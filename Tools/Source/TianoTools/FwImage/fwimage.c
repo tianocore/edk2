@@ -165,7 +165,7 @@ Returns:
   ULONG             Index;
   ULONG             Index1;
   BOOLEAN           TimeStampPresent;
-  UINTN                                 RelocSize;
+  UINTN                                 AllignedRelocSize;
   UINTN                                 Delta;
   EFI_IMAGE_SECTION_HEADER              *SectionHeader;
   UINT8      *FileBuffer;
@@ -356,7 +356,6 @@ Returns:
     PeHdr->FileHeader.TimeDateStamp = (UINT32) TimeStamp;
   }
 
-  RelocSize = 0;
   if (PeHdr->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     Optional32 = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHdr->OptionalHeader;
     Optional32->MajorLinkerVersion          = 0;
@@ -401,10 +400,29 @@ Returns:
       if (Optional32->DataDirectory[5].Size != 0) {
         SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
         for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+          //
+          // Look for the Section Header that starts as the same virtual address as the Base Relocation Data Directory
+          //
           if (SectionHeader->VirtualAddress == Optional32->DataDirectory[5].VirtualAddress) {
-            FileLength = SectionHeader->PointerToRawData + Optional32->DataDirectory[5].Size;
-            FileLength = (FileLength + 7) & 0xfffffff8;
-            RelocSize = FileLength - SectionHeader->PointerToRawData;
+            SectionHeader->Misc.VirtualSize = Optional32->DataDirectory[5].Size;
+            AllignedRelocSize = (Optional32->DataDirectory[5].Size + Optional32->FileAlignment - 1) & (~(Optional32->FileAlignment - 1));
+            //
+            // Check to see if there is zero padding at the end of the base relocations
+            //
+            if (AllignedRelocSize < SectionHeader->SizeOfRawData) {
+              //
+              // Check to see if the base relocations are at the end of the file
+              //
+              if (SectionHeader->PointerToRawData + SectionHeader->SizeOfRawData == Optional32->SizeOfImage) {
+                //
+                // All the required conditions are met to strip the zero padding of the end of the base relocations section
+                //
+                Optional32->SizeOfImage -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
+                Optional32->SizeOfInitializedData -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
+                SectionHeader->SizeOfRawData = AllignedRelocSize;
+                FileLength = Optional32->SizeOfImage;
+              }
+            }
           }
         }
       }
@@ -454,22 +472,31 @@ Returns:
       if (Optional64->DataDirectory[5].Size != 0) {
         SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
         for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+          //
+          // Look for the Section Header that starts as the same virtual address as the Base Relocation Data Directory
+          //
           if (SectionHeader->VirtualAddress == Optional64->DataDirectory[5].VirtualAddress) {
-            FileLength = SectionHeader->PointerToRawData + Optional64->DataDirectory[5].Size;
-            FileLength = (FileLength + 7) & 0xfffffff8;
-            RelocSize = FileLength - SectionHeader->PointerToRawData;
+            SectionHeader->Misc.VirtualSize = Optional64->DataDirectory[5].Size;
+            AllignedRelocSize = (Optional64->DataDirectory[5].Size + Optional64->FileAlignment - 1) & (~(Optional64->FileAlignment - 1));
+            //
+            // Check to see if there is zero padding at the end of the base relocations
+            //
+            if (AllignedRelocSize < SectionHeader->SizeOfRawData) {
+              //
+              // Check to see if the base relocations are at the end of the file
+              //
+              if (SectionHeader->PointerToRawData + SectionHeader->SizeOfRawData == Optional64->SizeOfImage) {
+                //
+                // All the required conditions are met to strip the zero padding of the end of the base relocations section
+                //
+                Optional64->SizeOfImage -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
+                Optional64->SizeOfInitializedData -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
+                SectionHeader->SizeOfRawData = AllignedRelocSize;
+                FileLength = Optional64->SizeOfImage;
+              }
+            }
           }
         }
-      }
-    }
-  }
-
-  if (RelocSize != 0) {
-    SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
-    for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
-      if (strcmp(SectionHeader->Name, ".reloc") == 0) {
-        SectionHeader->Misc.VirtualSize = (RelocSize + 0x1f) & 0xffffffe0;
-        SectionHeader->SizeOfRawData = RelocSize;
       }
     }
   }
