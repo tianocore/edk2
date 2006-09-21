@@ -34,6 +34,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
+import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.Externs.ExternsIdentification;
 
 /**
@@ -60,11 +61,9 @@ public class ExternsDlg extends IDialog implements ItemListener {
 
     private JScrollPane jScrollPane = null;
 
-    private JComboBox jComboBoxPcdIsDriver = null;
+    private JLabel jLabelSpecification = null;
 
-    private JLabel jLabelC_Name = null;
-
-    private JTextField jTextFieldC_Name = null;
+    private JTextField jTextFieldSpecification = null;
 
     private JLabel jLabelFeatureFlag = null;
 
@@ -77,6 +76,58 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JButton jButtonOk = null;
 
     private JButton jButtonCancel = null;
+
+    private StarLabel jStarLabel1 = null;
+
+    private JPanel jPanelSpecification = null;
+
+    private JPanel jPanelImage = null;
+
+    private JPanel jPanelDriver = null;
+
+    private JPanel jPanelLibrary = null;
+
+    private JPanel jPanelCallBack = null;
+
+    private JLabel jLabelModuleEntryPoint = null;
+
+    private JTextField jTextFieldModuleEntryPoint = null;
+
+    private JLabel jLabelModuleUnloadImage = null;
+
+    private JTextField jTextFieldModuleUnloadImage = null;
+
+    private JLabel jLabelDriverBinding = null;
+
+    private JTextField jTextFieldDriverBinding = null;
+
+    private JLabel jLabelComponentName = null;
+
+    private JTextField jTextFieldComponentName = null;
+
+    private JLabel jLabelDriverConfig = null;
+
+    private JTextField jTextFieldDriverConfig = null;
+
+    private JLabel jLabelDriverDiagnostic = null;
+
+    private JTextField jTextFieldDriverDiagnostic = null;
+
+    private JLabel jLabelConstructor = null;
+
+    private JTextField jTextFieldConstructor = null;
+
+    private JLabel jLabelDestructor = null;
+
+    private JTextField jTextFieldDestructor = null;
+
+    private JLabel jLabelVirtualAddressMap = null;
+
+    private JTextField jTextFieldVirtualAddressMap = null;
+
+    private JLabel jLabelExitBootServices = null;
+
+    private JTextField jTextFieldExitBootServices = null;
 
     //
     // Not used by UI
@@ -115,34 +166,18 @@ public class ExternsDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jComboBoxPcdIsDriver	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
-    private JComboBox getJComboBoxPcdIsDriver() {
-        if (jComboBoxPcdIsDriver == null) {
-            jComboBoxPcdIsDriver = new JComboBox();
-            jComboBoxPcdIsDriver.setLocation(new java.awt.Point(168, 37));
-            jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxPcdIsDriver.setSize(new java.awt.Dimension(320, 20));
-            jComboBoxPcdIsDriver.addItemListener(this);
-        }
-        return jComboBoxPcdIsDriver;
-    }
-
-    /**
      This method initializes jTextFieldC_Name	
      
      @return javax.swing.JTextField	
      
      **/
-    private JTextField getJTextFieldC_Name() {
-        if (jTextFieldC_Name == null) {
-            jTextFieldC_Name = new JTextField();
-            jTextFieldC_Name.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
-            jTextFieldC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+    private JTextField getJTextFieldSpecification() {
+        if (jTextFieldSpecification == null) {
+            jTextFieldSpecification = new JTextField();
+            jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(168, 0, 320, 20));
         }
-        return jTextFieldC_Name;
+        return jTextFieldSpecification;
     }
 
     /**
@@ -170,7 +205,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(300, 122, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(300, 187, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -186,11 +221,271 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(400, 122, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(400, 187, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
         return jButtonCancel;
+    }
+
+    /**
+     * This method initializes jPanelSpecification	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSpecification() {
+        if (jPanelSpecification == null) {
+            jPanelSpecification = new JPanel();
+            jPanelSpecification.setBounds(new java.awt.Rectangle(0, 37, 505, 20));
+            jPanelSpecification.setLayout(null);
+
+            jLabelSpecification = new JLabel();
+            jLabelSpecification.setBounds(new java.awt.Rectangle(12, 0, 140, 20));
+            jLabelSpecification.setText("Specification Name");
+
+            jPanelSpecification.add(jLabelSpecification, null);
+            jPanelSpecification.add(getJTextFieldSpecification(), null);
+        }
+        return jPanelSpecification;
+    }
+
+    /**
+     * This method initializes jPanelImage	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelImage() {
+        if (jPanelImage == null) {
+            jLabelModuleUnloadImage = new JLabel();
+            jLabelModuleUnloadImage.setBounds(new java.awt.Rectangle(12, 25, 140, 20));
+            jLabelModuleUnloadImage.setText("Module Unload Image");
+            jLabelModuleEntryPoint = new JLabel();
+            jLabelModuleEntryPoint.setBounds(new java.awt.Rectangle(12, 0, 140, 20));
+            jLabelModuleEntryPoint.setText("Module Entry Point");
+            jPanelImage = new JPanel();
+            jPanelImage.setBounds(new java.awt.Rectangle(0, 37, 505, 45));
+            jPanelImage.setLayout(null);
+            jPanelImage.add(jLabelModuleEntryPoint, null);
+            jPanelImage.add(getJTextFieldModuleEntryPoint(), null);
+            jPanelImage.add(jLabelModuleUnloadImage, null);
+            jPanelImage.add(getJTextFieldModuleUnloadImage(), null);
+        }
+        return jPanelImage;
+    }
+
+    /**
+     * This method initializes jPanelDriver	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelDriver() {
+        if (jPanelDriver == null) {
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(0, 0));
+            jLabelDriverDiagnostic = new JLabel();
+            jLabelDriverDiagnostic.setBounds(new java.awt.Rectangle(12, 75, 140, 20));
+            jLabelDriverDiagnostic.setText("Driver Diagnostic");
+            jLabelDriverConfig = new JLabel();
+            jLabelDriverConfig.setBounds(new java.awt.Rectangle(12, 50, 140, 20));
+            jLabelDriverConfig.setText("Driver Config");
+            jLabelComponentName = new JLabel();
+            jLabelComponentName.setBounds(new java.awt.Rectangle(12, 25, 140, 20));
+            jLabelComponentName.setText("Component Name");
+            jLabelDriverBinding = new JLabel();
+            jLabelDriverBinding.setBounds(new java.awt.Rectangle(12, 0, 140, 20));
+            jLabelDriverBinding.setText("Driver Binding");
+            jPanelDriver = new JPanel();
+            jPanelDriver.setBounds(new java.awt.Rectangle(0, 37, 505, 95));
+            jPanelDriver.setLayout(null);
+            jPanelDriver.add(jStarLabel1, null);
+            jPanelDriver.add(jLabelDriverBinding, null);
+            jPanelDriver.add(getJTextFieldDriverBinding(), null);
+            jPanelDriver.add(jLabelComponentName, null);
+            jPanelDriver.add(getJTextFieldComponentName(), null);
+            jPanelDriver.add(jLabelDriverConfig, null);
+            jPanelDriver.add(getJTextFieldDriverConfig(), null);
+            jPanelDriver.add(jLabelDriverDiagnostic, null);
+            jPanelDriver.add(getJTextFieldDriverDiagnostic(), null);
+        }
+        return jPanelDriver;
+    }
+
+    /**
+     * This method initializes jPanelLibrary	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelLibrary() {
+        if (jPanelLibrary == null) {
+            jLabelDestructor = new JLabel();
+            jLabelDestructor.setBounds(new java.awt.Rectangle(12, 25, 140, 20));
+            jLabelDestructor.setText("Destructor");
+            jLabelConstructor = new JLabel();
+            jLabelConstructor.setBounds(new java.awt.Rectangle(12, 0, 140, 20));
+            jLabelConstructor.setText("Constructor");
+            jPanelLibrary = new JPanel();
+            jPanelLibrary.setBounds(new java.awt.Rectangle(0, 37, 505, 45));
+            jPanelLibrary.setLayout(null);
+            jPanelLibrary.add(jLabelConstructor, null);
+            jPanelLibrary.add(getJTextFieldConstructor(), null);
+            jPanelLibrary.add(jLabelDestructor, null);
+            jPanelLibrary.add(getJTextFieldDestructor(), null);
+        }
+        return jPanelLibrary;
+    }
+
+    /**
+     * This method initializes jPanelCallBack	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelCallBack() {
+        if (jPanelCallBack == null) {
+            jLabelExitBootServices = new JLabel();
+            jLabelExitBootServices.setBounds(new java.awt.Rectangle(12, 25, 140, 20));
+            jLabelExitBootServices.setText("Exit Boot Services");
+            jLabelVirtualAddressMap = new JLabel();
+            jLabelVirtualAddressMap.setBounds(new java.awt.Rectangle(12, 0, 140, 20));
+            jLabelVirtualAddressMap.setText("Virtual Address Map");
+            jPanelCallBack = new JPanel();
+            jPanelCallBack.setBounds(new java.awt.Rectangle(0, 37, 505, 45));
+            jPanelCallBack.setLayout(null);
+            jPanelCallBack.add(jLabelVirtualAddressMap, null);
+            jPanelCallBack.add(getJTextFieldVirtualAddressMap(), null);
+            jPanelCallBack.add(jLabelExitBootServices, null);
+            jPanelCallBack.add(getJTextFieldExitBootServices(), null);
+        }
+        return jPanelCallBack;
+    }
+
+    /**
+     * This method initializes jTextFieldModuleEntryPoint	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldModuleEntryPoint() {
+        if (jTextFieldModuleEntryPoint == null) {
+            jTextFieldModuleEntryPoint = new JTextField();
+            jTextFieldModuleEntryPoint.setBounds(new java.awt.Rectangle(168, 0, 320, 20));
+        }
+        return jTextFieldModuleEntryPoint;
+    }
+
+    /**
+     * This method initializes jTextFieldModuleUnloadImage	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldModuleUnloadImage() {
+        if (jTextFieldModuleUnloadImage == null) {
+            jTextFieldModuleUnloadImage = new JTextField();
+            jTextFieldModuleUnloadImage.setBounds(new java.awt.Rectangle(168, 25, 320, 20));
+        }
+        return jTextFieldModuleUnloadImage;
+    }
+
+    /**
+     * This method initializes jTextFieldDriverBinding	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldDriverBinding() {
+        if (jTextFieldDriverBinding == null) {
+            jTextFieldDriverBinding = new JTextField();
+            jTextFieldDriverBinding.setBounds(new java.awt.Rectangle(168, 0, 320, 20));
+        }
+        return jTextFieldDriverBinding;
+    }
+
+    /**
+     * This method initializes jTextFieldComponentName	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldComponentName() {
+        if (jTextFieldComponentName == null) {
+            jTextFieldComponentName = new JTextField();
+            jTextFieldComponentName.setBounds(new java.awt.Rectangle(168, 25, 320, 20));
+        }
+        return jTextFieldComponentName;
+    }
+
+    /**
+     * This method initializes jTextFieldDriverConfig	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldDriverConfig() {
+        if (jTextFieldDriverConfig == null) {
+            jTextFieldDriverConfig = new JTextField();
+            jTextFieldDriverConfig.setBounds(new java.awt.Rectangle(168, 50, 320, 20));
+        }
+        return jTextFieldDriverConfig;
+    }
+
+    /**
+     * This method initializes jTextFieldDriverDiagnostic	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldDriverDiagnostic() {
+        if (jTextFieldDriverDiagnostic == null) {
+            jTextFieldDriverDiagnostic = new JTextField();
+            jTextFieldDriverDiagnostic.setBounds(new java.awt.Rectangle(168, 75, 320, 20));
+        }
+        return jTextFieldDriverDiagnostic;
+    }
+
+    /**
+     * This method initializes jTextFieldConstructor	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldConstructor() {
+        if (jTextFieldConstructor == null) {
+            jTextFieldConstructor = new JTextField();
+            jTextFieldConstructor.setBounds(new java.awt.Rectangle(168, 0, 320, 20));
+        }
+        return jTextFieldConstructor;
+    }
+
+    /**
+     * This method initializes jTextFieldDestructor	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldDestructor() {
+        if (jTextFieldDestructor == null) {
+            jTextFieldDestructor = new JTextField();
+            jTextFieldDestructor.setBounds(new java.awt.Rectangle(168, 25, 320, 20));
+        }
+        return jTextFieldDestructor;
+    }
+
+    /**
+     * This method initializes jTextFieldVirtualAddressMap	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldVirtualAddressMap() {
+        if (jTextFieldVirtualAddressMap == null) {
+            jTextFieldVirtualAddressMap = new JTextField();
+            jTextFieldVirtualAddressMap.setBounds(new java.awt.Rectangle(168, 0, 320, 20));
+        }
+        return jTextFieldVirtualAddressMap;
+    }
+
+    /**
+     * This method initializes jTextFieldExitBootServices	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldExitBootServices() {
+        if (jTextFieldExitBootServices == null) {
+            jTextFieldExitBootServices = new JTextField();
+            jTextFieldExitBootServices.setBounds(new java.awt.Rectangle(168, 25, 320, 20));
+        }
+        return jTextFieldExitBootServices;
     }
 
     public static void main(String[] args) {
@@ -202,7 +497,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(515, 200);
+        this.setSize(515, 250);
         this.setContentPane(getJScrollPane());
         this.setTitle("Externs");
         initFrame();
@@ -221,14 +516,56 @@ public class ExternsDlg extends IDialog implements ItemListener {
         this.id = inExternsId;
 
         if (this.id != null) {
-            if (id.getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-                this.jComboBoxPcdIsDriver.setSelectedItem(id.getName());
-            } else {
-                this.jTextFieldC_Name.setText(id.getName());
-            }
-            this.jComboBoxType.setSelectedItem(id.getType());
+            String type = id.getType();
+            //
+            // Filter the type to lock down the type
+            //
+            this.jComboBoxType.removeAllItems();
+            this.jComboBoxType.addItem(type);
+
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
             this.jArchCheckBox.setSelectedItems(id.getSupArchList());
+
+            //
+            // Init specification
+            //
+            if (type.equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+                this.jTextFieldSpecification.setText(id.getName0());
+            }
+
+            //
+            // Init image
+            //
+            if (type.equals(EnumerationData.EXTERNS_IMAGE)) {
+                this.jTextFieldModuleEntryPoint.setText(id.getName0());
+                this.jTextFieldModuleUnloadImage.setText(id.getName1());
+            }
+
+            //
+            // Init library
+            //
+            if (type.equals(EnumerationData.EXTERNS_LIBRARY)) {
+                this.jTextFieldConstructor.setText(id.getName0());
+                this.jTextFieldDestructor.setText(id.getName1());
+            }
+
+            //
+            // Init driver
+            //
+            if (type.equals(EnumerationData.EXTERNS_DRIVER)) {
+                this.jTextFieldDriverBinding.setText(id.getName0());
+                this.jTextFieldComponentName.setText(id.getName1());
+                this.jTextFieldDriverConfig.setText(id.getName2());
+                this.jTextFieldDriverDiagnostic.setText(id.getName3());
+            }
+
+            //
+            // Init library
+            //
+            if (type.equals(EnumerationData.EXTERNS_CALL_BACK)) {
+                this.jTextFieldVirtualAddressMap.setText(id.getName0());
+                this.jTextFieldExitBootServices.setText(id.getName1());
+            }
         }
     }
 
@@ -255,23 +592,21 @@ public class ExternsDlg extends IDialog implements ItemListener {
             jArchCheckBox = new ArchCheckBox();
             jArchCheckBox.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-            jLabelC_Name = new JLabel();
-            jLabelC_Name.setBounds(new java.awt.Rectangle(12, 37, 140, 20));
-            jLabelC_Name.setText("Enter Value");
+
             jLabelName = new JLabel();
             jLabelName.setText("Choose Extern Type");
-            jLabelName.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
+            jLabelName.setBounds(new java.awt.Rectangle(12, 12, 155, 20));
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 62, 155, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 87, 155, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelFeatureFlag.setEnabled(false);
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(505, 155));
+            jContentPane.setPreferredSize(new java.awt.Dimension(505, 200));
 
             jContentPane.add(jLabelName, null);
             jContentPane.add(getJComboBoxType(), null);
@@ -279,12 +614,15 @@ public class ExternsDlg extends IDialog implements ItemListener {
             jContentPane.add(jLabelArch, null);
             jContentPane.add(getJTextFieldFeatureFlag(), null);
 
-            jContentPane.add(getJComboBoxPcdIsDriver(), null);
-            jContentPane.add(jLabelC_Name, null);
-            jContentPane.add(getJTextFieldC_Name(), null);
             jContentPane.add(jArchCheckBox, null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
+
+            jContentPane.add(getJPanelSpecification(), null);
+            jContentPane.add(getJPanelImage(), null);
+            jContentPane.add(getJPanelDriver(), null);
+            jContentPane.add(getJPanelLibrary(), null);
+            jContentPane.add(getJPanelCallBack(), null);
         }
         return jContentPane;
     }
@@ -295,7 +633,11 @@ public class ExternsDlg extends IDialog implements ItemListener {
      **/
     private void initFrame() {
         Tools.generateComboBoxByVector(this.jComboBoxType, ed.getVExternTypes());
-        Tools.generateComboBoxByVector(this.jComboBoxPcdIsDriver, ed.getVPcdDriverTypes());
+        this.jPanelSpecification.setVisible(true);
+        this.jPanelImage.setVisible(false);
+        this.jPanelLibrary.setVisible(false);
+        this.jPanelDriver.setVisible(false);
+        this.jPanelCallBack.setVisible(false);
     }
 
     /* (non-Javadoc)
@@ -307,7 +649,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource() == jButtonOk) {
             if (checkAdd()) {
-                getCurrentExterns();
+                this.getCurrentExterns();
                 this.returnType = DataType.RETURN_TYPE_OK;
                 this.setVisible(false);
             }
@@ -332,43 +674,132 @@ public class ExternsDlg extends IDialog implements ItemListener {
         //
 
         //
-        // When and only When type is not "Pcd Is Driver"
+        // Check specification
         //
-        if (!this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-            //
-            // Check CName 
-            //
-            if (isEmpty(this.jTextFieldC_Name.getText())) {
-                Log.wrn("Update Externs", "Value couldn't be empty");
+        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+            if (isEmpty(this.jTextFieldSpecification.getText())) {
+                Log.wrn("Update Externs", "Please type specification's name");
+                return false;
+            }
+            if (!DataValidation.isSentence(this.jTextFieldSpecification.getText())) {
+                Log.wrn("Update Externs", "Incorrect data type for Specification");
                 return false;
             }
 
-            if (!isEmpty(this.jTextFieldC_Name.getText())) {
-                if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
-                    if (!DataValidation.isSentence(this.jTextFieldC_Name.getText())) {
-                        Log.wrn("Update Externs", "Incorrect data type for Specification");
-                        return false;
-                    }
-                } else {
-                    if (!DataValidation.isC_NameType(this.jTextFieldC_Name.getText())) {
-                        Log.wrn("Update Externs", "Incorrect data type for C Name");
-                        return false;
-                    }
-                }
-            }
+            //
+            // No need to check feature flag, return true directly here.
+            //
+            return true;
+        }
 
-            //
-            // Check FeatureFlag
-            //
-            if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
-                if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                    Log.wrn("Update Externs", "Incorrect data type for Feature Flag");
+        //
+        // Check image
+        //
+        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_IMAGE)) {
+            if (isEmpty(this.jTextFieldModuleEntryPoint.getText())
+                && isEmpty(this.jTextFieldModuleUnloadImage.getText())) {
+                Log.wrn("Update Externs", "At least one of ModuleEntryPoint or ModuleUnloadImage should have a value");
+                return false;
+            }
+            if (!isEmpty(this.jTextFieldModuleEntryPoint.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldModuleEntryPoint.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Module Entry Point");
                     return false;
                 }
             }
-        } else {
-            if (this.jComboBoxPcdIsDriver.getSelectedItem().toString().equals(DataType.EMPTY_SELECT_ITEM)) {
-                Log.wrn("Update Externs", "You must select one PCD DRIVER type");
+            if (!isEmpty(this.jTextFieldModuleUnloadImage.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldModuleUnloadImage.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Module Unload Image");
+                    return false;
+                }
+            }
+        }
+
+        //
+        // Check library
+        //
+        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_LIBRARY)) {
+            if (isEmpty(this.jTextFieldConstructor.getText()) && isEmpty(this.jTextFieldDestructor.getText())) {
+                Log.wrn("Update Externs", "At least one of Constructor or Destructor should have a value");
+                return false;
+            }
+            if (!isEmpty(this.jTextFieldConstructor.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldConstructor.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Constructor");
+                    return false;
+                }
+            }
+            if (!isEmpty(this.jTextFieldDestructor.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldDestructor.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Destructor");
+                    return false;
+                }
+            }
+        }
+
+        //
+        // Check driver
+        //
+        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_DRIVER)) {
+            if (isEmpty(this.jTextFieldDriverBinding.getText())) {
+                Log.wrn("Update Externs", "DriverBinding must have a value");
+                return false;
+            }
+            if (!isEmpty(this.jTextFieldDriverBinding.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldDriverBinding.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for DriverBinding");
+                    return false;
+                }
+            }
+            if (!isEmpty(this.jTextFieldComponentName.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldComponentName.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for ComponentName");
+                    return false;
+                }
+            }
+            if (!isEmpty(this.jTextFieldDriverConfig.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldDriverConfig.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for DriverConfig");
+                    return false;
+                }
+            }
+            if (!isEmpty(this.jTextFieldDriverDiagnostic.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldDriverDiagnostic.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for DriverDiagnostic");
+                    return false;
+                }
+            }
+        }
+
+        //
+        // Check call back
+        //
+        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_CALL_BACK)) {
+            if (isEmpty(this.jTextFieldVirtualAddressMap.getText())
+                && isEmpty(this.jTextFieldExitBootServices.getText())) {
+                Log.wrn("Update Externs", "At least one of VirtualAddressMap or ExitBootServices should have a value");
+                return false;
+            }
+            if (!isEmpty(this.jTextFieldVirtualAddressMap.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldVirtualAddressMap.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Virtual Address Map");
+                    return false;
+                }
+            }
+            if (!isEmpty(this.jTextFieldExitBootServices.getText())) {
+                if (!DataValidation.isC_NameType(this.jTextFieldExitBootServices.getText())) {
+                    Log.wrn("Update Externs", "Incorrect data type for Exit Boot Services");
+                    return false;
+                }
+            }
+        }
+
+        //
+        // Check FeatureFlag
+        //
+        if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
+            if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
+                Log.wrn("Update Externs", "Incorrect data type for Feature Flag");
                 return false;
             }
         }
@@ -378,17 +809,45 @@ public class ExternsDlg extends IDialog implements ItemListener {
 
     private ExternsIdentification getCurrentExterns() {
         String arg0 = "";
-        if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-            arg0 = this.jComboBoxPcdIsDriver.getSelectedItem().toString();
-        } else {
-            arg0 = this.jTextFieldC_Name.getText();
+        String arg1 = "";
+        String arg2 = "";
+        String arg3 = "";
+
+        String type = this.jComboBoxType.getSelectedItem().toString();
+        String featureFlag = this.jTextFieldFeatureFlag.getText();
+        Vector<String> arch = this.jArchCheckBox.getSelectedItemsVector();
+
+        if (type.equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+            arg0 = this.jTextFieldSpecification.getText();
+            id = new ExternsIdentification(arg0, type);
         }
-        String arg1 = this.jComboBoxType.getSelectedItem().toString();
 
-        String arg2 = this.jTextFieldFeatureFlag.getText();
-        Vector<String> arg3 = this.jArchCheckBox.getSelectedItemsVector();
+        if (type.equals(EnumerationData.EXTERNS_IMAGE)) {
+            arg0 = this.jTextFieldModuleEntryPoint.getText();
+            arg1 = this.jTextFieldModuleUnloadImage.getText();
+            id = new ExternsIdentification(arg0, arg1, type, featureFlag, arch);
+        }
 
-        id = new ExternsIdentification(arg0, arg1, arg2, arg3);
+        if (type.equals(EnumerationData.EXTERNS_LIBRARY)) {
+            arg0 = this.jTextFieldConstructor.getText();
+            arg1 = this.jTextFieldDestructor.getText();
+            id = new ExternsIdentification(arg0, arg1, type, featureFlag, arch);
+        }
+
+        if (type.equals(EnumerationData.EXTERNS_DRIVER)) {
+            arg0 = this.jTextFieldDriverBinding.getText();
+            arg1 = this.jTextFieldComponentName.getText();
+            arg2 = this.jTextFieldDriverConfig.getText();
+            arg3 = this.jTextFieldDriverDiagnostic.getText();
+            id = new ExternsIdentification(arg0, arg1, arg2, arg3, type, featureFlag, arch);
+        }
+
+        if (type.equals(EnumerationData.EXTERNS_CALL_BACK)) {
+            arg0 = this.jTextFieldVirtualAddressMap.getText();
+            arg1 = this.jTextFieldExitBootServices.getText();
+            id = new ExternsIdentification(arg0, arg1, type, featureFlag, arch);
+        }
+
         return id;
     }
 
@@ -400,19 +859,66 @@ public class ExternsDlg extends IDialog implements ItemListener {
      */
     public void itemStateChanged(ItemEvent arg0) {
         if (arg0.getSource() == jComboBoxType && arg0.getStateChange() == ItemEvent.SELECTED) {
-            if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-                this.jComboBoxPcdIsDriver.setVisible(true);
-                this.jTextFieldC_Name.setVisible(false);
+            if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+                this.jPanelSpecification.setVisible(true);
+                this.jPanelImage.setVisible(false);
+                this.jPanelLibrary.setVisible(false);
+                this.jPanelDriver.setVisible(false);
+                this.jPanelCallBack.setVisible(false);
                 this.jLabelArch.setEnabled(false);
                 this.jArchCheckBox.setAllItemsEnabled(false);
-            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
-                this.jLabelArch.setEnabled(false);
-                this.jArchCheckBox.setAllItemsEnabled(false);
-            } else {
-                this.jComboBoxPcdIsDriver.setVisible(false);
-                this.jTextFieldC_Name.setVisible(true);
+                this.jLabelArch.setLocation(12, 62);
+                this.jArchCheckBox.setLocation(168, 62);
+                this.jLabelFeatureFlag.setLocation(12, 87);
+                this.jTextFieldFeatureFlag.setLocation(168, 87);
+            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_IMAGE)) {
+                this.jPanelSpecification.setVisible(false);
+                this.jPanelImage.setVisible(true);
+                this.jPanelLibrary.setVisible(false);
+                this.jPanelDriver.setVisible(false);
+                this.jPanelCallBack.setVisible(false);
                 this.jLabelArch.setEnabled(true);
                 this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jLabelArch.setLocation(12, 87);
+                this.jArchCheckBox.setLocation(168, 87);
+                this.jLabelFeatureFlag.setLocation(12, 112);
+                this.jTextFieldFeatureFlag.setLocation(168, 112);
+            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_LIBRARY)) {
+                this.jPanelSpecification.setVisible(false);
+                this.jPanelImage.setVisible(false);
+                this.jPanelLibrary.setVisible(true);
+                this.jPanelDriver.setVisible(false);
+                this.jPanelCallBack.setVisible(false);
+                this.jLabelArch.setEnabled(true);
+                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jLabelArch.setLocation(12, 87);
+                this.jArchCheckBox.setLocation(168, 87);
+                this.jLabelFeatureFlag.setLocation(12, 112);
+                this.jTextFieldFeatureFlag.setLocation(168, 112);
+            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_DRIVER)) {
+                this.jPanelSpecification.setVisible(false);
+                this.jPanelImage.setVisible(false);
+                this.jPanelLibrary.setVisible(false);
+                this.jPanelDriver.setVisible(true);
+                this.jPanelCallBack.setVisible(false);
+                this.jLabelArch.setEnabled(true);
+                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jLabelArch.setLocation(12, 137);
+                this.jArchCheckBox.setLocation(168, 137);
+                this.jLabelFeatureFlag.setLocation(12, 162);
+                this.jTextFieldFeatureFlag.setLocation(168, 162);
+            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_CALL_BACK)) {
+                this.jPanelSpecification.setVisible(false);
+                this.jPanelImage.setVisible(false);
+                this.jPanelLibrary.setVisible(false);
+                this.jPanelDriver.setVisible(false);
+                this.jPanelCallBack.setVisible(true);
+                this.jLabelArch.setEnabled(true);
+                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jLabelArch.setLocation(12, 87);
+                this.jArchCheckBox.setLocation(168, 87);
+                this.jLabelFeatureFlag.setLocation(12, 112);
+                this.jTextFieldFeatureFlag.setLocation(168, 112);
             }
         }
     }

@@ -29,7 +29,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 
 import org.tianocore.ExternsDocument;
-import org.tianocore.PcdDriverTypes;
 import org.tianocore.ExternsDocument.Externs;
 import org.tianocore.ExternsDocument.Externs.Extern;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
@@ -184,8 +183,9 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
             jTable = new JTable(model);
             jTable.setRowHeight(20);
 
-            model.addColumn("Name");
             model.addColumn("Type");
+            model.addColumn("Name");
+            model.addColumn("Value");
 
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(this);
@@ -193,10 +193,6 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
             jTable.addMouseListener(this);
         }
         return jTable;
-    }
-
-    public static void main(String[] args) {
-
     }
 
     /**
@@ -222,17 +218,6 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
 
         if (this.externs != null) {
             //
-            // Get PcdIsDriver
-            //
-            if (this.externs.getPcdIsDriver() != null) {
-                String arg0 = this.externs.getPcdIsDriver().toString();
-                String arg1 = EnumerationData.EXTERNS_PCD_IS_DRIVER;
-
-                id = new ExternsIdentification(arg0, arg1, null, null);
-                vid.addExterns(id);
-            }
-
-            //
             // Get specification
             //
             if (this.externs.getSpecificationList().size() > 0) {
@@ -240,7 +225,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
                     String arg0 = externs.getSpecificationList().get(index);
                     String arg1 = EnumerationData.EXTERNS_SPECIFICATION;
 
-                    id = new ExternsIdentification(arg0, arg1, null, null);
+                    id = new ExternsIdentification(arg0, arg1);
                     vid.addExterns(id);
                 }
             }
@@ -250,57 +235,63 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
             //
             if (this.externs.getExternList().size() > 0) {
                 for (int index = 0; index < this.externs.getExternList().size(); index++) {
-                    String arg0 = null;
-                    String arg1 = null;
-                    if (this.externs.getExternList().get(index).getModuleEntryPoint() != null) {
-                        arg0 = this.externs.getExternList().get(index).getModuleEntryPoint();
-                        arg1 = EnumerationData.EXTERNS_MODULE_ENTRY_POINT;
-                    }
-                    if (this.externs.getExternList().get(index).getModuleUnloadImage() != null) {
-                        arg0 = this.externs.getExternList().get(index).getModuleUnloadImage();
-                        arg1 = EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE;
-                    }
-
-                    if (this.externs.getExternList().get(index).getConstructor() != null) {
-                        arg0 = this.externs.getExternList().get(index).getConstructor();
-                        arg1 = EnumerationData.EXTERNS_CONSTRUCTOR;
-                    }
-                    if (this.externs.getExternList().get(index).getDestructor() != null) {
-                        arg0 = this.externs.getExternList().get(index).getDestructor();
-                        arg1 = EnumerationData.EXTERNS_DESTRUCTOR;
-                    }
-
-                    if (this.externs.getExternList().get(index).getDriverBinding() != null) {
-                        arg0 = this.externs.getExternList().get(index).getDriverBinding();
-                        arg1 = EnumerationData.EXTERNS_DRIVER_BINDING;
-                    }
-                    if (this.externs.getExternList().get(index).getComponentName() != null) {
-                        arg0 = this.externs.getExternList().get(index).getComponentName();
-                        arg1 = EnumerationData.EXTERNS_COMPONENT_NAME;
-                    }
-                    if (this.externs.getExternList().get(index).getDriverConfig() != null) {
-                        arg0 = this.externs.getExternList().get(index).getDriverConfig();
-                        arg1 = EnumerationData.EXTERNS_DRIVER_CONFIG;
-                    }
-                    if (this.externs.getExternList().get(index).getDriverDiag() != null) {
-                        arg0 = this.externs.getExternList().get(index).getDriverDiag();
-                        arg1 = EnumerationData.EXTERNS_DRIVER_DIAG;
-                    }
-
-                    if (this.externs.getExternList().get(index).getSetVirtualAddressMapCallBack() != null) {
-                        arg0 = this.externs.getExternList().get(index).getSetVirtualAddressMapCallBack();
-                        arg1 = EnumerationData.EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK;
-                    }
-                    if (this.externs.getExternList().get(index).getExitBootServicesCallBack() != null) {
-                        arg0 = this.externs.getExternList().get(index).getExitBootServicesCallBack();
-                        arg1 = EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK;
-                    }
-
-                    String arg2 = externs.getExternList().get(index).getFeatureFlag();
-                    Vector<String> arg3 = Tools
+                    //
+                    // Get common data
+                    //
+                    String featureFlag = externs.getExternList().get(index).getFeatureFlag();
+                    Vector<String> arch = Tools
                                                .convertListToVector(externs.getExternList().get(index).getSupArchList());
 
-                    id = new ExternsIdentification(arg0, arg1, arg2, arg3);
+                    //
+                    // Get Image data
+                    //
+                    if (this.externs.getExternList().get(index).getModuleEntryPoint() != null
+                        || this.externs.getExternList().get(index).getModuleUnloadImage() != null) {
+                        String moduleEntryPoint = this.externs.getExternList().get(index).getModuleEntryPoint();
+                        String moduleUnloadImage = this.externs.getExternList().get(index).getModuleUnloadImage();
+                        String type = EnumerationData.EXTERNS_IMAGE;
+                        id = new ExternsIdentification(moduleEntryPoint, moduleUnloadImage, type, featureFlag, arch);
+                    }
+
+                    //
+                    // Get Library Data
+                    //
+                    if (this.externs.getExternList().get(index).getConstructor() != null
+                        || this.externs.getExternList().get(index).getDestructor() != null) {
+                        String constructor = this.externs.getExternList().get(index).getConstructor();
+                        String destructor = this.externs.getExternList().get(index).getDestructor();
+                        String type = EnumerationData.EXTERNS_LIBRARY;
+                        id = new ExternsIdentification(constructor, destructor, type, featureFlag, arch);
+                    }
+
+                    //
+                    // Get Driver Data
+                    //
+                    if (this.externs.getExternList().get(index).getDriverBinding() != null) {
+                        String driverBinding = this.externs.getExternList().get(index).getDriverBinding();
+                        String componentName = this.externs.getExternList().get(index).getComponentName();
+                        String driverConfig = this.externs.getExternList().get(index).getDriverConfig();
+                        String driverDiag = this.externs.getExternList().get(index).getDriverDiag();
+                        String type = EnumerationData.EXTERNS_DRIVER;
+                        id = new ExternsIdentification(driverBinding, componentName, driverConfig, driverDiag, type,
+                                                       featureFlag, arch);
+                    }
+
+                    //
+                    // Get Call Back Data
+                    //
+                    if (this.externs.getExternList().get(index).getSetVirtualAddressMapCallBack() != null
+                        || this.externs.getExternList().get(index).getExitBootServicesCallBack() != null) {
+                        String virtualAddressMap = this.externs.getExternList().get(index)
+                                                               .getSetVirtualAddressMapCallBack();
+                        String exitBootServices = this.externs.getExternList().get(index).getExitBootServicesCallBack();
+                        String type = EnumerationData.EXTERNS_CALL_BACK;
+                        id = new ExternsIdentification(virtualAddressMap, exitBootServices, type, featureFlag, arch);
+                    }
+
+                    //
+                    // Add id to vector
+                    //
                     vid.addExterns(id);
                 }
             }
@@ -391,7 +382,45 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
 
         if (vid.size() > 0) {
             for (int index = 0; index < vid.size(); index++) {
+                int line = 1;
+
+                //
+                // For Specification
+                //
+                if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+                    line = 1;
+                }
+
+                //
+                // For Image
+                //
+                if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_IMAGE)) {
+                    line = 2;
+                }
+
+                //
+                // For Library
+                //
+                if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_LIBRARY)) {
+                    line = 2;
+                }
+
+                //
+                // For Driver
+                //
+                if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER)) {
+                    line = 4;
+                }
+
+                //
+                // For Call Back
+                //
+                if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_CALL_BACK)) {
+                    line = 2;
+                }
+
                 model.addRow(vid.toStringVector(index));
+                jTable.setRowHeight(index, line * 18);
             }
         }
         this.jTable.repaint();
@@ -439,107 +468,116 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
         try {
             int count = this.vid.size();
 
-            this.externs = Externs.Factory.newInstance();
-            //            //
-            //            // Save PcdIsDriver first
-            //            //
-            //            if (!this.jComboBoxPcdIsDriver.getSelectedItem().toString().equals(DataType.EMPTY_SELECT_ITEM)) {
-            //                externs.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
-            //                                                                                              .toString()));
-            //            }
+            //
+            // Save pcd and flash map information first
+            //
+            Externs ex = Externs.Factory.newInstance();
+            if (this.externs.getPcdIsDriver() != null) {
+                ex.setPcdIsDriver(this.externs.getPcdIsDriver());
+            }
+            if (this.externs.getTianoR8FlashMapH()) {
+                ex.setTianoR8FlashMapH(this.externs.getTianoR8FlashMapH());
+            }
+            this.externs = ex;
 
+            //
+            // Save externs
+            //
             if (count > 0) {
                 for (int index = 0; index < count; index++) {
-                    //
-                    // Save Pcd Is Driver
-                    //
-                    if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-                        externs.setPcdIsDriver(PcdDriverTypes.Enum.forString(vid.getExterns(index).getName()));
-                        continue;
-                    }
-
                     //
                     // Save specfication
                     //
                     if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
-                        if (!isEmpty(vid.getExterns(index).getName())) {
+                        if (!isEmpty(vid.getExterns(index).getName0())) {
                             this.externs.addNewSpecification();
                             this.externs.setSpecificationArray(externs.getSpecificationList().size() - 1,
-                                                               vid.getExterns(index).getName());
+                                                               vid.getExterns(index).getName0());
+                            continue;
                         }
-                    } else {
-                        //
-                        // Save extern
-                        //
-                        Extern e = Extern.Factory.newInstance();
-
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_MODULE_ENTRY_POINT)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setModuleEntryPoint(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setModuleUnloadImage(vid.getExterns(index).getName());
-                            }
-                        }
-
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_CONSTRUCTOR)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setConstructor(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DESTRUCTOR)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setDestructor(vid.getExterns(index).getName());
-                            }
-                        }
-
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER_BINDING)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setDriverBinding(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_COMPONENT_NAME)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setComponentName(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER_CONFIG)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setDriverConfig(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER_DIAG)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setDriverDiag(vid.getExterns(index).getName());
-                            }
-                        }
-
-                        if (vid.getExterns(index).getType()
-                               .equals(EnumerationData.EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setSetVirtualAddressMapCallBack(vid.getExterns(index).getName());
-                            }
-                        }
-                        if (vid.getExterns(index).getType()
-                               .equals(EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK)) {
-                            if (!isEmpty(vid.getExterns(index).getName())) {
-                                e.setExitBootServicesCallBack(vid.getExterns(index).getName());
-                            }
-                        }
-
-                        if (!isEmpty(vid.getExterns(index).getFeatureFlag())) {
-                            e.setFeatureFlag(vid.getExterns(index).getFeatureFlag());
-                        }
-                        if (vid.getExterns(index).getSupArchList() != null
-                            && vid.getExterns(index).getSupArchList().size() > 0) {
-                            e.setSupArchList(vid.getExterns(index).getSupArchList());
-                        }
-
-                        this.externs.addNewExtern();
-                        this.externs.setExternArray(this.externs.getExternList().size() - 1, e);
                     }
+
+                    Extern e = Extern.Factory.newInstance();
+                    //
+                    // Save image
+                    //
+                    if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_IMAGE)) {
+                        if (!isEmpty(vid.getExterns(index).getName0()) || !isEmpty(vid.getExterns(index).getName1())) {
+                            e = Extern.Factory.newInstance();
+                            if (!isEmpty(vid.getExterns(index).getName0())) {
+                                e.setModuleEntryPoint(vid.getExterns(index).getName0());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName1())) {
+                                e.setModuleUnloadImage(vid.getExterns(index).getName1());
+                            }
+                        }
+                    }
+
+                    //
+                    // Save library
+                    //
+                    if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_LIBRARY)) {
+                        if (!isEmpty(vid.getExterns(index).getName0()) || !isEmpty(vid.getExterns(index).getName1())) {
+                            e = Extern.Factory.newInstance();
+                            if (!isEmpty(vid.getExterns(index).getName0())) {
+                                e.setConstructor(vid.getExterns(index).getName0());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName1())) {
+                                e.setDestructor(vid.getExterns(index).getName1());
+                            }
+                        }
+                    }
+
+                    //
+                    // Save call back
+                    //
+                    if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_CALL_BACK)) {
+                        if (!isEmpty(vid.getExterns(index).getName0()) || !isEmpty(vid.getExterns(index).getName1())) {
+                            e = Extern.Factory.newInstance();
+                            if (!isEmpty(vid.getExterns(index).getName0())) {
+                                e.setSetVirtualAddressMapCallBack(vid.getExterns(index).getName0());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName1())) {
+                                e.setExitBootServicesCallBack(vid.getExterns(index).getName1());
+                            }
+                        }
+                    }
+
+                    //
+                    // Save driver
+                    //
+                    if (vid.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER)) {
+                        if (!isEmpty(vid.getExterns(index).getName0()) || !isEmpty(vid.getExterns(index).getName1())
+                            || !isEmpty(vid.getExterns(index).getName2()) || !isEmpty(vid.getExterns(index).getName3())) {
+                            e = Extern.Factory.newInstance();
+                            if (!isEmpty(vid.getExterns(index).getName0())) {
+                                e.setDriverBinding(vid.getExterns(index).getName0());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName1())) {
+                                e.setComponentName(vid.getExterns(index).getName1());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName2())) {
+                                e.setDriverConfig(vid.getExterns(index).getName2());
+                            }
+                            if (!isEmpty(vid.getExterns(index).getName3())) {
+                                e.setDriverDiag(vid.getExterns(index).getName3());
+                            }
+                        }
+                    }
+
+                    //
+                    // Save common data
+                    //
+                    if (!isEmpty(vid.getExterns(index).getFeatureFlag())) {
+                        e.setFeatureFlag(vid.getExterns(index).getFeatureFlag());
+                    }
+                    if (vid.getExterns(index).getSupArchList() != null
+                        && vid.getExterns(index).getSupArchList().size() > 0) {
+                        e.setSupArchList(vid.getExterns(index).getSupArchList());
+                    }
+
+                    this.externs.addNewExtern();
+                    this.externs.setExternArray(this.externs.getExternList().size() - 1, e);
                 }
             }
 

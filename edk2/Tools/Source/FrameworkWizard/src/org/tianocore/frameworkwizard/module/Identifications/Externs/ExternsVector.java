@@ -16,6 +16,7 @@ package org.tianocore.frameworkwizard.module.Identifications.Externs;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 
 public class ExternsVector {
@@ -31,15 +32,6 @@ public class ExternsVector {
         return -1;
     }
 
-    public int findExterns(String name) {
-        for (int index = 0; index < vExterns.size(); index++) {
-            if (vExterns.elementAt(index).getName().equals(name)) {
-                return index;
-            }
-        }
-        return -1;
-    }
-
     public ExternsIdentification getExterns(int index) {
         if (index > -1) {
             return vExterns.elementAt(index);
@@ -49,21 +41,7 @@ public class ExternsVector {
     }
 
     public void addExterns(ExternsIdentification arg0) {
-        boolean isExistPcd = false;
-        if (arg0.getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-            for (int index = 0; index < size(); index++) {
-                if (getExterns(index).getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
-                    setExterns(arg0, index);
-                    isExistPcd = true;
-                    break;
-                }
-            }
-            if (!isExistPcd) {
-                vExterns.addElement(arg0);    
-            }
-        } else {
-            vExterns.addElement(arg0);
-        }
+        vExterns.addElement(arg0);
     }
 
     public void setExterns(ExternsIdentification arg0, int arg1) {
@@ -91,22 +69,106 @@ public class ExternsVector {
         vExterns = Externs;
     }
 
-    public Vector<String> getExternsName() {
-        Vector<String> v = new Vector<String>();
-        for (int index = 0; index < this.vExterns.size(); index++) {
-            v.addElement(vExterns.get(index).getName());
-        }
-        return v;
-    }
-
     public int size() {
         return this.vExterns.size();
     }
 
     public Vector<String> toStringVector(int index) {
         Vector<String> v = new Vector<String>();
-        v.addElement(getExterns(index).getName());
-        v.addElement(getExterns(index).getType());
+
+        //
+        // For Specification
+        //
+        if (this.getExterns(index).getType().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+            v.addElement(getExterns(index).getType());
+            v.addElement(getExterns(index).getType() + " Name");
+            v.addElement(getExterns(index).getName0());
+            return v;
+        }
+
+        //
+        // For Image
+        //
+        if (this.getExterns(index).getType().equals(EnumerationData.EXTERNS_IMAGE)) {
+            v.addElement(getExterns(index).getType());
+            String name = "";
+            String value = "";
+
+            name = EnumerationData.EXTERNS_MODULE_ENTRY_POINT;
+            value = this.getExterns(index).getName0();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName1()
+                    + DataType.HTML_LINE_SEPARATOR;
+
+            v.addElement("<html>" + name + "<html>");
+            v.addElement("<html>" + value + "<html>");
+            return v;
+        }
+
+        //
+        // For Library
+        //
+        if (this.getExterns(index).getType().equals(EnumerationData.EXTERNS_LIBRARY)) {
+            v.addElement(getExterns(index).getType());
+            String name = "";
+            String value = "";
+
+            name = EnumerationData.EXTERNS_CONSTRUCTOR;
+            value = this.getExterns(index).getName0();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_DESTRUCTOR;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName1()
+                    + DataType.HTML_LINE_SEPARATOR;
+
+            v.addElement("<html>" + name + "<html>");
+            v.addElement("<html>" + value + "<html>");
+            return v;
+        }
+
+        //
+        // For Driver
+        //
+        if (this.getExterns(index).getType().equals(EnumerationData.EXTERNS_DRIVER)) {
+            v.addElement(getExterns(index).getType());
+            String name = "";
+            String value = "";
+
+            name = EnumerationData.EXTERNS_DRIVER_BINDING;
+            value = this.getExterns(index).getName0();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_COMPONENT_NAME;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName1();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_DRIVER_CONFIG;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName2();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_DRIVER_DIAG;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName3()
+                    + DataType.HTML_LINE_SEPARATOR;
+
+            v.addElement("<html>" + name + "<html>");
+            v.addElement("<html>" + value + "<html>");
+            return v;
+        }
+
+        //
+        // For Call Back
+        //
+        if (this.getExterns(index).getType().equals(EnumerationData.EXTERNS_CALL_BACK)) {
+            v.addElement(getExterns(index).getType());
+            String name = "";
+            String value = "";
+
+            name = EnumerationData.EXTERNS_VIRTUAL_ADDRESS_MAP_CALL_BACK;
+            value = this.getExterns(index).getName0();
+            name = name + DataType.HTML_LINE_SEPARATOR + EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK;
+            value = value + DataType.HTML_LINE_SEPARATOR + this.getExterns(index).getName1()
+                    + DataType.HTML_LINE_SEPARATOR;
+
+            v.addElement("<html>" + name + "<html>");
+            v.addElement("<html>" + value + "<html>");
+            return v;
+        }
+
+        //
+        // Return a empty v
+        //
         return v;
     }
 }

@@ -27,6 +27,8 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.tianocore.frameworkwizard.common.Tools;
+
 /**
  The class is used to override Frame to provides customized interfaces 
  It extends JFrame implements ActionListener and WindowListener
@@ -228,10 +230,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener, Co
     
     **/
    public boolean isEmpty(String strValue) {
-       if (strValue.length() > 0) {
-           return false;
-       }
-       return true;
+       return Tools.isEmpty(strValue);
    }
    
    /**
