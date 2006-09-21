@@ -123,8 +123,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </Extern>
     <Extern>
       <DriverBinding>gPxeBcDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gPxeBcComponentName</ComponentName>
     </Extern>
   </Externs>

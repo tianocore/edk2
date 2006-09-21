@@ -93,11 +93,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gWinNtBlockIoDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gWinNtBlockIoComponentName</ComponentName>
-    </Extern>
-    <Extern>
       <DriverDiag>gWinNtBlockIoDriverDiagnostics</DriverDiag>
     </Extern>
   </Externs>

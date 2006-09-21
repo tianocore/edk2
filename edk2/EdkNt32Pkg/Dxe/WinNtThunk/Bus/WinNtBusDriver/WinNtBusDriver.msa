@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Version>1.0</Version>
     <Abstract>Win NT Bus driver</Abstract>
     <Description>
-      This following section documents the envirnoment variables for the Win NT 
-      build.  These variables are used to define the (virtual) hardware 
+      This following section documents the envirnoment variables for the Win NT
+      build.  These variables are used to define the (virtual) hardware
       configuration of the NT environment
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
@@ -123,8 +123,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gWinNtBusDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gWinNtBusDriverComponentName</ComponentName>
     </Extern>
   </Externs>
@@ -132,7 +130,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD declares the title string of the text console window. 
+      <HelpText>This PCD declares the title string of the text console window.
         such as "My EFI Console".
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
@@ -151,21 +149,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the windows directory who will be mounted as 
+      <HelpText>This PCD defines the windows directory who will be mounted as
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or 
+      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or
         removable media device
         The item type if this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines physical disk which will be simualted as a 
+      <HelpText>This PCD defines physical disk which will be simualted as a
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>

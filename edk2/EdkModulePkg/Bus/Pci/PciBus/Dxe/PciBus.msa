@@ -157,8 +157,6 @@
     </Extern>
     <Extern>
       <DriverBinding>gPciBusDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gPciBusComponentName</ComponentName>
     </Extern>
   </Externs>

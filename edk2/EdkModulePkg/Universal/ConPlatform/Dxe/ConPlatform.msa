@@ -130,14 +130,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gConPlatformTextInDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConPlatformComponentName</ComponentName>
     </Extern>
     <Extern>
       <DriverBinding>gConPlatformTextOutDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConPlatformComponentName</ComponentName>
     </Extern>
   </Externs>
