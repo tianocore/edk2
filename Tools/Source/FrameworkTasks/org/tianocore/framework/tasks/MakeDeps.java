@@ -31,6 +31,7 @@ import org.apache.tools.ant.types.Commandline;
 import org.apache.tools.ant.types.Path;
 
 import org.tianocore.common.logger.EdkLog;
+import org.tianocore.common.cache.FileTimeStamp;
 
 /**
  Class MakeDeps is used to wrap MakeDeps.exe as an ANT task.
@@ -233,12 +234,12 @@ public class MakeDeps extends Task {
         // If the source file(s) is newer than dependency list file, we need to
         // re-generate the dependency list file
         //
-        long depsFileTimeStamp = df.lastModified();
+        long depsFileTimeStamp = FileTimeStamp.get(dfName);
         List<String> fileList = inputFileList.getNameList();
         for (int i = 0, length = fileList.size(); i < length; ++i) {
-            File sf = new File(fileList.get(i));
-            if (sf.lastModified() > depsFileTimeStamp) {
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, sf.getPath() + " has been changed since last build!");
+            String sf = fileList.get(i);
+            if (FileTimeStamp.get(sf) > depsFileTimeStamp) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, sf + " has been changed since last build!");
                 return false;
             }
         }
@@ -279,7 +280,7 @@ public class MakeDeps extends Task {
                 // If a file cannot be found (moved or removed) or newer, regenerate the dep file
                 // 
                 File sourceFile = new File(line);
-                if ((!sourceFile.exists()) || (sourceFile.lastModified() > depsFileTimeStamp)) {
+                if ((!sourceFile.exists()) || (FileTimeStamp.get(line) > depsFileTimeStamp)) {
                     EdkLog.log(this, EdkLog.EDK_VERBOSE, sourceFile.getPath() + " has been (re)moved or changed since last build!");
                     ret = false;
                     break;
