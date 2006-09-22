@@ -68,11 +68,9 @@ public class Log {
         try {
             //Log.log("Test", "test");
             //Log.err("Test1", "test1");
-            Log.wrn("1");
             Log
-               .wrn(
-                    "aaa bbbbbb cccccccccccc ddddddddddd eeeeeeeeee fffffffffff gggggggggggggggggg hhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
-                    "iiiiii jjjj kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk lll mmm nn poooooooooooooooooooooooooooooooooooooooooooop");
+               .wrn("aaa bbbbbb cccccccccccc ddddddddddd eeeeeeeeee fffffffffff gggggggggggggggggg hhhhhhhhhhhhhhhhhhhhhhhhhhhhh iiiii jjjj kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk lll mmm nn poooooooooooooooooooooooooooooooooooooooooooop");
+            Log.wrn("Incorrect data type for ModuleEntryPoint");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,7 +174,8 @@ public class Log {
      **/
     private static void showWrnMessage(String strErr) {
         String strReturn = Tools.wrapStringByWord(strErr);
-        JOptionPane.showConfirmDialog(null, strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        JOptionPane
+                   .showConfirmDialog(null, strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
