@@ -283,7 +283,7 @@ public class ModuleGuids extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        GuidsDlg dlg = new GuidsDlg(vid.getGuids(index), new IFrame());
+        GuidsDlg dlg = new GuidsDlg(vid.getGuids(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

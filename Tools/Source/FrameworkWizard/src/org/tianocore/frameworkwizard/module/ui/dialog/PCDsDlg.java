@@ -36,8 +36,10 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -307,9 +309,19 @@ public class PCDsDlg extends IDialog implements ItemListener {
      * @param inPcdCodedId
      * 
      */
-    private void init(PcdCodedIdentification inPcdCodedId) {
+    private void init(PcdCodedIdentification inPcdCodedId, ModuleIdentification mid) {
         init();
         this.id = inPcdCodedId;
+        
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log.wrn("Init Pcd", "This module hasn't defined any package dependency, so there is no pcd can be added");
+        }
+
+        pcd = wt.getAllPcdDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid));
+        for (int index = 0; index < pcd.size(); index++) {
+            jComboBoxCName.addItem(pcd.getPcd(index));
+        }
 
         if (this.id != null) {
             for (int index = 0; index < this.jComboBoxCName.getItemCount(); index++) {
@@ -335,9 +347,9 @@ public class PCDsDlg extends IDialog implements ItemListener {
      * @param iFrame
      * 
      */
-    public PCDsDlg(PcdCodedIdentification inPcdCodedId, IFrame iFrame) {
+    public PCDsDlg(PcdCodedIdentification inPcdCodedId, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inPcdCodedId);
+        init(inPcdCodedId, mid);
     }
 
     /**
@@ -441,10 +453,6 @@ public class PCDsDlg extends IDialog implements ItemListener {
      * 
      */
     private void initFrame() {
-        for (int index = 0; index < pcd.size(); index++) {
-            jComboBoxCName.addItem(pcd.getPcd(index));
-        }
-
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVPcdUsage());
     }
 
@@ -486,6 +494,11 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         // Check C_Name
         //
+        if (this.jComboBoxCName.getSelectedItem() == null) {
+            Log.wrn("Update Pcd", "Please select one Pcd Name");
+            return false;
+        }
+
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update PcdCoded", "Incorrect data type for C Name");

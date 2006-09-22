@@ -33,7 +33,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Guids.GuidsIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -255,9 +257,17 @@ public class GuidsDlg extends IDialog {
      * @param inGuidsId
      * 
      */
-    private void init(GuidsIdentification inGuidsId) {
+    private void init(GuidsIdentification inGuidsId, ModuleIdentification mid) {
         init();
         this.id = inGuidsId;
+        
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log.wrn("Init Guid", "This module hasn't defined any package dependency, so there is no guid can be added");
+        }
+
+        Tools.generateComboBoxByVector(this.jComboBoxCName,
+                                       wt.getAllGuidDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid)));
 
         if (this.id != null) {
             this.jComboBoxCName.setSelectedItem(id.getName());
@@ -275,9 +285,9 @@ public class GuidsDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public GuidsDlg(GuidsIdentification inGuidsIdentification, IFrame iFrame) {
+    public GuidsDlg(GuidsIdentification inGuidsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inGuidsIdentification);
+        init(inGuidsIdentification, mid);
     }
 
     /**
@@ -356,7 +366,6 @@ public class GuidsDlg extends IDialog {
      * 
      */
     private void initFrame() {
-        Tools.generateComboBoxByVector(jComboBoxCName, wt.getAllGuidDeclarationsFromWorkspace());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVGuidUsage());
     }
 
@@ -398,6 +407,11 @@ public class GuidsDlg extends IDialog {
         //
         // Check Name
         //
+        if (this.jComboBoxCName.getSelectedItem() == null) {
+            Log.wrn("Update Guids", "Please select one Guid Name");
+            return false;
+        }
+
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update Guids", "Incorrect data type for Guid Name");

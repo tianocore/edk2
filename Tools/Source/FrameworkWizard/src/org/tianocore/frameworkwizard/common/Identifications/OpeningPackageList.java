@@ -171,6 +171,22 @@ public class OpeningPackageList {
         return null;
     }
     
+    public PackageIdentification getIdByGuidVersion(String guid, String version) {
+        for (int index = 0; index < vOpeningPackageList.size(); index++) {
+            PackageIdentification id = vOpeningPackageList.elementAt(index).getId();
+            if (version != null) {
+                if (id.getGuid().equals(guid) && id.getVersion().equals(version)) {
+                    return id;
+                }
+            } else {
+                if (id.getGuid().equals(guid)) {
+                    return id;
+                }
+            }
+        }
+        return null;
+    }
+    
     public void setNew(PackageIdentification id, boolean isNew) {
         int index = findIndexOfListById(id);
         if (index > -1) {

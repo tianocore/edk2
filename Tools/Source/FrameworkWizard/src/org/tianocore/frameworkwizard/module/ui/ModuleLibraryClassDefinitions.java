@@ -340,7 +340,7 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        LibraryClassDefsDlg mcdd = new LibraryClassDefsDlg(vLibraryClass.getLibraryClass(index), new IFrame());
+        LibraryClassDefsDlg mcdd = new LibraryClassDefsDlg(vLibraryClass.getLibraryClass(index), new IFrame(), omt.getId());
         int result = mcdd.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

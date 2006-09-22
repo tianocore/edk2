@@ -35,7 +35,9 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -302,9 +304,9 @@ public class LibraryClassDefsDlg extends IDialog {
      This is the default constructor
      
      **/
-    public LibraryClassDefsDlg(LibraryClassIdentification inLibraryClassIdentification, IFrame iFrame) {
+    public LibraryClassDefsDlg(LibraryClassIdentification inLibraryClassIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inLibraryClassIdentification);
+        init(inLibraryClassIdentification, mid);
     }
 
     /**
@@ -324,9 +326,18 @@ public class LibraryClassDefsDlg extends IDialog {
      This method initializes this
      
      **/
-    private void init(LibraryClassIdentification inLibraryClassIdentification) {
+    private void init(LibraryClassIdentification inLibraryClassIdentification, ModuleIdentification mid) {
         init();
         this.lcid = inLibraryClassIdentification;
+        
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log.wrn("Init Library Class", "This module hasn't defined any package dependency, so there is no library class can be added");
+        }
+        
+        Tools.generateComboBoxByVector(this.jComboBoxLibraryClassName,
+                                       wt.getAllLibraryClassDefinitionsFromPackages(wt.getPackageDependenciesOfModule(mid)));
+
         if (lcid != null) {
             this.jComboBoxLibraryClassName.setSelectedItem(lcid.getLibraryClassName());
             this.jComboBoxUsage.setSelectedItem(lcid.getUsage());
@@ -430,7 +441,6 @@ public class LibraryClassDefsDlg extends IDialog {
      
      **/
     private void initFrame() {
-        Tools.generateComboBoxByVector(jComboBoxLibraryClassName, wt.getAllLibraryClassDefinitionsFromWorkspace());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVLibraryUsage());
         this.iCheckBoxListModule.setAllItems(ed.getVFrameworkModuleTypes());
     }
@@ -472,7 +482,7 @@ public class LibraryClassDefsDlg extends IDialog {
         // Check LibraryClass
         //
         if (this.jComboBoxLibraryClassName.getSelectedItem() == null) {
-            Log.wrn("Update Library Class Definitions", "No Library Class can be added");
+            Log.wrn("Update Library Class Definitions", "Please select one Library Class");
             return false;
         }
         if (!DataValidation.isLibraryClass(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {

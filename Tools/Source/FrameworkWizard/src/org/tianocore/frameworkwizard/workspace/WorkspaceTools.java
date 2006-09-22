@@ -25,6 +25,7 @@ import org.tianocore.DbPathAndFilename;
 import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
+import org.tianocore.PackageDependenciesDocument.PackageDependencies;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.SourceFilesDocument.SourceFiles;
@@ -327,7 +328,7 @@ public class WorkspaceTools {
                         }
                     }
                     if (!isFind) {
-                        v.addElement(id);    
+                        v.addElement(id);
                     }
                 }
             }
@@ -466,6 +467,20 @@ public class WorkspaceTools {
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
+    
+    public Vector<String> getAllLibraryClassDefinitionsFromPackages(Vector<PackageIdentification> vpid) {
+        Vector<String> vector = new Vector<String>();
+        for (int index = 0; index < vpid.size(); index++) {
+            Vector<String> v = getAllLibraryClassDefinitionsFromPackage(GlobalData.openingPackageList
+                                                                                                     .getPackageSurfaceAreaFromId(vpid.get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
+            }
+
+        }
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        return vector;
+    }
 
     public Vector<String> getAllProtocolDeclarationsFromWorkspace() {
         Vector<String> vector = new Vector<String>();
@@ -481,12 +496,40 @@ public class WorkspaceTools {
         return vector;
     }
 
+    public Vector<String> getAllProtocolDeclarationsFromPackages(Vector<PackageIdentification> vpid) {
+        Vector<String> vector = new Vector<String>();
+        for (int index = 0; index < vpid.size(); index++) {
+            Vector<String> v = getAllProtocolDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                                  .getPackageSurfaceAreaFromId(vpid
+                                                                                                                                   .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
+            }
+        }
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        return vector;
+    }
+
     public Vector<String> getAllPpiDeclarationsFromWorkspace() {
         Vector<String> vector = new Vector<String>();
         for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
             Vector<String> v = getAllPpiDeclarationsFromPackage(GlobalData.openingPackageList
                                                                                              .getPackageSurfaceAreaFromId(GlobalData.vPackageList
                                                                                                                                                  .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
+            }
+        }
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        return vector;
+    }
+
+    public Vector<String> getAllPpiDeclarationsFromPackages(Vector<PackageIdentification> vpid) {
+        Vector<String> vector = new Vector<String>();
+        for (int index = 0; index < vpid.size(); index++) {
+            Vector<String> v = getAllPpiDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                             .getPackageSurfaceAreaFromId(vpid
+                                                                                                                              .get(index)));
             if (v != null && v.size() > 0) {
                 vector.addAll(v);
             }
@@ -510,12 +553,42 @@ public class WorkspaceTools {
         return vector;
     }
 
+    public Vector<String> getAllGuidDeclarationsFromPackages(Vector<PackageIdentification> vpid) {
+        Vector<String> vector = new Vector<String>();
+        for (int index = 0; index < vpid.size(); index++) {
+            Vector<String> v = getAllGuidDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                              .getPackageSurfaceAreaFromId(vpid
+                                                                                                                               .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
+            }
+
+        }
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        return vector;
+    }
+
     public PcdVector getAllPcdDeclarationsFromWorkspace() {
         PcdVector vector = new PcdVector();
         for (int index = 0; index < GlobalData.openingPackageList.size(); index++) {
             PcdVector v = getAllPcdDeclarationsFromPackage(GlobalData.openingPackageList
                                                                                         .getPackageSurfaceAreaFromId(GlobalData.vPackageList
                                                                                                                                             .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
+            }
+
+        }
+        Sort.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
+        return vector;
+    }
+
+    public PcdVector getAllPcdDeclarationsFromPackages(Vector<PackageIdentification> vpid) {
+        PcdVector vector = new PcdVector();
+        for (int index = 0; index < vpid.size(); index++) {
+            PcdVector v = getAllPcdDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                        .getPackageSurfaceAreaFromId(vpid
+                                                                                                                         .get(index)));
             if (v != null && v.size() > 0) {
                 vector.addAll(v);
             }
@@ -704,5 +777,31 @@ public class WorkspaceTools {
         }
 
         return v;
+    }
+
+    /**
+     Get a module's all package dependencies
+     
+     @param mid The module id
+     @return A vector of all package dependency ids
+     
+     **/
+    public Vector<PackageIdentification> getPackageDependenciesOfModule(ModuleIdentification mid) {
+        Vector<PackageIdentification> vpid = new Vector<PackageIdentification>();
+        ModuleSurfaceArea msa = GlobalData.openingModuleList.getModuleSurfaceAreaFromId(mid);
+        if (msa != null) {
+            PackageDependencies pd = msa.getPackageDependencies();
+            if (pd != null) {
+                for (int index = 0; index < pd.getPackageList().size(); index++) {
+                    String guid = pd.getPackageList().get(index).getPackageGuid();
+                    String version = pd.getPackageList().get(index).getPackageVersion();
+                    PackageIdentification pid = GlobalData.openingPackageList.getIdByGuidVersion(guid, version);
+                    if (pid != null) {
+                        vpid.addElement(pid);
+                    }
+                }
+            }
+        }
+        return vpid;
     }
 }
