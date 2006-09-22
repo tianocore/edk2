@@ -19,7 +19,7 @@ import java.util.regex.*;
 import org.tianocore.*;
 
 public final class ModuleReader implements Common.ForDoAll {
-	private static final ModuleReader modulereader = new ModuleReader();
+    private static final ModuleReader modulereader = new ModuleReader();
     private ModuleInfo mi;
     private final CommentLaplace commentlaplace = new CommentLaplace();
     
@@ -113,7 +113,7 @@ public final class ModuleReader implements Common.ForDoAll {
             if (mtrsection.group(1).contains("sources.")) {
                 mtrfilename = ptnfilename.matcher(mtrsection.group(2));
                 while (mtrfilename.find()) {
-                	mi.infsources.add(mtrfilename.group());
+                    mi.infsources.add(mtrfilename.group());
                     if (!mi.localmodulesources.contains(mtrfilename.group())) {
                         MigrationTool.ui.println("Warn: Source File Missing! : " + mtrfilename.group());
                     }
@@ -122,45 +122,45 @@ public final class ModuleReader implements Common.ForDoAll {
             if (mtrsection.group(1).matches("includes.")) {
                 mtrfilename = ptnfilename.matcher(mtrsection.group(2));
                 while (mtrfilename.find()) {
-                	mi.infincludes.add(mtrfilename.group());
+                    mi.infincludes.add(mtrfilename.group());
                 }
             }
         }
     }
     
     private final void preProcessModule() throws Exception {
-    	// according to .inf file, add extraordinary includes and sourcefiles
-        Common.dirCopy(mi.modulepath, mi.temppath);	// collect all Laplace.namechange to here???
+        // according to .inf file, add extraordinary includes and sourcefiles
+        Common.dirCopy(mi.modulepath, mi.temppath);    // collect all Laplace.namechange to here???
         
-    	if (!mi.infincludes.isEmpty()) {
+        if (!mi.infincludes.isEmpty()) {
             Iterator<String> it = mi.infincludes.iterator();
             String tempincludename = null;
-    		while (it.hasNext()) {
-    			tempincludename = it.next();
-    			if (tempincludename.contains("..")) {
-    				Matcher mtr = Common.PTNSEPARATER.matcher(tempincludename);
-    				if (mtr.find() && !mtr.group(2).matches(".")) {
-    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath, ".h");
-    				} else {
-    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1"), mi.temppath, ".h");
-    				}
-    			}
-    		}
-    	}
-    	if (!mi.infsources.isEmpty()) {
+            while (it.hasNext()) {
+                tempincludename = it.next();
+                if (tempincludename.contains("..")) {
+                    Matcher mtr = Common.PTNSEPARATER.matcher(tempincludename);
+                    if (mtr.find() && !mtr.group(2).matches(".")) {
+                        Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath, ".h");
+                    } else {
+                        Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1"), mi.temppath, ".h");
+                    }
+                }
+            }
+        }
+        if (!mi.infsources.isEmpty()) {
             Iterator<String> it = mi.infsources.iterator();
             String tempsourcename = null;
             while (it.hasNext()) {
-            	tempsourcename = it.next();
-            	if (tempsourcename.contains("..")) {
-            		Common.ensureDir(mi.temppath + File.separator + "MT_Parent_Sources");
-    				Matcher mtr = Common.PTNSEPARATER.matcher(tempsourcename);
-    				if (mtr.find()) {
-    					Common.fileCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath + File.separator + "MT_Parent_Sources" + File.separator + mtr.group(2));
-    				}
-            	}
+                tempsourcename = it.next();
+                if (tempsourcename.contains("..")) {
+                    Common.ensureDir(mi.temppath + File.separator + "MT_Parent_Sources");
+                    Matcher mtr = Common.PTNSEPARATER.matcher(tempsourcename);
+                    if (mtr.find()) {
+                        Common.fileCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath + File.separator + "MT_Parent_Sources" + File.separator + mtr.group(2));
+                    }
+                }
             }
-    	}
+        }
 
         //CommentOutNonLocalHFile();
         Common.toDoAll(mi.temppath, this, Common.FILE);
@@ -268,38 +268,38 @@ public final class ModuleReader implements Common.ForDoAll {
     
     public class CommentLaplace extends Common.Laplace {
         public String operation(String wholeline) {
-        	StringBuffer wholebuffer = new StringBuffer();
-        	String templine = null;
+            StringBuffer wholebuffer = new StringBuffer();
+            String templine = null;
             Pattern ptnincludefile = Pattern.compile("[\"<](.*[.]h)[\">]");
             Pattern ptninclude = Pattern.compile("#include\\s*(.*)");
             Matcher mtrinclude = ptninclude.matcher(wholeline);
             Matcher mtrincludefile = null;
             while (mtrinclude.find()) {
-            	mtrincludefile = ptnincludefile.matcher(mtrinclude.group(1));
-            	if (mtrincludefile.find() && mi.localmodulesources.contains(mtrincludefile.group(1))) {
-                	templine = mtrinclude.group();
-            	} else {
-                	templine = MigrationTool.MIGRATIONCOMMENT + mtrinclude.group();
-            	}
-            	mtrinclude.appendReplacement(wholebuffer, templine);
+                mtrincludefile = ptnincludefile.matcher(mtrinclude.group(1));
+                if (mtrincludefile.find() && mi.localmodulesources.contains(mtrincludefile.group(1))) {
+                    templine = mtrinclude.group();
+                } else {
+                    templine = MigrationTool.MIGRATIONCOMMENT + mtrinclude.group();
+                }
+                mtrinclude.appendReplacement(wholebuffer, templine);
             }
             mtrinclude.appendTail(wholebuffer);
             return wholebuffer.toString();
         }
         
         public boolean recognize(String filename) {
-        	return filename.contains(".c") || filename.contains(".h");
+            return filename.contains(".c") || filename.contains(".h");
         }
         
         public String namechange(String oldname) {
-        	return oldname;
+            return oldname;
         }
     }
 
     //-----------------------------------ForDoAll-----------------------------------//
     public void run(String filepath) throws Exception {
-    	String name = mi.temppath + File.separator + filepath.replace(mi.temppath + File.separator, "");
-    	commentlaplace.transform(name, name);
+        String name = mi.temppath + File.separator + filepath.replace(mi.temppath + File.separator, "");
+        commentlaplace.transform(name, name);
     }
 
     public boolean filter(File dir) {
@@ -308,11 +308,11 @@ public final class ModuleReader implements Common.ForDoAll {
     //-----------------------------------ForDoAll-----------------------------------//
     
     public final void setModuleInfo(ModuleInfo m) {
-    	mi = m;
+        mi = m;
     }
     
     public static final void aimAt(ModuleInfo mi) throws Exception {
-    	modulereader.setModuleInfo(mi);
-    	modulereader.ModuleScan();
+        modulereader.setModuleInfo(mi);
+        modulereader.ModuleScan();
     }
 }
