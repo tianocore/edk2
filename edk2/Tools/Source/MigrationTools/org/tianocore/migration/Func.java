@@ -23,8 +23,11 @@ public class Func {
     }
     Func(String[] linecontext) {
         r8funcname = linecontext[1];
-        r8libname = linecontext[0];
+        r8libname  = linecontext[0];
         r9funcname = linecontext[2];
+        if (r9funcname.contains("n/a")) {
+            r9funcname = "#error Unknown or missing library function in EDKII: " + r8funcname;
+        }
         r9libname = linecontext[3];
     }
     public String r8funcname;
