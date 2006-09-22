@@ -22,11 +22,11 @@ import org.apache.xmlbeans.*;
 public class MsaWriter implements MsaOwner {
 	MsaWriter(ModuleInfo moduleinfo) {
 		mi = moduleinfo;
-		msadoc = mi.msadoc;
+		//msadoc = mi.msadoc;
 	}
 	
     private ModuleInfo mi;
-    private ModuleSurfaceAreaDocument msadoc;
+    private ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
     
     private ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = msadoc.addNewModuleSurfaceArea();
     private MsaHeaderDocument.MsaHeader msaheader = msa.addNewMsaHeader();
