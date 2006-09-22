@@ -66,7 +66,7 @@ public final class Common {
     }
 
     public static final void fileCopy(String src, String des) throws Exception {
-    	string2file(file2string(src), des);
+        string2file(file2string(src), des);
     }
     
     //-----------------------------------file&string---------------------------------------//
@@ -127,14 +127,14 @@ public final class Common {
     }
     
     public static final void oneLevelDirCopy(String src, String des, String type) throws Exception {
-    	String[] list = new File(src).list();
-    	
-    	ensureDir(des);
-    	for (int i = 0; i < list.length; i++) {
-    		if (list[i].contains(type)) {
+        String[] list = new File(src).list();
+        
+        ensureDir(des);
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].contains(type)) {
                 string2file(file2string(src + File.separator + list[i]), des + File.separator + list[i]);
-    		}
-    	}
+            }
+        }
     }
 
     //--------------------------------------dir--------------------------------------------//

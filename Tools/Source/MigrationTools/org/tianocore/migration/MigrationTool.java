@@ -74,7 +74,7 @@ public class MigrationTool {
     }
 
     public static final String getTempDir(String modulepath) {
-    	return "C:" + File.separator + "MigrationTool_Temp" + modulepath.replace(startpath, "");
+        return "C:" + File.separator + "MigrationTool_Temp" + modulepath.replace(startpath, "");
     }
 
     private static final String assignOutPutPath(String inputpath) {
@@ -92,7 +92,7 @@ public class MigrationTool {
     }
 
     public static final void startMigrateAll(String path) throws Exception {
-    	startpath = path;
+        startpath = path;
         MigrationTool.ui.println("Project Migration");
         MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
         
