@@ -143,6 +143,10 @@ public class ToolChainId {
         return toolCommandCodes;
     }
     
+    public String getToolsDefArchNames() {
+        return toolsDefArchNames;
+    }
+    
     private void readTargetTxtFile() {
         File tFile = new File(strTargetFile);
 
