@@ -150,7 +150,6 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         if (this.ffsFileType.equals("")) {
             throw new BuildException ("Must set ffsFileType!\n");
         }
-
         //
         //  Create ffs file. File name = FfsFileGuid + BaseName + ffsSuffix.
         //  If outputDir's value was set,  file will output to the outputDir.
@@ -169,7 +168,16 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
         String ffsFilePath = outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix;
         File ffsFile = new File (ffsFilePath);
-        genFfs(ffsFile);
+        try{
+            genFfs(ffsFile);
+        }catch (BuildException e){
+            if (ffsFile != null && ffsFile.exists()){
+                ffsFile.deleteOnExit();
+            }
+            throw new BuildException(e.getMessage());
+            
+        }
+        
     }   
 
     /**
@@ -742,7 +750,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
        @param ffsFile          Name of FFS file.
        @param isOrg            Flag to indicate generate ORG ffs file or not.
     **/
-    private void genFfs(File ffsFile) {
+    private void genFfs(File ffsFile) throws BuildException {
         Section           sect;
         int               fileSize;
         int               fileDataSize;
@@ -772,6 +780,9 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                     //
                     sect.toBuffer((DataOutputStream)dataBuffer);
                 } catch (Exception e) {
+                    if (dataBuffer != null){
+                        dataBuffer.close();
+                    }
                     throw new BuildException (e.getMessage());
                 }
             }
