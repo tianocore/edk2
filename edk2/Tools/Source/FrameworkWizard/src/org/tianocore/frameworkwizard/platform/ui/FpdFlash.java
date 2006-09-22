@@ -2660,7 +2660,7 @@ public class FpdFlash extends IInternalFrame {
                 
                 jTableModInFv.setRowHeight(20);
                 jTableModInFv.setShowGrid(false);
-//                jTableModInFv.setAutoCreateColumnsFromModel(false);
+                jTableModInFv.setAutoCreateColumnsFromModel(false);
                 jTableModInFv.addMouseListener(new MouseAdapter() {
 
                     /* (non-Javadoc)
@@ -2778,7 +2778,7 @@ public class FpdFlash extends IInternalFrame {
                 }
                 jTableFpdModules.setRowHeight(20);
                 jTableFpdModules.setShowGrid(false);
-//                jTableFpdModules.setAutoCreateColumnsFromModel(false);
+                jTableFpdModules.setAutoCreateColumnsFromModel(false);
                 jTableFpdModules.addMouseListener(new MouseAdapter() {
 
                     /* (non-Javadoc)
@@ -2852,12 +2852,12 @@ public class FpdFlash extends IInternalFrame {
                         }
                         
                         int rowInModel = ((TableSorter)jTableFpdModules.getModel()).getModelRowIndex(selectedRowRight);
-                        String name = fpdModTableModel.getValueAt(selectedRowRight, 0)+"";
-                        String mg = fpdModTableModel.getValueAt(selectedRowRight, 1)+"";
-                        String mv = fpdModTableModel.getValueAt(selectedRowRight, 2)+"";
-                        String pg = fpdModTableModel.getValueAt(selectedRowRight, 3)+"";
-                        String pv = fpdModTableModel.getValueAt(selectedRowRight, 4)+"";
-                        String arch = fpdModTableModel.getValueAt(selectedRowRight, 5)+"";
+                        String name = fpdModTableModel.getValueAt(rowInModel, 0)+"";
+                        String mg = fpdModTableModel.getValueAt(rowInModel, 1)+"";
+                        String mv = fpdModTableModel.getValueAt(rowInModel, 2)+"";
+                        String pg = fpdModTableModel.getValueAt(rowInModel, 3)+"";
+                        String pv = fpdModTableModel.getValueAt(rowInModel, 4)+"";
+                        String arch = fpdModTableModel.getValueAt(rowInModel, 5)+"";
                         String[] row = {name, mg, mv, pg, pv, arch};
                         if (name.length() == 0 || name.equals("N/A")) {
                             return;
