@@ -354,7 +354,7 @@ public class Tools {
                 // Finish previous line
                 //
                 if (!isCopied) {
-                    strReturn = strReturn + strTemp + DataType.UNIX_LINE_SEPARATOR;
+                    strReturn = strReturn + strTemp + DataType.LINE_SEPARATOR;
                     strTemp = "";
                 }
                 //
@@ -376,8 +376,12 @@ public class Tools {
                     strTemp = strTemp + " " + ss;
                     continue;
                 } else {
-                    strReturn = strReturn + strTemp + DataType.UNIX_LINE_SEPARATOR;
-                    strTemp = ss + " ";
+                    strReturn = strReturn + strTemp + DataType.LINE_SEPARATOR;
+                    if ((index == s.length - 1) && (!ss.equals(""))) {
+                        strReturn = strReturn + ss;
+                    } else {
+                        strTemp = ss + " ";
+                    }
                     isCopied = true;
                 }
             }
@@ -632,7 +636,7 @@ public class Tools {
         count = wholeString.split(searchString).length;
         return count;
     }
-    
+
     /**
      * Check the input data is empty or not
      * 

@@ -640,6 +640,7 @@ public class MsaHeader extends IInternalFrame {
             jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxPcdIsDriver.setBounds(new java.awt.Rectangle(160, 530, 320, 20));
             jComboBoxPcdIsDriver.addItemListener(this);
+            jComboBoxPcdIsDriver.addFocusListener(this);
             jComboBoxPcdIsDriver.setEnabled(false);
             Tools.generateComboBoxByVector(jComboBoxPcdIsDriver, ed.getVPcdDriverTypes());
         }
@@ -889,7 +890,6 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jLabelLicense, null);
             jContentPane.add(jLabelCopyright, null);
             jContentPane.add(jLabelDescription, null);
-            //            jContentPane.add(jLabelSpecification, null);
             jContentPane.add(getJTextFieldSpecification(), null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -929,8 +929,6 @@ public class MsaHeader extends IInternalFrame {
             jStarLabel13.setLocation(new java.awt.Point(0, 480));
             jStarLabel14 = new StarLabel();
             jStarLabel14.setLocation(new java.awt.Point(0, 505));
-            //            jStarLabel15 = new StarLabel();
-            //            jStarLabel15.setLocation(new java.awt.Point(0, 530));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -943,7 +941,6 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jStarLabel12, null);
             jContentPane.add(jStarLabel13, null);
             jContentPane.add(jStarLabel14, null);
-            //            jContentPane.add(jStarLabel15, null);
             jContentPane.add(getJScrollPaneCopyright(), null);
 
             jContentPane.add(getJCheckBoxIa32(), null);
@@ -1411,21 +1408,17 @@ public class MsaHeader extends IInternalFrame {
         //
         // Check Pcd is Driver
         //
-        if (arg0.getSource() == this.jCheckBoxPcd) {
+        if (arg0.getSource() == this.jCheckBoxPcd || arg0.getSource() == this.jComboBoxPcdIsDriver) {
             if ((this.ex == null) && this.jCheckBoxPcd.isSelected()) {
                 this.ex = ExternsDocument.Externs.Factory.newInstance();
                 this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
                                                                                               .toString()));
                 this.msa.setExterns(this.ex);
-            }
-
-            if ((this.ex != null) && (this.ex.getPcdIsDriver() == null) && this.jCheckBoxPcd.isSelected()) {
+            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() == null) && this.jCheckBoxPcd.isSelected()) {
                 this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
                                                                                               .toString()));
                 this.msa.setExterns(this.ex);
-            }
-
-            if ((this.ex != null) && (this.ex.getPcdIsDriver() != null)) {
+            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() != null)) {
                 if (this.jCheckBoxPcd.isSelected()
                     && !this.jComboBoxPcdIsDriver.getSelectedItem().toString().equals(
                                                                                       this.ex.getPcdIsDriver()
@@ -1465,14 +1458,10 @@ public class MsaHeader extends IInternalFrame {
                 this.ex = ExternsDocument.Externs.Factory.newInstance();
                 this.ex.setTianoR8FlashMapH(this.jCheckBoxFlashMap.isSelected());
                 this.msa.setExterns(this.ex);
-            }
-
-            if ((this.ex != null) && this.jCheckBoxFlashMap.isSelected()) {
+            } else if ((this.ex != null) && this.jCheckBoxFlashMap.isSelected()) {
                 this.ex.setTianoR8FlashMapH(this.jCheckBoxFlashMap.isSelected());
                 this.msa.setExterns(this.ex);
-            }
-
-            if ((this.ex != null) && !this.jCheckBoxFlashMap.isSelected()) {
+            } else if ((this.ex != null) && !this.jCheckBoxFlashMap.isSelected()) {
                 ExternsDocument.Externs newEx = ExternsDocument.Externs.Factory.newInstance();
                 if (this.ex.getExternList() != null) {
                     for (int index = 0; index < this.ex.getExternList().size(); index++) {

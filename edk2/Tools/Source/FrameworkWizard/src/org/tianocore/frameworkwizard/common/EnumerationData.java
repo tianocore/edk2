@@ -353,7 +353,6 @@ public class EnumerationData {
         vLibraryUsage.addElement("SOMETIMES_CONSUMED");
         vLibraryUsage.addElement("ALWAYS_PRODUCED");
         vLibraryUsage.addElement("SOMETIMES_PRODUCED");
-        vLibraryUsage.addElement("DEFAULT");
         vLibraryUsage.addElement("PRIVATE");
     }
     
@@ -516,7 +515,6 @@ public class EnumerationData {
         vPackageUsage.removeAllElements();
         vPackageUsage.addElement("ALWAYS_CONSUMED");
         vPackageUsage.addElement("ALWAYS_PRODUCED");
-        vPackageUsage.addElement("DEFAULT");
     }
     
     private void initProtocolUsage() {
@@ -618,7 +616,6 @@ public class EnumerationData {
         vBootModeNames.addElement("MINIMAL");
         vBootModeNames.addElement("NO_CHANGE");
         vBootModeNames.addElement("DIAGNOSTICS");
-        vBootModeNames.addElement("DEFAULT");
         vBootModeNames.addElement("S2_RESUME");
         vBootModeNames.addElement("S3_RESUME");
         vBootModeNames.addElement("S4_RESUME");
@@ -666,7 +663,6 @@ public class EnumerationData {
         vGuidUsage.addElement("SOMETIMES_CONSUMED");
         vGuidUsage.addElement("ALWAYS_PRODUCED");
         vGuidUsage.addElement("SOMETIMES_PRODUCED");
-        vGuidUsage.addElement("DEFAULT");
         vGuidUsage.addElement("PRIVATE");
     }
     
@@ -678,24 +674,6 @@ public class EnumerationData {
         vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER);
         vExternTypes.addElement(EnumerationData.EXTERNS_LIBRARY);
         vExternTypes.addElement(EnumerationData.EXTERNS_CALL_BACK);
-        
-//        vExternTypes.addElement(EnumerationData.EXTERNS_PCD_IS_DRIVER);
-//
-//        vExternTypes.addElement(EnumerationData.EXTERNS_SPECIFICATION);
-//        
-//        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_ENTRY_POINT);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE);
-//        
-//        vExternTypes.addElement(EnumerationData.EXTERNS_CONSTRUCTOR);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_DESTRUCTOR);
-        
-//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_BINDING);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_COMPONENT_NAME);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_CONFIG);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_DIAG);
-//        
-//        vExternTypes.addElement(EnumerationData.EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK);
-//        vExternTypes.addElement(EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK);
     }
     
     private void initPcdDriverTypes() {
@@ -719,7 +697,6 @@ public class EnumerationData {
         vPcdUsage.addElement("SOMETIMES_CONSUMED");
         vPcdUsage.addElement("ALWAYS_PRODUCED");
         vPcdUsage.addElement("SOMETIMES_PRODUCED");
-        vPcdUsage.addElement("DEFAULT");
     }
     
     public Vector<String> getvCompontentType() {
