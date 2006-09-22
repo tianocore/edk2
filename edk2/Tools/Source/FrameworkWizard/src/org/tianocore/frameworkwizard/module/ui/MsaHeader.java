@@ -63,6 +63,13 @@ public class MsaHeader extends IInternalFrame {
 
     private int dialogHeight = 630;
 
+    private final int labelWidth = 155;
+    
+    private int valueWidth = 320;
+    
+    private final int labelCol = 12;
+    
+    private final int valueCol = 168;
     //
     //Define class members
     //
@@ -195,7 +202,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxIa32() {
         if (jCheckBoxIa32 == null) {
             jCheckBoxIa32 = new JCheckBox();
-            jCheckBoxIa32.setBounds(new java.awt.Rectangle(160, 505, 55, 20));
+            jCheckBoxIa32.setBounds(new java.awt.Rectangle(valueCol, 505, 55, 20));
             jCheckBoxIa32.setText("IA32");
             jCheckBoxIa32.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIa32.addFocusListener(this);
@@ -211,7 +218,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxX64() {
         if (jCheckBoxX64 == null) {
             jCheckBoxX64 = new JCheckBox();
-            jCheckBoxX64.setBounds(new java.awt.Rectangle(215, 505, 53, 20));
+            jCheckBoxX64.setBounds(new java.awt.Rectangle(valueCol + 55, 505, 53, 20));
             jCheckBoxX64.setText("X64");
             jCheckBoxX64.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxX64.addFocusListener(this);
@@ -227,7 +234,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxIpf() {
         if (jCheckBoxIpf == null) {
             jCheckBoxIpf = new JCheckBox();
-            jCheckBoxIpf.setBounds(new java.awt.Rectangle(270, 505, 52, 20));
+            jCheckBoxIpf.setBounds(new java.awt.Rectangle(valueCol + 110, 505, 52, 20));
             jCheckBoxIpf.setText("IPF");
             jCheckBoxIpf.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIpf.addFocusListener(this);
@@ -243,7 +250,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxEbc() {
         if (jCheckBoxEbc == null) {
             jCheckBoxEbc = new JCheckBox();
-            jCheckBoxEbc.setBounds(new java.awt.Rectangle(325, 505, 53, 20));
+            jCheckBoxEbc.setBounds(new java.awt.Rectangle(valueCol + 165, 505, 53, 20));
             jCheckBoxEbc.setText("EBC");
             jCheckBoxEbc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxEbc.addFocusListener(this);
@@ -259,7 +266,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxArm() {
         if (jCheckBoxArm == null) {
             jCheckBoxArm = new JCheckBox();
-            jCheckBoxArm.setBounds(new java.awt.Rectangle(380, 505, 54, 20));
+            jCheckBoxArm.setBounds(new java.awt.Rectangle(valueCol + 220, 505, 54, 20));
             jCheckBoxArm.setText("ARM");
             jCheckBoxArm.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxArm.addFocusListener(this);
@@ -275,7 +282,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxPpc() {
         if (jCheckBoxPpc == null) {
             jCheckBoxPpc = new JCheckBox();
-            jCheckBoxPpc.setBounds(new java.awt.Rectangle(435, 505, 53, 20));
+            jCheckBoxPpc.setBounds(new java.awt.Rectangle(valueCol + 285, 505, 53, 20));
             jCheckBoxPpc.setText("PPC");
             jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxPpc.addFocusListener(this);
@@ -292,7 +299,7 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldBaseName() {
         if (jTextFieldBaseName == null) {
             jTextFieldBaseName = new JTextField();
-            jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jTextFieldBaseName.setBounds(new java.awt.Rectangle(valueCol, 10, valueWidth, 20));
             jTextFieldBaseName.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldBaseName.addFocusListener(this);
             jTextFieldBaseName.setToolTipText("A brief Identifier, such as USB I/O Library, of the module");
@@ -310,7 +317,7 @@ public class MsaHeader extends IInternalFrame {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
             jTextFieldGuid.setPreferredSize(new java.awt.Dimension(250, 20));
-            jTextFieldGuid.setLocation(new java.awt.Point(160, 60));
+            jTextFieldGuid.setLocation(new java.awt.Point(valueCol, 60));
             jTextFieldGuid.setSize(new java.awt.Dimension(250, 20));
             jTextFieldGuid.addFocusListener(this);
             jTextFieldGuid.setToolTipText("Guaranteed Unique Identification Number, Registry Format (8-4-4-4-12)");
@@ -327,9 +334,9 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldVersion() {
         if (jTextFieldVersion == null) {
             jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldVersion.setLocation(new java.awt.Point(160, 85));
-            jTextFieldVersion.setSize(new java.awt.Dimension(320, 20));
+            jTextFieldVersion.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
+            jTextFieldVersion.setLocation(new java.awt.Point(valueCol, 85));
+            jTextFieldVersion.setSize(new java.awt.Dimension(valueWidth, 20));
             jTextFieldVersion.addFocusListener(this);
             jTextFieldVersion.setToolTipText("A Version Number, 1.0, 1, 1.01, 1.0.1");
         }
@@ -344,10 +351,11 @@ public class MsaHeader extends IInternalFrame {
      **/
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
+            int genGuidCol = valueCol + 285;
             jButtonGenerateGuid = new JButton();
             jButtonGenerateGuid.setPreferredSize(new java.awt.Dimension(65, 20));
             jButtonGenerateGuid.setSize(new java.awt.Dimension(65, 20));
-            jButtonGenerateGuid.setLocation(new java.awt.Point(415, 60));
+            jButtonGenerateGuid.setLocation(new java.awt.Point(genGuidCol, 60));
             jButtonGenerateGuid.setText("GEN");
             jButtonGenerateGuid.addActionListener(this);
         }
@@ -401,14 +409,15 @@ public class MsaHeader extends IInternalFrame {
      **/
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
+            int specWidth = valueWidth + 50;
             jTextFieldSpecification = new JTextField();
 
-            jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(specWidth, 20));
             jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
             jTextFieldSpecification.setBorder(null);
 
-            jTextFieldSpecification.setSize(new java.awt.Dimension(320, 20));
-            jTextFieldSpecification.setLocation(new java.awt.Point(2, dialogHeight - 30));
+            jTextFieldSpecification.setSize(new java.awt.Dimension(specWidth, 20));
+            jTextFieldSpecification.setLocation(new java.awt.Point(labelCol, dialogHeight - 30));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.addFocusListener(this);
         }
@@ -461,10 +470,10 @@ public class MsaHeader extends IInternalFrame {
         if (jScrollPaneLicense == null) {
             jScrollPaneLicense = new JScrollPane();
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneLicense.setSize(new java.awt.Dimension(320, 120));
-            jScrollPaneLicense.setLocation(new java.awt.Point(160, 305));
+            jScrollPaneLicense.setSize(new java.awt.Dimension(valueWidth, 120));
+            jScrollPaneLicense.setLocation(new java.awt.Point(valueCol, 305));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
-            jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(320, 120));
+            jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(valueWidth, 120));
         }
         return jScrollPaneLicense;
     }
@@ -479,10 +488,10 @@ public class MsaHeader extends IInternalFrame {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneDescription.setSize(new java.awt.Dimension(320, 120));
-            jScrollPaneDescription.setLocation(new java.awt.Point(160, 135));
+            jScrollPaneDescription.setSize(new java.awt.Dimension(valueWidth, 120));
+            jScrollPaneDescription.setLocation(new java.awt.Point(valueCol, 135));
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
-            jScrollPaneDescription.setPreferredSize(new java.awt.Dimension(320, 120));
+            jScrollPaneDescription.setPreferredSize(new java.awt.Dimension(valueWidth, 120));
         }
         return jScrollPaneDescription;
     }
@@ -496,9 +505,9 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldAbstract() {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldAbstract.setLocation(new java.awt.Point(160, 110));
-            jTextFieldAbstract.setSize(new java.awt.Dimension(320, 20));
+            jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
+            jTextFieldAbstract.setLocation(new java.awt.Point(valueCol, 110));
+            jTextFieldAbstract.setSize(new java.awt.Dimension(valueWidth, 20));
             jTextFieldAbstract.addFocusListener(this);
             jTextFieldAbstract.setToolTipText("A one sentence description of this module.");
         }
@@ -514,8 +523,8 @@ public class MsaHeader extends IInternalFrame {
     private JComboBox getJComboBoxModuleType() {
         if (jComboBoxModuleType == null) {
             jComboBoxModuleType = new JComboBox();
-            jComboBoxModuleType.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
-            jComboBoxModuleType.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxModuleType.setBounds(new java.awt.Rectangle(valueCol, 35, valueWidth, 20));
+            jComboBoxModuleType.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jComboBoxModuleType.addFocusListener(this);
         }
         return jComboBoxModuleType;
@@ -530,9 +539,9 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldURL() {
         if (jTextFieldURL == null) {
             jTextFieldURL = new JTextField();
-            jTextFieldURL.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldURL.setLocation(new java.awt.Point(160, 430));
-            jTextFieldURL.setSize(new java.awt.Dimension(320, 20));
+            jTextFieldURL.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
+            jTextFieldURL.setLocation(new java.awt.Point(valueCol, 430));
+            jTextFieldURL.setSize(new java.awt.Dimension(valueWidth, 20));
             jTextFieldURL.addFocusListener(this);
             jTextFieldURL.setToolTipText("A URL for the latest version of the license.");
         }
@@ -562,10 +571,10 @@ public class MsaHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneCopyright() {
         if (jScrollPaneCopyright == null) {
             jScrollPaneCopyright = new JScrollPane();
-            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(160, 260, 320, 40));
-            jScrollPaneCopyright.setPreferredSize(new java.awt.Dimension(320, 40));
+            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(valueCol, 260, valueWidth, 40));
+            jScrollPaneCopyright.setPreferredSize(new java.awt.Dimension(valueWidth, 40));
             jScrollPaneCopyright.setViewportView(getJTextAreaCopyright());
-            jScrollPaneCopyright.setSize(new java.awt.Dimension(320, 40));
+            jScrollPaneCopyright.setSize(new java.awt.Dimension(valueWidth, 40));
         }
         return jScrollPaneCopyright;
     }
@@ -584,7 +593,7 @@ public class MsaHeader extends IInternalFrame {
             jTextAreaCopyright.setWrapStyleWord(true);
             jTextAreaCopyright.setSelectionStart(0);
             jTextAreaCopyright.setSelectionEnd(0);
-            jTextAreaCopyright.setBounds(new java.awt.Rectangle(0, 0, 320, 40));
+            jTextAreaCopyright.setBounds(new java.awt.Rectangle(0, 0, valueWidth, 40));
             jTextAreaCopyright.setToolTipText("One or more copyright lines.");
         }
         return jTextAreaCopyright;
@@ -598,8 +607,8 @@ public class MsaHeader extends IInternalFrame {
     private JComboBox getJComboBoxBinaryModule() {
         if (jComboBoxBinaryModule == null) {
             jComboBoxBinaryModule = new JComboBox();
-            jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(160, 480, 320, 20));
-            jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(valueCol, 480, valueWidth, 20));
+            jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jComboBoxBinaryModule.addFocusListener(this);
             jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>"
                                                  + "which can be compiled or binary <br>"
@@ -621,8 +630,8 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldOutputFileBasename() {
         if (jTextFieldOutputFileBasename == null) {
             jTextFieldOutputFileBasename = new JTextField();
-            jTextFieldOutputFileBasename.setBounds(new java.awt.Rectangle(160, 455, 320, 20));
-            jTextFieldOutputFileBasename.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldOutputFileBasename.setBounds(new java.awt.Rectangle(valueCol, 455, valueWidth, 20));
+            jTextFieldOutputFileBasename.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jTextFieldOutputFileBasename.addFocusListener(this);
             jTextFieldOutputFileBasename.setToolTipText("Enter a single word for generated output file names.");
         }
@@ -637,12 +646,13 @@ public class MsaHeader extends IInternalFrame {
     private JComboBox getJComboBoxPcdIsDriver() {
         if (jComboBoxPcdIsDriver == null) {
             jComboBoxPcdIsDriver = new JComboBox();
-            jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxPcdIsDriver.setBounds(new java.awt.Rectangle(160, 530, 320, 20));
+            jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
+            jComboBoxPcdIsDriver.setBounds(new java.awt.Rectangle(valueCol, 530, valueWidth, 20));
             jComboBoxPcdIsDriver.addItemListener(this);
             jComboBoxPcdIsDriver.addFocusListener(this);
             jComboBoxPcdIsDriver.setEnabled(false);
             Tools.generateComboBoxByVector(jComboBoxPcdIsDriver, ed.getVPcdDriverTypes());
+            jComboBoxPcdIsDriver.setVisible(false);
         }
         return jComboBoxPcdIsDriver;
     }
@@ -812,6 +822,9 @@ public class MsaHeader extends IInternalFrame {
                 this.jCheckBoxPcd.setSelected(true);
                 this.jComboBoxPcdIsDriver.setEnabled(true);
                 this.jComboBoxPcdIsDriver.setSelectedItem(ex.getPcdIsDriver());
+                // TODO:  If the module type is DXE_DRIVER, set PCD_DXE_DRIVER
+                //        If the module type is PEIM, set PCD_PEI_DRIVER
+                //        If the module type is anything else, unset this!
             }
             this.jCheckBoxFlashMap.setSelected(ex.getTianoR8FlashMapH());
         }
@@ -828,51 +841,51 @@ public class MsaHeader extends IInternalFrame {
 
             jLabelURL = new JLabel();
             jLabelURL.setText("License URL");
-            jLabelURL.setLocation(new java.awt.Point(15, 430));
-            jLabelURL.setSize(new java.awt.Dimension(140, 20));
+            jLabelURL.setLocation(new java.awt.Point(labelCol, 430));
+            jLabelURL.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelBaseName = new JLabel();
             jLabelBaseName.setText("Module Name");
-            jLabelBaseName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
+            jLabelBaseName.setBounds(new java.awt.Rectangle(labelCol, 10, labelWidth, 20));
             jLabelModuleType = new JLabel();
-            jLabelModuleType.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jLabelModuleType.setBounds(new java.awt.Rectangle(labelCol, 35, labelWidth, 20));
             jLabelModuleType.setText("Module Type");
             jLabelGuid = new JLabel();
             jLabelGuid.setText("Guid Value");
-            jLabelGuid.setLocation(new java.awt.Point(15, 60));
-            jLabelGuid.setSize(new java.awt.Dimension(140, 20));
+            jLabelGuid.setLocation(new java.awt.Point(labelCol, 60));
+            jLabelGuid.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelVersion = new JLabel();
             jLabelVersion.setText("Version");
-            jLabelVersion.setLocation(new java.awt.Point(15, 85));
-            jLabelVersion.setSize(new java.awt.Dimension(140, 20));
+            jLabelVersion.setLocation(new java.awt.Point(labelCol, 85));
+            jLabelVersion.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelAbstract = new JLabel();
             jLabelAbstract.setText("Abstract");
-            jLabelAbstract.setLocation(new java.awt.Point(15, 110));
-            jLabelAbstract.setSize(new java.awt.Dimension(140, 20));
+            jLabelAbstract.setLocation(new java.awt.Point(labelCol, 110));
+            jLabelAbstract.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Description");
-            jLabelDescription.setLocation(new java.awt.Point(15, 135));
-            jLabelDescription.setSize(new java.awt.Dimension(140, 20));
+            jLabelDescription.setLocation(new java.awt.Point(labelCol, 135));
+            jLabelDescription.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
-            jLabelCopyright.setLocation(new java.awt.Point(15, 260));
-            jLabelCopyright.setSize(new java.awt.Dimension(140, 20));
+            jLabelCopyright.setLocation(new java.awt.Point(labelCol, 260));
+            jLabelCopyright.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setLocation(new java.awt.Point(15, 305));
-            jLabelLicense.setSize(new java.awt.Dimension(140, 20));
+            jLabelLicense.setLocation(new java.awt.Point(labelCol, 305));
+            jLabelLicense.setSize(new java.awt.Dimension(labelWidth, 20));
             jLabelOutputFileBasename = new JLabel();
-            jLabelOutputFileBasename.setBounds(new java.awt.Rectangle(15, 455, 140, 20));
+            jLabelOutputFileBasename.setBounds(new java.awt.Rectangle(labelCol, 455, labelWidth, 20));
             jLabelOutputFileBasename.setText("Output File Basename");
             jLabelBinaryModule = new JLabel();
-            jLabelBinaryModule.setBounds(new java.awt.Rectangle(15, 480, 140, 20));
+            jLabelBinaryModule.setBounds(new java.awt.Rectangle(labelCol, 480, labelWidth, 20));
             jLabelBinaryModule.setText("Binary Module");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 505, 140, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(labelCol, 505, labelWidth, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setLocation(new java.awt.Point(14, 530));
-            jLabelSpecification.setSize(new java.awt.Dimension(140, 20));
+            jLabelSpecification.setLocation(new java.awt.Point(labelCol, 530));
+            jLabelSpecification.setSize(new java.awt.Dimension(labelWidth, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -950,8 +963,10 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(getJCheckBoxArm(), null);
             jContentPane.add(getJCheckBoxPpc(), null);
 
+            
             jContentPane.add(getJCheckBoxPcd(), null);
             jContentPane.add(getJComboBoxPcdIsDriver(), null);
+            
             jContentPane.add(getJCheckBoxFlashMap(), null);
         }
         return jContentPane;
@@ -1171,15 +1186,15 @@ public class MsaHeader extends IInternalFrame {
         Tools.resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPaneCopyright, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth, intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
+        // Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth, intPreferredWidth);
-        Tools.resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
-        Tools.resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
+        // Tools.resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
+        // Tools.resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldOutputFileBasename, intCurrentWidth, intPreferredWidth);
-        Tools.resizeComponentWidth(this.jComboBoxPcdIsDriver, intCurrentWidth, intPreferredWidth);
+        // Tools.resizeComponentWidth(this.jComboBoxPcdIsDriver, intCurrentWidth, intPreferredWidth);
 
         Tools.relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, intPreferredWidth,
-                                 DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
+                                 DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON - 5);
     }
 
     public void focusLost(FocusEvent arg0) {
@@ -1581,7 +1596,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxPcd() {
         if (jCheckBoxPcd == null) {
             jCheckBoxPcd = new JCheckBox();
-            jCheckBoxPcd.setBounds(new java.awt.Rectangle(0, 530, 140, 20));
+            jCheckBoxPcd.setBounds(new java.awt.Rectangle(labelCol, 530, labelWidth, 20));
             jCheckBoxPcd.setText("Is this a PCD Driver?");
             jCheckBoxPcd.addFocusListener(this);
             jCheckBoxPcd.addActionListener(this);
@@ -1597,10 +1612,11 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxFlashMap() {
         if (jCheckBoxFlashMap == null) {
             jCheckBoxFlashMap = new JCheckBox();
-            jCheckBoxFlashMap.setBounds(new java.awt.Rectangle(0, 555, 480, 20));
+            jCheckBoxFlashMap.setBounds(new java.awt.Rectangle(labelCol, 555, 480, 20));
             jCheckBoxFlashMap.setText("Are you using a legacy FlashMap header file?");
             jCheckBoxFlashMap.addFocusListener(this);
         }
         return jCheckBoxFlashMap;
     }
+    
 }
