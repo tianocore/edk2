@@ -303,11 +303,12 @@ public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes
                         System.out.print(e.getMessage());
                         throw new BuildException(
                                 "Compress.toBuffer failed at section");
+                    } finally {
+                        if (Do != null){
+                            Do.close();
+                        }
                     }
-
                 }
-                Do.close();
-
                 //
                 // Call compress
                 //
@@ -364,7 +365,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes
                 }
             } catch (Exception e) {
                 throw new BuildException("compress.toBuffer failed!\n");
-            }
+            } 
         } else {
             Section sect;
             Iterator sectionIter = this.sectFileList.iterator();

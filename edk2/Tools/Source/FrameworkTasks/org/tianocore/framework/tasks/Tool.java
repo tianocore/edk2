@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.tools.ant.BuildException;
 import org.tianocore.common.logger.EdkLog;
@@ -36,7 +37,7 @@ public class Tool implements EfiDefine, Section {
     private Input inputFiles = new Input();
     private Input tempInputFile = new Input();
     private String outputPath;
-    private File outputFile ;
+    private String outputFileName ;
     private List<Section>  gensectList = new ArrayList<Section>();
     /**
      Call extern tool
@@ -56,7 +57,7 @@ public class Tool implements EfiDefine, Section {
         ///
         /// check if file exist
         ///
-        //File OutputFile = new File (this.outPutFileName);
+        File outputFile = new File (this.outputFileName);
         if (!outputFile.exists()) {
             throw new BuildException("The file " + outputFile.getPath() + " does not exist!\n");
         }
@@ -133,19 +134,25 @@ public class Tool implements EfiDefine, Section {
                 catch (BuildException e) {
                     EdkLog.log(e.getMessage());
                     throw new BuildException ("GenSection failed at Tool!");
-                }  
-                Do.close();
+                } finally {
+                    if (Do != null){
+                        Do.close();    
+                    }
+                    
+                } 
                 this.tempInputFile.insFile(outputFile.getPath());
             }        
         } catch (IOException e){
             throw new BuildException ("Gensection failed at tool!");
-        }
+        } 
 
         try {
-            outputFile = File.createTempFile("temp", null, new File(outputPath));
+            Random ran = new Random(9999); 
+            this.outputFileName = "Temp" + ran.nextInt();
             argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
-                         + tempInputFile.toString(" ")+ " -o " + outputFile.getPath();
+                         + tempInputFile.toString(" ")+ " -o " + outputFileName;
             EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
+            EdkLog.log(this, EdkLog.EDK_INFO, this.outputFileName);
             ///
             /// execute command line
             ///
@@ -158,8 +165,7 @@ public class Tool implements EfiDefine, Section {
                     file.delete();
                 }
             }
-        } catch (Exception e) {
-            EdkLog.log(e.getMessage());
+        } catch (Exception e) {            EdkLog.log(e.getMessage());
             throw new BuildException("Execution of externalTool task failed!\n");
         }
     }
