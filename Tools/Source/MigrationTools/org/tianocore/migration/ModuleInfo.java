@@ -30,8 +30,8 @@ public final class ModuleInfo {
     public final String modulepath;
     public final String temppath;
     
-    private MsaOwner msaowner = new MsaWriter(this);
-    public ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
+    //private MsaOwner msaowner = new MsaWriter(this);
+    //public ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
     
     public String modulename = null;
     public String guidvalue = null;
