@@ -78,7 +78,7 @@ public class SplashScreen extends IFrame {
             jLabel2.setBounds(new java.awt.Rectangle(25, 120, 270, 20));
             jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             jLabel2.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
-            jLabel2.setText("Initializaing...");
+            jLabel2.setText("Initializing...");
             jLabel1 = new JLabel();
             jLabel1.setBounds(new java.awt.Rectangle(3,166,270,20));
             jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
