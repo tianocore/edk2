@@ -118,7 +118,7 @@ public class PpisDlg extends IDialog implements ItemListener {
             jComboBoxPpiType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxPpiType.addItemListener(this);
             jComboBoxPpiType
-                            .setToolTipText("<html>PPIs are named by GUID.<br>PPI Notify is consumed via a register PPI Notify mechanism");
+                            .setToolTipText("<html>PPIs are named by GUID.<br>PPI Notify is consumed via a register PPI Notify mechanism</html>");
         }
         return jComboBoxPpiType;
     }
