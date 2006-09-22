@@ -309,7 +309,7 @@ public class ModuleProtocols extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        ProtocolsDlg dlg = new ProtocolsDlg(vid.getProtocols(index), new IFrame());
+        ProtocolsDlg dlg = new ProtocolsDlg(vid.getProtocols(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

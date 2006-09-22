@@ -36,7 +36,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Ppis.PpisIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -249,10 +251,6 @@ public class PpisDlg extends IDialog implements ItemListener {
         return jButtonCancel;
     }
 
-    public static void main(String[] args) {
-
-    }
-
     /**
      * This method initializes this
      * 
@@ -266,15 +264,24 @@ public class PpisDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes this Fill values to all fields if these values are
-     * not empty
-     * 
-     * @param inProtocolsId
-     * 
-     */
-    private void init(PpisIdentification inPpisId) {
+     This method initializes this Fill values to all fields if these values are
+     not empty
+     
+     @param inPpisId
+     @param mid
+     
+     **/
+    private void init(PpisIdentification inPpisId, ModuleIdentification mid) {
         init();
         this.id = inPpisId;
+
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log.wrn("Init Ppi", "This module hasn't defined any package dependency, so there is no ppi can be added");
+        }
+
+        Tools.generateComboBoxByVector(this.jComboBoxCName,
+                                       wt.getAllPpiDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid)));
 
         if (this.id != null) {
             this.jComboBoxCName.setSelectedItem(id.getName());
@@ -293,9 +300,9 @@ public class PpisDlg extends IDialog implements ItemListener {
      * @param iFrame
      * 
      */
-    public PpisDlg(PpisIdentification inPpisIdentification, IFrame iFrame) {
+    public PpisDlg(PpisIdentification inPpisIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inPpisIdentification);
+        init(inPpisIdentification, mid);
     }
 
     /**
@@ -370,7 +377,6 @@ public class PpisDlg extends IDialog implements ItemListener {
      * 
      */
     private void initFrame() {
-        Tools.generateComboBoxByVector(jComboBoxCName, wt.getAllPpiDeclarationsFromWorkspace());
         Tools.generateComboBoxByVector(jComboBoxPpiType, ed.getVPpiType());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVPpiUsage());
     }
@@ -413,6 +419,11 @@ public class PpisDlg extends IDialog implements ItemListener {
         //
         // Check Name
         //
+        if (this.jComboBoxCName.getSelectedItem() == null) {
+            Log.wrn("Update Ppis", "Please select one Ppi/PpiNotify Name");
+            return false;
+        }
+
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update Ppis", "Incorrect data type for Ppi/PpiNotify Name");

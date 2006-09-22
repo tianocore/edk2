@@ -37,7 +37,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -284,9 +286,17 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
      * @param inProtocolsId
      * 
      */
-    private void init(ProtocolsIdentification inProtocolsId) {
+    private void init(ProtocolsIdentification inProtocolsId, ModuleIdentification mid) {
         init();
         this.id = inProtocolsId;
+        
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log.wrn("Init Protocol", "This module hasn't defined any package dependency, so there is no protocol can be added");
+        }
+
+        Tools.generateComboBoxByVector(this.jComboBoxCName,
+                                       wt.getAllProtocolDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid)));
 
         if (this.id != null) {
             this.jComboBoxCName.setSelectedItem(id.getName());
@@ -305,9 +315,9 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
      * @param iFrame
      * 
      */
-    public ProtocolsDlg(ProtocolsIdentification inProtocolsIdentification, IFrame iFrame) {
+    public ProtocolsDlg(ProtocolsIdentification inProtocolsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inProtocolsIdentification);
+        init(inProtocolsIdentification, mid);
     }
 
     /**
@@ -397,7 +407,6 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
      */
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxProtocolType, ed.getVProtocolType());
-        Tools.generateComboBoxByVector(jComboBoxCName, wt.getAllProtocolDeclarationsFromWorkspace());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVProtocolUsage());
     }
 
@@ -439,6 +448,11 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
         //
         // Check Name
         //
+        if (this.jComboBoxCName.getSelectedItem() == null) {
+            Log.wrn("Update protocols", "Please select one Protocol/ProtocolNotify Name");
+            return false;
+        }
+
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update Protocols", "Incorrect data type for Protocol/ProtocolNotify Name");
