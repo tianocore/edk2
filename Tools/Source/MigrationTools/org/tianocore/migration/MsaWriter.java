@@ -19,10 +19,9 @@ import org.tianocore.*;
 import org.tianocore.SupportedArchitectures.Enum;
 import org.apache.xmlbeans.*;
 
-public class MsaWriter implements MsaOwner {
+public class MsaWriter {
 	MsaWriter(ModuleInfo moduleinfo) {
 		mi = moduleinfo;
-		//msadoc = mi.msadoc;
 	}
 	
     private ModuleInfo mi;
@@ -206,15 +205,7 @@ public class MsaWriter implements MsaOwner {
         bw.flush();
         bw.close();
     }
-    
-    //---------------------------MsaOwner---------------------------------//
-	
-	public void addSourceFiles(String filename, int arch) {
-		
-	}
 
-    //---------------------------MsaOwner---------------------------------//
-    
     public static final void parse(String msafile) throws Exception {
         ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(msafile);
         flush("c:\\temp.msa", msadoc);
