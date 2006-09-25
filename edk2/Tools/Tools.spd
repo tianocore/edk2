@@ -38,5 +38,6 @@
     <Filename>Source/SurfaceArea/SurfaceArea.msa</Filename>
     <Filename>Source/TianoTools/TianoTools.msa</Filename>
     <Filename>Source/MigrationTools/MigrationTools.msa</Filename>
+    <Filename>Source/Merge/Merge.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
