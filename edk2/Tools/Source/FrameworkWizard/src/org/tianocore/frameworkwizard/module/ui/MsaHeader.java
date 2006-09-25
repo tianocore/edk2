@@ -1602,7 +1602,7 @@ public class MsaHeader extends IInternalFrame {
         if (jCheckBoxFlashMap == null) {
             jCheckBoxFlashMap = new JCheckBox();
             jCheckBoxFlashMap.setBounds(new java.awt.Rectangle(labelCol, 555, 480, 20));
-            jCheckBoxFlashMap.setText("Are you using a legacy FlashMap header file?");
+            jCheckBoxFlashMap.setText("Does this module require a legacy FlashMap header file?");
             jCheckBoxFlashMap.addFocusListener(this);
         }
         return jCheckBoxFlashMap;
