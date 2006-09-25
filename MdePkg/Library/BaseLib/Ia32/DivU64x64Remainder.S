@@ -20,7 +20,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMathDivRemU64x32, _InternalMathDivRemU64x64
+.globl _InternalMathDivRemU64x32, _InternalMathDivRemU64x64
 
 #------------------------------------------------------------------------------
 # UINT64

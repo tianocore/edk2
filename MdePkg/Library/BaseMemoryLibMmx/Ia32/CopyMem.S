@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemCopyMem
+.globl _InternalMemCopyMem
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -42,7 +42,7 @@ _InternalMemCopyMem:
     cmpl    %edi, %esi
     jae     L0
     cmpl    %edi, %eax                  # Overlapped?
-    jae     @CopyBackward               # Copy backward if overlapped
+    jae     L_CopyBackward              # Copy backward if overlapped
 L0:
     xorl    %ecx, %ecx
     subl    %esi, %ecx
@@ -57,7 +57,7 @@ L1:
     movl    %edx, %ecx
     andl    $7, %edx
     shrl    $3, %ecx                    # ecx <- # of Qwords to copy
-    jz      @CopyBytes
+    jz      L_CopyBytes
     pushl   %eax
     pushl   %eax
     movq    %mm0, (%esp)                # save mm0
@@ -70,12 +70,12 @@ L2:
     movq    (%esp), %mm0                # restore mm0
     popl    %ecx                        # stack cleanup
     popl    %ecx                        # stack cleanup
-    jmp     @CopyBytes
-@CopyBackward:
+    jmp     L_CopyBytes
+L_CopyBackward:
     movl    %eax, %esi                  # esi <- Last byte in Source
     leal    -1(%edi,%edx,), %edi        # edi <- Last byte in Destination
     std
-@CopyBytes:
+L_CopyBytes:
     movl    %edx, %ecx
     rep
     movsb

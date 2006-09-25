@@ -28,7 +28,7 @@
 #   IN UINT64   Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteMm5
+.globl _AsmWriteMm5
 _AsmWriteMm5:
     movq    4(%esp), %mm5
     ret

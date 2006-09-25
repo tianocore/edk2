@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemZeroMem
+.globl _InternalMemZeroMem
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -49,14 +49,14 @@ L0:
     movl    %edx, %ecx
     andl    $15, %edx
     shrl    $4, %ecx
-    jz      @ZeroBytes
+    jz      L_ZeroBytes
     pxor    %xmm0, %xmm0
 L1:
     movntdq %xmm0, (%edi)
     addl    $16, %edi
     loop    L1
     mfence
-@ZeroBytes:
+L_ZeroBytes:
     movl    %edx, %ecx
     rep
     stosb

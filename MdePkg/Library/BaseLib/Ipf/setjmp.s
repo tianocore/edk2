@@ -17,7 +17,7 @@
 .auto
 .text
 
-.global InternalAssertJumpBuffer
+.globl InternalAssertJumpBuffer
 .type   InternalAssertJumpBuffer, @function
 
 .proc   SetJump

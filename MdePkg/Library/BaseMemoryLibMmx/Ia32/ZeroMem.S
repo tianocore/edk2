@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemZeroMem
+.globl _InternalMemZeroMem
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -37,13 +37,13 @@ _InternalMemZeroMem:
     movl    12(%esp), %ecx
     movl    %ecx, %edx
     shrl    $3, %ecx
-    jz      @ZeroBytes
+    jz      L_ZeroBytes
     pxor    %mm0, %mm0
 L0:
     movq    %mm0, (%edi)
     addl    $8, %edi
     loop    L0
-@ZeroBytes:
+L_ZeroBytes:
     andl    $7, %edx
     xorl    %eax, %eax
     movl    %edx, %ecx

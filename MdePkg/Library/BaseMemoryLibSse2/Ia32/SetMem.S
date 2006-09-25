@@ -34,7 +34,7 @@
 #    IN UINT8  Value
 #    );
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem
+.globl _InternalMemSetMem
 _InternalMemSetMem:
     push    %edi
     movl    12(%esp), %edx              # edx <- Count
@@ -53,7 +53,7 @@ L0:
     movl    %edx, %ecx
     andl    $15, %edx
     shrl    $4, %ecx                    # ecx <- # of DQwords to set
-    jz      @SetBytes
+    jz      L_SetBytes
     movb    %al, %ah                    # ax <- Value | (Value << 8)
     addl    $-16, %esp
     movdqu  %xmm0, (%esp)
@@ -67,7 +67,7 @@ L1:
     mfence
     movdqu  (%esp), %xmm0
     addl    $16, %esp                   # stack cleanup
-@SetBytes:
+L_SetBytes:
     movl    %edx, %ecx
     rep
     stosb

@@ -29,7 +29,7 @@
 #   IN UINT64  Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteMsr64
+.globl _AsmWriteMsr64
 _AsmWriteMsr64:
     movl    12(%esp), %edx
     movl    8(%esp), %eax

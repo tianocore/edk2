@@ -44,14 +44,14 @@ _InternalMemSetMem64:
     decl    %ecx
 L1:
     shrl    %ecx
-    jz      @SetQwords
+    jz      L_SetQwords
     movlhps %xmm0, %xmm0
 L2:
     movntdq %xmm0, (%edx)
     leal    16(%edx), %edx
     loop    L2
     mfence
-@SetQwords:
+L_SetQwords:
     jnc     L3
     movq    %xmm0, (%edx)
 L3:

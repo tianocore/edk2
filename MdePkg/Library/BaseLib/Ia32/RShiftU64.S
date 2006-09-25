@@ -22,7 +22,7 @@
     .686:
     .code:
 
-.global _InternalMathRShiftU64
+.globl _InternalMathRShiftU64
 
 #------------------------------------------------------------------------------
 # UINT64

@@ -28,7 +28,7 @@
 #   OUT IA32_DESCRIPTOR  *Idtr
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86WriteIdtr
+.globl _InternalX86WriteIdtr
 _InternalX86WriteIdtr:
     movl    4(%esp), %eax
     lidt    (%eax)
