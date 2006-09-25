@@ -900,7 +900,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />          
           <genteimage Dump="false" Verbose="false" OutputDir="" OutputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" InputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
-          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.te" tofile="${BIN_DIR}/@{FILENAME}.te" />
           <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" 
                       outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.tes" 
                       sectiontype="EFI_SECTION_TE"/>
@@ -946,7 +945,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
-          
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />
           <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
                       outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.pe32" 
                       sectiontype="EFI_SECTION_PE32"/>
@@ -954,7 +953,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <POST.PROCESS/>
         </sequential>
       </OnDependency>
-      <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />
     </sequential>
   </macrodef>
 
