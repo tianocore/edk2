@@ -279,4 +279,9 @@ public class DataType {
     public final static String PROTOCOL_TYPE_PROTOCOL = "Protocol";
     
     public final static String PROTOCOL_TYPE_PROTOCOL_NOTIFY = "Protocol Notify";
+    
+    //
+    // The default file name for guids.xref file
+    //
+    public final static String GUIDS_XREF_FILE_NAME = "guids.xref";
 }

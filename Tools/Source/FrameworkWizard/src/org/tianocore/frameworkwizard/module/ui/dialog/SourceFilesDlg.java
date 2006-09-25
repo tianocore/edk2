@@ -167,7 +167,7 @@ public class SourceFilesDlg extends IDialog {
             iComboBoxToolCode.setBounds(new java.awt.Rectangle(168, 62, 340, 20));
             iComboBoxToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
             iComboBoxToolCode.setToolTipText("<html>You may select a specific tool command from drop down list,<br>"
-                                             + "or you can DOUBLE-CLICK this feild to enter your customized<br>"
+                                             + "or you can DOUBLE-CLICK this field to enter your customized<br>"
                                              + "tool command.<br>"
                                              + "Press ENTER to save your input or press ESCAPE to quit</html>");
         }

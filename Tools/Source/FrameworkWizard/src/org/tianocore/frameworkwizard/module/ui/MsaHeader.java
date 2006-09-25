@@ -20,6 +20,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.util.Vector;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -44,6 +45,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import javax.swing.JRadioButton;
 
 /**
  The class is used to create, update MsaHeader of MSA file
@@ -123,8 +125,6 @@ public class MsaHeader extends IInternalFrame {
 
     private JLabel jLabelBinaryModule = null;
 
-    private JComboBox jComboBoxBinaryModule = null;
-
     private JLabel jLabelOutputFileBasename = null;
 
     private JTextField jTextFieldOutputFileBasename = null;
@@ -193,6 +193,10 @@ public class MsaHeader extends IInternalFrame {
     private OpeningModuleType omt = null;
 
     private EnumerationData ed = new EnumerationData();
+
+    private JRadioButton jRadioButtonBinaryModuleTrue = null;
+
+    private JRadioButton jRadioButtonBinaryModuleFalse = null;
 
     /**
      * This method initializes jCheckBoxIa32    
@@ -600,29 +604,6 @@ public class MsaHeader extends IInternalFrame {
     }
 
     /**
-     * This method initializes jComboBoxBinaryModule    
-     *  
-     * @return javax.swing.JComboBox    
-     */
-    private JComboBox getJComboBoxBinaryModule() {
-        if (jComboBoxBinaryModule == null) {
-            jComboBoxBinaryModule = new JComboBox();
-            jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(valueCol, 480, valueWidth, 20));
-            jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
-            jComboBoxBinaryModule.addFocusListener(this);
-            jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>"
-                                                 + "which can be compiled or binary <br>"
-                                                 + "modules which are linked.  <br>"
-                                                 + "A module cannot contain both. <br>"
-                                                 + "The GUID numbers should be identical <br>"
-                                                 + "for a binary and source MSA, <br>"
-                                                 + "however the BINARY MSA should have <br>"
-                                                 + "a higher version number.</html>");
-        }
-        return jComboBoxBinaryModule;
-    }
-
-    /**
      * This method initializes jTextFieldOutputFileBasename 
      *  
      * @return javax.swing.JTextField   
@@ -798,9 +779,9 @@ public class MsaHeader extends IInternalFrame {
                 this.setSelectedItems(Tools.convertListToVector(md.getSupportedArchitectures()));
             }
             if (md.getBinaryModule()) {
-                this.jComboBoxBinaryModule.setSelectedIndex(1);
+                this.jRadioButtonBinaryModuleTrue.setSelected(true);
             } else {
-                this.jComboBoxBinaryModule.setSelectedIndex(0);
+                this.jRadioButtonBinaryModuleFalse.setSelected(true);
             }
             if (md.getOutputFileBasename() != null) {
                 this.jTextFieldOutputFileBasename.setText(md.getOutputFileBasename());
@@ -917,7 +898,6 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jLabelOutputFileBasename, null);
             jContentPane.add(getJTextFieldOutputFileBasename(), null);
             jContentPane.add(jLabelBinaryModule, null);
-            jContentPane.add(getJComboBoxBinaryModule(), null);
             jContentPane.add(jLabelArch, null);
 
             jStarLabel1 = new StarLabel();
@@ -963,11 +943,15 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(getJCheckBoxArm(), null);
             jContentPane.add(getJCheckBoxPpc(), null);
 
-            
             jContentPane.add(getJCheckBoxPcd(), null);
             jContentPane.add(getJComboBoxPcdIsDriver(), null);
-            
             jContentPane.add(getJCheckBoxFlashMap(), null);
+
+            ButtonGroup bg = new ButtonGroup();
+            jContentPane.add(getJRadioButtonBinaryModuleTrue(), null);
+            jContentPane.add(getJRadioButtonBinaryModuleFalse(), null);
+            bg.add(getJRadioButtonBinaryModuleTrue());
+            bg.add(getJRadioButtonBinaryModuleFalse());
         }
         return jContentPane;
     }
@@ -1146,7 +1130,6 @@ public class MsaHeader extends IInternalFrame {
     private void initFrame() {
         EnumerationData ed = new EnumerationData();
         Tools.generateComboBoxByVector(jComboBoxModuleType, ed.getVModuleType());
-        Tools.generateComboBoxByVector(jComboBoxBinaryModule, ed.getVBoolean());
         this.setSelectedItems(ed.getVSupportedArchitectures());
     }
 
@@ -1186,15 +1169,14 @@ public class MsaHeader extends IInternalFrame {
         Tools.resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPaneCopyright, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth, intPreferredWidth);
-        // Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth, intPreferredWidth);
-        // Tools.resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
-        // Tools.resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldOutputFileBasename, intCurrentWidth, intPreferredWidth);
-        // Tools.resizeComponentWidth(this.jComboBoxPcdIsDriver, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jComboBoxPcdIsDriver, intCurrentWidth, intPreferredWidth);
 
         Tools.relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, intPreferredWidth,
-                                 DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON - 5);
+                                 DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
     }
 
     public void focusLost(FocusEvent arg0) {
@@ -1391,14 +1373,21 @@ public class MsaHeader extends IInternalFrame {
         //
         // Check Binary Module Type
         //
-        if (arg0.getSource() == this.jComboBoxBinaryModule) {
-            if (jComboBoxBinaryModule.getSelectedItem().toString().equals(DataType.TRUE)) {
+        if (arg0.getSource() == this.jRadioButtonBinaryModuleTrue) {
+            if (jRadioButtonBinaryModuleTrue.isSelected()) {
                 if (md.getBinaryModule()) {
                     return;
                 } else {
                     md.setBinaryModule(true);
                 }
-            } else if (jComboBoxBinaryModule.getSelectedItem().toString().equals(DataType.FALSE)) {
+            }
+        }
+
+        //
+        // Check Binary Module Type
+        //
+        if (arg0.getSource() == this.jRadioButtonBinaryModuleFalse) {
+            if (jRadioButtonBinaryModuleFalse.isSelected()) {
                 if (md.getBinaryModule()) {
                     md.setBinaryModule(false);
                 } else {
@@ -1618,5 +1607,51 @@ public class MsaHeader extends IInternalFrame {
         }
         return jCheckBoxFlashMap;
     }
-    
+
+    /**
+     * This method initializes jRadioButtonBinaryModuleTrue	
+     * 	
+     * @return javax.swing.JRadioButton	
+     */
+    private JRadioButton getJRadioButtonBinaryModuleTrue() {
+        if (jRadioButtonBinaryModuleTrue == null) {
+            jRadioButtonBinaryModuleTrue = new JRadioButton();
+            jRadioButtonBinaryModuleTrue.setBounds(new java.awt.Rectangle(valueCol, 480, 140, 20));
+            jRadioButtonBinaryModuleTrue.setText("True");
+            jRadioButtonBinaryModuleTrue.setSelected(true);
+            jRadioButtonBinaryModuleTrue.addFocusListener(this);
+            jRadioButtonBinaryModuleTrue.setToolTipText("<html>Modules are either source modules <br>"
+                                                        + "which can be compiled or binary <br>"
+                                                        + "modules which are linked.  <br>"
+                                                        + "A module cannot contain both. <br>"
+                                                        + "The GUID numbers should be identical <br>"
+                                                        + "for a binary and source MSA, <br>"
+                                                        + "however the BINARY MSA should have <br>"
+                                                        + "a higher version number.</html>");
+        }
+        return jRadioButtonBinaryModuleTrue;
+    }
+
+    /**
+     * This method initializes jRadioButtonBinaryModuleFalse	
+     * 	
+     * @return javax.swing.JRadioButton	
+     */
+    private JRadioButton getJRadioButtonBinaryModuleFalse() {
+        if (jRadioButtonBinaryModuleFalse == null) {
+            jRadioButtonBinaryModuleFalse = new JRadioButton();
+            jRadioButtonBinaryModuleFalse.setBounds(new java.awt.Rectangle(valueCol + 140, 480, 140, 20));
+            jRadioButtonBinaryModuleFalse.setText("False");
+            jRadioButtonBinaryModuleFalse.addFocusListener(this);
+            jRadioButtonBinaryModuleFalse.setToolTipText("<html>Modules are either source modules <br>"
+                                                         + "which can be compiled or binary <br>"
+                                                         + "modules which are linked.  <br>"
+                                                         + "A module cannot contain both. <br>"
+                                                         + "The GUID numbers should be identical <br>"
+                                                         + "for a binary and source MSA, <br>"
+                                                         + "however the BINARY MSA should have <br>"
+                                                         + "a higher version number.</html>");
+        }
+        return jRadioButtonBinaryModuleFalse;
+    }
 }

@@ -22,6 +22,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
@@ -306,6 +309,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     ///
     private static FrameworkWizardUI fwui = null;
 
+    private JMenuItem jMenuItemToolsGenerateGuidsXref = null;
+
     /**
      If the class hasn't an instnace, new one.
      
@@ -431,7 +436,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             jMenuFile.add(getJMenuItemFileSaveAs());
             jMenuFile.add(getJMenuItemFileSaveAll());
             jMenuFile.addSeparator();
-            
+
             jMenuFile.add(getJMenuItemFileRefresh());
             jMenuFile.addSeparator();
 
@@ -784,6 +789,9 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
             jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
             jMenuTools.add(getJMenuItemToolsBuildPreferences());
+            jMenuTools.addSeparator();
+
+            jMenuTools.add(getJMenuItemToolsGenerateGuidsXref());
         }
         return jMenuTools;
     }
@@ -1758,6 +1766,21 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         return jMenuItemEditFindLibraryInstance;
     }
 
+    /**
+     * This method initializes jMenuItemProjectGenerateGuidsXref	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemToolsGenerateGuidsXref() {
+        if (jMenuItemToolsGenerateGuidsXref == null) {
+            jMenuItemToolsGenerateGuidsXref = new JMenuItem();
+            jMenuItemToolsGenerateGuidsXref.setText("Generate guids.xref");
+            jMenuItemToolsGenerateGuidsXref.setMnemonic('G');
+            jMenuItemToolsGenerateGuidsXref.addActionListener(this);
+        }
+        return jMenuItemToolsGenerateGuidsXref;
+    }
+
     /* (non-Javadoc)
      * @see org.tianocore.packaging.common.ui.IFrame#main(java.lang.String[])
      *
@@ -1884,7 +1907,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         if (arg0.getSource() == this.jMenuItemFileSaveAll) {
             this.saveAll();
         }
-        
+
         if (arg0.getSource() == this.jMenuItemFileRefresh) {
             this.closeAll();
             this.refresh();
@@ -1949,6 +1972,10 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
         if (arg0.getSource() == this.jMenuItemToolsToolChainConfiguration) {
             this.setupToolChainConfiguration();
+        }
+
+        if (arg0.getSource() == this.jMenuItemToolsGenerateGuidsXref) {
+            this.generateGuidsXref();
         }
 
         if (arg0.getSource() == this.jMenuItemHelpAbout) {
@@ -2625,9 +2652,12 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         IDefaultMutableTreeNode belongNode = null;
 
         try {
-            id = iTree.getSelectNode().getId();
-            intCategory = iTree.getSelectCategory();
-            belongNode = iTree.getSelectNode().getBelongNode();
+            //
+            // Get selected tree node
+            //
+            if (iTree.getSelectNode() != null) {
+                id = iTree.getSelectNode().getId();
+            }
 
             //
             // If id is null, return directly
@@ -2635,6 +2665,9 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             if (id == null) {
                 return;
             }
+
+            intCategory = iTree.getSelectCategory();
+            belongNode = iTree.getSelectNode().getBelongNode();
 
             //              
             // If the node is not opened yet
@@ -3582,6 +3615,59 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         if (arg0.getSource() == this.iTree) {
             if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
                 this.doubleClickModuleTreeNode();
+            }
+        }
+    }
+
+    /**
+     Search whole workspace and find all module's name and guid, and save them to a file
+     
+     **/
+    private void generateGuidsXref() {
+        //
+        // Init File Chooser
+        //
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
+        fc.setSelectedFile(new File(Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
+                                    + DataType.GUIDS_XREF_FILE_NAME));
+        fc.setMultiSelectionEnabled(false);
+
+        //
+        // Get guids xref and save to file
+        //
+        int result = fc.showOpenDialog(new JPanel());
+        if (result == JFileChooser.APPROVE_OPTION) {
+            Vector<String> v = wt.getAllModuleGuidXref();
+            if (v.size() < 1) {
+                Log.wrn("No guids found!!!");
+                return;
+            }
+            File f = fc.getSelectedFile();
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                } catch (IOException e) {
+                    Log.wrn("Fail to create file", e.getMessage());
+                    Log.err("Fail to create file when generating guids.xref", e.getMessage());
+                }
+            }
+            FileWriter fw = null;
+            BufferedWriter bw = null;
+            try {
+                fw = new FileWriter(f);
+                bw = new BufferedWriter(fw);
+                for (int index = 0; index < v.size(); index++) {
+                    bw.write(v.get(index));
+                    bw.newLine();
+                }
+                bw.flush();
+                fw.flush();
+                bw.close();
+                fw.close();
+            } catch (IOException e) {
+                Log.wrn("Fail to write file", e.getMessage());
+                Log.err("Fail to write file when generating guids.xref", e.getMessage());
             }
         }
     }
