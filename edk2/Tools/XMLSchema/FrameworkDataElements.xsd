@@ -241,32 +241,32 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Extern">
           <xs:complexType>
-            <xs:choice minOccurs="1">
-              <xs:sequence>
+            <xs:choice minOccurs="1" maxOccurs="1">
+              <xs:sequence minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                   <xs:documentation xml:lang="en">Driver Module</xs:documentation>
                 </xs:annotation>
                 <xs:element minOccurs="0" maxOccurs="1" name="ModuleEntryPoint" type="C_NameType"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="ModuleUnloadImage" type="C_NameType"/>
               </xs:sequence>
-              <xs:sequence>
+              <xs:sequence minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                   <xs:documentation xml:lang="en">Library Module</xs:documentation>
                 </xs:annotation>
                 <xs:element minOccurs="0" maxOccurs="1" name="Constructor" type="C_NameType"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="Destructor" type="C_NameType"/>
               </xs:sequence>
-              <xs:sequence>
+              <xs:sequence minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                   <xs:documentation xml:lang="en">Allow multiple entries for DriverBinding, ComponentName, DriverConfig and DriverDiag elements. For ComponentName, DriverConfig and/or DriverDiag - you must have a 1:1 mapping to DriverBinding if the element is defined.</xs:documentation>
                   <xs:documentation xml:lang="en">Permit User Defined Extern Tags</xs:documentation>
                 </xs:annotation>
-                <xs:element minOccurs="0" maxOccurs="1" name="DriverBinding" type="C_NameType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="DriverBinding" type="C_NameType"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="ComponentName" type="C_NameType"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="DriverConfig" type="C_NameType"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="DriverDiag" type="C_NameType"/>
               </xs:sequence>
-              <xs:sequence>
+              <xs:sequence minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                   <xs:documentation xml:lang="en"> Module Call Backs</xs:documentation>
                 </xs:annotation>
