@@ -29,7 +29,7 @@
 #   IN      UINT64                    Operand
 #   );
 #------------------------------------------------------------------------------
-.global _InternalMathSwapBytes64
+.globl _InternalMathSwapBytes64
 _InternalMathSwapBytes64:
     movl    8(%esp), %eax
     movl    4(%esp), %edx

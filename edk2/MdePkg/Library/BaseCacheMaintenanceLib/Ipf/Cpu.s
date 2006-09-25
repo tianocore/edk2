@@ -46,7 +46,7 @@
   .section  .rtcode,  "ax", "progbits"
   .align 32
   .type  InvalidateInstructionCacheRange#  ,@function 
-        .global InvalidateInstructionCacheRange#
+        .globl InvalidateInstructionCacheRange#
 // Function compile flags: /Ogsy
   .section  .rtcode
 

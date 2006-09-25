@@ -24,7 +24,7 @@
     .386:
     .code:
 
-.global _InternalMemSetMem
+.globl _InternalMemSetMem
 
 #------------------------------------------------------------------------------
 #  VOID *

@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemSetMem16
+.globl _InternalMemSetMem16
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -51,7 +51,7 @@ L0:
     movl    %edx, %ecx
     andl    $7, %edx
     shrl    $3, %ecx
-    jz      @SetWords
+    jz      L_SetWords
     movd    %eax, %xmm0
     pshuflw $0, %xmm0, %xmm0
     movlhps %xmm0, %xmm0
@@ -60,7 +60,7 @@ L1:
     addl    $16, %edi
     loop    L1
     mfence
-@SetWords:
+L_SetWords:
     movl    %edx, %ecx
     rep
     stosw

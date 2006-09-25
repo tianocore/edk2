@@ -17,7 +17,7 @@
 .auto
 .text
 
-.global PalCallStatic
+.globl PalCallStatic
 .type   PalCallStatic, @function
 
 .proc   CpuFlushTlb

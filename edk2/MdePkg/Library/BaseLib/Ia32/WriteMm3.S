@@ -28,7 +28,7 @@
 #   IN UINT64   Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteMm3
+.globl _AsmWriteMm3
 _AsmWriteMm3:
     movq    4(%esp), %mm3
     ret

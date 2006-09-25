@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemSetMem32
+.globl _InternalMemSetMem32
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -51,7 +51,7 @@ L0:
     movl    %edx, %ecx
     andl    $3, %edx
     shrl    $2, %ecx
-    jz      @SetDwords
+    jz      L_SetDwords
     movd    %eax, %xmm0
     pshufd  $0, %xmm0, %xmm0
 L1:
@@ -59,7 +59,7 @@ L1:
     addl    $16, %edi
     loop    L1
     mfence
-@SetDwords:
+L_SetDwords:
     movl    %edx, %ecx
     rep
     stosl

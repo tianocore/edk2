@@ -28,7 +28,7 @@
 #   IN UINTN Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteDr3
+.globl _AsmWriteDr3
 _AsmWriteDr3:
     movl    4(%esp), %eax
     movl    %eax, %dr3

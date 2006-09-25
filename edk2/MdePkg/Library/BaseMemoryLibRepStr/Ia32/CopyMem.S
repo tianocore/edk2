@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global _InternalMemCopyMem
+.globl _InternalMemCopyMem
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -42,19 +42,19 @@ _InternalMemCopyMem:
     cmpl    %edi, %esi
     jae     L0
     cmpl    %edi, %eax
-    jae     @CopyBackward               # Copy backward if overlapped
+    jae     L_CopyBackward              # Copy backward if overlapped
 L0:
     movl    %edx, %ecx
     andl    $3, %edx
     shrl    $2, %ecx
     rep
     movsl                               # Copy as many Dwords as possible
-    jmp     @CopyBytes
-@CopyBackward:
+    jmp     L_CopyBytes
+L_CopyBackward:
     movl    %eax, %esi                  # esi <- End of Source
     leal    -1(%edi, %edx), %edi        # edi <- End of Destination
     std
-@CopyBytes:
+L_CopyBytes:
     movl    %edx, %ecx
     rep
     movsb                               # Copy bytes backward

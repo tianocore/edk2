@@ -22,7 +22,7 @@
     .386:
     .code:
 
-.global _InternalMathMultU64x32
+.globl _InternalMathMultU64x32
 
 #------------------------------------------------------------------------------
 # UINT64

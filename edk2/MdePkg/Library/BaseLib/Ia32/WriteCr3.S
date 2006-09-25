@@ -28,7 +28,7 @@
 #   IN      UINTN                     Cr3
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteCr3
+.globl _AsmWriteCr3
 _AsmWriteCr3:
     movl    4(%esp), %eax
     movl    %eax, %cr3

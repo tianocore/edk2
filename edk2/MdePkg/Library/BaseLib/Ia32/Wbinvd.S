@@ -28,7 +28,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWbinvd
+.globl _AsmWbinvd
 _AsmWbinvd:
     wbinvd
     ret

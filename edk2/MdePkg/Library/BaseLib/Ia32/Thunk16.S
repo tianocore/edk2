@@ -19,8 +19,8 @@
 #
 #------------------------------------------------------------------------------
 
-.global _m16Start, _m16Size, _mThunk16Attr, _m16Gdt, _m16GdtrBase, _mTransition
-.global _InternalAsmThunk16
+.globl _m16Start, _m16Size, _mThunk16Attr, _m16Gdt, _m16GdtrBase, _mTransition
+.globl _InternalAsmThunk16
 
 _m16Start:
 
@@ -30,8 +30,8 @@ _BackFromUserCode:
     push    %ss
     push    %cs
     .byte   0x66
-    call    @Base1                      # push eip
-@Base1:
+    call    L_Base1                     # push eip
+L_Base1:
     pushfw                              # pushfd actually
     cli                                 # disable interrupts
     push    %gs
@@ -39,20 +39,20 @@ _BackFromUserCode:
     push    %es
     push    %ds
     pushaw                              # pushad actually
-    .byte   0x66, 0xba                   # mov edx, imm32
+    .byte   0x66, 0xba                  # mov edx, imm32
 _ThunkAttr: .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
-    jz      @1
+    jz      1f
     movl    $0x15cd2401, %eax           # mov ax, 2401h & int 15h
     cli                                 # disable interrupts
-    jnc     @2
-@1:
+    jnc     2f
+1:
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL, %dl
-    jz      @2
+    jz      2f
     inb     $0x92, %al
     orb     $2, %al
     outb    %al, $0x92                  # deactivate A20M#
-@2:
+2:
     movl    %ss, %eax
     .byte   0x67, 0x66, 0x8d, 0x6c, 0x24, 0x34, 0x66
     mov     %ebp, 0xffffffd8(%esi)
@@ -93,16 +93,16 @@ _ToUserCode:
     movl    %esi, %ss                   # set up 16-bit stack segment
     xchgw   %bx, %sp                    # set up 16-bit stack pointer
     .byte   0x66
-    call    @Base                       # push eip
-@Base:
-    popw    %bp                         # ebp <- offset @Base
+    call    L_Base                      # push eip
+L_Base:
+    popw    %bp                         # ebp <- offset L_Base
     addr16  pushl 36(%si)
     .byte   0x36
     lea     0xc(%esi), %eax
     push    %eax
     lret
 
-@RealMode:
+L_RealMode:
     mov     %edx, %cs:0xffffffc5(%esi)
     mov     %bx, %cs:0xffffffcb(%esi)
     lidtw   %cs:0xffffffd7(%esi)

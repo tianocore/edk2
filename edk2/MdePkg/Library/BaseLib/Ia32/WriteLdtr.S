@@ -28,7 +28,7 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteLdtr
+.globl _AsmWriteLdtr
 _AsmWriteLdtr:
     movl    4(%esp), %eax
     lldtw   %ax
