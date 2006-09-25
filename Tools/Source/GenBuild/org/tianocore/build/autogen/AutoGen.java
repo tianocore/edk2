@@ -41,6 +41,7 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.pcd.action.PCDAutoGenAction;
 import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.definitions.EdkDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 
@@ -106,10 +107,11 @@ public class AutoGen {
 
     ///
     ///  For non library module, add its library instance's construct and destructor to
-    ///  list.
+    ///  list. String[0] recode LibConstructor name, String[1] recode Lib instance 
+	///  module type.
     ///
-    private List<String> libConstructList = new ArrayList<String>();
-    private List<String> libDestructList = new ArrayList<String>();
+    private List<String[]> libConstructList = new ArrayList<String[]>();
+    private List<String[]> libDestructList = new ArrayList<String[]>();
 
     ///
     /// List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack
@@ -1398,7 +1400,7 @@ public class AutoGen {
                  String buffer for AutoGen.c
       @throws Exception
     **/
-    void LibConstructorToAutogenC(List<String> libInstanceList,
+    void LibConstructorToAutogenC(List<String[]> libInstanceList,
                                   String moduleType, StringBuffer fileBuffer) throws EdkException {
         boolean isFirst = true;
 
@@ -1407,44 +1409,54 @@ public class AutoGen {
         // module type.
         //
         for (int i = 0; i < libInstanceList.size(); i++) {
-            switch (CommonDefinition.getModuleType(moduleType)) {
-            case CommonDefinition.ModuleTypeBase:
-                fileBuffer.append("RETURN_STATUS\r\n");
+			if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+				fileBuffer.append("RETURN_STATUS\r\n");
                 fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
+                fileBuffer.append(libInstanceList.get(i)[0]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer.append("  VOID\r\n");
                 fileBuffer.append("  );\r\n");
-                break;
+			} else {
+				switch (CommonDefinition.getModuleType(moduleType)) {
+                case CommonDefinition.ModuleTypeBase:
+                    fileBuffer.append("RETURN_STATUS\r\n");
+                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append(libInstanceList.get(i)[0]);
+                    fileBuffer.append(" (\r\n");
+                    fileBuffer.append("  VOID\r\n");
+                    fileBuffer.append("  );\r\n");
+                    break;
 
-            case CommonDefinition.ModuleTypePeiCore:
-            case CommonDefinition.ModuleTypePeim:
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer
-                .append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
-                fileBuffer
-                .append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
-                fileBuffer.append("  );\r\n");
-                break;
+                case CommonDefinition.ModuleTypePeiCore:
+                case CommonDefinition.ModuleTypePeim:
+					fileBuffer.append("EFI_STATUS\r\n");
+					fileBuffer.append("EFIAPI\r\n");
+					fileBuffer.append(libInstanceList.get(i)[0]);
+					fileBuffer.append(" (\r\n");
+					fileBuffer
+					.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
+					fileBuffer
+					.append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
+					fileBuffer.append("  );\r\n");
+					break;
+	
+				case CommonDefinition.ModuleTypeDxeCore:
+				case CommonDefinition.ModuleTypeDxeDriver:
+				case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+				case CommonDefinition.ModuleTypeDxeSmmDriver:
+				case CommonDefinition.ModuleTypeDxeSalDriver:
+				case CommonDefinition.ModuleTypeUefiDriver:
+				case CommonDefinition.ModuleTypeUefiApplication:
+					fileBuffer.append("EFI_STATUS\r\n");
+					fileBuffer.append("EFIAPI\r\n");
+					fileBuffer.append(libInstanceList.get(i)[0]);
+					fileBuffer.append(" (\r\n");
+					fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+					fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
+					fileBuffer.append("  );\r\n");
+					break;
 
-            case CommonDefinition.ModuleTypeDxeCore:
-            case CommonDefinition.ModuleTypeDxeDriver:
-            case CommonDefinition.ModuleTypeDxeRuntimeDriver:
-            case CommonDefinition.ModuleTypeDxeSmmDriver:
-            case CommonDefinition.ModuleTypeDxeSalDriver:
-            case CommonDefinition.ModuleTypeUefiDriver:
-            case CommonDefinition.ModuleTypeUefiApplication:
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  );\r\n");
-                break;
+			    }
             }
         }
 
@@ -1493,32 +1505,40 @@ public class AutoGen {
                 fileBuffer.append("\r\n");
                 isFirst = false;
             }
-            switch (CommonDefinition.getModuleType(moduleType)) {
-            case CommonDefinition.ModuleTypeBase:
+			if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
                 fileBuffer.append("  Status = ");
-                fileBuffer.append(libInstanceList.get(i));
+                fileBuffer.append(libInstanceList.get(i)[0]);
                 fileBuffer.append("();\r\n");
                 fileBuffer.append("  VOID\r\n");
-                break;
-            case CommonDefinition.ModuleTypePeiCore:
-            case CommonDefinition.ModuleTypePeim:
-                fileBuffer.append("  Status = ");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
-                break;
-            case CommonDefinition.ModuleTypeDxeCore:
-            case CommonDefinition.ModuleTypeDxeDriver:
-            case CommonDefinition.ModuleTypeDxeRuntimeDriver:
-            case CommonDefinition.ModuleTypeDxeSmmDriver:
-            case CommonDefinition.ModuleTypeDxeSalDriver:
-            case CommonDefinition.ModuleTypeUefiDriver:
-            case CommonDefinition.ModuleTypeUefiApplication:
-                fileBuffer.append("  Status = ");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (ImageHandle, SystemTable);\r\n");
-                break;
-            default:
-                EdkLog.log(EdkLog.EDK_INFO,"Autogen doesn't know how to deal with module type - " + moduleType + "!");
+			} else {
+				switch (CommonDefinition.getModuleType(moduleType)) {
+					case CommonDefinition.ModuleTypeBase:
+						fileBuffer.append("  Status = ");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append("();\r\n");
+						fileBuffer.append("  VOID\r\n");
+						break;
+					case CommonDefinition.ModuleTypePeiCore:
+					case CommonDefinition.ModuleTypePeim:
+						fileBuffer.append("  Status = ");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
+						break;
+					case CommonDefinition.ModuleTypeDxeCore:
+					case CommonDefinition.ModuleTypeDxeDriver:
+					case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+					case CommonDefinition.ModuleTypeDxeSmmDriver:
+					case CommonDefinition.ModuleTypeDxeSalDriver:
+					case CommonDefinition.ModuleTypeUefiDriver:
+					case CommonDefinition.ModuleTypeUefiApplication:
+						fileBuffer.append("  Status = ");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append(" (ImageHandle, SystemTable);\r\n");
+						break;
+					default:
+						EdkLog.log(EdkLog.EDK_INFO,"Autogen doesn't know how to deal with module type - " + moduleType + "!");
+			   }
+            
             }
             fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
         }
@@ -1539,46 +1559,55 @@ public class AutoGen {
                  String buffer for AutoGen.c
       @throws Exception
     **/
-    void LibDestructorToAutogenC(List<String> libInstanceList,
+    void LibDestructorToAutogenC(List<String[]> libInstanceList,
                                  String moduleType, StringBuffer fileBuffer) throws EdkException {
         boolean isFirst = true;
         for (int i = 0; i < libInstanceList.size(); i++) {
-            switch (CommonDefinition.getModuleType(moduleType)) {
-            case CommonDefinition.ModuleTypeBase:
+			if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
                 fileBuffer.append("RETURN_STATUS\r\n");
                 fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
+                fileBuffer.append(libInstanceList.get(i)[0]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer.append("  VOID\r\n");
                 fileBuffer.append("  );\r\n");
-                break;
-            case CommonDefinition.ModuleTypePeiCore:
-            case CommonDefinition.ModuleTypePeim:
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer
-                .append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
-                fileBuffer
-                .append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
-                fileBuffer.append("  );\r\n");
-                break;
-            case CommonDefinition.ModuleTypeDxeCore:
-            case CommonDefinition.ModuleTypeDxeDriver:
-            case CommonDefinition.ModuleTypeDxeRuntimeDriver:
-            case CommonDefinition.ModuleTypeDxeSmmDriver:
-            case CommonDefinition.ModuleTypeDxeSalDriver:
-            case CommonDefinition.ModuleTypeUefiDriver:
-            case CommonDefinition.ModuleTypeUefiApplication:
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(libInstanceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  );\r\n");
-                break;
+			} else {
+				switch (CommonDefinition.getModuleType(moduleType)) {
+					case CommonDefinition.ModuleTypeBase:
+						fileBuffer.append("RETURN_STATUS\r\n");
+						fileBuffer.append("EFIAPI\r\n");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append(" (\r\n");
+						fileBuffer.append("  VOID\r\n");
+						fileBuffer.append("  );\r\n");
+						break;
+					case CommonDefinition.ModuleTypePeiCore:
+					case CommonDefinition.ModuleTypePeim:
+						fileBuffer.append("EFI_STATUS\r\n");
+						fileBuffer.append("EFIAPI\r\n");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append(" (\r\n");
+						fileBuffer
+						.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
+						fileBuffer
+						.append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
+						fileBuffer.append("  );\r\n");
+						break;
+					case CommonDefinition.ModuleTypeDxeCore:
+					case CommonDefinition.ModuleTypeDxeDriver:
+					case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+					case CommonDefinition.ModuleTypeDxeSmmDriver:
+					case CommonDefinition.ModuleTypeDxeSalDriver:
+					case CommonDefinition.ModuleTypeUefiDriver:
+					case CommonDefinition.ModuleTypeUefiApplication:
+						fileBuffer.append("EFI_STATUS\r\n");
+						fileBuffer.append("EFIAPI\r\n");
+						fileBuffer.append(libInstanceList.get(i)[0]);
+						fileBuffer.append(" (\r\n");
+						fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+						fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
+						fileBuffer.append("  );\r\n");
+						break;
+			    }
             }
         }
 
@@ -1615,8 +1644,14 @@ public class AutoGen {
                     fileBuffer.append("\r\n");
                     isFirst = false;
                 }
+				if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+                    fileBuffer.append("  Status = ");
+                    fileBuffer.append(libInstanceList.get(i)[0]);
+                    fileBuffer.append("();\r\n");
+                    fileBuffer.append("  VOID\r\n");
+				}
                 fileBuffer.append("  Status = ");
-                fileBuffer.append(libInstanceList.get(i));
+                fileBuffer.append(libInstanceList.get(i)[0]);
                 fileBuffer.append("(ImageHandle, SystemTable);\r\n");
                 fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
             }
@@ -1880,6 +1915,7 @@ public class AutoGen {
 
         String libConstructName = null;
         String libDestructName = null;
+		String libModuleType   = null;
         String[] setVirtuals = null;
         String[] exitBoots = null;
 
@@ -1958,6 +1994,7 @@ public class AutoGen {
 					//
 					libConstructName = saq.getLibConstructorName();
 					libDestructName = saq.getLibDestructorName();
+					libModuleType = saq.getModuleType();
 
 					//
 					// Collect SetVirtualAddressMapCallBack and
@@ -1980,13 +2017,13 @@ public class AutoGen {
 					// Add dependent library instance constructor function.
 					//
 					if (libConstructName != null) {
-						this.libConstructList.add(libConstructName);
+						this.libConstructList.add(new String[] {libConstructName, libModuleType});
 					}
 					//
 					// Add dependent library instance destructor fuction.
 					//
 					if (libDestructName != null) {
-						this.libDestructList.add(libDestructName);
+						this.libDestructList.add(new String[] {libDestructName, libModuleType});
 					}
 				}
 			}
