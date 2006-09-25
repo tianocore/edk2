@@ -804,4 +804,13 @@ public class WorkspaceTools {
         }
         return vpid;
     }
+    
+    public Vector<String> getAllModuleGuidXref() {
+        Vector<String> v = new Vector<String>();
+        for (int index = 0; index < GlobalData.openingModuleList.size(); index++) {
+            ModuleIdentification id = GlobalData.openingModuleList.getOpeningModuleByIndex(index).getId();
+            v.addElement(id.getGuid() + " " + id.getName());
+        }
+        return v;
+    }
 }
