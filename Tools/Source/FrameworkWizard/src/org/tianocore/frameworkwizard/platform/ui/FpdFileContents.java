@@ -1761,9 +1761,14 @@ public class FpdFileContents {
         for (int i = 0; i < includeModules.size(); ++i) {
             cursor.beginElement(elementModule);
             cursor.insertAttributeWithValue("ModuleGuid", includeModules.get(i)[0]);
-            cursor.insertAttributeWithValue("ModuleVersion", includeModules.get(i)[1]);
+            if (!includeModules.get(i)[1].equals("null") && includeModules.get(i)[1].length() != 0) {
+                cursor.insertAttributeWithValue("ModuleVersion", includeModules.get(i)[1]);
+            }
             cursor.insertAttributeWithValue("PackageGuid", includeModules.get(i)[2]);
-            cursor.insertAttributeWithValue("PackageVersion", includeModules.get(i)[3]);
+            if (!includeModules.get(i)[3].equals("null") && includeModules.get(i)[3].length() != 0) {
+                cursor.insertAttributeWithValue("PackageVersion", includeModules.get(i)[3]);
+            }
+            
             cursor.insertAttributeWithValue("Arch", includeModules.get(i)[4]);
             cursor.toEndToken();
             cursor.toNextToken();
