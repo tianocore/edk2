@@ -275,7 +275,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
             Iterator resultIter = resultList.iterator();
             while (resultIter.hasNext()) {
                 Log.wrn("Update far", "Missing dependency package " + ((PackageIdentification) resultIter.next()).toString()
-                        + "in workspace!");
+                        + " in workspace!");
                 return;
             }
 

@@ -78,8 +78,8 @@ public class CreateStepThree extends IDialog implements MouseListener {
         if (jTextArea == null) {
             jTextArea = new JTextArea();
             jTextArea.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
-            jTextArea.setText("Add more file filter regular expressions in text field separated with space. \n");
-            jTextArea.append("Note that regular expressions please reference PERL language. ");
+            jTextArea.setText("Add additional file filter regular expressions in the text field, separated by space characters.\n");
+            jTextArea.append("Note, for additional information about regular expressions, please reference PERL language regular expressions.");
             jTextArea.setEditable(false);
         }
         return jTextArea;
@@ -209,7 +209,7 @@ public class CreateStepThree extends IDialog implements MouseListener {
         if (jContentPane == null) {
             jLabel1 = new JLabel();
             jLabel1.setBounds(new java.awt.Rectangle(30, 220, 260, 20));
-            jLabel1.setText("Input File Filter Pattern (Ref to ...)");
+            jLabel1.setText("Input File Filter Pattern (regular expressions)");
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(30, 64, 160, 20));
             jLabel.setText("File Filter Pattern: ");

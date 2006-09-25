@@ -128,12 +128,12 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener {
     private JTextArea getJTextArea1() {
         if (jTextAreaInstruction == null) {
             jTextAreaInstruction = new JTextArea();
-            jTextAreaInstruction.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
-            jTextAreaInstruction.setText("Step 1: Choose FAR from framework database. \n");
+            jTextAreaInstruction.setBounds(new java.awt.Rectangle(30, 7, 662, 50));
+            jTextAreaInstruction.setText("Step 1: Select FAR to remove.\n");
             jTextAreaInstruction.setCaretColor(Color.RED);
             jTextAreaInstruction
-                                .append("After choose FAR, the packages and platforms which belong to the FAR will display. \n");
-            jTextAreaInstruction.append("Picture \"Okay\" or \"No\" indicates whether FAR can be removed or not. ");
+                                .append("After choosing the FAR, the packages and/or platforms that belong to the FAR will displayed.\n");
+            jTextAreaInstruction.append("Icon \"OK\" or \"NO\" indicates whether the FAR can be safely removed.");
             jTextAreaInstruction.setEditable(false);
         }
         return jTextAreaInstruction;
@@ -269,7 +269,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener {
             jLabelImage = new JLabel();
             jLabelImage.setBounds(new java.awt.Rectangle(30, 319, 36, 36));
             jLabel4 = new JLabel();
-            jLabel4.setBounds(new java.awt.Rectangle(71, 325, 289, 20));
+            jLabel4.setBounds(new java.awt.Rectangle(71, 325, 320, 20));
             jLabel3 = new JLabel();
             jLabel3.setBounds(new java.awt.Rectangle(360, 170, 113, 20));
             jLabel3.setText("FAR's Platforms");
@@ -338,12 +338,12 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener {
 
             if (flag) {
                 jLabelImage.setIcon(new ImageIcon(getClass().getResource("/resources/images/Yes.JPG")));
-                jLabel4.setText("Without any remain packages depend on this FAR. ");
+                jLabel4.setText("None of the remaining packages depend on this FAR. ");
                 jButtonDetail.setVisible(false);
                 jButtonNext.setEnabled(true);
             } else {
                 jLabelImage.setIcon(new ImageIcon(getClass().getResource("/resources/images/No.JPG")));
-                jLabel4.setText("Some remain packages still depend on this FAR. ");
+                jLabel4.setText("Some of the remaining packages still depend on this FAR. ");
                 //        jButtonDetail.setVisible(true);
                 jButtonNext.setEnabled(false);
             }

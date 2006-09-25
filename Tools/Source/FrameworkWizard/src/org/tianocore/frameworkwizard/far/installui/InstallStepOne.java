@@ -234,8 +234,8 @@ public class InstallStepOne extends IDialog implements MouseListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelWarning = new JLabel();
-            jLabelWarning.setBounds(new java.awt.Rectangle(30, 125, 410, 20));
-            jLabelWarning.setText("Can't install this FAR, lack following packages in current workspace");
+            jLabelWarning.setBounds(new java.awt.Rectangle(30, 125, 510, 20));
+            jLabelWarning.setText("Cannot install this FAR, the WORKSPACE is missing the following required packages.");
             jLabelWarning.setVisible(false);
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(30, 80, 97, 20));
@@ -263,7 +263,7 @@ public class InstallStepOne extends IDialog implements MouseListener {
             //
             File farFile = new File(jTextFieldFarFile.getText());
             if (!farFile.exists() || !farFile.isFile()) {
-                Log.wrn("Install far", "Please choose a FAR file already exists. ");
+                Log.wrn("Install far", "Please choose an existing FAR file.");
                 return;
             }
 

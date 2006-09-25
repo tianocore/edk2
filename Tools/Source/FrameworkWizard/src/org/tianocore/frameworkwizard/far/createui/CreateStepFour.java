@@ -211,7 +211,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
             jLabel2.setText("File to Save:  ");
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(29,108,320,20));
-            jLabel.setText("This FAR will depend on following packages: ");
+            jLabel.setText("This FAR will depend on the following packages: ");
             jLabel.setVisible(false);
             jContentPane = new JPanel();
             jContentPane.setLayout(null);

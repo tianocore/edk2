@@ -100,9 +100,9 @@ public class InstallStepTwo extends IDialog implements MouseListener {
         if (jTextArea == null) {
             jTextArea = new JTextArea();
             jTextArea.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
-            jTextArea.setText("Step 2: Set Path for Packages and Platforms. \n");
+            jTextArea.setText("Step 2: Set Install Path for Packages and/or Platforms.\n");
             jTextArea.setCaretColor(Color.RED);
-            jTextArea.append("Note that path is relative to WORKSPACE. ");
+            jTextArea.append("Note that the Install Path is Relative to WORKSPACE. ");
             jTextArea.setEditable(false);
         }
         return jTextArea;
@@ -302,10 +302,10 @@ public class InstallStepTwo extends IDialog implements MouseListener {
         if (jContentPane == null) {
             jLabel1 = new JLabel();
             jLabel1.setBounds(new java.awt.Rectangle(30, 195, 348, 18));
-            jLabel1.setText("Edit pathes for platforms: ");
+            jLabel1.setText("Edit \"Install To\" paths for platforms: ");
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(29, 60, 366, 20));
-            jLabel.setText("Edit pathes for packages");
+            jLabel.setText("Edit \"Install To\" paths for packages");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.add(getJTextArea(), null);
@@ -346,11 +346,11 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 File toFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar
                                        + packageModel.getValueAt(i, 3));
                 if (!isPackagePathValid(toFile)) {
-                    Log.wrn("Install far", packageVector.get(i) + " path already has package now. ");
+                    Log.wrn("Install far", packageVector.get(i) + " path already contains a package.");
                     return;
                 }
                 if (allNewPath.contains(toFile)) {
-                    Log.wrn("Install far", "Path " + packageModel.getValueAt(i, 3) + " is specified by twice. ");
+                    Log.wrn("Install far", "Path " + packageModel.getValueAt(i, 3) + " is specified twice.");
                     return;
                 }
                 allNewPath.add(toFile);
@@ -365,7 +365,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 File toFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar
                                        + platformModel.getValueAt(i, 3));
                 if (!isPlatformPathValid(toFile)) {
-                    Log.wrn("Install far", platformVector.get(i) + " path already has platform now. ");
+                    Log.wrn("Install far", platformVector.get(i) + " path already contains a platform.");
                     return;
                 }
                 File fpdFile = new File((String) platformModel.getValueAt(i, 3) + File.separatorChar
