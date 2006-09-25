@@ -126,7 +126,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jTextFieldBaseName == null) {
             jTextFieldBaseName = new JTextField();
             jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 520, 20));
-            jTextFieldBaseName.setToolTipText("An brief Identifier, such as USB I/O Library, of the module");
+            jTextFieldBaseName.setToolTipText("A brief Identifier, such as USB I/O Drivers, of the Framework Archive.");
         }
         return jTextFieldBaseName;
     }
@@ -188,7 +188,8 @@ public class CreateStepOne extends IDialog implements MouseListener {
             jTextAreaLicense = new JTextArea();
             jTextAreaLicense.setText("");
             jTextAreaLicense.setLineWrap(true);
-            jTextAreaLicense.setToolTipText("The License for this file");
+            jTextAreaLicense.setWrapStyleWord(true);
+            jTextAreaLicense.setToolTipText("The License for this FAR file.");
         }
         return jTextAreaLicense;
     }
@@ -203,7 +204,8 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jTextAreaDescription == null) {
             jTextAreaDescription = new JTextArea();
             jTextAreaDescription.setLineWrap(true);
-            jTextAreaDescription.setToolTipText("A verbose description of the module");
+            jTextAreaDescription.setWrapStyleWord(true);
+            jTextAreaDescription.setToolTipText("A verbose description of the FAR contents.");
         }
         return jTextAreaDescription;
     }
@@ -266,7 +268,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
             jTextFieldAbstract.setBounds(new java.awt.Rectangle(160, 85, 520, 20));
-            jTextFieldAbstract.setToolTipText("A one sentence description of this module");
+            jTextFieldAbstract.setToolTipText("A one sentence description of this FAR package.");
         }
         return jTextFieldAbstract;
     }
@@ -497,11 +499,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check BaseName
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Create far", "Base Name couldn't be empty");
+            Log.wrn("Create far", "FAR Name must be entered.");
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Create far", "Incorrect data type for Base Name");
+            Log.wrn("Create far", "Incorrect data type for FAR Name");
             return false;
         }
         farHeader.setFarName(this.jTextFieldBaseName.getText());
@@ -510,7 +512,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Guid
         //
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.wrn("Create far", "Guid Value couldn't be empty");
+            Log.wrn("Create far", "A GUID must be entered.");
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
@@ -523,7 +525,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Version
         //
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.wrn("Create far", "Version couldn't be empty");
+            Log.wrn("Create far", "A Version must be entered.");
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
@@ -536,7 +538,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Abstact
         //
         if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.wrn("Create far", "Abstract couldn't be empty");
+            Log.wrn("Create far", "An Abstract must be entered.");
             return false;
         }
         if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
@@ -549,7 +551,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Description
         //
         if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.wrn("Create far", "Description couldn't be empty");
+            Log.wrn("Create far", "A Description must be entered.");
             return false;
         }
         farHeader.setDescription(this.jTextAreaDescription.getText());
@@ -558,7 +560,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Copyright
         //
         if (isEmpty(this.jTextAreaCopyright.getText())) {
-            Log.wrn("Create far", "Copyright couldn't be empty");
+            Log.wrn("Create far", "The Copyright must be entered.");
             return false;
         }
         farHeader.setCopyright(this.jTextAreaCopyright.getText());
@@ -567,7 +569,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check License
         //
         if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.wrn("Create far", "License couldn't be empty");
+            Log.wrn("Create far", "The License must be entered.");
             return false;
         }
         farHeader.setLicense(this.jTextAreaLicense.getText());

@@ -123,8 +123,8 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
             jTextArea = new JTextArea();
             jTextArea.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
             jTextArea.setText("Step 2: Choose Delete Mode. \n");
-            jTextArea.append("Mode 1 only remove register information from framework database. \n");
-            jTextArea.append("Mode 2 also delete all files from file system. ");
+            jTextArea.append("Mode 1 Only remove registation information from the WORKSPACE. \n");
+            jTextArea.append("Mode 2 Also delete all files and directories from file system. ");
             jTextArea.setEditable(false);
         }
         return jTextArea;
@@ -138,9 +138,9 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
     private JRadioButton getJRadioButton() {
         if (jRadioButton == null) {
             jRadioButton = new JRadioButton();
-            jRadioButton.setBounds(new java.awt.Rectangle(40,100,340,20));
+            jRadioButton.setBounds(new java.awt.Rectangle(40,100,440,20));
             jRadioButton.setSelected(true);
-            jRadioButton.setText("Mode 1: Only remove from framework database");
+            jRadioButton.setText("Mode 1: Only remove registration information from the WORKSPACE.");
         }
         return jRadioButton;
     }
@@ -153,8 +153,8 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
     private JRadioButton getJRadioButton1() {
         if (jRadioButton1 == null) {
             jRadioButton1 = new JRadioButton();
-            jRadioButton1.setBounds(new java.awt.Rectangle(40,140,358,20));
-            jRadioButton1.setText("Mode 2: Delete all related files from workspace");
+            jRadioButton1.setBounds(new java.awt.Rectangle(40,140,440,20));
+            jRadioButton1.setText("Mode 2: Delete ALL related files and directories from the WORKSPACE.");
         }
         return jRadioButton1;
     }

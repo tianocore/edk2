@@ -215,7 +215,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
         if (jContentPane == null) {
             jLabel1 = new JLabel();
             jLabel1.setBounds(new java.awt.Rectangle(30, 110, 355, 18));
-            jLabel1.setText("Choose FAR from current framework database");
+            jLabel1.setText("Choose FAR from current WORKSPACE.");
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(30, 80, 97, 20));
             jLabel.setText("Choose FAR file: ");
@@ -242,7 +242,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             //
             farFile = new File(jTextFieldFarFile.getText());
             if (!farFile.exists() || !farFile.isFile()) {
-                Log.wrn("Update far", "Please choose a FAR file already exists. ");
+                Log.wrn("Update far", "Please choose a FAR file that already exists.");
                 return;
             }
 
@@ -261,7 +261,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             // Add more logic process here
             //
             if (jListFarFromDb.getSelectedValue() == null) {
-                Log.wrn("Update far", "Please choose a FAR from framework database. ");
+                Log.wrn("Update far", "Please choose a FAR from current WORKSPACE.");
                 return;
             }
 
