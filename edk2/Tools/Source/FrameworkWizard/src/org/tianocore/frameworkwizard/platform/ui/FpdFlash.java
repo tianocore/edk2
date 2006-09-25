@@ -2842,7 +2842,7 @@ public class FpdFlash extends IInternalFrame {
         private JButton getJButtonInsert() {
             if (jButtonInsert == null) {
                 jButtonInsert = new JButton();
-                jButtonInsert.setText("<<");
+                jButtonInsert.setText("<");
                 jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
                 jButtonInsert.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -2888,7 +2888,7 @@ public class FpdFlash extends IInternalFrame {
             if (jButtonRemove == null) {
                 jButtonRemove = new JButton();
                 jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
-                jButtonRemove.setText(">>");
+                jButtonRemove.setText(">");
                 jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         int selectedRowLeft = jTableModInFv.getSelectedRow();
