@@ -152,7 +152,6 @@ public class Tool implements EfiDefine, Section {
             argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
                          + tempInputFile.toString(" ")+ " -o " + outputFileName;
             EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
-            EdkLog.log(this, EdkLog.EDK_INFO, this.outputFileName);
             ///
             /// execute command line
             ///
