@@ -767,7 +767,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <echo message="Ignoring ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+      <echo message="Ignoring ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" level="info" />
     </sequential>
   </macrodef>
 

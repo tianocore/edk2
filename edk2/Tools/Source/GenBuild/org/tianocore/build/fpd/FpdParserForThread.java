@@ -173,6 +173,7 @@ public class FpdParserForThread extends FpdParserTask {
                 }
                 
                 int percentage = (totalNumber - remainNumber) * 100 / totalNumber;
+                updateTaskName(percentage);
                 EdkLog.log(this, EdkLog.EDK_ALWAYS, percentage + "% finished. Has built " + (totalNumber - remainNumber) + " modules of " + totalNumber + " total. ");
 
                 Set<FpdModuleIdentification> currentQueueModules = fvs.get(queueList.get(currentQueueCode));
@@ -391,5 +392,18 @@ public class FpdParserForThread extends FpdParserTask {
             --currentRunNumber;
             --remainNumber;
         }
+    }
+    
+    private void updateTaskName(int percentage){
+        int number = percentage/10;
+        StringBuffer str = new StringBuffer(9);
+        for(int i = 0; i < 9; i++) {
+            if (i < number) {
+                str.append('>');
+            } else {
+                str.append('.');
+            }
+        }
+        this.setTaskName(str.toString());
     }
 }
