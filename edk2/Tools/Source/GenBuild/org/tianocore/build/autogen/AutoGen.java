@@ -1649,11 +1649,12 @@ public class AutoGen {
                     fileBuffer.append(libInstanceList.get(i)[0]);
                     fileBuffer.append("();\r\n");
                     fileBuffer.append("  VOID\r\n");
+				} else {
+					fileBuffer.append("  Status = ");
+					fileBuffer.append(libInstanceList.get(i)[0]);
+					fileBuffer.append("(ImageHandle, SystemTable);\r\n");
+					fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
 				}
-                fileBuffer.append("  Status = ");
-                fileBuffer.append(libInstanceList.get(i)[0]);
-                fileBuffer.append("(ImageHandle, SystemTable);\r\n");
-                fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
             }
             fileBuffer.append("}\r\n");
             break;
