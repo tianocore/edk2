@@ -36,6 +36,7 @@ import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.definitions.EdkDefinitions;
 import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
 import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.global.GlobalData;
@@ -43,11 +44,15 @@ import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.pcd.action.PlatformPcdPreprocessActionForBuilding;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
   <code>FpdParserTask</code> is an ANT task. The main function is parsing Framework
@@ -117,6 +122,8 @@ public class FpdParserTask extends Task {
      Surface area is not valid.
     **/
     public void execute() throws BuildException {
+        this.setTaskName("FpdParser");
+        
         //
         // Parse FPD file
         //
@@ -267,13 +274,45 @@ public class FpdParserTask extends Task {
                     }
                     bw.newLine();
                 }
-
+                
                 //
                 // Files
                 //
+                Set<FpdModuleIdentification> moduleSeqSet = getModuleSequenceForFv(validFv[i]);
+                
                 Set<FpdModuleIdentification> filesSet = fvs.get(validFv[i]);
-                if (filesSet != null) {
-                    FpdModuleIdentification[] files = filesSet.toArray(new FpdModuleIdentification[filesSet.size()]);
+                
+                FpdModuleIdentification[] files = null;
+                if (moduleSeqSet == null) {
+                    if (filesSet != null) {
+                        files = filesSet.toArray(new FpdModuleIdentification[filesSet.size()]);
+                    }
+                } else {
+                    //
+                    // if moduleSeqSet and filesSet is inconsistent, report error
+                    //
+                    if (filesSet == null && moduleSeqSet.size() != 0) {
+                        throw new BuildException("Can not find any modules belongs to FV[" + validFv[i] + "], but listed some in BuildOptions.UserExtensions[@UserID='IMAGES' @Identifier='1']");
+                    } else if(moduleSeqSet.size() != filesSet.size()){
+                        throw new BuildException("Modules for FV[" + validFv[i] + "] defined in FrameworkModules and in BuildOptions.UserExtensions[@UserID='IMAGES' @Identifier='1'] are inconsistent. ");
+                    } else {
+                        //
+                        // whether all modules in moduleSeqSet listed in filesSet
+                        //
+                        Iterator<FpdModuleIdentification> iter = moduleSeqSet.iterator();
+                        while (iter.hasNext()) {
+                            FpdModuleIdentification item = iter.next();
+                            if (!filesSet.contains(item)) {
+                                throw new BuildException("Can not find " + item + " belongs to FV[" + validFv[i] + "]");
+                            }
+                        }
+                    }
+                    
+                    files = moduleSeqSet.toArray(new FpdModuleIdentification[moduleSeqSet.size()]);
+                }
+                
+                
+                if (files != null) {
                     bw.write("[files]");
                     bw.newLine();
                     for (int j = 0; j < files.length; j++) {
@@ -286,6 +325,10 @@ public class FpdParserTask extends Task {
                 bw.close();
                 fw.close();
             } catch (IOException ex) {
+                BuildException buildException = new BuildException("Generation of the FV file [" + fvFile.getPath() + "] failed!\n" + ex.getMessage());
+                buildException.setStackTrace(ex.getStackTrace());
+                throw buildException;
+            } catch (EdkException ex) {
                 BuildException buildException = new BuildException("Generation of the FV file [" + fvFile.getPath() + "] failed!\n" + ex.getMessage());
                 buildException.setStackTrace(ex.getStackTrace());
                 throw buildException;
@@ -612,5 +655,100 @@ public class FpdParserTask extends Task {
         }
         
         return archs;
+    }
+    
+    private Set<FpdModuleIdentification> getModuleSequenceForFv(String fvName) throws EdkException {
+        Node node = saq.getFpdModuleSequence(fvName);
+        Set<FpdModuleIdentification> result = new LinkedHashSet<FpdModuleIdentification>();
+        
+        if ( node == null) {
+            EdkLog.log(this, EdkLog.EDK_WARNING, "FV[" + fvName + "] does not specify module sequence in FPD. Assuming present sequence as default sequence in FV. ");
+            return null;
+        } else {
+            NodeList childNodes = node.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childItem = childNodes.item(i);
+                if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                    //
+                    // Find child elements "IncludeModules"
+                    //
+                    if (childItem.getNodeName().compareTo("IncludeModules") == 0) {
+                        //
+                        // result will be updated
+                        //
+                        processNodes(childItem, result);
+                    } else if (childItem.getNodeName().compareTo("FvName") == 0) {
+                        
+                    } else if (childItem.getNodeName().compareTo("InfFileName") == 0) {
+                        
+                    } else {
+                        //
+                        // Report Warning
+                        //
+                        EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised element " + childItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='IMAGES' Identifier='1']");
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private void processNodes(Node node, Set<FpdModuleIdentification> result) throws EdkException {
+        //
+        // Found out all elements "Module"
+        //
+        NodeList childNodes = node.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+            Node childItem = childNodes.item(j);
+            if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                if (childItem.getNodeName().compareTo("Module") == 0) {
+                    String moduleGuid = null;
+                    String moduleVersion = null;
+                    String packageGuid = null;
+                    String packageVersion = null;
+                    String arch = null;
+                    
+                    NamedNodeMap attr = childItem.getAttributes();
+                    for (int i = 0; i < attr.getLength(); i++) {
+                        Node attrItem = attr.item(i);
+                        if (attrItem.getNodeName().compareTo("ModuleGuid") == 0) {
+                            moduleGuid = attrItem.getNodeValue();
+                        } else if (attrItem.getNodeName().compareTo("ModuleVersion") == 0) {
+                            moduleVersion = attrItem.getNodeValue();
+                        } else if (attrItem.getNodeName().compareTo("PackageGuid") == 0) {
+                            packageGuid = attrItem.getNodeValue();
+                        } else if (attrItem.getNodeName().compareTo("PackageVersion") == 0) {
+                            packageVersion = attrItem.getNodeValue();
+                        } else if (attrItem.getNodeName().compareTo("Arch") == 0) {
+                            arch = attrItem.getNodeValue();
+                        } else {
+                            //
+                            // Report warning
+                            //
+                            EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised attribute " + attrItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='IMAGES' Identifier='1'].IncludeModules.Module");
+                        }
+                    }
+                    
+                    PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
+                    GlobalData.refreshPackageIdentification(packageId);
+                    
+                    ModuleIdentification moduleId = new ModuleIdentification(moduleGuid, moduleVersion);
+                    moduleId.setPackage(packageId);
+                    GlobalData.refreshModuleIdentification(moduleId);
+                    
+                    if (arch == null) {
+                        throw new EdkException("Attribute [Arch] is required for element FPD.BuildOptions.UserExtensions[UserID='IMAGES' Identifier='1'].IncludeModules.Module. ");
+                    }
+                    
+                    result.add(new FpdModuleIdentification(moduleId, arch));
+                } else {
+                    //
+                    // Report Warning
+                    //
+                    EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised element " + childItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='IMAGES' Identifier='1'].IncludeModules");
+                }
+            }
+        }
     }
 }

@@ -27,9 +27,7 @@ import org.tianocore.ExternsDocument.Externs.Extern;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.tianocore.*;
-import org.tianocore.ExternsDocument.Externs;
 import org.tianocore.FilenameDocument.Filename;
-import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
@@ -1993,4 +1991,17 @@ public class SurfaceAreaQuery {
 			return false;
 		}
 	}
+    
+    public Node getFpdModuleSequence(String fvName) {
+        String[] xPath = new String[] { "/BuildOptions/UserExtensions[@UserID='IMAGES' and @Identifier='1' and ./FvName='" + fvName + "']" };
+        Object[] result = get("PlatformSurfaceArea", xPath);
+        
+        if (result == null || result.length == 0) {
+            return null;
+        }
+        
+        UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)result[0];
+        
+        return a.getDomNode();
+    }
 }

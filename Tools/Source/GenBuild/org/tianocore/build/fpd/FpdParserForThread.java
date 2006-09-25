@@ -205,7 +205,7 @@ public class FpdParserForThread extends FpdParserTask {
                     //
                     // Exist ready thread
                     //
-//                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Exist ready thread");
+                    EdkLog.log(this, EdkLog.EDK_DEBUG, "Exist ready thread");
 
                 } else if (existNoneReady && currentRunNumber == 0) {
                     //
@@ -216,21 +216,21 @@ public class FpdParserForThread extends FpdParserTask {
                     //
                     // Current queue build finish, move to next
                     //
-                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Current queue build finish, move to next");
+                    EdkLog.log(this, EdkLog.EDK_DEBUG, "Current queue build finish, move to next");
                     ++currentQueueCode;
                     continue ;
                 } else {
                     //
                     // active thread exist, but no ready thread
                     //
-                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Active thread exist, but no ready thread. Current running number is " + currentRunNumber);
+                    EdkLog.log(this, EdkLog.EDK_DEBUG, "Active thread exist, but no ready thread. Current running number is " + currentRunNumber);
                 }
 
                 try {
                     deamonSemaphore.wait();
                     
                     //
-                    // if find error. Let other threads to finish
+                    // if find error. Waiting running threads to finish
                     //
                     if (errorModule != null) {
                         while (currentRunNumber > 0) {
