@@ -53,7 +53,6 @@ import org.tianocore.ModuleBuildOptionsDocument.*;
 import org.tianocore.UserExtensionsDocument.*;
 
 import org.tianocore.PackageSurfaceAreaDocument.*;
-import org.tianocore.MsaFilesDocument.*;
 
 public class CombineMsa {
 
@@ -218,8 +217,6 @@ public class CombineMsa {
     private ModuleBuildOptions mergeBuildOptions = null;
 
     private UserExtensions mergeUserExtensions = null;
-
-    private XmlCursor cursor = null;
 
     private String mergeUsage = "";
 
@@ -1754,7 +1751,6 @@ public class CombineMsa {
                 PackageSurfaceAreaDocument spdDoc = PackageSurfaceAreaDocument.Factory.parse(spdFile);
                 PackageSurfaceArea spd = spdDoc.getPackageSurfaceArea();
 
-                // MsaFiles mergeMsaFilesForSpd = MsaFilesDocument.Factory.newInstance().addNewMsaFiles();
                 List<String> msaFilenames = spd.getMsaFiles().getFilenameList();
                 msaFilenames.add(msaLine);
                 XmlCursor cursor = XmlConfig.setupXmlCursor(spd.newCursor());
