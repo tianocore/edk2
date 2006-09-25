@@ -15,8 +15,6 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.*;
 
-import org.tianocore.ModuleSurfaceAreaDocument;
-
 /*
     Class ModuleInfo is built for scanning the source files, it contains all the needed
 information and all the temporary data.
@@ -30,8 +28,7 @@ public final class ModuleInfo {
     public final String modulepath;
     public final String temppath;
     
-    //private MsaOwner msaowner = new MsaWriter(this);
-    //public ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
+    private MsaOwner msaowner = new MsaOwner();
     
     public String modulename = null;
     public String guidvalue = null;

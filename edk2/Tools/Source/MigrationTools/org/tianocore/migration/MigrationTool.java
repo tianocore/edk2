@@ -32,13 +32,9 @@ public class MigrationTool {
     private static String startpath = null;
     
     private static final void mainFlow(ModuleInfo mi) throws Exception {
-
         ModuleReader.aimAt(mi);
-        
-        //MigrationTool.ui.yesOrNo("go on replace?");
         SourceFileReplacer.fireAt(mi);    // some adding library actions are taken here,so it must be put before "MsaWriter"
 
-        //MigrationTool.ui.yesOrNo("go on show?");
         // show result
         if (MigrationTool.printModuleInfo) {
             MigrationTool.ui.println("\nModule Information : ");
@@ -54,9 +50,7 @@ public class MigrationTool {
             show(mi.hashr8only, "hashr8only : ");
         }
 
-        //MigrationTool.ui.yesOrNo("go on msawrite?");
         new MsaWriter(mi).flush();
-        //MigrationTool.ui.yesOrNo("go on critic?");
 
         if (MigrationTool.doCritic) {
             Critic.fireAt(ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename);
