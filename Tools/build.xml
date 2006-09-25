@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/FrameworkWizard/build.xml
           Source/MigrationTools/build.xml
           Source/ContextTool/build.xml
+          Source/Merge/build.xml
           "/>
     </subant>
     <echo message="The EDK II Java Tools build has completed!"/>
@@ -51,6 +52,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <filelist dir="."
         files="
           Source/FrameworkWizard/build.xml
+          "/>
+    </subant>
+  </target>
+
+  <target name="Merge" depends="SurfaceArea">
+    <subant target="" verbose="true" inheritall="false">
+      <filelist dir="."
+        files="
+          Source/Merge/build.xml
           "/>
     </subant>
   </target>
@@ -117,6 +127,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/TianoTools/build.xml
           Source/MigrationTools/build.xml
           Source/ContextTool/build.xml
+          Source/Merge/build.xml
         "/>
     </subant>
   </target>
@@ -150,6 +161,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/TianoTools/build.xml
           Source/MigrationTools/build.xml
           Source/ContextTool/build.xml
+          Source/Merge/build.xml
         "/>
     </subant>
   </target>
