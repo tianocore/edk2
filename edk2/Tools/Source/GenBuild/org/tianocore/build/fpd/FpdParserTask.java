@@ -283,17 +283,20 @@ public class FpdParserTask extends Task {
                 Set<FpdModuleIdentification> filesSet = fvs.get(validFv[i]);
                 
                 FpdModuleIdentification[] files = null;
+                
                 if (moduleSeqSet == null) {
                     if (filesSet != null) {
                         files = filesSet.toArray(new FpdModuleIdentification[filesSet.size()]);
+                    }
+                } else if (filesSet == null) {
+                    if (moduleSeqSet.size() != 0) {
+                        throw new BuildException("Can not find any modules belongs to FV[" + validFv[i] + "], but listed some in BuildOptions.UserExtensions[@UserID='IMAGES' @Identifier='1']");
                     }
                 } else {
                     //
                     // if moduleSeqSet and filesSet is inconsistent, report error
                     //
-                    if (filesSet == null && moduleSeqSet.size() != 0) {
-                        throw new BuildException("Can not find any modules belongs to FV[" + validFv[i] + "], but listed some in BuildOptions.UserExtensions[@UserID='IMAGES' @Identifier='1']");
-                    } else if(moduleSeqSet.size() != filesSet.size()){
+                    if(moduleSeqSet.size() != filesSet.size()){
                         throw new BuildException("Modules for FV[" + validFv[i] + "] defined in FrameworkModules and in BuildOptions.UserExtensions[@UserID='IMAGES' @Identifier='1'] are inconsistent. ");
                     } else {
                         //
