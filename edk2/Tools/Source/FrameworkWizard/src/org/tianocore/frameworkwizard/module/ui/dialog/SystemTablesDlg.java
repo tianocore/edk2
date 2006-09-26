@@ -37,6 +37,7 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.SystemTables.SystemTablesIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -256,12 +257,29 @@ public class SystemTablesDlg extends IDialog {
     private void init(SystemTablesIdentification inSystemTablesId, ModuleIdentification mid) {
         init();
         this.id = inSystemTablesId;
-        
+
         //
         // Init arch with module's arch
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
-        
+
+        //
+        // Get defined guids from dependent packages
+        //
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log
+               .wrn("Init Guid",
+                    "This module hasn't defined any package dependency, so there is no guid value can be added for system table");
+        }
+        //
+        // Init guids drop down list
+        //
+        Tools
+             .generateComboBoxByVector(jComboBoxGuidC_Name,
+                                       wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_EFI_SYSTEM_CONFIGURATION_TABLE));
+
+
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
@@ -278,7 +296,8 @@ public class SystemTablesDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public SystemTablesDlg(SystemTablesIdentification inSystemTablesIdentification, IFrame iFrame, ModuleIdentification mid) {
+    public SystemTablesDlg(SystemTablesIdentification inSystemTablesIdentification, IFrame iFrame,
+                           ModuleIdentification mid) {
         super(iFrame, true);
         init(inSystemTablesIdentification, mid);
     }
@@ -358,7 +377,6 @@ public class SystemTablesDlg extends IDialog {
      */
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVSystemTableUsage());
-        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
     }
 
     /*
@@ -395,6 +413,14 @@ public class SystemTablesDlg extends IDialog {
         //
         // Check if all fields have correct data types
         //
+        
+        //
+        // Check Name
+        //
+        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+            Log.wrn("Update Guids", "Please select one System Table Name");
+            return false;
+        }
 
         //
         // Check FeatureFlag

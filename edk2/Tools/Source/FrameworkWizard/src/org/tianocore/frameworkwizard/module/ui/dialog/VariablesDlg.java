@@ -37,6 +37,7 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Variables.VariablesIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -116,8 +117,7 @@ public class VariablesDlg extends IDialog {
             jTextFieldVariableName.setSize(new java.awt.Dimension(320, 20));
             jTextFieldVariableName.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldVariableName.setLocation(new java.awt.Point(168, 12));
-            jTextFieldVariableName
-                                  .setToolTipText("Enter a string; the tool will convert to Unicode hex");
+            jTextFieldVariableName.setToolTipText("Enter a string; the tool will convert to Unicode hex");
         }
         return jTextFieldVariableName;
     }
@@ -277,11 +277,27 @@ public class VariablesDlg extends IDialog {
     private void init(VariablesIdentification inVariablesId, ModuleIdentification mid) {
         init();
         this.id = inVariablesId;
-        
+
         //
         // Init arch with module's arch
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+
+        //
+        // Get defined guids from dependent packages
+        //
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log
+               .wrn("Init Guid",
+                    "This module hasn't defined any package dependency, so there is no guid value can be added for variable");
+        }
+        //
+        // Init guids drop down list
+        //
+        Tools
+             .generateComboBoxByVector(jComboBoxGuidC_Name,
+                                       wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_EFI_VARIABLE));
 
         if (this.id != null) {
             this.jTextFieldVariableName.setText(id.getName());
@@ -415,7 +431,6 @@ public class VariablesDlg extends IDialog {
      */
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVPpiUsage());
-        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
     }
 
     /**
@@ -429,12 +444,20 @@ public class VariablesDlg extends IDialog {
         //
         // Check if all fields have correct data types
         //
-
+        
         //
         // Check VariableName
         //
         if (isEmpty(this.jTextFieldVariableName.getText())) {
             Log.wrn("Update Variables", "Variable Name must be entered!");
+            return false;
+        }
+        
+        //
+        // Check Guid Value
+        //
+        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+            Log.wrn("Update Guids", "Please select one Varibale Guid value");
             return false;
         }
 

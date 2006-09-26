@@ -36,6 +36,7 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -293,6 +294,23 @@ public class HobsDlg extends IDialog {
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
         
+        //
+        // Get defined guids from dependent packages
+        //
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log
+               .wrn("Init Guid",
+                    "This module hasn't defined any package dependency, so there is no guid value can be added for hob");
+        }
+        //
+        // Init guids drop down list
+        //
+        Tools
+             .generateComboBoxByVector(jComboBoxGuidC_Name,
+                                       wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_HOB));
+
+
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxHobType.setSelectedItem(id.getType());
@@ -404,7 +422,6 @@ public class HobsDlg extends IDialog {
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVHobUsage());
         Tools.generateComboBoxByVector(jComboBoxHobType, ed.getVHobType());
-        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
     }
 
     /*
@@ -441,7 +458,14 @@ public class HobsDlg extends IDialog {
         //
         // Check if all fields have correct data types
         //
-
+        
+        //
+        // Check Name
+        //
+        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+            Log.wrn("Update Guids", "Please select one Hob Name");
+            return false;
+        }
         //
         // Check Name
         //

@@ -416,12 +416,24 @@ public class WorkspaceTools {
      
      @return Vector
      **/
-    public Vector<String> getAllGuidDeclarationsFromPackage(PackageSurfaceArea spd) {
+    public Vector<String> getAllGuidDeclarationsFromPackage(PackageSurfaceArea spd, String type) {
         Vector<String> vector = new Vector<String>();
+        boolean isFound = false;
         if (spd.getGuidDeclarations() != null) {
             if (spd.getGuidDeclarations().getEntryList().size() > 0) {
                 for (int index = 0; index < spd.getGuidDeclarations().getEntryList().size(); index++) {
-                    vector.addElement(spd.getGuidDeclarations().getEntryList().get(index).getCName());
+                    Vector<String> vArch = Tools.convertListToVector(spd.getGuidDeclarations().getEntryList()
+                                                                        .get(index).getGuidTypeList());
+                    for (int indexOfArch = 0; indexOfArch < vArch.size(); indexOfArch++) {
+                        if (vArch.get(indexOfArch).equals(type)) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if ((isFound) || (vArch == null) || (vArch.size() < 1)) {
+                        vector.addElement(spd.getGuidDeclarations().getEntryList().get(index).getCName());
+                        isFound = false;
+                    }
                 }
             }
         }
@@ -539,12 +551,14 @@ public class WorkspaceTools {
         return vector;
     }
 
-    public Vector<String> getAllGuidDeclarationsFromWorkspace() {
+    public Vector<String> getAllGuidDeclarationsFromWorkspace(String type) {
         Vector<String> vector = new Vector<String>();
         for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
-            Vector<String> v = getAllGuidDeclarationsFromPackage(GlobalData.openingPackageList
+            Vector<String> v = getAllGuidDeclarationsFromPackage(
+                                                                 GlobalData.openingPackageList
                                                                                               .getPackageSurfaceAreaFromId(GlobalData.vPackageList
-                                                                                                                                                  .get(index)));
+                                                                                                                                                  .get(index)),
+                                                                 type);
             if (v != null && v.size() > 0) {
                 vector.addAll(v);
             }
@@ -554,12 +568,14 @@ public class WorkspaceTools {
         return vector;
     }
 
-    public Vector<String> getAllGuidDeclarationsFromPackages(Vector<PackageIdentification> vpid) {
+    public Vector<String> getAllGuidDeclarationsFromPackages(Vector<PackageIdentification> vpid, String type) {
         Vector<String> vector = new Vector<String>();
         for (int index = 0; index < vpid.size(); index++) {
-            Vector<String> v = getAllGuidDeclarationsFromPackage(GlobalData.openingPackageList
+            Vector<String> v = getAllGuidDeclarationsFromPackage(
+                                                                 GlobalData.openingPackageList
                                                                                               .getPackageSurfaceAreaFromId(vpid
-                                                                                                                               .get(index)));
+                                                                                                                               .get(index)),
+                                                                 type);
             if (v != null && v.size() > 0) {
                 vector.addAll(v);
             }

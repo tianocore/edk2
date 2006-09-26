@@ -36,6 +36,7 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Events.EventsIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -307,12 +308,28 @@ public class EventsDlg extends IDialog {
     private void init(EventsIdentification inEventsId, ModuleIdentification mid) {
         init();
         this.id = inEventsId;
-        
+
         //
         // Init arch with module's arch
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
-        
+
+        //
+        // Get defined guids from dependent packages
+        //
+        Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
+        if (vpid.size() <= 0) {
+            Log
+               .wrn("Init Guid",
+                    "This module hasn't defined any package dependency, so there is no guid value can be added for event");
+        }
+        //
+        // Init guids drop down list
+        //
+        Tools
+             .generateComboBoxByVector(jComboBoxGuidC_Name,
+                                       wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_EFI_EVENT));
+
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxEventsType.setSelectedItem(id.getType());
@@ -436,7 +453,6 @@ public class EventsDlg extends IDialog {
         Tools.generateComboBoxByVector(jComboBoxEventsType, ed.getVEventType());
         Tools.generateComboBoxByVector(jComboBoxEventGroup, ed.getVEventGroup());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVEventUsage());
-        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
     }
 
     /*
@@ -473,6 +489,14 @@ public class EventsDlg extends IDialog {
         //
         // Check if all fields have correct data types
         //
+        
+        //
+        // Check Name
+        //
+        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+            Log.wrn("Update Guids", "Please select one Event Name");
+            return false;
+        }
 
         //
         // Check Name
