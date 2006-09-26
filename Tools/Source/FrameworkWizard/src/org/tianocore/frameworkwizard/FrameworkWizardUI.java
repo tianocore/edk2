@@ -3636,7 +3636,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         //
         // Get guids xref and save to file
         //
-        int result = fc.showOpenDialog(new JPanel());
+        int result = fc.showSaveDialog(new JPanel());
         if (result == JFileChooser.APPROVE_OPTION) {
             Vector<String> v = wt.getAllModuleGuidXref();
             if (v.size() < 1) {
@@ -3668,7 +3668,11 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             } catch (IOException e) {
                 Log.wrn("Fail to write file", e.getMessage());
                 Log.err("Fail to write file when generating guids.xref", e.getMessage());
+                return;
             }
+
+            JOptionPane.showConfirmDialog(null, "File is created", "Generate guids.xref", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
