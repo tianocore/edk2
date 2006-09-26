@@ -1808,24 +1808,18 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      **/
     private void init() {
         //
+        // Set current workspace and check
+        // Check if exists WORKSPACE
+        //
+        Workspace.setCurrentWorkspace(System.getenv("WORKSPACE"));
+        this.checkWorkspace();
+
+        //
         // Show splash screen
         //
         SplashScreen ss = new SplashScreen();
         ss.setVisible(true);
-
-        //
-        // Set current workspace and check
-        // Check if exists WORKSPACE
-        // 
-        //
-        Workspace.setCurrentWorkspace(System.getenv("WORKSPACE"));
-        if (!Workspace.checkCurrentWorkspace()) {
-            JOptionPane.showConfirmDialog(null, "Workspace is not setup correctly. Please setup first.", "Warning",
-                                          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-            this.dispose();
-            System.exit(0);
-        }
-
+        
         //
         // Init Global Data
         //
@@ -3673,6 +3667,50 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
             JOptionPane.showConfirmDialog(null, "File is created", "Generate guids.xref", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    /**
+     Check if WORKSPACE Environment is valid
+     
+     **/
+    private void checkWorkspace() {
+        switch (Workspace.checkCurrentWorkspace()) {
+        case Workspace.WORKSPACE_VALID:
+            break;
+        case Workspace.WORKSPACE_NOT_DEFINED:
+            JOptionPane
+                       .showConfirmDialog(
+                                          null,
+                                          "WORKSPACE Environment Variable Is Not Defined, Please select a valid WORKSPACE directory. " +
+                                          DataType.LINE_SEPARATOR + DataType.LINE_SEPARATOR + "NOTICE:" +
+                                          DataType.LINE_SEPARATOR + "This does not change the System Environment Variable." +
+                                          DataType.LINE_SEPARATOR + "It only applies to where the Wizard will manage modification and file creations.",
+                                          "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            SwitchWorkspace sw = new SwitchWorkspace(this, true);
+            int result = sw.showDialog();
+            if (result == DataType.RETURN_TYPE_CANCEL) {
+                this.dispose();
+                System.exit(0);
+            } else if (result == DataType.RETURN_TYPE_OK) {
+                sw.dispose();
+                break;
+            }
+        case Workspace.WORKSPACE_NOT_EXIST:
+            JOptionPane.showConfirmDialog(null, "Defined WORKSPACE Is Not Existed", "Error",
+                                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            System.exit(0);
+        case Workspace.WORKSPACE_NOT_DIRECTORY:
+            JOptionPane.showConfirmDialog(null, "Defined WORKSPACE Is Not A Directory", "Error",
+                                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            System.exit(0);
+        case Workspace.WORKSPACE_NOT_VALID:
+            JOptionPane.showConfirmDialog(null, "WORKSPACE Environment Variable Is Not Valid", "Error",
+                                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            System.exit(0);
         }
     }
 }

@@ -2,11 +2,11 @@ package org.tianocore.frameworkwizard.workspace.ui;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.Log;
@@ -51,7 +51,8 @@ public class SwitchWorkspace extends IDialog {
             jTextFieldOld = new JTextField();
             jTextFieldOld.setBounds(new java.awt.Rectangle(140, 10, 320, 20));
             jTextFieldOld.setEditable(false);
-            jTextFieldOld.setText(Workspace.getCurrentWorkspace());
+            jTextFieldOld.setText(Workspace.getCurrentWorkspace() == null ? "Not Defined"
+                                                                         : Workspace.getCurrentWorkspace());
         }
         return jTextFieldOld;
     }
@@ -115,16 +116,6 @@ public class SwitchWorkspace extends IDialog {
     }
 
     /**
-     
-     @param args
-     
-     **/
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
      * This is the default constructor
      * 
      */
@@ -150,7 +141,7 @@ public class SwitchWorkspace extends IDialog {
     private void initialize() {
         this.setSize(472, 132);
         this.setContentPane(getJContentPane());
-        this.setTitle("Change workspace");
+        this.setTitle("Select workspace");
         this.centerWindow();
     }
 
@@ -185,7 +176,7 @@ public class SwitchWorkspace extends IDialog {
             Log.wrn("Switch Workspace", "New workspace must be entered!");
             return false;
         }
-        if (!Workspace.checkWorkspace(this.jTextFieldNew.getText())) {
+        if (Workspace.checkWorkspace(this.jTextFieldNew.getText()) != Workspace.WORKSPACE_VALID) {
             Log.wrn("Switch Workspace", "Please select a valid workspace!");
             return false;
         }
@@ -207,9 +198,9 @@ public class SwitchWorkspace extends IDialog {
             if (!check()) {
                 return;
             } else {
-                this.setVisible(false);
                 Workspace.setCurrentWorkspace(this.jTextFieldNew.getText());
                 returnType = DataType.RETURN_TYPE_OK;
+                this.setVisible(false);
             }
         }
 
