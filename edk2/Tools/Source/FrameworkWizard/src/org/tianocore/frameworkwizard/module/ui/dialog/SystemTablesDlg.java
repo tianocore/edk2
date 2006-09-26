@@ -35,6 +35,7 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.SystemTables.SystemTablesIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -252,10 +253,15 @@ public class SystemTablesDlg extends IDialog {
      * @param inSystemTablesId
      * 
      */
-    private void init(SystemTablesIdentification inSystemTablesId) {
+    private void init(SystemTablesIdentification inSystemTablesId, ModuleIdentification mid) {
         init();
         this.id = inSystemTablesId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
@@ -272,9 +278,9 @@ public class SystemTablesDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public SystemTablesDlg(SystemTablesIdentification inSystemTablesIdentification, IFrame iFrame) {
+    public SystemTablesDlg(SystemTablesIdentification inSystemTablesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inSystemTablesIdentification);
+        init(inSystemTablesIdentification, mid);
     }
 
     /**

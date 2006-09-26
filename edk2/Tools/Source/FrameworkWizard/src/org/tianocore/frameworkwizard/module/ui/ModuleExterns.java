@@ -344,7 +344,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
     }
 
     private void showEdit(int index) {
-        ExternsDlg dlg = new ExternsDlg(vid.getExterns(index), new IFrame());
+        ExternsDlg dlg = new ExternsDlg(vid.getExterns(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

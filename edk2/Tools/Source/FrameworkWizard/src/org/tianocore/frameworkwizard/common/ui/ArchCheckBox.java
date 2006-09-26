@@ -158,22 +158,22 @@ public class ArchCheckBox extends JPanel {
 
     public Vector<String> getSelectedItemsVector() {
         Vector<String> v = new Vector<String>();
-        if (this.jCheckBoxIa32.isSelected()) {
+        if (this.jCheckBoxIa32.isSelected() && this.jCheckBoxIa32.isEnabled()) {
             v.addElement(jCheckBoxIa32.getText());
         }
-        if (this.jCheckBoxX64.isSelected()) {
+        if (this.jCheckBoxX64.isSelected() && this.jCheckBoxX64.isEnabled()) {
             v.addElement(jCheckBoxX64.getText());
         }
-        if (this.jCheckBoxIpf.isSelected()) {
+        if (this.jCheckBoxIpf.isSelected() && this.jCheckBoxIpf.isEnabled()) {
             v.addElement(jCheckBoxIpf.getText());
         }
-        if (this.jCheckBoxEbc.isSelected()) {
+        if (this.jCheckBoxEbc.isSelected() && this.jCheckBoxEbc.isEnabled()) {
             v.addElement(jCheckBoxEbc.getText());
         }
-        if (this.jCheckBoxArm.isSelected()) {
+        if (this.jCheckBoxArm.isSelected() && this.jCheckBoxArm.isEnabled()) {
             v.addElement(jCheckBoxArm.getText());
         }
-        if (this.jCheckBoxPpc.isSelected()) {
+        if (this.jCheckBoxPpc.isSelected() && this.jCheckBoxPpc.isEnabled()) {
             v.addElement(jCheckBoxPpc.getText());
         }
         return v;
@@ -181,22 +181,22 @@ public class ArchCheckBox extends JPanel {
 
     public String getSelectedItemsString() {
         String s = "";
-        if (this.jCheckBoxIa32.isSelected()) {
+        if (this.jCheckBoxIa32.isSelected() && this.jCheckBoxIa32.isEnabled()) {
             s = s + jCheckBoxIa32.getText() + " ";
         }
-        if (this.jCheckBoxX64.isSelected()) {
+        if (this.jCheckBoxX64.isSelected() && this.jCheckBoxX64.isEnabled()) {
             s = s + jCheckBoxX64.getText() + " ";
         }
-        if (this.jCheckBoxIpf.isSelected()) {
+        if (this.jCheckBoxIpf.isSelected() && this.jCheckBoxIpf.isEnabled()) {
             s = s + jCheckBoxIpf.getText() + " ";
         }
-        if (this.jCheckBoxEbc.isSelected()) {
+        if (this.jCheckBoxEbc.isSelected() && this.jCheckBoxEbc.isEnabled()) {
             s = s + jCheckBoxEbc.getText() + " ";
         }
-        if (this.jCheckBoxArm.isSelected()) {
+        if (this.jCheckBoxArm.isSelected() && this.jCheckBoxArm.isEnabled()) {
             s = s + jCheckBoxArm.getText() + " ";
         }
-        if (this.jCheckBoxPpc.isSelected()) {
+        if (this.jCheckBoxPpc.isSelected() && this.jCheckBoxPpc.isEnabled()) {
             s = s + jCheckBoxPpc.getText() + " ";
         }
         return s.trim();

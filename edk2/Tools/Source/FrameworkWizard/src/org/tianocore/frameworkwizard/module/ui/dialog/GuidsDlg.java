@@ -261,6 +261,14 @@ public class GuidsDlg extends IDialog {
         init();
         this.id = inGuidsId;
         
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
+        //
+        // Get defined guids from dependent packages
+        //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
             Log.wrn("Init Guid", "This module hasn't defined any package dependency, so there is no guid can be added");

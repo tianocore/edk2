@@ -274,7 +274,15 @@ public class PpisDlg extends IDialog implements ItemListener {
     private void init(PpisIdentification inPpisId, ModuleIdentification mid) {
         init();
         this.id = inPpisId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
+        //
+        // Get defined ppis from dependent packages
+        //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
             Log.wrn("Init Ppi", "This module hasn't defined any package dependency, so there is no ppi can be added");

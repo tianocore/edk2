@@ -313,6 +313,14 @@ public class PCDsDlg extends IDialog implements ItemListener {
         init();
         this.id = inPcdCodedId;
         
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
+        //
+        // Get defined pcds from dependent packages
+        //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
             Log.wrn("Init Pcd", "This module hasn't defined any package dependency, so there is no pcd can be added");

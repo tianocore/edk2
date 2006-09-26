@@ -39,7 +39,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.DataHubs.DataHubsIdentification;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  * The class is used to create, update DataHub of the MSA file
@@ -97,6 +99,8 @@ public class DataHubsDlg extends IDialog {
     private DataHubsIdentification id = null;
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      * This method initializes jTextFieldDataHubRecord
@@ -254,10 +258,15 @@ public class DataHubsDlg extends IDialog {
      * @param inDataHubsId
      * 
      */
-    private void init(DataHubsIdentification inDataHubsId) {
+    private void init(DataHubsIdentification inDataHubsId, ModuleIdentification mid) {
         init();
         this.id = inDataHubsId;
 
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jTextFieldDataHubRecord.setText(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
@@ -274,9 +283,9 @@ public class DataHubsDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public DataHubsDlg(DataHubsIdentification inDataHubsIdentification, IFrame iFrame) {
+    public DataHubsDlg(DataHubsIdentification inDataHubsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inDataHubsIdentification);
+        init(inDataHubsIdentification, mid);
     }
 
     /**

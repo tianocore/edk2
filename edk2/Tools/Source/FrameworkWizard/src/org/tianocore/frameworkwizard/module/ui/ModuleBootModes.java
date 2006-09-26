@@ -289,7 +289,7 @@ public class ModuleBootModes extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        BootModesDlg dlg = new BootModesDlg(vid.getBootModes(index), new IFrame());
+        BootModesDlg dlg = new BootModesDlg(vid.getBootModes(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

@@ -286,7 +286,7 @@ public class ModuleSystemTables extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        SystemTablesDlg dlg = new SystemTablesDlg(vid.getSystemTables(index), new IFrame());
+        SystemTablesDlg dlg = new SystemTablesDlg(vid.getSystemTables(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

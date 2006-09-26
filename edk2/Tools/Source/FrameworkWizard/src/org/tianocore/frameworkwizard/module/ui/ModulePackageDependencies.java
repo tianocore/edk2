@@ -294,7 +294,7 @@ public class ModulePackageDependencies extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        PackageDepDlg pdd = new PackageDepDlg(vid.getPackageDependencies(index), new IFrame());
+        PackageDepDlg pdd = new PackageDepDlg(vid.getPackageDependencies(index), new IFrame(), omt.getId());
         int result = pdd.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

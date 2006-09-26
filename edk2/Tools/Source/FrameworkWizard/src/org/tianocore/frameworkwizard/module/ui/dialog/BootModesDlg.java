@@ -39,7 +39,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.BootModes.BootModesIdentification;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  * The class is used to create, update BootModes of MSA/MBD file
@@ -97,6 +99,8 @@ public class BootModesDlg extends IDialog {
     private BootModesIdentification id = null;
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      * This method initializes jComboBoxBootModeName
@@ -263,10 +267,15 @@ public class BootModesDlg extends IDialog {
      * @param inBootModesId
      * 
      */
-    private void init(BootModesIdentification inBootModesId) {
+    private void init(BootModesIdentification inBootModesId, ModuleIdentification mid) {
         init();
         this.id = inBootModesId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jComboBoxBootModeName.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
@@ -283,9 +292,9 @@ public class BootModesDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public BootModesDlg(BootModesIdentification inBootModesIdentification, IFrame iFrame) {
+    public BootModesDlg(BootModesIdentification inBootModesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inBootModesIdentification);
+        init(inBootModesIdentification, mid);
     }
 
     /**

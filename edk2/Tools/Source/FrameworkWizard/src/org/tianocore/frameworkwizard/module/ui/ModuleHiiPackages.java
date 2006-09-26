@@ -215,7 +215,7 @@ public class ModuleHiiPackages extends IInternalFrame {
     private void init(HiiPackages inHiiPackages) {
         init();
         this.hiiPackages = inHiiPackages;
-
+        
         if (this.hiiPackages != null) {
             if (this.hiiPackages.getHiiPackageList().size() > 0) {
                 for (int index = 0; index < this.hiiPackages.getHiiPackageList().size(); index++) {
@@ -286,7 +286,7 @@ public class ModuleHiiPackages extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        HiiPackagesDlg dlg = new HiiPackagesDlg(vid.getHiiPackages(index), new IFrame());
+        HiiPackagesDlg dlg = new HiiPackagesDlg(vid.getHiiPackages(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

@@ -330,6 +330,14 @@ public class LibraryClassDefsDlg extends IDialog {
         init();
         this.lcid = inLibraryClassIdentification;
         
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
+        //
+        // Get defined library classes from dependent packages
+        //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
             Log.wrn("Init Library Class", "This module hasn't defined any package dependency, so there is no library class can be added");
