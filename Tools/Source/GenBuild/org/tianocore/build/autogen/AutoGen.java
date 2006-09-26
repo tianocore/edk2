@@ -1509,14 +1509,12 @@ public class AutoGen {
                 fileBuffer.append("  Status = ");
                 fileBuffer.append(libInstanceList.get(i)[0]);
                 fileBuffer.append("();\r\n");
-                fileBuffer.append("  VOID\r\n");
 			} else {
 				switch (CommonDefinition.getModuleType(moduleType)) {
 					case CommonDefinition.ModuleTypeBase:
 						fileBuffer.append("  Status = ");
 						fileBuffer.append(libInstanceList.get(i)[0]);
 						fileBuffer.append("();\r\n");
-						fileBuffer.append("  VOID\r\n");
 						break;
 					case CommonDefinition.ModuleTypePeiCore:
 					case CommonDefinition.ModuleTypePeim:
