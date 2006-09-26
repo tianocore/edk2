@@ -260,12 +260,12 @@ public class GuidsDlg extends IDialog {
     private void init(GuidsIdentification inGuidsId, ModuleIdentification mid) {
         init();
         this.id = inGuidsId;
-        
+
         //
         // Init arch with module's arch
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
-        
+
         //
         // Get defined guids from dependent packages
         //
@@ -275,7 +275,8 @@ public class GuidsDlg extends IDialog {
         }
 
         Tools.generateComboBoxByVector(this.jComboBoxCName,
-                                       wt.getAllGuidDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid)));
+                                       wt.getAllGuidDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid),
+                                                                             EnumerationData.GUID_TYPE_GUID));
 
         if (this.id != null) {
             this.jComboBoxCName.setSelectedItem(id.getName());

@@ -18,7 +18,7 @@ import java.util.Vector;
 
 public class EnumerationData {
     //
-    // Static data
+    // Static data for externs definitions
     //
     public final static String EXTERNS_PCD_IS_DRIVER = "Pcd Is Driver";
     
@@ -41,6 +41,25 @@ public class EnumerationData {
     public final static String EXTERNS_CALL_BACK = "Call Back";
     public final static String EXTERNS_VIRTUAL_ADDRESS_MAP_CALL_BACK = "VirtualAddressMap";
     public final static String EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK = "ExitBootServices";
+    
+    //
+    // Static data for guid type
+    //
+    public final static String GUID_TYPE_DATA_HUB_RECORD = "DATA_HUB_RECORD";
+    
+    public final static String GUID_TYPE_EFI_EVENT = "EFI_EVENT";
+    
+    public final static String GUID_TYPE_EFI_SYSTEM_CONFIGURATION_TABLE = "EFI_SYSTEM_CONFIGURATION_TABLE";
+    
+    public final static String GUID_TYPE_EFI_VARIABLE = "EFI_VARIABLE";
+    
+    public final static String GUID_TYPE_GUID = "GUID";
+    
+    public final static String GUID_TYPE_HII_PACKAGE_LIST = "HII_PACKAGE_LIST";
+    
+    public final static String GUID_TYPE_HOB = "HOB";
+    
+    public final static String GUID_TYPE_TOKEN_SPACE_GUID = "TOKEN_SPACE_GUID";
     
     //
     // Common data
