@@ -37,7 +37,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.tianocore.common.definitions.EdkDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
-import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
@@ -454,7 +453,7 @@ public class FpdParserTask extends Task {
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
             //
             PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
-            ca.perform(platformId.getFpdFile().getPath(), ActionMessage.NULL_MESSAGE_LEVEL);
+            ca.perform(platformId.getFpdFile().getPath());
         } catch (IOException ex) {
             BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
             buildException.setStackTrace(ex.getStackTrace());
