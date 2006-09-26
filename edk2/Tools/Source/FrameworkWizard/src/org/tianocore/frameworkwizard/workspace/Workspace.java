@@ -21,6 +21,19 @@ import org.tianocore.frameworkwizard.common.DataType;
 
 public class Workspace {
     //
+    // Define static return value
+    //
+    public final static int WORKSPACE_VALID = 0;
+    
+    public final static int WORKSPACE_NOT_DEFINED = 1;
+    
+    public final static int WORKSPACE_NOT_EXIST = 2;
+    
+    public final static int WORKSPACE_NOT_DIRECTORY = 3;
+    
+    public final static int WORKSPACE_NOT_VALID = 4;
+    
+    //
     // Define class members
     //
     private static String currentWorkspace = null;
@@ -66,7 +79,7 @@ public class Workspace {
      @retval false - The current WORKSPACE doesn't exist
      
      */
-    public static boolean checkCurrentWorkspace() {
+    public static int checkCurrentWorkspace() {
         return checkWorkspace(getCurrentWorkspace());
     }
 
@@ -79,30 +92,38 @@ public class Workspace {
      @retval false - The current WORKSPACE doesn't exist
      
      */
-    public static boolean checkWorkspace(String strWorkspace) {
+    public static int checkWorkspace(String strWorkspace) {
+        //
+        // Check if WORKSPACE Environment is defined
+        //
         if (strWorkspace == null || strWorkspace == "") {
-            return false;
-        }
-        //
-        // Check workspace directory
-        //
-        File f = new File(strWorkspace);
-        if (!f.isDirectory()) {
-            return false;
-        }
-        if (!f.exists()) {
-            return false;
+            return Workspace.WORKSPACE_NOT_DEFINED;
         }
         
         //
-        // Check FrameworkDatabase.db
+        // Check if WORKSPACE Environment exists
+        //
+        File f = new File(strWorkspace);
+        if (!f.exists()) {
+            return Workspace.WORKSPACE_NOT_EXIST;
+        }
+        
+        //
+        // Check if WORKSPACE Environment is a directory
+        //
+        if (!f.isDirectory()) {
+            return Workspace.WORKSPACE_NOT_DIRECTORY;
+        }
+        
+        //
+        // Check if FrameworkDatabase.db exists
         //
         f = new File(strWorkspace + Workspace.getStrWorkspaceDatabaseFile());
         if (!f.exists()) {
-            return false;
+            return Workspace.WORKSPACE_NOT_VALID;
         }
         
-        return true;
+        return Workspace.WORKSPACE_VALID;
     }
 
     public static String getStrWorkspaceDatabaseFile() {
