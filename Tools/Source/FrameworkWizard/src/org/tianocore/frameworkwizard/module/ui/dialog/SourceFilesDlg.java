@@ -35,7 +35,9 @@ import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.SourceFiles.SourceFilesIdentification;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  * The class is used to create, update SourceFiles section of the MSA file
@@ -99,6 +101,8 @@ public class SourceFilesDlg extends IDialog {
     private String msaFileName = "";
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      This method initializes jTextFieldFileName 
@@ -261,9 +265,9 @@ public class SourceFilesDlg extends IDialog {
      This is the default constructor
      
      **/
-    public SourceFilesDlg(SourceFilesIdentification inSourceFilesIdentification, IFrame iFrame, String fileName) {
+    public SourceFilesDlg(SourceFilesIdentification inSourceFilesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inSourceFilesIdentification, fileName);
+        init(inSourceFilesIdentification, mid);
     }
 
     /**
@@ -287,10 +291,14 @@ public class SourceFilesDlg extends IDialog {
      @param inSourceFiles The input data of SourceFilesDocument.SourceFiles
      
      **/
-    private void init(SourceFilesIdentification inSourceFilesIdentifications, String fileName) {
+    private void init(SourceFilesIdentification inSourceFilesIdentifications, ModuleIdentification mid) {
         init();
-        //this.sfid = inSourceFilesIdentifications;
-        this.msaFileName = fileName;
+        this.msaFileName = mid.getPath();
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
 
         if (inSourceFilesIdentifications != null) {
             this.jTextFieldFileName.setText(inSourceFilesIdentifications.getFilename());

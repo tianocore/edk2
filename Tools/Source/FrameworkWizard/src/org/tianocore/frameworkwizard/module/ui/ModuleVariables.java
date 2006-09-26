@@ -286,7 +286,7 @@ public class ModuleVariables extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        VariablesDlg dlg = new VariablesDlg(vid.getVariables(index), new IFrame());
+        VariablesDlg dlg = new VariablesDlg(vid.getVariables(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

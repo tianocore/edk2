@@ -290,6 +290,14 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
         init();
         this.id = inProtocolsId;
         
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
+        //
+        // Get defined protocols from dependent packages
+        //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
             Log.wrn("Init Protocol", "This module hasn't defined any package dependency, so there is no protocol can be added");

@@ -35,6 +35,7 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Variables.VariablesIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -273,9 +274,14 @@ public class VariablesDlg extends IDialog {
      * @param inVariablesId
      * 
      */
-    private void init(VariablesIdentification inVariablesId) {
+    private void init(VariablesIdentification inVariablesId, ModuleIdentification mid) {
         init();
         this.id = inVariablesId;
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
 
         if (this.id != null) {
             this.jTextFieldVariableName.setText(id.getName());
@@ -294,9 +300,9 @@ public class VariablesDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public VariablesDlg(VariablesIdentification inVariablesIdentification, IFrame iFrame) {
+    public VariablesDlg(VariablesIdentification inVariablesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inVariablesIdentification);
+        init(inVariablesIdentification, mid);
     }
 
     /**

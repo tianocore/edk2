@@ -286,7 +286,7 @@ public class ModuleDataHubs extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        DataHubsDlg dlg = new DataHubsDlg(vid.getDataHubs(index), new IFrame());
+        DataHubsDlg dlg = new DataHubsDlg(vid.getDataHubs(index), new IFrame(), omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

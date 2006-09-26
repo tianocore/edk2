@@ -34,6 +34,7 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -283,10 +284,15 @@ public class HobsDlg extends IDialog {
      * @param inHobsId
      * 
      */
-    private void init(HobsIdentification inHobsId) {
+    private void init(HobsIdentification inHobsId, ModuleIdentification mid) {
         init();
         this.id = inHobsId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxHobType.setSelectedItem(id.getType());
@@ -304,9 +310,9 @@ public class HobsDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public HobsDlg(HobsIdentification inHobsIdentification, IFrame iFrame) {
+    public HobsDlg(HobsIdentification inHobsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inHobsIdentification);
+        init(inHobsIdentification, mid);
     }
 
     /**

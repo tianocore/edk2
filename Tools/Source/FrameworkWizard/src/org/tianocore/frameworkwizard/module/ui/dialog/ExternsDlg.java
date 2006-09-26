@@ -35,7 +35,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Externs.ExternsIdentification;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  * The class is used to create, update Externs section of the MSA file
@@ -135,6 +137,10 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private ExternsIdentification id = null;
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
+    
+    private Vector<String> vArchList = new Vector<String>();
 
     /**
      This method initializes jComboBoxType 
@@ -511,9 +517,14 @@ public class ExternsDlg extends IDialog implements ItemListener {
      @param inExternsId
 
      **/
-    private void init(ExternsIdentification inExternsId) {
+    private void init(ExternsIdentification inExternsId, ModuleIdentification mid) {
         init();
         this.id = inExternsId;
+        
+        //
+        // Init arch with module's arch
+        //
+        this.vArchList = wt.getModuleArch(mid);
 
         if (this.id != null) {
             String type = id.getType();
@@ -576,9 +587,9 @@ public class ExternsDlg extends IDialog implements ItemListener {
      @param iFrame
      
      **/
-    public ExternsDlg(ExternsIdentification inExternsIdentification, IFrame iFrame) {
+    public ExternsDlg(ExternsIdentification inExternsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inExternsIdentification);
+        init(inExternsIdentification, mid);
     }
 
     /**
@@ -878,7 +889,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
                 this.jPanelDriver.setVisible(false);
                 this.jPanelCallBack.setVisible(false);
                 this.jLabelArch.setEnabled(true);
-                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jArchCheckBox.setEnabledItems(this.vArchList);
                 this.jLabelArch.setLocation(12, 87);
                 this.jArchCheckBox.setLocation(168, 87);
                 this.jLabelFeatureFlag.setLocation(12, 112);
@@ -890,7 +901,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
                 this.jPanelDriver.setVisible(false);
                 this.jPanelCallBack.setVisible(false);
                 this.jLabelArch.setEnabled(true);
-                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jArchCheckBox.setEnabledItems(this.vArchList);
                 this.jLabelArch.setLocation(12, 87);
                 this.jArchCheckBox.setLocation(168, 87);
                 this.jLabelFeatureFlag.setLocation(12, 112);
@@ -902,7 +913,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
                 this.jPanelDriver.setVisible(true);
                 this.jPanelCallBack.setVisible(false);
                 this.jLabelArch.setEnabled(true);
-                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jArchCheckBox.setEnabledItems(this.vArchList);
                 this.jLabelArch.setLocation(12, 137);
                 this.jArchCheckBox.setLocation(168, 137);
                 this.jLabelFeatureFlag.setLocation(12, 162);
@@ -914,7 +925,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
                 this.jPanelDriver.setVisible(false);
                 this.jPanelCallBack.setVisible(true);
                 this.jLabelArch.setEnabled(true);
-                this.jArchCheckBox.setAllItemsEnabled(true);
+                this.jArchCheckBox.setEnabledItems(this.vArchList);
                 this.jLabelArch.setLocation(12, 87);
                 this.jArchCheckBox.setLocation(168, 87);
                 this.jLabelFeatureFlag.setLocation(12, 112);

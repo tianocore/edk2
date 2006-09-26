@@ -467,12 +467,13 @@ public class WorkspaceTools {
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
-    
+
     public Vector<String> getAllLibraryClassDefinitionsFromPackages(Vector<PackageIdentification> vpid) {
         Vector<String> vector = new Vector<String>();
         for (int index = 0; index < vpid.size(); index++) {
             Vector<String> v = getAllLibraryClassDefinitionsFromPackage(GlobalData.openingPackageList
-                                                                                                     .getPackageSurfaceAreaFromId(vpid.get(index)));
+                                                                                                     .getPackageSurfaceAreaFromId(vpid
+                                                                                                                                      .get(index)));
             if (v != null && v.size() > 0) {
                 vector.addAll(v);
             }
@@ -804,12 +805,26 @@ public class WorkspaceTools {
         }
         return vpid;
     }
-    
+
     public Vector<String> getAllModuleGuidXref() {
         Vector<String> v = new Vector<String>();
         for (int index = 0; index < GlobalData.openingModuleList.size(); index++) {
             ModuleIdentification id = GlobalData.openingModuleList.getOpeningModuleByIndex(index).getId();
             v.addElement(id.getGuid() + " " + id.getName());
+        }
+        return v;
+    }
+
+    public Vector<String> getModuleArch(ModuleIdentification id) {
+        Vector<String> v = new Vector<String>();
+        ModuleSurfaceArea msa = null;
+        if (id != null) {
+            msa = GlobalData.openingModuleList.getModuleSurfaceAreaFromId(id);
+        }
+        if (msa != null) {
+            if (msa.getModuleDefinitions() != null) {
+                v = Tools.convertListToVector(msa.getModuleDefinitions().getSupportedArchitectures());
+            }
         }
         return v;
     }

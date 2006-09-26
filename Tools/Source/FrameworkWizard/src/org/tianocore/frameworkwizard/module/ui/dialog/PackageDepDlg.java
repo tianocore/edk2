@@ -33,6 +33,7 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.PackageDependencies.PackageDependenciesIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
@@ -224,9 +225,15 @@ public class PackageDepDlg extends IDialog implements ItemListener {
      * This method initializes this
      * 
      */
-    private void init(PackageDependenciesIdentification inPackageDependenciesIdentification) {
+    private void init(PackageDependenciesIdentification inPackageDependenciesIdentification, ModuleIdentification mid) {
         init();
         this.pdid = inPackageDependenciesIdentification;
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (pdid != null) {
             this.jComboBoxPackageName.setSelectedItem(pdid.getName());
             this.jTextFieldPackageVersion.setText(pdid.getVersion());
@@ -240,9 +247,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
      * This is the default constructor
      * 
      */
-    public PackageDepDlg(PackageDependenciesIdentification inPackageDependenciesIdentification, IFrame iFrame) {
+    public PackageDepDlg(PackageDependenciesIdentification inPackageDependenciesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inPackageDependenciesIdentification);
+        init(inPackageDependenciesIdentification, mid);
     }
 
     /**

@@ -34,6 +34,7 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Events.EventsIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -303,10 +304,15 @@ public class EventsDlg extends IDialog {
      * @param inEventsId
      * 
      */
-    private void init(EventsIdentification inEventsId) {
+    private void init(EventsIdentification inEventsId, ModuleIdentification mid) {
         init();
         this.id = inEventsId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxEventsType.setSelectedItem(id.getType());
@@ -326,9 +332,9 @@ public class EventsDlg extends IDialog {
      * @param iFrame
      * 
      */
-    public EventsDlg(EventsIdentification inEventsIdentification, IFrame iFrame) {
+    public EventsDlg(EventsIdentification inEventsIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inEventsIdentification);
+        init(inEventsIdentification, mid);
     }
 
     /**

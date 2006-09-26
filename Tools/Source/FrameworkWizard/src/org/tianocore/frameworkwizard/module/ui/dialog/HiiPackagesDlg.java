@@ -34,7 +34,9 @@ import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.HiiPackages.HiiPackagesIdentification;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  * The class is used to create, update Hii Packages of the MSA file
@@ -92,6 +94,8 @@ public class HiiPackagesDlg extends IDialog {
     private HiiPackagesIdentification id = null;
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      * 
@@ -257,10 +261,15 @@ public class HiiPackagesDlg extends IDialog {
      * @param inHiiPackagesId
      * 
      **/
-    private void init(HiiPackagesIdentification inHiiPackagesId) {
+    private void init(HiiPackagesIdentification inHiiPackagesId, ModuleIdentification mid) {
         init();
         this.id = inHiiPackagesId;
-
+        
+        //
+        // Init arch with module's arch
+        //
+        this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
+        
         if (this.id != null) {
             this.jTextFieldName.setText(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
@@ -277,9 +286,9 @@ public class HiiPackagesDlg extends IDialog {
      * @param iFrame
      * 
      **/
-    public HiiPackagesDlg(HiiPackagesIdentification inHiiPackagesIdentification, IFrame iFrame) {
+    public HiiPackagesDlg(HiiPackagesIdentification inHiiPackagesIdentification, IFrame iFrame, ModuleIdentification mid) {
         super(iFrame, true);
-        init(inHiiPackagesIdentification);
+        init(inHiiPackagesIdentification, mid);
     }
 
     /**
