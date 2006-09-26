@@ -521,13 +521,19 @@ public class EnumerationData {
     private void initToolCode() {
         vToolCode.removeAllElements();
         vToolCode.addElement(DataType.EMPTY_SELECT_ITEM);
-        vToolCode.addElement("CC");
-        vToolCode.addElement("DLINK");
-        vToolCode.addElement("SLINK");
-        vToolCode.addElement("PP");
-        vToolCode.addElement("ASM");
-        vToolCode.addElement("ASMLINK");
-        vToolCode.addElement("ASL");
+        vToolCode.addElement("Build_CCode");
+        vToolCode.addElement("Build_AUTOGEN");
+        vToolCode.addElement("Build_DPX");
+        vToolCode.addElement("Build_ASM");
+        vToolCode.addElement("Build_Assembly");
+        vToolCode.addElement("Build_Gcc_Assembly");
+        vToolCode.addElement("Build_IPF_Assembly_Code");
+        vToolCode.addElement("Build_IPF_PP_Code");
+        vToolCode.addElement("Build_Library");
+        vToolCode.addElement("Build_UNI");
+        vToolCode.addElement("Build_Unicode_Database");
+        vToolCode.addElement("Build_VFR");
+        vToolCode.addElement("Build_DUMMY");
     }
     
     private void initPackageUsage() {
