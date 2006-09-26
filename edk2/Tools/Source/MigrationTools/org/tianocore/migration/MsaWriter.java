@@ -119,13 +119,13 @@ public class MsaWriter {
         externs.addNewSpecification().setStringValue("EFI_SPECIFICATION_VERSION 0x00020000");
         externs.addNewSpecification().setStringValue("EDK_RELEASE_VERSION 0x00020000");
         if (mi.entrypoint != null) {
-          externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
-          org.tianocore.ModuleTypeDef.Enum moduleType = msaheader.getModuleType();
-          if (moduleType == ModuleTypeDef.PEIM) {
-              mi.hashrequiredr9libs.add("PeimEntryPoint");
-          } else {
-              mi.hashrequiredr9libs.add("UefiDriverEntryPoint");
-          }
+            externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
+            org.tianocore.ModuleTypeDef.Enum moduleType = msaheader.getModuleType();
+            if (moduleType == ModuleTypeDef.PEIM) {
+                mi.hashrequiredr9libs.add("PeimEntryPoint");
+            } else {
+                mi.hashrequiredr9libs.add("UefiDriverEntryPoint");
+            }
         }
        
         it = mi.localmodulesources.iterator();
