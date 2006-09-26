@@ -25,7 +25,7 @@ import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.pcd.action.ActionMessage;
+import org.tianocore.common.logger.EdkLog;
 import org.tianocore.pcd.action.BuildAction;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.pcd.entity.Token;
@@ -190,8 +190,7 @@ public class PCDAutoGenAction extends BuildAction {
       @throws BuildActionException Failed to execute this aciton class.
     **/
     public void performAction() {
-        ActionMessage.debug(this,
-                            "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
+        EdkLog.log(EdkLog.EDK_DEBUG, "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
 
         dbManager = GlobalData.getPCDMemoryDBManager();
 
@@ -199,8 +198,7 @@ public class PCDAutoGenAction extends BuildAction {
             return;
         }
 
-        ActionMessage.debug(this,
-                            "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens.");
+        EdkLog.log(EdkLog.EDK_DEBUG, "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens.");
 
         generateAutogenForModule();
     }

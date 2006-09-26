@@ -45,48 +45,6 @@ public abstract class BuildAction extends Task {
     public abstract void performAction() throws BuildActionException;
 
     /**
-      setMessageLevel function set current message for task instance object.
-
-      The message should be restored when this action exit.
-
-      @param messageLevel The message level for this action.
-    **/
-    public void setMessageLevel(int messageLevel) {
-        originalMessageLevel        = ActionMessage.messageLevel;
-        ActionMessage.messageLevel  = messageLevel;
-    }
-
-    /**
-      logMsg function provide common log information functionality for all 
-      PCD tool extends from ANT task class.
-
-      This function will use the log function in Ant task class.
-     
-      @param action     The class object who want log information.
-      @param logStr     The string contains log information.
-    **/
-    public static void logMsg(Object action, String logStr) {
-        try {      
-            ((Task) action).log(logStr, Project.MSG_INFO);
-        } catch (Exception exp) {
-        }
-    }
-
-    /**
-      warningMsg function provide common warning information functionality for all 
-      PCD tool.
-
-      This function will dispatch message to special class such as BuildAction
-      Class, Entity Class etc.
-     
-      @param action      The class object who want warn information.
-      @param warningStr  The string contains warning information.
-    **/  
-    public static void warningMsg(Object action, String warningStr) {
-        ((Task) action).log(warningStr, Project.MSG_WARN);
-    }
-
-    /**
       execute function is the main flow for all build action class.
 
       This workflow will be:
@@ -99,10 +57,5 @@ public abstract class BuildAction extends Task {
     public void execute() throws BuildActionException {
         checkParameter();
         performAction();
-
-        //
-        // Restore orignal message level when exist the action.
-        //
-        ActionMessage.messageLevel = originalMessageLevel;
     }
 }

@@ -32,7 +32,6 @@ import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.FpdModuleIdentification;
-import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.pcd.action.PlatformPcdPreprocessAction;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.pcd.entity.ModulePcdInfoFromFpd;
@@ -63,18 +62,6 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     private PlatformSurfaceAreaDocument fpdDocInstance;
 
     /**
-      Set action message level for CollectPcdAction tool.
-
-      The message should be restored when this action exit.
-
-      @param actionMessageLevel parameter for this action
-    **/
-    public void setActionMessageLevel(int actionMessageLevel) {
-        originalMessageLevel       = ActionMessage.messageLevel;
-        ActionMessage.messageLevel = actionMessageLevel;
-    }
-
-    /**
       Set FPDFileName parameter for this action class.
 
       @param fpdFilePath    fpd file path
@@ -87,20 +74,17 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
       Common function interface for outer.
 
       @param fpdFilePath    The fpd file path of current build or processing.
-      @param messageLevel   The message level for this Action.
 
       @throws  PlatformPreprocessBuildException 
                             The exception of this function. Because it can *not* be predict
                             where the action class will be used. So only Exception can be throw.
 
     **/
-    public void perform(String fpdFilePath, int messageLevel) 
+    public void perform(String fpdFilePath) 
         throws PlatformPcdPreprocessBuildException {
         this.fpdFilePath = fpdFilePath;
-        setActionMessageLevel(messageLevel);
         checkParameter();
         execute();
-        ActionMessage.messageLevel = originalMessageLevel;
     }
 
     /**
