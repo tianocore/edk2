@@ -24,10 +24,11 @@ public class HelpInfo {
      * @return no return value
      **/
     public static void outputUsageInfo() {
+        System.out.printf("\n%s", DescripationString);
         System.out.printf("\n%s", UsageInfoString);
         System.out.printf("\n%s", DetailOfOptionString);
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < settingnum; i++) {
             outputSubUsageInfo(UsageString[i], UsageStringInfo[i]);
         }
         
@@ -84,16 +85,20 @@ public class HelpInfo {
     private static LinkedList<String> List = new LinkedList<String>();
 
     private static final int MaxSrtingLength = 40;
-
+    
+    private static final int settingnum = 7;
+    
+    private static final String DescripationString = "The purpose of this tool is modifying the settings in target.txt";
+    
     private static final String UsageInfoString = "Usage: ContextTool [-option1] [args] [-option2] [args] ...";
 
     private static final String DetailOfOptionString = "Where options include:";
     
-    private static final String ExampleString = "Example: ContextTool -a IA32 IA64 EBC -c Tools/Conf/tools_def.txt -t DEBUG";
+    private static final String ExampleString = "Example: ContextTool -a IA32 IA64 EBC -c Tools/Conf/tools_def.txt -t DEBUG -n GCC -p EdkNt32Pkg/Nt32.fpd -m 2\n";
 
     private static final String HString = "-h";
 
-    private static final String HStringInfo = "print this help message";
+    private static final String HStringInfo = "print usage info";
 
     private static final String AString = "-a  <list of Arch>";
 
@@ -101,7 +106,7 @@ public class HelpInfo {
 
     private static final String CString = "-c  <tool_definition_file.txt>";
 
-    private static final String CStringInfo = "Assign a txt file, which specify the tools to use for the build and must be located in the path: WORKSPACE/Tools/Conf/. If no file is specified, the default filename is \"tools_def.txt\"";
+    private static final String CStringInfo = "Assign a txt file with the relative path to WORKSPACE, which specify the tools to use for the build and must be located in the path: WORKSPACE/Tools/Conf/. If no file is specified, the default filename is \"tools_def.txt\"";
 
     private static final String NString = "-n  <list of TagNames>";
 
@@ -115,9 +120,13 @@ public class HelpInfo {
 
     private static final String TStringInfo = "What kind of the version is the binary target, such as DEBUG, RELEASE. Multiple values can be specified on a single line, using space to separate the values.";
 
+    private static final String MString = "-m  <num of Threads>";
+    
+    private static final String MStringInfo = "number should GE 0. 0 clears both MULTIPLE_THREAD and MAX_CONCURRENT_THREAD_NUMBER, others enable MULTIPLE_THREAD and set MAX_CONCURRENT_THREAD_NUMBER.";
+    
     private static final String[] UsageString = { HString, AString, CString,
-            NString, PString, TString };
+            NString, PString, TString, MString };
 
     private static final String[] UsageStringInfo = { HStringInfo, AStringInfo,
-            CStringInfo, NStringInfo, PStringInfo, TStringInfo };
+            CStringInfo, NStringInfo, PStringInfo, TStringInfo, MStringInfo };
 }

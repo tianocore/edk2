@@ -117,50 +117,176 @@ public class TargetFile {
         //
         try {
             while ((textLine = br.readLine()) != null) {
+                //
+                // the line is composed of Space
+                //
                 if (textLine.trim().compareToIgnoreCase("") == 0) {
                     bw.write(textLine);
                     bw.newLine();
-                } else if ((textLine.trim().charAt(0) == '#') && (textLine.indexOf("=") == -1)){
+                } 
+                //
+                // the line starts with "#", and no "="
+                //
+                else if ((textLine.trim().charAt(0) == '#') && (textLine.indexOf("=") == -1)){
                     bw.write(textLine);
                     bw.newLine();
                 } else {
+                    //
+                    //modify at the first time, and there should be *ACTIVE_PLATFORM*=* in the line
+                    //
                     if (textLine.indexOf("ACTIVE_PLATFORM") != -1) {
-                        if(ParseParameter.pstr.length() > ParseParameter.length) {
-                            bw.write(ParseParameter.pstr);
-                        } else {
-                            bw.write(textLine);
+                        if(pflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.pstr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.pstr);
+                                    bw.newLine();
+                                    pflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.pstr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.pstr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            pflag = false;
                         }
-                        bw.newLine();
                     } else if (textLine.indexOf("TARGET_ARCH") != -1) {
-                        if(ParseParameter.astr.length() > ParseParameter.length) {
-                            bw.write(ParseParameter.astr);
-                        } else {
-                            bw.write(textLine);
+                        if(aflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.astr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.astr);
+                                    bw.newLine();
+                                    aflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.astr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.astr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            aflag = false;
                         }
-                        bw.newLine();
                     } else if (textLine.indexOf("TARGET") != -1) {
-                        if(ParseParameter.tstr.length() > ParseParameter.length) {
-                            bw.write(ParseParameter.tstr);
-                        } else {
-                            bw.write(textLine);
+                        if(tflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.tstr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.tstr);
+                                    bw.newLine();
+                                    tflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.tstr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.tstr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            tflag = false;
                         }
-                        bw.newLine();
                     } else if (textLine.indexOf("TOOL_CHAIN_CONF") != -1) {
-                        if(ParseParameter.cstr.length() > ParseParameter.length) {
-                            bw.write(ParseParameter.cstr);
-                        } else {
-                            bw.write(textLine);
+                        if(cflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.cstr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.cstr);
+                                    bw.newLine();
+                                    cflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.cstr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.cstr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            cflag = false;
                         }
-                        bw.newLine();
                     } else if (textLine.indexOf("TOOL_CHAIN_TAG") != -1) {
-                        if(ParseParameter.nstr.length() > ParseParameter.length) {
-                            bw.write(ParseParameter.nstr);
-                        } else {
-                            bw.write(textLine);
+                        if(nflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.nstr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.nstr);
+                                    bw.newLine();
+                                    nflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.nstr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.nstr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            nflag = false;
                         }
-                        bw.newLine();
+                    } else if (textLine.indexOf("MAX_CONCURRENT_THREAD_NUMBER") != -1) {
+                        if(mflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.mstr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.mstr);
+                                    bw.newLine();
+                                    mflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.mstr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.mstr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            mflag = false;
+                        }
+                    }else if (textLine.indexOf("MULTIPLE_THREAD") != -1) {
+                        if(meflag == true){
+                            if(textLine.trim().charAt(0) == '#'){
+                                if(ParseParameter.mestr.length() > ParseParameter.length) {
+                                    bw.write(ParseParameter.mestr);
+                                    bw.newLine();
+                                    meflag = false;
+                                }
+                                continue;
+                            }
+                            if(ParseParameter.mestr.length() > ParseParameter.length) {
+                                bw.write(ParseParameter.mestr);
+                            } else {
+                                bw.write(textLine);
+                            }
+                            bw.newLine();
+                            meflag = false;
+                        }
                     }
                 }
+            }
+            //
+            //user maybe delete the line *ACTIVE_PLATFORM*=*
+            //
+            if( (pflag == true) && (ParseParameter.pstr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.pstr);
+                bw.newLine();
+            } else if ( (tflag == true) && (ParseParameter.tstr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.tstr);
+                bw.newLine();
+            } else if ( (aflag == true) && (ParseParameter.astr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.astr);
+                bw.newLine();
+            } else if ( (cflag == true) && (ParseParameter.cstr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.cstr);
+                bw.newLine();
+            } else if ( (nflag == true) && (ParseParameter.nstr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.nstr);
+                bw.newLine();
+            } else if ( (meflag == true) && (ParseParameter.mestr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.mestr);
+                bw.newLine();
+            } else if ( (mflag == true) && (ParseParameter.mstr.length() > ParseParameter.length) ){
+                bw.write(ParseParameter.mstr);
+                bw.newLine();
             }
         } catch (IOException e) {
             System.out.println("\n#  read or write file error!");
@@ -208,18 +334,22 @@ public class TargetFile {
         }
         FileChannel outputChannel = outputFile.getChannel();
 
-        ByteBuffer[] buffers = new ByteBuffer[5];
+        ByteBuffer[] buffers = new ByteBuffer[7];
         buffers[0] = ByteBuffer.allocate(ParseParameter.pstr.toString().length());
         buffers[1] = ByteBuffer.allocate(ParseParameter.tstr.toString().length());
         buffers[2] = ByteBuffer.allocate(ParseParameter.astr.toString().length());
         buffers[3] = ByteBuffer.allocate(ParseParameter.cstr.toString().length());
         buffers[4] = ByteBuffer.allocate(ParseParameter.nstr.toString().length());
+        buffers[5] = ByteBuffer.allocate(ParseParameter.mestr.toString().length());
+        buffers[6] = ByteBuffer.allocate(ParseParameter.mstr.toString().length());
 
         buffers[0].put(ParseParameter.pstr.toString().getBytes()).flip();
         buffers[1].put(ParseParameter.tstr.toString().getBytes()).flip();
         buffers[2].put(ParseParameter.astr.toString().getBytes()).flip();
         buffers[3].put(ParseParameter.cstr.toString().getBytes()).flip();
         buffers[4].put(ParseParameter.nstr.toString().getBytes()).flip();
+        buffers[5].put(ParseParameter.mestr.toString().getBytes()).flip();
+        buffers[6].put(ParseParameter.mstr.toString().getBytes()).flip();
 
         try {
             ByteBuffer bufofCP = ByteBuffer.allocate(Copyright.length());
@@ -255,6 +385,16 @@ public class TargetFile {
             outputChannel.write(buffer4);
             outputChannel.write(buffers[4]);
             
+            ByteBuffer buffer5 = ByteBuffer.allocate(meusage.length());
+            buffer4.put(meusage.getBytes()).flip();
+            outputChannel.write(buffer5);
+            outputChannel.write(buffers[5]);
+            
+            ByteBuffer buffer6 = ByteBuffer.allocate(musage.length());
+            buffer4.put(musage.getBytes()).flip();
+            outputChannel.write(buffer6);
+            outputChannel.write(buffers[6]);
+            
             outputFile.close();
         } catch (IOException e) {
             System.out.println("\n# The operations of file failed !");
@@ -272,6 +412,17 @@ public class TargetFile {
     /// point to target.txt.
     ///
     private static File Fd;
+    
+    ///
+    /// when the flag is true, the corresponding str should be add at the end of file.
+    ///
+    private static boolean pflag = true;
+    private static boolean tflag = true;
+    private static boolean aflag = true;
+    private static boolean cflag = true;
+    private static boolean nflag = true;
+    private static boolean mflag = true;
+    private static boolean meflag = true;
 
     private static final String Copyright = "#\n"
             + "#  Copyright (c) 2006, Intel Corporation\n"
@@ -331,4 +482,16 @@ public class TargetFile {
             + "#  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.\n"
             + "#                                             If not specified, all applicable TagName tools will be \n"
             + "#                                             used for the build.  The list uses space character separation.\n";
+    
+    private static final String musage = "\n\n"
+            + "#  MULTIPLE_THREAD       FLAG      Optional   Flag to enable multi-thread build. If not specified, default\n"
+            + "#                                             is \"Disable\". If your computer is multi-core or multiple CPUs,\n" 
+            + "#                                             enabling this feature will bring much benefit. For multi-thread\n" 
+            + "#                                             built, the log will write to ${BUILD_DIR}/build.log.\n" 
+            + "#                                             This feature is only for PLATFORM build, and clean, cleanall or\n"
+            + "#                                             stand-alone module build is still using the normal way.\n";
+    private static final String meusage = "\n\n"
+            + "# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 2. Recommend to\n" 
+            + "#                                                 set this value to one more than the number of your compurter\n"
+            + "#                                                 cores or CPUs.\n";
 }

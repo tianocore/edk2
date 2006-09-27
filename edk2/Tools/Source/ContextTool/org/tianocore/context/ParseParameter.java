@@ -34,7 +34,7 @@ public class ParseParameter {
             for(int i=0; i<args.length; i++){
                 if( (args[i].compareToIgnoreCase("-h") == 0) || 
                     (args[i].startsWith("-") && ((args[i].charAt(1) != 'a') && (args[i].charAt(1) != 'c') 
-                    && (args[i].charAt(1) != 'n') && (args[i].charAt(1) != 'p') && (args[i].charAt(1) != 't')))){
+                    && (args[i].charAt(1) != 'n') && (args[i].charAt(1) != 'p') && (args[i].charAt(1) != 't') && (args[i].charAt(1) != 'm')))){
                     HelpInfo.outputUsageInfo();
                     return false;
                 }
@@ -52,6 +52,9 @@ public class ParseParameter {
      **/
     private static void standardizeParameter(String[] args) {
         
+        //
+        // the parameters's length are same.
+        //
         length  = pstr.length();
         
         StringBuffer InputData = new StringBuffer();
@@ -83,17 +86,27 @@ public class ParseParameter {
             } else if (argstr.charAt(1) == 'n') {
                 nstr += argstr.substring(2);
 //                nstr += "\n";
-            }
+            } else if (argstr.charAt(1) == 'm') {
+                mstr += argstr.substring(2);
+//              mstr += "\n";
+                if (argstr.charAt(3) == '0'){
+                    mestr += " Disable";
+                } else {
+                    mestr += " Enable";
+                }
+          }
             i = j;
         }
 
     }
      
     public static int length  = 0;
-    public static String pstr = new String("ACTIVE_PLATFORM       = ");
-    public static String tstr = new String("TARGET                = ");
-    public static String astr = new String("TARGET_ARCH           = ");
-    public static String cstr = new String("TOOL_CHAIN_CONF       = ");
-    public static String nstr = new String("TOOL_CHAIN_TAG        = ");
+    public static String pstr = new String("ACTIVE_PLATFORM                     = ");
+    public static String tstr = new String("TARGET                              = ");
+    public static String astr = new String("TARGET_ARCH                         = ");
+    public static String cstr = new String("TOOL_CHAIN_CONF                     = ");
+    public static String nstr = new String("TOOL_CHAIN_TAG                      = ");
+    public static String mstr = new String("MAX_CONCURRENT_THREAD_NUMBER        = ");
+    public static String mestr = new String("MULTIPLE_THREAD                     = ");
 
 }
