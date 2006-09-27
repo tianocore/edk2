@@ -2461,6 +2461,7 @@ public class FpdFlash extends IInternalFrame {
                     if (mi != null) {
                         name = mi.getName();
                     }
+                    
                     String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
                     modInFvTableModel.addRow(row);
                 }
@@ -2903,10 +2904,13 @@ public class FpdFlash extends IInternalFrame {
                         String pv = modInFvTableModel.getValueAt(selectedRowLeft, 4)+"";
                         String arch = modInFvTableModel.getValueAt(selectedRowLeft, 5)+"";
                         String[] row = {name, mg, mv, pg, pv, arch};
-                        if (name.length() == 0 || name.equals("N/A")) {
+                        String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch; 
+                        if (name.length() == 0 || name.equals("N/A") || ffc.getModuleSA(moduleKey) == null) {
+                            JOptionPane.showMessageDialog(frame, "Module " + name + " not exists in platform. If you want to add back this module, please first add it into current platform. " + moduleKey );
+                            modInFvTableModel.removeRow(selectedRowLeft);
                             return;
                         }
-                        
+                       
                         fpdModTableModel.addRow(row);
                         int viewIndex = ((TableSorter) jTableFpdModules.getModel()).getViewIndexArray()[jTableFpdModules
                                                                                                                         .getRowCount() - 1];

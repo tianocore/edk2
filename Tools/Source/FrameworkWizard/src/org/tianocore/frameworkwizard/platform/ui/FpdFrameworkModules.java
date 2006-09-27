@@ -38,6 +38,7 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 import java.awt.FlowLayout;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -297,7 +298,19 @@ public class FpdFrameworkModules extends IInternalFrame {
 
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableAllModules.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+            jTableAllModules.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                        java.awt.Point p = e.getPoint();
+                        int rowIndex = jTableAllModules.rowAtPoint(p);
+                        TableSorter sorter = (TableSorter) jTableAllModules.getModel();
+                        rowIndex = sorter.getModelRowIndex(rowIndex);
+                        addModuleIntoPlatform (rowIndex);
+                    }
+                }
+            });
+            
+            
         }
         return jTableAllModules;
     }
@@ -319,6 +332,109 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         return jPanelTopSouth;
     }
+    
+    private void addModuleIntoPlatform (int selectedRow) {
+        String path = modelAllModules.getValueAt(selectedRow, pathColForAllModTable) + "";
+        ModuleIdentification mi = miList.get(selectedRow);
+        Vector<String> vArchs = null;
+        try {
+            vArchs = WorkspaceProfile.getModuleSupArchs(mi);
+        }
+        catch (Exception exp) {
+            JOptionPane.showMessageDialog(frame, exp.getMessage());
+        }
+
+        if (vArchs == null) {
+            JOptionPane.showMessageDialog(frame, "No Supported Architectures specified in MSA file.");
+            return;
+        }
+
+        String archsAdded = "";
+        String mg = mi.getGuid();
+        String mv = mi.getVersion();
+        String pg = mi.getPackageId().getGuid();
+        String pv = mi.getPackageId().getVersion();
+        String mType = SurfaceAreaQuery.getModuleType(mi);
+
+        ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
+        if (al == null) {
+            //
+            // if existing ModuleSA does not specify version info.
+            //
+            al = fpdMsa.get(mg + "null" + pg + "null");
+            if (al == null) {
+                al = fpdMsa.get(mg + "null" + pg + pv);
+                if (al == null){
+                    al = fpdMsa.get(mg + mv + pg + "null");
+                    if (al == null) {
+                        al = new ArrayList<String>();
+                        fpdMsa.put(mg + mv + pg + pv, al);    
+                    }
+                }
+            }
+        }
+        //
+        // filter from module SupArchs what archs has been added.
+        //
+        for (int i = 0; i < al.size(); ++i) {
+            vArchs.remove(al.get(i));
+        }
+        //
+        // check whether archs conform to SupArch of platform.
+        //
+        Vector<Object> platformSupArch = new Vector<Object>();
+        ffc.getPlatformDefsSupportedArchs(platformSupArch);
+        vArchs.retainAll(platformSupArch);
+        //
+        // Archs this Module supported have already been added.
+        //
+        if (vArchs.size() == 0) {
+            JOptionPane.showMessageDialog(frame, "This Module has already been added.");
+            return;
+        }
+        //ToDo put Arch instead of null
+        boolean errorOccurred = false;
+        for (int i = 0; i < vArchs.size(); ++i) {
+            String arch = vArchs.get(i);
+            al.add(arch);
+            archsAdded += arch + " ";
+            String[] row = { "", "", "", "", "", "", "" };
+
+            if (mi != null) {
+                row[modNameColForFpdModTable] = mi.getName();
+                row[pkgNameColForFpdModTable] = mi.getPackageId().getName();
+                row[pathColForFpdModTable] = path;
+                row[archColForFpdModTable] = arch;
+                row[pkgVerColForFpdModTable] = pv;
+                row[modVerColForFpdModTable] = mv;
+                row[typeColForFpdModTable] = mType;
+
+            }
+            modelFpdModules.addRow(row);
+
+            docConsole.setSaved(false);
+            try {
+                //ToDo : specify archs need to add.
+                ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
+            } catch (Exception exception) {
+                JOptionPane.showMessageDialog(frame, "Adding " + row[modNameColForFpdModTable] + " with Supporting Architectures: " + arch
+                                                     + ": " + exception.getMessage());
+                errorOccurred = true;
+            }
+        }
+
+        String s = "This Module with Architecture " + archsAdded;
+        if (errorOccurred) {
+            s += " was added with Error. Platform may NOT Build.";
+        } else {
+            s += " was added Successfully.";
+        }
+        JOptionPane.showMessageDialog(frame, s);
+        TableSorter sorterFpdModules = (TableSorter)jTableFpdModules.getModel();
+        int viewIndex = sorterFpdModules.getViewIndexArray()[modelFpdModules.getRowCount() - 1];
+        jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+
+    }
 
     /**
      * This method initializes jButtonAddModule	
@@ -339,105 +455,7 @@ public class FpdFrameworkModules extends IInternalFrame {
 
                     TableSorter sorter = (TableSorter) jTableAllModules.getModel();
                     selectedRow = sorter.getModelRowIndex(selectedRow);
-                    String path = modelAllModules.getValueAt(selectedRow, pathColForAllModTable) + "";
-                    ModuleIdentification mi = miList.get(selectedRow);
-                    Vector<String> vArchs = null;
-                    try {
-                        vArchs = WorkspaceProfile.getModuleSupArchs(mi);
-                    }
-                    catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, exp.getMessage());
-                    }
-
-                    if (vArchs == null) {
-                        JOptionPane.showMessageDialog(frame, "No Supported Architectures specified in MSA file.");
-                        return;
-                    }
-
-                    String archsAdded = "";
-                    String mg = mi.getGuid();
-                    String mv = mi.getVersion();
-                    String pg = mi.getPackageId().getGuid();
-                    String pv = mi.getPackageId().getVersion();
-                    String mType = SurfaceAreaQuery.getModuleType(mi);
-
-                    ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
-                    if (al == null) {
-                        //
-                        // if existing ModuleSA does not specify version info.
-                        //
-                        al = fpdMsa.get(mg + "null" + pg + "null");
-                        if (al == null) {
-                            al = fpdMsa.get(mg + "null" + pg + pv);
-                            if (al == null){
-                                al = fpdMsa.get(mg + mv + pg + "null");
-                                if (al == null) {
-                                    al = new ArrayList<String>();
-                                    fpdMsa.put(mg + mv + pg + pv, al);    
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // filter from module SupArchs what archs has been added.
-                    //
-                    for (int i = 0; i < al.size(); ++i) {
-                        vArchs.remove(al.get(i));
-                    }
-                    //
-                    // check whether archs conform to SupArch of platform.
-                    //
-                    Vector<Object> platformSupArch = new Vector<Object>();
-                    ffc.getPlatformDefsSupportedArchs(platformSupArch);
-                    vArchs.retainAll(platformSupArch);
-                    //
-                    // Archs this Module supported have already been added.
-                    //
-                    if (vArchs.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "This Module has already been added.");
-                        return;
-                    }
-                    //ToDo put Arch instead of null
-                    boolean errorOccurred = false;
-                    for (int i = 0; i < vArchs.size(); ++i) {
-                        String arch = vArchs.get(i);
-                        al.add(arch);
-                        archsAdded += arch + " ";
-                        String[] row = { "", "", "", "", "", "", "" };
-
-                        if (mi != null) {
-                            row[modNameColForFpdModTable] = mi.getName();
-                            row[pkgNameColForFpdModTable] = mi.getPackageId().getName();
-                            row[pathColForFpdModTable] = path;
-                            row[archColForFpdModTable] = arch;
-                            row[pkgVerColForFpdModTable] = pv;
-                            row[modVerColForFpdModTable] = mv;
-                            row[typeColForFpdModTable] = mType;
-
-                        }
-                        modelFpdModules.addRow(row);
-
-                        docConsole.setSaved(false);
-                        try {
-                            //ToDo : specify archs need to add.
-                            ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
-                        } catch (Exception exception) {
-                            JOptionPane.showMessageDialog(frame, "Adding " + row[modNameColForFpdModTable] + " with Supporting Architectures: " + arch
-                                                                 + ": " + exception.getMessage());
-                            errorOccurred = true;
-                        }
-                    }
-
-                    String s = "This Module with Architecture " + archsAdded;
-                    if (errorOccurred) {
-                        s += " was added with Error. Platform may NOT Build.";
-                    } else {
-                        s += " was added Successfully.";
-                    }
-                    JOptionPane.showMessageDialog(frame, s);
-                    TableSorter sorterFpdModules = (TableSorter)jTableFpdModules.getModel();
-                    int viewIndex = sorterFpdModules.getViewIndexArray()[modelFpdModules.getRowCount() - 1];
-                    jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+                    addModuleIntoPlatform (selectedRow);    
                 }
             });
         }
@@ -530,6 +548,18 @@ public class FpdFrameworkModules extends IInternalFrame {
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableFpdModules.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             
+            jTableFpdModules.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                        java.awt.Point p = e.getPoint();
+                        int rowIndex = jTableFpdModules.rowAtPoint(p);
+                        TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
+                        rowIndex = sorter.getModelRowIndex(rowIndex);
+                        showSettingsDlg (rowIndex);
+                    }
+                }
+            });
+            
             jTableFpdModules.getModel().addTableModelListener(this);
         }
         return jTableFpdModules;
@@ -550,6 +580,32 @@ public class FpdFrameworkModules extends IInternalFrame {
             docConsole.setSaved(false);
         }
     }
+    
+    private void showSettingsDlg (int row) {
+        try {
+            if (ffc.adjustPcd(row)) {
+                docConsole.setSaved(false);
+            }
+        }
+        catch (Exception exp) {
+            JOptionPane.showMessageDialog(frame, exp.getMessage());
+            return;
+        }
+        
+        if (settingDlg == null) {
+            settingDlg = new FpdModuleSA(ffc);
+        }
+
+        String[] sa = new String[5];
+        ffc.getFrameworkModuleInfo(row, sa);
+        String mg = sa[ffcModGuid];
+        String mv = sa[ffcModVer];
+        String pg = sa[ffcPkgGuid];
+        String pv = sa[ffcPkgVer];
+        String arch = sa[ffcModArch];
+        settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, row, docConsole);
+        settingDlg.setVisible(true);
+    }
     /**
      * This method initializes jButtonSettings
      * 	
@@ -569,29 +625,7 @@ public class FpdFrameworkModules extends IInternalFrame {
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.getModelRowIndex(selectedRow);
-                    try {
-                        if (ffc.adjustPcd(selectedRow)) {
-                            docConsole.setSaved(false);
-                        }
-                    }
-                    catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, exp.getMessage());
-                        return;
-                    }
-                    
-                    if (settingDlg == null) {
-                        settingDlg = new FpdModuleSA(ffc);
-                    }
-
-                    String[] sa = new String[5];
-                    ffc.getFrameworkModuleInfo(selectedRow, sa);
-                    String mg = sa[ffcModGuid];
-                    String mv = sa[ffcModVer];
-                    String pg = sa[ffcPkgGuid];
-                    String pv = sa[ffcPkgVer];
-                    String arch = sa[ffcModArch];
-                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, selectedRow, docConsole);
-                    settingDlg.setVisible(true);
+                    showSettingsDlg (selectedRow);
                 }
             });
         }
@@ -626,6 +660,18 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String pg = sa[ffcPkgGuid];
                     String pv = sa[ffcPkgVer];
                     String arch = sa[ffcModArch];
+                    //
+                    // sync. module order list in BuildOptions-UserExtensions.
+                    //
+                    String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+                    String fvBindings = ffc.getFvBinding(moduleKey);
+                    if (fvBindings != null) {
+                        String[] fvArray = fvBindings.split(" ");
+                        for (int i = 0; i < fvArray.length; ++i) {
+                            ffc.removeModuleInBuildOptionsUserExtensions(fvArray[i].trim(), mg, mv, pg, pv, arch);
+                        }
+                    }
+                    
                     ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv + " " + arch);
                     if (mi != null) {
                         mv = mi.getVersion();

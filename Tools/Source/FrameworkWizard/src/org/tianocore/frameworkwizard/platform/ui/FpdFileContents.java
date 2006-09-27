@@ -1897,6 +1897,138 @@ public class FpdFileContents {
         
     }
     
+    private boolean versionEqual (String v1, String v2) {
+        
+        if ((v1 == null || v1.length() == 0 || v1.equalsIgnoreCase("null")) 
+                        && (v2 == null || v2.length() == 0 || v2.equalsIgnoreCase("null"))) {
+            return true;
+        }
+        
+        if (v1 != null && v1.equals(v2)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public boolean moduleInBuildOptionsUserExtensions (String fvName, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+        boolean inList = false;
+        if (getUserExtsIncModCount(fvName) > 0) {
+            
+            XmlCursor cursor = getfpdBuildOpts().newCursor();
+            QName elementUserExts = new QName (xmlNs, "UserExtensions");
+            QName attribUserId = new QName ("UserID");
+            QName elementFvName = new QName (xmlNs, "FvName");
+            QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
+            QName attribModuleGuid = new QName("ModuleGuid");
+            QName attribModuleVersion = new QName("ModuleVersion");
+            QName attribPackageGuid = new QName("PackageGuid");
+            QName attribPackageVersion = new QName("PackageVersion");
+            QName attribArch = new QName("Arch");
+            
+            if (cursor.toChild(elementUserExts)) {
+                do {
+                    cursor.push();
+                    if (cursor.getAttributeText(attribUserId).equals("IMAGES")) {
+                        cursor.toChild(elementFvName);
+                        String elementName = cursor.getTextValue();
+                        if (elementName.equals(fvName)) {
+                            cursor.toNextSibling(elementIncludeModules);
+                            if (cursor.toFirstChild()) {
+                                
+                                do {
+                                    String mg = cursor.getAttributeText(attribModuleGuid);
+                                    String mv = cursor.getAttributeText(attribModuleVersion);
+                                    String pg = cursor.getAttributeText(attribPackageGuid);
+                                    String pv = cursor.getAttributeText(attribPackageVersion);
+                                    String ar = cursor.getAttributeText(attribArch);
+                                    if (!moduleGuid.equalsIgnoreCase(mg)) {
+                                        continue;
+                                    }
+                                    if (!packageGuid.equalsIgnoreCase(pg)) {
+                                        continue;
+                                    }
+                                    if (!arch.equalsIgnoreCase(ar)) {
+                                        continue;
+                                    }
+                                    if (!versionEqual(moduleVersion, mv)) {
+                                        continue;
+                                    }
+                                    if (!versionEqual(packageVersion, pv)) {
+                                        continue;
+                                    }
+                                    inList = true;
+                                    break;
+                                }while (cursor.toNextSibling());
+                            }
+                            break;
+                        }
+                    }
+                    cursor.pop();
+                }while (cursor.toNextSibling(elementUserExts));
+            }
+            cursor.dispose();
+        }
+        return inList;
+    }
+    
+    public void removeModuleInBuildOptionsUserExtensions (String fvName, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+        if (getUserExtsIncModCount(fvName) > 0) {
+            
+            XmlCursor cursor = getfpdBuildOpts().newCursor();
+            QName elementUserExts = new QName (xmlNs, "UserExtensions");
+            QName attribUserId = new QName ("UserID");
+            QName elementFvName = new QName (xmlNs, "FvName");
+            QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
+            QName attribModuleGuid = new QName("ModuleGuid");
+            QName attribModuleVersion = new QName("ModuleVersion");
+            QName attribPackageGuid = new QName("PackageGuid");
+            QName attribPackageVersion = new QName("PackageVersion");
+            QName attribArch = new QName("Arch");
+            
+            if (cursor.toChild(elementUserExts)) {
+                do {
+                    cursor.push();
+                    if (cursor.getAttributeText(attribUserId).equals("IMAGES")) {
+                        cursor.toChild(elementFvName);
+                        String elementName = cursor.getTextValue();
+                        if (elementName.equals(fvName)) {
+                            cursor.toNextSibling(elementIncludeModules);
+                            if (cursor.toFirstChild()) {
+                                
+                                do {
+                                    String mg = cursor.getAttributeText(attribModuleGuid);
+                                    String mv = cursor.getAttributeText(attribModuleVersion);
+                                    String pg = cursor.getAttributeText(attribPackageGuid);
+                                    String pv = cursor.getAttributeText(attribPackageVersion);
+                                    String ar = cursor.getAttributeText(attribArch);
+                                    if (!moduleGuid.equalsIgnoreCase(mg)) {
+                                        continue;
+                                    }
+                                    if (!packageGuid.equalsIgnoreCase(pg)) {
+                                        continue;
+                                    }
+                                    if (!arch.equalsIgnoreCase(ar)) {
+                                        continue;
+                                    }
+                                    if (!versionEqual(moduleVersion, mv)) {
+                                        continue;
+                                    }
+                                    if (!versionEqual(packageVersion, pv)) {
+                                        continue;
+                                    }
+                                    cursor.removeXml();
+                                }while (cursor.toNextSibling());
+                            }
+                            break;
+                        }
+                    }
+                    cursor.pop();
+                }while (cursor.toNextSibling(elementUserExts));
+            }
+            cursor.dispose();
+        }
+    }
     
     public void genBuildOptionsUserDefAntTask (String id, String fileName, String execOrder) {
         UserDefinedAntTasksDocument.UserDefinedAntTasks udats = getfpdBuildOpts().getUserDefinedAntTasks();

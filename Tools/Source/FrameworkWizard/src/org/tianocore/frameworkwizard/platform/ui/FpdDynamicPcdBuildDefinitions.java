@@ -23,6 +23,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import java.awt.GridLayout;
 
 public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
 
@@ -31,9 +32,6 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
      */
     private static final long serialVersionUID = 1L;
     private JPanel jContentPane = null;
-    private JPanel jPanelContentNorth = null;
-    private JPanel jPanelContentCenter = null;
-    private JPanel jPanelContentSouth = null;
     private JScrollPane jScrollPaneDynPcd = null;
     private JTable jTableDynPcd = null;
     private DynPcdTableModel modelPcd = null; 
@@ -63,6 +61,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private JRadioButton jRadioButtonDefaultValue = null;
     private ButtonGroup bg = new ButtonGroup();
     private JLabel jLabelPadd = null;
+    private JLabel jLabelPad1 = null;
     /**
      * This is the default constructor
      */
@@ -119,50 +118,11 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
-            jContentPane.add(getJPanelContentNorth(), java.awt.BorderLayout.NORTH);
-            jContentPane.add(getJPanelContentCenter(), java.awt.BorderLayout.CENTER);
-            jContentPane.add(getJPanelContentSouth(), java.awt.BorderLayout.SOUTH);
+            jContentPane.add(getJScrollPaneDynPcd(), java.awt.BorderLayout.NORTH);
+            jContentPane.add(getJPanelSkuInfo(), java.awt.BorderLayout.CENTER);
+            jContentPane.add(getJPanelDynPcdValue(), java.awt.BorderLayout.SOUTH);
         }
         return jContentPane;
-    }
-
-    /**
-     * This method initializes jPanel	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelContentNorth() {
-        if (jPanelContentNorth == null) {
-            jPanelContentNorth = new JPanel();
-        }
-        return jPanelContentNorth;
-    }
-
-    /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelContentCenter() {
-        if (jPanelContentCenter == null) {
-            jPanelContentCenter = new JPanel();
-            jPanelContentCenter.add(getJScrollPaneDynPcd(), null);
-            jPanelContentCenter.add(getJPanelSkuInfo(), null);
-            jPanelContentCenter.add(getJPanelDynPcdValue(), null);
-        }
-        return jPanelContentCenter;
-    }
-
-    /**
-     * This method initializes jPanel2	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelContentSouth() {
-        if (jPanelContentSouth == null) {
-            jPanelContentSouth = new JPanel();
-        }
-        return jPanelContentSouth;
     }
 
     /**
@@ -173,7 +133,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private JScrollPane getJScrollPaneDynPcd() {
         if (jScrollPaneDynPcd == null) {
             jScrollPaneDynPcd = new JScrollPane();
-            jScrollPaneDynPcd.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPaneDynPcd.setPreferredSize(new java.awt.Dimension(100,300));
             jScrollPaneDynPcd.setViewportView(getJTableDynPcd());
         }
         return jScrollPaneDynPcd;
@@ -345,6 +305,14 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
      */
     private JPanel getJPanelDynPcdValue() {
         if (jPanelDynPcdValue == null) {
+            jLabelPad1 = new JLabel();
+            jLabelPad1.setText(" ");
+            GridLayout gridLayout = new GridLayout();
+            gridLayout.setColumns(5);
+            gridLayout.setRows(4);
+            gridLayout.setHgap(5);
+            gridLayout.setVgap(5);
+            
             jLabelVpdOffset = new JLabel();
             jLabelVpdOffset.setPreferredSize(new java.awt.Dimension(80,20));
             jLabelVpdOffset.setText("VPD Offset");
@@ -363,11 +331,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jLabelVarName.setText("Variable Name");
             jLabelVarName.setToolTipText("");
             jLabelVarName.setPreferredSize(new java.awt.Dimension(90,20));
-            FlowLayout flowLayout1 = new FlowLayout();
-            flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
             jPanelDynPcdValue = new JPanel();
             jPanelDynPcdValue.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-            jPanelDynPcdValue.setLayout(flowLayout1);
+            jPanelDynPcdValue.setLayout(gridLayout);
             jPanelDynPcdValue.setPreferredSize(new java.awt.Dimension(600,120));
             jPanelDynPcdValue.add(getJRadioButtonHii(), null);
             jPanelDynPcdValue.add(jLabelVarName, null);
@@ -381,15 +347,16 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jPanelDynPcdValue.add(getJTextFieldHiiDefaultValue(), null);
             jPanelDynPcdValue.add(getJRadioButtonVpd(), null);
             jPanelDynPcdValue.add(jLabelVpdOffset, null);
-            jPanelDynPcdValue.add(getJTextFieldVpdOffset(), null);
             jLabelPadd = new JLabel();
             jLabelPadd.setText("                           ");
-            jPanelDynPcdValue.add(jLabelPadd, null);
+            jPanelDynPcdValue.add(getJTextFieldVpdOffset(), null);
 			jLabelVarName.setEnabled(false);
 			jLabelVarGuid.setEnabled(false);
 			jLabelHiiDefaultValue.setEnabled(false);
 			jLabelVarOffset.setEnabled(false);
 			jLabelVpdOffset.setEnabled(false);
+			jPanelDynPcdValue.add(jLabelPadd, null);
+			jPanelDynPcdValue.add(jLabelPad1, null);
 			jPanelDynPcdValue.add(getJRadioButtonDefaultValue(), null);
 			jPanelDynPcdValue.add(getJTextFieldDefaultValue(), null);
             bg.add(jRadioButtonHii);

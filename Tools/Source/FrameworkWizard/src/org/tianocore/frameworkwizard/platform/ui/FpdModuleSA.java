@@ -123,7 +123,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private OpeningPlatformType docConsole = null;
     private JPanel jPanelCustomToolChain = null;
     private JPanel jPanelToolchainS = null;
-    private JPanel jPanelToolchainC = null;
     private JPanel jPanelLibraryCenterN = null;
     private JPanel jPanelLibraryCenterC = null;  //  @jve:decl-index=0:visual-constraint="20,224"
     /**
@@ -1126,7 +1125,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTextField getJTextFieldFvBinding() {
         if (jTextFieldFvBinding == null) {
             jTextFieldFvBinding = new JTextField();
-            jTextFieldFvBinding.setPreferredSize(new java.awt.Dimension(150,20));
+            jTextFieldFvBinding.setPreferredSize(new java.awt.Dimension(400,20));
+            jTextFieldFvBinding.setEditable(false);
             jTextFieldFvBinding.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     String originalFvBinding = ffc.getFvBinding(moduleKey);
@@ -1603,7 +1603,7 @@ private JPanel getJPanelCustomToolChain() {
         jPanelCustomToolChain = new JPanel();
         jPanelCustomToolChain.setLayout(new BorderLayout());
         jPanelCustomToolChain.add(getJPanelToolchainS(), java.awt.BorderLayout.SOUTH);
-        jPanelCustomToolChain.add(getJPanelToolchainC(), java.awt.BorderLayout.CENTER);
+        jPanelCustomToolChain.add(getJScrollPaneModuleSaOptions(), java.awt.BorderLayout.CENTER);
         jPanelCustomToolChain.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent e) {
                 initToolChainOptions(moduleKey);
@@ -1625,18 +1625,7 @@ private JPanel getJPanelToolchainS() {
     }
     return jPanelToolchainS;
 }
-/**
- * This method initializes jPanelToolchainC	
- * 	
- * @return javax.swing.JPanel	
- */
-private JPanel getJPanelToolchainC() {
-    if (jPanelToolchainC == null) {
-        jPanelToolchainC = new JPanel();
-        jPanelToolchainC.add(getJScrollPaneModuleSaOptions(), null);
-    }
-    return jPanelToolchainC;
-}
+
 /**
  * This method initializes jPanelLibraryCenterN	
  * 	

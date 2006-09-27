@@ -294,21 +294,13 @@ public class FpdBuildOptions extends IInternalFrame {
 
     private JPanel jPanelSectionN = null;
 
-    private JPanel jPanelSectionC = null;
-
     private JPanel jPanelSectionsN = null;
 
-    private JPanel jPanelSectionsC = null;
-
     private JPanel jPanelSubSectionN = null;
-
-    private JPanel jPanelSubSectionC = null;
 
     private JPanel jPanelOptionsContainer = null;
 
     private JPanel jPanelUserDefCenterN = null;
-
-    private JPanel jPanelUserDefCenterC = null;
 
     /**
      * This method initializes jPanel	
@@ -1245,7 +1237,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelFfsCTop = new JPanel();
             jPanelFfsCTop.setLayout(new BorderLayout());
             jPanelFfsCTop.add(getJPanelSectionN(), java.awt.BorderLayout.NORTH);
-            jPanelFfsCTop.add(getJPanelSectionC(), java.awt.BorderLayout.CENTER);
+            jPanelFfsCTop.add(getJScrollPaneFfsSection(), java.awt.BorderLayout.CENTER);
         }
         return jPanelFfsCTop;
     }
@@ -1277,7 +1269,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelFfsCBottomTop = new JPanel();
             jPanelFfsCBottomTop.setLayout(new BorderLayout());
             jPanelFfsCBottomTop.add(getJPanelSectionsN(), java.awt.BorderLayout.NORTH);
-            jPanelFfsCBottomTop.add(getJPanelSectionsC(), java.awt.BorderLayout.CENTER);
+            jPanelFfsCBottomTop.add(getJScrollPaneFfsSections(), java.awt.BorderLayout.CENTER);
         }
         return jPanelFfsCBottomTop;
     }
@@ -1292,7 +1284,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelFfsCBottomBottom = new JPanel();
             jPanelFfsCBottomBottom.setLayout(new BorderLayout());
             jPanelFfsCBottomBottom.add(getJPanelSubSectionN(), java.awt.BorderLayout.NORTH);
-            jPanelFfsCBottomBottom.add(getJPanelSubSectionC(), java.awt.BorderLayout.CENTER);
+            jPanelFfsCBottomBottom.add(getJScrollPaneFfsSubSection(), java.awt.BorderLayout.CENTER);
         }
         return jPanelFfsCBottomBottom;
     }
@@ -1315,19 +1307,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanelSectionC   
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelSectionC() {
-        if (jPanelSectionC == null) {
-            jPanelSectionC = new JPanel();
-            jPanelSectionC.add(getJScrollPaneFfsSection(), null);
-        }
-        return jPanelSectionC;
-    }
-
-    /**
      * This method initializes jPanelSectionsN  
      *  
      * @return javax.swing.JPanel   
@@ -1345,19 +1324,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanelSectionsC  
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelSectionsC() {
-        if (jPanelSectionsC == null) {
-            jPanelSectionsC = new JPanel();
-            jPanelSectionsC.add(getJScrollPaneFfsSections(), null);
-        }
-        return jPanelSectionsC;
-    }
-
-    /**
      * This method initializes jPanelSubSectionN    
      *  
      * @return javax.swing.JPanel   
@@ -1372,19 +1338,6 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelSubSectionN.add(getJButtonFfsSubSectionRemove(), null);
         }
         return jPanelSubSectionN;
-    }
-
-    /**
-     * This method initializes jPanelSubSectionC    
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelSubSectionC() {
-        if (jPanelSubSectionC == null) {
-            jPanelSubSectionC = new JPanel();
-            jPanelSubSectionC.add(getJScrollPaneFfsSubSection(), null);
-        }
-        return jPanelSubSectionC;
     }
 
     /**
@@ -1977,19 +1930,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanelUserDefCenterC	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelUserDefCenterC() {
-        if (jPanelUserDefCenterC == null) {
-            jPanelUserDefCenterC = new JPanel();
-            jPanelUserDefCenterC.add(getJScrollPaneAntTasks(), null);
-        }
-        return jPanelUserDefCenterC;
-    }
-
-    /**
      * This method initializes jPanel8  
      *  
      * @return javax.swing.JPanel   
@@ -2044,7 +1984,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelUserDefCenter.setLayout(new BorderLayout());
 
             jPanelUserDefCenter.add(getJPanelUserDefCenterN(), java.awt.BorderLayout.NORTH);
-            jPanelUserDefCenter.add(getJPanelUserDefCenterC(), java.awt.BorderLayout.CENTER);
+            jPanelUserDefCenter.add(getJScrollPaneAntTasks(), java.awt.BorderLayout.CENTER);
         }
         return jPanelUserDefCenter;
     }
