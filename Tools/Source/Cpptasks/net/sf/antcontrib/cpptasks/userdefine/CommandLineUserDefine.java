@@ -19,6 +19,7 @@ package net.sf.antcontrib.cpptasks.userdefine;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -31,6 +32,9 @@ import net.sf.antcontrib.cpptasks.types.ConditionalFileSet;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.Environment;
+import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Environment.Variable;
 
 /**
  * 
@@ -40,7 +44,9 @@ public class CommandLineUserDefine {
     String includePathDelimiter = null;
 
     String outputDelimiter = null;
-
+    
+    private static String pathName = null;
+    
     public void command(CCTask cctask, UserDefineDef userdefine) {
         boolean isGccCommand = userdefine.getFamily().equalsIgnoreCase("GCC");
         File workdir;
@@ -136,6 +142,7 @@ public class CommandLineUserDefine {
         // if have source file append source file in command line.
         //
         Set allSrcFiles = new LinkedHashSet();
+
         for (int i = 0; i < srcSets.size(); i++) {
             ConditionalFileSet srcSet = (ConditionalFileSet) srcSets
                             .elementAt(i);
@@ -144,7 +151,6 @@ public class CommandLineUserDefine {
                 // Find matching source files
                 //
                 DirectoryScanner scanner = srcSet.getDirectoryScanner(project);
-                
                 //
                 // Check each source file - see if it needs compilation
                 //
@@ -207,19 +213,57 @@ public class CommandLineUserDefine {
         for (int j = 0; j < fileNames.length; j++) {
             cmd[index++] = fileNames[j];
         }
-
-        int retval = runCommand(cctask, workdir, cmd);
         
+//        StringBuffer logLine = new StringBuffer();
+//        for(int i = 0; i < cmd.length; i++) {
+//            logLine.append(cmd[i] + " ");
+//        }
+//        project.log(logLine.toString(), Project.MSG_VERBOSE);
+
+        int retval = 0;
+        
+        if (userdefine.getDpath() == null || userdefine.getDpath().trim().length() == 0) {
+            retval = runCommand(cctask, workdir, cmd, null);
+        } else {
+            String existPath = System.getenv(getPathName());
+            Environment newEnv = new Environment();
+            Variable var = new Variable();
+            var.setKey(getPathName());
+            var.setPath(new Path(project, userdefine.getDpath() + ";" + existPath));
+            newEnv.addVariable(var);
+            retval = runCommand(cctask, workdir, cmd, newEnv);
+        }
+        
+
         if (retval != 0) {
             throw new BuildException(userdefine.getCmd()
                             + " failed with return code " + retval, cctask
                             .getLocation());
         }
     }
+    
+    private String getPathName() {
+        if (pathName != null) {
+            return pathName;
+        }
+        Map allEnv = System.getenv();
+        Iterator iter = allEnv.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String)iter.next();
+            if(key.equalsIgnoreCase("PATH")) {
+                pathName = key;
+                break ;
+            }
+        }
+        return pathName;
+    }
 
-    protected int runCommand(CCTask task, File workingDir, String[] cmdline)
+    protected int runCommand(CCTask task, File workingDir, String[] cmdline, Environment env)
                     throws BuildException {
-        return CUtil.runCommand(task, workingDir, cmdline, false, null);
+        //
+        // Write command to File
+        //
+        return CUtil.runCommand(task, workingDir, cmdline, false, env);
 
     }
 }
