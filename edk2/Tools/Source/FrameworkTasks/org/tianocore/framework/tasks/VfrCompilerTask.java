@@ -46,6 +46,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
     private FileArg vfrFile = new FileArg();
     private IncludePath includepathList = new IncludePath();
     private FileArg outPutDir = new FileArg(" -od ", ".");
+    private String dllPath = "";
 
     /**
      get class member of createList file
@@ -153,6 +154,10 @@ public class VfrCompilerTask extends Task implements EfiDefine {
         this.processerArg.setArg(" -ppflag ", processerArg);
     }
 
+    public void setDllPath(String dllPath) {
+        this.dllPath = dllPath;
+    }
+
     /**
      The standard execute method of ANT task.
      **/
@@ -191,6 +196,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
             runner.setAntRun(project);            
             runner.setCommandline(commandLine.getCommandline());
             runner.setWorkingDirectory(new File(outPutDir.getValue())); 
+            runner.setEnvironment(new String[]{"PATH", dllPath});
             
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(commandLine.getCommandline()));
             EdkLog.log(this, vfrFile.toFileList());
