@@ -61,6 +61,8 @@ public class UserDefineDef extends ProcessorDef {
     private String outputFile;
 
     private Vector allLibraries = new Vector();
+    
+    private String dpath = null;
 
     public void addLibset(LibrarySet libset) {
         if (isReference()) {
@@ -291,6 +293,14 @@ public class UserDefineDef extends ProcessorDef {
 
     public void setOutputDelimiter(String outputDelimiter) {
         this.outputDelimiter = outputDelimiter;
+    }
+
+    public String getDpath() {
+        return dpath;
+    }
+
+    public void setDpath(String dpath) {
+        this.dpath = dpath;
     }
 
 }

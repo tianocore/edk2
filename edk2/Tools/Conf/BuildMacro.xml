@@ -76,7 +76,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
-              outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+              outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${CC_DPATH}">
               <EXTRA.INC/>
               <argument value="${LOCAL_CC_FLAGS}"/>
               <EXTRA.ARG/>
@@ -138,7 +138,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /TC /Yc /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
               <cc userdefine="on">
                 <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
-                    outputFile="${DEST_DIR_OUTPUT}/AutoGen.h.obj">
+                    outputFile="${DEST_DIR_OUTPUT}/AutoGen.h.obj" dpath="${CC_DPATH}">
                   <EXTRA.INC/>
                   <argument value="${LOCAL_CC_FLAGS}"/>
                   <EXTRA.ARG/>
@@ -183,7 +183,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
-                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${CC_DPATH}">
               <EXTRA.INC/>
               <argument value="${LOCAL_CC_FLAGS}"/>
               <EXTRA.ARG/>
@@ -230,7 +230,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}"
-                     outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
+                     outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i" dpath="${CC_DPATH}">
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -312,7 +312,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" dpath="${PP_DPATH}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -335,7 +335,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
           <cc userdefine="on">
             <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
-                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${ASM_DPATH}">
               <EXTRA.INC.1/>
       
               <argument value="${ASM_FLAGS}"/>
@@ -386,7 +386,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
           <cc userdefine="on">
             <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
-                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${ASM_DPATH}">
               <EXTRA.INC.1/>
       
               <argument value="${ASM_FLAGS}"/>
@@ -445,7 +445,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" dpath="${PP_DPATH}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -454,7 +454,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       
           <cc userdefine="on">
             <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
-                includepathDelimiter="-I" outputDelimiter="-o"
+                includepathDelimiter="-I" outputDelimiter="-o" dpath="${ASM_DPATH}"
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
               <EXTRA.INC.1/>
               <argument value="${ASM_FLAGS}"/>
@@ -490,7 +490,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
   
       <cc userdefine="on">
-        <command type="ASM" includepathDelimiter="-I">
+        <command type="ASM" includepathDelimiter="-I" dpath="${ASM_DPATH}">
           <includepath path="${WORKSPACE_DIR}"/>
           <includepath path="${MODULE_DIR}"/>
           <includepath path="${MODULE_DIR}/${ARCH}"/>
@@ -530,7 +530,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
           <cc userdefine="on">
             <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}"
-                outputFile="${BIN_DIR}/@{FILENAME}.lib">
+                outputFile="${BIN_DIR}/@{FILENAME}.lib" dpath="${SLINK_DPATH}">
               <argument value="${SLINK_FLAGS}"/>
 
               <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
@@ -655,7 +655,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
-                     includepathDelimiter="-I"
+                     includepathDelimiter="-I" dpath="${CC_DPATH}"
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj">
               <argument value="${LOCAL_CC_FLAGS}"/>
               <EXTRA.INC />
@@ -712,7 +712,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" DllPath="${DPATH}">
+          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}">
             <EXTRA.INC/>
           </vfrcompile>
     
@@ -732,7 +732,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" 
-                     includepathDelimiter="-I" family="${CC_FAMILY}"
+                     includepathDelimiter="-I" family="${CC_FAMILY}" dpath="${CC_DPATH}"
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" >
               <argument value="${LOCAL_CC_FLAGS}"/>
               <EXTRA.INC/>
@@ -799,7 +799,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}"
+            <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}" dpath="${SLINK_DPATH}"
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib">
               <argument value="${SLINK_FLAGS}"/>
 
@@ -808,7 +808,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
           <cc userdefine="on">
             <command type="DLINK" cmd="${DLINK}" family="${DLINK_FAMILY}"
-                     outputFile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll" >
+                     outputFile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll" dpath="${DLINK_DPATH}" >
               <argument value="${DLINK_FLAGS}"/>
               <libset libs="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib ${LIBS} ${DLINK_SPATH}"/>
               <LINK.ARG/>
