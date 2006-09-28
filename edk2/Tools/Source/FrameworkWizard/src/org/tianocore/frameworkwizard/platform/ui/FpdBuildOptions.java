@@ -364,7 +364,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
             jTabbedPane.addTab("Flash Filesystem Options", null, getJPanelFfsTab(), null);
-            jTabbedPane.addTab("Tool Arguments", null, getJPanelOptionsTab(), null);
+            jTabbedPane.addTab("Customize Tool Chain Configurations", null, getJPanelOptionsTab(), null);
             jTabbedPane.addTab("User Defined ANT Tasks", null, getJPanelUserDef(), null);
         }
         return jTabbedPane;
@@ -407,7 +407,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel getJPanelTableOptionsContainer() {
         if (jPanelTableOptionsContainer == null) {
             jLabelTableOptionsTitle = new JLabel();
-            jLabelTableOptionsTitle.setText("  Current Option Configuration Lines");
+            jLabelTableOptionsTitle.setText("  Current Argument Lines");
             jPanelTableOptionsContainer = new JPanel();
             jPanelTableOptionsContainer.setLayout(new BorderLayout());
             jPanelTableOptionsContainer.add(jLabelTableOptionsTitle, java.awt.BorderLayout.NORTH);
@@ -1426,7 +1426,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jLabelOptionContents = new JLabel();
             jLabelOptionContents.setBounds(new java.awt.Rectangle(labelColumn, rowSix, labelWidth, oneRowHeight));
             jLabelOptionContents.setLocation(new java.awt.Point(labelColumn, rowSix));
-            jLabelOptionContents.setText("Option Contents");
+            jLabelOptionContents.setText("Argument Strings");
 
             jPanelOptionsContainer = new JPanel();
 
@@ -1758,7 +1758,7 @@ public class FpdBuildOptions extends IInternalFrame {
             optionsTableModel.addColumn("Supported Architectures");
             optionsTableModel.addColumn("Tool Command Code");
             optionsTableModel.addColumn("TagName");
-            optionsTableModel.addColumn("Contents");
+            optionsTableModel.addColumn("Arguments");
 
             javax.swing.table.TableColumn toolFamilyCol = jTableOptions.getColumnModel().getColumn(1);
             JComboBox cb = new JComboBox();
