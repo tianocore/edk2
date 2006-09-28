@@ -16,8 +16,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 
 import javax.swing.JButton;
 
@@ -25,6 +27,7 @@ import javax.swing.JButton;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
@@ -59,7 +62,7 @@ public class GenListDialog extends JDialog implements ActionListener{
         
         if (arg0.getSource() == jButtonOk){
 
-            this.dispose();
+//            this.dispose();
         }
         
         if (arg0.getSource() == jButtonCancel){
@@ -111,6 +114,7 @@ public class GenListDialog extends JDialog implements ActionListener{
             jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
+            jButtonCancel.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
         }
         return jButtonCancel;
     }
@@ -185,7 +189,7 @@ public class GenListDialog extends JDialog implements ActionListener{
     public GenListDialog(ActionListener i){
         this();
         jButtonOk.addActionListener(i);
-        
+        jButtonOk.registerKeyboardAction(i, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
     }
 
     /**

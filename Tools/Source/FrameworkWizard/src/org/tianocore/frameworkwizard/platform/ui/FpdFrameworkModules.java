@@ -38,6 +38,7 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 import java.awt.FlowLayout;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,12 @@ public class FpdFrameworkModules extends IInternalFrame {
      * Initialize Globals
      */
     private static final long serialVersionUID = 1L;
+    
+    private static final int timeToWait = 3000;
+    
+    private long savedMs = 0;
+    
+    String searchField = "";
     
     public static final int forceDbgColForFpdModTable = 7;
 
@@ -309,10 +316,50 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
                 }
             });
+            jTableAllModules.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyPressed(java.awt.event.KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        int selectedRow = jTableAllModules.getSelectedRow();
+                        if (selectedRow < 0) {
+                            return;
+                        }
+                        TableSorter sorter = (TableSorter) jTableAllModules.getModel();
+                        selectedRow = sorter.getModelRowIndex(selectedRow);
+                        addModuleIntoPlatform (selectedRow);
+                    }
+                }
+            });
+            
+            jTableAllModules.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyTyped(java.awt.event.KeyEvent e) {
+
+                    if (System.currentTimeMillis() - savedMs < timeToWait) {
+                        searchField += e.getKeyChar();
+                    }
+                    else {
+                        searchField = "" + e.getKeyChar(); 
+                    }
+                    
+                    int viewIndex = gotoFoundRow (searchField, (TableSorter) jTableAllModules.getModel());
+                    if (viewIndex >= 0){
+                        jTableAllModules.changeSelection(viewIndex, 0, false, false);
+                    }
+                    savedMs = System.currentTimeMillis();
+                }
+            });
             
             
         }
         return jTableAllModules;
+    }
+    
+    private int gotoFoundRow (String s, TableSorter model) {
+        for (int i = 0; i < model.getRowCount(); ++i) {
+            if (model.getValueAt(i, 0) != null && model.getValueAt(i, 0).toString().regionMatches(true, 0, s, 0, s.length())) {
+                return model.getViewIndexArray()[i];
+            }
+        }
+        return -1;
     }
 
     /**
@@ -557,6 +604,38 @@ public class FpdFrameworkModules extends IInternalFrame {
                         rowIndex = sorter.getModelRowIndex(rowIndex);
                         showSettingsDlg (rowIndex);
                     }
+                }
+            });
+            
+            jTableFpdModules.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyPressed(java.awt.event.KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        int selectedRow = jTableFpdModules.getSelectedRow();
+                        if (selectedRow < 0) {
+                            return;
+                        }
+                        TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
+                        selectedRow = sorter.getModelRowIndex(selectedRow);
+                        showSettingsDlg (selectedRow);
+                    }
+                }
+            });
+            
+            jTableFpdModules.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyTyped(java.awt.event.KeyEvent e) {
+
+                    if (System.currentTimeMillis() - savedMs < timeToWait) {
+                        searchField += e.getKeyChar();
+                    }
+                    else {
+                        searchField = "" + e.getKeyChar(); 
+                    }
+                    
+                    int viewIndex = gotoFoundRow (searchField, (TableSorter) jTableFpdModules.getModel());
+                    if (viewIndex >= 0){
+                        jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+                    }
+                    savedMs = System.currentTimeMillis();
                 }
             });
             

@@ -86,6 +86,7 @@ public class LongTextEditor extends AbstractCellEditor implements TableCellEdito
         else { //User pressed dialog's "OK" button.
             
             text = dialog.getText().trim();
+            dialog.dispose();
         }
 
     }
