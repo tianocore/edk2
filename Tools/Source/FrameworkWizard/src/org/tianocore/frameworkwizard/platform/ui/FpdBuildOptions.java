@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFileChooser;
@@ -46,6 +47,7 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 
@@ -57,6 +59,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.awt.Dimension;
 import javax.swing.JSplitPane;
+import java.awt.GridLayout;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -194,8 +197,6 @@ public class FpdBuildOptions extends IInternalFrame {
 
     private JTable jTableOptions = null;
     
-    private JLabel jTitle = null;
-
     private JButton jButtonOptionsAdd = null;
 
     private JButton jButtonOptionsDel = null;
@@ -302,6 +303,10 @@ public class FpdBuildOptions extends IInternalFrame {
 
     private JPanel jPanelUserDefCenterN = null;
 
+    private JPanel jPanelTableOptionsContainer = null;
+
+    private JLabel jLabelTableOptionsTitle = null;
+
     /**
      * This method initializes jPanel	
      * 	
@@ -392,6 +397,23 @@ public class FpdBuildOptions extends IInternalFrame {
             jContentPane.add(getJTabbedPane(), java.awt.BorderLayout.CENTER);
         }
         return jContentPane;
+    }
+
+    /**
+     * This method initializes jPanelTableOptionsContainer	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelTableOptionsContainer() {
+        if (jPanelTableOptionsContainer == null) {
+            jLabelTableOptionsTitle = new JLabel();
+            jLabelTableOptionsTitle.setText("  Current Option Configuration Lines");
+            jPanelTableOptionsContainer = new JPanel();
+            jPanelTableOptionsContainer.setLayout(new BorderLayout());
+            jPanelTableOptionsContainer.add(jLabelTableOptionsTitle, java.awt.BorderLayout.NORTH);
+            jPanelTableOptionsContainer.add(getJScrollPaneOptions(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelTableOptionsContainer;
     }
 
     /**
@@ -1358,15 +1380,17 @@ public class FpdBuildOptions extends IInternalFrame {
             //            FlowLayout flowLayout9 = new FlowLayout();
             //            flowLayout9.setAlignment(java.awt.FlowLayout.LEFT);
 
+            GridLayout gridLayout = new GridLayout();
+            gridLayout.setRows(2);
             jPanelOptionsTab = new JPanel();
+            jPanelOptionsTab.setLayout(gridLayout);
             jPanelOptionsTab.setBounds(new java.awt.Rectangle(0, 0, dialogWidth * 2, dialogHeight * 3));
             jPanelOptionsTab.setPreferredSize(new java.awt.Dimension(dialogWidth + 10, (dialogHeight * 3) + 10));
             jPanelOptionsTab.setAutoscrolls(true);
             jPanelOptionsTab.setLocation(0, 0);
-            jPanelOptionsTab.setLayout(null);
             jPanelOptionsTab.add(getJPanelOptionsContainer(), null);
-            jPanelOptionsTab.add(getJScrollPaneOptions(), null);
-
+//            jPanelOptionsTab.add(getJScrollPaneOptions(), null);
+            jPanelOptionsTab.add(getJPanelTableOptionsContainer(), null);
         }
         return jPanelOptionsTab;
     }
@@ -1408,8 +1432,6 @@ public class FpdBuildOptions extends IInternalFrame {
 
             jPanelOptionsContainer.setLayout(null);
             
-            jPanelOptionsContainer.setLocation(new java.awt.Point(2, 2));
-            jPanelOptionsContainer.setBounds(new java.awt.Rectangle(2, 2, dialogWidth * 2, dialogHeight));
             jPanelOptionsContainer.setPreferredSize(new java.awt.Dimension(dialogWidth, dialogHeight));
             /*
             jPanelOptionsContainer
@@ -1701,6 +1723,12 @@ public class FpdBuildOptions extends IInternalFrame {
         return jButtonOptionsDel;
     }
 
+    public void componentResized(ComponentEvent arg0) {
+        int intPreferredWidth = 500;
+        
+        Tools.resizeComponentWidth(this.jScrollPaneOptions, this.getWidth(), intPreferredWidth);
+        
+    }
     /**
      * This method initializes jScrollPaneOptions	
      * 	Contains the Table and is located below the data entry section
@@ -1709,10 +1737,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneOptions() {
         if (jScrollPaneOptions == null) {
             jScrollPaneOptions = new JScrollPane();
-            jScrollPaneOptions.setPreferredSize(new java.awt.Dimension(dialogWidth, dialogHeight * 2));
-            jScrollPaneOptions.setBounds(new java.awt.Rectangle(2, (dialogHeight * 2) + 2, dialogWidth * 2, dialogHeight * 2));
-            jScrollPaneOptions.setLocation(new java.awt.Point(2, dialogHeight + 2));
-
             jScrollPaneOptions.setViewportView(getJTableOptions());
         }
         return jScrollPaneOptions;
@@ -1725,9 +1749,6 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JTable getJTableOptions() {
         if (jTableOptions == null) {
-            jTitle = new JLabel();
-            jTitle.setText("Current Option Configuration Lines");
-            jTitle.setBounds(2, 2, labelWidth, oneRowHeight);
             
             optionsTableModel = new DefaultTableModel();
             jTableOptions = new JTable(optionsTableModel);
@@ -1759,7 +1780,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jTableOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
             
             jTableOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    jTableOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+	        jTableOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTableOptions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     selectedRow = -1;
