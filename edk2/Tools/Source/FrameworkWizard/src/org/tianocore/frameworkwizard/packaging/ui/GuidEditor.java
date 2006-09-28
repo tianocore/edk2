@@ -16,11 +16,14 @@ package org.tianocore.frameworkwizard.packaging.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+//import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
+//import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+//import javax.swing.KeyStroke;
 import javax.swing.table.TableCellEditor;
 
 
@@ -45,6 +48,7 @@ public class GuidEditor extends AbstractCellEditor implements TableCellEditor, A
         button = new JButton();
         button.setActionCommand(EDIT);
         button.addActionListener(this);
+//        button.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0, false), JComponent.WHEN_FOCUSED);
         button.setBorderPainted(false);
 
         
@@ -86,7 +90,8 @@ public class GuidEditor extends AbstractCellEditor implements TableCellEditor, A
         }
         else { //User pressed dialog's "OK" button.
             currentGuid = dialog.getGuid();
-
+//            button.setText(currentGuid);
+            dialog.dispose();
         }
 
     }

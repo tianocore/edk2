@@ -98,6 +98,7 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
                 s += " ";
             }
             archs = s.trim();
+            dialog.dispose();
         }
 
     }

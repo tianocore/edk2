@@ -16,13 +16,18 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
+import javax.swing.KeyStroke;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
 import javax.swing.JScrollPane;
 
 
@@ -48,13 +53,11 @@ public class GenLongTextDialog extends JDialog implements ActionListener{
 
     private JScrollPane jScrollPane = null;
 
-
-
     public void actionPerformed(ActionEvent arg0) {
         
         if (arg0.getSource() == jButtonOk){
 
-            this.dispose();
+//            this.dispose();
         }
         
         if (arg0.getSource() == jButtonCancel){
@@ -107,6 +110,7 @@ public class GenLongTextDialog extends JDialog implements ActionListener{
             jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
+            jButtonCancel.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
         }
         return jButtonCancel;
     }
@@ -170,7 +174,7 @@ public class GenLongTextDialog extends JDialog implements ActionListener{
     public GenLongTextDialog(ActionListener i){
         this();
         jButtonOk.addActionListener(i);
-        
+        jButtonOk.registerKeyboardAction(i, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
     }
 
     /**

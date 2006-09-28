@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JDialog;
 import java.awt.GridLayout;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -27,12 +28,14 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.KeyStroke;
 
 import org.tianocore.frameworkwizard.common.Tools;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -62,6 +65,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
     private JButton jButtonCancel = null;
     private JButton jButtonNew = null;
     private JButton jButtonOk = null;
+    private ActionListener outerListener = null;
     
 //    private String guid = null;
 
@@ -121,7 +125,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
 //            else {
 //                JOptionPane.showMessageDialog(frame, "Incorrect GUID Value Format.");
 //            }
-            this.dispose();
+//            this.dispose();
         }
         
         if (arg0.getSource() == jButtonCancel){
@@ -227,6 +231,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
+            jButtonCancel.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
         }
         return jButtonCancel;
     }
@@ -243,6 +248,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             jButtonNew.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
             jButtonNew.setText("New");
             jButtonNew.addActionListener(this);
+            jButtonNew.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
         }
         return jButtonNew;
     }
@@ -258,7 +264,9 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonOk.setText("Ok");
             jButtonOk.setActionCommand("GenGuidValue");
-            jButtonOk.addActionListener(this);
+//            jButtonOk.addActionListener(this);
+            jButtonOk.registerKeyboardAction(outerListener, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
+            
         }
         return jButtonOk;
     }
@@ -289,6 +297,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
     
     public GenGuidDialog(ActionListener i){
         super();
+        outerListener = i;
         initialize();
         jButtonOk.addActionListener(i);
         this.addWindowListener(new WindowAdapter(){
