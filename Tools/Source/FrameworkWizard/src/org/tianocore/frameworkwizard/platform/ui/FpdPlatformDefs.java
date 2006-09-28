@@ -61,6 +61,8 @@ public class FpdPlatformDefs extends IInternalFrame {
 
     //    private final int sepWidth = 10;
 
+    private final int offsetWidth = 70;
+
     private final int buttonWidth = 90;
 
     private final int rowOne = 12;
@@ -963,8 +965,8 @@ public class FpdPlatformDefs extends IInternalFrame {
         if (jComboBoxInterDir == null) {
             jComboBoxInterDir = new JComboBox();
             jComboBoxInterDir.setPreferredSize(new Dimension(75, oneRowHeight));
-            jComboBoxInterDir.setBounds(new java.awt.Rectangle(valueColumn + 30, rowEleven, 75, oneRowHeight));
-            jComboBoxInterDir.setLocation(new java.awt.Point(valueColumn + 30, rowEleven));
+            jComboBoxInterDir.setBounds(new java.awt.Rectangle(valueColumn + offsetWidth, rowEleven, 95, oneRowHeight));
+            jComboBoxInterDir.setLocation(new java.awt.Point(valueColumn + offsetWidth, rowEleven));
             jComboBoxInterDir.addItem("UNIFIED");
             jComboBoxInterDir.addItem("MODULE");
             jComboBoxInterDir.setSelectedIndex(0);
@@ -993,9 +995,9 @@ public class FpdPlatformDefs extends IInternalFrame {
         if (jTextFieldOutputDir == null) {
             jTextFieldOutputDir = new JTextField();
             jTextFieldOutputDir.setPreferredSize(new java.awt.Dimension(290, 20));
-            jTextFieldOutputDir.setBounds(new java.awt.Rectangle(valueColumn + 30, rowTwelve, valueWidth - 30,
+            jTextFieldOutputDir.setBounds(new java.awt.Rectangle(valueColumn + offsetWidth, rowTwelve, valueWidth - 30,
                                                                  oneRowHeight));
-            jTextFieldOutputDir.setLocation(new java.awt.Point(valueColumn + 30, rowTwelve));
+            jTextFieldOutputDir.setLocation(new java.awt.Point(valueColumn + offsetWidth, rowTwelve));
             jTextFieldOutputDir.setToolTipText("Select the name or URL for the output directory tree.");
             jTextFieldOutputDir.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
