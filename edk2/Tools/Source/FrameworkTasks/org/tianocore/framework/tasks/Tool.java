@@ -38,6 +38,7 @@ public class Tool implements EfiDefine, Section {
     private Input tempInputFile = new Input();
     private String outputPath;
     private String outputFileName ;
+    private static Random ran = new Random(9999); 
     private List<Section>  gensectList = new ArrayList<Section>();
     /**
      Call extern tool
@@ -147,7 +148,6 @@ public class Tool implements EfiDefine, Section {
         } 
 
         try {
-            Random ran = new Random(9999); 
             this.outputFileName = "Temp" + ran.nextInt();
             argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
                          + tempInputFile.toString(" ")+ " -o " + outputFileName;
