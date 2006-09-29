@@ -127,9 +127,9 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             wholeline = replaceMacro (wholeline, mi.hashnonlocalmacro);
 
             // Converting guid
-            replaceGuid(wholeline, mi.guid, "guid", fileguid);
-            replaceGuid(wholeline, mi.ppi, "ppi", fileppi);
-            replaceGuid(wholeline, mi.protocol, "protocol", fileprotocol);
+            replaceGuid(wholeline, mi.guids, "guid", fileguid);
+            replaceGuid(wholeline, mi.ppis, "ppi", fileppi);
+            replaceGuid(wholeline, mi.protocols, "protocol", fileprotocol);
 
             // Converting Pei
             if (mi.getModuleType().matches("PEIM")) {

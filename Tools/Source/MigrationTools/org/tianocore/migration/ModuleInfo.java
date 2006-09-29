@@ -15,6 +15,8 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.*;
 
+import org.tianocore.UsageTypes;
+
 /*
     Class ModuleInfo is built for scanning the source files, it contains all the needed
 information and all the temporary data.
@@ -50,10 +52,34 @@ public final class ModuleInfo {
     public final Set<String> hashmacro = new HashSet<String>();
     
     public final Set<String> hashrequiredr9libs = new HashSet<String>();    // hashrequiredr9libs is now all added in SourceFileReplacer 
-    public final Set<String> guid = new HashSet<String>();
-    public final Set<String> protocol = new HashSet<String>();
-    public final Set<String> ppi = new HashSet<String>();
+    public final Set<String> guids = new HashSet<String>();
+    public final Set<String> protocols = new HashSet<String>();
+    public final Set<String> ppis = new HashSet<String>();
 
+    //-----------------------------------------------------------------------------------//
+
+    public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
+    	protocols.add(proname);
+    	return msaowner.addProtocol(proname, usage);
+    }
+    
+    public final boolean addPpi (String ppiname, UsageTypes.Enum usage) {
+    	ppis.add(ppiname);
+    	return msaowner.addPpi(ppiname, usage);
+    }
+    
+    public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
+    	guids.add(guidname);
+    	return msaowner.addGuid(guidname, usage);
+    }
+    
+    public final boolean addLibraryClass(String name, UsageTypes.Enum usage) {
+    	hashrequiredr9libs.add(name);
+    	return msaowner.addLibraryClass(name, usage);
+    }
+    
+    //-----------------------------------------------------------------------------------//
+    
     public final String getModuleType() {
         if (moduletype.contains("PEI")) {
             return "PEIM";
