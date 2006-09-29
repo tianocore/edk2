@@ -20,10 +20,10 @@ import org.tianocore.SupportedArchitectures.Enum;
 import org.apache.xmlbeans.*;
 
 public class MsaWriter {
-	MsaWriter(ModuleInfo moduleinfo) {
-		mi = moduleinfo;
-	}
-	
+    MsaWriter(ModuleInfo moduleinfo) {
+        mi = moduleinfo;
+    }
+    
     private ModuleInfo mi;
     private ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
     

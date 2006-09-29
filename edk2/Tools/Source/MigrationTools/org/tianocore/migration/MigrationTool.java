@@ -17,6 +17,8 @@ import java.util.*;
 
 import javax.swing.JFileChooser;
 
+import org.tianocore.UsageTypes;
+
 public class MigrationTool {
     public static UI ui = null;
     public static Database db = null;
@@ -51,7 +53,14 @@ public class MigrationTool {
         }
 
         new MsaWriter(mi).flush();
-
+/*
+        mi.addGuid("guid", UsageTypes.ALWAYS_CONSUMED);
+        mi.addLibraryClass("class", UsageTypes.ALWAYS_CONSUMED);
+        mi.addPpi("ppi", UsageTypes.ALWAYS_CONSUMED);
+        mi.addProtocol("protocol", UsageTypes.ALWAYS_CONSUMED);
+*/
+        mi.getMsaOwner().flush(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + mi.modulename + ".___");
+     
         if (MigrationTool.doCritic) {
             Critic.fireAt(ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename);
         }

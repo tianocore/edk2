@@ -1,16 +1,19 @@
 package org.tianocore.migration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.*;
 
+import org.apache.xmlbeans.XmlOptions;
 import org.tianocore.*;
 import org.tianocore.SupportedArchitectures.Enum;
 
 public class MsaOwner {
-	public static final String COPYRIGHT = "Copyright (c) 2006, Intel Corporation";
-	public static final String VERSION = "1.0";
-	public static final String ABSTRACT = "Component name for module ";
-	public static final String DESCRIPTION = "FIX ME!";
-	public static final String LICENSE = "All rights reserved.\n" +
+    public static final String COPYRIGHT = "Copyright (c) 2006, Intel Corporation";
+    public static final String VERSION = "1.0";
+    public static final String ABSTRACT = "Component name for module ";
+    public static final String DESCRIPTION = "FIX ME!";
+    public static final String LICENSE = "All rights reserved.\n" +
     "      This software and associated documentation (if any) is furnished\n" +
     "      under a license and may only be used or copied in accordance\n" +
     "      with the terms of the license. Except as permitted by such\n" +
@@ -18,13 +21,13 @@ public class MsaOwner {
     "      reproduced, stored in a retrieval system, or transmitted in any\n" +
     "      form or by any means without the express written consent of\n" +
     "      Intel Corporation.";
-	public static final String SPECIFICATION = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
-	
-	public static final Enum IA32 = SupportedArchitectures.IA_32;
-	public static final Enum X64 = SupportedArchitectures.X_64;
-	public static final Enum IPF = SupportedArchitectures.IPF;
-	public static final Enum EBC = SupportedArchitectures.EBC;
-	
+    public static final String SPECIFICATION = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
+    
+    public static final Enum IA32 = SupportedArchitectures.IA_32;
+    public static final Enum X64 = SupportedArchitectures.X_64;
+    public static final Enum IPF = SupportedArchitectures.IPF;
+    public static final Enum EBC = SupportedArchitectures.EBC;
+    
     private ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
     
     private ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = null;
@@ -40,346 +43,356 @@ public class MsaOwner {
     private ExternsDocument.Externs externs = null;
     
     private List<Enum> listarch = new ArrayList<Enum>();
-    //private Map<String, Enum> mapfilenames = new HashMap<String, Enum>();	//this need to be installed manually when msa is to be written
+    //private Map<String, Enum> mapfilenames = new HashMap<String, Enum>();    //this need to be installed manually when msa is to be written
     //private Map<String, UsageTypes.Enum> mapprotocols = new HashMap<String, UsageTypes.Enum>();
 
     //-----------------------------msaheader-------------------------------------//
 
     public final boolean addLibraryClass (String name, UsageTypes.Enum usage) {
-    	Iterator<LibraryClassDocument.LibraryClass> classit = libclassdefs.getLibraryClassList().iterator();
-    	while (classit.hasNext()) {
-    		if (classit.next().getKeyword() == name) {
-        		MigrationTool.ui.println ("Warning: Duplicate LibraryClass");
-    			return false;
-    		}
-    	}
-    	
-    	LibraryClassDocument.LibraryClass classname;
-    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
-    	classname = libclassdefs.addNewLibraryClass();
-    	classname.setKeyword(name);
-    	arch.add(usage);
-    	classname.setSupArchList(arch);
-    	return true;
+        Iterator<LibraryClassDocument.LibraryClass> classit = libclassdefs.getLibraryClassList().iterator();
+        while (classit.hasNext()) {
+            if (classit.next().getKeyword() == name) {
+                MigrationTool.ui.println ("Warning: Duplicate LibraryClass");
+                return false;
+            }
+        }
+        
+        LibraryClassDocument.LibraryClass classname;
+        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+        classname = libclassdefs.addNewLibraryClass();
+        classname.setKeyword(name);
+        arch.add(usage);
+        classname.setSupArchList(arch);
+        return true;
     }
     
     public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
-    	if (guids == null) {
-    		guids = msa.addNewGuids();
-    	}
-    	
-    	Iterator<GuidsDocument.Guids.GuidCNames> guidit = guids.getGuidCNamesList().iterator();
-    	while (guidit.hasNext()) {
-    		if (guidit.next().getGuidCName() == guidname) {
-        		MigrationTool.ui.println ("Warning: Duplicate Guid");
-    			return false;
-    		}
-    	}
-    	
-    	GuidsDocument.Guids.GuidCNames guid;
-    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
-    	guid = guids.addNewGuidCNames();
-    	guid.setGuidCName(guidname);
-    	arch.add(usage);
-    	guid.setSupArchList(arch);
-    	return true;
+        if (guids == null) {
+            guids = msa.addNewGuids();
+        }
+        
+        Iterator<GuidsDocument.Guids.GuidCNames> guidit = guids.getGuidCNamesList().iterator();
+        while (guidit.hasNext()) {
+            if (guidit.next().getGuidCName() == guidname) {
+                MigrationTool.ui.println ("Warning: Duplicate Guid");
+                return false;
+            }
+        }
+        
+        GuidsDocument.Guids.GuidCNames guid;
+        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+        guid = guids.addNewGuidCNames();
+        guid.setGuidCName(guidname);
+        arch.add(usage);
+        guid.setSupArchList(arch);
+        return true;
     }
     
     
     public final boolean addPpi (String ppiname, UsageTypes.Enum usage) {
-    	if (ppis == null) {
-    		ppis = msa.addNewPPIs();
-    	}
-    	
-    	Iterator<PPIsDocument.PPIs.Ppi> ppiit = ppis.getPpiList().iterator();
-    	while (ppiit.hasNext()) {
-    		if (ppiit.next().getPpiCName() == ppiname) {
-        		MigrationTool.ui.println ("Warning: Duplicate Ppi");
-    			return false;
-    		}
-    	}
-    	
-    	PPIsDocument.PPIs.Ppi ppi;
-    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
-    	ppi = ppis.addNewPpi();
-    	ppi.setPpiCName(ppiname);
-    	arch.add(usage);
-    	ppi.setSupArchList(arch);
-    	return true;
+        if (ppis == null) {
+            ppis = msa.addNewPPIs();
+        }
+        
+        Iterator<PPIsDocument.PPIs.Ppi> ppiit = ppis.getPpiList().iterator();
+        while (ppiit.hasNext()) {
+            if (ppiit.next().getPpiCName() == ppiname) {
+                MigrationTool.ui.println ("Warning: Duplicate Ppi");
+                return false;
+            }
+        }
+        
+        PPIsDocument.PPIs.Ppi ppi;
+        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+        ppi = ppis.addNewPpi();
+        ppi.setPpiCName(ppiname);
+        arch.add(usage);
+        ppi.setSupArchList(arch);
+        return true;
     }
     
     /*
     private final boolean installProtocols () {
-    	if (mapprotocols.isEmpty()) {
-    		return false;
-    	}
-    	Set<String> setprotocols = mapprotocols.keySet();
-    	ProtocolsDocument.Protocols.Protocol protocol;
-    	Iterator<String> it = setprotocols.iterator();
-    	while (it.hasNext()) {
-    		protocol = protocols.addNewProtocol();
-    		protocol.setProtocolCName(it.next());
-    		protocol.setUsage(mapprotocols.get(protocol.getProtocolCName()));
-    	}
-    	return true;
+        if (mapprotocols.isEmpty()) {
+            return false;
+        }
+        Set<String> setprotocols = mapprotocols.keySet();
+        ProtocolsDocument.Protocols.Protocol protocol;
+        Iterator<String> it = setprotocols.iterator();
+        while (it.hasNext()) {
+            protocol = protocols.addNewProtocol();
+            protocol.setProtocolCName(it.next());
+            protocol.setUsage(mapprotocols.get(protocol.getProtocolCName()));
+        }
+        return true;
     }
     
     public final boolean addProtocols (String protocol, UsageTypes.Enum usage) {
-    	if (mapprotocols.containsKey(protocol)) {
-    		return false;
-    	} else {
-    		mapprotocols.put(protocol, usage);
-    		return true;
-    	}
+        if (mapprotocols.containsKey(protocol)) {
+            return false;
+        } else {
+            mapprotocols.put(protocol, usage);
+            return true;
+        }
     }
     */
     public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
-    	if (protocols == null) {
-    		protocols = msa.addNewProtocols();
-    	}
-    	
-    	Iterator<ProtocolsDocument.Protocols.Protocol> proit = protocols.getProtocolList().iterator();
-    	while (proit.hasNext()) {
-    		if (proit.next().getProtocolCName() == proname) {
-        		MigrationTool.ui.println ("Warning: Duplicate Protocol");
-    			return false;
-    		}
-    	}
-    	
-    	ProtocolsDocument.Protocols.Protocol protocol;
-    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
-    	protocol = protocols.addNewProtocol();
-    	protocol.setProtocolCName(proname);
-    	arch.add(usage);
-    	protocol.setSupArchList(arch);
-    	return true;
+        if (protocols == null) {
+            protocols = msa.addNewProtocols();
+        }
+        
+        Iterator<ProtocolsDocument.Protocols.Protocol> proit = protocols.getProtocolList().iterator();
+        while (proit.hasNext()) {
+            if (proit.next().getProtocolCName() == proname) {
+                MigrationTool.ui.println ("Warning: Duplicate Protocol");
+                return false;
+            }
+        }
+        
+        ProtocolsDocument.Protocols.Protocol protocol;
+        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+        protocol = protocols.addNewProtocol();
+        protocol.setProtocolCName(proname);
+        arch.add(usage);
+        protocol.setSupArchList(arch);
+        return true;
     }
     
     /*
     private final boolean installHashFilename () {
-    	if (mapfilenames.isEmpty()) {
-    		return false;
-    	}
-    	Set<String> setfilename = mapfilenames.keySet();
-    	FilenameDocument.Filename filename;
-    	List<Enum> arch = new ArrayList<Enum>();
-    	Iterator<String> it = setfilename.iterator();
-    	while (it.hasNext()) {
-        	filename = sourcefiles.addNewFilename();
-        	filename.setStringValue(it.next());
-        	arch.add(mapfilenames.get(filename.getStringValue()));
-        	filename.setSupArchList(arch);
-    	}
-    	return true;
+        if (mapfilenames.isEmpty()) {
+            return false;
+        }
+        Set<String> setfilename = mapfilenames.keySet();
+        FilenameDocument.Filename filename;
+        List<Enum> arch = new ArrayList<Enum>();
+        Iterator<String> it = setfilename.iterator();
+        while (it.hasNext()) {
+            filename = sourcefiles.addNewFilename();
+            filename.setStringValue(it.next());
+            arch.add(mapfilenames.get(filename.getStringValue()));
+            filename.setSupArchList(arch);
+        }
+        return true;
     }
     
-    public final boolean addSourceFile (String filename, Enum arch) {		// dummy & null how to imply?
-    	if (mapfilenames.containsKey(filename)) {
-    		return false;
-    	} else {
+    public final boolean addSourceFile (String filename, Enum arch) {        // dummy & null how to imply?
+        if (mapfilenames.containsKey(filename)) {
+            return false;
+        } else {
             mapfilenames.put(filename, arch);
             return true;
-    	}
+        }
     }
     */
     public final boolean addSourceFile (String name, Enum en) {
-    	Iterator<FilenameDocument.Filename> fileit = sourcefiles.getFilenameList().iterator();
-    	while (fileit.hasNext()) {
-    		if (fileit.next().getStringValue() == name) {
-        		MigrationTool.ui.println ("Warning: Duplicate SourceFileName");
-    			return false;
-    		}
-    	}
-    	
-    	FilenameDocument.Filename filename;
-    	List<Enum> arch = new ArrayList<Enum>();
-    	filename = sourcefiles.addNewFilename();
-    	filename.setStringValue(name);
-    	arch.add(en);
-    	filename.setSupArchList(arch);
-    	return true;
+        Iterator<FilenameDocument.Filename> fileit = sourcefiles.getFilenameList().iterator();
+        while (fileit.hasNext()) {
+            if (fileit.next().getStringValue() == name) {
+                MigrationTool.ui.println ("Warning: Duplicate SourceFileName");
+                return false;
+            }
+        }
+        
+        FilenameDocument.Filename filename;
+        List<Enum> arch = new ArrayList<Enum>();
+        filename = sourcefiles.addNewFilename();
+        filename.setStringValue(name);
+        arch.add(en);
+        filename.setSupArchList(arch);
+        return true;
     }
     
     // entry point todo
     
     public final boolean setupExternSpecification () {
-    	addExternSpecification("EFI_SPECIFICATION_VERSION 0x00020000");
-    	addExternSpecification("EDK_RELEASE_VERSION 0x00020000");
-    	return true;
+        addExternSpecification("EFI_SPECIFICATION_VERSION 0x00020000");
+        addExternSpecification("EDK_RELEASE_VERSION 0x00020000");
+        return true;
     }
     
     public final boolean addExternSpecification (String specification) {
-    	if (externs.getSpecificationList().contains(specification)) {
-    		return false;
-    	} else {
-    		externs.addSpecification(specification);
-    		return true;
-    	}
+        if (externs.getSpecificationList().contains(specification)) {
+            return false;
+        } else {
+            externs.addSpecification(specification);
+            return true;
+        }
     }
     
     public final boolean setupPackageDependencies() {
-    	addPackage("5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec");
-    	addPackage("68169ab0-d41b-4009-9060-292c253ac43d");
-    	return true;
+        addPackage("5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec");
+        addPackage("68169ab0-d41b-4009-9060-292c253ac43d");
+        return true;
     }
     
     public final boolean addPackage (String guid) {
-    	if (packagedependencies.getPackageList().contains(guid)) {
-    		return false;
-    	} else {
+        if (packagedependencies.getPackageList().contains(guid)) {
+            return false;
+        } else {
             packagedependencies.addNewPackage().setPackageGuid(guid);
             return true;
-    	}
+        }
     }
     
-    public final boolean setupModuleDefinitions () {				//????????? give this job to moduleinfo
-    	moduledefinitions.setBinaryModule(false);
-    	moduledefinitions.setOutputFileBasename(msaheader.getModuleName());
-    	return true;
+    public final boolean setupModuleDefinitions () {                //????????? give this job to moduleinfo
+        moduledefinitions.setBinaryModule(false);
+        moduledefinitions.setOutputFileBasename(msaheader.getModuleName());
+        return true;
     }
     public final boolean addSupportedArchitectures (Enum arch) {
-    	if (listarch.contains(arch)) {
-    		return false;
-    	} else {
-    		listarch.add(arch);
-    		return true;
-    	}
+        if (listarch.contains(arch)) {
+            return false;
+        } else {
+            listarch.add(arch);
+            return true;
+        }
     }
     
     public final boolean addSpecification (String specification) {
         if (msaheader.getSpecification() == null) {
             if (specification == null) {
-            	msaheader.setSpecification(SPECIFICATION);
+                msaheader.setSpecification(SPECIFICATION);
             } else {
-            	msaheader.setSpecification(specification);
+                msaheader.setSpecification(specification);
             }
             return true;
         } else {
-    		MigrationTool.ui.println ("Warning: Duplicate Specification");
-    		return false;
+            MigrationTool.ui.println ("Warning: Duplicate Specification");
+            return false;
         }
     }
     
     public final boolean addLicense (String licensecontent) {
         if (msaheader.getLicense() == null) {
-        	license = msaheader.addNewLicense();
+            license = msaheader.addNewLicense();
             if (licensecontent == null) {
-            	license.setStringValue(LICENSE);
+                license.setStringValue(LICENSE);
             } else {
-            	license.setStringValue(licensecontent);
+                license.setStringValue(licensecontent);
             }
             return true;
         } else {
-    		MigrationTool.ui.println ("Warning: Duplicate License");
-    		return false;
+            MigrationTool.ui.println ("Warning: Duplicate License");
+            return false;
         }
     }
     
     public final boolean addDescription (String description) {
         if (msaheader.getDescription() == null) {
             if (description == null) {
-            	msaheader.setDescription(DESCRIPTION);
+                msaheader.setDescription(DESCRIPTION);
             } else {
-            	msaheader.setDescription(description);
+                msaheader.setDescription(description);
             }
             return true;
         } else {
-    		MigrationTool.ui.println ("Warning: Duplicate Description");
-    		return false;
+            MigrationTool.ui.println ("Warning: Duplicate Description");
+            return false;
         }
     }
     
     public final boolean addAbstract (String abs) {
         if (msaheader.getAbstract() == null) {
             if (abs == null) {
-            	msaheader.setAbstract(ABSTRACT + msaheader.getModuleName());
+                msaheader.setAbstract(ABSTRACT + msaheader.getModuleName());
             } else {
-            	msaheader.setVersion(abs);
+                msaheader.setVersion(abs);
             }
             return true;
         } else {
-    		MigrationTool.ui.println ("Warning: Duplicate Abstract");
-    		return false;
+            MigrationTool.ui.println ("Warning: Duplicate Abstract");
+            return false;
         }
     }
     
     public final boolean addVersion (String version) {
         if (msaheader.getVersion() == null) {
             if (version == null) {
-            	msaheader.setVersion(VERSION);
+                msaheader.setVersion(VERSION);
             } else {
-            	msaheader.setVersion(version);
+                msaheader.setVersion(version);
             }
             return true;
         } else {
-    		MigrationTool.ui.println ("Warning: Duplicate Version");
-    		return false;
+            MigrationTool.ui.println ("Warning: Duplicate Version");
+            return false;
         }
     }
     
     public final boolean addCopyRight (String copyright) {
-    	if (msaheader.getCopyright() == null) {
-        	if (copyright == null) {
+        if (msaheader.getCopyright() == null) {
+            if (copyright == null) {
                 msaheader.setCopyright(COPYRIGHT);
-        	} else {
-        		msaheader.setCopyright(copyright);
-        	}
-        	return true;
-    	} else {
-    		MigrationTool.ui.println ("Warning: Duplicate CopyRight");
-    		return false;
-    	}
+            } else {
+                msaheader.setCopyright(copyright);
+            }
+            return true;
+        } else {
+            MigrationTool.ui.println ("Warning: Duplicate CopyRight");
+            return false;
+        }
     }
     
     public final boolean addModuleType (String moduletype) {
-    	if (msaheader.getModuleType() == null) {
-    		msaheader.setModuleType(ModuleTypeDef.Enum.forString(moduletype));
-    		return true;
-    	} else {
-    		MigrationTool.ui.println ("Warning: Duplicate ModuleType");
-        	return false;
-    	}
+        if (msaheader.getModuleType() == null) {
+            msaheader.setModuleType(ModuleTypeDef.Enum.forString(moduletype));
+            return true;
+        } else {
+            MigrationTool.ui.println ("Warning: Duplicate ModuleType");
+            return false;
+        }
     }
     
     public final boolean addGuidValue (String guidvalue) {
-    	if (msaheader.getGuidValue() == null) {
-    		msaheader.setGuidValue(guidvalue);
-    		return true;
-    	} else  {
-    		MigrationTool.ui.println ("Warning: Duplicate GuidValue");
-        	return false;
-    	}
+        if (msaheader.getGuidValue() == null) {
+            msaheader.setGuidValue(guidvalue);
+            return true;
+        } else  {
+            MigrationTool.ui.println ("Warning: Duplicate GuidValue");
+            return false;
+        }
     }
     
     public final boolean addModuleName (String modulename) {
-    	if (msaheader.getModuleName() == null) {
-        	msaheader.setModuleName(modulename);
-        	return true;
-    	} else {
-    		MigrationTool.ui.println ("Warning: Duplicate ModuleName");
-        	return false;
-    	}
+        if (msaheader.getModuleName() == null) {
+            msaheader.setModuleName(modulename);
+            return true;
+        } else {
+            MigrationTool.ui.println ("Warning: Duplicate ModuleName");
+            return false;
+        }
     }
     //-----------------------------msaheader-------------------------------------//
     
-    public final void addSourceFiles (String filename, int arch) {
-    	
+    public final void flush(String outputpath) throws Exception {
+        XmlOptions options = new XmlOptions();
+
+        options.setCharacterEncoding("UTF-8");
+        options.setSavePrettyPrint();
+        options.setSavePrettyPrintIndent(2);
+        options.setUseDefaultNamespace();
+        
+        BufferedWriter bw = new BufferedWriter(new FileWriter(outputpath));
+        msadoc.save(bw, options);
+        bw.flush();
+        bw.close();
     }
     
     private final MsaOwner init () {
-    	msa = msadoc.addNewModuleSurfaceArea();
-    	msaheader = msa.addNewMsaHeader();
-    	moduledefinitions = msa.addNewModuleDefinitions();
-    	moduledefinitions.setSupportedArchitectures(listarch);
-    	
-    	sourcefiles = msa.addNewSourceFiles();
-    	packagedependencies = msa.addNewPackageDependencies();
-    	libclassdefs = msa.addNewLibraryClassDefinitions();
-    	externs = msa.addNewExterns();
-    	return this;
+        msa = msadoc.addNewModuleSurfaceArea();
+        msaheader = msa.addNewMsaHeader();
+        moduledefinitions = msa.addNewModuleDefinitions();
+        moduledefinitions.setSupportedArchitectures(listarch);
+        
+        sourcefiles = msa.addNewSourceFiles();
+        packagedependencies = msa.addNewPackageDependencies();
+        libclassdefs = msa.addNewLibraryClassDefinitions();
+        externs = msa.addNewExterns();
+        return this;
     }
     
     public static final MsaOwner initNewMsaOwner() {
-    	return new MsaOwner().init();
+        return new MsaOwner().init();
     }
 }
