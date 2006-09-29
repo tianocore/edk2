@@ -629,7 +629,6 @@ public class FlashMapTask extends Task implements EfiDefine {
     private boolean isUptodate() {
         long srcTimeStamp = 0;
         String srcName = "";
-        long dstTimeStamp = 0;
         String dstName = "";
         long timeStamp = 0;
 

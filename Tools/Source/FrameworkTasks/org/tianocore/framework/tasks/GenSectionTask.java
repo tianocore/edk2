@@ -364,7 +364,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes
                     }
                 }
             } catch (Exception e) {
-                throw new BuildException("compress.toBuffer failed!\n");
+                throw new BuildException("GenSection<SectionType=EFI_SECTION_COMPRESSION> to Buffer  failed!\n");
             } 
         } else {
             Section sect;

@@ -17,11 +17,7 @@
 package org.tianocore.framework.tasks;
 
 import java.io.File;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -30,8 +26,6 @@ import org.tianocore.common.logger.EdkLog;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
   SecFixupTask class.
