@@ -60,7 +60,6 @@ public final class ModuleInfo {
 
     public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
         //protocols.add(proname);
-        System.out.println("I'm in");
         return msaowner.addProtocol(proname, usage);
     }
     

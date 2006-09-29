@@ -58,11 +58,9 @@ public class MsaOwner {
         }
         
         LibraryClassDocument.LibraryClass classname;
-        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
         classname = libclassdefs.addNewLibraryClass();
         classname.setKeyword(name);
-        arch.add(usage);
-        classname.setSupArchList(arch);
+        classname.setUsage(usage);
         return true;
     }
     
@@ -80,11 +78,9 @@ public class MsaOwner {
         }
         
         GuidsDocument.Guids.GuidCNames guid;
-        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
         guid = guids.addNewGuidCNames();
         guid.setGuidCName(guidname);
-        arch.add(usage);
-        guid.setSupArchList(arch);
+        guid.setUsage(usage);
         return true;
     }
     
@@ -103,11 +99,9 @@ public class MsaOwner {
         }
         
         PPIsDocument.PPIs.Ppi ppi;
-        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
         ppi = ppis.addNewPpi();
         ppi.setPpiCName(ppiname);
-        arch.add(usage);
-        ppi.setSupArchList(arch);
+        ppi.setUsage(usage);
         return true;
     }
     
@@ -140,7 +134,7 @@ public class MsaOwner {
         if (protocols == null) {
             protocols = msa.addNewProtocols();
         }
-        
+
         Iterator<ProtocolsDocument.Protocols.Protocol> proit = protocols.getProtocolList().iterator();
         while (proit.hasNext()) {
             if (proit.next().getProtocolCName() == proname) {
@@ -148,13 +142,11 @@ public class MsaOwner {
                 return false;
             }
         }
-        
+
         ProtocolsDocument.Protocols.Protocol protocol;
-        List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
         protocol = protocols.addNewProtocol();
         protocol.setProtocolCName(proname);
-        arch.add(usage);
-        protocol.setSupArchList(arch);
+        protocol.setUsage(usage);
         return true;
     }
     

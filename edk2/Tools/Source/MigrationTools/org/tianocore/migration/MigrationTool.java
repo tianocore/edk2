@@ -53,14 +53,13 @@ public class MigrationTool {
         }
 
         new MsaWriter(mi).flush();
-/*
+
+        mi.addProtocol("protocol", UsageTypes.ALWAYS_CONSUMED);
         mi.addGuid("guid", UsageTypes.ALWAYS_CONSUMED);
         mi.addLibraryClass("class", UsageTypes.ALWAYS_CONSUMED);
         mi.addPpi("ppi", UsageTypes.ALWAYS_CONSUMED);
-        mi.addProtocol("protocol", UsageTypes.ALWAYS_CONSUMED);
-*/
         mi.getMsaOwner().flush(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + mi.modulename + ".___");
-     
+        
         if (MigrationTool.doCritic) {
             Critic.fireAt(ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename);
         }
