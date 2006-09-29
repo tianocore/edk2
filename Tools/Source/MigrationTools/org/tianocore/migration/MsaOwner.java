@@ -40,10 +40,75 @@ public class MsaOwner {
     private ExternsDocument.Externs externs = null;
     
     private List<Enum> listarch = new ArrayList<Enum>();
-    private Map<String, Enum> mapfilenames = new HashMap<String, Enum>();	//this need to be installed manually when msa is to be written
-    private Map<String, UsageTypes.Enum> mapprotocols = new HashMap<String, UsageTypes.Enum>();
+    //private Map<String, Enum> mapfilenames = new HashMap<String, Enum>();	//this need to be installed manually when msa is to be written
+    //private Map<String, UsageTypes.Enum> mapprotocols = new HashMap<String, UsageTypes.Enum>();
 
     //-----------------------------msaheader-------------------------------------//
+
+    public final boolean addLibraryClass (String name, UsageTypes.Enum usage) {
+    	Iterator<LibraryClassDocument.LibraryClass> classit = libclassdefs.getLibraryClassList().iterator();
+    	while (classit.hasNext()) {
+    		if (classit.next().getKeyword() == name) {
+        		MigrationTool.ui.println ("Warning: Duplicate LibraryClass");
+    			return false;
+    		}
+    	}
+    	
+    	LibraryClassDocument.LibraryClass classname;
+    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+    	classname = libclassdefs.addNewLibraryClass();
+    	classname.setKeyword(name);
+    	arch.add(usage);
+    	classname.setSupArchList(arch);
+    	return true;
+    }
+    
+    public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
+    	if (guids == null) {
+    		guids = msa.addNewGuids();
+    	}
+    	
+    	Iterator<GuidsDocument.Guids.GuidCNames> guidit = guids.getGuidCNamesList().iterator();
+    	while (guidit.hasNext()) {
+    		if (guidit.next().getGuidCName() == guidname) {
+        		MigrationTool.ui.println ("Warning: Duplicate Guid");
+    			return false;
+    		}
+    	}
+    	
+    	GuidsDocument.Guids.GuidCNames guid;
+    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+    	guid = guids.addNewGuidCNames();
+    	guid.setGuidCName(guidname);
+    	arch.add(usage);
+    	guid.setSupArchList(arch);
+    	return true;
+    }
+    
+    
+    public final boolean addPpi (String ppiname, UsageTypes.Enum usage) {
+    	if (ppis == null) {
+    		ppis = msa.addNewPPIs();
+    	}
+    	
+    	Iterator<PPIsDocument.PPIs.Ppi> ppiit = ppis.getPpiList().iterator();
+    	while (ppiit.hasNext()) {
+    		if (ppiit.next().getPpiCName() == ppiname) {
+        		MigrationTool.ui.println ("Warning: Duplicate Ppi");
+    			return false;
+    		}
+    	}
+    	
+    	PPIsDocument.PPIs.Ppi ppi;
+    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+    	ppi = ppis.addNewPpi();
+    	ppi.setPpiCName(ppiname);
+    	arch.add(usage);
+    	ppi.setSupArchList(arch);
+    	return true;
+    }
+    
+    /*
     private final boolean installProtocols () {
     	if (mapprotocols.isEmpty()) {
     		return false;
@@ -67,7 +132,30 @@ public class MsaOwner {
     		return true;
     	}
     }
+    */
+    public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
+    	if (protocols == null) {
+    		protocols = msa.addNewProtocols();
+    	}
+    	
+    	Iterator<ProtocolsDocument.Protocols.Protocol> proit = protocols.getProtocolList().iterator();
+    	while (proit.hasNext()) {
+    		if (proit.next().getProtocolCName() == proname) {
+        		MigrationTool.ui.println ("Warning: Duplicate Protocol");
+    			return false;
+    		}
+    	}
+    	
+    	ProtocolsDocument.Protocols.Protocol protocol;
+    	List<UsageTypes.Enum> arch = new ArrayList<UsageTypes.Enum>();
+    	protocol = protocols.addNewProtocol();
+    	protocol.setProtocolCName(proname);
+    	arch.add(usage);
+    	protocol.setSupArchList(arch);
+    	return true;
+    }
     
+    /*
     private final boolean installHashFilename () {
     	if (mapfilenames.isEmpty()) {
     		return false;
@@ -92,6 +180,24 @@ public class MsaOwner {
             mapfilenames.put(filename, arch);
             return true;
     	}
+    }
+    */
+    public final boolean addSourceFile (String name, Enum en) {
+    	Iterator<FilenameDocument.Filename> fileit = sourcefiles.getFilenameList().iterator();
+    	while (fileit.hasNext()) {
+    		if (fileit.next().getStringValue() == name) {
+        		MigrationTool.ui.println ("Warning: Duplicate SourceFileName");
+    			return false;
+    		}
+    	}
+    	
+    	FilenameDocument.Filename filename;
+    	List<Enum> arch = new ArrayList<Enum>();
+    	filename = sourcefiles.addNewFilename();
+    	filename.setStringValue(name);
+    	arch.add(en);
+    	filename.setSupArchList(arch);
+    	return true;
     }
     
     // entry point todo
