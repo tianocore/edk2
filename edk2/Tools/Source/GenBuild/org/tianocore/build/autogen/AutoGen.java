@@ -452,9 +452,14 @@ public class AutoGen {
         // Write Guid to autogen.c
         //
         String guid = CommonDefinition.formatGuidName(saq.getModuleGuid());
-
-        fileBuffer
-        .append("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID gEfiCallerIdGuid = {");
+        if (this.moduleId.getModuleType().equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+			fileBuffer
+            .append("GLOBAL_REMOVE_IF_UNREFERENCED GUID gEfiCallerIdGuid = {");
+		} else {
+			fileBuffer
+            .append("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID gEfiCallerIdGuid = {");
+		}
+        
         if (guid == null) {
             throw new AutoGenException("Guid value must set!\n");
         }
