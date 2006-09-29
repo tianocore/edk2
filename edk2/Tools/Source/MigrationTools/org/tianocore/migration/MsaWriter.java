@@ -132,9 +132,9 @@ public class MsaWriter {
         while (it.hasNext()) {
             addSourceFiles(it.next());
         }
-        if (!mi.protocol.isEmpty()) {
+        if (!mi.protocols.isEmpty()) {
             protocols = msa.addNewProtocols();
-            it = mi.protocol.iterator();
+            it = mi.protocols.iterator();
             while (it.hasNext()) {
                 if ((temp = it.next()) != null) {
                     ProtocolsDocument.Protocols.Protocol pr = protocols.addNewProtocol();
@@ -143,9 +143,9 @@ public class MsaWriter {
                 }
             }
         }
-        if (!mi.ppi.isEmpty()) {
+        if (!mi.ppis.isEmpty()) {
             ppis = msa.addNewPPIs();
-            it = mi.ppi.iterator();
+            it = mi.ppis.iterator();
             while (it.hasNext()) {
                 if ((temp = it.next()) != null) {
                     PPIsDocument.PPIs.Ppi pp = ppis.addNewPpi();
@@ -154,9 +154,9 @@ public class MsaWriter {
                 }
             }
         }
-        if (!mi.guid.isEmpty()) {
+        if (!mi.guids.isEmpty()) {
             guids = msa.addNewGuids();
-            it = mi.guid.iterator();
+            it = mi.guids.iterator();
             while (it.hasNext()) {
                 if ((temp = it.next()) != null) {
                     GuidsDocument.Guids.GuidCNames gcn = guids.addNewGuidCNames();

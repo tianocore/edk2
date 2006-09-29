@@ -39,9 +39,9 @@ public class MigrationTool {
         if (MigrationTool.printModuleInfo) {
             MigrationTool.ui.println("\nModule Information : ");
             MigrationTool.ui.println("Entrypoint : " + mi.entrypoint);
-            show(mi.protocol, "Protocol : ");
-            show(mi.ppi, "Ppi : ");
-            show(mi.guid, "Guid : ");
+            show(mi.protocols, "Protocol : ");
+            show(mi.ppis, "Ppi : ");
+            show(mi.guids, "Guid : ");
             show(mi.hashfuncc, "call : ");
             show(mi.hashfuncd, "def : ");
             show(mi.hashEFIcall, "EFIcall : ");

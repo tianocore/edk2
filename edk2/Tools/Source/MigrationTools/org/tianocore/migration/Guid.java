@@ -48,11 +48,11 @@ public class Guid {
         if (MigrationTool.db.hasGuid(temp)) {        // only changed guids registered, because both changed and not changed guids are included in database
             type = MigrationTool.db.getGuidType(temp);
             if (type.matches("Protocol")) {
-                mi.protocol.add(temp);
+                mi.protocols.add(temp);
             } else if (type.matches("Ppi")) {
-                mi.ppi.add(temp);
+                mi.ppis.add(temp);
             } else if (type.matches("Guid")) {
-                mi.guid.add(temp);
+                mi.guids.add(temp);
             }
             return temp;
         }
