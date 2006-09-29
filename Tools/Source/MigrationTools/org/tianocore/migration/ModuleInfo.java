@@ -30,7 +30,7 @@ public final class ModuleInfo {
     public final String modulepath;
     public final String temppath;
     
-    private MsaOwner msaowner = new MsaOwner();
+    private MsaOwner msaowner = MsaOwner.initNewMsaOwner();
     
     public String modulename = null;
     public String guidvalue = null;
@@ -59,23 +59,24 @@ public final class ModuleInfo {
     //-----------------------------------------------------------------------------------//
 
     public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
-    	protocols.add(proname);
-    	return msaowner.addProtocol(proname, usage);
+        //protocols.add(proname);
+        System.out.println("I'm in");
+        return msaowner.addProtocol(proname, usage);
     }
     
     public final boolean addPpi (String ppiname, UsageTypes.Enum usage) {
-    	ppis.add(ppiname);
-    	return msaowner.addPpi(ppiname, usage);
+        //ppis.add(ppiname);
+        return msaowner.addPpi(ppiname, usage);
     }
     
     public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
-    	guids.add(guidname);
-    	return msaowner.addGuid(guidname, usage);
+        //guids.add(guidname);
+        return msaowner.addGuid(guidname, usage);
     }
     
     public final boolean addLibraryClass(String name, UsageTypes.Enum usage) {
-    	hashrequiredr9libs.add(name);
-    	return msaowner.addLibraryClass(name, usage);
+        //hashrequiredr9libs.add(name);
+        return msaowner.addLibraryClass(name, usage);
     }
     
     //-----------------------------------------------------------------------------------//
@@ -111,5 +112,9 @@ public final class ModuleInfo {
             }
         }
         return false;
+    }
+    
+    public final MsaOwner getMsaOwner() {
+        return msaowner;
     }
 }
