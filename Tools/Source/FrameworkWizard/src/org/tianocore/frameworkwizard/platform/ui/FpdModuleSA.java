@@ -1126,7 +1126,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextFieldFvBinding == null) {
             jTextFieldFvBinding = new JTextField();
             jTextFieldFvBinding.setPreferredSize(new java.awt.Dimension(400,20));
-            jTextFieldFvBinding.setEditable(false);
+            jTextFieldFvBinding.setEditable(true);
             jTextFieldFvBinding.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     String originalFvBinding = ffc.getFvBinding(moduleKey);

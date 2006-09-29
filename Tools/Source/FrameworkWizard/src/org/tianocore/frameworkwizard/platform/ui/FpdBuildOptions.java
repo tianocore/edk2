@@ -1864,7 +1864,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (bool[5]) {
             s += "PPC ";
         }
-        if (s == " ") {
+        if (s.equals(" ")) {
             s += "IA32";
         }
         return s.trim();

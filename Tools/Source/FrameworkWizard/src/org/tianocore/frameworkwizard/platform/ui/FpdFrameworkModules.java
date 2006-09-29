@@ -53,7 +53,7 @@ public class FpdFrameworkModules extends IInternalFrame {
      */
     private static final long serialVersionUID = 1L;
     
-    private static final int timeToWait = 3000;
+    private static final int timeToWait = 2000;
     
     private long savedMs = 0;
     
@@ -340,7 +340,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         searchField = "" + e.getKeyChar(); 
                     }
                     
-                    int viewIndex = gotoFoundRow (searchField, (TableSorter) jTableAllModules.getModel());
+                    int viewIndex = gotoFoundRow (searchField, jTableAllModules);
                     if (viewIndex >= 0){
                         jTableAllModules.changeSelection(viewIndex, 0, false, false);
                     }
@@ -353,10 +353,10 @@ public class FpdFrameworkModules extends IInternalFrame {
         return jTableAllModules;
     }
     
-    private int gotoFoundRow (String s, TableSorter model) {
+    private int gotoFoundRow (String s, JTable model) {
         for (int i = 0; i < model.getRowCount(); ++i) {
             if (model.getValueAt(i, 0) != null && model.getValueAt(i, 0).toString().regionMatches(true, 0, s, 0, s.length())) {
-                return model.getViewIndexArray()[i];
+                return i;
             }
         }
         return -1;
@@ -631,7 +631,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         searchField = "" + e.getKeyChar(); 
                     }
                     
-                    int viewIndex = gotoFoundRow (searchField, (TableSorter) jTableFpdModules.getModel());
+                    int viewIndex = gotoFoundRow (searchField, jTableFpdModules);
                     if (viewIndex >= 0){
                         jTableFpdModules.changeSelection(viewIndex, 0, false, false);
                     }

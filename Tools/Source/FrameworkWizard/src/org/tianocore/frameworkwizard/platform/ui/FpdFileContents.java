@@ -2135,11 +2135,42 @@ public class FpdFileContents {
     
     private void setBuildOptionsOpt(Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents, OptionDocument.Option opt){
         opt.setStringValue(contents);
+        if (buildTargets != null) {
+            opt.setBuildTargets(buildTargets);
+        }
+        else {
+            if (opt.isSetBuildTargets()) {
+                opt.unsetBuildTargets();
+            }
+        }
         
-        opt.setBuildTargets(buildTargets);
-        opt.setToolChainFamily(toolChain);
-        opt.setTagName(tagName);
-        opt.setToolCode(toolCmd);
+        if (toolChain != null && toolChain.length() > 0) {
+            opt.setToolChainFamily(toolChain);
+        }
+        else {
+            if (opt.isSetToolChainFamily()) {
+                opt.unsetToolChainFamily();
+            }
+        }
+        
+        if (tagName != null && tagName.length() > 0) {
+            opt.setTagName(tagName);
+        }
+        else {
+            if (opt.isSetTagName()) {
+                opt.unsetTagName();
+            }
+        }
+        
+        if (toolCmd != null && toolCmd.length() > 0) {
+            opt.setToolCode(toolCmd);
+        }
+        else {
+            if (opt.isSetToolCode()) {
+                opt.unsetToolCode();
+            }
+        }
+        
         
         if (archList != null) {
             opt.setSupArchList(archList);
