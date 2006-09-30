@@ -1760,14 +1760,14 @@ public class FpdBuildOptions extends IInternalFrame {
             optionsTableModel.addColumn("TagName");
             optionsTableModel.addColumn("Arguments");
 
-            javax.swing.table.TableColumn toolFamilyCol = jTableOptions.getColumnModel().getColumn(1);
-            JComboBox cb = new JComboBox();
-            cb.addItem("MSFT");
-            cb.addItem("GCC");
-            cb.addItem("CYGWIN");
-            cb.addItem("INTEL");
-            cb.addItem("USER_DEFINED");
-            toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
+//            javax.swing.table.TableColumn toolFamilyCol = jTableOptions.getColumnModel().getColumn(1);
+//            JComboBox cb = new JComboBox();
+//            cb.addItem("MSFT");
+//            cb.addItem("GCC");
+//            cb.addItem("CYGWIN");
+//            cb.addItem("INTEL");
+//            cb.addItem("USER_DEFINED");
+//            toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
             vArch.add("X64");
