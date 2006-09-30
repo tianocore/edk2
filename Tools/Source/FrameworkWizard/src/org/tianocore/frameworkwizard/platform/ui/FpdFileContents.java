@@ -1105,6 +1105,10 @@ public class FpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getModuleSAOptionsCount(moduleKey) == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
