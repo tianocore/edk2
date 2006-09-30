@@ -374,6 +374,7 @@ Returns:
     return EFI_ABORTED;
   }
 
+  memset (Buffer, 0, FileSize + BUFFER_SIZE);
   fread (Buffer, FileSize, 1, InFile);
 
   Ptrx    = Buffer;
