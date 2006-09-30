@@ -64,10 +64,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <if>
             <and>
               <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </and>
             <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </then>
             <else>
               <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
@@ -113,7 +113,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
         <then>
           <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep">
             <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
@@ -127,7 +127,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
-          <file Name="${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+          <file Name="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
         </targetfiles>
 
         <sequential>
@@ -135,7 +135,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <if>
             <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
             <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /TC /Yc /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /TC /Yc /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
               <cc userdefine="on">
                 <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
                     outputFile="${DEST_DIR_OUTPUT}/AutoGen.h.obj" dpath="${CC_DPATH}">
@@ -174,7 +174,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <if>
             <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
             <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </then>
             <else>
               <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
@@ -643,10 +643,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <if>
             <and>
               <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </and>
             <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yc${DEST_DIR_DEBUG}/AutoGen.h /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yc${DEST_DIR_DEBUG}/AutoGen.h /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </then>
             <else>
               <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
@@ -720,10 +720,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <if>
             <and>
               <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </and>
             <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_DEBUG}/AutoGen.h.gch"/>
+              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
             </then>
             <else>
               <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
