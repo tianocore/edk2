@@ -529,6 +529,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="NonProcessedFiles">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="Filename" type="PathAndFilename"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Option">
     <!-- This element is used to store flags from the Tools -->
     <xs:complexType>

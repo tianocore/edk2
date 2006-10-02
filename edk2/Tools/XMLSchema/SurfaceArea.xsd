@@ -58,6 +58,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="ModuleDefinitions"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="NonProcessedFiles"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
