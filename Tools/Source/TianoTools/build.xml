@@ -162,7 +162,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <condition property="x86_64_linux">
       <and>
         <os name="Linux"/>
-        <equals arg1="${HostArch}" arg2="x64"/>
+        <equals arg1="${HostArch}" arg2="X64"/>
       </and>
     </condition>
     
