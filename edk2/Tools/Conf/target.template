@@ -31,7 +31,7 @@ ACTIVE_PLATFORM       = EdkNt32Pkg/Nt32.fpd
 #                                               valid targets specified in the FPD file will attempt 
 #                                               to be built.  The following line will build all platform
 #                                               targets.
-# TARGET                = 
+TARGET                = DEBUG
 
 #  TARGET_ARCH           List       Optional    What kind of architecture is the binary being target for. 
 #                                               One, or more, of the following, IA32, IA64, X64, EBC or ARM.
