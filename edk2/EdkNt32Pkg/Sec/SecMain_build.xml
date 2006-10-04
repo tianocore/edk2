@@ -99,6 +99,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <target name="sections" />
 
     <target name="output" >
+      <if>
+        <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        <then>
+          <var name="SLINK_FLAGS" value="${SLINK_FLAGS} ${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        </then>
+      </if>
       <OnDependency>
         <sourcefiles>
           <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
