@@ -14,15 +14,20 @@
 
 #if _MSC_EXTENSIONS
 
+//
+// Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics
+//
+void __debugbreak ();
+
+#pragma intrinsic(__debugbreak)
+
 VOID
 EFIAPI
 CpuBreakpoint (
   VOID
   )
 {
-  _asm {
-    int  3
-  }
+  __debugbreak ();
 }
 
 #endif
