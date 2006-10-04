@@ -488,10 +488,19 @@ public class GenBuildTask extends Ant {
             //
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS;
             String cmdFlags = GlobalData.getCommandSetting(key, fpdModuleId);
-            Set<String> addset = new LinkedHashSet<String>();
-            Set<String> subset = new LinkedHashSet<String>();
-            putFlagsToSet(addset, cmdFlags);
-            getProject().setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
+            if (cmdFlags != null) 
+            {
+//              Set<String> addset = new LinkedHashSet<String>();
+//              Set<String> subset = new LinkedHashSet<String>();
+//              putFlagsToSet(addset, cmdFlags);
+//              getProject().setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
+              getProject().setProperty(cmd[m] + "_FLAGS", cmdFlags);
+            } 
+            else 
+            {
+              getProject().setProperty(cmd[m] + "_FLAGS", "");
+            }
+
 
             //
             // Set CC_EXT
