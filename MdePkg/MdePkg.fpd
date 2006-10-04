@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </PlatformHeader>
   <PlatformDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
-    <BuildTargets>DEBUG</BuildTargets>
+    <BuildTargets>DEBUG RELEASE</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory>Build/Mde</OutputDirectory>
   </PlatformDefinitions>
@@ -2330,80 +2330,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </ModuleSA>
   </FrameworkModules>
   <BuildOptions>
-    <Options>
-      <!-- MSFT tool chain options definition : IA32 -->
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">
-        "/nologo", "/W3", "/WX", "/GX", "/Gy", "/Gs-", "/c", "/D EFI32", "/D UNICODE", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="SLINK"> "/NOLOGO" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
-        "/NOLOGO", "/NODEFAULTLIB", "/IGNORE:4086", "/MAP", "/OPT:REF", "/MACHINE:I386", "/ALIGN:32", "/DLL", "/LTCG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
-        "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
-      
-      <!-- GCC tool chain options definition : IA32 -->
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="CC">
-        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c", "-include ${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "-c", "-imacros ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry _${ENTRYPOINT}"
-      </Option>
-      <!-- MSFT tool chain options definition : X64 -->
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="CC">
-        "/nologo", "/X", "/W4", "/WX", "/Gy", "/c", "/Gs8192", "/GS-", "/D EFIx64", "/O1i", "/FAcs", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="SLINK">
-        "/NOLOGO"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="DLINK">
-        "/NOLOGO", "/Machine:AMD64", "/ALIGN:32", "/DLL", "/NODEFAULTLIB", "/OPT:REF", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="ASM">
-        "/nologo", "/W3", "/WX", "/c", "/DEFI32"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="ASMLINK"> </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="PP">
-        "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="ASL"> "/nologo" </Option>
-      
-      <!-- MSFT tool chain options definition : IPF -->
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="CC">
-        "/nologo", "/W4", "/WX", "/EHsc", "/Gy", "/c", "/GS-", "/D EFI64", "/O1i", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="SLINK"> "/NOLOGO" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="DLINK">
-        "/NOLOGO", "/NODEFAULTLIB", "/IGNORE:4086", "/MAP", "/OPT:REF", "/MACHINE:IA64", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="ASM">
-        "-N us", "-X explicit", "-M ilp64", "-N so", "-W4"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="ASMLINK"> </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="PP"> "/nologo", "/P", "/TC" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="ASL"> "/nologo" </Option>
-      
-      <!-- INTEL tool chain options definition : EBC -->
-      <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="CC">
-        "-nologo", "-FAcs", "-c", "-W3", "-WX", "-FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="SLINK">
-        "/lib", "/NOLOGO", "/MACHINE:EBC"
-      </Option>
-      <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="DLINK">
-        "/NOLOGO", "/MACHINE:EBC", "/SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER", "/OPT:REF", "/NODEFAULTLIB", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-      <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="PP"> "-nologo", "-P", "-TC" </Option>
-    </Options>    
-
 	  <Ffs FfsKey="APPLICATION">
 	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION" />
 	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
