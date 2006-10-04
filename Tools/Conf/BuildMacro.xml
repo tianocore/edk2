@@ -517,6 +517,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <var name="FILE_BASENAME" value="@{FILENAME}" />
       <var name="FILE_PATH" value="." />
+      <if>
+        <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        <then>
+          <var name="SLINK_FLAGS" value="${SLINK_FLAGS} ${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        </then>
+      </if>
       <mkdir dir="${BIN_DIR}"/>
 
       <OnDependency>
@@ -788,6 +794,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <var name="FILE_BASENAME" value="@{FILENAME}" />
       <var name="FILE_PATH" value="@{FILEPATH}" />
+      <if>
+        <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        <then>
+          <var name="SLINK_FLAGS" value="${SLINK_FLAGS} ${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+        </then>
+      </if>
       <OnDependency>
         <sourcefiles>
           <file list="${LIBS}"/>
