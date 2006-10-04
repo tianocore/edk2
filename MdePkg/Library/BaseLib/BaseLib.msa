@@ -1,4 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>BaseLib</ModuleName>
@@ -73,6 +83,7 @@
     <Filename>SwapBytes32.c</Filename>
     <Filename>SwapBytes64.c</Filename>
     <Filename>SwitchStack.c</Filename>
+    
     <Filename SupArchList="IA32">x86DisablePaging32.c</Filename>
     <Filename SupArchList="IA32">x86DisablePaging64.c</Filename>
     <Filename SupArchList="IA32">x86EnablePaging32.c</Filename>
@@ -91,210 +102,211 @@
     <Filename SupArchList="IA32">Ia32/Non-existing.c</Filename>
     <Filename SupArchList="IA32">Ia32/InternalSwitchStack.c</Filename>
 
-    <Filename SupArchList="IA32">Ia32/ARShiftU64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuBreakpoint.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuFlushTlb.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuSleep.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuId.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuIdEx.c</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuPause.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DisableInterrupts.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DisablePaging32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x32Remainder.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x64Remainder.c</Filename>
-    <Filename SupArchList="IA32">Ia32/DivS64x64Remainder.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/EnableDisableInterrupts.c</Filename>
-    <Filename SupArchList="IA32">Ia32/EnableInterrupts.c</Filename>
-    <Filename SupArchList="IA32">Ia32/EnablePaging32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/EnablePaging64.asm</Filename>
-    
-    <Filename SupArchList="IA32">Ia32/FlushCacheLine.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/FxSave.c</Filename>
-    <Filename SupArchList="IA32">Ia32/FxRestore.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/InterlockedIncrement.c</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedDecrement.c</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedCompareExchange32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedCompareExchange64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/Invd.c</Filename>
-    
-    <Filename SupArchList="IA32">Ia32/LongJump.c</Filename>
-    <Filename SupArchList="IA32">Ia32/LRotU64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/LShiftU64.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/MultU64x32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/MultU64x64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ModU64x32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/Monitor.c</Filename>
-    <Filename SupArchList="IA32">Ia32/Mwait.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/ReadCr0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr1.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr5.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr6.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr7.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadEflags.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm1.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm5.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm6.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm7.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMsr64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadEs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadFs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadGs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadSs.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadTr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadGdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadIdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadLdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadTsc.c</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadPmc.c</Filename>
-    <Filename SupArchList="IA32">Ia32/RShiftU64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/RRotU64.c</Filename>
-
-    <Filename SupArchList="IA32">Ia32/SetJump.c</Filename>
-    <Filename SupArchList="IA32">Ia32/SwapBytes64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/Thunk16.asm</Filename>
-
-    <Filename SupArchList="IA32">Ia32/WriteMsr64.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr1.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr5.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr6.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr7.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteGdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteIdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteLdtr.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm0.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm1.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm2.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm3.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm4.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm5.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm6.c</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm7.c</Filename>
-    <Filename SupArchList="IA32">Ia32/Wbinvd.c</Filename>
-    
     <!-- GCC assembly code is with .S extension -->
-    <Filename SupArchList="IA32">Ia32/LShiftU64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/RShiftU64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ARShiftU64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/LRotU64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/RRotU64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/MultU64x32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/MultU64x64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ModU64x32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x32Remainder.S</Filename>
-    <Filename SupArchList="IA32">Ia32/DivU64x64Remainder.S</Filename>
-    <Filename SupArchList="IA32">Ia32/SwapBytes64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/SetJump.S</Filename>
-    <Filename SupArchList="IA32">Ia32/LongJump.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuId.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuIdEx.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadEflags.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMsr64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMsr64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCr4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteCr4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr1.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr5.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr6.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDr7.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr1.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr5.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr6.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteDr7.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadCs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadDs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadEs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadFs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadGs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadSs.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadTr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadGdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteGdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadIdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteIdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadLdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteLdtr.S</Filename>
-    <Filename SupArchList="IA32">Ia32/FxSave.S</Filename>
-    <Filename SupArchList="IA32">Ia32/FxRestore.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm1.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm5.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm6.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadMm7.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm0.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm1.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm2.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm3.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm4.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm5.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm6.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMm7.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadTsc.S</Filename>
-    <Filename SupArchList="IA32">Ia32/ReadPmc.S</Filename>
-    <Filename SupArchList="IA32">Ia32/Monitor.S</Filename>
-    <Filename SupArchList="IA32">Ia32/Mwait.S</Filename>
-    <Filename SupArchList="IA32">Ia32/EnablePaging32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/DisablePaging32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/EnablePaging64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/Wbinvd.S</Filename>
-    <Filename SupArchList="IA32">Ia32/Invd.S</Filename>
-    <Filename SupArchList="IA32">Ia32/FlushCacheLine.S</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedIncrement.S</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedDecrement.S</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedCompareExchange32.S</Filename>
-    <Filename SupArchList="IA32">Ia32/InterlockedCompareExchange64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/EnableInterrupts.S</Filename>
-    <Filename SupArchList="IA32">Ia32/DisableInterrupts.S</Filename>
-    <Filename SupArchList="IA32">Ia32/EnableDisableInterrupts.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuSleep.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuPause.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuBreakpoint.S</Filename>
-    <Filename SupArchList="IA32">Ia32/CpuFlushTlb.S</Filename>
-    <Filename SupArchList="IA32">Ia32/Thunk16.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/LShiftU64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/RShiftU64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ARShiftU64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/LRotU64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/RRotU64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/MultU64x32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/MultU64x64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/DivU64x32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ModU64x32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/DivU64x32Remainder.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/DivU64x64Remainder.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/SwapBytes64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/SetJump.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/LongJump.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuId.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuIdEx.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadEflags.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMsr64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMsr64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadCr0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadCr2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadCr3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadCr4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteCr0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteCr2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteCr3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteCr4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr1.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr5.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr6.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDr7.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr1.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr5.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr6.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteDr7.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadCs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadDs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadEs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadFs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadGs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadSs.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadTr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadGdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteGdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadIdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteIdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadLdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteLdtr.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/FxSave.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/FxRestore.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm1.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm5.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm6.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadMm7.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm0.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm1.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm2.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm3.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm4.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm5.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm6.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/WriteMm7.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadTsc.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/ReadPmc.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Monitor.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Mwait.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/EnablePaging32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/DisablePaging32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/EnablePaging64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Wbinvd.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Invd.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/FlushCacheLine.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/InterlockedIncrement.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/InterlockedDecrement.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/InterlockedCompareExchange32.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/InterlockedCompareExchange64.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/EnableInterrupts.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/DisableInterrupts.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/EnableDisableInterrupts.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuSleep.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuPause.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuBreakpoint.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuFlushTlb.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Thunk16.S</Filename>
+    
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ARShiftU64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuBreakpoint.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuFlushTlb.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuSleep.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuId.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuIdEx.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/CpuPause.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DisableInterrupts.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DisablePaging32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x32Remainder.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x64Remainder.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivS64x64Remainder.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnableDisableInterrupts.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnableInterrupts.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnablePaging32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnablePaging64.asm</Filename>
+    
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/FlushCacheLine.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/FxSave.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/FxRestore.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedIncrement.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedDecrement.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedCompareExchange32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedCompareExchange64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Invd.c</Filename>
+    
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LongJump.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LRotU64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LShiftU64.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/MultU64x32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/MultU64x64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ModU64x32.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Monitor.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Mwait.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadCr0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadCr2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadCr3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadCr4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr1.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr5.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr6.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDr7.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadEflags.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm1.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm5.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm6.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMm7.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadMsr64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadCs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadDs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadEs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadFs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadGs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadSs.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadTr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadGdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadIdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadLdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadTsc.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/ReadPmc.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/RShiftU64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/RRotU64.c</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/SetJump.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/SwapBytes64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Thunk16.asm</Filename>
+
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMsr64.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteCr0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteCr2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteCr3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteCr4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr1.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr5.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr6.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteDr7.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteGdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteIdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteLdtr.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm0.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm1.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm2.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm3.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm4.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm5.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm6.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm7.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Wbinvd.c</Filename>
+                                
     <Filename SupArchList="X64">x86DisablePaging32.c</Filename>
     <Filename SupArchList="X64">x86DisablePaging64.c</Filename>
     <Filename SupArchList="X64">x86EnablePaging32.c</Filename>
@@ -318,8 +330,8 @@
     <Filename SupArchList="X64">X64/CpuId.asm</Filename>
     <Filename SupArchList="X64">X64/CpuIdEx.asm</Filename>
     <Filename SupArchList="X64">X64/ReadEflags.asm</Filename>
-    <Filename SupArchList="X64">X64/ReadMsr64.asm</Filename>
-    <Filename SupArchList="X64">X64/WriteMsr64.asm</Filename>
+    <Filename SupArchList="X64">X64/ReadMsr64.c</Filename>
+    <Filename SupArchList="X64">X64/WriteMsr64.c</Filename>
     <Filename SupArchList="X64">X64/ReadCr0.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr2.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr3.asm</Filename>
@@ -384,8 +396,8 @@
     <Filename SupArchList="X64">X64/Wbinvd.asm</Filename>
     <Filename SupArchList="X64">X64/Invd.asm</Filename>
     <Filename SupArchList="X64">X64/FlushCacheLine.asm</Filename>
-    <Filename SupArchList="X64">X64/InterlockedIncrement.asm</Filename>
-    <Filename SupArchList="X64">X64/InterlockedDecrement.asm</Filename>
+    <Filename SupArchList="X64">X64/InterlockedIncrement.c</Filename>
+    <Filename SupArchList="X64">X64/InterlockedDecrement.c</Filename>
     <Filename SupArchList="X64">X64/InterlockedCompareExchange32.asm</Filename>
     <Filename SupArchList="X64">X64/InterlockedCompareExchange64.asm</Filename>
     <Filename SupArchList="X64">X64/EnableInterrupts.asm</Filename>
@@ -393,9 +405,10 @@
     <Filename SupArchList="X64">X64/EnableDisableInterrupts.asm</Filename>
     <Filename SupArchList="X64">X64/CpuSleep.asm</Filename>
     <Filename SupArchList="X64">X64/CpuPause.asm</Filename>
-    <Filename SupArchList="X64">X64/CpuBreakpoint.asm</Filename>
+    <Filename SupArchList="X64">X64/CpuBreakpoint.c</Filename>
     <Filename SupArchList="X64">X64/CpuFlushTlb.asm</Filename>
     <Filename SupArchList="X64">X64/Thunk16.asm</Filename>
+    
     <Filename SupArchList="IPF">Math64.c</Filename>
     <Filename SupArchList="IPF">Ipf/asm.h</Filename>
     <Filename SupArchList="IPF">Ipf/ia_64gen.h</Filename>
@@ -412,6 +425,7 @@
     <Filename SupArchList="IPF">Ipf/CpuFlushTlb.s</Filename>
     <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
     <Filename SupArchList="IPF">Ipf/Non-existing.c</Filename>
+    
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>
     <Filename SupArchList="EBC">Ebc/SwitchStack.c</Filename>
