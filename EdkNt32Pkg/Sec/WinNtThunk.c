@@ -45,6 +45,7 @@ Abstract:
 //  to tell if all the elements have been initailized properly.
 //
 #pragma warning(disable : 4232)
+#pragma warning(disable : 4996)
 
 EFI_WIN_NT_THUNK_PROTOCOL mWinNtThunkTable = {
   EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE,
@@ -137,7 +138,7 @@ EFI_WIN_NT_THUNK_PROTOCOL mWinNtThunkTable = {
   PurgeComm,
   SetCommTimeouts,
   ExitProcess,
-  swprintf,
+  _snwprintf,
   GetDesktopWindow,
   GetForegroundWindow,
   CreateWindowEx,
@@ -173,6 +174,7 @@ EFI_WIN_NT_THUNK_PROTOCOL mWinNtThunkTable = {
   HeapFree
 };
 
+#pragma warning(default : 4996)
 #pragma warning(default : 4232)
 
 EFI_WIN_NT_THUNK_PROTOCOL *gWinNt = &mWinNtThunkTable;
