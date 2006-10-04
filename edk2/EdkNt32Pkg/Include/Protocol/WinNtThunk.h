@@ -790,6 +790,7 @@ WINUSERAPI
 INT32
 (WINAPIV *WinNtSprintf) (
   LPWSTR    Buffer,
+  size_t    Count,
   LPCWSTR   String,
   ...
   );
