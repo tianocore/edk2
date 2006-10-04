@@ -33,6 +33,7 @@ Abstract:
 --*/
 
 #include "SecMain.h"
+#pragma warning(disable : 4996)
 
 //
 // Globals
@@ -1167,3 +1168,5 @@ _ModuleEntryPoint (
   )
 {
 }
+
+#pragma warning(default : 4996)
