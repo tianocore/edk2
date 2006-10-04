@@ -462,7 +462,7 @@ Returns:
 
         WinNtDevice->ControllerNameTable = NULL;
 
-        WinNtThunk->SPrintf (ComponentName, L"%s", WinNtDevice->WinNtIo.EnvString);
+        WinNtThunk->SPrintf (ComponentName, sizeof (ComponentName), L"%s", WinNtDevice->WinNtIo.EnvString);
 
         WinNtDevice->DevicePath = WinNtBusCreateDevicePath (
                                     ParentDevicePath,
