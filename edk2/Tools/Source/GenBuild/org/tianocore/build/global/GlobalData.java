@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -731,11 +733,11 @@ public class GlobalData {
         ToolChainMap toolChainConfig = toolsDef.getConfig();
         String setting = null;
 
+        setting = toolChainConfig.get(toolChainKey);
+        if (setting == null) {
+          setting = "";
+        }
         if (!commandDescription[ToolChainElement.ATTRIBUTE.value].equals(ToolChainAttribute.FLAGS.toString())) {
-            setting = toolChainConfig.get(toolChainKey);
-            if (setting == null) {
-                setting = "";
-            }
             return setting;
         }
 
@@ -746,7 +748,98 @@ public class GlobalData {
         ToolChainMap option = moduleToolChainOption.get(fpdModuleId);
         ToolChainKey toolChainFamilyKey = null;
 
-        if ((option == null) || (option != null && (setting = option.get(toolChainKey)) == null)) {
+        if (option != null && option.get(toolChainKey) != null)  
+        {
+          String str = option.get(toolChainKey);
+
+          Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
+          Matcher matcher = myPattern.matcher(str + " ");
+          while (matcher.find()) 
+          {
+            setting = setting + " " + str.substring(matcher.start(1), matcher.end(1));
+          }
+        } 
+//        else 
+//        {
+          if (toolChainFamilyKey == null) 
+          {
+            toolChainFamilyKey = new ToolChainKey(commandDescription);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FAMILY.toString(), ToolChainElement.ATTRIBUTE.value);
+            String family = toolChainConfig.get(toolChainFamilyKey);
+            toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
+          }
+
+          option = moduleToolChainFamilyOption.get(fpdModuleId);
+          if (option != null && option.get(toolChainFamilyKey) != null) 
+          {
+            String str = option.get(toolChainFamilyKey);
+
+            Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
+            Matcher matcher = myPattern.matcher(str + " ");
+            while (matcher.find()) 
+            {
+              setting = setting + " " + str.substring(matcher.start(1), matcher.end(1));
+            }
+          }
+//        }
+
+        //
+        // get platform options, if any
+        //
+        // tool tag first
+//        if (platformToolChainOption != null && platformToolChainOption.get(toolChainKey) != null) 
+        if (platformToolChainOption.get(toolChainKey) != null) 
+        {
+          String str = platformToolChainOption.get(toolChainKey);
+
+          Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
+          Matcher matcher = myPattern.matcher(str + " ");
+          while (matcher.find()) 
+          {
+            setting = setting + " " + str.substring(matcher.start(1), matcher.end(1));
+          }
+        } 
+//        else 
+//        {
+          // then tool chain family
+          if (toolChainFamilyKey == null) 
+          {
+            toolChainFamilyKey = new ToolChainKey(commandDescription);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FAMILY.toString(), ToolChainElement.ATTRIBUTE.value);
+            String family = toolChainConfig.get(toolChainFamilyKey);
+            toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
+          }
+
+//          if (platformToolChainFamilyOption != null && platformToolChainFamilyOption.get(toolChainFamilyKey) != null) 
+          if (platformToolChainFamilyOption.get(toolChainFamilyKey) != null) 
+          {
+            String str = platformToolChainFamilyOption.get(toolChainFamilyKey);
+
+            setting = setting + " " + str;
+
+//            Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
+//            Matcher matcher = myPattern.matcher(str + " ");
+//            while (matcher.find()) 
+//            {
+//              setting = setting + " " + str.substring(matcher.start(1), matcher.end(1));
+//            }
+          }
+//        }
+
+        return setting;
+
+/*
+        //
+        // get module specific options, if any
+        //
+        // tool tag first
+        ToolChainMap option = moduleToolChainOption.get(fpdModuleId);
+        ToolChainKey toolChainFamilyKey = null;
+        
+        if ((option == null) || (option != null && (setting = option.get(toolChainKey)) == null)) 
+        {
             //
             // then tool chain family
             //
@@ -786,6 +879,7 @@ public class GlobalData {
         }
 
         return setting;
+*/
     }
 
     public static void setToolChainEnvInfo(ToolChainInfo envInfo) {
