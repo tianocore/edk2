@@ -164,12 +164,16 @@ Returns:
   EFI_IMAGE_DOS_HEADER  BackupDosHdr;
   ULONG             Index;
   ULONG             Index1;
+  ULONG             Index2;
+  ULONG             Index3;
   BOOLEAN           TimeStampPresent;
   UINTN                                 AllignedRelocSize;
   UINTN                                 Delta;
   EFI_IMAGE_SECTION_HEADER              *SectionHeader;
   UINT8      *FileBuffer;
   UINTN      FileLength;
+  RUNTIME_FUNCTION  *RuntimeFunction;
+  UNWIND_INFO       *UnwindInfo;
 
   SetUtilityName (UTILITY_NAME);
   //
@@ -374,26 +378,6 @@ Returns:
     Optional32->SizeOfHeapCommit   = 0;
 
     //
-    // Zero the .pdata section if the machine type is X64 and the Debug Directoty entry is empty
-    //
-    if (PeHdr->FileHeader.Machine == 0x8664) { // X64
-      if (Optional32->NumberOfRvaAndSizes >= 4) {
-        if (Optional32->NumberOfRvaAndSizes < 7 || (Optional32->NumberOfRvaAndSizes >= 7 && Optional32->DataDirectory[6].Size == 0)) {
-          SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
-          for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
-            if (SectionHeader->VirtualAddress == Optional32->DataDirectory[3].VirtualAddress) {
-              for (Index1 = 0; Index1 < Optional32->DataDirectory[3].Size; Index1++) {
-                FileBuffer[SectionHeader->PointerToRawData + Index1] = 0;
-              }
-            }
-          }
-          Optional32->DataDirectory[3].Size = 0;
-          Optional32->DataDirectory[3].VirtualAddress = 0;
-        }
-      }
-    }
-
-    //
     // Strip zero padding at the end of the .reloc section 
     //
     if (Optional32->NumberOfRvaAndSizes >= 6) {
@@ -454,8 +438,19 @@ Returns:
           SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
           for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
             if (SectionHeader->VirtualAddress == Optional64->DataDirectory[3].VirtualAddress) {
-              for (Index1 = 0; Index1 < Optional64->DataDirectory[3].Size; Index1++) {
-                FileBuffer[SectionHeader->PointerToRawData + Index1] = 0;
+              RuntimeFunction = (RUNTIME_FUNCTION *)(FileBuffer + SectionHeader->PointerToRawData);
+              for (Index1 = 0; Index1 < Optional64->DataDirectory[3].Size / sizeof (RUNTIME_FUNCTION); Index1++, RuntimeFunction++) {
+                SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+                for (Index2 = 0; Index2 < PeHdr->FileHeader.NumberOfSections; Index2++, SectionHeader++) {
+                  if (RuntimeFunction->UnwindInfoAddress > SectionHeader->VirtualAddress && RuntimeFunction->UnwindInfoAddress < (SectionHeader->VirtualAddress + SectionHeader->SizeOfRawData)) {
+                    UnwindInfo = (UNWIND_INFO *)(FileBuffer + SectionHeader->PointerToRawData + (RuntimeFunction->UnwindInfoAddress - SectionHeader->VirtualAddress));
+                    if (UnwindInfo->Version == 1) {
+                      memset (UnwindInfo + 1, 0, UnwindInfo->CountOfUnwindCodes * sizeof (UINT16));
+                      memset (UnwindInfo, 0, sizeof (UNWIND_INFO));
+                    }
+                  }
+                }
+                memset (RuntimeFunction, 0, sizeof (RUNTIME_FUNCTION));
               }
             }
           }
