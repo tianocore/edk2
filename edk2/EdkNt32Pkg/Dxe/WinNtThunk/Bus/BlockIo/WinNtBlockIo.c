@@ -204,14 +204,15 @@ Returns:
   if (DiskType == EfiWinNtVirtualDisks) {
     WinNtIo->WinNtThunk->SPrintf (
                           Buffer,
+                          sizeof (Buffer),
                           L"Diskfile%d",
                           WinNtIo->InstanceNumber
                           );
   } else {
     if (*Str >= 'A' && *Str <= 'Z' || *Str >= 'a' && *Str <= 'z') {
-      WinNtIo->WinNtThunk->SPrintf (Buffer, L"\\\\.\\%c:", *Str);
+      WinNtIo->WinNtThunk->SPrintf (Buffer, sizeof (Buffer), L"\\\\.\\%c:", *Str);
     } else {
-      WinNtIo->WinNtThunk->SPrintf (Buffer, L"\\\\.\\PHYSICALDRIVE%c", *Str);
+      WinNtIo->WinNtThunk->SPrintf (Buffer, sizeof (Buffer), L"\\\\.\\PHYSICALDRIVE%c", *Str);
     }
 
     Str++;
