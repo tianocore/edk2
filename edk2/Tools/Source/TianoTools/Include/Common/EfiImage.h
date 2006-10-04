@@ -672,6 +672,24 @@ typedef struct {
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY;
 
+//
+// .pdata entries for X64
+//
+typedef struct {
+  UINT32  FunctionStartAddress;
+  UINT32  FunctionEndAddress;
+  UINT32  UnwindInfoAddress;
+} RUNTIME_FUNCTION;
+
+typedef struct {
+  UINT8  Version:3;
+  UINT8  Flags:5;
+  UINT8  SizeOfProlog;
+  UINT8  CountOfUnwindCodes;
+  UINT8  FrameRegister:4;
+  UINT8  FrameRegisterOffset:4;
+} UNWIND_INFO;
+
 ///
 /// Header format for TE images
 ///
