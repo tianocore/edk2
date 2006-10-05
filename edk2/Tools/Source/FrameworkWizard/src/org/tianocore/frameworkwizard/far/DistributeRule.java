@@ -39,7 +39,7 @@ public class DistributeRule {
         // Get Far packages list;
         // 
         try {
-            farPkgList = myFar.mainfest.getPackageList();
+            farPkgList = myFar.manifest.getPackageList();
             Iterator pkgItems = farPkgList.iterator();
             while (pkgItems.hasNext()) {
                 PackageIdentification id = (PackageIdentification) pkgItems.next();

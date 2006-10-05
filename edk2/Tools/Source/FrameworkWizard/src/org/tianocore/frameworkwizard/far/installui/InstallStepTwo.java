@@ -197,7 +197,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
         try {
             Far far = stepOne.getFar();
 
-            packageVector = far.mainfest.getPackageList();
+            packageVector = far.manifest.getPackageList();
             Iterator<PackageIdentification> iter = packageVector.iterator();
             while (iter.hasNext()) {
                 String[] str = new String[4];
@@ -257,7 +257,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
         try {
             Far far = stepOne.getFar();
 
-            platformVector = far.mainfest.getPlatformList();
+            platformVector = far.manifest.getPlatformList();
             Iterator<PlatformIdentification> iter = platformVector.iterator();
             while (iter.hasNext()) {
                 String[] str = new String[4];
@@ -384,7 +384,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 // Add to database
                 //
                 WorkspaceTools wt = new WorkspaceTools();
-                wt.addFarToDb(packageList, platformList, far.mainfest.getHeader());
+                wt.addFarToDb(packageList, platformList, far.manifest.getHeader());
             } catch (Exception ex) {
                 Log.wrn("Install far", ex.getMessage());
                 Log.err("Install far", ex.getMessage());

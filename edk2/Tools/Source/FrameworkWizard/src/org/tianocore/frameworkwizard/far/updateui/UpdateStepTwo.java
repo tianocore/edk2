@@ -181,7 +181,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
         model.setRowCount(0);
         try {
             Far far = stepOne.getFar();
-            List<PackageIdentification> packagesInFar = far.mainfest.getPackageList();
+            List<PackageIdentification> packagesInFar = far.manifest.getPackageList();
 
             WorkspaceTools wt = new WorkspaceTools();
             List<PackageIdentification> packagesInDb = wt.getAllPackages();

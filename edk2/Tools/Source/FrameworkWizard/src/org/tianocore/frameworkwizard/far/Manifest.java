@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create Far's mainfest file
+ The file is used to create Far's manifest file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -47,16 +47,16 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class Mainfest implements ManifestInterface {
+public class Manifest implements ManifestInterface {
     // /
-    // / mainfest document
+    // / manifest document
     // /
-    Document mainfestDoc = null;
+    Document manifestDoc = null;
 
     // /
-    // / Mainfest file element name
+    // / Manfiest file element name
     // /
-    final static String mfFileName = "FrameworkArhciveMainfest.xml";
+    final static String mfFileName = "FrameworkArchiveManifest.xml";
 
     //
     // Header
@@ -110,7 +110,7 @@ public class Mainfest implements ManifestInterface {
     final static String farFileName_Md5sum = "Md5sum";
 
     //
-    // mainfest header information.
+    // manifest header information.
     //
     FarHeader fhInfo = new FarHeader();
 
@@ -127,7 +127,7 @@ public class Mainfest implements ManifestInterface {
     Set<File> files = new LinkedHashSet<File>();
 
     //
-    // Mainfest file
+    // Manifest file
     //
     public File mfFile = null;
 
@@ -135,21 +135,21 @@ public class Mainfest implements ManifestInterface {
         return fhInfo;
     }
 
-    public Mainfest() throws Exception {
+    public Manifest() throws Exception {
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder dombuilder = domfac.newDocumentBuilder();
         Document document = dombuilder.newDocument();
-        this.mainfestDoc = document;
+        this.manifestDoc = document;
 
     }
 
-    public Mainfest(InputStream mainfestInputStream) throws Exception {
+    public Manifest(InputStream manifestInputStream) throws Exception {
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         try {
-            if (mainfestInputStream != null) {
+            if (manifestInputStream != null) {
                 DocumentBuilder dombuilder = domfac.newDocumentBuilder();
-                this.mainfestDoc = dombuilder.parse(mainfestInputStream);
-                parseMainfest();
+                this.manifestDoc = dombuilder.parse(manifestInputStream);
+                parseManifest();
             }
 
         } catch (Exception e) {
@@ -194,11 +194,11 @@ public class Mainfest implements ManifestInterface {
         }
     }
 
-    public void setManifestFile(File mainfestFile) throws Exception {
+    public void setManifestFile(File manifestFile) throws Exception {
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder dombuilder = domfac.newDocumentBuilder();
-        InputStream is = new FileInputStream(mainfestFile);
-        this.mainfestDoc = dombuilder.parse(is);
+        InputStream is = new FileInputStream(manifestFile);
+        this.manifestDoc = dombuilder.parse(is);
     }
 
     public void addPkgToPkgList(PackageIdentification packageId, Set<String> fileFilter) throws Exception {
@@ -554,7 +554,7 @@ public class Mainfest implements ManifestInterface {
         //
         // Add far files in <FarPlatformList> to list
         //
-        NodeList elementList = this.mainfestDoc.getElementsByTagName(farPlatformList);
+        NodeList elementList = this.manifestDoc.getElementsByTagName(farPlatformList);
         for (int i = 0; i < elementList.getLength(); i++) {
             //
             // Get <farPlatform> node list.
@@ -589,56 +589,56 @@ public class Mainfest implements ManifestInterface {
 
     public void hibernateToFile() throws Exception {
         //
-        // create mainfest root node
+        // create manifest root node
         //
-        Element rootNode = this.mainfestDoc.createElement("FrameworkArchiveManifest");
-        this.mainfestDoc.appendChild(rootNode);
+        Element rootNode = this.manifestDoc.createElement("FrameworkArchiveManifest");
+        this.manifestDoc.appendChild(rootNode);
 
         //
-        // create mainfest header node
+        // create manifest header node
         //
-        Element headerNode = this.mainfestDoc.createElement(farHeader);
+        Element headerNode = this.manifestDoc.createElement(farHeader);
         rootNode.appendChild(headerNode);
         //
         // Add FarHeader to headerNode.
         //
-        Element farName = this.mainfestDoc.createElement(farHeader_FarName);
+        Element farName = this.manifestDoc.createElement(farHeader_FarName);
         farName.setTextContent(this.fhInfo.getFarName());
         headerNode.appendChild(farName);
 
-        Element gv = this.mainfestDoc.createElement(guidValue);
+        Element gv = this.manifestDoc.createElement(guidValue);
         gv.setTextContent(this.fhInfo.getGuidValue());
         headerNode.appendChild(gv);
 
-        Element ver = this.mainfestDoc.createElement(version);
+        Element ver = this.manifestDoc.createElement(version);
         ver.setTextContent(this.fhInfo.getVersion());
         headerNode.appendChild(ver);
 
-        Element abstra = this.mainfestDoc.createElement(farHeader_Abstract);
+        Element abstra = this.manifestDoc.createElement(farHeader_Abstract);
         abstra.setTextContent(this.fhInfo.getAbstractStr());
         headerNode.appendChild(abstra);
 
-        Element descr = this.mainfestDoc.createElement(farHeader_Description);
+        Element descr = this.manifestDoc.createElement(farHeader_Description);
         descr.setTextContent(this.fhInfo.getDescription());
         headerNode.appendChild(descr);
 
-        Element copyright = this.mainfestDoc.createElement(farHeader_CopyRight);
+        Element copyright = this.manifestDoc.createElement(farHeader_CopyRight);
         copyright.setTextContent(this.fhInfo.getCopyright());
         headerNode.appendChild(copyright);
 
-        Element license = this.mainfestDoc.createElement(farHeader_License);
+        Element license = this.manifestDoc.createElement(farHeader_License);
         license.setTextContent(this.fhInfo.getLicense());
         headerNode.appendChild(license);
 
-        Element spec = this.mainfestDoc.createElement(farHeader_Specification);
+        Element spec = this.manifestDoc.createElement(farHeader_Specification);
         spec.setTextContent(this.fhInfo.getSpecification());
         System.out.println(this.fhInfo.getSpecification());
         headerNode.appendChild(spec);
 
         //
-        // create mainfest FarPackageList node
+        // create manifest FarPackageList node
         //
-        Element pkgListNode = this.mainfestDoc.createElement(farPackageList);
+        Element pkgListNode = this.manifestDoc.createElement(farPackageList);
         rootNode.appendChild(pkgListNode);
 
         //
@@ -651,9 +651,9 @@ public class Mainfest implements ManifestInterface {
         }
 
         //
-        // create mainfest FarPlatformList node
+        // create manifest FarPlatformList node
         //
-        Element plfListNode = this.mainfestDoc.createElement(farPlatformList);
+        Element plfListNode = this.manifestDoc.createElement(farPlatformList);
         rootNode.appendChild(plfListNode);
 
         //
@@ -675,7 +675,7 @@ public class Mainfest implements ManifestInterface {
         //
         // Prepare the DOM document for writing
         //
-        Source source = new DOMSource(this.mainfestDoc);
+        Source source = new DOMSource(this.manifestDoc);
         //
         // Prepare the output file, get the Mainifest file name from <FarHeader>
         // <FarName>.
@@ -693,7 +693,7 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void pkgToFarPkgNode(Element parentNode, FarPackage pkgItem) {
-        Element pkgNode = this.mainfestDoc.createElement(farPackageList_FarPackage);
+        Element pkgNode = this.manifestDoc.createElement(farPackageList_FarPackage);
         //
         // Add <FarFileName>
         //
@@ -714,7 +714,7 @@ public class Mainfest implements ManifestInterface {
         //
         // Add <Contents>
         //
-        Element contentNode = this.mainfestDoc.createElement(contents);
+        Element contentNode = this.manifestDoc.createElement(contents);
         Iterator iterator = pkgItem.getContentList().iterator();
         while (iterator.hasNext()) {
             ffiToFfNode(contentNode, (FarFileItem) iterator.next());
@@ -724,7 +724,7 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void PlfToPlatformNode(Element parentNode, FarPlatformItem fplItem) {
-        Element fplNode = this.mainfestDoc.createElement(farPlatformList_FarPlatform);
+        Element fplNode = this.manifestDoc.createElement(farPlatformList_FarPlatform);
         //
         // Add <FarFileName>
         //
@@ -745,7 +745,7 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void ffiToFfNode(Element parentNode, FarFileItem ffi) {
-        Element farFileName = this.mainfestDoc.createElement(farPackage_FarfileName);
+        Element farFileName = this.manifestDoc.createElement(farPackage_FarfileName);
         farFileName.setTextContent(ffi.getRelativeFilename());
         System.out.println(farFileName.getTextContent());
         System.out.println(ffi.getRelativeFilename());
@@ -754,12 +754,12 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void setStrItemToNode(Element parentNode, String strValue, String strName) {
-        Element node = this.mainfestDoc.createElement(strName);
+        Element node = this.manifestDoc.createElement(strName);
         node.setTextContent(strValue);
         parentNode.appendChild(node);
     }
 
-    private void parseMainfest() {
+    private void parseManifest() {
 
         //
         // Parse header
@@ -773,11 +773,11 @@ public class Mainfest implements ManifestInterface {
         //
         // parse <farPlatformList>
         //
-        NodeList ele = this.mainfestDoc.getElementsByTagName(farPlatformList);
+        NodeList ele = this.manifestDoc.getElementsByTagName(farPlatformList);
         Node plfNode;
         if (ele.getLength() > 0) {
             //
-            // Only have one <FarPlatformList> node under mainfest root node.
+            // Only have one <FarPlatformList> node under manifest root node.
             //
             plfNode = ele.item(0);
             parseFarPlatformList(plfNode, this.fPlfList);
@@ -786,10 +786,10 @@ public class Mainfest implements ManifestInterface {
 
     private void parseMfHeader() {
         Node headerNode;
-        NodeList ele = this.mainfestDoc.getElementsByTagName(farHeader);
+        NodeList ele = this.manifestDoc.getElementsByTagName(farHeader);
         if (ele.getLength() > 0) {
             //
-            // For mainfest file only have one <FarHeader>
+            // For manifest file only have one <FarHeader>
             //
             headerNode = ele.item(0);
         } else {
@@ -824,10 +824,10 @@ public class Mainfest implements ManifestInterface {
 
     public void parseHeaderFarPackageList() {
         Node farPkgNode;
-        NodeList ele = this.mainfestDoc.getElementsByTagName(farPackageList);
+        NodeList ele = this.manifestDoc.getElementsByTagName(farPackageList);
         if (ele.getLength() > 0) {
             //
-            // For mainfest file only have one <FarHeader>
+            // For manifest file only have one <FarHeader>
             //
             farPkgNode = ele.item(0);
         } else {
