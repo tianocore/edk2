@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" >
+  <MsaHeader>
+    <ModuleName>Edk_II_Resources</ModuleName>
+    <ModuleType>TOOL</ModuleType>
+    <GuidValue>5d6c499e-53fd-430e-9285-2d7811b924e8</GuidValue>
+    <Version>2.0</Version>
+    <Abstract>This is the EDK II Tool Resources Module</Abstract>
+    <Description>
+      This Module provides the EFI/Tiano Tools and resources that are used to
+      create EFI/Tiano Modules and Platform Binary Files (PBF) These resources
+      and tools do not require compilation. (The three JAR files are provided,
+      Pre-compiled, and do not require additional compilation, the sources are
+      provided, but will not be built under normal procedures.
+    </Description>
+    <Copyright>Copyright 2005-2006, Intel Corporation</Copyright>
+    <License>
+All rights reserved.
+
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
+distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>NULL</OutputFileBasename>
+  </ModuleDefinitions>
+  <NonProcessedFiles>
+    <Filename>build.xml</Filename>
+    <Filename>bin/build</Filename>
+    <Filename>bin/build.bat</Filename>
+    <Filename>bin/FrameworkWizard</Filename>
+    <Filename>bin/FrameworkWizard.bat</Filename>
+    <Filename>bin/SAVerify.bat</Filename>
+    <Filename>Conf/FrameworkDatabase.db</Filename>
+    <Filename>Conf/tools_def.template</Filename>
+    <Filename>Conf/target.template</Filename>
+    <Filename>Conf/BuildMacro.xml</Filename>
+    <Filename>XMLSchema/FarManifest.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataAttributes.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataElements.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataTypes.xsd</Filename>
+    <Filename>XMLSchema/FrameworkHeaders.xsd</Filename>
+    <Filename>XMLSchema/FrameworkPlatformDataElements.xsd</Filename>
+    <Filename>XMLSchema/FrameworkPlatformDataTypes.xsd</Filename>
+    <Filename>XMLSchema/NamingConvention.xsd</Filename>
+    <Filename>XMLSchema/SurfaceArea.xsd</Filename>
+    <Filename>XMLSchema/SurfaceArea.xsdconfig</Filename>
+    <Filename>Conf/Pcd/PcdDatabaseCommonDefinitions.sample</Filename>
+    <Filename>Conf/Pcd/PcdDatabaseDxeDefinitions.sample</Filename>
+    <Filename>Conf/Pcd/PcdDatabasePeiDefinitions.sample</Filename>
+    <Filename>gcc/README.txt</Filename>
+    <Filename>gcc/tianoCross-gcc-4.0</Filename>
+    <Filename>gcc/tianoCross-gcc-4.1</Filename>
+  </NonProcessedFiles>
+</ModuleSurfaceArea>
