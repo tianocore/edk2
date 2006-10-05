@@ -35,9 +35,9 @@ import org.tianocore.frameworkwizard.workspace.Workspace;
 
 public class Far {
     //
-    // Class member Mainfest
+    // Class member Manifest
     //
-    public Mainfest mainfest = null;
+    public Manifest manifest = null;
 
     //
     // Jar file
@@ -60,7 +60,7 @@ public class Far {
     //
     public Far(JarFile farFile) throws Exception {
         jf = farFile;
-        this.mainfest = new Mainfest(getMainfestFile());
+        this.manifest = new Manifest(getManifestFile());
     }
 
     public void creatFar(List<PackageIdentification> pkgList, List<PlatformIdentification> plfList,
@@ -70,23 +70,23 @@ public class Far {
         //
         // Generate Manifest and get file lists
         //
-        this.mainfest = new Mainfest();
-        this.mainfest.setFarHeader(fHeader);
-        this.mainfest.createManifest(pkgList, plfList, fileFilter);
+        this.manifest = new Manifest();
+        this.manifest.setFarHeader(fHeader);
+        this.manifest.createManifest(pkgList, plfList, fileFilter);
 
-        this.mainfest.hibernateToFile();
+        this.manifest.hibernateToFile();
 
         //
         // Write Mainifest file to JAR.
         //
-        if (this.mainfest.mfFile != null) {
-            writeToJar(this.mainfest.mfFile, jos);
+        if (this.manifest.mfFile != null) {
+            writeToJar(this.manifest.mfFile, jos);
         }
 
         //
         // Write all files to JAR
         //
-        Set<File> files = this.mainfest.files;
+        Set<File> files = this.manifest.files;
         Iterator<File> iter = files.iterator();
         while (iter.hasNext()) {
             writeToJar(iter.next(), jos);
@@ -109,7 +109,7 @@ public class Far {
     }
 
     public void InstallFar(String dir) throws Exception {
-        List<FarFileItem> allFile = mainfest.getAllFileItem();
+        List<FarFileItem> allFile = manifest.getAllFileItem();
         extract(allFile, dir);
     }
 
@@ -119,7 +119,7 @@ public class Far {
         Iterator<PlatformIdentification> plfIter = plfKeys.iterator();
         while (plfIter.hasNext()) {
             PlatformIdentification item = plfIter.next();
-            extract(this.mainfest.getPlatformContents(item), plfMap.get(item).getPath());
+            extract(this.manifest.getPlatformContents(item), plfMap.get(item).getPath());
         }
 
         Set<PackageIdentification> pkgKeys = pkgMap.keySet();
@@ -132,15 +132,15 @@ public class Far {
     }
 
     public void installPackage(PackageIdentification packageId, File installPath) throws Exception {
-        List<FarFileItem> contents = this.mainfest.getPackageContents(packageId);
+        List<FarFileItem> contents = this.manifest.getPackageContents(packageId);
         extract(contents, installPath.getPath());
     }
 
-    public InputStream getMainfestFile() throws Exception {
+    public InputStream getManifestFile() throws Exception {
         JarEntry je = null;
         for (Enumeration e = jf.entries(); e.hasMoreElements();) {
             je = (JarEntry) e.nextElement();
-            if (je.getName().equalsIgnoreCase(Mainfest.mfFileName))
+            if (je.getName().equalsIgnoreCase(Manifest.mfFileName))
                 return jf.getInputStream(je);
         }
         return null;
@@ -262,7 +262,7 @@ public class Far {
         PackageQuery pkgQ = new PackageQuery();
         List<PackageIdentification> result = new ArrayList<PackageIdentification>();
 
-        entry = this.mainfest.getPackgeSpd(pkgId);
+        entry = this.manifest.getPackgeSpd(pkgId);
         if (entry == null) {
             return result;
         }
