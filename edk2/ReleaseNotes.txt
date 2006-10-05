@@ -182,20 +182,59 @@ Pre-defined targets in the build.xml file include:
 ----------------------------
 A Word on the GCC Tool Chain
 ----------------------------
+
 EDK II will not compile with a standard Linux gcc tool chain. While Linux
-distributions are usually based on ELF, EDK II requires a version of gcc 
-that is configured to produce PE-COFF images. You will find a script in 
-edk2/Tools/gcc that will download, configure, compile, and install a gcc 
-4.X cross-compile tool chain for EDK II development. This custom tool chain 
-supports the IA-32 architecture. It can be built and run on Cygwin, Linux, and 
-many other POSIX-compliant host operating environments. To compile the custom 
-gcc tool chain, you need the following tools on your host computer: bash, gcc, 
-gmake, curl (or wget).
+distributions are usually based on ELF, EDK II requires a version of gcc that
+is configured to produce PE-COFF images. You will find a script in <Root of
+EDK2 tree>/Tools/gcc/tianoCross-gcc-4.1 that will download, configure, compile,
+and install a gcc 4.1 cross-compile tool chain for EDK II development. This
+custom tool chain supports the IA-32 architecture. It can be built and run on
+Cygwin, Linux, and many other POSIX-compliant host operating environments. To
+compile the custom gcc tool chain, you need the following tools on your host
+computer: bash, gcc, gmake, curl (or wget).
 
 Only the MdePkg and EdkModulePkg are currently supported by gcc builds. Other
 builds, such as the EdkNt32Pkg, will not compile with gcc. By default, the edk2
 will try to build the NT32.fpd, which is not supported by gcc. So, you need to
 change the Tools/Conf/target.txt.
+
+The cross-compile build script has been tested on Cygwin, OS X and Linux. You
+should expect to hack on these scripts to make them work on your system. You
+may need to install additional tools on your system to make the scripts work.
+
+You will need
+
+  A recent version (3.0 or later should be fine) of gcc that is able to produce
+    executables for the machine that you want to run this compiler on (the host
+    machine).
+  wget or curl (which enables the download of the gcc compiler source code)
+  tar
+  bzip
+  gzip
+  bash
+  and possibly others
+
+CYGWIN Notes
+
+You should setup cygwin to use binmode on all mounts. When you initially
+install cygwin it gives you the choice of Unix file mode (recommended) or DOS
+file mode. Unix mode will cause all the cygwin directories to be mounted in
+binmode, while DOS will mount the dirs in textmode. Here is an example of a
+cygwin install where the dirs are (properly) mounted in binmode.
+
+C:\cygwin\bin on /usr/bin type user (binmode)
+C:\cygwin\lib on /usr/lib type user (binmode)
+c:\workspace on /workspace type system (binmode)
+C:\cygwin on / type user (binmode)
+
+If you use textmode, it is likely that the build will fail in a way that is
+hard to debug.
+
+Cygwin is pretty slow, so it is not recommended for large builds.
+
+
+
+
 
 The platform to be built is identified by the Tools/Conf/target.txt file:
 
