@@ -32,15 +32,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!-- Note: this is an ordered list. The projects have dependencies between them. -->
       <filelist dir="."
         files="
-          Source/Common/build.xml
-          Source/PcdTools/build.xml
-          Source/GenBuild/build.xml
-          Source/FrameworkTasks/build.xml
-          Source/Cpptasks/build.xml
-          Source/FrameworkWizard/build.xml
-          Source/MigrationTools/build.xml
-          Source/ContextTool/build.xml
-          Source/Merge/build.xml
+          Java/Source/Common/build.xml
+          Java/Source/PcdTools/build.xml
+          Java/Source/GenBuild/build.xml
+          Java/Source/FrameworkTasks/build.xml
+          Java/Source/Cpptasks/build.xml
+          Java/Source/FrameworkWizard/build.xml
+          Java/Source/MigrationTools/build.xml
+          Java/Source/ContextTool/build.xml
+          Java/Source/Merge/build.xml
           "/>
     </subant>
     <echo message="The EDK II Java Tools build has completed!"/>
@@ -51,7 +51,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!-- Note: this is an ordered list. The projects have dependencies between them. -->
       <filelist dir="."
         files="
-          Source/FrameworkWizard/build.xml
+          Java/Source/FrameworkWizard/build.xml
           "/>
     </subant>
   </target>
@@ -60,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="" verbose="true" inheritall="false">
       <filelist dir="."
         files="
-          Source/Merge/build.xml
+          Java/Source/Merge/build.xml
           "/>
     </subant>
   </target>
@@ -69,7 +69,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="" verbose="true" inheritall="false">
       <filelist dir="."
         files="
-          Source/SurfaceArea/build.xml
+          Java/Source/SurfaceArea/build.xml
           "/>
     </subant>
   </target>
@@ -117,17 +117,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="clean" inheritall="false">
       <filelist dir="."
         files="
-          Source/FrameworkWizard/build.xml 
-          Source/Cpptasks/build.xml 
-          Source/FrameworkTasks/build.xml 
-          Source/GenBuild/build.xml 
-          Source/PcdTools/build.xml 
-          Source/Common/build.xml 
-          Source/SurfaceArea/build.xml 
+          Java/Source/FrameworkWizard/build.xml 
+          Java/Source/Cpptasks/build.xml 
+          Java/Source/FrameworkTasks/build.xml 
+          Java/Source/GenBuild/build.xml 
+          Java/Source/PcdTools/build.xml 
+          Java/Source/Common/build.xml 
+          Java/Source/SurfaceArea/build.xml 
           Source/TianoTools/build.xml
-          Source/MigrationTools/build.xml
-          Source/ContextTool/build.xml
-          Source/Merge/build.xml
+          Java/Source/MigrationTools/build.xml
+          Java/Source/ContextTool/build.xml
+          Java/Source/Merge/build.xml
         "/>
     </subant>
   </target>
@@ -151,17 +151,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="cleanall" inheritall="true">
       <filelist dir="."
         files="
-          Source/FrameworkWizard/build.xml 
-          Source/Cpptasks/build.xml 
-          Source/FrameworkTasks/build.xml 
-          Source/GenBuild/build.xml 
-          Source/PcdTools/build.xml 
-          Source/Common/build.xml 
-          Source/SurfaceArea/build.xml 
+          Java/Source/FrameworkWizard/build.xml 
+          Java/Source/Cpptasks/build.xml 
+          Java/Source/FrameworkTasks/build.xml 
+          Java/Source/GenBuild/build.xml 
+          Java/Source/PcdTools/build.xml 
+          Java/Source/Common/build.xml 
+          Java/Source/SurfaceArea/build.xml 
           Source/TianoTools/build.xml
-          Source/MigrationTools/build.xml
-          Source/ContextTool/build.xml
-          Source/Merge/build.xml
+          Java/Source/MigrationTools/build.xml
+          Java/Source/ContextTool/build.xml
+          Java/Source/Merge/build.xml
         "/>
     </subant>
   </target>
