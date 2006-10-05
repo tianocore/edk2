@@ -4,7 +4,7 @@
     <PackageName>Tools</PackageName>
     <GuidValue>53f84ca0-53fe-4412-b4e7-dcec602e1d49</GuidValue>
     <Version>2.0</Version>
-    <Abstract>TianoCore.org EFI Framework Tools</Abstract>
+    <Abstract>TianoCore.org EDK II Tools</Abstract>
     <Description>This package provides the tools needed to create EFI/Framework platform
       binary files (PBF) and EFI/Framework Modules that can be incorporated 
       into a PBF.  Source Code is provided for all C and Java applications. 
@@ -27,17 +27,6 @@
     <RePackage>false</RePackage>
   </PackageDefinitions>
   <MsaFiles>
-    <Filename>ToolResources.msa</Filename>
-    <Filename>JavaResources.msa</Filename>
-    <Filename>Source/Common/Common.msa</Filename>
-    <Filename>Source/PcdTools/PcdTools.msa</Filename>
-    <Filename>Source/Cpptasks/CppTasks.msa</Filename>
-    <Filename>Source/FrameworkTasks/FrameworkTasks.msa</Filename>
-    <Filename>Source/FrameworkWizard/FrameworkWizard.msa</Filename>
-    <Filename>Source/GenBuild/GenBuild.msa</Filename>
-    <Filename>Source/SurfaceArea/SurfaceArea.msa</Filename>
-    <Filename>Source/TianoTools/TianoTools.msa</Filename>
-    <Filename>Source/MigrationTools/MigrationTools.msa</Filename>
-    <Filename>Source/Merge/Merge.msa</Filename>
+    <Filename>AllResourceFiles.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
