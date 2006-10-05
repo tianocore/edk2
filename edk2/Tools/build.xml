@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="" inheritall="false">
       <filelist dir="."
         files="
-          Source/TianoTools/build.xml
+          CTools/Source/build.xml
           "/>
     </subant>
   </target>
@@ -124,7 +124,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Java/Source/PcdTools/build.xml 
           Java/Source/Common/build.xml 
           Java/Source/SurfaceArea/build.xml 
-          Source/TianoTools/build.xml
+          CCode/Source/build.xml
           Java/Source/MigrationTools/build.xml
           Java/Source/ContextTool/build.xml
           Java/Source/Merge/build.xml
@@ -158,7 +158,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Java/Source/PcdTools/build.xml 
           Java/Source/Common/build.xml 
           Java/Source/SurfaceArea/build.xml 
-          Source/TianoTools/build.xml
+          CCode/Source/build.xml
           Java/Source/MigrationTools/build.xml
           Java/Source/ContextTool/build.xml
           Java/Source/Merge/build.xml
