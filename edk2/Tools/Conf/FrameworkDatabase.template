@@ -18,6 +18,7 @@
   <PackageList>
     <Filename>MdePkg/MdePkg.spd</Filename>
     <Filename>Tools/Tools.spd</Filename>
+    <Filename>Tools/Java/JavaTools.spd</Filename>
     <Filename>EdkModulePkg/EdkModulePkg.spd</Filename>
     <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
     <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
