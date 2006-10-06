@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="" inheritall="false">
       <filelist dir="."
         files="
-          CTools/Source/build.xml
+          CCode/Source/build.xml
           "/>
     </subant>
   </target>

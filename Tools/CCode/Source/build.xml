@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="WORKSPACE" value="${env.WORKSPACE}" />
   <property name="WORKSPACE_DIR" value="${WORKSPACE}" />
   <property name="PACKAGE" value="Tools" />
-  <property name="PACKAGE_DIR" value="${WORKSPACE}/Tools/Source/TianoTools" />
+  <property name="PACKAGE_DIR" value="${WORKSPACE}/Tools/CCode/Source" />
   <property name="LIB_DIR" value="${PACKAGE_DIR}/Library" />
   <property name="BIN_DIR" value="${WORKSPACE}/Tools/bin" />
   <property name="BUILD_MODE" value="PACKAGE" />

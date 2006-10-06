@@ -4,7 +4,7 @@
 # LIB="C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/lib;c:/Microsoft Visual Studio .NET 2003/Vc7/PlatformSDK/Lib"
 
 # PCCTS_HOME=<your PCCTS_HOME>
-PCCTS_HOME=$(WORKSPACE)\Tools\Source\TianoTools\Pccts
+PCCTS_HOME=$(WORKSPACE)\Tools\CCode\Source\Pccts
 ANTLR_SRC=$(PCCTS_HOME)\antlr
 PCCTS_H=$(PCCTS_HOME)\h
 
