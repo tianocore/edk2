@@ -117,20 +117,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
           <cc userdefine="on">
             <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}"
-                outputFile="${DEST_DIR_OUTPUT}/SecMainLocal.lib">
+                outputFile="${DEST_DIR_OUTPUT}/SecMainLocal.lib" dpath="${SLINK_DPATH}">
                 
               <argument value="${SLINK_FLAGS}"/>
 
               <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
             </command>
           </cc>
-          
+
           <var name="LIBS" value="${LIBS} ${DEST_DIR_OUTPUT}/SecMainLocal.lib" />
          
           <shellscript shell="cmd.exe" tmpsuffix=".cmd" >
             <arg line="/q"/>
             <arg line="/c"/>
             <arg line="call"/>
+            PATH ${DLINK_DPATH};%path%
             "${DLINK}" /LIBPATH:"${env.MSVCDir}\Lib" /LIBPATH:"${env.MSVCDir}\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib ${LIBS} /base:0x10000000 /out:${BIN_DIR}\SecMain.exe /pdb:${DEST_DIR_DEBUG}\SecMain.pdb
           </shellscript>
         </sequential>
