@@ -36,6 +36,9 @@ HighBitSet32 (
 {
   INTN                              BitIndex;
 
-  for (BitIndex = -1; Operand != 0; BitIndex++, Operand >>= 1);
+  if (Operand == 0) {
+    return - 1;
+  }
+  for (BitIndex = 31; (INT32)Operand > 0; BitIndex--, Operand <<= 1);
   return BitIndex;
 }
