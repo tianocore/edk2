@@ -424,6 +424,8 @@ Returns:
   //
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gST);
 
+  PERF_START (0,DXE_TOK, NULL, 0) ;
+
   //
   // Initialize the Global Coherency Domain Services
   //
