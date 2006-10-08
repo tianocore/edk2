@@ -374,6 +374,13 @@ public class ModuleBuildFileGenerator {
         // Initialize some properties by user
         //
         Element initEle = document.createElement("Build_Init");
+        Element initIncEle = document.createElement("EXTRA.INC");
+        for (int i = 0; i < includes.length; i++) {
+            Element includeEle = document.createElement("includepath");
+            includeEle.setAttribute("path", includes[i]);
+            initIncEle.appendChild(includeEle);
+        }
+        initEle.appendChild(initIncEle);
         root.appendChild(initEle);
 
         String moduleDir = project.getProperty("MODULE_DIR");
