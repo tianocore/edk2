@@ -37,7 +37,7 @@ goto end
   @goto end
 
 :standalone
-  @ant -q -f %WORKSPACE%\Tools\Source\SurfaceArea\build.xml validate -DSURFACE_AREA_FILE=%~f1
+  @ant -q -f %WORKSPACE%\Tools\Java\Source\SurfaceArea\build.xml validate -DSURFACE_AREA_FILE=%~f1
   @goto end
 
 :no_jdk
