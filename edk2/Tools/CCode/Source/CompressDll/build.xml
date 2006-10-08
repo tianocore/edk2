@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>
-  <property name="BUILD_DIR" value="${WORKSPACE}/Tools/Source/TianoTools/${LibName}/tmp"/>
+  <property name="BUILD_DIR" value="${WORKSPACE}/Tools/CCode/Source/${LibName}/tmp"/>
 
   <target name="GenTool" depends="init,Lib" >
     <echo message="The EDK Tool Library: ${LibName} build has completed!"/>
