@@ -17,7 +17,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64 IPF</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>Variable</OutputFileBasename>
   </ModuleDefinitions>
@@ -68,8 +68,6 @@
     <Filename SupArchList="IA32">Ia32Variable.dxs</Filename>
     <Filename SupArchList="X64">InitVariable.c</Filename>
     <Filename SupArchList="X64">x64Variable.dxs</Filename>
-    <Filename SupArchList="EBC">InitVariable.c</Filename>
-    <Filename SupArchList="EBC">x64Variable.dxs</Filename>
     <Filename SupArchList="IPF">Ipf/InitVariable.c</Filename>
     <Filename SupArchList="IPF">IpfVariable.dxs</Filename>
   </SourceFiles>
