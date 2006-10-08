@@ -333,6 +333,24 @@ public class NestElement extends DataType {
         return toFileList(" ");
     }
 
+    /**
+       Get the array of names
+
+       @return String[]     The array contains the names
+     **/
+    public String[] toArray() {
+        return nameList.toArray(new String[nameList.size()]);
+    }
+
+    /**
+       Check if we have any name or not
+
+       @return boolean
+     **/
+    public boolean isEmpty() {
+        return nameList.isEmpty();
+    }
+
     //
     // Remove any duplicated path separator or inconsistent path separator
     //
