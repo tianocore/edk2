@@ -480,6 +480,9 @@ public class GenBuildTask extends Ant {
             String cmdPath = GlobalData.getCommandSetting(key, fpdModuleId);
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_NAME;
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
+            if (cmdName.length() == 0) {
+                continue;
+            }
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
             getProject().setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
 

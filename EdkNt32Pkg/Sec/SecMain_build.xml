@@ -74,6 +74,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </GenBuild>
   </target>
   <target name="sourcefiles">
+      <Build_Init>
+        <EXTRA.INC>
+          <includepath path="${INCLUDE_PATHS}"/>
+        </EXTRA.INC>
+      </Build_Init>
       <Build_AUTOGEN FILEEXT="c" FILENAME="AutoGen" FILEPATH=".">
          <EXTRA.INC>
             <includepath path="${INCLUDE_PATHS}"/>

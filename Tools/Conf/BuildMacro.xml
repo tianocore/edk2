@@ -14,9 +14,59 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     Macro for intialize some properties. This Macro build will be called before source file build.  
     -->
   <macrodef name="Build_Init">
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+    
     <sequential>
       <var name="OBJECTS" value="" />
       <var name="SDB_FILES" value="" />
+
+      <if>
+        <isset property="PCH"/>
+        <then>
+          <if>
+            <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
+            <then>
+              <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep">
+                <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
+                <EXTRA.INC/>
+              </makedeps>
+            </then>
+          </if>
+    
+          <OnDependency>
+            <sourcefiles>
+              <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
+            </sourcefiles>
+            <targetfiles>
+              <file Name="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
+            </targetfiles>
+    
+            <sequential>
+              <!-- Generate pre-compiled header -->
+              <cc userdefine="on">
+                <command type="CC" cmd="${PCH}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
+                  outputFile="${DEST_DIR_OUTPUT}/AutoGen.h.obj">
+                  <EXTRA.INC/>
+                  <argument value="${PCH_FLAGS}"/>
+                  <EXTRA.ARG/>
+                  <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/AutoGen.h"/>
+                </command>
+              </cc>
+
+              <if>
+                <equals arg1="${CC_FAMILY}" arg2="GCC"/>
+                <then>
+                  <move file="${DEST_DIR_OUTPUT}/AutoGen.h.obj" tofile="${DEST_DIR_OUTPUT}/AutoGen.h.gch" overwrite="true"/>
+                </then>
+                <else>
+                  <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/AutoGen.h.obj"/>
+                </else>
+              </if>
+            </sequential>
+          </OnDependency>
+        </then>
+      </if>
     </sequential>
   </macrodef>
 
@@ -60,25 +110,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <!-- Use pre-compiled header if available -->
-          <if>
-            <and>
-              <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </and>
-            <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </then>
-            <else>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
-            </else>
-          </if>
-
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
               outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${CC_DPATH}">
               <EXTRA.INC/>
-              <argument value="${LOCAL_CC_FLAGS}"/>
+              <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
@@ -113,44 +149,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-        <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep">
-            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-            <EXTRA.INC/>
-          </makedeps>
-        </then>
-      </if>
-
-      <OnDependency>
-        <sourcefiles>
-          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
-        </sourcefiles>
-        <targetfiles>
-          <file Name="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-        </targetfiles>
-
-        <sequential>
-          <!-- Generate pre-compiled header -->
-          <if>
-            <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-            <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /TC /Yc /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-              <cc userdefine="on">
-                <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
-                    outputFile="${DEST_DIR_OUTPUT}/AutoGen.h.obj" dpath="${CC_DPATH}">
-                  <EXTRA.INC/>
-                  <argument value="${LOCAL_CC_FLAGS}"/>
-                  <EXTRA.ARG/>
-                  <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-                </command>
-              </cc>
-            </then>
-          </if>
-        </sequential>
-      </OnDependency>
-
-      <if>
         <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         <then>
           <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
@@ -170,22 +168,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <!-- Generate pre-compiled header -->
-          <if>
-            <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-            <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </then>
-            <else>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
-            </else>
-          </if>
-
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" dpath="${CC_DPATH}">
               <EXTRA.INC/>
-              <argument value="${LOCAL_CC_FLAGS}"/>
+              <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
               <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
@@ -645,25 +632,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
         
         <sequential>
-          <!-- Use pre-compiled header if available -->
-          <if>
-            <and>
-              <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </and>
-            <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yc${DEST_DIR_DEBUG}/AutoGen.h /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </then>
-            <else>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
-            </else>
-          </if>
-
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
                      includepathDelimiter="-I" dpath="${CC_DPATH}"
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj">
-              <argument value="${LOCAL_CC_FLAGS}"/>
+              <argument value="${CC_FLAGS}"/>
               <EXTRA.INC />
               <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
             </command>
@@ -722,25 +695,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <EXTRA.INC/>
           </vfrcompile>
     
-          <!-- Use pre-compiled header if available -->
-          <if>
-            <and>
-              <equals arg1="${CC_FAMILY}" arg2="MSFT" casesensitive="false"/>
-              <available file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </and>
-            <then>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS} /Yu${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            </then>
-            <else>
-              <var name="LOCAL_CC_FLAGS" value="${CC_FLAGS}"/>
-            </else>
-          </if>
-
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" 
                      includepathDelimiter="-I" family="${CC_FAMILY}" dpath="${CC_DPATH}"
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" >
-              <argument value="${LOCAL_CC_FLAGS}"/>
+              <argument value="${CC_FLAGS}"/>
               <EXTRA.INC/>
               <EXTRA.ARG/>
               <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.c"/>
