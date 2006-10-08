@@ -57,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <arg value="-dl"/>
       <arg value="-srconly"/>
       <arg value="-src"/>
-      <arg value="${WORKSPACE}/Tools/Source/SurfaceArea"/>
+      <arg value="${WORKSPACE}/Tools/Java/Source/SurfaceArea"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsd"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/FarManifest.xsd"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsdconfig"/>
@@ -72,7 +72,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <arg value="1.5"/>
       <arg value="-dl"/>
       <arg value="-src"/>
-      <arg value="${WORKSPACE}/Tools/Source/SurfaceArea"/>
+      <arg value="${WORKSPACE}/Tools/Java/Source/SurfaceArea"/>
       <arg value="-out"/>
       <arg value="${WORKSPACE}/Tools/Jars/SurfaceArea.jar"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsd"/>
@@ -83,7 +83,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   
   <target name="SurfaceArea.java.clean">
     <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${WORKSPACE}/Tools/Source/SurfaceArea/org" includes="**/*"/>
+      <fileset dir="${WORKSPACE}/Tools/Java/Source/SurfaceArea/org" includes="**/*"/>
     </delete>
   </target>
 
