@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <FrameworkDatabase xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <FdbHeader>
     <DatabaseName>FrameworkDatabase</DatabaseName>
@@ -18,7 +18,7 @@
   <PackageList>
     <Filename>MdePkg/MdePkg.spd</Filename>
     <Filename>Tools/Tools.spd</Filename>
-    <Filename>Tools/Java/JavaTools.spd</Filename>
+    <!--<Filename>Tools/Java/JavaTools.spd</Filename>-->
     <Filename>EdkModulePkg/EdkModulePkg.spd</Filename>
     <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
     <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
