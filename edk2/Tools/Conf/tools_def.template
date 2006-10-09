@@ -259,6 +259,11 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXGCC_IA32_ASM_NAME     = gcc
 *_UNIXGCC_IA32_PP_NAME      = gcc
 
+*_UNIXGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_UNIXGCC_IA32_ASM_FLAGS    = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+
 *_UNIXGCC_IA32_ASM_EXT      = .S
 *_UNIXGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 
