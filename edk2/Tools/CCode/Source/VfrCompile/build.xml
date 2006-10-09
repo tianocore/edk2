@@ -17,8 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="ToolName" value="VfrCompile"/>
   <property name="FileSet" value="*.cpp"/>
   <property name="FileSetPccts" value="ATokenBuffer.cpp DLexerBase.cpp AParser.cpp"/>
-  <taskdef resource="cpptasks.tasks"/>
-  <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>

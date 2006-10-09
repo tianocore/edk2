@@ -35,21 +35,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
   </path>
 
-  <taskdef classpathref="classpath" resource="GenBuild.tasks" />
   <taskdef classpathref="classpath" resource="net/sf/antcontrib/antlib.xml" />
 
-  <taskdef classpathref="classpath" resource="cpptasks.tasks"/>
-  <typedef classpathref="classpath" resource="cpptasks.types"/>
 
-  <target name="all" depends="init, Tools">
+  <target name="all" depends="initArch, init, Tools">
     <echo message="The EDK II C Tools build complete!"/>
   </target>
   
   <target name="init">
     <echo message="EDK C Code Tools, build initialization"/>
+    <taskdef classpathref="classpath" resource="GenBuild.tasks" />
+    <taskdef classpathref="classpath" resource="cpptasks.tasks"/>
+    <typedef classpathref="classpath" resource="cpptasks.types"/>
     <mkdir dir="${BIN_DIR}" />
     <mkdir dir="${LIB_DIR}" />
 
+  </target>
+
+  <target name="initArch">
     <condition property="HostArch" value="X64">
       <os arch="amd64"/>
     </condition>
@@ -240,7 +243,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </if>
   </target>
 
-  <target name="Libraries" depends="init">
+  <target name="Libraries" depends="initArch, init">
     <subant target="" inheritall="true">
       <fileset dir="${PACKAGE_DIR}" 
         includes="${Libs}"/>
@@ -254,13 +257,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </subant>
   </target>
 
-  <target name="clean" depends="init">
+  <target name="clean" depends="initArch">
     <subant target="clean" inheritall="true">
       <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"/>
     </subant>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall" depends="initArch">
     <subant target="cleanall" inheritall="true">
       <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"/>
     </subant>
