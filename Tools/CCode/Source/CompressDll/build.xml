@@ -20,8 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="FileSet" value="CompressDll.c CompressDll.h"/>
   <property name="LibFileSet" value="CompressDll.c DepexParser.h"/>
 
-  <taskdef resource="cpptasks.tasks"/>
-  <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>
@@ -71,7 +69,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall">
-    <echo message="Removing Object Files and the Executable: ${LibName}${ext_shared}"/>
+    <echo message="Removing Object Files and the Executable: ${LibName}${ext_dynamic}"/>
     <delete failonerror="false" quiet="true" includeEmptyDirs="true">
       <fileset dir="${BUILD_DIR}"/>
       <fileset file="${BIN_DIR}/${LibName}.*"/>

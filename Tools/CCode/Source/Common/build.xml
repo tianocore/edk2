@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Copyright (c) 2006, Intel Corporation
 -->
 
-  <taskdef resource="cpptasks.tasks"/>
-  <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="tmp" value="tmp"/>
