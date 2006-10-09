@@ -28,6 +28,7 @@ InternalMathDivRemU64x64 (
     mov     eax, dword ptr [Dividend + 0]   // edx:eax <- dividend
     mov     edi, edx
     mov     esi, eax                    // edi:esi <- dividend
+    mov     ecx, dword ptr [Divisor + 4]
     mov     ebx, dword ptr [Divisor + 0]   // ecx:ebx <- divisor
 BitLoop:
     shr     edx, 1
