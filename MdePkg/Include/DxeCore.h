@@ -45,6 +45,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Common/UefiBaseTypes.h>
 #include <Dxe/DxeCis.h>
 
-#include <Protocol/Pcd.h>
-
 #endif
