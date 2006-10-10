@@ -358,6 +358,9 @@ public class FpdFileContents {
                 if (!cursor.isText()) {
                     break;
                 }
+                if (cursor.getObject() == null) {
+                    break;
+                }
                 String s = cursor.getTextValue();
                 if (s.matches(regExpNewLineAndSpaces)) {
                     continue;
