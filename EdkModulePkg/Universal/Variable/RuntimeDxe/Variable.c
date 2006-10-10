@@ -1389,6 +1389,23 @@ Returns:
     mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) CurrPtr;
 
     //
+    // Check if the free area is blow a threshold
+    //
+    if ((((VARIABLE_STORE_HEADER *)((UINTN) CurrPtr))->Size - mVariableModuleGlobal->NonVolatileLastVariableOffset) < VARIABLE_RECLAIM_THRESHOLD) {
+      Status = Reclaim (
+                mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase,
+                &mVariableModuleGlobal->NonVolatileLastVariableOffset,
+                FALSE
+                );
+    }
+
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (mVariableModuleGlobal);
+      gBS->FreePool (VolatileVariableStore);
+      return Status;
+    }
+
+    //
     // Check if the free area is really free.
     //
     for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreHeader->Size; Index++) {

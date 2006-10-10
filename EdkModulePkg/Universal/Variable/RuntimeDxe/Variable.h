@@ -35,6 +35,7 @@ Abstract:
 #define ALIGNMENT  1
 #endif
 
+#define VARIABLE_RECLAIM_THRESHOLD (1024)
 
 #define VARIABLE_STORE_SIZE (64 * 1024)
 #define SCRATCH_SIZE        (4 * 1024)
