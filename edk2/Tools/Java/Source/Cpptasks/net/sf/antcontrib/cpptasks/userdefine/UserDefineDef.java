@@ -227,6 +227,13 @@ public class UserDefineDef extends ProcessorDef {
         if (isReference()) {
             throw tooManyAttributes();
         }
+        if (cmd == null || cmd.trim().length() == 0) {
+            throw new BuildException("cmd attribute is empty!");
+        }
+        File cmdProgram = new File(cmd);
+        if (cmdProgram.isDirectory()) {
+            throw new BuildException(cmd + " is not valid or executable!");
+        }
         this.cmd = cmd;
     }
 
