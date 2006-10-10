@@ -727,7 +727,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0) {
                         return;
                     }
-                    
+                    int nextSelection = selectedRow;
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.getModelRowIndex(selectedRow);
@@ -761,7 +761,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         ffc.removeModuleSA(selectedRow);    
                     }
                     catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, exp.getCause() + exp.getMessage());
+                        JOptionPane.showMessageDialog(frame, exp.getMessage());
                         return;
                     }
                     
@@ -780,6 +780,10 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
                     
                     modelFpdModules.removeRow(selectedRow);
+                    if (nextSelection >= jTableFpdModules.getRowCount()) {
+                        nextSelection = jTableFpdModules.getRowCount() - 1;
+                    }
+                    jTableFpdModules.changeSelection(nextSelection, 0, false, false);
                     docConsole.setSaved(false);
                 }
             });
