@@ -782,6 +782,8 @@
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="be490364-73d2-420d-950e-f6450ca75dfb" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -5943,6 +5945,8 @@
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="be490364-73d2-420d-950e-f6450ca75dfb" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -9963,6 +9967,8 @@
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="be490364-73d2-420d-950e-f6450ca75dfb" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -13987,6 +13993,8 @@
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="be490364-73d2-420d-950e-f6450ca75dfb" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
