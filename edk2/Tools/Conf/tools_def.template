@@ -309,45 +309,45 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 # Intel EFI Byte Code Compiler (Template)
 #
 ####################################################################################
-
-*_*_EBC_*_FAMILY     = INTEL
-*_*_EBC_PP_NAME      = iec.exe
-*_*_EBC_CC_NAME      = iec.exe
-*_*_EBC_SLINK_NAME   = link.exe
-*_*_EBC_*_PATH       = C:\Program Files\Intel\EBC\Bin
-*_*_EBC_*_SPATH      = C:\Program Files\Intel\EBC\Lib\EbcLib.lib
-
-*_*_EBC_SLINK_FLAGS   = /lib /NOLOGO /MACHINE:EBC
-*_*_EBC_PP_FLAGS      = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
-*_*_EBC_CC_FLAGS      = /nologo /FAcs /c /W3 /WX /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h
-*_*_EBC_DLINK_FLAGS   = /NOLOGO /MACHINE:EBC /OPT:REF /NODEFAULTLIB /ENTRY:${ENTRYPOINT} /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER
-
+# 
+# *_*_EBC_*_FAMILY     = INTEL
+# *_*_EBC_PP_NAME      = iec.exe
+# *_*_EBC_CC_NAME      = iec.exe
+# *_*_EBC_SLINK_NAME   = link.exe
+# *_*_EBC_*_PATH       = C:\Program Files\Intel\EBC\Bin
+# *_*_EBC_*_SPATH      = C:\Program Files\Intel\EBC\Lib\EbcLib.lib
+# 
+# *_*_EBC_SLINK_FLAGS   = /lib /NOLOGO /MACHINE:EBC
+# *_*_EBC_PP_FLAGS      = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
+# *_*_EBC_CC_FLAGS      = /nologo /FAcs /c /W3 /WX /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h
+# *_*_EBC_DLINK_FLAGS   = /NOLOGO /MACHINE:EBC /OPT:REF /NODEFAULTLIB /ENTRY:${ENTRYPOINT} /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER
+# 
 ####################################################################################
 #
 # Intel ACPI Source Language Compiler (Template)
 #
 ####################################################################################
-
-*_*_*_ASL_FAMILY  = INTEL
-*_*_*_ASL_NAME    = iasl.exe
-*_*_IA32_ASL_PATH = C:\ASL
-*_*_X64_ASL_PATH  = C:\ASL
-*_*_IPF_ASL_PATH  = C:\ASL
-*_*_EBC_ASL_PATH  = C:\ASL
-
+# 
+# *_*_*_ASL_FAMILY  = INTEL
+# *_*_*_ASL_NAME    = iasl.exe
+# *_*_IA32_ASL_PATH = C:\ASL
+# *_*_X64_ASL_PATH  = C:\ASL
+# *_*_IPF_ASL_PATH  = C:\ASL
+# *_*_EBC_ASL_PATH  = C:\ASL
+# 
 ####################################################################################
 #
 # Microsoft ACPI Source Language Compiler (Template)
 #
 ####################################################################################
-
-*_*_*_ASL_FAMILY  = MSFT
-*_*_*_ASL_NAME    = asl.exe
-*_*_IA32_ASL_PATH = C:\ASL
-*_*_X64_ASL_PATH  = C:\ASL
-*_*_IPF_ASL_PATH  = C:\ASL
-*_*_EBC_ASL_PATH  = C:\ASL
-
+# 
+# *_*_*_ASL_FAMILY  = MSFT
+# *_*_*_ASL_NAME    = asl.exe
+# *_*_IA32_ASL_PATH = C:\ASL
+# *_*_X64_ASL_PATH  = C:\ASL
+# *_*_IPF_ASL_PATH  = C:\ASL
+# *_*_EBC_ASL_PATH  = C:\ASL
+# 
 
 ####################################################################################
 #

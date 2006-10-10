@@ -22,7 +22,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="SDB_FILES" value="" />
 
       <if>
-        <isset property="PCH"/>
+        <and>
+          <isset property="PCH"/>
+          <not>
+            <equals arg1="${PCH}" arg2=""/>
+          </not>
+        </and>
         <then>
           <if>
             <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
