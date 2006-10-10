@@ -75,8 +75,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="makeCatalog">
-    <echo file="XMLSchema/catalog.xml">
-      <![CDATA[<?xml version="1.0"?>
+    <if>
+      <not>
+        <available file="XMLSchema/catalog.xml"/>
+      </not>
+      <then>
+        <echo file="XMLSchema/catalog.xml"><![CDATA[<?xml version="1.0"?>
 <!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.xsd">
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
   <rewriteSystem systemIdStartString="http://www.TianoCore.org/2006/Edk2.0/"
@@ -84,7 +88,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <rewriteURI uriStartString="http://www.TianoCore.org/2006/Edk2.0/"
     rewritePrefix="file:/]]>${env.WORKSPACE}<![CDATA[/Tools/XMLSchema/"/>
 </catalog>]]>
-    </echo>
+</echo>
+      </then>
+    </if>
     <if>
       <not>
         <available file="Conf/tools_def.txt"/>
