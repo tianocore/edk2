@@ -423,7 +423,7 @@ Returns:
   // Call constructor for all libraries
   //
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gST);
-
+  PERF_END   (0,PEI_TOK, NULL, 0) ;
   PERF_START (0,DXE_TOK, NULL, 0) ;
 
   //
