@@ -10,7 +10,7 @@
 @REM
 
 @REM set following environment in this file or in command shell
-@REM set JAVA_HOME=C:\Java\jdk1.5.0_04
+@REM set JAVA_HOME=C:\Java\jdk1.5.0_06
 @REM set ANT_HOME=C:\ANT
 @REM set XMLBEANS_HOME=C:\xmlbeans
 @REM set CYGWIN_HOME=C:\cygwin
