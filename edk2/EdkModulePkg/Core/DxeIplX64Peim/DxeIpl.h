@@ -104,7 +104,8 @@ EFI_STATUS
 PeiProcessFile (
   IN      UINT16                 SectionType,
   IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
-  OUT     VOID                   **Pe32Data
+  OUT     VOID                   **Pe32Data,
+  IN      EFI_PEI_HOB_POINTERS   *OrigHob
   );
 
 EFI_STATUS

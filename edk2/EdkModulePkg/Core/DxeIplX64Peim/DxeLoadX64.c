@@ -435,7 +435,8 @@ Returns:
       Status = PeiProcessFile (
                  SectionType,
                  &FfsFileHeader,
-                 Pe32Data
+                 Pe32Data,
+                 &Hob
                  );
       CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
       return Status;
@@ -650,7 +651,8 @@ Returns:
   Status = PeiProcessFile (
             EFI_SECTION_PE32,
             &FfsHeader,
-            &Pe32Data
+            &Pe32Data,
+            NULL
             );
 
   if (EFI_ERROR (Status)) {
@@ -675,7 +677,8 @@ EFI_STATUS
 PeiProcessFile (
   IN      UINT16                 SectionType,
   IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
-  OUT     VOID                   **Pe32Data
+  OUT     VOID                   **Pe32Data,
+  IN      EFI_PEI_HOB_POINTERS   *OrigHob
   )
 /*++
 
@@ -930,11 +933,17 @@ Returns:
               return EFI_NOT_FOUND;
             }
 
+            if (OrigHob != NULL) {
+              //
+              // 
+              OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
+            }
+            
             //
             // Reture the FfsHeader that contain Pe32Data.
             //
             *RealFfsFileHeader = FfsFileHeader;
-            return PeiProcessFile (SectionType, RealFfsFileHeader, Pe32Data);
+            return PeiProcessFile (SectionType, RealFfsFileHeader, Pe32Data, OrigHob);
           }
         }
         //
