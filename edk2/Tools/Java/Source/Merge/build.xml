@@ -28,10 +28,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </javac>
   </target>
   <target name="clean">
-    <delete dir="${buildDir}"/>
+    <delete includeemptydirs="true" failonerror="false" quiet="true">
+      <fileset dir="${WORKSPACE}/Tools/Java/Source/Merge" includes="${buildDir}"/>
+    </delete>
   </target>
-  <target name="cleanall">
-    <delete dir="${buildDir}"/>
+  <target name="cleanall" depends="clean">
     <delete file="${installLocation}/Merge.jar"/>
   </target>
   <target name="install" depends="source">
