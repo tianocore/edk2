@@ -44,7 +44,10 @@ import org.tianocore.common.logger.LogMethod;
 public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     Project project = null;
-
+	///
+    /// Time of the start of the build 
+	/// 
+    private long startTime = System.currentTimeMillis();
     ///
     /// flag to present whether cache all msg or not
     /// true means to cache.
@@ -76,7 +79,6 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
         if (this.project == null) {
             return;
         }
-
         //
         // If msgLevel is always print, then print it
         //
@@ -96,7 +98,7 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
         case EdkLog.EDK_INFO:
             log(msgSource, msg, Project.MSG_INFO);
             break;
-        case EdkLog.EDK_VERBOSE:
+		case EdkLog.EDK_VERBOSE:
             log(msgSource, msg, Project.MSG_VERBOSE);
             break;
         case EdkLog.EDK_DEBUG:
@@ -179,10 +181,7 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     }
     
     public void messageLogged(BuildEvent event) {
-        if (!enableFlag) {
-            return ;
-        }
-        int currentLevel = event.getPriority();
+		int currentLevel = event.getPriority();
         //
         // If current level is upper than Ant Level, skip it
         //
@@ -270,5 +269,41 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
 
     public void setId(FpdModuleIdentification id) {
         this.id = id;
+    }
+
+    public void buildFinished(BuildEvent event) {
+        Throwable error = event.getException();
+        StringBuffer message = new StringBuffer();
+
+        if (error == null) {
+            message.append(StringUtils.LINE_SEP);
+            message.append("BUILD SUCCESSFUL");
+        } else {
+            message.append(StringUtils.LINE_SEP);
+            message.append("BUILD FAILED");
+            message.append(StringUtils.LINE_SEP);
+
+            if (Project.MSG_DEBUG <= msgOutputLevel
+                || !(error instanceof BuildException)) {
+                message.append(StringUtils.getStackTrace(error));
+            } else {
+                if (error instanceof BuildException) {
+                    message.append(error.toString()).append(lSep);
+                } else {
+                    message.append(error.getMessage()).append(lSep);
+                }
+            }
+        }
+        message.append(StringUtils.LINE_SEP);
+        message.append("Total time: ");
+        message.append(formatTime(System.currentTimeMillis() - startTime));
+
+        String msg = message.toString();
+        if (error == null) {
+            printMessage(msg, out, Project.MSG_VERBOSE);
+        } else {
+            printMessage(msg, err, Project.MSG_ERR);
+        }
+        log(msg);
     }
 }
