@@ -49,10 +49,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Common/UefiBaseTypes.h>
 #include <Uefi/UefiSpec.h>
 
-
-//
-// All module types types have access to PCD for build support
-//
-#include <Protocol/Pcd.h>
-
 #endif

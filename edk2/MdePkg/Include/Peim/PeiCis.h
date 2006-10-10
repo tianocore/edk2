@@ -608,6 +608,4 @@ typedef struct {
 #include <Ppi/StatusCode.h>
 
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Protocol/Pcd.h>
-
 #endif
