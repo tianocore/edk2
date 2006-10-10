@@ -290,7 +290,7 @@ public class GenBuildTask extends Ant {
                     // don't do anything if no tools found
                     //
                     if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
-                        EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: No build issued.  No tools were found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
+                        EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: No build issued.  No tools found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
                         continue;
                     }
 
@@ -476,6 +476,8 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_NAME;
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
             if (cmdName.length() == 0) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "Warning: " + cmd[m] + " hasn't been defined!");
+                getProject().setProperty(cmd[m], "");
                 continue;
             }
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
