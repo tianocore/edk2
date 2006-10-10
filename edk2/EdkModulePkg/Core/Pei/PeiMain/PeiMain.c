@@ -107,11 +107,11 @@ Returns:
 
   mTick = 0;
 
-#ifdef EFI_PEI_PERFORMANCE
-  if (OldCoreData == NULL) {
-    mTick = GetPerformanceCounter ();
+  if (PerformanceMeasurementEnabled()) {
+    if (OldCoreData == NULL) {
+      mTick = GetPerformanceCounter ();
+    }
   }
-#endif
 
   //
   // For IPF in CAR mode the real memory access is uncached,in InstallPeiMemory()
@@ -178,6 +178,7 @@ Returns:
     //
     // Alert any listeners that there is permanent memory available
     //
+    PERF_START (NULL,"PEI", NULL, mTick);
     PERF_START (NULL,"DisMem", NULL, 0);
     Status = PeiServicesInstallPpi (&mMemoryDiscoveredPpi);
     PERF_END (NULL,"DisMem", NULL, 0);
