@@ -116,6 +116,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <fileset file="${BIN_DIR}/${ToolName}_X64${ext_exe}"/>
       <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
       <fileset file="${BIN_DIR}/${ToolName}_Ipf${ext_exe}"/>
+      <fileset file="${BIN_DIR}/${ToolName}_Ia32.pdb"/>
+      <fileset file="${BIN_DIR}/${ToolName}_X64.pdb"/>
+      <fileset file="${BIN_DIR}/${ToolName}.pdb"/>
+      <fileset file="${BIN_DIR}/${ToolName}_Ipf.pdb"/>
     </delete>
   </target>
 
