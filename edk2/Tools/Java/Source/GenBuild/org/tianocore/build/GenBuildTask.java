@@ -134,30 +134,25 @@ public class GenBuildTask extends Ant {
         try {
             processGenBuild();
         } catch (PcdAutogenException e) {
-            //
-            // Add more logic process here
-            //
-            throw new BuildException(e.getMessage());
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         } catch (AutoGenException e) {
-            //
-            // Add more logic process here
-            //
-            throw new BuildException(e.getMessage());
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         } catch (PlatformPcdPreprocessBuildException e) {
-            //
-            // Add more logic process here
-            //
-            throw new BuildException(e.getMessage());
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         } catch (GenBuildException e) {
-            //
-            // Add more logic process here
-            //
-            throw new BuildException(e.getMessage());
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         } catch (EdkException e) {
-            //
-            // Add more logic process here
-            //
-            throw new BuildException(e.getMessage());
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         }
     }
 

@@ -115,6 +115,11 @@ public class FrameworkBuildTask extends Task{
         
         try {
             processFrameworkBuild();
+        }catch (BuildException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
         } catch (PcdAutogenException e) {
             //
             // Add more logic process here
