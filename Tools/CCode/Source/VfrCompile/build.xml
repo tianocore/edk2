@@ -115,6 +115,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <fileset file="${basedir}/${ToolName}/tokens.h"/>
       <fileset file="${basedir}/${ToolName}/VfrCompile.cpp"/>
       <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
+      <fileset file="${BIN_DIR}/${ToolName}.pdb"/>
     </delete>
   </target>
 
