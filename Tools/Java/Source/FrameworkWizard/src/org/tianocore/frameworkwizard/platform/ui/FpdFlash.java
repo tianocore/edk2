@@ -169,6 +169,12 @@ public class FpdFlash extends IInternalFrame {
     private JPanel jPanelBgFvName = null;
     private JPanel jPanelBgFvImage = null;
     private JPanel jPanelW = null;
+    private JPanel jPanelFvImageParaN = null;
+    private JPanel jPanelFvImageParaS = null;
+    private JPanel jPanelFvImageParaC = null;
+    private JPanel jPanelFvImageOptsN = null;
+    private JPanel jPanelFvImageOptsS = null;
+    private JPanel jPanelFvImageOptsC = null;
     
     public FpdFlash() {
         super();
@@ -554,6 +560,8 @@ public class FpdFlash extends IInternalFrame {
      */
     private JPanel getJPanelFvImageC() {
         if (jPanelFvImageC == null) {
+            GridLayout gridLayout = new GridLayout();
+            gridLayout.setRows(2);
             jLabelFvParaName = new JLabel();
             jLabelFvParaName.setPreferredSize(new Dimension(38, 20));
             jLabelFvParaName.setText("Name");
@@ -563,14 +571,11 @@ public class FpdFlash extends IInternalFrame {
             jLabelFvParaType = new JLabel();
             jLabelFvParaType.setText("Type");
             jLabelFvParaType.setPreferredSize(new java.awt.Dimension(70,20));
-            FlowLayout flowLayout3 = new FlowLayout();
-            flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
-            flowLayout3.setHgap(5);
             jPanelFvImageC = new JPanel();
-            jPanelFvImageC.setLayout(flowLayout3);
+            jPanelFvImageC.setLayout(gridLayout);
             jPanelFvImageC.add(getJPanelFvImagePara(), null);
-            
             jPanelFvImageC.add(getJPanelFvImageOpts(), null);
+            
             
         }
         return jPanelFvImageC;
@@ -791,8 +796,6 @@ public class FpdFlash extends IInternalFrame {
 
  if (jPanelFvImageOpts == null) {
      //ToDo add ButtonGroup for RadioButtons
-            FlowLayout flowLayout5 = new FlowLayout();
-            flowLayout5.setAlignment(java.awt.FlowLayout.LEFT);
             jLabelOptions = new JLabel();
             jLabelOptions.setText("Attribute");
             jLabelFvImageOptValue = new JLabel();
@@ -804,23 +807,16 @@ public class FpdFlash extends IInternalFrame {
             jLabelFvImageOptName.setText("Name");
             jLabelFvImageOptName.setPreferredSize(new Dimension(38, 20));
             jPanelFvImageOpts = new JPanel();
-            jPanelFvImageOpts.setLayout(flowLayout5);
+            jPanelFvImageOpts.setLayout(new BorderLayout());
             jPanelFvImageOpts.setPreferredSize(new java.awt.Dimension(450,130));
             
             
 			jPanelFvImageOpts.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-			jPanelFvImageOpts.add(jLabelOptions, null);
-			jPanelFvImageOpts.add(jLabelFvImageOptName, null);
-			jPanelFvImageOpts.add(getJTextFieldFvImageOptName(), null);
-			jPanelFvImageOpts.add(jLabelFvImageOptValue, null);
-			jPanelFvImageOpts.add(getJTextFieldFvImageOptValue(), null);
-			jPanelFvImageOpts.add(getJScrollPane(), null);
-			jPanelFvImageOpts.add(getJPanelFvImageOptsButtonGroup(), null);
-            
-            
-            			
 
-            
+			jPanelFvImageOpts.add(getJPanelFvImageOptsN(), java.awt.BorderLayout.NORTH);
+			jPanelFvImageOpts.add(getJPanelFvImageOptsS(), java.awt.BorderLayout.SOUTH);
+			jPanelFvImageOpts.add(getJPanelFvImageOptsC(), java.awt.BorderLayout.CENTER);
+
         }
         return jPanelFvImageOpts;
     }
@@ -990,22 +986,20 @@ public class FpdFlash extends IInternalFrame {
      */
     private JPanel getJPanelFvImagePara() {
         if (jPanelFvImagePara == null) {
-            FlowLayout flowLayout6 = new FlowLayout();
-            flowLayout6.setAlignment(java.awt.FlowLayout.LEFT);
             StarLabel starLabel = new StarLabel();
             starLabel.setVisible(false);
             jPanelFvImagePara = new JPanel();
-            jPanelFvImagePara.setLayout(flowLayout6);
+            jPanelFvImagePara.setLayout(new BorderLayout());
             jPanelFvImagePara.setPreferredSize(new java.awt.Dimension(450,140));
             jPanelFvImagePara.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-            jPanelFvImagePara.add(new StarLabel(), null);
-            jPanelFvImagePara.add(jLabelFvImageNames, null);
-            jPanelFvImagePara.add(jLabelFvParaName, null);
-            jPanelFvImagePara.add(getJTextFieldFvParaName(), null);
-            jPanelFvImagePara.add(getJScrollPaneFvImageNames(), null);
-            jPanelFvImagePara.add(getJPanelBgFvName(), null);
-            jPanelFvImagePara.add(jLabelFvParaType, null);
-            jPanelFvImagePara.add(getJComboBoxFvParaType(), null);
+
+            jPanelFvImagePara.add(getJPanelFvImageParaN(), java.awt.BorderLayout.NORTH);
+            jPanelFvImagePara.add(getJPanelFvImageParaS(), java.awt.BorderLayout.SOUTH);
+            jPanelFvImagePara.add(getJPanelFvImageParaC(), java.awt.BorderLayout.CENTER);
+
+//            
+//            
+//            
         }
         return jPanelFvImagePara;
     }
@@ -2070,6 +2064,99 @@ public class FpdFlash extends IInternalFrame {
             jPanelW.add(getJPanelBgFvImage(), null);
         }
         return jPanelW;
+    }
+
+    /**
+     * This method initializes jPanelFvImageParaN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageParaN() {
+        if (jPanelFvImageParaN == null) {
+            FlowLayout flowLayout3 = new FlowLayout();
+            flowLayout3.setAlignment(java.awt.FlowLayout.CENTER);
+            jPanelFvImageParaN = new JPanel();
+            jPanelFvImageParaN.setLayout(flowLayout3);
+            jPanelFvImageParaN.add(new StarLabel(), null);
+            jPanelFvImageParaN.add(jLabelFvImageNames, null);
+            jPanelFvImageParaN.add(jLabelFvParaName, null);
+            jPanelFvImageParaN.add(getJTextFieldFvParaName(), null);
+        }
+        return jPanelFvImageParaN;
+    }
+
+    /**
+     * This method initializes jPanelFvImageParaS	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageParaS() {
+        if (jPanelFvImageParaS == null) {
+            FlowLayout flowLayout6 = new FlowLayout();
+            flowLayout6.setAlignment(java.awt.FlowLayout.CENTER);
+            jPanelFvImageParaS = new JPanel();
+            jPanelFvImageParaS.setLayout(flowLayout6);
+            jPanelFvImageParaS.add(jLabelFvParaType, null);
+            jPanelFvImageParaS.add(getJComboBoxFvParaType(), null);
+        }
+        return jPanelFvImageParaS;
+    }
+
+    /**
+     * This method initializes jPanelFvImageParaC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageParaC() {
+        if (jPanelFvImageParaC == null) {
+            jPanelFvImageParaC = new JPanel();
+            jPanelFvImageParaC.add(getJScrollPaneFvImageNames(), null);
+            jPanelFvImageParaC.add(getJPanelBgFvName(), null);
+        }
+        return jPanelFvImageParaC;
+    }
+
+    /**
+     * This method initializes jPanelFvImageOptsN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageOptsN() {
+        if (jPanelFvImageOptsN == null) {
+            jPanelFvImageOptsN = new JPanel();
+            jPanelFvImageOptsN.add(jLabelOptions, null);
+            jPanelFvImageOptsN.add(jLabelFvImageOptName, null);
+            jPanelFvImageOptsN.add(getJTextFieldFvImageOptName(), null);
+            jPanelFvImageOptsN.add(jLabelFvImageOptValue, null);
+            jPanelFvImageOptsN.add(getJTextFieldFvImageOptValue(), null);
+        }
+        return jPanelFvImageOptsN;
+    }
+
+    /**
+     * This method initializes jPanelFvImageOptsS	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageOptsS() {
+        if (jPanelFvImageOptsS == null) {
+            jPanelFvImageOptsS = new JPanel();
+        }
+        return jPanelFvImageOptsS;
+    }
+
+    /**
+     * This method initializes jPanelFvImageOptsC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFvImageOptsC() {
+        if (jPanelFvImageOptsC == null) {
+            jPanelFvImageOptsC = new JPanel();
+            jPanelFvImageOptsC.add(getJScrollPane(), null);
+            jPanelFvImageOptsC.add(getJPanelFvImageOptsButtonGroup(), null);
+        }
+        return jPanelFvImageOptsC;
     }
 
     /**

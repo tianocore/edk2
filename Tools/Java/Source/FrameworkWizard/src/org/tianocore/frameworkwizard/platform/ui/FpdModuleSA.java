@@ -185,6 +185,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             for (int i = 0; i < saa.length; ++i) {
                 ModuleIdentification mi = WorkspaceProfile.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
                 if (mi != null) {
+                    //
+                    // ToDo: verify this instance first.
+                    //
                     saa[i][0] = mi.getName();
                     saa[i][2] = mi.getVersion();
                     saa[i][4] = mi.getPackageId().getVersion();
@@ -267,7 +270,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             }
             
             //
-            // find potential instances in all dependency pkgs for classes still in classConsumed.
+            // find potential instances in all pkgs for classes still in classConsumed.
             //
             if (classInstanceMap == null){
                 classInstanceMap = new HashMap<String, ArrayList<String>>();

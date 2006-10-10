@@ -704,6 +704,8 @@ public class FpdPlatformDefs extends IInternalFrame {
                         for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
                             v.add(buildTargetTableModel.getValueAt(i, 0));
                         }
+                        docConsole.setSaved(false);
+                        ffc.setPlatformDefsBuildTargets(v);
                     }
                 }
             });
