@@ -375,7 +375,10 @@ public class FrameworkBuildTask extends Task{
         }
 
         str = getValue(ToolDefinitions.TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER, targetFileInfo);
-        if (str != null ) {
+        //
+        // Need to check the # of threads iff multithread is enabled.
+        //
+        if ((multithread) && (str != null )) {
             try {
                 int threadNum = Integer.parseInt(str);
                 if (threadNum > 0) {
