@@ -13,10 +13,8 @@
  **/
 package org.tianocore.build;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -57,8 +55,7 @@ import org.tianocore.common.logger.EdkLog;
   4. No MSA file, and ACTIVE_PLATFORM is specified, build the active platform;
   5. No MSA file, no ACTIVE_PLATFORM, and no FPD file, report error;
   6. No MSA file, no ACTIVE_PLATFORM, and only one FPD file, build the platform;
-  7. No MSA file, no ACTIVE_PLATFORM, and more than one FPD files, list all platform
-  and let user choose one. 
+  7. No MSA file, no ACTIVE_PLATFORM, and more than one FPD files, Report Error!
   </pre>
   
   <p>
@@ -76,8 +73,6 @@ import org.tianocore.common.logger.EdkLog;
 **/
 public class FrameworkBuildTask extends Task{
 
-    private Set<File> buildFiles = new LinkedHashSet<File>();
-    
     private Set<File> fpdFiles = new LinkedHashSet<File>();
     
     private Set<File> msaFiles = new LinkedHashSet<File>();
@@ -149,32 +144,27 @@ public class FrameworkBuildTask extends Task{
     }
     
     private void processFrameworkBuild() throws EdkException, GenBuildException, AutoGenException, PcdAutogenException, PlatformPcdPreprocessBuildException {
-        //
-        // Seach build.xml -> .FPD -> .MSA file
-        //
         try {
             //
-            // Gen Current Working Directory
+            // Get current working dir
             //
             File dummyFile = new File(".");
             File cwd = dummyFile.getCanonicalFile();
             File[] files = cwd.listFiles();
+            
+            //
+            // Scan current dir, and find out all .FPD and .MSA files
+            //
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isFile()) {
-                    if (files[i].getName().equalsIgnoreCase("build.xml")) {
+                    if (files[i].getName().endsWith(ToolDefinitions.FPD_EXTENSION)) {
                         //
-                        // First, search build.xml, if found, ANT call it
-                        //
-                        buildFiles.add(files[i]);
-
-                    } else if (files[i].getName().endsWith(ToolDefinitions.FPD_EXTENSION)) {
-                        //
-                        // Second, search FPD file, if found, build it
+                        // Found FPD file
                         //
                         fpdFiles.add(files[i]);
                     } else if (files[i].getName().endsWith(ToolDefinitions.MSA_EXTENSION)) {
                         //
-                        // Third, search MSA file, if found, build it
+                        // Found MSA file
                         //
                         msaFiles.add(files[i]);
                     }
@@ -187,9 +177,9 @@ public class FrameworkBuildTask extends Task{
         }
         
         //
-        // Deal with all environment variable (Add them to properties)
+        // Import all system environment variables to ANT properties
         //
-        backupSystemProperties();
+        importSystemEnvVariables();
         
         //
         // Read target.txt file
@@ -208,11 +198,11 @@ public class FrameworkBuildTask extends Task{
         // else fail build. 
         // If without MSA file, and ACTIVE_PLATFORM is set, build the ACTIVE_PLATFORM. 
         // If ACTIVE_PLATFORM is not set, and only find one FPD file, build the platform; 
-        // If find more than one FPD files, let user select one. 
+        // If find more than one FPD files, report error.  
         //
         File buildFile = null;
         if (msaFiles.size() > 1) {
-            throw new BuildException("Having more than one MSA file in a directory is not allowed!");
+            throw new BuildException("Found " + msaFiles.size() + " MSA files in current dir. ");
         } else if (msaFiles.size() == 1 && activePlatform == null) {
             throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [" + targetFilename + "]. ");
         } else if (msaFiles.size() == 1 && activePlatform != null) {
@@ -225,8 +215,9 @@ public class FrameworkBuildTask extends Task{
         } else if (fpdFiles.size() == 1) {
             buildFile = fpdFiles.toArray(new File[1])[0];
         } else if (fpdFiles.size() > 1) {
-            buildFile = intercommuniteWithUser();
+            throw new BuildException("Found " + fpdFiles.size() + " FPD files in current dir. ");
         }
+        
         //
         // If there is no build files or FPD files or MSA files, stop build
         //
@@ -296,11 +287,11 @@ public class FrameworkBuildTask extends Task{
     }
     
     /**
-      Transfer system environment variables to ANT properties. If system variable 
+      Import system environment variables to ANT properties. If system variable 
       already exiests in ANT properties, skip it.
       
     **/
-    private void backupSystemProperties() {
+    private void importSystemEnvVariables() {
         Map<String, String> sysProperties = System.getenv();
         Iterator<String> iter = sysProperties.keySet().iterator();
         while (iter.hasNext()) {
@@ -322,54 +313,6 @@ public class FrameworkBuildTask extends Task{
         }
     }
 
-    private File intercommuniteWithUser(){
-        File file = null;
-        if (fpdFiles.size() > 1) {
-            File[] allFiles = new File[fpdFiles.size()];
-            int index = 0;
-            Iterator<File> iter = fpdFiles.iterator();
-            while (iter.hasNext()) {
-                allFiles[index] = iter.next();
-                index++;
-            }
-
-            EdkLog.log(this, "Finding " + allFiles.length + " FPD files: ");
-            for (int i = 0; i < allFiles.length; i++) {
-                System.out.println("[" + (i + 1) + "]: " + allFiles[i].getName());
-            }
-            
-            boolean flag = true;
-            EdkLog.log(this, "Please select one of the following FPD files to build:[1] ");
-            do{
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                try {
-                     String str = br.readLine();
-                     if (str.trim().length() == 0) {
-                         file = allFiles[0];
-                         flag = false;
-                         continue ;
-                     }
-                     int indexSelect = Integer.parseInt(str);
-                     if (indexSelect <=0 || indexSelect > allFiles.length) {
-                         EdkLog.log(this, "Please enter a number between [1.." + allFiles.length + "]:[1] ");
-                         continue ;
-                     } else {
-                         file = allFiles[indexSelect - 1];
-                         flag = false;
-                         continue ;
-                     }
-                } catch (Exception e) {
-                    EdkLog.log(this, "Please enter a valid number:[1] ");
-                    flag = true;
-                }
-            } while (flag);
-        } else if (fpdFiles.size() == 1) {
-            file = fpdFiles.toArray(new File[1])[0];
-        }
-        return file;
-    }
-    
-    
     public void setType(String type) {
         if (type.equalsIgnoreCase("clean") || type.equalsIgnoreCase("cleanall")) {
             this.type = type.toLowerCase();
@@ -433,6 +376,10 @@ public class FrameworkBuildTask extends Task{
                     MAX_CONCURRENT_THREAD_NUMBER = threadNum;
                 }
             } catch (Exception ex) {
+                //
+                // Give a warning message, and keep the default value
+                //
+                EdkLog.log(this, EdkLog.EDK_WARNING, "Incorrent number specified for MAX_CONCURRENT_THREAD_NUMBER in file [" + targetFilename + "]");
             }
         }
     }
