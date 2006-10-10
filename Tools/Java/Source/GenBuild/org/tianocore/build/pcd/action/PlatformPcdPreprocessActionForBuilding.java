@@ -52,11 +52,6 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     private String                      fpdFilePath;
 
     ///
-    /// Message level for CollectPCDAction.
-    ///
-    private int                         originalMessageLevel;
-
-    ///
     /// Cache the fpd docment instance for private usage.
     ///
     private PlatformSurfaceAreaDocument fpdDocInstance;
