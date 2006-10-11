@@ -115,8 +115,8 @@ public class FpdFileContents {
               if (moduleSa.getPcdBuildDefinition() == null || moduleSa.getPcdBuildDefinition().getPcdDataList() == null) {
                   continue;
               }
-              String ModuleInfo = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() +
-               " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList());
+              String ModuleInfo = moduleSa.getModuleGuid().toLowerCase() + " " + moduleSa.getModuleVersion() +
+               " " + moduleSa.getPackageGuid().toLowerCase() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList());
               List<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lp = moduleSa.getPcdBuildDefinition().getPcdDataList();
               ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lpi = lp.listIterator();
               while (lpi.hasNext()) {
@@ -374,8 +374,10 @@ public class FpdFileContents {
             cursor.pop();
             cursor.removeXml();
             if (getFrameworkModulesCount() == 0) {
-                cursor.toParent();
-                cursor.removeXml();
+                cursor.dispose();
+                removeElement(getfpdFrameworkModules());
+                fpdFrameworkModules = null;
+                return;
             }
         }
         cursor.dispose();
@@ -478,7 +480,7 @@ public class FpdFileContents {
         String[] s = moduleInfo.split(" ");
         for(int i = 0; i < al.size(); ++i){
             String consumer = al.get(i);
-            if (consumer.contains(s[0]) && consumer.contains(s[2])){
+            if (consumer.contains(s[0].toLowerCase()) && consumer.contains(s[2].toLowerCase())){
                 String[] consumerPart = consumer.split(" ");
                 if (!consumerPart[4].equals(s[4])) {
                     continue;
@@ -2372,7 +2374,9 @@ public class FpdFileContents {
         if (sections == null){
             sections = ffs.addNewSections();
         }
-        sections.addNewSections().setEncapsulationType(encapType);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2 sections2 = sections.addNewSections();
+        sections2.setEncapsulationType(encapType);
+        sections2.addNewSection().setSectionType(EfiSectionType.Enum.forString("EFI_SECTION_PE32"));
     }
     
     public void removeBuildOptionsFfsSectionsSections(int i, int j) {
@@ -2498,9 +2502,9 @@ public class FpdFileContents {
             ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section> li = sections2.getSectionList().listIterator();
             while(li.hasNext()) {
                 BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section section = li.next();
-                if (section.isSetSectionType()) {
-                    al.add(section.getSectionType().toString());
-                }
+//                if (section.isSetSectionType()) {
+                    al.add(section.getSectionType()+"");
+//                }
                 
             }
         }
@@ -2549,7 +2553,7 @@ public class FpdFileContents {
                 if (ffs.getSections().getSectionList() != null){
                     ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Section> li = ffs.getSections().getSectionList().listIterator();
                     while (li.hasNext()) {
-                        firstLevelSection.add(li.next().getSectionType().toString());
+                        firstLevelSection.add(li.next().getSectionType()+"");
                     }
                 }
                 if (ffs.getSections().getSectionsList() != null) {
