@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall">
+    <echo message="Removing Object Files and the Executables from the package: Pccts"/>  
     <ant dir="${PACKAGE_DIR}/Pccts/antlr" target="cleanall" inheritAll="true"/>
     <ant dir="${PACKAGE_DIR}/Pccts/dlg" target="cleanall" inheritAll="true"/>
   </target>

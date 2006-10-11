@@ -12,9 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 <project name="CppTasks" default="CppTasks" basedir=".">
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
-  <property name="workspace" value="${env.WORKSPACE}"/>
+  <property name="WORKSPACE" value="${env.WORKSPACE}"/>
   <property name="buildDir" value="build"/>
-  <property name="installLocation" value="${workspace}/Tools/Jars"/>
+  <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
   <target name="CppTasks" depends="install"/>
   <target name="init">
     <uptodate property="jar.newer" targetfile="${installLocation}/cpptasks.jar">
@@ -25,18 +25,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <mkdir dir="${buildDir}"/>
     <javac srcdir="net" destdir="${buildDir}" source="1.4">
       <classpath>
-        <fileset dir="${workspace}/Tools/Jars">
+        <fileset dir="${WORKSPACE}/Tools/Jars">
           <include name="*.jar"/>
         </fileset>
       </classpath>
     </javac>
   </target>
   <target name="clean">
-    <delete includeemptydirs="true" failonerror="false">
+    <delete includeemptydirs="true" failonerror="false" quiet="true">
       <fileset dir="${WORKSPACE}/Tools/Java/Source/Cpptasks" includes="${buildDir}"/>
     </delete>
   </target>
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: cpptasks.jar"/>
     <delete file="${installLocation}/cpptasks.jar"/>
     <if>
       <available file="${installLocation}/cpptasks.jar"/>

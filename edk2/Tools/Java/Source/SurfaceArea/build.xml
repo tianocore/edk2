@@ -200,6 +200,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall" depends="SurfaceArea.jar.clean">
+    <echo message="Removing Class Files and the Java Archive: SurfaceArea.jar"/>
     <delete file="${WORKSPACE}/Tools/Jars/SurfaceArea.jar"/>
     <if>
       <available file="${WORKSPACE}/Tools/Jars/SurfaceArea.jar"/>

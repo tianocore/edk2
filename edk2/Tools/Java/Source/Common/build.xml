@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: Common.jar"/>
     <delete file="${installLocation}/Common.jar"/>
     <if>
       <available file="${installLocation}/Common.jar"/>

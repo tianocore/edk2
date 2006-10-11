@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="TRUE">
+	    	  <arg line="/NOLOGO"/>
 	    	  <arg line="-f AntlrMS.mak"/>
     		</exec>
 		  </then>
@@ -55,6 +56,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <istrue value="${gcc}"/>
         <then>
     	    <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
+	      	  <arg line="-s"/>
 	      	  <arg line="-f makefile BIN_DIR=${BIN_DIR}"/>
     	  	</exec>
         </then>
@@ -69,6 +71,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="TRUE">
+	    	  <arg line="/C"/>
+	    	  <arg line="/NOLOGO"/>
 	    	  <arg line="-f AntlrMS.mak clean"/>
     		</exec>
 		  </then>
@@ -84,6 +88,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <istrue value="${gcc}"/>
       <then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
+	      	  <arg line="-s"/>
 	    	  <arg line="-f makefile clean"/>
     		</exec>
       </then>
@@ -97,7 +102,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="FALSE">
-	    	  <arg line="-f AntlrMS.mak clean"/>
+	    	  <arg line="/C"/>
+	    	  <arg line="/NOLOGO"/>
+	    	  <arg line="/f AntlrMS.mak clean"/>
     		</exec>
 		  </then>
 		<elseif>
@@ -105,6 +112,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 			<then>
         <echo message="Building antlr with cygwin gcc"/>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="FALSE">
+	      	<arg line="-s"/>
 	    	  <arg line="-f makefile.cygwin clean"/>
     		</exec>
 		  </then>
@@ -114,6 +122,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <then>
         <echo message="Building antlr with gcc"/>
     	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="FALSE">
+	      	<arg line="-s"/>
 	    	  <arg line="-f makefile clean"/>
     		</exec>
       </then>

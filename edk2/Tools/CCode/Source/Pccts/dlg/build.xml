@@ -42,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="nmake" failonerror="TRUE">
+	    	  <arg line="/NOLOGO"/>
 	    	  <arg line="-f DlgMS.mak"/>
     		</exec>
 		  </then>
@@ -57,6 +58,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="gcc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="make" failonerror="TRUE">
+	      	<arg line="-s"/>
 	    	  <arg line="-f makefile BIN_DIR=${BIN_DIR}"/>
     		</exec>
 		  </then>
@@ -71,6 +73,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="nmake" failonerror="TRUE">
+	    	  <arg line="/C"/>
+	    	  <arg line="/NOLOGO"/>
 	    	  <arg line="-f DlgMS.mak clean"/>
     		</exec>
 		  </then>
@@ -86,6 +90,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="gcc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="make" failonerror="TRUE">
+	      	<arg line="-s"/>
 	    	  <arg line="-f makefile clean"/>
     		</exec>
 		  </then>
@@ -99,6 +104,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="nmake" failonerror="FALSE">
+	    	  <arg line="/C"/>
+	    	  <arg line="/NOLOGO"/>
 	    	  <arg line="-f DlgMS.mak clean"/>
     		</exec>
 		  </then>
@@ -106,6 +113,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <equals arg1="${ToolChain}" arg2="gcc"/>
 			<then>
     	  <exec dir="${PACKAGE_DIR}/Pccts/dlg" executable="make" failonerror="FALSE">
+	      	<arg line="-s"/>
 	    	  <arg line="-f makefile clean"/>
     		</exec>
 		  </then>

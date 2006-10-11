@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </delete>
   </target>
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: Merge.jar"/>
     <delete file="${installLocation}/Merge.jar"/>
   </target>
   <target name="install" depends="source">
