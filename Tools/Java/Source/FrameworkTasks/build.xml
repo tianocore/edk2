@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 <project name="FrameworkTasks" default="FrameworkTasks">
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
-  <property name="workspace" value="${env.WORKSPACE}"/>
+  <property name="WORKSPACE" value="${env.WORKSPACE}"/>
   <property name="buildDir" value="build"/>
-  <property name="installLocation" value="${workspace}/Tools/Jars"/>
+  <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
   <target name="FrameworkTasks" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">
       <classpath>
-        <fileset dir="${workspace}/Tools/Jars">
+        <fileset dir="${WORKSPACE}/Tools/Jars">
           <include name="*.jar"/>
         </fileset>
       </classpath>
@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </delete>
   </target>
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: frameworktasks.jar"/>
     <delete file="${installLocation}/frameworktasks.jar"/>
     <if>
       <available file="${installLocation}/frameworktasks.jar"/>

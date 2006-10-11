@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </delete>
   </target>
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: ContextTool.jar"/>
     <delete file="${installLocation}/ContextTool.jar"/>
     <if>
       <available file="${installLocation}/ContextTool.jar"/>

@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </delete>
   </target>
   <target name="cleanall" depends="clean">
+    <echo message="Removing Class Files and the Java Archive: MigrationTools.jar"/>
     <delete file="${installLocation}/MigrationTools.jar"/>
     <if>
       <available file="${installLocation}/MigrationTools.jar"/>
