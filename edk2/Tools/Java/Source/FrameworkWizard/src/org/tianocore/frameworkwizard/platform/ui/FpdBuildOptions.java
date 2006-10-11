@@ -625,6 +625,10 @@ public class FpdBuildOptions extends IInternalFrame {
                     docConsole.setSaved(false);
                     ffc.removeBuildOptionsFfs(jTableFfs.getSelectedRow());
                     ffsTableModel.removeRow(jTableFfs.getSelectedRow());
+                    sectionTableModel.setRowCount(0);
+                    sectionsTableModel.setRowCount(0);
+                    subsectionsTableModel.setRowCount(0);
+                    ffsAttributesTableModel.setRowCount(0);
                 }
             });
         }
@@ -1164,6 +1168,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     sectionsTableModel.removeRow(jTableFfsSections.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSections(jTableFfs.getSelectedRow(),
                                                               jTableFfsSections.getSelectedRow());
+                    subsectionsTableModel.setRowCount(0);
                 }
             });
         }
