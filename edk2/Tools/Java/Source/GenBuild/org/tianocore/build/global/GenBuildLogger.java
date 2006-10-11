@@ -44,17 +44,17 @@ import org.tianocore.common.logger.LogMethod;
 public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     Project project = null;
-	///
+    
+    ///
     /// Time of the start of the build 
-	/// 
+    ///
     private long startTime = System.currentTimeMillis();
+    
     ///
     /// flag to present whether cache all msg or not
     /// true means to cache.
     ///
     private static boolean flag = false;
-    
-    private static boolean enableFlag = true;
 
     private static Map<FpdModuleIdentification, List<String>> map = new LinkedHashMap<FpdModuleIdentification, List<String> >(256);
     
@@ -79,6 +79,7 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
         if (this.project == null) {
             return;
         }
+
         //
         // If msgLevel is always print, then print it
         //
@@ -98,7 +99,7 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
         case EdkLog.EDK_INFO:
             log(msgSource, msg, Project.MSG_INFO);
             break;
-		case EdkLog.EDK_VERBOSE:
+        case EdkLog.EDK_VERBOSE:
             log(msgSource, msg, Project.MSG_VERBOSE);
             break;
         case EdkLog.EDK_DEBUG:
@@ -181,7 +182,8 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     }
     
     public void messageLogged(BuildEvent event) {
-		int currentLevel = event.getPriority();
+        
+        int currentLevel = event.getPriority();
         //
         // If current level is upper than Ant Level, skip it
         //
@@ -231,10 +233,6 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     public static void setCacheEnable(boolean enable) {
         flag = enable;
-    }
-    
-    public static void maskAllLog(boolean enable) {
-        enableFlag = !enable;
     }
     
     protected synchronized void log(String message) {
