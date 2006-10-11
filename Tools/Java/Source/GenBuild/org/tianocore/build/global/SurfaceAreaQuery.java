@@ -38,7 +38,6 @@ import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
 import org.w3c.dom.Node;
 
 /**
@@ -249,22 +248,32 @@ public class SurfaceAreaQuery {
         returns = get("SourceFiles", xPath);
 
         if (returns == null || returns.length == 0) {
-            return new String[0][0];
+            return new String[0][3];
         }
 
         Filename[] sourceFileNames = (Filename[]) returns;
         List<String[]> outputList = new ArrayList<String[]>();
         for (int i = 0; i < sourceFileNames.length; i++) {
             List archList = sourceFileNames[i].getSupArchList();
-            if (arch == null || arch.equalsIgnoreCase("") || archList == null || contains(archList, arch)) {
-                outputList.add(new String[] {sourceFileNames[i].getToolCode(),sourceFileNames[i].getStringValue()});
+            if (arch == null || arch.trim().equalsIgnoreCase("") || archList == null || contains(archList, arch)) {
+                outputList.add(new String[] {sourceFileNames[i].getToolCode(), sourceFileNames[i].getStringValue(), sourceFileNames[i].getToolChainFamily()});
             }
         }
 
-        String[][] outputString = new String[outputList.size()][2];
+        String[][] outputString = new String[outputList.size()][3];
         for (int index = 0; index < outputList.size(); index++) {
+            //
+            // ToolCode (FileType)
+            //
             outputString[index][0] = outputList.get(index)[0];
+            //
+            // File name (relative to MODULE_DIR)
+            //
             outputString[index][1] = outputList.get(index)[1];
+            //
+            // Tool chain family
+            //
+            outputString[index][2] = outputList.get(index)[2];
         }
         return outputString;
     }
