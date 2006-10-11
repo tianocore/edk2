@@ -53,14 +53,14 @@ import org.w3c.dom.Node;
 **/
 public class FileProcess {
     ///
-    ///  The mapping information about source suffix, result suffix, file type.
+    ///  The mapping information about source suffix, tool code, file type.
     ///
     public final String[][] fileTypes = { {".h", "", "CHeader" }, 
-                                          {".c", "", "CCode" },
+                                          {".c", "CC", "CCode" },
                                           {".inc", "", "ASMHeader" },
-                                          {".asm", "", "ASM" }, 
-                                          {".S", "", "ASM" },
-                                          {".s", "", "ASM" },
+                                          {".asm", "ASM", "ASM" }, 
+                                          {".S", "ASM", "ASM" },
+                                          {".s", "ASM", "ASM" },
                                           {".uni", "", "UNI" },
                                           {".vfr", "", "VFR" },
                                           {".Vfr", "", "VFR" },
@@ -74,7 +74,7 @@ public class FileProcess {
                                           {".FYI", "", "FFS" },
                                           {".FFS", "", "FFS" },
                                           {".bmp", "", "BMP" },
-                                          {".i", "", "PPCode"}};
+                                          {".i", "PP", "PPCode"}};
     ///
     /// Current ANT context. 
     ///
@@ -121,9 +121,9 @@ public class FileProcess {
       @param root Root node
       @param unicodeFirst whether build Unicode file firstly or not
     **/
-    public synchronized void parseFile(String filename, Node root, boolean unicodeFirst) {
+    public synchronized void parseFile(String filename, String family, Node root, boolean unicodeFirst) {
         this.unicodeFirst = unicodeFirst;
-        parseFile(filename, root);
+        parseFile(filename, family, root);
     }
     
     /**
@@ -143,9 +143,9 @@ public class FileProcess {
       @param root Root node
       @param unicodeFirst whether build Unicode file firstly or not
     **/
-    public synchronized void parseFile(String filename, String filetype, Node root, boolean unicodeFirst) {
+    public synchronized void parseFile(String filename, String filetype, String family, Node root, boolean unicodeFirst) {
         this.unicodeFirst = unicodeFirst;
-        parseFile(filename, filetype, root);
+        parseFile(filename, filetype, family, root);
     }
     
     /**
@@ -154,10 +154,10 @@ public class FileProcess {
       @param filename Source file name
       @param root Root node
     **/
-    public synchronized void parseFile(String filename, Node root) throws BuildException {
+    public synchronized void parseFile(String filename, String family, Node root) throws BuildException {
         for (int i = 0; i < fileTypes.length; i++) {
             if (filename.endsWith(fileTypes[i][0])) {
-                parseFile(filename, fileTypes[i][2], root);
+                parseFile(filename, fileTypes[i][2], family, root);
                 return ;
             }
         }
@@ -175,7 +175,21 @@ public class FileProcess {
       @param filetype Source file type
       @param root Root node
     **/
-    public synchronized void parseFile(String filename, String filetype, Node root) {
+    public synchronized void parseFile(String filename, String filetype, String family, Node root) {
+        //
+        // Filter file with family. Only family is specified in source file and
+        // not include current family will skip the file. 
+        //
+        String toolCode = getToolCodeByFileType(filetype);
+        if (family != null && !family.trim().equalsIgnoreCase("")) {
+            String toolChainFamily = project.getProperty(toolCode + "_FAMILY");
+            if (toolChainFamily != null) {
+                if(!toolChainFamily.equalsIgnoreCase(family)) {
+                    return ;
+                }
+            }
+        }
+        
         if (unicodeFirst) {
             if ( ! filetype.equalsIgnoreCase("UNI")){
                 return ;
@@ -205,7 +219,7 @@ public class FileProcess {
         // If define CC_EXT in tools_def.txt file, the source file with 
         // different suffix is skipped
         //
-        String toolsDefExtName = project.getProperty(filetype + "_EXT");
+        String toolsDefExtName = project.getProperty(toolCode + "_EXT");
         if (toolsDefExtName != null) {
             String[] exts = toolsDefExtName.split(" ");
             for (int i = 0; i < exts.length; i++) {
@@ -259,5 +273,14 @@ public class FileProcess {
         }
         ele.appendChild(includesEle);
         root.appendChild(ele);
+    }
+    
+    private String getToolCodeByFileType(String fileType) {
+        for (int i = 0; i < fileTypes.length; i++) {
+            if (fileTypes[i][2].equalsIgnoreCase(fileType)) {
+                return fileTypes[i][1];
+            }
+        }
+        return null;
     }
 }

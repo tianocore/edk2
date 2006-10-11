@@ -363,7 +363,9 @@ public class ModuleBuildFileGenerator {
     **/
     private void applyCompileElement(Document document, Node root) {
         //
-        // sourceFiles[][0] is FileType, [][1] is File name relative to Module_Dir
+        // sourceFiles[][0] is FileType, 
+        // [][1] is File name relative to Module_Dir, 
+        // [][2] is ToolChainFamily
         //
         String[][] sourceFiles = saq.getSourceFiles(fpdModuleId.getArch());
 
@@ -395,9 +397,9 @@ public class ModuleBuildFileGenerator {
             sourceFiles[i][1] = sourceFile.getPath();
             String filetype = sourceFiles[i][0];
             if (filetype != null) {
-                fileProcess.parseFile(sourceFiles[i][1], filetype, root, true);
+                fileProcess.parseFile(sourceFiles[i][1], filetype, sourceFiles[i][2], root, true);
             } else {
-                fileProcess.parseFile(sourceFiles[i][1], root, true);
+                fileProcess.parseFile(sourceFiles[i][1], sourceFiles[i][2], root, true);
             }
         }
         
@@ -422,7 +424,7 @@ public class ModuleBuildFileGenerator {
         // Parse AutoGen.c & AutoGen.h
         //
         if ( ! fpdModuleId.getModule().getName().equalsIgnoreCase("Shell")) {
-            fileProcess.parseFile(project.getProperty("DEST_DIR_DEBUG") + File.separatorChar + "AutoGen.c", root, false);
+            fileProcess.parseFile(project.getProperty("DEST_DIR_DEBUG") + File.separatorChar + "AutoGen.c", null, root, false);
         }
         
         //
@@ -431,9 +433,9 @@ public class ModuleBuildFileGenerator {
         for (int i = 0; i < sourceFiles.length; i++) {
             String filetype = sourceFiles[i][0];
             if (filetype != null) {
-                fileProcess.parseFile(sourceFiles[i][1], filetype, root, false);
+                fileProcess.parseFile(sourceFiles[i][1], filetype, sourceFiles[i][2], root, false);
             } else {
-                fileProcess.parseFile(sourceFiles[i][1], root, false);
+                fileProcess.parseFile(sourceFiles[i][1], sourceFiles[i][2], root, false);
             }
         }
         

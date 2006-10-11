@@ -110,7 +110,7 @@ public class FrameworkBuildTask extends Task{
         // set Logger
         //
         GenBuildLogger logger = new GenBuildLogger(getProject());
-		EdkLog.setLogLevel(EdkLog.EDK_DEBUG);
+        EdkLog.setLogLevel(EdkLog.EDK_DEBUG);
         EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
         
