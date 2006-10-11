@@ -167,6 +167,8 @@ public class FpdHeader extends IInternalFrame {
     private FpdFileContents ffc = null;
     
     private OpeningPlatformType docConsole = null;
+    
+    private boolean amended = false; 
 
     /**
      This method initializes jTextFieldBaseName 
@@ -535,6 +537,10 @@ public class FpdHeader extends IInternalFrame {
     public FpdHeader(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
+        if (amended) {
+            docConsole.setSaved(false);
+            amended = false;
+        }
     }
 
     /**
@@ -587,21 +593,31 @@ public class FpdHeader extends IInternalFrame {
         }
         ffc.setFpdHdrSpec(jTextFieldSpecification.getText());
         
-        ffc.genPlatformDefsSkuInfo("0", "DEFAULT");
+        if (ffc.getPlatformDefsSkuInfoCount() == 0) {
+            ffc.genPlatformDefsSkuInfo("0", "DEFAULT");
+            amended = true;
+            JOptionPane.showMessageDialog(this, "Default SKU set for this platform.");
+        }
         Vector<Object> v = new Vector<Object>();
         ffc.getPlatformDefsSupportedArchs(v);
         if (v.size() == 0) {
             v.add("IA32");
             ffc.setPlatformDefsSupportedArchs(v);
+            amended = true;
+            JOptionPane.showMessageDialog(this, "Supported Arch. IA32 added for this platform.");
         }
         v.removeAllElements();
         ffc.getPlatformDefsBuildTargets(v);
         if (v.size() == 0) {
             v.add("DEBUG");
             ffc.setPlatformDefsBuildTargets(v);
+            amended = true;
+            JOptionPane.showMessageDialog(this, "Build target IA32 added for this platform.");
         }
         if (ffc.getPlatformDefsInterDir() == null) {
             ffc.setPlatformDefsInterDir("UNIFIED");
+            amended = true;
+            JOptionPane.showMessageDialog(this, "UNIFIED Intermediate Directory set for this platform.");
         }
     }
 
