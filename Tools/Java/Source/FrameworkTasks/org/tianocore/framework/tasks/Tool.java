@@ -148,7 +148,7 @@ public class Tool implements EfiDefine, Section {
         } 
 
         try {
-            this.outputFileName = "Temp" + ran.nextInt();
+            this.outputFileName = "Temp" + getRand();
             argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
                          + tempInputFile.toString(" ")+ " -o " + outputFileName;
             EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
@@ -164,7 +164,8 @@ public class Tool implements EfiDefine, Section {
                     file.delete();
                 }
             }
-        } catch (Exception e) {            EdkLog.log(e.getMessage());
+        } catch (Exception e) {
+            EdkLog.log(e.getMessage());
             throw new BuildException("Execution of externalTool task failed!\n");
         }
     }
@@ -236,7 +237,16 @@ public class Tool implements EfiDefine, Section {
     
     public void addGenSection(GenSectionTask genSect){
         this.gensectList.add(genSect);
-    }    
+    }
+
+    /**
+     Get random number.
+
+     @returns   The random integer.
+     **/
+    public synchronized int getRand() {
+        return ran.nextInt();
+    }
 }
 
 
