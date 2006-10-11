@@ -60,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <delete failonerror="false" quiet="true" includeEmptyDirs="true">
       <fileset dir="${BUILD_DIR}"/>
       <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
-      <fileset file="${BIN_DIR}/${ToolName}/pdb"/>
+      <fileset file="${BIN_DIR}/${ToolName}.pdb"/>
     </delete>
   </target>
 
