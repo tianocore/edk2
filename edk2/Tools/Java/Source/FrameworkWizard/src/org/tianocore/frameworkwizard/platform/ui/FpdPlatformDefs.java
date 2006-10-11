@@ -730,13 +730,17 @@ public class FpdPlatformDefs extends IInternalFrame {
 
             jButtonDelBuildTarget.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTableBuildTargets.getSelectedRow() < 0 || jTableBuildTargets.getSelectedRow() < 0) {
+                    if (jTableBuildTargets.getSelectedRow() < 0) {
+                        return;
+                    }
+                    if (jTableBuildTargets.getRowCount() == 1) {
+                        JOptionPane.showMessageDialog(frame, "At least one build target should be set for this platform.");
                         return;
                     }
                     buildTargetTableModel.removeRow(jTableBuildTargets.getSelectedRow());
                     Vector<Object> v = new Vector<Object>();
                     for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
-                        v.remove(buildTargetTableModel.getValueAt(i, 0));
+                        v.add(buildTargetTableModel.getValueAt(i, 0));
                     }
                     docConsole.setSaved(false);
                     ffc.setPlatformDefsBuildTargets(v);
