@@ -17,6 +17,7 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
+import org.tianocore.frameworkwizard.platform.ui.ListEditor;
 
 /**
 GUI for create library definition elements of spd file.
@@ -51,7 +52,8 @@ public class SpdProtocolDecls extends SpdGuidDecls {
     protected void initFrame() {
         
         this.setTitle("Protocol Declarations");
-        
+        starLabel.setVisible(false);
+        ((ListEditor)getJTable().getColumnModel().getColumn(6).getCellEditor()).setCanNotBeEmpty(false);
     }
     
     protected void init(SpdFileContents sfc){
