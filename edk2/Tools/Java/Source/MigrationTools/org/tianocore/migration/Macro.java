@@ -27,7 +27,7 @@ public class Macro {
     public String r8name;
     public String r9name;
 
-    public static Pattern ptntmacro = Pattern.compile("\\b[A-Z_]+\\s*?\\(?\\b",Pattern.MULTILINE);
+    public static Pattern ptntmacro = Pattern.compile("\\b\\w(\\w|\\d)*",Pattern.MULTILINE);
 
     private static String unmacro = "VOID UINTN BOOLEAN ASSERT OPTIONAL STATIC NULL TRUE IN OUT FALSE";
 
