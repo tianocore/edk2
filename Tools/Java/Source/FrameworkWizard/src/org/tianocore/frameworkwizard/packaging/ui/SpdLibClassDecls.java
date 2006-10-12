@@ -50,6 +50,7 @@ import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
+import org.tianocore.frameworkwizard.platform.ui.LongTextEditor;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
@@ -221,6 +222,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            model.addColumn("Version");
            model.addColumn("Supported Architectures");
            model.addColumn("Supported Module Types");
+           
+           jTable.getColumnModel().getColumn(cnHelpText).setCellEditor(new LongTextEditor());
            
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");

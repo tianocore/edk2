@@ -48,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.JCheckBox;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
+import org.tianocore.frameworkwizard.platform.ui.LongTextEditor;
 
 import java.awt.Rectangle;
 import java.util.Vector;
@@ -688,6 +689,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jComboBoxDataType.addItem("BOOLEAN");
             TableColumn dataTypeColumn = jTable.getColumnModel().getColumn(3);
             dataTypeColumn.setCellEditor(new DefaultCellEditor(jComboBoxDataType));
+            
+            jTable.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
 
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
@@ -762,7 +765,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 return;
             }
             if (column <= 10 && column >= 6) {
-                if (compareTwoVectors(stringToVector(usage), stringToVector(sa[6]))) {
+                Vector<String> v = stringToVector(usage);
+                if (compareTwoVectors(v, stringToVector(sa[6]))) {
+                    return;
+                }
+                if (v.contains("FEATURE_FLAG") && v.size() > 1) {
+                    JOptionPane.showMessageDialog(frame, "Usage Feature Flag can NOT co-exist with others.");
                     return;
                 }
             }
@@ -1092,11 +1100,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     }
     
     protected Vector<String> stringToVector(String s){
+        Vector<String> v = new Vector<String>();
         if (s == null) {
-            return null;
+            return v;
         }
         String[] sArray = s.split(" ");
-        Vector<String> v = new Vector<String>();
+        
         for (int i = 0; i < sArray.length; ++i) {
             v.add(sArray[i]);
         }

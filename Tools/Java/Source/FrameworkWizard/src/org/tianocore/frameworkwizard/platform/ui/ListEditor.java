@@ -21,6 +21,7 @@ import java.util.Vector;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
@@ -35,6 +36,7 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
      * 
      */
     private static final long serialVersionUID = 1L;
+    private boolean canNotBeEmpty = false;
     String archs;
     JButton button;
     static JFrame frame;
@@ -92,6 +94,10 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
         }
         else { //User pressed dialog's "OK" button.
             Vector<String> v = dialog.getList();
+            if (canNotBeEmpty && v.size() == 0) {
+                JOptionPane.showMessageDialog(frame, "You must select at least one item.");
+                return;
+            }
             String s = " ";
             for (int i = 0; i < v.size(); ++i) {
                 s += v.get(i);
@@ -101,6 +107,13 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
             dialog.dispose();
         }
 
+    }
+
+    /**
+     * @param canNotBeEmpty The canNotBeEmpty to set.
+     */
+    public void setCanNotBeEmpty(boolean canNotBeEmpty) {
+        this.canNotBeEmpty = canNotBeEmpty;
     }
 
 }

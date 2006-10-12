@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.util.Vector;
@@ -43,6 +44,7 @@ import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
+import org.tianocore.frameworkwizard.platform.ui.LongTextEditor;
 
 /**
  GUI for create library definition elements of spd file.
@@ -131,6 +133,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
 
     protected String[][] saa = null;
 
+    protected StarLabel starLabel = null;
+
     /**
       This method initializes this
      
@@ -189,6 +193,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            model.addColumn("Supported Module Types");
            model.addColumn("GuidTypes");
            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
+           jTable.getColumnModel().getColumn(3).setCellEditor(new LongTextEditor());
 
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
@@ -223,7 +228,9 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            vGuid.add("HII_PACKAGE_LIST");
            vGuid.add("HOB");
            vGuid.add("TOKEN_SPACE_GUID");
-           jTable.getColumnModel().getColumn(6).setCellEditor(new ListEditor(vGuid));
+           ListEditor le = new ListEditor(vGuid);
+           le.setCanNotBeEmpty(true);
+           jTable.getColumnModel().getColumn(6).setCellEditor(le);
            
            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -269,6 +276,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        if (cellData.equals(sa[column])) {
            return;
        }
+       
        if (cellData.toString().length() == 0 && sa[column] == null) {
            return;
        }
@@ -450,10 +458,14 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
      **/
     protected JPanel getJContentPane1() {
         if (jContentPane == null) {
+            
             jLabelGuidType = new JLabel();
-            jLabelGuidType.setBounds(new java.awt.Rectangle(400,122,103,16));
+            jLabelGuidType.setBounds(new java.awt.Rectangle(420,122,103,16));
             jLabelGuidType.setText("GUID Type List");
             jLabelGuidType.setEnabled(true);
+            starLabel = new StarLabel();
+            starLabel.setLocation(new Point(jLabelGuidType.getX() - 20, jLabelGuidType.getY()));
+            starLabel.setVisible(true);
             jLabelSupArch = new JLabel();
             jLabelSupArch.setBounds(new java.awt.Rectangle(197,122,108,16));
             jLabelSupArch.setText("Supported Arch");
@@ -513,6 +525,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             jContentPane.add(getJScrollPaneGuid(), null);
             jContentPane.add(getJScrollPaneModule(), null);
             jContentPane.add(jLabelGuidType, null);
+            jContentPane.add(starLabel, null);
         }
         return jContentPane;
     }
@@ -638,7 +651,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             vguidType = null;
         }
         if (vguidType == null) {
-            JOptionPane.showMessageDialog(this, "You must select one GUID type.");
+            JOptionPane.showMessageDialog(this, "You must select at least one GUID type.");
             return -1;
         }
         if (docConsole != null) {
