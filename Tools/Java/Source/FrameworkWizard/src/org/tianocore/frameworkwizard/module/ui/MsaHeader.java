@@ -1163,7 +1163,7 @@ public class MsaHeader extends IInternalFrame {
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
 
         Tools.resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth, intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth, intPreferredWidth + 7);
         Tools.resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth, intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
