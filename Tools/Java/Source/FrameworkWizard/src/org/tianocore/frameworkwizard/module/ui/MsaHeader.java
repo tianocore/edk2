@@ -1363,6 +1363,12 @@ public class MsaHeader extends IInternalFrame {
                 //                jTextFieldOutputFileBasename.addFocusListener(this);
                 return;
             }
+            
+            if (!DataValidation.isOutputFileBasename(this.jTextFieldOutputFileBasename.getText())) {
+                Log.wrn("Update Msa Header", "Incorrect data type for Output File Basename, it must be a valid file name");
+                return;
+            }
+            
             if (!this.jTextFieldOutputFileBasename.getText().equals(md.getOutputFileBasename())) {
                 this.md.setOutputFileBasename(this.jTextFieldOutputFileBasename.getText());
             } else {

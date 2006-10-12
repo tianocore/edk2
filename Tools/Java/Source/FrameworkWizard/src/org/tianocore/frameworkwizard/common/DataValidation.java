@@ -218,7 +218,7 @@ public class DataValidation {
      
      **/
     public static boolean isFileNameConvention(String arg0) {
-        return isMatch("[a-zA-Z][a-zA-Z0-9]*((_)*(-)*(.)*[a-zA-Z0-9]*)*", arg0);
+        return isMatch("[a-zA-Z](\\.?[-_a-zA-Z0-9]+)*", arg0);
     }
 
     /**
