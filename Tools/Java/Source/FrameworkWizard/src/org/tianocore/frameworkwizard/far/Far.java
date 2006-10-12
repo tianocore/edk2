@@ -154,39 +154,6 @@ public class Far {
         return true;
     }
 
-    //    public static void main(String[] args){
-    //        try {
-    //            JarFile jarFile = new JarFile(new File("C:\\cvswork\\newEdk\\jar.jar.far"));
-    //            JarEntry je= jarFile.getJarEntry("MdePkg/MdePkg.spd");
-    //            InputStream is = jarFile.getInputStream(je);
-    //            byte[] buffer = new byte[1];      
-    //            File tempFile = new File("C:\\cvswork\\newEdk\\tempFile");
-    //            File tfile2 = new File("C:\\cvswork\\newEdk\\tempFile1");
-    //            FileOutputStream fos1 = new FileOutputStream(tfile2);
-    //            FileOutputStream fos = new FileOutputStream(tempFile);
-    //            int size = is.read(buffer);
-    //            int totoalSize = size;
-    //            while ( size >=  0) {
-    //                fos.write(buffer);
-    //                size = is.read(buffer);
-    //                totoalSize = totoalSize + size;
-    //            }
-    //            
-    //            
-    ////            is = jarFile.getInputStream(je);
-    ////            is.read(totalbuffer);
-    ////            fos.write(totalbuffer);
-    //            fos.close();
-    //            byte[] totalbuffer = new byte[(int)tempFile.length()];
-    //            FileInputStream fis = new FileInputStream(tempFile);
-    //            fis.read(totalbuffer);
-    //            fos1.write(totalbuffer);
-    //            fos1.close();
-    //        }catch(Exception e){
-    //            
-    //        }
-    //    }
-
     public void extract(List<FarFileItem> allFile, String dir) throws Exception {
 
         Iterator filesItem = allFile.iterator();
@@ -213,28 +180,30 @@ public class Far {
                         // Read the entry data and write it to the output
                         // file.
                         //
-                        byte[] buffer = new byte[1];
-                        File tempFile = new File("tempFile");
-                        FileOutputStream fos = new FileOutputStream(tempFile);
-                        int size = entryStream.read(buffer);
-                        while (size >= 0) {
-                            fos.write(buffer);
-                            size = entryStream.read(buffer);
+                        int fileLen = (int)je.getSize();
+                        byte[] buffer = new byte[fileLen];
+                        int len = entryStream.read(buffer);
+                        if (len < fileLen){
+                            File tempFile = new File("tempFile");
+                            FileOutputStream fos = new FileOutputStream(tempFile);
+                            fos.write(buffer, 0, len);
+                            while (len < fileLen){
+                                int tempLen = entryStream.read(buffer);
+                                len = len + tempLen;
+                                fos.write(buffer, 0, tempLen);
+                            }
+                            fos.close();
+                            FileInputStream fin = new FileInputStream(tempFile);
+                            fin.read(buffer);
+                            tempFile.delete();
                         }
-
-                        fos.close();
-                        byte[] totalBuffer = new byte[(int) tempFile.length()];
-                        FileInputStream fis = new FileInputStream(tempFile);
-                        fis.read(totalBuffer);
                         //
                         //  Check Md5
                         //
-                        if (!ffItem.getMd5Value().equalsIgnoreCase(FarMd5.md5(totalBuffer))){
+                        if (!ffItem.getMd5Value().equalsIgnoreCase(FarMd5.md5(buffer))){
                             throw new Exception (ffItem.getRelativeFilename() + " MD5 Checksum is invaild!");
                         }
-                        outputStream.write(totalBuffer);
-                        fis.close();
-                        tempFile.delete();
+                        outputStream.write(buffer);
                     } finally {
                         outputStream.close();
                     }
