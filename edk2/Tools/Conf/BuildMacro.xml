@@ -443,9 +443,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" dpath="${PP_DPATH}">
+            <command type="PP" cmd="${APP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${APP_FAMILY}" dpath="${APP_DPATH}">
               <EXTRA.INC.1/>
-              <argument value="${PP_FLAGS}"/>
+              <argument value="${APP_FLAGS}"/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
