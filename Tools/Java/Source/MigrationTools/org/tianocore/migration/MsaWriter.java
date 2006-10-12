@@ -70,11 +70,20 @@ public class MsaWriter {
             filename.setSupArchList(arch);
         }
     }
-    
+    private void addWrapper() {
+        XmlCursor cursor = msa.newCursor();
+        String uri = "http://www.TianoCore.org/2006/Edk2.0";
+        cursor.push();
+        cursor.toNextToken();
+        cursor.insertNamespace("", uri);
+        cursor.insertNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        cursor.pop();
+        msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)cursor.getObject();
+    }
     private ModuleSurfaceAreaDocument fulfillMsadoc() throws Exception {
         Iterator<String> it;
         String temp;
-        
+       
         if (mi.modulename != null) {
             msaheader.setModuleName(mi.modulename);
         } else {
@@ -173,7 +182,8 @@ public class MsaWriter {
                 lc.setUsage(UsageTypes.ALWAYS_CONSUMED);
             }
         }
-        
+        addWrapper();
+        msadoc.setModuleSurfaceArea(msa);
         return msadoc;
     }
     
@@ -184,7 +194,7 @@ public class MsaWriter {
         options.setSavePrettyPrint();
         options.setSavePrettyPrintIndent(2);
         options.setUseDefaultNamespace();
-        
+
         BufferedWriter bw = new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + mi.modulename + ".msa"));
         fulfillMsadoc().save(bw, options);
         //MsaTreeEditor.init(mi, ui, msadoc);

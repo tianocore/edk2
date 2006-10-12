@@ -86,6 +86,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     }
     private class DxsLaplace extends Common.Laplace {
         public String operation(String wholeline) {
+            wholeline = replaceMacro(wholeline, mi.hashnonlocalmacro);
             if (mi.getModuleType().equals("PEIM")) {
                 return addincludefile(wholeline, "\\<PeimDepex.h\\>");
             } else {
@@ -105,7 +106,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     private class CLaplace extends Common.Laplace {
         public  String operation(String wholeline) {
             // remove EFI_DRIVER_ENTRY_POINT
-            wholeline = wholeline.replaceAll("(EFI_[A-Z]+_ENTRY_POINT\\s*\\(\\s*" + mi.entrypoint + "\\s*\\)\\s*;)", MigrationTool.MIGRATIONCOMMENT + " $1");
+            wholeline = wholeline.replaceAll("(EFI_[A-Z]+_ENTRY_POINT\\s*\\(\\s*\\w(\\w|\\d)*\\s*\\))", MigrationTool.MIGRATIONCOMMENT + " $1");
             // redefine module entry point for some self-relocated modules
             wholeline = wholeline.replaceAll (mi.entrypoint + "([^{]*?})", "_ModuleEntryPoint" + "$1");
             // remove R8 library contractor
@@ -277,7 +278,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             //mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));        
             if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
                 if (wholeline.contains(r8thing)) {
-                    wholeline = wholeline.replaceAll(r8thing, r9thing);
+                    String findString = "(?<!(?:\\d|\\w))" + r8thing + "(?!(?:\\d|\\w))";
+                    wholeline = wholeline.replaceAll(findString, r9thing);
                     filemacro.add(new r8tor9(r8thing, r9thing));
                 }
             }

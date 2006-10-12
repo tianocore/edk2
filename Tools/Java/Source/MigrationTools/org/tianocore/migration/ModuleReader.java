@@ -185,7 +185,7 @@ public final class ModuleReader implements Common.ForDoAll {
         Iterator<String> ii = mi.localmodulesources.iterator();
         while (ii.hasNext()) {
             temp = ii.next();
-            if (temp.contains(".c")) {
+            if (temp.contains(".c") || temp.contains(".dxs")) {
                 mi.preprocessedccodes.add(temp);
             }
         }
