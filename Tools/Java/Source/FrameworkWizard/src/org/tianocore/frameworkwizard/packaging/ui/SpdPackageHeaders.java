@@ -77,10 +77,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
     private JButton jButtonClearAll = null;
 
-    private JButton jButtonCancel = null;
-
-    private JButton jButtonOk = null;
-
     private JLabel jLabel = null;
 
     private JTextField jTextField = null;
@@ -99,6 +95,18 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
     private JTable jTable = null;
 
+    private final int buttonWidth = 100;
+    private final int buttonSep = 6;
+    private final int addButtonCol = 148;
+    private final int removeButtonCol = addButtonCol + buttonWidth + buttonSep;
+    private final int removeAllButtonCol = removeButtonCol + buttonWidth + buttonSep;
+    private final int labelCol = 12;
+    private final int valueCol = 168;
+    private final int rowOne = 12;
+    private final int rowTwo = rowOne + 25;
+    private final int rowThree = rowTwo + 25;
+    private final int rowFour = rowThree + 30;
+    private final int rowFive = rowFour + 30;
 
 
     /**
@@ -112,14 +120,14 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     }
 
     /**
-      This method initializes jRadioButtonSelect	
+      This method initializes jLabelSelect
       	
-      @return javax.swing.JRadioButton	
+      @return javax.swing.JLabel jLabelSelect
      **/
     private JLabel getJLabelSelect() {
         if (jLabelSelect == null) {
             jLabelSelect = new JLabel();
-            jLabelSelect.setBounds(new java.awt.Rectangle(14,10,198,20));
+            jLabelSelect.setBounds(new java.awt.Rectangle(labelCol,rowOne,155,20));
             jLabelSelect.setText("Select ModuleType");
 
         }
@@ -134,7 +142,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JComboBox getJComboBoxSelect() {
         if (jComboBoxSelect == null) {
             jComboBoxSelect = new JComboBox();
-            jComboBoxSelect.setBounds(new java.awt.Rectangle(220, 10, 260, 20));
+            jComboBoxSelect.setBounds(new java.awt.Rectangle(valueCol, rowOne, 260, 20));
             jComboBoxSelect.setPreferredSize(new java.awt.Dimension(260,20));
             
             jComboBoxSelect.setEnabled(true);
@@ -165,7 +173,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JButton getJButtonAdd() {
         if (jButtonAdd == null) {
             jButtonAdd = new JButton();
-            jButtonAdd.setBounds(new java.awt.Rectangle(189,119,73,20));
+            jButtonAdd.setBounds(new java.awt.Rectangle(addButtonCol,rowFour,buttonWidth,20));
             jButtonAdd.setText("Add");
             jButtonAdd.addActionListener(this);
         }
@@ -180,7 +188,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JButton getJButtonRemove() {
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
-            jButtonRemove.setBounds(new java.awt.Rectangle(271,119,87,20));
+            jButtonRemove.setBounds(new java.awt.Rectangle(removeButtonCol,rowFour,buttonWidth,20));
             jButtonRemove.setText("Remove");
             jButtonRemove.addActionListener(this);
         }
@@ -195,46 +203,11 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JButton getJButtonClearAll() {
         if (jButtonClearAll == null) {
             jButtonClearAll = new JButton();
-            jButtonClearAll.setBounds(new java.awt.Rectangle(374,119,90,20));
+            jButtonClearAll.setBounds(new java.awt.Rectangle(removeAllButtonCol,rowFour,buttonWidth,20));
             jButtonClearAll.setText("Clear All");
             jButtonClearAll.addActionListener(this);
         }
         return jButtonClearAll;
-    }
-
-    /**
-      This method initializes jButtonCancel	
-      	
-      @return javax.swing.JButton	
-     **/
-    private JButton getJButtonCancel() {
-        if (jButtonCancel == null) {
-            jButtonCancel = new JButton();
-            jButtonCancel.setPreferredSize(new java.awt.Dimension(90, 20));
-            jButtonCancel.setLocation(new java.awt.Point(390, 305));
-            jButtonCancel.setText("Cancel");
-            jButtonCancel.setSize(new java.awt.Dimension(90, 20));
-            jButtonCancel.setVisible(false);
-            jButtonCancel.addActionListener(this);
-        }
-        return jButtonCancel;
-    }
-
-    /**
-      This method initializes jButton	
-      	
-      @return javax.swing.JButton	
-     **/
-    private JButton getJButtonOk() {
-        if (jButtonOk == null) {
-            jButtonOk = new JButton();
-            jButtonOk.setSize(new java.awt.Dimension(90, 20));
-            jButtonOk.setText("OK");
-            jButtonOk.setLocation(new java.awt.Point(290, 305));
-            jButtonOk.setVisible(false);
-            jButtonOk.addActionListener(this);
-        }
-        return jButtonOk;
     }
 
     /**
@@ -306,11 +279,11 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
+            jStarLabel1.setLocation(new java.awt.Point(0, rowOne));
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(0,62));
+            jStarLabel2.setLocation(new java.awt.Point(0,rowTwo));
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(14,62,199,22));
+            jLabel.setBounds(new java.awt.Rectangle(labelCol,rowTwo,320,22));
             jLabel.setText("Include Header for Module Type");
             
             jContentPane = new JPanel();
@@ -324,8 +297,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonClearAll(), null);
-            jContentPane.add(getJButtonCancel(), null);
-            jContentPane.add(getJButtonOk(), null);
             
             jContentPane.add(getJTextField(), null);
             jContentPane.add(getJButtonBrowse(), null);
@@ -360,14 +331,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     public void actionPerformed(ActionEvent arg0) {
         
         docConsole.setSaved(false);
-        if (arg0.getSource() == jButtonOk) {
-            this.save();
-            this.dispose();
-
-        }
-        if (arg0.getSource() == jButtonCancel) {
-            this.dispose();
-        }
 
         if (arg0.getSource() == jButtonAdd) {
             String strLibClass = "";
@@ -432,7 +395,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JTextField getJTextField() {
         if (jTextField == null) {
             jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(13,90,346,21));
+            jTextField.setBounds(new java.awt.Rectangle(labelCol,rowThree,346,20));
             jTextField.setPreferredSize(new java.awt.Dimension(345,20));
         }
         return jTextField;
@@ -446,9 +409,9 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JButton getJButtonBrowse() {
         if (jButtonBrowse == null) {
             jButtonBrowse = new JButton();
-            jButtonBrowse.setBounds(new java.awt.Rectangle(374,89,92,21));
+            jButtonBrowse.setBounds(new java.awt.Rectangle(374,rowThree,buttonWidth,20));
             jButtonBrowse.setText("Browse");
-            jButtonBrowse.setPreferredSize(new java.awt.Dimension(92,20));
+            jButtonBrowse.setPreferredSize(new java.awt.Dimension(buttonWidth,20));
             jButtonBrowse.addActionListener(new javax.swing.AbstractAction() {
                 /**
                  * 
@@ -501,7 +464,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JScrollPane getJScrollPanePkgHdr() {
         if (jScrollPanePkgHdr == null) {
             jScrollPanePkgHdr = new JScrollPane();
-            jScrollPanePkgHdr.setBounds(new java.awt.Rectangle(13,149,453,258));
+            jScrollPanePkgHdr.setBounds(new java.awt.Rectangle(labelCol,rowFive,453,258));
             jScrollPanePkgHdr.setViewportView(getJTable());
         }
         return jScrollPanePkgHdr;
@@ -589,7 +552,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        Tools.resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
+        // Tools.resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPanePkgHdr, this.getWidth(), intPreferredWidth);
         Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);
