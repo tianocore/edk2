@@ -152,6 +152,16 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JLabel jLabelSupMod = null;
 
     private JLabel jLabelSupArch = null;
+    
+    private final int pcdCNameMinWidth = 200;
+    private final int pcdTokenMinWidth = 100;
+    private final int pcdTokenSpaceMinWidth = 200;
+    private final int datumTypeMinWidth = 80;
+    private final int defaultValueMinWidth = 100;
+    private final int helpTextMinWidth = 200;
+    private final int usageMinWidth = 60;
+    private final int supArchMinWidth = 200;
+    private final int supModMinWidth = 200;
 
     /**
      This method initializes this
@@ -677,6 +687,33 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             model.addColumn("DynamicEx");
             model.addColumn("SupportedArch");
             model.addColumn("SupportedModule");
+            
+            TableColumn column = jTable.getColumnModel().getColumn(0);
+            column.setMinWidth(this.pcdCNameMinWidth);
+            column = jTable.getColumnModel().getColumn(1);
+            column.setMinWidth(this.pcdTokenMinWidth);
+            column = jTable.getColumnModel().getColumn(2);
+            column.setMinWidth(this.pcdTokenSpaceMinWidth);
+            column = jTable.getColumnModel().getColumn(3);
+            column.setMinWidth(this.datumTypeMinWidth);
+            column = jTable.getColumnModel().getColumn(4);
+            column.setMinWidth(this.defaultValueMinWidth);
+            column = jTable.getColumnModel().getColumn(5);
+            column.setMinWidth(this.helpTextMinWidth);
+            column = jTable.getColumnModel().getColumn(6);
+            column.setMinWidth(this.usageMinWidth);
+            column = jTable.getColumnModel().getColumn(7);
+            column.setMinWidth(this.usageMinWidth);
+            column = jTable.getColumnModel().getColumn(8);
+            column.setMinWidth(this.usageMinWidth);
+            column = jTable.getColumnModel().getColumn(9);
+            column.setMinWidth(this.usageMinWidth);
+            column = jTable.getColumnModel().getColumn(10);
+            column.setMinWidth(this.usageMinWidth);
+            column = jTable.getColumnModel().getColumn(11);
+            column.setMinWidth(this.supArchMinWidth);
+            column = jTable.getColumnModel().getColumn(12);
+            column.setMinWidth(this.supModMinWidth);
             
             //ToDo: add a valid usage editor
             
