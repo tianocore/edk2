@@ -100,18 +100,16 @@ public class MsaWriter {
             msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("Guid Value Not Found!  Please Input Guid Value")));
         }
 
-        msaheader.setCopyright("Copyright (c) 2006, Intel Corporation");
+        msaheader.setCopyright("Copyright (c) 2006, Intel Corporation. All right reserved.");
         msaheader.setVersion("1.0");
         msaheader.setAbstract("Component name for module " + mi.modulename);
         msaheader.setDescription("FIX ME!");
-        msaheader.addNewLicense().setStringValue("All rights reserved.\n" +
-                "      This software and associated documentation (if any) is furnished\n" +
-                "      under a license and may only be used or copied in accordance\n" +
-                "      with the terms of the license. Except as permitted by such\n" +
-                "      license, no part of this software or documentation may be\n" +
-                "      reproduced, stored in a retrieval system, or transmitted in any\n" +
-                "      form or by any means without the express written consent of\n" +
-                "      Intel Corporation.");
+
+        if (mi.license == null) {
+            mi.license = "FIX ME!";
+            MigrationTool.ui.println ("Fail to extract license info in inf file"); 
+        }
+        msaheader.addNewLicense().setStringValue(mi.license);
         msaheader.setSpecification("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
         
         List<Enum> arch = new ArrayList<Enum>();
