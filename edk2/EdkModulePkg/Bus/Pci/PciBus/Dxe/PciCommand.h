@@ -24,6 +24,47 @@ Revision History
 #ifndef _EFI_PCI_COMMAND_H
 #define _EFI_PCI_COMMAND_H
 
+//
+// The PCI Command register bits owned by PCI Bus driver.
+//
+// They should be cleared at the beginning. The other registers
+// are owned by chipset, we should not touch them.
+//
+#define EFI_PCI_COMMAND_BITS_OWNED                          ( \
+                EFI_PCI_COMMAND_IO_SPACE                    | \
+                EFI_PCI_COMMAND_MEMORY_SPACE                | \
+                EFI_PCI_COMMAND_BUS_MASTER                  | \
+                EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE | \
+                EFI_PCI_COMMAND_VGA_PALETTE_SNOOP           | \
+                EFI_PCI_COMMAND_FAST_BACK_TO_BACK             \
+                )
+
+//
+// The PCI Bridge Control register bits owned by PCI Bus driver.
+// 
+// They should be cleared at the beginning. The other registers
+// are owned by chipset, we should not touch them.
+//
+#define EFI_PCI_BRIDGE_CONTROL_BITS_OWNED                   ( \
+                EFI_PCI_BRIDGE_CONTROL_ISA                  | \
+                EFI_PCI_BRIDGE_CONTROL_VGA                  | \
+                EFI_PCI_BRIDGE_CONTROL_VGA_16               | \
+                EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK      \
+                )
+
+//
+// The PCCard Bridge Control register bits owned by PCI Bus driver.
+// 
+// They should be cleared at the beginning. The other registers
+// are owned by chipset, we should not touch them.
+//
+#define EFI_PCCARD_BRIDGE_CONTROL_BITS_OWNED                ( \
+                EFI_PCI_BRIDGE_CONTROL_ISA                  | \
+                EFI_PCI_BRIDGE_CONTROL_VGA                  | \
+                EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK      \
+                )
+
+
 #define EFI_GET_REGISTER      1
 #define EFI_SET_REGISTER      2
 #define EFI_ENABLE_REGISTER   3
