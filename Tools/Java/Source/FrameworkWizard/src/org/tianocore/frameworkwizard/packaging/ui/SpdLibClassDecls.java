@@ -17,8 +17,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+//import java.util.Iterator;
+//import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -41,11 +41,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.GlobalData;
+//import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
@@ -53,8 +54,8 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
 import org.tianocore.frameworkwizard.platform.ui.LongTextEditor;
-import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
-import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+//import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
+//import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 
 /**
@@ -116,14 +117,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private JScrollPane jHelpTextScrollPane = null;
 
-    private JLabel jLabel3RecInstName = null;
-
-    private JTextField jTextField1RecInstName = null;
-
-    private JLabel jLabel4RecInstVer = null;
-
-    private JTextField jTextField2RecInstVer = null;
-
     private JLabel jLabel5SupArchList = null;
 
     private JLabel jLabel6SupModList = null;
@@ -136,15 +129,19 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private ICheckBoxList iCheckBoxListArch = null;
 
-    private JComboBox jComboBox = null;
-
     private int cnClassName = 0;
     private int cnHdrFile = 1;
     private int cnHelpText = 2;
-    private int cnRecInstName = 3;
-    private int cnRecInstVer = 4;
+//    private int cnRecInstName = 3;
+//    private int cnRecInstVer = 4;
     private int cnSupArch = 5;
     private int cnSupMod = 6;
+    
+    private final int classNameMinWidth = 200;
+    private final int hdrFileMinWidth = 300;
+    private final int helpTextMinWidth = 300;
+    private final int supArchMinWidth = 200;
+    private final int supModMinWidth = 200;
 
     private final int shortLabel = 90;
     private final int longLabel = 220;
@@ -253,6 +250,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            
            jTable.getColumnModel().getColumn(cnHelpText).setCellEditor(new LongTextEditor());
            
+           jTable.removeColumn(jTable.getColumnModel().getColumn(3));
+           jTable.removeColumn(jTable.getColumnModel().getColumn(3));
+           
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
            vArch.add("X64");
@@ -260,7 +260,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vArch.add("EBC");
            vArch.add("ARM");
            vArch.add("PPC");
-           jTable.getColumnModel().getColumn(cnSupArch).setCellEditor(new ListEditor(vArch));
+           jTable.getColumnModel().getColumn(cnSupArch - 2).setCellEditor(new ListEditor(vArch));
            
            Vector<String> vModule = new Vector<String>();
            vModule.add("BASE");
@@ -276,8 +276,19 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vModule.add("UEFI_APPLICATION");
            vModule.add("USER_DEFINED");
 
-           jTable.getColumnModel().getColumn(cnSupMod).setCellEditor(new ListEditor(vModule));
-          
+           jTable.getColumnModel().getColumn(cnSupMod - 2).setCellEditor(new ListEditor(vModule));
+           
+           TableColumn column = jTable.getColumnModel().getColumn(this.cnClassName);
+           column.setMinWidth(this.classNameMinWidth);
+           column = jTable.getColumnModel().getColumn(this.cnHdrFile);
+           column.setMinWidth(this.hdrFileMinWidth);
+           column = jTable.getColumnModel().getColumn(this.cnHelpText);
+           column.setMinWidth(this.helpTextMinWidth);
+           column = jTable.getColumnModel().getColumn(this.cnSupArch - 2);
+           column.setMinWidth(this.supArchMinWidth);
+           column = jTable.getColumnModel().getColumn(this.cnSupMod - 2);
+           column.setMinWidth(this.supModMinWidth);
+           
            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                public void valueChanged(ListSelectionEvent e) {
@@ -312,13 +323,13 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             String hdr = m.getValueAt(row, cnHdrFile) + "";
             String hlp = m.getValueAt(row, cnHelpText) + "";
             String name = null;
-            if (m.getValueAt(row, cnRecInstName) != null) {
-                name = m.getValueAt(row, cnRecInstName).toString();
-            } 
-            String ver = null;
-            if (m.getValueAt(row, cnRecInstVer) != null){
-                ver = m.getValueAt(row, cnRecInstVer).toString();
-            }
+//            if (m.getValueAt(row, cnRecInstName) != null) {
+//                name = m.getValueAt(row, cnRecInstName).toString();
+//            } 
+//            String ver = null;
+//            if (m.getValueAt(row, cnRecInstVer) != null){
+//                ver = m.getValueAt(row, cnRecInstVer).toString();
+//            }
             String arch = null;
             if (m.getValueAt(row, cnSupArch) != null) {
                arch = m.getValueAt(row, cnSupArch).toString();
@@ -327,20 +338,20 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (m.getValueAt(row, cnSupMod) != null) {
                 module = m.getValueAt(row, cnSupMod).toString();
             }
-            String[] rowData = {lib, hdr, hlp, name, ver};
+            String[] rowData = {lib, hdr, hlp, name};
             if (!dataValidation(rowData)) {
                 return;
             }
             
             String guid = null;
-            if (name != null && name.length() > 0) {
-                getLibInstances(lib);
-                guid = nameToGuid(name);
-                if (guid == null){
-                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
-                  return;
-                }
-            }
+//            if (name != null && name.length() > 0) {
+//                getLibInstances(lib);
+//                guid = nameToGuid(name);
+//                if (guid == null){
+//                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
+//                  return;
+//                }
+//            }
             
             String[] sa = new String[7];
             sfc.getSpdLibClassDeclaration(sa, row);
@@ -348,28 +359,26 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (cellData == null) {
                 cellData = "";
             }
-            if (column == cnRecInstName) {
-                if (guid == null) {
-                    if (sa[cnRecInstName] == null) {
-                        return;
-                    }
-                }
-                else {
-                    if (guid.equals(sa[cnRecInstName])) {
-                        return;
-                    }
-                }
+//            if (column == cnRecInstName) {
+//                if (guid == null) {
+//                    if (sa[cnRecInstName] == null) {
+//                        return;
+//                    }
+//                }
+//                else {
+//                    if (guid.equals(sa[cnRecInstName])) {
+//                        return;
+//                    }
+//                }
+//            }
+            if (cellData.equals(sa[column])) {
+                return;
             }
-            else {
-                if (cellData.equals(sa[column])) {
-                    return;
-                }
-                if (cellData.toString().length() == 0 && sa[column] == null) {
-                    return;
-                }
+            if (cellData.toString().length() == 0 && sa[column] == null) {
+                return;
             }
             docConsole.setSaved(false);
-            sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
+            sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, null, arch, module);
         }
     }
 
@@ -472,10 +481,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         sfc.getSpdLibClassDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
-            if (saa[i][3] != null && saa[i][3].length() > 0) {
-                getLibInstances(saa[i][0]);
-                saa[i][3] = guidToName(saa[i][3]);
-            }
+//            if (saa[i][3] != null && saa[i][3].length() > 0) {
+//                getLibInstances(saa[i][0]);
+//                saa[i][3] = guidToName(saa[i][3]);
+//            }
             
             model.addRow(saa[i]);
             i++;
@@ -571,8 +580,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             row[cnClassName] = jTextFieldAddClass.getText();
             row[cnHdrFile] = jTextFieldHdr.getText().replace('\\', '/');
             row[cnHelpText] = jTextAreaHelp.getText();
-            row[cnRecInstName] = jComboBox.getSelectedItem()+"";
-            row[cnRecInstVer] = jTextField2RecInstVer.getText();
+//            row[cnRecInstName] = jComboBox.getSelectedItem()+"";
+//            row[cnRecInstVer] = jTextField2RecInstVer.getText();
             row[cnSupArch] = vectorToString(iCheckBoxListArch.getAllCheckedItemsString());
             if (row[cnSupArch].length() == 0) {
                 row[cnSupArch] = null;
@@ -587,19 +596,19 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //
             //convert to GUID before storing recommended lib instance.
             //
-            getLibInstances(row[cnClassName]);
-            String recommendGuid = nameToGuid(row[cnRecInstName]);
-            if (row[cnRecInstName].equals("null")) {
-                row[cnRecInstName] = null;
-            }
-            else{
-                if (recommendGuid == null) {
-                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
-                  return;
-                }
-            }
+//            getLibInstances(row[cnClassName]);
+//            String recommendGuid = nameToGuid(row[cnRecInstName]);
+//            if (row[cnRecInstName].equals("null")) {
+//                row[cnRecInstName] = null;
+//            }
+//            else{
+//                if (recommendGuid == null) {
+//                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
+//                  return;
+//                }
+//            }
 
-            sfc.genSpdLibClassDeclarations(row[cnClassName], recommendGuid, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, row[cnRecInstVer], null, row[cnSupMod]);
+            sfc.genSpdLibClassDeclarations(row[cnClassName], null, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, null, null, row[cnSupMod]);
             model.addRow(row);
             jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             docConsole.setSaved(false);
@@ -642,17 +651,17 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             JOptionPane.showMessageDialog(frame, "Help Text must be entered!");
             return false;
         }
-        if (row[cnRecInstVer] != null && row[cnRecInstVer].length() > 0) {
-            if (row[cnRecInstName] == null || row[cnRecInstName].length() == 0) {
-                JOptionPane.showMessageDialog(frame, "Recommended Instance Version must associate with the Instance Name.");
-                return false;
-            }
-            
-            if (!DataValidation.isVersionDataType(row[cnRecInstVer])) {
-                JOptionPane.showMessageDialog(frame, "Recommended Instance Version does not match Version datatype.");
-                return false;
-            }
-        }
+//        if (row[cnRecInstVer] != null && row[cnRecInstVer].length() > 0) {
+//            if (row[cnRecInstName] == null || row[cnRecInstName].length() == 0) {
+//                JOptionPane.showMessageDialog(frame, "Recommended Instance Version must associate with the Instance Name.");
+//                return false;
+//            }
+//            
+//            if (!DataValidation.isVersionDataType(row[cnRecInstVer])) {
+//                JOptionPane.showMessageDialog(frame, "Recommended Instance Version does not match Version datatype.");
+//                return false;
+//            }
+//        }
         return true;
     }
     /**
@@ -846,53 +855,53 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         return iCheckBoxListArch;
     }
 
-    private void getLibInstances(String libClass){
-        libNameGuidMap.clear();
-        try {
-                Iterator ismi = GlobalData.vModuleList.iterator();
-                while (ismi.hasNext()) {
-                    ModuleIdentification mi = (ModuleIdentification) ismi.next();
-                    
-                    Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
-                    for (int i = 0; i < classProduced.size(); ++i) {
-                        if (classProduced.get(i).equals(libClass)) {
-                            libNameGuidMap.put(mi.getName(), mi.getGuid());
-                        }
-                    }
-                }
-           
-        }
-        catch(Exception e){
-            JOptionPane.showMessageDialog(frame, "Search Instances Failed.");
-        }
-        
-    }
+//    private void getLibInstances(String libClass){
+//        libNameGuidMap.clear();
+//        try {
+//                Iterator ismi = GlobalData.vModuleList.iterator();
+//                while (ismi.hasNext()) {
+//                    ModuleIdentification mi = (ModuleIdentification) ismi.next();
+//                    
+//                    Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
+//                    for (int i = 0; i < classProduced.size(); ++i) {
+//                        if (classProduced.get(i).equals(libClass)) {
+//                            libNameGuidMap.put(mi.getName(), mi.getGuid());
+//                        }
+//                    }
+//                }
+//           
+//        }
+//        catch(Exception e){
+//            JOptionPane.showMessageDialog(frame, "Search Instances Failed.");
+//        }
+//        
+//    }
 
-    private String nameToGuid(String name) {
-        String s = null;
-        if (!libNameGuidMap.containsKey(name)) {
-            return s;
-        }
-        
-        s = libNameGuidMap.get(name);
-        return s;
-    }
+//    private String nameToGuid(String name) {
+//        String s = null;
+//        if (!libNameGuidMap.containsKey(name)) {
+//            return s;
+//        }
+//        
+//        s = libNameGuidMap.get(name);
+//        return s;
+//    }
     
-    private String guidToName(String guid){
-        String s = "";
-        if (!libNameGuidMap.containsValue(guid)) {
-            return s;
-        }
-        Set<String> key = libNameGuidMap.keySet();
-        Iterator<String> is = key.iterator();
-        while(is.hasNext()) {
-            s = is.next();
-            if (libNameGuidMap.get(s).equals(guid)) {
-                break;
-            }
-        }
-        return s;
-    }
+//    private String guidToName(String guid){
+//        String s = "";
+//        if (!libNameGuidMap.containsValue(guid)) {
+//            return s;
+//        }
+//        Set<String> key = libNameGuidMap.keySet();
+//        Iterator<String> is = key.iterator();
+//        while(is.hasNext()) {
+//            s = is.next();
+//            if (libNameGuidMap.get(s).equals(guid)) {
+//                break;
+//            }
+//        }
+//        return s;
+//    }
 
 }
 

@@ -154,6 +154,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             modelPcd.addColumn("DatumType");
             jTableDynPcd = new JTable(modelPcd);
             jTableDynPcd.setRowHeight(20);
+            
+            jTableDynPcd.getColumnModel().getColumn(0).setMinWidth(250);
+            
             jTableDynPcd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableDynPcd.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {

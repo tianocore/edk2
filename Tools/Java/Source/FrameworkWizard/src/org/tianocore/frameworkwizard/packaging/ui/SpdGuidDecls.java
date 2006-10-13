@@ -34,6 +34,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
@@ -134,6 +135,15 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     protected String[][] saa = null;
 
     protected StarLabel starLabel = null;
+    
+    private final int guidNameMinWidth = 200;
+    private final int guidCNameMinWidth = 200;
+    private final int guidValueMinWidth = 300;
+    private final int helpTextMinWidth = 300;
+    private final int supArchMinWidth = 200;
+    private final int supModMinWidth = 200;
+    private final int guidTypeMinWidth = 200;
+    
 
     /**
       This method initializes this
@@ -192,6 +202,22 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            model.addColumn("Supported Architectures");
            model.addColumn("Supported Module Types");
            model.addColumn("GuidTypes");
+           
+           TableColumn column = jTable.getColumnModel().getColumn(0);
+           column.setMinWidth(this.guidNameMinWidth);
+           column = jTable.getColumnModel().getColumn(1);
+           column.setMinWidth(this.guidCNameMinWidth);
+           column = jTable.getColumnModel().getColumn(2);
+           column.setMinWidth(this.guidValueMinWidth);
+           column = jTable.getColumnModel().getColumn(3);
+           column.setMinWidth(this.helpTextMinWidth);
+           column = jTable.getColumnModel().getColumn(4);
+           column.setMinWidth(this.supArchMinWidth);
+           column = jTable.getColumnModel().getColumn(5);
+           column.setMinWidth(this.supModMinWidth);
+           column = jTable.getColumnModel().getColumn(6);
+           column.setMinWidth(this.guidTypeMinWidth);
+           
            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
            jTable.getColumnModel().getColumn(3).setCellEditor(new LongTextEditor());
 
