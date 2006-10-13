@@ -834,7 +834,7 @@ public class Find {
             }
 
             //
-            // Get the sting "PackageName.ModuleName" 
+            // Get the string "PackageName.ModuleName" 
             //
             String tmp = lcvId.getBelongModule().getPackageId().getName() + SEPERATOR
                          + lcvId.getBelongModule().getName();

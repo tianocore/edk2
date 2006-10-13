@@ -30,6 +30,7 @@ import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.find.Find;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
@@ -37,6 +38,7 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassVector;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -213,7 +215,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168,197,320,20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 197, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
             jTextFieldFeatureFlag.setEnabled(false);
@@ -304,7 +306,8 @@ public class LibraryClassDefsDlg extends IDialog {
      This is the default constructor
      
      **/
-    public LibraryClassDefsDlg(LibraryClassIdentification inLibraryClassIdentification, IFrame iFrame, ModuleIdentification mid) {
+    public LibraryClassDefsDlg(LibraryClassIdentification inLibraryClassIdentification, IFrame iFrame,
+                               ModuleIdentification mid) {
         super(iFrame, true);
         init(inLibraryClassIdentification, mid);
     }
@@ -329,22 +332,27 @@ public class LibraryClassDefsDlg extends IDialog {
     private void init(LibraryClassIdentification inLibraryClassIdentification, ModuleIdentification mid) {
         init();
         this.lcid = inLibraryClassIdentification;
-        
+
         //
         // Init arch with module's arch
         //
         this.jArchCheckBox.setEnabledItems(wt.getModuleArch(mid));
-        
+
         //
         // Get defined library classes from dependent packages
         //
         Vector<PackageIdentification> vpid = wt.getPackageDependenciesOfModule(mid);
         if (vpid.size() <= 0) {
-            Log.wrn("Init Library Class", "This module hasn't defined any package dependency, so there is no library class can be added");
+            Log.wrn("Init Library Class",
+                    "This module hasn't defined any package dependency, so there is no library class can be added");
         }
-        
-        Tools.generateComboBoxByVector(this.jComboBoxLibraryClassName,
-                                       wt.getAllLibraryClassDefinitionsFromPackages(wt.getPackageDependenciesOfModule(mid)));
+
+        Tools
+             .generateComboBoxByVector(
+                                       this.jComboBoxLibraryClassName,
+                                       wt
+                                         .getAllLibraryClassDefinitionsFromPackages(wt
+                                                                                      .getPackageDependenciesOfModule(mid)));
 
         if (lcid != null) {
             this.jComboBoxLibraryClassName.setSelectedItem(lcid.getLibraryClassName());
@@ -393,7 +401,7 @@ public class LibraryClassDefsDlg extends IDialog {
             jLabelArch.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12,197,168,20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 197, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelFeatureFlag.setEnabled(false);
             jLabelRecommendedInstanceGuid = new JLabel();
@@ -498,6 +506,32 @@ public class LibraryClassDefsDlg extends IDialog {
             return false;
         }
 
+        //
+        // Check if the library is produced
+        //
+        String strUsage = this.jComboBoxUsage.getSelectedItem().toString();
+        //
+        // Check only when the library class is consumed
+        //
+        if (strUsage.equals(DataType.USAGE_TYPE_ALWAYS_CONSUMED) || strUsage.equals(DataType.USAGE_TYPE_SOMETIMES_CONSUMED)) {
+            LibraryClassVector v = Find.getAllLibraryClassVector();
+            boolean isFind = false;
+            for (int index = 0; index < v.size(); index++) {
+                LibraryClassIdentification lid = v.getLibraryClass(index);
+                if (lid.getLibraryClassName().equals(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
+                    if (lid.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
+                        || lid.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
+                        isFind = true;
+                        break;
+                    }
+                }
+            }
+            if (!isFind) {
+                Log.wrn("Update Library Class Definitions", "This Library Class has no instance yet.");
+                return false;
+            }
+        }
+        
         //
         // Check RecommendedInstanceVersion
         //

@@ -16,14 +16,19 @@ package org.tianocore.frameworkwizard.module.Identifications.LibraryClass;
 
 import java.util.Vector;
 
-
 public class LibraryClassVector {
     private Vector<LibraryClassIdentification> vLibraryClass = new Vector<LibraryClassIdentification>();
-    
+
     public int findLibraryClass(LibraryClassIdentification lib) {
-        return findLibraryClass(lib.getLibraryClassName());
+        for (int index = 0; index < vLibraryClass.size(); index++) {
+            if (vLibraryClass.elementAt(index).getLibraryClassName().equals(lib.getLibraryClassName())
+                && vLibraryClass.elementAt(index).getUsage().equals(lib.getUsage())) {
+                return index;
+            }
+        }
+        return -1;
     }
-    
+
     public int findLibraryClass(String name) {
         for (int index = 0; index < vLibraryClass.size(); index++) {
             if (vLibraryClass.elementAt(index).getLibraryClassName().equals(name)) {
@@ -32,7 +37,7 @@ public class LibraryClassVector {
         }
         return -1;
     }
-    
+
     public LibraryClassIdentification getLibraryClass(int index) {
         if (index > -1) {
             return vLibraryClass.elementAt(index);
@@ -40,24 +45,24 @@ public class LibraryClassVector {
             return null;
         }
     }
-    
+
     public void addLibraryClass(LibraryClassIdentification lib) {
         if (findLibraryClass(lib) == -1) {
             vLibraryClass.addElement(lib);
         }
     }
-    
+
     public void setLibraryClass(LibraryClassIdentification lib, int index) {
         vLibraryClass.setElementAt(lib, index);
     }
-    
+
     public void removeLibraryClass(LibraryClassIdentification lib) {
         int index = findLibraryClass(lib);
         if (index > -1) {
             vLibraryClass.removeElementAt(index);
         }
     }
-    
+
     public void removeLibraryClass(int index) {
         if (index > -1 && index < this.size()) {
             vLibraryClass.removeElementAt(index);
@@ -71,7 +76,7 @@ public class LibraryClassVector {
     public void setVLibraryClass(Vector<LibraryClassIdentification> libraryClass) {
         vLibraryClass = libraryClass;
     }
-    
+
     public Vector<String> getLibraryClassName() {
         Vector<String> v = new Vector<String>();
         for (int index = 0; index < this.vLibraryClass.size(); index++) {
@@ -79,11 +84,11 @@ public class LibraryClassVector {
         }
         return v;
     }
-    
+
     public int size() {
         return this.vLibraryClass.size();
     }
-    
+
     public Vector<String> toStringVector(int index) {
         Vector<String> v = new Vector<String>();
         v.addElement(getLibraryClass(index).getLibraryClassName());
