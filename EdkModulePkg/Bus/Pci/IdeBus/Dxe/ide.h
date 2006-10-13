@@ -1,15 +1,15 @@
 /** @file
-  Header file for IDE Bus Driver, containing the helper functions' 
+  Header file for IDE Bus Driver, containing the helper functions'
   entire prototype.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   2002-6: Add Atapi6 enhancement, support >120GB hard disk, including
@@ -195,6 +195,19 @@ ReassignIdeResources (
 EFI_STATUS
 DiscoverIdeDevice (
   IN IDE_BLK_IO_DEV *IdeDev
+  )
+;
+
+/**
+  This interface is used to initialize all state data related to the
+  detection of one channel.
+
+  @retval EFI_SUCCESS Completed successfully.
+
+**/
+EFI_STATUS
+InitializeIDEChannelData (
+  VOID
   )
 ;
 
@@ -662,13 +675,15 @@ PioReadWriteData (
   TODO: Add function description
 
   @param  IdeDev TODO: add argument description
+  @param  IdeDev TODO: add argument description
 
   TODO: add return values
 
 **/
 EFI_STATUS
 AtapiTestUnitReady (
-  IN  IDE_BLK_IO_DEV  *IdeDev
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  OUT UINTN           *SenseCount
   )
 ;
 
@@ -692,13 +707,15 @@ AtapiRequestSense (
   TODO: Add function description
 
   @param  IdeDev TODO: add argument description
+  @param  IdeDev TODO: add argument description
 
   TODO: add return values
 
 **/
 EFI_STATUS
 AtapiReadCapacity (
-  IN  IDE_BLK_IO_DEV  *IdeDev
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  OUT UINTN           *SenseCount
   )
 ;
 
@@ -819,82 +836,32 @@ AtapiBlkIoWriteBlocks (
 /**
   TODO: Add function description
 
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
+  @param  IdeDev TODO: add argument description
+  @param  SenseCount TODO: add argument description
+  @param  Result TODO: add argument description
 
   TODO: add return values
 
 **/
-BOOLEAN
-IsNoMedia (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
+EFI_STATUS
+ParseSenseData (
+  IN IDE_BLK_IO_DEV     *IdeDev,
+  IN UINTN              SenseCount,
+  OUT SENSE_RESULT      *Result
   )
 ;
 
 /**
   TODO: Add function description
 
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
+  @param  IdeDev TODO: add argument description
 
   TODO: add return values
 
 **/
-BOOLEAN
-IsMediaError (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-;
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-IsMediaChange (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-;
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-  @param  NeedRetry TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-IsDriveReady (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts,
-  OUT BOOLEAN               *NeedRetry
-  )
-;
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-HaveSenseKey (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
+EFI_STATUS
+AtapiReadPendingData (
+  IN IDE_BLK_IO_DEV     *IdeDev
   )
 ;
 
@@ -1304,6 +1271,7 @@ EnableInterrupt (
   IN IDE_BLK_IO_DEV       *IdeDev
   )
 ;
+
 /**
   Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
 

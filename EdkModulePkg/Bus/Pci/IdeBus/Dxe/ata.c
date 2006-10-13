@@ -1,12 +1,12 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   2002-6: Add Atapi6 enhancement, support >120GB hard disk, including
@@ -64,11 +64,11 @@ AtaPioDataOutExt (
   Sends out an ATA Identify Command to the specified device.
 
   This function is called by DiscoverIdeDevice() during its device
-  identification. It sends out the ATA Identify Command to the 
-  specified device. Only ATA device responses to this command. If 
-  the command succeeds, it returns the Identify data structure which 
-  contains information about the device. This function extracts the 
-  information it needs to fill the IDE_BLK_IO_DEV data structure, 
+  identification. It sends out the ATA Identify Command to the
+  specified device. Only ATA device responses to this command. If
+  the command succeeds, it returns the Identify data structure which
+  contains information about the device. This function extracts the
+  information it needs to fill the IDE_BLK_IO_DEV data structure,
   including device type, media block size, media capacity, and etc.
 
   @param[in] *IdeDev
@@ -76,7 +76,7 @@ AtaPioDataOutExt (
   to record all the information of the IDE device.
 
   @retval EFI_SUCCESS Identify ATA device successfully.
-  
+
   @retval EFI_DEVICE_ERROR ATA Identify Device Command failed or
   device is not ATA device.
 
@@ -203,13 +203,13 @@ ATAIdentify (
 
   @retval  EFI_SUCCESS The disk specified by IdeDev is a Atapi6 supported one
   and 48-bit addressing must be used
-  
+
   @retval  EFI_UNSUPPORTED The disk dosn't not support Atapi6 or it supports but
   the capacity is below 120G, 48bit addressing is not
   needed
 
   @note
-  This function must be called after DEVICE_IDENTITY command has been 
+  This function must be called after DEVICE_IDENTITY command has been
   successfully returned
 
 **/
@@ -274,7 +274,7 @@ AtaAtapi6Identify (
 
 /**
   This function is called by ATAIdentify() or ATAPIIdentify()
-  to print device's module name. 
+  to print device's module name.
 
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -295,7 +295,7 @@ PrintAtaModuleName (
 }
 
 /**
-  This function is used to send out ATA commands conforms to the 
+  This function is used to send out ATA commands conforms to the
   PIO Data In Protocol.
 
   @param[in] *IdeDev
@@ -328,7 +328,7 @@ PrintAtaModuleName (
 
   @retval EFI_SUCCESS send out the ATA command and device send required
   data successfully.
-  
+
   @retval EFI_DEVICE_ERROR command sent failed.
 
 **/
@@ -462,7 +462,7 @@ AtaPioDataIn (
 }
 
 /**
-  This function is used to send out ATA commands conforms to the 
+  This function is used to send out ATA commands conforms to the
   PIO Data Out Protocol.
 
   @param *IdeDev
@@ -480,7 +480,7 @@ AtaPioDataIn (
 
   @retval EFI_SUCCESS send out the ATA command and device received required
   data successfully.
-  
+
   @retval EFI_DEVICE_ERROR command sent failed.
 
 **/
@@ -571,7 +571,7 @@ AtaPioDataOut (
   WordCount = 0;
 
   while (WordCount < ByteCount / 2) {
-    
+
     //
     // DRQReady2-- read Alternate Status Register to determine the DRQ bit
     // data transfer can be performed only when DRQ is ready.
@@ -595,7 +595,7 @@ AtaPioDataOut (
     //
     // perform a series of write without check DRQ ready
     //
-    
+
     IDEWritePortWMultiple (
       IdeDev->PciIo,
       IdeDev->IoPort->Data,
@@ -613,7 +613,7 @@ AtaPioDataOut (
 }
 
 /**
-  This function is used to analyze the Status Register and print out 
+  This function is used to analyze the Status Register and print out
   some debug information and if there is ERR bit set in the Status
   Register, the Error Register's value is also be parsed and print out.
 
@@ -729,10 +729,10 @@ CheckErrorStatus (
   to record all the information of the IDE device.
 
   @param[in] *DataBuffer
-  A pointer to the destination buffer for the data. 
+  A pointer to the destination buffer for the data.
 
   @param[in] Lba
-  The starting logical block address to read from 
+  The starting logical block address to read from
   on the device media.
 
   @param[in] NumberOfBlocks
@@ -770,7 +770,7 @@ AtaReadSectors (
   //
   AtaCommand      = READ_SECTORS_CMD;
 
-  
+
   BlocksRemaining = NumberOfBlocks;
 
   Lba32           = (UINT32) Lba;
@@ -778,7 +778,7 @@ AtaReadSectors (
   Status          = EFI_SUCCESS;
 
   while (BlocksRemaining > 0) {
-    
+
     //
     // in ATA-3 spec, LBA is in 28 bit width
     //
@@ -791,7 +791,7 @@ AtaReadSectors (
     Lba3 = (UINT8) ((Lba32 >> 24) & 0x0f);
 
     if (BlocksRemaining >= 0x100) {
-      
+
       //
       //  SectorCount8 is sent to Sector Count register, 0x00 means 256
       //  sectors to be read
@@ -847,10 +847,10 @@ AtaReadSectors (
   to record all the information of the IDE device.
 
   @param[in] *BufferData
-  A pointer to the source buffer for the data. 
+  A pointer to the source buffer for the data.
 
   @param[in] Lba
-  The starting logical block address to write onto 
+  The starting logical block address to write onto
   the device media.
 
   @param[in] NumberOfBlocks
@@ -902,7 +902,7 @@ AtaWriteSectors (
     Lba3  = (UINT8) ((Lba32 >> 24) & 0x0f);
 
     if (BlocksRemaining >= 0x100) {
-      
+
       //
       //  SectorCount8 is sent to Sector Count register, 0x00 means 256 sectors
       //  to be written
@@ -945,8 +945,8 @@ AtaWriteSectors (
 
 /**
   This function is used to implement the Soft Reset on the specified
-  device. But, the ATA Soft Reset mechanism is so strong a reset method 
-  that it will force resetting on both devices connected to the 
+  device. But, the ATA Soft Reset mechanism is so strong a reset method
+  that it will force resetting on both devices connected to the
   same cable.
 
   It is called by IdeBlkIoReset(), a interface function of Block
@@ -988,6 +988,10 @@ AtaSoftReset (
 
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
+  //
+  // SRST should assert for at least 5 us, we use 10 us for
+  // better compatibility
+  //
   gBS->Stall (10);
 
   //
@@ -996,6 +1000,11 @@ AtaSoftReset (
   DeviceControl = 0;
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
+  //
+  // Wait for at least 2 ms to check BSY status, we use 10 ms
+  // for better compatibility
+  //
+  gBS->Stall(10000);
   //
   // slave device needs at most 31s to clear BSY
   //
@@ -1017,7 +1026,7 @@ AtaSoftReset (
   The media id that the read request is for.
 
   @param[in] LBA
-  The starting logical block address to read from 
+  The starting logical block address to read from
   on the device.
 
   @param[in] BufferSize
@@ -1025,7 +1034,7 @@ AtaSoftReset (
   multiple of the intrinsic block size of the device.
 
   @param[out] *Buffer
-  A pointer to the destination buffer for the data. 
+  A pointer to the destination buffer for the data.
   The caller is responsible for either having implicit
   or explicit ownership of the memory that data is read into.
 
@@ -1033,11 +1042,11 @@ AtaSoftReset (
   @retval EFI_DEVICE_ERROR  Read Blocks failed.
   @retval EFI_NO_MEDIA      There is no media in the device.
   @retval EFI_MEDIA_CHANGE  The MediaId is not for the current media.
-  
+
   @retval EFI_BAD_BUFFER_SIZE
   The BufferSize parameter is not a multiple of the
   intrinsic block size of the device.
-  
+
   @retval EFI_INVALID_PARAMETER
   The read request contains LBAs that are not valid,
   or the data buffer is not valid.
@@ -1114,13 +1123,9 @@ AtaBlkIoReadBlocks (
   } else {
     //
     // For ATA-3 compatible device, use ATA-3 read block mechanism
-    // Notice DMA operation can only handle 32bit address
     //
-    if ((UINTN) Buffer <= 0xFFFFFFFF) {
-      Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    }
-
-    if (EFI_ERROR (Status) || ((UINTN) Buffer > 0xFFFFFFFF)) {
+    Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+    if (EFI_ERROR (Status)) {
       Status = AtaReadSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   }
@@ -1145,7 +1150,7 @@ AtaBlkIoReadBlocks (
   The media id that the write request is for.
 
   @param[in] LBA
-  The starting logical block address to write onto 
+  The starting logical block address to write onto
   the device.
 
   @param[in] BufferSize
@@ -1153,20 +1158,20 @@ AtaBlkIoReadBlocks (
   multiple of the intrinsic block size of the device.
 
   @param[out] *Buffer
-  A pointer to the source buffer for the data. 
+  A pointer to the source buffer for the data.
   The caller is responsible for either having implicit
-  or explicit ownership of the memory that data is 
+  or explicit ownership of the memory that data is
   written from.
 
   @retval EFI_SUCCESS       Write Blocks successfully.
   @retval EFI_DEVICE_ERROR  Write Blocks failed.
   @retval EFI_NO_MEDIA      There is no media in the device.
   @retval EFI_MEDIA_CHANGE  The MediaId is not for the current media.
-  
+
   @retval EFI_BAD_BUFFER_SIZE
   The BufferSize parameter is not a multiple of the
   intrinsic block size of the device.
-  
+
   @retval EFI_INVALID_PARAMETER
   The write request contains LBAs that are not valid,
   or the data buffer is not valid.
@@ -1241,7 +1246,7 @@ AtaBlkIoWriteBlocks (
     // For ATA-3 compatible device, use ATA-3 write block mechanism
     //
     Status = AtaUdmaWrite (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    if (EFI_ERROR (Status) || ((UINTN) Buffer > 0xFFFFFFFF)) {
+    if (EFI_ERROR (Status)) {
       Status = AtaWriteSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   }
@@ -1256,15 +1261,15 @@ AtaBlkIoWriteBlocks (
 
 /**
   This function is called by the AtaBlkIoReadBlocks() to perform
-  reading from media in block unit. The function has been enhanced to 
+  reading from media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] *DataBuffer    A pointer to the destination buffer for the data. 
-  @param[in] StartLba       The starting logical block address to read from 
+  @param[in] *DataBuffer    A pointer to the destination buffer for the data.
+  @param[in] StartLba       The starting logical block address to read from
   on the device media.
   @param[in] NumberOfBlocks The number of transfer data blocks.
 
@@ -1339,7 +1344,7 @@ AtaReadSectorsExt (
 
 /**
   This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing onto media in block unit. The function has been enhanced to 
+  writing onto media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev
@@ -1347,10 +1352,10 @@ AtaReadSectorsExt (
   to record all the information of the IDE device.
 
   @param[in] *DataBuffer
-  A pointer to the source buffer for the data. 
+  A pointer to the source buffer for the data.
 
   @param[in] Lba
-  The starting logical block address to write onto 
+  The starting logical block address to write onto
   the device media.
 
   @param[in] NumberOfBlocks
@@ -1427,14 +1432,14 @@ AtaWriteSectorsExt (
 }
 
 /**
-  This function is used to send out ATA commands conforms to the 
+  This function is used to send out ATA commands conforms to the
   PIO Data In Protocol, supporting ATA/ATAPI-6 standard
 
   Comparing with ATA-3 data in protocol, we have two differents here:<BR>
   1. Do NOT wait for DRQ clear before sending command into IDE device.(the
   wait will frequently fail... cause writing function return error)
 
-  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
+  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly
   slow down writing performance by 100 times!)
 
   @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -1448,7 +1453,7 @@ AtaWriteSectorsExt (
 
   @retval EFI_SUCCESS send out the ATA command and device send required
   data successfully.
-  
+
   @retval EFI_DEVICE_ERROR command sent failed.
 
 **/
@@ -1544,7 +1549,7 @@ AtaPioDataInExt (
   // According to PIO data in protocol, host can perform a series of reads to
   // the data register after each time device set DRQ ready;
   //
-  
+
   //
   // 256 words
   //
@@ -1592,14 +1597,14 @@ AtaPioDataInExt (
 }
 
 /**
-  This function is used to send out ATA commands conforms to the 
+  This function is used to send out ATA commands conforms to the
   PIO Data Out Protocol, supporting ATA/ATAPI-6 standard
 
   Comparing with ATA-3 data out protocol, we have two differents here:<BR>
   1. Do NOT wait for DRQ clear before sending command into IDE device.(the
   wait will frequently fail... cause writing function return error)
 
-  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
+  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly
   slow down writing performance by 100 times!)
 
   @param[in] *IdeDev
@@ -1614,7 +1619,7 @@ AtaPioDataInExt (
 
   @retval EFI_SUCCESS send out the ATA command and device receive required
   data successfully.
-  
+
   @retval EFI_DEVICE_ERROR command sent failed.
 
 **/
@@ -1661,7 +1666,7 @@ AtaPioDataOutExt (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-     
+
   //
   // Fill feature register if needed
   //
@@ -2090,7 +2095,7 @@ AtaCommandIssue (
   //
   // Fill the start LBA registers, which are also two-byte FIFO
   //
-  
+
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->SectorNumber, Lba0);
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->CylinderLsb, Lba1);
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->CylinderMsb, Lba2);
@@ -2110,15 +2115,15 @@ AtaCommandIssue (
 
 /**
   This function is called by the AtaBlkIoReadBlocks() to perform
-  reading from media in block unit. The function has been enhanced to 
+  reading from media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] *DataBuffer A pointer to the destination buffer for the data. 
+  @param[in] *DataBuffer A pointer to the destination buffer for the data.
 
-  @param[in] StartLba The starting logical block address to read from 
+  @param[in] StartLba The starting logical block address to read from
   on the device media.
 
   @param[in] NumberOfBlocks The number of transfer data blocks.
@@ -2139,21 +2144,26 @@ AtaUdmaReadExt (
   IN  UINTN           NumberOfBlocks
   )
 {
-  IDE_DMA_PRD *PrdAddr;
-  IDE_DMA_PRD *UsedPrdAddr;
-  IDE_DMA_PRD *TempPrdAddr;
-  UINT8       RegisterValue;
-  UINT8       Device;
-  UINT64      IoPortForBmic;
-  UINT64      IoPortForBmis;
-  UINT64      IoPortForBmid;
-  EFI_STATUS  Status;
-  UINTN       PrdTableNum;
-  UINTN       ByteCount;
-  UINTN       ByteAvailable;
-  UINT8       *PrdBuffer;
-  UINTN       RemainBlockNum;
-  UINT8       DeviceControl;
+  IDE_DMA_PRD                *PrdAddr;
+  IDE_DMA_PRD                *UsedPrdAddr;
+  IDE_DMA_PRD                *TempPrdAddr;
+  UINT8                      RegisterValue;
+  UINT8                      Device;
+  UINT64                     IoPortForBmic;
+  UINT64                     IoPortForBmis;
+  UINT64                     IoPortForBmid;
+  EFI_STATUS                 Status;
+  UINTN                      PrdTableNum;
+  UINTN                      ByteCount;
+  UINTN                      ByteAvailable;
+  UINT8                      *PrdBuffer;
+  UINTN                      RemainBlockNum;
+  UINT8                      DeviceControl;
+  UINT32                     Count;
+  UINTN                      PageCount;
+  VOID                       *Map;
+  EFI_PHYSICAL_ADDRESS       MemPage;
+  EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
   // Channel and device differential. Select device.
@@ -2207,7 +2217,20 @@ AtaUdmaReadExt (
     //
     // Build PRD table
     //
-    PrdAddr = (IDE_DMA_PRD *) AllocateZeroPool ((2 * PrdTableNum * sizeof (IDE_DMA_PRD)));
+    MemPage = 0xFFFFFFFF;
+    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiBootServicesData,
+                    PageCount,
+                    &MemPage
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
+
+    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
 
     //
     // To make sure PRD is allocated in one 64K page
@@ -2225,7 +2248,19 @@ AtaUdmaReadExt (
     //
     // Build the PRD table
     //
-    PrdBuffer   = DataBuffer;
+    Status = IdeDev->PciIo->Map (
+                       IdeDev->PciIo,
+                       EfiPciIoOperationBusMasterWrite,
+                       DataBuffer,
+                       &ByteCount,
+                       &DeviceAddress,
+                       &Map
+                       );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (MemPage, PageCount);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    PrdBuffer   = (VOID *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {
 
@@ -2245,7 +2280,7 @@ AtaUdmaReadExt (
       PrdBuffer += ByteAvailable;
       TempPrdAddr++;
     }
-  
+
     //
     // Set the base address to BMID register
     //
@@ -2308,15 +2343,16 @@ AtaUdmaReadExt (
     // Issue READ DMA EXT command
     //
     Status = AtaCommandIssueExt (
-              IdeDev,
-              READ_DMA_EXT_CMD,
-              Device,
-              0,
-              (UINT16) NumberOfBlocks,
-              StartLba
-              );
+               IdeDev,
+               READ_DMA_EXT_CMD,
+               Device,
+               0,
+               (UINT16) NumberOfBlocks,
+               StartLba
+               );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (PrdAddr);
+      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
 
@@ -2345,7 +2381,11 @@ AtaUdmaReadExt (
 
     //
     // Check the INTERRUPT and ERROR bit of BMIS
+    // Max transfer number of sectors for one command is 65536(32Mbyte),
+    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
+    // So set the variable Count to 2000, for about 2 second timeout time.
     //
+    Count = 2000;
     while (TRUE) {
 
       IdeDev->PciIo->Io.Read (
@@ -2356,21 +2396,49 @@ AtaUdmaReadExt (
                           1,
                           &RegisterValue
                           );
-      if (RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) {
-        if (RegisterValue & BMIS_ERROR) {
-          gBS->FreePool (PrdAddr);
+      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
+        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
+          //
+          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
+          //
+          IdeDev->PciIo->Io.Read (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+
+          RegisterValue &= ~((UINT8)BMIC_START);
+
+          IdeDev->PciIo->Io.Write (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
         break;
       }
 
       gBS->Stall (1000);
+      Count --;
     }
 
-    gBS->FreePool (PrdAddr);
-
+    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
-    // Set START bit of BMIC register
+    // Read Status Register of IDE device to clear interrupt
+    //
+    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
+    //
+    // Clear START bit of BMIC register
     //
     IdeDev->PciIo->Io.Read (
                         IdeDev->PciIo,
@@ -2400,20 +2468,27 @@ AtaUdmaReadExt (
     StartLba += NumberOfBlocks;
   }
 
+  //
+  // Disable interrupt of Select device
+  //
+  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
+  DeviceControl |= IEN_L;
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
+
   return EFI_SUCCESS;
 }
 
 /**
   This function is called by the AtaBlkIoReadBlocks() to perform
-  reading from media in block unit. The function has been enhanced to 
+  reading from media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] *DataBuffer    A pointer to the destination buffer for the data. 
-  @param[in] StartLba       The starting logical block address to read from 
+  @param[in] *DataBuffer    A pointer to the destination buffer for the data.
+  @param[in] StartLba       The starting logical block address to read from
   on the device media.
   @param[in] NumberOfBlocks The number of transfer data blocks.
 
@@ -2433,21 +2508,26 @@ AtaUdmaRead (
   IN  UINTN           NumberOfBlocks
   )
 {
-  IDE_DMA_PRD *PrdAddr;
-  IDE_DMA_PRD *UsedPrdAddr;
-  IDE_DMA_PRD *TempPrdAddr;
-  UINT8       RegisterValue;
-  UINT8       Device;
-  UINT64      IoPortForBmic;
-  UINT64      IoPortForBmis;
-  UINT64      IoPortForBmid;
-  EFI_STATUS  Status;
-  UINTN       PrdTableNum;
-  UINTN       ByteCount;
-  UINTN       ByteAvailable;
-  UINT8       *PrdBuffer;
-  UINTN       RemainBlockNum;
-  UINT8       DeviceControl;
+  IDE_DMA_PRD                *PrdAddr;
+  IDE_DMA_PRD                *UsedPrdAddr;
+  IDE_DMA_PRD                *TempPrdAddr;
+  UINT8                      RegisterValue;
+  UINT8                      Device;
+  UINT64                     IoPortForBmic;
+  UINT64                     IoPortForBmis;
+  UINT64                     IoPortForBmid;
+  EFI_STATUS                 Status;
+  UINTN                      PrdTableNum;
+  UINTN                      ByteCount;
+  UINTN                      ByteAvailable;
+  UINT8                      *PrdBuffer;
+  UINTN                      RemainBlockNum;
+  UINT8                      DeviceControl;
+  UINT32                     Count;
+  UINTN                      PageCount;
+  VOID                       *Map;
+  EFI_PHYSICAL_ADDRESS       MemPage;
+  EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
   // Channel and device differential
@@ -2501,7 +2581,20 @@ AtaUdmaRead (
     //
     // Build PRD table
     //
-    PrdAddr = (IDE_DMA_PRD *) AllocateZeroPool ((2 * PrdTableNum * sizeof (IDE_DMA_PRD)));
+    MemPage = 0xFFFFFFFF;
+    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiBootServicesData,
+                    PageCount,
+                    &MemPage
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
+
+    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
     //
     // To make sure PRD is allocated in one 64K page
     //
@@ -2518,7 +2611,19 @@ AtaUdmaRead (
     //
     // Build the PRD table
     //
-    PrdBuffer   = DataBuffer;
+    Status = IdeDev->PciIo->Map (
+                       IdeDev->PciIo,
+                       EfiPciIoOperationBusMasterWrite,
+                       DataBuffer,
+                       &ByteCount,
+                       &DeviceAddress,
+                       &Map
+                       );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (MemPage, PageCount);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {
 
@@ -2601,15 +2706,16 @@ AtaUdmaRead (
     // Issue READ DMA command
     //
     Status = AtaCommandIssue (
-              IdeDev,
-              READ_DMA_CMD,
-              Device,
-              0,
-              (UINT16) NumberOfBlocks,
-              StartLba
-              );
+               IdeDev,
+               READ_DMA_CMD,
+               Device,
+               0,
+               (UINT16) NumberOfBlocks,
+               StartLba
+               );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (PrdAddr);
+      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
 
@@ -2638,7 +2744,11 @@ AtaUdmaRead (
 
     //
     // Check the INTERRUPT and ERROR bit of BMIS
+    // Max transfer number of sectors for one command is 65536(32Mbyte),
+    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
+    // So set the variable Count to 2000, for about 2 second timeout time.
     //
+    Count = 2000;
     while (TRUE) {
 
       IdeDev->PciIo->Io.Read (
@@ -2649,21 +2759,49 @@ AtaUdmaRead (
                           1,
                           &RegisterValue
                           );
-      if (RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) {
-        if (RegisterValue & BMIS_ERROR) {
-          gBS->FreePool (PrdAddr);
+      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
+        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
+          //
+          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
+          //
+          IdeDev->PciIo->Io.Read (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+
+          RegisterValue &= ~((UINT8)BMIC_START);
+
+          IdeDev->PciIo->Io.Write (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
         break;
       }
 
       gBS->Stall (1000);
+      Count --;
     }
 
-    gBS->FreePool (PrdAddr);
-
+    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
-    // Set START bit of BMIC register
+    // Read Status Register of IDE device to clear interrupt
+    //
+    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
+    //
+    // Clear START bit of BMIC register
     //
     IdeDev->PciIo->Io.Read (
                         IdeDev->PciIo,
@@ -2693,20 +2831,27 @@ AtaUdmaRead (
     StartLba += NumberOfBlocks;
   }
 
+  //
+  // Disable interrupt of Select device
+  //
+  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
+  DeviceControl |= IEN_L;
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
+
   return EFI_SUCCESS;
 }
 
 /**
   This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing to media in block unit. The function has been enhanced to 
+  writing to media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] *DataBuffer A pointer to the source buffer for the data. 
+  @param[in] *DataBuffer A pointer to the source buffer for the data.
 
-  @param[in] StartLba The starting logical block address to write to 
+  @param[in] StartLba The starting logical block address to write to
   on the device media.
 
   @param[in] NumberOfBlocks The number of transfer data blocks.
@@ -2726,21 +2871,26 @@ AtaUdmaWriteExt (
   IN  UINTN           NumberOfBlocks
   )
 {
-  IDE_DMA_PRD *PrdAddr;
-  IDE_DMA_PRD *UsedPrdAddr;
-  IDE_DMA_PRD *TempPrdAddr;
-  UINT8       RegisterValue;
-  UINT8       Device;
-  UINT64      IoPortForBmic;
-  UINT64      IoPortForBmis;
-  UINT64      IoPortForBmid;
-  EFI_STATUS  Status;
-  UINTN       PrdTableNum;
-  UINTN       ByteCount;
-  UINTN       ByteAvailable;
-  UINT8       *PrdBuffer;
-  UINTN       RemainBlockNum;
-  UINT8       DeviceControl;
+  IDE_DMA_PRD                *PrdAddr;
+  IDE_DMA_PRD                *UsedPrdAddr;
+  IDE_DMA_PRD                *TempPrdAddr;
+  UINT8                      RegisterValue;
+  UINT8                      Device;
+  UINT64                     IoPortForBmic;
+  UINT64                     IoPortForBmis;
+  UINT64                     IoPortForBmid;
+  EFI_STATUS                 Status;
+  UINTN                      PrdTableNum;
+  UINTN                      ByteCount;
+  UINTN                      ByteAvailable;
+  UINT8                      *PrdBuffer;
+  UINTN                      RemainBlockNum;
+  UINT8                      DeviceControl;
+  UINT32                     Count;
+  UINTN                      PageCount;
+  VOID                       *Map;
+  EFI_PHYSICAL_ADDRESS       MemPage;
+  EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
   // Channel and device differential
@@ -2794,7 +2944,20 @@ AtaUdmaWriteExt (
     //
     // Build PRD table
     //
-    PrdAddr = (IDE_DMA_PRD *) AllocateZeroPool ((2 * PrdTableNum * sizeof (IDE_DMA_PRD)));
+    MemPage = 0xFFFFFFFF;
+    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiBootServicesData,
+                    PageCount,
+                    &MemPage
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
+
+    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
     //
     // To make sure PRD is allocated in one 64K page
     //
@@ -2811,7 +2974,19 @@ AtaUdmaWriteExt (
     //
     // Build the PRD table
     //
-    PrdBuffer   = DataBuffer;
+    Status = IdeDev->PciIo->Map (
+                       IdeDev->PciIo,
+                       EfiPciIoOperationBusMasterRead,
+                       DataBuffer,
+                       &ByteCount,
+                       &DeviceAddress,
+                       &Map
+                       );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (MemPage, PageCount);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {
 
@@ -2831,7 +3006,7 @@ AtaUdmaWriteExt (
       PrdBuffer += ByteAvailable;
       TempPrdAddr++;
     }
-  
+
     //
     // Set the base address to BMID register
     //
@@ -2896,15 +3071,16 @@ AtaUdmaWriteExt (
     // Issue WRITE DMA EXT command
     //
     Status = AtaCommandIssueExt (
-              IdeDev,
-              WRITE_DMA_EXT_CMD,
-              Device,
-              0,
-              (UINT16) NumberOfBlocks,
-              StartLba
-              );
+               IdeDev,
+               WRITE_DMA_EXT_CMD,
+               Device,
+               0,
+               (UINT16) NumberOfBlocks,
+               StartLba
+               );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (PrdAddr);
+      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
 
@@ -2933,7 +3109,11 @@ AtaUdmaWriteExt (
 
     //
     // Check the INTERRUPT and ERROR bit of BMIS
+    // Max transfer number of sectors for one command is 65536(32Mbyte),
+    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
+    // So set the variable Count to 2000, for about 2 second timeout time.
     //
+    Count = 2000;
     while (TRUE) {
 
       IdeDev->PciIo->Io.Read (
@@ -2944,21 +3124,49 @@ AtaUdmaWriteExt (
                           1,
                           &RegisterValue
                           );
-      if (RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) {
-        if (RegisterValue & BMIS_ERROR) {
-          gBS->FreePool (PrdAddr);
+      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
+        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
+          //
+          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
+          //
+          IdeDev->PciIo->Io.Read (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+
+          RegisterValue &= ~((UINT8)BMIC_START);
+
+          IdeDev->PciIo->Io.Write (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
         break;
       }
 
       gBS->Stall (1000);
+      Count --;
     }
 
-    gBS->FreePool (PrdAddr);
-
+    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
-    // Set START bit of BMIC register
+    // Read Status Register of IDE device to clear interrupt
+    //
+    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
+    //
+    // Clear START bit of BMIC register
     //
     IdeDev->PciIo->Io.Read (
                         IdeDev->PciIo,
@@ -2984,12 +3192,19 @@ AtaUdmaWriteExt (
     StartLba += NumberOfBlocks;
   }
 
+  //
+  // Disable interrupt of Select device
+  //
+  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
+  DeviceControl |= IEN_L;
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
+
   return EFI_SUCCESS;
 }
 
 /**
   This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing to media in block unit. The function has been enhanced to 
+  writing to media in block unit. The function has been enhanced to
   support >120GB access and transfer at most 65536 blocks per command
 
   @param[in] *IdeDev
@@ -2997,10 +3212,10 @@ AtaUdmaWriteExt (
   to record all the information of the IDE device.
 
   @param[in] *DataBuffer
-  A pointer to the source buffer for the data. 
+  A pointer to the source buffer for the data.
 
   @param[in] StartLba
-  The starting logical block address to write to 
+  The starting logical block address to write to
   on the device media.
 
   @param[in] NumberOfBlocks
@@ -3021,21 +3236,26 @@ AtaUdmaWrite (
   IN  UINTN           NumberOfBlocks
   )
 {
-  IDE_DMA_PRD *PrdAddr;
-  IDE_DMA_PRD *UsedPrdAddr;
-  IDE_DMA_PRD *TempPrdAddr;
-  UINT8       RegisterValue;
-  UINT8       Device;
-  UINT64      IoPortForBmic;
-  UINT64      IoPortForBmis;
-  UINT64      IoPortForBmid;
-  EFI_STATUS  Status;
-  UINTN       PrdTableNum;
-  UINTN       ByteCount;
-  UINTN       ByteAvailable;
-  UINT8       *PrdBuffer;
-  UINTN       RemainBlockNum;
-  UINT8       DeviceControl;
+  IDE_DMA_PRD                *PrdAddr;
+  IDE_DMA_PRD                *UsedPrdAddr;
+  IDE_DMA_PRD                *TempPrdAddr;
+  UINT8                      RegisterValue;
+  UINT8                      Device;
+  UINT64                     IoPortForBmic;
+  UINT64                     IoPortForBmis;
+  UINT64                     IoPortForBmid;
+  EFI_STATUS                 Status;
+  UINTN                      PrdTableNum;
+  UINTN                      ByteCount;
+  UINTN                      ByteAvailable;
+  UINT8                      *PrdBuffer;
+  UINTN                      RemainBlockNum;
+  UINT8                      DeviceControl;
+  UINT32                     Count;
+  UINTN                      PageCount;
+  VOID                       *Map;
+  EFI_PHYSICAL_ADDRESS       MemPage;
+  EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
   // Channel and device differential
@@ -3089,7 +3309,20 @@ AtaUdmaWrite (
     //
     // Build PRD table
     //
-    PrdAddr = (IDE_DMA_PRD *) AllocateZeroPool ((2 * PrdTableNum * sizeof (IDE_DMA_PRD)));
+    MemPage = 0xFFFFFFFF;
+    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiBootServicesData,
+                    PageCount,
+                    &MemPage
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
+
+    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
 
     //
     // To make sure PRD is allocated in one 64K page
@@ -3107,7 +3340,19 @@ AtaUdmaWrite (
     //
     // Build the PRD table
     //
-    PrdBuffer   = DataBuffer;
+    Status = IdeDev->PciIo->Map (
+                       IdeDev->PciIo,
+                       EfiPciIoOperationBusMasterRead,
+                       DataBuffer,
+                       &ByteCount,
+                       &DeviceAddress,
+                       &Map
+                       );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (MemPage, PageCount);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {
 
@@ -3127,7 +3372,7 @@ AtaUdmaWrite (
       PrdBuffer += ByteAvailable;
       TempPrdAddr++;
     }
-  
+
     //
     // Set the base address to BMID register
     //
@@ -3192,15 +3437,16 @@ AtaUdmaWrite (
     // Issue WRITE DMA command
     //
     Status = AtaCommandIssue (
-              IdeDev,
-              WRITE_DMA_CMD,
-              Device,
-              0,
-              (UINT16) NumberOfBlocks,
-              StartLba
-              );
+               IdeDev,
+               WRITE_DMA_CMD,
+               Device,
+               0,
+               (UINT16) NumberOfBlocks,
+               StartLba
+               );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (PrdAddr);
+      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
 
@@ -3229,7 +3475,11 @@ AtaUdmaWrite (
 
     //
     // Check the INTERRUPT and ERROR bit of BMIS
+    // Max transfer number of sectors for one command is 65536(32Mbyte),
+    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
+    // So set the variable Count to 2000, for about 2 second timeout time.
     //
+    Count = 2000;
     while (TRUE) {
 
       IdeDev->PciIo->Io.Read (
@@ -3240,21 +3490,50 @@ AtaUdmaWrite (
                           1,
                           &RegisterValue
                           );
-      if (RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) {
-        if (RegisterValue & BMIS_ERROR) {
-          gBS->FreePool (PrdAddr);
+      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
+        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
+          //
+          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
+          //
+          IdeDev->PciIo->Io.Read (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+
+          RegisterValue &= ~((UINT8)BMIC_START);
+
+          IdeDev->PciIo->Io.Write (
+                              IdeDev->PciIo,
+                              EfiPciIoWidthUint8,
+                              EFI_PCI_IO_PASS_THROUGH_BAR,
+                              IoPortForBmic,
+                              1,
+                              &RegisterValue
+                              );
+          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
         break;
       }
 
       gBS->Stall (1000);
+      Count --;
     }
 
-    gBS->FreePool (PrdAddr);
+    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
 
     //
-    // Set START bit of BMIC register
+    // Read Status Register of IDE device to clear interrupt
+    //
+    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
+    //
+    // Clear START bit of BMIC register
     //
     IdeDev->PciIo->Io.Read (
                         IdeDev->PciIo,
@@ -3279,6 +3558,13 @@ AtaUdmaWrite (
     DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
     StartLba += NumberOfBlocks;
   }
+
+  //
+  // Disable interrupt of Select device
+  //
+  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
+  DeviceControl |= IEN_L;
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
   return EFI_SUCCESS;
 }
