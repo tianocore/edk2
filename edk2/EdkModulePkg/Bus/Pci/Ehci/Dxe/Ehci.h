@@ -27,8 +27,10 @@ Revision History
 //
 #include <IndustryStandard/pci22.h>
 
-extern UINTN  gEHCDebugLevel;
-extern UINTN  gEHCErrorLevel;
+
+GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gEHCDebugLevel;
+GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gEHCErrorLevel;
+
 
 #define STALL_1_MACRO_SECOND              1
 #define STALL_1_MILLI_SECOND              1000 * STALL_1_MACRO_SECOND
@@ -192,10 +194,11 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName;
 #define OUTPUT_PACKET_ID        0xE1
 #define ERROR_PACKET_ID         0x55
 
-#define bit(a)                  1 << (a)
+#define bit(a)                  (1 << (a))
 
-#define GET_0B_TO_31B(Addr)     (UINT32) (UINTN) (Addr)
-#define GET_32B_TO_63B(Addr)    (UINT32) (RShiftU64(((UINT64) (UINTN) (Addr)), 32) & 0xffffffff)
+#define GET_0B_TO_31B(Addr)     (((UINTN) Addr) & (0xffffffff))
+#define GET_32B_TO_63B(Addr)    ((UINTN)RShiftU64((UINTN) Addr, 32) & (0xffffffff))
+
 
 //
 // Ehci Data and Ctrl Structures

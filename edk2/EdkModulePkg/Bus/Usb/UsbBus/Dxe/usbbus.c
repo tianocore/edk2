@@ -23,8 +23,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "usbbus.h"
 
-UINTN                       gUSBDebugLevel  = EFI_D_INFO;
-UINTN                       gUSBErrorLevel  = EFI_D_ERROR;
+
+GLOBAL_REMOVE_IF_UNREFERENCED    UINTN    gUSBDebugLevel  = EFI_D_INFO;
+GLOBAL_REMOVE_IF_UNREFERENCED    UINTN    gUSBErrorLevel  = EFI_D_ERROR;
 
 //
 // The UsbBusProtocol is just used to locate USB_BUS_CONTROLLER
@@ -2328,17 +2329,18 @@ UsbPortReset (
 --*/
 {
   USB_IO_CONTROLLER_DEVICE  *UsbIoController;
-  EFI_STATUS                Status;
 
   UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
 
+  if (IsHub (UsbIoController)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   //
   // Since at this time, this device has already been configured,
   // it needs to be re-configured.
   //
-  Status = ParentPortReset (UsbIoController, TRUE, 0);
-
-  return Status;
+  return ParentPortReset (UsbIoController, TRUE, 0);
 }
 
 EFI_STATUS

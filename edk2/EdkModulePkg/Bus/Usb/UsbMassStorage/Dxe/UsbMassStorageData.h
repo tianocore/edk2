@@ -25,7 +25,7 @@ Revision History
 //
 // bit definition
 //
-#define bit(a)  1 << (a)
+#define bit(a)  (1 << (a))
 
 //
 // timeout unit is in millisecond.

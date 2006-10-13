@@ -924,7 +924,6 @@ UsbFloppyDetectMedia (
   Status            = EFI_SUCCESS;
   FloppyStatus      = EFI_SUCCESS;
   CopyMem (&OldMediaInfo, UsbFloppyDevice->BlkIo.Media, sizeof (OldMediaInfo));
-  //OldMediaInfo      = *UsbFloppyDevice->BlkIo.Media;
   *MediaChange      = FALSE;
   NeedReadCapacity  = TRUE;
 

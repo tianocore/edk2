@@ -30,8 +30,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "hub.h"
 #include "usbutil.h"
 
-extern UINTN  gUSBDebugLevel;
-extern UINTN  gUSBErrorLevel;
+
+GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gUSBDebugLevel;
+GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gUSBErrorLevel;
+
 
 #define MICROSECOND       10000
 #define ONESECOND         (1000 * MICROSECOND)

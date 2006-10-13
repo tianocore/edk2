@@ -354,21 +354,18 @@ Cbi0DriverBindingStart (
     //
     if (EndpointDescriptor.Attributes == 0x02) {
       if (EndpointDescriptor.EndpointAddress & 0x80) {
-        CopyMem (&UsbCbiDev->BulkInEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-	 // UsbCbiDev->BulkInEndpointDescriptor = EndpointDescriptor;
-        EndpointExistMask |= bit (0);
+        CopyMem (&UsbCbiDev->BulkInEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
+	    EndpointExistMask |= bit (0);
       } else {
-        CopyMem (&UsbCbiDev->BulkOutEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-	 // UsbCbiDev->BulkOutEndpointDescriptor = EndpointDescriptor;
-        EndpointExistMask |= bit (1);
+        CopyMem (&UsbCbiDev->BulkOutEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
+	    EndpointExistMask |= bit (1);
       }
     }
     //
     // We parse interrupt endpoint
     //
     if (EndpointDescriptor.Attributes == 0x03) {
-      CopyMem (&UsbCbiDev->InterruptEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-      // UsbCbiDev->InterruptEndpointDescriptor = EndpointDescriptor;
+      CopyMem (&UsbCbiDev->InterruptEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
       EndpointExistMask |= bit (2);
     }
 

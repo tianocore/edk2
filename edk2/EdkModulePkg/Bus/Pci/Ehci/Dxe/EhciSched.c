@@ -340,7 +340,7 @@ Returns:
   //
   // Init fields in Qh
   //
-  gBS->SetMem (*QhPtrPtr, sizeof (EHCI_QH_ENTITY), 0);
+  ZeroMem (*QhPtrPtr, sizeof (EHCI_QH_ENTITY));
 
   //
   // Software field
@@ -699,7 +699,8 @@ Returns:
   //
   // Init fields in Qtd
   //
-  gBS->SetMem (*QtdPtrPtr, sizeof (EHCI_QTD_ENTITY), 0);
+
+  ZeroMem (*QtdPtrPtr, sizeof (EHCI_QTD_ENTITY));
 
   //
   // Software field
@@ -1386,7 +1387,7 @@ Returns:
   Value = NULL;
 
   if (!HwQtdPtr->AltNextQtdTerminate) {
-    Value = (EHCI_QTD_HW *) (UINTN) GET_0B_TO_31B (HwQtdPtr->AltNextQtdPointer << 5);
+    Value = (EHCI_QTD_HW *) GET_0B_TO_31B (HwQtdPtr->AltNextQtdPointer << 5);
   }
 
   return Value;
@@ -1417,7 +1418,7 @@ Returns:
   Value = NULL;
 
   if (!HwQtdPtr->NextQtdTerminate) {
-    Value = (EHCI_QTD_HW *) (UINTN) GET_0B_TO_31B (HwQtdPtr->NextQtdPointer << 5);
+    Value = (EHCI_QTD_HW *) GET_0B_TO_31B (HwQtdPtr->NextQtdPointer << 5);
   }
 
   return Value;
@@ -1727,7 +1728,7 @@ Returns:
       //
       // Not Null FrameList
       //
-      FindQhHwPtr = (EHCI_QH_HW *) (UINTN) GET_0B_TO_31B (FrameEntryPtr->LinkPointer << 5);
+      FindQhHwPtr = (EHCI_QH_HW *) GET_0B_TO_31B (FrameEntryPtr->LinkPointer << 5);
       FindQhPtr   = (EHCI_QH_ENTITY *) GET_QH_ENTITY_ADDR (FindQhHwPtr);
       //
       // FindQh is Left/Right to Qh
@@ -1742,12 +1743,12 @@ Returns:
         //
         if (NULL != FindQhPtr->Next) {
           FindQhPtr->Next->Prev         = QhPtr;
-          QhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(FindQhPtr->Next->Qh)) >> 5);
+          QhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(FindQhPtr->Next->Qh) >> 5);
           QhPtr->Qh.SelectType          = QH_SELECT_TYPE;
           QhPtr->Qh.QhTerminate         = FALSE;
         }
 
-        FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN)&(QhPtr->Qh)) >> 5);
+        FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
         FindQhPtr->Qh.SelectType          = QH_SELECT_TYPE;
         FindQhPtr->Qh.QhTerminate         = FALSE;
 
@@ -1762,7 +1763,7 @@ Returns:
           //
           // Qh is the First one in Frame[0] List
           //
-          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
           FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
           FrameEntryPtr->LinkTerminate  = FALSE;
         } else {
@@ -1770,12 +1771,12 @@ Returns:
           // Qh is not the First one in Frame[0] List
           //
           FindQhPtr->Prev->Next                   = QhPtr;
-          FindQhPtr->Prev->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+          FindQhPtr->Prev->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
           FindQhPtr->Prev->Qh.SelectType          = QH_SELECT_TYPE;
           FindQhPtr->Prev->Qh.QhTerminate         = FALSE;
         }
 
-        QhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(FindQhPtr->Qh)) >> 5);
+        QhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(FindQhPtr->Qh) >> 5);
         QhPtr->Qh.SelectType          = QH_SELECT_TYPE;
         QhPtr->Qh.QhTerminate         = FALSE;
 
@@ -1786,7 +1787,7 @@ Returns:
         //
         // Link Qh after FindQh, Qh is the Last one
         //
-        FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+        FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
         FindQhPtr->Prev->Qh.SelectType    = QH_SELECT_TYPE;
         FindQhPtr->Qh.QhTerminate         = FALSE;
 
@@ -1798,7 +1799,7 @@ Returns:
       //
       // Null FrameList
       //
-      FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+      FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
       FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
       FrameEntryPtr->LinkTerminate  = FALSE;
     }
@@ -1812,7 +1813,7 @@ Returns:
       FrameIndex += QhPtr->Interval;
       while (FrameIndex < HcDev->PeriodicFrameListLength) {
         FrameEntryPtr                 = (FRAME_LIST_ENTRY *) (FrameEntryPtr + QhPtr->Interval);
-        FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+        FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
         FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
         FrameEntryPtr->LinkTerminate  = FALSE;
         FrameIndex += QhPtr->Interval;
@@ -1825,7 +1826,7 @@ Returns:
       while (FrameIndex < HcDev->PeriodicFrameListLength) {
         FrameEntryPtr = (FRAME_LIST_ENTRY *) (FrameEntryPtr + QhPtr->Interval);
         if ((FrameIndex % QhPtr->Prev->Interval) != 0) {
-          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
           FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
           FrameEntryPtr->LinkTerminate  = FALSE;
         }
@@ -1843,7 +1844,7 @@ Returns:
       //
       // Not Null FrameList
       //
-      FindQhHwPtr = (EHCI_QH_HW *) (UINTN) GET_0B_TO_31B (FrameEntryPtr->LinkPointer << 5);
+      FindQhHwPtr = (EHCI_QH_HW *) GET_0B_TO_31B (FrameEntryPtr->LinkPointer << 5);
       FindQhPtr   = (EHCI_QH_ENTITY *) GET_QH_ENTITY_ADDR (FindQhHwPtr);
       //
       // FindQh is Last Qh in the Asynchronous List, Link Qh after FindQh
@@ -1852,7 +1853,7 @@ Returns:
         FindQhPtr = FindQhPtr->Next;
       }
 
-      FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+      FindQhPtr->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
       FindQhPtr->Qh.SelectType          = QH_SELECT_TYPE;
       FindQhPtr->Qh.QhTerminate         = FALSE;
 
@@ -1862,7 +1863,7 @@ Returns:
       //
       // Null FrameList
       //
-      FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Qh)) >> 5);
+      FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Qh) >> 5);
       FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
       FrameEntryPtr->LinkTerminate  = FALSE;
     }
@@ -1929,7 +1930,7 @@ Returns:
         }
       } else {
         while (FrameIndex < HcDev->PeriodicFrameListLength) {
-          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Next->Qh)) >> 5);
+          FrameEntryPtr->LinkPointer    = (UINT32) GET_0B_TO_31B (&(QhPtr->Next->Qh) >> 5);
           FrameEntryPtr->SelectType     = QH_SELECT_TYPE;
           FrameEntryPtr->LinkTerminate  = FALSE;
           FrameEntryPtr += Interval;
@@ -1949,7 +1950,7 @@ Returns:
         QhPtr->Prev->Qh.SelectType          = 0;
         QhPtr->Prev->Qh.QhTerminate         = TRUE;
       } else {
-        QhPtr->Prev->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (((UINTN) &(QhPtr->Next->Qh)) >> 5);
+        QhPtr->Prev->Qh.QhHorizontalPointer = (UINT32) GET_0B_TO_31B (&(QhPtr->Next->Qh) >> 5);
         QhPtr->Prev->Qh.SelectType          = QH_SELECT_TYPE;
         QhPtr->Prev->Qh.QhTerminate         = FALSE;
       }
@@ -2110,6 +2111,12 @@ Returns:
   ASSERT (QtdHwPtr);
 
   //
+  // Allow buffer address range across 4G.
+  // But EFI_USB_MAX_BULK_BUFFER_NUM = 1, so don't allow
+  // seperate buffer array.
+  //
+
+  //
   // Set BufferPointer0, ExtBufferPointer0 and Offset
   //
   QtdHwPtr->BufferPointer0    = (UINT32) (GET_0B_TO_31B (DataPtr) >> 12);
@@ -2125,7 +2132,7 @@ Returns:
   }
 
   QtdHwPtr->BufferPointer1    = QtdHwPtr->BufferPointer0 + 1;
-  QtdHwPtr->ExtBufferPointer1 = QtdHwPtr->ExtBufferPointer0;
+  QtdHwPtr->ExtBufferPointer1 = (QtdHwPtr->BufferPointer1 == 0) ? (QtdHwPtr->ExtBufferPointer0 + 1) : QtdHwPtr->ExtBufferPointer0;
 
   //
   // Set BufferPointer2 and ExtBufferPointer2
@@ -2136,7 +2143,7 @@ Returns:
   }
 
   QtdHwPtr->BufferPointer2    = QtdHwPtr->BufferPointer1 + 1;
-  QtdHwPtr->ExtBufferPointer2 = QtdHwPtr->ExtBufferPointer0;
+  QtdHwPtr->ExtBufferPointer2 = (QtdHwPtr->BufferPointer2 == 0) ? (QtdHwPtr->ExtBufferPointer1 + 1) : QtdHwPtr->ExtBufferPointer1;
 
   //
   // Set BufferPointer3 and ExtBufferPointer3
@@ -2147,7 +2154,7 @@ Returns:
   }
 
   QtdHwPtr->BufferPointer3    = QtdHwPtr->BufferPointer2 + 1;
-  QtdHwPtr->ExtBufferPointer3 = QtdHwPtr->ExtBufferPointer0;
+  QtdHwPtr->ExtBufferPointer3 = (QtdHwPtr->BufferPointer2 == 0) ? (QtdHwPtr->ExtBufferPointer2 + 1) : QtdHwPtr->ExtBufferPointer2;
 
   //
   // Set BufferPointer4 and ExtBufferPointer4
@@ -2158,7 +2165,7 @@ Returns:
   }
 
   QtdHwPtr->BufferPointer4    = QtdHwPtr->BufferPointer3 + 1;
-  QtdHwPtr->ExtBufferPointer4 = QtdHwPtr->ExtBufferPointer0;
+  QtdHwPtr->ExtBufferPointer4 = (QtdHwPtr->BufferPointer3 == 0) ? (QtdHwPtr->ExtBufferPointer3 + 1) : QtdHwPtr->ExtBufferPointer3;
 
 exit:
   return ;
@@ -2865,8 +2872,8 @@ Returns:
     }
 
     (*ErrQtdPos)++;
-    QtdHwPtr = GetQtdNextPointer (QtdHwPtr);
-    QtdPtr = (EHCI_QTD_ENTITY *) GET_QTD_ENTITY_ADDR (QtdHwPtr);
+    QtdPtr   = QtdPtr->Next;
+    QtdHwPtr = &(QtdPtr->Qtd);
 
   }
 
@@ -3026,7 +3033,7 @@ Returns:
     }
 
     QtdHwPtr = &(AsyncRequestPtr->QhPtr->FirstQtdPtr->Qtd);
-    ReceiveBuffer = (UINT8 *) (UINTN) GET_0B_TO_31B ((QtdHwPtr->BufferPointer0 << 12) | AsyncRequestPtr->QhPtr->FirstQtdPtr->StaticCurrentOffset);
+    ReceiveBuffer = (UINT8 *) GET_0B_TO_31B ((QtdHwPtr->BufferPointer0 << 12) | AsyncRequestPtr->QhPtr->FirstQtdPtr->StaticCurrentOffset);
     CopyMem (
       ProcessBuffer,
       ReceiveBuffer,

@@ -181,6 +181,19 @@ VOID
 InitializeUsbIoInstance (
   IN USB_IO_CONTROLLER_DEVICE     *UsbIoController
   )
+/*++
+
+Routine Description:
+
+  Initialize the instance of UsbIo controller
+
+Arguments:
+
+  UsbIoController - A pointer to controller structure of UsbIo
+
+Returns:
+
+--*/
 {
   //
   // Copy EFI_USB_IO protocol instance
@@ -349,11 +362,10 @@ UsbBulkTransfer (
   UINT8                       DataToggle;
   UINT8                       OldToggle;
   EFI_STATUS                  RetStatus;
-
   USB_IO_CONTROLLER_DEVICE    *UsbIoController;
   ENDPOINT_DESC_LIST_ENTRY    *EndPointListEntry;
-  UINT32                      TransferResult;
   UINT8                       DataBuffersNumber;
+  UINT32                      TransferResult;
   
   DataBuffersNumber = 1;
   UsbIoController   = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
