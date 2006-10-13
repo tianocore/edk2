@@ -105,6 +105,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Dxe/WinNtThunk/Cpu/Cpu.msa</Filename>
     <Filename>Dxe/WinNtThunk/WinNtThunk/WinNtThunk.msa</Filename>
     <Filename>Library/DxeWinNtLib/DxeWinNtLib.msa</Filename>
+    <Filename>Library/Nt32TimerLibNull/Nt32TimerLib.msa</Filename>
     <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
     <Filename>Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.msa</Filename>

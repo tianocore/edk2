@@ -243,8 +243,9 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: EdkNt32Pkg Mod: Nt32TimerLib Path: EdkNt32Pkg\Library\Nt32TimerLibNull\Nt32TimerLib.msa-->
+        <Instance ModuleGuid="3813bb9b-808b-4dcb-b9a3-ea47bd9324c0" ModuleVersion="1.0" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
