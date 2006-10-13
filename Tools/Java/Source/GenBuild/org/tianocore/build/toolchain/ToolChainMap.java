@@ -29,7 +29,7 @@ public class ToolChainMap {
     //
     // From which part of key can be used to match "*"
     // 
-    private int matchLevel = ToolChainKey.keyLength - 2;
+    private int matchLevel = ToolChainKey.keyLength - 1;
 
     //
     // A Map object in which tool chain configuration information will be stored
@@ -211,98 +211,96 @@ public class ToolChainMap {
         ///
         /// In the current tool chain definition format (in name/value pair), 
         /// there're five parts in the "name". The last part of the "name" must
-        /// not be "wildcard". So we should start combining "*" from the fourth part.
+        /// not be "wildcard". We should start combining "*" from left to right.
         /// We'll try all the possible combinations until the value can be fetched.
         ///  
         /// The following code implements the logic which will try to use, for example,
         /// following key parts combinations sequentially to get the value.
         /// 
         /// TARGET_TOOLCHAIN_ARCH_TOOLCODE_ATTRIBUTE
-        /// TARGET_TOOLCHAIN_ARCH_*_ATTRIBUTE
-        /// TARGET_TOOLCHAIN_*_TOOLCODE_ATTRIBUTE
-        /// TARGET_TOOLCHAIN_*_*_ATTRIBUTE
-        /// TARGET_*_ARCH_TOOLCODE_ATTRIBUTE
-        /// TARGET_*_ARCH_*_ATTRIBUTE
-        /// TARGET_*_*_TOOLCODE_ATTRIBUTE
-        /// TARGET_*_*_*_ATTRIBUTE
-        /// *_TOOLCHAIN_ARCH_TOOLCODE_ATTRIBUTE
-        /// *_TOOLCHAIN_ARCH_*_ATTRIBUTE
-        /// *_TOOLCHAIN_*_TOOLCODE_ATTRIBUTE
-        /// *_TOOLCHAIN_*_*_ATTRIBUTE
-        /// *_*_ARCH_TOOLCODE_ATTRIBUTE
-        /// *_*_ARCH_*_ATTRIBUTE
-        /// *_*_*_TOOLCODE_ATTRIBUTE
-        /// *_*_*_*_ATTRIBUTE
+        /// ******_TOOLCHAIN_ARCH_TOOLCODE_ATTRIBUTE
+        /// TARGET_*********_ARCH_TOOLCODE_ATTRIBUTE
+        /// ******_*********_ARCH_TOOLCODE_ATTRIBUTE
+        /// TARGET_TOOLCHAIN_****_TOOLCODE_ATTRIBUTE
+        /// ******_TOOLCHAIN_****_TOOLCODE_ATTRIBUTE
+        /// TARGET_*********_****_TOOLCODE_ATTRIBUTE
+        /// ******_*********_****_TOOLCODE_ATTRIBUTE
+        /// TARGET_TOOLCHAIN_ARCH_********_ATTRIBUTE
+        /// ******_TOOLCHAIN_ARCH_********_ATTRIBUTE
+        /// TARGET_*********_ARCH_********_ATTRIBUTE
+        /// ******_*********_ARCH_********_ATTRIBUTE
+        /// TARGET_TOOLCHAIN_****_********_ATTRIBUTE
+        /// ******_TOOLCHAIN_****_********_ATTRIBUTE
+        /// TARGET_*********_****_********_ATTRIBUTE
+        /// ******_*********_****_********_ATTRIBUTE
         /// 
 
         //
-        // level is used to control if all parts of "name" have been "wildcarded"
+        // The wildcard "*" appears regularly (2^n). "*" in TARGET appears 2^0 
+        // times at every 2^0 TARGET, "*" in TOOLCHAIN appears 2^1 times at 
+        // every 2^1 TOOLCHAIN,  and "*" in TOOLCODE appears 2^3 times at every 
+        // 2^3 TOOLCODE. We're going to use this to form all the combinations of key.
         // 
-        int level = matchLevel;
-        while (level >= 0) {
+        int[] combinations = new int[matchLevel];
+        for (int i = 0; i < matchLevel; ++i) {
             //
-            // tmplevel is used to control if all parts of "name" between first
-            // "*" and fourth name part have been "wildcarded".
+            // initialize the array with 2^n
             // 
-            int tmpLevel = level;
-            while (tmpLevel >= level) {
-                String[] tmpKeySet = tmpKey.getKeySet();
+            combinations[i] = 1 << (i + 1);
+        }
+
+        //
+        // when last part goes down to zero, we tried all combinations of key
+        // 
+        int lastIndex = matchLevel - 1;
+        while (combinations[lastIndex] > 0) {
+            //
+            // form the key which has "*" in it
+            // 
+            for (int i = 0; i < matchLevel; ++i) {
+                //
+                // start again if not finished
+                // 
+                if (combinations[i] == 0) {
+                    combinations[i] = 1 << (i + 1);
+                }
+
+                //
+                // half of 2^n is "*", the rest is non-*
+                // 
                 try {
-                    if (!tmpKeySet[tmpLevel].equals("*")) {
-                        //
-                        // If "tmplevel" part is not "*", set it to "*".
-                        // For example, at first loop, the key will become
-                        // TARGET_TOOLCHAIN_ARCH_*_ATTRIBUTE, and at next loop,
-                        // become TARGET_TOOLCHAIN_*_ARCH_ATTRIBUTE
-                        // 
-                        tmpKey.setKey("*", tmpLevel);
-                        //
-                        // We'll try all possible combinations between current
-                        // part and the fourth part.
-                        // 
-                        tmpLevel = matchLevel;
+                    if (combinations[i] > (1 << i)) {
+                        tmpKey.setKey(keySet[i], i);
                     } else {
-                        //
-                        // Restore original value of key if "*" at "tmplevel"
-                        // part of "name" has been checked
-                        // 
-                        tmpKey.setKey(keySet[tmpLevel], tmpLevel);
-                        //
-                        // Try "*" at part left to "tmplevel" part of "name"
-                        // 
-                        --tmpLevel;
-                        continue;
+                        tmpKey.setKey("*", i);
                     }
                 } catch (Exception e) {
                     return null;
                 }
 
-                //
-                // Try get the value from the map
-                // 
-                result = map.get(tmpKey);
-                if (result != null) {
-                    //
-                    // The map actually has no exact key as the given "key", 
-                    // putting it back into map can speed up the get() next time
-                    // 
-                    map.put(key, result);
-                    return result;
-                }
+                combinations[i] -= 1;
             }
-            ///
-            /// If all possible combinations of "wildcard" between "level" and 
-            /// the fourth part of "name" have been tried, try the left part
-            /// 
-            --level;
+
+            //
+            // Try get the value from the map
+            // 
+            result = map.get(tmpKey);
+            if (result != null) {
+                //
+                // The map actually has no exact key as the given "key", 
+                // putting it back into map can speed up the get() next time
+                // 
+                map.put(key, result);
+                return result;
+            }
         }
 
         //
         // The map actually has no exact key as the given "key", putting it back
         // into map can speed up the get() next time even we got nothing.
         // 
-        map.put(key, result);
-        return result;
+        map.put(key, null);
+        return null;
     }
 
     /**
