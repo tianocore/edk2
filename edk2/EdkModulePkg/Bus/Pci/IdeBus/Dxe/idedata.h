@@ -76,6 +76,16 @@ typedef enum {
   IdeUnknown
 } IDE_DEVICE_TYPE;
 
+typedef enum {
+  SenseNoSenseKey,
+  SenseDeviceNotReadyNoRetry,
+  SenseDeviceNotReadyNeedRetry,
+  SenseNoMedia,
+  SenseMediaChange,
+  SenseMediaError,
+  SenseOtherSense
+} SENSE_RESULT;
+
 //
 // IDE Registers
 //
@@ -233,6 +243,11 @@ typedef struct {
 // 5 seconds
 //
 #define ATAPILONGTIMEOUT  5000  
+
+//
+// 10 seconds
+//
+#define ATASMARTTIMEOUT   10000
 
 //
 // ATA Commands Code

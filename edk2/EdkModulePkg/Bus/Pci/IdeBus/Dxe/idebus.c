@@ -183,7 +183,6 @@ IDEBusDriverBindingStart (
   UINTN                             DataSize;
   UINT32                            Attributes;
   IDE_BUS_DRIVER_PRIVATE_DATA       *IdeBusDriverPrivateData;
-  EFI_EVENT                         Event;
 
   //
   // Local variables declaration for IdeControllerInit support
@@ -417,6 +416,12 @@ IDEBusDriverBindingStart (
               EfiIdeBusBeforeDevicePresenceDetection,
               IdeChannel
               );
+
+    //
+    // Prepare to detect IDE device of this channel
+    //
+    InitializeIDEChannelData ();
+
     //
     // -- 1st inner loop --- Master/Slave ------------  Step14
     //
@@ -489,6 +494,15 @@ IDEBusDriverBindingStart (
       IdeBlkIoDevicePtr->IoPort->BusMasterBaseAddr = IdeRegsBaseAddr[IdeChannel].BusMasterBaseAddr;
 
       //
+      // Report Status code: is about to detect IDE drive
+      //
+      REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+        EFI_PROGRESS_CODE,
+        (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_PRESENCE_DETECT),
+        IdeBlkIoDevicePtr->DevicePath
+        );
+
+      //
       // Discover device, now!
       //
       PERF_START (0, "DiscoverIdeDevice", "IDE", 0);
@@ -523,7 +537,6 @@ IDEBusDriverBindingStart (
         // Submit identify data to IDE controller init driver
         //
         CopyMem (&IdentifyData, IdeBlkIoDevicePtr->pIdData, sizeof (IdentifyData));
-        // IdentifyData  = *IdeBlkIoDevicePtr->pIdData;
         IdeBusDriverPrivateData->DeviceFound[IdeChannel * 2 + IdeDevice] = TRUE;
         IdeInit->SubmitData (IdeInit, IdeChannel, IdeDevice, &IdentifyData);
       } else {
@@ -706,10 +719,9 @@ IDEBusDriverBindingStart (
                       EFI_TPL_NOTIFY,
                       ClearInterrupt,
                       IdeBlkIoDevicePtr,
-                      &Event
+                      &IdeBlkIoDevicePtr->ExitBootServiceEvent
                       );
 
-  
       //
       // end of 2nd inner loop ----
       //
@@ -1028,7 +1040,8 @@ IDEBlkIoReset (
   //
   // for ATA device, using ATA reset method
   //
-  if (IdeBlkIoDevice->Type == IdeHardDisk) {
+  if (IdeBlkIoDevice->Type == IdeHardDisk ||
+      IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
     return AtaSoftReset (IdeBlkIoDevice);
   }
 

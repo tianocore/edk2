@@ -28,6 +28,10 @@
 #define MAX_IDE_CHANNELS  2
 #define MAX_IDE_DRIVES    2
 
+#define INVALID_DEVICE_TYPE 0xff
+#define ATA_DEVICE_TYPE     0x00
+#define ATAPI_DEVICE_TYPE   0x01
+
 typedef struct {
   BOOLEAN HaveScannedDevice[MAX_IDE_DEVICE];
   BOOLEAN DeviceFound[MAX_IDE_DEVICE];
@@ -66,6 +70,11 @@ typedef struct {
   REQUEST_SENSE_DATA          *SenseData;
   UINT8                       SenseDataNumber;
   UINT8                       *Cache;
+
+  //
+  // ExitBootService Event, it is used to clear pending IDE interrupt
+  //
+  EFI_EVENT                   ExitBootServiceEvent;
 
   EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
 } IDE_BLK_IO_DEV;

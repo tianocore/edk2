@@ -783,6 +783,15 @@ PioReadWriteData (
     PtrBuffer += WordCount;
     ActualWordCount += WordCount;
   }
+  
+  if (Read) {
+    //
+    // In the case where the drive wants to send more data than we need to read,
+    // the DRQ bit will be set and cause delays from DRQClear2().
+    // We need to read data from the drive until it clears DRQ so we can move on.
+    //
+    AtapiReadPendingData (IdeDev);
+  }
 
   //
   // After data transfer is completed, normally, DRQ bit should clear.
@@ -802,24 +811,24 @@ PioReadWriteData (
   Sends out ATAPI Test Unit Ready Packet Command to the specified device
   to find out whether device is accessible.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param[in] *IdeDev     Pointer pointing to IDE_BLK_IO_DEV data structure, used
+                         to record all the information of the IDE device.
+  @param[in] *SenseCount Sense count for this packet command
 
-  @retval EFI_SUCCESS
-  device is accessible.
-  
-  @retval EFI_DEVICE_ERROR
-  device is not accessible.
+  @retval EFI_SUCCESS      Device is accessible.
+  @retval EFI_DEVICE_ERROR Device is not accessible.
 
 **/
 EFI_STATUS
 AtapiTestUnitReady (
-  IN  IDE_BLK_IO_DEV  *IdeDev
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  OUT UINTN           *SenseCount
   )
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
+
+  *SenseCount = 0;
 
   //
   // fill command packet
@@ -831,7 +840,17 @@ AtapiTestUnitReady (
   // send command packet
   //
   Status = AtapiPacketCommandIn (IdeDev, &Packet, NULL, 0, ATAPITIMEOUT);
-  return Status;
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AtapiRequestSense (IdeDev, SenseCount);
+  if (EFI_ERROR (Status)) {
+    *SenseCount = 0;
+    return Status;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -927,7 +946,7 @@ AtapiRequestSense (
       //
       // Ptr is word-based pointer
       //
-      Ptr += sizeof (REQUEST_SENSE_DATA) / 2;
+      Ptr += (sizeof (REQUEST_SENSE_DATA) + 1) >> 1;
 
     } else {
       //
@@ -951,30 +970,28 @@ AtapiRequestSense (
   if the Read Capacity Command failed, the Sense data must be requested
   and be analyzed to determine if the Read Capacity Command should retry.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param[in] *IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
+                        to record all the information of the IDE device.
+  @param[in] SenseCount Sense count for this packet command
 
-  @retval EFI_SUCCESS
-  Read Capacity Command finally completes successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  Read Capacity Command failed because of device error.
+  @retval EFI_SUCCESS      Read Capacity Command finally completes successfully.
+  @retval EFI_DEVICE_ERROR Read Capacity Command failed because of device error.
 
-  @note
-  parameter "IdeDev" will be updated in this function.
+  @note Parameter "IdeDev" will be updated in this function.
 
   TODO:    EFI_NOT_READY - add return value to function comment
 **/
 EFI_STATUS
 AtapiReadCapacity (
-  IN  IDE_BLK_IO_DEV  *IdeDev
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  OUT UINTN               *SenseCount
   )
 {
   //
   // status returned by Read Capacity Packet Command
   //
   EFI_STATUS                Status;
+  EFI_STATUS                SenseStatus;
   ATAPI_PACKET_COMMAND      Packet;
 
   //
@@ -982,6 +999,8 @@ AtapiReadCapacity (
   //
   READ_CAPACITY_DATA        Data;
   READ_FORMAT_CAPACITY_DATA FormatData;
+
+  *SenseCount = 0;
 
   ZeroMem (&Data, sizeof (Data));
   ZeroMem (&FormatData, sizeof (FormatData));
@@ -991,12 +1010,12 @@ AtapiReadCapacity (
     ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
     Packet.Inquiry.opcode = READ_CAPACITY;
     Status = AtapiPacketCommandIn (
-              IdeDev,
-              &Packet,
-              (UINT16 *) &Data,
-              sizeof (READ_CAPACITY_DATA),
-              ATAPITIMEOUT
-              );
+               IdeDev,
+               &Packet,
+               (UINT16 *) &Data,
+               sizeof (READ_CAPACITY_DATA),
+               ATAPITIMEOUT
+               );
 
   } else {
     //
@@ -1006,81 +1025,91 @@ AtapiReadCapacity (
     Packet.ReadFormatCapacity.opcode                = READ_FORMAT_CAPACITY;
     Packet.ReadFormatCapacity.allocation_length_lo  = 12;
     Status = AtapiPacketCommandIn (
-              IdeDev,
-              &Packet,
-              (UINT16 *) &FormatData,
-              sizeof (READ_FORMAT_CAPACITY_DATA),
-              ATAPITIMEOUT
-              );
+               IdeDev,
+               &Packet,
+               (UINT16 *) &FormatData,
+               sizeof (READ_FORMAT_CAPACITY_DATA),
+               ATAPITIMEOUT
+               );
   }
 
-  if (!EFI_ERROR (Status)) {
+  if (Status == EFI_TIMEOUT) {
+    *SenseCount = 0;
+    return Status;
+  }
 
-    if (IdeDev->Type == IdeCdRom) {
+  SenseStatus = AtapiRequestSense (IdeDev, SenseCount);
 
-      IdeDev->BlkIo.Media->LastBlock = (Data.LastLba3 << 24) |
-        (Data.LastLba2 << 16) |
-        (Data.LastLba1 << 8) |
-        Data.LastLba0;
+  if (!EFI_ERROR (SenseStatus)) {
 
-      if (IdeDev->BlkIo.Media->LastBlock != 0) {
+    if (!EFI_ERROR (Status)) {
 
-        IdeDev->BlkIo.Media->BlockSize = (Data.BlockSize3 << 24) |
-          (Data.BlockSize2 << 16) |
-          (Data.BlockSize1 << 8) |
-          Data.BlockSize0;
+      if (IdeDev->Type == IdeCdRom) {
 
-        IdeDev->BlkIo.Media->MediaPresent = TRUE;
-      } else {
-        IdeDev->BlkIo.Media->MediaPresent = FALSE;
-        return EFI_DEVICE_ERROR;
-      }
+        IdeDev->BlkIo.Media->LastBlock = (Data.LastLba3 << 24) |
+          (Data.LastLba2 << 16) |
+          (Data.LastLba1 << 8) |
+          Data.LastLba0;
 
-      IdeDev->BlkIo.Media->ReadOnly = TRUE;
-
-      //
-      // Because the user data portion in the sector of the Data CD supported
-      // is always 0x800
-      //
-      IdeDev->BlkIo.Media->BlockSize = 0x800;
-    }
-
-    if (IdeDev->Type == IdeMagnetic) {
-
-      if (FormatData.DesCode == 3) {
-        IdeDev->BlkIo.Media->MediaPresent = FALSE;
-        IdeDev->BlkIo.Media->LastBlock    = 0;
-      } else {
-
-        IdeDev->BlkIo.Media->LastBlock =  (FormatData.LastLba3 << 24) |
-                                          (FormatData.LastLba2 << 16) | 
-                                          (FormatData.LastLba1 << 8)  |
-                                           FormatData.LastLba0;
         if (IdeDev->BlkIo.Media->LastBlock != 0) {
-          IdeDev->BlkIo.Media->LastBlock--;
 
-          IdeDev->BlkIo.Media->BlockSize = (FormatData.BlockSize2 << 16) |
-            (FormatData.BlockSize1 << 8) |
-            FormatData.BlockSize0;
+          IdeDev->BlkIo.Media->BlockSize = (Data.BlockSize3 << 24) |
+            (Data.BlockSize2 << 16) |
+            (Data.BlockSize1 << 8) |
+            Data.BlockSize0;
 
           IdeDev->BlkIo.Media->MediaPresent = TRUE;
         } else {
           IdeDev->BlkIo.Media->MediaPresent = FALSE;
-          //
-          // Return EFI_NOT_READY operation succeeds but returned capacity is 0
-          //
-          return EFI_NOT_READY;
+          return EFI_DEVICE_ERROR;
         }
 
-        IdeDev->BlkIo.Media->BlockSize = 0x200;
+        IdeDev->BlkIo.Media->ReadOnly = TRUE;
 
+        //
+        // Because the user data portion in the sector of the Data CD supported
+        // is always 0x800
+        //
+        IdeDev->BlkIo.Media->BlockSize = 0x800;
+      }
+
+      if (IdeDev->Type == IdeMagnetic) {
+
+        if (FormatData.DesCode == 3) {
+          IdeDev->BlkIo.Media->MediaPresent = FALSE;
+          IdeDev->BlkIo.Media->LastBlock    = 0;
+        } else {
+
+          IdeDev->BlkIo.Media->LastBlock =  (FormatData.LastLba3 << 24) |
+            (FormatData.LastLba2 << 16) | 
+            (FormatData.LastLba1 << 8)  |
+            FormatData.LastLba0;
+          if (IdeDev->BlkIo.Media->LastBlock != 0) {
+            IdeDev->BlkIo.Media->LastBlock--;
+
+            IdeDev->BlkIo.Media->BlockSize = (FormatData.BlockSize2 << 16) |
+              (FormatData.BlockSize1 << 8) |
+              FormatData.BlockSize0;
+
+            IdeDev->BlkIo.Media->MediaPresent = TRUE;
+          } else {
+            IdeDev->BlkIo.Media->MediaPresent = FALSE;
+            //
+            // Return EFI_NOT_READY operation succeeds but returned capacity is 0
+            //
+            return EFI_NOT_READY;
+          }
+
+          IdeDev->BlkIo.Media->BlockSize = 0x200;
+
+        }
       }
     }
 
     return EFI_SUCCESS;
 
   } else {
-
+    *SenseCount = 0;
     return EFI_DEVICE_ERROR;
   }
 }
@@ -1119,240 +1148,158 @@ AtapiDetectMedia (
   OUT BOOLEAN         *MediaChange
   )
 {
-  EFI_STATUS          Status;
-  EFI_STATUS          ReadCapacityStatus;
-  EFI_BLOCK_IO_MEDIA  OldMediaInfo;
-  UINTN               SenseCounts;
-  UINTN               RetryIndex;
-  UINTN               RetryTimes;
-  UINTN               MaximumRetryTimes;
-  UINTN               ReadyWaitFactor;
-  BOOLEAN             NeedRetry;
+  EFI_STATUS                    Status;
+  EFI_STATUS                    CleanStateStatus;
+  EFI_BLOCK_IO_MEDIA            OldMediaInfo;
+  UINTN                         RetryTimes;
+  UINTN                         RetryNotReady;
+  UINTN                         SenseCount;
+  SENSE_RESULT                  SResult;
+  BOOLEAN                       WriteProtected;
+
+  CopyMem (&OldMediaInfo, IdeDev->BlkIo.Media, sizeof (EFI_BLOCK_IO_MEDIA));
+  *MediaChange  = FALSE;
   //
-  // a flag used to determine whether need to perform Read Capacity command.
+  // Retry for SenseDeviceNotReadyNeedRetry.
+  // Each retry takes 1s and we limit the upper boundary to
+  // 120 times about 2 min.
   //
-  BOOLEAN             NeedReadCapacity;
-  BOOLEAN             WriteProtected;
+  RetryNotReady = 120;
 
   //
-  // init
+  // Do Test Unit Ready
   //
-  CopyMem (&OldMediaInfo, IdeDev->BlkIo.Media, sizeof (OldMediaInfo));
-  // OldMediaInfo        = *(IdeDev->BlkIo.Media);
-  *MediaChange        = FALSE;
-  ReadCapacityStatus  = EFI_DEVICE_ERROR;
+ DoTUR:
+  //
+  // Retry 5 times
+  //
+  RetryTimes = 5;
+  while (RetryTimes != 0) {
 
-  //
-  // if there is no media, or media is not changed,
-  // the request sense command will detect faster than read capacity command.
-  // read capacity command can be bypassed, thus improve performance.
-  //
-
-  //
-  // Test Unit Ready command is used to detect whether device is accessible,
-  // the device will produce corresponding Sense data.
-  //
-  for (RetryIndex = 0; RetryIndex < 2; RetryIndex++) {
-
-    Status = AtapiTestUnitReady (IdeDev);
-    if (!EFI_ERROR (Status)) {
-      //
-      // skip the loop if test unit command succeeds.
-      //
-      break;
-    }
-
-    Status = AtapiSoftReset (IdeDev);
+    Status = AtapiTestUnitReady (IdeDev, &SenseCount);
 
     if (EFI_ERROR (Status)) {
-      AtaSoftReset (IdeDev);
-    }
-  }
-
-  SenseCounts       = 0;
-  NeedReadCapacity  = TRUE;
-
-  //
-  // at most retry 5 times
-  //
-  MaximumRetryTimes = 5;
-  RetryTimes        = 1;
-
-  for (RetryIndex = 0; 
-       (RetryIndex < RetryTimes) && (RetryIndex < MaximumRetryTimes);
-       RetryIndex++) {
-
-    Status = AtapiRequestSense (IdeDev, &SenseCounts);
-
-    if (!EFI_ERROR (Status)) {
       //
-      // if first time there is no Sense Key, no need to read capacity any more
+      // Test Unit Ready error without sense data.
+      // For some devices, this means there's extra data
+      // that has not been read, so we read these extra
+      // data out before going on.
       //
-      if (!HaveSenseKey (IdeDev->SenseData, SenseCounts) &&
-          (IdeDev->BlkIo.Media->MediaPresent)) {
-
-        if (RetryIndex == 0) {
-          NeedReadCapacity = FALSE;
-        }
-
-      } else {
+      CleanStateStatus = AtapiReadPendingData (IdeDev);
+      if (EFI_ERROR (CleanStateStatus)) {
         //
-        // No Media
+        // Busy wait failed, try again
         //
-        if (IsNoMedia (IdeDev->SenseData, SenseCounts)) {
-          NeedReadCapacity                  = FALSE;
-          IdeDev->BlkIo.Media->MediaPresent = FALSE;
-          IdeDev->BlkIo.Media->LastBlock    = 0;
+        RetryTimes--;
+      }
+      //
+      // Try again without counting down RetryTimes
+      //
+      continue;
+    } else {
+
+      ParseSenseData (IdeDev, SenseCount, &SResult);
+
+      switch (SResult) {
+      case SenseNoSenseKey:
+        if (IdeDev->BlkIo.Media->MediaPresent) {
+          goto Done;
         } else {
           //
-          // Media Changed
+          // Media present but the internal structure need refreshed.
+          // Try Read Capacity
           //
-          if (IsMediaChange (IdeDev->SenseData, SenseCounts)) {
-            NeedReadCapacity = TRUE;
-            IdeDev->BlkIo.Media->MediaId++;
-          }
-          //
-          // Media Error
-          //
-          if (IsMediaError (IdeDev->SenseData, SenseCounts)) {
-            return EFI_DEVICE_ERROR;
-          }
+          goto DoRC;
         }
-      }
-    } else {
-      //
-      // retry once more, if request sense command met errors.
-      //
-      RetryTimes++;
-    }
-  }
-
-  if (NeedReadCapacity) {
-    //
-    // at most retry 5 times
-    //
-    MaximumRetryTimes = 5;
-    //
-    // initial retry twice
-    //
-    RetryTimes        = 2;
-    ReadyWaitFactor = 2;
-
-    for (RetryIndex = 0;
-         (RetryIndex < RetryTimes) && (RetryIndex < MaximumRetryTimes);
-         RetryIndex++) {
-
-      ReadCapacityStatus  = AtapiReadCapacity (IdeDev);
-
-      SenseCounts         = 0;
-
-      if (!EFI_ERROR (ReadCapacityStatus)) {
-        //
-        // Read Capacity succeeded
-        //
         break;
 
-      } else {
-
-        if (ReadCapacityStatus == EFI_NOT_READY) {
-          //
-          // If device not ready, wait here... waiting time increases by retry
-          // times.
-          //
-          gBS->Stall (ReadyWaitFactor * 2000 * STALL_1_MILLI_SECOND);
-          ReadyWaitFactor++;
-          //
-          // retry once more
-          //
-          RetryTimes++;
-          continue;
-        }
-        
-        //
-        // Other errors returned, requery sense data
-        //
-        Status = AtapiRequestSense (IdeDev, &SenseCounts);
-
-        //
-        // If Request Sense data failed, reset the device and retry.
-        //
-        if (EFI_ERROR (Status)) {
-
-          Status = AtapiSoftReset (IdeDev);
-
-          //
-          // if ATAPI soft reset fail,
-          // use stronger reset mechanism -- ATA soft reset.
-          //
-          if (EFI_ERROR (Status)) {
-            AtaSoftReset (IdeDev);
-          }
-          //
-          // retry once more
-          //
-          RetryTimes++;
-          continue;
-        }
-        
-        //
-        // No Media
-        //
-        if (IsNoMedia (IdeDev->SenseData, SenseCounts)) {
-
-          IdeDev->BlkIo.Media->MediaPresent = FALSE;
-          IdeDev->BlkIo.Media->LastBlock    = 0;
-          return EFI_NO_MEDIA;
-        }
-
-        if (IsMediaError (IdeDev->SenseData, SenseCounts)) {
+      case SenseDeviceNotReadyNeedRetry:
+        if (--RetryNotReady == 0) {
           return EFI_DEVICE_ERROR;
         }
-        
-        //
-        // Media Changed
-        //
-        if (IsMediaChange (IdeDev->SenseData, SenseCounts)) {
-          IdeDev->BlkIo.Media->MediaId++;
-        }
+        gBS->Stall (1000 * STALL_1_MILLI_SECOND);
+        continue;
+        break;
 
-        if (!IsDriveReady (IdeDev->SenseData, SenseCounts, &NeedRetry)) {
-          
-          //
-          // Drive not ready: if NeedRetry, then retry once more;
-          // else return error
-          //
-          if (NeedRetry) {
-            //
-            // Stall 1 second to wait for drive becoming ready
-            //
-            gBS->Stall (1000 * STALL_1_MILLI_SECOND);
-            //
-            // reset retry variable to zero,
-            // to make it retry for "drive in progress of becoming ready".
-            //
-            RetryIndex = 0;
-            continue;
-          } else {
-            AtapiSoftReset (IdeDev);
-            return EFI_DEVICE_ERROR;
-          }
-        }
-        //
-        // if read capacity fail not for above reasons, retry once more
-        //
-        RetryTimes++;
+      case SenseNoMedia:
+        IdeDev->BlkIo.Media->MediaPresent = FALSE;
+        IdeDev->BlkIo.Media->LastBlock    = 0;
+        goto Done;
+        break;
+
+      case SenseDeviceNotReadyNoRetry:
+      case SenseMediaError:
+        return EFI_DEVICE_ERROR;
+
+      case SenseMediaChange:
+        IdeDev->BlkIo.Media->MediaId++;
+        goto DoRC;
+        break;
+
+      default:
+        RetryTimes--;
+        break;
       }
-
-    }
-  
-    //
-    // tell whether the readcapacity process is successful or not in the end
-    //
-    if (EFI_ERROR (ReadCapacityStatus)) {
-      return EFI_DEVICE_ERROR;
     }
   }
 
+  return EFI_DEVICE_ERROR;
+
+  //
+  // Do Read Capacity
+  //
+ DoRC:
+    RetryTimes = 5;
+
+    while (RetryTimes != 0) {
+
+      Status = AtapiReadCapacity (IdeDev, &SenseCount);
+
+      if (EFI_ERROR (Status)) {
+        RetryTimes--;
+        continue;
+      } else {
+
+        ParseSenseData (IdeDev, SenseCount, &SResult);
+
+        switch (SResult) {
+        case SenseNoSenseKey:
+          goto Done;
+          break;
+
+        case SenseDeviceNotReadyNeedRetry:
+          //
+          // We use Test Unit Ready to retry which
+          // is faster.
+          //
+          goto DoTUR;
+          break;
+
+        case SenseNoMedia:
+          IdeDev->BlkIo.Media->MediaPresent = FALSE;
+          IdeDev->BlkIo.Media->LastBlock    = 0;
+          goto Done;
+          break;
+
+        case SenseDeviceNotReadyNoRetry:
+        case SenseMediaError:
+          return EFI_DEVICE_ERROR;
+
+        case SenseMediaChange:
+          IdeDev->BlkIo.Media->MediaId++;
+          continue;
+          break;
+
+        default:
+          RetryTimes--;
+          break;
+        }
+      }
+    }
+
+  return EFI_DEVICE_ERROR;
+
+ Done:
   //
   // the following code is to check the write-protected for LS120 media
   //
@@ -1423,8 +1370,11 @@ AtapiDetectMedia (
           );
   }
 
-  return EFI_SUCCESS;
-
+  if (IdeDev->BlkIo.Media->MediaPresent) {
+    return EFI_SUCCESS;
+  } else {
+    return EFI_NO_MEDIA;
+  }
 }
 
 /**
@@ -1490,7 +1440,7 @@ AtapiReadSectors (
   //
   // limit the data bytes that can be transferred by one Read(10) Command
   //
-  MaxBlock        = (UINT16) (65536 / BlockSize);
+  MaxBlock        = 65535;
 
   BlocksRemaining = NumberOfBlocks;
 
@@ -2037,259 +1987,114 @@ AtapiBlkIoWriteBlocks (
 
 }
 
-//
-// The following functions are a set of helper functions,
-// which are used to parse sense key returned by the device.
-//
-
 /**
-  TODO: Add function description
+  This function is used to parse sense data. Only the first
+  sense data is honoured.
 
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
+  @param[in] IdeDev     Indicates the calling context.
+  @param[in] SenseCount Count of sense data.
+  @param[out] Result    The parsed result.
 
-  TODO: add return values
+  @retval EFI_SUCCESS           Successfully parsed.
+  @retval EFI_INVALID_PARAMETER Count of sense data is zero.
 
 **/
-BOOLEAN
-IsNoMedia (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
+EFI_STATUS
+ParseSenseData (
+  IN IDE_BLK_IO_DEV     *IdeDev,
+  IN UINTN              SenseCount,
+  OUT SENSE_RESULT      *Result
   )
 {
-  REQUEST_SENSE_DATA  *SensePointer;
-  UINTN               Index;
-  BOOLEAN             NoMedia;
+  REQUEST_SENSE_DATA      *SenseData;
 
-  NoMedia       = FALSE;
-  SensePointer  = SenseData;
-
-  for (Index = 0; Index < SenseCounts; Index++) {
-    //
-    // Sense Key is SK_NOT_READY (0x2),
-    // Additional Sense Code is ASC_NO_MEDIA (0x3A)
-    //
-    if ((SensePointer->sense_key == SK_NOT_READY) &&
-        (SensePointer->addnl_sense_code == ASC_NO_MEDIA)) {
-
-      NoMedia = TRUE;
-    }
-
-    SensePointer++;
+  if (SenseCount == 0) {
+    return EFI_INVALID_PARAMETER;
   }
-
-  return NoMedia;
-}
-
-/**
-  Test if the device meets a media error after media changed
-
-  @param[in] *SenseData
-  pointer pointing to ATAPI device sense data list.
-  @param[in] SenseCounts
-  sense data number of the list          
-
-  @retval TRUE Device meets a media error
-  @retval FALSE No media error
-
-**/
-BOOLEAN
-IsMediaError (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-{
-  REQUEST_SENSE_DATA  *SensePointer;
-  UINTN               Index;
-  BOOLEAN             IsError;
-
-  IsError       = FALSE;
-  SensePointer  = SenseData;
-
-  for (Index = 0; Index < SenseCounts; Index++) {
-
-    switch (SensePointer->sense_key) {
-
-    case SK_MEDIUM_ERROR:
-      //
-      // Sense Key is SK_MEDIUM_ERROR (0x3)
-      //
-      switch (SensePointer->addnl_sense_code) {
-      case ASC_MEDIA_ERR1:
-      case ASC_MEDIA_ERR2:
-      case ASC_MEDIA_ERR3:
-      case ASC_MEDIA_ERR4:
-        IsError = TRUE;
-        break;
-
-      default:
-        break;
-      }
-
-      break;
-
-    case SK_NOT_READY:
-      //
-      // Sense Key is SK_NOT_READY (0x2)
-      //
-      switch (SensePointer->addnl_sense_code) {
-      //
-      // Additional Sense Code is ASC_MEDIA_UPSIDE_DOWN (0x6)
-      //
-      case ASC_MEDIA_UPSIDE_DOWN:
-        IsError = TRUE;
-        break;
-
-      default:
-        break;
-      }
-      break;
-
-    default:
-      break;
-    }
-
-    SensePointer++;
-  }
-
-  return IsError;
-}
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-IsMediaChange (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-{
-  REQUEST_SENSE_DATA  *SensePointer;
-  UINTN               Index;
-  BOOLEAN             IsMediaChange;
-
-  IsMediaChange = FALSE;
-  SensePointer  = SenseData;
-
-  for (Index = 0; Index < SenseCounts; Index++) {
-    //
-    // Sense Key is SK_UNIT_ATTENTION (0x6)
-    //
-    if ((SensePointer->sense_key == SK_UNIT_ATTENTION) &&
-        (SensePointer->addnl_sense_code == ASC_MEDIA_CHANGE)) {
-
-      IsMediaChange = TRUE;
-    }
-
-    SensePointer++;
-  }
-
-  return IsMediaChange;
-}
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-  @param  NeedRetry TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-IsDriveReady (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts,
-  OUT BOOLEAN               *NeedRetry
-  )
-{
-  REQUEST_SENSE_DATA  *SensePointer;
-  UINTN               Index;
-  BOOLEAN             IsReady;
-
-  IsReady       = TRUE;
-  *NeedRetry    = FALSE;
-  SensePointer  = SenseData;
-
-  for (Index = 0; Index < SenseCounts; Index++) {
-
-    switch (SensePointer->sense_key) {
-
-    case SK_NOT_READY:
-      //
-      // Sense Key is SK_NOT_READY (0x2)
-      //
-      switch (SensePointer->addnl_sense_code) {
-      case ASC_NOT_READY:
-        //
-        // Additional Sense Code is ASC_NOT_READY (0x4)
-        //
-        switch (SensePointer->addnl_sense_code_qualifier) {
-        case ASCQ_IN_PROGRESS:
-          //
-          // Additional Sense Code Qualifier is ASCQ_IN_PROGRESS (0x1)
-          //
-          IsReady     = FALSE;
-          *NeedRetry  = TRUE;
-          break;
-
-        default:
-          IsReady     = FALSE;
-          *NeedRetry  = FALSE;
-          break;
-        }
-        break;
-
-      default:
-        break;
-      }
-      break;
-
-    default:
-      break;
-    }
-
-    SensePointer++;
-  }
-
-  return IsReady;
-}
-
-/**
-  TODO: Add function description
-
-  @param  SenseData TODO: add argument description
-  @param  SenseCounts TODO: add argument description
-
-  TODO: add return values
-
-**/
-BOOLEAN
-HaveSenseKey (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-{
-  BOOLEAN Have;
-
-  Have = TRUE;
 
   //
-  // if first sense key in the Sense Data Array is SK_NO_SENSE,
-  // it indicates there is no more sense key in the Sense Data Array.
+  // Only use the first sense data
   //
-  if (SenseData->sense_key == SK_NO_SENSE) {
-    Have = FALSE;
+  SenseData = IdeDev->SenseData;
+  *Result   = SenseOtherSense;
+
+  switch (SenseData->sense_key) {
+  case SK_NO_SENSE:
+    *Result = SenseNoSenseKey;
+    break;
+  case SK_NOT_READY:
+    switch (SenseData->addnl_sense_code) {
+    case ASC_NO_MEDIA:
+      *Result = SenseNoMedia;
+      break;
+    case ASC_MEDIA_UPSIDE_DOWN:
+      *Result = SenseMediaError;
+      break;
+    case ASC_NOT_READY:
+      if (SenseData->addnl_sense_code_qualifier == ASCQ_IN_PROGRESS) {
+        *Result = SenseDeviceNotReadyNeedRetry;
+      } else {
+        *Result = SenseDeviceNotReadyNoRetry;
+      }
+      break;
+    }
+    break;
+  case SK_UNIT_ATTENTION:
+    if (SenseData->addnl_sense_code == ASC_MEDIA_CHANGE) {
+      *Result = SenseMediaChange;
+    }
+    break;
+  case SK_MEDIUM_ERROR:
+    switch (SenseData->addnl_sense_code) {
+    case ASC_MEDIA_ERR1:
+    case ASC_MEDIA_ERR2:
+    case ASC_MEDIA_ERR3:
+    case ASC_MEDIA_ERR4:
+      *Result = SenseMediaError;
+      break;
+    }
+    break;
+  default:
+    break;
   }
 
-  return Have;
+  return EFI_SUCCESS;
+}
+
+/**
+  This function reads the pending data in the device.
+
+  @param[in] IdeDev   Indicates the calling context.
+
+  @retval EFI_SUCCESS   Successfully read.
+  @retval EFI_NOT_READY The BSY is set avoiding reading.
+
+**/
+EFI_STATUS
+AtapiReadPendingData (
+  IN IDE_BLK_IO_DEV     *IdeDev
+  )
+{
+  UINT8     AltRegister;
+  UINT16    TempWordBuffer;
+
+  AltRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.AltStatus);
+  if ((AltRegister & BSY) == BSY) {
+    return EFI_NOT_READY;
+  }
+  if ((AltRegister & (BSY | DRQ)) == DRQ) {
+    TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
+    while ((TempWordBuffer & (BSY | DRQ)) == DRQ) {
+      IDEReadPortWMultiple (
+        IdeDev->PciIo,
+        IdeDev->IoPort->Data, 
+        1, 
+        &TempWordBuffer
+        );
+      TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
+    }
+  }
+  return EFI_SUCCESS;
 }
 
 /**
