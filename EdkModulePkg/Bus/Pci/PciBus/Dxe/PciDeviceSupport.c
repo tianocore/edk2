@@ -305,6 +305,7 @@ Returns:
   UINTN               PlatformOpRomSize;
   UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT8               Data8;
 
   //
   // Install the pciio protocol, device path protocol
@@ -339,7 +340,8 @@ Returns:
   // Force Interrupt line to zero for cards that come up randomly
   //
   PciIo = &(PciIoDevice->PciIo);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
+  Data8 = 0xFF;
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
   //
   // Process Platform OpRom
   //
@@ -1149,7 +1151,10 @@ Returns:
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
     if (IS_PCI_VGA(&Temp->Pci) && 
-        (Temp->Attributes & (EFI_PCI_IO_ATTRIBUTE_MEMORY | EFI_PCI_IO_ATTRIBUTE_IO))) {
+        (Temp->Attributes &
+         (EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY |
+          EFI_PCI_IO_ATTRIBUTE_VGA_IO     |
+          EFI_PCI_IO_ATTRIBUTE_VGA_IO_16))) {
       return Temp;
     }
 

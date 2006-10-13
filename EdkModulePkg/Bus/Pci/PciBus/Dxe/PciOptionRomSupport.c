@@ -24,6 +24,13 @@ Revision History
 #include "pcibus.h"
 #include "PciResourceSupport.h"
 
+//
+// Min Max
+//
+#define EFI_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define EFI_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+
 EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
@@ -152,6 +159,7 @@ Returns:
   UINT64                    RomSize;
   UINT64                    RomImageSize;
   UINT8                     *RomInMemory;
+  UINT8                     CodeType;
 
   RomSize       = PciDevice->RomSize;
 
@@ -159,6 +167,7 @@ Returns:
   RomImageSize  = 0;
   RomInMemory   = NULL;
   Temp          = 0;
+  CodeType      = 0xFF;
 
   //
   // Get the RomBarIndex
@@ -231,10 +240,21 @@ Returns:
                                       sizeof (PCI_DATA_STRUCTURE),
                                       (UINT8 *) RomPcir
                                       );
+    if (RomPcir->CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
+      CodeType = PCI_CODE_TYPE_PCAT_IMAGE;
+    }
     Indicator     = RomPcir->Indicator;
     RomImageSize  = RomImageSize + RomPcir->ImageLength * 512;
     RomBarOffset  = RomBarOffset + RomPcir->ImageLength * 512;
   } while (((Indicator & 0x80) == 0x00) && ((RomBarOffset - RomBar) < RomSize));
+
+  //
+  // Some Legacy Cards do not report the correct ImageLength so used the maximum
+  // of the legacy length and the PCIR Image Length
+  //
+  if (CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
+    RomImageSize = EFI_MAX(RomImageSize, (((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512 * 512));
+  }
 
   if (RomImageSize > 0) {
     retStatus = EFI_SUCCESS;

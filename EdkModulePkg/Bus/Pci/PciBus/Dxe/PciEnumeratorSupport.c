@@ -394,7 +394,7 @@ Returns:
   //
   if (gFullEnumeration) {
 
-    PciSetCommandRegister (PciIoDevice, 0);
+    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
   }
 
@@ -462,12 +462,12 @@ Returns:
     );
 
   if (gFullEnumeration) {
-    PciSetCommandRegister (PciIoDevice, 0);
+    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
     //
     // Initalize the bridge control register
     //
-    PciSetBridgeControlRegister (PciIoDevice, 0);
+    PciDisableBridgeControlRegister (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_BITS_OWNED);
 
   }
 
@@ -586,12 +586,12 @@ Returns:
     );
 
   if (gFullEnumeration) {
-    PciSetCommandRegister (PciIoDevice, 0);
+    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
     //
     // Initalize the bridge control register
     //
-    PciSetBridgeControlRegister (PciIoDevice, 0);
+    PciDisableBridgeControlRegister (PciIoDevice, EFI_PCCARD_BRIDGE_CONTROL_BITS_OWNED);
 
   }
   //
@@ -871,6 +871,11 @@ Returns:
     Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO;
   }
 
+  if (BridgeControl & EFI_PCI_BRIDGE_CONTROL_VGA_16) {
+    Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_IO_16;
+    Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16;
+  }
+
   if (Option == EFI_SET_SUPPORTS) {
 
     Attributes |= EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE | 
@@ -1066,7 +1071,7 @@ Returns:
               EFI_PCI_COMMAND_BUS_MASTER   |
               EFI_PCI_COMMAND_VGA_PALETTE_SNOOP;
 
-    BridgeControl = EFI_PCI_BRIDGE_CONTROL_ISA | EFI_PCI_BRIDGE_CONTROL_VGA;
+    BridgeControl = EFI_PCI_BRIDGE_CONTROL_ISA | EFI_PCI_BRIDGE_CONTROL_VGA | EFI_PCI_BRIDGE_CONTROL_VGA_16;
 
     //
     // Test whether the device can support attributes above
