@@ -26,7 +26,7 @@ public final class ModuleReader implements Common.ForDoAll {
     private static final Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
     private static final Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
     private static final Pattern ptnfilename = Pattern.compile("[^\\s]+");
-    
+
     public final void ModuleScan() throws Exception {
         Common.toDoAll(mi.modulepath, ModuleInfo.class.getMethod("enroll", String.class), mi, null, Common.FILE);
 
@@ -72,7 +72,36 @@ public final class ModuleReader implements Common.ForDoAll {
             }
         }
     }
-    
+    private final String extractLicense(String wholeline) throws Exception {
+        String tempLine;
+        String license = null;
+
+        BufferedReader rd = new BufferedReader(new StringReader(wholeline));
+        while ((tempLine = rd.readLine()) != null) {
+            if (tempLine.contains("#")) {
+                if (tempLine.contains("Copyright")) {
+                    //
+                    // Find license info.
+                    // 
+                    license = "";
+                    while ((tempLine = rd.readLine())!= null) {
+                        if (!tempLine.contains("#") ||
+                             tempLine.contains("Module Name:") ||
+                             tempLine.contains("Abstract:")) {
+                            //
+                            // We assume license ends here.
+                            // 
+                            break;
+                        }
+                        license += "      " + tempLine.replaceAll("\\s*[#]\\s*(.*)", "$1\n");
+                    }
+                    break;
+                }
+            }
+        }
+        return license;
+    }
+
     private final void readInf(String name) throws Exception {
         System.out.println("\nParsing INF file: " + name);
         String wholeline;
@@ -81,6 +110,7 @@ public final class ModuleReader implements Common.ForDoAll {
         Matcher mtrfilename;
 
         wholeline = Common.file2string(mi.modulepath + File.separator + name);
+        mi.license = extractLicense(wholeline);
         mtrsection = ptnsection.matcher(wholeline);
         while (mtrsection.find()) {
             if (mtrsection.group(1).matches("defines")) {

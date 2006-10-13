@@ -36,6 +36,7 @@ public final class ModuleInfo {
     public String guidvalue = null;
     public String moduletype = null;
     public String entrypoint = null;
+    public String license = null;
     
     public final Set<String> localmodulesources = new HashSet<String>();        //contains both .c and .h
     public final Set<String> preprocessedccodes = new HashSet<String>();
