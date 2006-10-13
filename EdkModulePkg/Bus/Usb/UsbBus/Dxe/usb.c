@@ -696,7 +696,7 @@ UsbSetConfiguration (
     
 --*/
 {
-  LIST_ENTRY          *NextEntry;
+  LIST_ENTRY              *NextEntry;
   CONFIG_DESC_LIST_ENTRY  *ConfigEntry;
   UINT32                  Status;
   EFI_STATUS              Result;
@@ -752,7 +752,7 @@ UsbSetDefaultConfiguration (
 {
   CONFIG_DESC_LIST_ENTRY  *ConfigEntry;
   UINT16                  ConfigValue;
-  LIST_ENTRY          *NextEntry;
+  LIST_ENTRY              *NextEntry;
 
   if (IsListEmpty (&UsbIoDev->ConfigDescListHead)) {
     return EFI_DEVICE_ERROR;

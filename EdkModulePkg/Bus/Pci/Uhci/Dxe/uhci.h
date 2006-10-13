@@ -59,7 +59,7 @@ Revision History
 //
 #define NORMAL_MEMORY_BLOCK_UNIT_IN_PAGES 1
 
-#define bit(a)                            1 << (a)
+#define bit(a)                            (1 << (a))
 
 //
 // ////////////////////////////////////////////////////////////////////////

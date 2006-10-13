@@ -297,7 +297,6 @@ USBKeyboardDriverBindingStart (
       // We only care interrupt endpoint here
       //
       CopyMem (&UsbKeyboardDevice->IntEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
-      //UsbKeyboardDevice->IntEndpointDescriptor  = EndpointDescriptor;
       Found = TRUE;
     }
   }

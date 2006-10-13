@@ -22,8 +22,10 @@ Revision History
 
 #include "Ehci.h"
 
-UINTN                       gEHCDebugLevel  = EFI_D_INFO;
-UINTN                       gEHCErrorLevel  = EFI_D_ERROR;
+
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN    gEHCDebugLevel  = EFI_D_INFO;
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN    gEHCErrorLevel  = EFI_D_ERROR;
+
 
 //
 // Prototypes
@@ -886,7 +888,7 @@ EhciReset (
     //
     Status = SetFrameListBaseAddr (
                HcDev, 
-               GET_0B_TO_31B (HcDev->PeriodicFrameListBuffer)
+               (UINT32)GET_0B_TO_31B (HcDev->PeriodicFrameListBuffer)
                );
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;

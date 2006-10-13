@@ -309,12 +309,10 @@ CBI1DriverBindingStart (
     //
     if (EndpointDescriptor.Attributes == 0x02) {
       if (EndpointDescriptor.EndpointAddress & 0x80) {
-        CopyMem (&UsbCbiDev->BulkInEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-	 //UsbCbiDev->BulkInEndpointDescriptor = EndpointDescriptor;
-      } else {
-        CopyMem (&UsbCbiDev->BulkOutEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-	  //UsbCbiDev->BulkOutEndpointDescriptor = EndpointDescriptor;
-      }
+        CopyMem (&UsbCbiDev->BulkInEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
+	  } else {
+        CopyMem (&UsbCbiDev->BulkOutEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
+	  }
 
       Found = TRUE;
     }
@@ -322,8 +320,7 @@ CBI1DriverBindingStart (
     // We parse interrupt endpoint
     //
     if (EndpointDescriptor.Attributes == 0x03) {
-      CopyMem (&UsbCbiDev->InterruptEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
-      //UsbCbiDev->InterruptEndpointDescriptor  = EndpointDescriptor;
+      CopyMem (&UsbCbiDev->InterruptEndpointDescriptor, &EndpointDescriptor, sizeof (EndpointDescriptor));
       Found = TRUE;
     }
 
