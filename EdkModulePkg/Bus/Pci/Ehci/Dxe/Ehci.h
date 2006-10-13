@@ -28,8 +28,8 @@ Revision History
 #include <IndustryStandard/pci22.h>
 
 
-GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gEHCDebugLevel;
-GLOBAL_REMOVE_IF_UNREFERENCED    extern UINTN  gEHCErrorLevel;
+extern UINTN  gEHCDebugLevel;
+extern UINTN  gEHCErrorLevel;
 
 
 #define STALL_1_MACRO_SECOND              1
