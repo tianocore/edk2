@@ -16,11 +16,28 @@ public class ContextMain {
     
     public static void main(String[] args) {
 
+        if (TargetFile.validateFilename("target.txt") == false) {
+            System.out.printf("%n%s", "Target.txt can't be found in WorkSpace. Please check it!");
+            System.exit(0);
+        }
+        
         if(ParseParameter.checkParameter(args) == false){
             System.exit(0);
         }
-
-        if (TargetFile.parsePath("target.txt") == false) {
+        
+        if (TargetFile.readFile() == false){
+            System.exit(0);
+        }
+        
+        if (ParseParameter.standardizeParameter(args) > 0){
+            System.exit(0);
+        }
+        
+        if (TargetFile.createTempFile("target.txt") == false){
+            System.exit(0);
+        }
+        
+        if (TargetFile.readwriteFile() == false){
             System.exit(0);
         }
         

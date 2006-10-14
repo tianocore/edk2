@@ -30,7 +30,7 @@ public class TargetFile {
      * @param String filename : the name of target file
      * @return true or false
      **/
-    public static boolean parsePath(String filename) {
+    public static boolean setFile(String filename) {
 
         String workspacePath = System.getenv("WORKSPACE");
         
@@ -55,17 +55,37 @@ public class TargetFile {
         TargetFile.writeFile(Fd);
         return true;
     }
+    
+    
+    /** 
+     * validate the filename
+     * @param String filename : the name of target file
+     * 
+     * @return true or false
+     **/
+    public static boolean validateFilename(String filename) {
+        
+        String workspacePath = System.getenv("WORKSPACE");
+        
+        Fd = new File(workspacePath + File.separator + "Tools" + File.separator + "Conf" + File.separator + filename);
+        
+        if (Fd.exists() == true && Fd.canRead() == true)
+            return true;
+        else
+            return false;
+    }
+    
 
     /**
      * create a empty temp file, which is located at the same directory with target file
      * @param String filename : the name of target temp file
      * @return true or false
      **/
-    private static boolean createTempFile(String filename) {
+    public static boolean createTempFile(String filename) {
 
         String workspacePath = System.getenv("WORKSPACE");
         
-        TempFd = new File(workspacePath + File.separator + "Tools" + File.separator + "Conf" + File.separator + filename);
+        TempFd = new File(workspacePath + File.separator + "Tools" + File.separator + "Conf" + File.separator + filename + "tmp");
 
         if (TempFd.exists() == true) {
             if (TempFd.delete() == false) {
@@ -89,7 +109,7 @@ public class TargetFile {
      * @param no paremeter
      * @return true or false
      **/
-    private static boolean readwriteFile() {
+    public static boolean readwriteFile() {
 
         if (Fd.canRead() != true)
             return false;
@@ -137,15 +157,15 @@ public class TargetFile {
                     if (textLine.indexOf("ACTIVE_PLATFORM") != -1) {
                         if(pflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.pstr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.pstr);
+                                if(ParseParameter.curpstr.length() >= ParseParameter.plength) {
+                                    bw.write(ParseParameter.curpstr);
                                     bw.newLine();
                                     pflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.pstr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.pstr);
+                            if(ParseParameter.curpstr.length() >= ParseParameter.plength) {
+                                bw.write(ParseParameter.curpstr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -155,15 +175,15 @@ public class TargetFile {
                     } else if (textLine.indexOf("TARGET_ARCH") != -1) {
                         if(aflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.astr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.astr);
+                                if(ParseParameter.curastr.length() >= ParseParameter.alength) {
+                                    bw.write(ParseParameter.curastr);
                                     bw.newLine();
                                     aflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.astr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.astr);
+                            if(ParseParameter.curastr.length() >= ParseParameter.alength) {
+                                bw.write(ParseParameter.curastr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -173,15 +193,15 @@ public class TargetFile {
                     } else if (textLine.indexOf("TARGET") != -1) {
                         if(tflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.tstr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.tstr);
+                                if(ParseParameter.curtstr.length() >= ParseParameter.tlength) {
+                                    bw.write(ParseParameter.curtstr);
                                     bw.newLine();
                                     tflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.tstr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.tstr);
+                            if(ParseParameter.curtstr.length() >= ParseParameter.tlength) {
+                                bw.write(ParseParameter.curtstr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -191,15 +211,15 @@ public class TargetFile {
                     } else if (textLine.indexOf("TOOL_CHAIN_CONF") != -1) {
                         if(cflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.cstr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.cstr);
+                                if(ParseParameter.curcstr.length() >= ParseParameter.clength) {
+                                    bw.write(ParseParameter.curcstr);
                                     bw.newLine();
                                     cflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.cstr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.cstr);
+                            if(ParseParameter.curcstr.length() >= ParseParameter.clength) {
+                                bw.write(ParseParameter.curcstr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -209,15 +229,15 @@ public class TargetFile {
                     } else if (textLine.indexOf("TOOL_CHAIN_TAG") != -1) {
                         if(nflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.nstr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.nstr);
+                                if(ParseParameter.curnstr.length() >= ParseParameter.nlength) {
+                                    bw.write(ParseParameter.curnstr);
                                     bw.newLine();
                                     nflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.nstr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.nstr);
+                            if(ParseParameter.curnstr.length() >= ParseParameter.nlength) {
+                                bw.write(ParseParameter.curnstr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -227,15 +247,15 @@ public class TargetFile {
                     } else if (textLine.indexOf("MAX_CONCURRENT_THREAD_NUMBER") != -1) {
                         if(mflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.mstr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.mstr);
+                                if(ParseParameter.curmstr.length() >= ParseParameter.mlength) {
+                                    bw.write(ParseParameter.curmstr);
                                     bw.newLine();
                                     mflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.mstr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.mstr);
+                            if(ParseParameter.curmstr.length() >= ParseParameter.mlength) {
+                                bw.write(ParseParameter.curmstr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -245,15 +265,15 @@ public class TargetFile {
                     }else if (textLine.indexOf("MULTIPLE_THREAD") != -1) {
                         if(meflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.mestr.length() > ParseParameter.length) {
-                                    bw.write(ParseParameter.mestr);
+                                if(ParseParameter.curmestr.length() >= ParseParameter.melength) {
+                                    bw.write(ParseParameter.curmestr);
                                     bw.newLine();
                                     meflag = false;
                                 }
                                 continue;
                             }
-                            if(ParseParameter.mestr.length() > ParseParameter.length) {
-                                bw.write(ParseParameter.mestr);
+                            if(ParseParameter.curmestr.length() >= ParseParameter.melength) {
+                                bw.write(ParseParameter.curmestr);
                             } else {
                                 bw.write(textLine);
                             }
@@ -266,26 +286,26 @@ public class TargetFile {
             //
             //user maybe delete the line *ACTIVE_PLATFORM*=*
             //
-            if( (pflag == true) && (ParseParameter.pstr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.pstr);
+            if( (pflag == true) && (ParseParameter.curpstr.length() >= ParseParameter.plength) ){
+                bw.write(ParseParameter.curpstr);
                 bw.newLine();
-            } else if ( (tflag == true) && (ParseParameter.tstr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.tstr);
+            } else if ( (tflag == true) && (ParseParameter.curtstr.length() >= ParseParameter.tlength) ){
+                bw.write(ParseParameter.curtstr);
                 bw.newLine();
-            } else if ( (aflag == true) && (ParseParameter.astr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.astr);
+            } else if ( (aflag == true) && (ParseParameter.curastr.length() >= ParseParameter.alength) ){
+                bw.write(ParseParameter.curastr);
                 bw.newLine();
-            } else if ( (cflag == true) && (ParseParameter.cstr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.cstr);
+            } else if ( (cflag == true) && (ParseParameter.curcstr.length() >= ParseParameter.clength) ){
+                bw.write(ParseParameter.curcstr);
                 bw.newLine();
-            } else if ( (nflag == true) && (ParseParameter.nstr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.nstr);
+            } else if ( (nflag == true) && (ParseParameter.curnstr.length() >= ParseParameter.nlength) ){
+                bw.write(ParseParameter.curnstr);
                 bw.newLine();
-            } else if ( (meflag == true) && (ParseParameter.mestr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.mestr);
+            } else if ( (meflag == true) && (ParseParameter.curmestr.length() >= ParseParameter.melength) ){
+                bw.write(ParseParameter.curmestr);
                 bw.newLine();
-            } else if ( (mflag == true) && (ParseParameter.mstr.length() > ParseParameter.length) ){
-                bw.write(ParseParameter.mstr);
+            } else if ( (mflag == true) && (ParseParameter.curmstr.length() >= ParseParameter.mlength) ){
+                bw.write(ParseParameter.curmstr);
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -313,6 +333,97 @@ public class TargetFile {
 
         return true;
     }
+    
+    /**
+     * read the file and output the lines which include setting
+     * @param File fd : the File of the target file
+     * @return String: the current setting
+     **/
+    public static boolean readFile() {
+        
+        BufferedReader br = null;
+        String textLine = null;
+
+        try {
+            br = new BufferedReader(new FileReader(Fd));
+        } catch (FileNotFoundException e) {
+            System.out
+                    .println("\n# create the BufferedReader failed, because can't find the file:target.txt!");
+            return false;
+        }
+        try {
+            while ((textLine = br.readLine()) != null) {
+                //
+                // the line is composed of Space
+                //
+                if (textLine.trim().compareToIgnoreCase("") == 0) {
+                    continue;
+                } 
+                //
+                // the line starts with "#"
+                //
+                else if ((textLine.trim().charAt(0) == '#')){
+                    continue;
+                } else {
+                    if (textLine.indexOf("ACTIVE_PLATFORM") != -1) {
+                        ParseParameter.curpstr = textLine;
+                        ParseParameter.plength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("TARGET_ARCH") != -1) {
+                        ParseParameter.curastr = textLine;
+                        ParseParameter.alength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("TARGET") != -1) {
+                        ParseParameter.curtstr = textLine;
+                        ParseParameter.tlength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("TOOL_CHAIN_CONF") != -1) {
+                        ParseParameter.curcstr = textLine;
+                        ParseParameter.clength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("TOOL_CHAIN_TAG") != -1) {
+                        ParseParameter.curnstr = textLine;
+                        ParseParameter.nlength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("MAX_CONCURRENT_THREAD_NUMBER") != -1) {
+                        ParseParameter.curmstr = textLine;
+                        ParseParameter.mlength = textLine.indexOf('=');
+                    } else if (textLine.indexOf("MULTIPLE_THREAD") != -1) {
+                        ParseParameter.curmestr = textLine;
+                        ParseParameter.melength = textLine.indexOf('=');
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("\n#  read file error!");
+            return false;
+        }
+
+        try {
+            br.close();
+        } catch (IOException e) {
+            System.out
+                    .println("\n#  close BufferedReader error");
+            return false;
+        }
+        return true;
+    }
+    
+    private static String convertStr(String str){
+        String convertStr = null;
+        
+        if( str.compareTo("-p") == 0 ){
+            convertStr =  "ACTIVE_PLATFORM";
+        }else if( str.compareTo("-a") == 0){
+            convertStr =  "TARGET_ARCH";
+        }else if( str.compareTo("-t") == 0){
+            convertStr =  "TARGET";
+        }else if( str.compareTo("-c") == 0){
+            convertStr =  "TOOL_CHAIN_CONF";
+        }else if( str.compareTo("-n") == 0){
+            convertStr =  "TOOL_CHAIN_TAG";
+        }else if( str.compareTo("-m") == 0){
+            convertStr =  "MAX_CONCURRENT_THREAD_NUMBER";
+        }
+        
+        return convertStr;
+    }
+    
 
     /**
      * according to user's input args, write the file directly
