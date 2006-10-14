@@ -225,8 +225,14 @@ public class MsaOwner {
     }
     
     public final boolean setupPackageDependencies() {
-        addPackage("5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec");
-        addPackage("68169ab0-d41b-4009-9060-292c253ac43d");
+        Iterator<String> it;
+        //
+        // For now, simply add all package guids in the database. 
+        // 
+        it = MigrationTool.db.dumpAllPkgGuid();
+        while (it.hasNext()) {
+            packagedependencies.addNewPackage().setPackageGuid(it.next());
+        }
         return true;
     }
     
