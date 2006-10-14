@@ -157,14 +157,16 @@ public class TargetFile {
                     if (textLine.indexOf("ACTIVE_PLATFORM") != -1) {
                         if(pflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curpstr.length() >= ParseParameter.plength) {
+                                if(ParseParameter.npflag == true) {
                                     bw.write(ParseParameter.curpstr);
-                                    bw.newLine();
-                                    pflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                pflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curpstr.length() >= ParseParameter.plength) {
+                            if(ParseParameter.npflag == true) {
                                 bw.write(ParseParameter.curpstr);
                             } else {
                                 bw.write(textLine);
@@ -175,14 +177,16 @@ public class TargetFile {
                     } else if (textLine.indexOf("TARGET_ARCH") != -1) {
                         if(aflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curastr.length() >= ParseParameter.alength) {
+                                if(ParseParameter.naflag == true) {
                                     bw.write(ParseParameter.curastr);
-                                    bw.newLine();
-                                    aflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                aflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curastr.length() >= ParseParameter.alength) {
+                            if(ParseParameter.naflag == true) {
                                 bw.write(ParseParameter.curastr);
                             } else {
                                 bw.write(textLine);
@@ -193,14 +197,16 @@ public class TargetFile {
                     } else if (textLine.indexOf("TARGET") != -1) {
                         if(tflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curtstr.length() >= ParseParameter.tlength) {
+                                if(ParseParameter.ntflag == true) {
                                     bw.write(ParseParameter.curtstr);
-                                    bw.newLine();
-                                    tflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                tflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curtstr.length() >= ParseParameter.tlength) {
+                            if(ParseParameter.ntflag == true) {
                                 bw.write(ParseParameter.curtstr);
                             } else {
                                 bw.write(textLine);
@@ -211,14 +217,16 @@ public class TargetFile {
                     } else if (textLine.indexOf("TOOL_CHAIN_CONF") != -1) {
                         if(cflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curcstr.length() >= ParseParameter.clength) {
+                                if(ParseParameter.ncflag == true) {
                                     bw.write(ParseParameter.curcstr);
-                                    bw.newLine();
-                                    cflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                cflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curcstr.length() >= ParseParameter.clength) {
+                            if(ParseParameter.ncflag == true) {
                                 bw.write(ParseParameter.curcstr);
                             } else {
                                 bw.write(textLine);
@@ -229,14 +237,16 @@ public class TargetFile {
                     } else if (textLine.indexOf("TOOL_CHAIN_TAG") != -1) {
                         if(nflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curnstr.length() >= ParseParameter.nlength) {
+                                if(ParseParameter.nnflag == true) {
                                     bw.write(ParseParameter.curnstr);
-                                    bw.newLine();
-                                    nflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                nflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curnstr.length() >= ParseParameter.nlength) {
+                            if(ParseParameter.nnflag == true) {
                                 bw.write(ParseParameter.curnstr);
                             } else {
                                 bw.write(textLine);
@@ -247,14 +257,16 @@ public class TargetFile {
                     } else if (textLine.indexOf("MAX_CONCURRENT_THREAD_NUMBER") != -1) {
                         if(mflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curmstr.length() >= ParseParameter.mlength) {
+                                if(ParseParameter.nmflag == true) {
                                     bw.write(ParseParameter.curmstr);
-                                    bw.newLine();
-                                    mflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                mflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curmstr.length() >= ParseParameter.mlength) {
+                            if(ParseParameter.nmflag == true) {
                                 bw.write(ParseParameter.curmstr);
                             } else {
                                 bw.write(textLine);
@@ -265,14 +277,16 @@ public class TargetFile {
                     }else if (textLine.indexOf("MULTIPLE_THREAD") != -1) {
                         if(meflag == true){
                             if(textLine.trim().charAt(0) == '#'){
-                                if(ParseParameter.curmestr.length() >= ParseParameter.melength) {
+                                if(ParseParameter.nmeflag == true) {
                                     bw.write(ParseParameter.curmestr);
-                                    bw.newLine();
-                                    meflag = false;
+                                }else{
+                                    bw.write(textLine);
                                 }
+                                bw.newLine();
+                                meflag = false;
                                 continue;
                             }
-                            if(ParseParameter.curmestr.length() >= ParseParameter.melength) {
+                            if(ParseParameter.nmeflag == true) {
                                 bw.write(ParseParameter.curmestr);
                             } else {
                                 bw.write(textLine);
@@ -286,25 +300,25 @@ public class TargetFile {
             //
             //user maybe delete the line *ACTIVE_PLATFORM*=*
             //
-            if( (pflag == true) && (ParseParameter.curpstr.length() >= ParseParameter.plength) ){
+            if( (pflag == true) && (ParseParameter.npflag == true) ){
                 bw.write(ParseParameter.curpstr);
                 bw.newLine();
-            } else if ( (tflag == true) && (ParseParameter.curtstr.length() >= ParseParameter.tlength) ){
+            } else if ( (tflag == true) && (ParseParameter.ntflag == true) ){
                 bw.write(ParseParameter.curtstr);
                 bw.newLine();
-            } else if ( (aflag == true) && (ParseParameter.curastr.length() >= ParseParameter.alength) ){
+            } else if ( (aflag == true) && (ParseParameter.naflag == true) ){
                 bw.write(ParseParameter.curastr);
                 bw.newLine();
-            } else if ( (cflag == true) && (ParseParameter.curcstr.length() >= ParseParameter.clength) ){
+            } else if ( (cflag == true) && (ParseParameter.ncflag == true) ){
                 bw.write(ParseParameter.curcstr);
                 bw.newLine();
-            } else if ( (nflag == true) && (ParseParameter.curnstr.length() >= ParseParameter.nlength) ){
+            } else if ( (nflag == true) && (ParseParameter.nnflag == true) ){
                 bw.write(ParseParameter.curnstr);
                 bw.newLine();
-            } else if ( (meflag == true) && (ParseParameter.curmestr.length() >= ParseParameter.melength) ){
+            } else if ( (meflag == true) && (ParseParameter.nmeflag == true) ){
                 bw.write(ParseParameter.curmestr);
                 bw.newLine();
-            } else if ( (mflag == true) && (ParseParameter.curmstr.length() >= ParseParameter.mlength) ){
+            } else if ( (mflag == true) && (ParseParameter.nmflag == true) ){
                 bw.write(ParseParameter.curmstr);
                 bw.newLine();
             }
