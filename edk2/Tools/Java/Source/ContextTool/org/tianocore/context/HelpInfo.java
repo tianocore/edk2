@@ -102,7 +102,7 @@ public class HelpInfo {
 
     private static final String AString = "-a  <list of Arch>";
 
-    private static final String AStringInfo = "what kind of architechure is the binary target, such as IA32, IA64, X64, EBC, or ARM. Multiple values can be specified on a single line, using space to separate the values.";
+    private static final String AStringInfo = "What kind of architechure is the binary target, such as IA32, IA64, X64, EBC, or ARM. Multiple values can be specified on a single line, using space to separate the values.";
 
     private static final String CString = "-c  <tool_definition_file.txt>";
 
@@ -122,7 +122,7 @@ public class HelpInfo {
 
     private static final String MString = "-m  <num of Threads>";
     
-    private static final String MStringInfo = "number should GE 0. 0 clears both MULTIPLE_THREAD and MAX_CONCURRENT_THREAD_NUMBER, others enable MULTIPLE_THREAD and set MAX_CONCURRENT_THREAD_NUMBER.";
+    private static final String MStringInfo = "The number of concurrent threads. Default is 2. Recommend to set this value to one more than the number of your compurter cores or CPUs. 0 will disable MULTIPLE_THREAD and clean MAX_CONCURRENT_THREAD_NUMBER.";
     
     private static final String[] UsageString = { HString, AString, CString,
             NString, PString, TString, MString };

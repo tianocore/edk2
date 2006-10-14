@@ -24,24 +24,31 @@ public class ParseParameter {
     public static boolean checkParameter(String[] args) {
         
         if(args.length == 0){
-            HelpInfo.outputUsageInfo();
+            TargetFile.readFile();
+            outputCurSetting();
             return false;
         } else {
-            if( args[0].charAt(0) != '-' ){
+            if( (args[0].compareToIgnoreCase("-h") == 0) || (args[0].compareToIgnoreCase("/h") == 0) || 
+                (args[0].compareToIgnoreCase("-?") == 0) || (args[0].compareToIgnoreCase("/?") == 0) || 
+                (args[0].compareToIgnoreCase("-help") == 0) || (args[0].compareToIgnoreCase("/help") == 0) ){
                 HelpInfo.outputUsageInfo();
                 return false;
             }
+            if( args[0].charAt(0) != '-' ){
+                System.out.printf("%s\n", "Error arguments! Please type \"ContextTool -h\" for helpinfo.");
+                return false;
+            }
             for(int i=0; i<args.length; i++){
-                if( (args[i].compareToIgnoreCase("-h") == 0) || 
-                    (args[i].startsWith("-") && ((args[i].charAt(1) != 'a') && (args[i].charAt(1) != 'c') 
-                    && (args[i].charAt(1) != 'n') && (args[i].charAt(1) != 'p') && (args[i].charAt(1) != 't') && (args[i].charAt(1) != 'm')))){
-                    HelpInfo.outputUsageInfo();
+                if( (args[i].startsWith("-") && 
+                    ((args[i].compareTo("-a") != 0) && (args[i].compareTo("-c") != 0) && 
+                    (args[i].compareTo("-n") != 0) && (args[i].compareTo("-p") != 0) && 
+                    (args[i].compareTo("-t") != 0) && (args[i].compareTo("-m") != 0)))){
+                    System.out.printf("%s\n", "Error arguments! Please type \"ContextTool -h\" for helpinfo.");                                                                                                                                                            
                     return false;
                 }
             }
         }
         
-        standardizeParameter(args);
         return true; 
     }
     
@@ -50,12 +57,8 @@ public class ParseParameter {
      * @param args -- user's input
      * @return no return value
      **/
-    private static void standardizeParameter(String[] args) {
+    public static int standardizeParameter(String[] args) {
         
-        //
-        // the parameters's length are same.
-        //
-        length  = pstr.length();
         
         StringBuffer InputData = new StringBuffer();
         for (int i = 0; i < args.length; i++) {
@@ -70,34 +73,138 @@ public class ParseParameter {
                 j = InputData.length();
 
             String argstr = InputData.substring(i, j);
-
+            i = j;
             if (argstr.charAt(1) == 'p') {
-                pstr += argstr.substring(2);
- //               pstr += "\n";
+                //
+                // argstr is "-p ", display current setting
+                //
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curpstr);
+                    return 1;
+                }
+                //
+                //argstr is "-p ?", display possible setting
+                //
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "assign the platform FPD file's relative path to WORKSPACE" );
+                    return 2;
+                }
+                //
+                //argstr is "-p 0", clean current setting
+                //
+                if(argstr.length() < 6 && argstr.charAt(3) == '0'){
+                    curpstr = pstr;
+                    continue;
+                }
+                curpstr = mergeSetting(curpstr, argstr);
             } else if (argstr.charAt(1) == 't') {
-                tstr += argstr.substring(2);
- //               tstr += "\n";
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curtstr);
+                    return 1;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "What kind of the version is the binary target, such as DEBUG, RELEASE" );
+                    return 2;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '0'){
+                    curtstr = tstr;
+                    continue;
+                }
+                curtstr = mergeSetting(curtstr, argstr);
             } else if (argstr.charAt(1) == 'a') {
-                astr += argstr.substring(2);
-//                astr += "\n";
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curastr);
+                    return 1;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "What kind of architechure is the binary target, such as IA32, IA64, X64, EBC, or ARM" );
+                    return 2;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '0'){
+                    curastr = astr;
+                    continue;
+                }
+                curastr = mergeSetting(curastr, argstr);
             } else if (argstr.charAt(1) == 'c') {
-                cstr += argstr.substring(2);
-//                cstr += "\n";
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curcstr);
+                    return 1;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "Assign a txt file with the relative path to WORKSPACE, which specify the tools to use for the build and must be located in the path: WORKSPACE/Tools/Conf/" );
+                    return 2;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '0'){
+                    curcstr = cstr;
+                    continue;
+                }
+                curcstr = mergeSetting(curcstr, argstr);
             } else if (argstr.charAt(1) == 'n') {
-                nstr += argstr.substring(2);
-//                nstr += "\n";
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curnstr);
+                    return 1;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "Specify the TagName, such as GCC, MSFT" );
+                    return 2;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '0'){
+                    curnstr = nstr;
+                    continue;
+                }
+                curnstr = mergeSetting(curnstr, argstr);
             } else if (argstr.charAt(1) == 'm') {
+                if(argstr.length() < 4 && argstr.charAt(2) == ' '){
+                    System.out.printf("%s\n", curmstr);
+                    return 1;
+                }
+                if(argstr.length() < 6 && argstr.charAt(3) == '?'){
+                    System.out.printf( "%s\n", "The number of concurrent threads. Default is 2. Recommend to set this value to one more than the number of your compurter cores or CPUs." );
+                    return 2;
+                }
                 mstr += argstr.substring(2);
-//              mstr += "\n";
+                curmstr = mstr;
                 if (argstr.charAt(3) == '0'){
                     mestr += " Disable";
                 } else {
                     mestr += " Enable";
                 }
-          }
-            i = j;
+                curmestr = mestr;
+            }
+            
         }
-
+        return 0;
+    }
+    
+    
+    public static String mergeSetting( String S1, String S2){
+        
+        String[] S = S2.split(" ");
+        if(S1 == null){
+            S1 = tstr.concat(S2.substring(2));
+        }else{
+            for(int i = 1; i < S.length; i++){
+                if( S1.contains(S[i]) == false ){
+                    S1 = S1.concat(S[i]).concat(" ");
+                }
+            }
+        }
+        
+        return S1;
+    }
+    
+    public static boolean outputCurSetting(){
+        
+        System.out.printf( "%s\n", "The current setting is:" );
+        System.out.printf( "%s\n", curpstr );
+        System.out.printf( "%s\n", curtstr );
+        System.out.printf( "%s\n", curastr );
+        System.out.printf( "%s\n", curcstr );
+        System.out.printf( "%s\n", curnstr );
+        System.out.printf( "%s\n", curmstr );
+        System.out.printf( "%s\n", curmestr );
+        
+        return true;
     }
      
     public static int length  = 0;
@@ -108,5 +215,21 @@ public class ParseParameter {
     public static String nstr = new String("TOOL_CHAIN_TAG                      = ");
     public static String mstr = new String("MAX_CONCURRENT_THREAD_NUMBER        = ");
     public static String mestr = new String("MULTIPLE_THREAD                     = ");
+    
+    public static String curpstr = null;
+    public static String curtstr = null;
+    public static String curastr = null;
+    public static String curcstr = null;
+    public static String curnstr = null;
+    public static String curmstr = null;
+    public static String curmestr = null;
+    
+    public static int plength = 0;
+    public static int tlength = 0;
+    public static int alength = 0;
+    public static int clength = 0;
+    public static int nlength = 0;
+    public static int mlength = 0;
+    public static int melength = 0;
 
 }
