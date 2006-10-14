@@ -23,6 +23,7 @@ public final class Database {
         DatabasePath = path;
 
         try {
+            importPkgGuid("PkgGuid.csv");
             importDBLib("Library.csv");
             importDBGuid("Guid.csv", "Guid");
             importDBGuid("Ppi.csv", "Ppi");
@@ -41,9 +42,32 @@ public final class Database {
     private Map<String,Guid> hashguid = new HashMap<String,Guid>();
     private Map<String,Func> hashfunc = new HashMap<String,Func>();
     private Map<String,Macro> hashmacro = new HashMap<String,Macro>();
+    private Map<String,String> hashPkgGuid = new HashMap<String,String>();
     
     //-------------------------------------import------------------------------------------//
-    
+    private void importPkgGuid(String filename) throws Exception {
+       BufferedReader rd = new BufferedReader(new FileReader(DatabasePath + File.separator + filename));
+        String line;
+        String[] linecontext;
+        Func lf;
+        
+        if (rd.ready()) {
+            System.out.println("Found " + filename + ", Importing Package Guid Database.");
+            //
+            // Skip the title row.
+            // 
+            line = rd.readLine();
+            while ((line = rd.readLine()) != null) {
+                if (line.length() != 0) {
+                    linecontext = line.split(",");
+                    hashPkgGuid.put(linecontext[0], linecontext[1]);
+                }
+            }
+        }
+    }
+    public Iterator<String> dumpAllPkgGuid() {
+        return hashPkgGuid.values().iterator();
+    }
     private void importDBLib(String filename) throws Exception {
         BufferedReader rd = new BufferedReader(new FileReader(DatabasePath + File.separator + filename));
         String line;
