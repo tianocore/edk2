@@ -94,9 +94,15 @@ public class ParseParameter {
                 //
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curpstr = pstr;
+                    npflag = true;
                     continue;
                 }
-                curpstr = mergeSetting(curpstr, argstr);
+                if(curpstr == null){
+                    curpstr = pstr.concat(argstr.substring(2));
+                }else{
+                    curpstr = mergeSetting(curpstr, argstr);
+                }
+                npflag = true;
             } else if (argstr.charAt(1) == 't') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
                     System.out.printf("%s\n", curtstr);
@@ -108,9 +114,15 @@ public class ParseParameter {
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curtstr = tstr;
+                    ntflag = true;
                     continue;
                 }
-                curtstr = mergeSetting(curtstr, argstr);
+                if(curtstr == null){
+                    curtstr = tstr.concat(argstr.substring(2));
+                }else{
+                    curtstr = mergeSetting(curtstr, argstr);
+                }
+                ntflag = true;
             } else if (argstr.charAt(1) == 'a') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
                     System.out.printf("%s\n", curastr);
@@ -122,9 +134,15 @@ public class ParseParameter {
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curastr = astr;
+                    naflag = true;
                     continue;
                 }
-                curastr = mergeSetting(curastr, argstr);
+                if(curastr == null){
+                    curastr = astr.concat(argstr.substring(2));
+                }else{
+                    curastr = mergeSetting(curastr, argstr);
+                }
+                naflag = true;
             } else if (argstr.charAt(1) == 'c') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
                     System.out.printf("%s\n", curcstr);
@@ -136,9 +154,15 @@ public class ParseParameter {
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curcstr = cstr;
+                    ncflag = true;
                     continue;
                 }
-                curcstr = mergeSetting(curcstr, argstr);
+                if(curcstr == null){
+                    curcstr = pstr.concat(argstr.substring(2));
+                }else{
+                    curcstr = mergeSetting(curcstr, argstr);
+                }
+                ncflag = true;
             } else if (argstr.charAt(1) == 'n') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
                     System.out.printf("%s\n", curnstr);
@@ -150,9 +174,15 @@ public class ParseParameter {
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curnstr = nstr;
+                    nnflag = true;
                     continue;
                 }
-                curnstr = mergeSetting(curnstr, argstr);
+                if(curnstr == null){
+                    curnstr = nstr.concat(argstr.substring(2));
+                }else{
+                    curnstr = mergeSetting(curnstr, argstr);
+                }
+                nnflag = true;
             } else if (argstr.charAt(1) == 'm') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
                     System.out.printf("%s\n", curmstr);
@@ -164,12 +194,14 @@ public class ParseParameter {
                 }
                 mstr += argstr.substring(2);
                 curmstr = mstr;
+                nmflag = true;
                 if (argstr.charAt(3) == '0'){
                     mestr += " Disable";
                 } else {
                     mestr += " Enable";
                 }
                 curmestr = mestr;
+                nmeflag = true;
             }
             
         }
@@ -180,13 +212,10 @@ public class ParseParameter {
     public static String mergeSetting( String S1, String S2){
         
         String[] S = S2.split(" ");
-        if(S1 == null){
-            S1 = tstr.concat(S2.substring(2));
-        }else{
-            for(int i = 1; i < S.length; i++){
-                if( S1.contains(S[i]) == false ){
-                    S1 = S1.concat(S[i]).concat(" ");
-                }
+
+        for(int i = 1; i < S.length; i++){
+            if(S1.contains(S[i]) == false){
+                S1 = S1.concat(" ").concat(S[i]);
             }
         }
         
@@ -231,5 +260,13 @@ public class ParseParameter {
     public static int nlength = 0;
     public static int mlength = 0;
     public static int melength = 0;
+    
+    public static boolean npflag = false;
+    public static boolean ntflag = false;
+    public static boolean naflag = false;
+    public static boolean ncflag = false;
+    public static boolean nnflag = false;
+    public static boolean nmflag = false;
+    public static boolean nmeflag = false;
 
 }
