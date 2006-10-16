@@ -108,15 +108,17 @@ public final class ModuleInfo {
     
     public final void enroll(String filepath) throws Exception {
         String temp = null;
-        if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
-                filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
-        	addSourceFile(filepath.replace(modulepath + File.separator, ""), null);
-        } else if (filepath.contains(".inf") || filepath.contains(".msa")) {
+         if (filepath.contains(".inf") || filepath.contains(".msa")) {
             temp = filepath.replace(modulepath + File.separator, "");
             if (!temp.contains(File.separator)) {                            // .inf in subdirectory is not regarded
                 msaorinf.add(temp);
             }
-        }
+        } else if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
+                filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni") ||
+                filepath.contains(".s") || filepath.contains(".S") || filepath.contains(".i") ||
+                filepath.contains(".asm")) {
+        	addSourceFile(filepath.replace(modulepath + File.separator, ""), null);
+        } 
     }
 
     public static final boolean isModule(String path) {

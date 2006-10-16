@@ -75,7 +75,9 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         }
         
         public boolean recognize(String filename) {
-            return filename.contains(".h") || filename.contains(".H") || filename.contains(".uni");
+            return filename.contains(".h") || filename.contains(".H") || filename.contains(".uni") ||
+                   filename.contains(".s") || filename.contains(".S") || filename.contains(".asm") ||
+                   (!filename.contains(".inf") && filename.contains(".i"));
         }
 
         public String namechange(String oldname) {
