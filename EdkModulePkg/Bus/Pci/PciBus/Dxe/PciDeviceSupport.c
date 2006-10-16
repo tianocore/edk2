@@ -305,7 +305,6 @@ Returns:
   UINTN               PlatformOpRomSize;
   UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
-  UINT8               Data8;
 
   //
   // Install the pciio protocol, device path protocol
@@ -340,8 +339,8 @@ Returns:
   // Force Interrupt line to zero for cards that come up randomly
   //
   PciIo = &(PciIoDevice->PciIo);
-  Data8 = 0xFF;
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
+  
   //
   // Process Platform OpRom
   //
