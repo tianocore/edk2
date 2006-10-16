@@ -591,9 +591,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         jComboBoxItemType.setSelectedItem(itemType);
                         jTextFieldMaxDatumSize.setEnabled(true);
                         jTextFieldMaxDatumSize.setVisible(true);
-                        jTextFieldMaxDatumSize.setText(jTablePcd.getValueAt(selectedRow, 4)+"");
+                        jTextFieldMaxDatumSize.setText(model.getValueAt(selectedRow, 4)+"");
                         jTextFieldPcdDefault.setEnabled(true);
-                        jTextFieldPcdDefault.setText(jTablePcd.getValueAt(selectedRow, 6)+"");
+                        jTextFieldPcdDefault.setText(model.getValueAt(selectedRow, 6)+"");
                         if (model.getValueAt(selectedRow, 5).equals("VOID*")) {
                             if (pcdInfo[1].equals("FEATURE_FLAG")) {
                                 jTextFieldMaxDatumSize.setVisible(false);
@@ -601,14 +601,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                             else if (pcdInfo[1].equals("FIXED_AT_BUILD")) {
                                 try{
                                     jTextFieldMaxDatumSize.setEnabled(false);
-                                    jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(jTablePcd.getValueAt(selectedRow, 6)+"")+"");
+                                    jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(model.getValueAt(selectedRow, 6)+"")+"");
                                 }
                                 catch(Exception except){
                                     JOptionPane.showMessageDialog(frame, "Unacceptable PCD Value: " + except.getMessage());
                                 }
                             }
                             else{
-                                jTextFieldMaxDatumSize.setText(jTablePcd.getValueAt(selectedRow, 4)+"");
+                                jTextFieldMaxDatumSize.setText(model.getValueAt(selectedRow, 4)+"");
                             }
                         }
                         else {
@@ -653,6 +653,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
     }
     
+    /**
+     * @param cName
+     * @param tsGuid
+     * @param sa sa[0]: HelpText; sa[1]: itemType in Msa; sa[2]: isBinary;
+     */
     private void getPcdInfo(String cName, String tsGuid, String[] sa) {
         String[][] saa = new String[ffc.getLibraryInstancesCount(moduleKey)][5];
         ffc.getLibraryInstances(moduleKey, saa);
@@ -1594,8 +1599,21 @@ private JButton getJButtonUpdatePcd() {
                 String oldItemType = model.getValueAt(row, 2)+"";
                 String newItemType = jComboBoxItemType.getSelectedItem()+"";
                 model.setValueAt(newItemType, row, 2);
-                model.setValueAt(jTextFieldMaxDatumSize.getText(), row, 4);
                 model.setValueAt(jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem(), row, 6);
+                
+                String[] pcdInfo = {"", "", ""};
+                getPcdInfo (model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"", pcdInfo);
+                if (pcdInfo[1].equals("FIXED_AT_BUILD") && model.getValueAt(row, 5).equals("VOID*")) {
+                    try {
+                        jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(model.getValueAt(row, 6)+"")+"");
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, "PCD Value MalFormed: " + exp.getMessage());
+                        return;
+                    }
+                }
+                model.setValueAt(jTextFieldMaxDatumSize.getText(), row, 4);
+                
                 if (oldItemType.equals("DYNAMIC") && !newItemType.equals("DYNAMIC")) {
                     pcdDynamicToNonDynamic(model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"");
                 }
