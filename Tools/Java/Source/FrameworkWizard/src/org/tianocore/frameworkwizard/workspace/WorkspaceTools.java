@@ -23,6 +23,8 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
+import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations;
+import org.tianocore.LibraryClassDefinitionsDocument.LibraryClassDefinitions;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
 import org.tianocore.PackageDependenciesDocument.PackageDependencies;
@@ -676,6 +678,10 @@ public class WorkspaceTools {
         msaFile.setFilenameArray(msaFile.getFilenameList().size() - 1, fn);
         spd.setMsaFiles(msaFile);
         SaveFile.saveSpdFile(mid.getPackageId().getPath(), spd);
+        //
+        // Update GlobalData
+        //
+        GlobalData.openingPackageList.getPackageSurfaceAreaFromId(mid.getPackageId()).setMsaFiles(msaFile);
     }
 
     /**
@@ -733,10 +739,18 @@ public class WorkspaceTools {
     public Vector<String> getAllFilesPathOfModule(String path) {
         Vector<String> v = new Vector<String>();
         path = Tools.convertPathToCurrentOsType(path);
+
+        //
+        // First add msa file's path
+        //
         v.addElement(path);
+
         ModuleSurfaceArea msa = GlobalData.openingModuleList
                                                             .getModuleSurfaceAreaFromId(GlobalData.openingModuleList
                                                                                                                     .getIdByPath(path));
+        //
+        // Get common defined files of module
+        //
         if (msa != null) {
             //
             // Get all files' path of a module
@@ -747,6 +761,44 @@ public class WorkspaceTools {
                     String temp = sf.getFilenameList().get(index).getStringValue();
                     temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
                     v.addElement(Tools.convertPathToCurrentOsType(temp));
+                }
+            }
+        }
+
+        //
+        // Get include header files for this module
+        //
+        if (msa.getLibraryClassDefinitions() != null) {
+            LibraryClassDefinitions lcd = msa.getLibraryClassDefinitions();
+            for (int index = 0; index < lcd.sizeOfLibraryClassArray(); index++) {
+                if (lcd.getLibraryClassList().get(index).getUsage().toString()
+                       .equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
+                    || lcd.getLibraryClassList().get(index).getUsage().toString()
+                          .equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
+                    //
+                    // Get library class name
+                    //
+                    String name = lcd.getLibraryClassList().get(index).getKeyword();
+
+                    //
+                    // Find file path for this class
+                    //
+                    PackageIdentification pid = GlobalData.openingModuleList.getIdByPath(path).getPackageId();
+                    PackageSurfaceArea spd = GlobalData.openingPackageList.getPackageSurfaceAreaFromId(pid);
+                    if (spd != null) {
+                        if (spd.getLibraryClassDeclarations() != null) {
+                            LibraryClassDeclarations lcdl = spd.getLibraryClassDeclarations();
+                            for (int indexOfLibOfSpd = 0; indexOfLibOfSpd < lcdl.sizeOfLibraryClassArray(); indexOfLibOfSpd++) {
+                                if (lcdl.getLibraryClassList().get(indexOfLibOfSpd).getName().equals(name)) {
+                                    v.addElement(Tools.convertPathToCurrentOsType(Tools.getFilePathOnly(pid.getPath())
+                                                                                  + DataType.FILE_SEPARATOR
+                                                                                  + lcdl.getLibraryClassList()
+                                                                                        .get(indexOfLibOfSpd)
+                                                                                        .getIncludeHeader()));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
