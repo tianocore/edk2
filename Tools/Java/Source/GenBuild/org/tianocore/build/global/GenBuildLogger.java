@@ -59,6 +59,10 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     private static Map<FpdModuleIdentification, List<String>> map = new LinkedHashMap<FpdModuleIdentification, List<String> >(256);
     
     private FpdModuleIdentification id = null;
+    //
+	//  semaroph for multi thread
+	// 
+    public static Object semaphore = new Object();
     
     public GenBuildLogger () {
         
@@ -270,38 +274,15 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     }
 
     public void buildFinished(BuildEvent event) {
-        Throwable error = event.getException();
-        StringBuffer message = new StringBuffer();
-
-        if (error == null) {
-            message.append(StringUtils.LINE_SEP);
-            message.append("BUILD SUCCESSFUL");
-        } else {
-            message.append(StringUtils.LINE_SEP);
-            message.append("BUILD FAILED");
-            message.append(StringUtils.LINE_SEP);
-
-            if (Project.MSG_DEBUG <= msgOutputLevel
-                || !(error instanceof BuildException)) {
-                message.append(StringUtils.getStackTrace(error));
-            } else {
-                if (error instanceof BuildException) {
-                    message.append(error.toString()).append(lSep);
-                } else {
-                    message.append(error.getMessage()).append(lSep);
-                }
-            }
-        }
-        message.append(StringUtils.LINE_SEP);
-        message.append("Total time: ");
-        message.append(formatTime(System.currentTimeMillis() - startTime));
-
-        String msg = message.toString();
-        if (error == null) {
-            printMessage(msg, out, Project.MSG_VERBOSE);
-        } else {
-            printMessage(msg, err, Project.MSG_ERR);
-        }
-        log(msg);
+		if (this.msgOutputLevel >= Project.MSG_VERBOSE) {
+			int level = this.msgOutputLevel;
+			synchronized(semaphore){
+			    this.msgOutputLevel = this.msgOutputLevel - 1;
+			    super.buildFinished(event);
+			    this.msgOutputLevel = level;
+			}
+		} else {
+			super.buildFinished(event);
+		}
     }
 }
