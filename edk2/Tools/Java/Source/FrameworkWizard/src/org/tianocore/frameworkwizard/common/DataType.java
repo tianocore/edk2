@@ -254,7 +254,7 @@ public class DataType {
     public static final String FALSE = "False";
     
     //
-    // The Sting for USAGE type
+    // The String for USAGE type
     //
     public final static String USAGE_TYPE_ALWAYS_CONSUMED = "ALWAYS_CONSUMED";
     
@@ -265,6 +265,19 @@ public class DataType {
     public final static String USAGE_TYPE_SOMETIMES_PRODUCED = "SOMETIMES_PRODUCED";
     
     public final static String USAGE_TYPE_PRIVATE = "PRIVATE";
+    
+    //
+    // The String for PCD type
+    //
+    public final static String PCD_ITEM_TYPE_FEATURE_FLAG = "FEATURE_FLAG";
+    
+    public final static String PCD_ITEM_TYPE_FIXED_AT_BUILD = "FIXED_AT_BUILD";
+    
+    public final static String PCD_ITEM_TYPE_PATCHABLE_IN_MODULE = "PATCHABLE_IN_MODULE";
+    
+    public final static String PCD_ITEM_TYPE_DYNAMIC = "DYNAMIC";
+    
+    public final static String PCD_ITEM_TYPE_DYNAMIC_EX = "DYNAMIC_EX";
     
     //
     // The String for PPI type

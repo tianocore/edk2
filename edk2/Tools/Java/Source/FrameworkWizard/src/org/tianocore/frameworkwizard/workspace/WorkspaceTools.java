@@ -458,7 +458,31 @@ public class WorkspaceTools {
                     String help = spd.getPcdDeclarations().getPcdEntryList().get(index).getHelpText();
                     Vector<String> type = Tools.convertListToVector(spd.getPcdDeclarations().getPcdEntryList()
                                                                        .get(index).getValidUsage());
-
+                    //
+                    // The algorithm for PCD of msa should be:
+                    // 1. If the type of PCD from Spd is FEATURE_FLAG, 
+                    //    the type of Msa only can be FEATURE_FLAG.
+                    // 2. If the type of PCD from Spd is not FEATURE_FLAG, 
+                    //    the type of Msa could be selected from the PCD's all types and "DYNAMIC" type.
+                    //
+                    boolean hasFEATURE_FLAG = false;
+                    boolean hasDYNAMIC = false;
+                    for (int indexOfType = 0; indexOfType < type.size(); indexOfType++) {
+                        if (type.elementAt(indexOfType).equals(DataType.PCD_ITEM_TYPE_DYNAMIC)) {
+                            hasDYNAMIC = true;
+                        }
+                        if(type.elementAt(indexOfType).equals(DataType.PCD_ITEM_TYPE_FEATURE_FLAG)) {
+                            hasFEATURE_FLAG = true;
+                        }
+                    }
+                    if (hasFEATURE_FLAG) {
+                        type.removeAllElements();
+                        type.addElement(DataType.PCD_ITEM_TYPE_FEATURE_FLAG);
+                    } else {
+                        if (!hasDYNAMIC) {
+                            type.addElement(DataType.PCD_ITEM_TYPE_DYNAMIC);
+                        }
+                    }
                     vector.addPcd(new PcdIdentification(name, guidCName, help, type));
                 }
             }
