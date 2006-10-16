@@ -303,7 +303,7 @@ Returns:
     // Check to see if we are attempting to fetch dependency expression instructions
     // past the end of the dependency expression.
     //
-    if (((UINTN)Iterator - (UINTN)DriverEntry->Depex) > DriverEntry->DepexSize) {
+    if (((UINTN)Iterator - (UINTN)DriverEntry->Depex) >= DriverEntry->DepexSize) {
       return FALSE;
     }
 

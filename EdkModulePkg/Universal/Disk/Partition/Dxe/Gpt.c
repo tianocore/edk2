@@ -154,7 +154,7 @@ Returns:
   // Verify that the Protective MBR is valid
   //
   if (ProtectiveMbr->Partition[0].BootIndicator != 0x00 ||
-      ProtectiveMbr->Partition[0].OSIndicator != 0xEE ||
+      ProtectiveMbr->Partition[0].OSIndicator != PMBR_GPT_PARTITION ||
       UNPACK_UINT32 (ProtectiveMbr->Partition[0].StartingLBA) != 1
       ) {
     goto Done;

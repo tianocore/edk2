@@ -1392,7 +1392,7 @@ Returns:
         
         MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
         MemoryMap->VirtualStart  = 0;
-        MemoryMap->NumberOfPages = MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
+        MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
         MemoryMap->Attribute     = GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO;
 
         if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) {

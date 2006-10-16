@@ -1094,7 +1094,7 @@ Returns:
     //
     if (GcdAllocateType == EfiGcdAllocateMaxAddressSearchBottomUp ||
         GcdAllocateType == EfiGcdAllocateMaxAddressSearchTopDown     ) {
-      MaxAddress = *BaseAddress - 1;
+      MaxAddress = *BaseAddress;
     } else {
       MaxAddress = Entry->EndAddress;
     }
@@ -1103,7 +1103,7 @@ Returns:
     // Verify that the list of descriptors are unallocated memory matching GcdMemoryType.
     //
     if (GcdAllocateType == EfiGcdAllocateMaxAddressSearchTopDown ||
-        GcdAllocateType == EfiGcdAllocateAnySearchTopDown           ) {
+        GcdAllocateType == EfiGcdAllocateAnySearchTopDown ) {
       Link = Map->BackLink;
     } else {
       Link = Map->ForwardLink;
