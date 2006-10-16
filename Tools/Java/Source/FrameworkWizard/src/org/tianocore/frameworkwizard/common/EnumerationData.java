@@ -709,11 +709,11 @@ public class EnumerationData {
     
     private void initPcdItemTypes() {
         vPcdItemTypes.removeAllElements();
-        vPcdItemTypes.addElement("FEATURE_FLAG");
-        vPcdItemTypes.addElement("FIXED_AT_BUILD");
-        vPcdItemTypes.addElement("PATCHABLE_IN_MODULE");
-        vPcdItemTypes.addElement("DYNAMIC");
-        vPcdItemTypes.addElement("DYNAMIC_EX");
+        vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_FEATURE_FLAG);
+        vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_FIXED_AT_BUILD);
+        vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_PATCHABLE_IN_MODULE);
+        vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_DYNAMIC);
+        vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_DYNAMIC_EX);
     }
     
     private void initPcdUsage() {
