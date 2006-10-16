@@ -21,7 +21,6 @@ Revision History:
 
 
 #include "Terminal.h"
-#include <Common/StatusCode.h>
 
 //
 // Function Prototypes
