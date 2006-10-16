@@ -49,7 +49,6 @@ public final class Database {
        BufferedReader rd = new BufferedReader(new FileReader(DatabasePath + File.separator + filename));
         String line;
         String[] linecontext;
-        Func lf;
         
         if (rd.ready()) {
             System.out.println("Found " + filename + ", Importing Package Guid Database.");

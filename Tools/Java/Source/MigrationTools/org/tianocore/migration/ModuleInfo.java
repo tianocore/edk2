@@ -16,6 +16,7 @@ import java.io.*;
 import java.util.*;
 
 import org.tianocore.UsageTypes;
+import org.tianocore.SupportedArchitectures.Enum;
 
 /*
     Class ModuleInfo is built for scanning the source files, it contains all the needed
@@ -59,24 +60,40 @@ public final class ModuleInfo {
 
     //-----------------------------------------------------------------------------------//
 
+    //addModuleType
+    //addGuidValue
+    //addModuleName
+    
+    public final boolean addSourceFile (String filename, Enum en) {
+    	localmodulesources.add(filename);
+    	return msaowner.addSourceFile(filename, en);
+    }
+    
     public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
-        //protocols.add(proname);
+        protocols.add(proname);
         return msaowner.addProtocol(proname, usage);
     }
     
     public final boolean addPpi (String ppiname, UsageTypes.Enum usage) {
-        //ppis.add(ppiname);
+        ppis.add(ppiname);
         return msaowner.addPpi(ppiname, usage);
     }
     
     public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
-        //guids.add(guidname);
+        guids.add(guidname);
         return msaowner.addGuid(guidname, usage);
     }
     
     public final boolean addLibraryClass(String name, UsageTypes.Enum usage) {
-        //hashrequiredr9libs.add(name);
-        return msaowner.addLibraryClass(name, usage);
+    	//
+    	// This section is only for adding library classes, this functionality should be inside MsaOwner!!!
+    	//
+    	//if (!hashrequiredr9libs.contains(name)) {
+    		msaowner.addLibraryClass(name, usage);
+    	//}
+    	//
+        hashrequiredr9libs.add(name);
+        return true;
     }
     
     //-----------------------------------------------------------------------------------//
@@ -93,7 +110,7 @@ public final class ModuleInfo {
         String temp = null;
         if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
                 filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
-            localmodulesources.add(filepath.replace(modulepath + File.separator, ""));
+        	addSourceFile(filepath.replace(modulepath + File.separator, ""), null);
         } else if (filepath.contains(".inf") || filepath.contains(".msa")) {
             temp = filepath.replace(modulepath + File.separator, "");
             if (!temp.contains(File.separator)) {                            // .inf in subdirectory is not regarded
