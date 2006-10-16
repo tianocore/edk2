@@ -220,20 +220,36 @@ public class CommandLineUserDefine {
 //        }
 //        project.log(logLine.toString(), Project.MSG_VERBOSE);
 
-        int retval = 0;
+        Environment newEnv = new Environment();
         
-        if (userdefine.getDpath() == null || userdefine.getDpath().trim().length() == 0) {
-            retval = runCommand(cctask, workdir, cmd, null);
-        } else {
-            String existPath = System.getenv(getPathName());
-            Environment newEnv = new Environment();
+        if (userdefine.getDpath() != null && userdefine.getDpath().trim().length() != 0) {
+            String existPath = System.getenv(getPathName("PATH"));
+            
             Variable var = new Variable();
-            var.setKey(getPathName());
+            var.setKey(getPathName("PATH"));
             var.setPath(new Path(project, userdefine.getDpath() + ";" + existPath));
             newEnv.addVariable(var);
-            retval = runCommand(cctask, workdir, cmd, newEnv);
         }
         
+        if (userdefine.getLibpath() != null && userdefine.getLibpath().trim().length() != 0) {
+            String existPath = System.getenv(getPathName("LIB"));
+            
+            Variable var = new Variable();
+            var.setKey(getPathName("LIB"));
+            var.setPath(new Path(project, userdefine.getLibpath() + ";" + existPath));
+            newEnv.addVariable(var);
+        }
+        
+        if (userdefine.getInclude() != null && userdefine.getInclude().trim().length() != 0) {
+            String existPath = System.getenv(getPathName("INCLUDE"));
+            
+            Variable var = new Variable();
+            var.setKey(getPathName("INCLUDE"));
+            var.setPath(new Path(project, userdefine.getInclude() + ";" + existPath));
+            newEnv.addVariable(var);
+        }
+        
+        int retval = runCommand(cctask, workdir, cmd, newEnv);
 
         if (retval != 0) {
             throw new BuildException(userdefine.getCmd()
@@ -242,7 +258,7 @@ public class CommandLineUserDefine {
         }
     }
     
-    private String getPathName() {
+    private String getPathName(String variableName) {
         if (pathName != null) {
             return pathName;
         }
@@ -250,7 +266,7 @@ public class CommandLineUserDefine {
         Iterator iter = allEnv.keySet().iterator();
         while (iter.hasNext()) {
             String key = (String)iter.next();
-            if(key.equalsIgnoreCase("PATH")) {
+            if(key.equalsIgnoreCase(variableName)) {
                 pathName = key;
                 break ;
             }
