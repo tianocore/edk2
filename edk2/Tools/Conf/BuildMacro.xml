@@ -1161,6 +1161,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
     </sequential>
   </macrodef>
+  
   <!--
     Microcode
    -->
@@ -1181,7 +1182,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <!--
     Graphics (bmp, ...)
     -->
-  <macrodef name="Build_Graphics">
+  <macrodef name="Build_BMP">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/> 
     <attribute name="FILEEXT" default="bmp"/>
@@ -1195,6 +1196,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
     </sequential>
   </macrodef> 
+
+  <!--
+    build EFI file
+  -->
   <macrodef name="Build_EFI">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
