@@ -376,7 +376,8 @@ public class Clone extends IDialog {
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
             this.jButtonBrowse.setVisible(false);
-            this.jTextFieldFilePath.setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.spd</html>");
+            this.jTextFieldFilePath
+                                   .setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.spd</html>");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Package Path and Filename");
         }
@@ -407,7 +408,8 @@ public class Clone extends IDialog {
             this.jButtonGenerateGuid.setEnabled(false);
             this.jLabelVersion.setEnabled(false);
             this.jTextFieldVersion.setEnabled(false);
-            this.jTextFieldFilePath.setToolTipText("<html>Input the workspace path, for example:<br>C:\\MyWorkspace</html>");
+            this.jTextFieldFilePath
+                                   .setToolTipText("<html>Input the workspace path, for example:<br>C:\\MyWorkspace</html>");
             this.jLabelDestinationFile.setText("New Workspace Path");
         }
     }
@@ -555,7 +557,9 @@ public class Clone extends IDialog {
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Clone", "<html>Incorrect data type for the Name, it must<br>be a single word, starting with an alpha character.</html>");
+            Log
+               .wrn("Clone",
+                    "<html>Incorrect data type for the Name, it must<br>be a single word, starting with an alpha character.</html>");
             return false;
         }
 
@@ -567,7 +571,10 @@ public class Clone extends IDialog {
             return false;
         }
         if (!DataValidation.isGuid(this.jTextFieldGuid.getText())) {
-            Log.wrn("Clone", "<html>Incorrect data type for Guid, which must<br>be in registry format (8-4-4-4-12) for example:<br>d3adb123-eef1-466d-39ac-02febcaf5997</html>");
+            Log
+               .wrn(
+                    "Clone",
+                    "<html>Incorrect data type for Guid, which must<br>be in registry format (8-4-4-4-12) for example:<br>d3adb123-eef1-466d-39ac-02febcaf5997</html>");
             return false;
         }
 
@@ -579,7 +586,10 @@ public class Clone extends IDialog {
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-            Log.wrn("Clone", "<html>Incorrect data type for Version, which must<br>be one or more digits, optionally followed by sequence<br>of one or more dot,  one or more digits; examples:<br>1.0 1.0.1 12.25.256</html>");
+            Log
+               .wrn(
+                    "Clone",
+                    "<html>Incorrect data type for Version, which must<br>be one or more digits, optionally followed by sequence<br>of one or more dot,  one or more digits; examples:<br>1.0 1.0.1 12.25.256</html>");
             return false;
         }
 
@@ -726,13 +736,29 @@ public class Clone extends IDialog {
             newId.setPath(trg);
             vFiles = wt.getAllFilesPathOfModule(src);
 
+            String oldPackagePath = GlobalData.openingModuleList.getIdByPath(src).getPackageId().getPath();
+            String newPackagePath = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getPath();
+
             //
             // First copy all files to new directory
             //
             FileOperation.copyFile(src, trg);
             for (int index = 1; index < vFiles.size(); index++) {
                 String oldFile = vFiles.get(index);
-                String newFile = vFiles.get(index).replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
+                String newFile = "";
+                if (oldFile.indexOf(Tools.getFilePathOnly(src)) > -1) {
+                    //
+                    // The file is not include header
+                    //
+                    newFile = oldFile.replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
+                } else if (oldFile.indexOf(Tools.getFilePathOnly(oldPackagePath)) > -1) {
+                    //
+                    // The file is include header
+                    //
+                    newFile = oldFile.replace(Tools.getFilePathOnly(oldPackagePath),
+                                              Tools.getFilePathOnly(newPackagePath));
+                }
+
                 FileOperation.copyFile(oldFile, newFile);
             }
 
@@ -753,7 +779,7 @@ public class Clone extends IDialog {
             // Update <Cloned> Section
             //
             updateModuleClonedId(msa, oldId);
-            
+
             //
             // Save to file
             //
@@ -775,7 +801,7 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addModuleToPackage(mid, psa);
-            
+
             //
             // Update GlobalData
             //
@@ -838,20 +864,20 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addPackageToDatabase(pid);
-            
+
             //
             // Update GlobalData
             //
             GlobalData.vPackageList.addElement(pid);
             GlobalData.openingPackageList.insertToOpeningPackageList(pid, spd);
-            
+
             //
             // Add all cloned modules
             //
             Vector<String> modulePaths = GlobalData.getAllModulesOfPackage(pid.getPath());
             String modulePath = null;
             ModuleSurfaceArea msa = null;
-            
+
             for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
                 try {
                     modulePath = modulePaths.get(indexJ);
@@ -871,7 +897,7 @@ public class Clone extends IDialog {
                 GlobalData.vModuleList.addElement(mid);
                 GlobalData.openingModuleList.insertToOpeningModuleList(mid, msa);
             }
-            
+
             this.returnType = DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA;
         }
 
@@ -908,7 +934,7 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addPlatformToDatabase(fid);
-            
+
             //
             // Update GlobalData
             //
