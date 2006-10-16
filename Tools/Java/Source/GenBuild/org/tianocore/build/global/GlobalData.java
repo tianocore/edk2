@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
@@ -41,7 +42,6 @@ import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
-import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainInfo;
@@ -720,7 +720,7 @@ public class GlobalData {
         String[] commands = getToolChainInfo().getCommands();
 
         for (int i = 0; i < commands.length; ++i) {
-            String cmdName = toolsDef.getConfig().get(new String[] {target, toolchain, arch, commands[i], ToolChainAttribute.NAME.toString()});
+            String cmdName = toolsDef.getConfig().get(new String[] {target, toolchain, arch, commands[i], ToolDefinitions.TOOLS_DEF_ATTRIBUTE_NAME});
             if (cmdName != null && cmdName.length() != 0) {
                 return true;
             }
@@ -741,7 +741,7 @@ public class GlobalData {
         if (setting == null) {
             setting = "";
         }
-        if (!commandDescription[ToolChainElement.ATTRIBUTE.value].equals(ToolChainAttribute.FLAGS.toString())) {
+        if (!commandDescription[ToolChainElement.ATTRIBUTE.value].equals(ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS)) {
             return setting;
         }
 
@@ -752,10 +752,10 @@ public class GlobalData {
         ToolChainMap option = null;
         ToolChainKey toolChainFamilyKey = new ToolChainKey(commandDescription);
 
-        toolChainFamilyKey.setKey(ToolChainAttribute.FAMILY.toString(), ToolChainElement.ATTRIBUTE.value);
+        toolChainFamilyKey.setKey(ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FAMILY, ToolChainElement.ATTRIBUTE.value);
         String family = toolChainConfig.get(toolChainFamilyKey);
         toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
-        toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
+        toolChainFamilyKey.setKey(ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS, ToolChainElement.ATTRIBUTE.value);
 
         //
         // Platform's tool chain family option

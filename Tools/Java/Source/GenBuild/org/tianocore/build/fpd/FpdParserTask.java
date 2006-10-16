@@ -35,6 +35,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.definitions.EdkDefinitions;
+import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.FrameworkBuildTask;
@@ -46,7 +47,6 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.pcd.action.PlatformPcdPreprocessActionForBuilding;
-import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
 import org.w3c.dom.NamedNodeMap;
@@ -545,7 +545,7 @@ public class FpdParserTask extends Task {
             if (flagString == null) {
                 flagString = "";
             }
-            options[i][flagIndex] = ToolChainAttribute.FLAGS + "";
+            options[i][flagIndex] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS;
             map.put(options[i], flagString.trim());
         }
 
