@@ -81,6 +81,8 @@ public class ToolDefinitions {
     public final static String TOOLS_DEF_ATTRIBUTE_EXT        = "EXT";
     public final static String TOOLS_DEF_ATTRIBUTE_FAMILY     = "FAMILY";
     public final static String TOOLS_DEF_ATTRIBUTE_FLAGS      = "FLAGS";
+    public final static String TOOLS_DEF_ATTRIBUTE_LIBPATH    = "LIBPATH";
+    public final static String TOOLS_DEF_ATTRIBUTE_INCLUDEPATH= "INCLUDEPATH";
 
     ///
     /// Tool Chain Families in the Tools Definition file
