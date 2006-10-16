@@ -526,7 +526,12 @@ public class SourceFilesDlg extends IDialog {
             File f[] = fc.getSelectedFiles();
             String s = "";
             for (int index = 0; index < f.length; index++) {
-                s = s + f[index].getName() + ";";
+                String relativePath = "";
+                relativePath = Tools.getRelativePath(Tools.getFilePathOnly(f[index].getPath()), Tools.getFilePathOnly(msaFileName));
+                if (!Tools.isEmpty(relativePath)) {
+                    relativePath = relativePath + DataType.UNIX_FILE_SEPARATOR;
+                }
+                s = s + relativePath + f[index].getName() + ";";
             }
             this.jTextFieldFileName.setText(s);
         }
