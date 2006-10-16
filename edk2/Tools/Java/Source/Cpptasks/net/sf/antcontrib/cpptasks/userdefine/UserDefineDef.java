@@ -63,6 +63,10 @@ public class UserDefineDef extends ProcessorDef {
     private Vector allLibraries = new Vector();
     
     private String dpath = null;
+    
+    private String libpath = null;
+    
+    private String include = null;
 
     public void addLibset(LibrarySet libset) {
         if (isReference()) {
@@ -308,6 +312,22 @@ public class UserDefineDef extends ProcessorDef {
 
     public void setDpath(String dpath) {
         this.dpath = dpath;
+    }
+
+    public String getLibpath() {
+        return libpath;
+    }
+
+    public void setLibpath(String libpath) {
+        this.libpath = libpath;
+    }
+
+    public String getInclude() {
+        return include;
+    }
+
+    public void setInclude(String include) {
+        this.include = include;
     }
 
 }
