@@ -209,7 +209,7 @@ Returns:
         continue;
       }
 
-      if (Mbr->Partition[Index].OSIndicator == 0xEE) {
+      if (Mbr->Partition[Index].OSIndicator == PMBR_GPT_PARTITION) {
         //
         // This is the guard MBR for the GPT. If you ever see a GPT disk with zero partitions you can get here.
         //  We can not produce an MBR BlockIo for this device as the MBR spans the GPT headers. So formating 
@@ -265,6 +265,11 @@ Returns:
         break;
       }
 
+      if ((Mbr->Partition[0].OSIndicator == EXTENDED_DOS_PARTITION) ||
+          (Mbr->Partition[0].OSIndicator == EXTENDED_WINDOWS_PARTITION)) {
+        ExtMbrStartingLba = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA);
+        continue;
+      }
       HdDev.PartitionNumber = PartitionNumber ++;
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA) + ExtMbrStartingLba + ParentHdDev.PartitionStart;
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[0].SizeInLBA);
@@ -294,8 +299,8 @@ Returns:
         Found = TRUE;
       }
 
-      if (Mbr->Partition[1].OSIndicator != EXTENDED_DOS_PARTITION &&
-          Mbr->Partition[1].OSIndicator != EXTENDED_WINDOWS_PARTITION
+      if ((Mbr->Partition[1].OSIndicator != EXTENDED_DOS_PARTITION) &&
+          (Mbr->Partition[1].OSIndicator != EXTENDED_WINDOWS_PARTITION)
           ) {
         break;
       }

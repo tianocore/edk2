@@ -133,7 +133,7 @@ Returns:
     // the 32-bit numerical values is stored in Both-byte orders
     //
     if (VolDescriptor->Type == CDVOL_TYPE_CODED) {
-      VolSpaceSize = VolDescriptor->VolSpaceSize[1];
+      VolSpaceSize = VolDescriptor->VolSpaceSize[0];
     }
     //
     // Is it an El Torito volume descriptor?
@@ -242,7 +242,14 @@ Returns:
       BootEntry++;
       CdDev.PartitionStart = Catalog->Boot.Lba;
       if (SectorCount < 2) {
-        CdDev.PartitionSize = VolSpaceSize;
+        //
+        // When the SectorCount < 2, set the Partition as the whole CD.
+        //
+        if (VolSpaceSize > (Media->LastBlock + 1)) {
+          CdDev.PartitionSize = (UINT32)(Media->LastBlock - Catalog->Boot.Lba + 1);
+        } else {
+          CdDev.PartitionSize = (UINT32)(VolSpaceSize - Catalog->Boot.Lba);
+        }
       } else {
         CdDev.PartitionSize = DivU64x32 (
                                 MultU64x32 (
