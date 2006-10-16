@@ -2039,6 +2039,45 @@ public class FpdFileContents {
         }
     }
     
+    public void addModuleIntoBuildOptionsUserExtensions (String fvName, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+        if (moduleInBuildOptionsUserExtensions (fvName, moduleGuid, moduleVersion, packageGuid, packageVersion, arch)) {
+            return;
+        }
+        ListIterator<UserExtensionsDocument.UserExtensions> li = getfpdBuildOpts().getUserExtensionsList().listIterator();
+        QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
+        QName elementModule = new QName(xmlNs, "Module");
+        while (li.hasNext()) {
+            UserExtensionsDocument.UserExtensions ues = li.next();
+            if (!ues.getUserID().equals("IMAGES")) {
+                continue;
+            }
+            XmlCursor cursor = ues.newCursor();
+            cursor.toFirstChild();
+            String elementName = cursor.getTextValue();
+            if (elementName.equals(fvName)) {
+                cursor.toNextSibling(elementIncludeModules);
+                cursor.toLastChild();
+                cursor.toEndToken();
+                cursor.toNextToken();
+                cursor.beginElement(elementModule);
+                cursor.insertAttributeWithValue("ModuleGuid", moduleGuid);
+                if (!moduleVersion.equals("null") && moduleVersion.length() != 0) {
+                    cursor.insertAttributeWithValue("ModuleVersion", moduleVersion);
+                }
+                cursor.insertAttributeWithValue("PackageGuid", packageGuid);
+                if (!packageVersion.equals("null") && packageVersion.length() != 0) {
+                    cursor.insertAttributeWithValue("PackageVersion", packageVersion);
+                }
+                
+                cursor.insertAttributeWithValue("Arch", arch);
+                cursor.dispose();
+                return;
+            }
+            cursor.dispose();
+        }
+        
+    }
+    
     public void genBuildOptionsUserDefAntTask (String id, String fileName, String execOrder) {
         UserDefinedAntTasksDocument.UserDefinedAntTasks udats = getfpdBuildOpts().getUserDefinedAntTasks();
         if (udats == null) {

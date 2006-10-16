@@ -668,7 +668,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         catch (Exception exp) {
             JOptionPane.showMessageDialog(frame, exp.getMessage());
-            return;
+//            return;
         }
         
         if (settingDlg == null) {
