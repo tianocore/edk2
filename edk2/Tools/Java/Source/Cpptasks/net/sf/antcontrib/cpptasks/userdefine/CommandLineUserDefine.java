@@ -45,8 +45,6 @@ public class CommandLineUserDefine {
 
     String outputDelimiter = null;
     
-    private static String pathName = null;
-    
     public void command(CCTask cctask, UserDefineDef userdefine) {
         boolean isGccCommand = userdefine.getFamily().equalsIgnoreCase("GCC");
         File workdir;
@@ -222,30 +220,48 @@ public class CommandLineUserDefine {
 
         Environment newEnv = new Environment();
         
+        //
+        // Prepare for environment variable PATH
+        //
         if (userdefine.getDpath() != null && userdefine.getDpath().trim().length() != 0) {
-            String existPath = System.getenv(getPathName("PATH"));
+            String pathName = getPathName("PATH");
+            String existPath = System.getenv(pathName);
             
             Variable var = new Variable();
-            var.setKey(getPathName("PATH"));
+            var.setKey(pathName);
             var.setPath(new Path(project, userdefine.getDpath() + ";" + existPath));
             newEnv.addVariable(var);
         }
         
+        //
+        // Prepare for environment variable LIB
+        //
         if (userdefine.getLibpath() != null && userdefine.getLibpath().trim().length() != 0) {
-            String existPath = System.getenv(getPathName("LIB"));
-            
+            String pathName = getPathName("LIB");
+            String existPath = System.getenv(pathName);
             Variable var = new Variable();
-            var.setKey(getPathName("LIB"));
-            var.setPath(new Path(project, userdefine.getLibpath() + ";" + existPath));
+            var.setKey(pathName);
+            if (existPath == null) {
+                var.setPath(new Path(project, userdefine.getLibpath()));
+            } else {
+                var.setPath(new Path(project, userdefine.getLibpath() + ";" + existPath));
+            }
             newEnv.addVariable(var);
         }
         
+        //
+        // Prepare for environment variable INCLUDE
+        //
         if (userdefine.getInclude() != null && userdefine.getInclude().trim().length() != 0) {
-            String existPath = System.getenv(getPathName("INCLUDE"));
-            
+            String pathName = getPathName("INCLUDE");
+            String existPath = System.getenv(pathName);
             Variable var = new Variable();
-            var.setKey(getPathName("INCLUDE"));
-            var.setPath(new Path(project, userdefine.getInclude() + ";" + existPath));
+            var.setKey(pathName);
+            if (existPath == null) {
+                var.setPath(new Path(project, userdefine.getInclude()));
+            } else {
+                var.setPath(new Path(project, userdefine.getInclude() + ";" + existPath));
+            }
             newEnv.addVariable(var);
         }
         
@@ -259,19 +275,15 @@ public class CommandLineUserDefine {
     }
     
     private String getPathName(String variableName) {
-        if (pathName != null) {
-            return pathName;
-        }
         Map allEnv = System.getenv();
         Iterator iter = allEnv.keySet().iterator();
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if(key.equalsIgnoreCase(variableName)) {
-                pathName = key;
-                break ;
+                return key;
             }
         }
-        return pathName;
+        return variableName;
     }
 
     protected int runCommand(CCTask task, File workingDir, String[] cmdline, Environment env)

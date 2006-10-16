@@ -543,6 +543,28 @@ public class GenBuildTask extends Ant {
             } else {
                 getProject().setProperty(cmd[m] + "_DPATH", "");
             }
+            
+            //
+            // Set CC_LIBPATH
+            //
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_LIBPATH;
+            String libpath = GlobalData.getCommandSetting(key, fpdModuleId);
+            if (libpath != null) {
+                getProject().setProperty(cmd[m] + "_LIBPATH", libpath.replaceAll("(\\\\)", "/"));
+            } else {
+                getProject().setProperty(cmd[m] + "_LIBPATH", "");
+            }
+            
+            //
+            // Set CC_INCLUDEPATH
+            //
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_INCLUDEPATH;
+            String includepath = GlobalData.getCommandSetting(key, fpdModuleId);
+            if (dpath != null) {
+                getProject().setProperty(cmd[m] + "_INCLUDEPATH", includepath.replaceAll("(\\\\)", "/"));
+            } else {
+                getProject().setProperty(cmd[m] + "_INCLUDEPATH", "");
+            }
         }
     }
 
