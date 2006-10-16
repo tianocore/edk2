@@ -472,11 +472,13 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
             // Save pcd and flash map information first
             //
             Externs ex = Externs.Factory.newInstance();
-            if (this.externs.getPcdIsDriver() != null) {
-                ex.setPcdIsDriver(this.externs.getPcdIsDriver());
-            }
-            if (this.externs.getTianoR8FlashMapH()) {
-                ex.setTianoR8FlashMapH(this.externs.getTianoR8FlashMapH());
+            if (this.externs != null) {
+                if (this.externs.getPcdIsDriver() != null) {
+                    ex.setPcdIsDriver(this.externs.getPcdIsDriver());
+                }
+                if (this.externs.getTianoR8FlashMapH()) {
+                    ex.setTianoR8FlashMapH(this.externs.getTianoR8FlashMapH());
+                }
             }
             this.externs = ex;
 
