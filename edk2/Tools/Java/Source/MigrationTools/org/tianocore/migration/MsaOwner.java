@@ -61,19 +61,35 @@ public class MsaOwner {
     //-----------------------------msaheader-------------------------------------//
 
     public final boolean addLibraryClass (String name, UsageTypes.Enum usage) {
-        Iterator<LibraryClassDocument.LibraryClass> classit = libclassdefs.getLibraryClassList().iterator();
-        while (classit.hasNext()) {
-            if (classit.next().getKeyword() == name) {
-                MigrationTool.ui.println ("Warning: Duplicate LibraryClass");
-                return false;
+    	/*
+    	if (!libclassdefs.getLibraryClassList().contains(name)) {
+            LibraryClassDocument.LibraryClass classname;
+            classname = libclassdefs.addNewLibraryClass();
+            classname.setKeyword(name);
+            classname.setUsage(usage);
+            return true;
+    	} else {
+    		return false;
+    	}
+    	*/
+    	if (name == null) {
+    		return false;
+    	} else {
+            Iterator<LibraryClassDocument.LibraryClass> classit = libclassdefs.getLibraryClassList().iterator();
+            while (classit.hasNext()) {
+                if (classit.next().getKeyword().matches(name)) {
+                    //MigrationTool.ui.println ("Warning: Duplicate LibraryClass");
+                    return false;
+                }
             }
-        }
-        
-        LibraryClassDocument.LibraryClass classname;
-        classname = libclassdefs.addNewLibraryClass();
-        classname.setKeyword(name);
-        classname.setUsage(usage);
-        return true;
+            
+            LibraryClassDocument.LibraryClass classname;
+            classname = libclassdefs.addNewLibraryClass();
+            classname.setKeyword(name);
+            classname.setUsage(usage);
+            return true;
+            
+    	}
     }
     
     public final boolean addGuid (String guidname, UsageTypes.Enum usage) {
@@ -84,7 +100,7 @@ public class MsaOwner {
         Iterator<GuidsDocument.Guids.GuidCNames> guidit = guids.getGuidCNamesList().iterator();
         while (guidit.hasNext()) {
             if (guidit.next().getGuidCName() == guidname) {
-                MigrationTool.ui.println ("Warning: Duplicate Guid");
+                //MigrationTool.ui.println ("Warning: Duplicate Guid");
                 return false;
             }
         }
@@ -105,7 +121,7 @@ public class MsaOwner {
         Iterator<PPIsDocument.PPIs.Ppi> ppiit = ppis.getPpiList().iterator();
         while (ppiit.hasNext()) {
             if (ppiit.next().getPpiCName() == ppiname) {
-                MigrationTool.ui.println ("Warning: Duplicate Ppi");
+                //MigrationTool.ui.println ("Warning: Duplicate Ppi");
                 return false;
             }
         }
@@ -150,7 +166,7 @@ public class MsaOwner {
         Iterator<ProtocolsDocument.Protocols.Protocol> proit = protocols.getProtocolList().iterator();
         while (proit.hasNext()) {
             if (proit.next().getProtocolCName() == proname) {
-                MigrationTool.ui.println ("Warning: Duplicate Protocol");
+                //MigrationTool.ui.println ("Warning: Duplicate Protocol");
                 return false;
             }
         }
@@ -375,6 +391,15 @@ public class MsaOwner {
     }
     //-----------------------------msaheader-------------------------------------//
     
+    private final void fullfill () throws Exception {
+    	addCopyRight(null);
+    	addVersion(null);
+    	addAbstract(null);
+    	addDescription(null);
+    	addLicense(null);
+    	addSpecification(null);
+    }
+    
     public final void flush(String outputpath) throws Exception {
         XmlOptions options = new XmlOptions();
 
@@ -384,6 +409,7 @@ public class MsaOwner {
         options.setUseDefaultNamespace();
         
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputpath));
+        fullfill();
         msadoc.save(bw, options);
         bw.flush();
         bw.close();

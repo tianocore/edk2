@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.tianocore.UsageTypes;
+
 public final class SourceFileReplacer implements Common.ForDoAll {
     private static final SourceFileReplacer SFReplacer = new SourceFileReplacer();
     private ModuleInfo mi;
@@ -297,7 +299,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         it = symbolSet.iterator();
         while (it.hasNext()) {
             r8thing = it.next();
-            mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));                // add a library here
+            mi.addLibraryClass(MigrationTool.db.getR9Lib(r8thing), UsageTypes.ALWAYS_CONSUMED);
+            //mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));            // add a library here
  
             r8tor9 temp;
             if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {

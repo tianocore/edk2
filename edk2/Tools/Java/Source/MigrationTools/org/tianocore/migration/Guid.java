@@ -14,6 +14,8 @@ package org.tianocore.migration;
 
 import java.util.regex.*;
 
+import org.tianocore.UsageTypes;
+
 public class Guid {
     Guid (String r8, String t, String n, String r9, String gv, String p) {
         r8name = r8;
@@ -48,11 +50,14 @@ public class Guid {
         if (MigrationTool.db.hasGuid(temp)) {        // only changed guids registered, because both changed and not changed guids are included in database
             type = MigrationTool.db.getGuidType(temp);
             if (type.matches("Protocol")) {
-                mi.protocols.add(temp);
+            	mi.addProtocol(temp, UsageTypes.ALWAYS_CONSUMED);
+                //mi.protocols.add(temp);
             } else if (type.matches("Ppi")) {
-                mi.ppis.add(temp);
+            	mi.addPpi(temp, UsageTypes.ALWAYS_CONSUMED);
+                //mi.ppis.add(temp);
             } else if (type.matches("Guid")) {
-                mi.guids.add(temp);
+            	mi.addGuid(temp, UsageTypes.ALWAYS_CONSUMED);
+                //mi.guids.add(temp);
             }
             return temp;
         }
