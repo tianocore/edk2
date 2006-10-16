@@ -1813,9 +1813,9 @@ Returns:
             fprintf (OutFptr, " \\\n");
             fprintf (OutFptr, "  /* %s.%s Subregion */\\\n", FBlock->Name, Subregion->Name);
             fprintf (OutFptr, "  {\\\n");
-            fprintf (OutFptr, "    EFI_HOB_TYPE_GUID_EXTENSION,\\\n");
+            fprintf (OutFptr, "    {EFI_HOB_TYPE_GUID_EXTENSION,\\\n");
             fprintf (OutFptr, "    sizeof (EFI_HOB_FLASH_MAP_ENTRY_TYPE ),\\\n");
-            fprintf (OutFptr, "    0,\\\n");
+            fprintf (OutFptr, "    0},\\\n");
             //
             // The NameGuid may have been specified in the input flash definition file as a GUID, or
             // as a quoted string. Do the right one.
@@ -1825,7 +1825,7 @@ Returns:
             } else {
               fprintf (
                 OutFptr,
-                "    { 0x%08X, 0x%04X, 0x%04X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },\\\n",
+                "    { 0x%08X, 0x%04X, 0x%04X, {0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X}},\\\n",
                 Subregion->NameGuid.Data1,
                 (unsigned int) Subregion->NameGuid.Data2,
                 (unsigned int) Subregion->NameGuid.Data3,
@@ -1840,7 +1840,7 @@ Returns:
                 );
             }
 
-            fprintf (OutFptr, "    0, 0, 0,\\\n");
+            fprintf (OutFptr, "    {0, 0, 0},\\\n");
             fprintf (OutFptr, "    %s,\\\n", Subregion->AreaType);
             //
             // The AreaTypeGuid may have been specified in the input flash definition file as a GUID, or
@@ -1851,7 +1851,7 @@ Returns:
             } else {
               fprintf (
                 OutFptr,
-                "    { 0x%08X, 0x%04X, 0x%04X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },\\\n",
+                "    { 0x%08X, 0x%04X, 0x%04X, {0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X}},\\\n",
                 Subregion->AreaTypeGuid.Data1,
                 (unsigned int) Subregion->AreaTypeGuid.Data2,
                 (unsigned int) Subregion->AreaTypeGuid.Data3,
@@ -1867,7 +1867,7 @@ Returns:
             }
 
             fprintf (OutFptr, "    1,\\\n");
-            fprintf (OutFptr, "    {\\\n");
+            fprintf (OutFptr, "    {{\\\n");
             fprintf (OutFptr, "      %s,\\\n", Subregion->Attributes);
             fprintf (OutFptr, "      0,\\\n");
             fprintf (OutFptr, "      FLASH_REGION_%s_SUBREGION_%s_BASE,\\\n", FBlock->Name, Subregion->Name);
@@ -1881,7 +1881,7 @@ Returns:
             } else {
               fprintf (
                 OutFptr,
-                "      { 0x%08X, 0x%04X, 0x%04X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },\\\n",
+                "      { 0x%08X, 0x%04X, 0x%04X, {0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X}},\\\n",
                 Subregion->FileSystemGuid.Data1,
                 (unsigned int) Subregion->FileSystemGuid.Data2,
                 (unsigned int) Subregion->FileSystemGuid.Data3,
@@ -1896,7 +1896,7 @@ Returns:
                 );
             }
 
-            fprintf (OutFptr, "    },\\\n");
+            fprintf (OutFptr, "    }},\\\n");
             fprintf (OutFptr, "  },");
           }
         }
