@@ -230,10 +230,10 @@ public class Tools {
         //
         // remove file separator of rear
         //
-        if (path.indexOf(DataType.DOS_FILE_SEPARATOR) == path.length() - DataType.DOS_FILE_SEPARATOR.length()) {
+        if (path.length() > 0 && path.indexOf(DataType.DOS_FILE_SEPARATOR) == path.length() - DataType.DOS_FILE_SEPARATOR.length()) {
             path = path.substring(0, path.length() - DataType.DOS_FILE_SEPARATOR.length());
         }
-        if (path.indexOf(DataType.UNIX_FILE_SEPARATOR) == path.length() - DataType.UNIX_FILE_SEPARATOR.length()) {
+        if (path.length() > 0 && path.indexOf(DataType.UNIX_FILE_SEPARATOR) == path.length() - DataType.UNIX_FILE_SEPARATOR.length()) {
             path = path.substring(0, path.length() - DataType.DOS_FILE_SEPARATOR.length());
         }
         //
