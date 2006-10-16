@@ -2,7 +2,7 @@
 <ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Logo</ModuleName>
-    <ModuleType>USER_DEFINED</ModuleType>
+    <ModuleType>BASE</ModuleType>
     <GuidValue>7BB28B99-61BB-11D5-9A5D-0090273FC14D</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for creating a Logo file.</Abstract>
@@ -22,7 +22,6 @@
     <OutputFileBasename>Logo</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
-    <Filename ToolCode="DUMMY">Logo_build.xml</Filename>
     <Filename>Logo.bmp</Filename>
   </SourceFiles>
   <PackageDependencies>
