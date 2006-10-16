@@ -124,6 +124,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JPanel jPanelToolchainS = null;
     private JPanel jPanelLibraryCenterN = null;
     private JPanel jPanelLibraryCenterC = null;  //  @jve:decl-index=0:visual-constraint="20,224"
+    
+    private final int buildTargetWidth = 150;
+    private final int toolChainFamilyWidth = 150;
+    private final int supportArchWidth = 150;
+    private final int toolCmdCodeWidth = 200;
+    private final int tagNameWidth = 150;
+    private final int argWidth = 400;
+    
     /**
      * This is the default constructor
      */
@@ -1147,8 +1155,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (newFvBinding.length() == 0 && originalFvBinding == null) {
                         return;
                     }
-                    docConsole.setSaved(false);
+                    
                     ffc.setFvBinding(moduleKey, newFvBinding);
+                    String moduleInfo[] = moduleKey.split(" ");
+                    String fvNames[] = newFvBinding.split(" ");
+                    for (int i = 0; i < fvNames.length; ++i) {
+                        ffc.addModuleIntoBuildOptionsUserExtensions(fvNames[i], moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);
+                    }
+                    docConsole.setSaved(false);
                 }
             });
             
@@ -1250,6 +1264,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jTableModuleSaOptions = new JTable(optionsTableModel);
             jTableModuleSaOptions.setRowHeight(20);
             
+            jTableModuleSaOptions.getColumnModel().getColumn(0).setMinWidth(buildTargetWidth);
+            jTableModuleSaOptions.getColumnModel().getColumn(1).setMinWidth(toolChainFamilyWidth);
+            jTableModuleSaOptions.getColumnModel().getColumn(2).setMinWidth(tagNameWidth);
+            jTableModuleSaOptions.getColumnModel().getColumn(3).setMinWidth(toolCmdCodeWidth);
+            jTableModuleSaOptions.getColumnModel().getColumn(4).setMinWidth(supportArchWidth);
+            jTableModuleSaOptions.getColumnModel().getColumn(5).setMinWidth(argWidth);
 //            javax.swing.table.TableColumn toolFamilyCol = jTableModuleSaOptions.getColumnModel().getColumn(1);
 //            JComboBox cb = new JComboBox();
 //            cb.addItem("MSFT");

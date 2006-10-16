@@ -306,6 +306,13 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel jPanelTableOptionsContainer = null;
 
     private JLabel jLabelTableOptionsTitle = null;
+    
+    private final int buildTargetWidth = 150;
+    private final int toolChainFamilyWidth = 150;
+    private final int supportArchWidth = 150;
+    private final int toolCmdCodeWidth = 200;
+    private final int tagNameWidth = 150;
+    private final int argWidth = 400;
 
     /**
      * This method initializes jPanel	
@@ -1764,6 +1771,13 @@ public class FpdBuildOptions extends IInternalFrame {
             optionsTableModel.addColumn("Tool Command Code");
             optionsTableModel.addColumn("TagName");
             optionsTableModel.addColumn("Arguments");
+            
+            jTableOptions.getColumnModel().getColumn(0).setMinWidth(buildTargetWidth);
+            jTableOptions.getColumnModel().getColumn(1).setMinWidth(toolChainFamilyWidth);
+            jTableOptions.getColumnModel().getColumn(2).setMinWidth(supportArchWidth);
+            jTableOptions.getColumnModel().getColumn(3).setMinWidth(toolCmdCodeWidth);
+            jTableOptions.getColumnModel().getColumn(4).setMinWidth(tagNameWidth);
+            jTableOptions.getColumnModel().getColumn(5).setMinWidth(argWidth);
 
 //            javax.swing.table.TableColumn toolFamilyCol = jTableOptions.getColumnModel().getColumn(1);
 //            JComboBox cb = new JComboBox();
