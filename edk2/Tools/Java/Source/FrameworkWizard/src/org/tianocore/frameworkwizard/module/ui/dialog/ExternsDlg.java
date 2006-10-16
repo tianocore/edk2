@@ -734,6 +734,10 @@ public class ExternsDlg extends IDialog implements ItemListener {
                 Log.wrn("Update Externs", "At least one of Constructor or Destructor should have a value");
                 return false;
             }
+            if (isEmpty(this.jTextFieldConstructor.getText()) && !isEmpty(this.jTextFieldDestructor.getText())) {
+                Log.wrn("Update Externs", "You must define a Constructor at the same time when you declare a Destructor");
+                return false;
+            }
             if (!isEmpty(this.jTextFieldConstructor.getText())) {
                 if (!DataValidation.isC_NameType(this.jTextFieldConstructor.getText())) {
                     Log.wrn("Update Externs", "Incorrect data type for Constructor");

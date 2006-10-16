@@ -332,6 +332,13 @@ public class Tools {
         String strTemp = "";
         boolean isCopied = true;
 
+        if (arg0 == null) {
+            return "";
+        }
+        if (arg0.length() <= 0) {
+            return "";
+        }
+        
         //
         // Convert string to array by " "
         //
