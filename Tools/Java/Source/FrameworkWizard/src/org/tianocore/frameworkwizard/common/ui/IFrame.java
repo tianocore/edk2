@@ -52,7 +52,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener, Co
     // 1 - Whne editing module
     //
     private int intExitType = 0;
-    
+
     /**
      Main class, used for test
      
@@ -95,11 +95,11 @@ public class IFrame extends JFrame implements ActionListener, WindowListener, Co
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - intWidth) / 2, (d.height - intHeight) / 2);
     }
-    
+
     /**
-    Start the window full of the screen
-    
-    **/
+     Start the window full of the screen
+     
+     **/
     protected void maxWindow() {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(0, 0);
@@ -215,49 +215,50 @@ public class IFrame extends JFrame implements ActionListener, WindowListener, Co
             this.dispose();
         }
     }
-    
+
     public int showSaveDialog() {
-        return JOptionPane.showConfirmDialog(null, "Save all changed files?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+        return JOptionPane.showConfirmDialog(null, "Save all changed files?", "Save", JOptionPane.YES_NO_CANCEL_OPTION,
+                                             JOptionPane.WARNING_MESSAGE);
     }
-    
+
     /**
-    Check the input data is empty or not
-    
-    @param strValue The input data which need be checked
-    
-    @retval true - The input data is empty
-    @retval fals - The input data is not empty
-    
-    **/
-   public boolean isEmpty(String strValue) {
-       return Tools.isEmpty(strValue);
-   }
-   
-   /**
-    Display the dialog
-    
-    **/
-   public void showDialog() {
-       this.setVisible(true);
-   }
+     Check the input data is empty or not
+     
+     @param strValue The input data which need be checked
+     
+     @retval true - The input data is empty
+     @retval fals - The input data is not empty
+     
+     **/
+    public boolean isEmpty(String strValue) {
+        return Tools.isEmpty(strValue);
+    }
 
-public void componentResized(ComponentEvent arg0) {
-    // TODO Auto-generated method stub
-    
-}
+    /**
+     Display the dialog
+     
+     **/
+    public void showDialog() {
+        this.setVisible(true);
+    }
 
-public void componentMoved(ComponentEvent arg0) {
-    // TODO Auto-generated method stub
-    
-}
+    public void componentResized(ComponentEvent arg0) {
+        // TODO Auto-generated method stub
 
-public void componentShown(ComponentEvent arg0) {
-    // TODO Auto-generated method stub
-    
-}
+    }
 
-public void componentHidden(ComponentEvent arg0) {
-    // TODO Auto-generated method stub
-    
-}
+    public void componentMoved(ComponentEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void componentShown(ComponentEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void componentHidden(ComponentEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
 }
