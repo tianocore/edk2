@@ -735,7 +735,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
        try {
            value = Integer.parseInt(intStringNoPrefix, radix);
        } catch (NumberFormatException e) {
-           log("Incorrect format of int [" + intString + "]. -1 is assumed");
+           EdkLog.log(this, EdkLog.EDK_ERROR, "Incorrect format of int [" + intString + "]. -1 is assumed");
            return -1;
        }
 
@@ -942,7 +942,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             //
             ffsBuffer.close();
         } catch (Exception e) {
-            log("genffsfile failed!");
+            EdkLog.log(this, EdkLog.EDK_ERROR, "genffsfile failed!");
             throw new BuildException (e.getMessage());
         }
 
