@@ -86,6 +86,13 @@ public class ToolChecks {
                 System.out.println("Tool Chain Tag Name: " + goodLog.get(i) + " is valid!");
             for (int i = 0; i < errLog.size(); i++)
                 System.out.println(errLog.get(i));
+            if (VERBOSE > 0) {
+                System.out.println();
+                System.out.println("You can remove these WARNING messages by editing the file:");
+                System.out.println("  " + toolConfFile);
+                System.out.println("and commenting out out or deleting the entries for the tool");
+                System.out.println("chain tag names that do not apply to your system.");
+            }
         }
 
         return returnCode;
@@ -122,7 +129,7 @@ public class ToolChecks {
                     if (!testPath.exists()) {
                         if (!props[1].trim().contentEquals(lastErrTag))
                             errLog.add("  -- WARNING: Tool Chain Tag Name: " + props[1].trim() + " is NOT valid!");
-                        if (VERBOSE > 0)
+                        if (VERBOSE > 1)
                             errLog.add("    Tool Code: [" + props[3].trim() + "] Path: " + path + " does not exist!");
                         retCode = 1;
                         lastErrTag = props[1].trim();
