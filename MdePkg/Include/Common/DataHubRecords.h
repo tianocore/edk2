@@ -671,7 +671,8 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeSdram                          = 0x0F,
   EfiMemoryTypeSgram                          = 0x10,
   EfiMemoryTypeRdram                          = 0x11,
-  EfiMemoryTypeDdr                            = 0x12
+  EfiMemoryTypeDdr                            = 0x12,
+  EfiMemoryTypeDdr2                           = 0x13
 } EFI_MEMORY_ARRAY_TYPE;
 
 typedef struct {
@@ -1163,6 +1164,7 @@ typedef enum {
   EfiSlotTypePC98E                        = 0xA2,
   EfiSlotTypePC98LocalBus                 = 0xA3,
   EfiSlotTypePC98Card                     = 0xA4,
+  EfiSlotTypePciExpress                   = 0xA5
 } EFI_MISC_SLOT_TYPE;
 
 typedef enum {  
