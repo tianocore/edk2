@@ -162,7 +162,7 @@ public class Preferences extends IFrame {
 
     private JTextField jTextFieldThreadCount = null;
     
-    private String threadCount;
+    private String threadCount = "";
     
     private boolean threadEnabled = false;
 
@@ -547,7 +547,6 @@ public class Preferences extends IFrame {
      * 
      */
     private void init() {
-
         for (int i = 0; i < maxTargetLines; i++) {
             targetLines[i] = null;
             targetLineNumber[i] = -1;
@@ -1119,6 +1118,9 @@ public class Preferences extends IFrame {
         File toFile = new File(bakFile);
         FileInputStream fromTxt = null;
         FileOutputStream toBak = null;
+        if (!fromFile.exists()) {
+            fromFile.createNewFile();
+        }
         try {
             fromTxt = new FileInputStream(fromFile);
             toBak = new FileOutputStream(toFile);
