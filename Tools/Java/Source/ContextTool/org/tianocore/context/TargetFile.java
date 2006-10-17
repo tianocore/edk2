@@ -152,7 +152,7 @@ public class TargetFile {
                     bw.newLine();
                 } else {
                     //
-                    //modify at the first time, and there should be *ACTIVE_PLATFORM*=* in the line
+                    //modify at the first time, and there should be "*ACTIVE_PLATFORM*=*" in the line
                     //
                     if (textLine.indexOf("ACTIVE_PLATFORM") != -1) {
                         if(pflag == true){
@@ -416,26 +416,6 @@ public class TargetFile {
             return false;
         }
         return true;
-    }
-    
-    private static String convertStr(String str){
-        String convertStr = null;
-        
-        if( str.compareTo("-p") == 0 ){
-            convertStr =  "ACTIVE_PLATFORM";
-        }else if( str.compareTo("-a") == 0){
-            convertStr =  "TARGET_ARCH";
-        }else if( str.compareTo("-t") == 0){
-            convertStr =  "TARGET";
-        }else if( str.compareTo("-c") == 0){
-            convertStr =  "TOOL_CHAIN_CONF";
-        }else if( str.compareTo("-n") == 0){
-            convertStr =  "TOOL_CHAIN_TAG";
-        }else if( str.compareTo("-m") == 0){
-            convertStr =  "MAX_CONCURRENT_THREAD_NUMBER";
-        }
-        
-        return convertStr;
     }
     
 
