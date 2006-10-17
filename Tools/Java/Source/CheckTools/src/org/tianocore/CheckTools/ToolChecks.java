@@ -121,10 +121,9 @@ public class ToolChecks {
                     File testPath = new File(path);
                     if (!testPath.exists()) {
                         if (!props[1].trim().contentEquals(lastErrTag))
-                            errLog.add("  -- ERROR: Tool Chain Tag Name: " + props[1].trim() + " is invalid!");
-                            // System.out.println("      +++++ ERROR: Tool Chain: " + props[1].trim() + " is invalid!");
-                        errLog.add("    Tool Code: [" + props[3].trim() + "] Path: " + path + " does not exist!");
-                        // System.out.println(" Tool: " + props[3].trim() + " Path: " + path + " does not exist!");
+                            errLog.add("  -- WARNING: Tool Chain Tag Name: " + props[1].trim() + " is NOT valid!");
+                        if (VERBOSE > 0)
+                            errLog.add("    Tool Code: [" + props[3].trim() + "] Path: " + path + " does not exist!");
                         retCode = 1;
                         lastErrTag = props[1].trim();
                     } else {
