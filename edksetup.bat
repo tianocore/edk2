@@ -15,7 +15,7 @@
 @REM set XMLBEANS_HOME=C:\xmlbeans
 @REM set CYGWIN_HOME=C:\cygwin
 
-@REM usage: edksetup.bat [Rebuild] [ForceRebuild]
+@REM usage: edksetup.bat [Rebuild] [ForceRebuild] [Reconfig]
 @REM if the argument, skip is present, only the paths and the
 @REM test and set of environment settings are performed. 
 
@@ -90,6 +90,8 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 @if "%1"=="/h" goto Usage
 @if "%1"=="/?" goto Usage
 @if "%1"=="/help" goto Usage
+@if "%1"=="ForceRebuild" goto ForceBuild
+@if "%1"=="Reconfig" goto Reconfig
 
 @IF NOT EXIST "Tools\Jars\Common.jar" goto NormalBuild
 @IF NOT EXIST "Tools\Jars\PcdTools.jar" goto NormalBuild
@@ -131,7 +133,6 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 @IF NOT EXIST "Tools\bin\dlg.exe" goto NormalBuild
 
 @if "%1"=="Rebuild" goto NormalBuild
-@if "%1"=="ForceRebuild" goto ForceBuild
 @if NOT "%1"=="" goto Usage
 
 goto skipbuild
@@ -250,9 +251,23 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\MigrationTools.jar
 echo CLASSPATH:     %CLASSPATH%
 goto end
 
+:Reconfig
+@REM
+@REM Reinstall all config files
+@REM
+call ant -f %WORKSPACE%\Tools\build.xml reconfig
+goto end
+
 :Usage
 echo.
-echo  Usage: %0 [Rebuild] [ForceRebuild]
+echo  Usage: %0 [Rebuild] [ForceRebuild] [Reconfig]
+echo         Rebuild:       Incremental build, only build those updated tools; 
+echo         ForceRebuild:  Rebuild all tools neither updated or not; 
+echo         Reconfig:      Reinstall target.txt, tools_def.txt, FrameworkDatabase.db. 
+echo.
+echo  Note that target.template, tools_def.template, FrameworkDatabase.template will be
+echo  only copied to target.txt, tools_def.txt, FrameworkDatabase.db respectively if they
+echo  are not existed. Using option [Reconfig] to do the force copy. 
 echo.
 
 :end

@@ -119,6 +119,55 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </if>
   </target>
 
+  <target name="reconfig">
+    <!-- backup all config files -->
+    <if>
+      <available file="Conf/target.txt"/>
+      <then>
+        <echo message="Backup Conf/target.txt to Conf/target.txt.bak" />
+        <copy file="Conf/target.txt" tofile="Conf/target.txt.bak" overwrite="true" />
+      </then>
+    </if>
+    <if>
+      <available file="Conf/tools_def.txt"/>
+      <then>
+        <echo message="Backup Conf/tools_def.txt to Conf/tools_def.txt.bak" />
+        <copy file="Conf/tools_def.txt" tofile="Conf/tools_def.txt.bak"  overwrite="true" />
+      </then>
+    </if>
+    <if>
+      <available file="Conf/FrameworkDatabase.db"/>
+      <then>
+        <echo message="Backup Conf/FrameworkDatabase.db to Conf/FrameworkDatabase.db.bak" />
+        <copy file="Conf/FrameworkDatabase.db" tofile="Conf/FrameworkDatabase.db.bak"  overwrite="true" />
+      </then>
+    </if>
+    
+    <if>
+      <available file="Conf/tools_def.template"/>
+      <then>
+        <echo message="Copy file from Conf/tools_def.template to Conf/tools_def.txt" />
+        <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="true" />
+      </then>
+    </if>
+
+    <if>
+      <available file="Conf/target.template"/>
+      <then>
+        <echo message="Copy file from Conf/target.template to Conf/target.txt" />
+        <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="true" />
+      </then>
+    </if>
+
+    <if>
+      <available file="Conf/FrameworkDatabase.template"/>
+      <then>
+        <echo message="Copy file from Conf/FrameworkDatabase.template to Conf/FrameworkDatabase.db" />
+        <copy file="Conf/FrameworkDatabase.template" tofile="Conf/FrameworkDatabase.db" overwrite="true" />
+      </then>
+    </if>
+  </target>
+
   <target name="clean">
     <subant target="clean" inheritall="false">
       <filelist dir="."
