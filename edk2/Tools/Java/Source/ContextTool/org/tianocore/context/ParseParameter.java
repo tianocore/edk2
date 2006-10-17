@@ -83,25 +83,26 @@ public class ParseParameter {
                     return 1;
                 }
                 //
-                //argstr is "-p ?", display possible setting
+                //argstr is "-p ? ", display possible setting
                 //
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
                     System.out.printf( "%s\n", "assign the platform FPD file's relative path to WORKSPACE" );
                     return 2;
                 }
                 //
-                //argstr is "-p 0", clean current setting
+                //argstr is "-p 0 ", clean current setting
                 //
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
                     curpstr = pstr;
                     npflag = true;
                     continue;
                 }
-                if(curpstr == null){
-                    curpstr = pstr.concat(argstr.substring(2));
-                }else{
-                    curpstr = mergeSetting(curpstr, argstr);
+                String[] S = argstr.split(" ");
+                if(S.length > 2){
+                    System.out.printf( "%s\n", "The number of ACTIVE_PLATFORM can not more than 1.");
+                    return 3;
                 }
+                curpstr = pstr.concat(argstr.substring(2));
                 npflag = true;
             } else if (argstr.charAt(1) == 't') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
@@ -117,11 +118,7 @@ public class ParseParameter {
                     ntflag = true;
                     continue;
                 }
-                if(curtstr == null){
-                    curtstr = tstr.concat(argstr.substring(2));
-                }else{
-                    curtstr = mergeSetting(curtstr, argstr);
-                }
+                curtstr = tstr.concat(argstr.substring(2));
                 ntflag = true;
             } else if (argstr.charAt(1) == 'a') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
@@ -137,11 +134,7 @@ public class ParseParameter {
                     naflag = true;
                     continue;
                 }
-                if(curastr == null){
-                    curastr = astr.concat(argstr.substring(2));
-                }else{
-                    curastr = mergeSetting(curastr, argstr);
-                }
+                curastr = astr.concat(argstr.substring(2));
                 naflag = true;
             } else if (argstr.charAt(1) == 'c') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
@@ -157,11 +150,12 @@ public class ParseParameter {
                     ncflag = true;
                     continue;
                 }
-                if(curcstr == null){
-                    curcstr = pstr.concat(argstr.substring(2));
-                }else{
-                    curcstr = mergeSetting(curcstr, argstr);
+                String[] S = argstr.split(" ");
+                if(S.length > 2){
+                    System.out.printf( "%s\n", "The number of TOOL_CHAIN_CONF can not more than 1.");
+                    return 3;
                 }
+                curcstr = cstr.concat(argstr.substring(2));
                 ncflag = true;
             } else if (argstr.charAt(1) == 'n') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
@@ -177,11 +171,7 @@ public class ParseParameter {
                     nnflag = true;
                     continue;
                 }
-                if(curnstr == null){
-                    curnstr = nstr.concat(argstr.substring(2));
-                }else{
-                    curnstr = mergeSetting(curnstr, argstr);
-                }
+                curnstr = nstr.concat(argstr.substring(2));
                 nnflag = true;
             } else if (argstr.charAt(1) == 'm') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
@@ -191,6 +181,11 @@ public class ParseParameter {
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
                     System.out.printf( "%s\n", "The number of concurrent threads. Default is 2. Recommend to set this value to one more than the number of your compurter cores or CPUs." );
                     return 2;
+                }
+                String[] S = argstr.split(" ");
+                if(S.length > 2){
+                    System.out.printf( "%s\n", "The format of number is wrong.");
+                    return 3;
                 }
                 mstr += argstr.substring(2);
                 curmstr = mstr;
@@ -207,31 +202,60 @@ public class ParseParameter {
         }
         return 0;
     }
-    
-    
-    public static String mergeSetting( String S1, String S2){
-        
-        String[] S = S2.split(" ");
 
-        for(int i = 1; i < S.length; i++){
-            if(S1.contains(S[i]) == false){
-                S1 = S1.concat(" ").concat(S[i]);
-            }
-        }
-        
-        return S1;
-    }
     
     public static boolean outputCurSetting(){
         
         System.out.printf( "%s\n", "The current setting is:" );
-        System.out.printf( "%s\n", curpstr );
-        System.out.printf( "%s\n", curtstr );
-        System.out.printf( "%s\n", curastr );
-        System.out.printf( "%s\n", curcstr );
-        System.out.printf( "%s\n", curnstr );
-        System.out.printf( "%s\n", curmstr );
-        System.out.printf( "%s\n", curmestr );
+        
+        if(curpstr != null){
+            System.out.printf( "%s\n", curpstr );
+        }
+        else{
+            System.out.printf( "%s\n", pstr );
+        }
+        
+        if(curtstr != null){
+            System.out.printf( "%s\n", curtstr );
+        }
+        else{
+            System.out.printf( "%s\n", tstr );
+        }
+        
+        if(curastr != null){
+            System.out.printf( "%s\n", curastr );
+        }
+        else{
+            System.out.printf( "%s\n", astr );
+        }
+        
+        if(curcstr != null){
+            System.out.printf( "%s\n", curcstr );
+        }
+        else{
+            System.out.printf( "%s\n", cstr );
+        }
+        
+        if(curnstr != null){
+            System.out.printf( "%s\n", curnstr );
+        }
+        else{
+            System.out.printf( "%s\n", nstr );
+        }
+        
+        if(curmstr != null){
+            System.out.printf( "%s\n", curmstr );
+        }
+        else{
+            System.out.printf( "%s\n", mstr );
+        }
+        
+        if(curmstr != null){
+            System.out.printf( "%s\n", curmestr );
+        }
+        else{
+            System.out.printf( "%s\n", mestr );
+        }
         
         return true;
     }
