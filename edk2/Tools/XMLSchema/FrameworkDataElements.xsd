@@ -461,7 +461,8 @@
   <xs:element name="ModuleBuildOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Options"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
