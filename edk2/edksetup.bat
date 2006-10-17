@@ -67,6 +67,9 @@ set WORKSPACE=%CD%
 
 set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
 
+if not defined ORIGINAL_CLASSPATH set ORIGINAL_CLASSPATH=%CLASSPATH%
+set CLASSPATH=%ORIGINAL_CLASSPATH%
+
 if defined WORKSPACE_TOOLS_PATH goto check_path
 set PATH=%FRAMEWORK_TOOLS_PATH%;%JAVA_HOME%\bin;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin;%PATH%
 set WORKSPACE_TOOLS_PATH=%FRAMEWORK_TOOLS_PATH%
@@ -134,8 +137,7 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 goto skipbuild
 
 :ForceBuild 
-@if "%CLASSPATH%"=="" set CLASSPATH=  
-call ant -noclasspath -f %WORKSPACE%\Tools\build.xml cleanall
+call ant -f %WORKSPACE%\Tools\build.xml -noclasspath cleanall
 
 :NormalBuild
 @REM
@@ -151,7 +153,7 @@ echo.
 @REM Java Programs can use it.
 @REM It needs the XMLBEANS libraries in order to compile.
 @REM
-set CLASSPATH=%XMLBEANS_HOME%\lib
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
@@ -230,7 +232,7 @@ echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
 echo PATH:          %PATH%
 echo.
-set CLASSPATH=%XMLBEANS_HOME%\lib
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
