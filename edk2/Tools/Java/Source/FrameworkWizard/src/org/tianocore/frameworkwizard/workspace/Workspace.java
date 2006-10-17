@@ -24,15 +24,17 @@ public class Workspace {
     // Define static return value
     //
     public final static int WORKSPACE_VALID = 0;
-    
+
     public final static int WORKSPACE_NOT_DEFINED = 1;
-    
+
     public final static int WORKSPACE_NOT_EXIST = 2;
-    
+
     public final static int WORKSPACE_NOT_DIRECTORY = 3;
-    
+
     public final static int WORKSPACE_NOT_VALID = 4;
     
+    public final static int WORKSPACE_NO_TARGET_FILE = 5;
+
     //
     // Define class members
     //
@@ -40,6 +42,9 @@ public class Workspace {
 
     private static String strWorkspaceDatabaseFile = DataType.FILE_SEPARATOR + "Tools" + DataType.FILE_SEPARATOR
                                                      + "Conf" + DataType.FILE_SEPARATOR + "FrameworkDatabase.db";
+
+    private static String targetFile = DataType.FILE_SEPARATOR + "Tools" + DataType.FILE_SEPARATOR + "Conf"
+                                       + DataType.FILE_SEPARATOR + "target.txt";
 
     /**
      
@@ -99,7 +104,7 @@ public class Workspace {
         if (strWorkspace == null || strWorkspace == "") {
             return Workspace.WORKSPACE_NOT_DEFINED;
         }
-        
+
         //
         // Check if WORKSPACE Environment exists
         //
@@ -107,14 +112,14 @@ public class Workspace {
         if (!f.exists()) {
             return Workspace.WORKSPACE_NOT_EXIST;
         }
-        
+
         //
         // Check if WORKSPACE Environment is a directory
         //
         if (!f.isDirectory()) {
             return Workspace.WORKSPACE_NOT_DIRECTORY;
         }
-        
+
         //
         // Check if FrameworkDatabase.db exists
         //
@@ -123,6 +128,14 @@ public class Workspace {
             return Workspace.WORKSPACE_NOT_VALID;
         }
         
+        //
+        // Check if Target.txt exists
+        //
+        f = new File(strWorkspace + Workspace.getTargetFile());
+        if (!f.exists()) {
+            return Workspace.WORKSPACE_NO_TARGET_FILE;
+        }
+
         return Workspace.WORKSPACE_VALID;
     }
 
@@ -132,5 +145,9 @@ public class Workspace {
 
     public static void setStrWorkspaceDatabaseFile(String strWorkspaceDatabaseFile) {
         //Workspace.strWorkspaceDatabaseFile = strWorkspaceDatabaseFile;
+    }
+
+    public static String getTargetFile() {
+        return targetFile;
     }
 }

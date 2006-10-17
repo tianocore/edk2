@@ -3711,6 +3711,11 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
+        case Workspace.WORKSPACE_NO_TARGET_FILE:
+            JOptionPane.showConfirmDialog(null, "Target.txt File Is Not Existed", "Error",
+                                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            System.exit(0);
         }
     }
 }
