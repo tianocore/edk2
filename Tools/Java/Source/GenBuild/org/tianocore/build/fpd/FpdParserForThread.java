@@ -368,6 +368,13 @@ public class FpdParserForThread extends FpdParserTask {
             //
             GlobalData.addModuleToolChainOption(fpdModuleId, parseModuleBuildOptions(false));
             GlobalData.addModuleToolChainFamilyOption(fpdModuleId, parseModuleBuildOptions(true));
+            
+            //
+            // parse MSA build options
+            //
+            GlobalData.addMsaBuildOption(moduleId, parseMsaBuildOptions(false));
+            GlobalData.addMsaFamilyBuildOption(moduleId, parseMsaBuildOptions(true));
+
             saq.pop();
         }
     }

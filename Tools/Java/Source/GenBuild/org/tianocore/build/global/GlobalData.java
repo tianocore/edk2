@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -132,7 +130,10 @@ public class GlobalData {
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainFamilyOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
 
-    private static Pattern flagPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
+    private static Map<ModuleIdentification, ToolChainMap> msaBuildOption = new HashMap<ModuleIdentification, ToolChainMap>();
+    private static Map<ModuleIdentification, ToolChainMap> msaFamilyBuildOption = new HashMap<ModuleIdentification, ToolChainMap>();
+
+//    private static Pattern flagPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
       the environment for next build. This method will only be executed only once
@@ -437,6 +438,7 @@ public class GlobalData {
             msaMap.put("Guids", cloneXmlObject(msa.getGuids(), true));
             msaMap.put("Externs", cloneXmlObject(msa.getExterns(), true));
             msaMap.put("PcdCoded", cloneXmlObject(msa.getPcdCoded(), true));
+            msaMap.put("ModuleBuildOptions", cloneXmlObject(msa.getModuleBuildOptions(), true));
             return msaMap;
         } catch(IOException ex) {
             EdkException edkException = new EdkException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage());
@@ -715,7 +717,17 @@ public class GlobalData {
         ToolChainMap toolChainOption) {
         moduleToolChainFamilyOption.put(fpdModuleId, toolChainOption);
     }
-
+    
+    public static void addMsaBuildOption(ModuleIdentification moduleId,
+        ToolChainMap toolChainOption) {
+        msaBuildOption.put(moduleId, toolChainOption);
+    }
+    
+    public static void addMsaFamilyBuildOption(ModuleIdentification moduleId,
+        ToolChainMap toolChainOption) {
+        msaFamilyBuildOption.put(moduleId, toolChainOption);
+    }
+    
     public static boolean isCommandSet(String target, String toolchain, String arch) {
         String[] commands = getToolChainInfo().getCommands();
 
@@ -729,6 +741,22 @@ public class GlobalData {
         return false;
     }
 
+    /**
+      Except FLAGS, all attribute are from TOOLS_DEF file. 
+      
+      For FLAGS, information from four places, they are: 
+      <pre>
+        1. tools_def.txt
+        2. MSA &lt;BuildOptions&gt;/&lt;Options&gt;
+        3. FPD &lt;BuildOptions&gt;/&lt;Options&gt;
+        4. FPD &lt;FrameworkModules&gt;/&lt;ModuleSaBuildOptions&gt;/&lt;Options&gt;
+      </pre>
+      
+      @param commandDescription Key: TARGET, TAGNAME, ARCH, COMMANDTYPE, ATTRIBUTE
+      @param fpdModuleId Module Identification with Arch
+      @return The corresponding String
+      @throws EdkException If build option definition error
+    **/
     public synchronized static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
         ToolChainKey toolChainKey = new ToolChainKey(commandDescription);
         ToolChainMap toolChainConfig = toolsDef.getConfig();
@@ -746,7 +774,7 @@ public class GlobalData {
         }
 
         //
-        // tool's option can be in .fpd and/or .msa file
+        // Tool's option can be in .fpd and/or .msa file
         //
         String optionString;
         ToolChainMap option = null;
@@ -757,6 +785,22 @@ public class GlobalData {
         toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
         toolChainFamilyKey.setKey(ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS, ToolChainElement.ATTRIBUTE.value);
 
+        //
+        // MSA's tool chain family option
+        //
+        option = msaFamilyBuildOption.get(fpdModuleId.getModule());
+        if (option != null && (optionString = option.get(toolChainFamilyKey)) != null) {
+            setting += (" " + optionString);
+        }
+        
+        //
+        // MSA's tool chain option
+        //
+        option = msaBuildOption.get(fpdModuleId.getModule());
+        if (option != null && (optionString = option.get(toolChainKey)) != null) {
+            setting += (" " + optionString);
+        }
+        
         //
         // Platform's tool chain family option
         //
@@ -770,10 +814,7 @@ public class GlobalData {
         //
         optionString = platformToolChainOption.get(toolChainKey);
         if (optionString != null) {
-            Matcher matcher = flagPattern.matcher(optionString + " ");
-            while (matcher.find()) {
-                setting += (" " + optionString.substring(matcher.start(1), matcher.end(1)));
-            }
+            setting += (" " + optionString);
         }
 
         //
@@ -781,10 +822,7 @@ public class GlobalData {
         //
         option = moduleToolChainFamilyOption.get(fpdModuleId);
         if (option != null && (optionString = option.get(toolChainFamilyKey)) != null) {
-            Matcher matcher = flagPattern.matcher(optionString + " ");
-            while (matcher.find()) {
-                setting += (" " + optionString.substring(matcher.start(1), matcher.end(1)));
-            }
+            setting += (" " + optionString);
         }
 
         //
@@ -792,10 +830,7 @@ public class GlobalData {
         //
         option = moduleToolChainOption.get(fpdModuleId);
         if (option != null && (optionString = option.get(toolChainKey)) != null) {
-            Matcher matcher = flagPattern.matcher(optionString + " ");
-            while (matcher.find()) {
-                setting += (" " + optionString.substring(matcher.start(1), matcher.end(1)));
-            }
+            setting += (" " + optionString);
         }
 
         return setting;

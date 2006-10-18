@@ -516,6 +516,13 @@ public class FpdParserTask extends Task {
             //
             GlobalData.addModuleToolChainOption(fpdModuleId, parseModuleBuildOptions(false));
             GlobalData.addModuleToolChainFamilyOption(fpdModuleId, parseModuleBuildOptions(true));
+            
+            //
+            // parse MSA build options
+            //
+            GlobalData.addMsaBuildOption(moduleId, parseMsaBuildOptions(false));
+            GlobalData.addMsaFamilyBuildOption(moduleId, parseMsaBuildOptions(true));
+    
             saq.pop();
         }
     }
@@ -536,6 +543,14 @@ public class FpdParserTask extends Task {
         return parseOptions(options);
     }
 
+    ToolChainMap parseMsaBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
+        String[][] options = saq.getMsaBuildOptions(toolChainFamilyFlag);
+        if (options == null || options.length == 0) {
+            return new ToolChainMap();
+        }
+        return parseOptions(options);
+    }
+    
     private ToolChainMap parseOptions(String[][] options) throws EdkException {
         ToolChainMap map = new ToolChainMap();
         int flagIndex = ToolChainElement.ATTRIBUTE.value;

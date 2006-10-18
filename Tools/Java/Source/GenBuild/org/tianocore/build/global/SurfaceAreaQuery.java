@@ -492,6 +492,22 @@ public class SurfaceAreaQuery {
 
         return getOptions("PlatformSurfaceArea", xPath, toolChainFamilyFlag);
     }
+    
+    public String[][] getMsaBuildOptions(boolean toolChainFamilyFlag) {
+        String[] xPath;
+        
+        if (toolChainFamilyFlag == true) {
+            xPath = new String[] {
+                    "/Options/Option[not(@ToolChainFamily) and not(@TagName)]",
+                    "/Options/Option[@ToolChainFamily]", };
+        } else {
+            xPath = new String[] {
+                    "/Options/Option[not(@ToolChainFamily) and not(@TagName)]",
+                    "/Options/Option[@TagName]", };
+        }
+
+        return getOptions("ModuleBuildOptions", xPath, toolChainFamilyFlag);
+    }
 
     public ToolChainInfo getFpdToolChainInfo() {
         String[] xPath = new String[] { "/PlatformDefinitions" };

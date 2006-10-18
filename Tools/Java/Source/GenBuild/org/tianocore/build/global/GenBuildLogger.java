@@ -46,11 +46,6 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     Project project = null;
     
     ///
-    /// Time of the start of the build 
-    ///
-    private long startTime = System.currentTimeMillis();
-    
-    ///
     /// flag to present whether cache all msg or not
     /// true means to cache.
     ///
