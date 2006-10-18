@@ -27,6 +27,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
@@ -551,6 +552,22 @@ public class Tools {
                                        int preferredHeight) {
         resizeComponentWidth(c, containerWidth, preferredWidth);
         resizeComponentHeight(c, containerHeight, preferredHeight);
+    }
+    
+    /**
+     To adjust each column's width to meet the table's size
+     
+     @param t the table need to be adjusted
+     @param width the new width of the table
+    
+    **/
+    public static void resizeTableColumn(JTable t, int width) {
+        if (t != null) {
+            int columnCount = t.getColumnCount();
+            for (int index = 0; index < columnCount; index++) {
+                t.getColumn(t.getColumnName(index)).setPreferredWidth(width / columnCount);
+            }
+        }
     }
 
     /**
