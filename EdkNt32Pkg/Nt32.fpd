@@ -592,8 +592,8 @@
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
         <Options>
-          <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">"Kernel32.lib", "MSVCRTD.lib", "Gdi32.lib", "User32.lib", "Winmm.lib"</Option>
-          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">"Kernel32.lib", "MSVCRTD.lib", "Gdi32.lib", "User32.lib", "Winmm.lib"</Option>
+          <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib</Option>
+          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
@@ -2542,8 +2542,8 @@
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
         <Options>
-          <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">"Kernel32.lib", "MSVCRTD.lib", "Gdi32.lib", "User32.lib", "Winmm.lib"</Option>
-          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">"Kernel32.lib", "MSVCRTD.lib", "Gdi32.lib", "User32.lib", "Winmm.lib"</Option>
+          <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib</Option>
+          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>

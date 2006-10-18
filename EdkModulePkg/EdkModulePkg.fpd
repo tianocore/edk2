@@ -765,7 +765,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>DXE_CORE</FfsFormatKey>
         <Options>
-          <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">"/WX-", "/Ob0"</Option>
+          <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">/WX- /Ob0</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
@@ -5928,7 +5928,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>DXE_CORE</FfsFormatKey>
         <Options>
-          <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="CC">"/WX-", "/Ob0"</Option>
+          <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="CC">/WX- /Ob0</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
@@ -9950,7 +9950,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>DXE_CORE</FfsFormatKey>
         <Options>
-          <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="CC">"/WX-", "/Ob0"</Option>
+          <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="CC">/WX- /Ob0</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
@@ -13976,7 +13976,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>DXE_CORE</FfsFormatKey>
         <Options>
-          <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="CC">"/WX-", "/Ob0"</Option>
+          <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="CC">/WX- /Ob0</Option>
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
