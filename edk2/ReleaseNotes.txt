@@ -221,6 +221,8 @@ install cygwin it gives you the choice of Unix file mode (recommended) or DOS
 file mode. Unix mode will cause all the cygwin directories to be mounted in
 binmode, while DOS will mount the dirs in textmode. Here is an example of a
 cygwin install where the dirs are (properly) mounted in binmode.
+To view mount information, type: 
+    mount
 
 C:\cygwin\bin on /usr/bin type user (binmode)
 C:\cygwin\lib on /usr/lib type user (binmode)
@@ -228,7 +230,12 @@ c:\workspace on /workspace type system (binmode)
 C:\cygwin on / type user (binmode)
 
 If you use textmode, it is likely that the build will fail in a way that is
-hard to debug.
+hard to debug.  Textmode is required to retain or add the DOS ^M characters
+in DOS batch files during file editing sessions.
+
+You can switch from textmode to binmode for compilation by executing the 
+following:
+    mount -b --change-cygdrive-prefix cygdrive
 
 Cygwin is pretty slow, so it is not recommended for large builds.
 
