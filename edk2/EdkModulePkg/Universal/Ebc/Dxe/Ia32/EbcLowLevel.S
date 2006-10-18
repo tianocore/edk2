@@ -10,7 +10,7 @@
 #*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 #*                                                                          
 #****************************************************************************
-.global _EbcLLCALLEXNative
+.globl _EbcLLCALLEXNative
 _EbcLLCALLEXNative:
         push   %ebp
         mov    %esp,%ebp
@@ -23,16 +23,16 @@ _EbcLLCALLEXNative:
         pop    %ebp
         ret    
 
-.global _EbcLLGetEbcEntryPoint
+.globl _EbcLLGetEbcEntryPoint
 _EbcLLGetEbcEntryPoint:
         ret    
 
-.global _EbcLLGetStackPointer
+.globl _EbcLLGetStackPointer
 _EbcLLGetStackPointer:
         mov    %esp,%eax
         add    $0x4,%eax
         ret    
 
-.global _EbcLLGetReturnValue
+.globl _EbcLLGetReturnValue
 _EbcLLGetReturnValue:
         ret    

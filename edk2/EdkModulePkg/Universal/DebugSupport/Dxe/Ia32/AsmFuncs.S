@@ -11,11 +11,11 @@
 #*
 #******************************************************************************
 
-.global _OrigVector
-.global _InterruptEntryStub
-.global _StubSize
-.global _CommonIdtEntry
-.global _FxStorSupport
+.globl _OrigVector
+.globl _InterruptEntryStub
+.globl _StubSize
+.globl _CommonIdtEntry
+.globl _FxStorSupport
 
 _AppEsp:         .long   0x11111111 # ?
 _DebugEsp:       .long   0x22222222 # ?
@@ -25,7 +25,7 @@ _Eflags:         .long   0x55555555 # ?
 _OrigVector:     .long   0x66666666 # ?
 _StubSize:       .long   _InterruptEntryStubEnd - _InterruptEntryStub
 
-.global _FxStorSupport
+.globl _FxStorSupport
 _FxStorSupport:
         push   %ebx
         mov    $0x1,%eax
@@ -36,7 +36,7 @@ _FxStorSupport:
         pop    %ebx
         ret    
 
-.global _GetIdtr
+.globl _GetIdtr
 _GetIdtr:
         push   %ebp
         mov    %esp,%ebp
@@ -46,7 +46,7 @@ _GetIdtr:
         leave  
         ret    
 
-.global _WriteInterruptFlag
+.globl _WriteInterruptFlag
 _WriteInterruptFlag:
         push   %ebp
         mov    %esp,%ebp
@@ -63,7 +63,7 @@ _WriteInterruptFlag:
         leave  
         ret    
 
-.global _Vect2Desc
+.globl _Vect2Desc
 _Vect2Desc:
         push   %ebp
         mov    %esp,%ebp
@@ -77,16 +77,16 @@ _Vect2Desc:
         leave  
         ret    
 
-.global _InterruptEntryStub
+.globl _InterruptEntryStub
 _InterruptEntryStub:
         mov    %esp,0x0
         mov    $0x0,%esp
         push   $0x0
         jmp    _CommonIdtEntry
-.global _InterruptEntryStubEnd
+.globl _InterruptEntryStubEnd
 _InterruptEntryStubEnd:
 
-.global _CommonIdtEntry
+.globl _CommonIdtEntry
 _CommonIdtEntry:
         pusha  
         pushf  
