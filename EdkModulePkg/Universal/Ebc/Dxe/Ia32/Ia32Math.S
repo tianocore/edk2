@@ -18,7 +18,7 @@
 #   Generic math routines for EBC interpreter running on IA32 processor
 #
 #------------------------------------------------------------------------------
-.global _LeftShiftU64
+.globl _LeftShiftU64
 _LeftShiftU64:
         push   %ebp
         mov    %esp,%ebp
@@ -43,7 +43,7 @@ _LeftShiftU64:
         leave  
         ret    
 
-.global _RightShiftU64
+.globl _RightShiftU64
 _RightShiftU64:
         push   %ebp
         mov    %esp,%ebp
@@ -68,7 +68,7 @@ _RightShiftU64:
         leave  
         ret    
 
-.global _ARightShift64
+.globl _ARightShift64
 _ARightShift64:
         push   %ebp
         mov    %esp,%ebp
@@ -98,7 +98,7 @@ _ARightShift64:
         leave  
         ret    
 
-.global _MulU64x64
+.globl _MulU64x64
 _MulU64x64:
         push   %ebp
         mov    %esp,%ebp
@@ -134,7 +134,7 @@ _MulU64x64:
         leave  
         ret    
 
-.global _MulS64x64
+.globl _MulS64x64
 _MulS64x64:
         push   %ebp
         mov    %esp,%ebp
@@ -186,7 +186,7 @@ _MulS64x64:
         leave  
         ret    
 
-.global _DivU64x64
+.globl _DivU64x64
 _DivU64x64:
         push   %ebp
         mov    %esp,%ebp
@@ -233,7 +233,7 @@ _DivU64x64:
         leave  
         ret    
 
-.global _DivS64x64
+.globl _DivS64x64
 _DivS64x64:
         push   %ebp
         mov    %esp,%ebp

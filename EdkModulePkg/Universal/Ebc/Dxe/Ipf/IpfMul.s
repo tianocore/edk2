@@ -24,7 +24,7 @@
 
   .proc MulS64x64#
   .align 32
-  .global MulS64x64#
+  .globl MulS64x64#
   .align 32
 
 ///*++
@@ -84,7 +84,7 @@ MulS64x64:
 
   .proc MulU64x64#
   .align 32
-  .global MulU64x64#
+  .globl MulU64x64#
   .align 32
 
 

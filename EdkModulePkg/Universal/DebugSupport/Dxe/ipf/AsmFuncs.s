@@ -24,10 +24,10 @@
 #include "common.i"
 #include "Ds64Macros.i"
 
-.global PatchSaveBuffer
-.global IpfContextBuf
-.global CommonHandler
-.global ExternalInterruptCount
+.globl PatchSaveBuffer
+.globl IpfContextBuf
+.globl CommonHandler
+.globl ExternalInterruptCount
 
 
 /////////////////////////////////////////////
@@ -38,7 +38,7 @@
 //  Description:
 //      Flushes instruction cache for specified number of bytes
 //
-        .global InstructionCacheFlush
+        .globl InstructionCacheFlush
         .proc   InstructionCacheFlush
         .align 32
 InstructionCacheFlush::
@@ -166,7 +166,7 @@ LoopBack:   // $L143:
 //       Notes:
 //
 //
-        .global ChainHandler
+        .globl ChainHandler
         .proc ChainHandler
 ChainHandler:
 
@@ -240,7 +240,7 @@ ChainHandlerDone:
 //  Notes:
 //
 //
-        .global UnchainHandler
+        .globl UnchainHandler
         .proc UnchainHandler
 
 UnchainHandler:
@@ -673,7 +673,7 @@ SetSlotDone:
 //  Returns:
 //      Current value if IVA
 
-        .global     GetIva
+        .globl     GetIva
         .proc       GetIva
 GetIva:
         mov         r8=cr2;;
@@ -693,7 +693,7 @@ GetIva:
 //  Returns:
 //      Previous state of psr.ic
 //
-        .global     ProgramInterruptFlags
+        .globl     ProgramInterruptFlags
         .proc       ProgramInterruptFlags
 ProgramInterruptFlags:
         alloc       loc0=1,2,0,0;;
@@ -1279,7 +1279,7 @@ EndHookHandler:
 //      Saves IVT index to SCRATCH_REG1 (immediate value is fixed up when code is copied
 //          to the IVT entry.
 
-        .global HookStub
+        .globl HookStub
         .proc   HookStub
 HookStub:
 
