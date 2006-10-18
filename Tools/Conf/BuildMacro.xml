@@ -642,6 +642,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <OnDependency>
         <sourcefiles>
           <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj"/>
