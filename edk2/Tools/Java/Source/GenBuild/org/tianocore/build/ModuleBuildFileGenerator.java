@@ -465,7 +465,11 @@ public class ModuleBuildFileGenerator {
             String[] list = fp.getGenSectionElements(document, "${BASE_NAME}", fpdModuleId.getModule().getGuid(), targetFilename);
 
             for (int i = 0; i < list.length; i++) {
-                Element ele = document.createElement(list[i]);
+                String sectiontype = list[i];
+                if (sectiontype.equalsIgnoreCase("EFI_SECTION_RAW") && project.getProperty("MODULE_TYPE").equalsIgnoreCase("SEC")) {
+                    sectiontype += "_SEC";
+                }
+                Element ele = document.createElement(sectiontype);
                 ele.setAttribute("FILEPATH", ".");
                 ele.setAttribute("FILENAME", "${BASE_NAME}");
                 root.appendChild(ele);
