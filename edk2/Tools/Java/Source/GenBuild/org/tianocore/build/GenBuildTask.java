@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
@@ -490,17 +488,12 @@ public class GenBuildTask extends Ant {
             String cmdFlags = GlobalData.getCommandSetting(key, fpdModuleId);
             if (cmdFlags != null) 
             {
-//              Set<String> addset = new LinkedHashSet<String>();
-//              Set<String> subset = new LinkedHashSet<String>();
-//              putFlagsToSet(addset, cmdFlags);
-//              getProject().setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
               getProject().setProperty(cmd[m] + "_FLAGS", cmdFlags);
             } 
             else 
             {
               getProject().setProperty(cmd[m] + "_FLAGS", "");
             }
-
 
             //
             // Set CC_EXT
@@ -716,54 +709,6 @@ public class GenBuildTask extends Ant {
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
-    }
-
-
-    /**
-      Separate the string and instore in set.
-
-      <p> String is separated by Java Regulation Expression
-      "[^\\\\]?(\".*?[^\\\\]\")[ \t,]+". </p>
-
-      <p>For example: </p>
-
-      <pre>
-        "/nologo", "/W3", "/WX"
-        "/C", "/DSTRING_DEFINES_FILE=\"BdsStrDefs.h\""
-      </pre>
-
-      @param set store the separated string
-      @param str string to separate
-    **/
-    private void putFlagsToSet(Set<String> set, String str) {
-        if (str == null || str.length() == 0) {
-            return;
-        }
-
-        Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
-        Matcher matcher = myPattern.matcher(str + " ");
-        while (matcher.find()) {
-            String item = str.substring(matcher.start(1), matcher.end(1));
-            set.add(item);
-        }
-    }
-
-    /**
-      Generate the final flags string will be used by compile command.
-
-      @param add the add flags set
-      @param sub the sub flags set
-      @return final flags after add set substract sub set
-    **/
-    private String getFlags(Set<String> add, Set<String> sub) {
-        String result = "";
-        add.removeAll(sub);
-        Iterator iter = add.iterator();
-        while (iter.hasNext()) {
-            String str = (String) iter.next();
-            result += str.substring(1, str.length() - 1) + " ";
-        }
-        return result;
     }
 
     public void setSingleModuleBuild(boolean isSingleModuleBuild) {

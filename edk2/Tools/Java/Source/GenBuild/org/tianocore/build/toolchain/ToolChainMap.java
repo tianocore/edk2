@@ -320,5 +320,9 @@ public class ToolChainMap {
     public Set<ToolChainKey> keySet() {
         return (Set<ToolChainKey>)map.keySet();
     }
+    
+    public String toString() {
+        return map + "";
+    }
 }
 
