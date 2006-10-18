@@ -67,6 +67,8 @@ public class CheckTools {
     
     private final int FAIL = 1;
 
+    private String SEP = System.getProperty("file.separator");
+
     public static void main(String[] argv) {
         int exitCode = new CheckTools().checkTool(argv);
         if (exitCode == -1) {
@@ -80,7 +82,6 @@ public class CheckTools {
         String WORKSPACE = System.getenv("WORKSPACE");
         if ((DEBUG > 0) || (VERBOSE > 0))
             System.out.println("Verifying Tool Chains for WORKSPACE: " + WORKSPACE);
-        String SEP = System.getProperty("file.separator");
         int returnCode = 0;
 
         if (WORKSPACE == null) {
@@ -99,15 +100,19 @@ public class CheckTools {
                 if (DEBUG > 1)
                     System.out.println(" [" + i + "] " + arg);
                 if (!(arg.toLowerCase().startsWith("-t") || arg.toLowerCase().startsWith("-s")
-                      || arg.toLowerCase().startsWith("-i") || arg.toLowerCase().startsWith("-v") || arg
-                                                                                                        .toLowerCase()
-                                                                                                        .startsWith(
-                                                                                                                    "-f"))) {
+                      || arg.toLowerCase().startsWith("-i") || arg.toLowerCase().startsWith("-v") 
+                      || arg.toLowerCase().startsWith("-h") || arg.toLowerCase().startsWith("-f"))) {
                     // Only allow valid option flags
                     System.out.println("Invalid argument: " + arg);
                     usage();
                     System.exit(FAIL);
                 }
+
+                if (arg.toLowerCase().startsWith("-h")) {
+                    usage();
+                    System.exit(PASS);
+                }
+
                 if (arg.toLowerCase().startsWith("-t")) {
                     if (cmdCode == DEFAULT) {
                         cmdCode = TEST;
@@ -217,6 +222,17 @@ public class CheckTools {
     }
 
     private void usage() {
-        System.out.println("Usage: checkTools [-i] [-s | -scan] [-t | -test] [[-f | -filename] filename.txt]");
+        System.out.println("Usage: checkTools [-h] [-i] [-v] [-s | -scan] [-t | -test] [[-f | -filename] filename.txt]");
+        System.out.println("  Where");
+        System.out.println("     -h           Help - display this screen.");
+        System.out.println("     -i           Interactive query - not yet implemented!");
+        System.out.println("     -v           Verbose - add up to 3 -v options to increase info messages.");
+        System.out.println("     -s           Scan - search the usual places on your system for tools.");
+        System.out.println("                    The Scan feature not yet implemented!.");
+        System.out.println("     -t           Test - checks that PATH entries in the tool configuration file exist.");
+        System.out.println("     -f filename  Use filename instead of the file specified in target.txt or");
+        System.out.println("                    tools_def.txt or tools_def.template.");
+        System.out.println("                    By Rule, all tool configuration files must reside in the");
+        System.out.println("                    WORKSPACE" + SEP + "Tools" + SEP + "Conf directory.");
     }
 }
