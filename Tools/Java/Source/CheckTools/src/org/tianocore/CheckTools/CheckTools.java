@@ -86,7 +86,7 @@ public class CheckTools {
 
         if (WORKSPACE == null) {
             System.out.println("Please set the environment variable, WORKSPACE and run again.");
-            System.exit(1);
+            System.exit(FAIL);
         }
         String targetTxt = WORKSPACE + SEP + "Tools" + SEP + "Conf" + SEP + "target.txt";
 
