@@ -17,6 +17,7 @@ package org.tianocore.frameworkwizard.common.find;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
 
@@ -37,7 +38,7 @@ import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 
-public class FindResult extends IFrame implements TableModelListener {
+public class FindResult extends IFrame implements TableModelListener, ComponentListener {
 
     ///
     /// Define class Serial Version UID
@@ -156,6 +157,10 @@ public class FindResult extends IFrame implements TableModelListener {
         if (jTable == null) {
             model = new IDefaultTableModel();
             jTable = new JTable(model);
+            jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+            jTable.getModel().addTableModelListener(this);
 
             model.addColumn("Name");
             model.addColumn("Type");
@@ -168,9 +173,18 @@ public class FindResult extends IFrame implements TableModelListener {
             jTable.getColumn("Produced by").setCellRenderer(new MyTableCellRenderer());
             jTable.getColumn("Consumed by").setCellRenderer(new MyTableCellRenderer());
             jTable.getColumn("Declared by").setCellRenderer(new MyTableCellRenderer());
-
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jTable.getModel().addTableModelListener(this);
+            
+//            jTable.getColumn("Name").setPreferredWidth((this.getSize().width - 30) / 5);
+//            jTable.getColumn("Type").setPreferredWidth((this.getSize().width - 30) / 5);
+//            jTable.getColumn("Produced by").setPreferredWidth((this.getSize().width - 30) / 5);
+//            jTable.getColumn("Consumed by").setPreferredWidth((this.getSize().width - 30) / 5);
+//            jTable.getColumn("Declared by").setPreferredWidth((this.getSize().width - 30) / 5);
+            int columnWidth = (this.getSize().width - 28) / 5;
+            jTable.getColumn("Name").setPreferredWidth(columnWidth);
+            jTable.getColumn("Type").setPreferredWidth(columnWidth);
+            jTable.getColumn("Produced by").setPreferredWidth(columnWidth);
+            jTable.getColumn("Consumed by").setPreferredWidth(columnWidth);
+            jTable.getColumn("Declared by").setPreferredWidth(columnWidth);
         }
         return jTable;
     }
@@ -451,6 +465,7 @@ public class FindResult extends IFrame implements TableModelListener {
                               intPreferredHeight);
         Tools.centerComponent(this.jButtonClose, intCurrentWidth, intCurrentHeight, intPreferredHeight,
                               DataType.SPACE_TO_BOTTOM_FOR_CLOSE_BUTTON);
+        Tools.resizeTableColumn(this.jTable, this.getSize().width - 28);
     }
 
     /* (non-Javadoc)
