@@ -380,6 +380,27 @@ public class Clone extends IDialog {
                                    .setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.spd</html>");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Package Path and Filename");
+
+            //
+            // Check if the package can be cloned
+            //
+            PackageSurfaceArea spd = GlobalData.openingPackageList
+                                                                  .getPackageSurfaceAreaFromId(GlobalData.openingPackageList
+                                                                                                                            .getIdByPath(this.oldId
+                                                                                                                                                   .getPath()));
+            if (spd != null) {
+                if (spd.getPackageDefinitions() != null) {
+                    if (!spd.getPackageDefinitions().getRePackage()) {
+                        Log.wrn("Clone Package", "This package can't repackaged and cloned");
+                        this.jTextFieldBaseName.setEnabled(false);
+                        this.jTextFieldFilePath.setEnabled(false);
+                        this.jTextFieldGuid.setEnabled(false);
+                        this.jTextFieldVersion.setEnabled(false);
+                        this.jButtonGenerateGuid.setEnabled(false);
+                        this.jButtonOk.setEnabled(false);
+                    }
+                }
+            }
         }
         //
         // For PLATFORM_SURFACE_AREA
