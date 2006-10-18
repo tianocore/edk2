@@ -93,6 +93,9 @@ public class ToolChecks {
                 System.out.println("and commenting out out or deleting the entries for the tool");
                 System.out.println("chain tag names that do not apply to your system.");
             }
+        } else {
+            System.out.println("");
+            System.out.println("  Tool Configuration File: " + toolConfFile + " is valid!");
         }
 
         return returnCode;
@@ -147,7 +150,7 @@ public class ToolChecks {
             }
         } catch (IOException e) {
             System.out.println(" [" + testFile + "] " + e);
-            System.exit(1);
+            System.exit(FAIL);
         }
         if (errLog.size() > 0)
             for (int i = 0; i < goodLog.size(); i++) {
