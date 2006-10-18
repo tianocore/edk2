@@ -739,6 +739,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </macrodef>
 
   <!--
+      Build the real mode ASM file
+    -->
+  <macrodef name="Build_RealAsm">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="asm"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+    
+    <sequential>
+      <!-- Lack Dependency Check -->
+      <exec dir="${DEST_DIR_OUTPUT}" executable="${ASM}" failonerror="true">
+        <arg line="/nologo /omf ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT} /Bl${ASMLINK} ${ASMLINK_FLAGS}"/>
+      </exec>
+      <concat destfile="${DEST_DIR_OUTPUT}/@{FILENAME}.cat" binary="yes">
+        <filelist dir="${MODULE_DIR}" files="Blank2.pad"/>
+        <filelist dir="${DEST_DIR_OUTPUT}" files="@{FILENAME}.com"/>
+      </concat>
+    </sequential>
+  </macrodef>
+  
+  <!--
     DUMMY
     -->
   <macrodef name="Build_DUMMY">
@@ -1124,6 +1147,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </sequential>
   </macrodef>
 
+  <!--
+    EFI_SECTION_RAW_SEC
+    -->
+  <macrodef name="EFI_SECTION_RAW_SEC">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="cat"/>
+
+    <element name="PRE.PROCESS" optional="yes"/>
+    <element name="POST.PROCESS" optional="yes"/>
+
+    <sequential>
+      <OnDependency>
+        <sourcefiles>
+          <file name="${DEST_DIR_OUTPUT}/ResetVec.@{FILEEXT}"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.te"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
+        </targetfiles>
+
+        <sequential>
+          <PRE.PROCESS/>
+          <secfixup secexefile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" resetvectorDatafile="${DEST_DIR_OUTPUT}/ResetVec.@{FILEEXT}"
+                   outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.bin"/>
+                   
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.bin" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.sec" 
+                      sectiontype="EFI_SECTION_RAW"/>
+          <POST.PROCESS/>
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef>
+  
   <!--
     EFI_SECTION_FIRMWARE_VOLUME_IMAGE
     -->

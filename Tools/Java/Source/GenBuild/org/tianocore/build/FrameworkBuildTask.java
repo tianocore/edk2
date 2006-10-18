@@ -77,9 +77,9 @@ public class FrameworkBuildTask extends Task{
     
     private Set<File> msaFiles = new LinkedHashSet<File>();
     
-    //
-    // This is only for none-multi-thread build to reduce overriding message
-    //
+    ///
+    /// This is only for none-multi-thread build to reduce overriding message
+    ///
     public static Hashtable<String, String> originalProperties = new Hashtable<String, String>();
     
     String toolsDefFilename = ToolDefinitions.DEFAULT_TOOLS_DEF_FILE_PATH;

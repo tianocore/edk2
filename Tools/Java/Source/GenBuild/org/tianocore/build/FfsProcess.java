@@ -379,7 +379,7 @@ public class FfsProcess {
             if (fileName == null) {
                 ele.setAttribute("file", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
             } else {
-                ele.setAttribute("file", "${PLATFORM_DIR}" + File.separatorChar + fileName);
+                ele.setAttribute("file", fileName);
             }
             root.appendChild(ele);
         } else {
@@ -390,7 +390,7 @@ public class FfsProcess {
             if (fileName == null) {
                 ele.setAttribute("fileName", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
             } else {
-                ele.setAttribute("fileName", "${PLATFORM_DIR}" + File.separatorChar + fileName);
+                ele.setAttribute("fileName", fileName);
             }
             root.appendChild(ele);
         }
