@@ -318,6 +318,10 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
                         && vLibraryClass.getLibraryClass(index).getSupArchList().size() > 0) {
                         mLibraryClass.setSupArchList(vLibraryClass.getLibraryClass(index).getSupArchList());
                     }
+                    if (vLibraryClass.getLibraryClass(index).getSupModuleList() != null
+                                    && vLibraryClass.getLibraryClass(index).getSupModuleList().size() > 0) {
+                                    mLibraryClass.setSupModuleList(vLibraryClass.getLibraryClass(index).getSupModuleList());
+                                }
                     if (!isEmpty(vLibraryClass.getLibraryClass(index).getHelp())) {
                         mLibraryClass.setHelpText(vLibraryClass.getLibraryClass(index).getHelp());
                     }
