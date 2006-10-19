@@ -19,10 +19,7 @@ Abstract:
 Revision History
 --*/
 
-
-#include <Common/StatusCode.h>
 #include "Terminal.h"
-
 
 EFI_STATUS
 EFIAPI

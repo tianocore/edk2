@@ -19,9 +19,7 @@ Abstract:
 Revision History
 --*/
 
-
 #include "Terminal.h"
-#include <Common/StatusCode.h>
 
 //
 // This list is used to define the valid extend chars.
