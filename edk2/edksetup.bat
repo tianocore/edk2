@@ -154,13 +154,13 @@ echo.
 @REM Java Programs can use it.
 @REM It needs the XMLBEANS libraries in order to compile.
 @REM
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xmlpublic.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
+set CLASSPATH=%XMLBEANS_HOME%\lib;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xbean.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xbean_xpath.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xmlpublic.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\saxon8.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\resolver.jar;%CLASSPATH%
 
 call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
@@ -168,7 +168,7 @@ call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 @REM Now we can make the other Java Programs
 @REM All of the remaining Java Programs require the SurfaceArea library to compile
 @REM
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
+set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%CLASSPATH%
 
 call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 
@@ -176,13 +176,13 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM We have all of the Java Programs and add-in classes created, so we can start
 @REM using the cpp-tasks to create our tools
 @REM
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\PcdTools.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\MigrationTools.jar
+set CLASSPATH=%WORKSPACE%\Tools\Jars\Common.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\PcdTools.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\GenBuild.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\cpptasks.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\frameworktasks.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Bin\FrameworkWizard.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Bin\MigrationTools.jar;%CLASSPATH%
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
 
@@ -233,21 +233,21 @@ echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
 echo PATH:          %PATH%
 echo.
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xmlpublic.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\PcdTools.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\MigrationTools.jar
+set CLASSPATH=%XMLBEANS_HOME%\lib;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xbean.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xbean_xpath.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\xmlpublic.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\saxon8.jar;%CLASSPATH%
+set CLASSPATH=%XMLBEANS_HOME%\lib\resolver.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\Common.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\PcdTools.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\GenBuild.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\cpptasks.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Jars\frameworktasks.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Bin\FrameworkWizard.jar;%CLASSPATH%
+set CLASSPATH=%WORKSPACE%\Tools\Bin\MigrationTools.jar;%CLASSPATH%
 echo CLASSPATH:     %CLASSPATH%
 goto end
 
