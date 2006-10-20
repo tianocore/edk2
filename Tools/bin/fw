@@ -9,7 +9,5 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/bin/FrameworkWizard.jar
-
 # Run Framework Wizard
-java org.tianocore.frameworkwizard.FrameworkWizardUI
+java -cp "$CLASSPATH:$WORKSPACE/Tools/bin/FrameworkWizard.jar" org.tianocore.frameworkwizard.FrameworkWizardUI

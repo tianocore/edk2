@@ -9,7 +9,5 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/bin/MigrationTools.jar
-
 # Run Migration Tool
-java org.tianocore.migration.MigrationTool
+java -cp "$CLASSPATH:$WORKSPACE/Tools/bin/MigrationTools.jar" org.tianocore.migration.MigrationTool
