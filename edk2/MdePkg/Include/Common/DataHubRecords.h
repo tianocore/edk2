@@ -1,22 +1,22 @@
 /** @file
-  This file defines GUIDs and associated data structures for records posted to the Data Hub. 
+  This file defines GUIDs and associated data structures for records posted to the Data Hub.
   The producers of these records use these definitions to construct records.
   The consumers of these records use these definitions to retrieve, filter and parse records.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  DataHubRecords.h
 
   @par Revision Reference:
-  DataHubRecord.h include all data hub sub class defitions from Cache subclass 
-  spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9, Processor 
+  DataHubRecord.h include all data hub sub class defitions from Cache subclass
+  spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9, Processor
   Subclass spec 0.9,Misc SubClass spec 0.9.
 
 **/
@@ -139,7 +139,7 @@ typedef struct {
   UINT32    HeaderSize;
   UINT16    Instance;
   UINT16    SubInstance;
-  UINT32    RecordType;    
+  UINT32    RecordType;
 } EFI_SUBCLASS_TYPE1_HEADER;
 
 typedef struct {
@@ -380,7 +380,7 @@ typedef enum {
   EfiProcessorHealthy        = 1,
   EfiProcessorPerfRestricted = 2,
   EfiProcessorFuncRestricted = 3
-} EFI_PROCESSOR_HEALTH_STATUS;  
+} EFI_PROCESSOR_HEALTH_STATUS;
 
 typedef UINTN   EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
@@ -465,7 +465,7 @@ typedef struct {
   UINT32  Reserved      :25;
 } EFI_CACHE_SRAM_TYPE_DATA;
 
-typedef enum {  
+typedef enum {
   EfiCacheErrorOther     = 1,
   EfiCacheErrorUnknown   = 2,
   EfiCacheErrorNone      = 3,
@@ -474,7 +474,7 @@ typedef enum {
   EfiCacheErrorMultiBit  = 6
 } EFI_CACHE_ERROR_TYPE_DATA;
 
-typedef enum {  
+typedef enum {
   EfiCacheTypeOther       = 1,
   EfiCacheTypeUnknown     = 2,
   EfiCacheTypeInstruction = 3,
@@ -482,7 +482,7 @@ typedef enum {
   EfiCacheTypeUnified     = 5
 } EFI_CACHE_TYPE_DATA;
 
-typedef enum {  
+typedef enum {
   EfiCacheAssociativityOther        = 1,
   EfiCacheAssociativityUnknown      = 2,
   EfiCacheAssociativityDirectMapped = 3,
@@ -493,7 +493,7 @@ typedef enum {
   EfiCacheAssociativity16Way        = 8
 } EFI_CACHE_ASSOCIATIVITY_DATA;
 
-typedef struct {  
+typedef struct {
   UINT32    Level           :3;
   UINT32    Socketed        :1;
   UINT32    Reserved2       :1;
@@ -518,7 +518,7 @@ typedef enum {
   EfiCacheReserved = 2,
   EfiCacheUnknown  = 3
 } EFI_CACHE_LOCATION;
-  
+
 #define EFI_CACHE_ENABLED    1
 #define EFI_CACHE_DISABLED   0
 
@@ -561,9 +561,9 @@ typedef union {
 
 typedef struct {
    EFI_SUBCLASS_TYPE1_HEADER      DataRecordHeader;
-   EFI_CACHE_VARIABLE_RECORD      VariableRecord;  
+   EFI_CACHE_VARIABLE_RECORD      VariableRecord;
 } EFI_CACHE_DATA_RECORD;
-  
+
 #define EFI_MEMORY_SUBCLASS_VERSION     0x0100
 
 
@@ -870,7 +870,11 @@ typedef struct {
   EFI_EXP_BASE2_DATA              BiosPhysicalDeviceSize;
   EFI_MISC_BIOS_CHARACTERISTICS   BiosCharacteristics1;
   EFI_MISC_BIOS_CHARACTERISTICS_EXTENSION  BiosCharacteristics2;
-} EFI_MISC_BIOS_VENDOR_DATA;       
+  UINT8                           BiosMajorRelease;
+  UINT8                           BiosMinorRelease;
+  UINT8                           BiosEmbeddedFirmwareMajorRelease;
+  UINT8                           BiosEmbeddedFirmwareMinorRelease;
+} EFI_MISC_BIOS_VENDOR_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -879,7 +883,7 @@ typedef struct {
 //
 #define EFI_MISC_SYSTEM_MANUFACTURER_RECORD_NUMBER 0x00000003
 
-typedef enum {  
+typedef enum {
   EfiSystemWakeupTypeReserved        = 0,
   EfiSystemWakeupTypeOther           = 1,
   EfiSystemWakeupTypeUnknown         = 2,
@@ -898,7 +902,9 @@ typedef struct {
   STRING_REF                      SystemSerialNumber;
   EFI_GUID                        SystemUuid;
   EFI_MISC_SYSTEM_WAKEUP_TYPE     SystemWakeupType;
-} EFI_MISC_SYSTEM_MANUFACTURER_DATA;       
+  STRING_REF                      SystemSKUNumber;
+  STRING_REF                      SystemFamily;
+} EFI_MISC_SYSTEM_MANUFACTURER_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -916,7 +922,7 @@ typedef struct {
   UINT32  Reserved              :27;
 } EFI_BASE_BOARD_FEATURE_FLAGS;
 
-typedef enum {  
+typedef enum {
   EfiBaseBoardTypeUnknown                = 1,
   EfiBaseBoardTypeOther                  = 2,
   EfiBaseBoardTypeServerBlade            = 3,
@@ -944,7 +950,7 @@ typedef struct {
   EFI_INTER_LINK_DATA             BaseBoardChassisLink;
   UINT32                          BaseBoardNumberLinks;
   EFI_INTER_LINK_DATA             LinkN;
-} EFI_MISC_BASE_BOARD_MANUFACTURER_DATA;       
+} EFI_MISC_BASE_BOARD_MANUFACTURER_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -953,7 +959,7 @@ typedef struct {
 //
 #define EFI_MISC_CHASSIS_MANUFACTURER_RECORD_NUMBER  0x00000005
 
-typedef enum {  
+typedef enum {
   EfiMiscChassisTypeOther               = 0x1,
   EfiMiscChassisTypeUnknown             = 0x2,
   EfiMiscChassisTypeDeskTop             = 0x3,
@@ -987,7 +993,7 @@ typedef struct {
   UINT32  Reserved          :15;
 } EFI_MISC_CHASSIS_STATUS;
 
-typedef enum {  
+typedef enum {
   EfiChassisStateOther           = 0x01,
   EfiChassisStateUnknown         = 0x02,
   EfiChassisStateSafe            = 0x03,
@@ -996,7 +1002,7 @@ typedef enum {
   EfiChassisStateNonRecoverable  = 0x06,
 } EFI_MISC_CHASSIS_STATE;
 
-typedef enum {  
+typedef enum {
   EfiChassisSecurityStatusOther                          = 0x01,
   EfiChassisSecurityStatusUnknown                        = 0x02,
   EfiChassisSecurityStatusNone                           = 0x03,
@@ -1015,7 +1021,7 @@ typedef struct {
   EFI_BASE_BOARD_TYPE     ChassisBaseBoard;
   UINT32                  ChassisElementMinimum;
   UINT32                  ChassisElementMaximum;
-} EFI_MISC_ELEMENTS; 
+} EFI_MISC_ELEMENTS;
 
 typedef struct {
   STRING_REF                      ChassisManufacturer;
@@ -1042,7 +1048,7 @@ typedef struct {
 //
 #define EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_RECORD_NUMBER 0x00000006
 
-typedef enum {  
+typedef enum {
   EfiPortConnectorTypeNone                   = 0x00,
   EfiPortConnectorTypeCentronics             = 0x01,
   EfiPortConnectorTypeMiniCentronics         = 0x02,
@@ -1085,7 +1091,7 @@ typedef enum {
   EfiPortConnectorTypeOther                  = 0xFF,
 } EFI_MISC_PORT_CONNECTOR_TYPE;
 
-typedef enum {  
+typedef enum {
   EfiPortTypeNone                      = 0x00,
   EfiPortTypeParallelXtAtCompatible    = 0x01,
   EfiPortTypeParallelPortPs2           = 0x02,
@@ -1130,7 +1136,7 @@ typedef struct {
   EFI_MISC_PORT_CONNECTOR_TYPE  PortExternalConnectorType;
   EFI_MISC_PORT_TYPE            PortType;
   EFI_MISC_PORT_DEVICE_PATH     PortPath;
-} EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA;      
+} EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1139,7 +1145,7 @@ typedef struct {
 //
 #define EFI_MISC_SYSTEM_SLOT_DESIGNATION_RECORD_NUMBER 0x00000007
 
-typedef enum {  
+typedef enum {
   EfiSlotTypeOther                        = 0x01,
   EfiSlotTypeUnknown                      = 0x02,
   EfiSlotTypeIsa                          = 0x03,
@@ -1167,7 +1173,7 @@ typedef enum {
   EfiSlotTypePciExpress                   = 0xA5
 } EFI_MISC_SLOT_TYPE;
 
-typedef enum {  
+typedef enum {
   EfiSlotDataBusWidthOther      = 0x01,
   EfiSlotDataBusWidthUnknown    = 0x02,
   EfiSlotDataBusWidth8Bit       = 0x03,
@@ -1177,14 +1183,14 @@ typedef enum {
   EfiSlotDataBusWidth128Bit     = 0x07,
 } EFI_MISC_SLOT_DATA_BUS_WIDTH;
 
-typedef enum {  
+typedef enum {
   EfiSlotUsageOther     = 1,
   EfiSlotUsageUnknown   = 2,
   EfiSlotUsageAvailable = 3,
   EfiSlotUsageInUse     = 4,
 } EFI_MISC_SLOT_USAGE;
-  
-typedef enum {  
+
+typedef enum {
   EfiSlotLengthOther   = 1,
   EfiSlotLengthUnknown = 2,
   EfiSlotLengthShort   = 3,
@@ -1215,7 +1221,7 @@ typedef struct {
   UINT16                        SlotId;
   EFI_MISC_SLOT_CHARACTERISTICS SlotCharacteristics;
   EFI_DEVICE_PATH_PROTOCOL      SlotDevicePath;
-} EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA;      
+} EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1224,7 +1230,7 @@ typedef struct {
 //
 #define EFI_MISC_ONBOARD_DEVICE_RECORD_NUMBER 0x00000008
 
-typedef enum {  
+typedef enum {
   EfiOnBoardDeviceTypeOther          = 1,
   EfiOnBoardDeviceTypeUnknown        = 2,
   EfiOnBoardDeviceTypeVideo          = 3,
@@ -1264,7 +1270,7 @@ typedef struct {
 //
 typedef struct {
   STRING_REF                          SystemOptionStringRef[1];
-} EFI_MISC_SYSTEM_OPTION_STRING_DATA;      
+} EFI_MISC_SYSTEM_OPTION_STRING_DATA;
 
 #define EFI_MISC_SYSTEM_OPTION_STRING_RECORD_NUMBER 0x0000000A
 
@@ -1284,7 +1290,7 @@ typedef struct {
   UINT16                              NumberOfInstallableLanguages;
   EFI_MISC_LANGUAGE_FLAGS             LanguageFlags;
   UINT16                              CurrentLanguageNumber;
-} EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA;       
+} EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1296,7 +1302,7 @@ typedef struct {
 typedef struct {
   UINT16                              LanguageId;
   STRING_REF                          SystemLanguageString;
-} EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA;      
+} EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1309,7 +1315,7 @@ typedef struct {
   STRING_REF               GroupName;
   UINT16                   NumberGroupItems;
   UINT16                   GroupId;
-} EFI_MISC_GROUP_NAME_DATA;  
+} EFI_MISC_GROUP_NAME_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1319,11 +1325,39 @@ typedef struct {
 #define EFI_MISC_GROUP_ITEM_SET_RECORD_NUMBER      0x0000000E
 
 typedef struct {
-  EFI_GUID                 SubClass;         
+  EFI_GUID                 SubClass;
   EFI_INTER_LINK_DATA      GroupLink;
   UINT16                   GroupId;
   UINT16                   GroupElementId;
 } EFI_MISC_GROUP_ITEM_SET_DATA;
+
+//  Misc. System Event Log  - SMBIOS Type 15
+//
+#define EFI_MISC_SYSTEM_EVENT_LOG_RECORD_NUMBER 0x0000000D
+typedef struct {
+  UINT16                LogAreaLength;
+  UINT16                LogHeaderStartOffset;
+  UINT16                LogDataStartOffset;
+  UINT8                 AccessMethod;
+  UINT8                 LogStatus;
+  UINT32                LogChangeToken;
+  UINT32                AccessMethodAddress;
+  UINT8                 LogHeaderFormat;
+  UINT8                 NumberOfSupportedLogType;
+  UINT8                 LengthOfLogDescriptor;
+} EFI_MISC_SYSTEM_EVENT_LOG_DATA;
+
+//
+// Access Method.
+//  0x00~0x04:  as following definition
+//  0x05~0x7f:  Available for future assignment.
+//  0x80~0xff:  BIOS Vendor/OEM-specific.
+//
+#define ACCESS_INDEXIO_1INDEX8BIT_DATA8BIT    0x00
+#define ACCESS_INDEXIO_2INDEX8BIT_DATA8BIT    0X01
+#define ACCESS_INDEXIO_1INDEX16BIT_DATA8BIT   0X02
+#define ACCESS_MEMORY_MAPPED                  0x03
+#define ACCESS_GPNV                           0x04
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1332,7 +1366,7 @@ typedef struct {
 //
 #define EFI_MISC_POINTING_DEVICE_TYPE_RECORD_NUMBER 0x0000000F
 
-typedef enum { 
+typedef enum {
   EfiPointingDeviceTypeOther         = 0x01,
   EfiPointingDeviceTypeUnknown       = 0x02,
   EfiPointingDeviceTypeMouse         = 0x03,
@@ -1344,7 +1378,7 @@ typedef enum {
   EfiPointingDeviceOpticalSensor     = 0x09,
 } EFI_MISC_POINTING_DEVICE_TYPE;
 
-typedef enum {  
+typedef enum {
   EfiPointingDeviceInterfaceOther              = 0x01,
   EfiPointingDeviceInterfaceUnknown            = 0x02,
   EfiPointingDeviceInterfaceSerial             = 0x03,
@@ -1372,7 +1406,7 @@ typedef struct {
 //
 #define EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER  0x00000010
 
-typedef enum { 
+typedef enum {
   EfiBatteryDeviceChemistryTypeOther               = 0x01,
   EfiBatteryDeviceChemistryTypeUnknown             = 0x02,
   EfiBatteryDeviceChemistryTypeLeadAcid            = 0x03,
@@ -1406,7 +1440,7 @@ typedef struct {
   EFI_MISC_BATTERY_SBDS_MANUFACTURE_DATE
                                      BatterySbdsManufacturingDate;
   UINT32                             BatteryOemSpecific;
-} EFI_MISC_BATTERY_LOCATION_DATA;   
+} EFI_MISC_BATTERY_LOCATION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1430,14 +1464,14 @@ typedef struct {
   UINT16                            ResetTimerInterval;
   UINT16                            ResetTimeout;
 } EFI_MISC_RESET_CAPABILITIES;
- 
+
 typedef struct {
     EFI_MISC_RESET_CAPABILITIES   ResetCapabilities;
     UINT16                        ResetCount;
     UINT16                        ResetLimit;
     UINT16                        ResetTimerInterval;
     UINT16                        ResetTimeout;
-} EFI_MISC_RESET_CAPABILITIES_DATA;       
+} EFI_MISC_RESET_CAPABILITIES_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1451,19 +1485,19 @@ typedef enum {
   EfiHardwareSecurityStatusEnabled        = 1,
   EfiHardwareSecurityStatusNotImplemented = 2,
   EfiHardwareSecurityStatusUnknown        = 3
-} EFI_MISC_HARDWARE_SECURITY_STATUS; 
+} EFI_MISC_HARDWARE_SECURITY_STATUS;
 
 typedef struct {
-  EFI_MISC_HARDWARE_SECURITY_STATUS   FrontPanelResetStatus       :2;  
-  EFI_MISC_HARDWARE_SECURITY_STATUS   AdministratorPasswordStatus :2;  
-  EFI_MISC_HARDWARE_SECURITY_STATUS   KeyboardPasswordStatus      :2;  
-  EFI_MISC_HARDWARE_SECURITY_STATUS   PowerOnPasswordStatus       :2;  
-  EFI_MISC_HARDWARE_SECURITY_STATUS   Reserved                    :24;  
+  EFI_MISC_HARDWARE_SECURITY_STATUS   FrontPanelResetStatus       :2;
+  EFI_MISC_HARDWARE_SECURITY_STATUS   AdministratorPasswordStatus :2;
+  EFI_MISC_HARDWARE_SECURITY_STATUS   KeyboardPasswordStatus      :2;
+  EFI_MISC_HARDWARE_SECURITY_STATUS   PowerOnPasswordStatus       :2;
+  EFI_MISC_HARDWARE_SECURITY_STATUS   Reserved                    :24;
 } EFI_MISC_HARDWARE_SECURITY_SETTINGS;
 
 typedef struct {
   EFI_MISC_HARDWARE_SECURITY_SETTINGS HardwareSecuritySettings;
-} EFI_MISC_HARDWARE_SECURITY_SETTINGS_DATA;       
+} EFI_MISC_HARDWARE_SECURITY_SETTINGS_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1478,7 +1512,7 @@ typedef struct {
   UINT16             ScheduledPoweronHour;
   UINT16             ScheduledPoweronMinute;
   UINT16             ScheduledPoweronSecond;
-} EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA;  
+} EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1509,7 +1543,7 @@ typedef struct {
   EFI_EXP_BASE10_DATA             MDLowerNonrecoverableThreshold;
   EFI_EXP_BASE10_DATA             MDUpperNonrecoverableThreshold;
   UINT32                          VoltageProbeOemDefined;
-} EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA; 
+} EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1530,7 +1564,7 @@ typedef struct {
   UINT16                         CoolingDeviceUnitGroup;
   EFI_EXP_BASE10_DATA            CoolingDeviceNominalSpeed;
   UINT32                         CoolingDeviceOemDefined;
-} EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA; 
+} EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1554,7 +1588,7 @@ typedef struct {
   EFI_EXP_BASE10_DATA      TemperatureProbeResolution;
   EFI_EXP_BASE10_DATA      TemperatureProbeTolerance;
   EFI_EXP_BASE10_DATA      TemperatureProbeAccuracy;
-  EFI_EXP_BASE10_DATA      TemperatureProbeNominalValue; 
+  EFI_EXP_BASE10_DATA      TemperatureProbeNominalValue;
   EFI_EXP_BASE10_DATA      MDLowerNoncriticalThreshold;
   EFI_EXP_BASE10_DATA      MDUpperNoncriticalThreshold;
   EFI_EXP_BASE10_DATA      MDLowerCriticalThreshold;
@@ -1562,7 +1596,7 @@ typedef struct {
   EFI_EXP_BASE10_DATA      MDLowerNonrecoverableThreshold;
   EFI_EXP_BASE10_DATA      MDUpperNonrecoverableThreshold;
   UINT32                   TemperatureProbeOemDefined;
-} EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA;  
+} EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1625,7 +1659,7 @@ typedef struct {
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS       BisEntryPoint;
-} EFI_MISC_BIS_ENTRY_POINT_DATA;    
+} EFI_MISC_BIS_ENTRY_POINT_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1634,7 +1668,7 @@ typedef struct {
 //
 #define EFI_MISC_BOOT_INFORMATION_STATUS_RECORD_NUMBER  0x0000001A
 
-typedef enum {  
+typedef enum {
   EfiBootInformationStatusNoError                  = 0x00,
   EfiBootInformationStatusNoBootableMedia          = 0x01,
   EfiBootInformationStatusNormalOSFailedLoading    = 0x02,
@@ -1661,7 +1695,7 @@ typedef struct {
 //
 #define EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_RECORD_NUMBER   0x0000001B
 
-typedef enum { 
+typedef enum {
   EfiManagementDeviceTypeOther      = 0x01,
   EfiManagementDeviceTypeUnknown    = 0x02,
   EfiManagementDeviceTypeLm75       = 0x03,
@@ -1677,7 +1711,7 @@ typedef enum {
   EfiManagementDeviceTypeHt82H791   = 0x0D,
 } EFI_MISC_MANAGEMENT_DEVICE_TYPE;
 
-typedef enum { 
+typedef enum {
   EfiManagementDeviceAddressTypeOther   = 1,
   EfiManagementDeviceAddressTypeUnknown = 2,
   EfiManagementDeviceAddressTypeIOPort  = 3,
@@ -1691,7 +1725,7 @@ typedef struct {
   UINTN                            ManagementDeviceAddress;
   EFI_MISC_MANAGEMENT_DEVICE_ADDRESS_TYPE
                                    ManagementDeviceAddressType;
-} EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_DATA; 
+} EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1704,15 +1738,15 @@ typedef struct {
 typedef struct {
   STRING_REF               ManagementDeviceComponentDescription;
   EFI_INTER_LINK_DATA      ManagementDeviceLink;
-  EFI_INTER_LINK_DATA      ManagementDeviceComponentLink; 
-} EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA; 
+  EFI_INTER_LINK_DATA      ManagementDeviceComponentLink;
+} EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA;
 
 //
 //////////////////////////////////////////////////////////////////////////////
 //
 // IPMI Data Record - SMBIOS Type 38
 //
-typedef enum {  
+typedef enum {
   EfiIpmiOther = 0,
   EfiIpmiKcs   = 1,
   EfiIpmiSmic  = 2,
@@ -1733,7 +1767,7 @@ typedef struct {
   UINT64                                IpmiBaseAddress;
   EFI_DEVICE_PATH_PROTOCOL              IpmiDevicePath;
 } EFI_MISC_IPMI_INTERFACE_TYPE_DATA;
-       
+
 #define EFI_MISC_IPMI_INTERFACE_TYPE_RECORD_NUMBER  0x0000001D
 
 //
@@ -1783,9 +1817,9 @@ typedef struct {
 typedef struct {
   SMBIOS_STRUCTURE_HDR          Header;
   UINT8                         RawData[1];
-} EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA; 
+} EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA;
 
-#define EFI_MISC_SMBIOS_STRUCT_ENCAP_RECORD_NUMBER  0x0000001F 
+#define EFI_MISC_SMBIOS_STRUCT_ENCAP_RECORD_NUMBER  0x0000001F
 
 //
 // Declare the following strutures alias to use them more conviniently.
@@ -1803,6 +1837,7 @@ typedef EFI_MISC_OEM_STRING_DATA                          EFI_MISC_OEM_STRING;
 typedef EFI_MISC_SYSTEM_OPTION_STRING_DATA                EFI_MISC_SYSTEM_OPTION_STRING;
 typedef EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA     EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES;
 typedef EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA              EFI_MISC_SYSTEM_LANGUAGE_STRING;
+typedef EFI_MISC_SYSTEM_EVENT_LOG_DATA                    EFI_MISC_SYSTEM_EVENT_LOG;
 typedef EFI_MISC_BIS_ENTRY_POINT_DATA                     EFI_MISC_BIS_ENTRY_POINT;
 typedef EFI_MISC_BOOT_INFORMATION_STATUS_DATA             EFI_MISC_BOOT_INFORMATION_STATUS;
 typedef EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                 EFI_MISC_SYSTEM_POWER_SUPPLY;
@@ -1813,23 +1848,24 @@ typedef union {
   EFI_MISC_BIOS_VENDOR_DATA                          MiscBiosVendor;
   EFI_MISC_SYSTEM_MANUFACTURER_DATA                  MiscSystemManufacturer;
   EFI_MISC_BASE_BOARD_MANUFACTURER_DATA              MiscBaseBoardManufacturer;
-  EFI_MISC_CHASSIS_MANUFACTURER_DATA                 MiscChassisManufacturer;  
+  EFI_MISC_CHASSIS_MANUFACTURER_DATA                 MiscChassisManufacturer;
   EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA   MiscPortInternalConnectorDesignator;
   EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA              MiscSystemSlotDesignation;
   EFI_MISC_ONBOARD_DEVICE_DATA                       MiscOnboardDevice;
   EFI_MISC_OEM_STRING_DATA                           MiscOemString;
   EFI_MISC_SYSTEM_OPTION_STRING_DATA                 MiscOptionString;
   EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA      NumberOfInstallableLanguages;
-  EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA               MiscSystemLanguageString;  
+  EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA               MiscSystemLanguageString;
+  EFI_MISC_SYSTEM_EVENT_LOG_DATA                     MiscSystemEventLog;
   EFI_MISC_GROUP_NAME_DATA                           MiscGroupNameData;
   EFI_MISC_GROUP_ITEM_SET_DATA                       MiscGroupItemSetData;
   EFI_MISC_PORTING_DEVICE_TYPE_DATA                  MiscPortingDeviceTypeData;
   EFI_MISC_RESET_CAPABILITIES_DATA                   MiscResetCapablilitiesData;
-  EFI_MISC_HARDWARE_SECURITY_SETTINGS_DATA           MiscHardwareSecuritySettingsData;  
+  EFI_MISC_HARDWARE_SECURITY_SETTINGS_DATA           MiscHardwareSecuritySettingsData;
   EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA             MiscScheduledPowerOnMonthData;
   EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA            MiscVoltagePorbeDescriptionData;
   EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA             MiscCoolingDeviceTempLinkData;
-  EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA        MiscTemperatureProbeDescriptionData;   
+  EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA        MiscTemperatureProbeDescriptionData;
   EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION_DATA MiscElectricalCurrentProbeDescriptionData;
   EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION_DATA
                                                      MiscRemoteAccessManufacturerDescriptionData;
@@ -1840,7 +1876,7 @@ typedef union {
                                                      MiscmangementDeviceComponentDescriptionData;
   EFI_MISC_IPMI_INTERFACE_TYPE_DATA                  MiscIpmiInterfaceTypeData;
   EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                  MiscPowerSupplyInfo;
-  EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA          MiscSmbiosStructEncapsulation;  
+  EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA          MiscSmbiosStructEncapsulation;
 } EFI_MISC_SUBCLASS_RECORDS;
 
 //
