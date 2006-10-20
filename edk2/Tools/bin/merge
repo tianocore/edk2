@@ -9,7 +9,6 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-# export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/ContextTool.jar
 
 # Run Framework Wizard
-java -cp ${WORKSPACE}/Tools/bin/Merge.jar org.tianocore.Merge.Merge $@
+java -cp "${WORKSPACE}/Tools/bin/Merge.jar" org.tianocore.Merge.Merge $@
