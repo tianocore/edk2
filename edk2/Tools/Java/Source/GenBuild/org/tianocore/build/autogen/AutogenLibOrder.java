@@ -27,7 +27,7 @@ import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.common.exception.EdkException;
-
+import org.tianocore.common.logger.EdkLog;
 /**
   This class This class is to reorder library instance sequence according to
   library dependence.
@@ -97,7 +97,7 @@ public class AutogenLibOrder {
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassMap.containsKey(libClassDeclList[j])) {
-                        System.out.println(libClassDeclList[j]
+                        EdkLog.log(EdkLog.EDK_ERROR,libClassDeclList[j]
                                 + " class is already implement by "
                                 + this.libClassMap.get(libClassDeclList[j]));
                         throw new AutoGenException("Library Class: " + libClassDeclList
