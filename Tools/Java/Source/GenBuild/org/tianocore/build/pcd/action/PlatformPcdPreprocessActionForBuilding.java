@@ -139,17 +139,9 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
       @param guidCName      Guid CName string.
 
       @return String        Guid information from SPD file.
-      @throws PlatformPcdPreprocessException
-                            Fail to get Guid information from SPD file.
     **/
-    public String getGuidInfoFromSpd(String guidCName) throws PlatformPcdPreprocessException {
-        String tokenSpaceStrRet = null;
-        try {
-            tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(guidCName);
-        } catch ( Exception e ) {
-            throw new PlatformPcdPreprocessException ("Failed to get Guid CName " + guidCName + " from the SPD file!");
-        }
-        return tokenSpaceStrRet;
+    public String getGuidInfoFromSpd(String guidCName) {
+        return GlobalData.getGuidInfoFromCname(guidCName);
     }
 
     /**
