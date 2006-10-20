@@ -214,18 +214,12 @@ public class AutoGen {
                   Failed to creat AutoGen.c & AutoGen.h.
     **/
     public void genAutogen() throws EdkException {
-        try {
-            //
-            // If outputPath do not exist, create it.
-            //
-            File path = new File(outputPath);
-            path.mkdirs();
-		} catch (Exception e) {
-            throw new AutoGenException(
-                                    "Failed to create "
-                                    + outputPath + " directory");
-        }
-            
+        //
+        // If outputPath do not exist, create it.
+        //
+        File path = new File(outputPath);
+        path.mkdirs();
+        
 		//
 		// Check current is library or not, then call the corresponding
 		// function.
