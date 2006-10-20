@@ -578,12 +578,21 @@ public class FpdFileContents {
                     //
                     // change item type while not updating dynPcdData????
                     //
-                    pcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
-                    if(pcdData.getDatumType().equals("VOID*")) {
+                    if (itemType != null) {
+                        pcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
+                    }
+                    
+                    if(pcdData.getDatumType().equals("VOID*") && maxSize != null) {
                         pcdData.setMaxDatumSize(new Integer(maxSize));
                     }
-                    pcdData.setValue(value);
-                    defaultPcdValue.put(cName + " " + tsGuid, value);
+                    //
+                    // if value input is null, keep old value untouched.
+                    //
+                    if (value != null) {
+                        pcdData.setValue(value);
+                        defaultPcdValue.put(cName + " " + tsGuid, value);
+                    }
+                    
                     break;
                 }
             }

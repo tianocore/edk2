@@ -1150,6 +1150,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     String[] row = { "" };
                     sectionsTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSections(jTableFfs.getSelectedRow(), "");
+                    JOptionPane.showMessageDialog(frame, "Add Default Section Type EFI_SECTION_PE32 into the New Sections Entry.");
                 }
             });
         }
@@ -1693,9 +1694,9 @@ public class FpdBuildOptions extends IInternalFrame {
                                   jTextFieldOptionContents.getText() };
                     optionsTableModel.addRow(o);
                     docConsole.setSaved(false);
-                    ffc.genBuildOptionsOpt(stringToVector(jTextFieldBuildTargets.getText()),
+                    ffc.genBuildOptionsOpt(stringToVector(jTextFieldBuildTargets.getText().trim()),
                                            jTextFieldToolChainFamily.getText(), jTextFieldTagName.getText(),
-                                           jTextFieldToolCmd.getText(), stringToVector(s),
+                                           jTextFieldToolCmd.getText(), stringToVector(s.trim()),
                                            jTextFieldOptionContents.getText());
                 }
             });
@@ -1854,7 +1855,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private Vector<Object> stringToVector(String s) {
         String[] sArray = s.split(" ");
         Vector<Object> v = null;
-        if (s.length() > 0) {
+        if (s.length() > 0 && !s.trim().equalsIgnoreCase("")) {
             v = new Vector<Object>();
             for (int i = 0; i < sArray.length; ++i) {
                 v.add(sArray[i]);
@@ -1883,9 +1884,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (bool[5]) {
             s += "PPC ";
         }
-        if (s.equals(" ")) {
-            s += "IA32";
-        }
+        
         return s.trim();
     }
 

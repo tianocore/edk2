@@ -317,7 +317,7 @@ public class SurfaceAreaQuery {
 	 * @returns null if nothing is there
 	 */
 
-	public static PackageIdentification[] getDependencePkg(String arch, ModuleIdentification mi) throws Exception{
+	public static PackageIdentification[] getDependencePkg(String arch, ModuleIdentification mi){
 		
 		String packageGuid = null;
 		String packageVersion = null;
@@ -375,11 +375,11 @@ public class SurfaceAreaQuery {
 	 *          xpath
 	 * @returns null if nothing is there
 	 */
-	public static Vector<String> getLibraryClasses(String usage, ModuleIdentification mi) throws Exception{
+	public static Vector<LibraryClassDescriptor> getLibraryClasses(String usage, ModuleIdentification mi){
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)WorkspaceProfile.getModuleXmlObject(mi);
-        Vector<String> libraryClassName = new Vector<String>();
+        Vector<LibraryClassDescriptor> libraryClassInfo = new Vector<LibraryClassDescriptor>();
         if (msa.getLibraryClassDefinitions() == null) {
-            return libraryClassName;
+            return libraryClassInfo;
         }
         
         int size = msa.getLibraryClassDefinitions().getLibraryClassList().size();
@@ -387,11 +387,12 @@ public class SurfaceAreaQuery {
 		for (int i = 0; i < size; i++) {
             LibraryClassDocument.LibraryClass libClass = msa.getLibraryClassDefinitions().getLibraryClassList().get(i);
             if (usage.equals(libClass.getUsage().toString())) {
-                libraryClassName.add(libClass.getKeyword());
+
+                libraryClassInfo.add(new LibraryClassDescriptor(libClass.getKeyword(), libClass.getSupArchList()+"", libClass.getSupModuleList()+""));
             }
 		}
         
-		return libraryClassName;
+		return libraryClassInfo;
 	}
 
     public static XmlObject[] getSpdPcdDeclarations(PackageIdentification pi) {
@@ -408,4 +409,5 @@ public class SurfaceAreaQuery {
         return returns;
     }
 
-}	
+}
+

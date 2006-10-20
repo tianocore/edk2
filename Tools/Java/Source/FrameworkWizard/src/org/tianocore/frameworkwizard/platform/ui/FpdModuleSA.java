@@ -21,12 +21,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
+import org.tianocore.frameworkwizard.platform.ui.global.LibraryClassDescriptor;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
@@ -93,9 +95,13 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private FpdFileContents ffc = null;
     private String moduleKey = null;
     private int moduleSaNum = -1;
-    private HashMap<String, ArrayList<String>> classInstanceMap = null;
-    private ArrayList<String> classProduced = null;
-    private HashMap<String, ArrayList<String>> classConsumed = null;
+    private HashMap<LibraryClassDescriptor, ArrayList<String>> classInstanceMap = null;
+    //
+    // map of <{libName, supArch, supMod}, list of Module information>
+    //
+    private HashMap<LibraryClassDescriptor, ArrayList<String>> classConsumed = null;
+    private HashMap<LibraryClassDescriptor, ArrayList<String>> classProduced = null;
+    
     private JPanel jPanelModuleSaOpts = null;
     private JLabel jLabelFvBinding = null;
     private JTextField jTextFieldFvBinding = null;
@@ -148,10 +154,19 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         this.moduleKey = k;
         moduleSaNum = i;
         this.docConsole = dc;
+        classInstanceMap = null;
         classProduced = null;
         classConsumed = null;
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+        int tabIndex = jTabbedPane.indexOfTab("Libraries");
+        if (mi.isLibrary()) {
+            jTabbedPane.setEnabledAt(tabIndex, false);
+        }
+        else {
+            jTabbedPane.setEnabledAt(tabIndex, true);
+        }
     }
 
     /**
@@ -178,10 +193,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     public void initLibraries(String key) {
-        //
-        // display library classes that need to be resolved. also potential instances for them.
-        //
-        resolveLibraryInstances(moduleKey);
+        try {
+            //
+            // display library classes that need to be resolved. also potential instances for them.
+            //
+            resolveLibraryInstances(moduleKey);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(frame, e.getMessage());
+        }
         //
         // display lib instances already selected for key
         //
@@ -191,7 +210,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             String[][] saa = new String[instanceCount][5];
             ffc.getLibraryInstances(key, saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = WorkspaceProfile.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                ModuleIdentification mi = WorkspaceProfile.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3]
+                                                                       + " " + saa[i][4]);
                 if (mi != null) {
                     //
                     // ToDo: verify this instance first.
@@ -202,11 +222,16 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     //
                     // re-evaluate lib instance usage when adding a already-selected lib instance.
                     //
-                    resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                    try {
+                        resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(frame, e.getMessage());
+                    }
                     selectedInstancesTableModel.addRow(saa[i]);
                 }
             }
         }
+
         showClassToResolved();
     }
     
@@ -241,71 +266,165 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
     }
     
-    private void resolveLibraryInstances(String key) {
-        ModuleIdentification mi = WorkspaceProfile.getModuleId(key);
-        PackageIdentification[] depPkgList = null;
-        try{
-            //
-            // Get dependency pkg list into which we will search lib instances.
-            //
-            depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
-            //
-            // Get the lib class consumed, produced by this module itself.
-            //
-            Vector<String> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
-            
-            if (this.classConsumed == null) {
-                this.classConsumed = new HashMap<String, ArrayList<String>>();
-            }
-            
-            for(int i = 0; i < vClassConsumed.size(); ++i){
-                ArrayList<String> consumedBy = this.classConsumed.get(vClassConsumed.get(i));
-                if (consumedBy == null) {
-                    consumedBy = new ArrayList<String>();
-                }
-                consumedBy.add(key);
-                this.classConsumed.put(vClassConsumed.get(i), consumedBy);
-            }
-            
-            Vector<String> vClassProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
-            if (this.classProduced == null) {
-                this.classProduced = new ArrayList<String>();
-            }
-            for(int i = 0; i < vClassProduced.size(); ++i){
-                if (!this.classProduced.contains(vClassProduced.get(i))){
-                    this.classProduced.add(vClassProduced.get(i));
-                }
-            }
-            
-            //
-            // find potential instances in all pkgs for classes still in classConsumed.
-            //
-            if (classInstanceMap == null){
-                classInstanceMap = new HashMap<String, ArrayList<String>>();
-            }
-            Iterator<String> lic = this.classConsumed.keySet().iterator();
-            while(lic.hasNext()){
-                String cls = lic.next();
-                if (this.classProduced.contains(cls) || classInstanceMap.containsKey(cls)) {
-                    continue;
-                }
-                ArrayList<String> instances = getInstancesForClass(cls, depPkgList);
-                if (instances.size() == 0){
-                    JOptionPane.showMessageDialog(frame, "No Applicable Instance for Library Class " + 
-                                                  cls + ", Platform Build will Fail.");
-                }
-                classInstanceMap.put(cls, instances);
-                
-            }
-            
-//            showClassToResolved();
+    private void filterClassConsumedByArch (Vector<LibraryClassDescriptor> v) {
+        String[] moduleInfo = moduleKey.split(" ");
+        Vector<String> vModuleArchs = new Vector<String>();
+        //
+        // Skip guid, version information, get archs to check.
+        //
+        for (int i = 4; i < moduleInfo.length; ++i) {
+            vModuleArchs.add(moduleInfo[i]);
         }
-        catch(Exception e) {
-            e.printStackTrace();
+        //
+        // if module will be built on all platforms, no filter needed for lib classes.
+        //
+        if (vModuleArchs.size() == 0) {
+            return;
+        }
+        
+        for (int j = 0; j < v.size(); ++j) {
+            LibraryClassDescriptor libInfo = v.get(j);
+
+            Vector<String> vSupArchs = libInfo.getVectorFromString(libInfo.supArchs);
+            
+            if (vSupArchs.size() == 0 || (vSupArchs.size() == 1 && vSupArchs.get(0).equalsIgnoreCase(""))) {
+                //
+                // update lib info to module archs only.
+                //
+                libInfo.supArchs = "";
+                for (int i = 0; i < vModuleArchs.size(); ++i) {
+                    libInfo.supArchs += vModuleArchs.get(i);
+                    libInfo.supArchs += " ";
+                }
+                libInfo.supArchs.trim();
+                continue;
+            }
+            //
+            // only retain those lib class used by module archs.
+            //
+            vSupArchs.retainAll(vModuleArchs);
+            if (vSupArchs.size() > 0) {
+                //
+                // update lib info to reflect which kind of arch need to select instance.
+                //
+                libInfo.supArchs = "";
+                for (int i = 0; i < vSupArchs.size(); ++i) {
+                    libInfo.supArchs += vSupArchs.get(i);
+                    libInfo.supArchs += " ";
+                }
+                libInfo.supArchs.trim();
+                continue;
+            }
+            //
+            // remove this lib definition if it supports no archs module will be built under.
+            //
+            v.iterator().remove();
         }
     }
     
-    private ArrayList<String> getInstancesForClass(String cls, PackageIdentification[] depPkgList) throws Exception{
+    private void resolveLibraryInstances(String key) throws MultipleInstanceException, NoInstanceException{
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(key);
+        PackageIdentification[] depPkgList = null;
+        
+        //
+        // Get dependency pkg list into which we will search lib instances.
+        //
+        depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
+        //
+        // Get the lib class consumed, produced by this module itself.
+        //
+        Vector<LibraryClassDescriptor> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
+        filterClassConsumedByArch(vClassConsumed);
+        if (this.classConsumed == null) {
+            this.classConsumed = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
+        }
+
+        for (int i = 0; i < vClassConsumed.size(); ++i) {
+            ArrayList<String> consumedBy = this.classConsumed.get(vClassConsumed.get(i));
+            if (consumedBy == null) {
+                consumedBy = new ArrayList<String>();
+            }
+            consumedBy.add(key);
+            this.classConsumed.put(vClassConsumed.get(i), consumedBy);
+        }
+
+        Vector<LibraryClassDescriptor> vClassProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
+        if (this.classProduced == null) {
+            this.classProduced = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
+        }
+        for (int i = 0; i < vClassProduced.size(); ++i) {
+            ArrayList<String> producedBy = this.classProduced.get(vClassProduced.get(i));
+            if (producedBy == null) {
+                producedBy = new ArrayList<String>();
+            }
+            //
+            // class already produced by previous module (lib instance).
+            /*
+            if (producedBy.size() == 1) {
+                String instanceKey = producedBy.get(0);
+                ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceKey);
+                throw new MultipleInstanceException (vClassProduced.get(i).className, libMi.getName(), mi.getName());
+            }
+            Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
+            while (lcdi.hasNext()) {
+                LibraryClassDescriptor lcd = lcdi.next();
+                if (vClassProduced.get(i).hasInterSectionWith(lcd)) {
+                    ArrayList<String> alreadyProducedBy = this.classProduced.get(lcd);
+                    String instanceKey = alreadyProducedBy.get(0);
+                    ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceKey);
+                    throw new MultipleInstanceException (vClassProduced.get(i).className, libMi.getName(), mi.getName());
+                }
+            }
+            */
+            // normal case.
+            //
+            producedBy.add(key);
+            this.classProduced.put(vClassProduced.get(i), producedBy);
+            
+        }
+
+        //
+        // find potential instances in all pkgs for classes still in classConsumed.
+        //
+        if (classInstanceMap == null) {
+            classInstanceMap = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
+        }
+        Iterator<LibraryClassDescriptor> lic = this.classConsumed.keySet().iterator();
+        while (lic.hasNext()) {
+            LibraryClassDescriptor cls = lic.next();
+            if (isBoundedClass(cls)) {
+                continue;
+            }
+            ArrayList<String> instances = getInstancesForClass(cls, depPkgList);
+            if (instances.size() == 0) {
+                throw new NoInstanceException (cls.className);
+            }
+            classInstanceMap.put(cls, instances);
+
+        }
+//            showClassToResolved();
+    }
+
+    /**Search classProduced map to see if this class has been produced by some instance (module).
+     * @param cls
+     * @return
+     */
+    private boolean isBoundedClass (LibraryClassDescriptor cls) {
+        if (this.classProduced.containsKey(cls)) {
+            return true;
+        }
+        Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
+        while (lcdi.hasNext()) {
+            LibraryClassDescriptor lcd = lcdi.next();
+            if (cls.isSubSetByArchs(lcd) && cls.isSubSetByModTypes(lcd)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private ArrayList<String> getInstancesForClass(LibraryClassDescriptor cls, PackageIdentification[] depPkgList){
         ArrayList<String> al = new ArrayList<String>();
         
 //        for (int i = 0; i < depPkgList.length; ++i) {
@@ -315,17 +434,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
 //                if (!mi.getPackageId().getGuid().equalsIgnoreCase(depPkgList[i].getGuid())) {
 //                    continue;
 //                }
-                String[] clsProduced = getClassProduced(mi);
+                Vector<LibraryClassDescriptor> clsProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
                 
                 boolean isPotential = false;
-                for (int j = 0; j < clsProduced.length; ++j) {
-                    if (clsProduced[j] == null) {
-                        continue;
-                    }
-                    if (clsProduced[j].equals(cls)){
+                Iterator<LibraryClassDescriptor> lcdi = clsProduced.iterator();
+                while (lcdi.hasNext()) {
+                    LibraryClassDescriptor lcd = lcdi.next();
+                    if (cls.isSubSetByArchs(lcd) && cls.isSubSetByModTypes(lcd)){
                         isPotential = true;
                     }
-                    if (classProduced.contains(clsProduced[j])) {
+                    
+                    if (hasBeenProduced(lcd)) {
                         isPotential = false;
                         break;
                     }
@@ -340,6 +459,28 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         return al;
     }
     
+    private boolean hasBeenProduced (LibraryClassDescriptor cls) {
+        Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
+        while (lcdi.hasNext()) {
+            LibraryClassDescriptor lcd = lcdi.next();
+            if (cls.hasInterSectionWith(lcd)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private ArrayList<String> getConsumedBy (String className) {
+        Iterator<LibraryClassDescriptor> lcdi = this.classConsumed.keySet().iterator();
+        while (lcdi.hasNext()) {
+            LibraryClassDescriptor lcd = lcdi.next();
+            if (lcd.className.equals(className)) {
+                return this.classConsumed.get(lcd);
+            }
+        }
+        return null;
+    }
+    
     private void removeInstance(String key) {
         ModuleIdentification mi = WorkspaceProfile.getModuleId(key); 
         //
@@ -349,82 +490,65 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // remove class produced by this instance and add back these produced class to be bound.
         //
-        String[] clsProduced = getClassProduced(mi);
-        for (int i = 0; i < clsProduced.length; ++i) {
+        Vector<LibraryClassDescriptor> clsProduced = getClassProduced(mi);
+        for (int i = 0; i < clsProduced.size(); ++i) {
             
-            classProduced.remove(clsProduced[i]);
+            classProduced.remove(clsProduced.get(i));
         }
         //
         // remove class consumed by this instance. we do not need to bound it now.
         //
         String[] clsConsumed = getClassConsumed(mi);
         for (int i = 0; i < clsConsumed.length; ++i) {
-            ArrayList<String> al = classConsumed.get(clsConsumed[i]);
+            ArrayList<String> al = getConsumedBy (clsConsumed[i]);
             
             if (al == null ) {
-                classConsumed.remove(clsConsumed[i]);
                 continue;
             }
             al.remove(key);
-            if (al.size() == 0) {
-                classConsumed.remove(clsConsumed[i]);
-            }
-           
+            
         }
-
+        
         showClassToResolved();
         
     }
     
     
-    private String[] getClassProduced(ModuleIdentification mi){
+    private Vector<LibraryClassDescriptor> getClassProduced(ModuleIdentification mi){
         
-        try{
-            Vector<String> clsProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
-            String[] sClassProduced = new String[clsProduced.size()];
-            for (int i = 0; i < clsProduced.size(); ++i) {
-                sClassProduced[i] = clsProduced.get(i);
-            }
-            return sClassProduced;
-            
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new String[0];
-        
+        Vector<LibraryClassDescriptor> clsProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
+        return clsProduced;
+//        String[] sClassProduced = new String[clsProduced.size()];
+//        for (int i = 0; i < clsProduced.size(); ++i) {
+//            sClassProduced[i] = clsProduced.get(i).className;
+//        }
+//        return sClassProduced;
     }
     
     private String[] getClassConsumed(ModuleIdentification mi){
         
-        try{
-            Vector<String> clsConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
-            String[] sClassConsumed = new String[clsConsumed.size()];
-            for (int i = 0; i < clsConsumed.size(); ++i) {
-                sClassConsumed[i] = clsConsumed.get(i);
-            }
-            return sClassConsumed;
-        }catch (Exception e) {
-            e.printStackTrace();
+        Vector<LibraryClassDescriptor> clsConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
+        String[] sClassConsumed = new String[clsConsumed.size()];
+        for (int i = 0; i < clsConsumed.size(); ++i) {
+            sClassConsumed[i] = clsConsumed.get(i).className;
         }
-        return new String[0];
+        return sClassConsumed;
     }
     
     private void showClassToResolved(){
         libClassTableModel.setRowCount(0);
-        if (classConsumed.size() == 0) {
+        if (classConsumed == null || classConsumed.size() == 0) {
             return;
         }
-        Iterator<String> li = classConsumed.keySet().iterator();
+        Iterator<LibraryClassDescriptor> li = classConsumed.keySet().iterator();
         while(li.hasNext()){
+            LibraryClassDescriptor lcd = li.next();
+            String[] s = {lcd.className, lcd.supArchs, lcd.supModTypes};
+            if (classConsumed.get(lcd) == null || classConsumed.get(lcd).size() == 0) {
+                continue;
+            }
             
-            String[] s = {li.next()};
-//            if (classConsumed.get(s[0]) == null) {
-//                continue;
-//            }
-//            if (classConsumed.get(s[0]).size() == 0) {
-//                continue;
-//            }
-            if (!classProduced.contains(s[0])){
+            if (!isBoundedClass(lcd)){
                 libClassTableModel.addRow(s);
             }
         }
@@ -850,10 +974,18 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTableLibClass == null) {
             libClassTableModel = new IDefaultTableModel();
             libClassTableModel.addColumn("LibraryClass");
+            libClassTableModel.addColumn("Arch");
+            libClassTableModel.addColumn("ModType");
             jTableLibClass = new JTable(libClassTableModel);
             jTableLibClass.setRowHeight(20);
             jTableLibClass.setShowGrid(false);
             jTableLibClass.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            TableColumn column = jTableLibClass.getColumnModel().getColumn(1);
+            jTableLibClass.getColumnModel().removeColumn(column);
+            column = jTableLibClass.getColumnModel().getColumn(1);
+            jTableLibClass.getColumnModel().removeColumn(column);
+            
             jTableLibClass.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()){
@@ -873,7 +1005,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         //
                         libInstanceTableModel.setRowCount(0);
                         String cls = libClassTableModel.getValueAt(selectedRow2, 0).toString();
-                        ArrayList<String> al = classInstanceMap.get(cls);
+                        String arch = libClassTableModel.getValueAt(selectedRow2, 1).toString();
+                        String modType = libClassTableModel.getValueAt(selectedRow2, 2).toString();
+                        ArrayList<String> al = classInstanceMap.get(new LibraryClassDescriptor(cls, arch, modType));
+                        if (al == null) {
+                            return;
+                        }
                         ListIterator<String> li = al.listIterator();
                         while(li.hasNext()) {
                             String instance = li.next();
@@ -1029,7 +1166,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                                   libInstanceTableModel.getValueAt(row, 2), libInstanceTableModel.getValueAt(row, 3),
                                   libInstanceTableModel.getValueAt(row, 4)};
                     selectedInstancesTableModel.addRow(s);
-                    resolveLibraryInstances(instanceValue);
+                    try {
+                        resolveLibraryInstances(instanceValue);
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                    }
                     showClassToResolved();
                 }
             });
@@ -1076,7 +1218,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
             jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonOk.setText("Ok");
+            jButtonOk.setText("Close");
             jButtonOk.addActionListener(this);
         }
         return jButtonOk;
@@ -1351,7 +1493,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     String[] row = {"", "", "", "", "", ""};
                     optionsTableModel.addRow(row);
-                    Vector<Object> v = new Vector<Object>();
+                    Vector<Object> v = null;
                     Vector<Object> v1 = null;
                     docConsole.setSaved(false);
                     ffc.genModuleSAOptionsOpt(moduleKey, v, "", "", "", v1, "");
@@ -1526,6 +1668,7 @@ private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
     for (int i = 0; i < al.size(); ++i) {
         String mKey = moduleInfo (al.get(i));
+        value = null;
         ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", maxSize, value);
         String itemType = jComboBoxItemType.getSelectedItem()+"";
         al.set(i, mKey + " " + itemType);
@@ -1709,3 +1852,51 @@ private JPanel getJPanelLibraryCenterC() {
 
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
+
+class MultipleInstanceException extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -9148463005930920297L;
+    private String className = null;
+    private String libInstance1 = null;
+    private String libInstance2 = null;
+    
+    MultipleInstanceException (String libClass, String instance1, String instance2) {
+        super();
+        className = libClass;
+        libInstance1 = instance1;
+        libInstance2 = instance2;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Throwable#getMessage()
+     */
+    @Override
+    public String getMessage() {
+        // TODO Auto-generated method stub
+        return "Library Class " + className + "is Produced by Two Instances: " 
+            + libInstance1 + " and " + libInstance2 + ". Platform Build will Fail.";
+    }
+    
+}
+
+class NoInstanceException extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1987122786598970598L;
+    
+    private String className = null;
+    
+    NoInstanceException (String libClass) {
+        className = libClass;
+    }
+    
+    public String getMessage() {
+        return "No Applicable Instance for Library Class " + className
+            + ", Platform Build will Fail.";
+    }
+}
