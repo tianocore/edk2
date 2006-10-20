@@ -29,7 +29,7 @@ if not exist %WORKSPACE%\Tools\bin\Merge.jar (
 )
 
 @REM Run Merge
-call "java" -cp %CLASSPATH%;%WORKSPACE%\Tools\bin\Merge.jar org.tianocore.Merge.Merge %*
+call "java" -cp "%CLASSPATH%;%WORKSPACE%\Tools\bin\Merge.jar" org.tianocore.Merge.Merge %*
 
 goto end
 
