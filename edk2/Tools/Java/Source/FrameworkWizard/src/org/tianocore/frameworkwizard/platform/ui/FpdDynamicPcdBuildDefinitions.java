@@ -18,12 +18,12 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import javax.swing.JCheckBox;
-import java.awt.FlowLayout;
 import javax.swing.JRadioButton;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
 
@@ -62,6 +62,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private ButtonGroup bg = new ButtonGroup();
     private JLabel jLabelPadd = null;
     private JLabel jLabelPad1 = null;
+    private JScrollPane jScrollPane = null;
     /**
      * This is the default constructor
      */
@@ -120,7 +121,6 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jContentPane.setLayout(new BorderLayout());
             jContentPane.add(getJScrollPaneDynPcd(), java.awt.BorderLayout.NORTH);
             jContentPane.add(getJPanelSkuInfo(), java.awt.BorderLayout.CENTER);
-            jContentPane.add(getJPanelDynPcdValue(), java.awt.BorderLayout.SOUTH);
         }
         return jContentPane;
     }
@@ -133,7 +133,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private JScrollPane getJScrollPaneDynPcd() {
         if (jScrollPaneDynPcd == null) {
             jScrollPaneDynPcd = new JScrollPane();
-            jScrollPaneDynPcd.setPreferredSize(new java.awt.Dimension(100,300));
+            jScrollPaneDynPcd.setPreferredSize(new java.awt.Dimension(100,250));
             jScrollPaneDynPcd.setViewportView(getJTableDynPcd());
         }
         return jScrollPaneDynPcd;
@@ -269,15 +269,17 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
      */
     private JPanel getJPanelSkuInfo() {
         if (jPanelSkuInfo == null) {
-            FlowLayout flowLayout = new FlowLayout();
-            flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
             jPanelSkuInfo = new JPanel();
+            jPanelSkuInfo.setLayout(new BorderLayout());
             jPanelSkuInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-            jPanelSkuInfo.setLayout(flowLayout);
-            jPanelSkuInfo.setPreferredSize(new java.awt.Dimension(600,100));
-            jPanelSkuInfo.add(getJCheckBoxSkuEnable(), null);
-            jPanelSkuInfo.add(getJScrollPaneSkuInfo(), null);
-            jPanelSkuInfo.add(getJButtonSkuInfoUpdate(), null);
+            jPanelSkuInfo.setPreferredSize(new java.awt.Dimension(600,120));
+
+//            jPanelSkuInfo.add(getJPanelSkuInfoN(), java.awt.BorderLayout.NORTH);
+            jPanelSkuInfo.add(getJScrollPane(), java.awt.BorderLayout.NORTH);
+            jPanelSkuInfo.add(getJScrollPaneSkuInfo(), java.awt.BorderLayout.CENTER);
+            
+            
+//            jPanelSkuInfo.add(getJPanelDynPcdValue(), java.awt.BorderLayout.SOUTH);
         }
         return jPanelSkuInfo;
     }
@@ -313,8 +315,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             GridLayout gridLayout = new GridLayout();
             gridLayout.setColumns(5);
             gridLayout.setRows(4);
-            gridLayout.setHgap(5);
-            gridLayout.setVgap(5);
+            gridLayout.setHgap(20);
+            gridLayout.setVgap(20);
             
             jLabelVpdOffset = new JLabel();
             jLabelVpdOffset.setPreferredSize(new java.awt.Dimension(80,20));
@@ -336,8 +338,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jLabelVarName.setPreferredSize(new java.awt.Dimension(90,20));
             jPanelDynPcdValue = new JPanel();
             jPanelDynPcdValue.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+            jPanelDynPcdValue.setPreferredSize(new java.awt.Dimension(1000,150));
             jPanelDynPcdValue.setLayout(gridLayout);
-            jPanelDynPcdValue.setPreferredSize(new java.awt.Dimension(600,120));
             jPanelDynPcdValue.add(getJRadioButtonHii(), null);
             jPanelDynPcdValue.add(jLabelVarName, null);
             jPanelDynPcdValue.add(getJTextFieldVarName(), null);
@@ -362,6 +364,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
 			jPanelDynPcdValue.add(jLabelPad1, null);
 			jPanelDynPcdValue.add(getJRadioButtonDefaultValue(), null);
 			jPanelDynPcdValue.add(getJTextFieldDefaultValue(), null);
+            jPanelDynPcdValue.add(getJCheckBoxSkuEnable(), null);
+            jPanelDynPcdValue.add(getJButtonSkuInfoUpdate(), null);
             bg.add(jRadioButtonHii);
             bg.add(jRadioButtonVpd);
         }			
@@ -424,7 +428,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private JScrollPane getJScrollPaneSkuInfo() {
         if (jScrollPaneSkuInfo == null) {
             jScrollPaneSkuInfo = new JScrollPane();
-            jScrollPaneSkuInfo.setPreferredSize(new java.awt.Dimension(300,80));
+            jScrollPaneSkuInfo.setPreferredSize(new java.awt.Dimension(300,50));
             jScrollPaneSkuInfo.setViewportView(getJTableSkuInfo());
         }
         return jScrollPaneSkuInfo;
@@ -498,6 +502,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     
     private void updateSkuInfo (int pcdSelected) {
         int skuCount = ffc.getDynamicPcdSkuInfoCount(pcdSelected);
+        String cName = modelPcd.getValueAt(pcdSelected, 0)+"";
+        String tsGuid = modelPcd.getValueAt(pcdSelected, 2)+"";
         
         String varName = null;
         String varGuid = null;
@@ -549,12 +555,27 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 ffc.removeDynamicPcdBuildDataSkuInfo(pcdSelected);
                 if (jRadioButtonHii.isSelected()) {
                     ffc.genDynamicPcdBuildDataSkuInfo("0", varName, varGuid, varOffset, hiiDefault, null, null, pcdSelected);
+                    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    for (int i = 0; i < al.size(); ++i) {
+                        String mKey = moduleInfo (al.get(i));
+                        ffc.updatePcdData(mKey, cName, tsGuid, null, null, hiiDefault);
+                    }
                 }
                 else if (jRadioButtonVpd.isSelected()){
                     ffc.genDynamicPcdBuildDataSkuInfo("0", null, null, null, null, vpdOffset, null, pcdSelected);
+                    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    for (int i = 0; i < al.size(); ++i) {
+                        String mKey = moduleInfo (al.get(i));
+                        ffc.updatePcdData(mKey, cName, tsGuid, null, null, vpdOffset);
+                    }
                 }
                 else{
                     ffc.genDynamicPcdBuildDataSkuInfo("0", null, null, null, null, null, value, pcdSelected);
+                    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    for (int i = 0; i < al.size(); ++i) {
+                        String mKey = moduleInfo (al.get(i));
+                        ffc.updatePcdData(mKey, cName, tsGuid, null, null, value);
+                    }
                 }
             }
         }
@@ -576,6 +597,11 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 ffc.updateDynamicPcdBuildDataSkuInfo(jTableSkuInfo.getValueAt(row, 0)+"", varName, varGuid, varOffset, hiiDefault, vpdOffset, value, pcdSelected);
             }
         }
+    }
+    
+    private String moduleInfo (String pcdInfo) {
+        
+        return pcdInfo.substring(0, pcdInfo.lastIndexOf(" "));
     }
     /**
      * This method initializes jTextField	
@@ -679,6 +705,20 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             bg.add(jRadioButtonDefaultValue);
         }
         return jRadioButtonDefaultValue;
+    }
+
+    /**
+     * This method initializes jScrollPane	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane() {
+        if (jScrollPane == null) {
+            jScrollPane = new JScrollPane();
+            jScrollPane.setPreferredSize(new java.awt.Dimension(1003,180));
+            jScrollPane.setViewportView(getJPanelDynPcdValue());
+        }
+        return jScrollPane;
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"

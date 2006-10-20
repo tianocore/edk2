@@ -463,6 +463,7 @@ public class FpdHeader extends IInternalFrame {
         if (jCopyrightTextArea == null) {
             jCopyrightTextArea = new JTextArea();
             jCopyrightTextArea.setWrapStyleWord(true);
+            jCopyrightTextArea.setLineWrap(true);
             jCopyrightTextArea.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isCopyright(jCopyrightTextArea.getText())) {
