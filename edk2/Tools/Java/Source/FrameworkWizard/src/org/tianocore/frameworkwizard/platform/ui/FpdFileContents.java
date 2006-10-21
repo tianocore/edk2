@@ -1991,7 +1991,16 @@ public class FpdFileContents {
     }
     
     public void removeModuleInBuildOptionsUserExtensions (String fvName, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
-        if (getUserExtsIncModCount(fvName) > 0) {
+        //
+        // if there is only one module before remove operation, the whole user extension should be removed.
+        //
+        int moduleAmount = getUserExtsIncModCount(fvName);
+        if (moduleAmount == 1) {
+            removeBuildOptionsUserExtensions(fvName);
+            return;
+        }
+        
+        if (moduleAmount > 1) {
             
             XmlCursor cursor = getfpdBuildOpts().newCursor();
             QName elementUserExts = new QName (xmlNs, "UserExtensions");
