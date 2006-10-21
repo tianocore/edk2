@@ -1282,6 +1282,19 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
         return jPanelModuleSaOpts;
     }
+    
+    private Vector<String> getVectorFromString (String s) {
+        if (s == null || s.equals("null")) {
+            s = "";
+        }
+        String[] sa1 = s.split(" ");
+        Vector<String> v = new Vector<String>();
+        for (int i = 0; i < sa1.length; ++i) {
+            v.add(sa1[i]);
+        }
+        return v;
+    }
+    
     /**
      * This method initializes jTextField	
      * 	
@@ -1303,11 +1316,24 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         return;
                     }
                     
-                    ffc.setFvBinding(moduleKey, newFvBinding);
+                    Vector<String> oldFvList = getVectorFromString (originalFvBinding);
+                    Vector<String> newFvList = getVectorFromString (newFvBinding);
                     String moduleInfo[] = moduleKey.split(" ");
-                    String fvNames[] = newFvBinding.split(" ");
-                    for (int i = 0; i < fvNames.length; ++i) {
-                        ffc.addModuleIntoBuildOptionsUserExtensions(fvNames[i], moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);
+                    ffc.setFvBinding(moduleKey, newFvBinding);
+                    //
+                    // remove module from Fvs that not in newFvList now.
+                    //
+                    oldFvList.removeAll(newFvList);
+                    for (int j = 0; j < oldFvList.size(); ++j) {
+                        ffc.removeModuleInBuildOptionsUserExtensions(oldFvList.get(j), moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);    
+                    }
+                    //
+                    // add module to Fvs that were not in oldFvList.
+                    //
+                    oldFvList = getVectorFromString (originalFvBinding);
+                    newFvList.removeAll(oldFvList);
+                    for (int i = 0; i < newFvList.size(); ++i) {
+                        ffc.addModuleIntoBuildOptionsUserExtensions(newFvList.get(i), moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);
                     }
                     docConsole.setSaved(false);
                 }
