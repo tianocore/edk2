@@ -2162,7 +2162,7 @@ AtaUdmaReadExt (
   UINT32                     Count;
   UINTN                      PageCount;
   VOID                       *Map;
-  EFI_PHYSICAL_ADDRESS       MemPage;
+  VOID                       *MemPage;
   EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
@@ -2217,14 +2217,15 @@ AtaUdmaReadExt (
     //
     // Build PRD table
     //
-    MemPage = 0xFFFFFFFF;
     PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiBootServicesData,
-                    PageCount,
-                    &MemPage
-                    );
+    Status = IdeDev->PciIo->AllocateBuffer (
+                       IdeDev->PciIo,
+                       AllocateAnyPages,
+                       EfiBootServicesData,
+                       PageCount,
+                       &MemPage,
+                       0
+                       );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2257,7 +2258,7 @@ AtaUdmaReadExt (
                        &Map
                        );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
     }
     PrdBuffer   = (VOID *) ((UINTN) DeviceAddress);
@@ -2351,7 +2352,7 @@ AtaUdmaReadExt (
                StartLba
                );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
@@ -2420,7 +2421,7 @@ AtaUdmaReadExt (
                               1,
                               &RegisterValue
                               );
-          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
           IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
@@ -2431,7 +2432,7 @@ AtaUdmaReadExt (
       Count --;
     }
 
-    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
     IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
     // Read Status Register of IDE device to clear interrupt
@@ -2526,7 +2527,7 @@ AtaUdmaRead (
   UINT32                     Count;
   UINTN                      PageCount;
   VOID                       *Map;
-  EFI_PHYSICAL_ADDRESS       MemPage;
+  VOID                       *MemPage;
   EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
@@ -2581,14 +2582,15 @@ AtaUdmaRead (
     //
     // Build PRD table
     //
-    MemPage = 0xFFFFFFFF;
     PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiBootServicesData,
-                    PageCount,
-                    &MemPage
-                    );
+    Status = IdeDev->PciIo->AllocateBuffer (
+                       IdeDev->PciIo,
+                       AllocateAnyPages,
+                       EfiBootServicesData,
+                       PageCount,
+                       &MemPage,
+                       0
+                       );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2620,7 +2622,7 @@ AtaUdmaRead (
                        &Map
                        );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
     }
     PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
@@ -2714,7 +2716,7 @@ AtaUdmaRead (
                StartLba
                );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
@@ -2783,7 +2785,7 @@ AtaUdmaRead (
                               1,
                               &RegisterValue
                               );
-          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
           IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
@@ -2794,7 +2796,7 @@ AtaUdmaRead (
       Count --;
     }
 
-    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
     IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
     // Read Status Register of IDE device to clear interrupt
@@ -2889,7 +2891,7 @@ AtaUdmaWriteExt (
   UINT32                     Count;
   UINTN                      PageCount;
   VOID                       *Map;
-  EFI_PHYSICAL_ADDRESS       MemPage;
+  VOID                       *MemPage;
   EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
@@ -2944,14 +2946,15 @@ AtaUdmaWriteExt (
     //
     // Build PRD table
     //
-    MemPage = 0xFFFFFFFF;
     PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiBootServicesData,
-                    PageCount,
-                    &MemPage
-                    );
+    Status = IdeDev->PciIo->AllocateBuffer (
+                       IdeDev->PciIo,
+                       AllocateAnyPages,
+                       EfiBootServicesData,
+                       PageCount,
+                       &MemPage,
+                       0
+                       );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2983,7 +2986,7 @@ AtaUdmaWriteExt (
                        &Map
                        );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
     }
     PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
@@ -3079,7 +3082,7 @@ AtaUdmaWriteExt (
                StartLba
                );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
@@ -3148,7 +3151,7 @@ AtaUdmaWriteExt (
                               1,
                               &RegisterValue
                               );
-          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
           IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
@@ -3159,7 +3162,7 @@ AtaUdmaWriteExt (
       Count --;
     }
 
-    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
     IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
     // Read Status Register of IDE device to clear interrupt
@@ -3254,7 +3257,7 @@ AtaUdmaWrite (
   UINT32                     Count;
   UINTN                      PageCount;
   VOID                       *Map;
-  EFI_PHYSICAL_ADDRESS       MemPage;
+  VOID                       *MemPage;
   EFI_PHYSICAL_ADDRESS       DeviceAddress;
 
   //
@@ -3309,14 +3312,15 @@ AtaUdmaWrite (
     //
     // Build PRD table
     //
-    MemPage = 0xFFFFFFFF;
     PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiBootServicesData,
-                    PageCount,
-                    &MemPage
-                    );
+    Status = IdeDev->PciIo->AllocateBuffer (
+                       IdeDev->PciIo,
+                       AllocateAnyPages,
+                       EfiBootServicesData,
+                       PageCount,
+                       &MemPage,
+                       0
+                       );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -3349,7 +3353,7 @@ AtaUdmaWrite (
                        &Map
                        );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
     }
     PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
@@ -3445,7 +3449,7 @@ AtaUdmaWrite (
                StartLba
                );
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemPage, PageCount);
+      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
       return EFI_DEVICE_ERROR;
     }
@@ -3514,7 +3518,7 @@ AtaUdmaWrite (
                               1,
                               &RegisterValue
                               );
-          gBS->FreePages (MemPage, PageCount);
+          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
           IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
           return EFI_DEVICE_ERROR;
         }
@@ -3525,7 +3529,7 @@ AtaUdmaWrite (
       Count --;
     }
 
-    gBS->FreePages (MemPage, PageCount);
+    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
     IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
 
     //
