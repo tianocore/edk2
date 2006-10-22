@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -425,6 +425,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IPF">Ipf/CpuFlushTlb.s</Filename>
     <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
     <Filename SupArchList="IPF">Ipf/Non-existing.c</Filename>
+    <Filename SupArchList="IPF">Ipf/InvalidateInstructionCacheRange.s</Filename>
+    <Filename SupArchList="IPF">Ipf/ReadItc.s</Filename>
     
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>

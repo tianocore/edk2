@@ -19,21 +19,6 @@
 #pragma intrinsic (__break)
 #pragma intrinsic (__mfa)
 
-typedef struct {
-  UINT64                            Status;
-  UINT64                            r9;
-  UINT64                            r10;
-  UINT64                            r11;
-} PAL_PROC_RETURN;
-
-PAL_PROC_RETURN
-PalCallStatic (
-  IN      CONST VOID                *PalEntryPoint,
-  IN      UINT64                    Arg1,
-  IN      UINT64                    Arg2,
-  IN      UINT64                    Arg3,
-  IN      UINT64                    Arg4
-  );
 
 /**
   Generates a breakpoint on the CPU.
