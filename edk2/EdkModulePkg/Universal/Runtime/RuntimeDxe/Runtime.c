@@ -468,7 +468,7 @@ RuntimeDriverSetVirtualAddressMap (
         RuntimeImage->RelocationData
         );
       
-      FlushCpuCache (RuntimeImage->ImageBase, (UINT64)RuntimeImage->ImageSize);
+      InvalidateInstructionCacheRange ((VOID *)(UINTN)RuntimeImage->ImageBase, (UINTN)RuntimeImage->ImageSize);
     }
   }
   //

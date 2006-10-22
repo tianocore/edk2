@@ -1038,6 +1038,7 @@
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B601F8C4-43B7-4784-95B1-F4226CB40CEE">
       <Libraries>
+        <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -6201,6 +6202,7 @@
     </ModuleSA>
     <ModuleSA SupArchList="X64" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B601F8C4-43B7-4784-95B1-F4226CB40CEE">
       <Libraries>
+        <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -10223,6 +10225,7 @@
     </ModuleSA>
     <ModuleSA SupArchList="IPF" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B601F8C4-43B7-4784-95B1-F4226CB40CEE">
       <Libraries>
+        <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

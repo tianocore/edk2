@@ -49,17 +49,15 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CacheMaintenanceLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Runtime.dxs</Filename>
     <Filename>Runtime.c</Filename>
     <Filename>Runtime.h</Filename>
     <Filename>Crc32.c</Filename>
-    <Filename SupArchList="IA32">Ia32/PeHotRelocateEx.c</Filename>
-    <Filename SupArchList="X64">x64/PeHotRelocateEx.c</Filename>
-    <Filename SupArchList="X64">x64/PeHotRelocateEx.h</Filename>
-    <Filename SupArchList="IPF">Ipf/PeHotRelocateEx.c</Filename>
-    <Filename SupArchList="IPF">Ipf/PeHotRelocateEx.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

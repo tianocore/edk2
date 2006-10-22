@@ -62,7 +62,7 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
-  return IpfInvalidateInstructionCacheRange (Address, Length);
+  return IpfFlushCacheRange (Address, Length);
 }
 
 /**
@@ -119,10 +119,7 @@ WriteBackInvalidateDataCacheRange (
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
 
-  if (Length > 0) {
-    WriteBackInvalidateDataCache ();
-  }
-  return Address;
+  return IpfFlushCacheRange (Address, Length);
 }
 
 /**
@@ -178,10 +175,7 @@ WriteBackDataCacheRange (
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
 
-  if (Length > 0) {
-    WriteBackDataCache ();
-  }
-  return Address;
+  return IpfFlushCacheRange (Address, Length);
 }
 
 /**
@@ -238,5 +232,5 @@ InvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  return WriteBackInvalidateDataCacheRange (Address, Length);
+  return IpfFlushCacheRange (Address, Length);
 }

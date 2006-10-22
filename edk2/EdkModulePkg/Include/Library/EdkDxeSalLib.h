@@ -137,12 +137,5 @@ GetEsalEntryPoint (
   )
 ;
 
-VOID
-EFIAPI
-SalFlushCache (
-  IN EFI_PHYSICAL_ADDRESS  Start,
-  IN UINT64                Length
-  )
-;
 
 #endif
