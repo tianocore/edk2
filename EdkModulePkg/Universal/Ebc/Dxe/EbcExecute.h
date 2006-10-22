@@ -234,73 +234,7 @@ EbcExecute (
   )
 ;
 
-//
-// Math library routines
-//
-INT64
-DivS64x64 (
-  IN INT64      Value1,
-  IN INT64      Value2,
-  OUT INT64     *Remainder,
-  OUT UINT32    *Error
-  )
-;
-#if 0
-UINT64
-DivU64x64 (
-  IN UINT64   Value1,
-  IN UINT64   Value2,
-  OUT UINT64  *Remainder,
-  OUT UINT32  *Error
-  )
-;
-#endif
 
-INT64
-MulS64x64 (
-  IN INT64  Value1,
-  IN INT64  Value2,
-  OUT INT64 *ResultHigh
-  )
-;
-
-UINT64
-MulU64x64 (
-  IN UINT64   Value1,
-  IN UINT64   Value2,
-  OUT UINT64  *ResultHigh
-  )
-;
-
-UINT64
-DivU64x64 (
-  IN UINT64   Value1,
-  IN UINT64   Value2,
-  OUT UINT64  *Remainder,
-  OUT UINT32  *Error
-  )
-;
-
-INT64
-ARightShift64 (
-  IN INT64  Operand,
-  IN INT64  Count
-  )
-;
-
-UINT64
-LeftShiftU64 (
-  IN UINT64   Operand,
-  IN UINT64   Count
-  )
-;
-
-UINT64
-RightShiftU64 (
-  IN UINT64   Operand,
-  IN UINT64   Count
-  )
-;
 
 UINT64
 GetVmVersion (

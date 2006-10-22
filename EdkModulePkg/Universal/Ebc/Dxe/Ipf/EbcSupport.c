@@ -339,14 +339,14 @@ Returns:
   UINT8       *Ptr;
   UINT8       *ThunkBase;
   UINT64      Addr;
-  UINT64        Code[3];    // Code in a bundle
-  UINT64        RegNum;     // register number for MOVL
-  UINT64        I;          // bits of MOVL immediate data
-  UINT64        Ic;         // bits of MOVL immediate data
-  UINT64        Imm5c;      // bits of MOVL immediate data
-  UINT64        Imm9d;      // bits of MOVL immediate data
-  UINT64        Imm7b;      // bits of MOVL immediate data
-  UINT64        Br;         // branch register for loading and jumping
+  UINT64      Code[3];    // Code in a bundle
+  UINT64      RegNum;     // register number for MOVL
+  UINT64      I;          // bits of MOVL immediate data
+  UINT64      Ic;         // bits of MOVL immediate data
+  UINT64      Imm5c;      // bits of MOVL immediate data
+  UINT64      Imm9d;      // bits of MOVL immediate data
+  UINT64      Imm7b;      // bits of MOVL immediate data
+  UINT64      Br;         // branch register for loading and jumping
   UINT64      *Data64Ptr;
   UINT32      ThunkSize;
   UINT32      Size;
@@ -441,25 +441,25 @@ Returns:
   //
   // Next is simply Addr[62:22] (41 bits) of the address
   //
-  Code[1] = RightShiftU64 (Addr, 22) & 0x1ffffffffff;
+  Code[1] = RShiftU64 (Addr, 22) & 0x1ffffffffff;
 
   //
   // Extract bits from the address for insertion into the instruction
   // i = Addr[63:63]
   //
-  I = RightShiftU64 (Addr, 63) & 0x01;
+  I = RShiftU64 (Addr, 63) & 0x01;
   //
   // ic = Addr[21:21]
   //
-  Ic = RightShiftU64 (Addr, 21) & 0x01;
+  Ic = RShiftU64 (Addr, 21) & 0x01;
   //
   // imm5c = Addr[20:16] for 5 bits
   //
-  Imm5c = RightShiftU64 (Addr, 16) & 0x1F;
+  Imm5c = RShiftU64 (Addr, 16) & 0x1F;
   //
   // imm9d = Addr[15:7] for 9 bits
   //
-  Imm9d = RightShiftU64 (Addr, 7) & 0x1FF;
+  Imm9d = RShiftU64 (Addr, 7) & 0x1FF;
   //
   // imm7b = Addr[6:0] for 7 bits
   //
@@ -474,14 +474,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] = LeftShiftU64 (Imm7b, 13)
-          | LeftShiftU64 (0x00, 20)   // vc
-          | LeftShiftU64 (Ic, 21)
-          | LeftShiftU64 (Imm5c, 22)
-          | LeftShiftU64 (Imm9d, 27)
-          | LeftShiftU64 (I, 36)
-          | LeftShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LeftShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] = LShiftU64 (Imm7b, 13)
+          | LShiftU64 (0x00, 20)   // vc
+          | LShiftU64 (Ic, 21)
+          | LShiftU64 (Imm5c, 22)
+          | LShiftU64 (Imm9d, 27)
+          | LShiftU64 (I, 36)
+          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
+          | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -506,25 +506,25 @@ Returns:
   //
   // Next is simply Addr[62:22] (41 bits) of the address
   //
-  Code[1] = RightShiftU64 (Addr, 22) & 0x1ffffffffff;
+  Code[1] = RShiftU64 (Addr, 22) & 0x1ffffffffff;
 
   //
   // Extract bits from the address for insertion into the instruction
   // i = Addr[63:63]
   //
-  I = RightShiftU64 (Addr, 63) & 0x01;
+  I = RShiftU64 (Addr, 63) & 0x01;
   //
   // ic = Addr[21:21]
   //
-  Ic = RightShiftU64 (Addr, 21) & 0x01;
+  Ic = RShiftU64 (Addr, 21) & 0x01;
   //
   // imm5c = Addr[20:16] for 5 bits
   //
-  Imm5c = RightShiftU64 (Addr, 16) & 0x1F;
+  Imm5c = RShiftU64 (Addr, 16) & 0x1F;
   //
   // imm9d = Addr[15:7] for 9 bits
   //
-  Imm9d = RightShiftU64 (Addr, 7) & 0x1FF;
+  Imm9d = RShiftU64 (Addr, 7) & 0x1FF;
   //
   // imm7b = Addr[6:0] for 7 bits
   //
@@ -539,14 +539,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] = LeftShiftU64 (Imm7b, 13)
-          | LeftShiftU64 (0x00, 20)   // vc
-          | LeftShiftU64 (Ic, 21)
-          | LeftShiftU64 (Imm5c, 22)
-          | LeftShiftU64 (Imm9d, 27)
-          | LeftShiftU64 (I, 36)
-          | LeftShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LeftShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] = LShiftU64 (Imm7b, 13)
+          | LShiftU64 (0x00, 20)   // vc
+          | LShiftU64 (Ic, 21)
+          | LShiftU64 (Imm5c, 22)
+          | LShiftU64 (Imm9d, 27)
+          | LShiftU64 (I, 36)
+          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
+          | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -578,25 +578,25 @@ Returns:
   //
   // Next is simply Addr[62:22] (41 bits) of the address
   //
-  Code[1] = RightShiftU64 (Addr, 22) & 0x1ffffffffff;
+  Code[1] = RShiftU64 (Addr, 22) & 0x1ffffffffff;
 
   //
   // Extract bits from the address for insertion into the instruction
   // i = Addr[63:63]
   //
-  I = RightShiftU64 (Addr, 63) & 0x01;
+  I = RShiftU64 (Addr, 63) & 0x01;
   //
   // ic = Addr[21:21]
   //
-  Ic = RightShiftU64 (Addr, 21) & 0x01;
+  Ic = RShiftU64 (Addr, 21) & 0x01;
   //
   // imm5c = Addr[20:16] for 5 bits
   //
-  Imm5c = RightShiftU64 (Addr, 16) & 0x1F;
+  Imm5c = RShiftU64 (Addr, 16) & 0x1F;
   //
   // imm9d = Addr[15:7] for 9 bits
   //
-  Imm9d = RightShiftU64 (Addr, 7) & 0x1FF;
+  Imm9d = RShiftU64 (Addr, 7) & 0x1FF;
   //
   // imm7b = Addr[6:0] for 7 bits
   //
@@ -610,14 +610,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] =   LeftShiftU64(Imm7b, 13)
-          | LeftShiftU64 (0x00, 20)   // vc
-          | LeftShiftU64 (Ic, 21)
-          | LeftShiftU64 (Imm5c, 22)
-          | LeftShiftU64 (Imm9d, 27)
-          | LeftShiftU64 (I, 36)
-          | LeftShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LeftShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] =   LShiftU64(Imm7b, 13)
+          | LShiftU64 (0x00, 20)   // vc
+          | LShiftU64 (Ic, 21)
+          | LShiftU64 (Imm5c, 22)
+          | LShiftU64 (Imm9d, 27)
+          | LShiftU64 (I, 36)
+          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
+          | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -641,8 +641,8 @@ Returns:
   // register and user register (same user register as previous bundle).
   //
   Br = 6;
-  Code[2] |= LeftShiftU64 (Br, 6);
-  Code[2] |= LeftShiftU64 (RegNum, 13);
+  Code[2] |= LShiftU64 (Br, 6);
+  Code[2] |= LShiftU64 (RegNum, 13);
   WriteBundle ((VOID *) Ptr, 0x0d, Code[0], Code[1], Code[2]);
 
   //
@@ -657,7 +657,7 @@ Returns:
   Code[0] = OPCODE_NOP;
   Code[1] = OPCODE_NOP;
   Code[2] = OPCODE_BR_COND_SPTK_FEW;
-  Code[2] |= LeftShiftU64 (Br, 13);
+  Code[2] |= LShiftU64 (Br, 13);
   WriteBundle ((VOID *) Ptr, 0x1d, Code[0], Code[1], Code[2]);
 
   //
@@ -728,8 +728,8 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Low64   = LeftShiftU64 (Slot1, 46) | LeftShiftU64 (Slot0, 5) | Template;
-  High64  = RightShiftU64 (Slot1, 18) | LeftShiftU64 (Slot2, 23);
+  Low64   = LShiftU64 (Slot1, 46) | LShiftU64 (Slot0, 5) | Template;
+  High64  = RShiftU64 (Slot1, 18) | LShiftU64 (Slot2, 23);
 
   //
   // Now write it all out
@@ -737,13 +737,13 @@ Returns:
   BPtr = (UINT8 *) MemPtr;
   for (Index = 0; Index < 8; Index++) {
     *BPtr = (UINT8) Low64;
-    Low64 = RightShiftU64 (Low64, 8);
+    Low64 = RShiftU64 (Low64, 8);
     BPtr++;
   }
 
   for (Index = 0; Index < 8; Index++) {
     *BPtr   = (UINT8) High64;
-    High64  = RightShiftU64 (High64, 8);
+    High64  = RShiftU64 (High64, 8);
     BPtr++;
   }
 
@@ -814,21 +814,21 @@ Returns:
     goto Action;
   }
 
-  CodeOne18 = RightShiftU64 (*((UINT64 *)CalleeAddr + 2), 46) & 0x3FFFF;
+  CodeOne18 = RShiftU64 (*((UINT64 *)CalleeAddr + 2), 46) & 0x3FFFF;
   CodeOne23 = (*((UINT64 *)CalleeAddr + 3)) & 0x7FFFFF;
-  CodeTwoI  = RightShiftU64 (*((UINT64 *)CalleeAddr + 3), 59) & 0x1;
-  CodeTwoIc = RightShiftU64 (*((UINT64 *)CalleeAddr + 3), 44) & 0x1;
-  CodeTwo7b = RightShiftU64 (*((UINT64 *)CalleeAddr + 3), 36) & 0x7F;
-  CodeTwo5c = RightShiftU64 (*((UINT64 *)CalleeAddr + 3), 45) & 0x1F;
-  CodeTwo9d = RightShiftU64 (*((UINT64 *)CalleeAddr + 3), 50) & 0x1FF;
+  CodeTwoI  = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 59) & 0x1;
+  CodeTwoIc = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 44) & 0x1;
+  CodeTwo7b = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 36) & 0x7F;
+  CodeTwo5c = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 45) & 0x1F;
+  CodeTwo9d = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 50) & 0x1FF;
 
   TargetEbcAddr = CodeTwo7b
-                  | LeftShiftU64 (CodeTwo9d, 7)
-                  | LeftShiftU64 (CodeTwo5c, 16)
-                  | LeftShiftU64 (CodeTwoIc, 21)
-                  | LeftShiftU64 (CodeOne18, 22)
-                  | LeftShiftU64 (CodeOne23, 40)
-                  | LeftShiftU64 (CodeTwoI, 63)
+                  | LShiftU64 (CodeTwo9d, 7)
+                  | LShiftU64 (CodeTwo5c, 16)
+                  | LShiftU64 (CodeTwoIc, 21)
+                  | LShiftU64 (CodeOne18, 22)
+                  | LShiftU64 (CodeOne23, 40)
+                  | LShiftU64 (CodeTwoI, 63)
                   ;
 
 Action:

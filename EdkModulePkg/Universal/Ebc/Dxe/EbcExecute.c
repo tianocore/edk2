@@ -2942,10 +2942,8 @@ Instruction syntax:
 
 --*/
 {
-  INT64 ResultHigh;
-
   if (*VmPtr->Ip & DATAMANIP_M_64) {
-    return MulS64x64 (Op1, Op2, &ResultHigh);
+    return MultS64x64 ((INT64)Op1, (INT64)Op2);
   } else {
     return (UINT64) ((INT64) ((INT32) Op1 * (INT32) Op2));
   }
@@ -2976,9 +2974,8 @@ Instruction syntax:
 
 --*/
 {
-  INT64 ResultHigh;
   if (*VmPtr->Ip & DATAMANIP_M_64) {
-    return MulU64x64 (Op1, Op2, (UINT64 *)&ResultHigh);
+    return MultU64x64 (Op1, Op2);
   } else {
     return (UINT64) ((UINT32) Op1 * (UINT32) Op2);
   }
@@ -3011,7 +3008,6 @@ Instruction syntax:
 --*/
 {
   INT64   Remainder;
-  UINT32  Error;
 
   //
   // Check for divide-by-0
@@ -3026,7 +3022,7 @@ Instruction syntax:
     return 0;
   } else {
     if (*VmPtr->Ip & DATAMANIP_M_64) {
-      return (UINT64) (DivS64x64 (Op1, Op2, &Remainder, &Error));
+      return (UINT64) (DivS64x64Remainder (Op1, Op2, &Remainder));
     } else {
       return (UINT64) ((INT64) ((INT32) Op1 / (INT32) Op2));
     }
@@ -3059,7 +3055,6 @@ Instruction syntax:
 --*/
 {
   UINT64  Remainder;
-  UINT32  Error;
 
   //
   // Check for divide-by-0
@@ -3076,7 +3071,7 @@ Instruction syntax:
     // Get the destination register
     //
     if (*VmPtr->Ip & DATAMANIP_M_64) {
-      return (UINT64) (DivU64x64 (Op1, Op2, &Remainder, &Error));
+      return (UINT64) (DivU64x64Remainder ((INT64)Op1, (INT64)Op2, &Remainder));
     } else {
       return (UINT64) ((UINT32) Op1 / (UINT32) Op2);
     }
@@ -3109,7 +3104,6 @@ Instruction syntax:
 --*/
 {
   INT64   Remainder;
-  UINT32  Error;
 
   //
   // Check for divide-by-0
@@ -3122,7 +3116,7 @@ Instruction syntax:
       );
     return 0;
   } else {
-    DivS64x64 ((INT64) Op1, (INT64) Op2, &Remainder, &Error);
+    DivS64x64Remainder ((INT64)Op1, (INT64)Op2, &Remainder);
     return Remainder;
   }
 }
@@ -3153,7 +3147,6 @@ Instruction syntax:
 --*/
 {
   UINT64  Remainder;
-  UINT32  Error;
 
   //
   // Check for divide-by-0
@@ -3166,7 +3159,7 @@ Instruction syntax:
       );
     return 0;
   } else {
-    DivU64x64 (Op1, Op2, &Remainder, &Error);
+    DivU64x64Remainder (Op1, Op2, &Remainder);
     return Remainder;
   }
 }
@@ -3282,7 +3275,7 @@ Instruction syntax:
 --*/
 {
   if (*VmPtr->Ip & DATAMANIP_M_64) {
-    return LeftShiftU64 (Op1, Op2);
+    return LShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((UINT32) ((UINT32) Op1 << (UINT32) Op2));
   }
@@ -3314,7 +3307,7 @@ Instruction syntax:
 --*/
 {
   if (*VmPtr->Ip & DATAMANIP_M_64) {
-    return RightShiftU64 (Op1, Op2);
+    return RShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((UINT32) Op1 >> (UINT32) Op2);
   }
@@ -3346,7 +3339,7 @@ Instruction syntax:
 --*/
 {
   if (*VmPtr->Ip & DATAMANIP_M_64) {
-    return ARightShift64 (Op1, Op2);
+    return ARShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((INT64) ((INT32) Op1 >> (UINT32) Op2));
   }
@@ -3950,7 +3943,6 @@ Returns:
 --*/
 {
   UINT64  Index;
-  UINT64  Remainder;
   INT64   Offset;
   INT64   C;
   INT64   N;
@@ -3962,17 +3954,17 @@ Returns:
   //
   // Get the mask for N. First get the number of bits from the index.
   //
-  NBits = RightShiftU64 ((Index & 0x7000000000000000ULL), 60);
+  NBits = RShiftU64 ((Index & 0x7000000000000000ULL), 60);
 
   //
   // Scale it for 64-bit indexes (multiply by 8 by shifting left 3)
   //
-  NBits = LeftShiftU64 (NBits, 3);
+  NBits = LShiftU64 ((UINT64)NBits, 3);
 
   //
   // Now using the number of bits, create a mask.
   //
-  Mask = (LeftShiftU64 ((UINT64)~0, (UINT64) NBits));
+  Mask = (LShiftU64 ((UINT64)~0, (UINTN)NBits));
 
   //
   // Now using the mask, extract N from the lower bits of the index.
@@ -3982,15 +3974,15 @@ Returns:
   //
   // Now compute C
   //
-  C       = ARightShift64 (((Index &~0xF000000000000000ULL) & Mask), (UINTN) NBits);
+  C       = ARShiftU64 (((Index &~0xF000000000000000ULL) & Mask), (UINTN)NBits);
 
-  Offset  = MulU64x64 (N, sizeof (UINTN), &Remainder) + C;
+  Offset  = MultU64x64 (N, sizeof (UINTN)) + C;
 
   //
   // Now set the sign
   //
   if (Index & 0x8000000000000000ULL) {
-    Offset = MulS64x64 (Offset, -1, (INT64 *)&Index);
+    Offset = MultS64x64 (Offset, -1);
   }
 
   return Offset;
