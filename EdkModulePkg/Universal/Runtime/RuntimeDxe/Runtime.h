@@ -50,8 +50,7 @@ typedef struct {
 VOID
 RelocatePeImageForRuntime (
   RUNTIME_IMAGE_RELOCATION_DATA  *Image
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -59,8 +58,7 @@ RuntimeDriverCalculateCrc32 (
   IN  VOID    *Data,
   IN  UINTN   DataSize,
   OUT UINT32  *CrcOut
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -69,8 +67,7 @@ RuntimeDriverRegisterImage (
   IN  EFI_PHYSICAL_ADDRESS              ImageBase,
   IN  UINTN                             ImageSize,
   IN  VOID                              *RelocationData
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -81,40 +78,27 @@ RuntimeDriverRegisterEvent (
   IN EFI_EVENT_NOTIFY                   NotifyFunction,
   IN VOID                               *NotifyContext,
   IN EFI_EVENT                          *Event
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 RuntimeDriverConvertPointer (
   IN     UINTN  DebugDisposition,
   IN OUT VOID   **ConvertAddress
-  )
-;
+  );
 
 VOID
 RuntimeDriverInitializeCrc32Table (
   VOID
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 RuntimeDriverInitialize (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
-  )
-;
+  );
 
 
-//
-// Cache Flush Routine.
-//
-EFI_STATUS
-FlushCpuCache (
-  IN EFI_PHYSICAL_ADDRESS          Start,
-  IN UINT64                        Length
-  )
-;
 
 #endif

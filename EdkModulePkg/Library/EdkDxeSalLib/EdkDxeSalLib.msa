@@ -35,7 +35,6 @@
   <SourceFiles>
     <Filename SupArchList="IPF">Ipf/EsalServiceLib.c</Filename>
     <Filename SupArchList="IPF">Ipf/AsmEsalServiceLib.s</Filename>
-    <Filename SupArchList="IPF">Ipf/AsmIpfCpuCache.s</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
