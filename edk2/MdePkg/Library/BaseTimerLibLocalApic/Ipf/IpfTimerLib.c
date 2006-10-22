@@ -18,50 +18,8 @@
 
 **/
 
-typedef struct {
-  UINT64                            Status;
-  UINT64                            r9;
-  UINT64                            r10;
-  UINT64                            r11;
-} PAL_PROC_RETURN;
 
-/**
-  Performs a PAL call using static calling convention.
 
-  An internal function to perform a PAL call using static calling convention.
-
-  @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
-                        would be used if this parameter were NULL on input.
-  @param  Arg1          The first argument of a PAL call.
-  @param  Arg1          The second argument of a PAL call.
-  @param  Arg1          The third argument of a PAL call.
-  @param  Arg1          The fourth argument of a PAL call.
-
-  @return The values returned in r8, r9, r10 and r11.
-
-**/
-PAL_PROC_RETURN
-PalCallStatic (
-  IN      CONST VOID                *PalEntryPoint,
-  IN      UINT64                    Arg1,
-  IN      UINT64                    Arg2,
-  IN      UINT64                    Arg3,
-  IN      UINT64                    Arg4
-  );
-
-/**
-  Returns the current value of ar.itc.
-
-  An internal function to return the current value of ar.itc, which is the
-  timer tick on IPF.
-
-  @return The currect value of ar.itc
-
-**/
-INT64
-InternalIpfReadItc (
-  VOID
-  );
 
 /**
   Performs a delay measured as number of ticks.
@@ -83,14 +41,14 @@ InternalIpfDelay (
   //
   // The target timer count is calculated here
   //
-  Ticks = InternalIpfReadItc () + Delay;
+  Ticks = IpfReadItc () + Delay;
 
   //
   // Wait until time out
   // Delay > 2^63 could not be handled by this function
   // Timer wrap-arounds are handled correctly by this function
   //
-  while (Ticks - InternalIpfReadItc () >= 0);
+  while (Ticks - IpfReadItc () >= 0);
 }
 
 /**
@@ -159,7 +117,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return InternalIpfReadItc ();
+  return IpfReadItc ();
 }
 
 /**

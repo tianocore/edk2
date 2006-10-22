@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>BaseTimerLibLocalApic</ModuleName>
     <ModuleType>BASE</ModuleType>
@@ -39,8 +39,6 @@
   <SourceFiles>
     <Filename SupArchList="IA32">x86TimerLib.c</Filename>
     <Filename SupArchList="X64">x86TimerLib.c</Filename>
-    <Filename SupArchList="IPF">Ipf/PalCallStatic.s</Filename>
-    <Filename SupArchList="IPF">Ipf/ReadItc.s</Filename>
     <Filename SupArchList="IPF">Ipf/IpfTimerLib.c</Filename>
     <Filename SupArchList="EBC">Ebc/EbcTimerLib.c</Filename>
   </SourceFiles>

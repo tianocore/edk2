@@ -12,21 +12,6 @@
 
 **/
 
-typedef struct {
-  UINT64                            Status;
-  UINT64                            r9;
-  UINT64                            r10;
-  UINT64                            r11;
-} PAL_PROC_RETURN;
-
-PAL_PROC_RETURN
-PalCallStatic (
-  IN      CONST VOID                *PalEntryPoint,
-  IN      UINT64                    Arg1,
-  IN      UINT64                    Arg2,
-  IN      UINT64                    Arg3,
-  IN      UINT64                    Arg4
-  );
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
@@ -43,6 +28,41 @@ InvalidateInstructionCache (
   )
 {
   PalCallStatic (NULL, 1, 1, 1, 0);
+}
+
+/**
+  Invalidates a range of instruction cache lines in the cache coherency domain
+  of the calling CPU.
+
+  Invalidates the instruction cache lines specified by Address and Length. If
+  Address is not aligned on a cache line boundary, then entire instruction
+  cache line containing Address is invalidated. If Address + Length is not
+  aligned on a cache line boundary, then the entire instruction cache line
+  containing Address + Length -1 is invalidated. This function may choose to
+  invalidate the entire instruction cache if that is more efficient than
+  invalidating the specified range. If Length is 0, the no instruction cache
+  lines are invalidated. Address is returned.
+
+  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
+
+  @param  Address The base address of the instruction cache lines to
+                  invalidate. If the CPU is in a physical addressing mode, then
+                  Address is a physical address. If the CPU is in a virtual
+                  addressing mode, then Address is a virtual address.
+
+  @param  Length  The number of bytes to invalidate from the instruction cache.
+
+  @return Address
+
+**/
+VOID *
+EFIAPI
+InvalidateInstructionCacheRange (
+  IN      VOID                      *Address,
+  IN      UINTN                     Length
+  )
+{
+  return IpfInvalidateInstructionCacheRange (Address, Length);
 }
 
 /**
