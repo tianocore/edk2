@@ -11,6 +11,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
@@ -84,6 +85,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     public void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
         if (ffc == null) {
             ffc = new FpdFileContents(fpd);
+            ffc.initDynPcdMap();
         }
         String[][] saa = new String[ffc.getDynamicPcdBuildDataCount()][5];
         ffc.getDynamicPcdBuildData(saa);
@@ -154,7 +156,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             modelPcd.addColumn("DatumType");
             jTableDynPcd = new JTable(modelPcd);
             jTableDynPcd.setRowHeight(20);
-            
+            TableColumn tokenColumn = jTableDynPcd.getColumnModel().getColumn(1);
+            jTableDynPcd.removeColumn(tokenColumn);
             jTableDynPcd.getColumnModel().getColumn(0).setMinWidth(250);
             
             jTableDynPcd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -556,6 +559,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 if (jRadioButtonHii.isSelected()) {
                     ffc.genDynamicPcdBuildDataSkuInfo("0", varName, varGuid, varOffset, hiiDefault, null, null, pcdSelected);
                     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    if (al == null) {
+                        return;
+                    }
                     for (int i = 0; i < al.size(); ++i) {
                         String mKey = moduleInfo (al.get(i));
                         ffc.updatePcdData(mKey, cName, tsGuid, null, null, hiiDefault);
@@ -564,6 +570,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 else if (jRadioButtonVpd.isSelected()){
                     ffc.genDynamicPcdBuildDataSkuInfo("0", null, null, null, null, vpdOffset, null, pcdSelected);
                     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    if (al == null) {
+                        return;
+                    }
                     for (int i = 0; i < al.size(); ++i) {
                         String mKey = moduleInfo (al.get(i));
                         ffc.updatePcdData(mKey, cName, tsGuid, null, null, vpdOffset);
@@ -572,6 +581,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 else{
                     ffc.genDynamicPcdBuildDataSkuInfo("0", null, null, null, null, null, value, pcdSelected);
                     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+                    if (al == null) {
+                        return;
+                    }
                     for (int i = 0; i < al.size(); ++i) {
                         String mKey = moduleInfo (al.get(i));
                         ffc.updatePcdData(mKey, cName, tsGuid, null, null, value);
