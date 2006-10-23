@@ -650,7 +650,8 @@ typedef enum _EFI_MEMORY_FORM_FACTOR {
   EfiMemoryFormFactorRowOfChips               = 0x0B,
   EfiMemoryFormFactorRimm                     = 0x0C,
   EfiMemoryFormFactorSodimm                   = 0x0D,
-  EfiMemoryFormFactorSrimm                    = 0x0E
+  EfiMemoryFormFactorSrimm                    = 0x0E,
+  EfiMemoryFormFactorFbDimm                   = 0x0F
 } EFI_MEMORY_FORM_FACTOR;
 
 typedef enum _EFI_MEMORY_ARRAY_TYPE {
@@ -672,7 +673,8 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeSgram                          = 0x10,
   EfiMemoryTypeRdram                          = 0x11,
   EfiMemoryTypeDdr                            = 0x12,
-  EfiMemoryTypeDdr2                           = 0x13
+  EfiMemoryTypeDdr2                           = 0x13,
+  EfiMemoryTypeDdr2FbDimm                     = 0x14
 } EFI_MEMORY_ARRAY_TYPE;
 
 typedef struct {
