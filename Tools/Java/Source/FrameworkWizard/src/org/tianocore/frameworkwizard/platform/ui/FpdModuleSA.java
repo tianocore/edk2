@@ -688,6 +688,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model.addColumn("DefaultValue");
             
             jTablePcd.getColumnModel().getColumn(0).setMinWidth(250);
+            
+            TableColumn tokenColumn = jTablePcd.getColumnModel().getColumn(3);
+            jTablePcd.removeColumn(tokenColumn);
                         
             jTablePcd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTablePcd.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
