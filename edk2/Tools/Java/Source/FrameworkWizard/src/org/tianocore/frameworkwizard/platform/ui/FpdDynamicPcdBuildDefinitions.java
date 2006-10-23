@@ -1,6 +1,8 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
@@ -487,7 +489,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         if (jButtonSkuInfoUpdate == null) {
             jButtonSkuInfoUpdate = new JButton();
             jButtonSkuInfoUpdate.setPreferredSize(new java.awt.Dimension(180,20));
-            jButtonSkuInfoUpdate.setText(" Update SKU Information");
+            jButtonSkuInfoUpdate.setText("Update SKU Value");
+            FontMetrics fm = jButtonSkuInfoUpdate.getFontMetrics(jButtonSkuInfoUpdate.getFont());
+            jButtonSkuInfoUpdate.setPreferredSize(new Dimension (fm.stringWidth(jButtonSkuInfoUpdate.getText()) + 40, 20));
             jButtonSkuInfoUpdate.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int pcdSelected = jTableDynPcd.getSelectedRow();

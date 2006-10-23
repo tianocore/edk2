@@ -199,7 +199,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             //
             resolveLibraryInstances(moduleKey);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, e.getMessage());
+            JOptionPane.showMessageDialog(frame, e.getCause() + " " + e.getMessage());
         }
         //
         // display lib instances already selected for key
@@ -225,7 +225,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     try {
                         resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(frame, e.getMessage());
+                        JOptionPane.showMessageDialog(frame, e.getCause() + " " + e.getMessage());
                     }
                     selectedInstancesTableModel.addRow(saa[i]);
                 }
@@ -1905,7 +1905,7 @@ class MultipleInstanceException extends Exception {
     @Override
     public String getMessage() {
         // TODO Auto-generated method stub
-        return "Library Class " + className + "is Produced by Two Instances: " 
+        return " Library Class " + className + "is Produced by Two Instances: " 
             + libInstance1 + " and " + libInstance2 + ". Platform Build will Fail.";
     }
     

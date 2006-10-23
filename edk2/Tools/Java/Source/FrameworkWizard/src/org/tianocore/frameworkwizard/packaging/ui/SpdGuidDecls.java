@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
@@ -163,7 +164,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     protected JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(137,60,435,20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(137,60,336,20));
             jTextFieldGuid.setPreferredSize(new java.awt.Dimension(200,20));
             
         }
@@ -490,16 +491,20 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             jLabelGuidType.setText("GUID Type List");
             jLabelGuidType.setEnabled(true);
             starLabel = new StarLabel();
-            starLabel.setLocation(new Point(jLabelGuidType.getX() - 20, jLabelGuidType.getY()));
+            starLabel.setLocation(new Point(jLabelGuidType.getX() - 10, jLabelGuidType.getY()));
             starLabel.setVisible(true);
             jLabelSupArch = new JLabel();
             jLabelSupArch.setBounds(new java.awt.Rectangle(197,122,108,16));
-            jLabelSupArch.setText("Supported Arch");
+            jLabelSupArch.setText("Supported Architectures");
             jLabelSupArch.setEnabled(true);
+            FontMetrics fm = jLabelSupArch.getFontMetrics(jLabelSupArch.getFont());
+            jLabelSupArch.setSize(fm.stringWidth(jLabelSupArch.getText()) + 10, 20);
             jLabelSupMod = new JLabel();
             jLabelSupMod.setBounds(new java.awt.Rectangle(14,120,110,16));
-            jLabelSupMod.setText("Supported Module");
+            jLabelSupMod.setText("Supported Module Types");
             jLabelSupMod.setEnabled(true);
+            fm = jLabelSupMod.getFontMetrics(jLabelSupMod.getFont());
+            jLabelSupMod.setSize(fm.stringWidth(jLabelSupMod.getText()) + 10, 20);
             jLabelHelp = new JLabel();
             jLabelHelp.setText("HelpText");
             jLabelHelp.setSize(new java.awt.Dimension(109,20));
@@ -716,7 +721,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     protected JButton getJButtonGen() {
         if (jButtonGen == null) {
             jButtonGen = new JButton();
-            jButtonGen.setBounds(new java.awt.Rectangle(379,58,92,21));
+            jButtonGen.setBounds(new java.awt.Rectangle(485,58,92,21));
             jButtonGen.setText("Gen GUID");
             jButtonGen.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonGen.addActionListener(this);
