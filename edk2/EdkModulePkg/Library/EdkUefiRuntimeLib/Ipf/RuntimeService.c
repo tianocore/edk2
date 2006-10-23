@@ -367,7 +367,7 @@ EFI_STATUS
 EFIAPI
 EfiConvertPointer (
   IN UINTN                  DebugDisposition,
-  IN OUT VOID               *Address
+  IN OUT VOID               **Address
   )
 /*++
 

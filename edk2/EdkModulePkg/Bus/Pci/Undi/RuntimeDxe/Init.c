@@ -130,7 +130,7 @@ Returns:
 
     EfiConvertPointer (
       EFI_OPTIONAL_POINTER,
-      (void **) &Pxe31Pointer
+      (VOID **) &Pxe31Pointer
       );
 
     //
@@ -140,13 +140,13 @@ Returns:
       UNDI32DeviceList[Index]->NIIProtocol_31.ID = (UINT64) (UINTN) Pxe31Pointer;
       EfiConvertPointer (
         EFI_OPTIONAL_POINTER,
-        (void **) &(UNDI32DeviceList[Index])
+        (VOID **) &(UNDI32DeviceList[Index])
         );
     }
 
     EfiConvertPointer (
       EFI_OPTIONAL_POINTER,
-      (void **) &(pxe_31->EntryPoint)
+      (VOID **) &(pxe_31->EntryPoint)
       );
     pxe_31 = Pxe31Pointer;
   }
@@ -154,7 +154,7 @@ Returns:
   for (Index = 0; Index <= PXE_OPCODE_LAST_VALID; Index++) {
     EfiConvertPointer (
       EFI_OPTIONAL_POINTER,
-      (void **) &api_table[Index].api_ptr
+      (VOID **) &api_table[Index].api_ptr
       );
   }
 }
