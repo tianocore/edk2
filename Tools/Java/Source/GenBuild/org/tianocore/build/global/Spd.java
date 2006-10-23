@@ -98,13 +98,7 @@ public class Spd {
             throw new EdkException("Package file [" + packageFile.getPath() + "] does not exist!");
         }
         try {
-            XmlObject spdDoc = XmlObject.Factory.parse(packageFile);
-            //
-            // Verify SPD file, if is invalid, throw Exception
-            //
-            if (! spdDoc.validate()) {
-                throw new EdkException("Package Surface Area file [" + packageFile.getPath() + "] format is invalid!");
-            }
+            XmlObject spdDoc = GlobalData.parseXmlFile(packageFile);
             //
             // We can change Map to XmlObject
             //

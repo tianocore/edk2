@@ -18,6 +18,8 @@ package org.tianocore.build.global;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,11 +29,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-
-import org.tianocore.common.definitions.ToolDefinitions;
-import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
-import org.tianocore.pcd.entity.MemoryDatabaseManager;
+import org.apache.xmlbeans.XmlOptions;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
@@ -45,6 +43,10 @@ import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
+import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
+import org.tianocore.pcd.entity.MemoryDatabaseManager;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
@@ -133,7 +135,6 @@ public class GlobalData {
     private static Map<ModuleIdentification, ToolChainMap> msaBuildOption = new HashMap<ModuleIdentification, ToolChainMap>();
     private static Map<ModuleIdentification, ToolChainMap> msaFamilyBuildOption = new HashMap<ModuleIdentification, ToolChainMap>();
 
-//    private static Pattern flagPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
       the environment for next build. This method will only be executed only once
@@ -173,14 +174,9 @@ public class GlobalData {
         // Parse Framework Database
         //
         File dbFile = new File(workspaceDir + File.separatorChar + workspaceDatabaseFile);
+        FrameworkDatabaseDocument db = null;
         try {
-            FrameworkDatabaseDocument db = (FrameworkDatabaseDocument) XmlObject.Factory.parse(dbFile);
-            //
-            // validate FrameworkDatabaseFile
-            //
-            if (!db.validate()) {
-                throw new EdkException("Framework Database file [" + dbFile.getPath() + "] format is invalid!");
-            }
+            db = (FrameworkDatabaseDocument)parseXmlFile(dbFile);
             //
             // Get package list
             //
@@ -203,7 +199,18 @@ public class GlobalData {
                     spdTable.put(spd.getPackageId(), spd);
                 }
             }
+        } catch(IOException ex) {
+            EdkException edkException = new EdkException("Parse of WORKSPACE Database file [" + dbFile.getPath() + "] failed!\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
+        } catch(XmlException ex) {
+            EdkException edkException = new EdkException("Parse of WORKSPACE Database file [" + dbFile.getPath() + "] failed!\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
+        }
 
+        File fpdFile = null;
+        try {
             //
             // Get platform list
             //
@@ -212,17 +219,11 @@ public class GlobalData {
                 Iterator<DbPathAndFilename> iter = platforms.iterator();
                 while (iter.hasNext()) {
                     String fileName = iter.next().getStringValue().trim();
-                    File fpdFile = new File(workspaceDir + File.separatorChar + fileName);
+                    fpdFile = new File(workspaceDir + File.separatorChar + fileName);
                     if ( !fpdFile.exists() ) {
                         throw new EdkException("Platform file [" + fpdFile.getPath() + "] not exists. ");
                     }
-                    XmlObject fpdDoc = XmlObject.Factory.parse(fpdFile);
-                    //
-                    // Verify FPD file, if is invalid, throw Exception
-                    //
-                    if (!fpdDoc.validate()) {
-                        throw new EdkException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
-                    }
+                    XmlObject fpdDoc = parseXmlFile(fpdFile);
                     //
                     // We can change Map to XmlObject
                     //
@@ -244,11 +245,11 @@ public class GlobalData {
                 }
             }
         } catch(IOException ex) {
-            EdkException edkException = new EdkException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + ex.getMessage());
+            EdkException edkException = new EdkException("Parse of platform definition file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
             edkException.setStackTrace(ex.getStackTrace());
             throw edkException;
         } catch(XmlException ex) {
-            EdkException edkException = new EdkException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + ex.getMessage());
+            EdkException edkException = new EdkException("Parse of platform definition file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
             edkException.setStackTrace(ex.getStackTrace());
             throw edkException;
         }
@@ -416,13 +417,7 @@ public class GlobalData {
             throw new EdkException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
         }
         try {
-            ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)XmlObject.Factory.parse(msaFile);
-            //
-            // Validate File if they accord with XML Schema
-            //
-            if ( !doc.validate()){
-                throw new EdkException("Module Surface Area file [" + msaFile.getPath() + "] format is invalid!");
-            }
+            ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)parseXmlFile(msaFile);
             //
             // parse MSA file
             //
@@ -441,11 +436,11 @@ public class GlobalData {
             msaMap.put("ModuleBuildOptions", cloneXmlObject(msa.getModuleBuildOptions(), true));
             return msaMap;
         } catch(IOException ex) {
-            EdkException edkException = new EdkException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage());
+            EdkException edkException = new EdkException("Parse of MSA file [" + msaFile.getPath() + "] failed!\n" + ex.getMessage());
             edkException.setStackTrace(ex.getStackTrace());
             throw edkException;
         } catch(XmlException ex) {
-            EdkException edkException = new EdkException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage());
+            EdkException edkException = new EdkException("Parse of MSA file [" + msaFile.getPath() + "] failed!\n" + ex.getMessage());
             edkException.setStackTrace(ex.getStackTrace());
             throw edkException;
         }
@@ -907,6 +902,30 @@ public class GlobalData {
         Map<FpdModuleIdentification,XmlObject> pcdBuildDef = getFpdModuleSaXmlObject ("PcdBuildDefinition");
 
         return pcdBuildDef;
+    }
+
+    public static XmlObject parseXmlFile(File xmlFile) throws IOException, XmlException {
+        Collection errors = new ArrayList();            
+        XmlOptions opt = new XmlOptions();
+
+        opt.setLoadLineNumbers();
+        opt.setLoadMessageDigest();
+        opt.setErrorListener(errors);
+
+        XmlObject doc = XmlObject.Factory.parse(xmlFile, opt);
+        //
+        // Validate File if they accord with XML Schema
+        //
+        if (!doc.validate(opt)){
+            StringBuilder errorMessage = new StringBuilder(1024);
+            for (Iterator it = errors.iterator(); it.hasNext(); ) {
+                errorMessage.append(it.next());
+                errorMessage.append("\n");
+            }
+            throw new XmlException(errorMessage.toString());
+        }
+
+        return doc;
     }
 }
 
