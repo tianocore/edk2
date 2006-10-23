@@ -17,7 +17,8 @@ package org.tianocore.frameworkwizard.common.find;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
 
@@ -28,6 +29,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -37,8 +40,10 @@ import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassVector;
 
-public class FindResult extends IFrame implements TableModelListener, ComponentListener {
+public class FindResult extends IFrame implements TableModelListener, ListSelectionListener, MouseListener {
 
     ///
     /// Define class Serial Version UID
@@ -74,6 +79,12 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
     private static FindResult findPcdsResult = null;
 
     private static FindResult findLibraryClassResult = null;
+
+    private int selectedRow = -1;
+
+    private LibraryClassVector lcv = null;
+
+    private Vector<FindResultId> vLibraryClassFindResult = null;
 
     /**
      * This is the default constructor
@@ -160,7 +171,9 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
             jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+            jTable.getSelectionModel().addListSelectionListener(this);
             jTable.getModel().addTableModelListener(this);
+            jTable.addMouseListener(this);
 
             model.addColumn("Name");
             model.addColumn("Type");
@@ -173,12 +186,7 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
             jTable.getColumn("Produced by").setCellRenderer(new MyTableCellRenderer());
             jTable.getColumn("Consumed by").setCellRenderer(new MyTableCellRenderer());
             jTable.getColumn("Declared by").setCellRenderer(new MyTableCellRenderer());
-            
-//            jTable.getColumn("Name").setPreferredWidth((this.getSize().width - 30) / 5);
-//            jTable.getColumn("Type").setPreferredWidth((this.getSize().width - 30) / 5);
-//            jTable.getColumn("Produced by").setPreferredWidth((this.getSize().width - 30) / 5);
-//            jTable.getColumn("Consumed by").setPreferredWidth((this.getSize().width - 30) / 5);
-//            jTable.getColumn("Declared by").setPreferredWidth((this.getSize().width - 30) / 5);
+
             int columnWidth = (this.getSize().width - 28) / 5;
             jTable.getColumn("Name").setPreferredWidth(columnWidth);
             jTable.getColumn("Type").setPreferredWidth(columnWidth);
@@ -402,29 +410,49 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
         }
 
         if (this.method.equals("LIBRARY_CLASS")) {
-            Vector<LibraryClassId> vLibraryClass = Find.getAllLibraryClassForFind();
+            lcv = Find.getAllLibraryClassVector();
+            vLibraryClassFindResult = Find.getAllLibraryClassForFind(lcv);
 
-            if (vLibraryClass.size() > 0) {
-
-                for (int index = 0; index < vLibraryClass.size(); index++) {
+            if (vLibraryClassFindResult.size() > 0) {
+                for (int index = 0; index < vLibraryClassFindResult.size(); index++) {
                     Vector<String> v = new Vector<String>();
-                    v.addElement(vLibraryClass.elementAt(index).getName());
-                    v.addElement(vLibraryClass.elementAt(index).getType());
-                    String strProducedModules = vLibraryClass.elementAt(index).getProducedModules();
+                    v.addElement(vLibraryClassFindResult.elementAt(index).getName());
+                    v.addElement(vLibraryClassFindResult.elementAt(index).getType());
+
+                    //
+                    // Generate Produced Modules List
+                    //
+                    String strProducedModules = "";
+                    Vector<ModuleIdentification> vModule = vLibraryClassFindResult.elementAt(index)
+                                                                                  .getProducedModules();
+                    for (int indexOfPM = 0; indexOfPM < vModule.size(); indexOfPM++) {
+                        strProducedModules = strProducedModules + "<br>"
+                                             + vModule.get(indexOfPM).getPackageId().getName() + "."
+                                             + vModule.get(indexOfPM).getName();
+                    }
                     if (strProducedModules.indexOf("<br>") == 0) {
                         strProducedModules = strProducedModules.substring("<br>".length());
                     }
                     int line1 = Tools.getSpecificStringCount(strProducedModules, "<br>");
                     v.addElement("<html>" + strProducedModules + "</html>");
 
-                    String strConsumedModules = vLibraryClass.elementAt(index).getConsumedModules();
+                    //
+                    // Generate Consumed Modules List
+                    //
+                    String strConsumedModules = "";
+                    vModule = vLibraryClassFindResult.elementAt(index).getConsumedModules();
+                    for (int indexOfCM = 0; indexOfCM < vModule.size(); indexOfCM++) {
+                        strConsumedModules = strConsumedModules + "<br>"
+                                             + vModule.get(indexOfCM).getPackageId().getName() + "."
+                                             + vModule.get(indexOfCM).getName();
+                    }
                     if (strConsumedModules.indexOf("<br>") == 0) {
                         strConsumedModules = strConsumedModules.substring("<br>".length());
                     }
                     int line2 = Tools.getSpecificStringCount(strConsumedModules, "<br>");
                     v.addElement("<html>" + strConsumedModules + "</html>");
 
-                    v.addElement(vLibraryClass.elementAt(index).getDeclaredBy());
+                    v.addElement(vLibraryClassFindResult.elementAt(index).getDeclaredBy().getName());
 
                     model.addRow(v);
                     jTable.setRowHeight(index, (Math.max(line1, line2) > 1 ? Math.max(line1, line2) : 1) * 18);
@@ -443,9 +471,12 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
 
     }
 
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     *
+     */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource() == this.jButtonClose) {
-
             this.dispose();
         }
     }
@@ -469,6 +500,39 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
     }
 
     /* (non-Javadoc)
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     *
+     */
+    public void valueChanged(ListSelectionEvent arg0) {
+        if (arg0.getValueIsAdjusting()) {
+            return;
+        }
+        ListSelectionModel lsm = (ListSelectionModel) arg0.getSource();
+        if (lsm.isSelectionEmpty()) {
+            return;
+        } else {
+            selectedRow = lsm.getMinSelectionIndex();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     *
+     */
+    public void mouseClicked(MouseEvent arg0) {
+        if (arg0.getClickCount() == 2) {
+            if (this.selectedRow < 0) {
+                return;
+            } else {
+                if (this.method.equals("LIBRARY_CLASS")) {
+                    FindResultDetailInfo frdi = new FindResultDetailInfo(vLibraryClassFindResult.elementAt(selectedRow));
+                    frdi.setVisible(true);
+                }
+            }
+        }
+    }
+
+    /* (non-Javadoc)
      * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
      *
      * Override windowClosing to popup warning message to confirm quit
@@ -480,7 +544,7 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
 
     class MyTableCellRenderer extends DefaultTableCellRenderer {
         ///
-        ///
+        /// Define Class Serial Version UID
         ///
         private static final long serialVersionUID = -2082787479305255946L;
 
@@ -490,4 +554,23 @@ public class FindResult extends IFrame implements TableModelListener, ComponentL
         }
     }
 
+    public void mousePressed(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void mouseEntered(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void mouseExited(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
 }

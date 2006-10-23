@@ -16,6 +16,7 @@ package org.tianocore.frameworkwizard.common.find;
 
 import java.util.Vector;
 
+import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass;
 import org.tianocore.LibraryClassDefinitionsDocument.LibraryClassDefinitions;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
@@ -781,8 +782,11 @@ public class Find {
                                                                                                .getLibraryClassDeclarations()
                                                                                                .getLibraryClassList()
                                                                                                .size(); indexOfLibraryClass++) {
-                                        if (spd.getLibraryClassDeclarations().getLibraryClassList().get(indexOfLibraryClass)
-                                               .getName().equals(name)) {
+                                        LibraryClass lc = spd.getLibraryClassDeclarations().getLibraryClassList().get(indexOfLibraryClass);
+                                        if (lc.getName().equals(name)) {
+                                            lcid.setSupArchList(Tools.convertListToVector(lc.getSupArchList()));
+                                            lcid.setSupModuleList(Tools.convertListToVector(lc.getSupModuleList()));
+                                            lcid.setHelp(lc.getHelpText());
                                             lcid.setDeclaredBy(packageId);
                                             break;
                                         }
@@ -809,9 +813,72 @@ public class Find {
      @return
      
      **/
-    public static Vector<LibraryClassId> getAllLibraryClassForFind() {
-        Vector<LibraryClassId> libraryClass = new Vector<LibraryClassId>();
-        LibraryClassVector lcv = Find.getAllLibraryClassVector();
+    //    public static Vector<LibraryClassId> getAllLibraryClassForFind(LibraryClassVector lcv) {
+    //        Vector<LibraryClassId> libraryClass = new Vector<LibraryClassId>();
+    //        boolean isAdded = false;
+    //        boolean isProduced = false;
+    //
+    //        //
+    //        // Go through pv to add item as new format to ppi one by one
+    //        //
+    //        for (int indexOfLcv = 0; indexOfLcv < lcv.size(); indexOfLcv++) {
+    //            isAdded = false;
+    //            LibraryClassIdentification lcvId = lcv.getLibraryClass(indexOfLcv);
+    //
+    //            //
+    //            // First check if produced or not
+    //            //
+    //            if (lcvId.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
+    //                || lcvId.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
+    //                isProduced = true;
+    //            } else if (lcvId.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_CONSUMED)
+    //                       || lcvId.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_CONSUMED)) {
+    //                isProduced = false;
+    //            }
+    //
+    //            //
+    //            // Get the string "PackageName.ModuleName" 
+    //            //
+    //            String tmp = lcvId.getBelongModule().getPackageId().getName() + SEPERATOR
+    //                         + lcvId.getBelongModule().getName();
+    //
+    //            //
+    //            // Check if the item has been added in
+    //            // If added, append package name and new module name
+    //            // If not added, add a new one first
+    //            //
+    //            for (int indexOfGuid = 0; indexOfGuid < libraryClass.size(); indexOfGuid++) {
+    //                LibraryClassId lcId = libraryClass.get(indexOfGuid);
+    //
+    //                if (lcvId.getLibraryClassName().equals(lcId.getName())) {
+    //                    if (isProduced) {
+    //                        libraryClass.get(indexOfGuid).setProducedModules(lcId.getProducedModules() + "<br>" + tmp);
+    //                    } else if (!isProduced) {
+    //                        libraryClass.get(indexOfGuid).setConsumedModules(lcId.getConsumedModules() + "<br>" + tmp);
+    //                    }
+    //                    isAdded = true;
+    //                    continue;
+    //                }
+    //            }
+    //
+    //            //
+    //            // Add a new one
+    //            //
+    //            if (!isAdded) {
+    //                if (isProduced) {
+    //                    libraryClass.addElement(new LibraryClassId(lcvId.getLibraryClassName(), "Library Class", tmp, null,
+    //                                                               lcvId.getDeclaredBy().getName()));
+    //                } else if (!isProduced) {
+    //                    libraryClass.addElement(new LibraryClassId(lcvId.getLibraryClassName(), "Library Class", null, tmp,
+    //                                                               lcvId.getDeclaredBy().getName()));
+    //                }
+    //            }
+    //        }
+    //
+    //        return libraryClass;
+    //    }
+    public static Vector<FindResultId> getAllLibraryClassForFind(LibraryClassVector lcv) {
+        Vector<FindResultId> libraryClass = new Vector<FindResultId>();
         boolean isAdded = false;
         boolean isProduced = false;
 
@@ -834,24 +901,18 @@ public class Find {
             }
 
             //
-            // Get the string "PackageName.ModuleName" 
-            //
-            String tmp = lcvId.getBelongModule().getPackageId().getName() + SEPERATOR
-                         + lcvId.getBelongModule().getName();
-
-            //
             // Check if the item has been added in
             // If added, append package name and new module name
             // If not added, add a new one first
             //
             for (int indexOfGuid = 0; indexOfGuid < libraryClass.size(); indexOfGuid++) {
-                LibraryClassId lcId = libraryClass.get(indexOfGuid);
+                FindResultId frId = libraryClass.get(indexOfGuid);
 
-                if (lcvId.getLibraryClassName().equals(lcId.getName())) {
+                if (lcvId.getLibraryClassName().equals(frId.getName())) {
                     if (isProduced) {
-                        libraryClass.get(indexOfGuid).setProducedModules(lcId.getProducedModules() + "<br>" + tmp);
+                        libraryClass.get(indexOfGuid).addProducedModules(lcvId.getBelongModule());
                     } else if (!isProduced) {
-                        libraryClass.get(indexOfGuid).setConsumedModules(lcId.getConsumedModules() + "<br>" + tmp);
+                        libraryClass.get(indexOfGuid).addConsumedModules(lcvId.getBelongModule());
                     }
                     isAdded = true;
                     continue;
@@ -862,13 +923,9 @@ public class Find {
             // Add a new one
             //
             if (!isAdded) {
-                if (isProduced) {
-                    libraryClass.addElement(new LibraryClassId(lcvId.getLibraryClassName(), "Library Class", tmp, null,
-                                                               lcvId.getDeclaredBy().getName()));
-                } else if (!isProduced) {
-                    libraryClass.addElement(new LibraryClassId(lcvId.getLibraryClassName(), "Library Class", null, tmp,
-                                                               lcvId.getDeclaredBy().getName()));
-                }
+                libraryClass.addElement(new FindResultId(lcvId.getLibraryClassName(), "Library Class",
+                                                         lcvId.getSupArchList(), lcvId.getHelp(),
+                                                         lcvId.getSupModuleList(), lcvId.getDeclaredBy()));
             }
         }
 

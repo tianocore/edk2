@@ -24,6 +24,7 @@ import org.tianocore.LibraryClassDefinitionsDocument.LibraryClassDefinitions;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.OpenFile;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
@@ -132,6 +133,31 @@ public class ModuleIdentification extends Identification {
                 }
             }
         }
+    }
+    
+    public boolean equals(String moduleGuid, String moduleVersion, String packageGuid, String packageVersion) {
+        boolean b = false;
+        if (this.getGuid().equals(moduleGuid) && this.getPackageId().getGuid().equals(packageGuid)) {
+            b = true;
+            //
+            // Check Version
+            //
+            if (moduleVersion != null) {
+                if (!Tools.isEmpty(moduleVersion)) {
+                    if (!moduleVersion.equals(this.getVersion())) {
+                        b = false;
+                    }
+                }
+            }
+            if (packageVersion != null) {
+                if (!Tools.isEmpty(packageVersion)) {
+                    if (!packageVersion.equals(this.getPackageId().getVersion())) {
+                        b = false;
+                    }
+                }
+            }
+        }
+        return b;
     }
 
     public boolean isLibrary() {

@@ -199,4 +199,25 @@ public class GlobalData {
         }
         return modulePath;
     }
+    
+    /**
+     Get a module id
+     
+     @param moduleGuid
+     @param moduleVersion
+     @param packageGuid
+     @param packageVersion
+     @return
+    
+    **/
+    public static ModuleIdentification findIdByGuidVersion(String moduleGuid, String moduleVersion, String packageGuid, String packageVersion) {
+        ModuleIdentification mid = null;
+        for (int index = 0; index < vModuleList.size(); index++) {
+            if (vModuleList.elementAt(index).equals(moduleGuid, moduleVersion, packageGuid, packageVersion)) {
+                mid = vModuleList.elementAt(index);
+                break;
+            }
+        }
+        return mid;
+    }
 }

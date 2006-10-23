@@ -231,10 +231,12 @@ public class Tools {
         //
         // remove file separator of rear
         //
-        if (path.length() > 0 && path.indexOf(DataType.DOS_FILE_SEPARATOR) == path.length() - DataType.DOS_FILE_SEPARATOR.length()) {
+        if (path.length() > 0
+            && path.indexOf(DataType.DOS_FILE_SEPARATOR) == path.length() - DataType.DOS_FILE_SEPARATOR.length()) {
             path = path.substring(0, path.length() - DataType.DOS_FILE_SEPARATOR.length());
         }
-        if (path.length() > 0 && path.indexOf(DataType.UNIX_FILE_SEPARATOR) == path.length() - DataType.UNIX_FILE_SEPARATOR.length()) {
+        if (path.length() > 0
+            && path.indexOf(DataType.UNIX_FILE_SEPARATOR) == path.length() - DataType.UNIX_FILE_SEPARATOR.length()) {
             path = path.substring(0, path.length() - DataType.DOS_FILE_SEPARATOR.length());
         }
         //
@@ -259,6 +261,35 @@ public class Tools {
             }
         }
         return v;
+    }
+
+    /**
+     Convert a Vector to a String, separator with ", "
+     
+     @param v
+     @return
+     
+     **/
+    public static String convertVectorToString(Vector<String> v) {
+        String s = "";
+        for (int index = 0; index < v.size(); index++) {
+            s = s + v.elementAt(index).toString() + ", ";
+        }
+        if (s.length() > 0) {
+            s = s.substring(0, s.length() - ", ".length());
+        }
+        return s;
+    }
+
+    /**
+     Convert a List to a String
+     
+     @param list
+     @return
+     
+     **/
+    public static String convertListToString(List list) {
+        return Tools.convertVectorToString(Tools.convertListToVector(list));
     }
 
     /**
@@ -339,7 +370,7 @@ public class Tools {
         if (arg0.length() <= 0) {
             return "";
         }
-        
+
         //
         // Convert string to array by " "
         //
@@ -553,14 +584,14 @@ public class Tools {
         resizeComponentWidth(c, containerWidth, preferredWidth);
         resizeComponentHeight(c, containerHeight, preferredHeight);
     }
-    
+
     /**
      To adjust each column's width to meet the table's size
      
      @param t the table need to be adjusted
      @param width the new width of the table
-    
-    **/
+     
+     **/
     public static void resizeTableColumn(JTable t, int width) {
         if (t != null) {
             int columnCount = t.getColumnCount();
