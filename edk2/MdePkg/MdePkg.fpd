@@ -388,22 +388,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>LIBRARY</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="55c61087-7367-4546-bc32-4937c5e6aff3">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b6e9a733-eb75-41b6-b30c-009bcf3801c8">
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -943,22 +927,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="55c61087-7367-4546-bc32-4937c5e6aff3">
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
@@ -1534,22 +1502,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>LIBRARY</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="X64" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="55c61087-7367-4546-bc32-4937c5e6aff3">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
     <ModuleSA SupArchList="X64" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b6e9a733-eb75-41b6-b30c-009bcf3801c8">
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -2089,22 +2041,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="55c61087-7367-4546-bc32-4937c5e6aff3">
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
