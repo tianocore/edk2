@@ -41,22 +41,22 @@ Abstract:
 // #define pci( device,function)  { 0x01, 0x01, 0x00, 0x06, device, function }
 // #define end  { 0xFF, 0xFF, 0x00, 0x04 }
 //
-#define ACPI \
+#define DP_ACPI \
   { \
     ACPI_DEVICE_PATH, ACPI_DP, (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
       ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8), EISA_PNP_ID (0x0A03), 0 \
   }
-#define PCI(device, function) \
+#define DP_PCI(device, function) \
   { \
     HARDWARE_DEVICE_PATH, HW_PCI_DP, (UINT8) (sizeof (PCI_DEVICE_PATH)), (UINT8) \
       ((sizeof (PCI_DEVICE_PATH)) >> 8), function, device \
   }
-#define END \
+#define DP_END \
   { \
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, END_DEVICE_PATH_LENGTH, 0 \
   }
 
-#define LPC(eisaid, function) \
+#define DP_LPC(eisaid, function) \
   { \
     ACPI_DEVICE_PATH, ACPI_DP, (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
       ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8), EISA_PNP_ID (eisaid), function \
