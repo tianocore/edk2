@@ -15,6 +15,8 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -719,8 +721,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JButton getJButtonRemoveModule() {
         if (jButtonRemoveModule == null) {
             jButtonRemoveModule = new JButton();
-            jButtonRemoveModule.setPreferredSize(new java.awt.Dimension(130, 20));
             jButtonRemoveModule.setText("Remove Module");
+            FontMetrics fm = jButtonRemoveModule.getFontMetrics(jButtonRemoveModule.getFont());
+            jButtonRemoveModule.setPreferredSize(new Dimension (fm.stringWidth(jButtonRemoveModule.getText()) + 40, 20));
             jButtonRemoveModule.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int selectedRow = jTableFpdModules.getSelectedRow();

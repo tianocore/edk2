@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.io.File;
@@ -423,8 +424,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (jButtonRemoveAll == null) {
             jButtonRemoveAll = new JButton();
             jButtonRemoveAll.setText("Remove All");
-            jButtonRemoveAll.setSize(new java.awt.Dimension(buttonWidth,20));
-            jButtonRemoveAll.setBounds(new java.awt.Rectangle(removeAllButtonCol,rowSeven,buttonWidth,20));
+            jButtonRemoveAll.setLocation(removeAllButtonCol,rowSeven);
+            FontMetrics fm = jButtonRemoveAll.getFontMetrics(jButtonRemoveAll.getFont());
+            jButtonRemoveAll.setSize(fm.stringWidth(jButtonRemoveAll.getText()) + 50, 20);
             jButtonRemoveAll.addActionListener(this);
         }
         return jButtonRemoveAll;

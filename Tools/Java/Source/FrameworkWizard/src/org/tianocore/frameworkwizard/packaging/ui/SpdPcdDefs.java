@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 
@@ -171,6 +172,15 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         this.setTitle("PCD Declarations");
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        int xPos = jCheckBoxPatchInMod.getX() + jCheckBoxPatchInMod.getWidth();
+        jCheckBoxFixedAtBuild.setLocation(xPos,133);
+        
+        xPos = jCheckBoxFeatureFlag.getX() + jCheckBoxFeatureFlag.getWidth();
+        jCheckBoxDyn.setLocation(xPos,161);
+        
+        xPos = jCheckBoxDyn.getX() + jCheckBoxDyn.getWidth();
+        jCheckBoxDynEx.setLocation(xPos,161);
+        
     }
 
     /**
@@ -355,17 +365,23 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jLabelSupArch.setBounds(new java.awt.Rectangle(241,192,89,16));
             jLabelSupArch.setText("Supported Architectures");
             jLabelSupArch.setEnabled(true);
+            FontMetrics fm = jLabelSupArch.getFontMetrics(jLabelSupArch.getFont());
+            jLabelSupArch.setSize(fm.stringWidth(jLabelSupArch.getText()) + 10, 20);
             jLabelSupMod = new JLabel();
             jLabelSupMod.setBounds(new java.awt.Rectangle(15,193,103,16));
-            jLabelSupMod.setText("Supported Module type");
+            jLabelSupMod.setText("Supported Module types");
             jLabelSupMod.setEnabled(true);
+            fm = jLabelSupMod.getFontMetrics(jLabelSupMod.getFont());
+            jLabelSupMod.setSize(fm.stringWidth(jLabelSupMod.getText()) + 10, 20);
             starLabel = new StarLabel();
             starLabel.setBounds(new java.awt.Rectangle(2,134,10,20));
             jLabelDefVal = new JLabel();
             jLabelDefVal.setBounds(new java.awt.Rectangle(277,84,80,20));
             jLabelDefVal.setText("Default Value");
+            fm = jLabelDefVal.getFontMetrics(jLabelDefVal.getFont());
+            jLabelDefVal.setSize(fm.stringWidth(jLabelDefVal.getText()) + 10, 20);
             jLabelVarVal = new JLabel();
-            jLabelVarVal.setBounds(new java.awt.Rectangle(11,133,84,20));
+            jLabelVarVal.setBounds(new java.awt.Rectangle(11,133,100,20));
             jLabelVarVal.setText("Valid Usage");
             jLabelC_Name = new JLabel();
             jLabelC_Name.setText("C Name");
@@ -575,7 +591,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JTextField getJTextFieldDefaultValue() {
         if (jTextFieldDefaultValue == null) {
             jTextFieldDefaultValue = new JTextField();
-            jTextFieldDefaultValue.setBounds(new java.awt.Rectangle(368,84,105,20));
+            int xPos = jLabelDefVal.getX() + jLabelDefVal.getWidth();
+            jTextFieldDefaultValue.setBounds(new java.awt.Rectangle(xPos,84,105,20));
             jTextFieldDefaultValue.setPreferredSize(new java.awt.Dimension(104,20));
         }
         return jTextFieldDefaultValue;
@@ -871,7 +888,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxFeatureFlag = new JCheckBox();
             jCheckBoxFeatureFlag.setBounds(new java.awt.Rectangle(156,161,100,21));
             jCheckBoxFeatureFlag.setText("Feature Flag");
-            jCheckBoxFeatureFlag.setPreferredSize(new java.awt.Dimension(21,20));
+            FontMetrics fm = jCheckBoxFeatureFlag.getFontMetrics(jCheckBoxFeatureFlag.getFont());
+            jCheckBoxFeatureFlag.setSize(fm.stringWidth(jCheckBoxFeatureFlag.getText()) + 30, 20);
             jCheckBoxFeatureFlag.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (jCheckBoxFeatureFlag.isSelected()) {
@@ -894,9 +912,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JCheckBox getJCheckBoxFixedAtBuild() {
         if (jCheckBoxFixedAtBuild == null) {
             jCheckBoxFixedAtBuild = new JCheckBox();
-            jCheckBoxFixedAtBuild.setBounds(new java.awt.Rectangle(312,133,108,20));
+            
             jCheckBoxFixedAtBuild.setText("Fixed at Build");
-            jCheckBoxFixedAtBuild.setPreferredSize(new java.awt.Dimension(21,20));
+            FontMetrics fm = jCheckBoxFixedAtBuild.getFontMetrics(jCheckBoxFixedAtBuild.getFont());
+            jCheckBoxFixedAtBuild.setSize(fm.stringWidth(jCheckBoxFixedAtBuild.getText()) + 30, 20);
             jCheckBoxFixedAtBuild.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (jCheckBoxFixedAtBuild.isSelected()) {
@@ -916,9 +935,11 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JCheckBox getJCheckBoxPatchInMod() {
         if (jCheckBoxPatchInMod == null) {
             jCheckBoxPatchInMod = new JCheckBox();
+            
             jCheckBoxPatchInMod.setBounds(new java.awt.Rectangle(156,133,154,20));
             jCheckBoxPatchInMod.setText("Patchable in Module");
-            jCheckBoxPatchInMod.setPreferredSize(new java.awt.Dimension(21,20));
+            FontMetrics fm = jCheckBoxPatchInMod.getFontMetrics(jCheckBoxPatchInMod.getFont());
+            jCheckBoxPatchInMod.setSize(fm.stringWidth(jCheckBoxPatchInMod.getText()) + 30, 20);
             jCheckBoxPatchInMod.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (jCheckBoxPatchInMod.isSelected()) {
@@ -938,9 +959,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JCheckBox getJCheckBoxDyn() {
         if (jCheckBoxDyn == null) {
             jCheckBoxDyn = new JCheckBox();
-            jCheckBoxDyn.setBounds(new java.awt.Rectangle(278,161,80,20));
+            
             jCheckBoxDyn.setText("Dynamic");
-            jCheckBoxDyn.setPreferredSize(new java.awt.Dimension(21,20));
+            FontMetrics fm = jCheckBoxDyn.getFontMetrics(jCheckBoxDyn.getFont());
+            jCheckBoxDyn.setSize(fm.stringWidth(jCheckBoxDyn.getText()) + 30, 20);
             jCheckBoxDyn.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (jCheckBoxDyn.isSelected()) {
@@ -960,9 +982,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JCheckBox getJCheckBoxDynEx() {
         if (jCheckBoxDynEx == null) {
             jCheckBoxDynEx = new JCheckBox();
-            jCheckBoxDynEx.setBounds(new java.awt.Rectangle(371,161,99,20));
+            
             jCheckBoxDynEx.setText("DynamicEx");
-            jCheckBoxDynEx.setPreferredSize(new java.awt.Dimension(21,20));
+            FontMetrics fm = jCheckBoxDynEx.getFontMetrics(jCheckBoxDynEx.getFont());
+            jCheckBoxDynEx.setSize(fm.stringWidth(jCheckBoxDynEx.getText()) + 30, 20);
             jCheckBoxDynEx.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (jCheckBoxDynEx.isSelected()) {
