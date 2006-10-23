@@ -1150,7 +1150,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/BasePeCoffLib/BasePeCoffLib.msa</Filename>
     <Filename>Library/BasePrintLib/BasePrintLib.msa</Filename>
-    <Filename>Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.msa</Filename>
     <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
     <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
     <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
