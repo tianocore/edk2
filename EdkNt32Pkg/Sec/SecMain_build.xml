@@ -58,14 +58,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </GenBuild>
     <GenBuild type="build">
       <property name="ARCH" value="${ARCH}"/>
-      <property name="MODULE_GUID" value="55c61087-7367-4546-bc32-4937c5e6aff3"/>
-      <property name="MODULE_VERSION" value=""/>
-      <property name="PLATFORM" value="${PLATFORM}"/>
-      <property name="PACKAGE_GUID" value="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-      <property name="PACKAGE_VERSION" value=""/>
-    </GenBuild>
-    <GenBuild type="build">
-      <property name="ARCH" value="${ARCH}"/>
       <property name="MODULE_GUID" value="9ba1d976-0624-41a3-8650-28165e8d9ae8"/>
       <property name="MODULE_VERSION" value=""/>
       <property name="PLATFORM" value="${PLATFORM}"/>
