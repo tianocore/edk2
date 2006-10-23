@@ -32,7 +32,7 @@ goto end
 
 :all
   @echo off
-  @for /R %%a in (*.msa *.fpd *.spd) do @ant -q -f %WORKSPACE%\Tools\Source\SurfaceArea\build.xml validate -DSURFACE_AREA_FILE=%%a
+  @for /R %%a in (*.msa *.fpd *.spd) do @ant -q -f %WORKSPACE%\Tools\Java\Source\SurfaceArea\build.xml validate -DSURFACE_AREA_FILE=%%a
   @echo on
   @goto end
 
