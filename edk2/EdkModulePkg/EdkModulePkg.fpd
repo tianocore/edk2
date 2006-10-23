@@ -17906,7 +17906,7 @@
         <Section SectionType="EFI_SECTION_RAW">
           <!--add 12 bytes blank.pad file-->
           <Filenames>
-            <Filename>Blank.pad</Filename>
+            <Filename>${PLATFORM_DIR}/Blank.pad</Filename>
           </Filenames>
         </Section>
         <Section SectionType="EFI_SECTION_PE32"/>
