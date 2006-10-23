@@ -505,32 +505,6 @@ public class LibraryClassDefsDlg extends IDialog {
             Log.wrn("Update Library Class Definitions", "Incorrect data type for Library Class");
             return false;
         }
-
-        //
-        // Check if the library is produced
-        //
-        String strUsage = this.jComboBoxUsage.getSelectedItem().toString();
-        //
-        // Check only when the library class is consumed
-        //
-        if (strUsage.equals(DataType.USAGE_TYPE_ALWAYS_CONSUMED) || strUsage.equals(DataType.USAGE_TYPE_SOMETIMES_CONSUMED)) {
-            LibraryClassVector v = Find.getAllLibraryClassVector();
-            boolean isFind = false;
-            for (int index = 0; index < v.size(); index++) {
-                LibraryClassIdentification lid = v.getLibraryClass(index);
-                if (lid.getLibraryClassName().equals(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
-                    if (lid.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
-                        || lid.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
-                        isFind = true;
-                        break;
-                    }
-                }
-            }
-            if (!isFind) {
-                Log.wrn("Update Library Class Definitions", "This Library Class has no instance yet.");
-                return false;
-            }
-        }
         
         //
         // Check RecommendedInstanceVersion
@@ -559,6 +533,32 @@ public class LibraryClassDefsDlg extends IDialog {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
                 Log.wrn("Update Library Class Definitions", "Incorrect data type for Feature Flag");
                 return false;
+            }
+        }
+        
+        //
+        // Check if the library is produced
+        //
+        String strUsage = this.jComboBoxUsage.getSelectedItem().toString();
+        //
+        // Check only when the library class is consumed
+        //
+        if (strUsage.equals(DataType.USAGE_TYPE_ALWAYS_CONSUMED) || strUsage.equals(DataType.USAGE_TYPE_SOMETIMES_CONSUMED)) {
+            LibraryClassVector v = Find.getAllLibraryClassVector();
+            boolean isFind = false;
+            for (int index = 0; index < v.size(); index++) {
+                LibraryClassIdentification lid = v.getLibraryClass(index);
+                if (lid.getLibraryClassName().equals(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
+                    if (lid.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
+                        || lid.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
+                        isFind = true;
+                        break;
+                    }
+                }
+            }
+            if (!isFind) {
+                Log.wrn("Update Library Class Definitions", "This Library Class has no instance yet. It may have some errors in build time.");
+                //return false;
             }
         }
 

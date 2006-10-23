@@ -471,7 +471,7 @@ public class WorkspaceTools {
                         if (type.elementAt(indexOfType).equals(DataType.PCD_ITEM_TYPE_DYNAMIC)) {
                             hasDYNAMIC = true;
                         }
-                        if(type.elementAt(indexOfType).equals(DataType.PCD_ITEM_TYPE_FEATURE_FLAG)) {
+                        if (type.elementAt(indexOfType).equals(DataType.PCD_ITEM_TYPE_FEATURE_FLAG)) {
                             hasFEATURE_FLAG = true;
                         }
                     }
@@ -666,10 +666,11 @@ public class WorkspaceTools {
                 //
                 // Check id
                 //
-                if (mid.equals(id)) {
-                    return GlobalData.vPackageList.elementAt(indexI);
+                if (mid != null) {
+                    if (mid.equals(id)) {
+                        return GlobalData.vPackageList.elementAt(indexI);
+                    }
                 }
-
             }
         }
 
@@ -809,19 +810,10 @@ public class WorkspaceTools {
                     //
                     PackageIdentification pid = GlobalData.openingModuleList.getIdByPath(path).getPackageId();
                     PackageSurfaceArea spd = GlobalData.openingPackageList.getPackageSurfaceAreaFromId(pid);
-                    if (spd != null) {
-                        if (spd.getLibraryClassDeclarations() != null) {
-                            LibraryClassDeclarations lcdl = spd.getLibraryClassDeclarations();
-                            for (int indexOfLibOfSpd = 0; indexOfLibOfSpd < lcdl.sizeOfLibraryClassArray(); indexOfLibOfSpd++) {
-                                if (lcdl.getLibraryClassList().get(indexOfLibOfSpd).getName().equals(name)) {
-                                    v.addElement(Tools.convertPathToCurrentOsType(Tools.getFilePathOnly(pid.getPath())
-                                                                                  + DataType.FILE_SEPARATOR
-                                                                                  + lcdl.getLibraryClassList()
-                                                                                        .get(indexOfLibOfSpd)
-                                                                                        .getIncludeHeader()));
-                                }
-                            }
-                        }
+                    String headerFile = getHeaderFileFromPackageByLibraryClassName(spd, name);
+                    if (!Tools.isEmpty(headerFile)) {
+                        v.addElement(Tools.convertPathToCurrentOsType(Tools.getFilePathOnly(pid.getPath())
+                                                                      + DataType.FILE_SEPARATOR + headerFile));
                     }
                 }
             }
@@ -919,5 +911,21 @@ public class WorkspaceTools {
             }
         }
         return v;
+    }
+
+    public String getHeaderFileFromPackageByLibraryClassName(PackageSurfaceArea spd, String name) {
+        String headerFile = "";
+        if (spd != null) {
+            if (spd.getLibraryClassDeclarations() != null) {
+                LibraryClassDeclarations lcdl = spd.getLibraryClassDeclarations();
+                for (int indexOfLibOfSpd = 0; indexOfLibOfSpd < lcdl.sizeOfLibraryClassArray(); indexOfLibOfSpd++) {
+                    if (lcdl.getLibraryClassList().get(indexOfLibOfSpd).getName().equals(name)) {
+                        return lcdl.getLibraryClassList().get(indexOfLibOfSpd).getIncludeHeader();
+                    }
+                }
+            }
+        }
+
+        return headerFile;
     }
 }

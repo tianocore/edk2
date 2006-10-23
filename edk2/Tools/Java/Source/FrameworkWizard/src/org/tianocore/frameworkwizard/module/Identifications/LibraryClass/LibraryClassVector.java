@@ -23,7 +23,14 @@ public class LibraryClassVector {
         for (int index = 0; index < vLibraryClass.size(); index++) {
             if (vLibraryClass.elementAt(index).getLibraryClassName().equals(lib.getLibraryClassName())
                 && vLibraryClass.elementAt(index).getUsage().equals(lib.getUsage())) {
-                return index;
+                if (vLibraryClass.elementAt(index).getBelongModule() != null && lib.getBelongModule() != null) {
+                    if (vLibraryClass.elementAt(index).getBelongModule().equals(lib.getBelongModule())) {
+                        return index;
+                    }
+                }
+                if (vLibraryClass.elementAt(index).getBelongModule() == null && lib.getBelongModule() == null) {
+                    return index;
+                }
             }
         }
         return -1;
