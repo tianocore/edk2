@@ -373,7 +373,7 @@ public class BootModesDlg extends IDialog {
      */
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxBootModeName, ed.getVBootModeNames());
-        Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVPpiUsage());
+        Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVBootModeUsage());
     }
 
     /*

@@ -386,7 +386,6 @@ public class EnumerationData {
         vFrameworkModuleTypes.addElement("DXE_RUNTIME_DRIVER");
         vFrameworkModuleTypes.addElement("DXE_SAL_DRIVER");
         vFrameworkModuleTypes.addElement("DXE_SMM_DRIVER");
-        vFrameworkModuleTypes.addElement("TOOL");
         vFrameworkModuleTypes.addElement("UEFI_DRIVER");
         vFrameworkModuleTypes.addElement("UEFI_APPLICATION");
         vFrameworkModuleTypes.addElement("USER_DEFINED");
@@ -648,12 +647,22 @@ public class EnumerationData {
         vBootModeNames.addElement("MINIMAL");
         vBootModeNames.addElement("NO_CHANGE");
         vBootModeNames.addElement("DIAGNOSTICS");
+        vBootModeNames.addElement("DEFAULT");
         vBootModeNames.addElement("S2_RESUME");
         vBootModeNames.addElement("S3_RESUME");
         vBootModeNames.addElement("S4_RESUME");
         vBootModeNames.addElement("S5_RESUME");
         vBootModeNames.addElement("FLASH_UPDATE");
-        vBootModeNames.addElement("RECOVERY");
+        vBootModeNames.addElement("RECOVERY_FULL");
+        vBootModeNames.addElement("RECOVERY_MINIMAL");
+        vBootModeNames.addElement("RECOVERY_NO_CHANGE");
+        vBootModeNames.addElement("RECOVERY_DIAGNOSTICS");
+        vBootModeNames.addElement("RECOVERY_DEFAULT");
+        vBootModeNames.addElement("RECOVERY_S2_RESUME");
+        vBootModeNames.addElement("RECOVERY_S3_RESUME");
+        vBootModeNames.addElement("RECOVERY_S4_RESUME");
+        vBootModeNames.addElement("RECOVERY_S5_RESUME");
+        vBootModeNames.addElement("RECOVERY_FLASH_UPDATE");
     }
     
     private void initBootModeUsage() {
