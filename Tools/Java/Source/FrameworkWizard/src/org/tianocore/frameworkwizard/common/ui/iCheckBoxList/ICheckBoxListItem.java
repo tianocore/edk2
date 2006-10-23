@@ -22,6 +22,8 @@ public class ICheckBoxListItem {
     protected String text;
 
     protected boolean checked;
+    
+    protected boolean selected;
 
     /**
      This is the default constructor to set check box item string
@@ -69,6 +71,14 @@ public class ICheckBoxListItem {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
 }

@@ -50,6 +50,14 @@ public class ICheckBoxList extends JList {
                 model.addElement(items.elementAt(index));
             }
         }
+        
+        //
+        // If there exists at least one item, set first item selected.
+        //
+        if (model.size() > 0) {
+            ICheckBoxListItem listItem = (ICheckBoxListItem) model.get(0);
+            listItem.setSelected(true);
+        }
         this.setCellRenderer(cellrenderer);
         this.setModel(model);
         this.addMouseListener(listener);
@@ -68,6 +76,14 @@ public class ICheckBoxList extends JList {
             for (int index = 0; index < items.size(); index++) {
                 model.addElement(new ICheckBoxListItem(items.elementAt(index)));
             }
+        }
+        
+        //
+        // If there exists at least one item, set first item selected.
+        //
+        if (model.size() > 0) {
+            ICheckBoxListItem listItem = (ICheckBoxListItem) model.get(0);
+            listItem.setSelected(true);
         }
     }
 
@@ -149,6 +165,15 @@ public class ICheckBoxList extends JList {
                 }
             }
         }
+        
+        //
+        // If there exists at least one item, set first item selected.
+        //
+        if (model.size() > 0) {
+            ICheckBoxListItem listItem = (ICheckBoxListItem) model.get(0);
+            listItem.setSelected(true);
+        }
+        
         this.validate();
     }
     
