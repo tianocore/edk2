@@ -41,6 +41,12 @@ public class PcdCodedIdentification {
     
     private String usage = null;
     
+    private String tokenSpaceGuidCName = null;
+    
+    private String token = null;
+    
+    private String datumType = null;
+    
     private ModuleIdentification belongModule = null;
     
     private PackageIdentification declaredBy = null;
@@ -141,5 +147,29 @@ public class PcdCodedIdentification {
 
     public void setDeclaredBy(PackageIdentification declaredBy) {
         this.declaredBy = declaredBy;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getTokenSpaceGuidCName() {
+        return tokenSpaceGuidCName;
+    }
+
+    public void setTokenSpaceGuidCName(String tokenSpaceGuidCName) {
+        this.tokenSpaceGuidCName = tokenSpaceGuidCName;
+    }
+
+    public String getDatumType() {
+        return datumType;
+    }
+
+    public void setDatumType(String datumType) {
+        this.datumType = datumType;
     }
 }

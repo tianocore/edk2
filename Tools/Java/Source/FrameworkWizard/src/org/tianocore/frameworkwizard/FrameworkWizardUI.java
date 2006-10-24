@@ -3374,6 +3374,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             // Refrash the tree
             //
             this.refresh();
+            this.makeEmptyTree();
         }
         sw.dispose();
     }
