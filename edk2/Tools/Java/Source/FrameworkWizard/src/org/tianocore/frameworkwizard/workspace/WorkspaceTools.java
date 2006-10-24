@@ -227,7 +227,7 @@ public class WorkspaceTools {
      @return
      
      **/
-    public Vector<PackageIdentification> getAllRepackagbalePackages() {
+    public Vector<PackageIdentification> getAllRepackagablePackages() {
         Vector<PackageIdentification> v = new Vector<PackageIdentification>();
         for (int index = 0; index < GlobalData.openingPackageList.size(); index++) {
             OpeningPackageType opt = GlobalData.openingPackageList.getOpeningPackageByIndex(index);
