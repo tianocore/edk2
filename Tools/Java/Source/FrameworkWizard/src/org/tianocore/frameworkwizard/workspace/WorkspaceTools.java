@@ -39,6 +39,7 @@ import org.tianocore.frameworkwizard.common.SaveFile;
 import org.tianocore.frameworkwizard.common.Sort;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.far.FarHeader;
 import org.tianocore.frameworkwizard.far.FarIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
@@ -217,6 +218,32 @@ public class WorkspaceTools {
      */
     public Vector<PackageIdentification> getAllPackages() {
         return GlobalData.vPackageList;
+    }
+
+    /**
+     Get all package which match parameter isRepackagable
+     
+     @param isRepackagable
+     @return
+     
+     **/
+    public Vector<PackageIdentification> getAllRepackagbalePackages() {
+        Vector<PackageIdentification> v = new Vector<PackageIdentification>();
+        for (int index = 0; index < GlobalData.openingPackageList.size(); index++) {
+            OpeningPackageType opt = GlobalData.openingPackageList.getOpeningPackageByIndex(index);
+            if (opt.getXmlSpd() != null) {
+                if (opt.getXmlSpd().getPackageDefinitions() != null) {
+                    if (opt.getXmlSpd().getPackageDefinitions().getRePackage()) {
+                        v.addElement(opt.getId());
+                    }
+                } else {
+                    v.addElement(opt.getId());
+                }
+            } else {
+                v.addElement(opt.getId());
+            }
+        }
+        return v;
     }
 
     public Vector<FarIdentification> getAllFars() {
