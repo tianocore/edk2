@@ -62,7 +62,7 @@ typedef struct {
 
 #define MAX_POOL_LIST       SIZE_TO_LIST(DEFAULT_PAGE_ALLOCATION)
 
-#define MAX_POOL_SIZE      0xffffff00
+#define MAX_POOL_SIZE     (MAX_ADDRESS - POOL_OVERHEAD)
 
 //
 // Globals
