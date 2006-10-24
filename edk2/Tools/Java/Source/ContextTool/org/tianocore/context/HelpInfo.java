@@ -33,6 +33,10 @@ public class HelpInfo {
         }
         
         System.out.printf("\n%s", ExampleString);
+        System.out.printf("\n%s", str1);
+        System.out.printf("\n%s", str2);
+        System.out.printf("\n%s", str3);
+        System.out.printf("\n%s", str4);
     }
 
     /** 
@@ -96,6 +100,14 @@ public class HelpInfo {
     
     private static final String ExampleString = "Example: ContextTool -a IA32 IA64 EBC -c Tools/Conf/tools_def.txt -t DEBUG -n GCC -p EdkNt32Pkg/Nt32.fpd -m 2\n";
 
+    private static final String str1 = "show current sub setting: ContextTool -x";
+    
+    private static final String str2 = "show possible sub setting: ContextTool -x ?";
+    
+    private static final String str3 = "clean current sub setting: ContextTool -x 0";
+    
+    private static final String str4 = "x is the sub setting option, such as p, a, n, m, t, c.\n";
+    
     private static final String HString = "-h";
 
     private static final String HStringInfo = "print usage info";
