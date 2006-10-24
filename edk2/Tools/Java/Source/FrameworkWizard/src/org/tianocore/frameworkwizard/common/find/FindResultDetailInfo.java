@@ -25,6 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData;
 import org.tianocore.FrameworkModulesDocument.FrameworkModules;
 import org.tianocore.LibrariesDocument.Libraries;
 import org.tianocore.LibrariesDocument.Libraries.Instance;
@@ -32,6 +35,9 @@ import org.tianocore.LibraryClassDocument.LibraryClass;
 import org.tianocore.ModuleSADocument.ModuleSA;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
+import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
+import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData;
+import org.tianocore.PcdCodedDocument.PcdCoded;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.GlobalData;
@@ -124,6 +130,251 @@ public class FindResultDetailInfo extends IFrame {
         this.jTextArea.setSelectionEnd(0);
     }
 
+    /**
+     
+     @param lci
+     
+     **/
+    public FindResultDetailInfo(PcdFindResultId frid) {
+        super();
+        init();
+        this.setTitle(frid.getName());
+        this.jTextArea.setText(createReport(frid));
+        this.jTextArea.setSelectionStart(0);
+        this.jTextArea.setSelectionEnd(0);
+    }
+
+    /**
+     Create detailed information report for pcd
+     
+     @param frid
+     @return
+     
+     **/
+    private String createReport(PcdFindResultId frid) {
+        String name = frid.getName();
+
+        //
+        // Write Pcd Name
+        //
+        writeReportLn("PCD C Name: " + name);
+
+        //
+        // Wrtie Declared package
+        //
+        writeReportLn("Declared in Package: " + frid.getDeclaredBy().getName() + " ("
+                      + Tools.getRelativePath(frid.getDeclaredBy().getPath(), Workspace.getCurrentWorkspace()) + ")");
+
+        //
+        // Write Token Space
+        //
+        writeReportLn("Token Space: " + frid.getTokenSpaceGuidCName());
+
+        //
+        // Write Token
+        //
+        writeReportLn("Token: " + frid.getToken());
+
+        //
+        // Write Datum Type
+        //
+        writeReportLn("Datum Type: " + frid.getDatumType());
+
+        //
+        // Write Default Value
+        //
+        writeReportLn("Default Value: " + frid.getValue());
+
+        //
+        // Write Usages
+        //
+        writeReportLn("Valid Usages: " + frid.getUsage());
+
+        //
+        // Write Help Text
+        //
+        writeReportLn("Help Text: ");
+        writeReportLn(TAB + frid.getHelp());
+
+        //
+        // Write an Empty Line
+        //
+        writeReportLn("");
+
+        //
+        // Wriet all modules which use this PCD:
+        //
+        writeReportLn("Modules Coded to Use This PCD: ");
+
+        Vector<ModuleIdentification> vModules = frid.getConsumedModules();
+        if (vModules != null) {
+            for (int index = 0; index < vModules.size(); index++) {
+                //
+                // Write Module Name and Path
+                //
+                writeReportLn(TAB + vModules.get(index).getName() + " ("
+                              + Tools.getRelativePath(vModules.get(index).getPath(), Workspace.getCurrentWorkspace())
+                              + ")");
+
+                //
+                // Write Module Pcd Info
+                //
+                ModuleSurfaceArea msa = GlobalData.openingModuleList.getModuleSurfaceAreaFromId(vModules.get(index));
+                if (msa != null) {
+                    PcdCoded pcdCoded = msa.getPcdCoded();
+                    if (pcdCoded != null) {
+                        for (int indexOfPcd = 0; indexOfPcd < pcdCoded.getPcdEntryList().size(); indexOfPcd++) {
+                            if (pcdCoded.getPcdEntryList().get(indexOfPcd).getCName().equals(name)) {
+                                //
+                                // Write Pcd Item Type
+                                //
+                                writeReportLn(TAB + TAB + "PcdItemType: "
+                                              + pcdCoded.getPcdEntryList().get(indexOfPcd).getPcdItemType().toString());
+
+                                //
+                                // Write Help Text
+                                //
+                                writeReportLn(TAB + TAB + "Help Text: ");
+                                writeReportLn(TAB + TAB + TAB
+                                              + pcdCoded.getPcdEntryList().get(indexOfPcd).getHelpText());
+                            }
+                        }
+                    }
+                }
+
+                //
+                // Write an Empty Line
+                //
+                writeReportLn("");
+            }
+        }
+
+        //
+        // Write an Empty Line
+        //
+        writeReportLn("");
+
+        //
+        // Write All Platforms Specifing this PCD
+        //
+        writeReportLn("Platforms Specifing this PCD: ");
+
+        for (int index = 0; index < GlobalData.openingPlatformList.size(); index++) {
+            PlatformSurfaceArea fpd = GlobalData.openingPlatformList.getOpeningPlatformByIndex(index).getXmlFpd();
+            PlatformIdentification pid = GlobalData.openingPlatformList.getOpeningPlatformByIndex(index).getId();
+
+            String tmp = "";
+            //
+            // Get Non-Dynamic Pcd
+            //
+            FrameworkModules fm = fpd.getFrameworkModules();
+            if (fm != null) {
+                for (int indexOfModuleSa = 0; indexOfModuleSa < fm.getModuleSAList().size(); indexOfModuleSa++) {
+                    ModuleSA msa = fm.getModuleSAList().get(indexOfModuleSa);
+                    if (msa != null) {
+                        PcdBuildDefinition p = msa.getPcdBuildDefinition();
+                        if (p != null) {
+                            if (p.getPcdDataList() != null) {
+
+                                for (int indexOfPcd = 0; indexOfPcd < p.getPcdDataList().size(); indexOfPcd++) {
+                                    PcdData pd = p.getPcdDataList().get(indexOfPcd);
+                                    //
+                                    // Find this PCD
+                                    //
+                                    if (pd.getCName().equals(name)) {
+                                        //
+                                        // Write Module Sa Info
+                                        //
+                                        ModuleIdentification moduleSaId = GlobalData
+                                                                                    .findIdByGuidVersion(
+                                                                                                         msa
+                                                                                                            .getModuleGuid(),
+                                                                                                         msa
+                                                                                                            .getModuleVersion(),
+                                                                                                         msa
+                                                                                                            .getPackageGuid(),
+                                                                                                         msa
+                                                                                                            .getPackageVersion());
+                                        tmp = tmp
+                                              + TAB
+                                              + TAB
+                                              + "Module: "
+                                              + moduleSaId.getName()
+                                              + " ("
+                                              + Tools.getRelativePath(moduleSaId.getPath(),
+                                                                      Workspace.getCurrentWorkspace()) + ")"
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Implementation: " + pd.getItemType().toString()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Specified / Implementation Value: "
+                                              + pd.getValue() + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + DataType.UNIX_LINE_SEPARATOR;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //
+            // Get Dynamic Pcd
+            //
+            DynamicPcdBuildDefinitions dpbd = fpd.getDynamicPcdBuildDefinitions();
+            if (dpbd != null) {
+                for (int indexOfDpbd = 0; indexOfDpbd < dpbd.getPcdBuildDataList().size(); indexOfDpbd++) {
+                    PcdBuildData pbd = dpbd.getPcdBuildDataList().get(indexOfDpbd);
+                    if (pbd != null) {
+                        if (pbd.getCName().equals(name)) {
+                            //
+                            // Write Dynamic Pcd Build Definition
+                            //
+                            tmp = tmp + TAB + TAB + "Dynamic Pcd Build Definition: " + DataType.UNIX_LINE_SEPARATOR;
+                            if (pbd.getSkuInfoList() != null) {
+                                for (int indexOfPcd = 0; indexOfPcd < pbd.getSkuInfoList().size(); indexOfPcd++) {
+                                    SkuInfo si = pbd.getSkuInfoList().get(indexOfPcd);
+                                    if (si != null) {
+                                        tmp = tmp + TAB + TAB + TAB + "Sku Id: " + si.getSkuId().toString()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Variable Name: " + si.getVariableName()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Variable GUID: " + si.getVariableGuid()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Variable Offset: " + si.getVariableOffset()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                        tmp = tmp + TAB + TAB + TAB + "Hii Default Value: " + si.getHiiDefaultValue()
+                                              + DataType.UNIX_LINE_SEPARATOR;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //
+            // If not empty, write this platform info
+            //
+            if (!Tools.isEmpty(tmp)) {
+                tmp = TAB + "Platform: " + pid.getName() + " ("
+                      + Tools.getRelativePath(pid.getPath(), Workspace.getCurrentWorkspace()) + ")"
+                      + DataType.UNIX_LINE_SEPARATOR + tmp;
+                this.writeReportLn(tmp);
+            }
+        }
+
+        return reportContent;
+    }
+
+    //
+    // Create detailed information report for library
+    // 
+    /**
+     
+     @param frid
+     @return
+     
+     **/
     private String createReport(FindResultId frid) {
         String tmp = "";
         String name = frid.getName();

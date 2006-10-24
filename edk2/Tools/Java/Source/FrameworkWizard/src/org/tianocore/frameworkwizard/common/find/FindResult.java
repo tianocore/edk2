@@ -42,6 +42,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassVector;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedVector;
 
 public class FindResult extends IFrame implements TableModelListener, ListSelectionListener, MouseListener {
 
@@ -85,6 +86,10 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
     private LibraryClassVector lcv = null;
 
     private Vector<FindResultId> vLibraryClassFindResult = null;
+
+    private PcdCodedVector pv = null;
+
+    private Vector<PcdFindResultId> vPcdFindResult = null;
 
     /**
      * This is the default constructor
@@ -377,29 +382,52 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
         }
 
         if (this.method.equals("PCD")) {
-            Vector<PcdId> vPcd = Find.getAllPcdCodedForFind();
+            pv = Find.getAllPcdCodedVector();
+            vPcdFindResult = Find.getAllPcdCodedForFind(pv);
 
-            if (vPcd.size() > 0) {
+            if (vPcdFindResult.size() > 0) {
 
-                for (int index = 0; index < vPcd.size(); index++) {
+                for (int index = 0; index < vPcdFindResult.size(); index++) {
                     Vector<String> v = new Vector<String>();
-                    v.addElement(vPcd.elementAt(index).getName());
-                    v.addElement(vPcd.elementAt(index).getType());
-                    String strProducedModules = vPcd.elementAt(index).getProducedModules();
+                    v.addElement(vPcdFindResult.elementAt(index).getName());
+                    v.addElement(vPcdFindResult.elementAt(index).getType());
+
+                    //
+                    // Generate Produced Modules List
+                    //
+                    String strProducedModules = "";
+                    Vector<ModuleIdentification> vModule = vPcdFindResult.elementAt(index).getProducedModules();
+                    for (int indexOfPM = 0; indexOfPM < vModule.size(); indexOfPM++) {
+                        strProducedModules = strProducedModules + "<br>"
+                                             + vModule.get(indexOfPM).getPackageId().getName() + "."
+                                             + vModule.get(indexOfPM).getName();
+                    }
                     if (strProducedModules.indexOf("<br>") == 0) {
                         strProducedModules = strProducedModules.substring("<br>".length());
                     }
                     int line1 = Tools.getSpecificStringCount(strProducedModules, "<br>");
                     v.addElement("<html>" + strProducedModules + "</html>");
 
-                    String strConsumedModules = vPcd.elementAt(index).getConsumedModules();
+                    //
+                    // Generate Consumed Modules List
+                    //
+                    String strConsumedModules = "";
+                    vModule = vPcdFindResult.elementAt(index).getConsumedModules();
+                    for (int indexOfCM = 0; indexOfCM < vModule.size(); indexOfCM++) {
+                        strConsumedModules = strConsumedModules + "<br>"
+                                             + vModule.get(indexOfCM).getPackageId().getName() + "."
+                                             + vModule.get(indexOfCM).getName();
+                    }
                     if (strConsumedModules.indexOf("<br>") == 0) {
                         strConsumedModules = strConsumedModules.substring("<br>".length());
                     }
                     int line2 = Tools.getSpecificStringCount(strConsumedModules, "<br>");
                     v.addElement("<html>" + strConsumedModules + "</html>");
 
-                    v.addElement(vPcd.elementAt(index).getDeclaredBy());
+                    //
+                    // Add declare package name
+                    //
+                    v.addElement(vPcdFindResult.elementAt(index).getDeclaredBy().getName());
 
                     model.addRow(v);
                     jTable.setRowHeight(index, (Math.max(line1, line2) > 1 ? Math.max(line1, line2) : 1) * 18);
@@ -526,6 +554,10 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
             } else {
                 if (this.method.equals("LIBRARY_CLASS")) {
                     FindResultDetailInfo frdi = new FindResultDetailInfo(vLibraryClassFindResult.elementAt(selectedRow));
+                    frdi.setVisible(true);
+                }
+                if (this.method.equals("PCD")) {
+                    FindResultDetailInfo frdi = new FindResultDetailInfo(vPcdFindResult.elementAt(selectedRow));
                     frdi.setVisible(true);
                 }
             }
