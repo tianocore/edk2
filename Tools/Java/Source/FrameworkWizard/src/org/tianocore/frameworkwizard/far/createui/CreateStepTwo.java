@@ -101,7 +101,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
             jComboBoxPackage = new ICheckBoxList();
             WorkspaceTools wt = new WorkspaceTools();
             Vector<String> v = new Vector<String>();
-            packageVector = wt.getAllPackages();
+            packageVector = wt.getAllRepackagablePackages();
             Iterator<PackageIdentification> iter = packageVector.iterator();
             while (iter.hasNext()) {
                 PackageIdentification item = iter.next();
