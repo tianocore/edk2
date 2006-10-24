@@ -17,7 +17,8 @@ public class ContextMain {
     public static void main(String[] args) {
 
         if (TargetFile.validateFilename("target.txt") == false) {
-            System.out.printf("%n%s", "Target.txt can't be found in WorkSpace. Please check it!");
+            String workspacePath = System.getenv("WORKSPACE");
+            System.out.printf("%n%s%n", "target.txt can't be found. Please check it in " + workspacePath + "\\Tool\\Conf");
             System.exit(0);
         }
         
@@ -41,6 +42,7 @@ public class ContextMain {
             System.exit(0);
         }
         
-        System.out.printf("%n%s", "Target.txt generate successfully!");
+        String workspacePath = System.getenv("WORKSPACE");
+        System.out.printf("%n%s%n", workspacePath + "\\Tool\\Conf\\target.txt is generated successfully!");
     }
 }

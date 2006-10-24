@@ -35,7 +35,7 @@ public class ParseParameter {
                 return false;
             }
             if( args[0].charAt(0) != '-' ){
-                System.out.printf("%s\n", "Error arguments! Please type \"ContextTool -h\" for helpinfo.");
+                System.out.printf("%s\n", "Error Parameters! Please type \"ContextTool -h\" for helpinfo.");
                 return false;
             }
             for(int i=0; i<args.length; i++){
@@ -43,7 +43,7 @@ public class ParseParameter {
                     ((args[i].compareTo("-a") != 0) && (args[i].compareTo("-c") != 0) && 
                     (args[i].compareTo("-n") != 0) && (args[i].compareTo("-p") != 0) && 
                     (args[i].compareTo("-t") != 0) && (args[i].compareTo("-m") != 0)))){
-                    System.out.printf("%s\n", "Error arguments! Please type \"ContextTool -h\" for helpinfo.");                                                                                                                                                            
+                    System.out.printf("%s\n", "Error Parameters! Please type \"ContextTool -h\" for helpinfo.");                                                                                                                                                            
                     return false;
                 }
             }
@@ -86,7 +86,8 @@ public class ParseParameter {
                 //argstr is "-p ? ", display possible setting
                 //
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
-                    System.out.printf( "%s\n", "assign the platform FPD file's relative path to WORKSPACE" );
+                    String workspacePath = System.getenv("WORKSPACE");
+                    System.out.printf( "%s\n", "Assign a platform FPD file with relative path to " + workspacePath);
                     return 2;
                 }
                 //
@@ -99,7 +100,7 @@ public class ParseParameter {
                 }
                 String[] S = argstr.split(" ");
                 if(S.length > 2){
-                    System.out.printf( "%s\n", "The number of ACTIVE_PLATFORM can not more than 1.");
+                    System.out.printf( "%s\n", "There should be none or only one ACTIVE_PLATFORM. Please check the number of value which follow \"-p\".");
                     return 3;
                 }
                 curpstr = pstr.concat(argstr.substring(2));
@@ -110,7 +111,7 @@ public class ParseParameter {
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
-                    System.out.printf( "%s\n", "What kind of the version is the binary target, such as DEBUG, RELEASE" );
+                    System.out.printf( "%s\n", "What kind of the version is the binary target, such as DEBUG, RELEASE." );
                     return 2;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
@@ -126,7 +127,7 @@ public class ParseParameter {
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
-                    System.out.printf( "%s\n", "What kind of architechure is the binary target, such as IA32, IA64, X64, EBC, or ARM" );
+                    System.out.printf( "%s\n", "What kind of architechure is the binary target, such as IA32, IA64, X64, EBC, or ARM." );
                     return 2;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
@@ -142,7 +143,8 @@ public class ParseParameter {
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
-                    System.out.printf( "%s\n", "Assign a txt file with the relative path to WORKSPACE, which specify the tools to use for the build and must be located in the path: WORKSPACE/Tools/Conf/" );
+                    String workspacePath = System.getenv("WORKSPACE");
+                    System.out.printf( "%s\n", "Assign a txt file with relative path to " + workspacePath + ", which specify the tools to use for the build and must be located in the path:" + workspacePath + "\\Tools\\Conf" );
                     return 2;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
@@ -152,7 +154,7 @@ public class ParseParameter {
                 }
                 String[] S = argstr.split(" ");
                 if(S.length > 2){
-                    System.out.printf( "%s\n", "The number of TOOL_CHAIN_CONF can not more than 1.");
+                    System.out.printf( "%s\n", "There should be one and only one TOOL_CHAIN_CONF. Please check the number of value which follow \"-c\".");
                     return 3;
                 }
                 curcstr = cstr.concat(argstr.substring(2));
@@ -163,7 +165,7 @@ public class ParseParameter {
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
-                    System.out.printf( "%s\n", "Specify the TagName, such as GCC, MSFT" );
+                    System.out.printf( "%s\n", "Specify the TagName, such as GCC, MSFT." );
                     return 2;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '0'){
@@ -184,7 +186,7 @@ public class ParseParameter {
                 }
                 String[] S = argstr.split(" ");
                 if(S.length > 2){
-                    System.out.printf( "%s\n", "The format of number is wrong.");
+                    System.out.printf( "%s\n", "There should be one and only one integer, which doesn't include space.");
                     return 3;
                 }
                 mstr += argstr.substring(2);
@@ -259,8 +261,7 @@ public class ParseParameter {
         
         return true;
     }
-     
-    public static int length  = 0;
+    
     public static String pstr = new String("ACTIVE_PLATFORM                     = ");
     public static String tstr = new String("TARGET                              = ");
     public static String astr = new String("TARGET_ARCH                         = ");
@@ -276,14 +277,6 @@ public class ParseParameter {
     public static String curnstr = null;
     public static String curmstr = null;
     public static String curmestr = null;
-    
-    public static int plength = 0;
-    public static int tlength = 0;
-    public static int alength = 0;
-    public static int clength = 0;
-    public static int nlength = 0;
-    public static int mlength = 0;
-    public static int melength = 0;
     
     public static boolean npflag = false;
     public static boolean ntflag = false;
