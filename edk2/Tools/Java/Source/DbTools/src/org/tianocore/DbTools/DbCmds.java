@@ -471,7 +471,7 @@ public class DbCmds {
                   .println("      -v                        OPTIONAL - Verbose, print information messages.  Adding more -v arguments increases verbosity.");
         System.out.println("      --package                 OPTIONAL - Show all Packages installed in the WORKSPACE.");
         System.out.println("      --platforms               OPTIONAL - Show all Platforms installed in the WORKSPACE.");
-        System.out.println("      -V                        OPTIONAL - Display Verision information and exit.");
+        System.out.println("      -V                        OPTIONAL - Display Version information and exit.");
         //
         // TODO: Implement the following options.
         //
