@@ -261,12 +261,19 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         Matcher mtrhobstatus;
         String templine = wholeline;
         for (int i = 0; i < specialhoblibfunc.length; i++) {
-            ptnhobstatus = Pattern.compile("(Status\\s*=\\s*)?" + specialhoblibfunc[i] + "(.*?\\)\\s*;)", Pattern.DOTALL);
-            mtrhobstatus = ptnhobstatus.matcher(templine);
-            if (mtrhobstatus.find()) {
-                templine = mtrhobstatus.replaceAll(specialhoblibfunc[i] + mtrhobstatus.group(2) + "\n  " + 
-                           MigrationTool.MIGRATIONCOMMENT +  "R9 Hob-building library functions will assert if build failure.\n  Status = EFI_SUCCESS;");
-            }
+            do {
+                ptnhobstatus = Pattern.compile("((?:\t| )*)(\\w(?:\\w|\\d)*)\\s*=\\s*" + specialhoblibfunc[i] + "(.*?;)", Pattern.DOTALL);
+                mtrhobstatus = ptnhobstatus.matcher(templine);
+                if (!mtrhobstatus.find()) {
+                    break;
+                }
+                String captureIndent = mtrhobstatus.group(1);
+                String captureStatus = mtrhobstatus.group(2);
+                String replaceString = captureIndent + specialhoblibfunc[i] + mtrhobstatus.group(3) + "\n";
+                replaceString += captureIndent + MigrationTool.MIGRATIONCOMMENT +  "R9 Hob-building library functions will assert if build failure.\n";
+                replaceString += captureIndent + captureStatus + " = EFI_SUCCESS;";
+                templine = mtrhobstatus.replaceFirst(replaceString);
+            } while (true);
         }
         return templine;
     }
