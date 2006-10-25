@@ -28,8 +28,8 @@ if not exist %WORKSPACE%\Tools\bin\CheckTools.jar (
   goto no_CheckTools
 )
 
-@REM Run Framework Wizard
-call "java" -cp %WORKSPACE%\Tools\bin\CheckTools.jar org.tianocore.CheckTools.CheckTools %*
+@REM Run CheckTools
+call "java" -cp "%WORKSPACE%\Tools\bin\CheckTools.jar" org.tianocore.CheckTools.CheckTools %*
 
 goto end
 

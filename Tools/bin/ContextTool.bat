@@ -28,8 +28,8 @@ if not exist %WORKSPACE%\Tools\Jars\ContextTool.jar (
   goto no_ContextTool
 )
 
-@REM Run Framework Wizard
-java -cp %WORKSPACE%\Tools\Jars\ContextTool.jar org.tianocore.context.ContextMain %*
+@REM Run ContextTool
+java -cp "%WORKSPACE%\Tools\Jars\ContextTool.jar" org.tianocore.context.ContextMain %*
 
 goto end
 

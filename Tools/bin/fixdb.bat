@@ -29,7 +29,7 @@ if not exist %WORKSPACE%\Tools\Jars\DbTools.jar (
 )
 
 @REM Run Framework Wizard
-call "java" -cp %WORKSPACE%\Tools\Jars\DbTools.jar org.tianocore.DbTools.DbTool -f %*
+call "java" -cp "%WORKSPACE%\Tools\Jars\DbTools.jar" org.tianocore.DbTools.DbTool -f %*
 
 goto end
 
