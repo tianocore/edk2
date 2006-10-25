@@ -31,18 +31,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </ModuleDefinitions>
   <SourceFiles>
     <Filename>build.xml</Filename>
+    <Filename>org/tianocore/migration/Common.java</Filename>
+    <Filename>org/tianocore/migration/Critic.java</Filename>
     <Filename>org/tianocore/migration/Database.java</Filename>
-    <Filename>org/tianocore/migration/FirstPanel.java</Filename> 
-    <Filename>org/tianocore/migration/Func.java</Filename> 
-    <Filename>org/tianocore/migration/Guid.java</Filename> 
-    <Filename>org/tianocore/migration/Macro.java</Filename> 
-    <Filename>org/tianocore/migration/ModuleInfo.java</Filename> 
-    <Filename>org/tianocore/migration/ModuleReader.java</Filename> 
-    <Filename>org/tianocore/migration/MsaWriter.java</Filename> 
+    <Filename>org/tianocore/migration/FirstPanel.java</Filename>
+    <Filename>org/tianocore/migration/Func.java</Filename>
+    <Filename>org/tianocore/migration/Guid.java</Filename>
+    <Filename>org/tianocore/migration/Macro.java</Filename>
+    <Filename>org/tianocore/migration/MigrationTool.java</Filename>
+    <Filename>org/tianocore/migration/ModuleInfo.java</Filename>
+    <Filename>org/tianocore/migration/ModuleReader.java</Filename>
+    <Filename>org/tianocore/migration/MsaOwner.java</Filename>
+    <Filename>org/tianocore/migration/MsaTreeEditor.java</Filename>
+    <Filename>org/tianocore/migration/MsaWriter.java</Filename>
+    <Filename>org/tianocore/migration/PathIterator.java</Filename>
     <Filename>org/tianocore/migration/SourceFileReplacer.java</Filename>
     <Filename>org/tianocore/migration/UI.java</Filename>
-    <Filename>org/tianocore/migration/MsaTreeEditor.java</Filename> 
-    <Filename>org/tianocore/migration/Critic.java</Filename> 
-    <Filename>org/tianocore/migration/Common.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>

@@ -35,21 +35,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <SourceFiles>
     <Filename>build.xml</Filename>
     <Filename>GenBuild.tasks</Filename>
+    <Filename>org/tianocore/build/FfsProcess.java</Filename>
+    <Filename>org/tianocore/build/FileProcess.java</Filename>
+    <Filename>org/tianocore/build/FrameworkBuildTask.java</Filename>
+    <Filename>org/tianocore/build/GenBuildTask.java</Filename>
+    <Filename>org/tianocore/build/ModuleBuildFileGenerator.java</Filename>
+    <Filename>org/tianocore/build/GenBuildThread.java</Filename>
+    
     <Filename>org/tianocore/build/autogen/AutoGen.java</Filename>
     <Filename>org/tianocore/build/autogen/AutogenLibOrder.java</Filename>
     <Filename>org/tianocore/build/autogen/CommonDefinition.java</Filename>
+    
     <Filename>org/tianocore/build/exception/AutoGenException.java</Filename>
-    <Filename>org/tianocore/build/exception/EdkException.java</Filename>
     <Filename>org/tianocore/build/exception/GenBuildException.java</Filename>
     <Filename>org/tianocore/build/exception/PcdAutogenException.java</Filename>
-    <Filename>org/tianocore/build/exception/TianoToolsException.java</Filename>
+    <Filename>org/tianocore/build/exception/PlatformPcdPreprocessBuildException.java</Filename>
     <Filename>org/tianocore/build/exception/XmlParseException.java</Filename>
-    <Filename>org/tianocore/build/FfsProcess.java</Filename>
-    <Filename>org/tianocore/build/FileProcess.java</Filename>
+
     <Filename>org/tianocore/build/fpd/FpdParserTask.java</Filename>
     <Filename>org/tianocore/build/fpd/PlatformBuildFileGenerator.java</Filename>
-    <Filename>org/tianocore/build/FrameworkBuildTask.java</Filename>
-    <Filename>org/tianocore/build/GenBuildTask.java</Filename>
+    <Filename>org/tianocore/build/fpd/FpdParserForThread.java</Filename>
+
     <Filename>org/tianocore/build/global/DpFile.java</Filename>
     <Filename>org/tianocore/build/global/DpFileList.java</Filename>
     <Filename>org/tianocore/build/global/GenBuildLogger.java</Filename>
@@ -59,25 +65,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/build/global/Spd.java</Filename>
     <Filename>org/tianocore/build/global/SurfaceAreaQuery.java</Filename>
     <Filename>org/tianocore/build/global/VariableTask.java</Filename>
+    
     <Filename>org/tianocore/build/id/FpdModuleIdentification.java</Filename>
     <Filename>org/tianocore/build/id/Identification.java</Filename>
     <Filename>org/tianocore/build/id/ModuleIdentification.java</Filename>
     <Filename>org/tianocore/build/id/PackageIdentification.java</Filename>
     <Filename>org/tianocore/build/id/PlatformIdentification.java</Filename>
-    <Filename>org/tianocore/build/ModuleBuildFileGenerator.java</Filename>
-    <Filename>org/tianocore/build/OutputDirSetup.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/CollectPCDAction.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/PcdDatabase.java</Filename>
+
     <Filename>org/tianocore/build/pcd/action/PCDAutoGenAction.java</Filename>
+    <Filename>org/tianocore/build/pcd/action/PcdDatabase.java</Filename>
+    <Filename>org/tianocore/build/pcd/action/PlatformPcdPreprocessActionForBuilding.java</Filename>
+    
     <Filename>org/tianocore/build/toolchain/ConfigReader.java</Filename>
-    <Filename>org/tianocore/build/toolchain/ToolChainAttribute.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainConfig.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainElement.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainInfo.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainKey.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainMap.java</Filename>
-    <Filename>org/tianocore/build/toolchain/ToolChainTask.java</Filename>
-    <Filename>org/tianocore/build/tools/DefaultBuildFileGenerator.java</Filename>
+    
     <Filename>org/tianocore/build/tools/ModuleItem.java</Filename>
     <Filename>org/tianocore/build/tools/PackageItem.java</Filename>
   </SourceFiles>

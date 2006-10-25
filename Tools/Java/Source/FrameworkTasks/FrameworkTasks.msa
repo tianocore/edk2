@@ -45,13 +45,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/framework/tasks/EfiRomTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/FfsHeader.java</Filename>
     <Filename>org/tianocore/framework/tasks/FfsTypes.java</Filename>
-    <Filename>org/tianocore/framework/tasks/FileParser.java</Filename>
+    <Filename>org/tianocore/framework/tasks/FileArg.java</Filename>
     <Filename>org/tianocore/framework/tasks/FlashMapTask.java</Filename>
-    <Filename>org/tianocore/framework/tasks/FrameworkLogger.java</Filename>
     <Filename>org/tianocore/framework/tasks/FwImageTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/GenAcpiTableTask.java</Filename>
-    <Filename>org/tianocore/framework/tasks/GenCapsuleHdrTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/GenCRC32SectionTask.java</Filename>
+    <Filename>org/tianocore/framework/tasks/GenCapsuleHdrTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/GenDepexTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/GenFfsFileTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/GenFvImageTask.java</Filename>
@@ -62,6 +61,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/framework/tasks/Input.java</Filename>
     <Filename>org/tianocore/framework/tasks/InputFile.java</Filename>
     <Filename>org/tianocore/framework/tasks/MakeDeps.java</Filename>
+    <Filename>org/tianocore/framework/tasks/ModifyInfTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/NestElement.java</Filename>
     <Filename>org/tianocore/framework/tasks/PeiReBaseTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/SecApResetVectorFixupTask.java</Filename>
@@ -77,6 +77,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/framework/tasks/ToolArg.java</Filename>
     <Filename>org/tianocore/framework/tasks/VfrCompilerTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/ZeroDebugDataTask.java</Filename>
-    <Filename>org/tianocore/framework/tasks/ModifyInfTask.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
