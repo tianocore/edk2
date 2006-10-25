@@ -31,15 +31,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </ModuleDefinitions>
   <SourceFiles>
     <Filename>build.xml</Filename>
-    <Filename>org/tianocore/pcd/action/ActionMessage.java</Filename>
+    <Filename>org/tianocore/pcd/action/PlatformPcdPreprocessAction.java</Filename>
     <Filename>org/tianocore/pcd/action/BuildAction.java</Filename>
+    <Filename>org/tianocore/pcd/entity/CommonDefinition.java</Filename>
     <Filename>org/tianocore/pcd/entity/DynamicTokenValue.java</Filename>
     <Filename>org/tianocore/pcd/entity/MemoryDatabaseManager.java</Filename>
+    <Filename>org/tianocore/pcd/entity/ModulePcdInfoFromFpd.java</Filename>
     <Filename>org/tianocore/pcd/entity/SkuInstance.java</Filename>
     <Filename>org/tianocore/pcd/entity/Token.java</Filename>
     <Filename>org/tianocore/pcd/entity/UsageInstance.java</Filename>
     <Filename>org/tianocore/pcd/exception/BuildActionException.java</Filename>
     <Filename>org/tianocore/pcd/exception/EntityException.java</Filename>
+    <Filename>org/tianocore/pcd/exception/PlatformPcdPreprocessException.java</Filename>
     <Filename>org/tianocore/pcd/exception/UIException.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>

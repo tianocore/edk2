@@ -34,9 +34,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </ModuleDefinitions>
   <SourceFiles>
     <Filename>build.xml</Filename>
-    <Filename>org/tianocore/exception/EdkException.java</Filename>
-    <Filename>org/tianocore/logger/DefaultLogger.java</Filename>
-    <Filename>org/tianocore/logger/EdkLog.java</Filename>
-    <Filename>org/tianocore/logger/LogMethod.java</Filename>
+    <Filename>org/tianocore/common/cache/FileTimeStamp.java</Filename>
+    
+    <Filename>org/tianocore/common/definitions/EdkDefinitions.java</Filename>
+    <Filename>org/tianocore/common/definitions/ToolDefinitions.java</Filename>
+    
+    <Filename>org/tianocore/common/exception/EdkException.java</Filename>
+    
+    <Filename>org/tianocore/common/logger/DefaultLogger.java</Filename>
+    <Filename>org/tianocore/common/logger/EdkLog.java</Filename>
+    <Filename>org/tianocore/common/logger/LogMethod.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
