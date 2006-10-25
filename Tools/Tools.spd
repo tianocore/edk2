@@ -24,9 +24,22 @@
   </SpdHeader>
   <PackageDefinitions>
     <ReadOnly>false</ReadOnly>
-    <RePackage>false</RePackage>
+    <RePackage>true</RePackage>
   </PackageDefinitions>
   <MsaFiles>
     <Filename>AllResourceFiles.msa</Filename>
+    <Filename>CCode/Source/TianoTools.msa</Filename>
+    <Filename>Java/Source/CheckTools/CheckTools.msa</Filename>
+    <Filename>Java/Source/Common/Common.msa</Filename>
+    <Filename>Java/Source/ContextTool/ContextTool.msa</Filename>
+    <Filename>Java/Source/Cpptasks/CppTasks.msa</Filename>
+    <Filename>Java/Source/DbTools/DbTools.msa</Filename>
+    <Filename>Java/Source/FrameworkTasks/FrameworkTasks.msa</Filename>
+    <Filename>Java/Source/FrameworkWizard/FrameworkWizard.msa</Filename>
+    <Filename>Java/Source/GenBuild/GenBuild.msa</Filename>
+    <Filename>Java/Source/Merge/Merge.msa</Filename>
+    <Filename>Java/Source/MigrationTools/MigrationTools.msa</Filename>
+    <Filename>Java/Source/PcdTools/PcdTools.msa</Filename>
+    <Filename>Java/Source/SurfaceArea/SurfaceArea.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>

@@ -42,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Java/Source/ContextTool/build.xml
           Java/Source/Merge/build.xml
           Java/Source/CheckTools/build.xml
+          Java/Source/DbTools/build.xml
           "/>
     </subant>
     <echo message="The EDK II Java Tools build has completed!"/>
@@ -184,6 +185,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Java/Source/ContextTool/build.xml
           Java/Source/Merge/build.xml
           Java/Source/CheckTools/build.xml
+          Java/Source/DbTools/build.xml
           CCode/Source/build.xml
         "/>
     </subant>
@@ -236,6 +238,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Java/Source/ContextTool/build.xml
           Java/Source/Merge/build.xml
           Java/Source/CheckTools/build.xml
+          Java/Source/DbTools/build.xml
           CCode/Source/build.xml
         "/>
     </subant>
