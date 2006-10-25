@@ -10,4 +10,4 @@
 #
 
 # Run DbTools
-java -cp ${WORKSPACE}/Tools/Jars/DbTools.jar org.tianocore.DbTools.DbTool $@
+java -cp "${WORKSPACE}/Tools/Jars/DbTools.jar" org.tianocore.DbTools.DbTool $@

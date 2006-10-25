@@ -10,4 +10,4 @@
 #
 
 # Run CheckTools
-java -cp ${WORKSPACE}/Tools/bin/CheckTools.jar org.tianocore.CheckTools.CheckTools $@
+java -cp "${WORKSPACE}/Tools/bin/CheckTools.jar" org.tianocore.CheckTools.CheckTools $@

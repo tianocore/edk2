@@ -10,5 +10,5 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-# Run Framework Wizard
+# Run ContextTool
 java -cp "${WORKSPACE}/Tools/Jars/ContextTool.jar" org.tianocore.context.ContextMain $@
