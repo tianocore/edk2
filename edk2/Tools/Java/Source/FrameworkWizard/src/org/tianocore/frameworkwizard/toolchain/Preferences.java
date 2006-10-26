@@ -555,7 +555,7 @@ public class Preferences extends IFrame {
         this.setSize(dialogWidth, dialogHeight);
         this.setContentPane(getJContentPane());
         this.setTitle("Build Preferences [" + toolsDefIdentifier + "]");
-        this.setDefaultCloseOperation(IFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(IFrame.DISPOSE_ON_CLOSE);
         this.centerWindow();
         this.setVisible(true);
     }
