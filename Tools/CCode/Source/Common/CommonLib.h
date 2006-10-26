@@ -124,9 +124,13 @@ PrintGuidToBuffer (
 #define ASSERT(x) assert(x)
 
 #ifdef __GNUC__
+#include <stdio.h>
+#include <sys/stat.h>
 #define stricmp strcasecmp
+#define _stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
+size_t _filelength(FILE *file);
 #ifndef __CYGWIN__
 char *strlwr(char *s);
 #endif

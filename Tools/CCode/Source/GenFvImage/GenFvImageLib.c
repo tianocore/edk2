@@ -1617,15 +1617,7 @@ Returns:
   //
   // Get the file size
   //
-#ifdef __GNUC__
-  {
-    struct stat stat_buf;
-    fstat(fileno(NewFile), &stat_buf);
-    FileSize = stat_buf.st_size;
-  }
-#else
   FileSize = _filelength (fileno (NewFile));
-#endif
 
   //
   // Read the file into a buffer
