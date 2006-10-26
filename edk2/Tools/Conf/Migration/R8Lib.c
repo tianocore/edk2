@@ -1013,7 +1013,7 @@ Returns:
   }
 
   GuidHob.Raw = GetNextGuidHob (Guid, *HobStart);
-  if (GuidHob == NULL) {
+  if (GuidHob.Raw == NULL) {
     return EFI_NOT_FOUND;
   }
   
