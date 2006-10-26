@@ -158,7 +158,7 @@ public class UpdateDb {
         }
 
         // Datebase update for SPD and FPD files
-        result = fixDB(workspace, dbFile, VERBOSE_FLAG, TEST, QUIET);
+        result = fixDB(workspace, dbFile, VERBOSE_FLAG, INTERACTIVE, TEST, QUIET);
         if ((result == 0) && (TEST) && (QUIET == false))
             System.out.println("Workspace is consistent with current database!");
         return PASS;
@@ -185,25 +185,62 @@ public class UpdateDb {
     }
 
     public int findSpds(String workspace, int VERBOSE_FLAG) {
-        System.out.println("The following Package (SPD) files are in the workspace!");            
+        System.out.println("The following Package (SPD) files are in the workspace" + workspace);            
         File wsDir = new File(workspace);
         findSPDFiles(wsDir, workspace, VERBOSE);
         for (int i = 0; i < spdList.size(); i++) {
-            System.out.println("  " + spdList.get(i).trim());
-            // TODO: get the PackageName from the file
+            String Filename = workspace + File.separator + spdList.get(i).trim();
+            File spdFilename = new File(Filename);
+            try {
+                FileReader fileReader = new FileReader(spdFilename);
+                BufferedReader reader = new BufferedReader(fileReader);
+                String PackageName = null;
+                String rLine = null;
+                while ((rLine = reader.readLine()) != null) {
+                    if (rLine.contains("<PackageName>")) {
+                        PackageName = rLine.replace("<PackageName>", "").trim();
+                        PackageName = PackageName.replace("</PackageName>", "").trim();
+                        System.out.printf("  %25s - %s\n",PackageName, spdList.get(i).trim());
+                        break;
+                    }
+                }
+                reader.close();
+            } catch (IOException e) {
+                System.out.println("ERROR Reading File: " + Filename + e);
+                System.exit(FAIL);
+            }
+            
         }
-        return FAIL;
+        return PASS;
     }
 
     public int findFpds(String workspace, int VERBOSE_FLAG) {
-        System.out.println("The following Platform (FPD) files are in the workspace!");
+        System.out.println("The following Platform (FPD) files are in the workspace: " + workspace);
         File wsDir = new File(workspace);
         findFPDFiles(wsDir, workspace, VERBOSE);
         for (int i = 0; i < fpdList.size(); i++) {
-            System.out.println("  " + fpdList.get(i).trim());
-            // TODO: get the PlatformName from the file
+            String Filename = workspace + File.separator + fpdList.get(i).trim();
+            File fpdFilename = new File(Filename);
+            try {
+                FileReader fileReader = new FileReader(fpdFilename);
+                BufferedReader reader = new BufferedReader(fileReader);
+                String PlatformName = null;
+                String rLine = null;
+                while ((rLine = reader.readLine()) != null) {
+                    if (rLine.contains("<PlatformName>")) {
+                        PlatformName = rLine.replace("<PlatformName>", "").trim();
+                        PlatformName = PlatformName.replace("</PlatformName>", "").trim();
+                        System.out.printf("  %25s - %s\n",PlatformName, fpdList.get(i).trim());
+                        break;
+                    }
+                }
+                reader.close();
+            } catch (IOException e) {
+                System.out.println("ERROR Reading File: " + Filename + e);
+                System.exit(FAIL);
+            }
         }
-        return FAIL;
+        return PASS;
     }
 
     // copy from source file to destination file
@@ -232,7 +269,7 @@ public class UpdateDb {
         return PASS;
     }
 
-    private int fixDB(String workspace, String dbFile, int VERBOSE, boolean TEST, boolean QUIET) {
+    private int fixDB(String workspace, String dbFile, int VERBOSE, boolean INTERACTIVE, boolean TEST, boolean QUIET) {
         File wsDir = new File(workspace);
         int retValue = PASS;
         // Find all .spd and .fpd files in workspace and put them in spdList and fpdList
@@ -251,7 +288,7 @@ public class UpdateDb {
 
         try {
             // check database file for possible update
-            retValue = checkDBForUpdate(workspace, dbFile, VERBOSE, TEST, QUIET);
+            retValue = checkDBForUpdate(workspace, dbFile, VERBOSE, INTERACTIVE, TEST, QUIET);
         } catch (IOException e) {
             if (QUIET == false)
                 System.out.println("Error: Updating " + dbFile + " file.");
@@ -342,7 +379,7 @@ public class UpdateDb {
         }
     }
 
-    private int checkDBForUpdate(String workspace, String dbFileName, int VERBOSE, boolean TEST, boolean QUIET)
+    private int checkDBForUpdate(String workspace, String dbFileName, int VERBOSE, boolean INTERACTIVE, boolean TEST, boolean QUIET)
                                                                                                                throws IOException {
         int SpdFlag = 0;
         int FpdFlag = 0;
