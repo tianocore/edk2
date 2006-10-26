@@ -495,6 +495,14 @@ Returns:
 }
 
 #ifdef __GNUC__
+
+size_t _filelength(FILE *file)
+{
+  struct stat stat_buf;
+  fstat(fileno(file), &stat_buf);
+  return stat_buf.st_size;
+}
+
 #ifndef __CYGWIN__
 char *strlwr(char *s)
 {
