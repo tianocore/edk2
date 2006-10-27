@@ -251,11 +251,6 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
     private static final FirstPanel init() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -264,8 +259,6 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         FirstPanel fp = new FirstPanel();
-        //fp.setLayout(new GridBagLayout());
-        //fp.setLayout(new BoxLayout(fp, BoxLayout.Y_AXIS));
         fp.setOpaque(true);
         frame.setContentPane(fp);
 

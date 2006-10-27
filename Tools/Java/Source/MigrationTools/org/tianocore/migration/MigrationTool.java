@@ -61,8 +61,6 @@ public class MigrationTool {
 
         MigrationTool.ui.println("Errors Left : " + MigrationTool.db.error);
         MigrationTool.ui.println("Complete!");
-        //MigrationTool.ui.println("Your R9 module was placed here: " + mi.modulepath + File.separator + "result");
-        //MigrationTool.ui.println("Your logfile was placed here: " + mi.modulepath);
     }
 
     private static final void show(Set<String> hash, String show) {

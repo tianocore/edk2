@@ -52,15 +52,4 @@ public class Func {
         }
         return temp;
     }
-    /*
-    public static String registerFuncD(Matcher mtr, ModuleInfo mi, Database db) {
-        String temp = null;
-
-        temp = mtr.group(1);                                    // both changed and not changed funcd are registered , for finding all the non-local function calls
-        if (!reservedwords.contains(temp)) {
-            mi.hashfuncd.add(temp);
-        }
-        return temp;
-    }
-    */
 }
