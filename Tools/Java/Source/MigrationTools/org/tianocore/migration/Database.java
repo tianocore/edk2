@@ -16,6 +16,19 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlObject.Factory;
+import org.tianocore.DbPathAndFilename;
+import org.tianocore.FrameworkDatabaseDocument;
+import org.tianocore.FrameworkDatabaseDocument.FrameworkDatabase;
+import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
+import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
+import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
+
+import org.tianocore.PackageListDocument.PackageList;
+import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
+
 public final class Database {
     private static final Database INSTANCE = Database.init();
     
@@ -23,6 +36,7 @@ public final class Database {
         DatabasePath = path;
 
         try {
+            // collectWorkSpaceDatabase();
             importPkgGuid("PkgGuid.csv");
             importDBLib("Library.csv");
             importDBGuid("Guid.csv", "Guid");
@@ -43,6 +57,7 @@ public final class Database {
     private Map<String,Func> hashfunc = new HashMap<String,Func>();
     private Map<String,Macro> hashmacro = new HashMap<String,Macro>();
     private Map<String,String> hashPkgGuid = new HashMap<String,String>();
+
     
     //-------------------------------------import------------------------------------------//
     private void importPkgGuid(String filename) throws Exception {
@@ -206,4 +221,97 @@ public final class Database {
     public static final Database getInstance() {
         return INSTANCE;
     }
+
+    private HashMap<String, String> hashDatabaseGuids     = new HashMap<String, String> ();
+    private HashMap<String, String> hashDatabasePpis      = new HashMap<String, String> ();
+    private HashMap<String, String> hashDatabaseProtocols = new HashMap<String, String> ();
+
+    private final void collectGuidDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        String                              pkgGuid;
+        Iterator<GuidDeclarations.Entry>    itGuids;
+
+        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+
+        itGuids = spdDatabase.getGuidDeclarations().getEntryList().iterator();
+        while (itGuids.hasNext()) {
+            hashDatabaseGuids.put(itGuids.next().getCName(), pkgGuid); 
+        }
+    }
+
+    private final void collectPpiDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        String                              pkgGuid;
+        Iterator<PpiDeclarations.Entry>     itPpis;
+
+        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+
+        itPpis = spdDatabase.getPpiDeclarations().getEntryList().iterator();
+        while (itPpis.hasNext()) {
+            hashDatabasePpis.put(itPpis.next().getCName(), pkgGuid); 
+        }
+    }
+
+    private final void collectProtocolDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        String                                  pkgGuid;
+        Iterator<ProtocolDeclarations.Entry>    itProtocols;
+
+        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+
+        itProtocols = spdDatabase.getProtocolDeclarations().getEntryList().iterator();
+        while (itProtocols.hasNext()) {
+            hashDatabaseGuids.put(itProtocols.next().getCName(), pkgGuid); 
+        }
+    }
+
+    private final void collectPackageDatabase(String packageFileName) throws Exception {
+        XmlObject            xmlPackage;
+        PackageSurfaceArea   spdDatabase;
+
+        xmlPackage  = XmlObject.Factory.parse(new File(packageFileName));
+        spdDatabase = ((PackageSurfaceAreaDocument) xmlPackage).getPackageSurfaceArea();
+
+        collectGuidDatabase(spdDatabase);
+        collectProtocolDatabase(spdDatabase);
+        collectPpiDatabase(spdDatabase);
+
+
+    }
+    public final void collectWorkSpaceDatabase() throws Exception {
+        String                      workspacePath;
+        String                      databaseFileName;
+        File                        databaseFile;
+        XmlObject                   xmlDatabase;
+        FrameworkDatabase           frameworkDatabase;
+        Iterator<DbPathAndFilename> packageFile;
+       
+        workspacePath = System.getenv("WORKSPACE");
+        
+        if (workspacePath == null) {
+            String errorMessage = "Envivornment variable \"WORKSPACE\" is not set!";
+            throw new Exception(errorMessage);
+        }
+        databaseFileName = workspacePath + File.separator + 
+                           "Tools" + File.separator +
+                           "Conf" + File.separator + 
+                           "FrameworkDatabase.db";
+        System.out.println("Open " + databaseFileName);
+        databaseFile        = new File(databaseFileName);
+        xmlDatabase         = XmlObject.Factory.parse(databaseFile);
+        frameworkDatabase   = ((FrameworkDatabaseDocument) xmlDatabase).getFrameworkDatabase();
+        packageFile         = frameworkDatabase.getPackageList().getFilenameList().iterator();
+
+        while (packageFile.hasNext()) {
+            String packageFileName = packageFile.next().getStringValue();
+            packageFileName = workspacePath + File.separator + packageFileName;
+            packageFileName = packageFileName.replace("/", File.separator);
+
+            System.out.println("Parse: " + packageFileName);
+            try {
+                collectPackageDatabase(packageFileName);
+            } catch (Exception e) {
+                System.out.println("Error occured when opening " + packageFileName + e.getMessage());
+            }
+        }
+        return;
+    }
+    
 }
