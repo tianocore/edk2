@@ -329,7 +329,9 @@ public final class ModuleReader implements Common.ForDoAll {
     //-----------------------------------ForDoAll-----------------------------------//
     public void run(String filepath) throws Exception {
         String name = mi.temppath + File.separator + filepath.replace(mi.temppath + File.separator, "");
-        commentlaplace.transform(name, name);
+        if (commentlaplace.recognize(name)) {
+            commentlaplace.transform(name, name);
+        }
     }
 
     public boolean filter(File dir) {
