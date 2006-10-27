@@ -133,31 +133,6 @@ public class MsaOwner {
         return true;
     }
     
-    /*
-    private final boolean installProtocols () {
-        if (mapprotocols.isEmpty()) {
-            return false;
-        }
-        Set<String> setprotocols = mapprotocols.keySet();
-        ProtocolsDocument.Protocols.Protocol protocol;
-        Iterator<String> it = setprotocols.iterator();
-        while (it.hasNext()) {
-            protocol = protocols.addNewProtocol();
-            protocol.setProtocolCName(it.next());
-            protocol.setUsage(mapprotocols.get(protocol.getProtocolCName()));
-        }
-        return true;
-    }
-    
-    public final boolean addProtocols (String protocol, UsageTypes.Enum usage) {
-        if (mapprotocols.containsKey(protocol)) {
-            return false;
-        } else {
-            mapprotocols.put(protocol, usage);
-            return true;
-        }
-    }
-    */
     public final boolean addProtocol (String proname, UsageTypes.Enum usage) {
         if (protocols == null) {
             protocols = msa.addNewProtocols();
@@ -178,33 +153,6 @@ public class MsaOwner {
         return true;
     }
     
-    /*
-    private final boolean installHashFilename () {
-        if (mapfilenames.isEmpty()) {
-            return false;
-        }
-        Set<String> setfilename = mapfilenames.keySet();
-        FilenameDocument.Filename filename;
-        List<Enum> arch = new ArrayList<Enum>();
-        Iterator<String> it = setfilename.iterator();
-        while (it.hasNext()) {
-            filename = sourcefiles.addNewFilename();
-            filename.setStringValue(it.next());
-            arch.add(mapfilenames.get(filename.getStringValue()));
-            filename.setSupArchList(arch);
-        }
-        return true;
-    }
-    
-    public final boolean addSourceFile (String filename, Enum arch) {        // dummy & null how to imply?
-        if (mapfilenames.containsKey(filename)) {
-            return false;
-        } else {
-            mapfilenames.put(filename, arch);
-            return true;
-        }
-    }
-    */
     public final boolean addSourceFile (String name, Enum en) {
         Iterator<FilenameDocument.Filename> fileit = sourcefiles.getFilenameList().iterator();
         while (fileit.hasNext()) {

@@ -13,38 +13,6 @@ public class MsaTreeEditor extends JPanel {
      */
     private static final long serialVersionUID = 3169905938472150649L;
     
-    private 
-/*
-    MsaTreeEditor(ModuleInfo m, UI u, ModuleSurfaceAreaDocument md) {
-        mi = m;
-        ui = u;
-        msadoc = md;
-        
-        //rootNode = msadoc.getDomNode();
-        rootNode = new DefaultMutableTreeNode("Root Node");
-        treeModel = new DefaultTreeModel(rootNode);
-
-        tree = new JTree(treeModel);
-        tree.setEditable(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setShowsRootHandles(false);
-        tree.addMouseListener(mouseadapter);
-
-        JScrollPane scrollPane = new JScrollPane(tree);
-        add(scrollPane);
-        
-        popupmenu = new JPopupMenu();
-        menuitemadd = new JMenuItem("addNode");
-        menuitemdel = new JMenuItem("deleteNode");
-        popupmenu.add(menuitemadd);
-        popupmenu.add(menuitemdel);
-        menuitemadd.addActionListener(actionListener);
-        menuitemdel.addActionListener(actionListener);
-        
-        addNode(rootNode, "1st");
-        addNode(rootNode, "2nd");
-    }
-*/
     MsaTreeEditor() throws Exception {
         rootNode = new DefaultMutableTreeNode("Root Node");
         treeModel = new DefaultTreeModel(rootNode);

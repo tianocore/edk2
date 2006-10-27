@@ -192,7 +192,6 @@ public final class ModuleReader implements Common.ForDoAll {
             }
         }
 
-        //CommentOutNonLocalHFile();
         Common.toDoAll(mi.temppath, this, Common.FILE);
         
         parsePreProcessedSourceCode();
@@ -200,13 +199,6 @@ public final class ModuleReader implements Common.ForDoAll {
     }
 
     private final void parsePreProcessedSourceCode() throws Exception {
-        //Cl cl = new Cl(modulepath);
-        //cl.execute("Fat.c");
-        //cl.generateAll(preprocessedccodes);
-        //
-        //System.out.println("Note!!!! The CL is not implemented now , pls do it manually!!! RUN :");
-        //System.out.println("cl " + modulepath + "\\temp\\*.c" + " -P");
-        //String[] list = new File(modulepath + File.separator + "temp").list();    // without CL , add
         BufferedReader rd = null;
         String ifile = null;
         String line = null;
