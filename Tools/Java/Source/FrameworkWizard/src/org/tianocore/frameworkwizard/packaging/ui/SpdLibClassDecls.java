@@ -407,7 +407,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JButton getJButtonRemove() {
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
-            jButtonRemove.setText("Remove");
+            jButtonRemove.setText("Delete");
             jButtonRemove.setSize(new java.awt.Dimension(buttonWidth,20));
             jButtonRemove.setBounds(new java.awt.Rectangle(removeButtonCol,rowSeven,buttonWidth,20));
             jButtonRemove.addActionListener(this);
@@ -423,7 +423,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JButton getJButtonRemoveAll() {
         if (jButtonRemoveAll == null) {
             jButtonRemoveAll = new JButton();
-            jButtonRemoveAll.setText("Remove All");
+            jButtonRemoveAll.setText("Clear All");
             jButtonRemoveAll.setLocation(removeAllButtonCol,rowSeven);
             FontMetrics fm = jButtonRemoveAll.getFontMetrics(jButtonRemoveAll.getFont());
             jButtonRemoveAll.setSize(fm.stringWidth(jButtonRemoveAll.getText()) + 50, 20);
@@ -473,6 +473,12 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     }
 
     private void init(SpdFileContents sfc) {
+
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
+        
         if (sfc.getSpdLibClassDeclarationCount() == 0) {
             return ;
         }
@@ -491,7 +497,21 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             model.addRow(saa[i]);
             i++;
         }
+        
     }
+    
+    private void initFrame() {
+        boolean editable = true;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            editable = false;
+        }
+        
+        jButtonAdd.setEnabled(editable);
+        jButtonRemove.setEnabled(editable);
+        jButtonRemoveAll.setEnabled(editable);
+        jTable.setEnabled(editable);
+    }
+
     private JScrollPane getJContentPane(){
         if (topScrollPane == null){
           topScrollPane = new JScrollPane();

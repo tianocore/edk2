@@ -170,7 +170,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
             jButtonRemove.setBounds(new java.awt.Rectangle(266,148,90,20));
-            jButtonRemove.setText("Remove");
+            jButtonRemove.setText("Delete");
             jButtonRemove.addActionListener(this);
         }
         return jButtonRemove;
@@ -264,10 +264,15 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             }
         });
         this.setVisible(true);
-        initFrame();
     }
 
     private void init(SpdFileContents sfc){
+
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
+        
         if (sfc.getSpdMsaFileCount() == 0) {
             return ;
         }
@@ -281,6 +286,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             model.addRow(saa[i]);
             i++;
         }
+        
     }
     
     private JScrollPane getJScrollPane(){
@@ -325,7 +331,15 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
      fill ComboBoxes with pre-defined contents
     **/
     private void initFrame() {
-
+        boolean editable = true;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            editable = false;
+        }
+        
+        jButtonAdd.setEnabled(editable);
+        jButtonRemove.setEnabled(editable);
+        jButtonClearAll.setEnabled(editable);
+        jTable.setEnabled(editable);
     }
 
     /* (non-Javadoc)

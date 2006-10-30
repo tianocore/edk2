@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -47,10 +48,14 @@ public class SpdPpiDecls extends SpdGuidDecls {
     public SpdPpiDecls(OpeningPackageType opt) {
         this(opt.getXmlSpd());
         docConsole = opt;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
     }
     
     protected void initFrame() {
-        
+        super.initFrame();
         this.setTitle("PPI Declarations");
         starLabel.setVisible(false);
         ((ListEditor)getJTable().getColumnModel().getColumn(6).getCellEditor()).setCanNotBeEmpty(false);
@@ -71,6 +76,7 @@ public class SpdPpiDecls extends SpdGuidDecls {
             model.addRow(saa[i]);
             i++;
         }
+        
     }
     
     protected void updateRow(int row, int column, TableModel m){
@@ -129,5 +135,12 @@ public class SpdPpiDecls extends SpdGuidDecls {
     protected void clearAllRow(){
         sfc.removeSpdPpiDeclaration();
         docConsole.setSaved(false);
+    }
+    
+    /**
+     * @return Returns the sfc.
+     */
+    protected SpdFileContents getSfc() {
+        return sfc;
     }
 }

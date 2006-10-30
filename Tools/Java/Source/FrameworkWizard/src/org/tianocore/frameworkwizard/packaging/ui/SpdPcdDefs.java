@@ -296,7 +296,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     }
 
     private void init(SpdFileContents sfc){
-        initFrame(sfc);
+        
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
+        
         if (sfc.getSpdPcdDefinitionCount() == 0) {
             return ;
         }
@@ -345,8 +350,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             
             i++;
         }
-        
-        
         
     }
     
@@ -459,7 +462,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
  			jContentPane.add(jLabelTokenSpace, null);
     
      **/
-    private void initFrame(SpdFileContents sfc) {
+    private void initFrame() {
 
         jComboBoxDataType.addItem("UINT8");
         jComboBoxDataType.addItem("UINT16");
@@ -474,6 +477,16 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         for (int i = 0; i < vGuidCName.size(); ++i) {
             jComboBoxTsGuid.addItem(vGuidCName.get(i));
         }
+        
+        boolean editable = true;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            editable = false;
+        }
+        
+        jButtonAdd.setEnabled(editable);
+        jButtonRemove.setEnabled(editable);
+        jButtonClearAll.setEnabled(editable);
+        jTable.setEnabled(editable);
     }
 
     public void actionPerformed(ActionEvent arg0) {

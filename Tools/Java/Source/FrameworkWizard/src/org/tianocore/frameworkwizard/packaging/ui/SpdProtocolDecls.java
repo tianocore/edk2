@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -47,10 +48,14 @@ public class SpdProtocolDecls extends SpdGuidDecls {
     public SpdProtocolDecls(OpeningPackageType opt) {
         this(opt.getXmlSpd());
         docConsole = opt;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
     }
     
     protected void initFrame() {
-        
+        super.initFrame();
         this.setTitle("Protocol Declarations");
         starLabel.setVisible(false);
         ((ListEditor)getJTable().getColumnModel().getColumn(6).getCellEditor()).setCanNotBeEmpty(false);
@@ -129,5 +134,12 @@ public class SpdProtocolDecls extends SpdGuidDecls {
     protected void clearAllRow(){
         sfc.removeSpdProtocolDeclaration();
         docConsole.setSaved(false);
+    }
+    
+    /**
+     * @return Returns the sfc.
+     */
+    protected SpdFileContents getSfc() {
+        return sfc;
     }
 }
