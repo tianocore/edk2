@@ -48,6 +48,16 @@ Abstract:
 #define MODE_PARSE    1
 #define MODE_SCAN     2
 #define MODE_DUMP     3
+//
+// Different file separater for Linux and Windows
+//
+#ifdef __GNUC__
+#define FILE_SEP_CHAR '/'
+#define FILE_SEP_STRING "/"
+#else
+#define FILE_SEP_CHAR '\\'
+#define FILE_SEP_STRING "\\"
+#endif
 
 //
 // We keep a linked list of these for the source files we process
@@ -1583,8 +1593,8 @@ ProcessArgs (
       }
 
       strcpy (NewList->Str, Argv[1]);
-      if (NewList->Str[strlen (NewList->Str) - 1] != '\\') {
-        strcat (NewList->Str, "\\");
+      if (NewList->Str[strlen (NewList->Str) - 1] != FILE_SEP_CHAR) {
+        strcat (NewList->Str, FILE_SEP_STRING);
       }
       //
       // Add it to our linked list
