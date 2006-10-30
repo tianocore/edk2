@@ -18,6 +18,7 @@ package org.tianocore.frameworkwizard.module.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
 import java.util.Vector;
 
 import javax.swing.ButtonGroup;
@@ -66,12 +67,13 @@ public class MsaHeader extends IInternalFrame {
     private int dialogHeight = 630;
 
     private final int labelWidth = 155;
-    
+
     private int valueWidth = 320;
-    
+
     private final int labelCol = 12;
-    
+
     private final int valueCol = 168;
+
     //
     //Define class members
     //
@@ -173,7 +175,7 @@ public class MsaHeader extends IInternalFrame {
 
     private JCheckBox jCheckBoxPpc = null;
 
-    private JComboBox jComboBoxPcdIsDriver = null;
+    private JTextField jComboBoxPcdIsDriver = null;
 
     private JCheckBox jCheckBoxPcd = null;
 
@@ -210,6 +212,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxIa32.setText("IA32");
             jCheckBoxIa32.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIa32.addFocusListener(this);
+            jCheckBoxIa32.addItemListener(this);
         }
         return jCheckBoxIa32;
     }
@@ -226,6 +229,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxX64.setText("X64");
             jCheckBoxX64.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxX64.addFocusListener(this);
+            jCheckBoxX64.addItemListener(this);
         }
         return jCheckBoxX64;
     }
@@ -242,6 +246,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxIpf.setText("IPF");
             jCheckBoxIpf.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIpf.addFocusListener(this);
+            jCheckBoxIpf.addItemListener(this);
         }
         return jCheckBoxIpf;
     }
@@ -258,6 +263,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxEbc.setText("EBC");
             jCheckBoxEbc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxEbc.addFocusListener(this);
+            jCheckBoxEbc.addItemListener(this);
         }
         return jCheckBoxEbc;
     }
@@ -274,6 +280,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxArm.setText("ARM");
             jCheckBoxArm.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxArm.addFocusListener(this);
+            jCheckBoxArm.addItemListener(this);
         }
         return jCheckBoxArm;
     }
@@ -290,6 +297,7 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxPpc.setText("PPC");
             jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxPpc.addFocusListener(this);
+            jCheckBoxPpc.addItemListener(this);
         }
         return jCheckBoxPpc;
     }
@@ -530,6 +538,7 @@ public class MsaHeader extends IInternalFrame {
             jComboBoxModuleType.setBounds(new java.awt.Rectangle(valueCol, 35, valueWidth, 20));
             jComboBoxModuleType.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jComboBoxModuleType.addFocusListener(this);
+            jComboBoxModuleType.addItemListener(this);
         }
         return jComboBoxModuleType;
     }
@@ -624,15 +633,15 @@ public class MsaHeader extends IInternalFrame {
      *  
      * @return javax.swing.JComboBox    
      */
-    private JComboBox getJComboBoxPcdIsDriver() {
+    private JTextField getJComboBoxPcdIsDriver() {
         if (jComboBoxPcdIsDriver == null) {
-            jComboBoxPcdIsDriver = new JComboBox();
+            jComboBoxPcdIsDriver = new JTextField();
             jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jComboBoxPcdIsDriver.setBounds(new java.awt.Rectangle(valueCol, 530, valueWidth, 20));
-            jComboBoxPcdIsDriver.addItemListener(this);
+            //jComboBoxPcdIsDriver.addItemListener(this);
             jComboBoxPcdIsDriver.addFocusListener(this);
             jComboBoxPcdIsDriver.setEnabled(false);
-            Tools.generateComboBoxByVector(jComboBoxPcdIsDriver, ed.getVPcdDriverTypes());
+            //Tools.generateComboBoxByVector(jComboBoxPcdIsDriver, ed.getVPcdDriverTypes());
             jComboBoxPcdIsDriver.setVisible(false);
         }
         return jComboBoxPcdIsDriver;
@@ -801,11 +810,7 @@ public class MsaHeader extends IInternalFrame {
             this.ex = inEx;
             if (ex.getPcdIsDriver() != null) {
                 this.jCheckBoxPcd.setSelected(true);
-                this.jComboBoxPcdIsDriver.setEnabled(true);
-                this.jComboBoxPcdIsDriver.setSelectedItem(ex.getPcdIsDriver());
-                // TODO:  If the module type is DXE_DRIVER, set PCD_DXE_DRIVER
-                //        If the module type is PEIM, set PCD_PEI_DRIVER
-                //        If the module type is anything else, unset this!
+                this.jCheckBoxPcd.setEnabled(true);
             }
             this.jCheckBoxFlashMap.setSelected(ex.getTianoR8FlashMapH());
         }
@@ -963,28 +968,10 @@ public class MsaHeader extends IInternalFrame {
      *
      */
     public void actionPerformed(ActionEvent arg0) {
-        if (arg0.getSource() == jButtonOk) {
-            if (this.check()) {
-                this.save();
-            } else {
-                return;
-            }
-            this.setEdited(true);
-            this.dispose();
-        }
-
-        if (arg0.getSource() == jButtonCancel) {
-            this.setEdited(false);
-        }
-
         if (arg0.getSource() == jButtonGenerateGuid) {
             jTextFieldGuid.setText(Tools.generateUuidString());
             jTextFieldGuid.requestFocus();
             jButtonGenerateGuid.requestFocus();
-        }
-
-        if (arg0.getSource() == this.jCheckBoxPcd) {
-            this.jComboBoxPcdIsDriver.setEnabled(this.jCheckBoxPcd.isSelected());
         }
     }
 
@@ -1363,12 +1350,13 @@ public class MsaHeader extends IInternalFrame {
                 //                jTextFieldOutputFileBasename.addFocusListener(this);
                 return;
             }
-            
+
             if (!DataValidation.isOutputFileBasename(this.jTextFieldOutputFileBasename.getText())) {
-                Log.wrn("Update Msa Header", "Incorrect data type for Output File Basename, it must be a valid file name");
+                Log.wrn("Update Msa Header",
+                        "Incorrect data type for Output File Basename, it must be a valid file name");
                 return;
             }
-            
+
             if (!this.jTextFieldOutputFileBasename.getText().equals(md.getOutputFileBasename())) {
                 this.md.setOutputFileBasename(this.jTextFieldOutputFileBasename.getText());
             } else {
@@ -1412,51 +1400,6 @@ public class MsaHeader extends IInternalFrame {
                 md.setSupportedArchitectures(this.getSelectedItemsVector());
             } else {
                 return;
-            }
-        }
-
-        //
-        // Check Pcd is Driver
-        //
-        if (arg0.getSource() == this.jCheckBoxPcd || arg0.getSource() == this.jComboBoxPcdIsDriver) {
-            if ((this.ex == null) && this.jCheckBoxPcd.isSelected()) {
-                this.ex = ExternsDocument.Externs.Factory.newInstance();
-                this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
-                                                                                              .toString()));
-                this.msa.setExterns(this.ex);
-            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() == null) && this.jCheckBoxPcd.isSelected()) {
-                this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
-                                                                                              .toString()));
-                this.msa.setExterns(this.ex);
-            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() != null)) {
-                if (this.jCheckBoxPcd.isSelected()
-                    && !this.jComboBoxPcdIsDriver.getSelectedItem().toString().equals(
-                                                                                      this.ex.getPcdIsDriver()
-                                                                                             .toString())) {
-                    this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getSelectedItem()
-                                                                                                  .toString()));
-                    this.msa.setExterns(this.ex);
-                }
-                if (!this.jCheckBoxPcd.isSelected()) {
-                    ExternsDocument.Externs newEx = ExternsDocument.Externs.Factory.newInstance();
-                    if (this.ex.getExternList() != null) {
-                        for (int index = 0; index < this.ex.getExternList().size(); index++) {
-                            newEx.addNewExtern();
-                            newEx.setExternArray(index, this.ex.getExternArray(index));
-                        }
-                    }
-                    if (this.ex.getSpecificationList() != null) {
-                        for (int index = 0; index < this.ex.getSpecificationList().size(); index++) {
-                            newEx.addNewSpecification();
-                            newEx.setSpecificationArray(index, this.ex.getSpecificationArray(index));
-                        }
-                    }
-                    if (this.ex.getTianoR8FlashMapH()) {
-                        newEx.setTianoR8FlashMapH(this.ex.getTianoR8FlashMapH());
-                    }
-                    this.ex = newEx;
-                    this.msa.setExterns(this.ex);
-                }
             }
         }
 
@@ -1543,7 +1486,7 @@ public class MsaHeader extends IInternalFrame {
     }
 
     private void setAllItemsSelected(boolean isSelected) {
-        this.jCheckBoxIa32.setSelected(isSelected);
+        this.jCheckBoxIa32.setSelected(true);
         this.jCheckBoxX64.setSelected(isSelected);
         this.jCheckBoxIpf.setSelected(isSelected);
         this.jCheckBoxEbc.setSelected(isSelected);
@@ -1553,10 +1496,12 @@ public class MsaHeader extends IInternalFrame {
 
     private void setSelectedItems(Vector<String> v) {
         setAllItemsSelected(false);
+        boolean isIA32Selected = false;
         if (v != null) {
             for (int index = 0; index < v.size(); index++) {
                 if (v.get(index).equals(this.jCheckBoxIa32.getText())) {
                     this.jCheckBoxIa32.setSelected(true);
+                    isIA32Selected = true;
                     continue;
                 }
                 if (v.get(index).equals(this.jCheckBoxIpf.getText())) {
@@ -1580,6 +1525,9 @@ public class MsaHeader extends IInternalFrame {
                     continue;
                 }
             }
+            if (!isIA32Selected) {
+                this.jCheckBoxIa32.setSelected(false);
+            }
         }
     }
 
@@ -1595,6 +1543,8 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxPcd.setText("Is this a PCD Driver?");
             jCheckBoxPcd.addFocusListener(this);
             jCheckBoxPcd.addActionListener(this);
+            jCheckBoxPcd.setEnabled(false);
+            jCheckBoxPcd.addItemListener(this);
         }
         return jCheckBoxPcd;
     }
@@ -1659,5 +1609,84 @@ public class MsaHeader extends IInternalFrame {
                                                          + "a higher version number.</html>");
         }
         return jRadioButtonBinaryModuleFalse;
+    }
+
+    public void itemStateChanged(ItemEvent arg0) {
+        if (arg0.getSource() == this.jCheckBoxIa32 || arg0.getSource() == this.jCheckBoxIpf
+            || arg0.getSource() == this.jCheckBoxX64 || arg0.getSource() == this.jCheckBoxEbc
+            || arg0.getSource() == this.jCheckBoxArm || arg0.getSource() == this.jCheckBoxPpc) {
+            if (!this.jCheckBoxIa32.isSelected() && !this.jCheckBoxX64.isSelected() && !this.jCheckBoxIpf.isSelected()
+                && !this.jCheckBoxEbc.isSelected() && !this.jCheckBoxPpc.isSelected()
+                && !this.jCheckBoxArm.isSelected()) {
+                Log
+                   .wrn("At lease one Supportted Architecture should be selected!    IA32 is selected as default value!");
+                this.jCheckBoxIa32.setSelected(true);
+            }
+        }
+
+        if (arg0.getSource() == this.jComboBoxModuleType) {
+            if (this.jComboBoxModuleType.getSelectedItem().equals("PEIM")
+                || this.jComboBoxModuleType.getSelectedItem().equals("DXE_DRIVER")) {
+                this.jCheckBoxPcd.setEnabled(true);
+                if (this.jCheckBoxPcd.isSelected()) {
+                    this.jCheckBoxPcd.setSelected(false);
+                    this.jCheckBoxPcd.setSelected(true);
+                }
+            } else {
+                this.jCheckBoxPcd.setEnabled(false);
+                this.jCheckBoxPcd.setSelected(false);
+            }
+        }
+
+        //
+        // Check Pcd is Driver
+        //
+        if (arg0.getSource() == this.jCheckBoxPcd) {
+            if (this.jCheckBoxPcd.isSelected()) {
+                if (this.jComboBoxModuleType.getSelectedItem().toString().equals("DXE_DRIVER")) {
+                    this.jComboBoxPcdIsDriver.setText("DXE_PCD_DRIVER");
+                    this.jComboBoxPcdIsDriver.setEnabled(true);
+                } else if (this.jComboBoxModuleType.getSelectedItem().toString().equals("PEIM")) {
+                    this.jComboBoxPcdIsDriver.setText("PEI_PCD_DRIVER");
+                    this.jComboBoxPcdIsDriver.setEnabled(true);
+                }
+            }
+
+            if ((this.ex == null) && this.jCheckBoxPcd.isSelected()) {
+                this.ex = ExternsDocument.Externs.Factory.newInstance();
+                this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getText()));
+                this.msa.setExterns(this.ex);
+            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() == null) && this.jCheckBoxPcd.isSelected()) {
+                this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getText()));
+                this.msa.setExterns(this.ex);
+            } else if ((this.ex != null) && (this.ex.getPcdIsDriver() != null)) {
+                if (this.jCheckBoxPcd.isSelected()
+                    && !this.jComboBoxPcdIsDriver.getText().toString().equals(this.ex.getPcdIsDriver().toString())) {
+                    this.ex.setPcdIsDriver(PcdDriverTypes.Enum.forString(this.jComboBoxPcdIsDriver.getText()));
+                    this.msa.setExterns(this.ex);
+                }
+                if (!this.jCheckBoxPcd.isSelected()) {
+                    ExternsDocument.Externs newEx = ExternsDocument.Externs.Factory.newInstance();
+                    if (this.ex.getExternList() != null) {
+                        for (int index = 0; index < this.ex.getExternList().size(); index++) {
+                            newEx.addNewExtern();
+                            newEx.setExternArray(index, this.ex.getExternArray(index));
+                        }
+                    }
+                    if (this.ex.getSpecificationList() != null) {
+                        for (int index = 0; index < this.ex.getSpecificationList().size(); index++) {
+                            newEx.addNewSpecification();
+                            newEx.setSpecificationArray(index, this.ex.getSpecificationArray(index));
+                        }
+                    }
+                    if (this.ex.getTianoR8FlashMapH()) {
+                        newEx.setTianoR8FlashMapH(this.ex.getTianoR8FlashMapH());
+                    }
+                    this.ex = newEx;
+                    this.msa.setExterns(this.ex);
+                }
+            }
+            this.save();
+        }
     }
 }
