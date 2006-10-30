@@ -43,4 +43,22 @@ public class PackageIdentification extends Identification{
     public String toString() {
       return getName() + " " + getVersion() + " [" + Tools.getRelativePath(getSpdFile().getPath(), Workspace.getCurrentWorkspace()) + "]";
     }
+    
+    public boolean equals(String packageGuid, String packageVersion) {
+        boolean b = false;
+        if (this.getGuid().equals(packageGuid)) {
+            b = true;
+            //
+            // Check Version
+            //
+            if (packageVersion != null) {
+                if (!Tools.isEmpty(packageVersion)) {
+                    if (!packageVersion.equals(this.getVersion())) {
+                        b = false;
+                    }
+                }
+            }
+        }
+        return b;
+    }
 }

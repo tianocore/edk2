@@ -286,15 +286,15 @@ public class FindResultDetailInfo extends IFrame {
                                         // Write Module Sa Info
                                         //
                                         ModuleIdentification moduleSaId = GlobalData
-                                                                                    .findIdByGuidVersion(
-                                                                                                         msa
-                                                                                                            .getModuleGuid(),
-                                                                                                         msa
-                                                                                                            .getModuleVersion(),
-                                                                                                         msa
-                                                                                                            .getPackageGuid(),
-                                                                                                         msa
-                                                                                                            .getPackageVersion());
+                                                                                    .findModuleIdByGuidVersion(
+                                                                                                               msa
+                                                                                                                  .getModuleGuid(),
+                                                                                                               msa
+                                                                                                                  .getModuleVersion(),
+                                                                                                               msa
+                                                                                                                  .getPackageGuid(),
+                                                                                                               msa
+                                                                                                                  .getPackageVersion());
                                         tmp = tmp
                                               + TAB
                                               + TAB
@@ -539,15 +539,15 @@ public class FindResultDetailInfo extends IFrame {
                                             if (mid.equals(i.getModuleGuid(), i.getModuleVersion(), i.getPackageGuid(),
                                                            i.getPackageVersion())) {
                                                 ModuleIdentification moduleSaId = GlobalData
-                                                                                            .findIdByGuidVersion(
-                                                                                                                 msa
-                                                                                                                    .getModuleGuid(),
-                                                                                                                 msa
-                                                                                                                    .getModuleVersion(),
-                                                                                                                 msa
-                                                                                                                    .getPackageGuid(),
-                                                                                                                 msa
-                                                                                                                    .getPackageVersion());
+                                                                                            .findModuleIdByGuidVersion(
+                                                                                                                       msa
+                                                                                                                          .getModuleGuid(),
+                                                                                                                       msa
+                                                                                                                          .getModuleVersion(),
+                                                                                                                       msa
+                                                                                                                          .getPackageGuid(),
+                                                                                                                       msa
+                                                                                                                          .getPackageVersion());
                                                 if (moduleSaId != null) {
                                                     vModuleSa.addElement(moduleSaId);
                                                 }

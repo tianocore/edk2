@@ -199,7 +199,7 @@ public class GlobalData {
         }
         return modulePath;
     }
-    
+
     /**
      Get a module id
      
@@ -208,9 +208,10 @@ public class GlobalData {
      @param packageGuid
      @param packageVersion
      @return
-    
-    **/
-    public static ModuleIdentification findIdByGuidVersion(String moduleGuid, String moduleVersion, String packageGuid, String packageVersion) {
+     
+     **/
+    public static ModuleIdentification findModuleIdByGuidVersion(String moduleGuid, String moduleVersion,
+                                                                 String packageGuid, String packageVersion) {
         ModuleIdentification mid = null;
         for (int index = 0; index < vModuleList.size(); index++) {
             if (vModuleList.elementAt(index).equals(moduleGuid, moduleVersion, packageGuid, packageVersion)) {
@@ -219,5 +220,43 @@ public class GlobalData {
             }
         }
         return mid;
+    }
+
+    /**
+     Get a package id
+     
+     @param packageGuid
+     @param packageVersion
+     @return
+     
+     **/
+    public static PackageIdentification findPackageIdByGuidVersion(String packageGuid, String packageVersion) {
+        PackageIdentification pid = null;
+        for (int index = 0; index < vPackageList.size(); index++) {
+            if (vPackageList.elementAt(index).equals(packageGuid, packageVersion)) {
+                pid = vPackageList.elementAt(index);
+                break;
+            }
+        }
+        return pid;
+    }
+
+    /**
+     Get a platform id 
+     
+     @param platformGuid
+     @param platformVersion
+     @return
+     
+     **/
+    public static PlatformIdentification findPlatformIdByGuidVersion(String platformGuid, String platformVersion) {
+        PlatformIdentification pid = null;
+        for (int index = 0; index < vPlatformList.size(); index++) {
+            if (vPlatformList.elementAt(index).equals(platformGuid, platformVersion)) {
+                pid = vPlatformList.elementAt(index);
+                break;
+            }
+        }
+        return pid;
     }
 }

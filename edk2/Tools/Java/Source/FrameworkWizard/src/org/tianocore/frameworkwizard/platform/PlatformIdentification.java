@@ -40,4 +40,22 @@ public class PlatformIdentification extends Identification{
     public String toString() {
       return getName() + " " + getVersion() + " [" + Tools.getRelativePath(getFpdFile().getPath(), Workspace.getCurrentWorkspace()) + "]";
     }
+    
+    public boolean equals(String platformGuid, String platformVersion) {
+        boolean b = false;
+        if (this.getGuid().equals(platformGuid)) {
+            b = true;
+            //
+            // Check Version
+            //
+            if (platformVersion != null) {
+                if (!Tools.isEmpty(platformVersion)) {
+                    if (!platformVersion.equals(this.getVersion())) {
+                        b = false;
+                    }
+                }
+            }
+        }
+        return b;
+    }
 }

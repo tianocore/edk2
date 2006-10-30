@@ -569,15 +569,19 @@ public class Clone extends IDialog {
      @retval false  Any one of name, guid and version is invalid
      
      **/
-    private boolean checkId() {
+    private boolean checkId(int mode) {
+        String name = this.jTextFieldBaseName.getText();
+        String guid = this.jTextFieldGuid.getText();
+        String version = this.jTextFieldVersion.getText();
+        
         //
         // Check Basename
         //
-        if (isEmpty(this.jTextFieldBaseName.getText())) {
+        if (isEmpty(name)) {
             Log.wrn("Clone", "The Name is required!");
             return false;
         }
-        if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
+        if (!DataValidation.isBaseName(name)) {
             Log
                .wrn("Clone",
                     "<html>Incorrect data type for the Name, it must<br>be a single word, starting with an alpha character.</html>");
@@ -587,11 +591,11 @@ public class Clone extends IDialog {
         //
         // Check Guid
         //
-        if (isEmpty(this.jTextFieldGuid.getText())) {
+        if (isEmpty(guid)) {
             Log.wrn("Clone", "A Guid is required!!");
             return false;
         }
-        if (!DataValidation.isGuid(this.jTextFieldGuid.getText())) {
+        if (!DataValidation.isGuid(guid)) {
             Log
                .wrn(
                     "Clone",
@@ -602,16 +606,39 @@ public class Clone extends IDialog {
         //
         // Check Version
         //
-        if (isEmpty(this.jTextFieldVersion.getText())) {
+        if (isEmpty(version)) {
             Log.wrn("Clone", "A Version must be entered!");
             return false;
         }
-        if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
+        if (!DataValidation.isVersion(version)) {
             Log
                .wrn(
                     "Clone",
                     "<html>Incorrect data type for Version, which must<br>be one or more digits, optionally followed by sequence<br>of one or more dot,  one or more digits; examples:<br>1.0 1.0.1 12.25.256</html>");
             return false;
+        }
+        
+        if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
+            String packageGuid = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getGuid();
+            String packageVersion = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getVersion();
+            if (GlobalData.findModuleIdByGuidVersion(guid, version, packageGuid, packageVersion) != null) {
+                Log.wrn("Clone", "A module with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
+            }
+        }
+
+        if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
+            if (GlobalData.findPackageIdByGuidVersion(guid, version) != null) {
+                Log.wrn("Clone", "A package with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
+            }
+        }
+
+        if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
+            if (GlobalData.findPlatformIdByGuidVersion(guid, version) != null) {
+                Log.wrn("Clone", "A platform with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
+            }
         }
 
         //
@@ -673,7 +700,7 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             trg = this.getModulePath();
-            if (src.equals(trg)) {
+            if (Tools.getFilePathOnly(src).equals(Tools.getFilePathOnly(trg))) {
                 Log.wrn("Clone", "The source and destination paths for cloning a module must be different!");
                 return false;
             }
@@ -682,7 +709,7 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target module already exists!");
                 return false;
             }
-            return checkId();
+            return checkId(mode);
         }
 
         //
@@ -703,7 +730,7 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target package already exists!");
                 return false;
             }
-            return checkId();
+            return checkId(mode);
         }
 
         //
@@ -714,12 +741,16 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The platform clone must be located in the current workspace!");
                 return false;
             }
+            if (Tools.getFilePathOnly(src).equals(Tools.getFilePathOnly(trg))) {
+                Log.wrn("Clone", "The source and destination paths for cloning a platform must be different!");
+                return false;
+            }
             trgFile = new File(trg);
             if (trgFile.exists()) {
                 Log.wrn("Clone", "The target platform already exists.");
                 return false;
             }
-            return checkId();
+            return checkId(mode);
         }
 
         return true;
