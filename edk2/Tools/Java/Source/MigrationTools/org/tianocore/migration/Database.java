@@ -22,21 +22,22 @@ import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.FrameworkDatabaseDocument.FrameworkDatabase;
 import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
-import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
-import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
-
 import org.tianocore.PackageListDocument.PackageList;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
+import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
+import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
+import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations;
+import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass;
 
 public final class Database {
-    private static final Database INSTANCE = Database.init();
+    private static final Database INSTANCE = null;
     
     Database(String path) {
         DatabasePath = path;
 
         try {
-            // collectWorkSpaceDatabase();
+            collectWorkSpaceDatabase();
             importPkgGuid("PkgGuid.csv");
             importDBLib("Library.csv");
             importDBGuid("Guid.csv", "Guid");
@@ -219,64 +220,203 @@ public final class Database {
     }
     
     public static final Database getInstance() {
+        if (INSTANCE == null) {
+            Database.init();
+        }
         return INSTANCE;
     }
 
-    private HashMap<String, String> hashDatabaseGuids     = new HashMap<String, String> ();
-    private HashMap<String, String> hashDatabasePpis      = new HashMap<String, String> ();
-    private HashMap<String, String> hashDatabaseProtocols = new HashMap<String, String> ();
 
-    private final void collectGuidDatabase(PackageSurfaceArea spdDatabase) throws Exception {
-        String                              pkgGuid;
-        Iterator<GuidDeclarations.Entry>    itGuids;
 
-        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+    private static String                  workspacePath;
+    private static HashMap<String, String> hashDbGuids        = new HashMap<String, String>();
+    private static HashMap<String, String> hashDbPpis         = new HashMap<String, String>();
+    private static HashMap<String, String> hashDbProtocols    = new HashMap<String, String>();
+    private static HashMap<String, String> hashDbLibSymbols   = new HashMap<String, String>();
+    private static HashMap<String, String> hashDbLibFunctions = new HashMap<String, String>();
+    private static HashMap<String, String> hashDbLibExterns   = new HashMap<String, String>();
 
-        itGuids = spdDatabase.getGuidDeclarations().getEntryList().iterator();
-        while (itGuids.hasNext()) {
-            hashDatabaseGuids.put(itGuids.next().getCName(), pkgGuid); 
+    private static final String     regLibClassName = ".*\\W(\\w[\\w\\d]*)\\.h";
+    private static final Pattern    ptnLibClassName = Pattern.compile(regLibClassName);
+
+    private static final String     regLibSymbol    = "#define\\s+(\\w[\\w\\d]*)";
+    private static final Pattern    ptnLibSymbol    = Pattern.compile(regLibSymbol);
+
+    private static final String     regLibDataType  = "[A-Z][A-Z0-9_]*\\s*\\**";
+    private static final String     regLibFunction  = regLibDataType + "\\s*(?:EFIAPI)?\\s+" + 
+                                                      "(\\w[\\w\\d]*)\\s*\\([^)]*\\)\\s*;";
+    private static final Pattern    ptnLibFunction  = Pattern.compile(regLibFunction);
+
+    private static final String     regLibExtern    = "extern\\s+" + regLibDataType + "\\s*(\\w[\\w\\d]*)";
+    private static final Pattern    ptnLibExtern    = Pattern.compile(regLibExtern);
+
+    private static final String convertToOsFilePath(String filePath) {
+        return filePath.replace("/", File.separator).replace("\\", File.separator);
+    }
+    private static final void collectLibHeaderFileInfo(String libHeaderFile, String pkgGuid) throws Exception {
+        String  fileContents;
+        String  libClassName;
+        String  libContainer;
+        Matcher mtrLibClass;
+        Matcher mtrLibSymbol;
+        Matcher mtrLibFunction;
+        Matcher mtrLibExtern;
+
+        System.out.println ("Parsing: " + libHeaderFile);
+        mtrLibClass = ptnLibClassName.matcher(libHeaderFile);
+        if (!mtrLibClass.matches()) {
+            throw new Exception("Illegal libary header file");
+        }
+        libClassName = mtrLibClass.group(1);
+        libContainer = libClassName + "@" + pkgGuid;
+
+        fileContents = Common.file2string(libHeaderFile);
+        mtrLibSymbol = ptnLibSymbol.matcher(fileContents);
+        while (mtrLibSymbol.find()) {
+            String libSymbol;
+            String oldLibContainer;
+
+            libSymbol       = mtrLibSymbol.group(1);
+            oldLibContainer = hashDbLibSymbols.put(libSymbol, libContainer);
+            if (oldLibContainer != null) {
+                String warnMessage;
+
+                warnMessage = "Duplicated Lib Symbol:" + libSymbol + " Found. " +
+                              "Later package will overide the previous one"; 
+                System.out.println(warnMessage);
+            }
+        }
+
+        mtrLibFunction = ptnLibFunction.matcher(fileContents);
+        while (mtrLibFunction.find()) {
+            String libFunction;
+            String oldLibContainer;
+
+            libFunction     = mtrLibFunction.group(1);
+            oldLibContainer = hashDbLibFunctions.put(libFunction, libContainer);
+            if (oldLibContainer != null) {
+                String warnMessage;
+
+                warnMessage = "Duplicated Lib Function:" + libFunction + " Found. " +
+                              "Later package will overide the previous one"; 
+                System.out.println(warnMessage);
+            }
+        }
+
+        mtrLibExtern = ptnLibExtern.matcher(fileContents);
+        while (mtrLibExtern.find()) {
+            String libExtern;
+            String oldLibContainer;
+
+            libExtern = mtrLibExtern.group(1);
+            oldLibContainer = hashDbLibExterns.put(libExtern, libContainer);
+            if (oldLibContainer != null) {
+                String warnMessage;
+
+                warnMessage = "Duplicated Lib Extern:" + libExtern + " Found. " +
+                              "Later package will overide the previous one"; 
+                System.out.println(warnMessage);
+            }
         }
     }
-
-    private final void collectPpiDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+    private static final void collectLibDataBase(PackageSurfaceArea spdDatabase, String pkgDirectory) throws Exception {
         String                              pkgGuid;
-        Iterator<PpiDeclarations.Entry>     itPpis;
+        LibraryClassDeclarations            libClassDeclarations;
 
         pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+        libClassDeclarations = spdDatabase.getLibraryClassDeclarations();
+        if (libClassDeclarations != null) {
+            Iterator<LibraryClass>   itLibClass;
 
-        itPpis = spdDatabase.getPpiDeclarations().getEntryList().iterator();
-        while (itPpis.hasNext()) {
-            hashDatabasePpis.put(itPpis.next().getCName(), pkgGuid); 
+            itLibClass = libClassDeclarations.getLibraryClassList().iterator();
+            while (itLibClass.hasNext()) {
+                String  libHeaderFile;
+
+                libHeaderFile = pkgDirectory + File.separator +
+                                itLibClass.next().getIncludeHeader(); 
+                libHeaderFile = convertToOsFilePath (libHeaderFile);
+                try {
+                    collectLibHeaderFileInfo(libHeaderFile, pkgGuid);
+                } catch (Exception e) {
+                    String errorMessage;
+
+                    errorMessage = "Error (" + e.getMessage() + ")occurs when parsing " +
+                                   libHeaderFile;
+                    System.out.println(errorMessage);
+                }
+            }
         }
     }
+    private static final void collectGuidDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        String                              pkgGuid;
+        GuidDeclarations                    guidDeclarations;
 
-    private final void collectProtocolDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+        guidDeclarations = spdDatabase.getGuidDeclarations();
+        if (guidDeclarations != null) {
+            Iterator<GuidDeclarations.Entry>    itGuids;
+
+            itGuids = guidDeclarations.getEntryList().iterator();
+            while (itGuids.hasNext()) {
+                hashDbGuids.put(itGuids.next().getCName(), pkgGuid); 
+            }
+        }
+        
+    }
+
+    private static final void collectPpiDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+        String                              pkgGuid;
+        PpiDeclarations                     ppiDeclarations;
+
+        pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+        ppiDeclarations = spdDatabase.getPpiDeclarations();
+
+        if (ppiDeclarations != null) {
+            Iterator<PpiDeclarations.Entry>     itPpis;
+
+            itPpis = ppiDeclarations.getEntryList().iterator();
+            while (itPpis.hasNext()) {
+                hashDbPpis.put(itPpis.next().getCName(), pkgGuid); 
+            }
+        }
+        
+    }
+
+    private static final void collectProtocolDatabase(PackageSurfaceArea spdDatabase) throws Exception {
         String                                  pkgGuid;
-        Iterator<ProtocolDeclarations.Entry>    itProtocols;
+        ProtocolDeclarations                    protocolDeclarations;
 
         pkgGuid = spdDatabase.getSpdHeader().getGuidValue();
+        protocolDeclarations = spdDatabase.getProtocolDeclarations();
 
-        itProtocols = spdDatabase.getProtocolDeclarations().getEntryList().iterator();
-        while (itProtocols.hasNext()) {
-            hashDatabaseGuids.put(itProtocols.next().getCName(), pkgGuid); 
+        if (protocolDeclarations != null) {
+            Iterator<ProtocolDeclarations.Entry>    itProtocols;
+
+            itProtocols = protocolDeclarations.getEntryList().iterator();
+            while (itProtocols.hasNext()) {
+                hashDbGuids.put(itProtocols.next().getCName(), pkgGuid); 
+            }
         }
+       
     }
 
-    private final void collectPackageDatabase(String packageFileName) throws Exception {
+    private static final void collectPackageDatabase(String packageFileName) throws Exception {
         XmlObject            xmlPackage;
         PackageSurfaceArea   spdDatabase;
-
-        xmlPackage  = XmlObject.Factory.parse(new File(packageFileName));
+        File                 pkgFile;
+       
+        pkgFile     = new File(packageFileName);
+        xmlPackage  = XmlObject.Factory.parse(pkgFile);
         spdDatabase = ((PackageSurfaceAreaDocument) xmlPackage).getPackageSurfaceArea();
-
+ 
         collectGuidDatabase(spdDatabase);
         collectProtocolDatabase(spdDatabase);
         collectPpiDatabase(spdDatabase);
+        collectLibDataBase(spdDatabase,  pkgFile.getParent());
 
 
     }
-    public final void collectWorkSpaceDatabase() throws Exception {
-        String                      workspacePath;
+    public static final void collectWorkSpaceDatabase() throws Exception {
         String                      databaseFileName;
         File                        databaseFile;
         XmlObject                   xmlDatabase;
@@ -302,16 +442,14 @@ public final class Database {
         while (packageFile.hasNext()) {
             String packageFileName = packageFile.next().getStringValue();
             packageFileName = workspacePath + File.separator + packageFileName;
-            packageFileName = packageFileName.replace("/", File.separator);
+            packageFileName = convertToOsFilePath(packageFileName);
 
-            System.out.println("Parse: " + packageFileName);
+            System.out.println("Parsing: " + packageFileName);
             try {
                 collectPackageDatabase(packageFileName);
             } catch (Exception e) {
                 System.out.println("Error occured when opening " + packageFileName + e.getMessage());
             }
         }
-        return;
     }
-    
 }
