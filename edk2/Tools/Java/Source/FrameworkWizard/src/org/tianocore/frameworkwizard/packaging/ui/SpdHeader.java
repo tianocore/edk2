@@ -493,13 +493,13 @@ public class SpdHeader extends IInternalFrame {
             jCheckBoxRdOnly.setText("Read Only");
             jCheckBoxRdOnly.setLocation(new java.awt.Point(labelColumn, rowNine));
             jCheckBoxRdOnly.setSize(new java.awt.Dimension(labelWidth, oneRowHeight));
-            // jCheckBoxRdOnly.setPreferredSize(new java.awt.Dimension(150, oneRowHeight));
             jCheckBoxRdOnly.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null) {
                         docConsole.setSaved(false);
                     }
-                    sfc.setSpdPkgDefsRdOnly(jCheckBoxRdOnly.isSelected() + "");
+                    sfc.setSpdPkgDefsRdOnly(jCheckBoxRdOnly.isSelected()+"");
+                    initFrame();
                 }
             });
         }
@@ -522,7 +522,7 @@ public class SpdHeader extends IInternalFrame {
                     if (docConsole != null) {
                         docConsole.setSaved(false);
                     }
-                    sfc.setSpdPkgDefsRePkg(jCheckBoxRePkg.isSelected() + "");
+                    sfc.setSpdPkgDefsRePkg(jCheckBoxRePkg.isSelected()+"");
                 }
             });
         }
@@ -558,6 +558,7 @@ public class SpdHeader extends IInternalFrame {
     public SpdHeader(OpeningPackageType opt) {
         this(opt.getXmlSpd());
         docConsole = opt;
+        initFrame();
     }
 
     /**
@@ -567,7 +568,6 @@ public class SpdHeader extends IInternalFrame {
     private void init() {
         this.setContentPane(getTopScrollPane());
         this.setTitle("Package Surface Area Header");
-        initFrame();
     }
 
     /**
@@ -646,9 +646,11 @@ public class SpdHeader extends IInternalFrame {
             jStarLabel7.setLocation(new java.awt.Point(2, rowEight));
             jStarLabel8 = new StarLabel();
             jStarLabel8.setLocation(new java.awt.Point(2, rowNine));
+            jStarLabel8.setVisible(false);
             jStarLabel9 = new StarLabel();
             jStarLabel9.setLocation(new java.awt.Point(2, rowTen));
 
+            jStarLabel9.setVisible(false);
             jPackageNameLabel = new JLabel();
             jPackageNameLabel.setText("Package Name");
             jPackageNameLabel.setBounds(new java.awt.Rectangle(labelColumn, rowOne, labelWidth, oneRowHeight));
@@ -739,7 +741,20 @@ public class SpdHeader extends IInternalFrame {
      
      **/
     private void initFrame() {
-
+        boolean editable = true;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            editable = false;
+        }
+        jPackageNameTextField.setEditable(editable);
+        jGuidTextField.setEditable(editable);
+        jGenerateGuidButton.setEnabled(editable);
+        jVersionTextField.setEditable(editable);
+        jCopyrightTextArea.setEditable(editable);
+        jLicenseTextArea.setEditable(editable);
+        jUrlTextField.setEditable(editable);
+        jAbstractTextField.setEditable(editable);
+        jDescriptionTextArea.setEditable(editable);
+        jCheckBoxRePkg.setEnabled(editable);
     }
 
     /* (non-Javadoc)

@@ -357,7 +357,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
             jButtonRemove.setBounds(new java.awt.Rectangle(270,227,90,20));
-            jButtonRemove.setText("Remove");
+            jButtonRemove.setText("Delete");
             jButtonRemove.addActionListener(this);
         }
         return jButtonRemove;
@@ -432,6 +432,10 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     public SpdGuidDecls(OpeningPackageType opt) {
         this(opt.getXmlSpd());
         docConsole = opt;
+        if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+        }
+        initFrame();
     }
     /**
       This method initializes this
@@ -449,7 +453,6 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         });
         this.setBounds(new java.awt.Rectangle(0, 0, 500, 370));
         this.setVisible(true);
-        initFrame();
     }
 
     protected void init(SpdFileContents sfc){
@@ -466,6 +469,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             model.addRow(saa[i]);
             i++;
         }
+        
     }
     
     protected JScrollPane getJContentPane(){
@@ -567,7 +571,16 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     protected void initFrame() {
         
         this.setTitle("GUID Declarations");
-
+        
+        boolean editable = true;
+        if (getSfc().getSpdPkgDefsRdOnly().equals("true")) {
+            editable = false;
+        }
+        
+        jButtonAdd.setEnabled(editable);
+        jButtonRemove.setEnabled(editable);
+        jButtonClearAll.setEnabled(editable);
+        jTable.setEnabled(editable);
     }
 
     /* (non-Javadoc)
@@ -722,7 +735,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         if (jButtonGen == null) {
             jButtonGen = new JButton();
             jButtonGen.setBounds(new java.awt.Rectangle(485,58,92,21));
-            jButtonGen.setText("Gen GUID");
+            jButtonGen.setText("Gen");
             jButtonGen.setPreferredSize(new java.awt.Dimension(80,20));
             jButtonGen.addActionListener(this);
         }
@@ -918,6 +931,13 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
 
     protected JLabel getJLabelGuidType() {
         return jLabelGuidType;
+    }
+
+    /**
+     * @return Returns the sfc.
+     */
+    protected SpdFileContents getSfc() {
+        return sfc;
     }
 }
 
