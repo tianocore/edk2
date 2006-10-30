@@ -683,7 +683,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemHelpAbout() {
         if (jMenuItemHelpAbout == null) {
             jMenuItemHelpAbout = new JMenuItem();
-            jMenuItemHelpAbout.setText("About...");
+            jMenuItemHelpAbout.setText("About");
             jMenuItemHelpAbout.setMnemonic('A');
             jMenuItemHelpAbout.addActionListener(this);
         }
@@ -1358,7 +1358,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemToolsBuildPreferences() {
         if (jMenuItemToolsBuildPreferences == null) {
             jMenuItemToolsBuildPreferences = new JMenuItem();
-            jMenuItemToolsBuildPreferences.setText("Build Preferences");
+            jMenuItemToolsBuildPreferences.setText("Build Preferences...");
             jMenuItemToolsBuildPreferences.setMnemonic('P');
             jMenuItemToolsBuildPreferences.setEnabled(true);
             jMenuItemToolsBuildPreferences.addActionListener(this);
@@ -1598,7 +1598,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemProjectInstallFar() {
         if (jMenuItemProjectInstallFar == null) {
             jMenuItemProjectInstallFar = new JMenuItem();
-            jMenuItemProjectInstallFar.setText("Install FAR");
+            jMenuItemProjectInstallFar.setText("Install FAR...");
             jMenuItemProjectInstallFar.setMnemonic('I');
             jMenuItemProjectInstallFar.setEnabled(true);
             jMenuItemProjectInstallFar.addActionListener(this);
@@ -1614,7 +1614,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemProjectUpdateFar() {
         if (jMenuItemProjectUpdateFar == null) {
             jMenuItemProjectUpdateFar = new JMenuItem();
-            jMenuItemProjectUpdateFar.setText("Update FAR");
+            jMenuItemProjectUpdateFar.setText("Update FAR...");
             jMenuItemProjectUpdateFar.setMnemonic('U');
             jMenuItemProjectUpdateFar.setEnabled(true);
             jMenuItemProjectUpdateFar.addActionListener(this);
@@ -1631,7 +1631,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemProjectRemoveFar() {
         if (jMenuItemProjectRemoveFar == null) {
             jMenuItemProjectRemoveFar = new JMenuItem();
-            jMenuItemProjectRemoveFar.setText("Remove FAR");
+            jMenuItemProjectRemoveFar.setText("Remove FAR...");
             jMenuItemProjectRemoveFar.setMnemonic('R');
             jMenuItemProjectRemoveFar.setEnabled(true);
             jMenuItemProjectRemoveFar.addActionListener(this);
@@ -1647,7 +1647,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemProjectCreateFar() {
         if (jMenuItemProjectCreateFar == null) {
             jMenuItemProjectCreateFar = new JMenuItem();
-            jMenuItemProjectCreateFar.setText("Create FAR");
+            jMenuItemProjectCreateFar.setText("Create FAR...");
             jMenuItemProjectCreateFar.setMnemonic('C');
             jMenuItemProjectCreateFar.addActionListener(this);
         }
@@ -1774,7 +1774,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     private JMenuItem getJMenuItemToolsGenerateGuidsXref() {
         if (jMenuItemToolsGenerateGuidsXref == null) {
             jMenuItemToolsGenerateGuidsXref = new JMenuItem();
-            jMenuItemToolsGenerateGuidsXref.setText("Generate guids.xref");
+            jMenuItemToolsGenerateGuidsXref.setText("Generate guids.xref...");
             jMenuItemToolsGenerateGuidsXref.setMnemonic('G');
             jMenuItemToolsGenerateGuidsXref.addActionListener(this);
         }
@@ -1903,9 +1903,10 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         }
 
         if (arg0.getSource() == this.jMenuItemFileRefresh) {
-            this.closeAll();
-            this.refresh();
-            this.makeEmptyTree();
+            if (this.closeAll() == 0) {
+                this.refresh();
+                this.makeEmptyTree();    
+            }
         }
 
         if (arg0.getSource() == this.jMenuItemFileExit) {
@@ -3189,8 +3190,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      Close all opening files and clean all showing internal frame
      
      **/
-    private void closeAll() {
-        int result = -1;
+    private int closeAll() {
+        int result = JOptionPane.NO_OPTION;
         if (!GlobalData.openingModuleList.isSaved() || !GlobalData.openingPackageList.isSaved()
             || !GlobalData.openingPlatformList.isSaved()) {
             result = showSaveDialog();
@@ -3203,13 +3204,15 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             // Do nothing
             //
         }
-        if (result == JOptionPane.CANCEL_OPTION) {
-            return;
+        if (result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
+            return -1;
         }
         this.cleanDesktopPane();
         GlobalData.openingModuleList.closeAll();
         GlobalData.openingPackageList.closeAll();
         GlobalData.openingPlatformList.closeAll();
+        
+        return 0;
     }
 
     /**
@@ -3282,18 +3285,16 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      
      **/
     private void exit() {
-        int result = -1;
+        int result = JOptionPane.NO_OPTION;
         if (!GlobalData.openingModuleList.isSaved() || !GlobalData.openingPackageList.isSaved()
             || !GlobalData.openingPlatformList.isSaved()) {
             result = showSaveDialog();
         }
         if (result == JOptionPane.YES_OPTION) {
             this.saveAll();
-        }
-        if (result == JOptionPane.NO_OPTION) {
+        } else if (result == JOptionPane.NO_OPTION) {
             // Do nothing
-        }
-        if (result == JOptionPane.CANCEL_OPTION) {
+        } else if (result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
             return;
         }
         this.dispose();
