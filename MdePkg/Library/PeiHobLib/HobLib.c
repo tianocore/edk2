@@ -228,6 +228,11 @@ BuildModuleHob (
   Hob->MemoryAllocationHeader.MemoryLength      = ModuleLength;
   Hob->MemoryAllocationHeader.MemoryType        = EfiBootServicesCode;
 
+  //
+  // Zero the reserved space to match HOB spec
+  //
+  ZeroMem (Hob->MemoryAllocationHeader.Reserved, sizeof (Hob->MemoryAllocationHeader.Reserved));
+  
   CopyGuid (&Hob->ModuleName, ModuleName);
   Hob->EntryPoint = EntryPoint;
 }
@@ -418,6 +423,11 @@ BuildCpuHob (
 
   Hob->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob->SizeOfIoSpace     = SizeOfIoSpace;
+
+  //
+  // Zero the reserved space to match HOB spec
+  //
+  ZeroMem (Hob->Reserved, sizeof (Hob->Reserved)); 
 }
 
 /**
@@ -447,6 +457,11 @@ BuildStackHob (
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
   Hob->AllocDescriptor.MemoryType        = EfiConventionalMemory;
+
+  //
+  // Zero the reserved space to match HOB spec
+  //
+  ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
 
 /**
@@ -478,6 +493,11 @@ BuildBspStoreHob (
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
   Hob->AllocDescriptor.MemoryType        = MemoryType;
+
+  //
+  // Zero the reserved space to match HOB spec
+  //
+  ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
 
 /**
@@ -509,4 +529,8 @@ BuildMemoryAllocationHob (
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
   Hob->AllocDescriptor.MemoryType        = MemoryType;
+  //
+  // Zero the reserved space to match HOB spec
+  //
+  ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }

@@ -159,7 +159,8 @@ Returns:
   UINTN             Height;
   UINTN             Width;
   UINTN             ImageIndex;
-
+  BOOLEAN           IsAllocated;
+  
   BmpHeader = (BMP_IMAGE_HEADER *) BmpImage;
   if (BmpHeader->CharB != 'B' || BmpHeader->CharM != 'M') {
     return EFI_UNSUPPORTED;
@@ -182,12 +183,14 @@ Returns:
   ImageHeader   = Image;
 
   BltBufferSize = BmpHeader->PixelWidth * BmpHeader->PixelHeight * sizeof (EFI_UGA_PIXEL);
+  IsAllocated   = FALSE;
   if (*UgaBlt == NULL) {
     *UgaBltSize = BltBufferSize;
     *UgaBlt     = AllocatePool (*UgaBltSize);
     if (*UgaBlt == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+    IsAllocated = TRUE;
   } else {
     if (*UgaBltSize < BltBufferSize) {
       *UgaBltSize = BltBufferSize;
@@ -256,6 +259,10 @@ Returns:
         break;
 
       default:
+        if (IsAllocated) {
+          gBS->FreePool (*UgaBlt);
+          *UgaBlt = NULL;
+        }
         return EFI_UNSUPPORTED;
         break;
       };
