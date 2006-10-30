@@ -143,3 +143,4 @@ IsaIo,gEfiIsaIoProtocolGuid,gEfiIsaIoProtocolGuid,7EE2BD44-3DA0-11D4-9A38-009027
 IsaAcpi,gEfiIsaAcpiProtocolGuid,gEfiIsaAcpiProtocolGuid,64A892DC-5561-4536-92C7-799BFC183355,EdkModulePkg
 Performance,gPerformanceProtocolGuid,gPerformanceProtocolGuid,76B6BDFA-2ACD-4462-9E3F-CB58C969D937,EdkModulePkg
 ScsiIo,gEfiScsiIoProtocolGuid,gEfiScsiIoProtocolGuid,403CD195-F233-48EC-8455-B2E52F1D9E02,EdkModulePkg
+ApciSupport,gEfiAcpiSupportGuid,gEfiAcpiSupportProtocolGuid,DBFF9D55-89B7-46DA-BDDF-677D3DC0241D,MdePkg
