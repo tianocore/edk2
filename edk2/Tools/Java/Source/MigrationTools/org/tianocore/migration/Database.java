@@ -31,7 +31,7 @@ import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations;
 import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass;
 
 public final class Database {
-    private static final Database INSTANCE = null;
+    private static final Database INSTANCE = Database.init();;
     
     Database(String path) {
         DatabasePath = path;
@@ -220,41 +220,38 @@ public final class Database {
     }
     
     public static final Database getInstance() {
-        if (INSTANCE == null) {
-            Database.init();
-        }
         return INSTANCE;
     }
 
 
 
-    private static String                  workspacePath;
-    private static HashMap<String, String> hashDbGuids        = new HashMap<String, String>();
-    private static HashMap<String, String> hashDbPpis         = new HashMap<String, String>();
-    private static HashMap<String, String> hashDbProtocols    = new HashMap<String, String>();
-    private static HashMap<String, String> hashDbLibSymbols   = new HashMap<String, String>();
-    private static HashMap<String, String> hashDbLibFunctions = new HashMap<String, String>();
-    private static HashMap<String, String> hashDbLibExterns   = new HashMap<String, String>();
+    private String                  workspacePath;
+    private HashMap<String, String> hashDbGuids        = new HashMap<String, String>();
+    private HashMap<String, String> hashDbPpis         = new HashMap<String, String>();
+    private HashMap<String, String> hashDbProtocols    = new HashMap<String, String>();
+    private HashMap<String, String> hashDbLibSymbols   = new HashMap<String, String>();
+    private HashMap<String, String> hashDbLibFunctions = new HashMap<String, String>();
+    private HashMap<String, String> hashDbLibExterns   = new HashMap<String, String>();
 
-    private static final String     regLibClassName = ".*\\W(\\w[\\w\\d]*)\\.h";
-    private static final Pattern    ptnLibClassName = Pattern.compile(regLibClassName);
+    private final String     regLibClassName = ".*\\W(\\w[\\w\\d]*)\\.h";
+    private final Pattern    ptnLibClassName = Pattern.compile(regLibClassName);
 
-    private static final String     regLibSymbol    = "#define\\s+(\\w[\\w\\d]*)";
-    private static final Pattern    ptnLibSymbol    = Pattern.compile(regLibSymbol);
+    private final String     regLibSymbol    = "#define\\s+(\\w[\\w\\d]*)";
+    private final Pattern    ptnLibSymbol    = Pattern.compile(regLibSymbol);
 
-    private static final String     regLibDataType  = "[A-Z][A-Z0-9_]*\\s*\\**";
-    private static final String     regLibFunction  = regLibDataType + "\\s*(?:EFIAPI)?\\s+" + 
+    private final String     regLibDataType  = "[A-Z][A-Z0-9_]*\\s*\\**";
+    private final String     regLibFunction  = regLibDataType + "\\s*(?:EFIAPI)?\\s+" + 
                                                       "(\\w[\\w\\d]*)\\s*\\([^)]*\\)\\s*;";
-    private static final Pattern    ptnLibFunction  = Pattern.compile(regLibFunction);
+    private Pattern    ptnLibFunction  = Pattern.compile(regLibFunction);
 
-    private static final String     regLibExtern    = "extern\\s+" + regLibDataType + 
+    private final String     regLibExtern    = "extern\\s+" + regLibDataType + 
                                                       "\\s*(\\w[\\w\\d]*)";
-    private static final Pattern    ptnLibExtern    = Pattern.compile(regLibExtern);
+    private final Pattern    ptnLibExtern    = Pattern.compile(regLibExtern);
 
-    private static final String convertToOsFilePath(String filePath) {
+    private final String convertToOsFilePath(String filePath) {
         return filePath.replace("/", File.separator).replace("\\", File.separator);
     }
-    private static final void collectLibHeaderFileInfo(String libHeaderFile, String pkgGuid) throws Exception {
+    private final void collectLibHeaderFileInfo(String libHeaderFile, String pkgGuid) throws Exception {
         String  fileContents;
         String  libClassName;
         String  libContainer;
@@ -320,7 +317,7 @@ public final class Database {
             }
         }
     }
-    private static final void collectLibDataBase(PackageSurfaceArea spdDatabase, String pkgDirectory) throws Exception {
+    private final void collectLibDataBase(PackageSurfaceArea spdDatabase, String pkgDirectory) throws Exception {
         String                              pkgGuid;
         LibraryClassDeclarations            libClassDeclarations;
 
@@ -348,7 +345,7 @@ public final class Database {
             }
         }
     }
-    private static final void collectGuidDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+    private final void collectGuidDatabase(PackageSurfaceArea spdDatabase) throws Exception {
         String                              pkgGuid;
         GuidDeclarations                    guidDeclarations;
 
@@ -365,7 +362,7 @@ public final class Database {
         
     }
 
-    private static final void collectPpiDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+    private final void collectPpiDatabase(PackageSurfaceArea spdDatabase) throws Exception {
         String                              pkgGuid;
         PpiDeclarations                     ppiDeclarations;
 
@@ -383,7 +380,7 @@ public final class Database {
         
     }
 
-    private static final void collectProtocolDatabase(PackageSurfaceArea spdDatabase) throws Exception {
+    private final void collectProtocolDatabase(PackageSurfaceArea spdDatabase) throws Exception {
         String                                  pkgGuid;
         ProtocolDeclarations                    protocolDeclarations;
 
@@ -401,7 +398,7 @@ public final class Database {
        
     }
 
-    private static final void collectPackageDatabase(String packageFileName) throws Exception {
+    private final void collectPackageDatabase(String packageFileName) throws Exception {
         XmlObject            xmlPackage;
         PackageSurfaceArea   spdDatabase;
         File                 pkgFile;
@@ -417,7 +414,7 @@ public final class Database {
 
 
     }
-    public static final void collectWorkSpaceDatabase() throws Exception {
+    public final void collectWorkSpaceDatabase() throws Exception {
         String                      databaseFileName;
         File                        databaseFile;
         XmlObject                   xmlDatabase;
