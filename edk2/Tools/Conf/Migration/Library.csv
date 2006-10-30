@@ -37,7 +37,7 @@ EfiDriverLib,EfiCreateEventReadyToBoot,EfiCreateEventReadyToBootEx,UefiLib,MdePk
 EfiDriverLib,EfiCreateEventLegacyBoot,EfiCreateEventLegacyBootEx,UefiLib,MdePkg
 EfiDriverLib,EfiInitializeFwVolDevicepathNode,EfiInitializeFwVolDevicepathNode,UefiLib,MdePkg
 EfiDriverLib,EfiGetNameGuidFromFwVolDevicePathNode,EfiGetNameGuidFromFwVolDevicePathNode,UefiLib,MdePkg
-EfiDriverLib,EfiLibReportStatusCode,ReportStatusCode,ReportStatusCodeLib,MdePkg
+EfiDriverLib,EfiLibReportStatusCode,gRT->ReportStatusCode,ReportStatusCodeLib,MdePkg
 EfiDriverLib,ReportStatusCodeWithDevicePath,ReportStatusCodeWithDevicePath,ReportStatusCodeLib,MdePkg
 EfiDriverLib,EFI_FIELD_OFFSET,EFI_FIELD_OFFSET,BaseLib,MdePkg
 EfiDriverLib,EFI_LIST,LIST_ENTRY,BaseLib,MdePkg
@@ -71,7 +71,7 @@ EfiCommonLib,BufToHexString,R8_BufToHexString,%,MdePkg
 EfiCommonLib,CHARACTER_NUMBER_FOR_VALUE,MAXIMUM_VALUE_CHARACTERS,PrintLib,MdePkg
 EfiCommonLib,CodeTypeToPostCode,CodeTypeToPostCode,ReportStatusCodeLib,MdePkg
 EfiCommonLib,COMMA_TYPE,COMMA_TYPE,PrintLib,MdePkg
-EfiCommonLib,DivU64x32,DivU64x64Remainder ,BaseLib,MdePkg
+EfiCommonLib,DivU64x32,DivU64x64Remainder,BaseLib,MdePkg
 EfiCommonLib,EfiAsciiStrCpy,AsciiStrCpy,BaseLib,MdePkg
 EfiCommonLib,EfiAsciiStrLen,AsciiStrLen,BaseLib,MdePkg
 EfiCommonLib,EfiCommonIoRead,n/a,n/a,MdePkg

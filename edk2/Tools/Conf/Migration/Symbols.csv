@@ -222,7 +222,7 @@ EfiLibAllocateRuntimeZeroPool,AllocateRuntimeZeroPool
 EfiLibAllocateZeroPool,AllocateZeroPool
 EfiCreateEventReadyToBoot,EfiCreateEventReadyToBootEx
 EfiCreateEventLegacyBoot,EfiCreateEventLegacyBootEx
-EfiLibReportStatusCode,ReportStatusCode
+EfiLibReportStatusCode,gRT->ReportStatusCode
 EFI_LIST,LIST_ENTRY
 EFI_LIST_ENTRY,LIST_ENTRY    
 EFI_LIST_NODE,LIST_ENTRY    
@@ -241,7 +241,7 @@ ASPrint,AsciiSPrint
 AvSPrint,AsciiVSPrint
 BufToHexString,R8_BufToHexString
 CHARACTER_NUMBER_FOR_VALUE,MAXIMUM_VALUE_CHARACTERS
-DivU64x32,DivU64x64Remainder 
+DivU64x32,DivU64x64Remainder
 EfiAsciiStrCpy,AsciiStrCpy
 EfiAsciiStrLen,AsciiStrLen
 EfiCommonIoRead,n/a
@@ -319,3 +319,4 @@ PEI_CR,CR
 PEI_DEBUG,DEBUG#
 PEI_DEBUG_CODE,DEBUG_CODE#
 PEI_DEBUG_SET_MEMORY,DEBUG_CLEAR_MEMORY
+gEfiAcpiSupportGuid,gEfiAcpiSupportProtocolGuid

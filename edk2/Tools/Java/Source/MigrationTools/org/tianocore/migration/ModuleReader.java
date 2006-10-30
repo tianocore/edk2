@@ -310,7 +310,7 @@ public final class ModuleReader implements Common.ForDoAll {
         }
         
         public boolean recognize(String filename) {
-            return filename.contains(".c") || filename.contains(".h");
+            return filename.contains(".c") || filename.contains(".h") || filename.contains(".dxs");
         }
         
         public String namechange(String oldname) {

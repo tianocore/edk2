@@ -315,7 +315,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
                 if (!r8thing.equals(r9thing)) {
                     if (wholeline.contains(r8thing)) {
-                        wholeline = wholeline.replaceAll(r8thing, r9thing);
+                    	String findString = "(?<!(?:\\d|\\w))" + r8thing + "(?!(?:\\d|\\w))";
+                        wholeline = wholeline.replaceAll(findString, r9thing);
                         filefunc.add(new r8tor9(r8thing, r9thing));
                         Iterator<r8tor9> rt = filefunc.iterator();
                         while (rt.hasNext()) {
