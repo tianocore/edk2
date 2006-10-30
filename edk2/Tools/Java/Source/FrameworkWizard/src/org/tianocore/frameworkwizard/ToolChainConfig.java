@@ -380,6 +380,7 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
             int result = fc.showSaveDialog(new JPanel());
             if (result == JFileChooser.APPROVE_OPTION) {
                 currentFile = fc.getSelectedFile().getPath();
+                currentFile = Tools.addPathExt(currentFile, DataType.RETURN_TYPE_TEXT);
                 try {
                     vtcc.saveFile(currentFile);
                 } catch (IOException e) {
