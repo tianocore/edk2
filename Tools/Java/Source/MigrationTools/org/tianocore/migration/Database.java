@@ -37,7 +37,7 @@ public final class Database {
         DatabasePath = path;
 
         try {
-            collectWorkSpaceDatabase();
+            //collectWorkSpaceDatabase();
             importPkgGuid("PkgGuid.csv");
             importDBLib("Library.csv");
             importDBGuid("Guid.csv", "Guid");
@@ -247,7 +247,8 @@ public final class Database {
                                                       "(\\w[\\w\\d]*)\\s*\\([^)]*\\)\\s*;";
     private static final Pattern    ptnLibFunction  = Pattern.compile(regLibFunction);
 
-    private static final String     regLibExtern    = "extern\\s+" + regLibDataType + "\\s*(\\w[\\w\\d]*)";
+    private static final String     regLibExtern    = "extern\\s+" + regLibDataType + 
+                                                      "\\s*(\\w[\\w\\d]*)";
     private static final Pattern    ptnLibExtern    = Pattern.compile(regLibExtern);
 
     private static final String convertToOsFilePath(String filePath) {
