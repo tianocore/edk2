@@ -227,7 +227,7 @@ Returns:
             }
             if (AsciiString != NULL) {
               FileNameFound = FALSE;
-              for (Index = 0, Index1 = 0; (AsciiString[Index] != 0) && (Index < sizeof (AsciiString)); Index++) {
+              for (Index = 0, Index1 = 0; AsciiString[Index] != '\0'; Index++) {
                 if (AsciiString[Index] == '\\') {
                   Index1 = Index;
                   FileNameFound = TRUE;
