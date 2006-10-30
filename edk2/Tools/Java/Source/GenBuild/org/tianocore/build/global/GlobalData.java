@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -768,6 +769,9 @@ public class GlobalData {
             return setting;
         }
 
+        Set<String> flagSet = new LinkedHashSet<String>();
+        flagSet.add(setting);
+        
         //
         // Tool's option can be in .fpd and/or .msa file
         //
@@ -785,7 +789,7 @@ public class GlobalData {
         //
         option = msaFamilyBuildOption.get(fpdModuleId.getModule());
         if (option != null && (optionString = option.get(toolChainFamilyKey)) != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
         
         //
@@ -793,7 +797,7 @@ public class GlobalData {
         //
         option = msaBuildOption.get(fpdModuleId.getModule());
         if (option != null && (optionString = option.get(toolChainKey)) != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
         
         //
@@ -801,7 +805,7 @@ public class GlobalData {
         //
         optionString = platformToolChainFamilyOption.get(toolChainFamilyKey);
         if (optionString != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
 
         //
@@ -809,7 +813,7 @@ public class GlobalData {
         //
         optionString = platformToolChainOption.get(toolChainKey);
         if (optionString != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
 
         //
@@ -817,7 +821,7 @@ public class GlobalData {
         //
         option = moduleToolChainFamilyOption.get(fpdModuleId);
         if (option != null && (optionString = option.get(toolChainFamilyKey)) != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
 
         //
@@ -825,9 +829,13 @@ public class GlobalData {
         //
         option = moduleToolChainOption.get(fpdModuleId);
         if (option != null && (optionString = option.get(toolChainKey)) != null) {
-            setting += (" " + optionString);
+            flagSet.add(optionString);
         }
-
+        
+        setting = "";
+        for(Iterator<String> iter = flagSet.iterator(); iter.hasNext();) {
+            setting += iter.next() +" ";
+        }
         return setting;
     }
 
