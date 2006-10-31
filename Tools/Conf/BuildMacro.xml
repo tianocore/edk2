@@ -761,7 +761,111 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </concat>
     </sequential>
   </macrodef>
-  
+
+  <!--
+      Build Asl table file
+    -->
+  <macrodef name="Build_ASL">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="asl"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+    
+    <sequential>
+      <mkdir dir="${DEST_DIR_OUTPUT}"/>
+
+      <OnDependency>
+        <sourcefiles>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
+        </targetfiles>
+
+        <sequential>
+          <cc userdefine="on">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}" family="${PP_FAMILY}" 
+                dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
+              <argument value="${APP_FLAGS}"/>
+              <EXTRA.INC/>              
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+
+          <exec dir="${DEST_DIR_OUTPUT}" executable="${ASL}" failonerror="true" outputproperty="ASL_OUTPUT">
+            <arg line="${DEST_DIR_OUTPUT}/@{FILENAME}.i"/>
+          </exec>
+
+          <if>
+            <or>
+              <contains string="${ASL_OUTPUT}" substring="Supports ACPI Specification Revision 2.0"/>
+              <contains string="${ASL_OUTPUT}" substring="Supports ACPI Specification Revision 1.0"/>
+            </or>
+            <then>
+              <fail message="Current Asl tool not support Acpi Spec 3.0. Pls update your Asl compiler."/>
+            </then>
+          </if>
+
+          <EFI_SECTION_RAW FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="aml"/>
+          
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef>  
+
+  <!--
+      Build Asl table c file
+    -->
+  <macrodef name="Build_CCASL">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="c"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+    
+    <sequential>
+      <mkdir dir="${DEST_DIR_OUTPUT}"/>
+
+      <OnDependency>
+        <sourcefiles>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
+        </targetfiles>
+
+        <sequential>
+
+          <cc userdefine="on">
+            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}"
+                outputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.obj" dpath="${CC_DPATH}" 
+                libpath="${CC_LIBPATH}" include="${CC_INCLUDEPATH}">
+              <EXTRA.INC/>
+              <argument value="${CC_FLAGS}"/>
+              <EXTRA.ARG/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+
+          <cc userdefine="on">
+            <command type="DLINK" cmd="${DLINK}" family="${DLINK_FAMILY}" 
+                     outputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.exe" dpath="${DLINK_DPATH}" >
+              <argument value="${SLINK_FLAGS}"/>
+              <fileset casesensitive="on" file="${DEST_DIR_OUTPUT}/@{FILENAME}.obj"/>
+            </command>
+          </cc>
+          
+          <genacpitable inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.exe" outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.acpi" />     
+     
+          <EFI_SECTION_RAW FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="acpi"/>
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef> 
+
   <!--
     DUMMY
     -->
@@ -1131,7 +1235,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
@@ -1139,7 +1243,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <PRE.PROCESS/>
-          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}" 
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
                       outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.sec" 
                       sectiontype="EFI_SECTION_RAW"/>
           <POST.PROCESS/>
