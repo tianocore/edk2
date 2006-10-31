@@ -91,6 +91,10 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
 
     private Vector<PcdFindResultId> vPcdFindResult = null;
 
+    private JButton jButtonReload = null;
+
+    private JPanel jPanelOperation = null;
+
     /**
      * This is the default constructor
      */
@@ -130,7 +134,7 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.add(getJScrollPaneTable(), null);
-            jContentPane.add(getJButtonClose(), null);
+            jContentPane.add(getJPanelOperation(), null);
             jContentPane.setPreferredSize(new java.awt.Dimension(585, 445));
         }
         return jContentPane;
@@ -213,8 +217,8 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
             jButtonClose = new JButton();
             jButtonClose.setText("Close");
             jButtonClose.addActionListener(this);
-            jButtonClose.setBounds(new java.awt.Rectangle(255, 415, 80, 20));
             jButtonClose.setPreferredSize(new java.awt.Dimension(80, 20));
+            jButtonClose.setBounds(new java.awt.Rectangle(90, 0, 80, 20));
         }
         return jButtonClose;
     }
@@ -281,6 +285,8 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
      **/
     private void showTable() {
         clearAll();
+        this.jTable.repaint();
+        this.jTable.updateUI();
 
         if (this.method.equals("PPI")) {
             Vector<PpiId> vPpi = Find.getAllPpisForFind();
@@ -507,6 +513,10 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
         if (arg0.getSource() == this.jButtonClose) {
             this.dispose();
         }
+        
+        if (arg0.getSource() == this.jButtonReload) {
+            this.showTable();
+        }
     }
 
     /* (non-Javadoc)
@@ -522,7 +532,7 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
 
         Tools.resizeComponent(this.jScrollPaneTable, intCurrentWidth, intCurrentHeight, intPreferredWidth,
                               intPreferredHeight);
-        Tools.centerComponent(this.jButtonClose, intCurrentWidth, intCurrentHeight, intPreferredHeight,
+        Tools.centerComponent(this.jPanelOperation, intCurrentWidth, intCurrentHeight, intPreferredHeight,
                               DataType.SPACE_TO_BOTTOM_FOR_CLOSE_BUTTON);
         Tools.resizeTableColumn(this.jTable, this.getSize().width - 28);
     }
@@ -604,5 +614,38 @@ public class FindResult extends IFrame implements TableModelListener, ListSelect
     public void mouseExited(MouseEvent e) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * This method initializes jButtonReload	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonReload() {
+        if (jButtonReload == null) {
+            jButtonReload = new JButton();
+            jButtonReload.setText("Reload");
+            jButtonReload.addActionListener(this);
+            jButtonReload.setBounds(new java.awt.Rectangle(0, 0, 80, 20));
+            jButtonReload.setPreferredSize(new java.awt.Dimension(80, 20));
+        }
+        return jButtonReload;
+    }
+
+    /**
+     * This method initializes jPanelOperation	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelOperation() {
+        if (jPanelOperation == null) {
+            jPanelOperation = new JPanel();
+            jPanelOperation.setLayout(null);
+            jPanelOperation.setBounds(new java.awt.Rectangle(300, 415, 170, 20));
+            jPanelOperation.setPreferredSize(new java.awt.Dimension(170, 20));
+            jPanelOperation.add(getJButtonClose(), null);
+            jPanelOperation.add(getJButtonReload(), null);
+        }
+        return jPanelOperation;
     }
 }

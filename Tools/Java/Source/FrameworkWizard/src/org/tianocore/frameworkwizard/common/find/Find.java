@@ -16,11 +16,14 @@ package org.tianocore.frameworkwizard.common.find;
 
 import java.util.Vector;
 
+import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
 import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass;
 import org.tianocore.LibraryClassDefinitionsDocument.LibraryClassDefinitions;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PcdDeclarationsDocument.PcdDeclarations.PcdEntry;
+import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
+import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Sort;
@@ -160,6 +163,39 @@ public class Find {
                 }
             }
         }
+        //
+        // Go through all defined ppi to find which is not added yet.
+        //
+        for (int indexOfPackage = 0; indexOfPackage < GlobalData.openingPackageList.size(); indexOfPackage++) {
+            PackageSurfaceArea spd = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage).getXmlSpd();
+            PackageIdentification packageId = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage)
+                                                                           .getId();
+            if (spd.getPpiDeclarations() != null) {
+                for (int indexOfPpis = 0; indexOfPpis < spd.getPpiDeclarations().getEntryList().size(); indexOfPpis++) {
+                    boolean isFound = false;
+                    PpiDeclarations.Entry e = spd.getPpiDeclarations().getEntryList().get(indexOfPpis);
+                    for (int indexOfPv = 0; indexOfPv < pv.size(); indexOfPv++) {
+                        if (e.getCName().equals(pv.getPpis(indexOfPv).getName())) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        String arg0 = e.getCName();
+                        String arg1 = "";
+                        String arg2 = "";
+                        String arg3 = "";
+                        Vector<String> arg4 = Tools.convertListToVector(e.getSupArchList());
+                        String arg5 = e.getHelpText();
+
+                        pid = new PpisIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+                        pid.setBelongModule(null);
+                        pid.setDeclaredBy(packageId);
+                        pv.addPpis(pid);
+                    }
+                }
+            }
+        }
         Sort.sortPpis(pv, DataType.SORT_TYPE_ASCENDING);
         return pv;
     }
@@ -197,7 +233,10 @@ public class Find {
             //
             // Get the sting "PackageName.ModuleName" 
             //
-            String tmp = pvId.getBelongModule().getPackageId().getName() + SEPERATOR + pvId.getBelongModule().getName();
+            String tmp = "";
+            if (pvId.getBelongModule() != null) {
+                tmp = pvId.getBelongModule().getPackageId().getName() + SEPERATOR + pvId.getBelongModule().getName();
+            }
 
             //
             // Check if the item has been added in
@@ -353,6 +392,39 @@ public class Find {
                 }
             }
         }
+        //
+        // Go through all defined protocols to find which is not added yet.
+        //
+        for (int indexOfPackage = 0; indexOfPackage < GlobalData.openingPackageList.size(); indexOfPackage++) {
+            PackageSurfaceArea spd = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage).getXmlSpd();
+            PackageIdentification packageId = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage)
+                                                                           .getId();
+            if (spd.getProtocolDeclarations() != null) {
+                for (int indexOfProtocols = 0; indexOfProtocols < spd.getProtocolDeclarations().getEntryList().size(); indexOfProtocols++) {
+                    boolean isFound = false;
+                    ProtocolDeclarations.Entry e = spd.getProtocolDeclarations().getEntryList().get(indexOfProtocols);
+                    for (int indexOfPv = 0; indexOfPv < pv.size(); indexOfPv++) {
+                        if (e.getCName().equals(pv.getProtocols(indexOfPv).getName())) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        String arg0 = e.getCName();
+                        String arg1 = "";
+                        String arg2 = "";
+                        String arg3 = "";
+                        Vector<String> arg4 = Tools.convertListToVector(e.getSupArchList());
+                        String arg5 = e.getHelpText();
+
+                        pid = new ProtocolsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+                        pid.setBelongModule(null);
+                        pid.setDeclaredBy(packageId);
+                        pv.addProtocols(pid);
+                    }
+                }
+            }
+        }
         Sort.sortProtocols(pv, DataType.SORT_TYPE_ASCENDING);
         return pv;
     }
@@ -390,7 +462,10 @@ public class Find {
             //
             // Get the sting "PackageName.ModuleName" 
             //
-            String tmp = pvId.getBelongModule().getPackageId().getName() + SEPERATOR + pvId.getBelongModule().getName();
+            String tmp = "";
+            if (pvId.getBelongModule() != null) {
+                tmp = pvId.getBelongModule().getPackageId().getName() + SEPERATOR + pvId.getBelongModule().getName();
+            }
 
             //
             // Check if the item has been added in
@@ -500,6 +575,38 @@ public class Find {
                 }
             }
         }
+        //
+        // Go through all defined guids to find which is not added yet.
+        //
+        for (int indexOfPackage = 0; indexOfPackage < GlobalData.openingPackageList.size(); indexOfPackage++) {
+            PackageSurfaceArea spd = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage).getXmlSpd();
+            PackageIdentification packageId = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage)
+                                                                           .getId();
+            if (spd.getGuidDeclarations() != null) {
+                for (int indexOfGuids = 0; indexOfGuids < spd.getGuidDeclarations().getEntryList().size(); indexOfGuids++) {
+                    boolean isFound = false;
+                    GuidDeclarations.Entry e = spd.getGuidDeclarations().getEntryList().get(indexOfGuids);
+                    for (int indexOfGv = 0; indexOfGv < gv.size(); indexOfGv++) {
+                        if (e.getCName().equals(gv.getGuids(indexOfGv).getName())) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        String arg0 = e.getCName();
+                        String arg1 = "";
+                        String arg2 = "";
+                        Vector<String> arg3 = Tools.convertListToVector(e.getSupArchList());
+                        String arg4 = e.getHelpText();
+
+                        gid = new GuidsIdentification(arg0, arg1, arg2, arg3, arg4);
+                        gid.setBelongModule(null);
+                        gid.setDeclaredBy(packageId);
+                        gv.addGuids(gid);
+                    }
+                }
+            }
+        }
         Sort.sortGuids(gv, DataType.SORT_TYPE_ASCENDING);
         return gv;
     }
@@ -537,7 +644,10 @@ public class Find {
             //
             // Get the sting "PackageName.ModuleName" 
             //
-            String tmp = gvId.getBelongModule().getPackageId().getName() + SEPERATOR + gvId.getBelongModule().getName();
+            String tmp = "";
+            if (gvId.getBelongModule() != null) {
+                tmp = gvId.getBelongModule().getPackageId().getName() + SEPERATOR + gvId.getBelongModule().getName();
+            }
 
             //
             // Check if the item has been added in
@@ -656,32 +766,51 @@ public class Find {
                 }
             }
         }
+        //
+        // Go through all defined pcds to find which is not added yet.
+        //
+        for (int indexOfPackage = 0; indexOfPackage < GlobalData.openingPackageList.size(); indexOfPackage++) {
+            PackageSurfaceArea spd = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage).getXmlSpd();
+            PackageIdentification packageId = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage)
+                                                                           .getId();
+            if (spd.getPcdDeclarations() != null) {
+                for (int indexOfPcds = 0; indexOfPcds < spd.getPcdDeclarations().getPcdEntryList().size(); indexOfPcds++) {
+                    boolean isFound = false;
+                    PcdEntry e = spd.getPcdDeclarations().getPcdEntryList().get(indexOfPcds);
+                    for (int indexOfPv = 0; indexOfPv < pv.size(); indexOfPv++) {
+                        if (e.getCName().equals(pv.getPcdCoded(indexOfPv).getName())) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        pid = new PcdCodedIdentification("", "", "", null, "", "", null, null);
+                        pid.setName(e.getCName());
+                        pid.setTokenSpaceGuidCName(e.getTokenSpaceGuidCName());
+                        pid.setToken(e.getToken().toString());
+                        pid.setDatumType(e.getDatumType().toString());
+                        pid.setValue(e.getDefaultValue());
+                        pid.setUsage(Tools.convertListToString(e.getValidUsage()));
+                        pid.setHelp(e.getHelpText());
+                        pid.setDeclaredBy(packageId);
+
+                        pid.setBelongModule(null);
+                        pv.addPcdCoded(pid);
+                    }
+                }
+            }
+        }
         Sort.sortPcdCodeds(pv, DataType.SORT_TYPE_ASCENDING);
         return pv;
     }
 
     /**
-     Re-org all guid entries for find table
      
+     @param pv
      @return
      
      **/
-/**
-
- @return
-
-**/
-/**
-
- @return
-
-**/
-/**
-
- @return
-
-**/
-public static Vector<PcdFindResultId> getAllPcdCodedForFind(PcdCodedVector pv) {
+    public static Vector<PcdFindResultId> getAllPcdCodedForFind(PcdCodedVector pv) {
         Vector<PcdFindResultId> pcd = new Vector<PcdFindResultId>();
         boolean isAdded = false;
         boolean isProduced = false;
@@ -734,13 +863,14 @@ public static Vector<PcdFindResultId> getAllPcdCodedForFind(PcdCodedVector pv) {
                 pcdId.setDatumType(pvId.getDatumType());
                 pcdId.setValue(pvId.getValue());
                 pcdId.setUsage(pvId.getUsage());
-                
+
                 pcd.addElement(pcdId);
             }
         }
 
         return pcd;
     }
+
     /**
      Get all library class entries from workspace
      
@@ -817,6 +947,38 @@ public static Vector<PcdFindResultId> getAllPcdCodedForFind(PcdCodedVector pv) {
 
                             lcv.addLibraryClass(lcid);
                         }
+                    }
+                }
+            }
+        }
+        //
+        // Go through all defined pcds to find which is not added yet.
+        //
+        for (int indexOfPackage = 0; indexOfPackage < GlobalData.openingPackageList.size(); indexOfPackage++) {
+            PackageSurfaceArea spd = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage).getXmlSpd();
+            PackageIdentification packageId = GlobalData.openingPackageList.getOpeningPackageByIndex(indexOfPackage)
+                                                                           .getId();
+            if (spd.getLibraryClassDeclarations() != null) {
+                for (int indexOfLibraryClass = 0; indexOfLibraryClass < spd.getLibraryClassDeclarations()
+                                                                           .getLibraryClassList().size(); indexOfLibraryClass++) {
+                    boolean isFound = false;
+                    LibraryClass lc = spd.getLibraryClassDeclarations().getLibraryClassList().get(indexOfLibraryClass);
+                    for (int indexOfLcv = 0; indexOfLcv < lcv.size(); indexOfLcv++) {
+                        if (lc.getName().equals(lcv.getLibraryClass(indexOfLcv).getLibraryClassName())) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        lcid = new LibraryClassIdentification("", null, "", "", null, "", null, "");
+                        lcid.setLibraryClassName(lc.getName());
+                        lcid.setSupArchList(Tools.convertListToVector(lc.getSupArchList()));
+                        lcid.setSupModuleList(Tools.convertListToVector(lc.getSupModuleList()));
+                        lcid.setHelp(lc.getHelpText());
+                        lcid.setDeclaredBy(packageId);
+
+                        lcid.setBelongModule(null);
+                        lcv.addLibraryClass(lcid);
                     }
                 }
             }
