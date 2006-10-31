@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  bootoption.c
+  BootOption.c
   
 Abstract:
 
@@ -24,7 +24,7 @@ Revision History
 
 --*/
 
-#include "bootmaint.h"
+#include "BootMaint.h"
 #include "BBSsupport.h"
 
 BM_MENU_ENTRY *

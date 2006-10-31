@@ -11,7 +11,7 @@
 //
 // Module Name:
 //
-//   formguid.h
+//   FormGuid.h
 //
 // Abstract:
 //
