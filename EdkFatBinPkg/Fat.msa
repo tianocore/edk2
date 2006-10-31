@@ -2,7 +2,7 @@
 <ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Fat</ModuleName>
-    <ModuleType>USER_DEFINED</ModuleType>
+    <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>961578FE-B6B7-44c3-AF35-6BC705CD2B1F</GuidValue>
     <Version>1.0</Version>
     <Abstract>Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.</Abstract>
@@ -22,12 +22,14 @@
     <OutputFileBasename>Fat</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
-    <Filename ToolCode="DUMMY">Fat_build.xml</Filename>
-    <Filename SupArchList="IA32">Ia32/Fat.FFS</Filename>
-    <Filename SupArchList="IPF">Ipf/Fat.FFS</Filename>
-    <Filename SupArchList="X64">X64/Fat.FFS</Filename>
-    <Filename SupArchList="EBC">Ebc/Fat.FFS</Filename>
+    <Filename SupArchList="IA32">Ia32/Fat.efi</Filename>
+    <Filename SupArchList="IPF">Ipf/Fat.efi</Filename>
+    <Filename SupArchList="X64">X64/Fat.efi</Filename>
+    <Filename SupArchList="EBC">Ebc/Fat.efi</Filename>
   </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>

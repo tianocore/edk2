@@ -6716,7 +6716,7 @@
     <ModuleSA SupArchList="IA32" PackageGuid="0fd7197b-9bde-44fe-a7e4-d2177a9922e5" ModuleGuid="961578FE-B6B7-44c3-AF35-6BC705CD2B1F">
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
-        <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="6987936E-ED34-44db-AE97-1FA5E4ED2116">
