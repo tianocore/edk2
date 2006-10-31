@@ -375,6 +375,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_MYTOOLS_*_DLINK_NAME           = link.exe
 *_MYTOOLS_*_ASMLINK_NAME         = link.exe
 *_MYTOOLS_*_PP_NAME              = cl.exe 
+*_MYTOOLS_*_APP_NAME             = cl.exe
 *_MYTOOLS_*_ASM_NAME             = ml.exe
 
 ##################
@@ -387,6 +388,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_MYTOOLS_IA32_*_DPATH           = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
 *_MYTOOLS_IA32_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
 
+*_MYTOOLS_IA32_APP_FLAGS         = /nologo /P /TC
 *_MYTOOLS_IA32_PP_FLAGS          = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
 DEBUG_MYTOOLS_IA32_CC_FLAGS      = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /O1ib2 /GL /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h /EHs-c- /GF /Gs8192 /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch /Yu${DEST_DIR_DEBUG}/AutoGen.h /Zi /Gm
 RELEASE_MYTOOLS_IA32_CC_FLAGS    = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /O1ib2 /GL /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h /EHs-c- /GF /Gs8192 /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch /Yu${DEST_DIR_DEBUG}/AutoGen.h
@@ -410,6 +412,7 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /
 *_MYTOOLS_X64_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
 
 *_MYTOOLS_X64_SLINK_FLAGS       = /nologo /LTCG
+*_MYTOOLS_X64_APP_FLAGS         = /nologo /P /TC
 *_MYTOOLS_X64_PP_FLAGS          = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
 DEBUG_MYTOOLS_X64_CC_FLAGS      = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /D EFIX64 /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch /Yu${DEST_DIR_DEBUG}/AutoGen.h /Zi /Gm /EHs-c- /GF
 RELEASE_MYTOOLS_X64_CC_FLAGS    = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /D EFIX64 /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/AutoGen.h /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch /Yu${DEST_DIR_DEBUG}/AutoGen.h /EHs-c- /GF
@@ -424,7 +427,6 @@ RELEASE_MYTOOLS_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /O
 # IPF definitions
 ##################
 *_MYTOOLS_IPF_PCH_NAME      = cl.exe
-*_MYTOOLS_IPF_APP_NAME      = cl.exe
 *_MYTOOLS_IPF_ASM_NAME      = ias.exe
 *_MYTOOLS_IPF_ASM_EXT       = .s
 
