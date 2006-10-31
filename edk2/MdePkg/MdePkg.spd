@@ -160,10 +160,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <IncludeHeader>Include/Library/TimerLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="Uefi2PortLib">
-      <IncludeHeader>Include/Library/Uefi2PortLib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
     <LibraryClass Name="UefiBootServicesTableLib">
       <IncludeHeader>Include/Library/UefiBootServicesTableLib.h</IncludeHeader>
       <HelpText/>
