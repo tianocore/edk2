@@ -1819,7 +1819,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         //
         SplashScreen ss = new SplashScreen();
         ss.setVisible(true);
-        
+
         //
         // Init Global Data
         //
@@ -1905,7 +1905,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         if (arg0.getSource() == this.jMenuItemFileRefresh) {
             if (this.closeAll() == 0) {
                 this.refresh();
-                this.makeEmptyTree();    
+                this.makeEmptyTree();
             }
         }
 
@@ -3086,7 +3086,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 if (!GlobalData.openingModuleList.getModuleSaved(currentOpeningModuleIndex)) {
                     int result = showSaveDialog();
                     if (result == JOptionPane.YES_OPTION) {
-                        this.saveAll();
+                        this.save();
                     }
                     if (result == JOptionPane.NO_OPTION) {
                         // Do nothing
@@ -3121,7 +3121,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 if (!GlobalData.openingPackageList.getPackageSaved(currentOpeningPackageIndex)) {
                     int result = showSaveDialog();
                     if (result == JOptionPane.YES_OPTION) {
-                        this.saveAll();
+                        this.save();
                     }
                     if (result == JOptionPane.NO_OPTION) {
                         // Do nothing
@@ -3156,7 +3156,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 if (!GlobalData.openingPlatformList.getPlatformSaved(currentOpeningPlatformIndex)) {
                     int result = showSaveDialog();
                     if (result == JOptionPane.YES_OPTION) {
-                        this.saveAll();
+                        this.save();
                     }
                     if (result == JOptionPane.NO_OPTION) {
                         // Do nothing
@@ -3211,7 +3211,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         GlobalData.openingModuleList.closeAll();
         GlobalData.openingPackageList.closeAll();
         GlobalData.openingPlatformList.closeAll();
-        
+
         return 0;
     }
 
@@ -3557,9 +3557,32 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             //
             // Enable close/close all if some files are opened
             //
-            jMenuItemFileClose.setEnabled(GlobalData.openingModuleList.isOpen()
-                                          || GlobalData.openingPackageList.isOpen()
-                                          || GlobalData.openingPlatformList.isOpen());
+            switch (this.jTabbedPaneEditor.getSelectedIndex()) {
+            case 0:
+                jMenuItemFileClose
+                                  .setEnabled(GlobalData.openingModuleList
+                                                                          .getModuleOpen(this.currentOpeningModuleIndex));
+                jMenuItemFileSave
+                                 .setEnabled(!GlobalData.openingModuleList
+                                                                          .getModuleSaved(this.currentOpeningModuleIndex));
+                break;
+            case 1:
+                jMenuItemFileClose
+                                  .setEnabled(GlobalData.openingPackageList
+                                                                           .getPackageOpen(this.currentOpeningPackageIndex));
+                jMenuItemFileSave
+                                 .setEnabled(!GlobalData.openingPackageList
+                                                                           .getPackageSaved(this.currentOpeningPackageIndex));
+                break;
+            case 2:
+                jMenuItemFileClose
+                                  .setEnabled(GlobalData.openingPlatformList
+                                                                            .getPlatformOpen(this.currentOpeningPlatformIndex));
+                jMenuItemFileSave
+                                 .setEnabled(!GlobalData.openingPlatformList
+                                                                            .getPlatformSaved(this.currentOpeningPlatformIndex));
+                break;
+            }
             jMenuItemFileCloseAll.setEnabled(GlobalData.openingModuleList.isOpen()
                                              || GlobalData.openingPackageList.isOpen()
                                              || GlobalData.openingPlatformList.isOpen());
@@ -3567,9 +3590,6 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             //
             // Enable save/save all if some files are changed
             //
-            jMenuItemFileSave.setEnabled(!GlobalData.openingModuleList.isSaved()
-                                         || !GlobalData.openingPackageList.isSaved()
-                                         || !GlobalData.openingPlatformList.isSaved());
             jMenuItemFileSaveAll.setEnabled(!GlobalData.openingModuleList.isSaved()
                                             || !GlobalData.openingPackageList.isSaved()
                                             || !GlobalData.openingPlatformList.isSaved());
@@ -3684,10 +3704,14 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             JOptionPane
                        .showConfirmDialog(
                                           null,
-                                          "WORKSPACE Environment Variable Is Not Defined, Please select a valid WORKSPACE directory. " +
-                                          DataType.LINE_SEPARATOR + DataType.LINE_SEPARATOR + "NOTICE:" +
-                                          DataType.LINE_SEPARATOR + "This does not change the System Environment Variable." +
-                                          DataType.LINE_SEPARATOR + "It only applies to where the Wizard will manage modification and file creations.",
+                                          "WORKSPACE Environment Variable Is Not Defined, Please select a valid WORKSPACE directory. "
+                                                          + DataType.LINE_SEPARATOR
+                                                          + DataType.LINE_SEPARATOR
+                                                          + "NOTICE:"
+                                                          + DataType.LINE_SEPARATOR
+                                                          + "This does not change the System Environment Variable."
+                                                          + DataType.LINE_SEPARATOR
+                                                          + "It only applies to where the Wizard will manage modification and file creations.",
                                           "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             SwitchWorkspace sw = new SwitchWorkspace(this, true);
             int result = sw.showDialog();
@@ -3714,8 +3738,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             this.dispose();
             System.exit(0);
         case Workspace.WORKSPACE_NO_TARGET_FILE:
-            JOptionPane.showConfirmDialog(null, "Target.txt File Is Not Existed", "Error",
-                                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showConfirmDialog(null, "Target.txt File Is Not Existed", "Error", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
         }

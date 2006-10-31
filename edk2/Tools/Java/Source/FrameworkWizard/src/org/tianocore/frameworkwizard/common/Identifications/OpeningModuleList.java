@@ -137,7 +137,7 @@ public class OpeningModuleList {
         if (index > -1) {
             return vOpeningModuleList.elementAt(index).isOpen();
         }
-        return true;
+        return false;
     }
 
     public void setTreePathById(ModuleIdentification id, Set<TreePath> treePath) {

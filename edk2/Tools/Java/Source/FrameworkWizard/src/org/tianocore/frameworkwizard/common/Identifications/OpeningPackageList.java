@@ -137,7 +137,7 @@ public class OpeningPackageList {
         if (index > -1) {
             return vOpeningPackageList.elementAt(index).isOpen();
         }
-        return true;
+        return false;
     }
     
     public void setTreePathById(PackageIdentification id, Set<TreePath> treePath) {

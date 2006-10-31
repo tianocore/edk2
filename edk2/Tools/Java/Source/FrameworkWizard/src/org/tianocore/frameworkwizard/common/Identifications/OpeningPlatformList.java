@@ -139,7 +139,7 @@ public class OpeningPlatformList {
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index).isOpen();
         }
-        return true;
+        return false;
     }
     
     public void setTreePathById(PlatformIdentification id, Set<TreePath> treePath) {
