@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  bmlib.c
+  BmLib.c
     
 AgBStract:
 
@@ -19,7 +19,7 @@ AgBStract:
 
 --*/
 
-#include "bootmaint.h"
+#include "BootMaint.h"
 
 EFI_STATUS
 EfiLibLocateProtocol (

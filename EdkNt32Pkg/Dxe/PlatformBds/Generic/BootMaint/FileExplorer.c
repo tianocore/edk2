@@ -20,7 +20,7 @@ AgBStract:
 --*/
 
 #include "Generic/Bds.h"
-#include "bootmaint.h"
+#include "BootMaint.h"
 #include "BdsPlatform.h"
 
 VOID

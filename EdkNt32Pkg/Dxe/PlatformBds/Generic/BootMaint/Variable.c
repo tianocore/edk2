@@ -15,12 +15,12 @@ Module Name:
 
 Abstract:
 
-  Variable operation that will be used by bootmaint
+  Variable operation that will be used by BootMaint
 
 --*/
 
 #include "Generic/Bds.h"
-#include "bootmaint.h"
+#include "BootMaint.h"
 #include "bdsplatform.h"
 
 EFI_STATUS

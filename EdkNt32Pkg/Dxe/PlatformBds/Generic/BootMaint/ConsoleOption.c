@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-    consoleoption.c
+    ConsoleOption.c
     
 Abstract:
 
@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "bootmaint.h"
+#include "BootMaint.h"
 
 EFI_DEVICE_PATH_PROTOCOL  *
 DevicePathInstanceDup (
