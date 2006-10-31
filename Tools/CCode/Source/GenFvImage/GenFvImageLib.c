@@ -48,7 +48,7 @@ Abstract:
 #include "EfiCompress.h"
 #include "WinNtInclude.h"
 
-
+static UINT32 MaxFfsAlignment = 0;
 //
 // Local function prototypes
 //
@@ -1031,9 +1031,9 @@ Returns:
 
   case 0:
     //
-    // 1 byte alignment
+    // 8 byte alignment, mini alignment requirement for FFS file. 
     //
-    *Alignment = (1 << 0);
+    *Alignment = (1 << 3);
     break;
 
   case 1:
@@ -1740,6 +1740,13 @@ Returns:
     printf ("ERROR: Could not determine alignment of file %s.\n", FvInfo->FvFiles[Index]);
     free (FileBuffer);
     return EFI_ABORTED;
+  }
+  
+  //
+  // Find the largest alignment of all the FFS files in the FV
+  //
+  if (CurrentFileAlignment > MaxFfsAlignment) {
+    MaxFfsAlignment = CurrentFileAlignment;
   }
   //
   // Add pad file if necessary
@@ -2644,6 +2651,31 @@ Returns:
   // Determine final Sym file size
   //
   *SymImageSize = SymImageMemoryFile.CurrentFilePointer - SymImageMemoryFile.FileImage;
+  
+  //
+  // Update FV Alignment attribute to the largest alignment of all the FFS files in the FV
+  //
+  if (FvHeader->Attributes | EFI_FVB_ALIGNMENT_CAP) {
+    for (Index = 1; Index <= 16; Index ++) {
+      if ((1 << Index) < MaxFfsAlignment) {
+        //
+        // Unset the unsupported alignment attribute.
+        //
+        FvHeader->Attributes = FvHeader->Attributes & ~((1 << Index) * EFI_FVB_ALIGNMENT_CAP);
+      } else {
+        //
+        // Set the supported alignment attribute.
+        //
+        FvHeader->Attributes = FvHeader->Attributes | ((1 << Index) * EFI_FVB_ALIGNMENT_CAP);
+      }
+    }
+    
+    //
+    // Update Checksum for FvHeader
+    //
+    FvHeader->Checksum      = 0;
+    FvHeader->Checksum      = CalculateChecksum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
+  }
 
   return EFI_SUCCESS;
 }
