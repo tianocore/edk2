@@ -207,7 +207,9 @@ Returns:
   EFI_PHYSICAL_ADDRESS                                      BaseOfStack;
   EFI_PHYSICAL_ADDRESS                                      BspStore;
   EFI_GUID                                                  DxeCoreFileName;
+  EFI_GUID                                                  FirmwareFileName;
   VOID                                                      *DxeCorePe32Data;
+  VOID                                                      *FvImageData;     
   EFI_PHYSICAL_ADDRESS                                      DxeCoreAddress;
   UINT64                                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                                      DxeCoreEntryPoint;
@@ -287,6 +289,18 @@ Returns:
       CpuDeadLoop ();
     }
   }
+
+  //
+  // Find the EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE type compressed Firmware Volume file
+  // The file found will be processed by PeiProcessFile: It will first be decompressed to
+  // a normal FV, then a corresponding FV type hob will be built. 
+  //
+  Status = PeiFindFile (
+            EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+            EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+            &FirmwareFileName,
+            &FvImageData
+            );
 
   //
   // Find the DXE Core in a Firmware Volume
@@ -418,10 +432,11 @@ Returns:
   FwVolHeader   = NULL;
   FfsFileHeader = NULL;
   SectionData   = NULL;
+  Status        = EFI_SUCCESS;
 
   //
-  // Foreach Firmware Volume, look for a specified type
-  // of file and break out when one is found
+  // For each Firmware Volume, look for a specified type
+  // of file and break out until no one is found 
   //
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw)) != NULL) {
@@ -434,12 +449,14 @@ Returns:
     if (!EFI_ERROR (Status)) {
       Status = PeiProcessFile (
                  SectionType,
-                 &FfsFileHeader,
+                 FfsFileHeader,
                  Pe32Data,
                  &Hob
                  );
       CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
-      return Status;
+      if (!EFI_ERROR (Status)) {
+        return EFI_SUCCESS;
+      }
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
@@ -650,7 +667,7 @@ Returns:
   //
   Status = PeiProcessFile (
             EFI_SECTION_PE32,
-            &FfsHeader,
+            FfsHeader,
             &Pe32Data,
             NULL
             );
@@ -676,7 +693,7 @@ Returns:
 EFI_STATUS
 PeiProcessFile (
   IN      UINT16                 SectionType,
-  IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
+  IN      EFI_FFS_FILE_HEADER    *FfsFileHeader,
   OUT     VOID                   **Pe32Data,
   IN      EFI_PEI_HOB_POINTERS   *OrigHob
   )
@@ -726,9 +743,7 @@ Returns:
   EFI_GUID                        TempGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
-  EFI_FFS_FILE_HEADER             *FfsFileHeader;
-  
-  FfsFileHeader = *RealFfsFileHeader;
+  UINT32                          FvAlignment;
 
   Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_COMPRESSION,
@@ -737,7 +752,7 @@ Returns:
              );
 
   //
-  // Upon finding a DXE Core file, see if there is first a compression section
+  // First process the compression section
   //
   if (!EFI_ERROR (Status)) {
     //
@@ -913,37 +928,64 @@ Returns:
                     );
 
         CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
-        if (CmpSection->Type == EFI_SECTION_RAW) {
+        if (CmpSection->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+          // 
+          // Firmware Volume Image in this Section
+          // Skip the section header to get FvHeader
           //
-          // Skip the section header and
-          // adjust the pointer alignment to 16
-          //
-          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (DstBuffer + 16);
+          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
 
-          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
-            FfsFileHeader = NULL;
-            BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
-            Status = PeiServicesFfsFindNextFile (
-                       EFI_FV_FILETYPE_DXE_CORE,
-                       FvHeader,
-                       &FfsFileHeader
-                       );
-
-            if (EFI_ERROR (Status)) {
-              return EFI_NOT_FOUND;
-            }
-
-            if (OrigHob != NULL) {
+          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {            
+            //
+            // Adjust Fv Base Address Alignment based on Align Attributes in Fv Header
+            //
+            
+            //
+            // When FvImage support Alignment, we need to check whether 
+            // its alignment is correct. 
+            //
+            if (FvHeader->Attributes | EFI_FVB_ALIGNMENT_CAP) {
+              
               //
-              // 
+              // Calculate the mini alignment for this FvImage
+              //
+              FvAlignment = 1 << (LowBitSet32 (FvHeader->Attributes >> 16) + 1);
+              
+              //
+              // If current FvImage base address doesn't meet the its alignment,
+              // we need to reload this FvImage to another correct memory address.
+              //
+              if (((UINTN) FvHeader % FvAlignment) != 0) {
+                DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength), FvAlignment);
+                if (DstBuffer == NULL) {
+                  return EFI_OUT_OF_RESOURCES;
+                }
+                CopyMem (DstBuffer, FvHeader, (UINTN) FvHeader->FvLength);
+                FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
+              }
+            }
+            //
+            // Build new FvHob for new decompressed Fv image.
+            //
+            BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
+            
+            //
+            // Set the original FvHob to unused.
+            //
+            if (OrigHob != NULL) {
               OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
             }
             
             //
-            // Reture the FfsHeader that contain Pe32Data.
+            // when search FvImage Section return true.
             //
-            *RealFfsFileHeader = FfsFileHeader;
-            return PeiProcessFile (SectionType, RealFfsFileHeader, Pe32Data, OrigHob);
+            if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+              *Pe32Data = (VOID *) FvHeader;
+              return EFI_SUCCESS;
+            } else {
+              return EFI_NOT_FOUND;
+            }
+
           }
         }
         //
@@ -966,6 +1008,9 @@ Returns:
           CmpSection                = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) CmpSection + OccupiedCmpSectionLength);
         } while (CmpSection->Type != 0 && (UINTN) ((UINT8 *) CmpSection - (UINT8 *) CmpFileData) < CmpFileSize);
       }
+      //
+      // End of the decompression activity
+      //
 
       Section   = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + OccupiedSectionLength);
       FileSize  = FfsFileHeader->Size[0] & 0xFF;
@@ -973,11 +1018,17 @@ Returns:
       FileSize += (FfsFileHeader->Size[2] << 16) & 0xFF0000;
       FileSize &= 0x00FFFFFF;
     } while (Section->Type != 0 && (UINTN) ((UINT8 *) Section - (UINT8 *) FfsFileHeader) < FileSize);
-
+    
     //
-    // End of the decompression activity
+    // search all sections (compression and non compression) in this FFS, don't 
+    // find expected section.
     //
+    return EFI_NOT_FOUND;
   } else {
+    //
+    // For those FFS that doesn't contain compression section, directly search 
+    // PE or TE section in this FFS.
+    //
 
     Status = PeiServicesFfsFindSectionData (
                EFI_SECTION_PE32,
