@@ -15,14 +15,21 @@ package org.tianocore.frameworkwizard.platform.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.util.HashMap;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -41,6 +48,7 @@ public class FpdFvOptions extends JDialog {
      * 
      */
     private static final long serialVersionUID = 1L;
+    private static JFrame frame;
     private JPanel jContentPane = null;
     private JPanel jPanelN = null;
     private JPanel jPanelS = null;
@@ -53,6 +61,9 @@ public class FpdFvOptions extends JDialog {
     private OpeningPlatformType docConsole = null;
     private JButton jButtonNew = null;
     private JButton jButtonDelete = null;
+    private String oldOptionName = "";
+    private int selectedRow = -1;
+    private TableModelListener tableModelListener = null;
 
     /**
      * This is the default constructor
@@ -67,10 +78,20 @@ public class FpdFvOptions extends JDialog {
         initialize();
         
     }
+    
+    protected void processWindowEvent (WindowEvent e) {
+        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+            if (jTableFvOptions.isEditing()) {
+                jTableFvOptions.getCellEditor().stopCellEditing();
+            }
+            tableModel.removeTableModelListener(tableModelListener);
+            this.dispose();
+        }
+    }
 
     private void initOptions() {
         tableModel.setRowCount(0);
-        HashMap<String, String> mOpts = new HashMap<String, String>();
+        LinkedHashMap<String, String> mOpts = new LinkedHashMap<String, String>();
         ffc.getFvImagesFvImageOptions(fvName, mOpts);
         Set<String> sKey = mOpts.keySet();
         Iterator<String> iter = sKey.iterator();
@@ -80,6 +101,19 @@ public class FpdFvOptions extends JDialog {
             tableModel.addRow(new String[]{name, value});
         }
     }
+    
+    private boolean fvOptionNameExists (String name) {
+        int count = 0;
+        for (int i = 0; i < jTableFvOptions.getRowCount(); ++i) {
+            if (getTableModel().getValueAt(i, 0).equals(name)) {
+                ++count;
+            }
+        }
+        if (count > 1) {
+            return true;
+        }
+        return false;
+    }
     /**
      * This method initializes this
      * 
@@ -87,12 +121,13 @@ public class FpdFvOptions extends JDialog {
      */
     private void initialize() {
         this.setSize(650, 400);
-        this.setModal(true);
+//        this.setModal(true);
         this.setTitle("FV Options");
-        this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.setContentPane(getJContentPane());
         this.centerWindow();
         this.setVisible(true);
+        
     }
 
     /**
@@ -171,26 +206,81 @@ public class FpdFvOptions extends JDialog {
      */
     private JTable getJTableFvOptions() {
         if (jTableFvOptions == null) {
-            jTableFvOptions = new JTable();
+            jTableFvOptions = new JTable(getTableModel()) {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = -1941328952828651192L;
+
+                public String getToolTipText(MouseEvent e) {
+                    String tip = null;
+                    java.awt.Point p = e.getPoint();
+                    int rowIndex = rowAtPoint(p);
+//                    int colIndex = columnAtPoint(p);
+//                    int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                    TableModel model = getModel();
+                    String optName = (String) model.getValueAt(rowIndex, 0);
+                    if (((FvOptsTableModel)model).getVKeyWords().contains(optName)){
+                        tip = optName + " is from Flash Definition File and it is NOT editable.";
+                    }
+                         
+                    return tip;
+                }
+
+            };
+ 
             jTableFvOptions.setRowHeight(20);
-            jTableFvOptions.setModel(getTableModel());
             
-            jTableFvOptions.getModel().addTableModelListener(new TableModelListener() {
-                public void tableChanged(TableModelEvent arg0) {
-                    // TODO Auto-generated method stub
-                    int row = arg0.getFirstRow();
-//                    int col = arg0.getColumn();
-                    TableModel m = (TableModel) arg0.getSource();
-                    
-                    if (arg0.getType() == TableModelEvent.UPDATE) {
-                        if (m.getValueAt(row, 0).equals("")) {
-                            return;
-                        }
-                        ffc.setTypedNamedFvImageNameValue(fvName, "Options", m.getValueAt(row, 0)+"", m.getValueAt(row, 1)+"");
-                        docConsole.setSaved(false);
+            jTableFvOptions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (e.getValueIsAdjusting()) {
+                        return;
+                    }
+                    ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                    if (lsm.isSelectionEmpty()) {
+                        return;
+                    } else {
+                        selectedRow = lsm.getMinSelectionIndex();
+                        oldOptionName = getTableModel().getValueAt(selectedRow, 0)+"";
                     }
                 }
             });
+            
+            tableModelListener = new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    int col = arg0.getColumn();
+                    TableModel m = (TableModel) arg0.getSource();
+                    
+                    if (arg0.getType() == TableModelEvent.UPDATE) {
+                        String newOptionName = m.getValueAt(row, 0) + "";
+                        if (col == 0) {
+                            if (newOptionName.equals(oldOptionName)) {
+                                return;
+                            }
+                            if (fvOptionNameExists(newOptionName)) {
+                                JOptionPane.showMessageDialog(frame, "This Option already exists. Please choose another Option name.");
+                                m.setValueAt(oldOptionName, row, 0);
+                                return;
+                            }
+                            
+                            ffc.setTypedNamedFvImageNameValue(fvName, "Options", oldOptionName, m.getValueAt(row, 1)+"", newOptionName);
+                            docConsole.setSaved(false);
+                            oldOptionName = newOptionName;
+                        }
+                        
+                        if (col == 1) {
+                            ffc.setTypedNamedFvImageNameValue(fvName, "Options", oldOptionName, m.getValueAt(row, 1)+"", newOptionName);
+                            docConsole.setSaved(false);    
+                        }
+                                            
+                    }
+                }
+            };
+            
+            jTableFvOptions.getModel().addTableModelListener(tableModelListener);
         }
         return jTableFvOptions;
     }
@@ -235,6 +325,7 @@ private JButton getJButtonNew() {
         jButtonNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 tableModel.addRow(new String[]{"", ""});
+                oldOptionName = "";
             }
         });
     }

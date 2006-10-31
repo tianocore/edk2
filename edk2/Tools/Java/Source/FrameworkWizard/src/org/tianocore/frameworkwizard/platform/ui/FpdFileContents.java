@@ -1531,7 +1531,10 @@ public class FpdFileContents {
                 if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
                     
                     if (getDynamicPcdBuildDataCount() == 1) {
-                        cursor.toParent();
+                        cursor.dispose();
+                        removeElement(o);
+                        fpdDynPcdBuildDefs = null;
+                        return;
                     }
                     cursor.removeXml();
                     cursor.dispose();
@@ -1548,6 +1551,8 @@ public class FpdFileContents {
     public int getDynamicPcdSkuInfoCount(int i){
         if (fpdRoot.getDynamicPcdBuildDefinitions() == null || fpdRoot.getDynamicPcdBuildDefinitions().getPcdBuildDataList() == null 
                         || fpdRoot.getDynamicPcdBuildDefinitions().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return 0;
         }
         
@@ -1716,9 +1721,11 @@ public class FpdFileContents {
     
     public void updateDynamicPcdBuildDataSkuInfo(String id, String varName, String varGuid, String varOffset, 
                                                  String hiiDefault, String vpdOffset, String value, int i){
-//        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
-//            return;
-//        }
+        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
+            return;
+        }
         
         XmlCursor cursor = getfpdDynPcdBuildDefs().newCursor();
         if (cursor.toFirstChild()) {
@@ -3278,32 +3285,31 @@ public class FpdFileContents {
      * @param name
      * @param value
      */
-    public void setTypedNamedFvImageNameValue (String fvName, String type, String name, String value) {
+    public void setTypedNamedFvImageNameValue (String fvName, String type, String name, String value, String newName) {
         boolean fvImageExists = false;
-        if (getfpdFlash().getFvImages() == null) {
-            return;
-        }
-        List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
-        if (l == null) {
-            return;
-        }
-        ListIterator li = l.listIterator();
-        while(li.hasNext()) {
-            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
-            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
-                continue;
+        if (getfpdFlash().getFvImages() != null) {
+
+            List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
+            if (l != null) {
+                ListIterator li = l.listIterator();
+                while (li.hasNext()) {
+                    FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage) li.next();
+                    if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                        continue;
+                    }
+                    if (!fi.getFvImageNamesList().contains(fvName)) {
+                        continue;
+                    }
+                    fvImageExists = true;
+                    setFvImagesFvImageNameValue(fi, name, value, newName);
+                }
             }
-            if (!fi.getFvImageNamesList().contains(fvName)) {
-                continue;
-            }
-            fvImageExists = true;
-            setFvImagesFvImageNameValue (fi, name, value, null);
         }
-        
+
         if (!fvImageExists) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(name, value);
-            genFvImagesFvImage(new String[]{fvName}, type, map);
+            genFvImagesFvImage(new String[] { fvName }, type, map);
         }
     }
     
@@ -3359,7 +3365,7 @@ public class FpdFileContents {
             FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fi.addNewFvImageOptions().addNewNameValue();
             nv.setName(name);
             nv.setValue(value);
-            if (newName != null) {
+            if (newName != null && !newName.equals(name)) {
                 nv.setName(newName);
             }
             return;
@@ -3371,7 +3377,7 @@ public class FpdFileContents {
                 FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = (FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue)cursor.getObject();
                 if (nv.getName().equals(name)) {
                     nv.setValue(value);
-                    if (newName != null) {
+                    if (newName != null && !newName.equals(name)) {
                         nv.setName(newName);
                     }
                     cursor.dispose();
@@ -3383,7 +3389,7 @@ public class FpdFileContents {
         FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fi.getFvImageOptions().addNewNameValue();
         nv.setName(name);
         nv.setValue(value);
-        if (newName != null) {
+        if (newName != null && !newName.equals(name)) {
             nv.setName(newName);
         }
         cursor.dispose();
