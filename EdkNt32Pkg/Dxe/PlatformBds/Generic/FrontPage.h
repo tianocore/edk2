@@ -25,7 +25,7 @@ Revision History
 #define _FRONT_PAGE_H
 
 #include "Generic/DeviceMngr/DeviceManager.h"
-#include "Generic/BootMaint/bootmaint.h"
+#include "Generic/BootMaint/BootMaint.h"
 #include "Generic/BootMngr/BootManager.h"
 
 //
