@@ -1160,7 +1160,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  FileSize = _filelength (_fileno (Fp));
+  FileSize = _filelength (fileno (Fp));
 
   if ((BsfInfo->CompType == COMP_TYPE_FIT_PAL_B) || (BsfInfo->CompType == COMP_TYPE_FIT_PAL_A_SPECIFIC)) {
 
@@ -1334,7 +1334,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  FileSize = _filelength (_fileno (Fp));
+  FileSize = _filelength (fileno (Fp));
   FileSize -= SIZE_OF_PAL_HEADER;
 
   if (BsfInfo->PreferredSize) {
@@ -1752,7 +1752,7 @@ Returns:
     printf ("\nERROR: Unable to open the file %s", FileName);
   }
 
-  FileSize = _filelength (_fileno (Fp));
+  FileSize = _filelength (fileno (Fp));
 
   if (FileSize > 16) {
     return EFI_ABORTED;
@@ -2145,7 +2145,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  FirstFwVSize = _filelength (_fileno (Fp));
+  FirstFwVSize = _filelength (fileno (Fp));
   fseek (Fp, (long) (FirstFwVSize - (UINTN) (SIZE_IA32_RESET_VECT + SIZE_SALE_ENTRY_POINT)), SEEK_SET);
   NumByte = fwrite ((VOID *) StartAddressPtr, sizeof (UINT64), 1, Fp);
 
@@ -2862,7 +2862,7 @@ Returns:
           return EFI_ABORTED;
         }
         
-        *BsfSize += _filelength (_fileno (Fp));
+        *BsfSize += _filelength (fileno (Fp));
         
         if (Fp) {
           fclose (Fp);
@@ -2985,7 +2985,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  FileSize = _filelength (_fileno (Fp));
+  FileSize = _filelength (fileno (Fp));
 
   if (BsfInfo->PreferredSize) {
     if (FileSize > BsfInfo->CompSize) {
@@ -3082,7 +3082,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  FileSize = _filelength (_fileno (Fp));
+  FileSize = _filelength (fileno (Fp));
 
   if (BsfInfo->PreferredSize) {
     if (FileSize > BsfInfo->CompSize) {
