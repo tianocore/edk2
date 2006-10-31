@@ -13,38 +13,44 @@
 package org.tianocore.migration;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public final class PathIterator implements Common.ForDoAll {
-//     this PathIterator is based on HashSet, an thread implementation is required.
-    PathIterator(String path, int md) throws Exception {
-        startpath = path;
-        mode = md;
-        Common.toDoAll(startpath, this, mode);
-        it = pathlist.iterator();
-    }
-    private String startpath = null;
-    private int mode;
-    private HashSet<String> pathlist = new HashSet<String>();
-    private Iterator<String> it = null;
+	// this PathIterator is based on HashSet, an thread implementation is
+	// required.
+	PathIterator(String path, int md) throws Exception {
+		startpath = path;
+		mode = md;
+		Common.toDoAll(startpath, this, mode);
+		it = pathlist.iterator();
+	}
 
-    public final void run(String path) throws Exception {
-        pathlist.add(path);
-    }
+	private String startpath = null;
 
-    public boolean filter(File dir) {
-        return true;
-    }
-    
-    public final String next() {
-        return it.next();
-    }
+	private int mode;
 
-    public final boolean hasNext() {
-        return it.hasNext();
-    }
+	private HashSet<String> pathlist = new HashSet<String>();
 
-    public final String toString() {
-        return pathlist.toString();
-    }
+	private Iterator<String> it = null;
+
+	public final void run(String path) throws Exception {
+		pathlist.add(path);
+	}
+
+	public boolean filter(File dir) {
+		return true;
+	}
+
+	public final String next() {
+		return it.next();
+	}
+
+	public final boolean hasNext() {
+		return it.hasNext();
+	}
+
+	public final String toString() {
+		return pathlist.toString();
+	}
 }
