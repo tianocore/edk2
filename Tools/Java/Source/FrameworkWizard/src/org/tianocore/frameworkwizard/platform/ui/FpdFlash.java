@@ -1055,9 +1055,16 @@ public class FpdFlash extends IInternalFrame {
                         jButtonFdfBrowse.setEnabled(true);
                     }
                     else {
-                        
+                        getFvInFdfTableModel().setRowCount(0);
                         jTextFieldFdf.setEnabled(false);
+                        jTextFieldFdf.setText("");
                         jButtonFdfBrowse.setEnabled(false);
+                        ffc.genFlashDefinitionFile("");
+                        docConsole.setSaved(false);
+                        int selectedBackup = selectedRowInFvAdditionalTable;
+                        selectedRowInFvAdditionalTable = -1;
+                        initFvAdditionalTable();
+                        selectedRowInFvAdditionalTable = selectedBackup;
                     }
                 }
             });
@@ -1194,9 +1201,16 @@ public class FpdFlash extends IInternalFrame {
         determinedFvBlockSize = blkSize;
         
         getFvInFdfTableModel().setRowCount(0);
+        Vector<String> vExistingFvNameInFpd = new Vector<String>();
+        ffc.getFvImagesFvImageFvImageNames(vExistingFvNameInFpd);
         for (int j = 0; j < vFvInfo.size(); ++j) {
             FvInfoFromFdf fvInfo = vFvInfo.get(j);
             String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
+            
+            if (row[0].length() > 0 && !vExistingFvNameInFpd.contains(row[0])) {
+                ffc.addFvImageFvImageNames(new String[]{row[0]});
+            }
+            
             // if FV addtional table contains the same FV from fdf file, remove that row.
             for (int k = 0; k < jTableFvAdditional.getRowCount(); ++k) {
                 if (fvAdditionalTableModel.getValueAt(k, 0).equals(row[0])) {
@@ -1221,15 +1235,15 @@ public class FpdFlash extends IInternalFrame {
                 else {
                     ffc.getFvImagesFvImageOptions(row[0], mOptions);
                     if (mOptions.get("EFI_BLOCK_SIZE") == null || !mOptions.get("EFI_BLOCK_SIZE").equalsIgnoreCase(blkSize)) {
-                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_BLOCK_SIZE", blkSize);
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_BLOCK_SIZE", blkSize, null);
                         memModified = true;
                     }
                     if (mOptions.get("EFI_NUM_BLOCKS") == null || Integer.decode(mOptions.get("EFI_NUM_BLOCKS")) != numBlocks) {
-                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_NUM_BLOCKS", numBlocks + "");
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_NUM_BLOCKS", numBlocks + "", null);
                         memModified = true;
                     }
                     if (mOptions.get("EFI_FILE_NAME") == null || !mOptions.get("EFI_FILE_NAME").equals(row[2])) {
-                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_FILE_NAME", row[2]);
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_FILE_NAME", row[2], null);
                         memModified = true;
                     }
                     
@@ -1810,20 +1824,20 @@ public class FpdFlash extends IInternalFrame {
                                 else {
                                     blkSize = defaultBlkSize;
                                 }
-                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", blkSize);
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", blkSize, null);
                                 int fs = Integer.decode(fvSize);
                                 int bs = Integer.decode(blkSize);
-                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"", null);
                                 docConsole.setSaved(false);
                             }
                             else {
                                 if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
                                     int retVal = JOptionPane.showConfirmDialog(frame, "Confirm", "FPD file contains error block size format. Would you like to replace it with a default value?", JOptionPane.YES_NO_OPTION);
                                     if (retVal == JOptionPane.YES_OPTION) {
-                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", defaultBlkSize);
+                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", defaultBlkSize, null);
                                         int fs = Integer.decode(fvSize);
                                         int bs = Integer.decode(defaultBlkSize);
-                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"", null);
                                         docConsole.setSaved(false);
                                         return;
                                     }
@@ -1834,13 +1848,13 @@ public class FpdFlash extends IInternalFrame {
                                 }
                                 int fs = Integer.decode(fvSize);
                                 int bs = Integer.decode(blkSize);
-                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"", null);
                                 docConsole.setSaved(false);
                             }
                         }
                         
                         if (col == 2 && !fileFromOptionDlg) {
-                            ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_FILE_NAME", m.getValueAt(row, col)+"");
+                            ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_FILE_NAME", m.getValueAt(row, col)+"", null);
                             docConsole.setSaved(false);
                         }
                         
@@ -2269,6 +2283,7 @@ public class FpdFlash extends IInternalFrame {
         jTextFieldFdf.setText("");
         String fdfFile = ffc.getFlashDefinitionFile();
         if (fdfFile != null && fdfFile.length() > 0) {
+            jCheckBoxFdf.setSelected(true);
             jTextFieldFdf.setText(fdfFile);
             String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
             initFvInFdfTable(fdfPath);
@@ -3181,6 +3196,7 @@ class FvOptsTableModel extends DefaultTableModel {
     private Vector<Object> vKeyWords = new Vector<Object>();
     
     public boolean isCellEditable(int row, int col) {
+
         if (vNonEditableName.size() > 0 || vKeyWords.size() > 0) {
             if (vKeyWords.contains(getValueAt(row, 0))) {
                 return false;
@@ -3188,7 +3204,11 @@ class FvOptsTableModel extends DefaultTableModel {
             if (vNonEditableName.contains(getValueAt(row, 0)) && col == 0) {
                 return false;
             }
-        }  
+        }
+        
+        if (col == 0 && getValueAt(row, 0) != null && getValueAt(row, 0).toString().length() > 0) {
+            return false;
+        }
        
         return true;
     }
