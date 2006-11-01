@@ -197,6 +197,7 @@ public class OpeningModuleList {
     public void closeAll() {
         for (int index = 0; index < this.size(); index++) {
             this.setModuleOpen(index, false);
+            this.setModuleSaved(index, true);
         }
     }
 

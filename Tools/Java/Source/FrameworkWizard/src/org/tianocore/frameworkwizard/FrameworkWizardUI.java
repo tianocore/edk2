@@ -3109,6 +3109,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 }
 
                 GlobalData.openingModuleList.setModuleOpen(this.currentOpeningModuleIndex, false);
+                GlobalData.openingModuleList.setModuleSaved(this.currentOpeningModuleIndex, true);
                 this.cleanDesktopPaneModule();
                 this.currentOpeningModuleIndex = -1;
             }
@@ -3144,6 +3145,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 }
 
                 GlobalData.openingPackageList.setPackageOpen(this.currentOpeningPackageIndex, false);
+                GlobalData.openingPackageList.setPackageSaved(this.currentOpeningPackageIndex, true);
                 this.cleanDesktopPanePackage();
                 this.currentOpeningPackageIndex = -1;
             }
@@ -3179,6 +3181,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 }
 
                 GlobalData.openingPlatformList.setPlatformOpen(this.currentOpeningPlatformIndex, false);
+                GlobalData.openingPlatformList.setPlatformSaved(this.currentOpeningPlatformIndex, true);
                 this.cleanDesktopPanePlatform();
                 this.currentOpeningPlatformIndex = -1;
             }

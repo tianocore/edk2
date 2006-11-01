@@ -197,6 +197,7 @@ public class OpeningPackageList {
     public void closeAll() {
         for (int index = 0; index < this.size(); index++) {
            this.setPackageOpen(index, false);
+           this.setPackageSaved(index, true);
         }
     }
     
