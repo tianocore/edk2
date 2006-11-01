@@ -47,6 +47,8 @@ import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import javax.swing.JRadioButton;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  The class is used to create, update MsaHeader of MSA file
@@ -55,7 +57,7 @@ import javax.swing.JRadioButton;
 
 
  **/
-public class MsaHeader extends IInternalFrame {
+public class MsaHeader extends IInternalFrame implements DocumentListener {
 
     ///
     /// Define class Serial Version UID
@@ -212,7 +214,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxIa32.setText("IA32");
             jCheckBoxIa32.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIa32.addFocusListener(this);
-            jCheckBoxIa32.addItemListener(this);
         }
         return jCheckBoxIa32;
     }
@@ -229,7 +230,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxX64.setText("X64");
             jCheckBoxX64.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxX64.addFocusListener(this);
-            jCheckBoxX64.addItemListener(this);
         }
         return jCheckBoxX64;
     }
@@ -246,7 +246,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxIpf.setText("IPF");
             jCheckBoxIpf.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxIpf.addFocusListener(this);
-            jCheckBoxIpf.addItemListener(this);
         }
         return jCheckBoxIpf;
     }
@@ -263,7 +262,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxEbc.setText("EBC");
             jCheckBoxEbc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxEbc.addFocusListener(this);
-            jCheckBoxEbc.addItemListener(this);
         }
         return jCheckBoxEbc;
     }
@@ -280,7 +278,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxArm.setText("ARM");
             jCheckBoxArm.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxArm.addFocusListener(this);
-            jCheckBoxArm.addItemListener(this);
         }
         return jCheckBoxArm;
     }
@@ -297,7 +294,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxPpc.setText("PPC");
             jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
             jCheckBoxPpc.addFocusListener(this);
-            jCheckBoxPpc.addItemListener(this);
         }
         return jCheckBoxPpc;
     }
@@ -538,7 +534,6 @@ public class MsaHeader extends IInternalFrame {
             jComboBoxModuleType.setBounds(new java.awt.Rectangle(valueCol, 35, valueWidth, 20));
             jComboBoxModuleType.setPreferredSize(new java.awt.Dimension(valueWidth, 20));
             jComboBoxModuleType.addFocusListener(this);
-            jComboBoxModuleType.addItemListener(this);
         }
         return jComboBoxModuleType;
     }
@@ -686,6 +681,7 @@ public class MsaHeader extends IInternalFrame {
         init(msa.getMsaHeader());
         init(msa.getModuleDefinitions());
         init(msa.getExterns());
+        this.addListeners();
 
         this.setVisible(true);
         this.setViewMode(false);
@@ -1544,7 +1540,6 @@ public class MsaHeader extends IInternalFrame {
             jCheckBoxPcd.addFocusListener(this);
             jCheckBoxPcd.addActionListener(this);
             jCheckBoxPcd.setEnabled(false);
-            jCheckBoxPcd.addItemListener(this);
         }
         return jCheckBoxPcd;
     }
@@ -1688,5 +1683,45 @@ public class MsaHeader extends IInternalFrame {
             }
             this.save();
         }
+        
+        this.omt.setSaved(false);
+    }
+    
+    private void addListeners() {
+        this.jTextFieldBaseName.getDocument().addDocumentListener(this);
+        this.jTextFieldGuid.getDocument().addDocumentListener(this);
+        this.jTextFieldAbstract.getDocument().addDocumentListener(this);
+        this.jTextAreaCopyright.getDocument().addDocumentListener(this);
+        this.jTextAreaDescription.getDocument().addDocumentListener(this);
+        this.jTextAreaLicense.getDocument().addDocumentListener(this);
+        this.jTextFieldOutputFileBasename.getDocument().addDocumentListener(this);
+        this.jTextFieldSpecification.getDocument().addDocumentListener(this);
+        this.jTextFieldURL.getDocument().addDocumentListener(this);
+        this.jTextFieldVersion.getDocument().addDocumentListener(this);
+        
+        this.jComboBoxModuleType.addItemListener(this);
+        
+        this.jCheckBoxIa32.addItemListener(this);
+        this.jCheckBoxX64.addItemListener(this);
+        this.jCheckBoxIpf.addItemListener(this);
+        this.jCheckBoxEbc.addItemListener(this);
+        this.jCheckBoxArm.addItemListener(this);
+        this.jCheckBoxPpc.addItemListener(this);
+        
+        this.jCheckBoxPcd.addItemListener(this);
+        
+        this.jCheckBoxFlashMap.addItemListener(this);
+    }
+
+    public void insertUpdate(DocumentEvent e) {
+        this.omt.setSaved(false);        
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+        this.omt.setSaved(false);
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        // Do nothing
     }
 }

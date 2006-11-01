@@ -183,6 +183,7 @@ public class OpeningPlatformList {
     public void closeAll() {
         for (int index = 0; index < this.size(); index++) {
            this.setPlatformOpen(index, false);
+           this.setPlatformSaved(index, true);
         }
     }
     
