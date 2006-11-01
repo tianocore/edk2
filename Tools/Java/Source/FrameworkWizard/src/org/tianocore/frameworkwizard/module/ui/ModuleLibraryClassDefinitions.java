@@ -96,8 +96,8 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
     private JButton getJButtonAdd() {
         if (jButtonAdd == null) {
             jButtonAdd = new JButton();
-            jButtonAdd.setBounds(new java.awt.Rectangle(230, 330, 80, 20));
-            jButtonAdd.setPreferredSize(new Dimension(80, 20));
+            jButtonAdd.setBounds(new java.awt.Rectangle(230, 330, 90, 20));
+            jButtonAdd.setPreferredSize(new Dimension(90, 20));
             jButtonAdd.setText("Add");
             jButtonAdd.addActionListener(this);
         }
@@ -113,9 +113,9 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
     private JButton getJButtonRemove() {
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
-            jButtonRemove.setBounds(new java.awt.Rectangle(400, 330, 80, 20));
+            jButtonRemove.setBounds(new java.awt.Rectangle(400, 330, 90, 20));
             jButtonRemove.setText("Remove");
-            jButtonRemove.setPreferredSize(new Dimension(80, 20));
+            jButtonRemove.setPreferredSize(new Dimension(90, 20));
             jButtonRemove.addActionListener(this);
         }
         return jButtonRemove;
@@ -130,9 +130,9 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
     private JButton getJButtonUpdate() {
         if (jButtonUpdate == null) {
             jButtonUpdate = new JButton();
-            jButtonUpdate.setBounds(new java.awt.Rectangle(315, 330, 80, 20));
+            jButtonUpdate.setBounds(new java.awt.Rectangle(315, 330, 90, 20));
             jButtonUpdate.setText("Edit");
-            jButtonUpdate.setPreferredSize(new Dimension(80, 20));
+            jButtonUpdate.setPreferredSize(new Dimension(90, 20));
             jButtonUpdate.addActionListener(this);
         }
         return jButtonUpdate;

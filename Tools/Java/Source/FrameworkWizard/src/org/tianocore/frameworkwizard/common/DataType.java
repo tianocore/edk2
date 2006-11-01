@@ -161,9 +161,9 @@ public class DataType {
 
     public static final int SPACE_TO_RIGHT_FOR_OK_BUTTON = 10;
 
-    public static final int SPACE_TO_RIGHT_FOR_ADD_BUTTON = 180;
+    public static final int SPACE_TO_RIGHT_FOR_ADD_BUTTON = 200;
 
-    public static final int SPACE_TO_RIGHT_FOR_REMOVE_BUTTON = 95;
+    public static final int SPACE_TO_RIGHT_FOR_REMOVE_BUTTON = 105;
 
     public static final int SPACE_TO_RIGHT_FOR_UPDATE_BUTTON = 10;
 
