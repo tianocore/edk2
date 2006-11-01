@@ -177,13 +177,18 @@ typedef INT64   INTN;
 #elif __GNUC__
   ///
   /// Define the standard calling convention reguardless of optimization level.
-  /// efidecl is an extension to GCC that supports the differnece between x64
-  /// GCC ABI and x64 Microsoft* ABI. EFI is closer to the Microsoft* ABI and
-  /// EFIAPI makes sure the right ABI is used for public interfaces. 
-  /// eficecl is a work in progress and we do not yet have the compiler
+  /// The GCC support assumes a GCC compiler that supports the EFI ABI. The EFI
+  /// ABI is much closer to the x64 Microsoft* ABI than standard x64 (x86-64) 
+  /// GCC ABI. Thus a standard x64 (x86-64) GCC compiler can not be used for 
+  /// x64. Warning the assembly code in the MDE x64 does not follow the correct 
+  /// ABI for the standard x64 (x86-64) GCC.
   ///
-  #define EFIAPI __attribute__((efidecl))    
+  #define EFIAPI 
 #else
+  ///
+  /// The default for a non Microsoft* or GCC compiler is to assume the EFI ABI
+  /// is the standard. 
+  ///
   #define EFIAPI       
 #endif
 
