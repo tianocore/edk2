@@ -282,8 +282,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             return;
         }
         
-        for (int j = 0; j < v.size(); ++j) {
-            LibraryClassDescriptor libInfo = v.get(j);
+        Iterator<LibraryClassDescriptor> iter = v.iterator();
+        while (iter.hasNext()) {
+            LibraryClassDescriptor libInfo = iter.next();
 
             Vector<String> vSupArchs = libInfo.getVectorFromString(libInfo.supArchs);
             
@@ -318,7 +319,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             //
             // remove this lib definition if it supports no archs module will be built under.
             //
-            v.iterator().remove();
+            iter.remove();
         }
     }
     
@@ -712,9 +713,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         // array for pcd related information: helpText, itemType, moduleType.
                         //
                         String[] pcdInfo = {"", "", ""};
-                        getPcdInfo(cName, tsGuid, pcdInfo);
+                        Vector<String> validPcdTypes = new Vector<String>();
+                        getPcdInfo(moduleKey, cName, tsGuid, pcdInfo, validPcdTypes);
                         jTextAreaPcdHelp.setText(pcdInfo[0]);
-                        initComboBox(pcdInfo[1], pcdInfo[2]);
+                        initComboBox(pcdInfo[1], pcdInfo[2], validPcdTypes);
                         jComboBoxItemType.setSelectedItem(itemType);
                         jTextFieldMaxDatumSize.setEnabled(true);
                         jTextFieldMaxDatumSize.setVisible(true);
@@ -768,15 +770,16 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         return jTablePcd;
     }
     
-    private void initComboBox(String originalType, String mType) {
+    private void initComboBox(String originalType, String mType, Vector<String> validPcdTypes) {
         jComboBoxItemType.removeAllItems();
-        jComboBoxItemType.addItem(originalType);
-        if (originalType.equals("PATCHABLE_IN_MODULE") && mType.equalsIgnoreCase("false")) {
-            jComboBoxItemType.addItem("FIXED_AT_BUILD");
-        }
+
         if (originalType.equals("DYNAMIC")) {
-            jComboBoxItemType.addItem("FIXED_AT_BUILD");
-            jComboBoxItemType.addItem("PATCHABLE_IN_MODULE");
+            for (int i = 0; i < validPcdTypes.size(); ++i) {
+                jComboBoxItemType.addItem(validPcdTypes.get(i));
+            }
+        }
+        else {
+            jComboBoxItemType.addItem(originalType);
         }
     }
     
@@ -785,17 +788,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * @param tsGuid
      * @param sa sa[0]: HelpText; sa[1]: itemType in Msa; sa[2]: isBinary;
      */
-    private void getPcdInfo(String cName, String tsGuid, String[] sa) {
+    private void getPcdInfo(String moduleKey, String cName, String tsGuid, String[] sa, Vector<String> validPcdTypes) {
         String[][] saa = new String[ffc.getLibraryInstancesCount(moduleKey)][5];
         ffc.getLibraryInstances(moduleKey, saa);
         
         try{
-            if (ffc.getPcdBuildDataInfo(WorkspaceProfile.getModuleId(moduleKey), cName, tsGuid, sa)) {
+            if (ffc.getPcdBuildDataInfo(WorkspaceProfile.getModuleId(moduleKey), cName, tsGuid, sa, validPcdTypes)) {
                 return;
             }
             for (int j = 0; j < saa.length; ++j) {
                 if (ffc.getPcdBuildDataInfo(WorkspaceProfile.getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
-                                            cName, tsGuid, sa)) {
+                                            cName, tsGuid, sa, validPcdTypes)) {
                     return;
                 }
             }
@@ -1657,26 +1660,25 @@ private JComboBox getJComboBoxItemType() {
     if (jComboBoxItemType == null) {
         jComboBoxItemType = new JComboBox();
         jComboBoxItemType.setPreferredSize(new java.awt.Dimension(200,20));
-        jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent e) {
-                int row = jTablePcd.getSelectedRow();
-                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
-                    return;
-                }
-                if (jComboBoxItemType.getItemCount() == 3) {
-                    if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
-                        
-                        if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
-                            jTextFieldPcdDefault.setText("");
-                            jTextFieldPcdDefault.setEnabled(true);
-                        }
-                    }
-                    else{
-                        
-                    }
-                }
-            }
-        });
+//        jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
+//            public void itemStateChanged(java.awt.event.ItemEvent e) {
+//                
+//                int row = jTablePcd.getSelectedRow();
+//                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
+//                    return;
+//                }
+//                    if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
+//                        
+//                        if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
+//                            jTextFieldPcdDefault.setText("");
+//                            jTextFieldPcdDefault.setEnabled(true);
+//                        }
+//                    }
+//                    else{
+//                        
+//                    }
+//                }
+//        });
     }
     return jComboBoxItemType;
 }
@@ -1698,8 +1700,8 @@ private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
     for (int i = 0; i < al.size(); ++i) {
         String mKey = moduleInfo (al.get(i));
         value = null;
-        ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", maxSize, value);
         String itemType = jComboBoxItemType.getSelectedItem()+"";
+        ffc.updatePcdData(mKey, cName, tsGuid, itemType, maxSize, value);
         al.set(i, mKey + " " + itemType);
     }
     
@@ -1710,8 +1712,8 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
     for (int i = 0; i < al.size(); ++i) {
         String mKey = moduleInfo (al.get(i));
-        ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", jTextFieldMaxDatumSize.getText(), jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
         String itemType = jComboBoxItemType.getSelectedItem()+"";
+        ffc.updatePcdData(mKey, cName, tsGuid, itemType, jTextFieldMaxDatumSize.getText(), jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
         al.set(i, mKey + " " + itemType);
     }
     try{
@@ -1719,6 +1721,16 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
     }
     catch(Exception e){
         JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
+    }
+}
+
+private void changePcdTypeWithinSameCategory (String cName, String tsGuid) {
+    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+    for (int i = 0; i < al.size(); ++i) {
+        String mKey = moduleInfo (al.get(i));
+        String itemType = jComboBoxItemType.getSelectedItem()+"";
+        ffc.updatePcdData(mKey, cName, tsGuid, itemType, null, null);
+        al.set(i, mKey + " " + itemType);
     }
 }
 
@@ -1767,14 +1779,17 @@ private JButton getJButtonUpdatePcd() {
                 if (row < 0) {
                     return;
                 }
-                docConsole.setSaved(false);
+                
+                String cName = model.getValueAt(row, 0)+"";
+                String tsGuid = model.getValueAt(row, 1)+"";
                 String oldItemType = model.getValueAt(row, 2)+"";
                 String newItemType = jComboBoxItemType.getSelectedItem()+"";
-                model.setValueAt(newItemType, row, 2);
+                
                 model.setValueAt(jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem(), row, 6);
                 
                 String[] pcdInfo = {"", "", ""};
-                getPcdInfo (model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"", pcdInfo);
+                Vector<String> validPcdTypes = new Vector<String>();
+                getPcdInfo (moduleKey, cName, tsGuid, pcdInfo, validPcdTypes);
                 if (pcdInfo[1].equals("FIXED_AT_BUILD") && model.getValueAt(row, 5).equals("VOID*")) {
                     try {
                         jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(model.getValueAt(row, 6)+"")+"");
@@ -1786,18 +1801,62 @@ private JButton getJButtonUpdatePcd() {
                 }
                 model.setValueAt(jTextFieldMaxDatumSize.getText(), row, 4);
                 
-                if (oldItemType.equals("DYNAMIC") && !newItemType.equals("DYNAMIC")) {
-                    pcdDynamicToNonDynamic(model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"");
+                if (newItemType != oldItemType) {
+                    Vector<ModuleIdentification> moduleInfo = new Vector<ModuleIdentification>();
+                    try {
+                        boolean changable = itemTypeCouldBeChanged (cName, tsGuid, newItemType, moduleInfo);
+                        if (!changable) {
+                            JOptionPane.showMessageDialog(frame, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName());
+                            return;
+                        }
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName() + " " + exp.getMessage());
+                        return;
+                    }
+                    
+                    if ((oldItemType.equals("DYNAMIC") || oldItemType.equals("DYNAMIC_EX")) && !newItemType.equals("DYNAMIC") && !newItemType.equals("DYNAMIC_EX")) {
+                        pcdDynamicToNonDynamic(cName, tsGuid);
+                    }
+                    if (!oldItemType.equals("DYNAMIC") && !oldItemType.equals("DYNAMIC_EX") && (newItemType.equals("DYNAMIC") || newItemType.equals("DYNAMIC_EX"))) {
+                        pcdNonDynamicToDynamic(cName, tsGuid);
+                    }
+                    else {
+                        changePcdTypeWithinSameCategory (cName, tsGuid);
+                    }
+                    model.setValueAt(newItemType, row, 2);
                 }
-                if (!oldItemType.equals("DYNAMIC") && newItemType.equals("DYNAMIC")) {
-                    pcdNonDynamicToDynamic(model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"");
-                }
-                ffc.updatePcdData(moduleKey, model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"", model.getValueAt(row, 2)+"", model.getValueAt(row, 4)+"", model.getValueAt(row, 6)+"");
+                
+                ffc.updatePcdData(moduleKey, cName, tsGuid, model.getValueAt(row, 2)+"", model.getValueAt(row, 4)+"", model.getValueAt(row, 6)+"");
+                docConsole.setSaved(false);
             }
         });
     }
     return jButtonUpdatePcd;
 }
+
+private boolean itemTypeCouldBeChanged (String cName, String tsGuid, String newItemType, Vector<ModuleIdentification> mi) throws Exception{
+    ArrayList<String> pcdConsumers = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+    for (int i = 0; i < pcdConsumers.size(); ++i) {
+        String consumerInfo = moduleInfo (pcdConsumers.get(i));
+        mi.removeAllElements();
+        mi.add(WorkspaceProfile.getModuleId(consumerInfo));
+        String[] sa = {"", "", ""};
+        Vector<String> validPcdTypes = new Vector<String>();
+        getPcdInfo (consumerInfo, cName, tsGuid, sa, validPcdTypes);
+        if (validPcdTypes.size() == 0) {
+            return false;
+        }
+        if (!sa[1].equals("DYNAMIC")) {
+            return false;
+        }
+        if (!validPcdTypes.contains(newItemType)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * This method initializes jComboBoxFeatureFlagValue
  * 	
