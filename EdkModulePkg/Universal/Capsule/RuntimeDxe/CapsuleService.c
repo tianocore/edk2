@@ -75,11 +75,11 @@ Returns:
   //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
-    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) && !(CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET)) {
+    if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;      
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
-      if (!(CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) {
+      if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }  
     }   
@@ -206,11 +206,11 @@ Returns:
   //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
-    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) && !(CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET)) {
+    if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;      
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
-      if (!(CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) {
+      if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }
     }  
