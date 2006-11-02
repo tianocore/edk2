@@ -21,7 +21,7 @@
 ///
 /// bit definition
 ///
-#define bit(a)        1 << (a)
+#define bit(a)        (1 << (a))
 
 #define MAX_TARGET_ID 4
 
