@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 
 
@@ -48,7 +50,7 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
  @since PackageEditor 1.0
 
  **/
-public class FpdHeader extends IInternalFrame {
+public class FpdHeader extends IInternalFrame implements DocumentListener{
 
     private int dialogWidth = 560;
 
@@ -181,6 +183,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldBaseName = new JTextField();
             jTextFieldBaseName.setBounds(new java.awt.Rectangle(valueColumn, rowOne, valueWidth, oneRowHeight));
             jTextFieldBaseName.setPreferredSize(new java.awt.Dimension(valueWidth,oneRowHeight));
+            jTextFieldBaseName.getDocument().addDocumentListener(this);
             jTextFieldBaseName.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e) {
                    if (!DataValidation.isUiNameType(jTextFieldBaseName.getText())) {
@@ -190,7 +193,6 @@ public class FpdHeader extends IInternalFrame {
                    if (jTextFieldBaseName.getText().equals(ffc.getFpdHdrPlatformName())) {
                        return;
                    }
-                   docConsole.setSaved(false);
                    ffc.setFpdHdrPlatformName(jTextFieldBaseName.getText());
                } 
             });
@@ -209,6 +211,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldGuid = new JTextField();
             jTextFieldGuid.setBounds(new java.awt.Rectangle(valueColumn, rowTwo, shortValueWidth, oneRowHeight));
             jTextFieldGuid.setPreferredSize(new java.awt.Dimension(shortValueWidth,oneRowHeight));
+            jTextFieldGuid.getDocument().addDocumentListener(this);
             jTextFieldGuid.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isGuid(jTextFieldGuid.getText())) {
@@ -218,7 +221,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jTextFieldGuid.getText().equals(ffc.getFpdHdrGuidValue())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrGuidValue(jTextFieldGuid.getText());
                 } 
              });
@@ -237,6 +239,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldVersion = new JTextField();
             jTextFieldVersion.setBounds(new java.awt.Rectangle(valueColumn, rowThree, valueWidth, oneRowHeight));
             jTextFieldVersion.setPreferredSize(new java.awt.Dimension(valueWidth,oneRowHeight));
+            jTextFieldVersion.getDocument().addDocumentListener(this);
             jTextFieldVersion.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
@@ -246,7 +249,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jTextFieldVersion.getText().equals(ffc.getFpdHdrVer())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrVer(jTextFieldVersion.getText());
                 } 
              });
@@ -281,6 +283,7 @@ public class FpdHeader extends IInternalFrame {
             jTextAreaLicense = new JTextArea();
             jTextAreaLicense.setText("");
             jTextAreaLicense.setLineWrap(true);
+            jTextAreaLicense.getDocument().addDocumentListener(this);
             jTextAreaLicense.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (jTextAreaLicense.getText().length() == 0) {
@@ -290,7 +293,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jTextAreaLicense.getText().equals(ffc.getFpdHdrLicense())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrLicense(jTextAreaLicense.getText());
                 } 
              });
@@ -308,6 +310,7 @@ public class FpdHeader extends IInternalFrame {
         if (jTextAreaDescription == null) {
             jTextAreaDescription = new JTextArea();
             jTextAreaDescription.setLineWrap(true);
+            jTextAreaDescription.getDocument().addDocumentListener(this);
             jTextAreaDescription.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (jTextAreaDescription.getText().length() == 0) {
@@ -317,7 +320,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jTextAreaDescription.getText().equals(ffc.getFpdHdrDescription())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrDescription(jTextAreaDescription.getText());
                 } 
              });
@@ -338,11 +340,11 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(specWidth,oneRowHeight));
             jTextFieldSpecification.setBorder(null);
-            jTextFieldSpecification.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e) {
-                    ffc.setFpdHdrSpec(jTextFieldSpecification.getText());
-                } 
-             });
+//            jTextFieldSpecification.addFocusListener(new FocusAdapter(){
+//                public void focusLost(FocusEvent e) {
+//                    ffc.setFpdHdrSpec(jTextFieldSpecification.getText());
+//                } 
+//             });
         }
         return jTextFieldSpecification;
     }
@@ -426,6 +428,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldAbstract = new JTextField();
             jTextFieldAbstract.setBounds(new java.awt.Rectangle(valueColumn,rowSeven,valueWidth,oneRowHeight));
             jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+            jTextFieldAbstract.getDocument().addDocumentListener(this);
             jTextFieldAbstract.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isAbstract(jTextFieldAbstract.getText())) {
@@ -435,7 +438,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jTextFieldAbstract.getText().equals(ffc.getFpdHdrAbs())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrAbs(jTextFieldAbstract.getText());
                 } 
              });
@@ -464,6 +466,7 @@ public class FpdHeader extends IInternalFrame {
             jCopyrightTextArea = new JTextArea();
             jCopyrightTextArea.setWrapStyleWord(true);
             jCopyrightTextArea.setLineWrap(true);
+            jCopyrightTextArea.getDocument().addDocumentListener(this);
             jCopyrightTextArea.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isCopyright(jCopyrightTextArea.getText())) {
@@ -473,7 +476,6 @@ public class FpdHeader extends IInternalFrame {
                     if (jCopyrightTextArea.getText().equals(ffc.getFpdHdrCopyright())) {
                         return;
                     }
-                    docConsole.setSaved(false);
                     ffc.setFpdHdrCopyright(jCopyrightTextArea.getText());
                 } 
              });
@@ -491,6 +493,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldUrl = new JTextField();
             jTextFieldUrl.setBounds(new java.awt.Rectangle(valueColumn,rowSix,valueWidth,oneRowHeight));
             jTextFieldUrl.setPreferredSize(new Dimension(valueWidth, oneRowHeight));
+            jTextFieldUrl.getDocument().addDocumentListener(this);
             jTextFieldUrl.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
                    if (jTextFieldUrl.getText().length() == 0 && ffc.getFpdHdrUrl() == null) {
@@ -501,7 +504,6 @@ public class FpdHeader extends IInternalFrame {
                    }
                    ffc.setFpdHdrLicense(jTextAreaLicense.getText());
                    ffc.setFpdHdrUrl(jTextFieldUrl.getText());
-                   docConsole.setSaved(false);
                } 
             });
         }
@@ -717,7 +719,6 @@ public class FpdHeader extends IInternalFrame {
     public void actionPerformed(ActionEvent arg0) {
         
         if (arg0.getSource() == jButtonGenerateGuid) {
-            docConsole.setSaved(false);
             jTextFieldGuid.setText(Tools.generateUuidString());
             ffc.setFpdHdrGuidValue(jTextFieldGuid.getText());
         }
@@ -756,4 +757,32 @@ public class FpdHeader extends IInternalFrame {
 		
         
 	}
+    
+    /* (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+     */
+    public void changedUpdate(DocumentEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
+     */
+    public void insertUpdate(DocumentEvent arg0) {
+        // TODO Auto-generated method stub
+        if (docConsole != null) {
+            docConsole.setSaved(false);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
+     */
+    public void removeUpdate(DocumentEvent arg0) {
+        // TODO Auto-generated method stub
+        if (docConsole != null) {
+            docConsole.setSaved(false);    
+        }
+    }
 }

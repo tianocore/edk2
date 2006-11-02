@@ -389,9 +389,9 @@ public class FpdFileContents {
         int pcdCount = getPcdDataCount(seqModuleSa);
         String[][] saaModuleSaPcd = new String[pcdCount][7];
         getPcdData(seqModuleSa, saaModuleSaPcd);
-        String mg = moduleSa.getModuleGuid();
+        String mg = moduleSa.getModuleGuid().toLowerCase();
         String mv = moduleSa.getModuleVersion();
-        String pg = moduleSa.getPackageGuid();
+        String pg = moduleSa.getPackageGuid().toLowerCase();
         String pv = moduleSa.getPackageVersion();
         String arch = listToString(moduleSa.getSupArchList());
         //
@@ -440,7 +440,7 @@ public class FpdFileContents {
                     ArrayList<String> al = getDynPcdMapValue(msaPcd.getCName() + " " + msaPcd.getTokenSpaceGuidCName());
                     if (al != null) {
                         for (int j = 0; j < al.size(); ++j) {
-                            if (al.get(j).contains(moduleKey)) {
+                            if (al.get(j).startsWith(moduleKey)) {
                                 continue msaPcdIter;
                             }
                         }
@@ -462,7 +462,7 @@ public class FpdFileContents {
                                                                         : msaPcd.getDefaultValue();
 
                     genPcdData(msaPcd.getCName(), spdPcd.getToken(), msaPcd.getTokenSpaceGuidCName(),
-                               msaPcd.getPcdItemType().toString(), spdPcd.getDatumType() + "", defaultVal, moduleSa);
+                               msaPcd.getPcdItemType().toString(), spdPcd.getDatumType() + "", defaultVal, moduleSa, spdPcd);
                     dataModified = true;
                  }
 
@@ -607,54 +607,49 @@ public class FpdFileContents {
      * @param sa Results: HelpText, Original item type.
      * @return
      */
-    public boolean getPcdBuildDataInfo(ModuleIdentification mi, String cName, String tsGuid, String[] sa) throws Exception{
-        try {
-           
-            ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)WorkspaceProfile.getModuleXmlObject(mi);
-            if (msa.getPcdCoded() == null) {
-                return false;
-            }
-            
-            Map<String, XmlObject> m = new HashMap<String, XmlObject>();
-            m.put("ModuleSurfaceArea", msa);
-            SurfaceAreaQuery.setDoc(m);
-            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
-            //
-            // First look through MSA pcd entries.
-            //
-            List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
-            ListIterator li = l.listIterator();
-            while(li.hasNext()) {
-                PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
-                if (!msaPcd.getCName().equals(cName)) {
-                    continue;
-                }
-                if (!msaPcd.getTokenSpaceGuidCName().equals(tsGuid)) {
-                    continue;
-                }
-                PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
-                if (spdPcd == null) {
-                    //
-                    // ToDo Error 
-                    //
-                    throw new PcdDeclNotFound(mi.getName() + " " + msaPcd.getCName());
-                }
-                //
-                // Get Pcd help text and original item type.
-                //
-                sa[0] = spdPcd.getHelpText() + msaPcd.getHelpText();
-                sa[1] = msaPcd.getPcdItemType()+"";
-                sa[2] = msa.getModuleDefinitions().getBinaryModule()+"";
-                return true;
-            }
-            
-            
+    public boolean getPcdBuildDataInfo(ModuleIdentification mi, String cName, String tsGuid, String[] sa, Vector<String> validPcdTypes) throws Exception{
+       
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) WorkspaceProfile
+                                                                                                                        .getModuleXmlObject(mi);
+        if (msa.getPcdCoded() == null) {
+            return false;
         }
-        catch (Exception e){
-            e.printStackTrace();
-            throw e;
+
+        PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
+        //
+        // First look through MSA pcd entries.
+        //
+        List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
+        ListIterator li = l.listIterator();
+        while (li.hasNext()) {
+            PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry) li.next();
+            if (!msaPcd.getCName().equals(cName)) {
+                continue;
+            }
+            if (!msaPcd.getTokenSpaceGuidCName().equals(tsGuid)) {
+                continue;
+            }
+            PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
+            if (spdPcd == null || spdPcd.getValidUsage() == null) {
+                //
+                // ToDo Error 
+                //
+                throw new PcdDeclNotFound(mi.getName() + " " + msaPcd.getCName());
+            }
+            //
+            // Get Pcd help text and original item type.
+            //
+            sa[0] = spdPcd.getHelpText() + msaPcd.getHelpText();
+            sa[1] = msaPcd.getPcdItemType() + "";
+            sa[2] = msa.getModuleDefinitions().getBinaryModule() + "";
+            ListIterator iter = spdPcd.getValidUsage().listIterator();
+            while (iter.hasNext()) {
+                String usage = iter.next().toString();
+                validPcdTypes.add(usage);
+            }
+            return true;
         }
-        
+
         return false;
     }
     
@@ -1151,46 +1146,40 @@ public class FpdFileContents {
     public void addFrameworkModulesPcdBuildDefs(ModuleIdentification mi, String arch, ModuleSADocument.ModuleSA moduleSa) throws Exception {
         //ToDo add Arch filter
         
-        try {
-            if (moduleSa == null) {
-                moduleSa = genModuleSA(mi, arch);
-            }
-            
-            ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)WorkspaceProfile.getModuleXmlObject(mi);
-            if (msa.getPcdCoded() == null) {
-                return;
-            }
-            
-            Map<String, XmlObject> m = new HashMap<String, XmlObject>();
-            m.put("ModuleSurfaceArea", msa);
-            SurfaceAreaQuery.setDoc(m);
-            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
-            //
-            // Implementing InitializePlatformPcdBuildDefinitions
-            //
-            List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
-            ListIterator li = l.listIterator();
-            while(li.hasNext()) {
-                PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
-                PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
-                if (spdPcd == null) {
-                    //
-                    // ToDo Error 
-                    //
-                    throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module " + mi.getName());
-                }
-                //
-                // AddItem to ModuleSA PcdBuildDefinitions
-                //
-                String defaultVal = msaPcd.getDefaultValue() == null ? spdPcd.getDefaultValue() : msaPcd.getDefaultValue();
-                
-                genPcdData(msaPcd.getCName(), spdPcd.getToken(), msaPcd.getTokenSpaceGuidCName(), msaPcd.getPcdItemType().toString(), spdPcd.getDatumType()+"", defaultVal, moduleSa);
-            }
-            
+        if (moduleSa == null) {
+            moduleSa = genModuleSA(mi, arch);
         }
-        catch (Exception e){
-            
-            throw e; 
+
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) WorkspaceProfile
+                                                                                                                        .getModuleXmlObject(mi);
+        if (msa.getPcdCoded() == null) {
+            return;
+        }
+
+        PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
+        //
+        // Implementing InitializePlatformPcdBuildDefinitions
+        //
+        List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
+        ListIterator li = l.listIterator();
+        while (li.hasNext()) {
+            PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry) li.next();
+            PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
+            if (spdPcd == null) {
+                //
+                // ToDo Error 
+                //
+                throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module "
+                                          + mi.getName());
+            }
+            //
+            // AddItem to ModuleSA PcdBuildDefinitions
+            //
+            String defaultVal = msaPcd.getDefaultValue() == null ? spdPcd.getDefaultValue() : msaPcd.getDefaultValue();
+
+            genPcdData(msaPcd.getCName(), spdPcd.getToken(), msaPcd.getTokenSpaceGuidCName(), msaPcd.getPcdItemType()
+                                                                                                    .toString(),
+                       spdPcd.getDatumType() + "", defaultVal, moduleSa, spdPcd);
         }
         
     }
@@ -1251,7 +1240,25 @@ public class FpdFileContents {
         return msa;
     }
     
-    private void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, ModuleSADocument.ModuleSA moduleSa) 
+    private String chooseDefaultPcdType (List validPcdTypes) {
+        String choosedType = "";
+        if (validPcdTypes.contains("FIXED_AT_BUILD")) {
+            choosedType = "FIXED_AT_BUILD";
+        }
+        else if (validPcdTypes.contains("DYNAMIC")) {
+            choosedType = "DYNAMIC";
+        }
+        else if (validPcdTypes.contains("PATCHABLE_IN_MODULE")) {
+            choosedType = "PATCHABLE_IN_MODULE";
+        }
+        else if (validPcdTypes.contains("DYNAMIC_EX")) {
+            choosedType = "DYNAMIC_EX";
+        }
+        return choosedType;
+    }
+    
+    private void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, 
+                             ModuleSADocument.ModuleSA moduleSa, PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd) 
     throws PcdItemTypeConflictException, PcdValueMalFormed{
         if (moduleSa.getPcdBuildDefinition() == null){
             moduleSa.addNewPcdBuildDefinition();
@@ -1275,12 +1282,43 @@ public class FpdFileContents {
                 return;
             }
         }
+        // if pcd type from MSA file is Dynamic
+        // we must choose one default type from SPD file for it.
+        //
+        List validPcdTypes = spdPcd.getValidUsage();
         //
         // Using existing Pcd type, if this pcd already exists in other ModuleSA
         //
         if (pcdConsumer.size() > 0) {
+            //
+            // platform should only contain one type for each pcd.
+            //
+            String existingItemType = itemType (pcdConsumer.get(0));
+            for (int i = 1; i < pcdConsumer.size(); ++i) {
+                if (!existingItemType.equals(itemType(pcdConsumer.get(i)))) {
+                    throw new PcdItemTypeConflictException (cName, pcdConsumer.get(0), pcdConsumer.get(i));
+                }
+            }
             
-            itemType = itemType (pcdConsumer.get(0));
+            if (itemType.equals("DYNAMIC")) {
+                if (!validPcdTypes.contains(existingItemType)) {
+                    throw new PcdItemTypeConflictException(cName, pcdConsumer.get(0));
+                }
+                itemType = existingItemType;
+            }
+            else {
+                if (!itemType.equals(existingItemType)) {
+                    throw new PcdItemTypeConflictException(cName, pcdConsumer.get(0));
+                }
+            }
+        }
+        //
+        // if this is the first occurence of this pcd. 
+        //
+        else {
+            if (itemType.equals("DYNAMIC")) {
+                itemType = chooseDefaultPcdType (validPcdTypes);
+            }
         }
         String listValue = moduleInfo + " " + itemType;
         pcdConsumer.add(listValue);
@@ -3636,9 +3674,36 @@ class PcdItemTypeConflictException extends Exception {
     private static final long serialVersionUID = 1L;
     private String details = null;
     
-    PcdItemTypeConflictException(String pcdName, String info){
+    PcdItemTypeConflictException (String pcdName, String info) {
         ModuleIdentification mi = WorkspaceProfile.getModuleId(info);
-        details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackageId().getName();
+        if (mi != null) {
+            details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackageId().getName();    
+        }
+        else {
+            details = pcdName + " ItemType Conflicts with " + info;
+        }
+    }
+    
+    PcdItemTypeConflictException (String pcdName, String info1, String info2) {
+        ModuleIdentification mi1 = WorkspaceProfile.getModuleId(info1);
+        ModuleIdentification mi2 = WorkspaceProfile.getModuleId(info2);
+        String moduleInfo1 = "";
+        String moduleInfo2 = "";
+        if (mi1 != null) {
+            moduleInfo1 = mi1.getName() + " in Pkg " + mi1.getPackageId().getName();
+        }
+        else {
+            moduleInfo1 = info1;
+        }
+        
+        if (mi2 != null) {
+            moduleInfo2 = mi2.getName() + " in Pkg " + mi2.getPackageId().getName();
+        }
+        else {
+            moduleInfo2 = info2;
+        }
+        
+        details = pcdName + " ItemType Conflicts in " + moduleInfo1 + " and " + moduleInfo2;
     }
     
     public String getMessage() {

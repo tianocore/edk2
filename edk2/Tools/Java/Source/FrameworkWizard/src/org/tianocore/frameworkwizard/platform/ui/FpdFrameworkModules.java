@@ -665,6 +665,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private void showSettingsDlg (int row) {
         try {
             if (ffc.adjustPcd(row)) {
+                JOptionPane.showMessageDialog(frame, "Pcd entries sync. with those in MSA files.");
                 docConsole.setSaved(false);
             }
         }
