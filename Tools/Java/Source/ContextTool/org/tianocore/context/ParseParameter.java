@@ -29,8 +29,7 @@ public class ParseParameter {
             return false;
         } else {
             if( (args[0].compareToIgnoreCase("-h") == 0) || (args[0].compareToIgnoreCase("/h") == 0) || 
-                (args[0].compareToIgnoreCase("-?") == 0) || (args[0].compareToIgnoreCase("/?") == 0) || 
-                (args[0].compareToIgnoreCase("-help") == 0) || (args[0].compareToIgnoreCase("/help") == 0) ){
+                (args[0].compareToIgnoreCase("--help") == 0) || (args[0].compareToIgnoreCase("/help") == 0) ){
                 HelpInfo.outputUsageInfo();
                 return false;
             }
@@ -209,58 +208,22 @@ public class ParseParameter {
     public static boolean outputCurSetting(){
         
         System.out.printf( "%s\n", "The current setting is:" );
+        String[] A = { pstr, tstr, astr, cstr, nstr, mstr, mestr };
+        String[] B = { curpstr, curtstr, curastr, curcstr, curnstr, curmstr, curmestr };
         
-        if(curpstr != null){
-            System.out.printf( "%s\n", curpstr );
-        }
-        else{
-            System.out.printf( "%s\n", pstr );
-        }
-        
-        if(curtstr != null){
-            System.out.printf( "%s\n", curtstr );
-        }
-        else{
-            System.out.printf( "%s\n", tstr );
-        }
-        
-        if(curastr != null){
-            System.out.printf( "%s\n", curastr );
-        }
-        else{
-            System.out.printf( "%s\n", astr );
-        }
-        
-        if(curcstr != null){
-            System.out.printf( "%s\n", curcstr );
-        }
-        else{
-            System.out.printf( "%s\n", cstr );
-        }
-        
-        if(curnstr != null){
-            System.out.printf( "%s\n", curnstr );
-        }
-        else{
-            System.out.printf( "%s\n", nstr );
-        }
-        
-        if(curmstr != null){
-            System.out.printf( "%s\n", curmstr );
-        }
-        else{
-            System.out.printf( "%s\n", mstr );
-        }
-        
-        if(curmstr != null){
-            System.out.printf( "%s\n", curmestr );
-        }
-        else{
-            System.out.printf( "%s\n", mestr );
+        for(int i=0; i<A.length; i++){
+            if(B[i] != null){
+                System.out.printf( "%s\n", B[i] );
+            }
+            else{
+                System.out.printf( "%s\n", A[i] );
+            }
+            
         }
         
         return true;
     }
+
     
     public static String pstr = new String("ACTIVE_PLATFORM                     = ");
     public static String tstr = new String("TARGET                              = ");

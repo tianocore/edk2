@@ -43,6 +43,6 @@ public class ContextMain {
         }
         
         String workspacePath = System.getenv("WORKSPACE");
-        System.out.printf("%n%s%n", workspacePath + "\\Tool\\Conf\\target.txt is generated successfully!");
+        System.out.printf("%n%s%n", workspacePath + "\\Tool\\Conf\\target.txt is updated successfully!");
     }
 }
