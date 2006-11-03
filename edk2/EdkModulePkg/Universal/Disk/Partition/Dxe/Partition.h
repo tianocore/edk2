@@ -27,7 +27,9 @@ Revision History
 #ifndef __PARTITION_H__
 #define __PARTITION_H__
 
-
+#include <IndustryStandard/Mbr.h>
+#include <IndustryStandard/ElTorito.h>
+#include <IndustryStandard/EfiGpt.h>
 
 //
 // Partition private data

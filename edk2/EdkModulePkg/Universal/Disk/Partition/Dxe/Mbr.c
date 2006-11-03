@@ -30,7 +30,6 @@ Abstract:
 --*/
 
 #include "Partition.h"
-#include "Mbr.h"
 
 BOOLEAN
 PartitionValidMbr (
