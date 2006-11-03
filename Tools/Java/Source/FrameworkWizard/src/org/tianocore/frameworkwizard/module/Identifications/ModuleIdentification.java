@@ -15,7 +15,6 @@
 
 package org.tianocore.frameworkwizard.module.Identifications;
 
-
 import java.io.IOException;
 
 import org.apache.xmlbeans.XmlException;
@@ -29,63 +28,64 @@ import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 public class ModuleIdentification extends Identification {
-    
+
     private PackageIdentification packageId;
-    
+
     private String moduleType;
-    
+
     private boolean isLibrary;
-    
+
     public ModuleIdentification(String name, String guid, String version, String path) {
-    	super(name, guid, version, path);
+        super(name, guid, version, path);
         setModuleType();
     }
-    
+
     public ModuleIdentification(String name, String guid, String version, String path, boolean library) {
         super(name, guid, version, path);
         this.isLibrary = library;
     }
-    
+
     public ModuleIdentification(Identification id) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
     }
-    
+
     public ModuleIdentification(Identification id, boolean library) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
         this.isLibrary = library;
     }
-    
-    public ModuleIdentification(String name, String guid, String version, String path, PackageIdentification packageId){
+
+    public ModuleIdentification(String name, String guid, String version, String path, PackageIdentification packageId) {
         super(name, guid, version, path);
         this.packageId = packageId;
         setModuleType();
     }
-    
-    public ModuleIdentification(String name, String guid, String version, String path, PackageIdentification packageId, String type){
+
+    public ModuleIdentification(String name, String guid, String version, String path, PackageIdentification packageId,
+                                String type) {
         super(name, guid, version, path);
         this.packageId = packageId;
         this.moduleType = type;
     }
-    
+
     public ModuleIdentification(Identification id, PackageIdentification packageId) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
         this.packageId = packageId;
         setModuleType();
     }
-    
+
     public ModuleIdentification(Identification id, PackageIdentification packageId, boolean library) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
         this.packageId = packageId;
         this.isLibrary = library;
     }
-    
+
     public ModuleIdentification(Identification id, PackageIdentification packageId, String type) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
         this.packageId = packageId;
         this.moduleType = type;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return "Module " + this.getName() + "[" + this.getGuid() + "] in package " + packageId;
     }
 
@@ -104,20 +104,20 @@ public class ModuleIdentification extends Identification {
     public void setModuleType(String moduleType) {
         this.moduleType = moduleType;
     }
-    
+
     private void setModuleType() {
         ModuleSurfaceArea msa = null;
         try {
             msa = OpenFile.openMsaFile(this.getPath());
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            
+
         } catch (XmlException e) {
             // TODO Auto-generated catch block
-            
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            
+
         }
         setModuleType(DataType.MODULE_TYPE_MODULE);
         setLibrary(false);
@@ -134,7 +134,7 @@ public class ModuleIdentification extends Identification {
             }
         }
     }
-    
+
     public boolean equals(String moduleGuid, String moduleVersion, String packageGuid, String packageVersion) {
         boolean b = false;
         if (this.getGuid().equals(moduleGuid) && this.getPackageId().getGuid().equals(packageGuid)) {

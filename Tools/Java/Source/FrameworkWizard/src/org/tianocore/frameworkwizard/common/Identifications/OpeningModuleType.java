@@ -15,7 +15,12 @@
 
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.io.IOException;
+
+import org.apache.xmlbeans.XmlException;
 import org.tianocore.ModuleSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Log;
+import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 public class OpeningModuleType extends OpeningFileType{
@@ -49,5 +54,22 @@ public class OpeningModuleType extends OpeningFileType{
 
     public void setId(ModuleIdentification id) {
         this.id = id;
+    }
+    
+    public void reload() {
+        if (this.id != null) {
+            String path = id.getPath();
+            if (path.length() > 0) {
+                try {
+                    this.xmlMsa = OpenFile.openMsaFile(id.getPath());
+                } catch (IOException e) {
+                    Log.err("Open Module Surface Area " + path, e.getMessage());
+                } catch (XmlException e) {
+                    Log.err("Open Module Surface Area " + path, e.getMessage());
+                } catch (Exception e) {
+                    Log.err("Open Module Surface Area " + path, "Invalid file type");
+                }
+            }
+        }
     }
 }

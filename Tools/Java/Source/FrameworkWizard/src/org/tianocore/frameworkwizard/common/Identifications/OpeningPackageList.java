@@ -222,4 +222,10 @@ public class OpeningPackageList {
         }
         return false;
     }
+    
+    public void reload(int index) {
+        if (index > -1) {
+            vOpeningPackageList.elementAt(index).reload();
+        }
+    }
 }

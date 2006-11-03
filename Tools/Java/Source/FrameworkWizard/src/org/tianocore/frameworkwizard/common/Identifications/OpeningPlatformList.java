@@ -208,4 +208,10 @@ public class OpeningPlatformList {
         }
         return false;
     }
+    
+    public void reload(int index) {
+        if (index > -1) {
+            vOpeningPlatformList.elementAt(index).reload();
+        }
+    }
 }

@@ -621,21 +621,21 @@ public class Clone extends IDialog {
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             String packageGuid = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getGuid();
             String packageVersion = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getVersion();
-            if (GlobalData.findModuleIdByGuidVersion(guid, version, packageGuid, packageVersion) != null) {
+            if (GlobalData.findModuleId(guid, version, packageGuid, packageVersion) != null) {
                 Log.wrn("Clone", "A module with same Guid and same Version already exists, please selece a new Guid or Version!");
                 return false;
             }
         }
 
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
-            if (GlobalData.findPackageIdByGuidVersion(guid, version) != null) {
+            if (GlobalData.findPackageId(guid, version) != null) {
                 Log.wrn("Clone", "A package with same Guid and same Version already exists, please selece a new Guid or Version!");
                 return false;
             }
         }
 
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
-            if (GlobalData.findPlatformIdByGuidVersion(guid, version) != null) {
+            if (GlobalData.findPlatformId(guid, version) != null) {
                 Log.wrn("Clone", "A platform with same Guid and same Version already exists, please selece a new Guid or Version!");
                 return false;
             }
@@ -709,6 +709,11 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target module already exists!");
                 return false;
             }
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(trg), mode)) {
+                Log.wrn("Clone", "There already exists a same directory with a module");
+                return false;
+            }
+            
             return checkId(mode);
         }
 
@@ -730,6 +735,11 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target package already exists!");
                 return false;
             }
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(trg), mode)) {
+                Log.wrn("Clone", "There already exists a same directory with a package");
+                return false;
+            }
+            
             return checkId(mode);
         }
 
@@ -750,6 +760,11 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target platform already exists.");
                 return false;
             }
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(trg), mode)) {
+                Log.wrn("Clone", "There already exists a same directory with a platform");
+                return false;
+            }
+            
             return checkId(mode);
         }
 
