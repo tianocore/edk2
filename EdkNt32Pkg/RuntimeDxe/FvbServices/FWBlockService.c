@@ -1196,8 +1196,9 @@ Returns:
   Ptr           = (UINT16 *) FwVolHeader;
   Checksum      = 0;
   while (HeaderLength > 0) {
-    Checksum = *Ptr++;
+    Checksum = Checksum + (*Ptr);
     HeaderLength--;
+    Ptr++;
   }
 
   if (Checksum != 0) {

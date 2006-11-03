@@ -685,6 +685,7 @@ Returns:
   EFI_STATUS                        Status;
   EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL  *EbcSimpleDebugger;
 
+  mVmPtr            = VmPtr;
   EbcSimpleDebugger = NULL;
   Status            = EFI_SUCCESS;
   StackCorrupted    = 0;
@@ -779,6 +780,7 @@ Returns:
   }
 
 Done:
+  mVmPtr          = NULL;
   return Status;
 }
 

@@ -51,6 +51,8 @@ typedef struct {
   UINTN             ImageBase;
 } VM_CONTEXT;
 
+extern VM_CONTEXT                    *mVmPtr;
+
 //
 // Bits of exception flags field of VM context
 //
