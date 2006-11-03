@@ -18,7 +18,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>BaseIoLibIntrinsic</OutputFileBasename>
   </ModuleDefinitions>
