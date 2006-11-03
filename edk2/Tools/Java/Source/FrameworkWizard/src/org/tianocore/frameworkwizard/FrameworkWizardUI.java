@@ -1887,6 +1887,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
         if (arg0.getSource() == this.jMenuItemFileCloseAll) {
             this.closeAll();
+            this.refresh();
             this.makeEmptyTree();
         }
 
@@ -3108,8 +3109,10 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                     iTree.removeNodeChildrenByPath(item);
                 }
 
+                GlobalData.openingModuleList.reload(this.currentOpeningModuleIndex);
                 GlobalData.openingModuleList.setModuleOpen(this.currentOpeningModuleIndex, false);
                 GlobalData.openingModuleList.setModuleSaved(this.currentOpeningModuleIndex, true);
+                
                 this.cleanDesktopPaneModule();
                 this.currentOpeningModuleIndex = -1;
             }
@@ -3144,6 +3147,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                     iTree.removeNodeChildrenByPath(item);
                 }
 
+                GlobalData.openingPackageList.reload(this.currentOpeningPackageIndex);
                 GlobalData.openingPackageList.setPackageOpen(this.currentOpeningPackageIndex, false);
                 GlobalData.openingPackageList.setPackageSaved(this.currentOpeningPackageIndex, true);
                 this.cleanDesktopPanePackage();
@@ -3180,6 +3184,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                     iTree.removeNodeChildrenByPath(item);
                 }
 
+                GlobalData.openingPlatformList.reload(this.currentOpeningPlatformIndex);
                 GlobalData.openingPlatformList.setPlatformOpen(this.currentOpeningPlatformIndex, false);
                 GlobalData.openingPlatformList.setPlatformSaved(this.currentOpeningPlatformIndex, true);
                 this.cleanDesktopPanePlatform();

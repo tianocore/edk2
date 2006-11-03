@@ -222,4 +222,10 @@ public class OpeningModuleList {
         }
         return false;
     }
+    
+    public void reload(int index) {
+        if (index > -1) {
+            vOpeningModuleList.elementAt(index).reload();
+        }
+    }
 }

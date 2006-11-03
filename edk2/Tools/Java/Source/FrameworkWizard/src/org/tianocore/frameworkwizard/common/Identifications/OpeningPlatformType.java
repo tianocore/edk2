@@ -14,7 +14,12 @@
  **/
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.io.IOException;
+
+import org.apache.xmlbeans.XmlException;
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Log;
+import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
 public class OpeningPlatformType extends OpeningFileType {
@@ -48,5 +53,22 @@ public class OpeningPlatformType extends OpeningFileType {
 
     public void setId(PlatformIdentification id) {
         this.id = id;
+    }
+    
+    public void reload() {
+        if (this.id != null) {
+            String path = id.getPath();
+            if (path.length() > 0) {
+                try {
+                    this.xmlFpd = OpenFile.openFpdFile(id.getPath());
+                } catch (IOException e) {
+                    Log.err("Open Platform Surface Area " + path, e.getMessage());
+                } catch (XmlException e) {
+                    Log.err("Open Platform Surface Area " + path, e.getMessage());
+                } catch (Exception e) {
+                    Log.err("Open Platform Surface Area " + path, "Invalid file type");
+                }
+            }
+        }
     }
 }

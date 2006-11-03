@@ -14,7 +14,12 @@
  **/
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.io.IOException;
+
+import org.apache.xmlbeans.XmlException;
 import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Log;
+import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 public class OpeningPackageType extends OpeningFileType {
@@ -48,5 +53,22 @@ public class OpeningPackageType extends OpeningFileType {
 
     public void setId(PackageIdentification id) {
         this.id = id;
+    }
+    
+    public void reload() {
+        if (this.id != null) {
+            String path = id.getPath();
+            if (path.length() > 0) {
+                try {
+                    this.xmlSpd = OpenFile.openSpdFile(id.getPath());
+                } catch (IOException e) {
+                    Log.err("Open Package Surface Area " + path, e.getMessage());
+                } catch (XmlException e) {
+                    Log.err("Open Package Surface Area " + path, e.getMessage());
+                } catch (Exception e) {
+                    Log.err("Open Package Surface Area " + path, "Invalid file type");
+                }
+            }
+        }
     }
 }

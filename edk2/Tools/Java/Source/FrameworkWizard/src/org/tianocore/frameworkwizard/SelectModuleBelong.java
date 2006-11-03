@@ -37,6 +37,7 @@ import org.tianocore.PlatformHeaderDocument.PlatformHeader;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.IFileFilter;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.SaveFile;
@@ -475,10 +476,14 @@ public class SelectModuleBelong extends IDialog {
      
      **/
     public boolean check() {
+        String path = this.jTextFieldFilePath.getText();
+        String guid = this.jTextFieldGuid.getText();
+        String version = this.jTextFieldVersion.getText();
+        
         //
         // Check if all required fields are not empty
         //
-        if (isEmpty(this.jTextFieldFilePath.getText())) {
+        if (isEmpty(path)) {
             Log.wrn("New File", "A File Path must be entered!");
             return false;
         }
@@ -486,11 +491,11 @@ public class SelectModuleBelong extends IDialog {
             Log.wrn("New File", "A Name must be entered");
             return false;
         }
-        if (isEmpty(this.jTextFieldGuid.getText())) {
+        if (isEmpty(guid)) {
             Log.wrn("New File", "The Guid must be entered!");
             return false;
         }
-        if (isEmpty(this.jTextFieldVersion.getText())) {
+        if (isEmpty(version)) {
             Log.wrn("New File", "A Version number must be entered!");
             return false;
         }
@@ -502,17 +507,19 @@ public class SelectModuleBelong extends IDialog {
             Log.wrn("New File", "Incorrect data type for the Name!");
             return false;
         }
-        if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
+        if (!DataValidation.isGuid((guid))) {
             Log.wrn("New File", "Incorrect data type for Guid, which must be in registry format! (8-4-4-4-12)");
             return false;
         }
+        
+
 
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             //
             // Check if the module is already existed in current package
             //
             String packagePath = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getPath();
-            String modulePath = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
+            String modulePath = Tools.convertPathToCurrentOsType(path);
             Vector<String> msaFile = wt.getAllModulesOfPackage(packagePath);
 
             for (int index = 0; index < msaFile.size(); index++) {
@@ -521,13 +528,31 @@ public class SelectModuleBelong extends IDialog {
                     return false;
                 }
             }
+            
+            //
+            // Check if path already exists
+            //
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(modulePath), mode)) {
+                Log.wrn("New File", "There already exists a same directory with a module");
+                return false;
+            }
+            
+            //
+            // Check if Guid+Version is unique
+            //
+            String packageGuid = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getGuid();
+            String packageVersion = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getVersion();
+            if (GlobalData.findModuleId(guid, version, packageGuid, packageVersion) != null) {
+                Log.wrn("New File", "A module with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
+            }
         }
 
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             //
             // Check if the package is already existed in database
             //
-            String path = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
+            path = Tools.convertPathToCurrentOsType(path);
             Vector<PackageIdentification> vPackageList = wt.getAllPackages();
             if (vPackageList != null && vPackageList.size() > 0) {
                 for (int index = 0; index < vPackageList.size(); index++) {
@@ -537,13 +562,29 @@ public class SelectModuleBelong extends IDialog {
                     }
                 }
             }
+            
+            //
+            // Check if path already exists
+            //
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(path), mode)) {
+                Log.wrn("New File", "There already exists a same directory with a package");
+                return false;
+            }
+            
+            //
+            // Check if Guid+Version is unique
+            //
+            if (GlobalData.findPackageId(guid, version) != null) {
+                Log.wrn("New File", "A package with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
+            }
         }
 
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
             //
             // Check if the platform is already existed in database
             //
-            String path = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
+            path = Tools.convertPathToCurrentOsType(path);
             Vector<PlatformIdentification> vPlatfromList = wt.getAllPlatforms();
             if (vPlatfromList != null && vPlatfromList.size() > 0) {
                 for (int index = 0; index < vPlatfromList.size(); index++) {
@@ -552,6 +593,22 @@ public class SelectModuleBelong extends IDialog {
                         return false;
                     }
                 }
+            }
+            
+            //
+            // Check if path already exists
+            //
+            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(path), mode)) {
+                Log.wrn("New File", "There already exists a same directory with a platform");
+                return false;
+            }
+            
+            //
+            // Check if Guid+Version is unique
+            //
+            if (GlobalData.findPlatformId(guid, version) != null) {
+                Log.wrn("New File", "A platform with same Guid and same Version already exists, please selece a new Guid or Version!");
+                return false;
             }
         }
 

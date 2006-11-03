@@ -210,8 +210,8 @@ public class GlobalData {
      @return
      
      **/
-    public static ModuleIdentification findModuleIdByGuidVersion(String moduleGuid, String moduleVersion,
-                                                                 String packageGuid, String packageVersion) {
+    public static ModuleIdentification findModuleId(String moduleGuid, String moduleVersion, String packageGuid,
+                                                    String packageVersion) {
         ModuleIdentification mid = null;
         for (int index = 0; index < vModuleList.size(); index++) {
             if (vModuleList.elementAt(index).equals(moduleGuid, moduleVersion, packageGuid, packageVersion)) {
@@ -230,7 +230,7 @@ public class GlobalData {
      @return
      
      **/
-    public static PackageIdentification findPackageIdByGuidVersion(String packageGuid, String packageVersion) {
+    public static PackageIdentification findPackageId(String packageGuid, String packageVersion) {
         PackageIdentification pid = null;
         for (int index = 0; index < vPackageList.size(); index++) {
             if (vPackageList.elementAt(index).equals(packageGuid, packageVersion)) {
@@ -249,7 +249,7 @@ public class GlobalData {
      @return
      
      **/
-    public static PlatformIdentification findPlatformIdByGuidVersion(String platformGuid, String platformVersion) {
+    public static PlatformIdentification findPlatformId(String platformGuid, String platformVersion) {
         PlatformIdentification pid = null;
         for (int index = 0; index < vPlatformList.size(); index++) {
             if (vPlatformList.elementAt(index).equals(platformGuid, platformVersion)) {
@@ -258,5 +258,43 @@ public class GlobalData {
             }
         }
         return pid;
+    }
+
+    /**
+    
+     @param relativePath
+     @param mode
+     @return
+    
+    **/
+    public static boolean isDuplicateRelativePath(String relativePath, int mode) {
+        if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
+            for (int index = 0; index < vModuleList.size(); index++) {
+                String path = vModuleList.elementAt(index).getPath();
+                if (Tools.getFilePathOnly(path).equals(relativePath)) {
+                    return true;
+                }
+            }
+        }
+
+        if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
+            for (int index = 0; index < vPackageList.size(); index++) {
+                String path = vPackageList.elementAt(index).getPath();
+                if (Tools.getFilePathOnly(path).equals(relativePath)) {
+                    return true;
+                }
+            }
+        }
+
+        if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
+            for (int index = 0; index < vPlatformList.size(); index++) {
+                String path = vPlatformList.elementAt(index).getPath();
+                if (Tools.getFilePathOnly(path).equals(relativePath)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
