@@ -22,7 +22,6 @@ Revision History
 --*/
 
 #include "Partition.h"
-#include "ElTorito.h"
 
 BOOLEAN
 PartitionInstallElToritoChildHandles (

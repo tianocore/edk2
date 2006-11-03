@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Partition</ModuleName>
@@ -52,9 +52,6 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Partition.h</Filename>
-    <Filename>ElTorito.h</Filename>
-    <Filename>Gpt.h</Filename>
-    <Filename>Mbr.h</Filename>
     <Filename>Partition.c</Filename>
     <Filename>ElTorito.c</Filename>
     <Filename>Gpt.c</Filename>

@@ -21,8 +21,6 @@ Abstract:
 --*/
 
 #include "Partition.h"
-#include "Gpt.h"
-#include "Mbr.h"
 
 BOOLEAN
 PartitionValidGptTable (
