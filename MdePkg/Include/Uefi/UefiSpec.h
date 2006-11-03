@@ -381,7 +381,7 @@ EFI_STATUS
   Invoke a notification event
                                                                                                       
   @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function¡¯s context, 
+  @param  Context               Pointer to the notification function's context, 
                                 which is implementation-dependent.                                                  
                                                                                                       
 **/                                                                                                   
@@ -396,9 +396,9 @@ VOID
   Creates an event.
                                                                                                       
   @param  Type                  The type of event to create and its mode and attributes.
-  @param  NotifyTpl             Pointer to the notification function¡¯s context.
-  @param  NotifyFunction        Pointer to the event¡¯s notification function, if any.  
-  @param  NotifyContext         Pointer to the notification function¡¯s context; corresponds to parameter
+  @param  NotifyTpl             Pointer to the notification function's context.
+  @param  NotifyFunction        Pointer to the event's notification function, if any.  
+  @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.                                                                                                          
   @param  Event                 Pointer to the newly created event if the call succeeds; undefined  
                                 otherwise.                                                          
@@ -422,9 +422,9 @@ EFI_STATUS
   Creates an event in a group.
                                                                                                       
   @param  Type                  The type of event to create and its mode and attributes.
-  @param  NotifyTpl             Pointer to the notification function¡¯s context.
-  @param  NotifyFunction        Pointer to the event¡¯s notification function, if any.  
-  @param  NotifyContext         Pointer to the notification function¡¯s context; corresponds to parameter
+  @param  NotifyTpl             Pointer to the notification function's context.
+  @param  NotifyFunction        Pointer to the event's notification function, if any.  
+  @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.          
   @param  EventGroup            Pointer to the unique identifier of the group to which this event belongs.                                                                                                                                
   @param  Event                 Pointer to the newly created event if the call succeeds; undefined  
@@ -554,7 +554,7 @@ EFI_STATUS
 #define EFI_TPL_HIGH_LEVEL    TPL_HIGH_LEVEL
 
 /**                                                 
-  Raises a task¡¯s priority level and returns its previous level.
+  Raises a task's priority level and returns its previous level.
                                                     
   @param  NewTpl                The new task priority level.
   
@@ -568,7 +568,7 @@ EFI_TPL
   );
 
 /**                                                 
-  Restores a task¡¯s priority level to its previous value.
+  Restores a task's priority level to its previous value.
                                                     
   @param  OldTpl                The previous task priority level to restore    
   
@@ -590,7 +590,7 @@ VOID
   Returns the value of a variable.
                                                     
   @param  VariableName          A Null-terminated Unicode string that is the name of the
-                                vendor¡¯s variable.                                     
+                                vendor's variable.                                     
   @param  VendorGuid            A unique identifier for the vendor.                    
   @param  Attributes            If not NULL, a pointer to the memory location to return the
                                 attributes bitmask for the variable.                       
@@ -645,7 +645,7 @@ EFI_STATUS
   Sets the value of a variable.
                                                                                                     
   @param  VariableName          A Null-terminated Unicode string that is the name of the
-                                vendor¡¯s variable.                                     
+                                vendor's variable.                                     
   @param  VendorGuid            A unique identifier for the vendor.                                
   @param  Attributes            Attributes bitmask to set for the variable.                                
   @param  DataSize              The size in bytes of the Data buffer.
@@ -684,7 +684,7 @@ typedef struct {
                                                                     
   @param  Time                  A pointer to storage to receive a snapshot of the current time.                                
   @param  Capabilities          An optional pointer to a buffer to receive the real time clock 
-                                device¡¯s capabilities.                                  
+                                device's capabilities.                                  
                                                                     
   @retval EFI_SUCCESS           The operation completed successfully.     
   @retval EFI_INVALID_PARAMETER Time is NULL.
@@ -778,7 +778,7 @@ EFI_STATUS
                                 manager, and that the boot manager is attempting to load    
                                 FilePath as a boot selection. Ignored if SourceBuffer is    
                                 not NULL.                                                   
-  @param  ParentImageHandle     The caller¡¯s image handle.
+  @param  ParentImageHandle     The caller's image handle.
   @param  FilePath              The DeviceHandle specific file path from which the image is
                                 loaded.                                                     
   @param  SourceBuffer          If not NULL, a pointer to the memory location containing a copy
@@ -809,7 +809,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Transfers control to a loaded image¡¯s entry point.
+  Transfers control to a loaded image's entry point.
   
   @param  ImageHandle           Handle of image to be started.  
   @param  ExitDataSize          Pointer to the size, in bytes, of ExitData.
@@ -833,7 +833,7 @@ EFI_STATUS
   Terminates a loaded EFI image and returns control to boot services.
   
   @param  ImageHandle           Handle that identifies the image.
-  @param  ExitStatus            The image¡¯s exit code.
+  @param  ExitStatus            The image's exit code.
   @param  ExitDataSize          The size, in bytes, of ExitData.
   @param  ExitData              Pointer to a data buffer that includes a Null-terminated Unicode string,                    
                                 optionally followed by additional binary data.                                                                            
@@ -903,7 +903,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Sets the system¡¯s watchdog timer.
+  Sets the system's watchdog timer.
   
   @param  Timeout               The number of seconds to set the watchdog timer to.
   @param  WatchdogCode          The numeric code to log on a watchdog timer timeout event.
@@ -976,7 +976,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Returns the next high 32 bits of the platform¡¯s monotonic counter.
+  Returns the next high 32 bits of the platform's monotonic counter.
   
   @param  HighCount             Pointer to returned value.
                                 

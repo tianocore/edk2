@@ -506,9 +506,9 @@ EFI_STATUS
   @param  NewSendGUID           If not NULL, a pointer to a value that specifies whether to replace the
                                 current value of SendGUID.                                             
   @param  NewTTL                If not NULL, a pointer to be used in place of the current value of TTL,
-                                the ¡°time to live¡± field of the IP header.                           
+                                the "time to live" field of the IP header.                           
   @param  NewToS                If not NULL, a pointer to be used in place of the current value of ToS,
-                                the ¡°type of service¡± field of the IP header.                        
+                                the "type of service" field of the IP header.                        
   @param  NewMakeCallback       If not NULL, a pointer to a value that specifies whether to replace the
                                 current value of the MakeCallback field of the Mode structure.                                                                
                                   

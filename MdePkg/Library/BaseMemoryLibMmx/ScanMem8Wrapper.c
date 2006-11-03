@@ -34,7 +34,7 @@
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.

@@ -191,7 +191,7 @@ EFI_STATUS
   Retrieves the platform policy regarding enumeration.
 
   @param GetPciRom
-  Gets the PCI device¡¯s option ROM from a platform-specific location.
+  Gets the PCI device's option ROM from a platform-specific location.
 
 **/
 struct _EFI_PCI_PLATFORM_PROTOCOL {

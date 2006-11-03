@@ -111,7 +111,7 @@ EFI_STATUS
 
 /**
   @par Protocol Description:
-  Abstracts the hardware control of the physical address region 0xC0000¨C0xFFFFF 
+  Abstracts the hardware control of the physical address region 0xC0000-C0xFFFFF 
   for the traditional BIOS.
 
   @param Decode

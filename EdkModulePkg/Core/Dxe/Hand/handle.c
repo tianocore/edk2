@@ -1325,7 +1325,7 @@ Arguments:
 
   UserHandle       -  The handle for the protocol interface that was previously opened
                       with OpenProtocol(), and is now being closed.
-  Protocol         -  The published unique identifier of the protocol. It is the caller¡¯s
+  Protocol         -  The published unique identifier of the protocol. It is the caller's
                       responsibility to pass in a valid GUID.
   AgentHandle      -  The handle of the agent that is closing the protocol interface.
   ControllerHandle -  If the agent that opened a protocol is a driver that follows the

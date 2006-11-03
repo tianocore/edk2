@@ -306,7 +306,7 @@ AllocateReservedZeroPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -329,7 +329,7 @@ AllocateCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -352,7 +352,7 @@ AllocateRuntimeCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.

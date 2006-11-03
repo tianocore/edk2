@@ -40,7 +40,7 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
   Get Variable value by Name and GUID pair
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  VariableName   A NULL-terminated Unicode string that is the name of the vendor¡¯s variable.
+  @param  VariableName   A NULL-terminated Unicode string that is the name of the vendor's variable.
   @param  VendorGuid     A unique identifier for the vendor.
   @param  Attributes     If not NULL, a pointer to the memory location to return
                          the attributes bitmask for the variable.

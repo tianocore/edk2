@@ -161,7 +161,7 @@ EFI_STATUS
 /**                                                                 
   Frees memory structures allocated and returned by other functions in the EFI_BIS protocol.  
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                         
   @param  ToFree                   An EFI_BIS_DATA* and associated memory block to be freed.
 
@@ -181,10 +181,10 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Shuts down an application¡¯s instance of the BIS service, invalidating the application handle. After
+  Shuts down an application's instance of the BIS service, invalidating the application handle. After
   this call, other BIS functions may no longer be invoked using the application handle value.         
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
 
   @retval EFI_SUCCESS              The function completed successfully.
@@ -204,7 +204,7 @@ EFI_STATUS
   Retrieves the certificate that has been configured as the identity of the organization designated as
   the source of authorization for signatures of boot objects.
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  Certificate              The function writes an allocated EFI_BIS_DATA* containing the Boot
                                    Object Authorization Certificate object.                            
@@ -229,7 +229,7 @@ EFI_STATUS
   Verifies the integrity and authorization of the indicated data object according to the
   indicated credentials.                                                                
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  Credentials              A Signed Manifest containing verification information for the indicated
                                    data object.                                                            
@@ -259,7 +259,7 @@ EFI_STATUS
 /**                                                                 
   Retrieves the current status of the Boot Authorization Check Flag.
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  CheckIsRequired          The function writes the value TRUE if a Boot Authorization Check is
                                    currently required on this platform, otherwise the function writes 
@@ -284,7 +284,7 @@ EFI_STATUS
   Retrieves a unique token value to be included in the request credential for the next update of any
   parameter in the Boot Object Authorization set                                                    
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  UpdateToken              The function writes an allocated EFI_BIS_DATA* containing the new
                                    unique update token value.                                                                          
@@ -308,7 +308,7 @@ EFI_STATUS
 /**                                                                 
   Updates one of the configurable parameters of the Boot Object Authorization set.
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  RequestCredential        This is a Signed Manifest with embedded attributes that carry the details
                                    of the requested update.                                                 
@@ -337,7 +337,7 @@ EFI_STATUS
   Verifies the integrity and authorization of the indicated data object according to the indicated
   credentials and authority certificate.                                                          
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  Credentials              A Signed Manifest containing verification information for the
                                    indicated data object.                                       
@@ -345,7 +345,7 @@ EFI_STATUS
   @param  SectionName              An ASCII (not Unicode) string giving the section name in the  
                                    manifest holding the verification information (in other words,
                                    hash value) that corresponds to DataObject.                             
-  @param  AuthorityCertificate     A digital certificate whose public key must match the signer¡¯s                              
+  @param  AuthorityCertificate     A digital certificate whose public key must match the signer's                              
                                    public key which is found in the credentials.                  
   @param  IsVerified               The function writes TRUE if the verification was successful.
                                    Otherwise, the function writes FALSE.                       
@@ -377,7 +377,7 @@ EFI_STATUS
   Retrieves a list of digital certificate identifier, digital signature algorithm, hash algorithm, and keylength
   combinations that the platform supports.                                                                      
       
-  @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
+  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  SignatureInfo            The function writes an allocated EFI_BIS_DATA* containing the array
                                    of EFI_BIS_SIGNATURE_INFO structures representing the supported    

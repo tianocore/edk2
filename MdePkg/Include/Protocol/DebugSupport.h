@@ -512,7 +512,7 @@ VOID
   );
 
 /**                                                                 
-  Registers and enables the on-target debug agent¡¯s periodic entry point.
+  Registers and enables the on-target debug agent's periodic entry point.
       
   @param  SystemContext         Exception content.
                                    
@@ -609,9 +609,9 @@ EFI_STATUS
   causes a fresh memory fetch to retrieve code to be executed.                                  
     
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
-  @param  ProcessorIndex        Specifies which processor¡¯s instruction cache is to be invalidated.
+  @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
   @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
-  @param  Length                Specifies the minimum number of bytes in the processor¡¯s instruction
+  @param  Length                Specifies the minimum number of bytes in the processor's instruction
                                 cache to invalidate.                                                 
                                 
   @retval EFI_SUCCESS           The function completed successfully.  

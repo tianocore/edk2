@@ -905,7 +905,7 @@ Arguments:
   ExitData        - Pointer to a pointer to a data buffer that includes a Null-terminated
                     Unicode string, optionally followed by additional binary data. The string
                     is a description that the caller may use to further indicate the reason for
-                    the image¡¯s exit.
+                    the image's exit.
 
 Returns:
 
@@ -1209,13 +1209,13 @@ Arguments:
 
   ImageHandle       - Handle that identifies the image. This parameter is passed to the image
                       on entry.
-  Status            - The image¡¯s exit code.
+  Status            - The image's exit code.
   ExitDataSize      - The size, in bytes, of ExitData. Ignored if ExitStatus is
                       EFI_SUCCESS.
   ExitData          - Pointer to a data buffer that includes a Null-terminated Unicode string,
                       optionally followed by additional binary data. The string is a
                       description that the caller may use to further indicate the reason for
-                      the image¡¯s exit.
+                      the image's exit.
 
 Returns:
 

@@ -346,8 +346,8 @@ typedef struct {
   //
   // Driver Option Add Handle page storage
   //
-  UINT16  DriverAddHandleDesc[75];
-  UINT16  DriverAddHandleOptionalData[75];
+  UINT16  DriverAddHandleDesc[100];
+  UINT16  DriverAddHandleOptionalData[100];
   UINT8   DriverAddActive;
   UINT8   DriverAddForceReconnect;
 

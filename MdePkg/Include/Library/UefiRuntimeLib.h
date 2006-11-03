@@ -55,7 +55,7 @@ EfiGoneVirtual (
   capabilities of hardware platform.
 
   @param  Time         A pointer to storage to receive a snapshot of the current time.
-  @param  Capabilities An optional pointer to a buffer to receive the real time clock device¡¯s
+  @param  Capabilities An optional pointer to a buffer to receive the real time clock device's
                        capabilities.
  
   @retval  EFI_SUCCESS  Success to execute the function.

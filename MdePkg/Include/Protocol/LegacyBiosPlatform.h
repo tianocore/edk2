@@ -168,7 +168,7 @@ EFI_STATUS
   @param  DeviceHandle          List of PCI devices in the system.
   @param  ShadowAddress         First free OpROM area, after other OpROMs have been dispatched.
   @param  Compatibility16Table  Pointer to Compatibility16Table.
-  @param  AdditionalData        Mode specific Pointer to additional data returned ¨C mode specific.
+  @param  AdditionalData        Mode specific Pointer to additional data returned - mode specific.
 
   @retval EFI_SUCCESS           RomImage is valid
   @retval EFI_UNSUPPORTED       Mode is not supported on the platform.

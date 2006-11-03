@@ -167,7 +167,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Provides the PCI controller¨Cspecific addresses required to access system memory from a
+  Provides the PCI controller-Cspecific addresses required to access system memory from a
   DMA bus master.                                                                        
             
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.

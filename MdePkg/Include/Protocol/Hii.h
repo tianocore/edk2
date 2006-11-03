@@ -526,7 +526,7 @@ EFI_STATUS
                                 terminator of the string.
   @param  GlyphBufferSize       A pointer to a value. On output, if the function
                                 returns EFI_SUCCESS, it contains the amount of memory that is required to
-                                store the string¡¯s glyph equivalent.
+                                store the string's glyph equivalent.
 
   @retval EFI_SUCCESS           All glyphs are available. Note that an empty string
                                 always returns this value.

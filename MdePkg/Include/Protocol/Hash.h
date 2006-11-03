@@ -85,7 +85,7 @@ typedef union {
 
   @param  This                  Points to this instance of EFI_HASH_PROTOCOL.
   @param  HashAlgorithm         Points to the EFI_GUID which identifies the algorithm to use.
-  @param  HashSize              Holds the returned size of the algorithm¡¯s hash.
+  @param  HashSize              Holds the returned size of the algorithm's hash.
 
   @retval EFI_SUCCESS           Hash size returned successfully.
   @retval EFI_INVALID_PARAMETER HashSize is NULL
@@ -117,7 +117,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           Hash returned successfully.
   @retval EFI_INVALID_PARAMETER Message or Hash is NULL
   @retval EFI_UNSUPPORTED       The algorithm specified by HashAlgorithm is not supported by this
-                                 driver. Or extend is TRUE and the algorithm doesn¡¯t support extending the hash.
+                                 driver. Or extend is TRUE and the algorithm doesn't support extending the hash.
 
 **/
 typedef

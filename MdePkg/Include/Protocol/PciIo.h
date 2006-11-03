@@ -245,7 +245,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Provides the PCI controller¨Cspecific addresses needed to access system memory.
+  Provides the PCI controller-Cspecific addresses needed to access system memory.
             
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
   @param  Operation             Indicates if the bus master is going to read or write to system memory.
@@ -360,13 +360,13 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Retrieves this PCI controller¡¯s current PCI bus number, device number, and function number.
+  Retrieves this PCI controller's current PCI bus number, device number, and function number.
             
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.  
-  @param  SegmentNumber         The PCI controller¡¯s current PCI segment number.
-  @param  BusNumber             The PCI controller¡¯s current PCI bus number.
-  @param  DeviceNumber          The PCI controller¡¯s current PCI device number.
-  @param  FunctionNumber        The PCI controller¡¯s current PCI function number.
+  @param  SegmentNumber         The PCI controller's current PCI segment number.
+  @param  BusNumber             The PCI controller's current PCI bus number.
+  @param  DeviceNumber          The PCI controller's current PCI device number.
+  @param  FunctionNumber        The PCI controller's current PCI function number.
                                   
   @retval EFI_SUCCESS           The PCI controller location was returned.                                                       
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.                              

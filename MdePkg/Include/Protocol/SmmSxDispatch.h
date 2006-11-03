@@ -61,7 +61,7 @@ typedef struct {
   Dispatch function for a Sx state SMI handler.
 
   @param  DispatchHandle        Handle of this dispatch function.
-  @param  DispatchContext       Pointer to the dispatch function¡¯s context.
+  @param  DispatchContext       Pointer to the dispatch function's context.
                                 The Type and Phase fields are filled in by the Sx dispatch driver
                                 prior to invoking this dispatch function. For this interface,
                                 the Sx driver will call the dispatch function for all Sx type

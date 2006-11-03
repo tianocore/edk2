@@ -29,7 +29,7 @@
                         This includes information about the class and subclass that is used to classify the entity 
                         as well as an operation.  For progress codes, the operation is the current activity.  
                         For error codes, it is the exception.  For debug codes, it is not defined at this time.  
-                        Type EFI_STATUS_CODE_VALUE is defined in ¡°Related Definitions¡± below.  
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
   @param  Instance      The enumeration of a hardware or software entity within the system.  
                         A system may contain multiple entities that match a class/subclass pairing.  
@@ -80,7 +80,7 @@ EFI_PEI_PPI_DESCRIPTOR        mStatusCodePpiDescriptor = {
                         This includes information about the class and subclass that is used to classify the entity 
                         as well as an operation.  For progress codes, the operation is the current activity.  
                         For error codes, it is the exception.  For debug codes, it is not defined at this time.  
-                        Type EFI_STATUS_CODE_VALUE is defined in ¡°Related Definitions¡± below.  
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
   @param  Instance      The enumeration of a hardware or software entity within the system.  
                         A system may contain multiple entities that match a class/subclass pairing.  

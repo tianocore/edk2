@@ -64,7 +64,7 @@ UefiDecompressGetInfo (
 
   This function is designed so that the decompression algorithm can be implemented
   without using any memory services.  As a result, this function is not allowed to
-  call any memory allocation services in its implementation.  It is the caller¡¯s r
+  call any memory allocation services in its implementation.  It is the caller's r
   esponsibility to allocate and free the Destination and Scratch buffers.
   If the compressed source data specified by Source is sucessfully decompressed 
   into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
