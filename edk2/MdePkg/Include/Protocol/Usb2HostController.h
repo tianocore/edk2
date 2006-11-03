@@ -101,7 +101,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The state information of the host controller was returned in State.
   @retval EFI_INVALID_PARAMETER State is NULL.
   @retval EFI_DEVICE_ERROR      An error was encountered while attempting to retrieve the
-                                host controller¡¯s current state.
+                                host controller's current state.
 
 **/
 typedef

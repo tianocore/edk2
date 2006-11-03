@@ -178,7 +178,7 @@ DxeStatusCodeDriverEntry (
   virtual mode.
 
   @param  Event         Event whose notification function is being invoked.
-  @param  Context       Pointer to the notification function¡¯s context, which is
+  @param  Context       Pointer to the notification function's context, which is
                         always zero in current implementation.
 
 **/

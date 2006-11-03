@@ -259,7 +259,7 @@ EFI_STATUS
   );
 
 /**
-  This service published by the PEI Foundation abstracts the creation of a Hand-Off Block's (HOB¡¯s) headers.
+  This service published by the PEI Foundation abstracts the creation of a Hand-Off Block's (HOB's) headers.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  Type             The type of HOB to be installed.

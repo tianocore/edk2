@@ -171,7 +171,7 @@ typedef struct {
 
   @retval EFI_SUCCESS           The mode data was read.
   @retval EFI_INVALID_PARAMETER This is NULL.
-  @retval EFI_NOT_STARTED       No configuration data is available because this instance hasn¡¯t
+  @retval EFI_NOT_STARTED       No configuration data is available because this instance hasn't
                                  been started.
 
 **/
@@ -278,7 +278,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - ConnectionToken is NULL.
                                 - ConnectionToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  The driver can¡¯t allocate enough resource to initiate the activeopen.
+  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the activeopen.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/

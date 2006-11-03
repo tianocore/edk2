@@ -291,7 +291,7 @@ EFI_STATUS
                        the default parameters that were set in the
                        EFI_MTFTP4_PROTOCOL.Configure() function are used.
   @param  Filename     Pointer to ASCIIZ file name string.
-  @param  ModeStr      Pointer to ASCIIZ mode string. If NULL, ¡°octet¡± will be used.
+  @param  ModeStr      Pointer to ASCIIZ mode string. If NULL, "octet" will be used.
   @param  OptionCount  Number of option/value string pairs in OptionList.
   @param  OptionList   Pointer to array of option/value string pairs. Ignored if
                        OptionCount is zero.
@@ -422,7 +422,7 @@ EFI_STATUS
   
 
 /**
-  Downloads a data file ¡°directory¡± from an MTFTPv4 server. May be unsupported in some EFI
+  Downloads a data file "directory" from an MTFTPv4 server. May be unsupported in some EFI
   implementations.                                                                                                                                                                                 
 
   @param  This  Pointer to the EFI_MTFTP4_PROTOCOL instance.

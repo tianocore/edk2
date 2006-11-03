@@ -53,7 +53,7 @@ typedef struct {
 /**
   Provides direction to the configuration driver whether to use the HII 
   database or a passed-in set of data. This function also establishes a 
-  pointer to the calling driver¡¯s callback interface. 
+  pointer to the calling driver's callback interface. 
 
   @param  This                  A pointer to the EFI_FORM_BROWSER_PROTOCOL instance.
   @param  UseDatabase           Determines whether the HII database is to be
@@ -65,7 +65,7 @@ typedef struct {
   @param  HandleCount           The number of handles in the array specified by Handle.
   @param  Packet                A pointer to a set of data containing pointers to IFR
                                 and/or string data.
-  @param  CallbackHandle        The handle to the driver¡¯s callback interface.
+  @param  CallbackHandle        The handle to the driver's callback interface.
                                 This parameter is used only when the UseDatabase parameter is FALSE
                                 and an application wants to register a callback with the browser
   @param  NvMapOverride         This buffer is used only when there is no NV variable
@@ -143,7 +143,7 @@ EFI_STATUS
   @param SendForm
   Provides direction to the configuration driver whether to use the HII 
   database or to use a passed-in set of data. This functions also establishes 
-  a pointer to the calling driver¡¯s callback interface. 
+  a pointer to the calling driver's callback interface. 
 
   @param CreatePopUp
   Routine used to abstract a generic dialog interface and return the 

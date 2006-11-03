@@ -175,7 +175,7 @@ GetFirstGuidHob (
   @param  ModuleName              The GUID File Name of the module.
   @param  MemoryAllocationModule  The 64 bit physical address of the module.
   @param  ModuleLength            The length of the module in bytes.
-  @param  EntryPoint              The 64 bit physical address of the module’s entry point.
+  @param  EntryPoint              The 64 bit physical address of the module's entry point.
 
 **/
 VOID

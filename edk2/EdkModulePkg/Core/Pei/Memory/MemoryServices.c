@@ -302,7 +302,7 @@ Returns:
   EFI_HOB_MEMORY_POOL      *Hob;
 
  //
- // If some ¡°post-memory¡± PEIM wishes to allocate larger pool,
+ // If some "post-memory" PEIM wishes to allocate larger pool,
  // it should use AllocatePages service instead.
  //
  ASSERT (Size < 0x10000 - sizeof (EFI_HOB_MEMORY_POOL));

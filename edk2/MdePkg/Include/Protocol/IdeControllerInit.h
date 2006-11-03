@@ -311,7 +311,7 @@ EFI_STATUS
   @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
   @param  Channel               Zero-based channel number.
   @param  Device                Zero-based device number on the Channel.
-  @param  IdentifyData          The device¡¯s response to the ATA IDENTIFY_DEVICE command.
+  @param  IdentifyData          The device's response to the ATA IDENTIFY_DEVICE command.
 
   @retval EFI_SUCCESS           The information was accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).

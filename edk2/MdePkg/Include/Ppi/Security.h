@@ -56,7 +56,7 @@ EFI_STATUS
 /**
   @par Ppi Description:
   This PPI is installed by some platform PEIM that abstracts the security 
-  policy to the PEI Foundation, namely the case of a PEIM¡¯s authentication 
+  policy to the PEI Foundation, namely the case of a PEIM's authentication 
   state being returned during the PEI section extraction process. 
 
   @param AuthenticationState

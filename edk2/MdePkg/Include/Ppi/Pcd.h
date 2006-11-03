@@ -767,7 +767,7 @@ EFI_STATUS
   @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
   @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.
                     If the input token namespace or token number does not exist on the platform, an error is 
-                    returned and the value of *TokenNumber is undefined. To retrieve the ¡°first¡± token, 
+                    returned and the value of *TokenNumber is undefined. To retrieve the "first" token, 
                     have the pointer reference a TokenNumber value of 0. If the input token number is 0 
                     and there is no valid token number for this token namespace,  *TokenNumber will be 
                     assigned to 0 and the function return EFI_SUCCESS. If the token number is the last valid 

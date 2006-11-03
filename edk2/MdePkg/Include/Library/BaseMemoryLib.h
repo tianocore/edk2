@@ -45,7 +45,7 @@ CopyMem (
   Fills a target buffer with a byte value, and returns the target buffer.
 
   This function fills Length bytes of Buffer with Value, and returns Buffer.
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer    Memory to set.
   @param  Length    Number of bytes to set.
@@ -148,7 +148,7 @@ SetMem64 (
 
   This function fills Length bytes of Buffer with zeros, and returns Buffer.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to fill with zeros.
   @param  Length      Number of bytes in Buffer to fill with zeros.
@@ -201,7 +201,7 @@ CompareMem (
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.
@@ -229,7 +229,7 @@ ScanMem8 (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If Length is not aligned on a 16-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.
@@ -257,7 +257,7 @@ ScanMem16 (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.
@@ -285,7 +285,7 @@ ScanMem32 (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.
@@ -357,7 +357,7 @@ CompareGuid (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 128-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
 
   @param  Buffer  Pointer to the target buffer to scan.
   @param  Length  Number of bytes in Buffer to scan.

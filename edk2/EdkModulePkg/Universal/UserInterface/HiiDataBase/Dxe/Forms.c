@@ -144,11 +144,11 @@ Routine Description:
   
 Arguments:
 
-  DataTable       ¨C On input, this parameter point to the EFI_HII_DATA_TABLE structure
+  DataTable       - On input, this parameter point to the EFI_HII_DATA_TABLE structure
                     of the final data buffer for the EFI_HII_EXPORT interface. This function
                     update the NumberOfVariableData attribute.
   IfrData         - It points to a staring address of a EFI_HII_IFR_PACK structure.
-  ExportBufferPtr ¨C On input, it points the starting address of the data buffer to 
+  ExportBufferPtr - On input, it points the starting address of the data buffer to 
                     host the variable pack. On output, it is the starting address
                     of data buffer for the next extraction operation.
 Returns: 

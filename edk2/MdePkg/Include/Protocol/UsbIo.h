@@ -123,7 +123,7 @@ EFI_STATUS
 
 /**                                                                 
   This function is used to manage a USB device with an interrupt transfer pipe. An Asynchronous   
-  Interrupt Transfer is typically used to query a device¡¯s status at a fixed rate. For example,  
+  Interrupt Transfer is typically used to query a device's status at a fixed rate. For example,  
   keyboard, mouse, and hub devices use this type of transfer to query their interrupt endpoints at
   a fixed rate.                                                                                   
     
@@ -131,7 +131,7 @@ EFI_STATUS
   @param  DeviceEndpoint        A pointer to the USB device request that will be sent to the USB
                                 device.                                                         
   @param  IsNewTransfer         If TRUE, a new transfer will be submitted to USB controller. If                             
-                                FALSE, the interrupt transfer is deleted from the device¡¯s interrupt
+                                FALSE, the interrupt transfer is deleted from the device's interrupt
                                 transfer queue.                                                      
   @param  PollingInterval       Indicates the periodic rate, in milliseconds, that the transfer is to be                        
                                 executed.                                                                 

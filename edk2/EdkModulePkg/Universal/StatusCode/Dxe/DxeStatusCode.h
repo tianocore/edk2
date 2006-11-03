@@ -102,13 +102,13 @@ EfiSerialStatusCodeInitializeWorker (
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
  
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions¡± below.
+  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
  
   @param  Value         Describes the current status of a hardware or software entity.  
                         This included information about the class and subclass that is used to classify the entity 
                         as well as an operation.  For progress codes, the operation is the current activity. 
                         For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in ¡°Related Definitions¡± below.  
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
  
   @param  Instance      The enumeration of a hardware or software entity within the system.  
@@ -155,13 +155,13 @@ RtMemoryStatusCodeInitializeWorker (
   @param  RtMemoryStatusCodeTable      
                         Point to Runtime memory table header.
 
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions¡± below.
+  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
  
   @param  Value         Describes the current status of a hardware or software entity.  
                         This included information about the class and subclass that is used to classify the entity 
                         as well as an operation.  For progress codes, the operation is the current activity. 
                         For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in ¡°Related Definitions¡± below.  
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
  
   @param  Instance      The enumeration of a hardware or software entity within the system.  
@@ -196,13 +196,13 @@ DataHubStatusCodeInitializeWorker (
 /**
   Report status code into DataHub.
  
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions¡± below.
+  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
  
   @param  Value         Describes the current status of a hardware or software entity.  
                         This included information about the class and subclass that is used to classify the entity 
                         as well as an operation.  For progress codes, the operation is the current activity. 
                         For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in ¡°Related Definitions¡± below.  
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
  
   @param  Instance      The enumeration of a hardware or software entity within the system.  

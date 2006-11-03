@@ -90,7 +90,7 @@ typedef struct {
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  VariableName          A NULL-terminated Unicode string that is the
-                                name of the vendor¡¯s variable.
+                                name of the vendor's variable.
   @param  VendorGuid            A unique identifier for the vendor.
   @param  Attributes            If not NULL, a pointer to the memory location to
                                 return the attribute's bit-mask for the variable.

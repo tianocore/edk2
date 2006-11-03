@@ -73,8 +73,8 @@ EFI_STATUS
   Inserts an entry to the ARP cache.
 
   @param  This            A pointer to the EFI_ARP_PROTOCOL instance.  
-  @param  DenyFlag        Set to TRUE if this entry is a ¡°deny¡± entry. Set to FALSE if this
-                          entry is a ¡°normal¡± entry.
+  @param  DenyFlag        Set to TRUE if this entry is a "deny" entry. Set to FALSE if this
+                          entry is a "normal" entry.
   @param  TargetSwAddress Pointer to a protocol address to add (or deny). May be set to
                           NULL if DenyFlag is TRUE.
   @param  TargetHwAddress Pointer to a hardware address to add (or deny). May be set to

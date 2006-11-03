@@ -64,7 +64,7 @@ EFI_STATUS
   );
 
 /**
-  Gets a block device¡¯s media information.
+  Gets a block device's media information.
 
   @param  PeiServices    General-purpose services that are available to every PEIM
   @param  This           Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
