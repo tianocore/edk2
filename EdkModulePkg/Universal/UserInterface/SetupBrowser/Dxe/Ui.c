@@ -806,7 +806,7 @@ UpdateStatusBar (
           gScreenDimensions.BottomRow - 1,
           NvUpdateMessage
           );
-        gResetRequired    = (BOOLEAN) (gResetRequired | (Flags & RESET_REQUIRED));
+        gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED));
 
         gNvUpdateRequired = TRUE;
       } else {
@@ -1222,6 +1222,15 @@ Returns:
   // Ensure we have got a valid buffer
   //
   if (*OutputString != NULL) {
+  
+    //
+    //NARROW_CHAR can not be printed in screen, so if a line only contain  the two CHARs: 'NARROW_CHAR + CHAR_CARRIAGE_RETURN' , it is a empty line  in Screen.
+    //To avoid displaying this  empty line in screen,  just skip  the two CHARs here.
+    //
+   if ((InputString[*Index] == NARROW_CHAR) && (InputString[*Index + 1] == CHAR_CARRIAGE_RETURN)) {
+     *Index = *Index + 2;
+   } 
+
     //
     // Fast-forward the string and see if there is a carriage-return in the string
     //
@@ -1441,7 +1450,7 @@ Returns:
   UI_MENU_OPTION              *PreviousMenuOption;
   EFI_IFR_BINARY              *IfrBinary;
   UI_CONTROL_FLAG             ControlFlag;
-  EFI_SCREEN_DESCRIPTOR           LocalScreen;
+  EFI_SCREEN_DESCRIPTOR       LocalScreen;
   EFI_FILE_FORM_TAGS          *FileFormTags;
   MENU_REFRESH_ENTRY          *MenuRefreshEntry;
   MENU_REFRESH_ENTRY          *OldMenuRefreshEntry;
