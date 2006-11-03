@@ -77,6 +77,32 @@ EbcGetVersion (
   IN OUT UINT64           *Version
   );
 
+EFI_STATUS
+EFIAPI
+InitializeEbcCallback (
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This
+  );
+
+VOID
+EFIAPI
+CommonEbcExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  );
+
+VOID
+EFIAPI
+EbcPeriodicNotifyFunction (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  );
+
+EFI_STATUS
+EFIAPI
+EbcDebugPeriodic (
+  IN VM_CONTEXT *VmPtr
+  );
+
 //
 // These two functions and the  GUID are used to produce an EBC test protocol.
 // This functionality is definitely not required for execution.
@@ -158,6 +184,12 @@ static EFI_PERIODIC_CALLBACK  mDebugPeriodicCallback                            
 static EFI_EXCEPTION_CALLBACK mDebugExceptionCallback[MAX_EBC_EXCEPTION + 1] = {NULL};
 static EFI_GUID               mEfiEbcVmTestProtocolGuid = EFI_EBC_VM_TEST_PROTOCOL_GUID;
 
+//
+// Event for Periodic callback
+//
+static EFI_EVENT              mEbcPeriodicEvent;
+VM_CONTEXT                    *mVmPtr = NULL;
+
 EFI_STATUS
 EFIAPI
 InitializeEbcDriver (
@@ -189,6 +221,9 @@ Returns:
   UINTN                       NumHandles;
   UINTN                       Index;
   BOOLEAN                     Installed;
+
+  EbcProtocol      = NULL;
+  EbcDebugProtocol = NULL;
 
   //
   // Allocate memory for our protocol. Then fill in the blanks.
@@ -271,7 +306,7 @@ Returns:
                   (VOID **) &EbcDebugProtocol
                   );
   if (Status != EFI_SUCCESS) {
-    return EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   }
 
   EbcDebugProtocol->Isa                         = IsaEbc;
@@ -294,13 +329,58 @@ Returns:
   //
   if (EFI_ERROR (Status)) {
     gBS->FreePool (EbcDebugProtocol);
+    goto ErrorExit;
   }
+  //
+  // Install EbcDebugSupport Protocol Successfully
+  // Now we need to initialize the Ebc default Callback
+  //
+  Status = InitializeEbcCallback (EbcDebugProtocol);
+
   //
   // Produce a VM test interface protocol. Not required for execution.
   //
   DEBUG_CODE_BEGIN ();
     InitEbcVmTestProtocol (&ImageHandle);
   DEBUG_CODE_END ();
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  HandleBuffer  = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiEbcProtocolGuid,
+                  NULL,
+                  &NumHandles,
+                  &HandleBuffer
+                  );
+  if (Status == EFI_SUCCESS) {
+    //
+    // Loop through the handles
+    //
+    for (Index = 0; Index < NumHandles; Index++) {
+      Status = gBS->HandleProtocol (
+                      HandleBuffer[Index],
+                      &gEfiEbcProtocolGuid,
+                      (VOID **) &OldEbcProtocol
+                      );
+      if (Status == EFI_SUCCESS) {
+        gBS->UninstallProtocolInterface (
+               HandleBuffer[Index],
+               &gEfiEbcProtocolGuid,
+               OldEbcProtocol
+               );
+      }
+    }
+  }
+
+  if (HandleBuffer != NULL) {
+    gBS->FreePool (HandleBuffer);
+    HandleBuffer = NULL;
+  }
+
+  gBS->FreePool (EbcProtocol);
 
   return Status;
 }
@@ -508,8 +588,8 @@ Returns:
 {
   EFI_SYSTEM_CONTEXT_EBC  EbcContext;
   EFI_SYSTEM_CONTEXT      SystemContext;
-  EFI_STATUS_CODE_VALUE   StatusCodeValue;
-  BOOLEAN                 Report;
+
+  ASSERT ((ExceptionType >= 0) && (ExceptionType <= MAX_EBC_EXCEPTION));
   //
   // Save the exception in the context passed in
   //
@@ -522,155 +602,178 @@ Returns:
   if (ExceptionFlags & EXCEPTION_FLAG_FATAL) {
     VmPtr->StopFlags |= STOPFLAG_APP_DONE;
   }
-  //
-  // Initialize the context structure
-  //
-  EbcContext.R0                   = VmPtr->R[0];
-  EbcContext.R1                   = VmPtr->R[1];
-  EbcContext.R2                   = VmPtr->R[2];
-  EbcContext.R3                   = VmPtr->R[3];
-  EbcContext.R4                   = VmPtr->R[4];
-  EbcContext.R5                   = VmPtr->R[5];
-  EbcContext.R6                   = VmPtr->R[6];
-  EbcContext.R7                   = VmPtr->R[7];
-  EbcContext.Ip                   = (UINT64) (UINTN) VmPtr->Ip;
-  EbcContext.Flags                = VmPtr->Flags;
-  EbcContext.ControlFlags         = 0;
-  SystemContext.SystemContextEbc  = &EbcContext;
+
   //
   // If someone's registered for exception callbacks, then call them.
-  // Otherwise report the status code via the status code API
   //
-  if ((ExceptionType >= 0) && (ExceptionType <= MAX_EBC_EXCEPTION) &&
-      (mDebugExceptionCallback[ExceptionType] != NULL)) {
+  // EBC driver will register default exception callback to report the
+  // status code via the status code API
+  //
+  if (mDebugExceptionCallback[ExceptionType] != NULL) {
+
+    //
+    // Initialize the context structure
+    //
+    EbcContext.R0                   = VmPtr->R[0];
+    EbcContext.R1                   = VmPtr->R[1];
+    EbcContext.R2                   = VmPtr->R[2];
+    EbcContext.R3                   = VmPtr->R[3];
+    EbcContext.R4                   = VmPtr->R[4];
+    EbcContext.R5                   = VmPtr->R[5];
+    EbcContext.R6                   = VmPtr->R[6];
+    EbcContext.R7                   = VmPtr->R[7];
+    EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
+    EbcContext.Flags                = VmPtr->Flags;
+    EbcContext.ControlFlags         = 0;
+    SystemContext.SystemContextEbc  = &EbcContext;
+
     mDebugExceptionCallback[ExceptionType] (ExceptionType, SystemContext);
-  }
-  //
-  // Determine if we should report the exception. We report all of them by default,
-  // but if a debugger is attached don't report the breakpoint, debug, and step exceptions.
-  // Note that EXCEPT_EBC_OVERFLOW is never reported by this VM implementation, so is
-  // not included in the switch statement.
-  //
-  Report = TRUE;
-  switch (ExceptionType) {
-  case EXCEPT_EBC_UNDEFINED:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_UNDEFINED;
-    break;
-
-  case EXCEPT_EBC_DIVIDE_ERROR:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_DIVIDE_ERROR;
-    break;
-
-  case EXCEPT_EBC_DEBUG:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_DEBUG;
-    Report          = (BOOLEAN) ((mDebugExceptionCallback[ExceptionType] == NULL) ? TRUE : FALSE);
-    break;
-
-  case EXCEPT_EBC_BREAKPOINT:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_BREAKPOINT;
-    Report          = (BOOLEAN) ((mDebugExceptionCallback[ExceptionType] == NULL) ? TRUE : FALSE);
-    break;
-
-  case EXCEPT_EBC_INVALID_OPCODE:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_INVALID_OPCODE;
-    break;
-
-  case EXCEPT_EBC_STACK_FAULT:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_STACK_FAULT;
-    break;
-
-  case EXCEPT_EBC_ALIGNMENT_CHECK:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_ALIGNMENT_CHECK;
-    break;
-
-  case EXCEPT_EBC_INSTRUCTION_ENCODING:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_INSTRUCTION_ENCODING;
-    break;
-
-  case EXCEPT_EBC_BAD_BREAK:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_BAD_BREAK;
-    break;
-
-  case EXCEPT_EBC_STEP:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_EBC_STEP;
-    Report          = (BOOLEAN) ((mDebugExceptionCallback[ExceptionType] == NULL) ? TRUE : FALSE);
-    break;
-
-  default:
-    StatusCodeValue = EFI_SOFTWARE_EBC_EXCEPTION | EFI_SW_EC_NON_SPECIFIC;
-    break;
-  }
-  //
-  // If we determined that we should report the condition, then do so now.
-  //
-  if (Report) {
-    REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED, StatusCodeValue);
-  }
-
-  switch (ExceptionType) {
-  //
-  // If ReportStatusCode returned, then for most exceptions we do an assert. The
-  // ExceptionType++ is done simply to force the ASSERT() condition to be met.
-  // For breakpoints, assume a debugger did not insert a software breakpoint
-  // and skip the instruction.
-  //
-  case EXCEPT_EBC_BREAKPOINT:
-    VmPtr->Ip += 2;
-    break;
-
-  case EXCEPT_EBC_STEP:
-    break;
-
-  case EXCEPT_EBC_UNDEFINED:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_UNDEFINED);
-    break;
-
-  case EXCEPT_EBC_DIVIDE_ERROR:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_DIVIDE_ERROR);
-    break;
-
-  case EXCEPT_EBC_DEBUG:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_DEBUG);
-    break;
-
-  case EXCEPT_EBC_INVALID_OPCODE:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_INVALID_OPCODE);
-    break;
-
-  case EXCEPT_EBC_STACK_FAULT:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_STACK_FAULT);
-    break;
-
-  case EXCEPT_EBC_ALIGNMENT_CHECK:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_ALIGNMENT_CHECK);
-    break;
-
-  case EXCEPT_EBC_INSTRUCTION_ENCODING:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_INSTRUCTION_ENCODING);
-    break;
-
-  case EXCEPT_EBC_BAD_BREAK:
-    ExceptionType++;
-    ASSERT (ExceptionType == EXCEPT_EBC_BAD_BREAK);
-    break;
-
-  default:
     //
-    // Unknown
+    // Restore the context structure and continue to execute
     //
-    ASSERT (0);
-    break;
+    VmPtr->R[0]  = EbcContext.R0;
+    VmPtr->R[1]  = EbcContext.R1;
+    VmPtr->R[2]  = EbcContext.R2;
+    VmPtr->R[3]  = EbcContext.R3;
+    VmPtr->R[4]  = EbcContext.R4;
+    VmPtr->R[5]  = EbcContext.R5;
+    VmPtr->R[6]  = EbcContext.R6;
+    VmPtr->R[7]  = EbcContext.R7;
+    VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
+    VmPtr->Flags = EbcContext.Flags;
+  }
+  
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+InitializeEbcCallback (
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This
+  )
+/*++
+
+Routine Description:
+
+  To install default Callback function for the VM interpreter.
+  
+Arguments:
+
+  This - pointer to the instance of DebugSupport protocol
+
+Returns:
+
+  None
+  
+--*/
+{
+  INTN       Index;
+  EFI_STATUS Status;
+
+  //
+  // For ExceptionCallback
+  //
+  for (Index = 0; Index <= MAX_EBC_EXCEPTION; Index++) {
+    EbcDebugRegisterExceptionCallback (
+      This,
+      0,
+      CommonEbcExceptionHandler,
+      Index
+      );
+  }
+
+  //
+  // For PeriodicCallback
+  //
+  Status = gBS->CreateEvent (
+                  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
+                  EFI_TPL_NOTIFY,
+                  EbcPeriodicNotifyFunction,
+                  &mVmPtr,
+                  &mEbcPeriodicEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  Status = gBS->SetTimer (
+                  mEbcPeriodicEvent,
+                  TimerPeriodic,
+                  EBC_VM_PERIODIC_CALLBACK_RATE
+                  );
+  if (EFI_ERROR(Status)) {
+    return Status;
   }
 
   return EFI_SUCCESS;
 }
+
+VOID
+CommonEbcExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+/*++
+
+Routine Description:
+
+  The default Exception Callback for the VM interpreter.
+  In this function, we report status code, and print debug information
+  about EBC_CONTEXT, then dead loop.
+  
+Arguments:
+
+  InterruptType - Interrupt type.
+  SystemContext - EBC system context.
+
+Returns:
+
+  None
+  
+--*/
+{
+  //
+  // We deadloop here to make it easy to debug this issue.
+  //
+  ASSERT (FALSE);
+
+  return ;
+}
+
+VOID
+EFIAPI
+EbcPeriodicNotifyFunction (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  )
+/*++
+
+Routine Description:
+
+  The periodic callback function for EBC VM interpreter, which is used
+  to support the EFI debug support protocol.
+  
+Arguments:
+
+  Event   - The Periodic Callback Event.
+  Context - It should be the address of VM_CONTEXT pointer.
+
+Returns:
+
+  None.
+  
+--*/
+{
+  VM_CONTEXT *VmPtr;
+
+  VmPtr = *(VM_CONTEXT **)Context;
+
+  if (VmPtr != NULL) {
+    EbcDebugPeriodic (VmPtr);
+  }
+
+  return ;
+}
+
 
 EFI_STATUS
 EbcDebugPeriodic (
@@ -693,6 +796,47 @@ Returns:
   
 --*/
 {
+  EFI_SYSTEM_CONTEXT_EBC   EbcContext;
+  EFI_SYSTEM_CONTEXT       SystemContext;
+  
+  //
+  // If someone's registered for periodic callbacks, then call them.
+  //
+  if (mDebugPeriodicCallback != NULL) {
+
+    //
+    // Initialize the context structure
+    //
+    EbcContext.R0                   = VmPtr->R[0];
+    EbcContext.R1                   = VmPtr->R[1];
+    EbcContext.R2                   = VmPtr->R[2];
+    EbcContext.R3                   = VmPtr->R[3];
+    EbcContext.R4                   = VmPtr->R[4];
+    EbcContext.R5                   = VmPtr->R[5];
+    EbcContext.R6                   = VmPtr->R[6];
+    EbcContext.R7                   = VmPtr->R[7];
+    EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
+    EbcContext.Flags                = VmPtr->Flags;
+    EbcContext.ControlFlags         = 0;
+    SystemContext.SystemContextEbc  = &EbcContext;
+
+    mDebugPeriodicCallback (SystemContext);
+
+    //
+    // Restore the context structure and continue to execute
+    //
+    VmPtr->R[0]  = EbcContext.R0;
+    VmPtr->R[1]  = EbcContext.R1;
+    VmPtr->R[2]  = EbcContext.R2;
+    VmPtr->R[3]  = EbcContext.R3;
+    VmPtr->R[4]  = EbcContext.R4;
+    VmPtr->R[5]  = EbcContext.R5;
+    VmPtr->R[6]  = EbcContext.R6;
+    VmPtr->R[7]  = EbcContext.R7;
+    VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
+    VmPtr->Flags = EbcContext.Flags;
+  }
+  
   return EFI_SUCCESS;
 }
 

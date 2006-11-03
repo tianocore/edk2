@@ -595,6 +595,7 @@ Returns:
   EFI_DEVICE_PATH_PROTOCOL   *HandleFilePath;
   UINTN                      FilePathSize;
 
+  SecurityStatus = EFI_SUCCESS;
 
   ASSERT (gEfiCurrentTpl < EFI_TPL_NOTIFY);
   ParentImage = NULL;
@@ -753,6 +754,8 @@ Done:
       CoreUnloadAndCloseImage (Image, (BOOLEAN)(DstBuffer == 0));
       *ImageHandle = NULL;
     }
+  } else if (EFI_ERROR (SecurityStatus)) {
+    Status = SecurityStatus;
   }
 
   return Status;

@@ -189,7 +189,8 @@ Vect2Desc       PROC    C PUBLIC DestPtr:DWORD, Vector:DWORD
                 mov     eax, Vector
                 mov     ecx, DestPtr
                 mov     word ptr [ecx], ax                  ; write bits 15..0 of offset
-                mov     word ptr [ecx+2], 20h               ; SYS_CODE_SEL from GDT
+                mov     dx, cs
+                mov     word ptr [ecx+2], dx                ; SYS_CODE_SEL from GDT
                 mov     word ptr [ecx+4], 0e00h OR 8000h    ; type = 386 interrupt gate, present
                 shr     eax, 16
                 mov     word ptr [ecx+6], ax                ; write bits 31..16 of offset
