@@ -9,7 +9,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 Module Name:
-        Presentation.c
+  Presentation.c
 
 Abstract:
 
@@ -732,7 +732,7 @@ Returns:
         PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
       }
     } else {
-      PrintStringAt (StartColumnOfHelp, BottomRowOfHelp, gEnterCommitString);
+      PrintStringAt (SecCol, BottomRowOfHelp, gEnterCommitString);
 
       //
       // If it is a selected numeric with manual input, display different message
@@ -740,7 +740,7 @@ Returns:
       if ((Selection->ThisTag->Operand == EFI_IFR_NUMERIC_OP) && (Selection->ThisTag->Step == 0)) {
         PrintStringAt (SecCol, TopRowOfHelp, gNumericInput);
       } else if (Selection->ThisTag->Operand != EFI_IFR_ORDERED_LIST_OP) {
-        PrintAt (SecCol, BottomRowOfHelp, (CHAR16 *) L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+        PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
       }
 
       if (Selection->ThisTag->Operand == EFI_IFR_ORDERED_LIST_OP) {

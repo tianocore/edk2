@@ -232,9 +232,10 @@ Returns:
   //
   // Allocate a block of memory that contain performance data to OS
   //
+  mAcpiLowMemoryBase = 0xFFFFFFFF;
   Status = gBS->AllocatePages (
-                  AllocateAnyPages,
-                  EfiACPIReclaimMemory,
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
                   4,
                   &mAcpiLowMemoryBase
                   );
@@ -242,7 +243,7 @@ Returns:
     return ;
   }
 
-  mAcpiLowMemoryLength  = 0x1000;
+  mAcpiLowMemoryLength  = EFI_PAGES_TO_SIZE(4);
 
   Ptr                   = (UINT8 *) ((UINT32) mAcpiLowMemoryBase + sizeof (PERF_HEADER));
   LimitCount            = (mAcpiLowMemoryLength - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
@@ -261,7 +262,7 @@ Returns:
                   &Cpu
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (mAcpiLowMemoryBase, 1);
+    gBS->FreePages (mAcpiLowMemoryBase, 4);
     return ;
   }
   //
@@ -269,7 +270,7 @@ Returns:
   //
   Status = Cpu->GetTimerValue (Cpu, 0, &(CurrentTicker), &TimerPeriod);
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (mAcpiLowMemoryBase, 1);
+    gBS->FreePages (mAcpiLowMemoryBase, 4);
     return ;
   }
 
@@ -294,7 +295,7 @@ Returns:
                   &Handles
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (mAcpiLowMemoryBase, 1);
+    gBS->FreePages (mAcpiLowMemoryBase, 4);
     return ;
   }
   //
