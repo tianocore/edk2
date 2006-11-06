@@ -101,6 +101,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32">Unaligned.c</Filename>
     <Filename SupArchList="IA32">Ia32/Non-existing.c</Filename>
     <Filename SupArchList="IA32">Ia32/InternalSwitchStack.c</Filename>
+    <Filename SupArchList="IA32">Ia32/DivS64x64Remainder.c</Filename>
 
     <!-- GCC assembly code is with .S extension -->
     <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/LShiftU64.S</Filename>
@@ -212,7 +213,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x32.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x32Remainder.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivU64x64Remainder.c</Filename>
-    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/DivS64x64Remainder.c</Filename>
 
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnableDisableInterrupts.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnableInterrupts.c</Filename>
