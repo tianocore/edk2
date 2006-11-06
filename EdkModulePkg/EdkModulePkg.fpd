@@ -4698,7 +4698,6 @@
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
@@ -5036,7 +5035,6 @@
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
@@ -17106,8 +17104,6 @@
         <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: PeiServicesLib Path: MdePkg\Library\PeiServicesLib\PeiServicesLib.msa-->
         <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <!--Pkg: MdePkg Mod: BaseIoLibIntrinsic Path: MdePkg\Library\BaseIoLibIntrinsic\BaseIoLibIntrinsic.msa-->
-        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: PeiHobLib Path: MdePkg\Library\PeiHobLib\PeiHobLib.msa-->
         <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
@@ -17237,8 +17233,6 @@
         <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: PeiServicesLib Path: MdePkg\Library\PeiServicesLib\PeiServicesLib.msa-->
         <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <!--Pkg: MdePkg Mod: BaseIoLibIntrinsic Path: MdePkg\Library\BaseIoLibIntrinsic\BaseIoLibIntrinsic.msa-->
-        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: PeiHobLib Path: MdePkg\Library\PeiHobLib\PeiHobLib.msa-->
         <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
