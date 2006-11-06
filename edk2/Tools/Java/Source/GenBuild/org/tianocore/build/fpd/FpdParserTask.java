@@ -49,6 +49,7 @@ import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.pcd.action.PlatformPcdPreprocessActionForBuilding;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
+import org.tianocore.build.toolchain.ToolChainInfo;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -447,6 +448,11 @@ public class FpdParserTask extends Task {
             parseToolChainFamilyOptions();
             parseToolChainOptions();
 
+            //
+            // check if the tool chain is valid or not
+            // 
+            checkToolChain();
+
             saq.push(map);
 
             //
@@ -766,6 +772,27 @@ public class FpdParserTask extends Task {
                     EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised element " + childItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='IMAGES' Identifier='1'].IncludeModules");
                 }
             }
+        }
+    }
+
+
+    private void checkToolChain() throws EdkException {
+        ToolChainInfo toolChainInfo = GlobalData.getToolChainInfo();
+
+        if (toolChainInfo.getTargets().length == 0) {
+            throw new EdkException("No valid target specified! Please check your TARGET definition in Tools/Conf/target.txt.");
+        }
+
+        if (toolChainInfo.getTagnames().length == 0) {
+            throw new EdkException("No valid tool chain specified! Please check your TOOL_CHAIN_TAG definition in Tools/Conf/target.txt.");
+        }
+
+        if (toolChainInfo.getArchs().length == 0) {
+            throw new EdkException("No valid ARCH specified! Please check your TARGET_ARCH definition in Tools/Conf/target.txt.");
+        }
+
+        if (toolChainInfo.getCommands().length == 0) {
+            throw new EdkException("No valid COMMAND specified! Please check your TARGET definition in Tools/Conf/tools_def.txt.");
         }
     }
 }
