@@ -83,6 +83,7 @@ public class ToolChainConfig {
             info.addTagnames(keySet[ToolChainElement.TOOLCHAIN.value]);
             info.addArchs(keySet[ToolChainElement.ARCH.value]);
             info.addCommands(keySet[ToolChainElement.TOOLCODE.value]);
+            info.normalize();
         }
     }
 
