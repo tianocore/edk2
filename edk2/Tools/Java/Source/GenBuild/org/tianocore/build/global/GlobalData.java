@@ -682,7 +682,7 @@ public class GlobalData {
     ///
     /// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
     ///
-    public synchronized static ToolChainInfo getToolChainInfo() {
+    public synchronized static ToolChainInfo getToolChainInfo() throws EdkException {
         if (toolChainInfo == null) {
             toolChainInfo = toolsDef.getConfigInfo().intersection(toolChainEnvInfo);
             if (toolChainPlatformInfo != null) {
@@ -690,6 +690,23 @@ public class GlobalData {
             }
             toolChainInfo.addCommands(toolsDef.getConfigInfo().getCommands());
             toolChainInfo.normalize();
+
+            if (toolChainInfo.getTargets().length == 0) {
+                throw new EdkException("No valid target specified! Please check your TARGET definition in Tools/Conf/target.txt.");
+            }
+
+            if (toolChainInfo.getTagnames().length == 0) {
+                throw new EdkException("No valid tool chain specified! Please check your TOOL_CHAIN_TAG definition in Tools/Conf/target.txt.");
+            }
+
+            if (toolChainInfo.getArchs().length == 0) {
+                throw new EdkException("No valid ARCH specified! Please check your TARGET_ARCH definition in Tools/Conf/target.txt.");
+            }
+
+            if (toolChainInfo.getCommands().length == 0) {
+                throw new EdkException("No valid COMMAND specified! Please check your TARGET definition in Tools/Conf/tools_def.txt.");
+            }
+
             EdkLog.log("Init", EdkLog.EDK_ALWAYS, "Current build tool chain information summary: ");
             EdkLog.log("Init", EdkLog.EDK_ALWAYS, toolChainInfo + "");
         }
@@ -724,7 +741,7 @@ public class GlobalData {
         msaFamilyBuildOption.put(moduleId, toolChainOption);
     }
     
-    public static boolean isCommandSet(String target, String toolchain, String arch) {
+    public static boolean isCommandSet(String target, String toolchain, String arch) throws EdkException {
         String[] commands = getToolChainInfo().getCommands();
 
         for (int i = 0; i < commands.length; ++i) {
