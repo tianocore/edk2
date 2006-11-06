@@ -56,6 +56,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeCoffGetEntryPointLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PciBus.h</Filename>
@@ -160,4 +163,16 @@
       <ComponentName>gPciBusComponentName</ComponentName>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdPciIsaEnable</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>Whether ISA decoding is enabled on this platform so we should avoid those aliased resources</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdPciVgaEnable</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>Whether VGA decoding is enabled on this platform so we should avoid those aliased resources</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>

@@ -241,11 +241,24 @@ Returns:
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
   UINT64            offset;
+  BOOLEAN           IsaEnable;
+  BOOLEAN           VGAEnable;
 
   //
   // Always assume there is ISA device and VGA device on the platform
   // will be customized later
   //
+  IsaEnable = FALSE;
+  VGAEnable = FALSE;
+
+  if (FeaturePcdGet (PcdPciIsaEnable)){
+    IsaEnable = TRUE;
+  }
+
+  if (FeaturePcdGet (PcdPciVgaEnable)){
+    VGAEnable = TRUE;
+  }
+
   Aperture = 0;
 
   if (!Bridge) {
@@ -277,6 +290,34 @@ Returns:
     // If both of them are enabled, then the IO resource would
     // become too limited to meet the requirement of most of devices.
     //
+
+    if (IsaEnable || VGAEnable) {
+      if (!IS_PCI_BRIDGE (&(Node->PciDev->Pci)) && !IS_CARDBUS_BRIDGE (&(Node->PciDev->Pci))) {
+        //
+        // Check if there is need to support ISA/VGA decoding
+        // If so, we need to avoid isa/vga aliasing range
+        //
+        if (IsaEnable) {
+          SkipIsaAliasAperture (
+            &Aperture,
+            Node->Length               
+            );
+          offset = Aperture & (Node->Alignment);
+          if (offset) {
+            Aperture = Aperture + (Node->Alignment + 1) - offset;
+          }
+        } else if (VGAEnable) {
+          SkipVGAAperture (
+            &Aperture,
+            Node->Length
+            );
+          offset = Aperture & (Node->Alignment);
+          if (offset) {
+            Aperture = Aperture + (Node->Alignment + 1) - offset;
+          }
+        }
+      }
+    }
 
     Node->Offset = Aperture;
 

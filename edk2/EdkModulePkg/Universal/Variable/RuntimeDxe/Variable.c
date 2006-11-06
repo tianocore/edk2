@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Provide support functions for variable services.
+Revision History
 
 --*/
 
@@ -125,8 +125,7 @@ Arguments:
 
 Returns:
 
-  EFI_INVALID_PARAMETER   - Parameters not valid
-  EFI_SUCCESS             - Variable store successfully updated
+  EFI STATUS
 
 --*/
 {
@@ -177,10 +176,11 @@ Returns:
     if ((DataPtr + DataSize) >= ((UINTN) ((UINT8 *) VolatileBase + VolatileBase->Size))) {
       return EFI_INVALID_PARAMETER;
     }
-
-    //
-    // If Volatile Variable just do a simple mem copy.
-    //
+  }
+  //
+  // If Volatile Variable just do a simple mem copy.
+  //
+  if (Volatile) {
     CopyMem ((UINT8 *) ((UINTN) DataPtr), Buffer, DataSize);
     return EFI_SUCCESS;
   }
@@ -212,7 +212,9 @@ Returns:
                     &CurrWriteSize,
                     CurrBuffer
                     );
-          return Status;
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
         } else {
           Size = (UINT32) (LinearOffset + PtrBlockMapEntry->BlockLength - CurrWritePtr);
           Status = EfiFvbWriteBlock (
@@ -813,7 +815,8 @@ Returns:
   //  The size of the VariableName, including the Unicode Null in bytes plus
   //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
   //
-  else if (sizeof (VARIABLE_HEADER) + ArrayLength (VariableName) + DataSize > MAX_VARIABLE_SIZE) {
+  else if ((DataSize > MAX_VARIABLE_SIZE) ||
+           (sizeof (VARIABLE_HEADER) + ArrayLength (VariableName) + DataSize > MAX_VARIABLE_SIZE)) {
     return EFI_INVALID_PARAMETER;
   }
   //
