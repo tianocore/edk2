@@ -780,19 +780,26 @@ public class FpdParserTask extends Task {
         ToolChainInfo toolChainInfo = GlobalData.getToolChainInfo();
 
         if (toolChainInfo.getTargets().length == 0) {
-            throw new EdkException("No valid target specified! Please check your TARGET definition in Tools/Conf/target.txt.");
+            throw new EdkException("No valid target found! "+
+                                   "Please check the TARGET definition in Tools/Conf/target.txt, "+
+                                   "or the <BuildTarget>, <BuildOptions> in the FPD file.");
         }
 
         if (toolChainInfo.getTagnames().length == 0) {
-            throw new EdkException("No valid tool chain specified! Please check your TOOL_CHAIN_TAG definition in Tools/Conf/target.txt.");
+            throw new EdkException("No valid tool chain found! "+
+                                   "Please check the TOOL_CHAIN_TAG definition in Tools/Conf/target.txt, "+
+                                   "or the <BuildOptions> in the FPD file.");
         }
 
         if (toolChainInfo.getArchs().length == 0) {
-            throw new EdkException("No valid ARCH specified! Please check your TARGET_ARCH definition in Tools/Conf/target.txt.");
+            throw new EdkException("No valid architecture found! "+
+                                   "Please check the TARGET_ARCH definition in Tools/Conf/target.txt, "+
+                                   "or the <SupportedArchitectures>, <BuildOptions> in the FPD file.");
         }
 
         if (toolChainInfo.getCommands().length == 0) {
-            throw new EdkException("No valid COMMAND specified! Please check your TARGET definition in Tools/Conf/tools_def.txt.");
+            throw new EdkException("No valid COMMAND found! Please check the tool chain definitions "+
+                                   "in Tools/Conf/tools_def.txt.");
         }
     }
 }
