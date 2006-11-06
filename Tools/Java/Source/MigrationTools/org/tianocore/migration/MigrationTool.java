@@ -116,13 +116,19 @@ public class MigrationTool {
 	 * This method designates the location of temp directory.
 	 * 
 	 * @param modulepath
-	 * @return
+	 * @return String
 	 */
 	public static final String getTempDir(String modulepath) {
 		return "C:" + File.separator + "MigrationTool_Temp"
 				+ modulepath.replace(startpath, "");
 	}
 
+	/**
+	 * This method is the default output path generating scheme.
+	 * 
+	 * @param inputpath
+	 * @return String
+	 */
 	private static final String assignOutPutPath(String inputpath) {
 		if (MigrationTool.defaultoutput) {
 			return inputpath.replaceAll(Common.STRSEPARATER, "$1");
@@ -133,6 +139,14 @@ public class MigrationTool {
 		}
 	}
 
+	/**
+	 * This function is called by main loop of the MigrationTool which
+	 * verifies whether a dir contains a module, thus generating a map
+	 * which shows the corresponding path for each module.
+	 * 
+	 * @param filepath
+	 * @throws Exception
+	 */
 	public static final void seekModule(String filepath) throws Exception {
 		if (ModuleInfo.isModule(filepath)) {
 			ModuleInfoMap.put(new ModuleInfo(filepath),
@@ -140,6 +154,12 @@ public class MigrationTool {
 		}
 	}
 
+	/**
+	 * This is the main loop of the tool.
+	 * 
+	 * @param path
+	 * @throws Exception
+	 */
 	public static final void startMigrateAll(String path) throws Exception {
 		startpath = path;
 		MigrationTool.ui.println("Project Migration");
@@ -162,6 +182,12 @@ public class MigrationTool {
 		Common.deleteDir("C:" + File.separator + "MigrationTool_Temp");
 	}
 
+	/**
+	 * This main method initializes the environment. 
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		ui = FirstPanel.getInstance();
 		db = Database.getInstance();
