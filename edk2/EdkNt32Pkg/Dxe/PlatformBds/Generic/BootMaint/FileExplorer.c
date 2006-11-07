@@ -148,7 +148,8 @@ Returns:
   BM_FILE_CONTEXT *NewFileContext;
   FORM_ID         FormId;
   BOOLEAN         ExitFileExplorer;
-
+  EFI_STATUS      Status;
+  
   NewMenuEntry      = NULL;
   NewFileContext    = NULL;
   ExitFileExplorer  = FALSE;
@@ -180,7 +181,11 @@ Returns:
     if (NewFileContext->IsDir ) {
       RemoveEntryList (&NewMenuEntry->Link);
       BOpt_FreeMenu (&DirectoryMenu);
-      BOpt_FindFiles (CallbackData, NewMenuEntry);
+      Status = BOpt_FindFiles (CallbackData, NewMenuEntry);
+       if (EFI_ERROR (Status)) {
+         ExitFileExplorer = TRUE;
+         goto exit;
+       }
       CreateMenuStringToken (CallbackData, CallbackData->FeHiiHandle, &DirectoryMenu);
       BOpt_DestroyMenuEntry (NewMenuEntry);
 
@@ -247,7 +252,7 @@ Returns:
       }
     }
   }
-
+exit:
   return ExitFileExplorer;
 }
 
