@@ -288,10 +288,6 @@ typedef struct {
 
 #define PCI_MAX_BAR                   0x0006
 #define PCI_MAX_CONFIG_OFFSET         0x0100
-//
-// bugbug: this is supported in PCI spec v2.3
-//
-#define PCI_EXP_MAX_CONFIG_OFFSET                   0x1000
 
 #define PCI_VENDOR_ID_OFFSET                        0x00
 #define PCI_DEVICE_ID_OFFSET                        0x02
@@ -323,14 +319,6 @@ typedef struct {
 #define PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET    0x19
 #define PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET  0x1a
 
-typedef struct {
-  UINT8 Register;
-  UINT8 Function;
-  UINT8 Device;
-  UINT8 Bus;
-  UINT8 Reserved[4];
-} DEFIO_PCI_ADDR;
-
 typedef union {
   struct {
     UINT32  Reg : 8;
@@ -345,9 +333,7 @@ typedef union {
 
 #pragma pack()
 
-#define EFI_ROOT_BRIDGE_LIST                            'eprb'
 #define PCI_EXPANSION_ROM_HEADER_SIGNATURE              0xaa55
-#define EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE       0x0EF1
 #define PCI_DATA_STRUCTURE_SIGNATURE                    EFI_SIGNATURE_32 ('P', 'C', 'I', 'R')
 #define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
 #define PCI_CODE_TYPE_EFI_IMAGE                         0x03
@@ -405,30 +391,11 @@ typedef struct {
 
 typedef struct {
   UINT16  Signature;    // 0xaa55
-  UINT16  InitializationSize;
-  UINT32  EfiSignature; // 0x0EF1
-  UINT16  EfiSubsystem;
-  UINT16  EfiMachineType;
-  UINT16  CompressionType;
-  UINT8   Reserved[8];
-  UINT16  EfiImageHeaderOffset;
-  UINT16  PcirOffset;
-} EFI_PCI_EXPANSION_ROM_HEADER;
-
-typedef struct {
-  UINT16  Signature;    // 0xaa55
   UINT8   Size512;
   UINT8   InitEntryPoint[3];
-  UINT8   Reserved[0x12];  
+  UINT8   Reserved[0x12];
   UINT16  PcirOffset;
 } EFI_LEGACY_EXPANSION_ROM_HEADER;
-
-typedef union {
-  UINT8                           *Raw;
-  PCI_EXPANSION_ROM_HEADER        *Generic;
-  EFI_PCI_EXPANSION_ROM_HEADER    *Efi;
-  EFI_LEGACY_EXPANSION_ROM_HEADER *PcAt;
-} EFI_PCI_ROM_HEADER;
 
 typedef struct {
   UINT32  Signature;    // "PCIR"
@@ -455,10 +422,6 @@ typedef struct {
 #define EFI_PCI_CAPABILITY_ID_MSI     0x05
 #define EFI_PCI_CAPABILITY_ID_HOTPLUG 0x06
 #define EFI_PCI_CAPABILITY_ID_PCIX    0x07
-//
-// bugbug: this ID is defined in PCI spec v2.3
-//
-#define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10
 
 typedef struct {
   UINT8 CapabilityID;
@@ -568,5 +531,13 @@ typedef struct {
 #define PCI_BAR_ALL         0xFF
 
 #pragma pack(pop)
+
+//
+// NOTE: The following header files are included here for
+// compatibility consideration.
+//
+#include "pci23.h"
+#include "pci30.h"
+#include "EfiPci.h"
 
 #endif
