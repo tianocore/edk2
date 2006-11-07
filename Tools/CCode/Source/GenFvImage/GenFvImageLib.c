@@ -48,6 +48,17 @@ Abstract:
 #include "EfiCompress.h"
 #include "WinNtInclude.h"
 
+//
+// Different file separater for Linux and Windows
+//
+#ifdef __GNUC__
+#define FILE_SEP_CHAR '/'
+#define FILE_SEP_STRING "/"
+#else
+#define FILE_SEP_CHAR '\\'
+#define FILE_SEP_STRING "\\"
+#endif
+
 static UINT32 MaxFfsAlignment = 0;
 //
 // Local function prototypes
@@ -1374,7 +1385,7 @@ Returns:
   // Copy the file name for the path of the sym file and truncate the name portion.
   //
   strcpy (SymFileName, Buffer);
-  Ptr = strrchr (SymFileName, '\\');
+  Ptr = strrchr (SymFileName, FILE_SEP_CHAR);
   assert (Ptr);
   Ptr[0] = 0;
 
@@ -1411,7 +1422,7 @@ Returns:
     // Add the symbol file name and extension to the file path.
     //
     strcat (Buffer, ".sym");
-    strcat (SymFileName, "\\");
+    strcat (SymFileName, FILE_SEP_CHAR);
     strcat (SymFileName, Buffer);
   } else {
     //
