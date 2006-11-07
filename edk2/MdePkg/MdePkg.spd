@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>MdePkg</PackageName>
     <GuidValue>5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec</GuidValue>
@@ -28,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </SpdHeader>
   <PackageDefinitions>
-    <ReadOnly>true</ReadOnly>
+    <ReadOnly>false</ReadOnly>
     <RePackage>false</RePackage>
   </PackageDefinitions>
   <LibraryClassDeclarations>
@@ -2333,6 +2323,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0xE0000000</DefaultValue>
       <HelpText>The base address of PCI Express MMIO window.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPlatformBusSpeed</C_Name>
+      <Token>0x0000000c</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
+      <DefaultValue>200000000</DefaultValue>
+      <HelpText>This value is the Bus Speed on platform</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

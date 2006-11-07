@@ -19,18 +19,9 @@
 **/
 
 //
-// The following 2 arrays are used in calculating the frequency of local APIC
+// The following array is used in calculating the frequency of local APIC
 // timer. Refer to IA-32 developers' manual for more details.
 //
-
-GLOBAL_REMOVE_IF_UNREFERENCED
-CONST UINT32                          mTimerLibLocalApicFrequencies[] = {
-  100000000,
-  133000000,
-  200000000,
-  166000000
-};
-
 GLOBAL_REMOVE_IF_UNREFERENCED
 CONST UINT8                           mTimerLibLocalApicDivisor[] = {
   0x02, 0x04, 0x08, 0x10,
@@ -73,7 +64,7 @@ InternalX86GetTimerFrequency (
   )
 {
   return
-    mTimerLibLocalApicFrequencies[AsmMsrBitFieldRead32 (44, 16, 18)] /
+    PcdGet32(PcdPlatformBusSpeed) /
     mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
 }
 
@@ -255,5 +246,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return (UINT64)InternalX86GetTimerFrequency (ApicBase);
+  return PcdGet32(PcdPlatformBusSpeed);
 }
