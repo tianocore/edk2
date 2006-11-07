@@ -116,7 +116,15 @@ Returns:
   //
   // Add the null termination over the 0x0D
   //
-  InputBuffer[CharsToCopy - 1] = '\0';
+  if (InputBuffer[CharsToCopy - 1] == '\r') {
+
+    InputBuffer[CharsToCopy - 1] = '\0';
+
+  } else {
+
+    InputBuffer[CharsToCopy] = '\0';
+
+  }
 
   //
   // Increment the current file pointer (include the 0x0A)

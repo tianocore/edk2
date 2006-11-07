@@ -126,7 +126,7 @@ Returns:
   CHAR8       SymFileNameBuffer[_MAX_PATH];
   CHAR8       *SymFileName;
   UINT8       *SymImage;
-  UINTN       SymImageSize;
+  UINTN       SymImageSize = 0;
   CHAR8       *CurrentSymString;
 
   FvFileName  = FvFileNameBuffer;
