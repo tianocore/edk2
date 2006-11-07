@@ -35,6 +35,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename SupArchList="IA32">x86TimerLib.c</Filename>
@@ -49,4 +52,11 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdPlatformBusSpeed</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This value is the Bus Speed on platform</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>

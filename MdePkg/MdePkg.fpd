@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <PlatformHeader>
     <PlatformName>MdePkgAll</PlatformName>
     <GuidValue>0fe7dd3e-0969-48c3-8cd2-de9a190088e2</GuidValue>
@@ -31,6 +21,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <BuildTargets>DEBUG RELEASE</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory>Build/Mde</OutputDirectory>
+    <SkuInfo>
+      <UiSkuName SkuID="0">DEFAULT</UiSkuName>
+    </SkuInfo>
   </PlatformDefinitions>
   <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
@@ -113,6 +106,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b">
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>200000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>
@@ -661,6 +664,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b">
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>200000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>
@@ -1221,6 +1234,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="X64" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b">
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>200000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>
@@ -1769,6 +1792,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b">
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>200000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>
@@ -2254,153 +2287,135 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </ModuleSA>
   </FrameworkModules>
   <BuildOptions>
-	  <Ffs FfsKey="APPLICATION">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PE32" /> 
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="BINARY">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections  EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_RAW" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="FILE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_RAW"/> 
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="PE32_PEIM_CompressPEIM">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	      <Sections EncapsulationType="Compress">
-	        <Section SectionType="EFI_SECTION_PE32" /> 
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PEI_CORE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEI_CORE" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PE32"/>
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PE32_PEIM_Relocatable">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="DXE_CORE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DXE_CORE" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Section SectionType="EFI_SECTION_PE32" /> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	      <Section SectionType="EFI_SECTION_VERSION" /> 
-	    </Sections>
-	  </Ffs>
-	
-	
-	  <Ffs FfsKey="BS_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="RT_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="SAL_RT_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  	
-	  <Ffs FfsKey="COMBINED_PEIM_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PE32_PEIM">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="Logo">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_RAW" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
+    <Ffs FfsKey="APPLICATION">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_PE32"/>
+          <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+          <Section SectionType="EFI_SECTION_VERSION"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="BINARY">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_RAW"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="FILE">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_RAW"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="PE32_PEIM_CompressPEIM">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+        <Sections EncapsulationType="Compress">
+          <Section SectionType="EFI_SECTION_PE32"/>
+          <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+          <Section SectionType="EFI_SECTION_VERSION"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="PEI_CORE">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEI_CORE"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+        <Section SectionType="EFI_SECTION_VERSION"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="PE32_PEIM_Relocatable">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+        <Section SectionType="EFI_SECTION_PE32"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="DXE_CORE">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DXE_CORE"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+        <Section SectionType="EFI_SECTION_VERSION"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="BS_DRIVER">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+          <Section SectionType="EFI_SECTION_PE32"/>
+          <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+          <Section SectionType="EFI_SECTION_VERSION"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="RT_DRIVER">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+          <Section SectionType="EFI_SECTION_PE32"/>
+          <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+          <Section SectionType="EFI_SECTION_VERSION"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="SAL_RT_DRIVER">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+          <Section SectionType="EFI_SECTION_PE32"/>
+          <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+          <Section SectionType="EFI_SECTION_VERSION"/>
+        </Sections>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="COMBINED_PEIM_DRIVER">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+        <Section SectionType="EFI_SECTION_VERSION"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="PE32_PEIM">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections>
+        <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
+        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+        <Section SectionType="EFI_SECTION_VERSION"/>
+      </Sections>
+    </Ffs>
+    <Ffs FfsKey="Logo">
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM"/>
+      <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
+      <Sections EncapsulationType="Compress">
+        <Sections EncapsulationType="Guid-Defined">
+          <Section SectionType="EFI_SECTION_RAW"/>
+        </Sections>
+      </Sections>
+    </Ffs>
   </BuildOptions>
 </PlatformSurfaceArea>
