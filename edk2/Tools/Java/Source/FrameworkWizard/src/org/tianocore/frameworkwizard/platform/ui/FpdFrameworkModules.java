@@ -389,18 +389,22 @@ public class FpdFrameworkModules extends IInternalFrame {
         String path = modelAllModules.getValueAt(selectedRow, pathColForAllModTable) + "";
         ModuleIdentification mi = miList.get(selectedRow);
         Vector<String> vArchs = null;
-        try {
-            vArchs = WorkspaceProfile.getModuleSupArchs(mi);
-        }
-        catch (Exception exp) {
-            JOptionPane.showMessageDialog(frame, exp.getMessage());
-        }
+
+        vArchs = WorkspaceProfile.getModuleSupArchs(mi);
 
         if (vArchs == null) {
             JOptionPane.showMessageDialog(frame, "No Supported Architectures specified in MSA file.");
             return;
         }
 
+        Vector<Object> platformSupArch = new Vector<Object>();
+        ffc.getPlatformDefsSupportedArchs(platformSupArch);
+        platformSupArch.retainAll(vArchs);
+        if (platformSupArch.size() == 0) {
+            JOptionPane.showMessageDialog(frame, "This Module does not support this platform architectures.");
+            return;
+        }
+        
         String archsAdded = "";
         String mg = mi.getGuid();
         String mv = mi.getVersion();
@@ -434,7 +438,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         //
         // check whether archs conform to SupArch of platform.
         //
-        Vector<Object> platformSupArch = new Vector<Object>();
+        platformSupArch.removeAllElements();
         ffc.getPlatformDefsSupportedArchs(platformSupArch);
         vArchs.retainAll(platformSupArch);
         //

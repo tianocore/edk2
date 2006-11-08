@@ -105,7 +105,7 @@ public class WorkspaceProfile {
         return null;
     }
     
-    public static Vector<String> getModuleSupArchs(ModuleIdentification mi) throws Exception {
+    public static Vector<String> getModuleSupArchs(ModuleIdentification mi){
         Vector<String> vArchs = null;
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)getModuleXmlObject(mi);
         if (msa.getModuleDefinitions() == null || msa.getModuleDefinitions().getSupportedArchitectures() == null) {
