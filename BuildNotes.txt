@@ -1,7 +1,7 @@
 Intel(R) Platform Innovation Framework for EFI
 EFI Development Kit II (EDK II) 
 Root Package 1.00
-2006-07-18
+2006-11-08
 
 Intel is a trademark or registered trademark of Intel Corporation or its 
 subsidiaries in the United States and other countries.
@@ -24,7 +24,7 @@ Package Contents
 
 Note: MDE and MDK that appear in other documentation refer to the MdePkg and
 Tools packages, respectively.  While, these two packages are the minimum 
-requirement for developing EDK II Packageswe recommend that you download all 
+requirement for developing EDK II Packages we recommend that you download all 
 of the top-level files listed above.
 
 The following package is available as a separate project, under a separate 
@@ -34,7 +34,7 @@ license, on the TianoCore.org website: https://fat-driver2.tianocore.org
                    system
 
 Documents have the following filenames (to download these documents, see “Notes 
-on Documentation” later in these Release Notes):
+on Documentation?later in these Release Notes):
   EDK II Module Development Environment Library Specification, v0.58 
       (MDE_Library_Spec_0_58.rtf)
   EDK II Build and Packaging Architecture Specification, v0.53
@@ -64,6 +64,7 @@ Assembler Tool Chain
       Microsoft Macro Assembler, version 6.15 or later
     or
       GNU binutils 2.16.1 or later
+      (Http://ftp.gnu.org/gnu/binutils)
 
 Java Development Kit ( Java 5.0 or later)
       Sun* jdk-1.5.0_06 or later (http://java.sun.com)
@@ -124,14 +125,14 @@ Software Installation Order:
 Java Development Kit:
  
    The Java Environment Variable must be set before attempting to build.
-       For Sun JDK (see note below†):
+       For Sun JDK (see note below?:
               set JAVA_HOME=c:\Java\jdk1.5.0_06  (Windows example)
               export JAVA_HOME=/Library/Java/Home/ (OS X example)
               export JAVA_HOME=/usr/lib/j2sdk1.5-sun/ (Linux example)
        For Bea Systems:
               set JAVA_HOME=c:\Java\jrockit-R26.0.0-jdk1.5.0_04
  
-  † When using the Sun JDK5.0:
+  ?When using the Sun JDK5.0:
     During installation, you should specify the install directory as C:\Java
     instead of C:\Program Files\(or some other drive letter.)  While installing
     to this non-standard location is not required, in practice, it seems to work 
@@ -263,7 +264,7 @@ you would like to build (MdePkg/ or EdkModulePkg/) and then type build.
 A Word on compiling on Linux
 ----------------------------
 
-In order to compile on Linux, you will need to have the e2fsprogs-dev package
+In order to compile on Linux, you will need to have the e2fsprogs-devel package
 installed.  Check your distribution for the rpm, deb or other package format.
 This package contains the uuid library and header that are used by some of the
 host tools.
@@ -298,7 +299,7 @@ not support the EFIAPI calling convention the x64 tools do not support generatin
 PE32+ image.  The EFIAPI calling convention is very similar to the Microsoft x64 
 calling convention.
 
-On Itanium® Processors the gcc compiler does not support generating a PE32+ image.
+On Itanium?Processors the gcc compiler does not support generating a PE32+ image.
 
 -----------------------
 Notes on Documentation
@@ -353,7 +354,7 @@ This command builds the active platform specified in text file target.txt. If
 the active platform is not specified target.txt, you must execute the build 
 command from the sub-directory that contains FPD files. For more information 
 about the active platform policy, see the “EDK II Build and Packaging 
-Architecture Specification.”
+Architecture Specification.?
 
 -------------------------------------------------------------------------------
 Detailed Starting Instructions
@@ -385,9 +386,9 @@ the tools get rebuilt by typing:
 
 The edksetup script is referred to as the setup command throughout the 
 rest of this document.
-      NOTE: You should run the setup command at the start of every session.
-            This configures the environment to include the TianoTools and the
-            Java applications and libraries.
+      NOTE: You should run the setup command (edksetup)at the start of every 
+            session.  This configures the environment to include the 
+            TianoTools and the Java applications and libraries.
 
 Any changes to the tool source code or XML Schema documents require that
 you execute the following:
@@ -414,7 +415,7 @@ This command builds the active platform specified in text file target.txt. If
 the active platform is not specified, go to the sub-directory that contains FPD 
 files and execute the build command. For more information about the active 
 platform policy, see the “EDK II Build and Packaging Architecture 
-Specification.”
+Specification.?
 
 --------------------------
 Individual Platform Builds
@@ -430,14 +431,14 @@ or
   Note that the active platform specified in target.txt overrides the platform 
   specified by any FPD file in the current directory. For more   information 
   about active platform policy, see the “EDK II Build and Packaging Architecture
-  Specification.” 
+  Specification.?
 
 To run the Nt32 emulation platform under Microsoft Windows, go to 
 <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
 
-To exit the Nt32 emulation platform, type “reset” at the EFI Shell>
+To exit the Nt32 emulation platform, type “reset?at the EFI Shell>
 command prompt.  Alternatively, from the graphical interface, select the Boot
-Maintenance Manager's “Reset System” command.
+Maintenance Manager's “Reset System?command.
 
       NOTE: When creating a new platform, the Platform Name is restricted
       to a single word containing alphanumeric characters, underscore, dash, 
@@ -479,7 +480,7 @@ the modules that the package contains, including the location of all MSA files,
 and public library names and headers that might be provided by a module in the
 package.  Packages are defined by SPD files.  (Found in the root of the Package
 subdirectory (i.e. EdkNt32Pkg).) The SPD file is further explained in “EDK II 
-Build and Packaging Architecture Specification.”
+Build and Packaging Architecture Specification.?
  
 B) Module Surface Area Definition (MSA) files.  A description of a module's 
 surface area, with all module specific default flags and features specified.
@@ -654,7 +655,7 @@ Of particular note:
    easier.
 2) The MDE libraries represent significant changes in source
    (with only limited changes in functionality.)  These new libraries conform
-   to the "EDK II Module Development Environment Library Specification.” 
+   to the "EDK II Module Development Environment Library Specification.?
 3) The Fat Binary and the EDK Shell Binary Packages are functionally identical
    to the original EDK.
 4) The EDK tools directory has been expanded to include more tools and more
@@ -664,6 +665,5 @@ Of particular note:
 6) The Application "HelloWorld" has been ported to EDK II as well.
 
 =======================================================
-Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4718, no
+Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4890, no
 virus detected.
-
