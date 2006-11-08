@@ -40,6 +40,7 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -188,6 +189,8 @@ public class FpdFrameworkModules extends IInternalFrame {
     private final int typeMinWidth = 100;
     
     private final int typeMaxWidth = 155;
+
+    private JButton jButtonApriori = null;
     
     /**
      * This method initializes jSplitPane
@@ -526,6 +529,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             jPanelBottomSouth.setLayout(flowLayout1);
             jPanelBottomSouth.add(getJButtonSettings(), null);
             jPanelBottomSouth.add(getJButtonRemoveModule(), null);
+            jPanelBottomSouth.add(getJButtonApriori(), null);
         }
         return jPanelBottomSouth;
     }
@@ -751,7 +755,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (fvBindings != null) {
                         String[] fvArray = fvBindings.split(" ");
                         for (int i = 0; i < fvArray.length; ++i) {
-                            ffc.removeModuleInBuildOptionsUserExtensions(fvArray[i].trim(), mg, mv, pg, pv, arch);
+                            ffc.removeModuleInBuildOptionsUserExtensions(fvArray[i].trim(), "IMAGES", 1, mg, mv, pg, pv, arch);
                         }
                     }
                     
@@ -793,6 +797,29 @@ public class FpdFrameworkModules extends IInternalFrame {
             });
         }
         return jButtonRemoveModule;
+    }
+
+    /**
+     * This method initializes jButtonApriori	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonApriori() {
+        if (jButtonApriori == null) {
+            jButtonApriori = new JButton();
+            jButtonApriori.setText("Apriori Files");
+            FontMetrics fm = jButtonApriori.getFontMetrics(jButtonApriori.getFont());
+            int buttonWidth = fm.stringWidth(jButtonApriori.getText()) + 40;
+            if (jButtonRemoveModule.getWidth() > buttonWidth) {
+                buttonWidth = jButtonRemoveModule.getWidth();
+            }
+            jButtonApriori.setPreferredSize(new Dimension (buttonWidth, 20));
+            jButtonApriori.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    new GenAprioriFileDialog(ffc, docConsole).setVisible(true);
+                }});
+        }
+        return jButtonApriori;
     }
 
     /**
