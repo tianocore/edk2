@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -101,7 +102,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
             jComboBoxPackage = new ICheckBoxList();
             WorkspaceTools wt = new WorkspaceTools();
             Vector<String> v = new Vector<String>();
-            packageVector = wt.getAllRepackagablePackages();
+            packageVector = wt.getAllPackages();
             Iterator<PackageIdentification> iter = packageVector.iterator();
             while (iter.hasNext()) {
                 PackageIdentification item = iter.next();
@@ -255,6 +256,32 @@ public class CreateStepTwo extends IDialog implements MouseListener {
                 Log.wrn("Create far", "Choose at least one package and/or platform.");
                 return;
             }
+            
+            //
+            // If some packages a Repackage=false, give a warning message
+            //
+            List<PackageIdentification> selectedPackages = getSelectedPackages();
+            WorkspaceTools wt = new WorkspaceTools();
+            List<PackageIdentification> allRepackablePackages = wt.getAllRepackagablePackages();
+            
+            List<PackageIdentification> unRepackablePackages = new Vector<PackageIdentification>();
+            String msg = "Following selected packages: \n";
+            Iterator<PackageIdentification> iter = selectedPackages.iterator();
+            while (iter.hasNext()) {
+                PackageIdentification item = iter.next();
+                if (!allRepackablePackages.contains(item)) {
+                    unRepackablePackages.add(item);
+                    msg += item.getName() + "\n";
+                }
+            }
+            msg += "is un-Repackagable. Do you want to continue? ";
+            
+            if (unRepackablePackages.size() > 0) {
+                if(JOptionPane.showConfirmDialog(null, msg, "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+                    return ;
+                }
+            }
+            
             if (stepThree == null) {
                 stepThree = new CreateStepThree(this, true, this);
             }
