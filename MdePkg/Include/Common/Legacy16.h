@@ -37,7 +37,7 @@ typedef struct {
   //
   UINT32  BiosLessThan1MB;
   UINT32  HiPmmMemory;
-  UINT32  PmmMemorySizeInBytes;
+  UINT32  HiPmmMemorySizeInBytes;
 
   UINT16  ReverseThunkCallSegment;
   UINT16  ReverseThunkCallOffset;
@@ -76,7 +76,7 @@ typedef enum {
 //  Legacy16InitializeYourself
 //    Description: This is the first call to 16-bit code. It allows the
 //                 16-bit to perform any internal initialization.
-//    Input:  ES:BX pointer to EFI_TO_LEGACY16_INIT_TABLE
+//    Input:  ES:BX pointer to EFI_TO_COMPATIBILITY16_INIT_TABLE
 //    Output:
 //  Legacy16UpdateBbs
 //    Description: The 16-bit code updates the BBS table for non-compliant
