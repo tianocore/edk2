@@ -183,15 +183,15 @@ typedef struct {
   UINT8   EfiMinorRevision;
   UINT8   TableMajorRevision;
   UINT8   TableMinorRevision;
-  UINT8   Reserved[2];
-  UINT16  Legacy16CallSegment;
-  UINT16  Legacy16CallOffset;
+  UINT16  Reserved;
+  UINT16  Compatibility16CallSegment;
+  UINT16  Compatibility16CallOffset;
 
   UINT16  PnPInstallationCheckSegment;
   UINT16  PnPInstallationCheckOffset;
 
   UINT32  EfiSystemTable;
-  UINT32  OemStringPointer;
+  UINT32  OemIdStringPointer;
   UINT32  AcpiRsdPtrPointer;
   UINT16  OemRevision;
   UINT32  E820Pointer;
@@ -516,7 +516,7 @@ EFI_STATUS
   OUT UINT16                          *HddCount,
   OUT HDD_INFO                        **HddInfo,
   OUT UINT16                          *BbsCount,
-  OUT IN BBS_TABLE                    **BbsTable
+  IN OUT BBS_TABLE                    **BbsTable
   )
 ;
 
@@ -536,7 +536,7 @@ EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI) (
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   OUT UINT16                          *BbsCount,
-  OUT IN BBS_TABLE                    **BbsTable
+  OUT BBS_TABLE                       **BbsTable
   )
 ;
 
@@ -689,8 +689,8 @@ struct _EFI_LEGACY_BIOS_PROTOCOL {
   EFI_LEGACY_BIOS_BOOT                        LegacyBoot;
   EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS  UpdateKeyboardLedStatus;
   EFI_LEGACY_BIOS_GET_BBS_INFO                GetBbsInfo;
-  EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI         PrepareToBootEfi;
   EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS    ShadowAllLegacyOproms;
+  EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI         PrepareToBootEfi;
   EFI_LEGACY_BIOS_GET_LEGACY_REGION           GetLegacyRegion;
   EFI_LEGACY_BIOS_COPY_LEGACY_REGION          CopyLegacyRegion;
   EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE  BootUnconventionalDevice;
