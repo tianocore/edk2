@@ -330,6 +330,11 @@ public class FpdParserForThread extends FpdParserTask {
                 allThreads.put(libFpdModuleId, liBuildThread);
                 
                 updateFvs("libqueue", libFpdModuleId);
+                
+                saq.push(GlobalData.getDoc(libinstances[i], fpdModuleId.getArch()));
+                GlobalData.addMsaBuildOption(libinstances[i], parseMsaBuildOptions(false));
+                GlobalData.addMsaFamilyBuildOption(libinstances[i], parseMsaBuildOptions(true));
+                saq.pop();
             }
             
             genBuildThread.setDependencies(dependencies);
