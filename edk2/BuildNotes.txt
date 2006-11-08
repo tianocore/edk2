@@ -13,7 +13,7 @@ how to install and build the EDK II.
 
 Package Contents
 ----------------
-  ReleaseNote.txt- These release notes for the package.
+  BuildNotes.txt - The build notes for this package.
   MdePkg         - Industry-standard headers and libraries
   Tools          - Build -specific tools that are designed to help the 
                    developer create and modify drivers and libraries
