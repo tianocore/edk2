@@ -417,6 +417,7 @@ Returns:
 {
   EFI_STATUS  Status;
   UINT8       FakeNvRamMap[1];
+  BOOLEAN     FrontPageMenuResetRequired;
 
   //
   // Begin waiting for USER INPUT
@@ -427,6 +428,7 @@ Returns:
         );
 
   FakeNvRamMap[0] = (UINT8) mLastSelection;
+  FrontPageMenuResetRequired = FALSE;
   Status = gBrowser->SendForm (
                       gBrowser,
                       TRUE,                     // Use the database
@@ -436,8 +438,14 @@ Returns:
                       FrontPageCallbackHandle,  // This is the handle that the interface to the callback was installed on
                       FakeNvRamMap,
                       NULL,
-                      NULL
+                      &FrontPageMenuResetRequired
                       );
+  //
+  // Check whether user change any option setting which needs a reset to be effective
+  //                      
+  if (FrontPageMenuResetRequired) {
+    EnableResetRequired ();
+  }
 
   Hii->ResetStrings (Hii, gFrontPageHandle);
 
@@ -877,6 +885,11 @@ Returns:
 
   } while ((Status == EFI_SUCCESS) && (gCallbackKey != 1));
 
+  //
+  //Will leave browser, check any reset required change is applied? if yes, reset system
+  //
+  SetupResetReminder ();
+  
   //
   // Automatically load current entry
   // Note: The following lines of code only execute when Auto boot
