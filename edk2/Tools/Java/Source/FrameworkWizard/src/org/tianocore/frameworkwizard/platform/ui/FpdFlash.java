@@ -34,6 +34,7 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
@@ -1268,7 +1269,10 @@ public class FpdFlash extends IInternalFrame {
         if (index >= startIndexOfDynamicTab) {
             return;
         }
-        jTabbedPane.addTab(fvName, null, new ModuleOrderPane(fvName, outputFile), null);
+        ModuleOrderPane pane = new ModuleOrderPane(fvName, outputFile, ffc, this);
+        pane.showModulesInFv(fvName);
+        pane.showAllModulesInPlatform();
+        jTabbedPane.addTab(fvName, null, pane, null);
     }
     /**
      * This method initializes jTextField4	
@@ -1799,7 +1803,10 @@ public class FpdFlash extends IInternalFrame {
                                 ffc.updateFvImageNameAll(oldFvName, newFvName);
                                 
                             } else {
-                                jTabbedPane.addTab(newFvName, new ModuleOrderPane(newFvName, ""));
+                                ModuleOrderPane pane = new ModuleOrderPane(newFvName, "", ffc, FpdFlash.this);
+                                pane.showModulesInFv(newFvName);
+                                pane.showAllModulesInPlatform();
+                                jTabbedPane.addTab(newFvName, pane);
                                 // Add FvImageNames in Flash
                                 String[] fvNames = {newFvName};
                                 ffc.addFvImageFvImageNames(fvNames);
@@ -2475,718 +2482,655 @@ public class FpdFlash extends IInternalFrame {
         }
 
     }
-    
-//    class ModuleSAInfo {
-//        private int rowNumber = -1;
-//        private String moduleGuid = null;
-//        private String moduleVersion = null;
-//        private String packageGuid = null;
-//        private String packageVersion = null;
-//        private String arch = null;
-//        
-//        public ModuleSAInfo (String mg, String mv, String pg, String pv, String a) {
-//            moduleGuid = mg;
-//            moduleVersion = mv;
-//            packageGuid = pg;
-//            packageVersion = pv;
-//            arch = a;
-//        }
-//
-//        /**
-//         * @return Returns the arch.
-//         */
-//        public String getArch() {
-//            return arch;
-//        }
-//
-//        /**
-//         * @param arch The arch to set.
-//         */
-//        public void setArch(String arch) {
-//            this.arch = arch;
-//        }
-//
-//        /**
-//         * @return Returns the moduleGuid.
-//         */
-//        public String getModuleGuid() {
-//            return moduleGuid;
-//        }
-//
-//        /**
-//         * @param moduleGuid The moduleGuid to set.
-//         */
-//        public void setModuleGuid(String moduleGuid) {
-//            this.moduleGuid = moduleGuid;
-//        }
-//
-//        /**
-//         * @return Returns the moduleVersion.
-//         */
-//        public String getModuleVersion() {
-//            return moduleVersion;
-//        }
-//
-//        /**
-//         * @param moduleVersion The moduleVersion to set.
-//         */
-//        public void setModuleVersion(String moduleVersion) {
-//            this.moduleVersion = moduleVersion;
-//        }
-//
-//        /**
-//         * @return Returns the packageGuid.
-//         */
-//        public String getPackageGuid() {
-//            return packageGuid;
-//        }
-//
-//        /**
-//         * @param packageGuid The packageGuid to set.
-//         */
-//        public void setPackageGuid(String packageGuid) {
-//            this.packageGuid = packageGuid;
-//        }
-//
-//        /**
-//         * @return Returns the packageVersion.
-//         */
-//        public String getPackageVersion() {
-//            return packageVersion;
-//        }
-//
-//        /**
-//         * @param packageVersion The packageVersion to set.
-//         */
-//        public void setPackageVersion(String packageVersion) {
-//            this.packageVersion = packageVersion;
-//        }
-//
-//        /**
-//         * @return Returns the rowNumber.
-//         */
-//        public int getRowNumber() {
-//            return rowNumber;
-//        }
-//
-//        /**
-//         * @param rowNumber The rowNumber to set.
-//         */
-//        public void setRowNumber(int rowNumber) {
-//            this.rowNumber = rowNumber;
-//        }
-//    }
-    
-    private class ModuleOrderPane extends JPanel {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1L;
-        private JPanel jPanelModOrderN = null;
-        private JPanel jPanelModOrderS = null;
-        private JPanel jPanelModOrderC = null;
-        private JScrollPane jScrollPaneModInFv = null;
-        private JTable jTableModInFv = null;
-        private JPanel jPanelController = null;
-        private JScrollPane jScrollPaneFpdModules = null;
-        private JTable jTableFpdModules = null;
-        private JButton jButtonUp = null;
-        private JButton jButtonInsert = null;
-        private JButton jButtonRemove = null;
-        private JButton jButtonDown = null;
-        private JButton jButtonOk = null;
-        private JButton jButtonCancel = null;
-        private IDefaultTableModel modInFvTableModel = null;
-        private IDefaultTableModel fpdModTableModel = null;
-//        private ArrayList<ModuleSAInfo> listTableModInFvModuleSAInfo = null;
-//        private ArrayList<ModuleSAInfo> listTableFpdModulesModuleSAInfo = null;
-        private String title = null;
-        private String outputFileName = null;
-        
-        public ModuleOrderPane(String tabTitle, String file) {
-            super(new BorderLayout());
-            title = tabTitle;
-            outputFileName = file;
-//            listTableModInFvModuleSAInfo = new ArrayList<ModuleSAInfo>();
-//            listTableFpdModulesModuleSAInfo = new ArrayList<ModuleSAInfo>();
-            add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
-            add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
-            add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
-            showModulesInFv(title);
-            showAllModulesInPlatform();
+    /* (non-Javadoc)
+     * @see org.tianocore.frameworkwizard.common.ui.IInternalFrame#actionPerformed(java.awt.event.ActionEvent)
+     */
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getActionCommand().equals("ModuleOrderPaneOk")) {
+            docConsole.setSaved(false);
+            jTabbedPane.setSelectedIndex(0);
         }
-        
-        private void showModulesInFv(String fvName) {
-            int size = ffc.getUserExtsIncModCount(fvName);
-            
-            if (size != -1) {
-                String[][] saa = new String[size][5];
-                ffc.getUserExtsIncMods(fvName, saa);
-
-                for (int i = 0; i < size; ++i) {
-                    String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
-                    ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
-                    String name = "N/A";
-                    if (mi != null) {
-                        name = mi.getName();
-                    }
-                    
-                    String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
-                    modInFvTableModel.addRow(row);
-                }
-            }
-            //
-            // From ModuleSAs, get module guids with FvBinding = fvName.
-            //
-            Vector<String[]> vModuleSA = new Vector<String[]>();
-            ffc.getFrameworkModuleSAByFvBinding(fvName, vModuleSA);
-            //
-            // If BuildOptions->UserExtensions already contain these module info,
-            // no need to add them into table again.
-            //
-            Iterator<String[]> iter = vModuleSA.iterator();
-            while (iter.hasNext()){
-                String[] sa = iter.next();
-                if (!moduleInfoInTable (sa, modInFvTableModel)) {
-                    String moduleKey = sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3];
-                    ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
-                    String name = "N/A";
-                    if (mi != null) {
-                        name = mi.getName();
-                    }
-                    String[] row = { name, sa[0] , sa[1], sa[2] , sa[3], sa[4] };
-                    modInFvTableModel.addRow(row);
-                }
-            }
-
+        else if (arg0.getActionCommand().equals("ModuleOrderPaneCancel")) {
+            jTabbedPane.setSelectedIndex(0);
         }
+        else {
+            return;
+        }
+    }
+    
+}  //  @jve:decl-index=0:visual-constraint="10,10"
+
+class ModuleOrderPane extends JPanel implements ActionListener{
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private JPanel jPanelModOrderN = null;
+    private JPanel jPanelModOrderS = null;
+    private JPanel jPanelModOrderC = null;
+    private JScrollPane jScrollPaneModInFv = null;
+    private JTable jTableModInFv = null;
+    private JPanel jPanelController = null;
+    private JScrollPane jScrollPaneFpdModules = null;
+    private JTable jTableFpdModules = null;
+    private JButton jButtonUp = null;
+    private JButton jButtonInsert = null;
+    private JButton jButtonRemove = null;
+    private JButton jButtonDown = null;
+    private JButton jButtonOk = null;
+    private JButton jButtonCancel = null;
+    private IDefaultTableModel modInFvTableModel = null;
+    private IDefaultTableModel fpdModTableModel = null;
+    private FpdFileContents ffc = null;
+    private String title = null;
+    private String outputFileName = null;
+    
+    public ModuleOrderPane(String tabTitle, String file, FpdFileContents inputFfc, ActionListener action) {
+        super(new BorderLayout());
+        title = tabTitle;
+        outputFileName = file;
+        ffc = inputFfc;
+        add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
+        add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
+        add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
+        jButtonOk.addActionListener(action);
+        jButtonCancel.addActionListener(action);
         
-        private void showAllModulesInPlatform() {
-            int size = ffc.getFrameworkModulesCount();
+    }
+    
+    public void showModulesInFv(String fvName) {
+        
+        if (modInFvTableModel == null) {
+            return;
+        }
+        int size = ffc.getUserExtsIncModCount(fvName, "IMAGES", 1);
+        
+        if (size != -1) {
             String[][] saa = new String[size][5];
-            ffc.getFrameworkModulesInfo(saa);
-            
+            ffc.getUserExtsIncMods(fvName, "IMAGES", 1, saa);
+
             for (int i = 0; i < size; ++i) {
-                if (moduleInfoInTable(saa[i], modInFvTableModel) || moduleInfoInTable(saa[i], fpdModTableModel)) {
-                    continue;
-                }
                 String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
                 ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
                 String name = "N/A";
                 if (mi != null) {
                     name = mi.getName();
                 }
+                
                 String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
-                fpdModTableModel.addRow(row);
+                modInFvTableModel.addRow(row);
+            }
+        }
+        //
+        // From ModuleSAs, get module guids with FvBinding = fvName.
+        //
+        Vector<String[]> vModuleSA = new Vector<String[]>();
+        ffc.getFrameworkModuleSAByFvBinding(fvName, vModuleSA);
+        //
+        // If BuildOptions->UserExtensions already contain these module info,
+        // no need to add them into table again.
+        //
+        Iterator<String[]> iter = vModuleSA.iterator();
+        while (iter.hasNext()){
+            String[] sa = iter.next();
+            if (!moduleInfoInTable (sa, modInFvTableModel)) {
+                String moduleKey = sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3];
+                ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+                String name = "N/A";
+                if (mi != null) {
+                    name = mi.getName();
+                }
+                String[] row = { name, sa[0] , sa[1], sa[2] , sa[3], sa[4] };
+                modInFvTableModel.addRow(row);
+            }
+        }
+
+    }
+    
+    public void showAllModulesInPlatform() {
+        
+        if (modInFvTableModel == null || fpdModTableModel == null) {
+            return;
+        }
+        int size = ffc.getFrameworkModulesCount();
+        String[][] saa = new String[size][5];
+        ffc.getFrameworkModulesInfo(saa);
+        
+        for (int i = 0; i < size; ++i) {
+            if (moduleInfoInTable(saa[i], modInFvTableModel) || moduleInfoInTable(saa[i], fpdModTableModel)) {
+                continue;
+            }
+            String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
+            ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+            String name = "N/A";
+            if (mi != null) {
+                name = mi.getName();
+            }
+            String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
+            fpdModTableModel.addRow(row);
+        }
+        
+        TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+        sorter.setSortState(0, TableSorter.ASCENDING);
+    }
+    
+    
+    protected boolean moduleInfoInTable (String[] moduleInfo, DefaultTableModel model) {
+        boolean matched = false;
+        int size = model.getDataVector().size();
+        for (int i = 0; i < size; ++i) {
+            Vector rowData = (Vector)model.getDataVector().elementAt(i);
+            for (int j = 1; j < rowData.size(); ++j) {
+                if (rowData.elementAt(j) == null && moduleInfo[j-1] == null) {
+                    matched = true;
+                }
+                else if (rowData.elementAt(j).equals("null") && moduleInfo[j-1] == null) {
+                    matched = true;
+                }
+                else if (rowData.elementAt(j) == null && moduleInfo[j-1].equals("null")) {
+                    matched = true;
+                }
+                else if (rowData.elementAt(j) != null && rowData.elementAt(j).toString().equalsIgnoreCase(moduleInfo[j-1])) {
+                    matched = true;
+                }
+                else {
+                    matched = false;
+                    break;
+                }
             }
             
-            TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
-            sorter.setSortState(0, TableSorter.ASCENDING);
+            if (matched) {
+                return true;
+            }
+            
         }
-        
-        
-        private boolean moduleInfoInTable (String[] moduleInfo, DefaultTableModel model) {
-            boolean matched = false;
-            int size = model.getDataVector().size();
-            for (int i = 0; i < size; ++i) {
-                Vector rowData = (Vector)model.getDataVector().elementAt(i);
-                for (int j = 1; j < rowData.size(); ++j) {
-                    if (rowData.elementAt(j) == null && moduleInfo[j-1] == null) {
-                        matched = true;
-                    }
-                    else if (rowData.elementAt(j).equals("null") && moduleInfo[j-1] == null) {
-                        matched = true;
-                    }
-                    else if (rowData.elementAt(j) == null && moduleInfo[j-1].equals("null")) {
-                        matched = true;
-                    }
-                    else if (rowData.elementAt(j) != null && rowData.elementAt(j).toString().equalsIgnoreCase(moduleInfo[j-1])) {
-                        matched = true;
+        return false;
+    }
+    
+    
+    
+    /**
+     * This method initializes jPanelModOrderN  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderN() {
+        if (jPanelModOrderN == null) {
+            jPanelModOrderN = new JPanel();
+        }
+        return jPanelModOrderN;
+    }
+
+    /**
+     * This method initializes jPanelModOrderS  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderS() {
+        if (jPanelModOrderS == null) {
+            FlowLayout flowLayout6 = new FlowLayout();
+            flowLayout6.setAlignment(java.awt.FlowLayout.RIGHT);
+            jPanelModOrderS = new JPanel();
+            jPanelModOrderS.setLayout(flowLayout6);
+            jPanelModOrderS.add(getJButtonOk(), null);
+            jPanelModOrderS.add(getJButtonCancel(), null);
+        }
+        return jPanelModOrderS;
+    }
+
+    /**
+     * This method initializes jPanelModOrderC  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderC() {
+        if (jPanelModOrderC == null) {
+            jPanelModOrderC = new JPanel();
+            jPanelModOrderC.add(getJScrollPaneModInFv(), null);
+            jPanelModOrderC.add(getJPanelController(), null);
+            jPanelModOrderC.add(getJScrollPaneFpdModules(), null);
+        }
+        return jPanelModOrderC;
+    }
+
+    /**
+     * This method initializes jScrollPaneModInFv   
+     *  
+     * @return javax.swing.JScrollPane  
+     */
+    private JScrollPane getJScrollPaneModInFv() {
+        if (jScrollPaneModInFv == null) {
+            jScrollPaneModInFv = new JScrollPane();
+            jScrollPaneModInFv.setPreferredSize(new java.awt.Dimension(200,500));
+            jScrollPaneModInFv.setViewportView(getJTableModInFv());
+        }
+        return jScrollPaneModInFv;
+    }
+
+    /**
+     * This method initializes jTableModInFv    
+     *  
+     * @return javax.swing.JTable   
+     */
+    protected JTable getJTableModInFv() {
+        if (jTableModInFv == null) {
+            modInFvTableModel = new IDefaultTableModel();
+            
+            jTableModInFv = new JTable(modInFvTableModel){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 4903583933542581721L;
+
+                public String getToolTipText(MouseEvent e) {
+                    String tip = null;
+                    java.awt.Point p = e.getPoint();
+                    int rowIndex = rowAtPoint(p);
+//                    int colIndex = columnAtPoint(p);
+//                    int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                    TableModel model = getModel();
+                    String mg = (String) model.getValueAt(rowIndex, 1);
+                    String mv = (String) model.getValueAt(rowIndex, 2);
+                    String pg = (String) model.getValueAt(rowIndex, 3);
+                    String pv = (String) model.getValueAt(rowIndex, 4);
+                    String arch = (String) model.getValueAt(rowIndex, 5);
+                    ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                    if (mi != null) {
+                        tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
                     }
                     else {
-                        matched = false;
-                        break;
+                        tip = "No Module Path Information."; 
                     }
+                         
+                    return tip;
                 }
-                
-                if (matched) {
-                    return true;
-                }
-                
+
+            };
+            modInFvTableModel.addColumn("Module Orders in FV");
+            modInFvTableModel.addColumn("mg");
+            modInFvTableModel.addColumn("mv");
+            modInFvTableModel.addColumn("pg");
+            modInFvTableModel.addColumn("pv");
+            modInFvTableModel.addColumn("arch");
+            
+            for (int i = 1; i < 6; ++i) {
+                jTableModInFv.removeColumn(jTableModInFv.getColumnModel().getColumn(jTableModInFv.getColumnCount()-1));
             }
-            return false;
-        }
-        
-        
-        
-        /**
-         * This method initializes jPanelModOrderN  
-         *  
-         * @return javax.swing.JPanel   
-         */
-        private JPanel getJPanelModOrderN() {
-            if (jPanelModOrderN == null) {
-                jPanelModOrderN = new JPanel();
-            }
-            return jPanelModOrderN;
-        }
+            
+            jTableModInFv.setRowHeight(20);
+            jTableModInFv.setShowGrid(false);
+            jTableModInFv.setAutoCreateColumnsFromModel(false);
+            jTableModInFv.addMouseListener(new MouseAdapter() {
 
-        /**
-         * This method initializes jPanelModOrderS  
-         *  
-         * @return javax.swing.JPanel   
-         */
-        private JPanel getJPanelModOrderS() {
-            if (jPanelModOrderS == null) {
-                FlowLayout flowLayout6 = new FlowLayout();
-                flowLayout6.setAlignment(java.awt.FlowLayout.RIGHT);
-                jPanelModOrderS = new JPanel();
-                jPanelModOrderS.setLayout(flowLayout6);
-                jPanelModOrderS.add(getJButtonOk(), null);
-                jPanelModOrderS.add(getJButtonCancel(), null);
-            }
-            return jPanelModOrderS;
-        }
-
-        /**
-         * This method initializes jPanelModOrderC  
-         *  
-         * @return javax.swing.JPanel   
-         */
-        private JPanel getJPanelModOrderC() {
-            if (jPanelModOrderC == null) {
-                jPanelModOrderC = new JPanel();
-                jPanelModOrderC.add(getJScrollPaneModInFv(), null);
-                jPanelModOrderC.add(getJPanelController(), null);
-                jPanelModOrderC.add(getJScrollPaneFpdModules(), null);
-            }
-            return jPanelModOrderC;
-        }
-
-        /**
-         * This method initializes jScrollPaneModInFv   
-         *  
-         * @return javax.swing.JScrollPane  
-         */
-        private JScrollPane getJScrollPaneModInFv() {
-            if (jScrollPaneModInFv == null) {
-                jScrollPaneModInFv = new JScrollPane();
-                jScrollPaneModInFv.setPreferredSize(new java.awt.Dimension(200,500));
-                jScrollPaneModInFv.setViewportView(getJTableModInFv());
-            }
-            return jScrollPaneModInFv;
-        }
-
-        /**
-         * This method initializes jTableModInFv    
-         *  
-         * @return javax.swing.JTable   
-         */
-        private JTable getJTableModInFv() {
-            if (jTableModInFv == null) {
-                modInFvTableModel = new IDefaultTableModel();
-                
-                jTableModInFv = new JTable(modInFvTableModel){
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = 4903583933542581721L;
-
-                    public String getToolTipText(MouseEvent e) {
-                        String tip = null;
-                        java.awt.Point p = e.getPoint();
-                        int rowIndex = rowAtPoint(p);
-//                        int colIndex = columnAtPoint(p);
-//                        int realColumnIndex = convertColumnIndexToModel(colIndex);
-
-                        TableModel model = getModel();
+                /* (non-Javadoc)
+                 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+                 */
+                @Override
+                public void mouseClicked(MouseEvent arg0) {
+                    if (arg0.getButton() == MouseEvent.BUTTON3) {
+                        java.awt.Point p = arg0.getPoint();
+                        int rowIndex = jTableModInFv.rowAtPoint(p);
+                        TableModel model = jTableModInFv.getModel();
                         String mg = (String) model.getValueAt(rowIndex, 1);
                         String mv = (String) model.getValueAt(rowIndex, 2);
                         String pg = (String) model.getValueAt(rowIndex, 3);
                         String pv = (String) model.getValueAt(rowIndex, 4);
-                        String arch = (String) model.getValueAt(rowIndex, 5);
                         ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                        String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
                         if (mi != null) {
-                            tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
+                            details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
                         }
-                        else {
-                            tip = "No Module Path Information."; 
-                        }
-                             
-                        return tip;
+                        JOptionPane.showMessageDialog(ModuleOrderPane.this, details);
                     }
-
-                };
-                modInFvTableModel.addColumn("Module Orders in FV");
-                modInFvTableModel.addColumn("mg");
-                modInFvTableModel.addColumn("mv");
-                modInFvTableModel.addColumn("pg");
-                modInFvTableModel.addColumn("pv");
-                modInFvTableModel.addColumn("arch");
-                
-                for (int i = 1; i < 6; ++i) {
-                    jTableModInFv.removeColumn(jTableModInFv.getColumnModel().getColumn(jTableModInFv.getColumnCount()-1));
                 }
                 
-                jTableModInFv.setRowHeight(20);
-                jTableModInFv.setShowGrid(false);
-                jTableModInFv.setAutoCreateColumnsFromModel(false);
-                jTableModInFv.addMouseListener(new MouseAdapter() {
+            });
+        }
+        return jTableModInFv;
+    }
 
-                    /* (non-Javadoc)
-                     * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
-                     */
-                    @Override
-                    public void mouseClicked(MouseEvent arg0) {
-                        if (arg0.getButton() == MouseEvent.BUTTON3) {
-                            java.awt.Point p = arg0.getPoint();
-                            int rowIndex = jTableModInFv.rowAtPoint(p);
-                            TableModel model = jTableModInFv.getModel();
-                            String mg = (String) model.getValueAt(rowIndex, 1);
-                            String mv = (String) model.getValueAt(rowIndex, 2);
-                            String pg = (String) model.getValueAt(rowIndex, 3);
-                            String pv = (String) model.getValueAt(rowIndex, 4);
-                            ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
-                            String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
-                            if (mi != null) {
-                                details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
-                            }
-                            JOptionPane.showMessageDialog(frame, details);
-                        }
+    /**
+     * This method initializes jPanelController 
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelController() {
+        if (jPanelController == null) {
+            FlowLayout flowLayout5 = new FlowLayout();
+            flowLayout5.setVgap(50);
+            flowLayout5.setHgap(50);
+            jPanelController = new JPanel();
+            jPanelController.setLayout(flowLayout5);
+            jPanelController.setPreferredSize(new java.awt.Dimension(150,500));
+            jPanelController.add(getJButtonUp(), null);
+            jPanelController.add(getJButtonInsert(), null);
+            jPanelController.add(getJButtonRemove(), null);
+            jPanelController.add(getJButtonDown(), null);
+        }
+        return jPanelController;
+    }
+
+    /**
+     * This method initializes jScrollPaneFpdModules    
+     *  
+     * @return javax.swing.JScrollPane  
+     */
+    private JScrollPane getJScrollPaneFpdModules() {
+        if (jScrollPaneFpdModules == null) {
+            jScrollPaneFpdModules = new JScrollPane();
+            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(200,500));
+            jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
+        }
+        return jScrollPaneFpdModules;
+    }
+
+    /**
+     * This method initializes jTableFpdModules 
+     *  
+     * @return javax.swing.JTable   
+     */
+    private JTable getJTableFpdModules() {
+        if (jTableFpdModules == null) {
+            fpdModTableModel = new IDefaultTableModel();
+            TableSorter sorter = new TableSorter(fpdModTableModel);
+            jTableFpdModules = new JTable(sorter){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = -4666296888377637808L;
+
+                public String getToolTipText(MouseEvent e) {
+                    String tip = null;
+                    java.awt.Point p = e.getPoint();
+                    int rowIndex = rowAtPoint(p);
+//                    int colIndex = columnAtPoint(p);
+//                    int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                    TableModel model = getModel();
+                    String mg = (String) model.getValueAt(rowIndex, 1);
+                    String mv = (String) model.getValueAt(rowIndex, 2);
+                    String pg = (String) model.getValueAt(rowIndex, 3);
+                    String pv = (String) model.getValueAt(rowIndex, 4);
+                    String arch = (String) model.getValueAt(rowIndex, 5);
+                    ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                    if (mi != null) {
+                        tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
                     }
-                    
-                });
+                    else {
+                        tip = "No Module Path Information."; 
+                    }
+                         
+                    return tip;
+                }
+
+            };
+            
+            fpdModTableModel.addColumn("Modules in Platform");
+            fpdModTableModel.addColumn("mg");
+            fpdModTableModel.addColumn("mv");
+            fpdModTableModel.addColumn("pg");
+            fpdModTableModel.addColumn("pv");
+            fpdModTableModel.addColumn("arch");
+            
+            for (int i = 1; i < 6; ++i) {
+                jTableFpdModules.removeColumn(jTableFpdModules.getColumnModel().getColumn(jTableFpdModules.getColumnCount()-1));
             }
-            return jTableModInFv;
-        }
+            jTableFpdModules.setRowHeight(20);
+            jTableFpdModules.setShowGrid(false);
+            jTableFpdModules.setAutoCreateColumnsFromModel(false);
+            jTableFpdModules.addMouseListener(new MouseAdapter() {
 
-        /**
-         * This method initializes jPanelController 
-         *  
-         * @return javax.swing.JPanel   
-         */
-        private JPanel getJPanelController() {
-            if (jPanelController == null) {
-                FlowLayout flowLayout5 = new FlowLayout();
-                flowLayout5.setVgap(50);
-                flowLayout5.setHgap(50);
-                jPanelController = new JPanel();
-                jPanelController.setLayout(flowLayout5);
-                jPanelController.setPreferredSize(new java.awt.Dimension(150,500));
-                jPanelController.add(getJButtonUp(), null);
-                jPanelController.add(getJButtonInsert(), null);
-                jPanelController.add(getJButtonRemove(), null);
-                jPanelController.add(getJButtonDown(), null);
-            }
-            return jPanelController;
-        }
-
-        /**
-         * This method initializes jScrollPaneFpdModules    
-         *  
-         * @return javax.swing.JScrollPane  
-         */
-        private JScrollPane getJScrollPaneFpdModules() {
-            if (jScrollPaneFpdModules == null) {
-                jScrollPaneFpdModules = new JScrollPane();
-                jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(200,500));
-                jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
-            }
-            return jScrollPaneFpdModules;
-        }
-
-        /**
-         * This method initializes jTableFpdModules 
-         *  
-         * @return javax.swing.JTable   
-         */
-        private JTable getJTableFpdModules() {
-            if (jTableFpdModules == null) {
-                fpdModTableModel = new IDefaultTableModel();
-                TableSorter sorter = new TableSorter(fpdModTableModel);
-                jTableFpdModules = new JTable(sorter){
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = -4666296888377637808L;
-
-                    public String getToolTipText(MouseEvent e) {
-                        String tip = null;
-                        java.awt.Point p = e.getPoint();
-                        int rowIndex = rowAtPoint(p);
-//                        int colIndex = columnAtPoint(p);
-//                        int realColumnIndex = convertColumnIndexToModel(colIndex);
-
-                        TableModel model = getModel();
+                /* (non-Javadoc)
+                 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+                 */
+                @Override
+                public void mouseClicked(MouseEvent arg0) {
+                    if (arg0.getButton() == MouseEvent.BUTTON3) {
+                        java.awt.Point p = arg0.getPoint();
+                        int rowIndex = jTableFpdModules.rowAtPoint(p);
+                        TableModel model = jTableFpdModules.getModel();
                         String mg = (String) model.getValueAt(rowIndex, 1);
                         String mv = (String) model.getValueAt(rowIndex, 2);
                         String pg = (String) model.getValueAt(rowIndex, 3);
                         String pv = (String) model.getValueAt(rowIndex, 4);
-                        String arch = (String) model.getValueAt(rowIndex, 5);
                         ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                        String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
                         if (mi != null) {
-                            tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
+                            details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
                         }
-                        else {
-                            tip = "No Module Path Information."; 
-                        }
-                             
-                        return tip;
+                        JOptionPane.showMessageDialog(ModuleOrderPane.this, details);
                     }
-
-                };
-                
-                fpdModTableModel.addColumn("Modules in Platform");
-                fpdModTableModel.addColumn("mg");
-                fpdModTableModel.addColumn("mv");
-                fpdModTableModel.addColumn("pg");
-                fpdModTableModel.addColumn("pv");
-                fpdModTableModel.addColumn("arch");
-                
-                for (int i = 1; i < 6; ++i) {
-                    jTableFpdModules.removeColumn(jTableFpdModules.getColumnModel().getColumn(jTableFpdModules.getColumnCount()-1));
                 }
-                jTableFpdModules.setRowHeight(20);
-                jTableFpdModules.setShowGrid(false);
-                jTableFpdModules.setAutoCreateColumnsFromModel(false);
-                jTableFpdModules.addMouseListener(new MouseAdapter() {
+                
+            });
 
-                    /* (non-Javadoc)
-                     * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
-                     */
-                    @Override
-                    public void mouseClicked(MouseEvent arg0) {
-                        if (arg0.getButton() == MouseEvent.BUTTON3) {
-                            java.awt.Point p = arg0.getPoint();
-                            int rowIndex = jTableFpdModules.rowAtPoint(p);
-                            TableModel model = jTableFpdModules.getModel();
-                            String mg = (String) model.getValueAt(rowIndex, 1);
-                            String mv = (String) model.getValueAt(rowIndex, 2);
-                            String pg = (String) model.getValueAt(rowIndex, 3);
-                            String pv = (String) model.getValueAt(rowIndex, 4);
-                            ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
-                            String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
-                            if (mi != null) {
-                                details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
-                            }
-                            JOptionPane.showMessageDialog(frame, details);
-                        }
+        }
+        return jTableFpdModules;
+    }
+
+    /**
+     * This method initializes jButtonUp    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonUp() {
+        if (jButtonUp == null) {
+            jButtonUp = new JButton();
+            jButtonUp.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonUp.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
+            jButtonUp.setText("^");
+            jButtonUp.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int selectedRow = jTableModInFv.getSelectedRow();
+                    if (selectedRow <= 0) {
+                        return;
+                    }
+                    modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
+                    jTableModInFv.changeSelection(selectedRow - 1, 0, false, false);
+                }
+            });
+        }
+        return jButtonUp;
+    }
+
+    /**
+     * This method initializes jButtonInsert    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonInsert() {
+        if (jButtonInsert == null) {
+            jButtonInsert = new JButton();
+            jButtonInsert.setText("<");
+            jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonInsert.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int selectedRowRight = jTableFpdModules.getSelectedRow();
+                    if (selectedRowRight < 0) {
+                        return;
                     }
                     
-                });
-
-            }
-            return jTableFpdModules;
-        }
-
-        /**
-         * This method initializes jButtonUp    
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonUp() {
-            if (jButtonUp == null) {
-                jButtonUp = new JButton();
-                jButtonUp.setPreferredSize(new java.awt.Dimension(60,20));
-                jButtonUp.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
-                jButtonUp.setText("^");
-                jButtonUp.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        int selectedRow = jTableModInFv.getSelectedRow();
-                        if (selectedRow <= 0) {
-                            return;
-                        }
-                        modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
-                        jTableModInFv.changeSelection(selectedRow - 1, 0, false, false);
+                    int rowInModel = ((TableSorter)jTableFpdModules.getModel()).getModelRowIndex(selectedRowRight);
+                    String name = fpdModTableModel.getValueAt(rowInModel, 0)+"";
+                    String mg = fpdModTableModel.getValueAt(rowInModel, 1)+"";
+                    String mv = fpdModTableModel.getValueAt(rowInModel, 2)+"";
+                    String pg = fpdModTableModel.getValueAt(rowInModel, 3)+"";
+                    String pv = fpdModTableModel.getValueAt(rowInModel, 4)+"";
+                    String arch = fpdModTableModel.getValueAt(rowInModel, 5)+"";
+                    String[] row = {name, mg, mv, pg, pv, arch};
+                    if (name.length() == 0 || name.equals("N/A")) {
+                        return;
                     }
-                });
-            }
-            return jButtonUp;
-        }
-
-        /**
-         * This method initializes jButtonInsert    
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonInsert() {
-            if (jButtonInsert == null) {
-                jButtonInsert = new JButton();
-                jButtonInsert.setText("<");
-                jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
-                jButtonInsert.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        int selectedRowRight = jTableFpdModules.getSelectedRow();
-                        if (selectedRowRight < 0) {
-                            return;
-                        }
-                        
-                        int rowInModel = ((TableSorter)jTableFpdModules.getModel()).getModelRowIndex(selectedRowRight);
-                        String name = fpdModTableModel.getValueAt(rowInModel, 0)+"";
-                        String mg = fpdModTableModel.getValueAt(rowInModel, 1)+"";
-                        String mv = fpdModTableModel.getValueAt(rowInModel, 2)+"";
-                        String pg = fpdModTableModel.getValueAt(rowInModel, 3)+"";
-                        String pv = fpdModTableModel.getValueAt(rowInModel, 4)+"";
-                        String arch = fpdModTableModel.getValueAt(rowInModel, 5)+"";
-                        String[] row = {name, mg, mv, pg, pv, arch};
-                        if (name.length() == 0 || name.equals("N/A")) {
-                            return;
-                        }
-                        
-                        int selectedRowLeft = jTableModInFv.getSelectedRow();
-                        if (selectedRowLeft < 0) {
-                            modInFvTableModel.addRow(row);
-                            jTableModInFv.changeSelection(jTableModInFv.getRowCount() - 1, 0, false, false);
-                        }
-                        else {
-                            modInFvTableModel.insertRow(selectedRowLeft, row);
-                            jTableModInFv.changeSelection(selectedRowLeft, 0, false, false);
-                        }
-                        fpdModTableModel.removeRow(rowInModel);
+                    
+                    int selectedRowLeft = jTableModInFv.getSelectedRow();
+                    if (selectedRowLeft < 0) {
+                        modInFvTableModel.addRow(row);
+                        jTableModInFv.changeSelection(jTableModInFv.getRowCount() - 1, 0, false, false);
                     }
-                });
-            }
-            return jButtonInsert;
+                    else {
+                        modInFvTableModel.insertRow(selectedRowLeft, row);
+                        jTableModInFv.changeSelection(selectedRowLeft, 0, false, false);
+                    }
+                    fpdModTableModel.removeRow(rowInModel);
+                }
+            });
         }
+        return jButtonInsert;
+    }
 
-        /**
-         * This method initializes jButtonRemove    
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonRemove() {
-            if (jButtonRemove == null) {
-                jButtonRemove = new JButton();
-                jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
-                jButtonRemove.setText(">");
-                jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        int selectedRowLeft = jTableModInFv.getSelectedRow();
-                        if (selectedRowLeft < 0) {
-                            return;
-                        }
-                        
-                        String name = modInFvTableModel.getValueAt(selectedRowLeft, 0)+"";
-                        String mg = modInFvTableModel.getValueAt(selectedRowLeft, 1)+"";
-                        String mv = modInFvTableModel.getValueAt(selectedRowLeft, 2)+"";
-                        String pg = modInFvTableModel.getValueAt(selectedRowLeft, 3)+"";
-                        String pv = modInFvTableModel.getValueAt(selectedRowLeft, 4)+"";
-                        String arch = modInFvTableModel.getValueAt(selectedRowLeft, 5)+"";
-                        String[] row = {name, mg, mv, pg, pv, arch};
-                        String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch; 
-                        if (name.length() == 0 || name.equals("N/A") || ffc.getModuleSA(moduleKey) == null) {
-                            JOptionPane.showMessageDialog(frame, "Module " + name + " not exists in platform. If you want to add back this module, please first add it into current platform. " + moduleKey );
-                            modInFvTableModel.removeRow(selectedRowLeft);
-                            return;
-                        }
-                       
-                        fpdModTableModel.addRow(row);
-                        int viewIndex = ((TableSorter) jTableFpdModules.getModel()).getViewIndexArray()[jTableFpdModules
-                                                                                                                        .getRowCount() - 1];
-                        jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+    /**
+     * This method initializes jButtonRemove    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonRemove() {
+        if (jButtonRemove == null) {
+            jButtonRemove = new JButton();
+            jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonRemove.setText(">");
+            jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int selectedRowLeft = jTableModInFv.getSelectedRow();
+                    if (selectedRowLeft < 0) {
+                        return;
+                    }
+                    
+                    String name = modInFvTableModel.getValueAt(selectedRowLeft, 0)+"";
+                    String mg = modInFvTableModel.getValueAt(selectedRowLeft, 1)+"";
+                    String mv = modInFvTableModel.getValueAt(selectedRowLeft, 2)+"";
+                    String pg = modInFvTableModel.getValueAt(selectedRowLeft, 3)+"";
+                    String pv = modInFvTableModel.getValueAt(selectedRowLeft, 4)+"";
+                    String arch = modInFvTableModel.getValueAt(selectedRowLeft, 5)+"";
+                    String[] row = {name, mg, mv, pg, pv, arch};
+                    String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch; 
+                    if (name.length() == 0 || name.equals("N/A") || ffc.getModuleSA(moduleKey) == null) {
+                        JOptionPane.showMessageDialog(ModuleOrderPane.this, "Module " + name + " not exists in platform. If you want to add back this module, please first add it into current platform. " + moduleKey );
                         modInFvTableModel.removeRow(selectedRowLeft);
+                        return;
                     }
-                });
-            }
-            return jButtonRemove;
+                   
+                    fpdModTableModel.addRow(row);
+                    int viewIndex = ((TableSorter) jTableFpdModules.getModel()).getViewIndexArray()[jTableFpdModules
+                                                                                                                    .getRowCount() - 1];
+                    jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+                    modInFvTableModel.removeRow(selectedRowLeft);
+                }
+            });
         }
+        return jButtonRemove;
+    }
 
-        /**
-         * This method initializes jButtonDown  
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonDown() {
-            if (jButtonDown == null) {
-                jButtonDown = new JButton();
-                jButtonDown.setPreferredSize(new java.awt.Dimension(60,20));
-                jButtonDown.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
-                jButtonDown.setText("v");
-                jButtonDown.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        int selectedRow = jTableModInFv.getSelectedRow();
-                        if (selectedRow >= jTableModInFv.getRowCount() - 1) {
-                            return;
-                        }
-                        modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow + 1);
-                        jTableModInFv.changeSelection(selectedRow + 1, 0, false, false);
+    /**
+     * This method initializes jButtonDown  
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonDown() {
+        if (jButtonDown == null) {
+            jButtonDown = new JButton();
+            jButtonDown.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonDown.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
+            jButtonDown.setText("v");
+            jButtonDown.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int selectedRow = jTableModInFv.getSelectedRow();
+                    if (selectedRow >= jTableModInFv.getRowCount() - 1) {
+                        return;
                     }
-                });
-            }
-            return jButtonDown;
+                    modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow + 1);
+                    jTableModInFv.changeSelection(selectedRow + 1, 0, false, false);
+                }
+            });
         }
-        
-        /**
-         * This method initializes jButtonOk    
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonOk() {
-            if (jButtonOk == null) {
-                jButtonOk = new JButton();
-                jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
-                jButtonOk.setText("Ok");
-                jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        // need reset FvBindings in ModuleSA.
-                        ffc.removeFvBindingAll(title);
-                        //
-                        // collect module order information to store them into <BuildOptions> -> <UserExtensions>.
-                        // also update the FvBinding info in <ModuleSA>.
-                        //
-                        Vector<String[]> vModInFv = new Vector<String[]>();
-                        for (int i = 0; i < jTableModInFv.getRowCount(); ++i) {
-                            String moduleName = modInFvTableModel.getValueAt(i, 0)+"";
-                            if (moduleName.length() == 0 || moduleName.equals("N/A")) {
-                                continue;
-                            }
-                            
-                            String mg = modInFvTableModel.getValueAt(i, 1)+"";
-                            String mv = modInFvTableModel.getValueAt(i, 2)+"";
-                            String pg = modInFvTableModel.getValueAt(i, 3)+"";
-                            String pv = modInFvTableModel.getValueAt(i, 4)+"";
-                            String arch = modInFvTableModel.getValueAt(i, 5)+"";
-                           
-                            String moduleInfo = mg + " " + mv + " " + pg + " " + pv + " " + arch;
-                                
-                            String[] sa = { mg, mv, pg, pv, arch};
-                            vModInFv.add(sa);
-                            ffc.updateFvBindingInModuleSA(moduleInfo, title);
-                            
-                        }
-                        ffc.removeBuildOptionsUserExtensions(title);
-                        ffc.genBuildOptionsUserExtensions(title, outputFileName, vModInFv);
-                        
-                        docConsole.setSaved(false);
-                        jTabbedPane.setSelectedIndex(0);
-                    }
-                });
-            }
-            return jButtonOk;
+        return jButtonDown;
+    }
+    
+    /**
+     * This method initializes jButtonOk    
+     *  
+     * @return javax.swing.JButton  
+     */
+    protected JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonOk.setText("Ok");
+            jButtonOk.setActionCommand("ModuleOrderPaneOk");
+            jButtonOk.addActionListener(this);
+            
         }
+        return jButtonOk;
+    }
 
-        /**
-         * This method initializes jButtonCancel    
-         *  
-         * @return javax.swing.JButton  
-         */
-        private JButton getJButtonCancel() {
-            if (jButtonCancel == null) {
-                jButtonCancel = new JButton();
-                jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
-                jButtonCancel.setText("Cancel");
-                jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        jTabbedPane.setSelectedIndex(0);
-                    }
-                });
+    /**
+     * This method initializes jButtonCancel    
+     *  
+     * @return javax.swing.JButton  
+     */
+    protected JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.setActionCommand("ModuleOrderPaneCancel");
+            
+        }
+        return jButtonCancel;
+    }
+
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getSource() == jButtonOk) {
+            //          need reset FvBindings in ModuleSA.
+            ffc.removeFvBindingAll(title);
+            //
+            // collect module order information to store them into <BuildOptions> -> <UserExtensions>.
+            // also update the FvBinding info in <ModuleSA>.
+            //
+            Vector<String[]> vModInFv = new Vector<String[]>();
+            for (int i = 0; i < jTableModInFv.getRowCount(); ++i) {
+                String moduleName = modInFvTableModel.getValueAt(i, 0)+"";
+                if (moduleName.length() == 0 || moduleName.equals("N/A")) {
+                    continue;
+                }
+                
+                String mg = modInFvTableModel.getValueAt(i, 1)+"";
+                String mv = modInFvTableModel.getValueAt(i, 2)+"";
+                String pg = modInFvTableModel.getValueAt(i, 3)+"";
+                String pv = modInFvTableModel.getValueAt(i, 4)+"";
+                String arch = modInFvTableModel.getValueAt(i, 5)+"";
+               
+                String moduleInfo = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+                    
+                String[] sa = { mg, mv, pg, pv, arch};
+                vModInFv.add(sa);
+                ffc.updateFvBindingInModuleSA(moduleInfo, title);
+                
             }
-            return jButtonCancel;
+            ffc.removeBuildOptionsUserExtensions(title, "IMAGES", 1);
+            ffc.genBuildOptionsUserExtensions(title, "IMAGES", "1", outputFileName, vModInFv);
+            
         }
     }
 
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+    /**
+     * @return Returns the fpdModTableModel.
+     */
+    protected IDefaultTableModel getFpdModTableModel() {
+        return fpdModTableModel;
+    }
+
+    /**
+     * @return Returns the modInFvTableModel.
+     */
+    protected IDefaultTableModel getModInFvTableModel() {
+        return modInFvTableModel;
+    }
+}
+
 
 class FvOptsTableModel extends DefaultTableModel {
 
