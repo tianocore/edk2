@@ -529,6 +529,14 @@ public class FpdParserTask extends Task {
             GlobalData.addMsaBuildOption(moduleId, parseMsaBuildOptions(false));
             GlobalData.addMsaFamilyBuildOption(moduleId, parseMsaBuildOptions(true));
     
+            ModuleIdentification[] libraryInstances = saq.getLibraryInstance(null);
+            for (int i = 0; i < libraryInstances.length; i++) {
+                saq.push(GlobalData.getDoc(libraryInstances[i], fpdModuleId.getArch()));
+                GlobalData.addMsaBuildOption(libraryInstances[i], parseMsaBuildOptions(false));
+                GlobalData.addMsaFamilyBuildOption(libraryInstances[i], parseMsaBuildOptions(true));
+                saq.pop();
+            }
+            
             saq.pop();
         }
     }
