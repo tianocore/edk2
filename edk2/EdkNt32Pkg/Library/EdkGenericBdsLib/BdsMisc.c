@@ -19,6 +19,9 @@ Abstract:
 
 --*/
 
+#define MAX_STRING_LEN        200
+static BOOLEAN   mFeaturerSwitch = TRUE;
+static BOOLEAN   mResetRequired  = FALSE;
 extern UINT16 gPlatformBootTimeOutDefault;
 
 UINT16
@@ -762,3 +765,218 @@ Returns:
 
   return Status;
 }
+
+//
+//  Following are BDS Lib functions which  contain all the code about setup browser reset reminder feature.
+//  Setup Browser reset reminder feature is that an reset reminder will be given before user leaves the setup browser  if 
+//  user change any option setting which needs a reset to be effective, and  the reset will be applied according to  the user selection.
+//
+
+VOID
+EnableResetReminderFeature (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+  Enable the setup browser reset reminder feature.
+  This routine is used in platform tip. If the platform policy need the feature, use the routine to enable it.
+
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  mFeaturerSwitch = TRUE;
+} 
+
+VOID
+DisableResetReminderFeature (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+  Disable the setup browser reset reminder feature.
+  This routine is used in platform tip. If the platform policy do not want the feature, use the routine to disable it.
+  
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  mFeaturerSwitch = FALSE;
+} 
+
+VOID
+EnableResetRequired (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+   Record the info that  a reset is required.
+   A  module boolean variable is used to record whether a reset is required. 
+  
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  mResetRequired = TRUE;
+} 
+
+VOID
+DisableResetRequired (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+   Record the info that  no reset is required.
+   A  module boolean variable is used to record whether a reset is required. 
+
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  mResetRequired = FALSE;
+} 
+
+BOOLEAN
+IsResetReminderFeatureEnable (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+  Check whether platform policy enable the reset reminder feature. The default is enabled.
+
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  return mFeaturerSwitch;
+}
+
+BOOLEAN
+IsResetRequired (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+  Check if  user changed any option setting which needs a system reset to be effective.
+  
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  return mResetRequired;
+}
+
+VOID
+SetupResetReminder (
+  VOID
+  )
+/*++
+
+Routine Description:
+ 
+  Check whether a reset is needed, and finish the reset reminder feature.
+  If a reset is needed, Popup a menu to notice user, and finish the feature 
+  according to the user selection.
+
+Arguments:
+
+  VOID
+
+Returns:
+
+  VOID
+
+--*/
+{
+  EFI_STATUS                    Status;
+  EFI_FORM_BROWSER_PROTOCOL     *Browser;
+  EFI_INPUT_KEY                 Key;  
+  CHAR16                        *StringBuffer1;
+  CHAR16                        *StringBuffer2;    
+
+
+  //
+  //check any reset required change is applied? if yes, reset system
+  //
+  if (IsResetReminderFeatureEnable ()) {
+    if (IsResetRequired ()) {
+    
+      Status = gBS->LocateProtocol (
+                      &gEfiFormBrowserProtocolGuid,
+                      NULL,
+                      &Browser
+                      );      
+                      
+      StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+      ASSERT (StringBuffer1 != NULL);
+      StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+      ASSERT (StringBuffer2 != NULL);      
+      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now ? ");
+      StrCpy (StringBuffer2, L"Enter (YES)  /   Esc (NO)");      
+      //
+      // Popup a menu to notice user
+      // 
+      do {
+        Browser->CreatePopUp (2, TRUE, 0, NULL, &Key, StringBuffer1, StringBuffer2);
+      } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN)); 
+      
+      gBS->FreePool (StringBuffer1);      
+      gBS->FreePool (StringBuffer2);            
+      //
+      // If the user hits the YES Response key, reset
+      //
+      if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN)) {
+        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+      }
+      gST->ConOut->ClearScreen (gST->ConOut);
+    } 
+  } 
+} 

@@ -139,6 +139,7 @@ Returns:
   UINT8               *Location;
   EFI_GUID            BmGuid;
   LIST_ENTRY          BdsBootOptionList;
+  BOOLEAN	          BootMngrMenuResetRequired;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -299,13 +300,34 @@ Returns:
 
   ASSERT (gBrowser);
 
-  gBrowser->SendForm (gBrowser, TRUE, &gBootManagerHandle, 1, NULL, NULL, NULL, NULL, NULL);
+  BootMngrMenuResetRequired = FALSE;
+  gBrowser->SendForm (
+              gBrowser, 
+              TRUE, 
+              &gBootManagerHandle, 
+              1, 
+              NULL, 
+              NULL, 
+              NULL, 
+              NULL, 
+              &BootMngrMenuResetRequired
+              );
+
+  if (BootMngrMenuResetRequired) {
+    EnableResetRequired ();
+  }
 
   Hii->ResetStrings (Hii, gBootManagerHandle);
 
   if (gOption == NULL) {
     return ;
   }
+  
+  //
+  //Will leave browser, check any reset required change is applied? if yes, reset system
+  //
+  SetupResetReminder ();
+  
   //
   // BugBug: This code looks repeated from the BDS. Need to save code space.
   //

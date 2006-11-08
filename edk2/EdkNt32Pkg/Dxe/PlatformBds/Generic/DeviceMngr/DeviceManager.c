@@ -197,6 +197,7 @@ Returns:
   UINTN               VideoOptionSize;
   EFI_HII_HANDLE      *HiiHandles;
   UINT16              HandleBufferLength;
+  BOOLEAN	          BootDeviceMngrMenuResetRequired;
 
   IfrOptionList       = NULL;
   VideoOption         = NULL;
@@ -435,6 +436,7 @@ Returns:
     gBS->FreePool (IfrOptionList);
   }
 
+  BootDeviceMngrMenuResetRequired = FALSE;
   Status = gBrowser->SendForm (
                       gBrowser,
                       TRUE,                             // Use the database
@@ -444,8 +446,12 @@ Returns:
                       FPCallbackInfo.CallbackHandle,
                       (UINT8 *) &FPCallbackInfo.Data,
                       NULL,
-                      NULL
+                      &BootDeviceMngrMenuResetRequired
                       );
+
+  if (BootDeviceMngrMenuResetRequired) {
+    EnableResetRequired ();
+  }
 
   Hii->ResetStrings (Hii, FPCallbackInfo.DevMgrHiiHandle);
 
@@ -454,6 +460,7 @@ Returns:
   // a target to display
   //
   if (gCallbackKey != 0 && gCallbackKey < 0x2000) {
+    BootDeviceMngrMenuResetRequired = FALSE;
     Status = gBrowser->SendForm (
                         gBrowser,
                         TRUE,                             // Use the database
@@ -463,9 +470,12 @@ Returns:
                         NULL,                             // This is the handle that the interface to the callback was installed on
                         NULL,
                         NULL,
-                        NULL
+                        &BootDeviceMngrMenuResetRequired
                         );
 
+    if (BootDeviceMngrMenuResetRequired) {
+      EnableResetRequired ();
+    }
     //
     // Force return to Device Manager
     //
