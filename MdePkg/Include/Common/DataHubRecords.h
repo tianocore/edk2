@@ -368,7 +368,10 @@ typedef enum {
   EfiProcessorSocket478              = 0xF,
   EfiProcessorSocket754              = 0x10,
   EfiProcessorSocket940              = 0x11,
-  EfiProcessorSocketLG775            = 0x12
+  EfiProcessorSocket939              = 0x12,
+  EfiProcessorSocketmPGA604          = 0x13,
+  EfiProcessorSocketLGA771           = 0x14,
+  EfiProcessorSocketLGA775           = 0x15
 
 } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
