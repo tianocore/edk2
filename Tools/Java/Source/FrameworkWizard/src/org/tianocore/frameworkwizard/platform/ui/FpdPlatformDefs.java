@@ -474,6 +474,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        jCheckBoxIa32.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -499,6 +500,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        jCheckBoxX64.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -524,6 +526,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        jCheckBoxIpf.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -551,6 +554,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        jCheckBoxEbc.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -578,6 +582,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        jCheckBoxArm.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -605,6 +610,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "Platform must support at least ONE  Architecture.");
+                        jCheckBoxPpc.setSelected(true);
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
