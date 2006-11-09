@@ -17811,6 +17811,147 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
+    <!--Mod: DxeIplX64 Type: PEIM Path: EdkModulePkg\Core\DxeIplX64Peim\DxeIplX64.msa-->
+    <ModuleSA ModuleGuid="0c55bdf7-d71d-4962-8fcb-348773e48929" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="IA32">
+      <Libraries>
+        <!--Pkg: EdkModulePkg Mod: BaseCustomDecompressLibNull Path: EdkModulePkg\Library\BaseCustomDecompressLibNull\BaseCustomDecompressLibNull.msa-->
+        <Instance ModuleGuid="e5566134-c75e-4ace-bad1-e23a3b335e30" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: BaseUefiTianoDecompressLib Path: EdkModulePkg\Library\BaseUefiTianoDecompressLib\BaseUefiTianoDecompressLib.msa-->
+        <Instance ModuleGuid="d774c4d9-c121-4da3-a5e2-0f317e3c630c" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiMemoryAllocationLib Path: MdePkg\Library\PeiMemoryAllocationLib\PeiMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="b694e0dc-cd4e-4b30-885b-9c164ed3e74a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiPcdLib Path: MdePkg\Library\PeiPcdLib\PeiPcdLib.msa-->
+        <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkPeCoffLoaderLib Path: EdkModulePkg\Library\EdkPeCoffLoaderLib\EdkPeCoffLoaderLib.msa-->
+        <Instance ModuleGuid="858bbbc9-474f-4556-a361-0ae52a44ffa5" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BasePeCoffLib Path: MdePkg\Library\BasePeCoffLib\BasePeCoffLib.msa-->
+        <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiHobLib Path: MdePkg\Library\PeiHobLib\PeiHobLib.msa-->
+        <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiMemoryLib Path: MdePkg\Library\PeiMemoryLib\PeiMemoryLib.msa-->
+        <Instance ModuleGuid="3a9759d2-53bc-4eb2-abcd-c93099419063" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiReportStatusCodeLib Path: MdePkg\Library\PeiReportStatusCodeLib\PeiReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiIoLibCpuIo Path: MdePkg\Library\PeiIoLibCpuIo\PeiIoLibCpuIo.msa-->
+        <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiServicesTablePointerLibMm7 Path: MdePkg\Library\PeiServicesTablePointerLibMm7\PeiServicesTablePointerLibMm7.msa-->
+        <Instance ModuleGuid="e6e9c1f8-2c8a-4f4b-a27c-c382e4bb8e67" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiServicesLib Path: MdePkg\Library\PeiServicesLib\PeiServicesLib.msa-->
+        <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseTimerLibLocalApic Path: MdePkg\Library\BaseTimerLibLocalApic\BaseTimerLibLocalApic.msa-->
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeimEntryPoint Path: MdePkg\Library\PeimEntryPoint\PeimEntryPoint.msa-->
+        <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseCacheMaintenanceLib Path: MdePkg\Library\BaseCacheMaintenanceLib\BaseCacheMaintenanceLib.msa-->
+        <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
+          <Token>0x00010034</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDxeIplSupportTianoDecompress</C_Name>
+          <Token>0x00010035</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDxeIplSupportCustomDecompress</C_Name>
+          <Token>0x00010036</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>200000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>PE32_PEIM</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
   </FrameworkModules>
   <DynamicPcdBuildDefinitions>
     <PcdBuildData ItemType="DYNAMIC">
