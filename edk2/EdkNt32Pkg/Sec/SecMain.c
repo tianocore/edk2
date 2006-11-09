@@ -601,12 +601,13 @@ Returns:
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
-  TopOfMemory = LargestRegion + ((LargestRegionSize) & (~15));
+  TopOfMemory = LargestRegion + LargestRegionSize;
 
   //
   // Allocate 128KB for the Stack
   //
-  TopOfStack  = (VOID *) (UINTN) (TopOfMemory - sizeof (EFI_PEI_STARTUP_DESCRIPTOR));
+  TopOfStack  = (VOID *)((UINTN)TopOfMemory - sizeof (EFI_PEI_STARTUP_DESCRIPTOR) - CPU_STACK_ALIGNMENT);
+  TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
   TopOfMemory = TopOfMemory - STACK_SIZE;
 
   //
