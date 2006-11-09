@@ -262,7 +262,8 @@ Returns:
   // Compute the top of the stack we were allocated. Pre-allocate a 32 bytes
   // for safety (PpisNeededByDxe and DxeCore).
   //
-  TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
+  TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
+  TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
   // Add architecture-specifc HOBs (including the BspStore HOB)
