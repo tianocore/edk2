@@ -147,6 +147,11 @@ typedef INT32   INTN;
 #define MAX_ADDRESS   0xFFFFFFFF
 
 //
+// The stack alignment required for IA-32
+//
+#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
+
+//
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify thier member functions with EFIAPI.

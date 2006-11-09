@@ -159,9 +159,14 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000
 
 //
-// Maximum legal Itanium-based address
+// Maximum legal X64 address
 //
 #define MAX_ADDRESS   0xFFFFFFFFFFFFFFFF
+
+//
+// The stack alignment required for X64
+//
+#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
 
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics

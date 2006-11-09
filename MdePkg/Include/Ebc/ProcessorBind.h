@@ -61,6 +61,12 @@ typedef unsigned long         UINTN;
 // Maximum legal EBC address
 //
 #define MAX_ADDRESS   ((UINTN) ~0)
+
+//
+// The stack alignment required for EBC
+//
+#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
+
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
