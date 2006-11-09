@@ -172,6 +172,12 @@ typedef INT64   INTN;
 #define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
 //
+// Per the Itanium Software Conventions and Runtime Architecture Guide,
+// section 3.3.4, IPF stack must always be 16-byte aligned.
+//
+#define CPU_STACK_ALIGNMENT   16
+
+//
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify thier member functions with EFIAPI.
