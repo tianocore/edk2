@@ -33,12 +33,6 @@ Abstract:
 #define EBC_THUNK_ALIGNMENT 16
 
 //
-// Per the IA-64 Software Conventions and Runtime Architecture Guide,
-// section 3.3.4, IPF stack must always be 16-byte aligned.
-//
-#define IPF_STACK_ALIGNMENT 16
-
-//
 // Opcodes for IPF instructions. We'll need to hand-create thunk code (stuffing
 // bits) to insert a jump to the interpreter.
 //
@@ -899,8 +893,8 @@ Returns:
   //
   FrameSize   = (UINTN) FramePtr - (UINTN) EbcSp + 64;
   Source      = (VOID *) EbcSp;
-  Destination = (VOID *) ((UINT8 *) EbcSp - FrameSize - IPF_STACK_ALIGNMENT);
-  Destination = (VOID *) ((UINTN) ((UINTN) Destination + IPF_STACK_ALIGNMENT - 1) &~((UINTN) IPF_STACK_ALIGNMENT - 1));
+  Destination = (VOID *) ((UINT8 *) EbcSp - FrameSize - CPU_STACK_ALIGNMENT);
+  Destination = (VOID *) ((UINTN) ((UINTN) Destination + CPU_STACK_ALIGNMENT - 1) &~((UINTN) CPU_STACK_ALIGNMENT - 1));
   gBS->CopyMem (Destination, Source, FrameSize);
   EbcAsmLLCALLEX ((UINTN) CallAddr, (UINTN) Destination);
 }
