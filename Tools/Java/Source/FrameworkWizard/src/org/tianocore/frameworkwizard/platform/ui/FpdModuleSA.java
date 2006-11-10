@@ -160,6 +160,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
         ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+        if (mi == null) {
+            return;
+        }
         int tabIndex = jTabbedPane.indexOfTab("Libraries");
         if (mi.isLibrary()) {
             jTabbedPane.setEnabledAt(tabIndex, false);

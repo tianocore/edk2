@@ -402,6 +402,9 @@ public class FpdFileContents {
         String[][] saaLib = new String[libCount][5];
         getLibraryInstances(moduleKey, saaLib);
         ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+        if (mi == null) {
+            throw new Exception ("Module does NOT exist in workspace.");
+        }
         Vector<ModuleIdentification> vMi = new Vector<ModuleIdentification>();
         //
         // create vector for module & library instance MIs.
@@ -417,6 +420,9 @@ public class FpdFileContents {
 
                 for (int j = 0; j < vMi.size(); ++j) {
                     ModuleIdentification nextMi = vMi.get(j);
+                    if (nextMi == null) {
+                        continue;
+                    }
                     if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], nextMi)) {
                         continue nextPcd;
                     }
