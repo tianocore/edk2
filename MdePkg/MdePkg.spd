@@ -2331,7 +2331,7 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>200000000</DefaultValue>
-      <HelpText>This value is the Bus Speed on platform</HelpText>
+      <HelpText>Bus speed on the platform, its unit is Hz.  its default value is 200000000, that means bus speed is 200Mhz.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
