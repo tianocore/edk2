@@ -457,26 +457,34 @@ public class FpdBuildOptions extends IInternalFrame {
         initFfsTable();
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameDeactivated(InternalFrameEvent e) {
-                if (jTableFfs.isEditing()) {
-                    jTableFfs.getCellEditor().stopCellEditing();
-                }
-                if (jTableFfsSection.isEditing()) {
-                    jTableFfsSection.getCellEditor().stopCellEditing();
-                }
+                
                 if (jTableAntTasks.isEditing()) {
                     jTableAntTasks.getCellEditor().stopCellEditing();
-                }
-                if (jTableFfsSubSection.isEditing()) {
-                    jTableFfsSubSection.getCellEditor().stopCellEditing();
-                }
-                if (jTableFfsAttribs.isEditing()) {
-                    jTableFfsAttribs.getCellEditor().stopCellEditing();
                 }
                 if (jTableOptions.isEditing()) {
                     jTableOptions.getCellEditor().stopCellEditing();
                 }
+                stopEditingInTables ();
             }
         });
+    }
+    
+    private void stopEditingInTables () {
+        if (jTableFfs.isEditing()) {
+            jTableFfs.getCellEditor().stopCellEditing();
+        }
+        if (jTableFfsSection.isEditing()) {
+            jTableFfsSection.getCellEditor().stopCellEditing();
+        }
+        if (jTableFfsSections.isEditing()) {
+            jTableFfsSections.getCellEditor().stopCellEditing();
+        }
+        if (jTableFfsSubSection.isEditing()) {
+            jTableFfsSubSection.getCellEditor().stopCellEditing();
+        }
+        if (jTableFfsAttribs.isEditing()) {
+            jTableFfsAttribs.getCellEditor().stopCellEditing();
+        }
     }
 
     /**
@@ -629,6 +637,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTableFfs.getSelectedRow() < 0) {
                         return;
                     }
+                    stopEditingInTables();
                     docConsole.setSaved(false);
                     ffc.removeBuildOptionsFfs(jTableFfs.getSelectedRow());
                     ffsTableModel.removeRow(jTableFfs.getSelectedRow());
@@ -758,6 +767,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTableFfs.getSelectedRow() < 0) {
                         return;
                     }
+                    stopEditingInTables();
                     if (jTableFfsAttribs.getSelectedRow() >= 0) {
                         docConsole.setSaved(false);
                         ffsAttributesTableModel.removeRow(jTableFfsAttribs.getSelectedRow());
@@ -1067,6 +1077,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTableFfs.getSelectedRow() < 0 || jTableFfsSection.getSelectedRow() < 0) {
                         return;
                     }
+                    stopEditingInTables();
                     docConsole.setSaved(false);
                     sectionTableModel.removeRow(jTableFfsSection.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSection(jTableFfs.getSelectedRow(),
@@ -1116,15 +1127,22 @@ public class FpdBuildOptions extends IInternalFrame {
             jButtonFfsSubSectionRemove.setText("Remove");
             jButtonFfsSubSectionRemove.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTableFfs.getSelectedRow() < 0 || jTableFfsSections.getSelectedRow() < 0
-                        || jTableFfsSubSection.getSelectedRow() < 0) {
+                    int selectedFfsRow = jTableFfs.getSelectedRow();
+                    int selectedSectionsRow = jTableFfsSections.getSelectedRow();
+                    int selectedSubSectionRow = jTableFfsSubSection.getSelectedRow();
+                    if (selectedFfsRow < 0 || selectedSectionsRow < 0
+                        || selectedSubSectionRow < 0) {
                         return;
                     }
+                    stopEditingInTables();
                     docConsole.setSaved(false);
-                    subsectionsTableModel.removeRow(jTableFfsSubSection.getSelectedRow());
-                    ffc.removeBuildOptionsFfsSectionsSectionsSection(jTableFfs.getSelectedRow(),
-                                                                     jTableFfsSections.getSelectedRow(),
-                                                                     jTableFfsSubSection.getSelectedRow());
+                    subsectionsTableModel.removeRow(selectedSubSectionRow);
+                    ffc.removeBuildOptionsFfsSectionsSectionsSection(selectedFfsRow,
+                                                                     selectedSectionsRow,
+                                                                     selectedSubSectionRow);
+                    if (subsectionsTableModel.getRowCount() == 0) {
+                        sectionsTableModel.removeRow(selectedSectionsRow);
+                    }
                 }
             });
         }
@@ -1172,6 +1190,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTableFfs.getSelectedRow() < 0 || jTableFfsSections.getSelectedRow() < 0) {
                         return;
                     }
+                    stopEditingInTables();
                     docConsole.setSaved(false);
                     sectionsTableModel.removeRow(jTableFfsSections.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSections(jTableFfs.getSelectedRow(),
