@@ -260,10 +260,14 @@ Returns:
 
   //
   // Compute the top of the stack we were allocated. Pre-allocate a 32 bytes
-  // for safety (PpisNeededByDxe and DxeCore).
+  // for x64 calling convention.
   //
-  TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
-  TopOfStack = (EFI_PHYSICAL_ADDRESS) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+  // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
+  // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
+  // register parameters is reserved on the stack, in case the called function 
+  // wants to spill them; this is important if the function is variadic. 
+  //
+  TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
 
   //
   // Add architecture-specifc HOBs (including the BspStore HOB)
