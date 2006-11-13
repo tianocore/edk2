@@ -64,7 +64,7 @@ InternalX86GetTimerFrequency (
   )
 {
   return
-    PcdGet32(PcdPlatformBusSpeed) /
+    PcdGet32(PcdFSBClock) /
     mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
 }
 
@@ -246,5 +246,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return PcdGet32(PcdPlatformBusSpeed);
+  return PcdGet32(PcdFSBClock);
 }

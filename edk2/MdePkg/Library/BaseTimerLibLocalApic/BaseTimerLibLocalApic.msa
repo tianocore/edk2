@@ -54,7 +54,7 @@
   </Externs>
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
-      <C_Name>PcdPlatformBusSpeed</C_Name>
+      <C_Name>PcdFSBClock</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>Bus speed on the platform, its unit is Hz.  its default value is 200000000, that means bus speed is 200Mhz.</HelpText>
     </PcdEntry>
