@@ -7,7 +7,10 @@
     <Version>1.0</Version>
     <Abstract>Misc Sub class driver</Abstract>
     <Description>
-      Parses the MiscSubclassDataTable and reports any generated data to the DataHub
+      Parses the MiscSubclassDataTable and reports any generated data to the DataHub.
+      All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
+      MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file 
+      and parse all .uni file.
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
