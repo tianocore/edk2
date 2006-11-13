@@ -272,7 +272,7 @@ Returns:
   //
   //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
   //
-  TopOfStack = ALIGN_POINTER (TopOfStack, 16);
+  TopOfStack = (EFI_PHYSICAL_ADDRESS) ALIGN_POINTER (TopOfStack, 16);
 
   //
   // Add architecture-specifc HOBs (including the BspStore HOB)
