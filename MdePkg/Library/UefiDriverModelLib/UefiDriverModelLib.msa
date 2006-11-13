@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>UefiDriverModelLib</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
@@ -64,4 +64,16 @@
       <Destructor>UefiDriverModelLibDestructor</Destructor>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdComponentNameDisable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Compoent Name Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>

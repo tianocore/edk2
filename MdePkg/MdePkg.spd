@@ -2333,5 +2333,23 @@
       <DefaultValue>200000000</DefaultValue>
       <HelpText>Bus speed on the platform, its unit is Hz.  its default value is 200000000, that means bus speed is 200Mhz.</HelpText>
     </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdComponentNameDisable</C_Name>
+      <Token>0x0000000d</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this value is set TRUE, autogen will replace Compoent Name Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+      <Token>0x0000000e</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics Protocol instance with NULL.</HelpText>
+    </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

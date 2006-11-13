@@ -420,6 +420,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -582,6 +598,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -859,7 +891,7 @@
           <Value>0</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -1037,6 +1069,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -1850,6 +1898,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2016,6 +2080,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -2729,6 +2809,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2813,6 +2909,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2896,6 +3008,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2978,6 +3106,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -3336,6 +3480,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>FALSE</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -3420,6 +3580,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -3503,6 +3679,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -3599,6 +3791,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -3682,6 +3890,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -3767,6 +3991,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -3851,6 +4091,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -3934,6 +4190,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -4021,6 +4293,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4106,6 +4394,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4190,6 +4494,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -4277,6 +4597,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4362,6 +4698,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4446,6 +4798,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -4533,6 +4901,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4618,6 +5002,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -4702,6 +5102,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -4872,7 +5288,7 @@
           <Value>0x06</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -5049,7 +5465,7 @@
           <Value>0x06</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -5226,7 +5642,7 @@
           <Value>0x06</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -5630,6 +6046,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -5792,6 +6224,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -6069,7 +6517,7 @@
           <Value>0</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -6247,6 +6695,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -7060,6 +7524,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -7145,6 +7625,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -7558,6 +8054,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -7642,6 +8154,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -7725,6 +8253,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -7807,6 +8351,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -8165,6 +8725,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>FALSE</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8249,6 +8825,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8332,6 +8924,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -8428,6 +9036,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8511,6 +9135,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -8598,6 +9238,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8683,6 +9339,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8767,6 +9439,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -8854,6 +9542,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8939,6 +9643,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -9023,6 +9743,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -9110,6 +9846,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -9195,6 +9947,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -9279,6 +10047,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -9677,6 +10461,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -9839,6 +10639,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -10116,7 +10932,7 @@
           <Value>0</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -10294,6 +11110,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -11111,6 +11943,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -11196,6 +12044,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -11609,6 +12473,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -11693,6 +12573,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -11776,6 +12672,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -11858,6 +12770,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -12216,6 +13144,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>FALSE</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12300,6 +13244,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12383,6 +13343,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -12479,6 +13455,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12562,6 +13554,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -12649,6 +13657,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12734,6 +13758,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12818,6 +13858,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -12905,6 +13961,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12990,6 +14062,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -13074,6 +14162,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -13161,6 +14265,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -13246,6 +14366,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -13330,6 +14466,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -13728,6 +14880,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -13890,6 +15058,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -14167,7 +15351,7 @@
           <Value>0</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
@@ -14345,6 +15529,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -14804,6 +16004,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -14889,6 +16105,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -15302,6 +16534,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -15386,6 +16634,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -15469,6 +16733,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -15551,6 +16831,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -15826,6 +17122,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>FALSE</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -15910,6 +17222,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -15993,6 +17321,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -16089,6 +17433,22 @@
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16172,6 +17532,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -16259,6 +17635,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16344,6 +17736,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16428,6 +17836,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -16515,6 +17939,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16600,6 +18040,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16684,6 +18140,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -16771,6 +18243,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16856,6 +18344,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16940,6 +18444,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -17547,6 +19067,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -17632,6 +19168,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -17719,6 +19271,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -17804,6 +19372,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdComponentNameDisable</C_Name>
+          <Token>0x0000000d</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+          <Token>0x0000000e</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -17939,7 +19523,7 @@
           <Value>10000000</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdPlatformBusSpeed</C_Name>
+          <C_Name>PcdGenericPlatformBusSpeed</C_Name>
           <Token>0x0000000c</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
