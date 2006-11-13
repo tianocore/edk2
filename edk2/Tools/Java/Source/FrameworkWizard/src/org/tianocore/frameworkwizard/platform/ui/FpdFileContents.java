@@ -2391,10 +2391,8 @@ public class FpdFileContents {
     }
     
     public void updateBuildOptionsFfsSectionsType(int i, String type) {
-        BuildOptionsDocument.BuildOptions.Ffs ffs = getfpdBuildOpts().addNewFfs();
-        if (type != null) {
-            ffs.addNewSections().setEncapsulationType(type);
-        }
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        ffs.getSections().setEncapsulationType(type);
     }
     
     public void genBuildOptionsFfsAttribute(int i, String name, String value) {

@@ -36,6 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -166,10 +168,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel jPanelFfsTabCenterN = null;
 
     private JPanel jPanelFfsTabCenterS = null;
-
-    private JLabel jLabelFfsKey = null;
-
-    private JTextField jTextFieldFfsKey = null;
 
     private JButton jButtonFfsAdd = null;
 
@@ -313,6 +311,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private final int toolCmdCodeWidth = 200;
     private final int tagNameWidth = 150;
     private final int argWidth = 400;
+    
+    private boolean ffsSelection = false;
 
     /**
      * This method initializes jPanel	
@@ -457,7 +457,6 @@ public class FpdBuildOptions extends IInternalFrame {
         initFfsTable();
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameDeactivated(InternalFrameEvent e) {
-                
                 if (jTableAntTasks.isEditing()) {
                     jTableAntTasks.getCellEditor().stopCellEditing();
                 }
@@ -529,12 +528,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jLabelEncapType.setText("Encapsulation Type");
             FlowLayout flowLayout5 = new FlowLayout();
             flowLayout5.setAlignment(java.awt.FlowLayout.RIGHT);
-            jLabelFfsKey = new JLabel();
-            jLabelFfsKey.setText("FFS Key");
+            
             jPanelFfsTabCenterN = new JPanel();
             jPanelFfsTabCenterN.setLayout(flowLayout5);
-            jPanelFfsTabCenterN.add(jLabelFfsKey, null);
-            jPanelFfsTabCenterN.add(getJTextFieldFfsKey(), null);
+            
+            
             jPanelFfsTabCenterN.add(jLabelEncapType, null);
             jPanelFfsTabCenterN.add(getJTextFieldEncapType(), null);
             jPanelFfsTabCenterN.add(getJButtonFfsAdd(), null);
@@ -552,16 +550,12 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jPanelFfsTabCenterS == null) {
             jLabelFfsAttribs = new JLabel();
             jLabelFfsAttribs.setText("Attributes");
-            FlowLayout flowLayout6 = new FlowLayout();
-            flowLayout6.setHgap(5);
-            flowLayout6.setVgap(20);
-            flowLayout6.setAlignment(java.awt.FlowLayout.CENTER);
             jPanelFfsTabCenterS = new JPanel();
             jPanelFfsTabCenterS.setPreferredSize(new java.awt.Dimension(491, 130));
-            jPanelFfsTabCenterS.setLayout(flowLayout6);
-            jPanelFfsTabCenterS.add(jLabelFfsAttribs, null);
-            jPanelFfsTabCenterS.add(getJScrollPaneFfsAttribs(), null);
-            jPanelFfsTabCenterS.add(getJPanelFfsAttribButtonGroup(), null);
+            jPanelFfsTabCenterS.setLayout(new BorderLayout());
+            jPanelFfsTabCenterS.add(jLabelFfsAttribs, java.awt.BorderLayout.WEST);
+            jPanelFfsTabCenterS.add(getJScrollPaneFfsAttribs(), java.awt.BorderLayout.CENTER);
+            jPanelFfsTabCenterS.add(getJPanelFfsAttribButtonGroup(), java.awt.BorderLayout.EAST);
         }
         return jPanelFfsTabCenterS;
     }
@@ -571,22 +565,7 @@ public class FpdBuildOptions extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextFieldFfsKey() {
-        if (jTextFieldFfsKey == null) {
-            jTextFieldFfsKey = new JTextField();
-            jTextFieldFfsKey.setPreferredSize(new java.awt.Dimension(100, 20));
-            jTextFieldFfsKey.setEditable(true);
-            jTextFieldFfsKey.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusLost(java.awt.event.FocusEvent e) {
-                    if (jTableFfs.getSelectedRow() < 0) {
-                        return;
-                    }
-                    //                    ffc.updateBuildOptionsFfsKey(jTable.getSelectedRow(), jTextField6.getText());
-                }
-            });
-        }
-        return jTextFieldFfsKey;
-    }
+    
 
     /**
      * This method initializes jButton8	
@@ -597,7 +576,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jButtonFfsAdd == null) {
             jButtonFfsAdd = new JButton();
             jButtonFfsAdd.setPreferredSize(new java.awt.Dimension(70, 20));
-            jButtonFfsAdd.setText("Add");
+            jButtonFfsAdd.setText("New");
             jButtonFfsAdd.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -605,12 +584,13 @@ public class FpdBuildOptions extends IInternalFrame {
                 private static final long serialVersionUID = -2923720717273384221L;
 
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTextFieldFfsKey.getText().length() > 0) {
-                        String[] row = { jTextFieldFfsKey.getText() };
+                    
+                        String[] row = { "" };
                         ffsTableModel.addRow(row);
                         docConsole.setSaved(false);
-                        ffc.genBuildOptionsFfs(jTextFieldFfsKey.getText(), jTextFieldEncapType.getText());
-                    }
+                        ffc.genBuildOptionsFfs("", "");
+                        jTableFfs.changeSelection(ffsTableModel.getRowCount()-1, 0, false, false);
+                    
                 }
             });
         }
@@ -659,8 +639,9 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneFfsAttribs() {
         if (jScrollPaneFfsAttribs == null) {
             jScrollPaneFfsAttribs = new JScrollPane();
-            jScrollPaneFfsAttribs.setPreferredSize(new java.awt.Dimension(350, 100));
+//            jScrollPaneFfsAttribs.setPreferredSize(new java.awt.Dimension(350, 100));
             jScrollPaneFfsAttribs.setViewportView(getJTableFfsAttribs());
+            
         }
         return jScrollPaneFfsAttribs;
     }
@@ -674,7 +655,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTableFfsAttribs == null) {
             ffsAttributesTableModel = new DefaultTableModel();
             jTableFfsAttribs = new JTable(ffsAttributesTableModel);
-            jTableFfsAttribs.setPreferredSize(new java.awt.Dimension(400, 80));
+//            jTableFfsAttribs.setPreferredSize(new java.awt.Dimension(400, 80));
             jTableFfsAttribs.setRowHeight(20);
             ffsAttributesTableModel.addColumn("Name");
             ffsAttributesTableModel.addColumn("Value");
@@ -715,6 +696,7 @@ public class FpdBuildOptions extends IInternalFrame {
         for (int i = 0; i < saa.length; ++i) {
             ffsTableModel.addRow(saa[i]);
         }
+        jTableFfs.changeSelection(0, 0, false, false);
     }
 
     /**
@@ -788,7 +770,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneFfs() {
         if (jScrollPaneFfs == null) {
             jScrollPaneFfs = new JScrollPane();
-            jScrollPaneFfs.setPreferredSize(new java.awt.Dimension(150, 419));
+            jScrollPaneFfs.setPreferredSize(new java.awt.Dimension(200,419));
             jScrollPaneFfs.setViewportView(getJTableFfs());
         }
         return jScrollPaneFfs;
@@ -828,7 +810,7 @@ public class FpdBuildOptions extends IInternalFrame {
                         ArrayList<String> alSections = new ArrayList<String>();
                         ArrayList<String> alSection = new ArrayList<String>();
                         ffc.getBuildOptionsFfs(row, sArray, lhm, alSections, alSection);
-                        jTextFieldFfsKey.setText(sArray[0]);
+                        ffsSelection = true;
                         jTextFieldEncapType.setText(sArray[1]);
                         for (int i = 0; i < alSection.size(); ++i) {
                             String[] sectionRow = { alSection.get(i) };
@@ -1008,13 +990,42 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField getJTextFieldEncapType() {
         if (jTextFieldEncapType == null) {
             jTextFieldEncapType = new JTextField();
-            jTextFieldEncapType.setPreferredSize(new java.awt.Dimension(100, 20));
+            jTextFieldEncapType.setPreferredSize(new java.awt.Dimension(200,20));
+            jTextFieldEncapType.getDocument().addDocumentListener(new DocumentListener() {
+
+                public void insertUpdate(DocumentEvent arg0) {
+                    if (ffsSelection) {
+                        ffsSelection = false;
+                        return;
+                    }
+                    if (docConsole != null) {
+                        docConsole.setSaved(false);
+                    }
+                }
+
+                public void removeUpdate(DocumentEvent arg0) {
+                    if (ffsSelection) {
+                        ffsSelection = false;
+                        return;
+                    }
+                    if (docConsole != null) {
+                        docConsole.setSaved(false);
+                    }
+                }
+
+                public void changedUpdate(DocumentEvent arg0) {
+                    // TODO Auto-generated method stub
+                    
+                }
+                
+            });
             jTextFieldEncapType.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     if (jTableFfs.getSelectedRow() < 0) {
                         return;
                     }
                     ffc.updateBuildOptionsFfsSectionsType(jTableFfs.getSelectedRow(), jTextFieldEncapType.getText());
+                    
                 }
             });
         }
@@ -1165,10 +1176,11 @@ public class FpdBuildOptions extends IInternalFrame {
                         return;
                     }
                     docConsole.setSaved(false);
-                    String[] row = { "" };
+                    String[] row = { "Compress" };
                     sectionsTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSections(jTableFfs.getSelectedRow(), "");
                     JOptionPane.showMessageDialog(frame, "Add Default Section Type EFI_SECTION_PE32 into the New Sections Entry.");
+                    jTableFfsSections.changeSelection(sectionsTableModel.getRowCount()-1, 0, false, false);
                 }
             });
         }
