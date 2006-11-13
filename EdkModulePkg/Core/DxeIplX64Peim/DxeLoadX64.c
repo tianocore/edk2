@@ -272,7 +272,7 @@ Returns:
   //
   //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
   //
-  TopOfStack = (EFI_PHYSICAL_ADDRESS) ALIGN_POINTER (TopOfStack, 16);
+  TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, 16);
 
   //
   // Add architecture-specifc HOBs (including the BspStore HOB)
@@ -324,8 +324,9 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA \
+  // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA
   // memory, it may be corrupted when copying FV to high-end memory 
+  //
   LoadGo64Gdt();
 
   //
@@ -1062,3 +1063,4 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
