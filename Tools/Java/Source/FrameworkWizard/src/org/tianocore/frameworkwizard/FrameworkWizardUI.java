@@ -73,6 +73,7 @@ import org.tianocore.frameworkwizard.far.installui.InstallStepOne;
 import org.tianocore.frameworkwizard.far.updateui.UpdateStepOne;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.ui.ModuleBootModes;
+import org.tianocore.frameworkwizard.module.ui.ModuleBuildOptions;
 import org.tianocore.frameworkwizard.module.ui.ModuleDataHubs;
 import org.tianocore.frameworkwizard.module.ui.ModuleEvents;
 import org.tianocore.frameworkwizard.module.ui.ModuleExterns;
@@ -2535,6 +2536,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         iTree.addNode(new IDefaultMutableTreeNode("External Defintions", IDefaultMutableTreeNode.MSA_EXTERNS, true, id,
                                                   belongNode));
         iTree.addNode(new IDefaultMutableTreeNode("Pcd Coded", IDefaultMutableTreeNode.MSA_PCDS, true, id, belongNode));
+        iTree.addNode(new IDefaultMutableTreeNode("Build Options", IDefaultMutableTreeNode.MSA_BUILDOPTIONS, true, id, belongNode));
     }
 
     private void insertPackageTreeNode(Identification id) {
@@ -2881,6 +2883,10 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         case IDefaultMutableTreeNode.MSA_PCDS:
             ModulePCDs frmPcd = new ModulePCDs(msa);
             getJDesktopPaneModule().add(frmPcd, 1);
+            break;
+        case IDefaultMutableTreeNode.MSA_BUILDOPTIONS:
+            ModuleBuildOptions frmMbo = new ModuleBuildOptions(msa);
+            getJDesktopPaneModule().add(frmMbo, 1);
             break;
         }
         this.jTabbedPaneEditor.setSelectedIndex(0);
