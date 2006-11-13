@@ -166,7 +166,7 @@ typedef INT64   INTN;
 //
 // The stack alignment required for X64
 //
-#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
+#define CPU_STACK_ALIGNMENT   16
 
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
