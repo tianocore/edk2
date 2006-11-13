@@ -259,8 +259,8 @@ Returns:
   ASSERT (BaseOfStack != 0);
 
   //
-  // Compute the top of the stack we were allocated. Pre-allocate a 32 bytes
-  // for x64 calling convention.
+  // Compute the top of the stack we were allocated, which is used to load X64 dxe core. 
+  // Pre-allocate a 32 bytes which confroms to x64 calling convention.
   //
   // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
   // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
@@ -268,6 +268,11 @@ Returns:
   // wants to spill them; this is important if the function is variadic. 
   //
   TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
+
+  //
+  //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
+  //
+  TopOfStack = ALIGN_POINTER (TopOfStack, 16);
 
   //
   // Add architecture-specifc HOBs (including the BspStore HOB)
