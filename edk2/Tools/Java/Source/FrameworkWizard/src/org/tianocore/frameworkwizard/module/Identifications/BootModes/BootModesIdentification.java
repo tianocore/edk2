@@ -1,6 +1,6 @@
 /** @file
 
- The file is used to define Package Dependencies Identification
+ The file is used to define Boot Modes Identification
 
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials

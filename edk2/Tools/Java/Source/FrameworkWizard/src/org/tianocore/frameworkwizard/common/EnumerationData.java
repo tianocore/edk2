@@ -21,183 +21,205 @@ public class EnumerationData {
     // Static data for externs definitions
     //
     public final static String EXTERNS_PCD_IS_DRIVER = "Pcd Is Driver";
-    
+
     public final static String EXTERNS_SPECIFICATION = "Specification";
-    
+
     public final static String EXTERNS_IMAGE = "Image";
+
     public final static String EXTERNS_MODULE_ENTRY_POINT = "ModuleEntryPoint";
+
     public final static String EXTERNS_MODULE_UNLOAD_IMAGE = "ModuleUnloadImage";
-    
+
     public final static String EXTERNS_LIBRARY = "Library";
+
     public final static String EXTERNS_CONSTRUCTOR = "Constructor";
+
     public final static String EXTERNS_DESTRUCTOR = "Destructor";
-    
+
     public final static String EXTERNS_DRIVER = "Driver";
+
     public final static String EXTERNS_DRIVER_BINDING = "DriverBinding";
+
     public final static String EXTERNS_COMPONENT_NAME = "ComponentName";
+
     public final static String EXTERNS_DRIVER_CONFIG = "DriverConfig";
+
     public final static String EXTERNS_DRIVER_DIAG = "DriverDiag";
-    
+
     public final static String EXTERNS_CALL_BACK = "Call Back";
+
     public final static String EXTERNS_VIRTUAL_ADDRESS_MAP_CALL_BACK = "VirtualAddressMap";
+
     public final static String EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK = "ExitBootServices";
-    
+
     //
     // Static data for guid type
     //
     public final static String GUID_TYPE_DATA_HUB_RECORD = "DATA_HUB_RECORD";
-    
+
     public final static String GUID_TYPE_EFI_EVENT = "EFI_EVENT";
-    
+
     public final static String GUID_TYPE_EFI_SYSTEM_CONFIGURATION_TABLE = "EFI_SYSTEM_CONFIGURATION_TABLE";
-    
+
     public final static String GUID_TYPE_EFI_VARIABLE = "EFI_VARIABLE";
-    
+
     public final static String GUID_TYPE_GUID = "GUID";
-    
+
     public final static String GUID_TYPE_HII_PACKAGE_LIST = "HII_PACKAGE_LIST";
-    
+
     public final static String GUID_TYPE_HOB = "HOB";
-    
+
     public final static String GUID_TYPE_TOKEN_SPACE_GUID = "TOKEN_SPACE_GUID";
     
+    //
+    // Static data for build targets
+    //
+    public final static String BUILD_TARGET_DEBUG = "DEBUG";
+    
+    public final static String BUILD_TARGET_RELEASE = "RELEASE";
+
     //
     // Common data
     //
     public Vector<String> vSupportedArchitectures = new Vector<String>();
-    
+
     public Vector<String> vEnabled = new Vector<String>();
-    
+
     public Vector<String> vBoolean = new Vector<String>();
-    
+
     //
     // Used by Msa Header
     //
     public Vector<String> vModuleType = new Vector<String>();
-    
+
     public Vector<String> vCompontentType = new Vector<String>();
-    
+
     //
     // Used by Library Class Definitions
     //
     public Vector<String> vLibraryUsage = new Vector<String>();
-    
+
     public Vector<String> vFrameworkModuleTypes = new Vector<String>();
-    
+
     public Vector<String> vLibClassDef = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefBase = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefPei = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefPeim = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefDxeCore = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefDxeDriver = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefDxeSmmDriver = new Vector<String>();
-    
+
     public Vector<String> vLibClassDefUefiDriver = new Vector<String>();
-    
+
     //
     // Used by Source Files
     //
     public Vector<String> vSourceFilesToolChainFamily = new Vector<String>();
-    
+
     public Vector<String> vSourceFilesFileType = new Vector<String>();
-    
+
     public Vector<String> vToolCode = new Vector<String>();
-    
+
     //
     // Used by Package Dependencies
     //
     public Vector<String> vPackageUsage = new Vector<String>();
-    
+
     //
     // Used by Protocols
     //
     public Vector<String> vProtocolUsage = new Vector<String>();
-    
+
     public Vector<String> vProtocolNotifyUsage = new Vector<String>();
-    
+
     public Vector<String> vProtocolType = new Vector<String>();
-    
+
     //
     // Used by Events
     //
     public Vector<String> vEventType = new Vector<String>();
-    
+
     public Vector<String> vEventUsage = new Vector<String>();
-    
+
     public Vector<String> vEventGroup = new Vector<String>();
-    
+
     //
     // Used by Hobs
     //
     public Vector<String> vHobType = new Vector<String>();
-    
+
     public Vector<String> vHobUsage = new Vector<String>();
-    
+
     //
     // Used by Ppis
     //
     public Vector<String> vPpiType = new Vector<String>();
-    
+
     public Vector<String> vPpiUsage = new Vector<String>();
-    
+
     public Vector<String> vPpiNotifyUsage = new Vector<String>();
-    
+
     //
     // Used by Variable
     //
     public Vector<String> vVariableUsage = new Vector<String>();
-    
+
     //
     // Used by Boot Mode
     //
     public Vector<String> vBootModeNames = new Vector<String>();
-    
+
     public Vector<String> vBootModeUsage = new Vector<String>();
-   
+
     //
     // Used by System Tables
     //
     public Vector<String> vSystemTableUsage = new Vector<String>();
-    
+
     //
     // Used by Data Hubs
     //
     public Vector<String> vDataHubUsage = new Vector<String>();
-    
+
     //
     // Used by Hii Packages
     //
     public Vector<String> vHiiPackageUsage = new Vector<String>();
-    
+
     //
     // Used by Guid
     //
     public Vector<String> vGuidUsage = new Vector<String>();
-    
+
     //
     // Used by Externs
     //
     public Vector<String> vExternTypes = new Vector<String>();
-    
+
     public Vector<String> vPcdDriverTypes = new Vector<String>();
-    
+
     //
     // Used by Pcd
     //
     public Vector<String> vPcdItemTypes = new Vector<String>();
-    
+
     public Vector<String> vPcdUsage = new Vector<String>();
+    
+    //
+    // Used by Build Options
+    //
+    public Vector<String> vBuildTargets = new Vector<String>();
 
     public EnumerationData() {
         init();
     }
-    
+
     private void init() {
         //
         // Init common data first
@@ -205,12 +227,12 @@ public class EnumerationData {
         initSupportedArchitectures();
         initEnabled();
         initBoolean();
-        
+
         //
         // Used by Msa header
         //
         initModuleType();
-        
+
         //
         // Used by Library Class Definitions
         //
@@ -231,95 +253,100 @@ public class EnumerationData {
         initSourceFilesToolChainFamily();
         initSourceFilesFileType();
         initToolCode();
-        
+
         //
         // Used by Package Dependencies
         //
         initPackageUsage();
-        
+
         //
         // Used by Protocols
         //
         initProtocolType();
         initProtocolUsage();
         initProtocolNotifyUsage();
-        
+
         //
         // Used by Events
         //
         initEventType();
         initEventUsage();
         initEventGroup();
-        
+
         //
         // Used by Hobs
         //
         initHobType();
         initHobUsage();
-        
+
         //
         // Used by Ppis
         //
         initPpiType();
         initPpiUsage();
         initPpiNotifyUsage();
-        
+
         //
         // Used by Variable
         //
         initVariableUsage();
-        
+
         //
         // Used by Boot Mode
         //
         initBootModeNames();
         initBootModeUsage();
-        
+
         //
         // Used by System Tables
         //
         initSystemTableUsage();
-        
+
         //
         // Used by Data Hubs
         //
         initDataHubUsage();
-        
+
         //
         // Used by Hii Packages
         //
         initHiiPackages();
-        
+
         //
         // Used by Guid
         //
         initGuidUsage();
-        
+
         //
         // Used by Externs
         //
         initExternTypes();
         initPcdDriverTypes();
-        
+
         //
         // Used by Pcd
         //
         initPcdItemTypes();
         initPcdUsage();
+        
+        //
+        // Used by Build Option
+        //
+        initBuildTargets();
     }
-    
+
     private void initEnabled() {
         vEnabled.removeAllElements();
         vEnabled.addElement("Disabled");
         vEnabled.addElement("Enabled");
     }
-    
+
     private void initBoolean() {
         vBoolean.removeAllElements();
         vBoolean.addElement(DataType.FALSE);
         vBoolean.addElement(DataType.TRUE);
     }
-    
+
     private void initModuleType() {
         vModuleType.removeAllElements();
         vModuleType.addElement("BASE");
@@ -337,25 +364,25 @@ public class EnumerationData {
         vModuleType.addElement("USER_DEFINED");
         Sort.sortVectorString(vModuleType, DataType.SORT_TYPE_ASCENDING);
     }
-    
-//    private void initComponentType() {
-//        vCompontentType.removeAllElements();
-//        vCompontentType.addElement("APRIORI");
-//        vCompontentType.addElement("LIBRARY");
-//        vCompontentType.addElement("FV_IMAGE_FILE");
-//        vCompontentType.addElement("BS_DRIVER");
-//        vCompontentType.addElement("RT_DRIVER");
-//        vCompontentType.addElement("SAL_RT_DRIVER");
-//        vCompontentType.addElement("PE32_PEIM");
-//        vCompontentType.addElement("PIC_PEIM");
-//        vCompontentType.addElement("COMBINED_PEIM_DRIVER");
-//        vCompontentType.addElement("PEI_CORE");
-//        vCompontentType.addElement("DXE_CORE");
-//        vCompontentType.addElement("APPLICATION");
-//        vCompontentType.addElement("BS_DRIVER_EFI");
-//        vCompontentType.addElement("SHELLAPP");
-//    }
-    
+
+    //    private void initComponentType() {
+    //        vCompontentType.removeAllElements();
+    //        vCompontentType.addElement("APRIORI");
+    //        vCompontentType.addElement("LIBRARY");
+    //        vCompontentType.addElement("FV_IMAGE_FILE");
+    //        vCompontentType.addElement("BS_DRIVER");
+    //        vCompontentType.addElement("RT_DRIVER");
+    //        vCompontentType.addElement("SAL_RT_DRIVER");
+    //        vCompontentType.addElement("PE32_PEIM");
+    //        vCompontentType.addElement("PIC_PEIM");
+    //        vCompontentType.addElement("COMBINED_PEIM_DRIVER");
+    //        vCompontentType.addElement("PEI_CORE");
+    //        vCompontentType.addElement("DXE_CORE");
+    //        vCompontentType.addElement("APPLICATION");
+    //        vCompontentType.addElement("BS_DRIVER_EFI");
+    //        vCompontentType.addElement("SHELLAPP");
+    //    }
+
     private void initSupportedArchitectures() {
         vSupportedArchitectures.removeAllElements();
         vSupportedArchitectures.addElement("EBC");
@@ -365,7 +392,7 @@ public class EnumerationData {
         vSupportedArchitectures.addElement("ARM");
         vSupportedArchitectures.addElement("PPC");
     }
-    
+
     private void initLibraryUsage() {
         vLibraryUsage.removeAllElements();
         vLibraryUsage.addElement("ALWAYS_CONSUMED");
@@ -374,7 +401,7 @@ public class EnumerationData {
         vLibraryUsage.addElement("SOMETIMES_PRODUCED");
         vLibraryUsage.addElement("PRIVATE");
     }
-    
+
     private void initFrameworkModuleTypes() {
         vFrameworkModuleTypes.removeAllElements();
         vFrameworkModuleTypes.addElement("BASE");
@@ -416,7 +443,7 @@ public class EnumerationData {
             vLibClassDef.addElement(vLibClassDefUefiDriver.elementAt(index));
         }
     }
-    
+
     private void initLibClassDefBase() {
         vLibClassDefBase.removeAllElements();
         vLibClassDefBase.addElement("BaseLib");
@@ -435,12 +462,12 @@ public class EnumerationData {
         vLibClassDefBase.addElement("SmbusLib");
         vLibClassDefBase.addElement("TimerLib");
     }
-    
+
     private void initLibClassDefPei() {
         vLibClassDefPei.removeAllElements();
         vLibClassDefPei.addElement("PeiCoreEntryPoint");
     }
-    
+
     private void initLibClassDefPeim() {
         vLibClassDefPeim.removeAllElements();
         vLibClassDefPeim.addElement("BaseMemoryLib");
@@ -456,13 +483,13 @@ public class EnumerationData {
         vLibClassDefPeim.addElement("ResourcePublicationLib");
         vLibClassDefPeim.addElement("SmbusLib");
     }
-    
+
     private void initLibClassDefDxeCore() {
         vLibClassDefDxeCore.removeAllElements();
         vLibClassDefDxeCore.addElement("DxeCoreEntryPoint");
         vLibClassDefDxeCore.addElement("HobLib");
     }
-    
+
     private void initLibClassDefDxeDriver() {
         vLibClassDefDxeDriver.removeAllElements();
         vLibClassDefDxeDriver.addElement("DxeServicesTableLib");
@@ -477,12 +504,12 @@ public class EnumerationData {
         vLibClassDefDxeDriver.addElement("UefiDecompressLib");
         vLibClassDefDxeDriver.addElement("UefiRuntimeServicesTableLib");
     }
-    
+
     private void initLibClassDefDxeSmmDriver() {
         vLibClassDefDxeSmmDriver.removeAllElements();
         vLibClassDefDxeSmmDriver.addElement("DxeSmmDriverEntryPoint");
     }
-    
+
     private void initLibClassDefUefiDriver() {
         vLibClassDefUefiDriver.removeAllElements();
         vLibClassDefUefiDriver.addElement("BaseMemoryLib");
@@ -492,14 +519,14 @@ public class EnumerationData {
         vLibClassDefUefiDriver.addElement("UefiDriverModelLib");
         vLibClassDefUefiDriver.addElement("UefiLib");
     }
-    
+
     private void initSourceFilesToolChainFamily() {
         vSourceFilesToolChainFamily.removeAllElements();
         vSourceFilesToolChainFamily.addElement("MSFT");
         vSourceFilesToolChainFamily.addElement("INTC");
         vSourceFilesToolChainFamily.addElement("GCC");
     }
-    
+
     private void initSourceFilesFileType() {
         vSourceFilesFileType.removeAllElements();
         vSourceFilesFileType.addElement("CCODE");
@@ -516,23 +543,23 @@ public class EnumerationData {
         vSourceFilesFileType.addElement("FFS");
         vSourceFilesFileType.addElement("EFI");
     }
-    
+
     private void initToolCode() {
         vToolCode.removeAllElements();
         vToolCode.addElement(DataType.EMPTY_SELECT_ITEM);
-//        vToolCode.addElement("Build_CCode");
-//        vToolCode.addElement("Build_AUTOGEN");
-//        vToolCode.addElement("Build_DPX");
-//        vToolCode.addElement("Build_ASM");
-//        vToolCode.addElement("Build_Assembly");
-//        vToolCode.addElement("Build_Gcc_Assembly");
-//        vToolCode.addElement("Build_IPF_Assembly_Code");
-//        vToolCode.addElement("Build_IPF_PP_Code");
-//        vToolCode.addElement("Build_Library");
-//        vToolCode.addElement("Build_UNI");
-//        vToolCode.addElement("Build_Unicode_Database");
-//        vToolCode.addElement("Build_VFR");
-//        vToolCode.addElement("Build_DUMMY");
+        //        vToolCode.addElement("Build_CCode");
+        //        vToolCode.addElement("Build_AUTOGEN");
+        //        vToolCode.addElement("Build_DPX");
+        //        vToolCode.addElement("Build_ASM");
+        //        vToolCode.addElement("Build_Assembly");
+        //        vToolCode.addElement("Build_Gcc_Assembly");
+        //        vToolCode.addElement("Build_IPF_Assembly_Code");
+        //        vToolCode.addElement("Build_IPF_PP_Code");
+        //        vToolCode.addElement("Build_Library");
+        //        vToolCode.addElement("Build_UNI");
+        //        vToolCode.addElement("Build_Unicode_Database");
+        //        vToolCode.addElement("Build_VFR");
+        //        vToolCode.addElement("Build_DUMMY");
         vToolCode.addElement("CC");
         vToolCode.addElement("DLINK");
         vToolCode.addElement("SLINK");
@@ -541,13 +568,13 @@ public class EnumerationData {
         vToolCode.addElement("ASMLINK");
         vToolCode.addElement("ASL");
     }
-    
+
     private void initPackageUsage() {
         vPackageUsage.removeAllElements();
         vPackageUsage.addElement("ALWAYS_CONSUMED");
         vPackageUsage.addElement("ALWAYS_PRODUCED");
     }
-    
+
     private void initProtocolUsage() {
         vProtocolUsage.removeAllElements();
         vProtocolUsage.addElement("ALWAYS_CONSUMED");
@@ -558,19 +585,19 @@ public class EnumerationData {
         vProtocolUsage.addElement("BY_START");
         vProtocolUsage.addElement("PRIVATE");
     }
-    
+
     private void initProtocolType() {
         vProtocolType.removeAllElements();
         vProtocolType.addElement("Protocol");
         vProtocolType.addElement("Protocol Notify");
     }
-    
+
     private void initEventType() {
         vEventType.removeAllElements();
         vEventType.addElement("CreateEvents");
         vEventType.addElement("SignalEvents");
     }
-    
+
     private void initEventUsage() {
         vEventUsage.removeAllElements();
         vEventUsage.addElement("ALWAYS_CONSUMED");
@@ -579,14 +606,14 @@ public class EnumerationData {
         vEventUsage.addElement("SOMETIMES_PRODUCED");
         vEventUsage.addElement("PRIVATE");
     }
-    
+
     private void initEventGroup() {
         vEventGroup.removeAllElements();
         vEventGroup.addElement("EVENT_GROUP_GUID");
         vEventGroup.addElement("EVENT_TYPE_PERIODIC_TIMER");
         vEventGroup.addElement("EVENT_TYPE_RELATIVE_TIMER");
     }
-    
+
     private void initHobType() {
         vHobType.removeAllElements();
         vHobType.addElement("PHIT");
@@ -598,7 +625,7 @@ public class EnumerationData {
         vHobType.addElement("POOL");
         vHobType.addElement("CAPSULE_VOLUME");
     }
-    
+
     private void initHobUsage() {
         vHobUsage.removeAllElements();
         vHobUsage.addElement("ALWAYS_CONSUMED");
@@ -607,13 +634,13 @@ public class EnumerationData {
         vHobUsage.addElement("SOMETIMES_PRODUCED");
         vHobUsage.addElement("PRIVATE");
     }
-    
+
     private void initPpiType() {
         vPpiType.removeAllElements();
         vPpiType.addElement("Ppi");
         vPpiType.addElement("Ppi Notify");
     }
-    
+
     private void initPpiUsage() {
         vPpiUsage.removeAllElements();
         vPpiUsage.addElement("ALWAYS_CONSUMED");
@@ -622,16 +649,16 @@ public class EnumerationData {
         vPpiUsage.addElement("SOMETIMES_PRODUCED");
         vPpiUsage.addElement("PRIVATE");
     }
-    
+
     private void initPpiNotifyUsage() {
         vPpiNotifyUsage.removeAllElements();
         vPpiNotifyUsage.addElement("SOMETIMES_CONSUMED");
     }
-    
+
     private void initProtocolNotifyUsage() {
         vProtocolNotifyUsage.addElement("SOMETIMES_CONSUMED");
     }
-    
+
     private void initVariableUsage() {
         vVariableUsage.removeAllElements();
         vVariableUsage.addElement("ALWAYS_CONSUMED");
@@ -640,7 +667,7 @@ public class EnumerationData {
         vVariableUsage.addElement("SOMETIMES_PRODUCED");
         vVariableUsage.addElement("PRIVATE");
     }
-    
+
     private void initBootModeNames() {
         vBootModeNames.removeAllElements();
         vBootModeNames.addElement("FULL");
@@ -664,7 +691,7 @@ public class EnumerationData {
         vBootModeNames.addElement("RECOVERY_S5_RESUME");
         vBootModeNames.addElement("RECOVERY_FLASH_UPDATE");
     }
-    
+
     private void initBootModeUsage() {
         vBootModeUsage.removeAllElements();
         vBootModeUsage.addElement("ALWAYS_CONSUMED");
@@ -672,7 +699,7 @@ public class EnumerationData {
         vBootModeUsage.addElement("ALWAYS_PRODUCED");
         vBootModeUsage.addElement("SOMETIMES_PRODUCED");
     }
-    
+
     private void initSystemTableUsage() {
         vSystemTableUsage.removeAllElements();
         vSystemTableUsage.addElement("ALWAYS_CONSUMED");
@@ -681,7 +708,7 @@ public class EnumerationData {
         vSystemTableUsage.addElement("SOMETIMES_PRODUCED");
         vSystemTableUsage.addElement("PRIVATE");
     }
-    
+
     private void initDataHubUsage() {
         vDataHubUsage.removeAllElements();
         vDataHubUsage.addElement("ALWAYS_CONSUMED");
@@ -690,14 +717,14 @@ public class EnumerationData {
         vDataHubUsage.addElement("SOMETIMES_PRODUCED");
         vDataHubUsage.addElement("PRIVATE");
     }
-    
+
     private void initHiiPackages() {
         vHiiPackageUsage.removeAllElements();
         vHiiPackageUsage.addElement("ALWAYS_PRODUCED");
         vHiiPackageUsage.addElement("SOMETIMES_PRODUCED");
         vHiiPackageUsage.addElement("PRIVATE");
     }
-    
+
     private void initGuidUsage() {
         vGuidUsage.removeAllElements();
         vGuidUsage.addElement("ALWAYS_CONSUMED");
@@ -706,23 +733,23 @@ public class EnumerationData {
         vGuidUsage.addElement("SOMETIMES_PRODUCED");
         vGuidUsage.addElement("PRIVATE");
     }
-    
+
     private void initExternTypes() {
         vExternTypes.removeAllElements();
-        
+
         vExternTypes.addElement(EnumerationData.EXTERNS_SPECIFICATION);
         vExternTypes.addElement(EnumerationData.EXTERNS_IMAGE);
         vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER);
         vExternTypes.addElement(EnumerationData.EXTERNS_LIBRARY);
         vExternTypes.addElement(EnumerationData.EXTERNS_CALL_BACK);
     }
-    
+
     private void initPcdDriverTypes() {
-        vPcdDriverTypes.removeAllElements();        
+        vPcdDriverTypes.removeAllElements();
         vPcdDriverTypes.addElement("PEI_PCD_DRIVER");
         vPcdDriverTypes.addElement("DXE_PCD_DRIVER");
     }
-    
+
     private void initPcdItemTypes() {
         vPcdItemTypes.removeAllElements();
         vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_FEATURE_FLAG);
@@ -731,7 +758,7 @@ public class EnumerationData {
         vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_DYNAMIC);
         vPcdItemTypes.addElement(DataType.PCD_ITEM_TYPE_DYNAMIC_EX);
     }
-    
+
     private void initPcdUsage() {
         vPcdUsage.removeAllElements();
         vPcdUsage.addElement("ALWAYS_CONSUMED");
@@ -740,6 +767,12 @@ public class EnumerationData {
         vPcdUsage.addElement("SOMETIMES_PRODUCED");
     }
     
+    private void initBuildTargets() {
+        vBuildTargets.removeAllElements();
+        vBuildTargets.addElement(EnumerationData.BUILD_TARGET_DEBUG);
+        vBuildTargets.addElement(EnumerationData.BUILD_TARGET_RELEASE);
+    }
+
     public Vector<String> getvCompontentType() {
         return vCompontentType;
     }
@@ -1078,5 +1111,13 @@ public class EnumerationData {
 
     public void setVPcdUsage(Vector<String> pcdUsage) {
         vPcdUsage = pcdUsage;
+    }
+
+    public Vector<String> getVBuildTargets() {
+        return vBuildTargets;
+    }
+
+    public void setVBuildTargets(Vector<String> buildTargets) {
+        vBuildTargets = buildTargets;
     }
 }
