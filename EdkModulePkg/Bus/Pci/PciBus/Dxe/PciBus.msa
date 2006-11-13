@@ -7,7 +7,11 @@
     <Version>1.0</Version>
     <Abstract>Component description file for PciBus module.</Abstract>
     <Description>PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
-       space for these devices.</Description>
+       space for these devices.
+       LightPcdLib.c tagged with "ToolCode="DUMMY"" is light weight verison for PCI library
+       function. This version provide simple implementation and do not support hot plug. Only one
+       between PcdLib.c and LightPcdLib.c can be choosed. 
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

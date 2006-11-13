@@ -203,7 +203,7 @@ IDEBusDriverDiagnosticsRunDiagnostics (
       return Status;
     }
 
-    EfiCopyMem (*Buffer, IDE_BUS_DIAGNOSTIC_ERROR, *BufferSize);
+    CopyMem (*Buffer, IDE_BUS_DIAGNOSTIC_ERROR, *BufferSize);
 
     Status = EFI_DEVICE_ERROR;
   }
