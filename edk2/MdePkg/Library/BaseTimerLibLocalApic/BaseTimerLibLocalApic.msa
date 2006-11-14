@@ -56,7 +56,7 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFSBClock</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>Bus speed on the platform, its unit is Hz.  its default value is 200000000, that means bus speed is 200Mhz.</HelpText>
+      <HelpText>This value is FSB Clock frequency. Its unit is Hz and its default value is 200000000, that means FSB frequency is 200Mhz.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

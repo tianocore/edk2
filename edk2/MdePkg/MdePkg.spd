@@ -8,12 +8,12 @@
     <Description>This Package provides headers and libraries that conform to EFI/Framework Industry standards.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved.
-      This program and the accompanying materials are licensed and made available under 
-      the terms and conditions of the BSD License which accompanies this distribution. 
-      The full text of the license may be found at 
-      http://opensource.org/licenses/bsd-license.php 
+      This program and the accompanying materials are licensed and made available under
+      the terms and conditions of the BSD License which accompanies this distribution.
+      The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
 
-      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </SpdHeader>
@@ -2325,13 +2325,13 @@
       <HelpText>The base address of PCI Express MMIO window.</HelpText>
     </PcdEntry>
     <PcdEntry>
-      <C_Name>PcdPlatformBusSpeed</C_Name>
+      <C_Name>PcdFSBClock</C_Name>
       <Token>0x0000000c</Token>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>200000000</DefaultValue>
-      <HelpText>Bus speed on the platform, its unit is Hz.  its default value is 200000000, that means bus speed is 200Mhz.</HelpText>
+      <HelpText>This value is FSB Clock frequency. Its unit is Hz and its default value is 200000000, that means FSB frequency is 200Mhz.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdComponentNameDisable</C_Name>
