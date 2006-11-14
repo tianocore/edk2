@@ -672,7 +672,8 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private void showSettingsDlg (int row) {
         try {
-            if (ffc.adjustPcd(row)) {
+            Vector<String> vExceptions = new Vector<String>();
+            if (ffc.adjustPcd(row, vExceptions)) {
                 JOptionPane.showMessageDialog(frame, "Pcd entries sync. with those in MSA files.");
                 docConsole.setSaved(false);
             }
@@ -852,8 +853,16 @@ public class FpdFrameworkModules extends IInternalFrame {
     public FpdFrameworkModules(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
-        if (pcdSync()) {
+        Vector<String> vExceptions = new Vector<String>();
+        if (pcdSync(vExceptions)) {
             JOptionPane.showMessageDialog(frame, "PCD in this platform are synchronized with those in MSA files.");    
+        }
+        if (vExceptions.size() > 0) {
+            String errorMsg = "";
+            for (int i = 0; i < vExceptions.size(); ++i) {
+                errorMsg += " " + vExceptions.get(i);
+            }
+            JOptionPane.showMessageDialog(frame, "Error occurred during synchronization:" + errorMsg);
         }
     }
 
@@ -916,16 +925,16 @@ public class FpdFrameworkModules extends IInternalFrame {
         
     }
 
-    private boolean pcdSync() {
+    private boolean pcdSync(Vector<String> v) {
         boolean synced = false;
         for (int i = 0; i < jTableFpdModules.getRowCount(); ++i) {
             try {
-                if (ffc.adjustPcd(i)) {
+                if (ffc.adjustPcd(i, v)) {
                     synced = true;
                 }
             }
             catch (Exception exp) {
-                JOptionPane.showMessageDialog(frame, exp.getMessage());
+//                JOptionPane.showMessageDialog(frame, exp.getMessage());
                 continue;
             }
         }

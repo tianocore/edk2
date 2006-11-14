@@ -383,7 +383,7 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
-    public boolean adjustPcd (int seqModuleSa) throws Exception {
+    public boolean adjustPcd (int seqModuleSa, Vector<String> vExceptions) throws Exception {
         boolean dataModified = false;
         ModuleSADocument.ModuleSA moduleSa = getModuleSA(seqModuleSa);
         int pcdCount = getPcdDataCount(seqModuleSa);
@@ -403,6 +403,7 @@ public class FpdFileContents {
         getLibraryInstances(moduleKey, saaLib);
         ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
         if (mi == null) {
+            vExceptions.add("Module " + mg + " does NOT exist in workspace.");
             throw new Exception ("Module does NOT exist in workspace.");
         }
         Vector<ModuleIdentification> vMi = new Vector<ModuleIdentification>();
@@ -413,7 +414,9 @@ public class FpdFileContents {
         for (int j = 0; j < saaLib.length; ++j) {
             String libKey = saaLib[j][1] + " " + saaLib[j][2] + " " + saaLib[j][3] + " " + saaLib[j][4];
             ModuleIdentification libMi = WorkspaceProfile.getModuleId(libKey);
-            vMi.add(libMi);
+            if (libMi != null) {
+                vMi.add(libMi);
+            }
         }
         
     nextPcd:for (int i = 0; i < saaModuleSaPcd.length; ++i) {
@@ -458,8 +461,13 @@ public class FpdFileContents {
                         //
                         // ToDo Error 
                         //
-                        throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module "
-                                                  + mi.getName());
+                        String errorMessage = "No Declaration for PCD Entry " + msaPcd.getCName() + " in Module "
+                        + mi.getName();
+                        if (i != 0) {
+                            errorMessage += " Library Instance " + vMi.get(i).getName(); 
+                        }
+                        vExceptions.add(errorMessage);
+                        throw new PcdDeclNotFound(errorMessage);
                     }
                     //
                     // AddItem to ModuleSA PcdBuildDefinitions
