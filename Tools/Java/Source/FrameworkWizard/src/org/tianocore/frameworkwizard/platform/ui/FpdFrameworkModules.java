@@ -860,7 +860,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         if (vExceptions.size() > 0) {
             String errorMsg = "";
             for (int i = 0; i < vExceptions.size(); ++i) {
-                errorMsg += " " + vExceptions.get(i);
+                errorMsg += " " + vExceptions.get(i) + "\n";
             }
             JOptionPane.showMessageDialog(frame, "Error occurred during synchronization:" + errorMsg);
         }
