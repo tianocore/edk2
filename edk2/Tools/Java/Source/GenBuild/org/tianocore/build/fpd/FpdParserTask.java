@@ -92,14 +92,23 @@ public class FpdParserTask extends Task {
     Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
 
     ///
+    /// Mapping from FV apriori file to its type (PEI or DXE)
+    ///
+    Map<String, String> aprioriType = new HashMap<String, String>();
+    
+    ///
     /// FpdParserTask can specify some ANT properties.
     ///
     private Vector<Property> properties = new Vector<Property>();
 
     SurfaceAreaQuery saq = null;
-    
-    boolean isUnified = true;
 
+    boolean isUnified = true;
+    
+    public static String PEI_APRIORI_GUID = "00000000-0000-0000-0000-000000000000";
+    
+    public static String DXE_APRIORI_GUID = "fc510ee7-ffdc-11d4-bd41-0080c73c8881";
+    
     /**
       Public construct method. It is necessary for ANT task.
     **/
@@ -163,7 +172,7 @@ public class FpdParserTask extends Task {
         // Gen build.xml
         //
         String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile, aprioriType);
         fileGenerator.genBuildFile();
 
         //
@@ -318,6 +327,33 @@ public class FpdParserTask extends Task {
                 if (files != null) {
                     bw.write("[files]");
                     bw.newLine();
+                    
+                    Set<FpdModuleIdentification> modules = null;
+                    
+                    if ( (modules = getPeiApriori(validFv[i])) != null) {
+                        //
+                        // Special GUID - validFv[i].FFS
+                        //
+                        String str = ffsCommonDir + File.separatorChar + "FV" + File.separatorChar + PEI_APRIORI_GUID + "-" + validFv[i] + ".FFS";
+                        bw.write(getProject().replaceProperties("EFI_FILE_NAME = " + str));
+                        bw.newLine();
+                        
+                        File aprioriFile = new File(getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i] + ".apr");
+                        aprioriType.put(validFv[i], PEI_APRIORI_GUID);
+                        genAprioriFile(modules, aprioriFile);
+                    } else if((modules = getDxeApriori(validFv[i])) != null) {
+                        //
+                        // Special GUID - validFv[i].FFS
+                        //
+                        String str = ffsCommonDir + File.separatorChar + "FV" + File.separatorChar + DXE_APRIORI_GUID + "-" + validFv[i] + ".FFS";
+                        bw.write(getProject().replaceProperties("EFI_FILE_NAME = " + str));
+                        bw.newLine();
+                        
+                        File aprioriFile = new File(getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i] + ".apr");
+                        aprioriType.put(validFv[i], DXE_APRIORI_GUID);
+                        genAprioriFile(modules, aprioriFile);
+                    }
+                    
                     for (int j = 0; j < files.length; j++) {
                         String str = ffsCommonDir + File.separatorChar + outfiles.get(files[j]);
                         bw.write(getProject().replaceProperties("EFI_FILE_NAME = " + str));
@@ -375,7 +411,7 @@ public class FpdParserTask extends Task {
         }
 
         String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile, aprioriType);
         fileGenerator.genBuildFile();
         
         Ant ant = new Ant();
@@ -686,6 +722,97 @@ public class FpdParserTask extends Task {
         }
         
         return archs;
+    }
+    
+    private void genAprioriFile(Set<FpdModuleIdentification> modules, File file) {
+        try {
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            Iterator<FpdModuleIdentification> iter = modules.iterator();
+            while(iter.hasNext()) {
+                bw.write(iter.next().getModule().getGuid());
+                bw.newLine();
+            }
+            
+            bw.flush();
+            bw.close();
+            fw.close();
+        }  catch (IOException ex) {
+            BuildException buildException = new BuildException("Generation of the Apriori file [" + file.getPath() + "] failed!\n" + ex.getMessage());
+            buildException.setStackTrace(ex.getStackTrace());
+            throw buildException;
+        }
+    }
+    
+    private Set<FpdModuleIdentification> getPeiApriori(String fvName) throws EdkException {
+        Node node = saq.getPeiApriori(fvName);
+        Set<FpdModuleIdentification> result = new LinkedHashSet<FpdModuleIdentification>();
+        if (node == null) {
+            return null;
+        }
+        
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node childItem = childNodes.item(i);
+            if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                //
+                // Find child elements "IncludeModules"
+                //
+                if (childItem.getNodeName().compareTo("IncludeModules") == 0) {
+                    //
+                    // result will be updated
+                    //
+                    processNodes(childItem, result);
+                } else if (childItem.getNodeName().compareTo("FvName") == 0) {
+                    
+                } else if (childItem.getNodeName().compareTo("InfFileName") == 0) {
+                    
+                } else {
+                    //
+                    // Report Warning
+                    //
+                    EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised element " + childItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='APRIORI' Identifier='0']");
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private Set<FpdModuleIdentification> getDxeApriori(String fvName) throws EdkException {
+        Node node = saq.getDxeApriori(fvName);
+        Set<FpdModuleIdentification> result = new LinkedHashSet<FpdModuleIdentification>();
+        if (node == null) {
+            return null;
+        }
+        
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node childItem = childNodes.item(i);
+            if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                //
+                // Find child elements "IncludeModules"
+                //
+                if (childItem.getNodeName().compareTo("IncludeModules") == 0) {
+                    //
+                    // result will be updated
+                    //
+                    processNodes(childItem, result);
+                } else if (childItem.getNodeName().compareTo("FvName") == 0) {
+                    
+                } else if (childItem.getNodeName().compareTo("InfFileName") == 0) {
+                    
+                } else {
+                    //
+                    // Report Warning
+                    //
+                    EdkLog.log(this, EdkLog.EDK_WARNING, "Unrecognised element " + childItem.getNodeName() + " under FPD.BuildOptions.UserExtensions[UserID='APRIORI' Identifier='1']");
+                }
+            }
+        }
+        
+        return result;
     }
     
     private Set<FpdModuleIdentification> getModuleSequenceForFv(String fvName) throws EdkException {

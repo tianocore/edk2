@@ -121,7 +121,7 @@ public class FpdParserForThread extends FpdParserTask {
         // Gen build.xml
         //
         String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile, aprioriType);
         fileGenerator.genBuildFile();
         
         //

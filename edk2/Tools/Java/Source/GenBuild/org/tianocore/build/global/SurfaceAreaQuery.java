@@ -2011,6 +2011,32 @@ public class SurfaceAreaQuery {
 		}
 	}
     
+    public Node getPeiApriori(String fvName) {
+        String[] xPath = new String[] { "/BuildOptions/UserExtensions[@UserID='APRIORI' and @Identifier='0' and ./FvName='" + fvName + "']" };
+        Object[] result = get("PlatformSurfaceArea", xPath);
+        
+        if (result == null || result.length == 0) {
+            return null;
+        }
+        
+        UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)result[0];
+        
+        return a.getDomNode();
+    }
+    
+    public Node getDxeApriori(String fvName) {
+        String[] xPath = new String[] { "/BuildOptions/UserExtensions[@UserID='APRIORI' and @Identifier='1' and ./FvName='" + fvName + "']" };
+        Object[] result = get("PlatformSurfaceArea", xPath);
+        
+        if (result == null || result.length == 0) {
+            return null;
+        }
+        
+        UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)result[0];
+        
+        return a.getDomNode();
+    }
+    
     public Node getFpdModuleSequence(String fvName) {
         String[] xPath = new String[] { "/BuildOptions/UserExtensions[@UserID='IMAGES' and @Identifier='1' and ./FvName='" + fvName + "']" };
         Object[] result = get("PlatformSurfaceArea", xPath);

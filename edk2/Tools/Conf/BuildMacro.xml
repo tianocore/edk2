@@ -1392,4 +1392,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         tofile="${DEST_DIR_OUTPUT}/${BASE_NAME}.efi"/>
     </sequential>
   </macrodef>
+  
+  <!-- 
+    Build macro for Apriori
+  -->
+  <macrodef name="Build_Apriori">
+    <attribute name="FILEPATH" default="."/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="apr"/>
+    <attribute name="GUID"/>
+
+    <sequential>
+      <mkdir dir="${FV_DIR}/Apriori" />
+      <gensection inputfile="${FV_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                  outputfile="${FV_DIR}/Apriori/@{FILENAME}.sec" 
+                  sectiontype="EFI_SECTION_RAW"/>
+
+      <genffsfile BaseName="@{FILENAME}" ffsATTRIBCHECKSUM="TRUE" ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" 
+                  fileGuid="@{GUID}" moduleType="BASE" outputDir="${FV_DIR}">
+        <sectFile fileName="${FV_DIR}/Apriori/@{FILENAME}.sec"/>
+      </genffsfile>
+      
+    </sequential>
+  </macrodef>
 </project>
