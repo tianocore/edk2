@@ -76,8 +76,7 @@ public class SurfaceAreaQuery {
     //
     // keep the namep declaration for xmlbeans Xpath query
     //
-    private String queryDeclaration = null;
-
+    private String queryDeclaration = null;    
     private StringBuffer normQueryString = new StringBuffer(4096);
     private Pattern xPathPattern = Pattern.compile("([^/]*)(/|//)([^/]+)");
 
