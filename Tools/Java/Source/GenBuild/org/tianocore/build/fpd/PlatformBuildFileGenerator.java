@@ -64,6 +64,8 @@ public class PlatformBuildFileGenerator {
     
     private File platformBuildFile = null;
     
+    private Map<String, String> aprioriType = null;
+    
     private Project project;
     
     private String info = "DO NOT EDIT \n" 
@@ -72,13 +74,14 @@ public class PlatformBuildFileGenerator {
         + "Abstract:\n"
         + "Auto-generated ANT build file for building EFI Modules and Platforms\n";
 
-    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified, SurfaceAreaQuery saq, String platformBuildFile){
+    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified, SurfaceAreaQuery saq, String platformBuildFile, Map<String, String> aprioriType){
         this.project = project;
         this.outfiles = outfiles;
         this.isUnified = isUnified;
         this.fvs = fvs;
         this.saq = saq;
         this.platformBuildFile = new File(platformBuildFile);
+        this.aprioriType = aprioriType;
     }
     
     /**
@@ -193,6 +196,39 @@ public class PlatformBuildFileGenerator {
         Element ele = document.createElement("target");
         ele.setAttribute("name", "modules");
 
+        //
+        // Try to build apriori if necessary
+        //
+        //
+        // For every Target and ToolChain
+        //
+        String[] targetList = GlobalData.getToolChainInfo().getTargets();
+        for (int i = 0; i < targetList.length; i++){
+            String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+            for(int j = 0; j < toolchainList.length; j++){
+                //
+                // Prepare FV_DIR
+                //
+                String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
+                                + targetList[i] + "_" 
+                                + toolchainList[j];
+                File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                Element fvEle = document.createElement("var");
+                fvEle.setAttribute("name", "FV_DIR");
+                fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
+                ele.appendChild(fvEle);
+                
+                Iterator<String> aprIter = aprioriType.keySet().iterator();
+                while (aprIter.hasNext()) {
+                    String fvName = aprIter.next();
+                    Element moduleEle = document.createElement("Build_Apriori");
+                    moduleEle.setAttribute("FILENAME", fvName);
+                    moduleEle.setAttribute("GUID", aprioriType.get(fvName));
+                    ele.appendChild(moduleEle);
+                }
+            }
+        }
+        
         //
         // Get all valid FV name
         //
