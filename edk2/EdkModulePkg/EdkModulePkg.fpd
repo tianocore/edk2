@@ -5472,6 +5472,14 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>200000000</Value>
         </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT64</DatumType>
+          <MaxDatumSize>8</MaxDatumSize>
+          <Value>0x0ffffc000000</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -18592,6 +18600,14 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT64</DatumType>
+          <MaxDatumSize>8</MaxDatumSize>
+          <Value>0x0ffffc000000</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -18722,6 +18738,14 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT64</DatumType>
+          <MaxDatumSize>8</MaxDatumSize>
+          <Value>0x0ffffc000000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>

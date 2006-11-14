@@ -2324,6 +2324,15 @@
       <DefaultValue>0xE0000000</DefaultValue>
       <HelpText>The base address of PCI Express MMIO window.</HelpText>
     </PcdEntry>
+    <PcdEntry SupArchList="IPF">
+      <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+      <Token>0x0000000c</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT64</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0ffffc000000</DefaultValue>
+      <HelpText>The base address of IPF IO Block</HelpText>
+    </PcdEntry>
     <PcdEntry>
       <C_Name>PcdFSBClock</C_Name>
       <Token>0x0000000c</Token>
