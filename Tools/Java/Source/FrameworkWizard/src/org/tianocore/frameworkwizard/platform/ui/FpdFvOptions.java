@@ -121,7 +121,7 @@ public class FpdFvOptions extends JDialog {
      */
     private void initialize() {
         this.setSize(650, 400);
-//        this.setModal(true);
+        this.setModal(true);
         this.setTitle("FV Options");
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.setContentPane(getJContentPane());

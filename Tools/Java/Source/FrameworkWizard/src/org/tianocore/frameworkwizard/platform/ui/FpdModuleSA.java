@@ -1787,24 +1787,23 @@ private JButton getJButtonUpdatePcd() {
                 String tsGuid = model.getValueAt(row, 1)+"";
                 String oldItemType = model.getValueAt(row, 2)+"";
                 String newItemType = jComboBoxItemType.getSelectedItem()+"";
-                
-                model.setValueAt(jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem(), row, 6);
+                String newValue = jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem()+""; 
                 
                 String[] pcdInfo = {"", "", ""};
                 Vector<String> validPcdTypes = new Vector<String>();
                 getPcdInfo (moduleKey, cName, tsGuid, pcdInfo, validPcdTypes);
                 if (pcdInfo[1].equals("FIXED_AT_BUILD") && model.getValueAt(row, 5).equals("VOID*")) {
                     try {
-                        jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(model.getValueAt(row, 6)+"")+"");
+                        jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(newValue)+"");
                     }
                     catch (Exception exp) {
                         JOptionPane.showMessageDialog(frame, "PCD Value MalFormed: " + exp.getMessage());
                         return;
                     }
                 }
-                model.setValueAt(jTextFieldMaxDatumSize.getText(), row, 4);
+                String newMaxDatumSize = jTextFieldMaxDatumSize.getText();
                 
-                if (newItemType != oldItemType) {
+                if (!newItemType.equals(oldItemType)) {
                     Vector<ModuleIdentification> moduleInfo = new Vector<ModuleIdentification>();
                     try {
                         boolean changable = itemTypeCouldBeChanged (cName, tsGuid, newItemType, moduleInfo);
@@ -1830,8 +1829,11 @@ private JButton getJButtonUpdatePcd() {
                     model.setValueAt(newItemType, row, 2);
                 }
                 
-                ffc.updatePcdData(moduleKey, cName, tsGuid, model.getValueAt(row, 2)+"", model.getValueAt(row, 4)+"", model.getValueAt(row, 6)+"");
+                ffc.updatePcdData(moduleKey, cName, tsGuid, model.getValueAt(row, 2)+"", newMaxDatumSize, newValue);
                 docConsole.setSaved(false);
+                model.setValueAt(newValue, row, 6);
+                model.setValueAt(newMaxDatumSize, row, 4);
+                
             }
         });
     }
