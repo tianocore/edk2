@@ -1175,8 +1175,8 @@ public class FpdFileContents {
                 //
                 // ToDo Error 
                 //
-                throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module "
-                                          + mi.getName());
+                throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " used by Module "
+                                          + mi.getName() + " or its Library Instances.");
             }
             //
             // AddItem to ModuleSA PcdBuildDefinitions
