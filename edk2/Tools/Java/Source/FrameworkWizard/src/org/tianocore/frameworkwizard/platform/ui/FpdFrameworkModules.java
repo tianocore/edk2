@@ -852,6 +852,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     public FpdFrameworkModules(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
+        if (pcdSync()) {
+            JOptionPane.showMessageDialog(frame, "PCD in this platform are synchronized with those in MSA files.");    
+        }
     }
 
     private void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
@@ -910,9 +913,26 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
 
         showAllModules();
-
+        
     }
 
+    private boolean pcdSync() {
+        boolean synced = false;
+        for (int i = 0; i < jTableFpdModules.getRowCount(); ++i) {
+            try {
+                if (ffc.adjustPcd(i)) {
+                    synced = true;
+                }
+            }
+            catch (Exception exp) {
+                JOptionPane.showMessageDialog(frame, exp.getMessage());
+                continue;
+            }
+        }
+        return synced;
+        
+    }
+    
     private void showAllModules() {
 
         if (miList == null) {
