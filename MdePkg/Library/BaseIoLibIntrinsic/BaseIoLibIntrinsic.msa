@@ -18,7 +18,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64 IPF</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>BaseIoLibIntrinsic</OutputFileBasename>
   </ModuleDefinitions>
@@ -32,6 +32,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename SupArchList="IA32">IoLib.c</Filename>
@@ -42,6 +45,8 @@
     <Filename SupArchList="X64">IoLibMsc.c</Filename>
     <Filename SupArchList="X64">IoLibGcc.c</Filename>
     <Filename SupArchList="X64">IoHighLevel.c</Filename>
+    <Filename SupArchList="IPF">IoLibIpf.c</Filename>
+    <Filename SupArchList="IPF">IoHighLevel.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -50,4 +55,12 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
+  <PcdCoded>
+    <PcdEntry SupArchList="IPF" PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>0x0ffffc000000</DefaultValue>
+      <HelpText>The base address of IPF IO Block</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
