@@ -313,6 +313,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private final int argWidth = 400;
     
     private boolean ffsSelection = false;
+    private int selectedFfsTableRow = -1;
 
     /**
      * This method initializes jPanel	
@@ -812,6 +813,7 @@ public class FpdBuildOptions extends IInternalFrame {
                         ffc.getBuildOptionsFfs(row, sArray, lhm, alSections, alSection);
                         ffsSelection = true;
                         jTextFieldEncapType.setText(sArray[1]);
+                        ffsSelection = false;
                         for (int i = 0; i < alSection.size(); ++i) {
                             String[] sectionRow = { alSection.get(i) };
                             sectionTableModel.addRow(sectionRow);
@@ -830,6 +832,7 @@ public class FpdBuildOptions extends IInternalFrame {
                             String[] attribRow = { key, lhm.get(key) };
                             ffsAttributesTableModel.addRow(attribRow);
                         }
+                        selectedFfsTableRow = row;
                     }
                 }
             });
@@ -995,7 +998,7 @@ public class FpdBuildOptions extends IInternalFrame {
 
                 public void insertUpdate(DocumentEvent arg0) {
                     if (ffsSelection) {
-                        ffsSelection = false;
+//                        ffsSelection = false;
                         return;
                     }
                     if (docConsole != null) {
@@ -1005,7 +1008,7 @@ public class FpdBuildOptions extends IInternalFrame {
 
                 public void removeUpdate(DocumentEvent arg0) {
                     if (ffsSelection) {
-                        ffsSelection = false;
+//                        ffsSelection = false;
                         return;
                     }
                     if (docConsole != null) {
@@ -1021,10 +1024,10 @@ public class FpdBuildOptions extends IInternalFrame {
             });
             jTextFieldEncapType.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
-                    if (jTableFfs.getSelectedRow() < 0) {
+                    if (selectedFfsTableRow < 0) {
                         return;
                     }
-                    ffc.updateBuildOptionsFfsSectionsType(jTableFfs.getSelectedRow(), jTextFieldEncapType.getText());
+                    ffc.updateBuildOptionsFfsSectionsType(selectedFfsTableRow, jTextFieldEncapType.getText());
                     
                 }
             });
