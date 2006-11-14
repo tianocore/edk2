@@ -26,7 +26,9 @@ Abstract:
 
 #include <Common/UefiBaseTypes.h>
 
-#define PROGRAM_NAME  "CreateMtFile"
+#define UTILITY_NAME "CreateMtFile"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 1
 
 typedef struct {
   INT8    *OutFileName;
@@ -44,7 +46,13 @@ ProcessArgs (
 
 static
 void
-Usage (
+CMFUsage (
+  VOID
+  );
+
+static
+void
+CMFVersion (
   VOID
   );
 
@@ -86,11 +94,7 @@ Returns:
   // Open the output file
   //
   if ((OutFptr = fopen (Options.OutFileName, "wb")) == NULL) {
-    fprintf (
-      stdout,
-      PROGRAM_NAME " ERROR: Could not open output file '%s' for writing\n",
-      Options.OutFileName
-      );
+      printf (" ERROR: Could not open output file '%s' for writing\n", Options.OutFileName);
     return EFI_DEVICE_ERROR;
   }
   //
@@ -99,7 +103,7 @@ Returns:
   while (Options.FileSize > 0) {
     if (fwrite (&Options.ByteValue, 1, 1, OutFptr) != 1) {
       fclose (OutFptr);
-      fprintf (stdout, PROGRAM_NAME " ERROR: Failed to write to output file\n");
+      printf (" ERROR: Failed to write to output file\n");
       return EFI_DEVICE_ERROR;
     }
 
@@ -151,15 +155,32 @@ Returns:
   //
   Argv++;
   Argc--;
+  
+  if (Argc < 1) {
+    CMFUsage();
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    CMFUsage();
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    CMFVersion();
+    return EFI_INVALID_PARAMETER;
+  }
+ 
   if (Argc < 2) {
-    Usage ();
+    CMFUsage ();
     return EFI_INVALID_PARAMETER;
   }
   //
   // If first arg is dash-option, then print usage.
   //
   if (Argv[0][0] == '-') {
-    Usage ();
+    CMFUsage ();
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -176,13 +197,22 @@ Returns:
   if ((Argv[0][strlen (Argv[0]) - 1] == 'k') || (Argv[0][strlen (Argv[0]) - 1] == 'K')) {
     Multiplier = 1024;
   }
+  
+  //
+  // Check for negtive size
+  //
+  if (Argv[0][0] == '-') {
+    printf("ERROR: File size should be non-negtive.\n");
+    return EFI_INVALID_PARAMETER;
+  }
+  
   //
   // Look for 0x prefix on file size
   //
   if ((Argv[0][0] == '0') && ((Argv[0][1] == 'x') || (Argv[0][1] == 'X'))) {
     if (sscanf (Argv[0], "%x", &Options->FileSize) != 1) {
-      fprintf (stdout, PROGRAM_NAME " ERROR: Invalid file size '%s'\n", Argv[0]);
-      Usage ();
+      printf ("ERROR: Invalid file size '%s'\n", Argv[0]);
+      CMFUsage ();
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -190,12 +220,12 @@ Returns:
     //
   } else {
     if (sscanf (Argv[0], "%d", &Options->FileSize) != 1) {
-      fprintf (stdout, PROGRAM_NAME " ERROR: Invalid file size '%s'\n", Argv[0]);
-      Usage ();
+      printf ("ERROR: Invalid file size '%s'\n", Argv[0]);
+      CMFUsage ();
       return EFI_INVALID_PARAMETER;
     }
   }
-
+  
   Options->FileSize *= Multiplier;
   //
   // Assume byte value of 0xff
@@ -203,12 +233,39 @@ Returns:
   Options->ByteValue = (INT8) (UINT8) 0xFF;
   return EFI_SUCCESS;
 }
+
+
+static
+void 
+CMFVersion(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for Strip.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -EDK utility to create a pad file containing fixed data\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+
 //
 // Print utility usage info
 //
 static
 void
-Usage (
+CMFUsage (
   VOID
   )
 /*++
@@ -226,22 +283,15 @@ Returns:
   GC_TODO: add return values
 
 --*/
-{
-  UINT32            Index;
-  static const INT8 *Text[] = {
-    " ",
-    "Usage:  "PROGRAM_NAME " OutFileName FileSize",
-    "  where:",
-    "    OutFileName is the name of the output file to generate",
-    "    FileSize is the size of the file to create",
-    "  Examples:",
-    "    "PROGRAM_NAME " OutFile.bin 32K",
-    "    "PROGRAM_NAME " OutFile.bin 0x1000",
-    " ",
-    NULL
-  };
+{ 
+  CMFVersion();
+  
+  printf ("\n  Usage: %s OutFileName FileSize \n\
+      where: \n\
+        OutFileName is the name of the output file to generate \n\
+        FileSize is the size of the file to create \n\
+      Examples: \n\
+        %s OutFile.bin 32K \n\
+        %s OutFile.bin 0x1000 \n",UTILITY_NAME, UTILITY_NAME, UTILITY_NAME);
+} 
 
-  for (Index = 0; Text[Index] != NULL; Index++) {
-    fprintf (stdout, "%s\n", Text[Index]);
-  }
-}

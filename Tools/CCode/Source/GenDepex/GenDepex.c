@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004-2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -86,7 +86,7 @@ ParseDepex (
   );
 
 VOID
-PrintGenDepexUtilityInfo (
+GDVersion (
   VOID
   )
 /*++
@@ -111,11 +111,11 @@ Returns:
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION
     );
-  printf ("Copyright (C) 1996-2002 Intel Corporation.  All rights reserved.\n\n");
+  printf ("Copyright (C) 1996-2006 Intel Corporation. All rights reserved.\n");
 }
 
 VOID
-PrintGenDepexUsageInfo (
+GDUsage (
   VOID
   )
 /*++
@@ -134,15 +134,16 @@ Returns:
 
 --*/
 {
+  GDVersion();
   printf (
-    "Usage: %s -I <INFILE> -O <OUTFILE> [-P <Optional Boundary for padding up>] \n",
+    "\n  Usage: %s -I InputFile -O OutputFile [-P <Optional Boundary for padding up>] \n",
     UTILITY_NAME
     );
-  printf (" Where:\n");
-  printf ("  <INFILE> is the input pre-processed dependency text files name.\n");
-  printf ("  <OUTFILE> is the output binary dependency files name.\n");
-  printf ("  <Optional Boundary for padding up> is the padding integer value.\n");
-  printf ("    This is the boundary to align the output file size to.\n");
+  printf ("  Where:\n");
+  printf ("    InputFile is the input pre-processed dependency text files name.\n");
+  printf ("    OutputFile is the output binary dependency files name.\n");
+  printf ("    <Optional Boundary for padding up> is the padding integer value.\n");
+  printf ("       This is the boundary to align the output file size to.\n");
 }
 
 DEPENDENCY_OPCODE
@@ -855,9 +856,25 @@ Returns:
   Output_Flag = FALSE;
   Pad_Flag    = FALSE;
 
+  if (argc < 1) {
+    GDUsage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    GDUsage();
+    return 0;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    GDVersion();
+    return 0;
+  }
+  
   if (argc < 5) {
     printf ("Not enough arguments\n");
-    PrintGenDepexUsageInfo ();
+    GDUsage();
     return EFI_INVALID_PARAMETER;
   }
 
@@ -901,17 +918,15 @@ Returns:
     }
   }
 
-  PrintGenDepexUtilityInfo ();
-
   if (InFile == NULL) {
     printf ("Can not open <INFILE> for reading.\n");
-    PrintGenDepexUsageInfo ();
+    GDUsage();
     return EFI_ABORTED;
   }
 
   if (OutFile == NULL) {
     printf ("Can not open <OUTFILE> for writting.\n");
-    PrintGenDepexUsageInfo ();
+    GDUsage();
     return EFI_ABORTED;
   }
 

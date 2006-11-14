@@ -25,6 +25,59 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 
+#define UTILITY_NAME  "Strip"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 1
+
+
+void 
+StripVersion(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for Strip.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -EDK Convert EXE to BIN\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 2005-2006 Intel Corporation. All rights reserved.\n");
+}
+
+void 
+StripUsage(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out usage information for Strip.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  StripVersion();
+  printf ("\n  Usage: %s InputFile OutputFile\n", UTILITY_NAME);
+}
+
 int
 main (
   int  argc,
@@ -54,9 +107,25 @@ Returns:
   int   FileSize;
   char  *Buffer;
   char  *Ptrx;
-
+  
+  if (argc < 1) {
+    StripUsage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    StripUsage();
+    return 0;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    StripVersion();
+    return 0;
+  }
+  
   if (argc < 3) {
-    printf ("Need more args, such as file name to convert and output name\n");
+    StripUsage();
     return -1;
   }
 
@@ -64,12 +133,12 @@ Returns:
   OutFile = fopen (argv[2], "wb");
 
   if (!InFile) {
-    printf ("no file, exit\n");
+    printf ("Unable to open input file, exit\n");
     return -1;
   }
 
   if (OutFile == NULL) {
-    printf ("Unable to open output file.\n");
+    printf ("Unable to open output file, exit.\n");
     return -1;
   }
 
@@ -77,7 +146,7 @@ Returns:
   FileSize = ftell (InFile);
 
   if (FileSize < 0x200) {
-    printf ("%d is not a legal size, exit\n", FileSize);
+    printf ("%d is not a legal file size, exit\n", FileSize);
     return -1;
   }
 

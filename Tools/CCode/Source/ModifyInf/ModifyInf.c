@@ -24,6 +24,10 @@ Abstract:
 #include "stdio.h"
 #include "string.h"
 
+#define UTILITY_NAME "ModifyInf"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 1
+
 //
 // Read a line into buffer including '\r\n'
 //
@@ -242,28 +246,66 @@ Returns:
   return 0;
 }
 
-void
-Usage (
+void 
+MIVersion(
   void
   )
 /*++
 
 Routine Description:
 
-  GC_TODO: Add function description
+  Print out version information for Strip.
 
 Arguments:
 
   None
-
+  
 Returns:
 
-  GC_TODO: add return values
-
---*/
+  None
+  
+--*/ 
 {
-  printf ("ModifyInf InputFVInfFileName OutputFVInfFileName [Pattern strings]\r\n");
+  printf ("%s v%d.%d -EDK Modify fields in FV inf files.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 2005-2006 Intel Corporation. All rights reserved.\n");
 }
+
+void 
+MIUsage(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out usage information for Strip.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  MIVersion();
+  printf ("\n Usage: %s InputFile OutputFile Pattern_String [Pattern_String бн]\n\
+   Where: \n\
+     Pattern_String is of the format (note that the section name must be \n\
+     enclosed within square brackets):\n\
+         [section]FieldKey<op>Value [(FieldKey<op>Value) бн] \n\
+     The operator, <op>, must be one of the following: \n\
+         '==' replace a field value with a new value \n\
+         '+=' append a string at the end of original line \n\
+         '-'  prevent the line from applying any patterns \n\
+     Example: \n\
+         ModifyInf BuildRootFvFvMain.inf BuildRootFvFvMainEXP.inf \\ \n\
+               [files]EFI_FILE_NAME+=.Org EFI_NUM_BLOCKS==0x20 \\ \n\
+               [options]EFI_FILENAME==FcMainCompact.fv -DpsdSignature.dxe \n", UTILITY_NAME);
+}
+
 
 int
 main (
@@ -291,8 +333,24 @@ Returns:
   FILE  *fpin;
   FILE  *fpout;
 
+  if (argc < 1) {
+    MIUsage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    MIUsage();
+    return 0;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    MIVersion();
+    return 0;
+  }
+  
   if (argc < 3) {
-    Usage ();
+    MIUsage();
     return -1;
   }
 
