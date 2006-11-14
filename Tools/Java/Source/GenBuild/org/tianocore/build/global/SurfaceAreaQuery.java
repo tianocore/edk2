@@ -2023,4 +2023,25 @@ public class SurfaceAreaQuery {
         
         return a.getDomNode();
     }
+
+    /**
+     Get the value of PCD by PCD cName
+
+     @return PcdValue         String of PcdComponentName
+	         null         If don't find ComponentName Pcd
+    **/
+    public String getPcdValueBycName(String cName){
+        String[] xPath = new String[] { "/PcdData" };
+        Object[] returns = get("PcdBuildDefinition", xPath);
+	if (returns == null || returns.length == 0) {
+	    return  null;
+	} 
+	for (int i = 0; i < returns.length; i++) {
+            PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)returns[i];
+	    if (pcdData.getCName().equalsIgnoreCase(cName)){
+	        return pcdData.getValue();
+            }
+        }
+        return null;
+    }
 }

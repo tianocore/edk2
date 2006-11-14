@@ -1669,7 +1669,12 @@ public class AutoGen {
     **/
     void ExternsDriverBindingToAutoGenC(StringBuffer fileBuffer)
     throws EdkException {
-
+        //
+		// Flag to indicate whether need to replace cmponentName/DriverDiagnostic
+		// to NULL.
+		// 
+        boolean componentNamePcd = false;
+		boolean driverDiagnostPcd = false;
         //
         // Get the arry of extern. The driverBindingGroup is a 2 dimension array.
 		// The second dimension is include following element: DriverBinding, 
@@ -1677,7 +1682,24 @@ public class AutoGen {
 		// 
         String[][] driverBindingGroup = this.saq.getExternProtocolGroup();
 
-        //
+		//
+		// Get the Pcd Value of ComponentName and DriverDiagnostic to 
+		// decide whether need to disable the componentName and 
+		// DriverDiagnostic.
+		// 
+		
+		String pcdValue = null;
+		pcdValue = saq.getPcdValueBycName("PcdComponentNameDisable");
+		if (pcdValue != null && pcdValue.equalsIgnoreCase("true")) {
+            componentNamePcd = true;
+		}
+
+		pcdValue  = saq.getPcdValueBycName("PcdDriverDiagnosticsDisable");
+		if (pcdValue != null && pcdValue.equalsIgnoreCase("true")) {
+            driverDiagnostPcd = true;
+		}
+
+		//
         // inital BitMask;
 		// 
         int BitMask = 0;
@@ -1696,30 +1718,32 @@ public class AutoGen {
         //
         // Write component name protocol extern to autogen.c
         //
-		for (int i = 0; i < driverBindingGroup.length; i++) {
-			if (driverBindingGroup[i][1]!= null) {
-				if (driverBindingGroup[i][0] != null) {
-					BitMask |= 0x01;
-				    fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
-                    fileBuffer.append(driverBindingGroup[i][1]);
-                    fileBuffer.append(";\r\n");
-				} else {
-                    throw new AutoGenException("DriverBinding can't be empty!!");
-				}
-			}
+		if (componentNamePcd) {
+		    for (int i = 0; i < driverBindingGroup.length; i++) {
+			    if (driverBindingGroup[i][1]!= null) {
+				    if (driverBindingGroup[i][0] != null) {
+					    BitMask |= 0x01;
+				        fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
+                        fileBuffer.append(driverBindingGroup[i][1]);
+                        fileBuffer.append(";\r\n");
+				    } else {
+                        throw new AutoGenException("DriverBinding can't be empty!!");
+				    }
+			    }
+		    }
 		}
-
+        
         //
         // Write driver configration protocol extern to autogen.c
         //
 		for (int i = 0; i < driverBindingGroup.length; i++) {
-			if (driverBindingGroup[i][2] != null) {
-				if (driverBindingGroup[i][0] != null) {
+		    if (driverBindingGroup[i][2] != null) {
+			    if (driverBindingGroup[i][0] != null) {
                     BitMask |= 0x02;
-				    fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
+		            fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
                     fileBuffer.append(driverBindingGroup[i][2]);
                     fileBuffer.append(";\r\n");
-				} else {
+			    } else {
                     throw new AutoGenException("DriverBinding can't be empty!!");
 				}
 			}
@@ -1728,18 +1752,21 @@ public class AutoGen {
         //
         // Write driver dignastic protocol extern to autogen.c
         //
-		for (int i = 0; i < driverBindingGroup.length; i++) {
-			if (driverBindingGroup[i][3] != null) {
-				if (driverBindingGroup[i][0] != null) {
-                    BitMask |= 0x04;
-                    fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
-                    fileBuffer.append(driverBindingGroup[i][3]);
-                    fileBuffer.append(";\r\n");
-				} else {
-                    throw new AutoGenException("DriverBinding can't be empty!!");
-				}
-			}
+		if (driverDiagnostPcd) {
+			for (int i = 0; i < driverBindingGroup.length; i++) {
+			    if (driverBindingGroup[i][3] != null) {
+				    if (driverBindingGroup[i][0] != null) {
+                        BitMask |= 0x04;
+                        fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
+                        fileBuffer.append(driverBindingGroup[i][3]);
+                        fileBuffer.append(";\r\n");
+				    } else {
+                        throw new AutoGenException("DriverBinding can't be empty!!");
+				    }
+			    }
+		    }
 		}
+		
       
         //
         // Write driver module protocol bitmask.
@@ -1771,14 +1798,18 @@ public class AutoGen {
             if (i != 0) {
                 fileBuffer.append(",");
             }
-			
+			//
+			//  DriverBinding
+			// 
 			fileBuffer.append("\r\n {\r\n");
             fileBuffer.append("  &");
             fileBuffer.append(driverBindingGroup[i][0]);
             fileBuffer.append(", \r\n");
 			
-
-            if (driverBindingGroup[i][1] != null) {
+            //
+			//  ComponentName
+			// 
+            if (driverBindingGroup[i][1] != null && componentNamePcd) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][1]);
                 fileBuffer.append(", \r\n");
@@ -1786,6 +1817,9 @@ public class AutoGen {
                 fileBuffer.append("  NULL, \r\n");
             }
 
+			//
+			// DriverConfiguration
+			// 
             if (driverBindingGroup[i][2] != null) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][2]);
@@ -1794,7 +1828,10 @@ public class AutoGen {
                 fileBuffer.append("  NULL, \r\n");
             }
 
-            if (driverBindingGroup[i][3] != null) {
+			//
+			// DriverDiagnostic
+			// 
+            if (driverBindingGroup[i][3] != null && driverDiagnostPcd) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][3]);
                 fileBuffer.append(", \r\n");
