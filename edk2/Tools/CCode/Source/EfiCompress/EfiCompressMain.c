@@ -27,8 +27,60 @@ Abstract:
 #include <stdio.h>
 
 #include <Common/UefiBaseTypes.h>
-
 #include "EfiCompress.h"
+
+#define UTILITY_NAME "EfiCompress"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 1
+
+void 
+ECVersion(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for EfiCompress.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -EDK Efi Compress Utility\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 2005-2006 Intel Corporation. All rights reserved.\n");
+}
+
+void 
+ECUsage(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out usage information for EfiCompress.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  ECVersion();
+  printf ("\n  Usage: %s Inputfile Outputfile\n", UTILITY_NAME);
+}
+
 
 int
 main (
@@ -65,19 +117,28 @@ Returns:
   //  Added for makefile debug - KCE
   //
   INT32       arg_counter;
-  printf ("\n\n");
-  for (arg_counter = 0; arg_counter < argc; arg_counter++) {
-    printf ("%s ", argv[arg_counter]);
-  }
-
-  printf ("\n\n");
-
+ 
   SrcBuffer             = DstBuffer = NULL;
-
   infile                = outfile = NULL;
 
+  if (argc < 1) {
+    ECUsage();
+    goto Done;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    ECUsage();
+    goto Done;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    ECVersion();
+    goto Done;
+  }
+  
   if (argc != 3) {
-    printf ("Usage: EFICOMPRESS <infile> <outfile>\n");
+    ECUsage();
     goto Done;
   }
 
