@@ -105,7 +105,7 @@ public class FpdParserTask extends Task {
 
     boolean isUnified = true;
     
-    public static String PEI_APRIORI_GUID = "00000000-0000-0000-0000-000000000000";
+    public static String PEI_APRIORI_GUID = "1b45cc0a-156a-428a-af62-49864da0e6e6";
     
     public static String DXE_APRIORI_GUID = "fc510ee7-ffdc-11d4-bd41-0080c73c8881";
     
