@@ -100,6 +100,11 @@ _ThunkAttr  DD      ?
     mov     ebx, (IA32_REGS ptr [rsi - sizeof (IA32_REGS)])._EIP
     shl     ax, 4                       ; shl eax, 4
     add     bp, ax                      ; add ebp, eax
+    mov     ax, cs
+    shl     ax, 4
+    lea     ax, [eax + ebx + (@64BitCode - @Base)]
+    DB      2eh                         ; cs:
+    mov     [rdi + (@64Eip - @Base)], ax
     DB      66h, 0b8h                   ; mov eax, imm32
 SavedCr4    DD      ?
     mov     cr4, rax
@@ -113,13 +118,13 @@ SavedCr4    DD      ?
     DB      66h, 0b8h                   ; mov eax, imm32
 SavedCr0    DD      ?
     mov     cr0, rax
-    DB      0b8h                        ; mov ax, imm16
-SavedSs     DW      ?
-    mov     ss, eax
-    DB      66h, 0bch                   ; mov esp, imm32
-SavedEsp    DD      ?
-    DB      66h
-    retf                                ; return to protected mode
+    DB      66h, 0eah                   ; jmp far cs:@64Bit
+@64Eip      DD      ?
+SavedCs     DW      ?
+@64BitCode:
+    DB      48h, 0b8h                   ; mov rax, imm64
+SavedRip    DQ      ?
+    jmp     rax                         ; return to caller
 _BackFromUserCode   ENDP
 
 _EntryPoint DD      _ToUserCode - m16Start
@@ -147,7 +152,7 @@ _ToUserCode PROC
     wrmsr
     mov     cr4, rbp
     mov     ss, esi                     ; set up 16-bit stack segment
-    xchg    sp, bx                      ; set up 16-bit stack pointer
+    mov     sp, bx                      ; set up 16-bit stack pointer
     DB      66h
     call    @Base                       ; push eip
 @Base:
@@ -157,11 +162,6 @@ _ToUserCode PROC
     push    rax
     retf
 @RealMode:
-    DB      6ah, DATA32
-    DB      2eh                         ; cs:
-    pop     [rsi + (SavedSs - @Base)]
-    DB      2eh                         ; cs:
-    mov     [rsi + (SavedEsp - @Base)], bx
     DB      66h, 2eh                    ; CS and operand size override
     lidt    fword ptr [rsi + (_16Idtr - @Base)]
     DB      66h, 61h                    ; popad
@@ -232,8 +232,7 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     mov     eax, edx                    ; eax <- transition code address
     and     edx, 0fh
     shl     eax, 12
-    lea     edx, [rdx + (_BackFromUserCode - m16Start)]
-    mov     ax, dx
+    lea     ax, [rdx + (_BackFromUserCode - m16Start)]
     stosd                               ; [edi] <- return address of user code
     sgdt    fword ptr [rcx + (SavedGdt - SavedCr4)]
     sidt    fword ptr [rsp + 38h]       ; save IDT stack in argument space
@@ -250,7 +249,14 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     mov     ss, edx
     pushfq
     lea     edx, [rdx + DATA16 - DATA32]
-    call    fword ptr [rcx + (_EntryPoint - SavedCr4)]
+    lea     r8, @RetFromRealMode
+    mov     [rcx + (SavedRip - SavedCr4)], r8
+    mov     r8d, cs
+    mov     [rcx + (SavedCs - SavedCr4)], r8w
+    mov     r8, rsp
+    jmp     fword ptr [rcx + (_EntryPoint - SavedCr4)]
+@RetFromRealMode:
+    mov     rsp, r8
     popfq
     lidt    fword ptr [rsp + 38h]       ; restore protected mode IDTR
     lea     eax, [rbp - sizeof (IA32_REGS)]
