@@ -1786,8 +1786,21 @@ private JButton getJButtonUpdatePcd() {
                 String cName = model.getValueAt(row, 0)+"";
                 String tsGuid = model.getValueAt(row, 1)+"";
                 String oldItemType = model.getValueAt(row, 2)+"";
+                String dataType = model.getValueAt(row, 5)+"";
                 String newItemType = jComboBoxItemType.getSelectedItem()+"";
                 String newValue = jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem()+""; 
+                if (newValue.length() == 0){
+                
+                    if (dataType.equals("UINT8") || dataType.equals("UINT16") || dataType.equals("UINT32") || dataType.equals("UINT64")) {
+                        newValue = "0";
+                    }
+                    if (dataType.equals("BOOLEAN")){
+                        newValue = "FALSE";
+                    }
+                    if (dataType.equals("VOID*")) {
+                        newValue = "L\"\"";
+                    }
+                }
                 
                 String[] pcdInfo = {"", "", ""};
                 Vector<String> validPcdTypes = new Vector<String>();

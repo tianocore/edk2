@@ -1345,7 +1345,7 @@ public class FpdFileContents {
         fpdPcd.setDatumType(PcdDataTypes.Enum.forString(dataType));
         fpdPcd.setItemType(PcdItemTypes.Enum.forString(itemType));
         
-        if (defaultVal != null){
+        if (defaultVal != null && defaultVal.length() > 0){
             fpdPcd.setValue(defaultVal);
         }
         else {
@@ -1356,7 +1356,7 @@ public class FpdFileContents {
                 fpdPcd.setValue("FALSE");
             }
             if (dataType.equals("VOID*")) {
-                fpdPcd.setValue("");
+                fpdPcd.setValue("L\"\"");
             }
         }
         //

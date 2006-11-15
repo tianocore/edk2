@@ -856,6 +856,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         Vector<String> vExceptions = new Vector<String>();
         if (pcdSync(vExceptions)) {
             JOptionPane.showMessageDialog(frame, "PCD in this platform are synchronized with those in MSA files.");    
+            docConsole.setSaved(false);
         }
         if (vExceptions.size() > 0) {
             String errorMsg = "";
