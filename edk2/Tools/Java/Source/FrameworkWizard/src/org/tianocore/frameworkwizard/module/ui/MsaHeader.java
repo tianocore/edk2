@@ -1503,14 +1503,11 @@ public class MsaHeader extends IInternalFrame implements DocumentListener {
             jRadioButtonBinaryModuleTrue.setText("True");
             jRadioButtonBinaryModuleTrue.setSelected(true);
             jRadioButtonBinaryModuleTrue.addFocusListener(this);
-            jRadioButtonBinaryModuleTrue.setToolTipText("<html>Modules are either source modules <br>"
-                                                        + "which can be compiled or binary <br>"
-                                                        + "modules which are linked.  <br>"
-                                                        + "A module cannot contain both. <br>"
-                                                        + "The GUID numbers should be identical <br>"
-                                                        + "for a binary and source MSA, <br>"
-                                                        + "however the BINARY MSA should have <br>"
-                                                        + "a higher version number.</html>");
+            jRadioButtonBinaryModuleTrue
+                                        .setToolTipText("<html>Modules are either source modules which can be compiled or binary <br>"
+                                                        + "modules which are linked. A module cannot contain both. <br>"
+                                                        + "The GUID numbers should be identical for a binary and source MSA, <br>"
+                                                        + "however the BINARY MSA should have a higher version number.</html>");
         }
         return jRadioButtonBinaryModuleTrue;
     }
@@ -1526,7 +1523,8 @@ public class MsaHeader extends IInternalFrame implements DocumentListener {
             jRadioButtonBinaryModuleFalse.setBounds(new java.awt.Rectangle(valueCol + 140, 480, 140, 20));
             jRadioButtonBinaryModuleFalse.setText("False");
             jRadioButtonBinaryModuleFalse.addFocusListener(this);
-            jRadioButtonBinaryModuleFalse.setToolTipText("<html>Modules are either source modules which can be compiled or binary <br>"
+            jRadioButtonBinaryModuleFalse
+                                         .setToolTipText("<html>Modules are either source modules which can be compiled or binary <br>"
                                                          + "modules which are linked. A module cannot contain both. <br>"
                                                          + "The GUID numbers should be identical for a binary and source MSA, <br>"
                                                          + "however the BINARY MSA should have a higher version number.</html>");
