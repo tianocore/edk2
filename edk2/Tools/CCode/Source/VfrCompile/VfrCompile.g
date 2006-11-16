@@ -172,69 +172,69 @@ Returns:
   // on it.
   //
   fclose (VfrFptr);
-  Len = strlen (PREPROCESSOR_OPTIONS) + strlen (gOptions.VfrFileName) + 10;
-  if (gOptions.CPreprocessorOptions != NULL) {
-    Len += strlen (gOptions.CPreprocessorOptions) + 1;
-  }
-  if (gOptions.IncludePaths != NULL) {
-    Len += strlen (gOptions.IncludePaths) + 1;
-  }
-  Cmd = (char *)malloc (Len);
-  if (Cmd == NULL) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "could not allocate memory");
-    Cleanup();
-    return STATUS_ERROR;
-  }  
-  strcpy (Cmd, PREPROCESSOR_OPTIONS);
-  if (gOptions.IncludePaths != NULL) {
-    strcat (Cmd, gOptions.IncludePaths);
-    strcat (Cmd, " ");
-  }
-  if (gOptions.CPreprocessorOptions != NULL) {
-    strcat (Cmd, gOptions.CPreprocessorOptions);
-    strcat (Cmd, " ");
-  }
-  strcat (Cmd, gOptions.VfrFileName);
-#ifndef __GNUC__
-  Status = _spawnlp (_P_WAIT, PREPROCESSOR_COMMAND, Cmd, NULL);
-#else
-  {
-    char CommandLine[1000];
-    char *p;
-
-    //
-    // Lean the slashes forward.
-    //
-    for (p = gOptions.PreprocessorOutputFileName; *p; p++) {
-      if (*p=='\\') {
-        *p=FILE_SEP_CHAR;
-      }
-    }
- 
-    //
-    // Lean the slashes forward.
-    //
-    for (p = Cmd; *p; p++) {
-      if (*p=='\\') {
-        *p=FILE_SEP_CHAR;
-      }
-    }
- 
-    sprintf(CommandLine, "%s %s > %s", PREPROCESSOR_COMMAND, Cmd, gOptions.PreprocessorOutputFileName);
-    Status = system (CommandLine);
-  }
-#endif
-  if (Status != 0) {
-    Error (PROGRAM_NAME, 0, 0, gOptions.VfrFileName, "failed to spawn C preprocessor on VFR file");
-    printf ("Command: '%s %s'\n", PREPROCESSOR_COMMAND, Cmd);
-    Cleanup();
-    return STATUS_ERROR;
-  }
-  free (Cmd);
+//  Len = strlen (PREPROCESSOR_OPTIONS) + strlen (gOptions.VfrFileName) + 10;
+//  if (gOptions.CPreprocessorOptions != NULL) {
+//    Len += strlen (gOptions.CPreprocessorOptions) + 1;
+//  }
+//  if (gOptions.IncludePaths != NULL) {
+//    Len += strlen (gOptions.IncludePaths) + 1;
+//  }
+//  Cmd = (char *)malloc (Len);
+//  if (Cmd == NULL) {
+//    Error (PROGRAM_NAME, 0, 0, NULL, "could not allocate memory");
+//    Cleanup();
+//    return STATUS_ERROR;
+//  }  
+//  strcpy (Cmd, PREPROCESSOR_OPTIONS);
+//  if (gOptions.IncludePaths != NULL) {
+//    strcat (Cmd, gOptions.IncludePaths);
+//    strcat (Cmd, " ");
+//  }
+//  if (gOptions.CPreprocessorOptions != NULL) {
+//    strcat (Cmd, gOptions.CPreprocessorOptions);
+//    strcat (Cmd, " ");
+//  }
+//  strcat (Cmd, gOptions.VfrFileName);
+//#ifndef __GNUC__
+//  Status = _spawnlp (_P_WAIT, PREPROCESSOR_COMMAND, Cmd, NULL);
+//#else
+//  {
+//    char CommandLine[1000];
+//    char *p;
+// 
+//    //
+//    // Lean the slashes forward.
+//    //
+//    for (p = gOptions.PreprocessorOutputFileName; *p; p++) {
+//      if (*p=='\\') {
+//        *p=FILE_SEP_CHAR;
+//      }
+//    }
+// 
+//    //
+//    // Lean the slashes forward.
+//    //
+//    for (p = Cmd; *p; p++) {
+//      if (*p=='\\') {
+//        *p=FILE_SEP_CHAR;
+//      }
+//      }
+// 
+//    sprintf(CommandLine, "%s %s > %s", PREPROCESSOR_COMMAND, Cmd, gOptions.PreprocessorOutputFileName);
+//    Status = system (CommandLine);
+//  }
+//#endif
+//  if (Status != 0) {
+//    Error (PROGRAM_NAME, 0, 0, gOptions.VfrFileName, "failed to spawn C preprocessor on VFR file");
+//    printf ("Command: '%s %s'\n", PREPROCESSOR_COMMAND, Cmd);
+//    Cleanup();
+//    return STATUS_ERROR;
+//  }
+//  free (Cmd);
   //
   // Open the preprocessor output file
   //
-  if ((VfrFptr = fopen (gOptions.PreprocessorOutputFileName, "r")) == NULL) {
+  if ((VfrFptr = fopen (gOptions.VfrFileName, "r")) == NULL) {
     Error (PROGRAM_NAME, 0, 0, "failed to open input VFR preprocessor output file", 
       gOptions.PreprocessorOutputFileName);
     Cleanup();

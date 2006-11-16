@@ -88,7 +88,7 @@
     <Filename>Generic\FrontPage.h</Filename>
     <Filename>Generic\FrontPage.c</Filename>
     <Filename>Generic\FrontPageStrings.uni</Filename>
-    <Filename>Generic\FrontPageVfr.vfr</Filename>
+    <Filename>Generic\FrontPageVfr.Vfr</Filename>
     <Filename>Generic\Language.h</Filename>
     <Filename>Generic\Language.c</Filename>
     <Filename>Generic\String.h</Filename>
@@ -114,11 +114,11 @@
     <Filename>Generic\BootMngr\BootManager.h</Filename>
     <Filename>Generic\BootMngr\BootManager.c</Filename>
     <Filename>Generic\BootMngr\BootManagerStrings.uni</Filename>
-    <Filename>Generic\BootMngr\BootManagerVfr.vfr</Filename>
+    <Filename>Generic\BootMngr\BootManagerVfr.Vfr</Filename>
     <Filename>Generic\DeviceMngr\DeviceManager.h</Filename>
     <Filename>Generic\DeviceMngr\DeviceManager.c</Filename>
     <Filename>Generic\DeviceMngr\DeviceManagerStrings.uni</Filename>
-    <Filename>Generic\DeviceMngr\DeviceManagerVfr.vfr</Filename>
+    <Filename>Generic\DeviceMngr\DeviceManagerVfr.Vfr</Filename>
     <Filename>Generic\Bds.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>

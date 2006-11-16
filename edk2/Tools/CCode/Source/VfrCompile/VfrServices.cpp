@@ -332,8 +332,8 @@ Returns:
     //
     // Open the input VFR file and the output list file
     //
-    if ((InFptr = fopen (gOptions.PreprocessorOutputFileName, "r")) == NULL) {
-      Warning (PROGRAM_NAME, 0, 0, gOptions.PreprocessorOutputFileName, "could not open file for creating a list file");
+    if ((InFptr = fopen (gOptions.VfrFileName, "r")) == NULL) {
+      Warning (PROGRAM_NAME, 0, 0, gOptions.VfrFileName, "could not open file for creating a list file");
     } else {
       if ((OutFptr = fopen (gOptions.VfrListFileName, "w")) == NULL) {
         Warning (PROGRAM_NAME, 0, 0, gOptions.VfrListFileName, "could not open output list file for writing");
