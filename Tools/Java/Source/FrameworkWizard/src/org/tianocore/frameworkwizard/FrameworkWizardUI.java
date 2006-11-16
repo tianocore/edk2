@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ToolTipManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -121,6 +122,12 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     /// Define class Serial Version UID
     ///
     private static final long serialVersionUID = -7103240960573031772L;
+    
+    //
+    // Set ToolTipText Show Time
+    //
+    static { ToolTipManager.sharedInstance().setDismissDelay(18000);} 
+
 
     ///
     /// Used to record current operation target
@@ -1830,7 +1837,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         // Close splash screen
         //
         ss.dispose();
-
+                
         //
         // Init the frame
         //
