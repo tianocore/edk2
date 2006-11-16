@@ -40,6 +40,8 @@
 #define EFI_BOOT_SCRIPT_TABLE_OPCODE                  0xAA
 #define EFI_BOOT_SCRIPT_TERMINATE_OPCODE              0xFF
 
+#pragma pack(1)
+
 //
 // EFI Boot Script Width
 //
@@ -203,5 +205,7 @@ typedef union {
   EFI_BOOT_SCRIPT_COMMON_HEADER         *CommonHeader;
   UINT8                                 *Raw;
 } BOOT_SCRIPT_POINTERS;
+
+#pragma pack()
 
 #endif
