@@ -357,6 +357,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_CYGWINGCC_X64_DLINK_NAME    = ld
 *_CYGWINGCC_X64_ASM_NAME      = gcc
 *_CYGWINGCC_X64_PP_NAME       = gcc
+*_CYGWINGCC_X64_VFR_NAME      = gcc
 
 *_CYGWINGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_CYGWINGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
