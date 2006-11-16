@@ -296,12 +296,46 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXGCC_IA32_ASM_EXT      = .S
 *_UNIXGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 
+
 ####################################################################################
 #
-# CygWin GCC
+# Unix GCC
 #
 ####################################################################################
 
+*_UNIXGCC_*_*_FAMILY        = GCC
+*_UNIXGCC_*_*_FAMILY        = GCC
+
+*_UNIXGCC_IA32_CC_NAME      = gcc
+*_UNIXGCC_IA32_SLINK_NAME   = ar
+*_UNIXGCC_IA32_DLINK_NAME   = ld
+*_UNIXGCC_IA32_ASM_NAME     = gcc
+*_UNIXGCC_IA32_PP_NAME      = gcc
+
+*_UNIXGCC_X64_CC_NAME       = gcc
+*_UNIXGCC_X64_SLINK_NAME    = ar
+*_UNIXGCC_X64_DLINK_NAME    = ld
+*_UNIXGCC_X64_ASM_NAME      = gcc
+*_UNIXGCC_X64_PP_NAME       = gcc
+
+*_UNIXGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
+*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_UNIXGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXGCC_*_ASM_EXT         = .S
+
+*_UNIXGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_UNIXGCC_X64_*_PATH        = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+
+
+####################################################################################
+#
+# Cygwin GCC
+#
+####################################################################################
+
+*_CYGWINGCC_X64_*_FAMILY      = GCC
 *_CYGWINGCC_IA32_*_FAMILY     = GCC
 
 *_CYGWINGCC_IA32_CC_NAME      = gcc
@@ -310,18 +344,28 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_CYGWINGCC_IA32_ASM_NAME     = gcc
 *_CYGWINGCC_IA32_PP_NAME      = gcc
 
-*_CYGWINGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
-*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
-*_CYGWINGCC_IA32_ASM_FLAGS    = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h
-*_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_CYGWINGCC_X64_CC_NAME       = gcc
+*_CYGWINGCC_X64_SLINK_NAME    = ar
+*_CYGWINGCC_X64_DLINK_NAME    = ld
+*_CYGWINGCC_X64_ASM_NAME      = gcc
+*_CYGWINGCC_X64_PP_NAME       = gcc
 
-*_CYGWINGCC_IA32_ASM_EXT      = .S
+*_CYGWINGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_CYGWINGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
+*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_CYGWINGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h
+*_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_CYGWINGCC_*_ASM_EXT         = .S
+
 *_CYGWINGCC_IA32_*_PATH       = c:/Cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-*_CYGWINGCC_IA32_*_DPATH      = c:/Cygwin/bin
+*_CYGWINGCC_X64_*_PATH        = c:/Cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+*_CYGWINGCC_*_*_DPATH         = c:/Cygwin/bin
+
 
 ####################################################################################
 #
-# Mixed x64_64
+# Mixed x64 - This configuration is used to compile C code with gcc and assemble
+#             with the Microsoft assembler.
 #
 ####################################################################################
 
@@ -351,7 +395,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 DEBUG_MIXED_X64_ASM_FLAGS     = /nologo /W3 /WX /c /Cx /Zd /Zi
 RELEASE_MIXED_X64_ASM_FLAGS   = /nologo /W3 /WX /c /Cx /Zd
-
 
 ####################################################################################
 #
