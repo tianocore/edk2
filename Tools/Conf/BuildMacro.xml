@@ -709,7 +709,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}">
+          <cc userdefine="on">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
+                dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
+              <argument value="${VFR_FLAGS}"/>
+              <!-- Output file of the preprocess -->           
+              <argument value="-o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
+              <EXTRA.INC/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+          
+          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
             <EXTRA.INC/>
           </vfrcompile>
     
