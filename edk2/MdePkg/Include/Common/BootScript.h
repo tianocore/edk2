@@ -40,7 +40,9 @@
 #define EFI_BOOT_SCRIPT_TABLE_OPCODE                  0xAA
 #define EFI_BOOT_SCRIPT_TERMINATE_OPCODE              0xFF
 
+#ifndef __GNUC__
 #pragma pack(1)
+#endif
 
 //
 // EFI Boot Script Width
@@ -206,6 +208,8 @@ typedef union {
   UINT8                                 *Raw;
 } BOOT_SCRIPT_POINTERS;
 
+#ifndef __GNUC__
 #pragma pack()
+#endif
 
 #endif
