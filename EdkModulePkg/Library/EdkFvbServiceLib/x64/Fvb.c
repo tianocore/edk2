@@ -35,9 +35,9 @@ Key:
 // Lib will ASSERT if more FVB devices than this are added to the system.
 //
 STATIC FVB_ENTRY          *mFvbEntry;
-STATIC EFI_EVENT          mFvbVirtualNotifyEvent;
+// STATIC EFI_EVENT          mFvbVirtualNotifyEvent;
 STATIC EFI_EVENT          mFvbRegistration;
-STATIC EFI_EVENT          mEfiFvbVirtualNotifyEvent;
+// STATIC EFI_EVENT          mEfiFvbVirtualNotifyEvent;
 STATIC BOOLEAN            mEfiFvbInitialized        = FALSE;
 STATIC UINTN              mFvbCount;
 
@@ -113,10 +113,10 @@ Returns:
     //
     //  Get the interface pointer and if it's ours, skip it
     //
-    Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, &mFvbEntry[UpdateIndex].Fvb);
+    Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&mFvbEntry[UpdateIndex].Fvb);
     ASSERT_EFI_ERROR (Status);
 
-    Status = gBS->HandleProtocol (Handle, &gEfiFvbExtensionProtocolGuid, &mFvbEntry[UpdateIndex].FvbExtension);
+    Status = gBS->HandleProtocol (Handle, &gEfiFvbExtensionProtocolGuid, (VOID **)&mFvbEntry[UpdateIndex].FvbExtension);
     if (Status != EFI_SUCCESS) {
       mFvbEntry[UpdateIndex].FvbExtension = NULL;
     }

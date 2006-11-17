@@ -30,7 +30,7 @@ Revision History
 //
 #define BOOT_BLOCK_BASE
 
-STATIC
+// STATIC
 EFI_STATUS
 GetSwapState (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice,
@@ -56,7 +56,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+// STATIC
 EFI_STATUS
 SetSwapState (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice,
