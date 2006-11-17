@@ -22,7 +22,9 @@ Abstract:
 
 #include <DxeIpl.h>
 
+#ifndef __GNUC__
 #pragma warning( disable : 4305 )
+#endif
 
 BOOLEAN gInMemory = FALSE;
 

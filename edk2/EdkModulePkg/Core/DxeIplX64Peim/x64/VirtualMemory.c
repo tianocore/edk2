@@ -155,6 +155,6 @@ Returns:
        );
   }
 
-  return (EFI_PHYSICAL_ADDRESS) PageMap;
+  return (EFI_PHYSICAL_ADDRESS) (UINTN)PageMap; // FIXME
 }
 
