@@ -60,6 +60,7 @@
     <Filename SupArchList="IA32">Ia32/EbcLowLevel.S</Filename>
     <Filename SupArchList="IA32">Ia32/EbcSupport.c</Filename>
     <Filename SupArchList="X64">x64/EbcLowLevel.asm</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="gcc">x64/EbcLowLevel.S</Filename>
     <Filename SupArchList="X64">x64/EbcSupport.c</Filename>
     <Filename SupArchList="IPF">Ipf/EbcLowLevel.s</Filename>
     <Filename SupArchList="IPF">Ipf/EbcSupport.c</Filename>
