@@ -74,6 +74,7 @@
     <Filename>DxeLoadX64.c</Filename>
     <Filename SupArchList="IA32">x64/ImageRead.c</Filename>
     <Filename SupArchList="IA32">x64/LongMode.asm</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="gcc">x64/LongMode.S</Filename>
     <Filename SupArchList="IA32">x64/DxeLoadFunc.c</Filename>
     <Filename SupArchList="IA32">x64/VirtualMemory.h</Filename>
     <Filename SupArchList="IA32">x64/VirtualMemory.c</Filename>
