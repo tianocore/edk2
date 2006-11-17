@@ -24,7 +24,7 @@
 _SetJump:
     push   %rcx
     add    $0xffffffffffffffe0,%rsp
-    call   InternalAssertJumpBuffer
+    call   _InternalAssertJumpBuffer
     add    $0x20,%rsp
     pop    %rcx
     pop    %rdx
