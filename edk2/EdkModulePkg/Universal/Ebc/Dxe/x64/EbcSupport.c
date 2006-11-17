@@ -158,7 +158,7 @@ Returns:
   // The x64 does not do this so pad the stack accordingly.
   //
   PushU64 (&VmContext, (UINT64) 0);
-  PushU64 (&VmContext, (UINT64) 0x1234567887654321);
+  PushU64 (&VmContext, (UINT64) 0x1234567887654321ULL);
 
   //
   // For x64, this is where we say our return address is
@@ -276,7 +276,7 @@ Returns:
   // VM pushes 16-bytes for return address. Simulate that here.
   //
   PushU64 (&VmContext, (UINT64) 0);
-  PushU64 (&VmContext, (UINT64) 0x1234567887654321);
+  PushU64 (&VmContext, (UINT64) 0x1234567887654321ULL);
 
   //
   // For x64, this is where we say our return address is
@@ -373,7 +373,7 @@ Returns:
   *Ptr = 0xB8;
   Ptr++;
   Size--;
-  Addr = (UINT64) 0xCA112EBCCA112EBC;
+  Addr = (UINT64) 0xCA112EBCCA112EBCULL;
   for (I = 0; I < sizeof (Addr); I++) {
     *Ptr = (UINT8) (UINTN) Addr;
     Addr >>= 8;
