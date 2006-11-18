@@ -59,10 +59,6 @@
       <Constructor>UefiDriverModelLibConstructor</Constructor>
       <Destructor>UefiDriverModelLibDestructor</Destructor>
     </Extern>
-    <Extern>
-      <Constructor>UefiDriverModelLibConstructor</Constructor>
-      <Destructor>UefiDriverModelLibDestructor</Destructor>
-    </Extern>
   </Externs>
   <PcdCoded>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
