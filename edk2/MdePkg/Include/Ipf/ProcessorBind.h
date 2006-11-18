@@ -55,6 +55,11 @@
 #pragma warning ( disable : 4057 )
 
 //
+// Disable warning on conversion from function pointer to a data pointer
+//
+#pragma warning ( disable : 4054 )
+
+//
 // ASSERT(FALSE) or while (TRUE) are legal constructes so supress this warning
 //
 #pragma warning ( disable : 4127 )
