@@ -763,6 +763,101 @@
       <GuidValue>00DBD91D-55E9-420F-9639-5E9F8437B44F</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="ExtendedSalBaseIoServices">
+      <C_Name>gEfiExtendedSalBaseIoServicesProtocolGuid</C_Name>
+      <GuidValue>5AEA42b5-31E1-4515-BC31-B8D5257565A6</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalStallServices">
+      <C_Name>gEfiExtendedSalStallServicesProtocolGuid</C_Name>
+      <GuidValue>53A58D06-AC27-4D8C-B5E9-F08A80654107</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalLockServices">
+      <C_Name>gEfiExtendedSalLockServicesProtocolGuid</C_Name>
+      <GuidValue>76b75C23-FE4F-4E17-A2AD-1A653DBB494A</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalVirtualServices">
+      <C_Name>gEfiExtendedSalVirtualServicesProtocolGuid</C_Name>
+      <GuidValue>C1A74056-260E-4871-A031-E645A65B6E11</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalRtcServices">
+      <C_Name>gEfiExtendedSalRtcServicesProtocolGuid</C_Name>
+      <GuidValue>7E97A470-EFDB-4D02-8FCE-6190D27BA296</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalMtcServices">
+      <C_Name>gEfiExtendedSalMtcServicesProtocolGuid</C_Name>
+      <GuidValue>899AFD18-75E8-408B-A41A-6E2E7ECDF454</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalResetServices">
+      <C_Name>gEfiExtendedSalResetServicesProtocolGuid</C_Name>
+      <GuidValue>7D019990-8CE1-46F5-A776-3C5198676AA0</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalFvBlockServices">
+      <C_Name>gEfiExtendedSalFvBlockServicesProtocolGuid</C_Name>
+      <GuidValue>a2271df1-bcbb-4f1d-98a9-06bc172f071a</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalMpServices">
+      <C_Name>gEfiExtendedSalMpServicesProtocolGuid</C_Name>
+      <GuidValue>697d81a2-cf18-4dc0-9e0d-06113b618a3f</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalPalServices">
+      <C_Name>gEfiExtendedSalPalServicesProtocolGuid</C_Name>
+      <GuidValue>e1cd9d21-0fc2-438d-9703-04e66d961e57</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalBaseServices">
+      <C_Name>gEfiExtendedSalBaseServicesProtocolGuid</C_Name>
+      <GuidValue>d9e9fa06-0fe0-41c3-96fb-83425a3394f8</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalMcaServices">
+      <C_Name>gEfiExtendedSalMcaServicesProtocolGuid</C_Name>
+      <GuidValue>2a591128-6cc7-42b1-8af0-58933b682dbb</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalPciServices">
+      <C_Name>gEfiExtendedSalPciServicesProtocolGuid</C_Name>
+      <GuidValue>a46b1a31-ad66-4905-92f6-2b4659dc3063</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalCacheServices">
+      <C_Name>gEfiExtendedSalCacheServicesProtocolGuid</C_Name>
+      <GuidValue>0edc9494-2743-4ba5-8818-0aef5213f188</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalMcaLogServices">
+      <C_Name>gEfiExtendedSalMcaLogServicesProtocolGuid</C_Name>
+      <GuidValue>cb3fd86e-38a3-4c03-9a5c-90cfa3a2ab7a</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalELogServices">
+      <C_Name>gEfiExtendedSalELogServicesProtocolGuid</C_Name>
+      <GuidValue>d5e4ee5f-3e0a-453c-a725-b692bb06365a</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalSensorServices">
+      <C_Name>gEfiExtendedSalSensorServicesProtocolGuid</C_Name>
+      <GuidValue>4a153b6e-85a1-4982-98f4-6a8cfca4aba1</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalSmComLayerServices">
+      <C_Name>gEfiExtendedSalSmComLayerServicesProtocolGuid</C_Name>
+      <GuidValue>04356799-81b7-4e08-a38d-d978fa47ba42</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ExtendedSalSstGuid">
+      <C_Name>gEfiExtendedSalSstGuid</C_Name>
+      <GuidValue>38802700-868a-4b4e-81d4-4f1bdccfb46f</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="IsaIo">
       <C_Name>gEfiIsaIoProtocolGuid</C_Name>
       <GuidValue>7EE2BD44-3DA0-11D4-9A38-0090273FC14D</GuidValue>
