@@ -32,6 +32,20 @@ typedef UINTN EFI_SAL_STATUS;
 #define EFI_SAL_NOT_ENOUGH_SCRATCH    ((EFI_SAL_STATUS) - 9)
 
 //
+//  Delivery Mode of IPF CPU.
+//
+typedef enum {
+  EFI_DELIVERY_MODE_INT,
+  EFI_DELIVERY_MODE_MPreserved1,
+  EFI_DELIVERY_MODE_PMI,
+  EFI_DELIVERY_MODE_MPreserved2,
+  EFI_DELIVERY_MODE_NMI,
+  EFI_DELIVERY_MODE_INIT,
+  EFI_DELIVERY_MODE_MPreserved3,
+  EFI_DELIVERY_MODE_ExtINT
+} EFI_DELIVERY_MODE;
+
+//
 //  Return values from SAL
 //
 typedef struct {
