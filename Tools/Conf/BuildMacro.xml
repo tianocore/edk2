@@ -712,9 +712,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <cc userdefine="on">
             <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
                 dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
-              <argument value="${VFR_FLAGS}"/>
+              <argument value="${VFR_FLAGS} ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
               <!-- Output file of the preprocess -->           
-              <argument value="-o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
               <EXTRA.INC/>
               <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
