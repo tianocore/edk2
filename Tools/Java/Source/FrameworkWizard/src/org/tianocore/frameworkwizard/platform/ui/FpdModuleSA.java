@@ -561,7 +561,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void showClassToResolved(){
-        
+        libClassTableModel.setRowCount(0);
+        libInstanceTableModel.setRowCount(0);
         if (classConsumed == null || classConsumed.size() == 0) {
             return;
         }
