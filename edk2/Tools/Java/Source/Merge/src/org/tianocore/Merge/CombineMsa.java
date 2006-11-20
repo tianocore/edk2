@@ -1829,8 +1829,17 @@ public class CombineMsa {
             System.out.println("Please use the FrameworkWizard to add this MSA file to the package.");
             System.exit(FAIL);
         }
-        path2Msa = Cwd.replace(path2Spd, "");
-        path2Msa = path2Msa + "/" + msaFn;
+		if (path2Spd.equals(Cwd + "/")) 
+		{
+			//  .msa file and .spd in the same directory
+			path2Msa = msaFn;
+		} 
+		else 
+		{
+			path2Msa = Cwd.replace(path2Spd, "");
+			path2Msa = path2Msa + "/" + msaFn;
+		}
+
         return path2Msa;
     }
 
