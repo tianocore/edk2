@@ -246,5 +246,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return PcdGet32(PcdFSBClock);
+  return (UINT64) InternalX86GetTimerFrequency (ApicBase);;
 }
