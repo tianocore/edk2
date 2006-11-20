@@ -50,7 +50,11 @@ public class PeiReBaseTask extends Task implements EfiDefine {
     //
     private ToolArg baseAddr = new ToolArg();
     //
+    // Fv.inf file
     // 
+    private FileArg fvinfFile = new FileArg();
+    //
+    // map file
     // 
     private FileArg mapFile = new FileArg();
     //
@@ -99,7 +103,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         if (mapFile.getValue().length() == 0) {
             mapFile.setArg(" -M ", outputFile.getValue() + ".map");
         }
-        argument = "" + inputFile + outputFile + baseAddr + mapFile;
+        argument = "" + inputFile + outputFile + baseAddr + fvinfFile + mapFile;
 
         //
         // return value of fwimage execution
@@ -232,6 +236,24 @@ public class PeiReBaseTask extends Task implements EfiDefine {
      **/
     public void setArch(String arch) {
         this.arch = arch;
+    }
+
+    /**
+       Get the value of fv.inf file
+
+       @return String   The fv.inf file path
+     **/
+    public String getFvInfFile() {
+        return fvinfFile.getValue();
+    }
+
+    /**
+       Set "-F FvinfFile" argument
+
+       @param fvinfFile   The path of fv.inf file
+     **/
+    public void setFvInfFile(String fvinfFile) {
+        this.fvinfFile.setArg(" -F ", fvinfFile);
     }
 
     /**
