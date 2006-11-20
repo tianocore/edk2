@@ -100,6 +100,10 @@ Returns:
   EFI_FFS_FILE_HEADER         *CurrentFile;
   BOOLEAN                     ErasePolarity;
   EFI_PHYSICAL_ADDRESS        CurrentFileBaseAddress;
+  CHAR8                       InfFileName[_MAX_PATH];
+  CHAR8                       *InfFileImage;
+  UINTN                       InfFileSize;
+  MEMORY_FILE                 InfMemoryFile;
 
   ErasePolarity = FALSE;
   //
@@ -129,6 +133,9 @@ Returns:
   OutputFile        = NULL;
   MapFile           = NULL;
   FvImage           = NULL;
+  InfFileImage      = NULL;
+  InfFileSize       = 0;
+  strcpy (InfFileName, "");
 
   //
   // Parse the command line arguments
@@ -194,6 +201,52 @@ Returns:
       }
       break;
 
+    case 'F':
+    case 'f':
+      if (!BaseAddressSet) {
+        strcpy (InfFileName, argv[Index + 1]);
+        //
+        // Read the INF file image
+        //
+        Status = GetFileImage (InfFileName, &InfFileImage, &InfFileSize);
+        if (EFI_ERROR (Status)) {
+          PrintUsage ();
+          Error (NULL, 0, 0, argv[Index + 1], "-f FvInfFile can't be opened.");
+          return STATUS_ERROR;
+        }
+        //
+        // Initialize file structures
+        //
+        InfMemoryFile.FileImage           = InfFileImage;
+        InfMemoryFile.CurrentFilePointer  = InfFileImage;
+        InfMemoryFile.Eof                 = InfFileImage + InfFileSize;
+        //
+        // Read BaseAddress from fv.inf file.
+        //
+        FindToken (&InfMemoryFile, "[options]", "EFI_BASE_ADDRESS", 0, InfFileName);
+        //
+        // free Inf File Image
+        //
+        free (InfFileImage);
+        
+        //
+        // Convert string to UINT64 base address.
+        //
+        Status = AsciiStringToUint64 (InfFileName, FALSE, &BaseAddress);
+        if (EFI_ERROR (Status)) {
+          PrintUsage ();
+          Error (NULL, 0, 0, argv[Index + 1], "can't find the base address in the specified fv.inf file.");
+          return STATUS_ERROR;
+        }
+
+        BaseAddressSet = TRUE;
+      } else {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "BaseAddress has been got once from fv.inf or the specified base address.");
+        return STATUS_ERROR;
+      }
+      break;
+
     case 'M':
     case 'm':
       if (strlen (MapFileName) == 0) {
@@ -212,7 +265,7 @@ Returns:
       break;
     }
   }
-
+  
   //
   // Create the Map file if we need it
   //
@@ -486,15 +539,18 @@ Returns:
 --*/
 {
   printf (
-    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress [-M MapFile]\n",
+    "Usage: %s -I InputFileName -O OutputFileName [-B BaseAddress] -F FvInfFileName -M MapFile\n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
-  printf ("    InputFileName is the name of the EFI FV file to rebase.\n");
+  printf ("    InputFileName  is the name of the EFI FV file to rebase.\n");
   printf ("    OutputFileName is the desired output file name.\n");
-  printf ("    BaseAddress is the FV base address to rebase agains.\n");
-  printf ("    MapFileName is an optional map file of the relocations\n");
-  printf ("  Argument pair may be in any order.\n\n");
+  printf ("    BaseAddress    is the FV base address to rebase agains.\n");
+  printf ("    FvInfFileName  is the fv.inf to be used to generate this fv image.\n");
+  printf ("                   BaseAddress can also be got from the fv.inf file.\n");
+  printf ("                   Choose only one method to input BaseAddress.\n");
+  printf ("    MapFileName    is an optional map file of the relocations\n");
+  printf ("    Argument pair may be in any order.\n\n");
 }
 
 EFI_STATUS

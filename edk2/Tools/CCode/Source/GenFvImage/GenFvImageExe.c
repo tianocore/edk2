@@ -215,6 +215,11 @@ Returns:
             &SymFileName
             );
 
+  //
+  // free InfFileImage memory
+  //
+  free (InfFileImage);
+
   if (EFI_ERROR (Status)) {
     switch (Status) {
 
