@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -709,15 +709,39 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <cc userdefine="on">
-            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
-                dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
-              <argument value="${VFR_FLAGS} ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-              <!-- Output file of the preprocess -->           
-              <EXTRA.INC/>
-              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-            </command>
-          </cc>
+          <!-- if "TOOLCHIAN FAMILY" is "GCC", it should point the ouput file for preprocess compiler -->         
+          <if>
+            <equals arg1="${CC_FAMILY}" arg2="GCC"/>
+            <then>
+              <cc userdefine="on">
+                <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
+                         dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
+                  <argument value="${VFRPP_FLAGS} -o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
+                  <!-- Output file of the preprocess -->   
+                  <EXTRA.INC/>            
+                  <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>              
+                </command>
+              </cc>
+            </then>
+          </if>
+          
+          <if>
+            <not>
+              <equals arg1="${CC_FAMILY}" arg2="GCC"/>
+            </not>
+            <then>
+              <cc userdefine="on">
+                <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
+                         dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
+                  <argument value="${VFRPP_FLAGS}"/>
+                  <!-- Output file of the preprocess -->   
+                  <EXTRA.INC/>            
+                  <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>              
+                </command>
+              </cc>
+            </then>
+          </if>
+          
           
           <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
             <EXTRA.INC/>
