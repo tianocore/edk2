@@ -116,9 +116,6 @@
     <Ppi Usage="SOMETIMES_CONSUMED">
       <PpiCName>gEfiPeiSecurityPpiGuid</PpiCName>
     </Ppi>
-    <Ppi Usage="PRIVATE">
-      <PpiCName>gPeiInMemoryGuid</PpiCName>
-    </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
