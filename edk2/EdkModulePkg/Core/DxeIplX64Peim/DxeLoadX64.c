@@ -52,12 +52,6 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiList = {
   &mDxeIplPpi
 };
 
-static EFI_PEI_PPI_DESCRIPTOR     mPpiPeiInMemory = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gPeiInMemoryGuid,
-  NULL
-};
-
 static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
@@ -127,14 +121,7 @@ Returns:
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiServicesLocatePpi (
-             &gPeiInMemoryGuid,
-             0,
-             NULL,
-             NULL
-             );
-
-  if (EFI_ERROR (Status) && (BootMode != BOOT_ON_S3_RESUME)) {   
+  if (!gInMemory && (BootMode != BOOT_ON_S3_RESUME)) {   
     //
     // The DxeIpl has not yet been shadowed
     //
@@ -150,10 +137,6 @@ Returns:
 
   } else {
     if (BootMode != BOOT_ON_S3_RESUME) {
-    //
-    // The DxeIpl has been shadowed
-    //
-    gInMemory = TRUE;
 
     //
     // Install LoadFile PPI
@@ -167,7 +150,7 @@ Returns:
     //
     // Install DxeIpl PPI
     //
-    PeiServicesInstallPpi (&mPpiList);
+    Status = PeiServicesInstallPpi (&mPpiList);
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -620,14 +603,9 @@ Returns:
  
   if (Status == EFI_SUCCESS) {
     //
-    // Install PeiInMemory to indicate the Dxeipl is shadowed
+    // Set gInMemory global variable to TRUE to indicate the dxeipl is shadowed.
     //
-    Status = PeiServicesInstallPpi (&mPpiPeiInMemory);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
+    *(BOOLEAN *) ((UINTN) &gInMemory + (UINTN) DxeIplEntryPoint - (UINTN) _ModuleEntryPoint) = TRUE;
     Status = ((EFI_PEIM_ENTRY_POINT) (UINTN) DxeIplEntryPoint) (DxeIplFileHeader, GetPeiServicesTablePointer());
   }
 
