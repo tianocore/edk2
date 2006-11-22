@@ -1169,6 +1169,7 @@
     <Filename>Library/PeiResourcePublicationLib/PeiResourcePublicationLib.msa</Filename>
     <Filename>Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.msa</Filename>
     <Filename>Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.msa</Filename>
+    <Filename>Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.msa</Filename>
     <Filename>Library/UefiBootServicesTableLib/UefiBootServicesTableLib.msa</Filename>
     <Filename>Library/UefiDebugLibConOut/UefiDebugLibConOut.msa</Filename>
     <Filename>Library/UefiDebugLibStdErr/UefiDebugLibStdErr.msa</Filename>
