@@ -1,4 +1,4 @@
-#!env python
+#!/usr/bin/env python
 
 """Calculate the dependencies a given module has by looking through the source
 code to see what guids and functions are referenced to see which Packages and
