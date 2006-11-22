@@ -12,7 +12,7 @@
 # Specify the architectures for which the tools are to be built
 # To build for single target: ARCHS="m68k"
 #
-ARCHS="${ARCHS:-x86_64}"
+ARCHS="${ARCHS:-i386}"
 
 # Let's be nice
 renice 10 -p $$
@@ -23,16 +23,16 @@ set -e
 #
 # Specify the versions
 #
-GCC=gcc-4.1.1
-BINUTILS=binutils-2.17
+GCC=gcc-4.1.0
+BINUTILS=binutils-2.16.1
 # BINUTILS=binutils-2.16.91-20060119-1
 CYGWIN_SNAP=20060403 # You may need to find a more recent one.
-export PATH=/bin:/usr/bin:/usr/local/bin
+export PATH=/bin:/usr/bin
 
 #
 # Where to install
 #
-PREFIX="${PREFIX:-~/tiano/}"
+PREFIX="${PREFIX:-/opt/tiano/}"
 
 #
 # Where to get the GNU tools
@@ -98,7 +98,7 @@ CONF_SHELL="${CONF_SHELL:-/bin/bash}"
 build() {
     for arch in $ARCHS
     do (
-        export targ=${arch}-pc-mingw64
+        export targ=${arch}-tiano-pe
         export pref=${PREFIX}${targ}
         export PATH="${pref}/bin:$PATH"
 
@@ -106,7 +106,7 @@ build() {
         cd build-binutils-$targ
         "${CONF_SHELL}" "../${BINUTILS}/configure" \
             --disable-nls "--target=${targ}" "--prefix=${pref}"
-        ${MAKE} -j4 -w all
+        ${MAKE} -j1 -w all
         ${MAKE} -w install
         ) >> ${targ}.log 2>&1 &&
 
@@ -138,6 +138,8 @@ build() {
 #
 # Comment out any activities you wish to omit
 #
-# getSource
-# unpackSource
+getSource
+unpackSource
 build
+
+
