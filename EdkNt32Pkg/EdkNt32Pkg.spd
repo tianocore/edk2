@@ -45,11 +45,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkGenericBdsLib">
-      <IncludeHeader>Include/library/EdkGenericBdsLib.h</IncludeHeader>
+      <IncludeHeader>Include/Library/EdkGenericBdsLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="WinNtLib">
-      <IncludeHeader>Include/library/WinNtLib.h</IncludeHeader>
+      <IncludeHeader>Include/Library/WinNtLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="NtAutoscan">
