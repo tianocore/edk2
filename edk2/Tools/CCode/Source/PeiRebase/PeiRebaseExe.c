@@ -680,13 +680,13 @@ Returns:
     // Allocate a buffer for the image to be loaded into.
     //
     Pe32ImageSize       = GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION);
-    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x1000));
+    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x10000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation failure", NULL);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x1000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFF) & (-1 << 12);
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
+    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
     
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
@@ -696,6 +696,25 @@ Returns:
       Error (NULL, 0, 0, "LoadImage() call failed on rebase", FileGuidString);
       free ((VOID *) MemoryImagePointer);
       return Status;
+    }
+    
+    //
+    // Check if section-alignment and file-alignment match or not
+    //
+    if (!(ImageContext.IsTeImage)) {
+      PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext.ImageAddress + 
+                                              ImageContext.PeCoffHeaderOffset);
+      if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
+        Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
+		_asm int 3;
+        free ((VOID *) MemoryImagePointer);
+        return EFI_ABORTED;
+      }
+    }
+    else {
+      //
+      // BUGBUG: TE Image Header lack section-alignment and file-alignment info
+      //
     }
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
@@ -932,14 +951,14 @@ Returns:
     //
     // Allocate a buffer for the image to be loaded into.
     //
-    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x1000));
+    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x10000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation error on rebase of TE image", FileGuidString);
       free (TEBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x1000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFF) & (-1 << 12);
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
+    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
     
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
@@ -950,6 +969,11 @@ Returns:
       free ((VOID *) MemoryImagePointer);
       return Status;
     }
+    
+    //
+    // Check if section-alignment and file-alignment match or not
+	// BUGBUG: TE Image Header lack section-alignment and file-alignment info
+    //
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
