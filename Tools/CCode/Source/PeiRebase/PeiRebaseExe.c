@@ -706,7 +706,6 @@ Returns:
                                               ImageContext.PeCoffHeaderOffset);
       if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
         Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
-		_asm int 3;
         free ((VOID *) MemoryImagePointer);
         return EFI_ABORTED;
       }
