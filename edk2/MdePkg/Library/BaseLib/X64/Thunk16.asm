@@ -96,18 +96,25 @@ _ThunkAttr  DD      ?
 @2:
     mov     eax, ss
     lea     bp, [esp + sizeof (IA32_REGS)]
+    ;
+    ; rsi in the following 2 instructions is indeed bp in 16-bit code
+    ;
     mov     word ptr (IA32_REGS ptr [rsi - sizeof (IA32_REGS)])._ESP, bp
+    DB      66h
     mov     ebx, (IA32_REGS ptr [rsi - sizeof (IA32_REGS)])._EIP
     shl     ax, 4                       ; shl eax, 4
     add     bp, ax                      ; add ebp, eax
     mov     ax, cs
     shl     ax, 4
     lea     ax, [eax + ebx + (@64BitCode - @Base)]
-    DB      2eh                         ; cs:
-    mov     [rdi + (@64Eip - @Base)], ax
+    DB      66h, 2eh, 89h, 87h          ; mov cs:[bx + (@64Eip - @Base)], eax
+    DW      @64Eip - @Base
     DB      66h, 0b8h                   ; mov eax, imm32
 SavedCr4    DD      ?
     mov     cr4, rax
+    ;
+    ; rdi in the instruction below is indeed bx in 16-bit code
+    ;
     DB      66h, 2eh
     lgdt    fword ptr [rdi + (SavedGdt - @Base)]
     DB      66h
