@@ -272,7 +272,7 @@ ReleaseSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  SPIN_LOCK    LockValue;
+  volatile SPIN_LOCK    LockValue;
 
   ASSERT (SpinLock != NULL);
 
