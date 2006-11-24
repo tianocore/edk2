@@ -62,6 +62,7 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 
 /**
  This class processes fpd file contents such as add remove xml elements. 
@@ -829,7 +830,7 @@ public class FpdFileContents {
         XmlCursor cursor = instance.newCursor();
         try{
             String comment = "Pkg: " + pn + " Mod: " + mn 
-                + " Path: " + libMi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                + " Path: " + libMi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
             cursor.insertComment(comment);
         }
         catch (Exception e){
@@ -1232,7 +1233,7 @@ public class FpdFileContents {
         XmlCursor cursor = msa.newCursor();
         try{
             String comment = "Mod: " + mi.getName() + " Type: " + SurfaceAreaQuery.getModuleType(mi) + " Path: "
-                            + mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                            + mi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
             cursor.insertComment(comment);
         }
         catch(Exception e){
@@ -1507,7 +1508,7 @@ public class FpdFileContents {
             saa[i][1] = dynPcd.getToken().toString();
             saa[i][2] = dynPcd.getTokenSpaceGuidCName();
             saa[i][3] = dynPcd.getMaxDatumSize()+"";
-            saa[i][4] = dynPcd.getDatumType().toString();
+            saa[i][4] = dynPcd.getDatumType()+"";
             
             ++i;
         }
@@ -1732,9 +1733,10 @@ public class FpdFileContents {
                 return;
             }
             else {
-                QName qSkuInfo = new QName(xmlNs, "SkuInfo");
-                cursor.toChild(qSkuInfo);
-                cursor.removeXml();
+            	pcdData.getSkuInfoList().clear();
+//                QName qSkuInfo = new QName(xmlNs, "SkuInfo");
+//                cursor.toChild(qSkuInfo);
+//                cursor.removeXml();
             }
         }
         cursor.dispose();

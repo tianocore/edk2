@@ -37,6 +37,7 @@ import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 import java.awt.FlowLayout;
@@ -893,7 +894,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     row[pkgVerColForFpdModTable] = mi.getPackageId().getVersion();
                     row[archColForFpdModTable] = saa[i][ffcModArch];
                     try {
-                        row[pathColForFpdModTable] = mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                        row[pathColForFpdModTable] = mi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, "Show FPD Modules:" + e.getMessage());
                     }
@@ -960,7 +961,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 s[pkgNameColForAllModTable] = mi.getPackageId().getName();
                 s[pkgVerColForAllModTable] = mi.getPackageId().getVersion();
                 try {
-                    s[pathColForAllModTable] = mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                    s[pathColForAllModTable] = mi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(frame, "Show All Modules:" + e.getMessage());
                 }

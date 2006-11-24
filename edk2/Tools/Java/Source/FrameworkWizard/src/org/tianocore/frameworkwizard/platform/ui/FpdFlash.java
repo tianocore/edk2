@@ -31,6 +31,7 @@ import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -1024,7 +1025,7 @@ public class FpdFlash extends IInternalFrame {
                 public void componentShown(ComponentEvent e) {
 //                    if (ffc.getFlashDefinitionFile() != null) {
 //                        jTextFieldFdf.setText(ffc.getFlashDefinitionFile());
-//                        initFvInFdfTable(System.getenv("WORKSPACE") + File.separator + jTextFieldFdf.getText());
+//                        initFvInFdfTable(Workspace.getCurrenetWorkspace() + File.separator + jTextFieldFdf.getText());
 //    
 //                    }
                 }
@@ -1112,7 +1113,7 @@ public class FpdFlash extends IInternalFrame {
 
                 public void actionPerformed(ActionEvent e) {
                     // TODO Auto-generated method stub
-                    String wsDir = System.getenv("WORKSPACE");
+                    String wsDir = Workspace.getCurrentWorkspace();
                     JFileChooser chooser = new JFileChooser(wsDir);
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -2292,7 +2293,7 @@ public class FpdFlash extends IInternalFrame {
         if (fdfFile != null && fdfFile.length() > 0) {
             jCheckBoxFdf.setSelected(true);
             jTextFieldFdf.setText(fdfFile);
-            String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
+            String fdfPath = Workspace.getCurrentWorkspace() + File.separator + fdfFile;
             initFvInFdfTable(fdfPath);
         }
         
