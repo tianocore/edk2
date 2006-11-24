@@ -21,6 +21,7 @@ Abstract:
 
 
 STATIC EXTENDED_SAL_BOOT_SERVICE_PROTOCOL *mEsalBootService;
+STATIC EFI_PLABEL                         mPlabel;
 
 EFI_STATUS
 EFIAPI
@@ -29,12 +30,57 @@ DxeSalLibConstruct (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_PLABEL  *Plabel;
+  EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
+  //
+  // The protocol contains a function pointer, which is an indirect procedure call.
+  // An indirect procedure call goes through a plabel, and pointer to a function is
+  // a pointer to a plabel. To implement indirect procedure calls that can work in
+  // both physical and virtual mode, two plabels are required (one physical and one
+  // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
+  // away. We cache it in a module global, so we can register the vitrual version.
+  //
+  Status              = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
   ASSERT_EFI_ERROR (Status);
 
+  Plabel              = (EFI_PLABEL *) (UINTN) mEsalBootService->ExtendedSalProc;
+
+  mPlabel.EntryPoint  = Plabel->EntryPoint;
+  mPlabel.GP          = Plabel->GP;
+  SetEsalPhysicalEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
+
   return Status;
+}
+
+VOID
+EFIAPI
+DxeSalVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+/*++
+
+Routine Description:
+
+  Fixup virtual address pointer of label.
+
+Arguments:
+
+  Event   - The Event that is being processed
+  
+  Context - Event Context
+
+Returns: 
+
+  None
+
+--*/
+{
+  EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
+  EfiConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
+
+  SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 }
 
 EFI_STATUS

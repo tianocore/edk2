@@ -24,8 +24,6 @@ Module Name:
 
 STATIC EFI_EVENT                          mRuntimeNotifyEvent;
 STATIC EFI_EVENT                          mEfiVirtualNotifyEvent;
-STATIC EFI_PLABEL                         mPlabel;
-STATIC EXTENDED_SAL_BOOT_SERVICE_PROTOCOL *mEsalBootService;
 
 EFI_RUNTIME_SERVICES                      *mRT;
 
@@ -103,10 +101,10 @@ Returns:
     ChildNotifyEventHandler (Event, NULL);
   }
 
-  mRT->ConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
-  mRT->ConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
-
-  SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
+  //
+  // Update global for Runtime Services Table
+  //
+  EfiConvertPointer (0, (VOID **) &mRT);
 }
 
 EFI_STATUS
@@ -135,28 +133,9 @@ Returns:
 
 --*/
 {
-  EFI_PLABEL  *Plabel;
   EFI_STATUS  Status;
 
   mRT = SystemTable->RuntimeServices;
-
-  //
-  // The protocol contains a function pointer, which is an indirect procedure call.
-  // An indirect procedure call goes through a plabel, and pointer to a function is
-  // a pointer to a plabel. To implement indirect procedure calls that can work in
-  // both physical and virtual mode, two plabels are required (one physical and one
-  // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
-  // away. We cache it in a module global, so we can register the vitrual version.
-  //
-  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
-  ASSERT_EFI_ERROR (Status);
-
-  Plabel              = (EFI_PLABEL *) (UINTN) mEsalBootService->ExtendedSalProc;
-
-  mPlabel.EntryPoint  = Plabel->EntryPoint;
-  mPlabel.GP          = Plabel->GP;
-
-  SetEsalPhysicalEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 
   //
   // Register our ExitBootServices () notify function
