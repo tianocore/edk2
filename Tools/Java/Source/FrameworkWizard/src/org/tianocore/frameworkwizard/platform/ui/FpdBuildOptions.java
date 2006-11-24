@@ -52,6 +52,7 @@ import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1956,7 +1957,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     //
                     // Select files from current workspace
                     //
-                    String dirPrefix = System.getenv("WORKSPACE");
+                    String dirPrefix = Workspace.getCurrentWorkspace();
                     JFileChooser chooser = new JFileChooser(dirPrefix);
                     File theFile = null;
                     String headerDest = null;

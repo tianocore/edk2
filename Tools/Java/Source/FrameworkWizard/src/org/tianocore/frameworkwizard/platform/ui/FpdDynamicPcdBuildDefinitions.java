@@ -191,7 +191,9 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     // should display default sku info here, as no selection event of table1 will be triggered when change selection of rows in table. 
     //
     private void displayDetails(int i) {
-        jTableSkuInfo.changeSelection(0, 1, false, false);
+    	int defaultSkuRow = getDefaultSkuInfoRow();
+		jTableSkuInfo.changeSelection(defaultSkuRow, 0, false, false);
+		
         int skuCount = ffc.getDynamicPcdSkuInfoCount(i);
         String defaultVal = ffc.getDynamicPcdBuildDataValue(i);
         if (defaultVal != null) {
@@ -237,34 +239,49 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         
     }
     
-    private void displaySkuInfoDetails(int i) {
+    private void displaySkuInfoDetails(String id) {
         int pcdSelected = jTableDynPcd.getSelectedRow();
         if (pcdSelected < 0) {
             return;
         }
         
-        String[][] saa = new String[ffc.getDynamicPcdSkuInfoCount(pcdSelected)][7];
+        int skuInfoCount = ffc.getDynamicPcdSkuInfoCount(pcdSelected);
+        String[][] saa = new String[skuInfoCount][7];
         ffc.getDynamicPcdSkuInfos(pcdSelected, saa);
-        
-        if (saa[i][5] != null){
-            jRadioButtonVpd.setSelected(true);
-            jTextFieldVpdOffset.setText(saa[i][5]);
-        } 
-        
-        else if (saa[i][1] != null) {
-            jRadioButtonHii.setSelected(true);
-            String varDisplayName = Tools.convertUnicodeHexStringToString(saa[i][1]);
-            jTextFieldVarName.setText(varDisplayName);
-            jTextFieldVarGuid.setText(saa[i][2]);
-            jTextFieldVarOffset.setText(saa[i][3]);
-            jTextFieldHiiDefaultValue.setText(saa[i][4]);
+        int i = 0;
+        while (i < skuInfoCount) {
+        	if (id.equals(saa[i][0])) {
+        		if (saa[i][5] != null){
+                    jRadioButtonVpd.setSelected(true);
+                    jTextFieldVpdOffset.setText(saa[i][5]);
+                } 
+                
+                else if (saa[i][1] != null) {
+                    jRadioButtonHii.setSelected(true);
+                    String varDisplayName = Tools.convertUnicodeHexStringToString(saa[i][1]);
+                    jTextFieldVarName.setText(varDisplayName);
+                    jTextFieldVarGuid.setText(saa[i][2]);
+                    jTextFieldVarOffset.setText(saa[i][3]);
+                    jTextFieldHiiDefaultValue.setText(saa[i][4]);
+                }
+                
+                else{
+                    jRadioButtonDefaultValue.setSelected(true);
+                    jTextFieldDefaultValue.setText(saa[i][6]);
+                }
+        		return;
+        	}
+        	++i;
         }
-        
-        else{
-            jRadioButtonDefaultValue.setSelected(true);
-            jTextFieldDefaultValue.setText(saa[i][6]);
-        }
-        
+    }
+    
+    private int getDefaultSkuInfoRow () {
+    	for (int i = 0; i < modelSku.getRowCount(); ++i) {
+    		if (modelSku.getValueAt(i, 0).equals("0")) {
+    			return i;
+    		}
+    	}
+    	return 0;
     }
 
     /**
@@ -300,6 +317,10 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jCheckBoxSkuEnable.setText("SKU Enable");
             jCheckBoxSkuEnable.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                	if (!jCheckBoxSkuEnable.isSelected()) {
+                		int defaultSkuRow = getDefaultSkuInfoRow();
+                		jTableSkuInfo.changeSelection(defaultSkuRow, 0, false, false);
+                	}
                     jTableSkuInfo.setEnabled(jCheckBoxSkuEnable.isSelected());
                 }
             });
@@ -450,7 +471,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jTableSkuInfo = new JTable(modelSku);
             modelSku.addColumn("SKU ID");
             modelSku.addColumn("SKU Name");
-            
+            jTableSkuInfo.setEnabled(false);
             jTableSkuInfo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableSkuInfo.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -472,7 +493,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                         jTextFieldVarOffset.setText("");
                         jTextFieldHiiDefaultValue.setText("");
                         int selected = lsm.getMinSelectionIndex();
-                        displaySkuInfoDetails(selected);
+                        String skuId = modelSku.getValueAt(selected, 0)+"";
+                        displaySkuInfoDetails(skuId);
                     }
                 }
             });
@@ -602,7 +624,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             if (skuCount == 1) {
                 
                 for (int i = 1; i < jTableSkuInfo.getRowCount(); ++i) {
-                    ffc.genDynamicPcdBuildDataSkuInfo(jTableSkuInfo.getValueAt(i, 0)+"", varName, varGuid, varOffset, hiiDefault, vpdOffset, value, pcdSelected);
+                    ffc.genDynamicPcdBuildDataSkuInfo(modelSku.getValueAt(i, 0)+"", varName, varGuid, varOffset, hiiDefault, vpdOffset, value, pcdSelected);
                 }
             }
             else {
@@ -610,7 +632,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                 if (row < 0) {
                     return;
                 }
-                ffc.updateDynamicPcdBuildDataSkuInfo(jTableSkuInfo.getValueAt(row, 0)+"", varName, varGuid, varOffset, hiiDefault, vpdOffset, value, pcdSelected);
+                ffc.updateDynamicPcdBuildDataSkuInfo(modelSku.getValueAt(row, 0)+"", varName, varGuid, varOffset, hiiDefault, vpdOffset, value, pcdSelected);
             }
         }
     }

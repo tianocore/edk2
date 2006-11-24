@@ -1695,25 +1695,22 @@ private JComboBox getJComboBoxItemType() {
     if (jComboBoxItemType == null) {
         jComboBoxItemType = new JComboBox();
         jComboBoxItemType.setPreferredSize(new java.awt.Dimension(200,20));
-//        jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
-//            public void itemStateChanged(java.awt.event.ItemEvent e) {
-//                
-//                int row = jTablePcd.getSelectedRow();
-//                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
-//                    return;
-//                }
-//                    if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
-//                        
-//                        if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
-//                            jTextFieldPcdDefault.setText("");
-//                            jTextFieldPcdDefault.setEnabled(true);
-//                        }
-//                    }
-//                    else{
-//                        
-//                    }
-//                }
-//        });
+        jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent e) {
+                
+                int row = jTablePcd.getSelectedRow();
+                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
+                    return;
+                }
+                        
+                if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
+				    jTextFieldPcdDefault.setEnabled(true);
+                }
+                else {
+                	jTextFieldPcdDefault.setEnabled(false);
+                }
+            }        
+        });
     }
     return jComboBoxItemType;
 }
@@ -1752,7 +1749,7 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
         al.set(i, mKey + " " + itemType);
     }
     try{
-        ffc.addDynamicPcdBuildData(cName, jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 3), tsGuid, "DYNAMIC", jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 5)+"", jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
+        ffc.addDynamicPcdBuildData(cName, model.getValueAt(jTablePcd.getSelectedRow(), 3), tsGuid, "DYNAMIC", model.getValueAt(jTablePcd.getSelectedRow(), 5)+"", jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
     }
     catch(Exception e){
         JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
