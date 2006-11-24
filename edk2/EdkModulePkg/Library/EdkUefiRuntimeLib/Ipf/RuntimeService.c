@@ -91,7 +91,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-  EFI_GUID Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, GetTime, (UINT64) Time, (UINT64) Capabilities, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
@@ -119,8 +119,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-
-  EFI_GUID Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, SetTime, (UINT64) Time, 0, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
@@ -152,8 +151,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-
-  EFI_GUID Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, GetWakeupTime, (UINT64) Enabled, (UINT64) Pending, (UINT64) Time, 0, 0, 0, 0);
   return ReturnReg.Status;
@@ -184,8 +182,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-
-  EFI_GUID Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, SetWakeupTime, (UINT64) Enable, (UINT64) Time, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
@@ -224,7 +221,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-  EFI_GUID Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (
                 &Guid,
@@ -271,7 +268,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-  EFI_GUID Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (
                 &Guid,
@@ -318,7 +315,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-  EFI_GUID Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (
                 &Guid,
@@ -356,8 +353,7 @@ Returns:
 --*/
 {
   SAL_RETURN_REGS ReturnReg;
-
-  EFI_GUID Guid = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID;
+  EFI_GUID        Guid = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, GetNextHighMonotonicCount, (UINT64) HighCount, 0, 0, 0, 0, 0, 0);
   return (EFI_STATUS) ReturnReg.Status;
@@ -492,9 +488,9 @@ EfiSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
-  IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
-  IN UINTN				    CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS	ScatterGatherList	OPTIONAL
+  IN UEFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN UINTN                CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS ScatterGatherList OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
@@ -503,10 +499,10 @@ EfiUpdateCapsule (
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
-  IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
-  IN UINTN				    CapsuleCount,
-  OUT	UINT64			    *MaximumCapsuleSize,
-  OUT EFI_RESET_TYPE		*ResetType
+  IN UEFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN UINTN                CapsuleCount,
+  OUT UINT64              *MaximumCapsuleSize,
+  OUT EFI_RESET_TYPE    *ResetType
   )
 {
   return EFI_UNSUPPORTED;
@@ -516,10 +512,10 @@ EfiQueryCapsuleCapabilities (
 EFI_STATUS
 EFIAPI
 EfiQueryVariableInfo (
-  IN UINT32			  Attributes,
-  OUT UINT64			*MaximumVariableStorageSize,
-  OUT	 UINT64			*RemainingVariableStorageSize,
-  OUT UINT64			*MaximumVariableSize
+  IN UINT32       Attributes,
+  OUT UINT64      *MaximumVariableStorageSize,
+  OUT  UINT64     *RemainingVariableStorageSize,
+  OUT UINT64      *MaximumVariableSize
   )
 {
   return EFI_UNSUPPORTED;

@@ -26,10 +26,16 @@
       <Keyword>EdkDxeSalLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiRuntimeLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -50,6 +56,9 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <Constructor>DxeSalLibConstruct</Constructor>
+    </Extern>
+    <Extern>
+      <SetVirtualAddressMapCallBack>DxeSalVirtualNotifyEvent</SetVirtualAddressMapCallBack>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
