@@ -70,7 +70,7 @@ DebugPrint (
   //
   VA_START (Marker, Format);
   for (Index = 0, ArgumentPointer = (UINT64 *)(DebugInfo + 1); Index < 12; Index++, ArgumentPointer++) {
-    *ArgumentPointer = VA_ARG (Marker, UINT64);
+    WriteUnaligned64(ArgumentPointer, VA_ARG (Marker, UINT64));
   }
   VA_END (Marker);
   AsciiStrCpy ((CHAR8 *)ArgumentPointer, Format);
