@@ -281,7 +281,7 @@ Returns:
       goto Finish;
     }
 
-    if (strcmp (SectionHeader.Name, ".data") == 0) {
+    if (strcmp (SectionHeader.Name, ".data") == 0 || strcmp (SectionHeader.Name, ".sdata") == 0) {
       if (fseek (InFptr, SectionHeader.PointerToRawData, SEEK_SET) != 0) {
         Error (NULL, 0, 0, InFileName, "failed to seek to .data section");
         goto Finish;
