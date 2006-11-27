@@ -7539,7 +7539,7 @@
   </DynamicPcdBuildDefinitions>
   <BuildOptions>
     <Options>
-      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">/EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096</Option>
+      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">/EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE</Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">/ALIGN:4096</Option>
     </Options>
     <Ffs FfsKey="APPLICATION">
