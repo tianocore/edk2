@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>DxeIpl</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -67,6 +67,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>MemoryAllocationLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>DxeLoad.c</Filename>
@@ -74,12 +77,17 @@
     <Filename>DxeIpl.dxs</Filename>
     <Filename SupArchList="IA32">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="IA32">Ia32/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="IA32">Ia32/LongMode.asm</Filename>
+    <Filename ToolChainFamily="GCC" SupArchList="IA32">Ia32/LongMode.S</Filename>
+    <Filename SupArchList="IA32">Ia32/VirtualMemory.c</Filename>
+    <Filename SupArchList="IA32">Ia32/VirtualMemory.h</Filename>
     <Filename SupArchList="X64">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="X64">Ia32/DxeLoadFunc.c</Filename>
     <Filename SupArchList="IPF">ipf/ImageRead.c</Filename>
     <Filename SupArchList="IPF">ipf/DxeLoadFunc.c</Filename>
     <Filename SupArchList="EBC">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="EBC">Ia32/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="X64 IPF EBC">Non-existing.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -118,9 +126,6 @@
     <Ppi Usage="SOMETIMES_CONSUMED">
       <PpiCName>gEfiPeiSecurityPpiGuid</PpiCName>
     </Ppi>
-    <Ppi Usage="PRIVATE">
-      <PpiCName>gPeiInMemoryGuid</PpiCName>
-    </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
@@ -134,4 +139,30 @@
       <ModuleEntryPoint>PeimInitializeDxeIpl</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSwitchToLongMode</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL will load a 64-bit DxeCore.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the EFI Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportTianoDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Tiano Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportCustomDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Custom Compression algorithm</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
