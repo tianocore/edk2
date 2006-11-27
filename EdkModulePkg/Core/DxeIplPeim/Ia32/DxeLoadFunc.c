@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include <DxeIpl.h>
+#include "DxeIpl.h"
 
 EFI_STATUS
 CreateArchSpecificHobs (

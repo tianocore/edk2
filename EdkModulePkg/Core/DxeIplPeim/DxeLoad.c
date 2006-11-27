@@ -20,7 +20,11 @@ Abstract:
 
 --*/
 
-#include <DxeIpl.h>
+#include "DxeIpl.h"
+
+#ifndef __GNUC__
+#pragma warning( disable : 4305 )
+#endif
 
 BOOLEAN gInMemory = FALSE;
 
@@ -36,22 +40,17 @@ static EFI_PEI_FV_FILE_LOADER_PPI mLoadFilePpi = {
   DxeIplLoadFile
 };
 
-static EFI_PEI_PPI_DESCRIPTOR     mPpiLoadFile = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+static EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
+  {
+  EFI_PEI_PPI_DESCRIPTOR_PPI,
   &gEfiPeiFvFileLoaderPpiGuid,
   &mLoadFilePpi
-};
-
-static EFI_PEI_PPI_DESCRIPTOR     mPpiList = {
+  },
+  {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiDxeIplPpiGuid,
   &mDxeIplPpi
-};
-
-static EFI_PEI_PPI_DESCRIPTOR     mPpiPeiInMemory = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gPeiInMemoryGuid,
-  NULL
+  }
 };
 
 static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
@@ -60,37 +59,20 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   NULL
 };
 
-DECOMPRESS_LIBRARY  gEfiDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gEfiDecompress = {
   UefiDecompressGetInfo,
   UefiDecompress
 };
 
-DECOMPRESS_LIBRARY  gTianoDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gTianoDecompress = {
   TianoDecompressGetInfo,
   TianoDecompress
 };
 
-DECOMPRESS_LIBRARY  gCustomDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gCustomDecompress = {
   CustomDecompressGetInfo,
   CustomDecompress
 };
-
-STATIC
-UINTN
-GetOccupiedSize (
-  IN UINTN   ActualSize,
-  IN UINTN   Alignment
-  )
-{
-  UINTN OccupiedSize;
-
-  OccupiedSize = ActualSize;
-  while ((OccupiedSize & (Alignment - 1)) != 0) {
-    OccupiedSize++;
-  }
-
-  return OccupiedSize;
-}
 
 EFI_STATUS
 EFIAPI
@@ -120,17 +102,9 @@ Returns:
   EFI_BOOT_MODE                             BootMode;
 
   Status = PeiServicesGetBootMode (&BootMode);
-
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiServicesLocatePpi (
-             &gPeiInMemoryGuid,
-             0,
-             NULL,
-             NULL
-             );
-
-  if (EFI_ERROR (Status) && (BootMode != BOOT_ON_S3_RESUME)) {
+  if (!gInMemory && (BootMode != BOOT_ON_S3_RESUME)) {   
     //
     // The DxeIpl has not yet been shadowed
     //
@@ -140,38 +114,15 @@ Returns:
     // Shadow DxeIpl and then re-run its entry point
     //
     Status = ShadowDxeIpl (FfsHeader, PeiEfiPeiPeCoffLoader);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
   } else {
-    if (BootMode != BOOT_ON_S3_RESUME) {
     //
-    // The DxeIpl has been shadowed
+    // Install FvFileLoader and DxeIpl PPIs.
     //
-    gInMemory = TRUE;
-
-    //
-    // Install LoadFile PPI
-    //
-    Status = PeiServicesInstallPpi (&mPpiLoadFile);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-      }
-    }
-    //
-    // Install DxeIpl PPI
-    //
-    PeiServicesInstallPpi (&mPpiList);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
+    Status = PeiServicesInstallPpi (mPpiList);
+    ASSERT_EFI_ERROR(Status);
   }
-
-  return EFI_SUCCESS;
+  
+  return Status;
 }
 
 EFI_STATUS
@@ -200,12 +151,13 @@ Returns:
 --*/
 {
   EFI_STATUS                                Status;
-  VOID                                      *TopOfStack;
-  VOID                                      *BaseOfStack;
+  EFI_PHYSICAL_ADDRESS                      TopOfStack;
+  EFI_PHYSICAL_ADDRESS                      BaseOfStack;
   EFI_PHYSICAL_ADDRESS                      BspStore;
   EFI_GUID                                  DxeCoreFileName;
   EFI_GUID                                  FirmwareFileName;
   VOID                                      *Pe32Data;
+  VOID                                      *FvImageData;     
   EFI_PHYSICAL_ADDRESS                      DxeCoreAddress;
   UINT64                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
@@ -213,104 +165,32 @@ Returns:
   EFI_BOOT_MODE                             BootMode;
   EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
   EFI_PEI_S3_RESUME_PPI                     *S3Resume;
+  EFI_PHYSICAL_ADDRESS                      PageTables;
 
 //  PERF_START (PeiServices, L"DxeIpl", NULL, 0);
-  TopOfStack  = NULL;
-  BaseOfStack = NULL;
+  TopOfStack  = 0;
+  BaseOfStack = 0;
   BspStore    = 0;
-  Status      = EFI_SUCCESS;
+  PageTables  = 0;
 
   //
   // if in S3 Resume, restore configure
   //
   Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR(Status);
 
-  if (!EFI_ERROR (Status) && (BootMode == BOOT_ON_S3_RESUME)) {
+  if (BootMode == BOOT_ON_S3_RESUME) {
     Status = PeiServicesLocatePpi (
                &gEfiPeiS3ResumePpiGuid,
                0,
                NULL,
                (VOID **)&S3Resume
                );
-
     ASSERT_EFI_ERROR (Status);
 
     Status = S3Resume->S3RestoreConfig (PeiServices);
-
     ASSERT_EFI_ERROR (Status);
-  }
-
-  Status = EFI_SUCCESS;
-
-  //
-  // Install the PEI Protocols that are shared between PEI and DXE
-  //
-  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
-  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
-
-
-  //
-  // Allocate 128KB for the Stack
-  //
-  BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
-  ASSERT (BaseOfStack != NULL);
-
-  //
-  // Compute the top of the stack we were allocated. Pre-allocate a UINTN
-  // for safety.
-  //
-  TopOfStack = (VOID *)((UINTN)BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
-  TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
-
-  //
-  // Add architecture-specifc HOBs (including the BspStore HOB)
-  //
-  Status = CreateArchSpecificHobs (&BspStore);
-
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Add HOB for the EFI Decompress Protocol
-  //
-  BuildGuidDataHob (
-    &gEfiDecompressProtocolGuid,
-    (VOID *)&gEfiDecompress,
-    sizeof (gEfiDecompress)
-    );
-
-  //
-  // Add HOB for the Tiano Decompress Protocol
-  //
-  BuildGuidDataHob (
-    &gEfiTianoDecompressProtocolGuid,
-    (VOID *)&gTianoDecompress,
-    sizeof (gTianoDecompress)
-    );
-
-  //
-  // Add HOB for the user customized Decompress Protocol
-  //
-  BuildGuidDataHob (
-    &gEfiCustomizedDecompressProtocolGuid,
-    (VOID *)&gCustomDecompress,
-    sizeof (gCustomDecompress)
-    );
-
-  //
-  // Add HOB for the PE/COFF Loader Protocol
-  //
-  BuildGuidDataHob (
-    &gEfiPeiPeCoffLoaderGuid,
-    (VOID *)&PeiEfiPeiPeCoffLoader,
-    sizeof (VOID *)
-    );
-
-  //
-  // See if we are in crisis recovery
-  //
-  Status = PeiServicesGetBootMode (&BootMode);
-
-  if (!EFI_ERROR (Status) && (BootMode == BOOT_IN_RECOVERY_MODE)) {
+  } else if (BootMode == BOOT_IN_RECOVERY_MODE) {
 
     Status = PeiServicesLocatePpi (
                &gEfiPeiRecoveryModulePpiGuid,
@@ -318,8 +198,8 @@ Returns:
                NULL,
                (VOID **)&PeiRecovery
                );
-
     ASSERT_EFI_ERROR (Status);
+
     Status = PeiRecovery->LoadRecoveryCapsule (PeiServices, PeiRecovery);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
@@ -332,19 +212,34 @@ Returns:
   }
 
   //
-  // Find the EFI_FV_FILETYPE_RAW type compressed Firmware Volume file in FTW spare block
+  // Install the PEI Protocols that are shared between PEI and DXE
+  //
+  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
+  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
+
+  //
+  // Allocate 128KB for the Stack
+  //
+  PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
+  ASSERT (BaseOfStack != 0);
+
+  //
+  // Add architecture-specifc HOBs (including the BspStore HOB)
+  //
+  Status = CreateArchSpecificHobs (&BspStore);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Find the EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE type compressed Firmware Volume file
   // The file found will be processed by PeiProcessFile: It will first be decompressed to
-  // a normal FV, then a corresponding FV type hob will be built which is provided for DXE
-  // core to find and dispatch drivers in this FV. Because PeiProcessFile typically checks
-  // for EFI_FV_FILETYPE_DXE_CORE type file, in this condition we need not check returned
-  // status
+  // a normal FV, then a corresponding FV type hob will be built. 
   //
   Status = PeiFindFile (
-            EFI_FV_FILETYPE_RAW,
-            EFI_SECTION_PE32,
-            &FirmwareFileName,
-            &Pe32Data
-            );
+             EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+             EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+             &FirmwareFileName,
+             &FvImageData
+             );
 
   //
   // Find the DXE Core in a Firmware Volume
@@ -355,20 +250,18 @@ Returns:
             &DxeCoreFileName,
             &Pe32Data
             );
-
   ASSERT_EFI_ERROR (Status);
 
   //
   // Load the DXE Core from a Firmware Volume
   //
   Status = PeiLoadFile (
-            PeiEfiPeiPeCoffLoader,
-            Pe32Data,
-            &DxeCoreAddress,
-            &DxeCoreSize,
-            &DxeCoreEntryPoint
-            );
-
+             PeiEfiPeiPeCoffLoader,
+             Pe32Data,
+             &DxeCoreAddress,
+             &DxeCoreSize,
+             &DxeCoreEntryPoint
+             );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -377,7 +270,6 @@ Returns:
   //
 
   Status = PeiServicesInstallPpi (&mPpiSignal);
-
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -399,14 +291,93 @@ Returns:
     );
 
   DEBUG ((EFI_D_INFO, "DXE Core Entry\n"));
-  SwitchIplStacks (
-    (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-    HobList.Raw,
-    NULL,
-    TopOfStack,
-    (VOID *) (UINTN) BspStore
-    );
+  if (FeaturePcdGet(PcdDxeIplSwitchToLongMode)) {
+    //
+    // Compute the top of the stack we were allocated, which is used to load X64 dxe core. 
+    // Pre-allocate a 32 bytes which confroms to x64 calling convention.
+    //
+    // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
+    // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
+    // register parameters is reserved on the stack, in case the called function 
+    // wants to spill them; this is important if the function is variadic. 
+    //
+    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
 
+    //
+    //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
+    //
+    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, 16);
+    //
+    // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA
+    // memory, it may be corrupted when copying FV to high-end memory 
+    //
+    LoadGo64Gdt();
+    //
+    // Limit to 36 bits of addressing for debug. Should get it from CPU
+    //
+    PageTables = CreateIdentityMappingPageTables (36);
+    //
+    // Go to Long Mode. Interrupts will not get turned on until the CPU AP is loaded.
+    // Call x64 drivers passing in single argument, a pointer to the HOBs.
+    //
+    ActivateLongMode (
+      PageTables, 
+      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw), 
+      TopOfStack,
+      0x00000000,
+      DxeCoreEntryPoint
+      );
+  } else {
+    //
+    // Add HOB for the EFI Decompress Protocol
+    //
+    BuildGuidDataHob (
+      &gEfiDecompressProtocolGuid,
+      (VOID *)&gEfiDecompress,
+      sizeof (gEfiDecompress)
+      );
+
+    //
+    // Add HOB for the Tiano Decompress Protocol
+    //
+    BuildGuidDataHob (
+      &gEfiTianoDecompressProtocolGuid,
+      (VOID *)&gTianoDecompress,
+      sizeof (gTianoDecompress)
+      );
+
+    //
+    // Add HOB for the user customized Decompress Protocol
+    //
+    BuildGuidDataHob (
+      &gEfiCustomizedDecompressProtocolGuid,
+      (VOID *)&gCustomDecompress,
+      sizeof (gCustomDecompress)
+      );
+
+    //
+    // Add HOB for the PE/COFF Loader Protocol
+    //
+    BuildGuidDataHob (
+      &gEfiPeiPeCoffLoaderGuid,
+      (VOID *)&PeiEfiPeiPeCoffLoader,
+      sizeof (VOID *)
+      );
+    //
+    // Compute the top of the stack we were allocated. Pre-allocate a UINTN
+    // for safety.
+    //
+    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
+    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
+    SwitchIplStacks (
+      (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
+      HobList.Raw,
+      NULL,
+      (VOID *) (UINTN) TopOfStack,
+      (VOID *) (UINTN) BspStore
+      );
+  } 
   //
   // If we get here, then the DXE Core returned.  This is an error
   // Dxe Core should not return.
@@ -462,10 +433,11 @@ Returns:
   FwVolHeader   = NULL;
   FfsFileHeader = NULL;
   SectionData   = NULL;
+  Status        = EFI_SUCCESS;
 
   //
-  // Foreach Firmware Volume, look for a specified type
-  // of file and break out when one is found
+  // For each Firmware Volume, look for a specified type
+  // of file and break out until no one is found 
   //
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw)) != NULL) {
@@ -478,11 +450,14 @@ Returns:
     if (!EFI_ERROR (Status)) {
       Status = PeiProcessFile (
                  SectionType,
-                 &FfsFileHeader,
-                 Pe32Data
+                 FfsFileHeader,
+                 Pe32Data,
+                 &Hob
                  );
       CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
-      return Status;
+      if (!EFI_ERROR (Status)) {
+        return EFI_SUCCESS;
+      }
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
@@ -608,7 +583,7 @@ Returns:
 
   while ((Section->Type != EFI_SECTION_PE32) && (Section->Type != EFI_SECTION_TE)) {
     SectionLength         = *(UINT32 *) (Section->Size) & 0x00ffffff;
-    OccupiedSectionLength = GetOccupiedSize (SectionLength, 4);
+    OccupiedSectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
     Section               = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + OccupiedSectionLength);
   }
   //
@@ -624,14 +599,9 @@ Returns:
 
   if (Status == EFI_SUCCESS) {
     //
-    // Install PeiInMemory to indicate the Dxeipl is shadowed
+    // Set gInMemory global variable to TRUE to indicate the dxeipl is shadowed.
     //
-    Status = PeiServicesInstallPpi (&mPpiPeiInMemory);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
+    *(BOOLEAN *) ((UINTN) &gInMemory + (UINTN) DxeIplEntryPoint - (UINTN) _ModuleEntryPoint) = TRUE;
     Status = ((EFI_PEIM_ENTRY_POINT) (UINTN) DxeIplEntryPoint) (DxeIplFileHeader, GetPeiServicesTablePointer());
   }
 
@@ -689,8 +659,9 @@ Returns:
   //
   Status = PeiProcessFile (
             EFI_SECTION_PE32,
-            &FfsHeader,
-            &Pe32Data
+            FfsHeader,
+            &Pe32Data,
+            NULL
             );
 
   if (EFI_ERROR (Status)) {
@@ -713,8 +684,9 @@ Returns:
 EFI_STATUS
 PeiProcessFile (
   IN      UINT16                 SectionType,
-  IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
-  OUT     VOID                   **Pe32Data
+  IN      EFI_FFS_FILE_HEADER    *FfsFileHeader,
+  OUT     VOID                   **Pe32Data,
+  IN      EFI_PEI_HOB_POINTERS   *OrigHob
   )
 /*++
 
@@ -762,9 +734,7 @@ Returns:
   EFI_GUID                        TempGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
-  EFI_FFS_FILE_HEADER             *FfsFileHeader;
-
-  FfsFileHeader = *RealFfsFileHeader;
+  UINT32                          FvAlignment;
 
   Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_COMPRESSION,
@@ -773,7 +743,7 @@ Returns:
              );
 
   //
-  // Upon finding a DXE Core file, see if there is first a compression section
+  // First process the compression section
   //
   if (!EFI_ERROR (Status)) {
     //
@@ -784,7 +754,7 @@ Returns:
 
     do {
       SectionLength         = *(UINT32 *) (Section->Size) & 0x00ffffff;
-      OccupiedSectionLength = GetOccupiedSize (SectionLength, 4);
+      OccupiedSectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
 
       //
       // Was the DXE Core file encapsulated in a GUID'd section?
@@ -881,14 +851,24 @@ Returns:
 
         switch (CompressionSection->CompressionType) {
         case EFI_STANDARD_COMPRESSION:
-          DecompressLibrary = &gTianoDecompress;
+          if (FeaturePcdGet (PcdDxeIplSupportTianoDecompress)) {
+            DecompressLibrary = &gTianoDecompress;
+          } else {
+            ASSERT (FALSE);
+            return EFI_NOT_FOUND;
+          }
           break;
 
         case EFI_CUSTOMIZED_COMPRESSION:
           //
           // Load user customized compression protocol.
           //
-          DecompressLibrary = &gCustomDecompress;
+          if (FeaturePcdGet (PcdDxeIplSupportCustomDecompress)) {
+            DecompressLibrary = &gCustomDecompress;
+          } else {
+            ASSERT (FALSE);
+            return EFI_NOT_FOUND;
+          }
           break;
 
         case EFI_NOT_COMPRESSED:
@@ -939,31 +919,64 @@ Returns:
                     );
 
         CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
-        if (CmpSection->Type == EFI_SECTION_RAW) {
+        if (CmpSection->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+          // 
+          // Firmware Volume Image in this Section
+          // Skip the section header to get FvHeader
           //
-          // Skip the section header and
-          // adjust the pointer alignment to 16
-          //
-          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (DstBuffer + 16);
+          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
 
-          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
-            FfsFileHeader = NULL;
+          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {            
+            //
+            // Adjust Fv Base Address Alignment based on Align Attributes in Fv Header
+            //
+            
+            //
+            // When FvImage support Alignment, we need to check whether 
+            // its alignment is correct. 
+            //
+            if (FvHeader->Attributes | EFI_FVB_ALIGNMENT_CAP) {
+              
+              //
+              // Calculate the mini alignment for this FvImage
+              //
+              FvAlignment = 1 << (LowBitSet32 (FvHeader->Attributes >> 16) + 1);
+              
+              //
+              // If current FvImage base address doesn't meet the its alignment,
+              // we need to reload this FvImage to another correct memory address.
+              //
+              if (((UINTN) FvHeader % FvAlignment) != 0) {
+                DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength), FvAlignment);
+                if (DstBuffer == NULL) {
+                  return EFI_OUT_OF_RESOURCES;
+                }
+                CopyMem (DstBuffer, FvHeader, (UINTN) FvHeader->FvLength);
+                FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
+              }
+            }
+            //
+            // Build new FvHob for new decompressed Fv image.
+            //
             BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
-            Status = PeiServicesFfsFindNextFile (
-                       EFI_FV_FILETYPE_DXE_CORE,
-                       FvHeader,
-                       &FfsFileHeader
-                       );
-
-            if (EFI_ERROR (Status)) {
+            
+            //
+            // Set the original FvHob to unused.
+            //
+            if (OrigHob != NULL) {
+              OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
+            }
+            
+            //
+            // when search FvImage Section return true.
+            //
+            if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+              *Pe32Data = (VOID *) FvHeader;
+              return EFI_SUCCESS;
+            } else {
               return EFI_NOT_FOUND;
             }
 
-            //
-            // Reture the FfsHeader that contain Pe32Data.
-            //
-            *RealFfsFileHeader = FfsFileHeader;
-            return PeiProcessFile (SectionType, RealFfsFileHeader, Pe32Data);
           }
         }
         //
@@ -982,10 +995,13 @@ Returns:
             return EFI_SUCCESS;
           }
 
-          OccupiedCmpSectionLength  = GetOccupiedSize (CmpSectionLength, 4);
+          OccupiedCmpSectionLength  = GET_OCCUPIED_SIZE (CmpSectionLength, 4);
           CmpSection                = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) CmpSection + OccupiedCmpSectionLength);
         } while (CmpSection->Type != 0 && (UINTN) ((UINT8 *) CmpSection - (UINT8 *) CmpFileData) < CmpFileSize);
       }
+      //
+      // End of the decompression activity
+      //
 
       Section   = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + OccupiedSectionLength);
       FileSize  = FfsFileHeader->Size[0] & 0xFF;
@@ -993,11 +1009,17 @@ Returns:
       FileSize += (FfsFileHeader->Size[2] << 16) & 0xFF0000;
       FileSize &= 0x00FFFFFF;
     } while (Section->Type != 0 && (UINTN) ((UINT8 *) Section - (UINT8 *) FfsFileHeader) < FileSize);
-
+    
     //
-    // End of the decompression activity
+    // search all sections (compression and non compression) in this FFS, don't 
+    // find expected section.
     //
+    return EFI_NOT_FOUND;
   } else {
+    //
+    // For those FFS that doesn't contain compression section, directly search 
+    // PE or TE section in this FFS.
+    //
 
     Status = PeiServicesFfsFindSectionData (
                EFI_SECTION_PE32,
@@ -1021,3 +1043,4 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
