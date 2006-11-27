@@ -178,7 +178,7 @@ Returns:
     //
     // Alert any listeners that there is permanent memory available
     //
-    PERF_START (NULL,"PEI", NULL, mTick);
+    
     PERF_START (NULL,"DisMem", NULL, 0);
     Status = PeiServicesInstallPpi (&mMemoryDiscoveredPpi);
     PERF_END (NULL,"DisMem", NULL, 0);
@@ -193,6 +193,7 @@ Returns:
       EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
       );
 
+    PERF_START (NULL,"PEI", NULL, mTick);
     //
     // If first pass, start performance measurement.
     //
