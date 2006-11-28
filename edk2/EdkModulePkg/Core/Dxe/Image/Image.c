@@ -74,6 +74,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   EFI_SUCCESS,                // Status
   0,                          // ExitDataSize
   NULL,                       // ExitData
+  NULL,                       // JumpBuffer
   NULL,                       // JumpContext
   0,                          // Machine
   NULL,                       // Ebc
@@ -949,12 +950,15 @@ Returns:
 
   //
   // Set long jump for Exit() support
+  // JumpContext must be aligned on a CPU specific boundary.
+  // Overallocate the buffer and force the required alignment
   //
-  Image->JumpContext = CoreAllocateBootServicesPool (sizeof (*Image->JumpContext));
-  if (Image->JumpContext == NULL) {
+  Image->JumpBuffer = CoreAllocateBootServicesPool (sizeof (*Image->JumpContext) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
+  if (Image->JumpBuffer == NULL) {
     PERF_END (ImageHandle, START_IMAGE_TOK, NULL, 0);
     return EFI_OUT_OF_RESOURCES;
   }
+  Image->JumpContext = (VOID *)((UINTN)(ALIGN_POINTER (Image->JumpBuffer, BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT)) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
 
   SetJumpFlag = SetJump (Image->JumpContext);
   //
@@ -991,7 +995,7 @@ Returns:
   ASSERT (Image->Tpl == gEfiCurrentTpl);
   CoreRestoreTpl (Image->Tpl);
 
-  CoreFreePool (Image->JumpContext);
+  CoreFreePool (Image->JumpBuffer);
 
   //
   // Pop the current start image context
