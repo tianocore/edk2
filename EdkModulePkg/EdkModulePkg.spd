@@ -1247,14 +1247,23 @@
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>Whether VGA decoding is enabled on this platform so we should avoid those aliased resources</HelpText>
     </PcdEntry>
-    <PcdEntry>
+    <PcdEntry SupArchList="IA32">
       <C_Name>PcdDxeIplSwitchToLongMode</C_Name>
       <Token>0x0001003b</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>If this feature is enabled, then the DXE IPL will load a 64-bit DxeCore.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDxeIplBuildShareCodeHobs</C_Name>
+      <Token>0x0001003c</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this feature is enabled, DXE IPL will build a series of HOBs to share code with DXE Core.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
