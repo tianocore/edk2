@@ -164,6 +164,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private final int supArchMinWidth = 200;
     private final int supModMinWidth = 200;
 
+//    private Object boolModifyLock = new Object();
+//    private boolean exclusiveUsage = false;
+
     /**
      This method initializes this
      
@@ -831,14 +834,28 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
                 return;
             }
+
             if (column <= 10 && column >= 6) {
                 Vector<String> v = stringToVector(usage);
                 if (compareTwoVectors(v, stringToVector(sa[6]))) {
                     return;
                 }
-                if (v.contains("FEATURE_FLAG") && v.size() > 1) {
+                if (v.contains("FEATURE_FLAG")/* && v.size() > 1 && !exclusiveUsage*/) {
+                    if (v.size() > 1) {
                     JOptionPane.showMessageDialog(frame, "Usage Feature Flag can NOT co-exist with others.");
                     return;
+                }
+//                    synchronized (boolModifyLock){
+//                        exclusiveUsage = true;
+//                    }
+//                    m.setValueAt(false, row, 7);
+//                    m.setValueAt(false, row, 8);
+//                    m.setValueAt(false, row, 9);
+//                    m.setValueAt(false, row, 10);
+                    else {
+                        m.setValueAt("BOOLEAN", row, 3);
+                    }
+                    
                 }
             }
             
@@ -910,6 +927,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                         jCheckBoxFixedAtBuild.setSelected(false);
                         jCheckBoxDyn.setSelected(false);
                         jCheckBoxDynEx.setSelected(false);
+                        jComboBoxDataType.setSelectedItem("BOOLEAN");
                     }
                 }
             });
