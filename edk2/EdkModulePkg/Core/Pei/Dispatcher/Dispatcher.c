@@ -63,6 +63,7 @@ Returns:
   BOOLEAN                           NextFvFound;
   EFI_FIRMWARE_VOLUME_HEADER        *NextFvAddress;
   EFI_FIRMWARE_VOLUME_HEADER        *DefaultFvAddress;
+  VOID                              *TopOfStack;
   //
   // Debug data for uninstalled Peim list
   //
@@ -204,15 +205,16 @@ Returns:
                 PrivateDataInMem = (UINTN) TransferOldDataToNewDataRange (PrivateData);
                 ASSERT (PrivateDataInMem != 0);
                 //
-                //Subtract 0x10 from the 4th parameter indicating the new stack base,
-                //in order to provide buffer protection against possible illegal stack
-                //access that might corrupt the stack.
+                // Adjust the top of stack to be aligned at CPU_STACK_ALIGNMENT
                 //
+                TopOfStack = (VOID *)((UINTN)PrivateData->StackBase + (UINTN)PrivateData->StackSize - CPU_STACK_ALIGNMENT);
+                TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
                 PeiSwitchStacks (
                   (SWITCH_STACK_ENTRY_POINT)(UINTN)TempPtr.Raw,
                   PeiStartupDescriptor,
                   (VOID*)PrivateDataInMem,
-                  (VOID*)((UINTN)PrivateData->StackBase + (UINTN)PrivateData->StackSize),
+                  TopOfStack,
                   (VOID*)(UINTN)PrivateData->StackBase
                   );
               }
