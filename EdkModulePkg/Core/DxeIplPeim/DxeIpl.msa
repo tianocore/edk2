@@ -151,7 +151,7 @@
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DefaultValue>TRUE</DefaultValue>
+      <DefaultValue>FALSE</DefaultValue>
       <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the EFI Compression algorithm</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
