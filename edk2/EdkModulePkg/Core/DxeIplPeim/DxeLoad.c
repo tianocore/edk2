@@ -22,10 +22,6 @@ Abstract:
 
 #include "DxeIpl.h"
 
-#ifndef __GNUC__
-#pragma warning( disable : 4305 )
-#endif
-
 BOOLEAN gInMemory = FALSE;
 
 //
@@ -151,9 +147,6 @@ Returns:
 --*/
 {
   EFI_STATUS                                Status;
-  EFI_PHYSICAL_ADDRESS                      TopOfStack;
-  EFI_PHYSICAL_ADDRESS                      BaseOfStack;
-  EFI_PHYSICAL_ADDRESS                      BspStore;
   EFI_GUID                                  DxeCoreFileName;
   EFI_GUID                                  FirmwareFileName;
   VOID                                      *Pe32Data;
@@ -165,13 +158,8 @@ Returns:
   EFI_BOOT_MODE                             BootMode;
   EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
   EFI_PEI_S3_RESUME_PPI                     *S3Resume;
-  EFI_PHYSICAL_ADDRESS                      PageTables;
 
 //  PERF_START (PeiServices, L"DxeIpl", NULL, 0);
-  TopOfStack  = 0;
-  BaseOfStack = 0;
-  BspStore    = 0;
-  PageTables  = 0;
 
   //
   // if in S3 Resume, restore configure
@@ -217,17 +205,6 @@ Returns:
   PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
   ASSERT (PeiEfiPeiPeCoffLoader != NULL);
 
-  //
-  // Allocate 128KB for the Stack
-  //
-  PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
-  ASSERT (BaseOfStack != 0);
-
-  //
-  // Add architecture-specifc HOBs (including the BspStore HOB)
-  //
-  Status = CreateArchSpecificHobs (&BspStore);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Find the EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE type compressed Firmware Volume file
@@ -290,70 +267,37 @@ Returns:
     EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
     );
 
-  DEBUG ((EFI_D_INFO, "DXE Core Entry\n"));
-  if (FeaturePcdGet(PcdDxeIplSwitchToLongMode)) {
-    //
-    // Compute the top of the stack we were allocated, which is used to load X64 dxe core. 
-    // Pre-allocate a 32 bytes which confroms to x64 calling convention.
-    //
-    // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
-    // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
-    // register parameters is reserved on the stack, in case the called function 
-    // wants to spill them; this is important if the function is variadic. 
-    //
-    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
-
-    //
-    //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
-    //
-    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, 16);
-    //
-    // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA
-    // memory, it may be corrupted when copying FV to high-end memory 
-    //
-    LoadGo64Gdt();
-    //
-    // Limit to 36 bits of addressing for debug. Should get it from CPU
-    //
-    PageTables = CreateIdentityMappingPageTables (36);
-    //
-    // Go to Long Mode. Interrupts will not get turned on until the CPU AP is loaded.
-    // Call x64 drivers passing in single argument, a pointer to the HOBs.
-    //
-    ActivateLongMode (
-      PageTables, 
-      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw), 
-      TopOfStack,
-      0x00000000,
-      DxeCoreEntryPoint
-      );
-  } else {
-    //
-    // Add HOB for the EFI Decompress Protocol
-    //
-    BuildGuidDataHob (
-      &gEfiDecompressProtocolGuid,
-      (VOID *)&gEfiDecompress,
-      sizeof (gEfiDecompress)
-      );
-
-    //
-    // Add HOB for the Tiano Decompress Protocol
-    //
-    BuildGuidDataHob (
-      &gEfiTianoDecompressProtocolGuid,
-      (VOID *)&gTianoDecompress,
-      sizeof (gTianoDecompress)
-      );
-
-    //
-    // Add HOB for the user customized Decompress Protocol
-    //
-    BuildGuidDataHob (
-      &gEfiCustomizedDecompressProtocolGuid,
-      (VOID *)&gCustomDecompress,
-      sizeof (gCustomDecompress)
-      );
+  if (FeaturePcdGet (PcdDxeIplBuildShareCodeHobs)) {
+    if (FeaturePcdGet (PcdDxeIplSupportEfiDecompress)) {
+      //
+      // Add HOB for the EFI Decompress Protocol
+      //
+      BuildGuidDataHob (
+        &gEfiDecompressProtocolGuid,
+        (VOID *)&gEfiDecompress,
+        sizeof (gEfiDecompress)
+        );
+    }
+    if (FeaturePcdGet (PcdDxeIplSupportTianoDecompress)) {
+      //
+      // Add HOB for the Tiano Decompress Protocol
+      //
+      BuildGuidDataHob (
+        &gEfiTianoDecompressProtocolGuid,
+        (VOID *)&gTianoDecompress,
+        sizeof (gTianoDecompress)
+        );
+    }
+    if (FeaturePcdGet (PcdDxeIplSupportCustomDecompress)) {
+      //
+      // Add HOB for the user customized Decompress Protocol
+      //
+      BuildGuidDataHob (
+        &gEfiCustomizedDecompressProtocolGuid,
+        (VOID *)&gCustomDecompress,
+        sizeof (gCustomDecompress)
+        );
+    }
 
     //
     // Add HOB for the PE/COFF Loader Protocol
@@ -363,21 +307,10 @@ Returns:
       (VOID *)&PeiEfiPeiPeCoffLoader,
       sizeof (VOID *)
       );
-    //
-    // Compute the top of the stack we were allocated. Pre-allocate a UINTN
-    // for safety.
-    //
-    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
-    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+  }
 
-    SwitchIplStacks (
-      (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-      HobList.Raw,
-      NULL,
-      (VOID *) (UINTN) TopOfStack,
-      (VOID *) (UINTN) BspStore
-      );
-  } 
+  DEBUG ((EFI_D_INFO, "DXE Core Entry\n"));
+  HandOffToDxeCore (DxeCoreEntryPoint, HobList);
   //
   // If we get here, then the DXE Core returned.  This is an error
   // Dxe Core should not return.

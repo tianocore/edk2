@@ -27,38 +27,6 @@ Abstract:
 
 extern BOOLEAN gInMemory;
 
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
-                      Reserved on other architectures.
-
-**/
-VOID
-EFIAPI
-SwitchIplStacks (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack,
-  IN      VOID                      *NewBsp
-  );
-
 EFI_STATUS
 PeiFindFile (
   IN  UINT8                  Type,
@@ -78,12 +46,6 @@ PeiLoadFile (
   )
 ;
 
-
-EFI_STATUS
-CreateArchSpecificHobs (
-  OUT EFI_PHYSICAL_ADDRESS                      *BspStore
-  )
-;
 
 EFI_STATUS
 GetImageReadFunction (
@@ -124,6 +86,12 @@ DxeLoadCore (
   IN EFI_PEI_HOB_POINTERS  HobList
   );
 
+VOID
+HandOffToDxeCore (
+  IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
+  IN EFI_PEI_HOB_POINTERS   HobList
+  );
+
 EFI_STATUS
 PeiProcessFile (
   IN      UINT16                 SectionType,
@@ -138,17 +106,6 @@ PeimInitializeDxeIpl (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
-
-EFI_STATUS
-PeiLoadx64File (
-  IN  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader,
-  IN  VOID                                      *Pe32Data,
-  IN  EFI_MEMORY_TYPE                           MemoryType,
-  OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
-  OUT UINT64                                    *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  )
-;
 
 EFI_PHYSICAL_ADDRESS
 CreateIdentityMappingPageTables (

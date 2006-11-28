@@ -21,66 +21,69 @@ Abstract:
 
 #include "DxeIpl.h"
 
-EFI_STATUS
-CreateArchSpecificHobs (
-  OUT EFI_PHYSICAL_ADDRESS      *BspStore
-  )
-/*++
-
-Routine Description:
-
-  Creates architecture-specific HOBs.
-
-  Note: New parameters should NOT be added for any HOBs that are added to this
-        function.  BspStore is a special case because it is required for the
-        call to SwitchStacks() in DxeLoad().
-
-Arguments:
-
-  BspStore    - The address of the BSP Store for those architectures that need
-                it.  Otherwise 0.
-
-Returns:
-
-  EFI_SUCCESS   - The HOBs were created successfully.
-
---*/
-{
-  *BspStore = 0;
-  return EFI_SUCCESS;
-}
-
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
-                      Reserved on other architectures.
-
-**/
 VOID
-EFIAPI
-SwitchIplStacks (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack,
-  IN      VOID                      *NewBsp
+HandOffToDxeCore (
+  IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
+  IN EFI_PEI_HOB_POINTERS   HobList
   )
 {
-  SwitchStack (EntryPoint, Context1, Context2, NewStack);
+  EFI_STATUS                Status;
+  EFI_PHYSICAL_ADDRESS      BaseOfStack;
+  EFI_PHYSICAL_ADDRESS      TopOfStack;
+  EFI_PHYSICAL_ADDRESS      PageTables;
+
+  Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
+  ASSERT_EFI_ERROR (Status);
+  
+  if (FeaturePcdGet(PcdDxeIplSwitchToLongMode)) {
+    //
+    // Compute the top of the stack we were allocated, which is used to load X64 dxe core. 
+    // Pre-allocate a 32 bytes which confroms to x64 calling convention.
+    //
+    // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
+    // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
+    // register parameters is reserved on the stack, in case the called function 
+    // wants to spill them; this is important if the function is variadic. 
+    //
+    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
+
+    //
+    //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
+    //
+    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, 16);
+    //
+    // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA
+    // memory, it may be corrupted when copying FV to high-end memory 
+    //
+    LoadGo64Gdt();
+    //
+    // Limit to 36 bits of addressing for debug. Should get it from CPU
+    //
+    PageTables = CreateIdentityMappingPageTables (36);
+    //
+    // Go to Long Mode. Interrupts will not get turned on until the CPU AP is loaded.
+    // Call x64 drivers passing in single argument, a pointer to the HOBs.
+    //
+    ActivateLongMode (
+      PageTables, 
+      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw), 
+      TopOfStack,
+      0x00000000,
+      DxeCoreEntryPoint
+      );
+  } else {
+    //
+    // Compute the top of the stack we were allocated. Pre-allocate a UINTN
+    // for safety.
+    //
+    TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
+    TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
+    SwitchStack (
+      (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
+      HobList.Raw,
+      NULL,
+      (VOID *) (UINTN) TopOfStack
+      );
+  } 
 }

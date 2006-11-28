@@ -75,19 +75,15 @@
     <Filename>DxeLoad.c</Filename>
     <Filename>DxeIpl.h</Filename>
     <Filename>DxeIpl.dxs</Filename>
-    <Filename SupArchList="IA32">Ia32/ImageRead.c</Filename>
+    <Filename SupArchList="IA32 X64 EBC">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="IA32">Ia32/DxeLoadFunc.c</Filename>
     <Filename SupArchList="IA32">Ia32/LongMode.asm</Filename>
     <Filename ToolChainFamily="GCC" SupArchList="IA32">Ia32/LongMode.S</Filename>
     <Filename SupArchList="IA32">Ia32/VirtualMemory.c</Filename>
     <Filename SupArchList="IA32">Ia32/VirtualMemory.h</Filename>
-    <Filename SupArchList="X64">Ia32/ImageRead.c</Filename>
-    <Filename SupArchList="X64">Ia32/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="X64 EBC">X64/DxeLoadFunc.c</Filename>
     <Filename SupArchList="IPF">ipf/ImageRead.c</Filename>
     <Filename SupArchList="IPF">ipf/DxeLoadFunc.c</Filename>
-    <Filename SupArchList="EBC">Ia32/ImageRead.c</Filename>
-    <Filename SupArchList="EBC">Ia32/DxeLoadFunc.c</Filename>
-    <Filename SupArchList="X64 IPF EBC">Non-existing.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -143,8 +139,14 @@
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdDxeIplSwitchToLongMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>If this feature is enabled, then the DXE IPL will load a 64-bit DxeCore.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplBuildShareCodeHobs</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, DXE IPL will build a series of HOBs to share code with DXE Core.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
