@@ -47,6 +47,7 @@ typedef struct {
 
     UINTN                       ExitDataSize;   // Size of ExitData from started image
     VOID                        *ExitData;      // Pointer to exit data from started image
+    VOID                        *JumpBuffer;    // Pointer to pool allocation for context save/retore
     BASE_LIBRARY_JUMP_BUFFER    *JumpContext;   // Pointer to buffer for context save/retore
     UINT16                      Machine;        // Machine type from PE image
 
