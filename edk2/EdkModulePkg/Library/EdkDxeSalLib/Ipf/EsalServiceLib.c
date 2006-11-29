@@ -19,19 +19,25 @@ Abstract:
 
 #include <Ipf/IpfDefines.h>
 
-
+BOOLEAN mLibraryInitialized = FALSE;
 STATIC EXTENDED_SAL_BOOT_SERVICE_PROTOCOL *mEsalBootService;
 STATIC EFI_PLABEL                         mPlabel;
 
 EFI_STATUS
 EFIAPI
 DxeSalLibConstruct (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+//  IN EFI_HANDLE        ImageHandle,
+//  IN EFI_SYSTEM_TABLE  *SystemTable
+  VOID
   )
 {
   EFI_PLABEL  *Plabel;
   EFI_STATUS  Status;
+
+  if (mLibraryInitialized == TRUE) {
+    return EFI_SUCCESS;
+  }
+  mLibraryInitialized = TRUE;
 
   //
   // The protocol contains a function pointer, which is an indirect procedure call.
@@ -109,6 +115,7 @@ Returns:
 
 --*/
 {
+  DxeSalLibConstruct ();
   return mEsalBootService->AddExtendedSalProc (
                             mEsalBootService,
                             ClassGuid,
@@ -217,6 +224,7 @@ Returns:
   SAL_RETURN_REGS       ReturnReg;
   SAL_EXTENDED_SAL_PROC EsalProc;
 
+  DxeSalLibConstruct ();
   ReturnReg = GetEsalEntryPoint ();
   if (ReturnReg.Status != EFI_SAL_SUCCESS) {
     return ReturnReg;

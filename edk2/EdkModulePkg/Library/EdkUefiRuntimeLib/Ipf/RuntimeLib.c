@@ -159,7 +159,7 @@ Returns:
                   EFI_TPL_NOTIFY,
                   RuntimeLibVirtualNotifyEvent,
                   NULL,
-                  mEfiVirtualNotifyEvent
+                  &mEfiVirtualNotifyEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
