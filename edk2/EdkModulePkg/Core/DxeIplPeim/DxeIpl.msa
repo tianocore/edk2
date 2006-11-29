@@ -77,8 +77,6 @@
     <Filename>DxeIpl.dxs</Filename>
     <Filename SupArchList="IA32 X64 EBC">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="IA32">Ia32/DxeLoadFunc.c</Filename>
-    <Filename SupArchList="IA32">Ia32/LongMode.asm</Filename>
-    <Filename ToolChainFamily="GCC" SupArchList="IA32">Ia32/LongMode.S</Filename>
     <Filename SupArchList="IA32">Ia32/VirtualMemory.c</Filename>
     <Filename SupArchList="IA32">Ia32/VirtualMemory.h</Filename>
     <Filename SupArchList="X64 EBC">X64/DxeLoadFunc.c</Filename>

@@ -107,22 +107,5 @@ PeimInitializeDxeIpl (
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
-EFI_PHYSICAL_ADDRESS
-CreateIdentityMappingPageTables (
-  IN UINT32                NumberOfProcessorPhysicalAddressBits
-  )
-;
-
-VOID
-ActivateLongMode (
-  IN  EFI_PHYSICAL_ADDRESS  PageTables,
-  IN  EFI_PHYSICAL_ADDRESS  HobStart,
-  IN  EFI_PHYSICAL_ADDRESS  Stack,
-  IN  EFI_PHYSICAL_ADDRESS  CodeEntryPoint1,
-  IN  EFI_PHYSICAL_ADDRESS  CodeEntryPoint2
-  );
-
-VOID
-LoadGo64Gdt();
 
 #endif

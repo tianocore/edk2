@@ -26,7 +26,28 @@ Abstract:
 #define _VIRTUAL_MEMORY_H_
 
 
+#define SYS_CODE64_SEL 0x38
+
 #pragma pack(1)
+
+typedef union {
+  struct {
+    UINT32  LimitLow    : 16;
+    UINT32  BaseLow     : 16;
+    UINT32  BaseMid     : 8;
+    UINT32  Type        : 4;
+    UINT32  System      : 1;
+    UINT32  Dpl         : 2;
+    UINT32  Present     : 1;
+    UINT32  LimitHigh   : 4;
+    UINT32  Software    : 1;
+    UINT32  Reserved    : 1;
+    UINT32  DefaultSize : 1;
+    UINT32  Granularity : 1;
+    UINT32  BaseHigh    : 8;
+  } Bits;
+  UINT64  Uint64;
+} IA32_GDT;
 
 //
 // Page-Map Level-4 Offset (PML4) and
@@ -77,7 +98,7 @@ typedef union {
 
 #pragma pack()
 
-EFI_PHYSICAL_ADDRESS
+UINTN
 CreateIdentityMappingPageTables (
   VOID
   )

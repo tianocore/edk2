@@ -34,7 +34,7 @@ Abstract:
 
 #include "VirtualMemory.h"
 
-EFI_PHYSICAL_ADDRESS
+UINTN
 CreateIdentityMappingPageTables (
   VOID
   )
@@ -155,6 +155,6 @@ Returns:
        );
   }
 
-  return (EFI_PHYSICAL_ADDRESS) (UINTN)PageMap; // FIXME
+  return (UINTN)PageMap; // FIXME
 }
 
