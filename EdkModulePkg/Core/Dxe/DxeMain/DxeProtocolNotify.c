@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,8 +15,8 @@ Module Name:
 
 Abstract:
 
-  This file deals with Architecture Protocol (AP) registration in 
-  the Dxe Core. The mArchProtocols[] array represents a list of 
+  This file deals with Architecture Protocol (AP) registration in
+  the Dxe Core. The mArchProtocols[] array represents a list of
   events that represent the Architectural Protocols.
 
 --*/
@@ -44,10 +44,12 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#ifndef MDE_CPU_IPF
   //
   // UEFI 2.0 added support for Capsule services. DXE CIS ??? Added support for this AP
   //
   { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE},
+#endif
 #endif
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
@@ -79,7 +81,7 @@ Arguments:
 
 Returns:
   EFI_SUCCESS   - All AP services are available
-  EFI_NOT_FOUND - At least one AP service is not available 
+  EFI_NOT_FOUND - At least one AP service is not available
 
 --*/
 {
@@ -106,14 +108,14 @@ GenericArchProtocolNotify (
 Routine Description:
   Notification event handler registered by CoreNotifyOnArchProtocolInstallation ().
   This notify function is registered for every architectural protocol. This handler
-  updates mArchProtocol[] array entry with protocol instance data and sets it's 
-  present flag to TRUE. If any constructor is required it is executed. The EFI 
+  updates mArchProtocol[] array entry with protocol instance data and sets it's
+  present flag to TRUE. If any constructor is required it is executed. The EFI
   System Table headers are updated.
 
 Arguments:
 
   Event   - The Event that is being processed, not used.
-  
+
   Context - Event Context, not used.
 
 Returns:
@@ -126,21 +128,21 @@ Returns:
   ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
   VOID                            *Protocol;
   BOOLEAN                         Found;
-  
+
   Found = FALSE;
   for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
- 
+
     Status = CoreLocateProtocol (Entry->ProtocolGuid, Entry->Registration, &Protocol);
     if (EFI_ERROR (Status)) {
       continue;
-    } 
-    
+    }
+
     Found = TRUE;
     Entry->Present = TRUE;
-    
+
     //
     // Update protocol global variable if one exists. Entry->Protocol points to a global variable
-    // if one exists in the DXE core for this Architectural Protocol 
+    // if one exists in the DXE core for this Architectural Protocol
     //
     if (Entry->Protocol != NULL) {
       *(Entry->Protocol) = Protocol;
@@ -195,7 +197,7 @@ Returns:
   ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
 
   for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
-    
+
     //
     // Create the event
     //
@@ -212,8 +214,8 @@ Returns:
     // Register for protocol notifactions on this event
     //
     Status = CoreRegisterProtocolNotify (
-              Entry->ProtocolGuid, 
-              Entry->Event, 
+              Entry->ProtocolGuid,
+              Entry->Event,
               &Entry->Registration
               );
     ASSERT_EFI_ERROR(Status);
@@ -279,5 +281,5 @@ Returns:
         }
       }
     }
-  } 
+  }
 }
