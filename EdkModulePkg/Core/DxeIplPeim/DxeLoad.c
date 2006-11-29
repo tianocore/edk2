@@ -309,7 +309,7 @@ Returns:
       );
   }
 
-  DEBUG ((EFI_D_INFO, "DXE Core Entry\n"));
+  DEBUG ((EFI_D_INFO, "DXE Core Entry Point 0x%08x\n", (UINTN) DxeCoreEntryPoint));
   HandOffToDxeCore (DxeCoreEntryPoint, HobList);
   //
   // If we get here, then the DXE Core returned.  This is an error

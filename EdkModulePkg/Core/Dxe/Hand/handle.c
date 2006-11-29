@@ -449,7 +449,7 @@ Returns:
   //
   // Print debug message
   //
-  DEBUG((EFI_D_ERROR | EFI_D_INFO, "InstallProtocolInterface: %g %x\n", Protocol, Interface));
+  DEBUG((EFI_D_ERROR | EFI_D_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot = NULL;

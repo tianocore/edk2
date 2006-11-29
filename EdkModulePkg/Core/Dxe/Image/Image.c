@@ -456,7 +456,7 @@ Returns:
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
 
-    DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading driver at 0x%08x EntryPoint=0x%08x ", (UINTN)Image->ImageContext.ImageAddress, (UINTN)Image->ImageContext.EntryPoint));
+    DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading driver at 0x%10p EntryPoint=0x%10p ", (VOID *)(UINTN)Image->ImageContext.ImageAddress, (VOID *)(UINTN)Image->ImageContext.EntryPoint));
     if (Image->ImageContext.PdbPointer != NULL) {
       StartIndex = 0;
       for (Index = 0; Image->ImageContext.PdbPointer[Index] != 0; Index++) {
@@ -979,7 +979,7 @@ Returns:
     //
     DEBUG_CODE_BEGIN ();
       if (EFI_ERROR (Image->Status)) {
-        DEBUG ((EFI_D_ERROR, "Error: Image at %08X start failed: %x\n", Image->Info.ImageBase, Image->Status));
+        DEBUG ((EFI_D_ERROR, "Error: Image at %10p start failed: %r\n", Image->Info.ImageBase, Image->Status));
       }
     DEBUG_CODE_END ();
 
