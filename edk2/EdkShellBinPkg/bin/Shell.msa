@@ -125,7 +125,7 @@
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/sermode.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/stall.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/timezone.efi</Filename>
-    <Filename SupArchList="IPF">ipf/Shell.efi</Filename>
+    <Filename SupArchList="IPF">ipf/Shell_Full.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Shell_Full.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Attrib.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Cls.efi</Filename>
