@@ -130,7 +130,7 @@ PrintGuidToBuffer (
 #define _stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
-size_t _filelength(FILE *file);
+size_t _filelength(int fd);
 #ifndef __CYGWIN__
 char *strlwr(char *s);
 #endif

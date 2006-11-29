@@ -496,10 +496,10 @@ Returns:
 
 #ifdef __GNUC__
 
-size_t _filelength(FILE *file)
+size_t _filelength(int fd)
 {
   struct stat stat_buf;
-  fstat(fileno(file), &stat_buf);
+  fstat(fd, &stat_buf);
   return stat_buf.st_size;
 }
 
