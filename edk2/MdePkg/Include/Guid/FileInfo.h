@@ -1,5 +1,5 @@
 /** @file
-  SimpleFileSystem protocol as defined in the EFI 1.0 specification.
+  SimpleFileSystem guid and data structure as defined in the EFI 1.0 specification.
 
   The SimpleFileSystem protocol is the programatic access to the FAT (12,16,32) 
   file system specified in EFI 1.0. It can also be used to abstract any 

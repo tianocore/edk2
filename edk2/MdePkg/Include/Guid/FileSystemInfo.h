@@ -1,5 +1,5 @@
 /** @file
-  FileSystemInfo protocol as defined in the EFI 1.0 specification.
+  FileSystemInfo guid and data structure as defined in the EFI 1.0 specification.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
