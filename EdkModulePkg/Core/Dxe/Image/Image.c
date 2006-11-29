@@ -953,12 +953,12 @@ Returns:
   // JumpContext must be aligned on a CPU specific boundary.
   // Overallocate the buffer and force the required alignment
   //
-  Image->JumpBuffer = CoreAllocateBootServicesPool (sizeof (*Image->JumpContext) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
+  Image->JumpBuffer = CoreAllocateBootServicesPool (sizeof (BASE_LIBRARY_JUMP_BUFFER) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
   if (Image->JumpBuffer == NULL) {
     PERF_END (ImageHandle, START_IMAGE_TOK, NULL, 0);
     return EFI_OUT_OF_RESOURCES;
   }
-  Image->JumpContext = (VOID *)((UINTN)(ALIGN_POINTER (Image->JumpBuffer, BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT)) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
+  Image->JumpContext = ALIGN_POINTER (Image->JumpBuffer, BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
 
   SetJumpFlag = SetJump (Image->JumpContext);
   //
