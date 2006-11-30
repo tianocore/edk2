@@ -452,6 +452,8 @@ Returns:
                 }
                 memset (RuntimeFunction, 0, sizeof (RUNTIME_FUNCTION));
               }
+
+              break;
             }
           }
           Optional64->DataDirectory[3].Size = 0;
