@@ -31,5 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </PackageDefinitions>
   <MsaFiles>
     <Filename>bin/Shell.msa</Filename>
+    <Filename>FullShell/FullShell.msa</Filename>
+    <Filename>MinimumShell/MinimumShell.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
