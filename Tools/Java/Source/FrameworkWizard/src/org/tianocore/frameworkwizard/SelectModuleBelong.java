@@ -477,6 +477,7 @@ public class SelectModuleBelong extends IDialog {
      **/
     public boolean check() {
         String path = this.jTextFieldFilePath.getText();
+        path = Tools.addPathExt(path, mode);
         String guid = this.jTextFieldGuid.getText();
         String version = this.jTextFieldVersion.getText();
         
@@ -512,7 +513,15 @@ public class SelectModuleBelong extends IDialog {
             return false;
         }
         
-
+        //
+        // Check if path is valid
+        //
+        File f = new File(path);
+        if (!f.isFile()) {
+            Log.wrn("New File", "Please type a complete file path!");
+            return false;
+        }
+        f = null;
 
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             //

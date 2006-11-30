@@ -126,8 +126,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
     //
     // Set ToolTipText Show Time
     //
-    static { ToolTipManager.sharedInstance().setDismissDelay(18000);} 
-
+    static { ToolTipManager.sharedInstance().setDismissDelay(18000); }
 
     ///
     /// Used to record current operation target
