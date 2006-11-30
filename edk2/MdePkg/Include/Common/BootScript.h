@@ -36,6 +36,7 @@
 #define EFI_BOOT_SCRIPT_STALL_OPCODE                  0x07
 #define EFI_BOOT_SCRIPT_DISPATCH_OPCODE               0x08
 #define EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE             0x09
+#define EFI_BOOT_SCRIPT_INFORMATION_OPCODE            0x0A
 
 #define EFI_BOOT_SCRIPT_TABLE_OPCODE                  0xAA
 #define EFI_BOOT_SCRIPT_TERMINATE_OPCODE              0xFF
@@ -188,6 +189,13 @@ typedef struct {
 typedef struct {
   UINT16  OpCode;
   UINT8   Length;
+  UINT32                InformationLength;  
+  EFI_PHYSICAL_ADDRESS  Information;
+} EFI_BOOT_SCRIPT_INFORMATION;
+
+typedef struct {
+  UINT16  OpCode;
+  UINT8   Length;
 } EFI_BOOT_SCRIPT_TERMINATE;
 
 typedef union {
@@ -203,6 +211,7 @@ typedef union {
   EFI_BOOT_SCRIPT_STALL                 *Stall;
   EFI_BOOT_SCRIPT_DISPATCH              *Dispatch;
   EFI_BOOT_SCRIPT_DISPATCH_2            *Dispatch2;  
+  EFI_BOOT_SCRIPT_INFORMATION           *Information;
   EFI_BOOT_SCRIPT_TERMINATE             *Terminate;
   EFI_BOOT_SCRIPT_COMMON_HEADER         *CommonHeader;
   UINT8                                 *Raw;
