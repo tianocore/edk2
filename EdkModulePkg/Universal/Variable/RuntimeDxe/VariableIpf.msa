@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>Variable</ModuleName>
-    <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
-    <GuidValue>CBD2E4D5-7068-4FF5-B462-9822B4AD8D60</GuidValue>
+    <ModuleName>VariableIpf</ModuleName>
+    <ModuleType>DXE_SAL_DRIVER</ModuleType>
+    <GuidValue>9D0E793B-3970-4a6c-BA26-B4E2C30B437B</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Variable module.</Abstract>
     <Description>This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.</Description>
@@ -17,9 +17,9 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
+    <SupportedArchitectures>IPF</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>Variable</OutputFileBasename>
+    <OutputFileBasename>VariableIpf</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -53,6 +53,9 @@
       <Keyword>EdkFvbServiceLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>EdkDxeSalLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
@@ -61,8 +64,8 @@
     <Filename>Variable.c</Filename>
     <Filename>reclaim.h</Filename>
     <Filename>reclaim.c</Filename>
-    <Filename>InitVariable.c</Filename>
-    <Filename>Variable.dxs</Filename>
+    <Filename>Ipf/InitVariable.c</Filename>
+    <Filename>IpfVariable.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -104,6 +107,12 @@
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiExtendedSalBootServiceProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiExtendedSalVariableServicesProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>

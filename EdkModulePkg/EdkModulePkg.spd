@@ -434,7 +434,9 @@
     <Filename>Universal/UserInterface/SetupBrowser/Dxe/SetupBrowser.msa</Filename>
     <Filename>Universal/Variable/Pei/Variable.msa</Filename>
     <Filename>Universal/EmuVariable/RuntimeDxe/EmuVariable.msa</Filename>
+    <Filename>Universal/EmuVariable/RuntimeDxe/EmuVariableIpf.msa</Filename>
     <Filename>Universal/Variable/RuntimeDxe/Variable.msa</Filename>
+    <Filename>Universal/Variable/RuntimeDxe/VariableIpf.msa</Filename>
     <Filename>Universal/Capsule/RuntimeDxe/CapsuleRuntime.msa</Filename>
     <Filename>Universal/WatchdogTimer/Dxe/WatchDogTimer.msa</Filename>
     <Filename>Universal/StatusCode/Pei/PeiStatusCode.msa</Filename>
