@@ -19,25 +19,21 @@ Abstract:
 
 #include <Ipf/IpfDefines.h>
 
-BOOLEAN mLibraryInitialized = FALSE;
-STATIC EXTENDED_SAL_BOOT_SERVICE_PROTOCOL *mEsalBootService;
-STATIC EFI_PLABEL                         mPlabel;
+EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *mEsalBootService = NULL;
+EFI_PLABEL                          mPlabel;
 
 EFI_STATUS
 EFIAPI
-DxeSalLibConstruct (
-//  IN EFI_HANDLE        ImageHandle,
-//  IN EFI_SYSTEM_TABLE  *SystemTable
+DxeSalLibInitialize (
   VOID
   )
 {
   EFI_PLABEL  *Plabel;
   EFI_STATUS  Status;
 
-  if (mLibraryInitialized == TRUE) {
+  if (mEsalBootService != NULL) {
     return EFI_SUCCESS;
   }
-  mLibraryInitialized = TRUE;
 
   //
   // The protocol contains a function pointer, which is an indirect procedure call.
@@ -47,8 +43,11 @@ DxeSalLibConstruct (
   // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
   // away. We cache it in a module global, so we can register the vitrual version.
   //
-  Status              = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
-  ASSERT_EFI_ERROR (Status);
+  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
+  if (EFI_ERROR (Status)) {
+    mEsalBootService = NULL;
+    return EFI_SUCCESS;
+  }
 
   Plabel              = (EFI_PLABEL *) (UINTN) mEsalBootService->ExtendedSalProc;
 
@@ -56,7 +55,17 @@ DxeSalLibConstruct (
   mPlabel.GP          = Plabel->GP;
   SetEsalPhysicalEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 
-  return Status;
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+DxeSalLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return DxeSalLibInitialize ();
 }
 
 VOID
@@ -115,7 +124,7 @@ Returns:
 
 --*/
 {
-  DxeSalLibConstruct ();
+  DxeSalLibInitialize ();
   return mEsalBootService->AddExtendedSalProc (
                             mEsalBootService,
                             ClassGuid,
@@ -224,10 +233,30 @@ Returns:
   SAL_RETURN_REGS       ReturnReg;
   SAL_EXTENDED_SAL_PROC EsalProc;
 
-  DxeSalLibConstruct ();
   ReturnReg = GetEsalEntryPoint ();
   if (ReturnReg.Status != EFI_SAL_SUCCESS) {
     return ReturnReg;
+  }
+
+  //
+  // Look at the physical mode ESAL entry point to determine of the ESAL entry point has been initialized
+  //
+  if (*(UINT64 *)ReturnReg.r9 == 0 && *(UINT64 *)(ReturnReg.r9 + 8) == 0) {
+    //
+    // Both the function ponter and the GP value are zero, so attempt to initialize the ESAL Entry Point
+    //
+    DxeSalLibInitialize ();
+    ReturnReg = GetEsalEntryPoint ();
+    if (ReturnReg.Status != EFI_SAL_SUCCESS) {
+      return ReturnReg;
+    }
+    if (*(UINT64 *)ReturnReg.r9 == 0 && *(UINT64 *)(ReturnReg.r9 + 8) == 0) {
+      //
+      // The ESAL Entry Point could not be initialized
+      //
+      ReturnReg.Status = EFI_SAL_ERROR;
+      return ReturnReg;
+    }
   }
 
   if (ReturnReg.r11 & PSR_IT_MASK) {
