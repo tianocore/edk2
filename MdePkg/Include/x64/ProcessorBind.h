@@ -70,7 +70,7 @@
 #endif
 
 
-#if (__STDC_VERSION__ < 199901L)
+#if !defined(__GNUC__) && (__STDC_VERSION__ < 199901L)
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
