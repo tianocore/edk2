@@ -5,49 +5,13 @@ code to see what guids and functions are referenced to see which Packages and
 Library Classes need to be referenced. """
 
 import os, sys, re, getopt, string, glob, xml.dom.minidom, pprint
+from XmlRoutines import *
 
 # Map each function name back to the lib class that declares it.
 function_table = {}
 
 # Map each guid name to a package name.
 cname_table = {}
-
-def XmlList(Dom, String):
-  """Get a list of XML Elements using XPath style syntax."""
-  if Dom.nodeType==Dom.DOCUMENT_NODE:
-    return XmlList(Dom.documentElement, String)
-  if String[0] == "/":
-    return XmlList(Dom, String[1:])
-  if String == "" :
-    return []
-  TagList = String.split('/')
-  nodes = []
-  if Dom.nodeType == Dom.ELEMENT_NODE and Dom.tagName.strip() == TagList[0]:
-    if len(TagList) == 1:
-      nodes = [Dom]
-    else:
-      restOfPath = "/".join(TagList[1:])
-      for child in Dom.childNodes:
-        nodes = nodes + XmlList(child, restOfPath)
-  return nodes
-
-def XmlElement (Dom, String):
-  """Return a single element that matches the String which is XPath style syntax."""
-  try:
-    return XmlList (Dom, String)[0].firstChild.data.strip(' ')
-  except:
-    return ''
-
-def XmlElementData (Dom):
-  """Get the text for this element."""
-  return Dom.firstChild.data.strip(' ')
-
-def XmlAttribute (Dom, String):
-  """Return a single attribute that named by String."""
-  try:
-    return Dom.getAttribute(String)
-  except:
-    return ''
 
 def inWorkspace(rel_path):
   """Treat the given path as relative to the workspace."""
