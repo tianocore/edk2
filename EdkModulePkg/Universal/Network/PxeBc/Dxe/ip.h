@@ -19,8 +19,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Client architecture types
 //
-#define IA64            2
-#define SYS_ARCH_EFI32  6
+#if defined   MDE_CPU_IA32    
+#define       SYS_ARCH  0x6
+#elif defined MDE_CPU_X64
+#define       SYS_ARCH  0x7
+#elif defined MDE_CPU_IPF
+#define       SYS_ARCH  0x2
+#else
+#error Unsupported Client Processor Type
+#endif
+
 
 //
 // portability macros
