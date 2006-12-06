@@ -336,8 +336,12 @@ Returns:
   //
   VarDataSize = Variable.CurrPtr->DataSize;
   if (*DataSize >= VarDataSize) {
+    if (Data == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
-    if (Attributes) {
+    if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
     }
 
