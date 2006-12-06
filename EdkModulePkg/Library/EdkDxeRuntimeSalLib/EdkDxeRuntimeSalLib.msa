@@ -1,15 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>EdkUefiRuntimeLib</ModuleName>
+    <ModuleName>EdkDxeRuntimeSalLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <GuidValue>b1ee6c28-54aa-4d17-b705-3e28ccb27b2e</GuidValue>
+    <GuidValue>61999c3c-72a5-4506-a4ff-4271d18a1d14</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Runtime driver library</Abstract>
-    <Description>
-      Instance of runtime driver library, Hook VitualAddressChange and 
-      BooterviceExit event and provide runtime service.
-    </Description>
+    <Abstract>SAL library for BS/RT drivers</Abstract>
+    <Description>Contains APIs to register/invoke SAL functions.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -22,14 +19,11 @@
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>EdkUefiRuntimeLib</OutputFileBasename>
+    <OutputFileBasename>EdkDxeSalLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">
-      <Keyword>UefiRuntimeLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiLib</Keyword>
+      <Keyword>EdkDxeSalLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
@@ -41,19 +35,12 @@
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>EdkDxeSalLib</Keyword>
+      <Keyword>UefiRuntimeLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>RuntimeLibInternal.h</Filename>
-    <Filename SupArchList="IA32">Common/RuntimeLib.c</Filename>
-    <Filename SupArchList="IA32">Common/RuntimeService.c</Filename>
-    <Filename SupArchList="X64">Common/RuntimeLib.c</Filename>
-    <Filename SupArchList="X64">Common/RuntimeService.c</Filename>
-    <Filename SupArchList="EBC">Common/RuntimeLib.c</Filename>
-    <Filename SupArchList="EBC">Common/RuntimeService.c</Filename>
-    <Filename SupArchList="IPF">Ipf/RuntimeLib.c</Filename>
-    <Filename SupArchList="IPF">Ipf/RuntimeService.c</Filename>
+    <Filename SupArchList="IPF">Ipf/EsalServiceLib.c</Filename>
+    <Filename SupArchList="IPF">Ipf/AsmEsalServiceLib.s</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -68,11 +55,10 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
-      <Constructor>RuntimeDriverLibConstruct</Constructor>
-      <Destructor>RuntimeDriverLibDeconstruct</Destructor>
+      <Constructor>DxeSalLibConstructor</Constructor>
     </Extern>
     <Extern>
-      <ExitBootServicesCallBack>RuntimeDriverExitBootServices</ExitBootServicesCallBack>
+      <SetVirtualAddressMapCallBack>DxeSalVirtualNotifyEvent</SetVirtualAddressMapCallBack>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
