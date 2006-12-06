@@ -21,14 +21,11 @@ Module Name:
 // Driver Lib Module Globals
 //
 
-STATIC EFI_EVENT              mRuntimeNotifyEvent;
 STATIC EFI_EVENT              mEfiVirtualNotifyEvent;
 STATIC BOOLEAN                mEfiGoneVirtual         = FALSE;
 STATIC BOOLEAN                mEfiAtRuntime           = FALSE;
-
 EFI_RUNTIME_SERVICES          *mRT;
 
-STATIC
 VOID
 EFIAPI
 RuntimeDriverExitBootServices (
@@ -53,16 +50,6 @@ Returns:
 
 --*/
 {
-  EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
-  UINTN             Index;
-
-  for (Index = 0; 
-       _gDriverExitBootServicesEvent[Index] != NULL;
-       Index++) {
-    ChildNotifyEventHandler = _gDriverExitBootServicesEvent[Index];
-    ChildNotifyEventHandler (Event, NULL);
-  }
-
   //
   // Clear out BootService globals
   //
@@ -147,21 +134,9 @@ Returns:
   mRT = SystemTable->RuntimeServices;
 
   //
-  // Register our ExitBootServices () notify function
-  //
-  Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                  EFI_TPL_NOTIFY,
-                  RuntimeDriverExitBootServices,
-                  NULL,
-                  &mRuntimeNotifyEvent
-                  );
-
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Register SetVirtualAddressMap () notify function
   // 
+  if (_gDriverSetVirtualAddressMapEvent[0] != NULL) {
   Status = gBS->CreateEvent (
                   EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   EFI_TPL_NOTIFY,
@@ -171,6 +146,7 @@ Returns:
                   );
 
   ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }
@@ -202,16 +178,12 @@ Returns:
   EFI_STATUS  Status;
 
   //
-  // Close our ExitBootServices () notify function
-  //
-  Status = gBS->CloseEvent (mRuntimeNotifyEvent);
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Close SetVirtualAddressMap () notify function
   //
+  if (_gDriverSetVirtualAddressMapEvent[0] != NULL) {
   Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
   ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }

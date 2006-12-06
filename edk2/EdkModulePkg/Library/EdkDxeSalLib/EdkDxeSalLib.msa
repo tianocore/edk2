@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>EdkDxeSalLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <GuidValue>61999c3c-72a5-4506-a4ff-4271d18a1d14</GuidValue>
+    <GuidValue>F0AC8548-34DE-45bd-9B0A-A5A2DE819E65</GuidValue>
     <Version>1.0</Version>
     <Abstract>SAL library for BS/RT drivers</Abstract>
     <Description>Contains APIs to register/invoke SAL functions.</Description>
@@ -56,9 +56,6 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <Constructor>DxeSalLibConstructor</Constructor>
-    </Extern>
-    <Extern>
-      <SetVirtualAddressMapCallBack>DxeSalVirtualNotifyEvent</SetVirtualAddressMapCallBack>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
