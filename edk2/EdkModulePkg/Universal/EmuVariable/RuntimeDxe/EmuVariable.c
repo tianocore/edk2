@@ -413,7 +413,7 @@ Returns:
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
 
-  if (VariableNameSize == NULL || VendorGuid == NULL) {
+  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
