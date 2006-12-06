@@ -1,16 +1,16 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
     EmuVariable.c
 
 Abstract:
@@ -60,37 +60,6 @@ Returns:
   }
 
   return (Count * 2) + 2;
-}
-
-UINTN
-EFIAPI
-GetPadSize (
-  IN UINTN Value
-  )
-/*++
-
-Routine Description:
-
-  This function return the pad size for alignment
-
-Arguments:
-
-  Value  The value need to align
-
-Returns:
-
-  Pad size for value
-
---*/
-{
-  //
-  // If alignment is 0 or 1, means no alignment required
-  //
-  if (ALIGNMENT == 0 || ALIGNMENT == 1) {
-    return 0;
-  }
-
-  return ALIGNMENT - (Value % ALIGNMENT);
 }
 
 VARIABLE_STORE_STATUS
@@ -161,7 +130,7 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GetPadSize (Variable->NameSize));
+  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
 }
 
 VARIABLE_HEADER *
@@ -413,7 +382,7 @@ Returns:
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
 
-  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+  if (VariableNameSize == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -593,8 +562,8 @@ Returns:
     //
     VarNameOffset = sizeof (VARIABLE_HEADER);
     VarNameSize   = ArrayLength (VariableName);
-    VarDataOffset = VarNameOffset + VarNameSize + GetPadSize (VarNameSize);
-    VarSize       = VarDataOffset + DataSize + GetPadSize (DataSize);
+    VarDataOffset = VarNameOffset + VarNameSize + GET_PAD_SIZE (VarNameSize);
+    VarSize       = VarDataOffset + DataSize + GET_PAD_SIZE (DataSize);
 
     if (Attributes & EFI_VARIABLE_NON_VOLATILE) {
       if ((UINT32) (VarSize +*NonVolatileOffset) >
@@ -675,11 +644,11 @@ Routine Description:
 
 Arguments:
 
-  Attributes                      Attributes bitmask to specify the type of variables 
+  Attributes                      Attributes bitmask to specify the type of variables
                                   on which to return information.
   MaximumVariableStorageSize      Pointer to the maximum size of the storage space available
                                   for the EFI variables associated with the attributes specified.
-  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available 
+  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available
                                   for the EFI variables associated with the attributes specified.
   MaximumVariableSize             Pointer to the maximum size of the individual EFI variables
                                   associated with the attributes specified.
@@ -699,7 +668,7 @@ Returns:
   VARIABLE_HEADER        *NextVariable;
   UINT64                 VariableSize;
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
-  
+
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -725,7 +694,7 @@ Returns:
     //
     // Query is Volatile related.
     //
-    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);    
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);
   } else {
     //
     // Query is Non-Volatile related.
@@ -734,14 +703,14 @@ Returns:
   }
 
   //
-  // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize 
+  // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize
   // with the storage size (excluding the storage header size)
   //
   *MaximumVariableStorageSize   = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
   *RemainingVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
 
   //
-  // Let *MaximumVariableSize be MAX_VARIABLE_SIZE 
+  // Let *MaximumVariableSize be MAX_VARIABLE_SIZE
   //
   *MaximumVariableSize = MAX_VARIABLE_SIZE;
 
@@ -846,7 +815,7 @@ Returns:
   //
   mVariableModuleGlobal = (ESAL_VARIABLE_GLOBAL *) AllocateRuntimePool (
                                                     sizeof (ESAL_VARIABLE_GLOBAL)
-                                                    );
+                                                   );
   if (NULL == mVariableModuleGlobal) {
     return EFI_OUT_OF_RESOURCES;
   }
