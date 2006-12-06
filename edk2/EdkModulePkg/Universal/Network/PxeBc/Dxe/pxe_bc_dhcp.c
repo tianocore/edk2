@@ -43,13 +43,6 @@ typedef union {
   UINT8                     *BytePtr;
 } UNION_PTR;
 
-//
-// 1 for Itanium-based, 0 for IA32
-//
-#define IA64SZ    ((sizeof (UINTN) / sizeof (UINT32)) - 1)
-
-#define SYS_ARCH  (SYS_ARCH_EFI32 - (SYS_ARCH_EFI32 - IA64) * IA64SZ)
-
 #pragma pack(1)
 //
 // option structure for DHCPREQUEST at end of DISCOVER options
