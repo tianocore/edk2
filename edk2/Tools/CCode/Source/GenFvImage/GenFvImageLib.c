@@ -45,7 +45,7 @@ Abstract:
 #include "Crc32.h"
 #include "EfiUtilityMsgs.h"
 #include "FvLib.h"
-#include "EfiCompress.h"
+#include "Compress.h"
 #include "WinNtInclude.h"
 
 //
