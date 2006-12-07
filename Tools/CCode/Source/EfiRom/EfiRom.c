@@ -31,7 +31,7 @@ Abstract:
 
 #include <IndustryStandard/pci22.h>  // for option ROM header structures
 
-#include "EfiCompress.h"
+#include "Compress.h"
 #include "CommonLib.h"
 
 //
@@ -633,7 +633,7 @@ Returns:
     }
 
     CompressedFileSize  = FileSize;
-    Status              = Compress (Buffer, FileSize, CompressedBuffer, &CompressedFileSize);
+    Status              = EfiCompress (Buffer, FileSize, CompressedBuffer, &CompressedFileSize);
     if (Status != STATUS_SUCCESS) {
       fprintf (stdout, "ERROR: Compression failed\n");
       goto BailOut;

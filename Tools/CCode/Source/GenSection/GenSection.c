@@ -28,7 +28,7 @@ Abstract:
 #include <Protocol/GuidedSectionExtraction.h>
 
 #include "CommonLib.h"
-#include "EfiCompress.h"
+#include "Compress.h"
 #include "EfiCustomizedCompress.h"
 #include "Crc32.h"
 #include "EfiUtilityMsgs.h"
@@ -429,7 +429,7 @@ Returns:
     break;
 
   case EFI_STANDARD_COMPRESSION:
-    CompressFunction = (COMPRESS_FUNCTION) Compress;
+    CompressFunction = (COMPRESS_FUNCTION) TianoCompress;
     break;
 
   case EFI_CUSTOMIZED_COMPRESSION:

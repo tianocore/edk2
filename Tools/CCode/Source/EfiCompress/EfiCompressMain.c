@@ -27,7 +27,7 @@ Abstract:
 #include <stdio.h>
 
 #include <Common/UefiBaseTypes.h>
-#include "EfiCompress.h"
+#include "Compress.h"
 
 #define UTILITY_NAME "EfiCompress"
 #define UTILITY_MAJOR_VERSION 1
@@ -176,14 +176,14 @@ Returns:
   // Get destination data size and do the compression
   //
   DstSize = 0;
-  Status  = Compress (SrcBuffer, SrcSize, DstBuffer, &DstSize);
+  Status  = EfiCompress (SrcBuffer, SrcSize, DstBuffer, &DstSize);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     if ((DstBuffer = malloc (DstSize)) == NULL) {
       printf ("Can't allocate memory\n");
       goto Done;
     }
 
-    Status = Compress (SrcBuffer, SrcSize, DstBuffer, &DstSize);
+    Status = EfiCompress (SrcBuffer, SrcSize, DstBuffer, &DstSize);
   }
 
   if (EFI_ERROR (Status)) {
