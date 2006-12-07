@@ -805,7 +805,7 @@ Returns:
           // Decompress the stream
           //
           if (CompressionHeader->CompressionType == EFI_STANDARD_COMPRESSION) {
-          Status = CoreLocateProtocol (&gEfiTianoDecompressProtocolGuid, NULL, (VOID **)&Decompress);
+            Status = CoreLocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
           } else {
             Status = CoreLocateProtocol (&gEfiCustomizedDecompressProtocolGuid, NULL, (VOID **)&Decompress);
           }

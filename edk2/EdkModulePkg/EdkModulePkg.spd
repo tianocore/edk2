@@ -44,10 +44,6 @@
       <IncludeHeader>Include/Library/EdkPeCoffLoaderLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="EdkPeCoffLoaderX64Lib">
-      <IncludeHeader>Include/Library/EdkPeCoffLoaderX64Lib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
     <LibraryClass Name="EdkScsiLib">
       <IncludeHeader>Include/Library/EdkScsiLib.h</IncludeHeader>
       <HelpText/>
@@ -208,10 +204,6 @@
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkPeCoffLoaderLib">
       <IncludeHeader>Include/Library/EdkPeCoffLoaderLib.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkPeCoffLoaderX64Lib">
-      <IncludeHeader>Include/Library/EdkPeCoffLoaderX64Lib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkScsiLib">
@@ -399,7 +391,6 @@
     <Filename>Library/EdkIfrSupportLib/EdkIfrSupportLib.msa</Filename>
     <Filename>Library/EdkNullCustomizedDecompressLib/EdkNullCustomizedDecompressLib.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
-    <Filename>Library/EdkPeCoffLoaderX64Lib/EdkPeCoffLoaderX64Lib.msa</Filename>
     <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
     <Filename>Library/EdkScsiLib/EdkScsiLib.msa</Filename>
     <Filename>Library/EdkUefiDebugLibConOut/EdkUefiDebugLibConOut.msa</Filename>

@@ -19,7 +19,7 @@ typedef long long __int64;/*For cygwin build*/
 
 extern
 EFI_STATUS
-TianoCompress (
+EfiCompress (
   IN      UINT8   *SrcBuffer,
   IN      UINT32  SrcSize,
   IN      UINT8   *DstBuffer,
@@ -47,7 +47,7 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //  First call compress function and get need buffer size
    //
 
-   Result = TianoCompress (
+   Result = EfiCompress (
         (char*) InputBuffer, 
         SourceSize,  
         DestBuffer,
@@ -61,12 +61,12 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //
    //  Second call compress and get the DestBuffer value
    //
-   Result = TianoCompress(
-              (char*) InputBuffer, 
+   Result = EfiCompress(
+        (char*) InputBuffer, 
         SourceSize,  
         DestBuffer,
         &DestSize  
-     );
+        );
 
    //
    // new a MV array to store the return compressed buffer
