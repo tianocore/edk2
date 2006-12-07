@@ -38,7 +38,7 @@ Abstract:
 #include <Common/FirmwareVolumeImageFormat.h>
 
 #include "ParseInf.h"
-#include "EfiCompress.h"
+#include "Compress.h"
 #include "EfiCustomizedCompress.h"
 #include "Crc32.h"
 #include "GenFfsFile.h"
@@ -591,14 +591,14 @@ Returns:
     // Added "Dummy" to keep backward compatibility.
     //
     CompressionType   = EFI_STANDARD_COMPRESSION;
-    CompressFunction  = (COMPRESS_FUNCTION) Compress;
+    CompressFunction  = (COMPRESS_FUNCTION) TianoCompress;
 
   } else if (strcmpi (Type, "LZH") == 0) {
     //
     // EFI stardard compression (LZH)
     //
     CompressionType   = EFI_STANDARD_COMPRESSION;
-    CompressFunction  = (COMPRESS_FUNCTION) Compress;
+    CompressFunction  = (COMPRESS_FUNCTION) TianoCompress;
 
   } else {
     //

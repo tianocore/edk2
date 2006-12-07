@@ -15,11 +15,11 @@
 typedef long long __int64;/*For cygwin build*/
 #endif
 #include "CompressDll.h"
-#include "EfiCompress.h"
+#include "Compress.h"
 
 extern
 EFI_STATUS
-Compress (
+TianoCompress (
   IN      UINT8   *SrcBuffer,
   IN      UINT32  SrcSize,
   IN      UINT8   *DstBuffer,
@@ -47,7 +47,7 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //  First call compress function and get need buffer size
    //
 
-   Result = Compress (
+   Result = TianoCompress (
         (char*) InputBuffer, 
         SourceSize,  
         DestBuffer,
@@ -61,7 +61,7 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //
    //  Second call compress and get the DestBuffer value
    //
-   Result = Compress(
+   Result = TianoCompress(
               (char*) InputBuffer, 
         SourceSize,  
         DestBuffer,
