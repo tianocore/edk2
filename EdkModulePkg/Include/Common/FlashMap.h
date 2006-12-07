@@ -103,6 +103,8 @@ typedef struct {
   UINTN                     Length;
   EFI_FLASH_AREA_ATTRIBUTES Attributes;
   EFI_FLASH_AREA_TYPE       AreaType;
+  UINT8                     Reserved[3];
+  EFI_GUID                  AreaTypeGuid;
 } EFI_FLASH_AREA_DATA;
 
 #pragma pack()

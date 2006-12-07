@@ -76,6 +76,8 @@ typedef struct _FLASH_BLOCK_DESCRIPTION {
   unsigned int                    Alignment;                  // power of 2 alignment
   WCHAR_T                         Attributes[MAX_ATTR_LEN];   // only used for Region definitions
   WCHAR_T                         AreaType[MAX_AREATYPE_LEN]; // only used for Region definitions
+  EFI_GUID                        AreaTypeGuid;
+  WCHAR_T                         AreaTypeGuidString[MAX_NAME_LEN];
   FLASH_SUBREGION_DESCRIPTION     *Subregions;
   FLASH_SUBREGION_DESCRIPTION     *LastSubregion;
 } FLASH_BLOCK_DESCRIPTION;
@@ -795,6 +797,41 @@ Returns:
       }
 
       PreviousComma = SFPIsToken (",");
+      //
+      // Parse optional attribute "AreaTypeGuid"
+      //
+      if (SFPIsKeyword ("AreaTypeGuid")) {
+        //
+        // Check for preceeding comma now
+        //
+        if (!PreviousComma) {
+          Warning (SFPGetFileName (), SFPGetLineNumber (), 0, "expected ',' before 'AreaTypeGuid'", NULL);
+          WarningCount++;
+        }
+        
+        if (!SFPIsToken ("=")) {
+          Warning (SFPGetFileName (), SFPGetLineNumber (), 0, "expected '='", NULL);
+          WarningCount++;
+        }
+        
+        if (SFPGetQuotedString (FBlockDesc->AreaTypeGuidString, sizeof (FBlockDesc->AreaTypeGuidString))) {
+          //
+          // Nothing else to do
+          //
+        } else if (!SFPGetGuid (PARSE_GUID_STYLE_5_FIELDS, &FBlockDesc->AreaTypeGuid)) {
+          Error (
+            SFPGetFileName (),
+            SFPGetLineNumber (),
+            0,
+            "expected AreaTypeGuid quoted string or GUID of form 12345678-1234-1234-1234-123456789ABC",
+            NULL
+            );
+          ErrorCount++;
+          goto Done;
+        }
+        PreviousComma = SFPIsToken (",");
+      }
+
       //
       // Parse optional Subregion definitions
       //
@@ -1781,7 +1818,32 @@ Returns:
     fprintf (OutFptr, "    FLASH_REGION_%s_BASE,\\\n", FBlock->Name);
     fprintf (OutFptr, "    FLASH_REGION_%s_SIZE,\\\n", FBlock->Name);
     fprintf (OutFptr, "    %s,\\\n", FBlock->Attributes);
-    fprintf (OutFptr, "    %s,\\\n  },\\\n", FBlock->AreaType);
+    fprintf (OutFptr, "    %s,\\\n", FBlock->AreaType);
+    fprintf (OutFptr, "    0, 0, 0,\\\n");
+    //
+    // The AreaTypeGuid may have been specified in the input flash definition file as a GUID, or
+    // as a quoted string. Do the right one.
+    //
+    if (FBlock->AreaTypeGuidString[0] != 0) {
+      fprintf (OutFptr, "    %s, \\\n", FBlock->AreaTypeGuidString);
+    } else {
+      fprintf (
+        OutFptr,
+        "    { 0x%08X, 0x%04X, 0x%04X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },\\\n",
+        FBlock->AreaTypeGuid.Data1,
+        (unsigned int) FBlock->AreaTypeGuid.Data2,
+        (unsigned int) FBlock->AreaTypeGuid.Data3,
+        (unsigned int) FBlock->AreaTypeGuid.Data4[0],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[1],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[2],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[3],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[4],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[5],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[6],
+        (unsigned int) FBlock->AreaTypeGuid.Data4[7]
+        );
+    }
+    fprintf (OutFptr, "  },\\\n");
   }
 
   fprintf (OutFptr, "\n\n");
