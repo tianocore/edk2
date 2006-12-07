@@ -198,7 +198,23 @@ typedef struct {
   UINT8   Xmm5[16];
   UINT8   Xmm6[16];
   UINT8   Xmm7[16];
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  //
+  // NOTE: UEFI 2.0 spec definition as follows. It should be updated 
+  // after spec update.
+  //
   UINT8   Reserved11[14 * 16];
+#else
+  UINT8   Xmm8[16];
+  UINT8   Xmm9[16];
+  UINT8   Xmm10[16];
+  UINT8   Xmm11[16];
+  UINT8   Xmm12[16];
+  UINT8   Xmm13[16];
+  UINT8   Xmm14[16];
+  UINT8   Xmm15[16];
+  UINT8   Reserved10[6 * 16];
+#endif
 } EFI_FX_SAVE_STATE_X64;
 
 typedef struct {
