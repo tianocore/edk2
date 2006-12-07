@@ -11,15 +11,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   
-  EfiDecompress.c
+  Decompress.c
 
 Abstract:
 
-  Decompressor. Algorithm Ported from OPSD code (Decomp.asm)
+  Decompressor. Algorithm Ported from OPSD code (Decomp.asm) 
+  for Efi and Tiano compress algorithm.
   
 --*/
 
-#include "EfiDecompress.h"
+#include "Decompress.h"
 
 //
 // Decompression algorithm begins here
@@ -33,11 +34,12 @@ Abstract:
 //
 // C: Char&Len Set; P: Position Set; T: exTra Set
 //
-#define NC    (0xff + MAXMATCH + 2 - THRESHOLD)
-#define CBIT  9
-#define PBIT  5
-#define TBIT  5
-#define MAXNP ((1U << PBIT) - 1)
+#define NC      (0xff + MAXMATCH + 2 - THRESHOLD)
+#define CBIT    9
+#define EFIPBIT 4
+#define MAXPBIT 5
+#define TBIT    5
+#define MAXNP ((1U << MAXPBIT) - 1)
 #define NT    (CODE_BIT + 3)
 #if NT > MAXNP
 #define NPT NT
@@ -68,6 +70,8 @@ typedef struct {
   UINT16  mPTTable[256];
 } SCRATCH_DATA;
 
+STATIC UINT16 mPbit = EFIPBIT;
+  
 STATIC
 VOID
 FillBuf (
@@ -556,7 +560,7 @@ Returns:
 
     ReadCLen (Sd);
 
-    Sd->mBadTableFlag = ReadPTLen (Sd, MAXNP, PBIT, (UINT16) (-1));
+    Sd->mBadTableFlag = ReadPTLen (Sd, MAXNP, mPbit, (UINT16) (-1));
     if (Sd->mBadTableFlag != 0) {
       return 0;
     }
@@ -706,11 +710,10 @@ Decompress (
 
 Routine Description:
 
-  The implementation of EFI_DECOMPRESS_PROTOCOL.Decompress().
+  The implementation Efi and Tiano Decompress().
 
 Arguments:
 
-  This        - The protocol instance pointer
   Source      - The source buffer containing the compressed data.
   SrcSize     - The size of source buffer
   Destination - The destination buffer to store the decompressed data
@@ -787,4 +790,134 @@ Returns:
   }
 
   return Status;
+}
+
+EFI_STATUS
+EfiGetInfo (
+  IN      VOID    *Source,
+  IN      UINT32  SrcSize,
+  OUT     UINT32  *DstSize,
+  OUT     UINT32  *ScratchSize
+  )
+/*++
+
+Routine Description:
+
+  The implementation Efi Decompress GetInfo().
+
+Arguments:
+
+  Source      - The source buffer containing the compressed data.
+  SrcSize     - The size of source buffer
+  DstSize     - The size of destination buffer.
+  ScratchSize - The size of scratch buffer.
+
+Returns:
+
+  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
+  EFI_INVALID_PARAMETER - The source data is corrupted
+
+--*/
+{
+  return GetInfo (Source, SrcSize, DstSize, ScratchSize);
+}
+
+EFI_STATUS
+TianoGetInfo (
+  IN      VOID    *Source,
+  IN      UINT32  SrcSize,
+  OUT     UINT32  *DstSize,
+  OUT     UINT32  *ScratchSize
+  )
+/*++
+
+Routine Description:
+
+  The implementation Tiano Decompress GetInfo().
+
+Arguments:
+
+  Source      - The source buffer containing the compressed data.
+  SrcSize     - The size of source buffer
+  DstSize     - The size of destination buffer.
+  ScratchSize - The size of scratch buffer.
+
+Returns:
+
+  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
+  EFI_INVALID_PARAMETER - The source data is corrupted
+
+--*/
+{
+  return GetInfo (Source, SrcSize, DstSize, ScratchSize);
+}
+
+EFI_STATUS
+EfiDecompress (
+  IN      VOID    *Source,
+  IN      UINT32  SrcSize,
+  IN OUT  VOID    *Destination,
+  IN      UINT32  DstSize,
+  IN OUT  VOID    *Scratch,
+  IN      UINT32  ScratchSize
+  )
+/*++
+
+Routine Description:
+
+  The implementation of Efi Decompress().
+
+Arguments:
+
+  Source      - The source buffer containing the compressed data.
+  SrcSize     - The size of source buffer
+  Destination - The destination buffer to store the decompressed data
+  DstSize     - The size of destination buffer.
+  Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  ScratchSize - The size of scratch buffer.
+
+Returns:
+
+  EFI_SUCCESS           - Decompression is successfull
+  EFI_INVALID_PARAMETER - The source data is corrupted
+
+--*/
+{
+  mPbit = EFIPBIT;
+  return Decompress (Source, SrcSize, Destination, DstSize, Scratch, ScratchSize);
+}
+
+EFI_STATUS
+TianoDecompress (
+  IN      VOID    *Source,
+  IN      UINT32  SrcSize,
+  IN OUT  VOID    *Destination,
+  IN      UINT32  DstSize,
+  IN OUT  VOID    *Scratch,
+  IN      UINT32  ScratchSize
+  )
+/*++
+
+Routine Description:
+
+  The implementation of Tiano Decompress().
+
+Arguments:
+
+  Source      - The source buffer containing the compressed data.
+  SrcSize     - The size of source buffer
+  Destination - The destination buffer to store the decompressed data
+  DstSize     - The size of destination buffer.
+  Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  ScratchSize - The size of scratch buffer.
+
+Returns:
+
+  EFI_SUCCESS           - Decompression is successfull
+  EFI_INVALID_PARAMETER - The source data is corrupted
+
+--*/
+{
+  mPbit = MAXPBIT;
+  return Decompress (Source, SrcSize, Destination, DstSize, Scratch, ScratchSize);
 }

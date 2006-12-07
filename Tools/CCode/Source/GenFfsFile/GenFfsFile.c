@@ -591,14 +591,14 @@ Returns:
     // Added "Dummy" to keep backward compatibility.
     //
     CompressionType   = EFI_STANDARD_COMPRESSION;
-    CompressFunction  = (COMPRESS_FUNCTION) TianoCompress;
+    CompressFunction  = (COMPRESS_FUNCTION) EfiCompress;
 
   } else if (strcmpi (Type, "LZH") == 0) {
     //
     // EFI stardard compression (LZH)
     //
     CompressionType   = EFI_STANDARD_COMPRESSION;
-    CompressFunction  = (COMPRESS_FUNCTION) TianoCompress;
+    CompressFunction  = (COMPRESS_FUNCTION) EfiCompress;
 
   } else {
     //

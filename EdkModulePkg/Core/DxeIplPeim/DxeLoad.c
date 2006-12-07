@@ -669,6 +669,13 @@ Returns:
   EFI_COMPRESSION_SECTION         *CompressionSection;
   UINT32                          FvAlignment;
 
+  //
+  // Initialize local variables.
+  //
+  DecompressLibrary = NULL;
+  DstBuffer         = NULL;
+  DstBufferSize     = 0;
+
   Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_COMPRESSION,
              FfsFileHeader,
@@ -784,8 +791,11 @@ Returns:
 
         switch (CompressionSection->CompressionType) {
         case EFI_STANDARD_COMPRESSION:
+          //
+          // Load EFI standard compression.
+          //
           if (FeaturePcdGet (PcdDxeIplSupportTianoDecompress)) {
-            DecompressLibrary = &gTianoDecompress;
+            DecompressLibrary = &gEfiDecompress;
           } else {
             ASSERT (FALSE);
             return EFI_NOT_FOUND;
@@ -794,7 +804,7 @@ Returns:
 
         case EFI_CUSTOMIZED_COMPRESSION:
           //
-          // Load user customized compression protocol.
+          // Load user customized compression.
           //
           if (FeaturePcdGet (PcdDxeIplSupportCustomDecompress)) {
             DecompressLibrary = &gCustomDecompress;
@@ -805,52 +815,71 @@ Returns:
           break;
 
         case EFI_NOT_COMPRESSED:
+          //
+          // Allocate destination buffer
+          //
+          DstBufferSize = CompressionSection->UncompressedLength;
+          DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+          if (DstBuffer == NULL) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+          //
+          // stream is not actually compressed, just encapsulated.  So just copy it.
+          //
+          CopyMem (DstBuffer, CompressionSection + 1, DstBufferSize);
+          break;
+
         default:
           //
-          // Need to support not compressed file
+          // Don't support other unknown compression type.
           //
           ASSERT_EFI_ERROR (Status);
           return EFI_NOT_FOUND;
         }
-
-        Status = DecompressLibrary->GetInfo (
-                   (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                   (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
-                   &DstBufferSize,
-                   &ScratchBufferSize
-                   );
-        if (EFI_ERROR (Status)) {
+        
+        if (CompressionSection->CompressionType != EFI_NOT_COMPRESSED) {
           //
-          // GetInfo failed
+          // For compressed data, decompress them to dstbuffer.
           //
-          return EFI_NOT_FOUND;
+          Status = DecompressLibrary->GetInfo (
+                     (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                     (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                     &DstBufferSize,
+                     &ScratchBufferSize
+                     );
+          if (EFI_ERROR (Status)) {
+            //
+            // GetInfo failed
+            //
+            return EFI_NOT_FOUND;
+          }
+  
+          //
+          // Allocate scratch buffer
+          //
+          ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+          if (ScratchBuffer == NULL) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+  
+          //
+          // Allocate destination buffer
+          //
+          DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+          if (DstBuffer == NULL) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+  
+          //
+          // Call decompress function
+          //
+          Status = DecompressLibrary->Decompress (
+                      (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                      DstBuffer,
+                      ScratchBuffer
+                      );
         }
-
-        //
-        // Allocate scratch buffer
-        //
-        ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
-        if (ScratchBuffer == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-
-        //
-        // Allocate destination buffer
-        //
-        DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-        if (DstBuffer == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-
-        //
-        // Call decompress function
-        //
-        Status = DecompressLibrary->Decompress (
-                    (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                    DstBuffer,
-                    ScratchBuffer
-                    );
-
+        
         CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
         if (CmpSection->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
           // 
@@ -909,7 +938,6 @@ Returns:
             } else {
               return EFI_NOT_FOUND;
             }
-
           }
         }
         //

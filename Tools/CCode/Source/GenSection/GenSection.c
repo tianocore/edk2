@@ -429,7 +429,7 @@ Returns:
     break;
 
   case EFI_STANDARD_COMPRESSION:
-    CompressFunction = (COMPRESS_FUNCTION) TianoCompress;
+    CompressFunction = (COMPRESS_FUNCTION) EfiCompress;
     break;
 
   case EFI_CUSTOMIZED_COMPRESSION:
