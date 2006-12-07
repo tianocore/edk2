@@ -41,7 +41,7 @@ Abstract:
 /* Tool Headers */
 #include "CommonLib.h"
 #include "Crc32.h"
-#include "EfiCompress.h"
+#include "Compress.h"
 #include "EfiUtilityMsgs.h"
 #include "ParseInf.h"
 
