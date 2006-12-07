@@ -1,6 +1,6 @@
 /**@file
-  IA32 specific debug support functions
-  
+  X64 specific debug support functions
+
 Copyright (c) 2006 Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -21,9 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // This the global main table to keep track of the interrupts
 //
 IDT_ENTRY   *IdtEntryTable  = NULL;
-DESCRIPTOR  NullDesc        = 0;
+DESCRIPTOR  NullDesc        = {0, 0};
 
-#ifndef EFI_NT_EMULATOR
 STATIC
 EFI_STATUS
 CreateEntryStub (
@@ -62,22 +61,20 @@ Returns:
 
     // The stub code looks like this:
     //
-    //    00000000  89 25 00000004 R  mov     AppEsp, esp             ; save stack top
-    //    00000006  BC 00008014 R     mov     esp, offset DbgStkBot   ; switch to debugger stack
-    //    0000000B  6A 00             push    0                       ; push vector number - will be modified before installed
-    //    0000000D  E9                db      0e9h                    ; jump rel32
-    //    0000000E  00000000          dd      0                       ; fixed up to relative address of CommonIdtEntry
+    //    00000000  6A 00               push    0                       ; push vector number - will be modified before installed
+    //    00000002  E9                  db      0e9h                    ; jump rel32
+    //    00000003  00000000            dd      0                       ; fixed up to relative address of CommonIdtEntry
     //
 
     //
     // poke in the exception type so the second push pushes the exception type
     //
-    StubCopy[0x0c] = (UINT8) ExceptionType;
+    StubCopy[0x1] = (UINT8) ExceptionType;
 
     //
     // fixup the jump target to point to the common entry
     //
-    *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
+    *(UINT32 *) &StubCopy[0x3] = (UINT32)((UINTN) CommonIdtEntry - (UINTN) &StubCopy[StubSize]);
   }
 
   return Status;
@@ -117,8 +114,9 @@ Returns:
     OldIntFlagState = WriteInterruptFlag (0);
     ReadIdt (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
 
-    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[0]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc)[0];
-    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[1]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc)[3];
+    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[0]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc.Low)[0];
+    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[1]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc.Low)[3];
+    ((UINT32 *) &IdtEntryTable[ExceptionType].OrigVector)[1]  = ((UINT32 *) &IdtEntryTable[ExceptionType].OrigDesc.High)[0];
 
     Vect2Desc (&IdtEntryTable[ExceptionType].NewDesc, IdtEntryTable[ExceptionType].StubEntry);
     IdtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
@@ -159,7 +157,6 @@ Returns:
 
   return (Status);
 }
-#endif
 
 EFI_STATUS
 ManageIdtEntryTable (
@@ -194,7 +191,6 @@ Returns:
 
   Status = EFI_SUCCESS;
 
-#ifndef EFI_NT_EMULATOR
   if (CompareDescriptor (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc)) {
     //
     // we've already installed to this vector
@@ -220,7 +216,7 @@ Returns:
       Status = HookEntry (ExceptionType, NewCallback);
     }
   }
-#endif
+
   return Status;
 }
 
@@ -358,7 +354,7 @@ Arguments:
 
 Returns:
   EFI_SUCCESS
-  EFI_UNSUPPORTED - if IA32 processor does not support FXSTOR/FXRSTOR instructions,
+  EFI_UNSUPPORTED - if X64 processor does not support FXSTOR/FXRSTOR instructions,
                     the context save will fail, so these processor's are not supported.
   EFI_OUT_OF_RESOURCES - not resource to finish initialization
 

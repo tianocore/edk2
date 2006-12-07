@@ -1,5 +1,5 @@
 /**@file
-  IA32 specific debug support macros, typedefs and prototypes.
+  X64 specific debug support macros, typedefs and prototypes.
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -23,10 +23,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ReadIdt(Vector, Dest)           CopyDescriptor ((Dest), &((GetIdtr ())[(Vector)]))
 #define WriteIdt(Vector, Src)           CopyDescriptor (&((GetIdtr ())[(Vector)]), (Src))
 #define CompareDescriptor(Desc1, Desc2) CompareMem ((Desc1), (Desc2), sizeof (DESCRIPTOR))
-#define EFI_ISA                         IsaIa32
+#define EFI_ISA                         IsaX64
 #define FF_FXSR                         (1 << 24)
 
-typedef UINT64  DESCRIPTOR;
+typedef struct {
+  UINT64 Low;
+  UINT64 High;
+} DESCRIPTOR;
 
 typedef struct {
   DESCRIPTOR  OrigDesc;
@@ -167,7 +170,7 @@ Arguments:
 
 Returns:
   EFI_SUCCESS
-  EFI_UNSUPPORTED - if IA32 processor does not support FXSTOR/FXRSTOR instructions,
+  EFI_UNSUPPORTED - if X64 processor does not support FXSTOR/FXRSTOR instructions,
                     the context save will fail, so these processor's are not supported.
   EFI_OUT_OF_RESOURCES - not resource to finish initialization
 
