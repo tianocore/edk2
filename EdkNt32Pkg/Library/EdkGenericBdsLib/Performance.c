@@ -23,17 +23,6 @@ Abstract:
 
 #include "Performance.h"
 
-VOID
-ClearDebugRegisters (
-  VOID
-  )
-{
-  //
-  // BugBug: We should not need to do this. We need to root cause this bug!!!!
-  //
-  AsmWriteDr0 (0);
-  AsmWriteDr1 (0);
-}
 
 STATIC
 VOID
@@ -373,8 +362,6 @@ Returns:
   }
 
 Done:
-
-  ClearDebugRegisters ();
 
   mPerfHeader.Signiture = 0x66726550;
 
