@@ -207,11 +207,10 @@ public class FrameworkBuildTask extends Task{
         // If find more than one FPD files, report error.  
         //
         File buildFile = null;
-        if (msaFiles.size() > 1) {
-            throw new BuildException("Found " + msaFiles.size() + " MSA files in current dir. ");
-        } else if (msaFiles.size() == 1 && activePlatform == null) {
-            throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [" + targetFilename + "]. ");
-        } else if (msaFiles.size() == 1 && activePlatform != null) {
+        if (msaFiles.size() > 0) {
+            if (activePlatform == null) {
+                throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [" + targetFilename + "]. ");
+            }
             //
             // Build the single module
             //
@@ -278,17 +277,21 @@ public class FrameworkBuildTask extends Task{
             }
             File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
             EdkLog.log(this, "Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
-            EdkLog.log(this, "Processing the MSA file [" + buildFile.getPath() + "] ..>> ");
-            GenBuildTask genBuildTask = new GenBuildTask();
-            genBuildTask.setSingleModuleBuild(true);
-            genBuildTask.setType(type);
-            getProject().setProperty("PLATFORM_FILE", activePlatform);
-            if( !multithread) {
-                originalProperties.put("PLATFORM_FILE", activePlatform);
+
+            File[] moduleFiles = msaFiles.toArray(new File[msaFiles.size()]);
+            for (int i = 0; i < moduleFiles.length; ++i) {
+                EdkLog.log(this, "Processing the MSA file [" + moduleFiles[i].getPath() + "] ..>> ");
+                GenBuildTask genBuildTask = new GenBuildTask();
+                genBuildTask.setSingleModuleBuild(true);
+                genBuildTask.setType(type);
+                getProject().setProperty("PLATFORM_FILE", activePlatform);
+                if( !multithread) {
+                    originalProperties.put("PLATFORM_FILE", activePlatform);
+                }
+                genBuildTask.setProject(getProject());
+                genBuildTask.setMsaFile(moduleFiles[i]);
+                genBuildTask.perform();
             }
-            genBuildTask.setProject(getProject());
-            genBuildTask.setMsaFile(buildFile);
-            genBuildTask.perform();
         }
     }
     
