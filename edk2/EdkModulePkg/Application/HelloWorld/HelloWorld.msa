@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <ModuleName>Hello World UEFI Application</ModuleName>
+    <ModuleName>Hello_World_UEFI_Application</ModuleName>
     <ModuleType>UEFI_APPLICATION</ModuleType>
     <GuidValue>6987936E-ED34-44db-AE97-1FA5E4ED2116</GuidValue>
     <Version>1.0</Version>

@@ -253,6 +253,10 @@ public class GenBuildTask extends Ant {
             }
         }
 
+        if (archList.length == 0) {
+            EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + moduleId + " was not found in current platform FPD file!\n");
+        }
+
         for (int k = 0; k < archList.length; k++) {
 
             getProject().setProperty("ARCH", archList[k]);
@@ -422,7 +426,7 @@ public class GenBuildTask extends Ant {
         getProject().setProperty("VERSION", moduleId.getVersion());
         getProject().setProperty("MODULE_TYPE", moduleId.getModuleType());
         getProject().setProperty("MODULE_DIR", moduleId.getMsaFile().getParent().replaceAll("(\\\\)", "/"));
-        getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/") + File.separatorChar + moduleId.getName());
 
         //
         // SUBSYSTEM
