@@ -84,22 +84,5 @@ PeHotRelocateImageEx (
   IN UINT64      Adjust
   )
 {
-  UINT64      *F64;
-
-  switch ((*Reloc) >> 12) {
-    case EFI_IMAGE_REL_BASED_DIR64:
-      F64 = (UINT64 *) Fixup;
-      *FixupData = ALIGN_POINTER(*FixupData, sizeof(UINT64));
-      if (*(UINT64 *)(*FixupData) == *F64) {
-        *F64  = *F64 + (UINT64) Adjust;
-      }
-
-      *FixupData = *FixupData + sizeof(UINT64);
-      break;
-
-    default:
-      return RETURN_UNSUPPORTED;
-  }
- 
-  return RETURN_SUCCESS;
+  return RETURN_UNSUPPORTED;
 }
