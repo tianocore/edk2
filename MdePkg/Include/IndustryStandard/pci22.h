@@ -319,6 +319,11 @@ typedef struct {
 #define PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET    0x19
 #define PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET  0x1a
 
+//
+// Interrupt Line "Unknown" or "No connection" value defined for x86 based system
+//
+#define PCI_INT_LINE_UNKNOWN                        0xFF               
+
 typedef union {
   struct {
     UINT32  Reg : 8;
