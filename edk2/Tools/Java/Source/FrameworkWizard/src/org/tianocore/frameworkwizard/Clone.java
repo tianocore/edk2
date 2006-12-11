@@ -709,10 +709,16 @@ public class Clone extends IDialog {
                 Log.wrn("Clone", "The target module already exists!");
                 return false;
             }
-            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(trg), mode)) {
-                Log.wrn("Clone", "There already exists a same directory with a module");
-                return false;
-            }
+            
+            //
+            // Check if path already exists
+            // Currently we allow user to add multiple msa files in one same directory
+            // Remove this checkpoint
+            //
+//            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(trg), mode)) {
+//                Log.wrn("Clone", "There already exists a same directory with a module");
+//                return false;
+//            }
             
             return checkId(mode);
         }
