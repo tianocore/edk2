@@ -425,8 +425,11 @@ public class GenBuildTask extends Ant {
         getProject().setProperty("FILE_GUID", moduleId.getGuid());
         getProject().setProperty("VERSION", moduleId.getVersion());
         getProject().setProperty("MODULE_TYPE", moduleId.getModuleType());
-        getProject().setProperty("MODULE_DIR", moduleId.getMsaFile().getParent().replaceAll("(\\\\)", "/"));
-        getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/") + File.separatorChar + moduleId.getName());
+        File msaFile = moduleId.getMsaFile();
+        String msaFileName = msaFile.getName();
+        getProject().setProperty("MODULE_DIR", msaFile.getParent().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/") 
+            + File.separatorChar + msaFileName.substring(0, msaFileName.length() - 3));
 
         //
         // SUBSYSTEM
