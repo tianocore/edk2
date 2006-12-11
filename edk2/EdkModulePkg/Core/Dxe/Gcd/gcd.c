@@ -2089,7 +2089,7 @@ Returns:
   if (GuidHob != NULL) {
     EfiMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
     DataSize                 = GET_GUID_HOB_DATA_SIZE (GuidHob);
-    if (EfiMemoryTypeInformation != NULL && DataSize > 0 && DataSize < EfiMaxMemoryType * sizeof (EFI_MEMORY_TYPE_INFORMATION)) {
+    if (EfiMemoryTypeInformation != NULL && DataSize > 0 && DataSize <= (EfiMaxMemoryType + 1) * sizeof (EFI_MEMORY_TYPE_INFORMATION)) {
       CopyMem (&gMemoryTypeInformation, EfiMemoryTypeInformation, DataSize);
     }
   }
