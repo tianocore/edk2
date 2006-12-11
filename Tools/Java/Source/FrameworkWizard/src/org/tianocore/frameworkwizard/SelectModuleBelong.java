@@ -540,11 +540,13 @@ public class SelectModuleBelong extends IDialog {
             
             //
             // Check if path already exists
+            // Currently we allow user to add multiple msa files in one same directory
+            // Remove this checkpoint
             //
-            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(modulePath), mode)) {
-                Log.wrn("New File", "There already exists a same directory with a module");
-                return false;
-            }
+//            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(modulePath), mode)) {
+//                Log.wrn("New File", "There already exists a same directory with a module");
+//                return false;
+//            }
             
             //
             // Check if Guid+Version is unique
