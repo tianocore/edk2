@@ -1,6 +1,12 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+  This is the main routine for initializing the Graphics Console support routines.
+Remaining Tasks
+  Add all standard Glyphs from EFI 1.02 Specification
+  Implement optimal automatic Mode creation algorithm
+  Solve palette issues for mixed graphics and text
+  When does this protocol reset the palette?
+    
+Copyright (c) 2006 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,23 +15,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  GraphicsConsole.c
-  
-Abstract:
-
-  This is the main routine for initializing the Graphics Console support routines.
-
-Revision History
-
-Remaining Tasks
-  Add all standard Glyphs from EFI 1.02 Specification
-  Implement optimal automatic Mode creation algorithm
-  Solve palette issues for mixed graphics and text
-  When does this protocol reset the palette?
-
---*/
+**/
 
 #include "GraphicsConsole.h"
 
@@ -126,22 +116,22 @@ static EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
   //
   // B     G     R
   //
-  0x00, 0x00, 0x00, 0x00,  // BLACK
-  0x98, 0x00, 0x00, 0x00,  // BLUE
-  0x00, 0x98, 0x00, 0x00,  // GREEN
-  0x98, 0x98, 0x00, 0x00,  // CYAN
-  0x00, 0x00, 0x98, 0x00,  // RED
-  0x98, 0x00, 0x98, 0x00,  // MAGENTA
-  0x00, 0x98, 0x98, 0x00,  // BROWN
-  0x98, 0x98, 0x98, 0x00,  // LIGHTGRAY
-  0x30, 0x30, 0x30, 0x00,  // DARKGRAY - BRIGHT BLACK
-  0xff, 0x00, 0x00, 0x00,  // LIGHTBLUE - ?
-  0x00, 0xff, 0x00, 0x00,  // LIGHTGREEN - ?
-  0xff, 0xff, 0x00, 0x00,  // LIGHTCYAN
-  0x00, 0x00, 0xff, 0x00,  // LIGHTRED
-  0xff, 0x00, 0xff, 0x00,  // LIGHTMAGENTA
-  0x00, 0xff, 0xff, 0x00,  // LIGHTBROWN
-  0xff, 0xff, 0xff, 0x00,  // WHITE
+  {0x00, 0x00, 0x00, 0x00},  // BLACK
+  {0x98, 0x00, 0x00, 0x00},  // BLUE
+  {0x00, 0x98, 0x00, 0x00},  // GREEN
+  {0x98, 0x98, 0x00, 0x00},  // CYAN
+  {0x00, 0x00, 0x98, 0x00},  // RED
+  {0x98, 0x00, 0x98, 0x00},  // MAGENTA
+  {0x00, 0x98, 0x98, 0x00},  // BROWN
+  {0x98, 0x98, 0x98, 0x00},  // LIGHTGRAY
+  {0x30, 0x30, 0x30, 0x00},  // DARKGRAY - BRIGHT BLACK
+  {0xff, 0x00, 0x00, 0x00},  // LIGHTBLUE - ?
+  {0x00, 0xff, 0x00, 0x00},  // LIGHTGREEN - ?
+  {0xff, 0xff, 0x00, 0x00},  // LIGHTCYAN
+  {0x00, 0x00, 0xff, 0x00},  // LIGHTRED
+  {0xff, 0x00, 0xff, 0x00},  // LIGHTMAGENTA
+  {0x00, 0xff, 0xff, 0x00},  // LIGHTBROWN
+  {0xff, 0xff, 0xff, 0x00}  // WHITE
 };
 
 static EFI_NARROW_GLYPH     mCursorGlyph = {

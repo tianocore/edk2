@@ -1,20 +1,4 @@
-/*++ 
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  ConSplitter.c
-
-Abstract:
-
+/**@file
   Console Splitter Driver. Any Handle that attatched 
   EFI_CONSOLE_IDENTIFIER_PROTOCOL can be bound by this driver.
   
@@ -31,8 +15,17 @@ Abstract:
   and Console I/O protocol, will be produced in the driver entry point. 
   The virtual handle are added on driver entry and never removed.
   Such design ensures sytem function well during none console device situation.
+
+Copyright (c) 2006 Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
   
---*/
+**/
 
 #include "ConSplitter.h"
 
@@ -381,7 +374,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 ConSplitterTextInConstructor (
   TEXT_IN_SPLITTER_PRIVATE_DATA       *ConInPrivate
@@ -457,7 +449,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 ConSplitterTextOutConstructor (
   TEXT_OUT_SPLITTER_PRIVATE_DATA      *ConOutPrivate
@@ -540,7 +531,6 @@ ConSplitterTextOutConstructor (
   return Status;
 }
 
-STATIC
 EFI_STATUS
 ConSplitterSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
@@ -607,7 +597,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingSupported (
@@ -638,7 +627,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingSupported (
@@ -669,7 +657,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingSupported (
@@ -700,7 +687,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingSupported (
@@ -731,7 +717,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStart (
@@ -796,7 +781,6 @@ Returns:
                 );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingStart (
@@ -844,7 +828,6 @@ Returns:
   return ConSplitterTextInAddDevice (&mConIn, TextIn);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingStart (
@@ -887,7 +870,6 @@ Returns:
   return ConSplitterSimplePointerAddDevice (&mConIn, SimplePointer);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingStart (
@@ -980,7 +962,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingStart (
@@ -1045,7 +1026,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStop (
@@ -1101,7 +1081,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingStop (
@@ -1147,7 +1126,6 @@ Returns:
   return ConSplitterTextInDeleteDevice (&mConIn, TextIn);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingStop (
@@ -1193,7 +1171,6 @@ Returns:
   return ConSplitterSimplePointerDeleteDevice (&mConIn, SimplePointer);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingStop (
@@ -1240,7 +1217,6 @@ Returns:
   return ConSplitterTextOutDeleteDevice (&mConOut, TextOut);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingStop (
