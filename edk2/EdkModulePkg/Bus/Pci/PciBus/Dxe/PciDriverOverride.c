@@ -139,8 +139,11 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                    Status;
+  EFI_IMAGE_DOS_HEADER          *DosHdr;
+  EFI_IMAGE_NT_HEADERS          *PeHdr;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
   PCI_DRIVER_OVERRIDE_LIST      *Node;
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
   EFI_DRIVER_OS_HANDOFF_HEADER  *DriverOsHandoffHeader;
   EFI_DRIVER_OS_HANDOFF_HEADER  *NewDriverOsHandoffHeader;
   EFI_DRIVER_OS_HANDOFF         *DriverOsHandoff;
@@ -149,6 +152,7 @@ Returns:
   UINTN                         NumberOfEntries;
   UINTN                         Size;
   UINTN                         Index;
+#endif
 
   Status = gBS->HandleProtocol (DriverImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &LoadedImage);
   if (EFI_ERROR (Status)) {
@@ -167,10 +171,18 @@ Returns:
 
   PciIoDevice->BusOverride  = TRUE;
 
-  if (PeCoffLoaderGetMachineType ((VOID *)(UINTN)LoadedImage->ImageBase) != EFI_IMAGE_MACHINE_EBC) {
+  DosHdr                    = (EFI_IMAGE_DOS_HEADER *) LoadedImage->ImageBase;
+  if (DosHdr->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
     return EFI_SUCCESS;
   }
 
+  PeHdr = (EFI_IMAGE_NT_HEADERS *) ((UINTN) LoadedImage->ImageBase + DosHdr->e_lfanew);
+
+  if (PeHdr->FileHeader.Machine != EFI_IMAGE_MACHINE_EBC) {
+    return EFI_SUCCESS;
+  }
+
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
   DriverOsHandoffHeader = NULL;
   Status                = EfiGetSystemConfigurationTable (&gEfiUgaIoProtocolGuid, (VOID **) &DriverOsHandoffHeader);
   if (!EFI_ERROR (Status) && DriverOsHandoffHeader != NULL) {
@@ -276,6 +288,7 @@ Returns:
   if (DriverOsHandoffHeader != NULL) {
     gBS->FreePool (DriverOsHandoffHeader);
   }
+#endif
 
   return EFI_SUCCESS;
 }

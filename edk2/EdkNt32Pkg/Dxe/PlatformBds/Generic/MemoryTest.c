@@ -28,10 +28,10 @@ Abstract:
 //
 EFI_STATUS
 PlatformBdsShowProgress (
-  IN EFI_UGA_PIXEL TitleForeground,
-  IN EFI_UGA_PIXEL TitleBackground,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
   IN CHAR16        *Title,
-  IN EFI_UGA_PIXEL ProgressColor,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
   IN UINTN         Progress,
   IN UINTN         PreviousValue
   )
@@ -56,12 +56,13 @@ Returns:
 --*/
 {
   EFI_STATUS            Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL   *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL *UgaDraw;
   UINT32                SizeOfX;
   UINT32                SizeOfY;
   UINT32                ColorDepth;
   UINT32                RefreshRate;
-  EFI_UGA_PIXEL         Color;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Color;
   UINTN                 BlockHeight;
   UINTN                 BlockWidth;
   UINTN                 BlockNum;
@@ -73,24 +74,39 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  UgaDraw = NULL;
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
-                  &gEfiUgaDrawProtocolGuid,
-                  &UgaDraw
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &GraphicsOutput
                   );
   if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    GraphicsOutput = NULL;
+
+    Status = gBS->HandleProtocol (
+                    gST->ConsoleOutHandle,
+                    &gEfiUgaDrawProtocolGuid,
+                    &UgaDraw
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
-  Status = UgaDraw->GetMode (
-                      UgaDraw,
-                      &SizeOfX,
-                      &SizeOfY,
-                      &ColorDepth,
-                      &RefreshRate
-                      );
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+  if (GraphicsOutput != NULL) {
+    SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
+    SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
+  } else {
+    Status = UgaDraw->GetMode (
+                        UgaDraw,
+                        &SizeOfX,
+                        &SizeOfY,
+                        &ColorDepth,
+                        &RefreshRate
+                        );
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   BlockWidth  = SizeOfX / 100;
@@ -105,38 +121,68 @@ Returns:
     //
     // Clear progress area
     //
-    SetMem (&Color, sizeof (EFI_UGA_PIXEL), 0x0);
+    SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
 
-    Status = UgaDraw->Blt (
-                        UgaDraw,
-                        &Color,
-                        EfiUgaVideoFill,
-                        0,
-                        0,
-                        0,
-                        PosY - GLYPH_HEIGHT - 1,
-                        SizeOfX,
-                        SizeOfY - (PosY - GLYPH_HEIGHT - 1),
-                        SizeOfX * sizeof (EFI_UGA_PIXEL)
-                        );
+    if (GraphicsOutput != NULL) {
+      Status = GraphicsOutput->Blt (
+                          GraphicsOutput,
+                          &Color,
+                          EfiBltVideoFill,
+                          0,
+                          0,
+                          0,
+                          PosY - GLYPH_HEIGHT - 1,
+                          SizeOfX,
+                          SizeOfY - (PosY - GLYPH_HEIGHT - 1),
+                          SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          );
+    } else {
+      Status = UgaDraw->Blt (
+                          UgaDraw,
+                          (EFI_UGA_PIXEL *) &Color,
+                          EfiUgaVideoFill,
+                          0,
+                          0,
+                          0,
+                          PosY - GLYPH_HEIGHT - 1,
+                          SizeOfX,
+                          SizeOfY - (PosY - GLYPH_HEIGHT - 1),
+                          SizeOfX * sizeof (EFI_UGA_PIXEL)
+                          );
+    }
   }
   //
   // Show progress by drawing blocks
   //
   for (Index = PreviousValue; Index < BlockNum; Index++) {
     PosX = Index * BlockWidth;
-    Status = UgaDraw->Blt (
-                        UgaDraw,
-                        &ProgressColor,
-                        EfiUgaVideoFill,
-                        0,
-                        0,
-                        PosX,
-                        PosY,
-                        BlockWidth - 1,
-                        BlockHeight,
-                        (BlockWidth) * sizeof (EFI_UGA_PIXEL)
-                        );
+    if (GraphicsOutput != NULL) {
+      Status = GraphicsOutput->Blt (
+                          GraphicsOutput,
+                          &ProgressColor,
+                          EfiBltVideoFill,
+                          0,
+                          0,
+                          PosX,
+                          PosY,
+                          BlockWidth - 1,
+                          BlockHeight,
+                          (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          );
+    } else {
+      Status = UgaDraw->Blt (
+                          UgaDraw,
+                          (EFI_UGA_PIXEL *) &ProgressColor,
+                          EfiUgaVideoFill,
+                          0,
+                          0,
+                          PosX,
+                          PosY,
+                          BlockWidth - 1,
+                          BlockHeight,
+                          (BlockWidth) * sizeof (EFI_UGA_PIXEL)
+                          );
+    }
   }
 
   PrintXY (
@@ -189,9 +235,9 @@ Returns:
   CHAR16                            *StrTotalMemory;
   CHAR16                            *Pos;
   CHAR16                            *TmpStr;
-  EFI_UGA_PIXEL                     Foreground;
-  EFI_UGA_PIXEL                     Background;
-  EFI_UGA_PIXEL                     Color;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Foreground;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Background;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Color;
   UINT8                             Value;
   UINTN                             DataSize;
   UINT32                            Attributes;
@@ -213,9 +259,9 @@ Returns:
   ErrorOut          = FALSE;
   TestAbort         = FALSE;
 
-  SetMem (&Foreground, sizeof (EFI_UGA_PIXEL), 0xff);
-  SetMem (&Background, sizeof (EFI_UGA_PIXEL), 0x0);
-  SetMem (&Color, sizeof (EFI_UGA_PIXEL), 0xff);
+  SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
+  SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
+  SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
 
   RequireSoftECCInit = FALSE;
 
