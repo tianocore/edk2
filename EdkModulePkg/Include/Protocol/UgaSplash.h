@@ -31,11 +31,11 @@ Abstract:
 typedef struct _EFI_UGA_SPLASH_PROTOCOL   EFI_UGA_SPLASH_PROTOCOL;
 
 
-struct _EFI_UGA_SPLASH_PROTOCOL {
+typedef struct _EFI_UGA_SPLASH_PROTOCOL {
   UINT32          PixelWidth;
   UINT32          PixelHeight;
-  EFI_UGA_PIXEL   *Image;
-};
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Image;
+} EFI_UGA_SPLASH_PROTOCOL;
 
 extern EFI_GUID gEfiUgaSplashProtocolGuid;
 

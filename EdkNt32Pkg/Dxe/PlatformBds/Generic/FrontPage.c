@@ -74,13 +74,13 @@ Returns:
   EFI_STATUS    Status;
   UINTN         Index;
   CHAR16        *TmpStr;
-  EFI_UGA_PIXEL Foreground;
-  EFI_UGA_PIXEL Background;
-  EFI_UGA_PIXEL Color;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Color;
 
-  SetMem (&Foreground, sizeof (EFI_UGA_PIXEL), 0xff);
-  SetMem (&Background, sizeof (EFI_UGA_PIXEL), 0x0);
-  SetMem (&Color, sizeof (EFI_UGA_PIXEL), 0xff);
+  SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
+  SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
+  SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
 
   Count = 0;
 

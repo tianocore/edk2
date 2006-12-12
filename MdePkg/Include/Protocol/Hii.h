@@ -22,6 +22,7 @@
 #ifndef __HII_H__
 #define __HII_H__
 
+#include "GraphicsOutput.h"
 
 #define EFI_HII_PROTOCOL_GUID \
   { \
@@ -597,14 +598,14 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_GLYPH_TO_BLT) (
-  IN     EFI_HII_PROTOCOL   *This,
-  IN     UINT8              *GlyphBuffer,
-  IN     EFI_UGA_PIXEL      Foreground,
-  IN     EFI_UGA_PIXEL      Background,
-  IN     UINTN              Count,
-  IN     UINTN              Width,
-  IN     UINTN              Height,
-  IN OUT EFI_UGA_PIXEL      *BltBuffer
+  IN     EFI_HII_PROTOCOL             *This,
+  IN     UINT8                        *GlyphBuffer,
+  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
+  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
+  IN     UINTN                         Count,
+  IN     UINTN                         Width,
+  IN     UINTN                         Height,
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
   );
 
 /**

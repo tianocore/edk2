@@ -89,12 +89,12 @@ BdsMemoryTest (
 
 EFI_STATUS
 PlatformBdsShowProgress (
-  EFI_UGA_PIXEL TitleForeground,
-  EFI_UGA_PIXEL TitleBackground,
-  CHAR16        *Title,
-  EFI_UGA_PIXEL ProgressColor,
-  UINTN         Progress,
-  UINTN         PreviousValue
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
+  CHAR16                        *Title,
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
+  UINTN                         Progress,
+  UINTN                         PreviousValue
   )
 ;
 

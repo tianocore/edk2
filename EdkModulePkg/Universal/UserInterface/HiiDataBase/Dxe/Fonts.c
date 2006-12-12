@@ -233,14 +233,14 @@ Returns:
 EFI_STATUS
 EFIAPI
 HiiGlyphToBlt (
-  IN     EFI_HII_PROTOCOL   *This,
-  IN     UINT8              *GlyphBuffer,
-  IN     EFI_UGA_PIXEL      Foreground,
-  IN     EFI_UGA_PIXEL      Background,
-  IN     UINTN              Count,
-  IN     UINTN              Width,
-  IN     UINTN              Height,
-  IN OUT EFI_UGA_PIXEL      *BltBuffer
+  IN     EFI_HII_PROTOCOL              *This,
+  IN     UINT8                         *GlyphBuffer,
+  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
+  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
+  IN     UINTN                         Count,
+  IN     UINTN                         Width,
+  IN     UINTN                         Height,
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
   )
 {
   UINTN X;

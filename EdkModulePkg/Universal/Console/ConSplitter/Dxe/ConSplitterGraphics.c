@@ -32,7 +32,7 @@ EFIAPI
 ConSpliterConsoleControlGetMode (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE *Mode,
-  OUT BOOLEAN                         *UgaExists,
+  OUT BOOLEAN                         *GopExists,
   OUT BOOLEAN                         *StdInLocked
   )
 /*++
@@ -63,13 +63,13 @@ ConSpliterConsoleControlGetMode (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Mode = Private->UgaMode;
+  *Mode = Private->ConsoleOutputMode;
 
-  if (UgaExists != NULL) {
-    *UgaExists = FALSE;
+  if (GopExists != NULL) {
+    *GopExists = FALSE;
     for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
-      if (Private->TextOutList[Index].UgaDraw != NULL) {
-        *UgaExists = TRUE;
+      if ((Private->TextOutList[Index].GraphicsOutput != NULL) || (Private->TextOutList[Index].UgaDraw != NULL)) {
+        *GopExists = TRUE;
         break;
       }
     }
@@ -107,7 +107,7 @@ ConSpliterConsoleControlSetMode (
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
-  TEXT_OUT_AND_UGA_DATA           *TextAndUga;
+  TEXT_OUT_AND_GOP_DATA           *TextAndGop;
   BOOLEAN                         Supported;
 
   Private = CONSOLE_CONTROL_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
@@ -117,9 +117,9 @@ ConSpliterConsoleControlSetMode (
   }
 
   Supported   = FALSE;
-  TextAndUga  = &Private->TextOutList[0];
-  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++, TextAndUga++) {
-    if (TextAndUga->UgaDraw != NULL) {
+  TextAndGop  = &Private->TextOutList[0];
+  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++, TextAndGop++) {
+    if ((TextAndGop->GraphicsOutput != NULL) || (TextAndGop->UgaDraw != NULL)) {
       Supported = TRUE;
       break;
     }
@@ -129,27 +129,512 @@ ConSpliterConsoleControlSetMode (
     return EFI_UNSUPPORTED;
   }
 
-  Private->UgaMode  = Mode;
+  Private->ConsoleOutputMode  = Mode;
 
-  TextAndUga        = &Private->TextOutList[0];
-  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++, TextAndUga++) {
+  TextAndGop = &Private->TextOutList[0];
+  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++, TextAndGop++) {
 
-    TextAndUga->TextOutEnabled = TRUE;
+    TextAndGop->TextOutEnabled = TRUE;
     //
     // If we are going into Graphics mode disable ConOut to any UGA device
     //
-    if ((Mode == EfiConsoleControlScreenGraphics) && (TextAndUga->UgaDraw != NULL)) {
-      TextAndUga->TextOutEnabled = FALSE;
-      DevNullUgaSync (Private, TextAndUga->UgaDraw);
+    if ((Mode == EfiConsoleControlScreenGraphics) &&((TextAndGop->GraphicsOutput != NULL) || (TextAndGop->UgaDraw != NULL))) {
+      TextAndGop->TextOutEnabled = FALSE;
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+      DevNullGopSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
+#else
+      DevNullUgaSync (Private, TextAndGop->UgaDraw);
+#endif
     }
   }
 
   if (Mode == EfiConsoleControlScreenText) {
-    DevNullSyncUgaStdOut (Private);
+    DevNullSyncGopStdOut (Private);
   }
 
   return EFI_SUCCESS;
 }
+
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+EFI_STATUS
+EFIAPI
+ConSpliterGraphicsOutputQueryMode (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL          *This,
+  IN  UINT32                                ModeNumber,
+  OUT UINTN                                 *SizeOfInfo,
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
+  )
+/*++
+
+  Routine Description:
+    Return the current video mode information.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    ModeNumber            - The mode number to return information on.
+    Info                  - Caller allocated buffer that returns information about ModeNumber.
+    SizeOfInfo            - A pointer to the size, in bytes, of the Info buffer.
+
+  Returns:
+    EFI_SUCCESS           - Mode information returned.
+    EFI_BUFFER_TOO_SMALL  - The Info buffer was too small.
+    EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
+    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
+    EFI_INVALID_PARAMETER - One of the input args was NULL.
+
+--*/
+{
+  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
+  EFI_STATUS                      Status;
+  TEXT_OUT_GOP_MODE               *Mode;
+
+  if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // retrieve private data
+  //
+  Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  if (Private->HardwareNeedsStarting) {
+    return EFI_NOT_STARTED;
+  }
+
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
+                  Info
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+
+  CopyMem (*Info, Private->GraphicsOutput.Mode->Info, *SizeOfInfo);
+  Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
+  (*Info)->HorizontalResolution = Mode->HorizontalResolution;
+  (*Info)->VerticalResolution = Mode->VerticalResolution;
+  (*Info)->PixelsPerScanLine = Mode->HorizontalResolution;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+ConSpliterGraphicsOutputSetMode (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
+  IN  UINT32                       ModeNumber
+  )
+/*++
+
+Routine Description:
+
+  Graphics output protocol interface to set video mode
+
+  Arguments:
+    This             - Protocol instance pointer.
+    ModeNumber       - The mode number to be set.
+
+  Returns:
+    EFI_SUCCESS      - Graphics mode was changed.
+    EFI_DEVICE_ERROR - The device had an error and could not complete the request.
+    EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
+
+--*/
+{
+  EFI_STATUS                             Status;
+  TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
+  UINTN                                  Index;
+  EFI_STATUS                             ReturnStatus;
+  TEXT_OUT_GOP_MODE                      *Mode;
+  UINTN                                  Size;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
+  UINTN                                  NumberIndex;
+  UINTN                                  SizeOfInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Info;
+  EFI_UGA_DRAW_PROTOCOL                  *UgaDraw;
+
+  if (ModeNumber >= This->Mode->MaxMode) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (ModeNumber == This->Mode->Mode) {
+    return EFI_SUCCESS;
+  }
+
+  Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // GopDevNullSetMode ()
+  //
+  ReturnStatus = EFI_SUCCESS;
+
+  //
+  // Free the old version
+  //
+  if (Private->GraphicsOutputBlt != NULL) {
+    gBS->FreePool (Private->GraphicsOutputBlt);
+  }
+
+  //
+  // Allocate the virtual Blt buffer
+  //
+  Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
+  Size = Mode->HorizontalResolution * Mode->VerticalResolution * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+  Private->GraphicsOutputBlt = AllocateZeroPool (Size);
+
+  if (Private->GraphicsOutputBlt == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if (!Private->HardwareNeedsStarting) {
+    if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+  //
+  // return the worst status met
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
+    GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
+    if (GraphicsOutput != NULL) {
+      //
+      // Find corresponding ModeNumber of this GraphicsOutput instance
+      //
+      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex ++) {
+        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) NumberIndex, &SizeOfInfo, &Info);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        if ((Info->HorizontalResolution == Mode->HorizontalResolution) && (Info->VerticalResolution == Mode->VerticalResolution)) {
+          gBS->FreePool (Info);
+          break;
+        }
+        gBS->FreePool (Info);
+      }
+
+      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32) NumberIndex);
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      }
+    }
+
+    UgaDraw = Private->TextOutList[Index].UgaDraw;
+    if (UgaDraw != NULL) {
+      Status = UgaDraw->SetMode (
+                          UgaDraw,
+                          Mode->HorizontalResolution,
+                          Mode->VerticalResolution,
+                          32,
+                          60
+                          );
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      }
+    }
+  }
+
+  This->Mode->Mode = ModeNumber;
+
+  Info = This->Mode->Info;
+  Info->HorizontalResolution = Mode->HorizontalResolution;
+  Info->VerticalResolution   = Mode->VerticalResolution;
+  Info->PixelsPerScanLine    = Mode->HorizontalResolution;
+
+  //
+  // Information is not enough here, so the following items remain unchanged:
+  //  GraphicsOutputMode->Info->Version, GraphicsOutputMode->Info->PixelFormat
+  //  GraphicsOutputMode->SizeOfInfo, GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
+  // These items will be initialized/updated when a new GOP device is added into ConsoleSplitter.
+  //
+
+  Private->HardwareNeedsStarting = FALSE;
+
+  return ReturnStatus;
+}
+
+EFI_STATUS
+DevNullGraphicsOutputBlt (
+  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION             BltOperation,
+  IN  UINTN                                         SourceX,
+  IN  UINTN                                         SourceY,
+  IN  UINTN                                         DestinationX,
+  IN  UINTN                                         DestinationY,
+  IN  UINTN                                         Width,
+  IN  UINTN                                         Height,
+  IN  UINTN                                         Delta         OPTIONAL
+  )
+{
+  UINTN                         SrcY;
+  UINTN                         Index;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltPtr;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ScreenPtr;
+  UINTN                         HorizontalResolution;
+  UINTN                         VerticalResolution;
+
+  if ((BltOperation < EfiBltVideoFill) || (BltOperation >= EfiGraphicsOutputBltOperationMax)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Width == 0 || Height == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Delta == 0) {
+    Delta = Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+  }
+
+  HorizontalResolution  = Private->GraphicsOutput.Mode->Info->HorizontalResolution;
+  VerticalResolution    = Private->GraphicsOutput.Mode->Info->VerticalResolution;
+
+  //
+  // We need to fill the Virtual Screen buffer with the blt data.
+  //
+  if (BltOperation == EfiBltVideoToBltBuffer) {
+    //
+    // Video to BltBuffer: Source is Video, destination is BltBuffer
+    //
+    if ((SourceY + Height) > VerticalResolution) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((SourceX + Width) > HorizontalResolution) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    BltPtr    = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + DestinationY * Delta + DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    ScreenPtr = &Private->GraphicsOutputBlt[SourceY * HorizontalResolution + SourceX];
+    while (Height) {
+      CopyMem (BltPtr, ScreenPtr, Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+      BltPtr = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltPtr + Delta);
+      ScreenPtr += HorizontalResolution;
+      Height--;
+    }
+  } else {
+    //
+    // BltBuffer to Video: Source is BltBuffer, destination is Video
+    //
+    if (DestinationY + Height > VerticalResolution) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (DestinationX + Width > HorizontalResolution) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ScreenPtr = &Private->GraphicsOutputBlt[DestinationY * HorizontalResolution + DestinationX];
+    SrcY      = SourceY;
+    while (Height) {
+      if (BltOperation == EfiBltVideoFill) {
+        for (Index = 0; Index < Width; Index++) {
+          ScreenPtr[Index] = *BltBuffer;
+        }
+      } else {
+        if (BltOperation == EfiBltBufferToVideo) {
+          BltPtr = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + SrcY * Delta + SourceX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+        } else {
+          BltPtr = &Private->GraphicsOutputBlt[SrcY * HorizontalResolution + SourceX];
+        }
+
+        CopyMem (ScreenPtr, BltPtr, Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+      }
+
+      ScreenPtr += HorizontalResolution;
+      SrcY++;
+      Height--;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+ConSpliterGraphicsOutputBlt (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL                  *This,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION             BltOperation,
+  IN  UINTN                                         SourceX,
+  IN  UINTN                                         SourceY,
+  IN  UINTN                                         DestinationX,
+  IN  UINTN                                         DestinationY,
+  IN  UINTN                                         Width,
+  IN  UINTN                                         Height,
+  IN  UINTN                                         Delta         OPTIONAL
+  )
+/*++
+
+  Routine Description:
+    The following table defines actions for BltOperations:
+    EfiBltVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
+      directly to every pixel of the video display rectangle
+      (DestinationX, DestinationY)
+      (DestinationX + Width, DestinationY + Height).
+      Only one pixel will be used from the BltBuffer. Delta is NOT used.
+    EfiBltVideoToBltBuffer - Read data from the video display rectangle
+      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+      the BltBuffer rectangle (DestinationX, DestinationY )
+      (DestinationX + Width, DestinationY + Height). If DestinationX or
+      DestinationY is not zero then Delta must be set to the length in bytes
+      of a row in the BltBuffer.
+    EfiBltBufferToVideo - Write data from the  BltBuffer rectangle
+      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+      video display rectangle (DestinationX, DestinationY)
+      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+      not zero then Delta must be set to the length in bytes of a row in the
+      BltBuffer.
+    EfiBltVideoToVideo - Copy from the video display rectangle
+      (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+      to the video display rectangle (DestinationX, DestinationY)
+      (DestinationX + Width, DestinationY + Height).
+     The BltBuffer and Delta  are not used in this mode.
+
+  Arguments:
+    This          - Protocol instance pointer.
+    BltBuffer     - Buffer containing data to blit into video buffer. This
+                    buffer has a size of Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+    BltOperation  - Operation to perform on BlitBuffer and video memory
+    SourceX       - X coordinate of source for the BltBuffer.
+    SourceY       - Y coordinate of source for the BltBuffer.
+    DestinationX  - X coordinate of destination for the BltBuffer.
+    DestinationY  - Y coordinate of destination for the BltBuffer.
+    Width         - Width of rectangle in BltBuffer in pixels.
+    Height        - Hight of rectangle in BltBuffer in pixels.
+    Delta         -
+
+  Returns:
+    EFI_SUCCESS           - The Blt operation completed.
+    EFI_INVALID_PARAMETER - BltOperation is not valid.
+    EFI_DEVICE_ERROR      - A hardware error occured writting to the video
+                             buffer.
+
+--*/
+{
+  EFI_STATUS                      Status;
+  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
+  UINTN                           Index;
+  EFI_STATUS                      ReturnStatus;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
+  EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
+
+  Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // Sync up DevNull GOP device
+  //
+  ReturnStatus = DevNullGraphicsOutputBlt (
+                  Private,
+                  BltBuffer,
+                  BltOperation,
+                  SourceX,
+                  SourceY,
+                  DestinationX,
+                  DestinationY,
+                  Width,
+                  Height,
+                  Delta
+                  );
+
+  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
+    return ReturnStatus;
+  }
+  //
+  // return the worst status met
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
+    GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
+    if (GraphicsOutput != NULL) {
+      Status = GraphicsOutput->Blt (
+                              GraphicsOutput,
+                              BltBuffer,
+                              BltOperation,
+                              SourceX,
+                              SourceY,
+                              DestinationX,
+                              DestinationY,
+                              Width,
+                              Height,
+                              Delta
+                              );
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      } else if (BltOperation == EfiBltVideoToBltBuffer) {
+        //
+        // Only need to read the data into buffer one time
+        //
+        return EFI_SUCCESS;
+      }
+    }
+
+    UgaDraw = Private->TextOutList[Index].UgaDraw;
+    if (UgaDraw != NULL) {
+      Status = UgaDraw->Blt (
+                              UgaDraw,
+                              (EFI_UGA_PIXEL *) BltBuffer,
+                              BltOperation,
+                              SourceX,
+                              SourceY,
+                              DestinationX,
+                              DestinationY,
+                              Width,
+                              Height,
+                              Delta
+                              );
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      } else if (BltOperation == EfiBltVideoToBltBuffer) {
+        //
+        // Only need to read the data into buffer one time
+        //
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  return ReturnStatus;
+}
+
+EFI_STATUS
+DevNullGopSync (
+  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
+  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
+  )
+{
+  if (GraphicsOutput != NULL) {
+    return GraphicsOutput->Blt (
+                      GraphicsOutput,
+                      Private->GraphicsOutputBlt,
+                      EfiBltBufferToVideo,
+                      0,
+                      0,
+                      0,
+                      0,
+                      Private->GraphicsOutput.Mode->Info->HorizontalResolution,
+                      Private->GraphicsOutput.Mode->Info->VerticalResolution,
+                      0
+                      );
+  } else {
+    return UgaDraw->Blt (
+                      UgaDraw,
+                      (EFI_UGA_PIXEL *) Private->GraphicsOutputBlt,
+                      EfiUgaBltBufferToVideo,
+                      0,
+                      0,
+                      0,
+                      0,
+                      Private->GraphicsOutput.Mode->Info->HorizontalResolution,
+                      Private->GraphicsOutput.Mode->Info->VerticalResolution,
+                      0
+                      );
+  }
+}
+
+#else
 
 EFI_STATUS
 EFIAPI
@@ -260,7 +745,7 @@ ConSpliterUgaDrawSetMode (
   Private->UgaColorDepth            = ColorDepth;
   Private->UgaRefreshRate           = RefreshRate;
 
-  if (Private->UgaMode != EfiConsoleControlScreenGraphics) {
+  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
     return ReturnStatus;
   }
   //
@@ -465,7 +950,7 @@ ConSpliterUgaDrawBlt (
                   Height,
                   Delta
                   );
-  if (Private->UgaMode != EfiConsoleControlScreenGraphics) {
+  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
     return ReturnStatus;
   }
   //
@@ -518,6 +1003,7 @@ DevNullUgaSync (
                     Private->UgaHorizontalResolution * sizeof (EFI_UGA_PIXEL)
                     );
 }
+#endif
 
 EFI_STATUS
 DevNullTextOutOutputString (
@@ -927,7 +1413,7 @@ DevNullTextOutEnableCursor (
 }
 
 EFI_STATUS
-DevNullSyncUgaStdOut (
+DevNullSyncGopStdOut (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
   )
 /*++
@@ -977,9 +1463,9 @@ DevNullSyncUgaStdOut (
     Sto = Private->TextOutList[List].TextOut;
 
     //
-    // Skip non UGA devices
+    // Skip non GOP/UGA devices
     //
-    if (Private->TextOutList[List].UgaDraw != NULL) {
+    if ((Private->TextOutList[List].GraphicsOutput != NULL) || (Private->TextOutList[List].UgaDraw != NULL)) {
       Sto->EnableCursor (Sto, FALSE);
       Sto->ClearScreen (Sto);
     }
@@ -1034,9 +1520,9 @@ DevNullSyncUgaStdOut (
           Sto = Private->TextOutList[List].TextOut;
 
           //
-          // Skip non UGA devices
+          // Skip non GOP/UGA devices
           //
-          if (Private->TextOutList[List].UgaDraw != NULL) {
+          if ((Private->TextOutList[List].GraphicsOutput != NULL) || (Private->TextOutList[List].UgaDraw != NULL)) {
             Sto->SetAttribute (Sto, CurrentAttribute);
             Sto->SetCursorPosition (Sto, CurrentColumn, Row);
             Status = Sto->OutputString (Sto, Buffer);
@@ -1058,9 +1544,9 @@ DevNullSyncUgaStdOut (
     Sto = Private->TextOutList[List].TextOut;
 
     //
-    // Skip non UGA devices
+    // Skip non GOP/UGA devices
     //
-    if (Private->TextOutList[List].UgaDraw != NULL) {
+    if ((Private->TextOutList[List].GraphicsOutput != NULL) || (Private->TextOutList[List].UgaDraw != NULL)) {
       Sto->SetAttribute (Sto, StartAttribute);
       Sto->SetCursorPosition (Sto, StartColumn, StartRow);
       Status = Sto->EnableCursor (Sto, StartCursorState);

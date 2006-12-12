@@ -174,8 +174,8 @@ EFIAPI
 PrintXY (
   IN UINTN                            X,
   IN UINTN                            Y,
-  IN EFI_UGA_PIXEL                    *Foreground, OPTIONAL
-  IN EFI_UGA_PIXEL                    *Background, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Background, OPTIONAL
   IN CHAR16                           *Fmt,
   ...
   )

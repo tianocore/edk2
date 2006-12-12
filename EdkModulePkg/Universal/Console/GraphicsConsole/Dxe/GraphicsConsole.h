@@ -50,19 +50,21 @@ typedef struct {
   UINTN   Rows;
   INTN    DeltaX;
   INTN    DeltaY;
-  UINT32  UgaWidth;
-  UINT32  UgaHeight;
+  UINT32  GopWidth;
+  UINT32  GopHeight;
+  UINT32  GopModeNumber;
 } GRAPHICS_CONSOLE_MODE_DATA;
 
 #define GRAPHICS_MAX_MODE 3
 
 typedef struct {
   UINTN                         Signature;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL         *UgaDraw;
   EFI_SIMPLE_TEXT_OUT_PROTOCOL  SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE   SimpleTextOutputMode;
   GRAPHICS_CONSOLE_MODE_DATA    ModeData[GRAPHICS_MAX_MODE];
-  EFI_UGA_PIXEL                 *LineBuffer;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *LineBuffer;
   EFI_HII_HANDLE                HiiHandle;
 } GRAPHICS_CONSOLE_DEV;
 

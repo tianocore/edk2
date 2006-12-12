@@ -59,6 +59,16 @@ extern EFI_GUID gEfiWinNtVirtualDisksGuid;
 extern EFI_GUID gEfiWinNtPhysicalDisksGuid;
 
 //
+// EFI_WIN_NT_GOP_GUID
+//
+#define EFI_WIN_NT_GOP_GUID \
+  { \
+    0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a } \
+  }
+
+extern EFI_GUID gEfiWinNtFileSystemGuid;
+
+//
 // EFI_WIN_NT_FILE_SYSTEM
 //
 #define EFI_WIN_NT_FILE_SYSTEM_GUID \
@@ -66,7 +76,7 @@ extern EFI_GUID gEfiWinNtPhysicalDisksGuid;
     0xc95a935, 0xa006, 0x11d4, {0xbc, 0xfa, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
   }
 
-extern EFI_GUID gEfiWinNtFileSystemGuid;
+extern EFI_GUID mEfiWinNtGopGuid;
 
 //
 // EFI_WIN_NT_SERIAL_PORT
