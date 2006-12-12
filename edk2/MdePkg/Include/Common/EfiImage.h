@@ -292,6 +292,11 @@ typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
 
+//
+// @bug - Remove me when other package updated. 
+//
+typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
+
 #elif defined (MDE_CPU_X64)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
@@ -314,6 +319,11 @@ typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
+
+//
+// @bug - Remove me when other package updated. 
+//
+typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 
 #else
 #error Unknown Processor Type

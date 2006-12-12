@@ -204,7 +204,7 @@ ConSpliterGraphicsOutputQueryMode (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
-                  Info
+                  (VOID **) Info
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -575,7 +575,7 @@ ConSpliterGraphicsOutputBlt (
       Status = UgaDraw->Blt (
                               UgaDraw,
                               (EFI_UGA_PIXEL *) BltBuffer,
-                              BltOperation,
+                              (EFI_UGA_BLT_OPERATION) BltOperation,
                               SourceX,
                               SourceY,
                               DestinationX,
