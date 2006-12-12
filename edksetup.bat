@@ -84,14 +84,14 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 
 :path_ok
 
-@if "%1"=="-h" goto Usage
-@if "%1"=="-help" goto Usage
-@if "%1"=="--help" goto Usage
-@if "%1"=="/h" goto Usage
-@if "%1"=="/?" goto Usage
-@if "%1"=="/help" goto Usage
-@if "%1"=="ForceRebuild" goto ForceBuild
-@if "%1"=="Reconfig" goto Reconfig
+@if /I "%1"=="-h" goto Usage
+@if /I "%1"=="-help" goto Usage
+@if /I "%1"=="--help" goto Usage
+@if /I "%1"=="/h" goto Usage
+@if /I "%1"=="/?" goto Usage
+@if /I "%1"=="/help" goto Usage
+@if /I "%1"=="ForceRebuild" goto ForceBuild
+@if /I "%1"=="Reconfig" goto Reconfig
 
 @IF NOT EXIST "Tools\Jars\Common.jar" goto NormalBuild
 @IF NOT EXIST "Tools\Jars\PcdTools.jar" goto NormalBuild
@@ -132,7 +132,7 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 @IF NOT EXIST "Tools\bin\antlr.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\dlg.exe" goto NormalBuild
 
-@if "%1"=="Rebuild" goto NormalBuild
+@if /I "%1"=="Rebuild" goto NormalBuild
 @if NOT "%1"=="" goto Usage
 
 goto skipbuild
