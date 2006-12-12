@@ -933,7 +933,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  &GraphicsOutput,
+                  (VOID **) &GraphicsOutput,
                   This->DriverBindingHandle,
                   mConOut.VirtualHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -3153,8 +3153,7 @@ ConSplitterTextOutQueryMode (
   // Check whether param ModeNumber is valid.
   // ModeNumber should be within range 0 ~ MaxMode - 1.
   //
-  if ( (ModeNumber < 0)                         ||
-       (ModeNumber > (UINTN)(((UINT32)-1)>>1)) ) {
+  if ( (ModeNumber > (UINTN)(((UINT32)-1)>>1)) ) {
     return EFI_UNSUPPORTED;
   }
   
@@ -3208,8 +3207,7 @@ ConSplitterTextOutSetMode (
   // Check whether param ModeNumber is valid.
   // ModeNumber should be within range 0 ~ MaxMode - 1.
   //
-  if ( (ModeNumber < 0)                         ||
-       (ModeNumber > (UINTN)(((UINT32)-1)>>1)) ) {
+  if ( (ModeNumber > (UINTN)(((UINT32)-1)>>1)) ) {
     return EFI_UNSUPPORTED;
   }
 
