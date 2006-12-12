@@ -71,7 +71,7 @@ Returns:
     AsciiStrCpy (Language, "eng");
   }
 
-  for (Index = 0; Language[Index] != 0; Index++) {
+  for (Index = 0; Index < 3; Index++) {
     //
     // Bitwise AND ascii value with 0xDF yields an uppercase value.
     // Sign extend into a unicode value
