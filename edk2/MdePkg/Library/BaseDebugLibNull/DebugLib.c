@@ -12,11 +12,6 @@
 
 **/
 
-//
-// Define the maximum debug and assert message length that this library supports 
-//
-#define MAX_DEBUG_MESSAGE_LENGTH  0x100
-
 /**
 
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -39,20 +34,6 @@ DebugPrint (
   ...
   )
 {
-  CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  VA_LIST  Marker;
-
-  //
-  // If Format is NULL, then ASSERT().
-  //
-  ASSERT (Format != NULL);
-
-  //
-  // Print the assert message to a buffer
-  //
-  VA_START (Marker, Format);
-  AsciiVSPrint (Buffer, sizeof (Buffer), Format, Marker);
-  VA_END (Marker);
 }
 
 
@@ -87,21 +68,6 @@ DebugAssert (
   IN CONST CHAR8  *Description
   )
 {
-  CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-
-  //
-  // Print the assert message to a buffer
-  //
-  AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT %s(%d): %s\n", FileName, LineNumber, Description);
-
-  //
-  // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
-  //
-  if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED) != 0) {
-    CpuBreakpoint ();
-  } else if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED) != 0) {
-    CpuDeadLoop ();
-  }
 }
 
 
@@ -129,15 +95,7 @@ DebugClearMemory (
   IN UINTN  Length
   )
 {
-  //
-  // If Buffer is NULL, then ASSERT().
-  //
-  ASSERT (Buffer != NULL);
-
-  //
-  // SetMem() checks for the the ASSERT() condition on Length and returns Buffer
-  //
-  return SetMem (Buffer, Length, PcdGet8(PcdDebugClearMemoryValue));
+  return Buffer;
 }
 
 
@@ -158,7 +116,7 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return FALSE;
 }
 
 
@@ -179,7 +137,7 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return FALSE;
 }
 
 
@@ -200,7 +158,7 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return FALSE;
 }
 
 
@@ -221,5 +179,5 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return FALSE;
 }

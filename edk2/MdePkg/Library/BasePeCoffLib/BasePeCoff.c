@@ -78,6 +78,35 @@ PeCoffLoaderImageFormatSupported (
   );
 
 
+/**
+  Retrieves the magic value from the PE/COFF header.
+
+  @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
+
+  @return EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC - Image is PE32
+  @return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC - Image is PE32+
+
+**/
+UINT16
+PeCoffLoaderGetPeHeaderMagicValue (
+  IN  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr
+  )
+{
+  //
+  // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value 
+  //       in the PE/COFF Header.  If the MachineType is Itanium(IA64) and the 
+  //       Magic value in the OptionalHeader is  EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
+  //       then override the returned value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
+  //
+  if (Hdr.Pe32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+  }
+  //
+  // Return the magic value from the PC/COFF Optional Header
+  //
+  return Hdr.Pe32->OptionalHeader.Magic;
+}
+
 
 /**
   Retrieves the PE or TE Header from a PE/COFF or TE image.
@@ -98,6 +127,7 @@ PeCoffLoaderGetPeHeader (
   RETURN_STATUS         Status;
   EFI_IMAGE_DOS_HEADER  DosHdr;
   UINTN                 Size;
+  UINT16                Magic;
 
   //
   // Read the DOS image header to check for it's existance
@@ -156,7 +186,9 @@ PeCoffLoaderGetPeHeader (
     ImageContext->IsTeImage = FALSE;
     ImageContext->Machine = Hdr.Pe32->FileHeader.Machine;
 
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
+
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -165,7 +197,7 @@ PeCoffLoaderGetPeHeader (
       ImageContext->SectionAlignment  = Hdr.Pe32->OptionalHeader.SectionAlignment;
       ImageContext->SizeOfHeaders     = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
 
-    } else if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
       //
       // Use PE32+ offset
       //
@@ -233,6 +265,7 @@ PeCoffLoaderGetImageInfo (
   EFI_IMAGE_SECTION_HEADER              SectionHeader;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY       DebugEntry;
   UINT32                                NumberOfRvaAndSizes;
+  UINT16                                Magic;
 
   if (NULL == ImageContext) {
     return RETURN_INVALID_PARAMETER;
@@ -248,11 +281,13 @@ PeCoffLoaderGetImageInfo (
     return Status;
   }
 
+  Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
+
   //
   // Retrieve the base address of the image
   //
   if (!(ImageContext->IsTeImage)) {
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -297,7 +332,7 @@ PeCoffLoaderGetImageInfo (
   }
 
   if (!(ImageContext->IsTeImage)) {
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -542,6 +577,7 @@ PeCoffLoaderRelocateImage (
   CHAR8                                 *FixupData;
   PHYSICAL_ADDRESS                      BaseAddress;
   UINT32                                NumberOfRvaAndSizes;
+  UINT16                                Magic;
 
   ASSERT (ImageContext != NULL);
 
@@ -569,7 +605,10 @@ PeCoffLoaderRelocateImage (
 
   if (!(ImageContext->IsTeImage)) {
     Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)ImageContext->ImageAddress + ImageContext->PeCoffHeaderOffset);
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+
+    Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
+
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -771,6 +810,7 @@ PeCoffLoaderLoadImage (
   UINTN                                 Size;
   UINT32                                TempDebugEntryRva;
   UINT32                                NumberOfRvaAndSizes;
+  UINT16                                Magic;
 
   ASSERT (ImageContext != NULL);
 
@@ -958,11 +998,12 @@ PeCoffLoaderLoadImage (
   //
   // Get image's entry point
   //
+  Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
   if (!(ImageContext->IsTeImage)) {
     //
     // Sizes of AddressOfEntryPoint are different so we need to do this safely
     //
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -996,7 +1037,7 @@ PeCoffLoaderLoadImage (
   // the optional header to verify a desired directory entry is there.
   //
   if (!(ImageContext->IsTeImage)) {
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -1164,6 +1205,7 @@ PeCoffLoaderRelocateImageForRuntime (
   CHAR8                               *FixupData;
   UINTN                               Adjust;
   RETURN_STATUS                       Status;
+  UINT16                              Magic;
 
   OldBase = (CHAR8 *)((UINTN)ImageBase);
   NewBase = (CHAR8 *)((UINTN)VirtImageBase);
@@ -1192,10 +1234,9 @@ PeCoffLoaderRelocateImageForRuntime (
     return ;
   }
 
-  //
-  // Get some data from the PE type dependent data
-  //
-  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
+
+  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
     // Use PE32 offset
     //
