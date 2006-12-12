@@ -1,6 +1,7 @@
-/*++
+/**@file
+  Private data structures for the Console Splitter driver
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,18 +10,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
+**/
 
-  ConSplitter.h
-
-Abstract:
-
-  Private data structures for the Console Splitter driver
-
---*/
-
-#ifndef SPLITER_H_
-#define SPLITER_H_
+#ifndef _CON_SPLITER_H_
+#define _CON_SPLITER_H_
 
 //
 // Private Data Structures
@@ -64,18 +57,18 @@ typedef struct {
   BOOLEAN                     InputEventSignalState;
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
 
-#define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA, \
-      TextIn, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
+#define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
+  CR ((a),                                            \
+      TEXT_IN_SPLITTER_PRIVATE_DATA,                \
+      TextIn,                                       \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE       \
       )
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_SIMPLE_POINTER_THIS(a) \
-  CR (a, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA, \
-      SimplePointer, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
+  CR ((a),                                                          \
+      TEXT_IN_SPLITTER_PRIVATE_DATA,                              \
+      SimplePointer,                                              \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE                     \
       )
 
 //
@@ -135,31 +128,31 @@ typedef struct {
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA, \
-      TextOut, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE \
+  CR ((a),                                            \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA,               \
+      TextOut,                                      \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE      \
       )
 
-#define GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA, \
-      GraphicsOutput, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE \
+#define GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
+  CR ((a),                                                    \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA,                       \
+      GraphicsOutput,                                       \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE              \
       )
 
 #define UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA, \
-      UgaDraw, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE \
+  CR ((a),                                            \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA,               \
+      UgaDraw,                                      \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE      \
       )
 
-#define CONSOLE_CONTROL_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA, \
-      ConsoleControl, \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE \
+#define CONSOLE_CONTROL_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
+  CR ((a),                                                    \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA,                       \
+      ConsoleControl,                                       \
+      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE              \
       )
 
 //
@@ -173,14 +166,12 @@ ConSplitterDriverEntry (
   )
 ;
 
-STATIC
 EFI_STATUS
 ConSplitterTextInConstructor (
   TEXT_IN_SPLITTER_PRIVATE_DATA       *Private
   )
 ;
 
-STATIC
 EFI_STATUS
 ConSplitterTextOutConstructor (
   TEXT_OUT_SPLITTER_PRIVATE_DATA      *Private
@@ -190,7 +181,6 @@ ConSplitterTextOutConstructor (
 //
 // Driver Binding Functions
 //
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingSupported (
@@ -200,7 +190,6 @@ ConSplitterConInDriverBindingSupported (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingSupported (
@@ -210,7 +199,6 @@ ConSplitterSimplePointerDriverBindingSupported (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingSupported (
@@ -220,7 +208,6 @@ ConSplitterConOutDriverBindingSupported (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingSupported (
@@ -230,7 +217,6 @@ ConSplitterStdErrDriverBindingSupported (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingStart (
@@ -240,7 +226,6 @@ ConSplitterConInDriverBindingStart (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingStart (
@@ -250,7 +235,6 @@ ConSplitterSimplePointerDriverBindingStart (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingStart (
@@ -260,7 +244,6 @@ ConSplitterConOutDriverBindingStart (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingStart (
@@ -270,7 +253,6 @@ ConSplitterStdErrDriverBindingStart (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingStop (
@@ -281,7 +263,6 @@ ConSplitterConInDriverBindingStop (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingStop (
@@ -292,7 +273,6 @@ ConSplitterSimplePointerDriverBindingStop (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingStop (
@@ -303,7 +283,6 @@ ConSplitterConOutDriverBindingStop (
   )
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingStop (
