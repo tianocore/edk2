@@ -101,7 +101,7 @@ GRAPHICS_CONSOLE_DEV        mGraphicsConsoleDevTemplate = {
   },
   {
     { 80, 25, 0, 0, 0, 0 },  // Mode 0
-    { 80, 50, 0, 0, 0, 0 },  // Mode 1
+    { 80, 50, 0, 0, 0, 0 },  // Mode 1 
     {  0,  0, 0, 0, 0, 0 }   // Mode 2
   },
   (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
