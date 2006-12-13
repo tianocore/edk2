@@ -226,9 +226,9 @@ public class GenBuildTask extends Ant {
         }
 
         Set<String> archSet = new LinkedHashSet<String>();
-
-        if ( getProject().getProperty("ARCH") != null) {
-            String[] fpdArchList = getProject().getProperty("ARCH").split(" ");
+        String archString = getProject().getProperty("ARCH");
+        if (archString != null) {
+            String[] fpdArchList = archString.split(" ");
 
             for (int i = 0; i < fpdArchList.length; i++) {
                 if (archListSupByToolChain.contains(fpdArchList[i])) {
@@ -254,7 +254,7 @@ public class GenBuildTask extends Ant {
         }
 
         if (archList.length == 0) {
-            EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + moduleId + " was not found in current platform FPD file!\n");
+            EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + "[" + archString + "] is not supported for " + moduleId + " in this build!\n");
         }
 
         for (int k = 0; k < archList.length; k++) {
@@ -429,7 +429,7 @@ public class GenBuildTask extends Ant {
         String msaFileName = msaFile.getName();
         getProject().setProperty("MODULE_DIR", msaFile.getParent().replaceAll("(\\\\)", "/"));
         getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/") 
-            + File.separatorChar + msaFileName.substring(0, msaFileName.length() - 3));
+            + File.separatorChar + msaFileName.substring(0, msaFileName.lastIndexOf('.')));
 
         //
         // SUBSYSTEM
