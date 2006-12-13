@@ -14,6 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
+import org.apache.tools.ant.Project;
+
 import org.tianocore.build.exception.GenBuildException;
 
 import java.io.BufferedReader;
@@ -38,8 +40,8 @@ public class ConfigReader {
 
       @return String[][]    The definition array
     **/
-    public static synchronized String[][] parse(String filename) throws GenBuildException {
-        return parse(new File(filename));
+    public static synchronized String[][] parse(Project prj, String filename) throws GenBuildException {
+        return parse(prj, new File(filename));
     }
 
     /**
@@ -53,7 +55,7 @@ public class ConfigReader {
       @throws   GenBuildException
                 Config file's format is not valid
     **/
-    public static synchronized String[][] parse(File configFile) throws GenBuildException {
+    public static synchronized String[][] parse(Project prj, File configFile) throws GenBuildException {
         List<String> keyList = new ArrayList<String>(256);
         List<String> valueList = new ArrayList<String>(256);
         int lines = 0;
@@ -87,7 +89,11 @@ public class ConfigReader {
                 // look as line "A = B"
                 //
                 keyList.add(str.substring(0, index).trim());
-                valueList.add(str.substring(index + 1).trim());
+                if (prj != null) {
+                    valueList.add(prj.replaceProperties(str.substring(index + 1).trim()));
+                } else {
+                    valueList.add(str.substring(index + 1).trim());
+                }
             }
         } catch (Exception ex) {
             GenBuildException e = new GenBuildException("ERROR Processing file [" 

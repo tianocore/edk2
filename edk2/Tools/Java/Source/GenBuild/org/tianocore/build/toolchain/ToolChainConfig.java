@@ -15,13 +15,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import org.tianocore.build.exception.GenBuildException;
-import org.tianocore.build.toolchain.ToolChainKey;
-import org.tianocore.build.toolchain.ToolChainMap;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.tools.ant.Project;
+import org.tianocore.build.exception.GenBuildException;
+import org.tianocore.build.toolchain.ToolChainKey;
+import org.tianocore.build.toolchain.ToolChainMap;
 
 
 /**
@@ -44,8 +45,8 @@ public class ToolChainConfig {
       
       @param toolChainFile File object representing the tool chain configuration file
     **/
-    public ToolChainConfig (File toolChainFile) throws GenBuildException {
-        config = getToolChainConfig(toolChainFile);
+    public ToolChainConfig (Project prj, File toolChainFile) throws GenBuildException {
+        config = getToolChainConfig(prj, toolChainFile);
         parseToolChainDefKey(config.keySet());
     }
 
@@ -57,9 +58,9 @@ public class ToolChainConfig {
        
        @return ToolChainMap
      **/
-    private ToolChainMap getToolChainConfig(File ConfigFile) throws GenBuildException {
+    private ToolChainMap getToolChainConfig(Project prj, File ConfigFile) throws GenBuildException {
         ToolChainMap map = new ToolChainMap();
-        String[][] toolChainDef = ConfigReader.parse(ConfigFile);
+        String[][] toolChainDef = ConfigReader.parse(prj, ConfigFile);
     
         for (int i = 0; i < toolChainDef[0].length; ++i) {
             map.put(toolChainDef[0][i], toolChainDef[1][i]);
