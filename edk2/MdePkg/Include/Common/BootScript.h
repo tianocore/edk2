@@ -109,68 +109,68 @@ typedef struct {
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
+  UINT32                Width;
 } EFI_BOOT_SCRIPT_COMMON_HEADER;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
-  UINTN                 Count;
+  UINT32                Width;
+  UINT32                Count;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_IO_WRITE;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
+  UINT32                Width;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_IO_READ_WRITE;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
-  UINTN                 Count;
+  UINT32                Width;
+  UINT32                Count;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_MEM_WRITE;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
+  UINT32                Width;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_MEM_READ_WRITE;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
-  UINTN                 Count;
+  UINT32                Width;
+  UINT32                Count;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE;
 
 typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
-  EFI_BOOT_SCRIPT_WIDTH Width;
+  UINT32                Width;
   UINT64                Address;
 } EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE;
 
 typedef struct {
   UINT16                    OpCode;
   UINT8                     Length;
-  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress;
-  EFI_SMBUS_DEVICE_COMMAND  Command;
-  EFI_SMBUS_OPERATION       Operation;
+  UINT64                    SlaveAddress;
+  UINT64                    Command;
+  UINT32                    Operation;
   BOOLEAN                   PecCheck;
-  UINTN                     DataSize;
+  UINT32                    DataSize;
 } EFI_BOOT_SCRIPT_SMBUS_EXECUTE;
 
 typedef struct {
   UINT16  OpCode;
   UINT8   Length;
-  UINTN   Duration;
+  UINT64  Duration;
 } EFI_BOOT_SCRIPT_STALL;
 
 typedef struct {
