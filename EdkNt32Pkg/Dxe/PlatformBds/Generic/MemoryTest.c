@@ -240,7 +240,6 @@ Returns:
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Color;
   UINT8                             Value;
   UINTN                             DataSize;
-  UINT32                            Attributes;
 
   ReturnStatus = EFI_SUCCESS;
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
@@ -412,7 +411,7 @@ Done:
   Status = gRT->GetVariable (
                   L"BootState",
                   &gEfiBootStateGuid,
-                  &Attributes,
+                  NULL,
                   &DataSize,
                   &Value
                   );

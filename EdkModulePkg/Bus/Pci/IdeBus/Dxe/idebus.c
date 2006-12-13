@@ -181,7 +181,6 @@ IDEBusDriverBindingStart (
   UINT16                            CommandBlockBaseAddr;
   UINT16                            ControlBlockBaseAddr;
   UINTN                             DataSize;
-  UINT32                            Attributes;
   IDE_BUS_DRIVER_PRIVATE_DATA       *IdeBusDriverPrivateData;
 
   //
@@ -316,7 +315,7 @@ IDEBusDriverBindingStart (
   Status = gRT->GetVariable (
                   (CHAR16 *) L"Configuration",
                   &gEfiCallerIdGuid,
-                  &Attributes,
+                  NULL,
                   &DataSize,
                   &ConfigurationOptions
                   );

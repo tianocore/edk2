@@ -15,9 +15,9 @@ Module Name:
   
 Abstract:
 
-  PCI Bus Driver Lib header file
-  It abstracts some functions that can be different 
-  between light PCI bus driver and full PCI bus driver
+  PCI Bus Driver Lib header file.
+  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
+  support hot plug.
 
 Revision History
 
@@ -155,6 +155,18 @@ Returns:
 ;
 
 EFI_STATUS
+PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
+  IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
+  )
+;
+
+EFI_STATUS
+PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
+  IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
+  )
+;
+
+EFI_STATUS
 PciScanBus (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber,
@@ -179,6 +191,24 @@ Returns:
   TODO: add return values
 
 --*/
+;
+
+EFI_STATUS
+PciScanBus_WithHotPlugDeviceSupport (
+  IN PCI_IO_DEVICE                      *Bridge,
+  IN UINT8                              StartBusNumber,
+  OUT UINT8                             *SubBusNumber,
+  OUT UINT8                             *PaddedBusRange
+  )
+;
+
+EFI_STATUS
+PciScanBus_WithoutHotPlugDeviceSupport (
+  IN PCI_IO_DEVICE                      *Bridge,
+  IN UINT8                              StartBusNumber,
+  OUT UINT8                             *SubBusNumber,
+  OUT UINT8                             *PaddedBusRange
+  )
 ;
 
 EFI_STATUS

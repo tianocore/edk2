@@ -767,7 +767,7 @@ SetHiiVariable (
   Status = gRT->GetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
-    &Attribute,
+    NULL,
     &Size,
     NULL
     );

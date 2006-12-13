@@ -7,11 +7,8 @@
     <Version>1.0</Version>
     <Abstract>Component description file for PciBus module.</Abstract>
     <Description>PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
-       space for these devices.
-       LightPcdLib.c tagged with "ToolCode="DUMMY"" is light weight verison for PCI library
-       function. This version provide simple implementation and do not support hot plug. Only one
-       between PcdLib.c and LightPcdLib.c can be choosed. 
-    </Description>
+       space for these devices. Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
+       support hot plug.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -93,7 +90,6 @@
     <Filename>pcibus.c</Filename>
     <Filename>PciIo.c</Filename>
     <Filename>PciLib.c</Filename>
-    <Filename ToolCode="DUMMY">LightPciLib.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -177,6 +173,12 @@
       <C_Name>PcdPciVgaEnable</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>Whether VGA decoding is enabled on this platform so we should avoid those aliased resources</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdPciBusHotplugDeviceSupport</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If TRUE, the PCI bus driver will support hot plug device. If not hot plug device is supported, this feature flag can be set to FALSE to save size.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
