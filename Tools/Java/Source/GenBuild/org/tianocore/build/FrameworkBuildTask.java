@@ -197,7 +197,7 @@ public class FrameworkBuildTask extends Task{
         //
         File workspacePath = new File(getProject().getProperty("WORKSPACE"));
         getProject().setProperty("WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
-        GlobalData.initInfo(dbFilename, workspacePath.getPath(), toolsDefFilename);
+        GlobalData.initInfo(getProject(), dbFilename, workspacePath.getPath(), toolsDefFilename);
         
         //
         // If find MSA file and ACTIVE_PLATFORM is set, build the module; 
@@ -333,7 +333,7 @@ public class FrameworkBuildTask extends Task{
     private void readTargetFile() throws EdkException{
         String targetFile = getProject().getProperty("WORKSPACE_DIR") + File.separatorChar + targetFilename;
         
-        String[][] targetFileInfo = ConfigReader.parse(targetFile);
+        String[][] targetFileInfo = ConfigReader.parse(getProject(), targetFile);
         
         //
         // Get ToolChain Info from target.txt

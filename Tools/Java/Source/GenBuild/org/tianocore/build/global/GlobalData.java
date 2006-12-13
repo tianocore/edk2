@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.Project;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -146,7 +147,7 @@ public class GlobalData {
       @throws BuildException
             Framework Dababase or SPD or MSA file is not valid
     **/
-    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename ) throws EdkException {
+    public synchronized static void initInfo(Project prj, String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename ) throws EdkException {
         //
         // ensure this method will be revoked only once
         //
@@ -169,7 +170,7 @@ public class GlobalData {
         //
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
         EdkLog.log("Init", EdkLog.EDK_ALWAYS, "Using tool definition file [" + toolsDefFile.getPath() + "].");
-        toolsDef = new ToolChainConfig(toolsDefFile);
+        toolsDef = new ToolChainConfig(prj, toolsDefFile);
 
         //
         // Parse Framework Database
