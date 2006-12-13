@@ -161,7 +161,6 @@ IDEBusDriverConfigurationSetOptions (
   UINT8       NewValue;
   UINTN       DataSize;
   UINTN       Index;
-  UINT32      Attributes;
 
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
@@ -173,7 +172,7 @@ IDEBusDriverConfigurationSetOptions (
   Status = gRT->GetVariable (
                   L"Configuration",
                   &gEfiCallerIdGuid,
-                  &Attributes,
+                  NULL,
                   &DataSize,
                   &Value
                   );
@@ -255,7 +254,6 @@ IDEBusDriverConfigurationOptionsValid (
   EFI_STATUS  Status;
   UINT8       Value;
   UINTN       DataSize;
-  UINT32      Attributes;
 
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
@@ -265,7 +263,7 @@ IDEBusDriverConfigurationOptionsValid (
   Status = gRT->GetVariable (
                   L"Configuration",
                   &gEfiCallerIdGuid,
-                  &Attributes,
+                  NULL,
                   &DataSize,
                   &Value
                   );
