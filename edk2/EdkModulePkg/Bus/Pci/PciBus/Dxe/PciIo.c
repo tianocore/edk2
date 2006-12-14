@@ -1346,7 +1346,7 @@ Returns:
   // decode
   //
             
-  if (Temp->BusNumber > PciIoDevice->BusNumber) {
+  if (Temp->BusNumber < PciIoDevice->BusNumber) {
     //
     // GFX should be set to decode
     //
@@ -1971,9 +1971,5 @@ Returns:
     return TRUE;
   }
 
-  if (PciDevice1->BusNumber > PciDevice2->BusNumber) {
-    return PciDeviceExisted (PciDevice1->Parent, PciDevice2);
-  }
-
-  return PciDeviceExisted (PciDevice2->Parent, PciDevice1);
+  return (PciDeviceExisted (PciDevice1->Parent, PciDevice2)|| PciDeviceExisted (PciDevice2->Parent, PciDevice1));
 }
