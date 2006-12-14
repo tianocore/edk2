@@ -56,7 +56,7 @@ typedef struct {
   //
   // A list of all runtime events
   //
-  LIST_ENTRY              RuntimeLink;
+  EFI_RUNTIME_EVENT_ENTRY   RuntimeData;
 
   //
   // Information by event type
@@ -204,6 +204,5 @@ extern UINTN          gEventPending;
 extern LIST_ENTRY     gEventQueue[];
 extern LIST_ENTRY     gEventSignalQueue;
 extern UINT8          gHSB[];
-extern LIST_ENTRY     mRuntimeEventList;
 
 #endif

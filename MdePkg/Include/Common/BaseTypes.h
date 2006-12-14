@@ -203,4 +203,14 @@ typedef INTN RETURN_STATUS;
 
 typedef UINT64 PHYSICAL_ADDRESS;
 
+//
+// LIST_ENTRY definition
+//
+typedef struct _LIST_ENTRY LIST_ENTRY;
+
+struct _LIST_ENTRY {
+  LIST_ENTRY  *ForwardLink;
+  LIST_ENTRY  *BackLink;
+};
+
 #endif

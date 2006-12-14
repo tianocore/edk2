@@ -41,9 +41,19 @@ RuntimeDriverCalculateCrc32 (
 
 Routine Description:
 
+  Calculate CRC32 for target data
+
 Arguments:
 
+  Data     - The target data.
+  DataSize - The target data size.
+  CrcOut   - The CRC32 for target data.
+
 Returns:
+
+  EFI_SUCCESS           - The CRC32 for target data is calculated successfully.
+  EFI_INVALID_PARAMETER - Some parameter is not valid, so the CRC32 is not 
+                          calculated.
 
 --*/
 {
@@ -72,9 +82,15 @@ ReverseBits (
 
 Routine Description:
 
+  Reverse bits for 32bit data.
+
 Arguments:
 
+  Value - the data to be reversed.
+
 Returns:
+
+  UINT32 data reversed.
 
 --*/
 {
@@ -99,9 +115,15 @@ RuntimeDriverInitializeCrc32Table (
 
 Routine Description:
 
+  Initialize CRC32 table.
+
 Arguments:
 
+  None.
+
 Returns:
+
+  None.
 
 --*/
 {
