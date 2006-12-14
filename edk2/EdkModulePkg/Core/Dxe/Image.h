@@ -53,11 +53,9 @@ typedef struct {
 
     EFI_EBC_PROTOCOL            *Ebc;           // EBC Protocol pointer
 
-    BOOLEAN                     RuntimeFixupValid; // True if RT image needs fixup
-    VOID                        *RuntimeFixup;     // Copy of fixup data;
-    LIST_ENTRY                  Link;              // List of RT LOADED_IMAGE_PRIVATE_DATA
+    EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   // Runtime image list
 
-    PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;     // PeCoffLoader ImageContext
+    PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; // PeCoffLoader ImageContext
 
 } LOADED_IMAGE_PRIVATE_DATA;
 

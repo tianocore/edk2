@@ -697,16 +697,6 @@ BcdToDecimal8 (
   );
 
 //
-// LIST_ENTRY definition
-//
-typedef struct _LIST_ENTRY LIST_ENTRY;
-
-struct _LIST_ENTRY {
-  LIST_ENTRY  *ForwardLink;
-  LIST_ENTRY  *BackLink;
-};
-
-//
 // Linked List Functions and Macros
 //
 

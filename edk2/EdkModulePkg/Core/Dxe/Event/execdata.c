@@ -49,7 +49,3 @@ UINTN           gEventPending = 0;
 //
 LIST_ENTRY      gEventSignalQueue = INITIALIZE_LIST_HEAD_VARIABLE (gEventSignalQueue);
 
-//
-// LIST of runtime events that need to be fired by RT AP.
-//
-LIST_ENTRY      mRuntimeEventList = INITIALIZE_LIST_HEAD_VARIABLE (mRuntimeEventList);

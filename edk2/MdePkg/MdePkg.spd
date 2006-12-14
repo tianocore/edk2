@@ -1540,7 +1540,7 @@
     </Entry>
     <Entry Name="Runtime">
       <C_Name>gEfiRuntimeArchProtocolGuid</C_Name>
-      <GuidValue>96D08253-8483-11D4-BCF1-0080C73C8881</GuidValue>
+      <GuidValue>b7dfb4e1-052f-449f-87be-9818fc91b733</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="Security">

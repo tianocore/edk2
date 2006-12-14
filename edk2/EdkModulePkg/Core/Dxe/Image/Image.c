@@ -24,11 +24,6 @@ Abstract:
 // Module Globals
 //
 
-//
-// LIST of runtime images that need to be relocated.
-//
-LIST_ENTRY                 mRuntimeImageList = INITIALIZE_LIST_HEAD_VARIABLE (mRuntimeImageList);
-
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
 
 LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
@@ -78,9 +73,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   NULL,                       // JumpContext
   0,                          // Machine
   NULL,                       // Ebc
-  FALSE,                      // RuntimeFixupValid
-  NULL,                       // RuntimeFixup
-  { NULL, NULL },             // Link
+  NULL,                       // RuntimeData
 };
 
 
@@ -173,52 +166,6 @@ Returns:
            );
 }
 
-
-EFI_STATUS
-CoreShutdownImageServices (
-  VOID
-  )
-/*++
-
-Routine Description:
-
-  Transfer control of runtime images to runtime service
-
-Arguments:
-
-  None
-
-Returns:
-
-  EFI_SUCCESS       - Function successfully returned
-
---*/
-{
-  LIST_ENTRY                  *Link;
-  LOADED_IMAGE_PRIVATE_DATA   *Image;
-
-  //
-  // The Runtime AP is required for the core to function!
-  //
-  ASSERT (gRuntime != NULL);
-
-  for (Link = mRuntimeImageList.ForwardLink; Link != &mRuntimeImageList; Link = Link->ForwardLink) {
-    Image = CR (Link, LOADED_IMAGE_PRIVATE_DATA, Link, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE);
-    if (Image->RuntimeFixupValid) {
-      gRuntime->RegisterImage (
-                  gRuntime,
-                  (UINT64)(UINTN)(Image->Info.ImageBase),
-                  (EFI_SIZE_TO_PAGES ((UINTN)Image->Info.ImageSize)),
-                  Image->RuntimeFixup
-                  );
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-
 EFI_STATUS
 CoreLoadPeImage (
   IN VOID                        *Pe32Handle,
@@ -253,8 +200,9 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                            Status;
-  UINTN                                 Size;
+  EFI_STATUS      Status;
+  BOOLEAN         DstBufAlocated;
+  UINTN           Size;
 
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
@@ -281,7 +229,7 @@ Returns:
   //
   // Allocate memory of the correct memory type aligned on the required image boundry
   //
-
+  DstBufAlocated = FALSE;
   if (DstBuffer == 0) {
     //
     // Allocate Destination Buffer as caller did not pass it in
@@ -308,8 +256,7 @@ Returns:
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
-    Image->ImageBasePage = Image->ImageContext.ImageAddress;
+    DstBufAlocated = TRUE;
 
   } else {
     //
@@ -334,9 +281,9 @@ Returns:
 
     Image->NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)Image->ImageContext.ImageSize + Image->ImageContext.SectionAlignment);
     Image->ImageContext.ImageAddress = DstBuffer;
-    Image->ImageBasePage = Image->ImageContext.ImageAddress;
   }
 
+  Image->ImageBasePage = Image->ImageContext.ImageAddress;
   Image->ImageContext.ImageAddress =
       (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
       ~((UINTN)Image->ImageContext.SectionAlignment - 1);
@@ -346,7 +293,7 @@ Returns:
   //
   Status = gEfiPeiPeCoffLoader->LoadImage (gEfiPeiPeCoffLoader, &Image->ImageContext);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   //
@@ -361,13 +308,6 @@ Returns:
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-
-      //
-      // Make a list off all the RT images so we can let the RT AP know about them
-      //
-      Image->RuntimeFixupValid = TRUE;
-      Image->RuntimeFixup = Image->ImageContext.FixupData;
-      InsertTailList (&mRuntimeImageList, &Image->Link);
     }
   }
 
@@ -376,7 +316,7 @@ Returns:
   //
   Status = gEfiPeiPeCoffLoader->RelocateImage (gEfiPeiPeCoffLoader, &Image->ImageContext);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   //
@@ -438,7 +378,23 @@ Returns:
   Image->Info.ImageSize     = Image->ImageContext.ImageSize;
   Image->Info.ImageCodeType = Image->ImageContext.ImageCodeMemoryType;
   Image->Info.ImageDataType = Image->ImageContext.ImageDataMemoryType;
-
+  if (Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) {
+    if (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
+      //
+      // Make a list off all the RT images so we can let the RT AP know about them.
+      //
+      Image->RuntimeData = CoreAllocateRuntimePool (sizeof(EFI_RUNTIME_IMAGE_ENTRY));
+      if (Image->RuntimeData == NULL) {
+        goto Done;
+      }
+      Image->RuntimeData->ImageBase      = Image->Info.ImageBase;
+      Image->RuntimeData->ImageSize      = (UINT64) (Image->Info.ImageSize);
+      Image->RuntimeData->RelocationData = Image->ImageContext.FixupData;
+      Image->RuntimeData->Handle         = Image->Handle;
+      InsertTailList (&gRuntime->ImageHead, &Image->RuntimeData->Link);
+    }
+  }
+  
   //
   // Fill in the entry point of the image if it is available
   //
@@ -489,10 +445,19 @@ Returns:
   return EFI_SUCCESS;
 
 Done:
+
   //
-  // Free memory
+  // Free memory.
   //
-  CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
+  
+  if (DstBufAlocated) {
+    CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
+  }
+  
+  if (Image->ImageContext.FixupData != NULL) {
+    CoreFreePool (Image->ImageContext.FixupData);
+  }
+
   return Status;
 }
 
@@ -1168,13 +1133,16 @@ Returns:
                );
   }
 
-  if (Image->RuntimeFixupValid) {
-    //
-    // Remove the Image from the Runtime Image list as we are about to Free it!
-    //
-    RemoveEntryList (&Image->Link);
+  if (Image->RuntimeData != NULL) {
+    if (Image->RuntimeData->Link.ForwardLink != NULL) {
+      //
+      // Remove the Image from the Runtime Image list as we are about to Free it!
+      //
+      RemoveEntryList (&Image->RuntimeData->Link);
+    }
+    CoreFreePool (Image->RuntimeData);
   }
-
+  
   //
   // Free the Image from memory
   //

@@ -128,6 +128,8 @@ Returns:
   ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
   VOID                            *Protocol;
   BOOLEAN                         Found;
+  LIST_ENTRY                      *Link;
+  LIST_ENTRY                      TempLinkNode;
 
   Found = FALSE;
   for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
@@ -160,6 +162,34 @@ Returns:
       // When runtime architectural protocol is available, updates CRC32 in the Debug Table
       //
       CoreUpdateDebugTableCrc32 ();
+
+      //
+      // Update the Runtime Architectural protocol with the template that the core was
+      // using so there would not need to be a dependency on the Runtime AP
+      //
+
+      //
+      // Copy all the registered Image to new gRuntime protocol
+      //
+      for (Link = gRuntimeTemplate.ImageHead.ForwardLink; Link != &gRuntimeTemplate.ImageHead; Link = TempLinkNode.ForwardLink) {
+        CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+        InsertTailList (&gRuntime->ImageHead, Link);
+      }
+      //
+      // Copy all the registered Event to new gRuntime protocol
+      //
+      for (Link = gRuntimeTemplate.EventHead.ForwardLink; Link != &gRuntimeTemplate.EventHead; Link = TempLinkNode.ForwardLink) {
+        CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+        InsertTailList (&gRuntime->EventHead, Link);
+      }
+      
+      //
+      // Clean up gRuntimeTemplate
+      //
+      gRuntimeTemplate.ImageHead.ForwardLink = &gRuntimeTemplate.ImageHead;
+      gRuntimeTemplate.ImageHead.BackLink    = &gRuntimeTemplate.ImageHead;
+      gRuntimeTemplate.EventHead.ForwardLink = &gRuntimeTemplate.EventHead;
+      gRuntimeTemplate.EventHead.BackLink    = &gRuntimeTemplate.EventHead;
     }
   }
 
