@@ -688,7 +688,6 @@ Returns:
 
   DevicePath      = Multi;
   DevicePathInst  = GetNextDevicePathInstance (&DevicePath, &Size);
-  Size -= sizeof (EFI_DEVICE_PATH_PROTOCOL);
 
   //
   // Search for the match of 'Single' in 'Multi'
@@ -698,17 +697,13 @@ Returns:
     // If the single device path is found in multiple device paths,
     // return success
     //
-    if (Size == 0) {
-      return FALSE;
-    }
-
     if (CompareMem (Single, DevicePathInst, Size) == 0) {
+      gBS->FreePool (DevicePathInst);
       return TRUE;
     }
 
     gBS->FreePool (DevicePathInst);
     DevicePathInst = GetNextDevicePathInstance (&DevicePath, &Size);
-    Size -= sizeof (EFI_DEVICE_PATH_PROTOCOL);
   }
 
   return FALSE;
