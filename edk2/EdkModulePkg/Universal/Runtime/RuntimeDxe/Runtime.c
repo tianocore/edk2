@@ -483,7 +483,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  &MyLoadedImage
+                  (VOID**)&MyLoadedImage
                   );
   ASSERT_EFI_ERROR (Status);
   mMyImageBase = MyLoadedImage->ImageBase;
