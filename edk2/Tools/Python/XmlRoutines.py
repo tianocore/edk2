@@ -42,6 +42,11 @@ def XmlAttribute (Dom, String):
   except:
     return ''
 
+def XmlTopTag(Dom):
+  """Return the name of the Root or top tag in the XML tree."""
+  return Dom.firstChild.nodeName
+  
+
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.
 if __name__ == '__main__':
