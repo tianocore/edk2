@@ -23,8 +23,7 @@ def parseMsa(msaFile, spdDir):
 
 def parseSpd(spdFile):
 
-  filelist = [spdFile]
-  msaFileList = []
+  filelist = []
 
   spdDir = os.path.dirname(spdFile)
 
@@ -33,7 +32,7 @@ def parseSpd(spdFile):
   xmlPaths = [
     "/PackageSurfaceArea/LibraryClassDeclarations/LibraryClass/IncludeHeader",
     "/PackageSurfaceArea/IndustryStdIncludes/IndustryStdHeader/IncludeHeader",
-    "/PackageSurfaceArea/<PackageHeaders/IncludePkgHeader" ]
+    "/PackageSurfaceArea/PackageHeaders/IncludePkgHeader" ]
 
   for xmlPath in xmlPaths:
     for f in XmlList(spd, xmlPath):
@@ -78,14 +77,15 @@ def makeFar(filelist, farname):
       package.appendChild(spdfilename)
 
       spdfilename.appendChild( man.createTextNode(infile) )
+      zip.write(inWorkspace(infile), infile)
 
       for spdfile in filelist:
         content = man.createElement("FarFilename")
         content.appendChild( man.createTextNode(spdfile))
         contents.appendChild(content)
+        zip.write(inWorkspace(spdfile), spdfile)
 
     elif extension == ".fpd":
-      filelist = [infile]
 
       platform = man.createElement("FarPlatform")
       platList.appendChild(platform)
@@ -94,12 +94,11 @@ def makeFar(filelist, farname):
       platform.appendChild(fpdfilename)
 
       fpdfilename.appendChild( man.createTextNode(infile) )
+      zip.write(inWorkspace(infile), infile)
 
     else:
-      filelist = []
+      print "Skipping file '%s' since is is not a .spd or .fpd." % infile
 
-    for f in set(filelist):
-      zip.write(inWorkspace(f), f)
   zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml(2*" "))
   zip.close()
   return
