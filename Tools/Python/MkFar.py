@@ -97,24 +97,40 @@ def makeFar(filelist, farname):
 
     else:
       filelist = []
-      content = man.createElement("FarFilename")
-      content.appendChild( man.createTextNode(infile))
-      contents.appendChild(content)
 
     for f in set(filelist):
       zip.write(inWorkspace(f), f)
-  zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml("  "))
+  zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml(2*" "))
   zip.close()
   return
 
-# This acts like the main() function for the script, unless it is 'import'ed into another
-# script.
+# This acts like the main() function for the script, unless it is 'import'ed
+# into another script.
 if __name__ == '__main__':
 
   # Create a pretty printer for dumping data structures in a readable form.
   # pp = pprint.PrettyPrinter(indent=2)
 
-  # Process the command line args.
-  optlist, args = getopt.getopt(sys.argv[1:], 'h', [ 'example-long-arg=', 'testing'])
+  # Default name for far file.
+  farName = "output.far"
 
-  makeFar(args, "test.far")
+  # Process the command line args.
+  optlist, args = getopt.getopt(sys.argv[1:], 'hf:', [ 'far=', 'help'])
+
+  for o, a in optlist:
+    if o in ["-h", "--help"]:
+      print """
+Pass a list of .spd and .fpd files to be placed into a far for distribution.
+You may give the name of the far with a -f or --far option. For example:
+
+  %s --far library.far MdePkg/MdePkg.spd
+
+The file paths of .spd and .fpd are relative to the WORKSPACE envirnonment
+which must be set to a valid workspace root directory.
+""" % os.path.basename(sys.argv[0])
+
+      sys.exit()
+    if o in ["-f", "--far"]:
+      farName = a
+
+  makeFar(args, farName)
