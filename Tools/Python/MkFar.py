@@ -6,7 +6,7 @@ from WorkspaceRoutines import *
 
 def parseMsa(msaFile, spdDir):
 
-  filelist = []
+  filelist = [msaFile]
 
   msaDir = os.path.dirname(msaFile)
 
@@ -42,8 +42,6 @@ def parseSpd(spdFile):
   for xmlPath in ["/PackageSurfaceArea/MsaFiles/Filename"]:
     for f in XmlList(spd, xmlPath):
       msaFile = str(os.path.join(spdDir, XmlElementData(f)))
-      filelist.append(msaFile)
-
       filelist += parseMsa(msaFile, spdDir)
 
   return filelist
@@ -55,6 +53,23 @@ def makeFar(filelist, farname):
 <FrameworkArchiveManifest>
 </FrameworkArchiveManifest>
 """
+
+  domImpl = xml.dom.minidom.getDOMImplementation()
+  man = domImpl.createDocument(None, "FrameworkArchiveManifest", None)
+  top_element = man.documentElement
+
+  header = man.createElement("FarHeader")
+  top_element.appendChild(header)
+  
+  packList = man.createElement("FarPackageList")
+  top_element.appendChild(packList)
+  
+  platList = man.createElement("FarPlatformList")
+  top_element.appendChild(platList)
+  
+  contents = man.createElement("Contents")
+  top_element.appendChild(contents)
+  
   zip = zipfile.ZipFile(farname, "w")
   for file in args:
     if not os.path.exists(inWorkspace(file)):
@@ -62,13 +77,24 @@ def makeFar(filelist, farname):
     (_, extension) = os.path.splitext(file)
     if extension == ".spd":
       filelist = parseSpd(file)
+
+      for file in filelist:
+  
+        package = man.createElement("FarPackage")
+        packList.appendChild(package)
+
+        spdfilename = man.createElement("FarFileName")
+        package.appendChild(spdfilename)
+
+        spdfilename.appendChild( man.createTextNode(file) )
+
     elif extension == ".fpd":
       filelist = [file]
     else:
       filelist = []
     for f in set(filelist):
       zip.write(inWorkspace(f), f)
-  zip.writestr("FrameworkArchiveManifest.xml", man)
+  zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml("  "))
   zip.close()
   return
 
