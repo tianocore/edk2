@@ -39,20 +39,13 @@ def parseSpd(spdFile):
     for f in XmlList(spd, xmlPath):
       filelist.append(str(os.path.join(spdDir, XmlElementData(f))))
 
-  for xmlPath in ["/PackageSurfaceArea/MsaFiles/Filename"]:
-    for f in XmlList(spd, xmlPath):
-      msaFile = str(os.path.join(spdDir, XmlElementData(f)))
-      filelist += parseMsa(msaFile, spdDir)
+  for f in XmlList(spd, "/PackageSurfaceArea/MsaFiles/Filename"):
+    msaFile = str(os.path.join(spdDir, XmlElementData(f)))
+    filelist += parseMsa(msaFile, spdDir)
 
   return filelist
 
 def makeFar(filelist, farname):
-
-  man = \
-"""<?xml version="1.0" encoding="UTF-8"?>
-<FrameworkArchiveManifest>
-</FrameworkArchiveManifest>
-"""
 
   domImpl = xml.dom.minidom.getDOMImplementation()
   man = domImpl.createDocument(None, "FrameworkArchiveManifest", None)
@@ -60,38 +53,54 @@ def makeFar(filelist, farname):
 
   header = man.createElement("FarHeader")
   top_element.appendChild(header)
-  
+
   packList = man.createElement("FarPackageList")
   top_element.appendChild(packList)
-  
+
   platList = man.createElement("FarPlatformList")
   top_element.appendChild(platList)
-  
+
   contents = man.createElement("Contents")
   top_element.appendChild(contents)
-  
+
   zip = zipfile.ZipFile(farname, "w")
-  for file in args:
-    if not os.path.exists(inWorkspace(file)):
-      print "Skipping non-existent file '%s'." % file
-    (_, extension) = os.path.splitext(file)
+  for infile in filelist:
+    if not os.path.exists(inWorkspace(infile)):
+      print "Skipping non-existent file '%s'." % infile
+    (_, extension) = os.path.splitext(infile)
     if extension == ".spd":
-      filelist = parseSpd(file)
+      filelist = parseSpd(infile)
 
-      for file in filelist:
-  
-        package = man.createElement("FarPackage")
-        packList.appendChild(package)
+      package = man.createElement("FarPackage")
+      packList.appendChild(package)
 
-        spdfilename = man.createElement("FarFileName")
-        package.appendChild(spdfilename)
+      spdfilename = man.createElement("FarFilename")
+      package.appendChild(spdfilename)
 
-        spdfilename.appendChild( man.createTextNode(file) )
+      spdfilename.appendChild( man.createTextNode(infile) )
+
+      for spdfile in filelist:
+        content = man.createElement("FarFilename")
+        content.appendChild( man.createTextNode(spdfile))
+        contents.appendChild(content)
 
     elif extension == ".fpd":
-      filelist = [file]
+      filelist = [infile]
+
+      platform = man.createElement("FarPlatform")
+      platList.appendChild(platform)
+
+      fpdfilename = man.createElement("FarFilename")
+      platform.appendChild(fpdfilename)
+
+      fpdfilename.appendChild( man.createTextNode(infile) )
+
     else:
       filelist = []
+      content = man.createElement("FarFilename")
+      content.appendChild( man.createTextNode(infile))
+      contents.appendChild(content)
+
     for f in set(filelist):
       zip.write(inWorkspace(f), f)
   zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml("  "))
