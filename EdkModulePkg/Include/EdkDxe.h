@@ -30,7 +30,7 @@ Abstract:
 #include <Common/FlashMap.h>
 // BUGBUG: We must include this lib here due to ordering issues
 //
-#include <Ipf/SalApi.h>
+//#include <Ipf/SalApi.h>
 #include <Library/PeCoffLib.h>
 
 
@@ -52,7 +52,9 @@ Abstract:
 #include <Guid/StatusCode.h>
 #include <Guid/PciOptionRomTable.h>
 #include <Guid/PciHotplugDevice.h>
+#if defined(MDE_CPU_IPF)
 #include <Guid/ExtendedSalGuid.h>
+#endif
 #include <Guid/PeiPeCoffLoader.h>
 #include <Guid/CapsuleVendor.h>
 #include <Guid/CompatibleMemoryTested.h>
@@ -81,7 +83,9 @@ Abstract:
 #include <Protocol/DebugAssert.h>
 #include <Protocol/usbatapi.h>
 #include <Protocol/PciHotPlugRequest.h>
+#if defined(MDE_CPU_IPF)
 #include <Protocol/ExtendedSalBootService.h>
+#endif
 #include <Protocol/IsaAcpi.h>
 
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
