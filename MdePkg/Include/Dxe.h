@@ -37,10 +37,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   #error EDK_RELEASE_VERSION can not be zero
 #endif
 
-
 #include <Common/UefiBaseTypes.h>
 #include <Dxe/DxeCis.h>
+
+#if defined(MDE_CPU_IA32) || defined(MDE_CPU_X64)
 #include <Dxe/SmmCis.h>
+#endif
+
+#if defined(MDE_CPU_IPF)
+#include <SalApi.h>
+#endif
 
 #include <Common/DataHubRecords.h>
 #include <Guid/DataHubRecords.h>
