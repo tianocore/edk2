@@ -40,7 +40,7 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
       <Keyword>EdkDxeSalLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">

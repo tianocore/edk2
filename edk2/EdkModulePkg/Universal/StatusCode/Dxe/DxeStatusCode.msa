@@ -68,7 +68,7 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>OemHookStatusCodeLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
       <Keyword>EdkDxeSalLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
