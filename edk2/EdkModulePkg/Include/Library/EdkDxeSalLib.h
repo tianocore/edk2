@@ -20,8 +20,6 @@ Abstract:
 #ifndef _ESAL_SERVICE_LIB_H__
 #define _ESAL_SERVICE_LIB_H__
 
-//#include <Ipf/SalApi.h>
-
 EFI_STATUS
 EFIAPI
 RegisterEsalFunction (
