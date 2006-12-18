@@ -30,6 +30,13 @@ typedef struct _EFI_SEC_PLATFORM_INFORMATION_PPI EFI_SEC_PLATFORM_INFORMATION_PP
 
 extern EFI_GUID gEfiSecPlatformInformationPpiGuid;
 
+typedef struct {
+  UINTN BootPhase;      // entry r20 value
+  UINTN UniqueId;       // PAL arbitration ID
+  UINTN HealthStat;     // Health Status
+  UINTN PALRetAddress;  // return address to PAL
+} IPF_HANDOFF_STATUS;
+
 ///
 /// EFI_HEALTH_FLAGS
 ///

@@ -167,12 +167,6 @@ EFI_STATUS
   );
 
 typedef
-VOID
-(EFIAPI *EFI_AP_PROCEDURE) (
-  IN  VOID                              *Buffer
-  );
-
-typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_STARTUP_THIS_AP) (
   IN  EFI_AP_PROCEDURE                    Procedure,

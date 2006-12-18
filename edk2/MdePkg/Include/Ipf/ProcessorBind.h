@@ -215,12 +215,5 @@ typedef struct {
   UINT64  GP;
 } EFI_PLABEL;
 
-typedef struct {
-  UINTN BootPhase;      // entry r20 value
-  UINTN UniqueId;       // PAL arbitration ID
-  UINTN HealthStat;     // Health Status
-  UINTN PALRetAddress;  // return address to PAL
-} IPF_HANDOFF_STATUS;
-
 #endif
 

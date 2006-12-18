@@ -484,6 +484,16 @@ typedef struct {
 } EFI_DXE_SERVICES;
 
 
+//
+// Function prototype for invoking a function on an Application Processor
+// Used by both the SMM infrastructure and the MP Services Protocol
+//
+typedef
+VOID
+(EFIAPI *EFI_AP_PROCEDURE) (
+  IN  VOID                              *Buffer
+  );
+
 #include <Common/BootMode.h>
 #include <Common/BootScript.h>
 #include <Common/Capsule.h>
