@@ -30,7 +30,6 @@ Abstract:
 #include <Common/FlashMap.h>
 // BUGBUG: We must include this lib here due to ordering issues
 //
-//#include <Ipf/SalApi.h>
 #include <Library/PeCoffLib.h>
 
 

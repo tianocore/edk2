@@ -15,7 +15,6 @@ Module Name:
 
 --*/
 
-//#include <SalApi.h>
 #include <RuntimeLibInternal.h>
 
 //

@@ -24,10 +24,6 @@ Revision History
 #ifndef _PEI_MAIN_H_
 #define _PEI_MAIN_H_
 
-//#ifdef EFI64
-//#include "SalApi.h"
-//#endif
-
 //
 //Build private HOB to PEI core to transfer old NEM-range data to new NEM-range
 //
