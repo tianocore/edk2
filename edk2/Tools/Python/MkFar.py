@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, re, getopt, string, glob, xml.dom.minidom, pprint, zipfile, tempfile
+import os, sys, getopt, string, xml.dom.minidom, zipfile, md5
 from XmlRoutines import *
 from WorkspaceRoutines import *
 
@@ -10,10 +10,12 @@ def parseMsa(msaFile, spdDir):
 
   msaDir = os.path.dirname(msaFile)
 
-  msa = xml.dom.minidom.parse(inWorkspace(msaFile))
+  msa = xml.dom.minidom.parse(inWorkspace(os.path.join(spdDir, msaFile)))
 
   xmlPaths = [
-    "/ModuleSurfaceArea/SourceFiles/Filename" ]
+    "/ModuleSurfaceArea/SourceFiles/Filename",
+    "/ModuleSurfaceArea/NonProcessedFiles/Filename" ]
+    
 
   for xmlPath in xmlPaths:
     for f in XmlList(msa, xmlPath):
@@ -23,7 +25,7 @@ def parseMsa(msaFile, spdDir):
 
 def parseSpd(spdFile):
 
-  filelist = []
+  files = []
 
   spdDir = os.path.dirname(spdFile)
 
@@ -36,13 +38,60 @@ def parseSpd(spdFile):
 
   for xmlPath in xmlPaths:
     for f in XmlList(spd, xmlPath):
-      filelist.append(str(os.path.join(spdDir, XmlElementData(f))))
+      files.append(str(XmlElementData(f)))
 
   for f in XmlList(spd, "/PackageSurfaceArea/MsaFiles/Filename"):
-    msaFile = str(os.path.join(spdDir, XmlElementData(f)))
-    filelist += parseMsa(msaFile, spdDir)
+    msaFile = str(XmlElementData(f))
+    files += parseMsa(msaFile, spdDir)
 
-  return filelist
+  cwd = os.getcwd()
+  os.chdir(inWorkspace(spdDir))
+  for root, dirs, entries in os.walk("Include"):
+    for r  in ["CVS", ".svn"]:
+      if r in dirs:
+        dirs.remove(r)
+    for entry in entries:
+      files.append(os.path.join(os.path.normpath(root), entry))
+  os.chdir(cwd)
+
+  return files
+
+def makeFarHeader(doc):
+
+  header = doc.createElement("FarHeader")
+  name = doc.createElement("FarName")
+  name.appendChild(doc.createTextNode("My New Far"))
+  header.appendChild(name)
+  guidVal = doc.createElement("GuidValue")
+  guidVal.appendChild(doc.createTextNode(genguid()))
+  header.appendChild(guidVal)
+  ver = doc.createElement("Version")
+  ver.appendChild(doc.createTextNode("1.0"))
+  header.appendChild(ver)
+  abstract = doc.createElement("Abstract")
+  abstract.appendChild(doc.createTextNode("This is a cool new far."))
+  header.appendChild(abstract)
+  desc = doc.createElement("Description")
+  desc.appendChild(doc.createTextNode("This is a cool new far. It can do great things."))
+  header.appendChild(desc)
+  copy = doc.createElement("Copyright")
+  copy.appendChild(doc.createTextNode("Copyright (c) Intel Corporation 2006."))
+  header.appendChild(copy)
+  lic = doc.createElement("License")
+  lic.appendChild(doc.createTextNode("BSD Compatible."))
+  header.appendChild(lic)
+  spec = doc.createElement("Specification")
+  spec.appendChild(doc.createTextNode("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052"))
+  header.appendChild(spec)
+
+  return header
+
+def getSpdGuidVersion(spdFile):
+
+  spd = xml.dom.minidom.parse(inWorkspace(spdFile))
+
+  return (XmlElement(spd, "/PackageSurfaceArea/SpdHeader/GuidValue"),
+          XmlElement(spd, "/PackageSurfaceArea/SpdHeader/Version"))
 
 def makeFar(filelist, farname):
 
@@ -50,8 +99,7 @@ def makeFar(filelist, farname):
   man = domImpl.createDocument(None, "FrameworkArchiveManifest", None)
   top_element = man.documentElement
 
-  header = man.createElement("FarHeader")
-  top_element.appendChild(header)
+  top_element.appendChild(makeFarHeader(man))
 
   packList = man.createElement("FarPackageList")
   top_element.appendChild(packList)
@@ -62,6 +110,9 @@ def makeFar(filelist, farname):
   contents = man.createElement("Contents")
   top_element.appendChild(contents)
 
+  exts = man.createElement("UserExtensions")
+  top_element.appendChild(exts)
+
   zip = zipfile.ZipFile(farname, "w")
   for infile in filelist:
     if not os.path.exists(inWorkspace(infile)):
@@ -69,39 +120,71 @@ def makeFar(filelist, farname):
     (_, extension) = os.path.splitext(infile)
     if extension == ".spd":
       filelist = parseSpd(infile)
+      spdDir = os.path.dirname(infile)
+
+      (spdGuid, spdVersion) = getSpdGuidVersion(infile)
 
       package = man.createElement("FarPackage")
       packList.appendChild(package)
 
-      spdfilename = man.createElement("FarFilename")
+      spdfilename = farFileNode(man, inWorkspace(infile))
+      zip.write(inWorkspace(infile), infile)
+      spdfilename.appendChild(man.createTextNode(infile))
       package.appendChild(spdfilename)
 
-      spdfilename.appendChild( man.createTextNode(infile) )
-      zip.write(inWorkspace(infile), infile)
+      guidValue = man.createElement("GuidValue")
+      guidValue.appendChild(man.createTextNode(spdGuid))
+      package.appendChild(guidValue)
+
+      version = man.createElement("Version")
+      version.appendChild(man.createTextNode(spdVersion))
+      package.appendChild(version)
+
+      defaultPath = man.createElement("DefaultPath")
+      defaultPath.appendChild(man.createTextNode(spdDir))
+      package.appendChild(defaultPath)
+
+      farPlatformList = man.createElement("FarPlatformList")
+      package.appendChild(farPlatformList)
+
+      packContents = man.createElement("Contents")
+      package.appendChild(packContents)
+
+      ue = man.createElement("UserExtensions")
+      package.appendChild(ue)
 
       for spdfile in filelist:
-        content = man.createElement("FarFilename")
-        content.appendChild( man.createTextNode(spdfile))
-        contents.appendChild(content)
-        zip.write(inWorkspace(spdfile), spdfile)
+        content = farFileNode(man, inWorkspace(os.path.join(spdDir, spdfile))) 
+        zip.write(inWorkspace(os.path.join(spdDir, spdfile)), spdfile)
+        content.appendChild(man.createTextNode(spdfile))
+        packContents.appendChild(content)
 
     elif extension == ".fpd":
 
       platform = man.createElement("FarPlatform")
       platList.appendChild(platform)
 
-      fpdfilename = man.createElement("FarFilename")
-      platform.appendChild(fpdfilename)
-
-      fpdfilename.appendChild( man.createTextNode(infile) )
+      fpdfilename = farFileNode(man, inWorkspace(infile))
       zip.write(inWorkspace(infile), infile)
+      platform.appendChild(fpdfilename)
+      fpdfilename.appendChild( man.createTextNode(infile) )
 
     else:
-      print "Skipping file '%s' since is is not a .spd or .fpd." % infile
+      content = farFileNode(man, inWorkspace(infile))
+      zip.write(inWorkspace(infile), infile)
+      content.appendChild(man.createTextNode(infile))
+      contents.appendChild(content)
 
   zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml(2*" "))
   zip.close()
   return
+
+def farFileNode(doc, filename):
+  content = doc.createElement("FarFilename")
+  f=open(filename, "rb")
+  content.setAttribute("Md5sum", md5.md5(f.read()).hexdigest())
+  f.close()
+  return content
 
 # This acts like the main() function for the script, unless it is 'import'ed
 # into another script.
