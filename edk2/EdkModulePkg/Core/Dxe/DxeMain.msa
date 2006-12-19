@@ -86,7 +86,6 @@
     <Filename>Image/ImageFile.c</Filename>
     <Filename>SectionExtraction/CoreSectionExtraction.c</Filename>
     <Filename>DebugImageInfo.h</Filename>
-    <Filename>DebugMask.h</Filename>
     <Filename>DxeMain.h</Filename>
     <Filename>Exec.h</Filename>
     <Filename>FwVolBlock.h</Filename>
