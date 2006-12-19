@@ -56,7 +56,6 @@
     <Filename>IfrCommon.c</Filename>
     <Filename>IfrOnTheFly.c</Filename>
     <Filename>IfrOpCodeCreation.c</Filename>
-    <Filename>IfrLibrary.h</Filename>
     <Filename>IfrVariable.c</Filename>
   </SourceFiles>
   <PackageDependencies>
