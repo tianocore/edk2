@@ -102,7 +102,8 @@ Returns:
       //
       // Use the next free slot for a new entry
       //
-      UpdateIndex                   = mFvbCount++;;
+      UpdateIndex                   = mFvbCount++;
+			ASSERT (UpdateIndex < MAX_FVB_COUNT);      
       mFvbEntry[UpdateIndex].Handle = Handle;
     }
     //
