@@ -115,8 +115,6 @@
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/efidecompress.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/err.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/hexedit.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/legacyboot.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/loadfv.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/mem.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/memmap.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/mm.efi</Filename>
