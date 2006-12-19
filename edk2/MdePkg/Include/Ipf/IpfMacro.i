@@ -41,6 +41,9 @@ name::
          mov ar##.##pfs=loc1 ;;\
          br##.##ret##.##dpnt  b0;;
 
+#define GLOBAL_FUNCTION(Function) \
+         .##type   Function, @function; \
+         .##global Function
 
 #define INTERRUPT_HANDLER_BEGIN(name) \
 PROCEDURE_ENTRY(name##HandlerBegin) \
