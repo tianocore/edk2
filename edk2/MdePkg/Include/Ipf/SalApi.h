@@ -17,11 +17,27 @@
 #ifndef __SAL_API_H__
 #define __SAL_API_H__
 
-typedef UINTN EFI_SAL_STATUS;
+//
+// FIT Types 
+// Table 2-2 of Intel Itanium Processor Family System Abstraction Layer Specification December 2003
+//
+#define EFI_SAL_FIT_FIT_HEADER_TYPE 0x00
+#define EFI_SAL_FIT_PAL_B_TYPE      0x01
+//
+// type from 0x02 to 0x0E is reserved.
+//
+#define EFI_SAL_FIT_PAL_A_TYPE  0x0F
+//
+// OEM-defined type range is from 0x10 to 0x7E. Here we defined the PEI_CORE type as 0x10
+//
+#define EFI_SAL_FIT_PEI_CORE_TYPE 0x10
+#define EFI_SAL_FIT_UNUSED_TYPE   0x7F
 
 //
-// EFI_SAL_STATUS defines
+// EFI_SAL_STATUS 
 //
+typedef UINTN EFI_SAL_STATUS;
+
 #define EFI_SAL_SUCCESS               ((EFI_SAL_STATUS) 0)
 #define EFI_SAL_MORE_RECORDS          ((EFI_SAL_STATUS) 3)
 #define EFI_SAL_NOT_IMPLEMENTED       ((EFI_SAL_STATUS) - 1)
