@@ -83,6 +83,40 @@ public class DataValidation {
     }
 
     /**
+    Check if the input data is long int and it is in the valid scope
+    The scope is provided by String
+    
+    @param strNumber The input string which needs validation
+    @param BeginNumber The left boundary of the scope
+    @param EndNumber The right boundary of the scope
+    
+    @retval true - The input is Int and in the scope;
+    @retval false - The input is not Int or not in the scope
+    
+    **/
+   public static boolean isLongInt(String strNumber, long BeginNumber, long EndNumber) throws Exception{
+       //
+       //Check if the input data is int first
+       //
+       if (!isInt(strNumber)) {
+           return false;
+       }
+       //
+       //And then check if the data is between the scope
+       //
+       try {
+    	   Long intTemp = new Long(strNumber);
+    	   if ((intTemp.longValue() < BeginNumber) || (intTemp.longValue() > EndNumber)) {
+               return false;
+           }
+       }
+       catch (Exception e) {
+    	   throw e;
+       }
+       
+       return true;
+   }
+    /**
      Check if the input data is int and it is in the valid scope
      The scope is provided by String
      
