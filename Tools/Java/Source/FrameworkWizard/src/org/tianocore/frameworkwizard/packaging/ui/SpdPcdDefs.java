@@ -524,13 +524,18 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                                 jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(),
                                 jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected(),
                                 archList, modTypeList};
-                if (!dataValidation(row)) {
-                    return;
-                }
-                
-                if (tokenCNameExisted(jTextFieldToken.getText(), jTextFieldC_Name.getText())) {
-                    return;
-                }
+                try {
+				    if (!dataValidation(row)) {
+					    return;
+				    }
+
+				    if (tokenCNameExisted(jTextFieldToken.getText(),jTextFieldC_Name.getText())) {
+					    return;
+				    }
+			    } catch (Exception e) {
+				    JOptionPane.showMessageDialog(frame, "Illegal Token:"+ e.getCause());
+				    return;
+			    }
                 
                 model.addRow(row);
                 jTable.changeSelection(model.getRowCount()-1, 0, false, false);
@@ -900,8 +905,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             }
             
             Object[] o = {cName, token, ts, dataType, defaultVal, help};
-            if (!dataValidation(o)){
-                return;
+            try {
+            	if (!dataValidation(o)){
+                    return;
+                }
+            }
+            catch (Exception e) {
+            	JOptionPane.showMessageDialog(frame, "Illegal Token:" + e.getCause());
+            	return;
             }
             docConsole.setSaved(false);
             sfc.updateSpdPcdDefinition(row, cName, token, dataType, usage, ts, defaultVal, help, archList, modTypeList);
@@ -1049,19 +1060,19 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         return usage.trim();
     }
     
-    private boolean tokenCNameExisted(String token, String cName) {
-        Integer inputToken = Integer.decode(token);
+    private boolean tokenCNameExisted(String token, String cName) throws Exception{
+        Long inputToken = Long.decode(token);
         
-        for (int i = 0; i < jTable.getRowCount(); ++i) {
-            if (jTable.getValueAt(i, 0).equals(cName)) {
+        for (int i = 0; i < model.getRowCount(); ++i) {
+            if (model.getValueAt(i, 0).equals(cName)) {
                 JOptionPane.showMessageDialog(frame, "C_Name already existed in table.");
                 return true;
             }
-            if (jTable.getValueAt(i, 1).equals(token)) {
+            if (model.getValueAt(i, 1).equals(token)) {
                 JOptionPane.showMessageDialog(frame, "Token already existed in table.");
                 return true;
             }
-            Integer tokenValue = Integer.decode(jTable.getValueAt(i, 1)+"");
+            Long tokenValue = Long.decode(model.getValueAt(i, 1)+"");
             if (tokenValue.equals(inputToken)) {
                 JOptionPane.showMessageDialog(frame, "Same token value already existed in table.");
                 return true;
@@ -1078,14 +1089,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         }
         return true;
     }
-    private boolean dataValidation(Object[] row) {
+    private boolean dataValidation(Object[] row) throws Exception{
         
         if (!DataValidation.isC_NameType(row[0].toString())) {
             JOptionPane.showMessageDialog(frame, "C_Name is NOT C_NameType.");
             return false;
         }
         if (!DataValidation.isHexDoubleWordDataType(row[1].toString()) && 
-                        !DataValidation.isInt(row[1].toString(), Integer.MIN_VALUE, Integer.MAX_VALUE)) {
+                        !DataValidation.isLongInt(row[1].toString(), 1, Long.MAX_VALUE)) {
             JOptionPane.showMessageDialog(frame, "Token is NOT correct.");
             return false;
         }
