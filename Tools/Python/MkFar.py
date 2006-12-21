@@ -4,6 +4,22 @@ import os, sys, getopt, string, xml.dom.minidom, zipfile, md5
 from XmlRoutines import *
 from WorkspaceRoutines import *
 
+class Far:
+  """This class is used to collect arbitrarty data from the template file."""
+  def __init__(far):
+    """Assign the default values for the far fields."""
+    far.FileName = "output.far"
+    far.FarName=""
+    far.Version=""
+    far.License=""
+    far.Description=""
+    far.Copyright=""
+    far.SpdFiles=""
+    far.FpdFile=""
+    far.ExtraFile=""
+
+far = Far()
+
 def parseMsa(msaFile, spdDir):
 
   filelist = [msaFile]
@@ -16,7 +32,6 @@ def parseMsa(msaFile, spdDir):
     "/ModuleSurfaceArea/SourceFiles/Filename",
     "/ModuleSurfaceArea/NonProcessedFiles/Filename" ]
     
-
   for xmlPath in xmlPaths:
     for f in XmlList(msa, xmlPath):
       filelist.append(str(os.path.join(msaDir, XmlElementData(f))))
@@ -60,25 +75,25 @@ def makeFarHeader(doc):
 
   header = doc.createElement("FarHeader")
   name = doc.createElement("FarName")
-  name.appendChild(doc.createTextNode("My New Far"))
+  name.appendChild(doc.createTextNode(far.FarName))
   header.appendChild(name)
   guidVal = doc.createElement("GuidValue")
   guidVal.appendChild(doc.createTextNode(genguid()))
   header.appendChild(guidVal)
   ver = doc.createElement("Version")
-  ver.appendChild(doc.createTextNode("1.0"))
+  ver.appendChild(doc.createTextNode(far.Version))
   header.appendChild(ver)
   abstract = doc.createElement("Abstract")
-  abstract.appendChild(doc.createTextNode("This is a cool new far."))
+  abstract.appendChild(doc.createTextNode(far.Abstract))
   header.appendChild(abstract)
   desc = doc.createElement("Description")
-  desc.appendChild(doc.createTextNode("This is a cool new far. It can do great things."))
+  desc.appendChild(doc.createTextNode(far.Description))
   header.appendChild(desc)
   copy = doc.createElement("Copyright")
-  copy.appendChild(doc.createTextNode("Copyright (c) Intel Corporation 2006."))
+  copy.appendChild(doc.createTextNode(far.Copyright))
   header.appendChild(copy)
   lic = doc.createElement("License")
-  lic.appendChild(doc.createTextNode("BSD Compatible."))
+  lic.appendChild(doc.createTextNode(far.License))
   header.appendChild(lic)
   spec = doc.createElement("Specification")
   spec.appendChild(doc.createTextNode("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052"))
@@ -193,11 +208,8 @@ if __name__ == '__main__':
   # Create a pretty printer for dumping data structures in a readable form.
   # pp = pprint.PrettyPrinter(indent=2)
 
-  # Default name for far file.
-  farName = "output.far"
-
   # Process the command line args.
-  optlist, args = getopt.getopt(sys.argv[1:], 'hf:', [ 'far=', 'help'])
+  optlist, args = getopt.getopt(sys.argv[1:], 'hf:t:', [ 'template=', 'far=', 'help'])
 
   for o, a in optlist:
     if o in ["-h", "--help"]:
@@ -207,12 +219,20 @@ You may give the name of the far with a -f or --far option. For example:
 
   %s --far library.far MdePkg/MdePkg.spd
 
-The file paths of .spd and .fpd are relative to the WORKSPACE envirnonment
-which must be set to a valid workspace root directory.
+The file paths of .spd and .fpd are treated as relative to the WORKSPACE
+envirnonment variable which must be set to a valid workspace root directory.
 """ % os.path.basename(sys.argv[0])
 
       sys.exit()
+    if o in ["-t", "--template"]:
+      # The template file is processed first, so that command line options can
+      # override it.
+      templateName = a
+      execfile(templateName)
     if o in ["-f", "--far"]:
-      farName = a
+      far.FileName = a
+      if os.path.exists(far.FileName):
+        print "Error: File %s exists. Not overwriting." % far.FileName
+        sys.exit()
 
-  makeFar(args, farName)
+  makeFar(args, far.FileName)

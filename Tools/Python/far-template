@@ -1,0 +1,23 @@
+# This file is a template to be used in creating a Framework Archive Manifest.
+# Each entry can be assigned to a string, which is quoted, or to a string that
+# spans mutliple lines, which is triple quoted.
+# This file should be passed as a command line argument to the MkFar.py script. 
+# It is used to help the user control how the far is created.
+
+far.FileName = "my.far"
+far.FarName = "My Far"
+far.Version = "0.3"
+far.License="""This program and the accompanying materials are licensed and made
+available under the terms and conditions of the BSD License which accompanies
+this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER
+THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF
+ANY KIND, EITHER EXPRESS OR IMPLIED."""
+far.Description="""This Package provides headers and libraries that conform to
+my wishes."""
+far.Copyright="Copyright (c) 2006, My Corporation."
+far.SpdFiles=""
+far.FpdFile=""
+far.ExtraFile=""
+
+# vim:syntax=python
