@@ -1184,7 +1184,7 @@ public class FpdFileContents {
                 //
                 // ToDo Error 
                 //
-                throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " used by Module "
+                throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + "\n used by Module "
                                           + mi.getName() + " or its Library Instances.");
             }
             //
@@ -3703,10 +3703,10 @@ class PcdItemTypeConflictException extends Exception {
     PcdItemTypeConflictException (String pcdName, String info) {
         ModuleIdentification mi = WorkspaceProfile.getModuleId(info);
         if (mi != null) {
-            details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackageId().getName();    
+            details = pcdName + " ItemType Conflicts with " + mi.getName() + "\n in Pkg " + mi.getPackageId().getName();    
         }
         else {
-            details = pcdName + " ItemType Conflicts with " + info;
+            details = pcdName + " ItemType Conflicts with \n" + info;
         }
     }
     
@@ -3729,7 +3729,7 @@ class PcdItemTypeConflictException extends Exception {
             moduleInfo2 = info2;
         }
         
-        details = pcdName + " ItemType Conflicts in " + moduleInfo1 + " and " + moduleInfo2;
+        details = pcdName + " ItemType Conflicts in \n" + moduleInfo1 + "\n and " + moduleInfo2;
     }
     
     public String getMessage() {
