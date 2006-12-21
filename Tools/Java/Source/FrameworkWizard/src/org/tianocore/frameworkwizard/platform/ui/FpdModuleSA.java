@@ -1189,7 +1189,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         addLibInstance (libMi);
                     }
                     catch (Exception exception) {
-                        JOptionPane.showMessageDialog(frame, "Adding Instance" + libMi.getName() + ": "+ exception.getMessage());
+                        JOptionPane.showMessageDialog(frame, "Adding Instance " + libMi.getName() + " : \n"+ exception.getMessage());
                         return;
                     }
                     docConsole.setSaved(false);
