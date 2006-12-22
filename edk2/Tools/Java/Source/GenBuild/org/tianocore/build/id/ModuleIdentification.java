@@ -129,12 +129,33 @@ public class ModuleIdentification extends Identification {
     }
     
     public String toString() {
-        if (version == null || version.trim().equalsIgnoreCase("")) {
-            return "Module [" + name + "] in " + packageId;
+        String nameString;
+        String versionString;
+        String packageString;
+
+        if (name != null && name != "") {
+            nameString = name;
+        } else {
+            if (guid != null && guid != "") {
+                nameString = guid;
+            } else {
+                nameString = "UNKNOWN";
+            }
         }
-        else {
-            return "Module [" + name + " " + version + "] in " + packageId; 
+
+        if (version != null) {
+            versionString = version;
+        } else {
+            versionString = ""; 
         }
+
+        if (packageId != null) {
+            packageString = packageId.toString();
+        } else {
+            packageString = "Package [UNKNOWN]";
+        }
+
+        return "Module [" + nameString + versionString + "] in " + packageString; 
     }
 
     /**

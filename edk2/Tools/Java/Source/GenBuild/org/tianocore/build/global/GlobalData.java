@@ -302,19 +302,19 @@ public class GlobalData {
         PackageIdentification packageId = null;
         Iterator iter = packageList.iterator();
         while (iter.hasNext()) {
-            packageId = (PackageIdentification)iter.next();
-            moduleId.setPackage(packageId);
-            Spd spd = spdTable.get(packageId);
+            PackageIdentification pid = (PackageIdentification)iter.next();
+            Spd spd = spdTable.get(pid);
             File tempMsaFile = null;
             if ((tempMsaFile = spd.getModuleFile(moduleId)) != null ) {
                 if (tempMsaFile.getParent().equalsIgnoreCase(moduleId.getMsaFile().getParent())) {
+                    packageId = pid;
                     break ;
                 }
                 tempMsaFile = null;
             }
         }
         if (packageId == null){
-            throw new EdkException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
+            throw new EdkException("Can't find Module [" + moduleId.getName() + "] in any package!");
         } else {
             return packageId;
         }
@@ -648,7 +648,7 @@ public class GlobalData {
                 return moduleId;
             }
         }
-        throw new EdkException("Can't find module GUID value " + moduleId.toGuidString() + " in " + packageId + " under the current workspace!");
+        throw new EdkException("Can't find " + moduleId + " under the current workspace!");
     }
 
     public synchronized static Set<PackageIdentification> getPackageList(){
