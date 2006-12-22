@@ -75,7 +75,7 @@
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugClearMemoryValue</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>The value used by DebugClearMemory () to fill a certain range
                 of memory.</HelpText>
     </PcdEntry>
