@@ -12,11 +12,12 @@ class Far:
     far.FarName=""
     far.Version=""
     far.License=""
+    far.Abstract=""
     far.Description=""
     far.Copyright=""
-    far.SpdFiles=""
-    far.FpdFile=""
-    far.ExtraFile=""
+    far.SpdFiles=[]
+    far.FpdFiles=[]
+    far.ExtraFiles=[]
 
 far = Far()
 
@@ -62,7 +63,8 @@ def parseSpd(spdFile):
   cwd = os.getcwd()
   os.chdir(inWorkspace(spdDir))
   for root, dirs, entries in os.walk("Include"):
-    for r  in ["CVS", ".svn"]:
+    # Some files need to be skipped.
+    for r in ["CVS", ".svn"]:
       if r in dirs:
         dirs.remove(r)
     for entry in entries:
@@ -108,7 +110,7 @@ def getSpdGuidVersion(spdFile):
   return (XmlElement(spd, "/PackageSurfaceArea/SpdHeader/GuidValue"),
           XmlElement(spd, "/PackageSurfaceArea/SpdHeader/Version"))
 
-def makeFar(filelist, farname):
+def makeFar(files, farname):
 
   domImpl = xml.dom.minidom.getDOMImplementation()
   man = domImpl.createDocument(None, "FrameworkArchiveManifest", None)
@@ -129,7 +131,7 @@ def makeFar(filelist, farname):
   top_element.appendChild(exts)
 
   zip = zipfile.ZipFile(farname, "w")
-  for infile in filelist:
+  for infile in set(files):
     if not os.path.exists(inWorkspace(infile)):
       print "Skipping non-existent file '%s'." % infile
     (_, extension) = os.path.splitext(infile)
@@ -144,7 +146,7 @@ def makeFar(filelist, farname):
 
       spdfilename = farFileNode(man, inWorkspace(infile))
       zip.write(inWorkspace(infile), infile)
-      spdfilename.appendChild(man.createTextNode(infile))
+      spdfilename.appendChild(man.createTextNode(lean(infile)))
       package.appendChild(spdfilename)
 
       guidValue = man.createElement("GuidValue")
@@ -171,7 +173,7 @@ def makeFar(filelist, farname):
       for spdfile in filelist:
         content = farFileNode(man, inWorkspace(os.path.join(spdDir, spdfile))) 
         zip.write(inWorkspace(os.path.join(spdDir, spdfile)), spdfile)
-        content.appendChild(man.createTextNode(spdfile))
+        content.appendChild(man.createTextNode(lean(spdfile)))
         packContents.appendChild(content)
 
     elif extension == ".fpd":
@@ -182,12 +184,12 @@ def makeFar(filelist, farname):
       fpdfilename = farFileNode(man, inWorkspace(infile))
       zip.write(inWorkspace(infile), infile)
       platform.appendChild(fpdfilename)
-      fpdfilename.appendChild( man.createTextNode(infile) )
+      fpdfilename.appendChild(man.createTextNode(lean(infile)))
 
     else:
       content = farFileNode(man, inWorkspace(infile))
       zip.write(inWorkspace(infile), infile)
-      content.appendChild(man.createTextNode(infile))
+      content.appendChild(man.createTextNode(lean(infile)))
       contents.appendChild(content)
 
   zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml(2*" "))
@@ -211,6 +213,7 @@ if __name__ == '__main__':
   # Process the command line args.
   optlist, args = getopt.getopt(sys.argv[1:], 'hf:t:', [ 'template=', 'far=', 'help'])
 
+  # First pass through the options list.
   for o, a in optlist:
     if o in ["-h", "--help"]:
       print """
@@ -220,19 +223,28 @@ You may give the name of the far with a -f or --far option. For example:
   %s --far library.far MdePkg/MdePkg.spd
 
 The file paths of .spd and .fpd are treated as relative to the WORKSPACE
-envirnonment variable which must be set to a valid workspace root directory.
+environment variable which must be set to a valid workspace root directory.
 """ % os.path.basename(sys.argv[0])
 
       sys.exit()
+      optlist.remove((o,a))
     if o in ["-t", "--template"]:
       # The template file is processed first, so that command line options can
       # override it.
       templateName = a
       execfile(templateName)
+      optlist.remove((o,a))
+
+  # Second pass through the options list. These can override the first pass.
+  for o, a in optlist:
+    print o, a
     if o in ["-f", "--far"]:
       far.FileName = a
-      if os.path.exists(far.FileName):
-        print "Error: File %s exists. Not overwriting." % far.FileName
-        sys.exit()
 
-  makeFar(args, far.FileName)
+  # Let's err on the side of caution and not let people blow away data 
+  # accidentally.
+  if os.path.exists(far.FileName):
+    print "Error: File %s exists. Not overwriting." % far.FileName
+    sys.exit()
+
+  makeFar(far.SpdFiles + far.FpdFiles + far.ExtraFiles + args, far.FileName)

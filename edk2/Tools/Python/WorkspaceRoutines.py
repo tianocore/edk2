@@ -19,3 +19,8 @@ def genguid():
         str(time.time()) + 
         socket.gethostbyname(socket.gethostname())).hexdigest()
   return "%s-%s-%s-%s-%s" % (g[0:8], g[8:12], g[12:16], g[16:20], g[20:])
+
+def lean(path):
+  """Lean the slashes forward"""
+
+  return os.path.normpath(path).replace("\\", "/")
