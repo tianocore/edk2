@@ -30,6 +30,7 @@ HandOffToDxeCore (
 {
   VOID                *BaseOfStack;
   VOID                *TopOfStack;
+  EFI_STATUS          Status;
 
   //
   // Allocate 128KB for the Stack
