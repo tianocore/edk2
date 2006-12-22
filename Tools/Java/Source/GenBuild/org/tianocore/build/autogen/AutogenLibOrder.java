@@ -112,30 +112,6 @@ public class AutogenLibOrder {
                 }
             }
         }
-
-        //
-        // Check is the library instance list meet the require;
-        //
-        //for (int s = 0; s < this.libInstanceList.size(); s++) {
-        //    String[] libClass = this.libInstanceMap.get(this.libInstanceList
-        //            .get(s));
-        //    if (libClass != null) {
-        //        for (int t = 0; t < libClass.length; t++) {
-        //            if (this.libClassMap.get(libClass[t]) == null) {
-                        //
-                        // Note: There exist a kind of module which depend on 
-                        // library class with no instance or whose instance will
-                        // never be linked into the module. 
-                        // For this satuation, the module has the description of 
-                        // library class in MSA file but no description of 
-                        // corresponding library instance in MBD file. There 
-                        // will be a warnig message given here after a standard 
-                        // log way has been decided.
-                        //
-        //           }
-        //       }
-        //   }
-        //}
     }
 
     /**
@@ -146,131 +122,86 @@ public class AutogenLibOrder {
       
       @return     List which content the ordered library instance.
     **/
-    List<ModuleIdentification> orderLibInstance1() {
-        List<ModuleIdentification> orderList = new ArrayList<ModuleIdentification>();
-        //
-        // Stack of node which track the library instance name ant its visiting
-        // flag.
-        //
-        List<Node> stackList = new ArrayList<Node>();
-        int stackSize = 0;
-        ModuleIdentification libInstanceId = null;
-        if (libInstanceList.size() < 0) {
-            return null;
-        }
-
-        //
-        // Reorder the library instance.
-        //
-        for (int i = 0; i < libInstanceList.size(); i++) {
-            //
-            // If library instance is already in the order list skip it.
-            //
-            if (isInLibInstance(orderList, libInstanceList.get(i).libId)) {
-                continue;
-            }
-            
-            Node node = new Node(libInstanceList.get(i).libId, false);
-            //
-            // Use stack to reorder library instance.
-            // Push node to stack.
-            //
-            stackList.add(node);
-            while (stackList.size() > 0) {
-                stackSize = stackList.size() - 1;
-                //
-                // Pop the first node in stack. If the node flag has been visited
-                // add this node to orderlist and remove it from stack.
-                //
-                if (stackList.get(stackSize).isVisit) {
-                    if (!isInLibInstance(orderList,
-                            stackList.get(stackSize).nodeId)) {
-                        orderList.add(stackList.get(stackSize).nodeId);
-                        stackList.remove(stackSize);
-                    }
-                    
-                } else {
-                    //
-                    // Get the node value and set visit flag as true.
-                    //
-                    stackList.get(stackList.size() - 1).isVisit = true;
-                    String[] libClassList = this.libInstanceMap.get(stackList
-                            .get(stackSize).nodeId);
-                    //
-                    // Push the node dependence library instance to the stack.
-                    //
-                    if (libClassList != null) {
-                        for (int j = 0; j < libClassList.length; j++) {
-                            libInstanceId = this.libClassMap.get(libClassList[j]);
-                            if (libInstanceId != null
-                                    && !isInLibInstance(orderList, libInstanceId)) {
-                                //
-                                // If and only if the currently library instance
-                                // is not in stack and it have constructor or 
-                                // destructor function, push this library 
-                                // instacne in stack.
-                                //
-                                if (!isInStackList(stackList, this.libClassMap
-                                        .get(libClassList[j])) /* && isHaveConsDestructor(libInstanceId) */) {
-                                    stackList.add(new Node(this.libClassMap
-                                            .get(libClassList[j]), false));
-                                }
-                            }
-                        }
-                    }
-                }
-                System.out.println("################################################");
-                for (int ii = 0; ii < orderList.size(); ++ii) {
-                    System.out.println("  " + orderList.get(ii));
-                }
-            }
-        }
-        return orderList;
-    }
-
     List<ModuleIdentification> orderLibInstance() {
         LinkedList<ModuleIdentification> orderList = new LinkedList<ModuleIdentification>();
         for (int i = 0; i < libInstanceList.size(); ++i) {
             ModuleIdentification current = libInstanceList.get(i).libId;
             int insertPoint = orderList.size();
+            //
+            // check current library instance against orderred ones in orderList
+            // 
             for (int j = 0; j < orderList.size(); ++j) {
                 ModuleIdentification old = orderList.get(j);
-                //System.out.println("### old = " + old);
                 if (consumes(current, old)) {
+                    //
+                    // if current library instance consumes the one in orderList
+                    // it must be put after
+                    // 
                     insertPoint = j + 1;
                 } else if (consumes(old, current)) {
+                    //
+                    // if current library instance is consumed by the one in orderList
+                    // it must be put before. And no further check is needed.
+                    // 
                     insertPoint = j;
                     break;
                 }
             }
             orderList.add(insertPoint, current);
-//             System.out.println("################################################");
-//             for (int ii = 0; ii < orderList.size(); ++ii) {
-//                 System.out.println("  " + orderList.get(ii));
-//             }
         }
 
         return orderList;
     }
 
-    boolean consumes(ModuleIdentification lib1, ModuleIdentification lib2) {
-        //System.out.println("$$$ lib1 = " + lib1);
+    //
+    // Test if one library consumes another library
+    // 
+    private boolean consumes(ModuleIdentification lib1, ModuleIdentification lib2) {
         LinkedList<ModuleIdentification> stack = new LinkedList<ModuleIdentification>();
+
         stack.add(lib1);
         int j = 0;
         while (j < stack.size()) {
+            //
+            // get the last library instance in stack, which hasn't been checked
+            // 
             ModuleIdentification lib = stack.get(j++);
+            //
+            // get the library classes consumed by it
+            // 
             String[] consumedClasses = libInstanceMap.get(lib);
             for (int i = 0; i < consumedClasses.length; ++i) {
+                //
+                // for each library class, find its corresponding library instance
+                // 
                 ModuleIdentification consumedLib = libClassMap.get(consumedClasses[i]);
-                //System.out.println("$$$ class = " + consumedClasses[i]);
-                //System.out.println("$$$ insta = " + consumedLib);
+                //
+                // if the corresponding instance is the "lib2", we can say that
+                // "lib1"  consumes "lib2"
+                // 
                 if (consumedLib == lib2) {
-                    //System.out.println(lib1 + "\n   consumes\n" + lib2 + "\n");
+                    EdkLog.log(EdkLog.EDK_DEBUG, lib1 + "\n   consumes\n" + lib2 + "\n");
                     return true;
                 }
+                //
+                // otherwise, we put it back into the stack to check it later
+                // to see if it consumes "lib2" or not. If the library instance
+                // consumed by "lib1" consumes "lib2", we can also say that "lib1"
+                // consumes "lib2"
+                // 
                 if (consumedLib != null && !stack.contains(consumedLib)) {
                     stack.offer(consumedLib);
+                } else if (consumedLib == lib1) {
+                    //
+                    // found circular consume, do nothing now but just print
+                    // out message for debugging
+                    // 
+                    String msg = "!!! Library consumes circularly: ";
+                    for (int k = 0; k < j; k++) {
+                        msg += stack.get(k).getName() + "->";
+                    }
+                    msg += lib1.getName();
+                    EdkLog.log(EdkLog.EDK_DEBUG, msg);
                 }
             }
         }

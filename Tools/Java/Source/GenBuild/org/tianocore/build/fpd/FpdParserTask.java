@@ -75,6 +75,11 @@ import org.w3c.dom.NodeList;
 **/
 public class FpdParserTask extends Task {
 
+    ///
+    /// Be used to ensure Global data will be initialized only once.
+    ///
+    private static boolean parsed = false;
+
     private File fpdFile = null;
 
     PlatformIdentification platformId;
@@ -494,8 +499,10 @@ public class FpdParserTask extends Task {
             //
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
             //
-            PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
-            ca.perform(platformId.getFpdFile().getPath());
+            if (!parsed) {
+                PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
+                ca.perform(platformId.getFpdFile().getPath());
+            }
         } catch (IOException ex) {
             BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
             buildException.setStackTrace(ex.getStackTrace());
@@ -508,6 +515,9 @@ public class FpdParserTask extends Task {
             BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
             buildException.setStackTrace(ex.getStackTrace());
             throw buildException;
+        }
+        if (!parsed) {
+            parsed = true;
         }
     }
 
