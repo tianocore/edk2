@@ -120,6 +120,8 @@ def getCNames(spdFile):
 
   # Get the name of the package
   packageName = XmlElement(spd, "PackageSurfaceArea/SpdHeader/PackageName")
+  packageVersion = XmlElement(spd, "PackageSurfaceArea/SpdHeader/Version")
+  packageGuid = XmlElement(spd, "PackageSurfaceArea/SpdHeader/GuidValue")
 
   # Find the C_Name
   for cname in XmlList(spd, "/PackageSurfaceArea/GuidDeclarations/Entry/C_Name") + \
@@ -132,7 +134,8 @@ def getCNames(spdFile):
 
     # Map the <C_Name> to the <PackageName>. We will use this to lookup every 
     # identifier in the Input Code.
-    cname_table[cname_text] = packageName
+    cname_table[cname_text] = {"name": packageName, "version": packageVersion, "guid": packageGuid}
+
 
   return
 
@@ -195,7 +198,11 @@ large file."""
   getSpds()
 
   # Debug stuff.
-  print pp.pprint(function_table)
-  print pp.pprint(cname_table)
-  print "Classes = ", pp.pprint(list(search_classes(ids)))
-  print "C_Names = ", pp.pprint(list(search_cnames(ids)))
+  print "Function Table = "
+  pp.pprint(function_table)
+  print "CName Table = "
+  pp.pprint(cname_table)
+  print "Classes = "
+  pp.pprint(list(search_classes(ids)))
+  print "C_Names = "
+  pp.pprint(list(search_cnames(ids)))
