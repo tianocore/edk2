@@ -89,7 +89,8 @@ DxeLoadCore (
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList
+  IN EFI_PEI_HOB_POINTERS   HobList,
+  IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
   );
 
 EFI_STATUS
