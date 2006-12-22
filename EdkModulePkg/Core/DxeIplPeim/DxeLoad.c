@@ -242,14 +242,6 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Transfer control to the DXE Core
-  // The handoff state is simply a pointer to the HOB list
-  //
-
-  Status = PeiServicesInstallPpi (&mPpiSignal);
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Add HOB for the DXE Core
   //
   BuildModuleHob (
@@ -309,8 +301,13 @@ Returns:
       );
   }
 
+  //
+  // Transfer control to the DXE Core
+  // The handoff state is simply a pointer to the HOB list
+  //
+
   DEBUG ((EFI_D_INFO, "DXE Core Entry Point 0x%08x\n", (UINTN) DxeCoreEntryPoint));
-  HandOffToDxeCore (DxeCoreEntryPoint, HobList);
+  HandOffToDxeCore (DxeCoreEntryPoint, HobList, &mPpiSignal);
   //
   // If we get here, then the DXE Core returned.  This is an error
   // Dxe Core should not return.

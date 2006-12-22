@@ -49,7 +49,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR gGdt = {
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList
+  IN EFI_PEI_HOB_POINTERS   HobList,
+  IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
   )
 {
   EFI_STATUS                Status;
@@ -86,6 +87,13 @@ HandOffToDxeCore (
     // Create page table and save PageMapLevel4 to CR3
     //
     PageTables = CreateIdentityMappingPageTables ();
+
+    //
+    // End of PEI phase singal
+    //
+    Status = PeiServicesInstallPpi (EndOfPeiSignal);
+    ASSERT_EFI_ERROR (Status);
+    
     AsmWriteCr3 (PageTables);
      //
     // Go to Long Mode. Interrupts will not get turned on until the CPU AP is loaded.
@@ -105,6 +113,12 @@ HandOffToDxeCore (
     //
     TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
+    //
+    // End of PEI phase singal
+    //
+    Status = PeiServicesInstallPpi (EndOfPeiSignal);
+    ASSERT_EFI_ERROR (Status);
 
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,

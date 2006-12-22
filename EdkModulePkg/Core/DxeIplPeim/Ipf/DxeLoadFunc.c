@@ -24,7 +24,8 @@ Abstract:
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList
+  IN EFI_PEI_HOB_POINTERS   HobList,
+  IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
   )
 {
   VOID                *BaseOfStack;
@@ -53,6 +54,12 @@ HandOffToDxeCore (
   //
   TopOfStack = (VOID *) ((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
+  //
+  // End of PEI phase singal
+  //
+  Status = PeiServicesInstallPpi (EndOfPeiSignal);
+  ASSERT_EFI_ERROR (Status);
 
   AsmSwitchStackAndBackingStore (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
