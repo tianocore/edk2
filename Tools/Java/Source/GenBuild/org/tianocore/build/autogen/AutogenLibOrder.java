@@ -18,8 +18,12 @@ package org.tianocore.build.autogen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.HashSet;
 
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.exception.AutoGenException;
@@ -142,7 +146,7 @@ public class AutogenLibOrder {
       
       @return     List which content the ordered library instance.
     **/
-    List<ModuleIdentification> orderLibInstance() {
+    List<ModuleIdentification> orderLibInstance1() {
         List<ModuleIdentification> orderList = new ArrayList<ModuleIdentification>();
         //
         // Stack of node which track the library instance name ant its visiting
@@ -207,7 +211,7 @@ public class AutogenLibOrder {
                                 // instacne in stack.
                                 //
                                 if (!isInStackList(stackList, this.libClassMap
-                                        .get(libClassList[j])) && isHaveConsDestructor(libInstanceId)) {
+                                        .get(libClassList[j])) /* && isHaveConsDestructor(libInstanceId) */) {
                                     stackList.add(new Node(this.libClassMap
                                             .get(libClassList[j]), false));
                                 }
@@ -215,9 +219,62 @@ public class AutogenLibOrder {
                         }
                     }
                 }
+                System.out.println("################################################");
+                for (int ii = 0; ii < orderList.size(); ++ii) {
+                    System.out.println("  " + orderList.get(ii));
+                }
             }
         }
         return orderList;
+    }
+
+    List<ModuleIdentification> orderLibInstance() {
+        LinkedList<ModuleIdentification> orderList = new LinkedList<ModuleIdentification>();
+        for (int i = 0; i < libInstanceList.size(); ++i) {
+            ModuleIdentification current = libInstanceList.get(i).libId;
+            int insertPoint = orderList.size();
+            for (int j = 0; j < orderList.size(); ++j) {
+                ModuleIdentification old = orderList.get(j);
+                //System.out.println("### old = " + old);
+                if (consumes(current, old)) {
+                    insertPoint = j + 1;
+                } else if (consumes(old, current)) {
+                    insertPoint = j;
+                    break;
+                }
+            }
+            orderList.add(insertPoint, current);
+//             System.out.println("################################################");
+//             for (int ii = 0; ii < orderList.size(); ++ii) {
+//                 System.out.println("  " + orderList.get(ii));
+//             }
+        }
+
+        return orderList;
+    }
+
+    boolean consumes(ModuleIdentification lib1, ModuleIdentification lib2) {
+        //System.out.println("$$$ lib1 = " + lib1);
+        LinkedList<ModuleIdentification> stack = new LinkedList<ModuleIdentification>();
+        stack.add(lib1);
+        int j = 0;
+        while (j < stack.size()) {
+            ModuleIdentification lib = stack.get(j++);
+            String[] consumedClasses = libInstanceMap.get(lib);
+            for (int i = 0; i < consumedClasses.length; ++i) {
+                ModuleIdentification consumedLib = libClassMap.get(consumedClasses[i]);
+                //System.out.println("$$$ class = " + consumedClasses[i]);
+                //System.out.println("$$$ insta = " + consumedLib);
+                if (consumedLib == lib2) {
+                    //System.out.println(lib1 + "\n   consumes\n" + lib2 + "\n");
+                    return true;
+                }
+                if (consumedLib != null && !stack.contains(consumedLib)) {
+                    stack.offer(consumedLib);
+                }
+            }
+        }
+        return false;
     }
 
     /**
