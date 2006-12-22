@@ -69,12 +69,8 @@ Returns:
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
-
-  //
-  // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
-  //
-  PageMap = AllocatePages (1);
-  ASSERT (PageMap != NULL);
+  UINTN                                         TotalPagesNum;
+  UINTN                                         BigPageAddress;
 
   //
   // Get physical address bits supported.
@@ -98,6 +94,19 @@ Returns:
     NumberOfPdpEntriesNeeded = 512;
   }
 
+  //
+  // Pre-allocate big pages to avoid later allocations. 
+  //
+  TotalPagesNum = (NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1;
+  BigPageAddress = (UINTN) AllocatePages (TotalPagesNum);
+  ASSERT (BigPageAddress != 0);
+
+  //
+  // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
+  //
+  PageMap         = (VOID *) BigPageAddress;
+  BigPageAddress += EFI_PAGE_SIZE;
+
   PageMapLevel4Entry = PageMap;
   PageAddress        = 0;
   for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
@@ -105,8 +114,8 @@ Returns:
     // Each PML4 entry points to a page of Page Directory Pointer entires.
     // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
     //
-    PageDirectoryPointerEntry = AllocatePages (1);
-    ASSERT (PageDirectoryPointerEntry != NULL);
+    PageDirectoryPointerEntry = (VOID *) BigPageAddress;
+    BigPageAddress += EFI_PAGE_SIZE;
 
     //
     // Make a PML4 Entry
@@ -120,8 +129,8 @@ Returns:
       // Each Directory Pointer entries points to a page of Page Directory entires.
       // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
       //       
-      PageDirectoryEntry = AllocatePages (1);
-      ASSERT (PageDirectoryEntry != NULL);
+      PageDirectoryEntry = (VOID *) BigPageAddress;
+      BigPageAddress += EFI_PAGE_SIZE;
 
       //
       // Fill in a Page Directory Pointer Entries
