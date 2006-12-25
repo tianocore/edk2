@@ -303,6 +303,7 @@ public class GlobalData {
         Iterator iter = packageList.iterator();
         while (iter.hasNext()) {
             PackageIdentification pid = (PackageIdentification)iter.next();
+            moduleId.setPackage(pid);
             Spd spd = spdTable.get(pid);
             File tempMsaFile = null;
             if ((tempMsaFile = spd.getModuleFile(moduleId)) != null ) {
