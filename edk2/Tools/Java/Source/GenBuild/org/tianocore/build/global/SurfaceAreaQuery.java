@@ -1947,30 +1947,56 @@ public class SurfaceAreaQuery {
         return new ModuleSADocument.ModuleSA[0];
 
     }
+ 
     /**
-    Get name array of PCD in a module. In one module, token space
-    is same, and token name should not be conflicted.
-
-    @return String[]
+       Get name array who contains all PCDs in a module according to specified arch.
+       
+       @param arch          The specified architecture type.
+       
+       @return String[]     return all PCDs name into array, if no any PCD used by
+                            this module, a String[0] array is returned.
     **/
-    public String[] getModulePcdEntryNameArray() {
+    public String[] getModulePcdEntryNameArray(String arch) {
         PcdCodedDocument.PcdCoded.PcdEntry[] pcdEntries  = null;
-        String[]            results;
-        int                 index;
-        String[]            xPath       = new String[] {"/PcdEntry"};
-        Object[]         returns     = get ("PcdCoded", xPath);
+        java.util.List                       archList    = null;
+        java.util.List<String>               results     = new java.util.ArrayList<String> ();
+        int                                  index;
+        String[]                             xPath       = new String[] {"/PcdEntry"};
+        Object[]                             returns     = get ("PcdCoded", xPath);
 
         if (returns == null) {
             return new String[0];
         }
 
-        pcdEntries = (PcdCodedDocument.PcdCoded.PcdEntry[])returns;
-        results    = new String[pcdEntries.length];
+        pcdEntries  = (PcdCodedDocument.PcdCoded.PcdEntry[])returns;
 
         for (index = 0; index < pcdEntries.length; index ++) {
-            results[index] = pcdEntries[index].getCName();
+            archList        = pcdEntries[index].getSupArchList();
+            //
+            // If the ArchList is specified in MSA for this PCD, need check
+            // current arch whether can support by this PCD.
+            // 
+            if (archList != null) {
+                if (archList.contains(arch)) {
+                    results.add(new String(pcdEntries[index].getCName()));
+                }
+            } else {
+                //
+                // If no ArchList is specificied in MSA for this PCD, that means
+                // this PCD support all architectures.
+                // 
+                results.add(new String(pcdEntries[index].getCName()));
+            }
         }
-        return results;
+
+        if (results.size() == 0) {
+            return new String[0];
+        }
+
+        String[]    retArray = new String[results.size()];
+        results.toArray(retArray);
+
+        return retArray;        
     }
 
     /**

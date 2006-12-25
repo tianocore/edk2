@@ -668,7 +668,7 @@ public class AutoGen {
         this.myPcdAutogen = new PCDAutoGenAction(moduleId,
                                                  arch,
                                                  true,
-                                                 saq.getModulePcdEntryNameArray(),
+                                                 saq.getModulePcdEntryNameArray(this.arch),
                                                  pcdDriverType, 
                                                  parentId);
         this.myPcdAutogen.execute();
