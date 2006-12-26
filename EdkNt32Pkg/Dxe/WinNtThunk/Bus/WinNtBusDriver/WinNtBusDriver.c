@@ -128,6 +128,9 @@ EFI_DRIVER_BINDING_PROTOCOL           gWinNtBusDriverBinding = {
 static NT_PCD_ENTRY  mPcdEnvironment[] = {
   PcdToken(PcdWinNtConsole),       &gEfiWinNtConsoleGuid,
   PcdToken(PcdWinNtUga),           &gEfiWinNtUgaGuid,
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  PcdToken(PcdWinNtGop),           &gEfiWinNtGopGuid,
+#endif
   PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,
   PcdToken(PcdWinNtFileSystem),    &gEfiWinNtFileSystemGuid,
   PcdToken(PcdWinNtVirtualDisk),   &gEfiWinNtVirtualDisksGuid,

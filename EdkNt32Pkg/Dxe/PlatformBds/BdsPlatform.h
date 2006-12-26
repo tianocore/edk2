@@ -58,6 +58,12 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        End;
 } NT_PLATFORM_UGA_DEVICE_PATH;
 
+typedef struct {
+  VENDOR_DEVICE_PATH              NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE  NtGopDevice;
+  EFI_DEVICE_PATH_PROTOCOL        End;
+} NT_PLATFORM_GOP_DEVICE_PATH;
+
 //
 // Platform BDS Functions
 //

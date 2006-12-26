@@ -98,6 +98,9 @@
       <GuidCName>gEfiWinNtUgaGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiWinNtGopGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiWinNtConsoleGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
@@ -130,6 +133,12 @@
       <C_Name>PcdWinNtUga</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD declares the resolutions for the UGA windows.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtGop</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD declares the resolutions for the GOP windows.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
