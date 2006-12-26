@@ -848,6 +848,7 @@ Returns:
             //
             // GetInfo failed
             //
+            DEBUG ((EFI_D_ERROR, "Decompress GetInfo Failed - %r\n", Status));
             return EFI_NOT_FOUND;
           }
   
@@ -875,6 +876,13 @@ Returns:
                       DstBuffer,
                       ScratchBuffer
                       );
+          if (EFI_ERROR (Status)) {
+            //
+            // Decompress failed
+            //
+            DEBUG ((EFI_D_ERROR, "Decompress Failed - %r\n", Status));
+            return EFI_NOT_FOUND;
+          }
         }
         
         CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
