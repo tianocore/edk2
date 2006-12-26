@@ -243,6 +243,9 @@ Returns:
   //
   if (Hob.HandoffInformationTable->EfiFreeMemoryTop - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < 
       Hob.HandoffInformationTable->EfiFreeMemoryBottom) {
+    DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%x Pages is available.\n", Pages));
+    DEBUG ((EFI_D_ERROR, "There is only left 0x%x pages memory resource to be allocated.\n", \
+    (Hob.HandoffInformationTable->EfiFreeMemoryTop - Hob.HandoffInformationTable->EfiFreeMemoryBottom)/EFI_PAGE_SIZE));
     return  EFI_OUT_OF_RESOURCES;
   } else {
     //
