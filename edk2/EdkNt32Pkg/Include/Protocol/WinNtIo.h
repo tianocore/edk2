@@ -23,15 +23,14 @@ Abstract:
 #define EFI_WIN_NT_IO_PROTOCOL_GUID \
   { 0x96eb4ad6, 0xa32a, 0x11d4, { 0xbc, 0xfd, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
+extern EFI_GUID gEfiWinNtIoProtocolGuid;
+
 typedef struct {
   EFI_WIN_NT_THUNK_PROTOCOL *WinNtThunk;
   EFI_GUID                  *TypeGuid;
   CHAR16                    *EnvString;
   UINT16                    InstanceNumber;
 } EFI_WIN_NT_IO_PROTOCOL;
-
-
-extern EFI_GUID gEfiWinNtIoProtocolGuid;
 
 //
 // The following GUIDs are used in EFI_WIN_NT_IO_PROTOCOL_GUID
@@ -63,10 +62,10 @@ extern EFI_GUID gEfiWinNtPhysicalDisksGuid;
 //
 #define EFI_WIN_NT_GOP_GUID \
   { \
-    0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a } \
+    0x4e11e955, 0xccca, 0x11d4, {0xbd, 0x0d, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81} \
   }
 
-extern EFI_GUID gEfiWinNtFileSystemGuid;
+extern EFI_GUID gEfiWinNtGopGuid;
 
 //
 // EFI_WIN_NT_FILE_SYSTEM
@@ -76,7 +75,7 @@ extern EFI_GUID gEfiWinNtFileSystemGuid;
     0xc95a935, 0xa006, 0x11d4, {0xbc, 0xfa, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
   }
 
-extern EFI_GUID mEfiWinNtGopGuid;
+extern EFI_GUID gEfiWinNtFileSystemGuid;
 
 //
 // EFI_WIN_NT_SERIAL_PORT

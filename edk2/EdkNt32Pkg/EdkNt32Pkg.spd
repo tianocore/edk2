@@ -97,6 +97,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Dxe/WinNtThunk/Bus/SerialIo/WinNtSerialIo.msa</Filename>
     <Filename>Dxe/WinNtThunk/Bus/SimpleFileSystem/WinNtSimpleFileSystem.msa</Filename>
     <Filename>Dxe/WinNtThunk/Bus/Uga/WinNtUga.msa</Filename>
+    <Filename>Dxe/WinNtThunk/Bus/Gop/WinNtGop.msa</Filename>
     <Filename>Dxe/WinNtThunk/Bus/WinNtBusDriver/WinNtBusDriver.msa</Filename>
     <Filename>Dxe/WinNtThunk/Chipset/Metronome/Metronome.msa</Filename>
     <Filename>Dxe/WinNtThunk/Chipset/RealTimeClock/RealTimeClock.msa</Filename>
@@ -153,6 +154,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Entry Name="WinNtSerialPort">
       <C_Name>gEfiWinNtSerialPortGuid</C_Name>
       <GuidValue>0C95A93D-A006-11D4-BCFA-0080C73C8881</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="WinNtGop">
+      <C_Name>gEfiWinNtGopGuid</C_Name>
+      <GuidValue>4e11e955-ccca-11d4-bd0d-0080c73c8881</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="WinNtUga">
@@ -367,6 +373,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DefaultValue>L"64!64"</DefaultValue>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
         the size of PcdWinNtMemorySizeForSecMain in windows platform.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdWinNtGop</C_Name>
+      <Token>0x0000100d</Token>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>VOID*</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>L"UGA Window 1!UGA Window 2"</DefaultValue>
+      <HelpText>This PCD declares the resolutions for the GOP windows.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

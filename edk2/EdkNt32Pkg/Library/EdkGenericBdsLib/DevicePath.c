@@ -27,6 +27,7 @@ EFI_GUID  UnknownDeviceGuid           = UNKNOWN_DEVICE_GUID;
 
 EFI_GUID  mEfiWinNtThunkProtocolGuid  = EFI_WIN_NT_THUNK_PROTOCOL_GUID;
 EFI_GUID  mEfiWinNtUgaGuid            = EFI_WIN_NT_UGA_GUID;
+EFI_GUID  mEfiWinNtGopGuid            = EFI_WIN_NT_GOP_GUID;
 EFI_GUID  mEfiWinNtSerialPortGuid     = EFI_WIN_NT_SERIAL_PORT_GUID;
 EFI_GUID  mEfiMsgPcAnsiGuid           = DEVICE_PATH_MESSAGING_PC_ANSI;
 EFI_GUID  mEfiMsgVt100Guid            = DEVICE_PATH_MESSAGING_VT_100;
@@ -313,6 +314,9 @@ Returns:
     } else if (CompareGuid (&Vendor->Guid, &mEfiWinNtUgaGuid)) {
       CatPrint (Str, L"%s", L"UGA");
       return ;
+    } else if (CompareGuid (&Vendor->Guid, &mEfiWinNtGopGuid)) {
+      CatPrint (Str, L"%s", L"GOP");
+      return ;
     } else if (CompareGuid (&Vendor->Guid, &mEfiWinNtSerialPortGuid)) {
       CatPrint (Str, L"%s", L"Serial");
       return ;
@@ -368,6 +372,139 @@ DevPathAcpi (
   } else {
     CatPrint (Str, L"Acpi(%08x,%x)", Acpi->HID, Acpi->UID);
   }
+}
+
+VOID
+DevPathExtendedAcpi (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath
+  )
+{
+  ACPI_EXTENDED_HID_DEVICE_PATH   *ExtendedAcpi;
+  //
+  // Index for HID, UID and CID strings, 0 for non-exist
+  //
+  UINT16                          HIDSTRIdx;
+  UINT16                          UIDSTRIdx;
+  UINT16                          CIDSTRIdx;
+  UINT16                          Index;
+  UINT16                          Length;
+  UINT16                          Anchor;
+  CHAR8                           *AsChar8Array;
+
+  ASSERT (Str != NULL);
+  ASSERT (DevPath != NULL);
+
+  HIDSTRIdx    = 0;
+  UIDSTRIdx    = 0;
+  CIDSTRIdx    = 0;
+  ExtendedAcpi = DevPath;
+  Length       = DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) ExtendedAcpi);
+
+  ASSERT (Length >= 19);
+  AsChar8Array = (CHAR8 *) ExtendedAcpi;
+
+  //
+  // find HIDSTR
+  //
+  Anchor = 16;
+  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+    ;
+  }
+  if (Index > Anchor) {
+    HIDSTRIdx = Anchor;
+  }
+  //
+  // find UIDSTR
+  //
+  Anchor = Index + 1;
+  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+    ;
+  }
+  if (Index > Anchor) {
+    UIDSTRIdx = Anchor;
+  }
+  //
+  // find CIDSTR
+  //
+  Anchor = Index + 1;
+  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+    ;
+  }
+  if (Index > Anchor) {
+    CIDSTRIdx = Anchor;
+  }
+  
+  if (HIDSTRIdx == 0 && CIDSTRIdx == 0 && ExtendedAcpi->UID == 0) {
+    CatPrint (Str, L"AcpiExp(");
+    if ((ExtendedAcpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
+      CatPrint (Str, L"PNP%04x,", EISA_ID_TO_NUM (ExtendedAcpi->HID));
+    } else {
+      CatPrint (Str, L"%08x,", ExtendedAcpi->HID);
+    }
+    if ((ExtendedAcpi->CID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
+      CatPrint (Str, L"PNP%04x,", EISA_ID_TO_NUM (ExtendedAcpi->CID));
+    } else {
+      CatPrint (Str, L"%08x,", ExtendedAcpi->CID);
+    }
+    if (UIDSTRIdx != 0) {
+      CatPrint (Str, L"%a)", AsChar8Array + UIDSTRIdx);
+    } else {
+      CatPrint (Str, L"\"\")");
+    }
+  } else {
+    CatPrint (Str, L"AcpiEx(");
+    if ((ExtendedAcpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
+      CatPrint (Str, L"PNP%04x,", EISA_ID_TO_NUM (ExtendedAcpi->HID));
+    } else {
+      CatPrint (Str, L"%08x,", ExtendedAcpi->HID);
+    }
+    if ((ExtendedAcpi->CID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
+      CatPrint (Str, L"PNP%04x,", EISA_ID_TO_NUM (ExtendedAcpi->CID));
+    } else {
+      CatPrint (Str, L"%08x,", ExtendedAcpi->CID);
+    }
+    CatPrint (Str, L"%x,", ExtendedAcpi->UID);
+
+    if (HIDSTRIdx != 0) {
+      CatPrint (Str, L"%a,", AsChar8Array + HIDSTRIdx);
+    } else {
+      CatPrint (Str, L"\"\",");
+    }
+    if (CIDSTRIdx != 0) {
+      CatPrint (Str, L"%a,", AsChar8Array + CIDSTRIdx);
+    } else {
+      CatPrint (Str, L"\"\",");
+    }
+    if (UIDSTRIdx != 0) {
+      CatPrint (Str, L"%a)", AsChar8Array + UIDSTRIdx);
+    } else {
+      CatPrint (Str, L"\"\")");
+    }
+  }
+
+}
+
+VOID
+DevPathAdrAcpi (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath
+  )
+{
+  ACPI_ADR_DEVICE_PATH    *AcpiAdr;
+  UINT16                  Index;
+  UINT16                  Length;
+  UINT16                  AdditionalAdrCount;
+
+  AcpiAdr            = DevPath;
+  Length             = DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) AcpiAdr);
+  AdditionalAdrCount = (Length - 8) / 4;
+
+  CatPrint (Str, L"AcpiAdr(%x", AcpiAdr->ADR);
+  for (Index = 0; Index < AdditionalAdrCount; Index++) {
+    CatPrint (Str, L",%x", *(UINT32 *) ((UINT8 *) AcpiAdr + 8 + Index * 4));
+  }
+  CatPrint (Str, L")");
 }
 
 VOID
@@ -783,6 +920,12 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
   ACPI_DEVICE_PATH,
   ACPI_DP,
   DevPathAcpi,
+  ACPI_DEVICE_PATH,
+  ACPI_EXTENDED_DP,
+  DevPathExtendedAcpi,
+  ACPI_DEVICE_PATH,
+  ACPI_ADR_DP,
+  DevPathAdrAcpi,
   MESSAGING_DEVICE_PATH,
   MSG_ATAPI_DP,
   DevPathAtapi,

@@ -158,9 +158,11 @@ Returns:
     //
     return EFI_SUCCESS;
   }
-
+  //
+  // Signal the EFI_EVENT_SIGNAL_READY_TO_BOOT event
+  //
   EfiSignalEventReadyToBoot ();
-
+  
   //
   // Set Boot Current
   //
