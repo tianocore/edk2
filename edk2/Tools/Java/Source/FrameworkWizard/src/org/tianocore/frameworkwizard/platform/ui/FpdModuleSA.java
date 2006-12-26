@@ -499,7 +499,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         Iterator<LibraryClassDescriptor> lcdi = this.classConsumed.keySet().iterator();
         while (lcdi.hasNext()) {
             LibraryClassDescriptor lcd = lcdi.next();
-            if (lcd.className.equals(className)) {
+            if ((lcd.className != null) && lcd.className.equals(className)) {
                 return this.classConsumed.get(lcd);
             }
         }
@@ -748,7 +748,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         jTextFieldMaxDatumSize.setText(model.getValueAt(selectedRow, 4)+"");
                         jTextFieldPcdDefault.setEnabled(true);
                         jTextFieldPcdDefault.setText(model.getValueAt(selectedRow, 6)+"");
-                        if (model.getValueAt(selectedRow, 5).equals("VOID*")) {
+                        if ((model.getValueAt(selectedRow, 5) != null) && model.getValueAt(selectedRow, 5).equals("VOID*")) {
                             if (pcdInfo[1].equals("FEATURE_FLAG")) {
                                 jTextFieldMaxDatumSize.setVisible(false);
                             }
@@ -1703,7 +1703,7 @@ private JComboBox getJComboBoxItemType() {
                     return;
                 }
                         
-                if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
+                if (jComboBoxItemType.getSelectedItem() != null && jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
 				    jTextFieldPcdDefault.setEnabled(true);
                 }
                 else {
