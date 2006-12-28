@@ -672,17 +672,18 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
     
     private void showSettingsDlg (int row) {
-        try {
-            Vector<String> vExceptions = new Vector<String>();
-            if (ffc.adjustPcd(row, vExceptions)) {
-                JOptionPane.showMessageDialog(frame, "Pcd entries sync. with those in MSA files.");
-                docConsole.setSaved(false);
-            }
-        }
-        catch (Exception exp) {
-            JOptionPane.showMessageDialog(frame, exp.getMessage());
-//            return;
-        }
+//		As PCD sync. check is full platform range now during opening FrameworkModules editor,
+//    	the following check is no longer needed.
+//        try {
+//            Vector<String> vExceptions = new Vector<String>();
+//            if (ffc.adjustPcd(row, vExceptions)) {
+//                JOptionPane.showMessageDialog(frame, "Pcd entries sync. with those in MSA files.");
+//                docConsole.setSaved(false);
+//            }
+//        }
+//        catch (Exception exp) {
+//            JOptionPane.showMessageDialog(frame, exp.getMessage());
+//        }
         
         if (settingDlg == null) {
             settingDlg = new FpdModuleSA(ffc);
@@ -864,7 +865,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             for (int i = 0; i < vExceptions.size(); ++i) {
                 errorMsg += " " + vExceptions.get(i) + "\n";
             }
-            JOptionPane.showMessageDialog(frame, "Error occurred during synchronization:" + errorMsg);
+            JOptionPane.showMessageDialog(frame, "Error occurred during synchronization:\n" + errorMsg);
         }
     }
 
