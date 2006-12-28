@@ -109,7 +109,7 @@ EfiNamedEventListen (
   IN EFI_TPL           NotifyTpl,
   IN EFI_EVENT_NOTIFY  NotifyFunction,
   IN CONST VOID        *NotifyContext,  OPTIONAL
-  OUT VOID             *Registration    OPTIONAL
+  OUT VOID             **Registration
   );
 
 /**
