@@ -76,7 +76,7 @@ Returns:
     CallbackInfo->Data.VideoBIOS = (UINT8) (UINTN) (((EFI_IFR_DATA_ENTRY *)(DataArray + 1))->Data);
     gRT->SetVariable (
           L"VBIOS",
-          &gEfiGlobalVariableGuid,
+          &gEfiGenericPlatformVariableGuid,
           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
           sizeof (UINT8),
           &CallbackInfo->Data.VideoBIOS
@@ -395,7 +395,7 @@ Returns:
   //
   VideoOption = BdsLibGetVariableAndSize (
                   L"VBIOS",
-                  &gEfiGlobalVariableGuid,
+                  &gEfiGenericPlatformVariableGuid,
                   &VideoOptionSize
                   );
   if (NULL == VideoOption) {

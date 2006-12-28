@@ -213,6 +213,9 @@
       <GuidCName>gEfiGlobalVariableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiGenericPlatformVariableGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFlashMapHobGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
