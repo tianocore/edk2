@@ -58,6 +58,7 @@ Abstract:
 #include <Guid/CapsuleVendor.h>
 #include <Guid/CompatibleMemoryTested.h>
 #include <Guid/MemoryStatusCodeRecord.h>
+#include <Guid/GenericPlatformVariable.h>
 
 #include <Ppi/StatusCodeMemory.h>
 
