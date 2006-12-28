@@ -427,7 +427,7 @@ public class FpdFileContents {
                     if (nextMi == null) {
                         continue;
                     }
-                    if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], nextMi)) {
+                    if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], arch, nextMi)) {
                         continue nextPcd;
                     }
                 }
@@ -454,6 +454,13 @@ public class FpdFileContents {
                                 continue msaPcdIter;
                             }
                         }
+                    }
+                    // Check sup arch conformance for the new PCD
+                    if (msaPcd.getSupArchList() != null) {
+                    	String newPcdArch = msaPcd.getSupArchList().toString();
+                    	if (!newPcdArch.toLowerCase().contains(arch.toLowerCase())) {
+                    		continue;
+                    	}
                     }
                     
                     PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, vMi.get(i));
@@ -686,7 +693,7 @@ public class FpdFileContents {
         
         int pcdSourceCount = 0;
         for (int i = 0; i < vMi.size(); ++i) {
-            if (WorkspaceProfile.pcdInMsa(cName, tsGuidCName, vMi.get(i))) {
+            if (WorkspaceProfile.pcdInMsa(cName, tsGuidCName, null, vMi.get(i))) {
                 pcdSourceCount++;
             }
         }
@@ -1179,6 +1186,11 @@ public class FpdFileContents {
         ListIterator li = l.listIterator();
         while (li.hasNext()) {
             PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry) li.next();
+            if (msaPcd.getSupArchList() != null) {
+            	if (!msaPcd.getSupArchList().toString().toLowerCase().contains(arch.toLowerCase())) {
+            		continue;
+            	}
+            }
             PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
             if (spdPcd == null) {
                 //

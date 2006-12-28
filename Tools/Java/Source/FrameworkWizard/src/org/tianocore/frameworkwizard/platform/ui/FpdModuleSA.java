@@ -581,12 +581,21 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         
     }
     
+    private String getModuleArch () {
+    	String arch = "";
+    	String[] moduleInfo = moduleKey.split(" ");
+    	for (int i = 4; i < moduleInfo.length; ++i) {
+    		arch += moduleInfo[i];
+    		arch += " ";
+    	}
+    	return arch.trim();
+    }
     private void addLibInstance (ModuleIdentification libMi) throws Exception{
         
         //
         // Add pcd information of selected instance to current moduleSA
         //
-        ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
+        ffc.addFrameworkModulesPcdBuildDefs(libMi, getModuleArch(), ffc.getModuleSA(moduleKey));
         
         ffc.genLibraryInstance(libMi, moduleKey);
     }

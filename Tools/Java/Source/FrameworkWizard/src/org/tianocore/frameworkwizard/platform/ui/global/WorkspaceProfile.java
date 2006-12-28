@@ -130,7 +130,7 @@ public class WorkspaceProfile {
         return msa.getModuleDefinitions().getOutputFileBasename();
     }
     
-    public static boolean pcdInMsa (String cName, String tsGuid, ModuleIdentification mi) {
+    public static boolean pcdInMsa (String cName, String tsGuid, String supArchList, ModuleIdentification mi) {
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)getModuleXmlObject(mi);
         if (msa.getPcdCoded() == null || msa.getPcdCoded().getPcdEntryList() == null) {
             return false;
@@ -139,7 +139,14 @@ public class WorkspaceProfile {
         while (li.hasNext()) {
             PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
             if (msaPcd.getCName().equals(cName) && msaPcd.getTokenSpaceGuidCName().equals(tsGuid)) {
-                return true;
+                if (supArchList != null && msaPcd.getSupArchList() != null) {
+                	if (msaPcd.getSupArchList().toString().toLowerCase().contains(supArchList.trim().toLowerCase())) {
+                		return true;
+                	}
+                }
+                else{
+                	return true;
+                }
             }
         }
         return false;
