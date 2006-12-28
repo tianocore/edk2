@@ -640,6 +640,11 @@
       <GuidValue>060CC026-4C0D-4DDA-8F41-595FEF00A502</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="GenericPlatformVariable" GuidTypeList="EFI_VARIABLE">
+      <C_Name>gEfiGenericPlatformVariableGuid</C_Name>
+      <GuidValue>59d1c24f-50f1-401a-b101-f33e0daed443</GuidValue>
+      <HelpText>The variable space Guid to pair with a Unicode string name to tag an EFI variable</HelpText>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="Capsule">
