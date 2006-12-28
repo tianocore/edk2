@@ -96,6 +96,8 @@ public class ModuleEvents extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -286,10 +288,11 @@ public class ModuleEvents extends IInternalFrame {
      @param inEvents The input EventsDocument.Events
      
      **/
-    public ModuleEvents(OpeningModuleType inOmt) {
+    public ModuleEvents(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getEvents());
         this.setVisible(true);
     }
@@ -315,7 +318,7 @@ public class ModuleEvents extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        EventsDlg dlg = new EventsDlg(vid.getEvents(index), new IFrame(), omt.getId());
+        EventsDlg dlg = new EventsDlg(vid.getEvents(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

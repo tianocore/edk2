@@ -91,6 +91,8 @@ public class ModuleDataHubs extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -257,10 +259,11 @@ public class ModuleDataHubs extends IInternalFrame {
      @param inDataHubs The input DataHubsDocument.DataHubs
      
      **/
-    public ModuleDataHubs(OpeningModuleType inOmt) {
+    public ModuleDataHubs(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getDataHubs());
         this.setVisible(true);
     }
@@ -286,7 +289,7 @@ public class ModuleDataHubs extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        DataHubsDlg dlg = new DataHubsDlg(vid.getDataHubs(index), new IFrame(), omt.getId());
+        DataHubsDlg dlg = new DataHubsDlg(vid.getDataHubs(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

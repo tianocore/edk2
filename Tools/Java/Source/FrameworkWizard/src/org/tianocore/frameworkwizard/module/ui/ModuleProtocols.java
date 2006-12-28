@@ -96,6 +96,8 @@ public class ModuleProtocols extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -280,10 +282,11 @@ public class ModuleProtocols extends IInternalFrame {
      @param inProtocol The input data of ProtocolsDocument.Protocols
      
      **/
-    public ModuleProtocols(OpeningModuleType inOmt) {
+    public ModuleProtocols(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getProtocols());
         this.setVisible(true);
     }
@@ -309,7 +312,7 @@ public class ModuleProtocols extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        ProtocolsDlg dlg = new ProtocolsDlg(vid.getProtocols(index), new IFrame(), omt.getId());
+        ProtocolsDlg dlg = new ProtocolsDlg(vid.getProtocols(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

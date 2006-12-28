@@ -2831,67 +2831,67 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             getJDesktopPaneModule().add(frmMsaHeader, 1);
             break;
         case IDefaultMutableTreeNode.MSA_LIBRARYCLASSDEFINITIONS:
-            ModuleLibraryClassDefinitions frmMlcd = new ModuleLibraryClassDefinitions(msa);
+            ModuleLibraryClassDefinitions frmMlcd = new ModuleLibraryClassDefinitions(msa, this);
             getJDesktopPaneModule().add(frmMlcd, 1);
             break;
         case IDefaultMutableTreeNode.MSA_PACKAGEDEPENDENCIES:
-            ModulePackageDependencies frmMpd = new ModulePackageDependencies(msa);
+            ModulePackageDependencies frmMpd = new ModulePackageDependencies(msa, this);
             getJDesktopPaneModule().add(frmMpd, 1);
             break;
         case IDefaultMutableTreeNode.MSA_SOURCEFILES:
-            ModuleSourceFiles frmMsf = new ModuleSourceFiles(msa);
+            ModuleSourceFiles frmMsf = new ModuleSourceFiles(msa, this);
             getJDesktopPaneModule().add(frmMsf, 1);
             break;
         case IDefaultMutableTreeNode.MSA_PROTOCOLS:
-            ModuleProtocols frmMp = new ModuleProtocols(msa);
+            ModuleProtocols frmMp = new ModuleProtocols(msa, this);
             getJDesktopPaneModule().add(frmMp, 1);
             break;
         case IDefaultMutableTreeNode.MSA_EVENTS:
-            ModuleEvents frmMe = new ModuleEvents(msa);
+            ModuleEvents frmMe = new ModuleEvents(msa, this);
             getJDesktopPaneModule().add(frmMe, 1);
             break;
         case IDefaultMutableTreeNode.MSA_HOBS:
-            ModuleHobs frmMh = new ModuleHobs(msa);
+            ModuleHobs frmMh = new ModuleHobs(msa, this);
             getJDesktopPaneModule().add(frmMh, 1);
             break;
         case IDefaultMutableTreeNode.MSA_PPIS:
-            ModulePpis frmMpp = new ModulePpis(msa);
+            ModulePpis frmMpp = new ModulePpis(msa, this);
             getJDesktopPaneModule().add(frmMpp, 1);
             break;
         case IDefaultMutableTreeNode.MSA_VARIABLES:
-            ModuleVariables frmMv = new ModuleVariables(msa);
+            ModuleVariables frmMv = new ModuleVariables(msa, this);
             getJDesktopPaneModule().add(frmMv, 1);
             break;
         case IDefaultMutableTreeNode.MSA_BOOTMODES:
-            ModuleBootModes frmMbm = new ModuleBootModes(msa);
+            ModuleBootModes frmMbm = new ModuleBootModes(msa, this);
             getJDesktopPaneModule().add(frmMbm, 1);
             break;
         case IDefaultMutableTreeNode.MSA_SYSTEMTABLES:
-            ModuleSystemTables frmMst = new ModuleSystemTables(msa);
+            ModuleSystemTables frmMst = new ModuleSystemTables(msa, this);
             getJDesktopPaneModule().add(frmMst, 1);
             break;
         case IDefaultMutableTreeNode.MSA_DATAHUBS:
-            ModuleDataHubs frmMdh = new ModuleDataHubs(msa);
+            ModuleDataHubs frmMdh = new ModuleDataHubs(msa, this);
             getJDesktopPaneModule().add(frmMdh, 1);
             break;
         case IDefaultMutableTreeNode.MSA_HIIPACKAGES:
-            ModuleHiiPackages frmMf = new ModuleHiiPackages(msa);
+            ModuleHiiPackages frmMf = new ModuleHiiPackages(msa, this);
             getJDesktopPaneModule().add(frmMf, 1);
             break;
         case IDefaultMutableTreeNode.MSA_GUIDS:
-            ModuleGuids frmGuid = new ModuleGuids(msa);
+            ModuleGuids frmGuid = new ModuleGuids(msa, this);
             getJDesktopPaneModule().add(frmGuid, 1);
             break;
         case IDefaultMutableTreeNode.MSA_EXTERNS:
-            ModuleExterns frmMex = new ModuleExterns(msa);
+            ModuleExterns frmMex = new ModuleExterns(msa, this);
             getJDesktopPaneModule().add(frmMex, 1);
             break;
         case IDefaultMutableTreeNode.MSA_PCDS:
-            ModulePCDs frmPcd = new ModulePCDs(msa);
+            ModulePCDs frmPcd = new ModulePCDs(msa, this);
             getJDesktopPaneModule().add(frmPcd, 1);
             break;
         case IDefaultMutableTreeNode.MSA_BUILDOPTIONS:
-            ModuleBuildOptions frmMbo = new ModuleBuildOptions(msa);
+            ModuleBuildOptions frmMbo = new ModuleBuildOptions(msa, this);
             getJDesktopPaneModule().add(frmMbo, 1);
             break;
         }

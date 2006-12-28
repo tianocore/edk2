@@ -88,6 +88,8 @@ public class ModuleHiiPackages extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -257,10 +259,11 @@ public class ModuleHiiPackages extends IInternalFrame {
      @param inFormsets The input data of HiiPackagesDocument.HiiPackages
      
      **/
-    public ModuleHiiPackages(OpeningModuleType inOmt) {
+    public ModuleHiiPackages(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getHiiPackages());
         this.setVisible(true);
     }
@@ -286,7 +289,7 @@ public class ModuleHiiPackages extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        HiiPackagesDlg dlg = new HiiPackagesDlg(vid.getHiiPackages(index), new IFrame(), omt.getId());
+        HiiPackagesDlg dlg = new HiiPackagesDlg(vid.getHiiPackages(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

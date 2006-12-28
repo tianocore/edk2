@@ -75,6 +75,8 @@ public class ModuleBootModes extends IInternalFrame {
     private JScrollPane jScrollPaneTable = null;
 
     private JTable jTable = null;
+    
+    private IFrame parentFrame = null;
 
     //
     // Not used by UI
@@ -260,10 +262,11 @@ public class ModuleBootModes extends IInternalFrame {
      @param inBootModes The input BootModesDocument.BootModes
      
      **/
-    public ModuleBootModes(OpeningModuleType inOmt) {
+    public ModuleBootModes(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getBootModes());
         this.setVisible(true);
     }
@@ -289,7 +292,7 @@ public class ModuleBootModes extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        BootModesDlg dlg = new BootModesDlg(vid.getBootModes(index), new IFrame(), omt.getId());
+        BootModesDlg dlg = new BootModesDlg(vid.getBootModes(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {
