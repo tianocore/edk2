@@ -94,6 +94,8 @@ public class ModulePpis extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -279,10 +281,11 @@ public class ModulePpis extends IInternalFrame {
      @param inPpis The input data of PPIsDocument.PPIs
      
      **/
-    public ModulePpis(OpeningModuleType inOmt) {
+    public ModulePpis(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getPPIs());
         this.setVisible(true);
     }
@@ -308,7 +311,7 @@ public class ModulePpis extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        PpisDlg dlg = new PpisDlg(vid.getPpis(index), new IFrame(), omt.getId());
+        PpisDlg dlg = new PpisDlg(vid.getPpis(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

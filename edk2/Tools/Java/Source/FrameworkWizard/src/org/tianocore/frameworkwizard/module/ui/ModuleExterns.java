@@ -91,6 +91,8 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -315,10 +317,11 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
      @param inExterns The input data of ExternsDocument.Externs
      
      **/
-    public ModuleExterns(OpeningModuleType inOmt) {
+    public ModuleExterns(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getExterns());
         this.setVisible(true);
     }
@@ -344,7 +347,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
     }
 
     private void showEdit(int index) {
-        ExternsDlg dlg = new ExternsDlg(vid.getExterns(index), new IFrame(), omt.getId());
+        ExternsDlg dlg = new ExternsDlg(vid.getExterns(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

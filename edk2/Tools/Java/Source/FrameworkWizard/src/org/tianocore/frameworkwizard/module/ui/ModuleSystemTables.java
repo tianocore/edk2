@@ -90,6 +90,8 @@ public class ModuleSystemTables extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -256,10 +258,11 @@ public class ModuleSystemTables extends IInternalFrame {
      @param inSystemTables The input data of SystemTablesDocument.SystemTables
      
      **/
-    public ModuleSystemTables(OpeningModuleType inOmt) {
+    public ModuleSystemTables(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getSystemTables());
         this.setVisible(true);
     }
@@ -286,7 +289,7 @@ public class ModuleSystemTables extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        SystemTablesDlg dlg = new SystemTablesDlg(vid.getSystemTables(index), new IFrame(), omt.getId());
+        SystemTablesDlg dlg = new SystemTablesDlg(vid.getSystemTables(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

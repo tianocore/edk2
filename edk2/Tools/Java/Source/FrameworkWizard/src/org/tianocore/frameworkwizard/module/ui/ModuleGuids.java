@@ -88,6 +88,8 @@ public class ModuleGuids extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -254,10 +256,11 @@ public class ModuleGuids extends IInternalFrame {
      @param inGuids The input data of GuidsDocument.Guids
      
      **/
-    public ModuleGuids(OpeningModuleType inOmt) {
+    public ModuleGuids(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getGuids());
         this.setVisible(true);
     }
@@ -283,7 +286,7 @@ public class ModuleGuids extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        GuidsDlg dlg = new GuidsDlg(vid.getGuids(index), new IFrame(), omt.getId());
+        GuidsDlg dlg = new GuidsDlg(vid.getGuids(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

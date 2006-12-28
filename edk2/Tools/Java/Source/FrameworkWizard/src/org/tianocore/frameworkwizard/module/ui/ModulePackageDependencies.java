@@ -94,6 +94,8 @@ public class ModulePackageDependencies extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -217,10 +219,11 @@ public class ModulePackageDependencies extends IInternalFrame {
      @param 
      
      **/
-    public ModulePackageDependencies(OpeningModuleType inOmt) {
+    public ModulePackageDependencies(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getPackageDependencies());
         this.setVisible(true);
     }
@@ -294,7 +297,7 @@ public class ModulePackageDependencies extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        PackageDepDlg pdd = new PackageDepDlg(vid.getPackageDependencies(index), new IFrame(), omt.getId());
+        PackageDepDlg pdd = new PackageDepDlg(vid.getPackageDependencies(index), this.parentFrame, omt.getId());
         int result = pdd.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

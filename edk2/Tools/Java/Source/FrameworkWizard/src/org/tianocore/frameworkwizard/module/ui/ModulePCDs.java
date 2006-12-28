@@ -91,6 +91,8 @@ public class ModulePCDs extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -264,10 +266,11 @@ public class ModulePCDs extends IInternalFrame {
      @param inPcds The input data of PCDsDocument.PCDs
      
      **/
-    public ModulePCDs(OpeningModuleType inOmt) {
+    public ModulePCDs(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getPcdCoded());
         this.setVisible(true);
     }
@@ -293,7 +296,7 @@ public class ModulePCDs extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        PCDsDlg dlg = new PCDsDlg(vid.getPcdCoded(index), new IFrame(), omt.getId());
+        PCDsDlg dlg = new PCDsDlg(vid.getPcdCoded(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

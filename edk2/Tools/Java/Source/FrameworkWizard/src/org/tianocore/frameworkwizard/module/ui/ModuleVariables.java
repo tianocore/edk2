@@ -89,6 +89,8 @@ public class ModuleVariables extends IInternalFrame {
     private IDefaultTableModel model = null;
 
     private int selectedRow = -1;
+    
+    private IFrame parentFrame = null;
 
     /**
      This method initializes jButtonAdd 
@@ -257,10 +259,11 @@ public class ModuleVariables extends IInternalFrame {
      @param inVariables The input data of VariablesDocument.Variables
      
      **/
-    public ModuleVariables(OpeningModuleType inOmt) {
+    public ModuleVariables(OpeningModuleType inOmt, IFrame iFrame) {
         super();
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
+        this.parentFrame = iFrame;
         init(msa.getVariables());
         this.setVisible(true);
     }
@@ -286,7 +289,7 @@ public class ModuleVariables extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        VariablesDlg dlg = new VariablesDlg(vid.getVariables(index), new IFrame(), omt.getId());
+        VariablesDlg dlg = new VariablesDlg(vid.getVariables(index), this.parentFrame, omt.getId());
         int result = dlg.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {
