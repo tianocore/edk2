@@ -1699,7 +1699,7 @@ private JComboBox getJComboBoxItemType() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 
                 int row = jTablePcd.getSelectedRow();
-                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
+                if (row < 0) {
                     return;
                 }
                         
