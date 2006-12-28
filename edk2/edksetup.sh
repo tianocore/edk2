@@ -34,7 +34,7 @@ then
 else
   
 # These should be ok as they are.
-export CLASSPATH=$WORKSPACE/Tools/Jars/SurfaceArea.jar:$WORKSPACE/Tools/Jars/frameworktasks.jar:$WORKSPACE/Tools/Jars/cpptasks.jar:$WORKSPACE/Tools/Jars/PcdTools.jar:$WORKSPACE/Tools/Jars/GenBuild.jar:$XMLBEANS_HOME/lib/resolver.jar:$XMLBEANS_HOME/lib/xbean.jar:$XMLBEANS_HOME/lib/xmlpublic.jar:$XMLBEANS_HOME/lib/jsr173_1.0_api.jar:$XMLBEANS_HOME/lib/saxon8.jar:$XMLBEANS_HOME/lib/xbean_xpath.jar
+export CLASSPATH=$ANT_HOME/lib/ant-contrib.jar:$WORKSPACE/Tools/Jars/SurfaceArea.jar:$WORKSPACE/Tools/Jars/frameworktasks.jar:$WORKSPACE/Tools/Jars/cpptasks.jar:$WORKSPACE/Tools/Jars/PcdTools.jar:$WORKSPACE/Tools/Jars/GenBuild.jar:$XMLBEANS_HOME/lib/resolver.jar:$XMLBEANS_HOME/lib/xbean.jar:$XMLBEANS_HOME/lib/xmlpublic.jar:$XMLBEANS_HOME/lib/jsr173_1.0_api.jar:$XMLBEANS_HOME/lib/saxon8.jar:$XMLBEANS_HOME/lib/xbean_xpath.jar
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/Common.jar
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/PcdTools.jar
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Bin/FrameworkWizard.jar
