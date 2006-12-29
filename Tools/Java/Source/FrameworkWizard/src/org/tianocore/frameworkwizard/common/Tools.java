@@ -35,6 +35,7 @@ import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PlatformHeaderDocument.PlatformHeader;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.SpdHeaderDocument.SpdHeader;
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
@@ -334,7 +335,7 @@ public class Tools {
      
      **/
     public static void showInformationMessage(String arg0) {
-        JOptionPane.showConfirmDialog(null, arg0, "Info", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showConfirmDialog(FrameworkWizardUI.getInstance(), arg0, "Info", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

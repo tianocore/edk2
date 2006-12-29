@@ -21,7 +21,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -102,7 +101,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
     //
     //Define class members
     //
-    static JFrame frame;
+    private IInternalFrame topFrame;
 
     private JPanel jContentPane = null;
 
@@ -191,7 +190,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jPackageNameTextField.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isUiNameType(jPackageNameTextField.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Package Name must start with a letter.");
+                        JOptionPane.showMessageDialog(topFrame, "Package Name must start with a letter.");
                         return;
                     }
                     if (jPackageNameTextField.getText().equals(sfc.getSpdHdrPkgName())) {
@@ -219,7 +218,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jGuidTextField.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isGuid(jGuidTextField.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Guid must be in registry (8-4-4-4-12) format.");
+                        JOptionPane.showMessageDialog(topFrame, "Guid must be in registry (8-4-4-4-12) format.");
                         return;
                     }
                     if (jGuidTextField.getText().equals(sfc.getSpdHdrGuidValue())) {
@@ -247,7 +246,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jVersionTextField.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isVersion(jVersionTextField.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Version must start with a number.");
+                        JOptionPane.showMessageDialog(topFrame, "Version must start with a number.");
                         return;
                     }
                     if (jVersionTextField.getText().equals(sfc.getSpdHdrVer())) {
@@ -290,7 +289,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jLicenseTextArea.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (jLicenseTextArea.getText().length() == 0) {
-                        JOptionPane.showMessageDialog(frame, "License is a required field.");
+                        JOptionPane.showMessageDialog(topFrame, "License is a required field.");
                         return;
                     }
                     if (jLicenseTextArea.getText().equals(sfc.getSpdHdrLicense())) {
@@ -318,7 +317,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
                 public void focusLost(FocusEvent e) {
                     if (jDescriptionTextArea.getText().length() == 0) {
                         JOptionPane
-                                   .showMessageDialog(frame,
+                                   .showMessageDialog(topFrame,
                                                       "Description is a required field, and should reflect the contents of the package.");
                         return;
                     }
@@ -405,7 +404,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jAbstractTextField.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isAbstract(jAbstractTextField.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
+                        JOptionPane.showMessageDialog(topFrame, "Abstract could NOT be empty.");
                         return;
                     }
                     if (jAbstractTextField.getText().equals(sfc.getSpdHdrAbs())) {
@@ -443,7 +442,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
             jCopyrightTextArea.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isCopyright(jCopyrightTextArea.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Copyright must be entered.");
+                        JOptionPane.showMessageDialog(topFrame, "Copyright must be entered.");
                         return;
                     }
                     if (jCopyrightTextArea.getText().equals(sfc.getSpdHdrCopyright())) {
@@ -560,6 +559,7 @@ public class SpdHeader extends IInternalFrame implements DocumentListener{
         this(opt.getXmlSpd());
         docConsole = opt;
         initFrame();
+        topFrame = this;
     }
 
     /**

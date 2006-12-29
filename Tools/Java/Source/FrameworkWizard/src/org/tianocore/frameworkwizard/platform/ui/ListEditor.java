@@ -37,26 +37,26 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
      */
     private static final long serialVersionUID = 1L;
     private boolean canNotBeEmpty = false;
+    private JFrame topFrame = null;
     String archs;
     JButton button;
-    static JFrame frame;
     GenListDialog dialog;
     protected static final String EDIT = "edit";
 
-    public ListEditor() {
-        
+    public ListEditor(JFrame frame) {
+        topFrame = frame;
         button = new JButton();
         button.setActionCommand(EDIT);
         button.addActionListener(this);
         button.setBorderPainted(false);
 
         
-        dialog = new GenListDialog(this);
+        dialog = new GenListDialog(this, frame);
         
     }
     
-    public ListEditor(Vector<String> v) {
-        this();
+    public ListEditor(Vector<String> v, JFrame frame) {
+        this(frame);
         dialog.initList(v);
     }
 
@@ -95,7 +95,7 @@ public class ListEditor extends AbstractCellEditor implements TableCellEditor, A
         else { //User pressed dialog's "OK" button.
             Vector<String> v = dialog.getList();
             if (canNotBeEmpty && v.size() == 0) {
-                JOptionPane.showMessageDialog(frame, "You must select at least one item.");
+                JOptionPane.showMessageDialog(topFrame, "You must select at least one item.");
                 return;
             }
             String s = " ";

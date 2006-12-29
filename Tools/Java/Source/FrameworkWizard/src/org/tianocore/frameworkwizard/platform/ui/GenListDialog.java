@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
@@ -181,13 +182,13 @@ public class GenListDialog extends JDialog implements ActionListener{
     /**
      * This is the default constructor
      */
-    public GenListDialog() {
-        super();
+    public GenListDialog(JFrame frame) {
+        super(frame);
         initialize();
     }
     
-    public GenListDialog(ActionListener i){
-        this();
+    public GenListDialog(ActionListener i, JFrame frame){
+        this(frame);
         jButtonOk.addActionListener(i);
         jButtonOk.registerKeyboardAction(i, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
     }

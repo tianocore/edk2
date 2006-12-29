@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
@@ -24,6 +23,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.IDefaultTableModel;
@@ -53,7 +53,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * 
      */
     private static final long serialVersionUID = 1L;
-    static JFrame frame;
     private JPanel jContentPane = null;
     private JTabbedPane jTabbedPane = null;
     private JPanel jPanelPcd = null;
@@ -142,7 +141,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * This is the default constructor
      */
     public FpdModuleSA() {
-        super();
+        super(FrameworkWizardUI.getInstance());
         initialize();
     }
     public FpdModuleSA(FpdFileContents ffc) {
@@ -208,7 +207,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         } catch (Exception e) {
             String exceptionMsg = e.getCause() + " " + e.getMessage();
             errorMsg.add(exceptionMsg);
-            JOptionPane.showMessageDialog(frame, exceptionMsg);
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), exceptionMsg);
         }
         //
         // display lib instances already selected for key
@@ -236,7 +235,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     } catch (Exception e) {
                         String exceptionMsg = e.getCause() + " " + e.getMessage();
                         if (!errorMsg.contains(exceptionMsg)) {
-                            JOptionPane.showMessageDialog(frame, e.getCause() + " " + e.getMessage());
+                            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), e.getCause() + " " + e.getMessage());
                         }
                     }
                     selectedInstancesTableModel.addRow(saa[i]);
@@ -249,7 +248,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             for (int i = 0; i < errorMsg.size(); ++i) {
                 errors += " " + errorMsg.get(i) + "\n";
             }
-            JOptionPane.showMessageDialog(frame, errors);
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), errors);
         }
         showClassToResolved();
     }
@@ -767,7 +766,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                                     jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(model.getValueAt(selectedRow, 6)+"")+"");
                                 }
                                 catch(Exception except){
-                                    JOptionPane.showMessageDialog(frame, "Unacceptable PCD Value: " + except.getMessage());
+                                    JOptionPane.showMessageDialog(FpdModuleSA.this, "Unacceptable PCD Value: " + except.getMessage());
                                 }
                             }
                             else{
@@ -1198,7 +1197,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         addLibInstance (libMi);
                     }
                     catch (Exception exception) {
-                        JOptionPane.showMessageDialog(frame, "Adding Instance " + libMi.getName() + " : \n"+ exception.getMessage());
+                        JOptionPane.showMessageDialog(FpdModuleSA.this, "Adding Instance " + libMi.getName() + " : \n"+ exception.getMessage());
                         return;
                     }
                     docConsole.setSaved(false);
@@ -1212,7 +1211,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         resolveLibraryInstances(instanceValue, errorMsg);
                     }
                     catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                        JOptionPane.showMessageDialog(FpdModuleSA.this, exp.getMessage());
                     }
                     
                     if (errorMsg.size() > 0) {
@@ -1220,7 +1219,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         for (int i = 0; i < errorMsg.size(); ++i) {
                             errors += " " + errorMsg.get(i) + "\n";
                         }
-                        JOptionPane.showMessageDialog(frame, errors);
+                        JOptionPane.showMessageDialog(FpdModuleSA.this, errors);
                     }
                     showClassToResolved();
                 }
@@ -1414,7 +1413,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     }
                     if (newFileGuid.length() > 0) {
                         if (!DataValidation.isGuid(newFileGuid)) {
-                            JOptionPane.showMessageDialog(frame, "FFS File Guid is NOT GUID Type.");
+                            JOptionPane.showMessageDialog(FpdModuleSA.this, "FFS File Guid is NOT GUID Type.");
                             return;
                         }
                     }
@@ -1509,9 +1508,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             vArch.add("EBC");
             vArch.add("ARM");
             vArch.add("PPC");
-            jTableModuleSaOptions.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
+            jTableModuleSaOptions.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch, FrameworkWizardUI.getInstance()));
             
-            jTableModuleSaOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
+            jTableModuleSaOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor(FrameworkWizardUI.getInstance()));
             
             jTableModuleSaOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			jTableModuleSaOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -1761,7 +1760,7 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
         ffc.addDynamicPcdBuildData(cName, model.getValueAt(jTablePcd.getSelectedRow(), 3), tsGuid, "DYNAMIC", model.getValueAt(jTablePcd.getSelectedRow(), 5)+"", jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
     }
     catch(Exception e){
-        JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
+        JOptionPane.showMessageDialog(FpdModuleSA.this, "PCD value format: " + e.getMessage());
     }
 }
 
@@ -1848,7 +1847,7 @@ private JButton getJButtonUpdatePcd() {
                         jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(newValue)+"");
                     }
                     catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, "PCD Value MalFormed: " + exp.getMessage());
+                        JOptionPane.showMessageDialog(FpdModuleSA.this, "PCD Value MalFormed: " + exp.getMessage());
                         return;
                     }
                 }
@@ -1859,12 +1858,12 @@ private JButton getJButtonUpdatePcd() {
                     try {
                         boolean changable = itemTypeCouldBeChanged (cName, tsGuid, newItemType, moduleInfo);
                         if (!changable) {
-                            JOptionPane.showMessageDialog(frame, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName());
+                            JOptionPane.showMessageDialog(FpdModuleSA.this, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName());
                             return;
                         }
                     }
                     catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName() + " " + exp.getMessage());
+                        JOptionPane.showMessageDialog(FpdModuleSA.this, "Can NOT Change Pcd Type in: " + moduleInfo.get(0).getName() + " contained in package " + moduleInfo.get(0).getPackageId().getName() + " " + exp.getMessage());
                         return;
                     }
                     

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Log;
@@ -222,7 +223,7 @@ public class ToolChainId {
                 e.printStackTrace();
             }
         } else {
-            JOptionPane.showMessageDialog(null, "<html>" + "Tool Preferences file: <br>" + strTargetFile
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "<html>" + "Tool Preferences file: <br>" + strTargetFile
                                                 + "<br>does not exist!</html>");
         }
     }
@@ -236,7 +237,7 @@ public class ToolChainId {
             toolsConfFile = Workspace.getCurrentWorkspace() + System.getProperty("file.separator") + resString.trim();
             File toolsDefFile = new File(toolsConfFile);
             if (!toolsDefFile.exists()) {
-                JOptionPane.showMessageDialog(null, "<html>" + "Tool Definition file, " + toolDefinitionFile
+                JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "<html>" + "Tool Definition file, " + toolDefinitionFile
                                                     + "<br>specified in the target.txt file does not exist!"
                                                     + "<br>Using the default Tool Definition File:<br>"
                                                     + defaultToolsConf);

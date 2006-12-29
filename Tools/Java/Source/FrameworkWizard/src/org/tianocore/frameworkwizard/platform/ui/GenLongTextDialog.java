@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
@@ -166,13 +167,13 @@ public class GenLongTextDialog extends JDialog implements ActionListener{
     /**
      * This is the default constructor
      */
-    public GenLongTextDialog() {
-        super();
+    public GenLongTextDialog(JFrame frame) {
+        super(frame);
         initialize();
     }
     
-    public GenLongTextDialog(ActionListener i){
-        this();
+    public GenLongTextDialog(ActionListener i, JFrame frame){
+        this(frame);
         jButtonOk.addActionListener(i);
         jButtonOk.registerKeyboardAction(i, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
     }

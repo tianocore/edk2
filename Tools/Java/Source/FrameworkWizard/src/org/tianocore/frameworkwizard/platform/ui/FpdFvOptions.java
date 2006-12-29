@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.JButton;
 
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 
 /**
@@ -69,7 +70,7 @@ public class FpdFvOptions extends JDialog {
      * This is the default constructor
      */
     public FpdFvOptions(String name, DefaultTableModel tm, FpdFileContents ffc, OpeningPlatformType dc) {
-        super();
+        super(FrameworkWizardUI.getInstance());
         fvName = name;
         this.ffc = ffc;
         this.docConsole = dc;

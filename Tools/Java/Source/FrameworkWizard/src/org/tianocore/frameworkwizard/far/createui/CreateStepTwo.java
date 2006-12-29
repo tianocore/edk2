@@ -277,7 +277,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
             msg += "is un-Repackagable. Do you want to continue? ";
             
             if (unRepackablePackages.size() > 0) {
-                if(JOptionPane.showConfirmDialog(null, msg, "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+                if(JOptionPane.showConfirmDialog(this, msg, "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
                     return ;
                 }
             }

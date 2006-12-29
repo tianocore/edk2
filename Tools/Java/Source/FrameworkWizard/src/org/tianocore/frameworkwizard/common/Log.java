@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
+
 /**
  The class is used to provides static interfaces to save log and error information
  
@@ -175,7 +177,7 @@ public class Log {
     private static void showWrnMessage(String strErr) {
         String strReturn = Tools.wrapStringByWord(strErr);
         JOptionPane
-                   .showConfirmDialog(null, strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                   .showConfirmDialog(FrameworkWizardUI.getInstance(), strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     /**

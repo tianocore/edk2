@@ -28,7 +28,6 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -48,6 +47,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
@@ -111,8 +111,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private final int fieldWidth = 320;
 
     private static final long serialVersionUID = 1L;
-
-    static JFrame frame;
 
     private JPanel jContentPane = null;
 
@@ -1183,7 +1181,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     String[] row = { "Compress" };
                     sectionsTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSections(jTableFfs.getSelectedRow(), "");
-                    JOptionPane.showMessageDialog(frame, "Add Default Section Type EFI_SECTION_PE32 into the New Sections Entry.");
+                    JOptionPane.showMessageDialog(FpdBuildOptions.this, "Add Default Section Type EFI_SECTION_PE32 into the New Sections Entry.");
                     jTableFfsSections.changeSelection(sectionsTableModel.getRowCount()-1, 0, false, false);
                 }
             });
@@ -1830,9 +1828,9 @@ public class FpdBuildOptions extends IInternalFrame {
             vArch.add("EBC");
             vArch.add("ARM");
             vArch.add("PPC");
-            jTableOptions.getColumnModel().getColumn(2).setCellEditor(new ListEditor(vArch));
+            jTableOptions.getColumnModel().getColumn(2).setCellEditor(new ListEditor(vArch, FrameworkWizardUI.getInstance()));
             
-            jTableOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
+            jTableOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor(FrameworkWizardUI.getInstance()));
             
             jTableOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	        jTableOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -1964,13 +1962,13 @@ public class FpdBuildOptions extends IInternalFrame {
 
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(FpdBuildOptions.this);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current package!");
+                            JOptionPane.showMessageDialog(FpdBuildOptions.this, "You can only select files in current package!");
                             return;
                         }
                     } else {
@@ -2103,7 +2101,7 @@ public class FpdBuildOptions extends IInternalFrame {
                 public void actionPerformed(ActionEvent e) {
                     if (!DataValidation.isInt(jTextFieldAntTaskId.getText())
                         || jTextFieldAntTaskId.getText().length() != 8) {
-                        JOptionPane.showMessageDialog(frame, "ID must be an 8-digit integer.");
+                        JOptionPane.showMessageDialog(FpdBuildOptions.this, "ID must be an 8-digit integer.");
                         return;
                     }
                     Object[] o = { jTextFieldAntTaskId.getText(), null, null };

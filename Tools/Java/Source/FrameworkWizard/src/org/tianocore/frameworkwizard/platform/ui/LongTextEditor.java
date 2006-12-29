@@ -36,18 +36,17 @@ public class LongTextEditor extends AbstractCellEditor implements TableCellEdito
     private static final long serialVersionUID = 1L;
     String text;
     JButton button;
-    static JFrame frame;
     GenLongTextDialog dialog;
     protected static final String EDIT = "editLongText";
 
-    public LongTextEditor() {
+    public LongTextEditor(JFrame frame) {
         
         button = new JButton();
         button.setActionCommand(EDIT);
         button.addActionListener(this);
         button.setBorderPainted(false);
         
-        dialog = new GenLongTextDialog(this);
+        dialog = new GenLongTextDialog(this, frame);
         
     }
 

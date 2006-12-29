@@ -66,7 +66,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      */
     private static final long serialVersionUID = 1L;
 
-    static JFrame frame;
+    private JFrame topFrame;
     
     private JPanel jContentPane = null;  
 
@@ -163,7 +163,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private final int usageMinWidth = 60;
     private final int supArchMinWidth = 200;
     private final int supModMinWidth = 200;
-
+    
 //    private Object boolModifyLock = new Object();
 //    private boolean exclusiveUsage = false;
 
@@ -262,21 +262,21 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     /**
      This is the default constructor
      **/
-    public SpdPcdDefs() {
+    public SpdPcdDefs(JFrame frame) {
         super();
         init();
         initialize();
-        
+        topFrame = frame;
     }
 
-    public SpdPcdDefs(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa) {
-        this();
+    public SpdPcdDefs(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame) {
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdPcdDefs(OpeningPackageType opt) {
-        this(opt.getXmlSpd());
+    public SpdPcdDefs(OpeningPackageType opt, JFrame frame) {
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
     }
     /**
@@ -301,7 +301,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private void init(SpdFileContents sfc){
         
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(topFrame, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
         
@@ -525,15 +525,15 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                                 jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected(),
                                 archList, modTypeList};
                 try {
-				    if (!dataValidation(row)) {
-					    return;
-				    }
-
-				    if (tokenCNameExisted(jTextFieldToken.getText(),jTextFieldC_Name.getText())) {
-					    return;
-				    }
+                if (!dataValidation(row)) {
+                    return;
+                }
+                
+                if (tokenCNameExisted(jTextFieldToken.getText(), jTextFieldC_Name.getText())) {
+                    return;
+                }
 			    } catch (Exception e) {
-				    JOptionPane.showMessageDialog(frame, "Illegal Token:"+ e.getCause());
+				    JOptionPane.showMessageDialog(this, "Illegal Token:"+ e.getCause());
 				    return;
 			    }
                 
@@ -765,7 +765,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             TableColumn dataTypeColumn = jTable.getColumnModel().getColumn(3);
             dataTypeColumn.setCellEditor(new DefaultCellEditor(jComboBoxDataType));
             
-            jTable.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
+            jTable.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor(topFrame));
 
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
@@ -774,7 +774,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             vArch.add("EBC");
             vArch.add("ARM");
             vArch.add("PPC");
-            jTable.getColumnModel().getColumn(11).setCellEditor(new ListEditor(vArch));
+            jTable.getColumnModel().getColumn(11).setCellEditor(new ListEditor(vArch, topFrame));
             
             Vector<String> vModule = new Vector<String>();
             vModule.add("BASE");
@@ -789,7 +789,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             vModule.add("UEFI_DRIVER");
             vModule.add("UEFI_APPLICATION");
             vModule.add("USER_DEFINED");
-            jTable.getColumnModel().getColumn(12).setCellEditor(new ListEditor(vModule));
+            jTable.getColumnModel().getColumn(12).setCellEditor(new ListEditor(vModule, topFrame));
             
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -836,7 +836,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             
             String usage = getValidUsage(new Boolean(m.getValueAt(row, 6)+""), new Boolean(m.getValueAt(row, 7)+""), new Boolean(m.getValueAt(row, 8)+""), new Boolean(m.getValueAt(row, 9)+""), new Boolean(m.getValueAt(row, 10)+""));
             if (usage.length() == 0) {
-                JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
+                JOptionPane.showMessageDialog(this, "You must choose at least one usage for PCD entry.");
                 return;
             }
 
@@ -847,9 +847,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 }
                 if (v.contains("FEATURE_FLAG")/* && v.size() > 1 && !exclusiveUsage*/) {
                     if (v.size() > 1) {
-                    JOptionPane.showMessageDialog(frame, "Usage Feature Flag can NOT co-exist with others.");
-                    return;
-                }
+                        JOptionPane.showMessageDialog(this, "Usage Feature Flag can NOT co-exist with others.");
+                        return;
+                    }
 //                    synchronized (boolModifyLock){
 //                        exclusiveUsage = true;
 //                    }
@@ -906,12 +906,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             
             Object[] o = {cName, token, ts, dataType, defaultVal, help};
             try {
-            	if (!dataValidation(o)){
-                    return;
-                }
+            if (!dataValidation(o)){
+                return;
+            }
             }
             catch (Exception e) {
-            	JOptionPane.showMessageDialog(frame, "Illegal Token:" + e.getCause());
+            	JOptionPane.showMessageDialog(this, "Illegal Token:" + e.getCause());
             	return;
             }
             docConsole.setSaved(false);
@@ -1065,16 +1065,16 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         
         for (int i = 0; i < model.getRowCount(); ++i) {
             if (model.getValueAt(i, 0).equals(cName)) {
-                JOptionPane.showMessageDialog(frame, "C_Name already existed in table.");
+                JOptionPane.showMessageDialog(this, "C_Name already existed in table.");
                 return true;
             }
             if (model.getValueAt(i, 1).equals(token)) {
-                JOptionPane.showMessageDialog(frame, "Token already existed in table.");
+                JOptionPane.showMessageDialog(this, "Token already existed in table.");
                 return true;
             }
             Long tokenValue = Long.decode(model.getValueAt(i, 1)+"");
             if (tokenValue.equals(inputToken)) {
-                JOptionPane.showMessageDialog(frame, "Same token value already existed in table.");
+                JOptionPane.showMessageDialog(this, "Same token value already existed in table.");
                 return true;
             }
             
@@ -1084,7 +1084,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     
     private boolean checkValidUsage(boolean[] b) {
         if (!(b[0] || b[1] || b[2] || b[3] || b[4])){
-            JOptionPane.showMessageDialog(frame, "You must specify at least one usage.");
+            JOptionPane.showMessageDialog(this, "You must specify at least one usage.");
             return false;
         }
         return true;
@@ -1092,20 +1092,20 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private boolean dataValidation(Object[] row) throws Exception{
         
         if (!DataValidation.isC_NameType(row[0].toString())) {
-            JOptionPane.showMessageDialog(frame, "C_Name is NOT C_NameType.");
+            JOptionPane.showMessageDialog(this, "C_Name is NOT C_NameType.");
             return false;
         }
         if (!DataValidation.isHexDoubleWordDataType(row[1].toString()) && 
                         !DataValidation.isLongInt(row[1].toString(), 1, Long.MAX_VALUE)) {
-            JOptionPane.showMessageDialog(frame, "Token is NOT correct.");
+            JOptionPane.showMessageDialog(this, "Token is NOT correct.");
             return false;
         }
         if (!DataValidation.isC_NameType(row[2].toString())) {
-            JOptionPane.showMessageDialog(frame, "Token Space is NOT C_NameType");
+            JOptionPane.showMessageDialog(this, "Token Space is NOT C_NameType");
             return false;
         }
         if (row[5].toString().length() == 0) {
-            JOptionPane.showMessageDialog(frame, "HelpText could NOT be empty.");
+            JOptionPane.showMessageDialog(this, "HelpText could NOT be empty.");
             return false;
         }
         return true;

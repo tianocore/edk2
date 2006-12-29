@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -32,24 +33,25 @@ public class SpdPpiDecls extends SpdGuidDecls {
      */
     private static final long serialVersionUID = 1L;
     private SpdFileContents sfc = null;
-    private OpeningPackageType docConsole = null; 
+    private OpeningPackageType docConsole = null;
+//    private JFrame topFrame = null;
     
-    public SpdPpiDecls() {
-        super();
+    public SpdPpiDecls(JFrame frame) {
+        super(frame);
         // TODO Auto-generated constructor stub
     }
 
-    public SpdPpiDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa) {
-        this();
+    public SpdPpiDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame) {
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdPpiDecls(OpeningPackageType opt) {
-        this(opt.getXmlSpd());
+    public SpdPpiDecls(OpeningPackageType opt, JFrame frame) {
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(this, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
     }

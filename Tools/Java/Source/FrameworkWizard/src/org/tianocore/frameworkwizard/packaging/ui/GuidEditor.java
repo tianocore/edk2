@@ -20,8 +20,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
-//import javax.swing.JComponent;
 import javax.swing.JFrame;
+//import javax.swing.JComponent;
 import javax.swing.JTable;
 //import javax.swing.KeyStroke;
 import javax.swing.table.TableCellEditor;
@@ -39,11 +39,10 @@ public class GuidEditor extends AbstractCellEditor implements TableCellEditor, A
     private static final long serialVersionUID = 1L;
     String currentGuid;
     JButton button;
-    static JFrame frame;
     GenGuidDialog dialog;
     protected static final String EDIT = "edit";
 
-    public GuidEditor() {
+    public GuidEditor(JFrame frame) {
         
         button = new JButton();
         button.setActionCommand(EDIT);
@@ -52,7 +51,7 @@ public class GuidEditor extends AbstractCellEditor implements TableCellEditor, A
         button.setBorderPainted(false);
 
         
-        dialog = new GenGuidDialog(this);
+        dialog = new GenGuidDialog(this, frame);
         
     }
 

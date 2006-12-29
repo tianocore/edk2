@@ -17,13 +17,13 @@ import javax.swing.JPanel;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
@@ -77,7 +77,6 @@ public class FpdFlash extends IInternalFrame {
      */
     private static final long serialVersionUID = 1L;
     private final int startIndexOfDynamicTab = 2;
-    static JFrame frame;
     private JPanel jContentPane = null;
     private JPanel jPanelContentEast = null;
     private JPanel jPanelContentSouth = null;
@@ -203,7 +202,7 @@ public class FpdFlash extends IInternalFrame {
         docConsole = opt;
         if (memModified) {
             docConsole.setSaved(false);
-            JOptionPane.showMessageDialog(frame, "Platform Synced with FDF file.");
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Platform Synced with FDF file.");
             memModified = false;
         }
     }
@@ -1117,13 +1116,13 @@ public class FpdFlash extends IInternalFrame {
                     JFileChooser chooser = new JFileChooser(wsDir);
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(FpdFlash.this);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         File theFile = chooser.getSelectedFile();
                         String filePath = theFile.getPath();
                         if (!filePath.startsWith(wsDir)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current WORKSPACE.");
+                            JOptionPane.showMessageDialog(FpdFlash.this, "You can only select files in current WORKSPACE.");
                             return;
                         }
                         jTextFieldFdf.setText(filePath.substring(wsDir.length() + 1).replace('\\', '/'));
@@ -1184,7 +1183,7 @@ public class FpdFlash extends IInternalFrame {
         getFvInfoFromFdf(fdfPath, vFvInfo);
         getFlashInfoFromFdf (fdfPath);
         if (!erasePolarity.equals("1") && !erasePolarity.equals("0")) {
-            JOptionPane.showMessageDialog(frame, "FDF file does NOT contain valid Erase Polarity.");
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "FDF file does NOT contain valid Erase Polarity.");
         }
         else {
             ffc.setTypedFvImageNameValue("Attributes", "EFI_ERASE_POLARITY", erasePolarity);
@@ -1196,7 +1195,7 @@ public class FpdFlash extends IInternalFrame {
         if (vBlockSize.size() > 0) {
             blkSize = vBlockSize.get(0);
             if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
-                JOptionPane.showMessageDialog(frame, "FDF file does NOT contain valid FV block size. Default size 0x10000 will be used.");
+                JOptionPane.showMessageDialog(FpdFlash.this, "FDF file does NOT contain valid FV block size. Default size 0x10000 will be used.");
                 blkSize = defaultBlkSize;
             }
         }
@@ -1252,7 +1251,7 @@ public class FpdFlash extends IInternalFrame {
                 }
             }
             catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(frame, e.getMessage());
+                JOptionPane.showMessageDialog(FpdFlash.this, e.getMessage());
             }
         }
 
@@ -1787,7 +1786,7 @@ public class FpdFlash extends IInternalFrame {
                                 return;
                             }
                             if (fvNameExists(newFvName)) {
-                                JOptionPane.showMessageDialog(frame, "This FV already exists. Please choose another FV name.");
+                                JOptionPane.showMessageDialog(FpdFlash.this, "This FV already exists. Please choose another FV name.");
                                 m.setValueAt(oldFvName, row, 0);
                                 return;
                             }
@@ -1819,7 +1818,7 @@ public class FpdFlash extends IInternalFrame {
                         if (col == 1 && !sizeFromOptionDlg) {
                             String fvSize = m.getValueAt(row, col) + "";
                             if (!DataValidation.isInt(fvSize) && !DataValidation.isHexDoubleWordDataType(fvSize)) {
-                                JOptionPane.showMessageDialog(frame, "FV size should be Integer or Hex format.");
+                                JOptionPane.showMessageDialog(FpdFlash.this, "FV size should be Integer or Hex format.");
                                 return;
                             }
                             HashMap<String, String> mFvOpts = new HashMap<String, String>();
@@ -1840,7 +1839,7 @@ public class FpdFlash extends IInternalFrame {
                             }
                             else {
                                 if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
-                                    int retVal = JOptionPane.showConfirmDialog(frame, "Confirm", "FPD file contains error block size format. Would you like to replace it with a default value?", JOptionPane.YES_NO_OPTION);
+                                    int retVal = JOptionPane.showConfirmDialog(FpdFlash.this, "Confirm", "FPD file contains error block size format. Would you like to replace it with a default value?", JOptionPane.YES_NO_OPTION);
                                     if (retVal == JOptionPane.YES_OPTION) {
                                         ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", defaultBlkSize, null);
                                         int fs = Integer.decode(fvSize);
@@ -2029,11 +2028,11 @@ public class FpdFlash extends IInternalFrame {
             boolean numOfBlockWellFormat = true;
             if (!DataValidation.isHexDoubleWordDataType(bSize) && !DataValidation.isInt(bSize)) {
                blockSizeWellFormat = false;
-               JOptionPane.showMessageDialog(frame, fvName + " block size bad format.");
+               JOptionPane.showMessageDialog(FpdFlash.this, fvName + " block size bad format.");
             } 
             if (!DataValidation.isHexDoubleWordDataType(numBlks) && !DataValidation.isInt(numBlks)) {
                numOfBlockWellFormat = false;
-               JOptionPane.showMessageDialog(frame, fvName + " number of blocks bad format.");
+               JOptionPane.showMessageDialog(FpdFlash.this, fvName + " number of blocks bad format.");
             }
             if (blockSizeWellFormat && numOfBlockWellFormat) {
                 int size = Integer.decode(bSize);
