@@ -34,6 +34,7 @@ import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -84,7 +85,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
 
     private JComboBox jComboBoxProtocolType = null;
 
-    private JComboBox jComboBoxCName = null;
+    private IComboBox iComboBoxCName = null;
 
     private JLabel jLabelHelpText = null;
 
@@ -180,19 +181,19 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jComboBoxCName
+     * This method initializes iComboBoxCName
      * 
      * @return javax.swing.JComboBox
      */
-    private JComboBox getJComboBoxCName() {
-        if (jComboBoxCName == null) {
-            jComboBoxCName = new JComboBox();
-            jComboBoxCName.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
-            jComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxCName.setToolTipText("Select Guid C Name of the Protocol");
+    private IComboBox getIComboBoxCName() {
+        if (iComboBoxCName == null) {
+            iComboBoxCName = new IComboBox();
+            iComboBoxCName.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
+            iComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
+            iComboBoxCName.setToolTipText("Select Guid C Name of the Protocol");
 
         }
-        return jComboBoxCName;
+        return iComboBoxCName;
     }
 
     /**
@@ -303,11 +304,11 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             Log.wrn("Init Protocol", "This module hasn't defined any package dependency, so there is no protocol can be added");
         }
 
-        Tools.generateComboBoxByVector(this.jComboBoxCName,
+        Tools.generateComboBoxByVector(this.iComboBoxCName,
                                        wt.getAllProtocolDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid)));
 
         if (this.id != null) {
-            this.jComboBoxCName.setSelectedItem(id.getName());
+            this.iComboBoxCName.setSelectedItem(id.getName());
             this.jComboBoxProtocolType.setSelectedItem(id.getType());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
@@ -393,7 +394,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             jContentPane.add(getJComboBoxProtocolType(), null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jLabelC_Name, null);
-            jContentPane.add(getJComboBoxCName(), null);
+            jContentPane.add(getIComboBoxCName(), null);
             jContentPane.add(jStarLabel3, null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxProtocolUsage(), null);
@@ -456,13 +457,13 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
         //
         // Check Name
         //
-        if (this.jComboBoxCName.getSelectedItem() == null) {
+        if (this.iComboBoxCName.getSelectedItem() == null) {
             Log.wrn("Update protocols", "Please select one Protocol/ProtocolNotify Name");
             return false;
         }
 
-        if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
-            if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
+        if (!isEmpty(this.iComboBoxCName.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.iComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update Protocols", "Incorrect data type for Protocol/ProtocolNotify Name");
                 return false;
             }
@@ -482,7 +483,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
     }
 
     private ProtocolsIdentification getCurrentProtocols() {
-        String arg0 = this.jComboBoxCName.getSelectedItem().toString();
+        String arg0 = this.iComboBoxCName.getSelectedItem().toString();
         String arg1 = this.jComboBoxProtocolType.getSelectedItem().toString();
         String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
 

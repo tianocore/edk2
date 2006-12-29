@@ -192,4 +192,36 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
         this.setEditable(false);
         this.getEditor().setItem("");
     }
+
+    /**
+     Set the input item as selected
+     
+     @param item the item which is needed to be set selected
+     
+     **/
+    public void setSelectedItem(Object item) {
+        boolean isFind = false;
+        //
+        // If the input value is not in the default list, add it to the list
+        //
+        if (item != null) {
+            for (int index = 0; index < this.getItemCount(); index++) {
+                if (this.getItemAt(index).equals(item)) {
+                    isFind = true;
+                    break;
+                }
+            }
+            //
+            // Add this item to IComboBox if not found
+            //
+            if (!isFind && !item.toString().equals("")) {
+                super.addItem(item);
+            }
+        }
+        
+        //
+        // Call super function to set the item selected.
+        //
+        super.setSelectedItem(item);
+    }
 }

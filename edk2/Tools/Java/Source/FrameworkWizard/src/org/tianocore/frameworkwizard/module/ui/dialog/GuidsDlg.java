@@ -30,6 +30,7 @@ import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -58,7 +59,7 @@ public class GuidsDlg extends IDialog {
 
     private JLabel jLabelC_Name = null;
 
-    private JComboBox jComboBoxCName = null;
+    private IComboBox iComboBoxCName = null;
 
     private JLabel jLabelUsage = null;
 
@@ -103,14 +104,14 @@ public class GuidsDlg extends IDialog {
      * @return javax.swing.JTextField jTextFieldC_Name
      * 
      */
-    private JComboBox getJComboBoxCName() {
-        if (jComboBoxCName == null) {
-            jComboBoxCName = new JComboBox();
-            jComboBoxCName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
-            jComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxCName.setToolTipText("Select the C Name of the GUID");
+    private IComboBox getIComboBoxCName() {
+        if (iComboBoxCName == null) {
+            iComboBoxCName = new IComboBox();
+            iComboBoxCName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
+            iComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
+            iComboBoxCName.setToolTipText("Select the C Name of the GUID");
         }
-        return jComboBoxCName;
+        return iComboBoxCName;
     }
 
     /**
@@ -274,12 +275,13 @@ public class GuidsDlg extends IDialog {
             Log.wrn("Init Guid", "This module hasn't defined any package dependency, so there is no guid can be added");
         }
 
-        Tools.generateComboBoxByVector(this.jComboBoxCName,
+        Tools.generateComboBoxByVector(this.iComboBoxCName,
                                        wt.getAllGuidDeclarationsFromPackages(wt.getPackageDependenciesOfModule(mid),
                                                                              EnumerationData.GUID_TYPE_GUID));
+        
 
         if (this.id != null) {
-            this.jComboBoxCName.setSelectedItem(id.getName());
+            this.iComboBoxCName.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
@@ -354,7 +356,7 @@ public class GuidsDlg extends IDialog {
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelC_Name, null);
-            jContentPane.add(getJComboBoxCName(), null);
+            jContentPane.add(getIComboBoxCName(), null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxUsage(), null);
@@ -416,13 +418,13 @@ public class GuidsDlg extends IDialog {
         //
         // Check Name
         //
-        if (this.jComboBoxCName.getSelectedItem() == null) {
+        if (this.iComboBoxCName.getSelectedItem() == null) {
             Log.wrn("Update Guids", "Please select one Guid Name");
             return false;
         }
 
-        if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
-            if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
+        if (!isEmpty(this.iComboBoxCName.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.iComboBoxCName.getSelectedItem().toString())) {
                 Log.wrn("Update Guids", "Incorrect data type for Guid Name");
                 return false;
             }
@@ -442,7 +444,7 @@ public class GuidsDlg extends IDialog {
     }
 
     private GuidsIdentification getCurrentGuids() {
-        String arg0 = this.jComboBoxCName.getSelectedItem().toString();
+        String arg0 = this.iComboBoxCName.getSelectedItem().toString();
         String arg1 = this.jComboBoxUsage.getSelectedItem().toString();
 
         String arg2 = this.jTextFieldFeatureFlag.getText();

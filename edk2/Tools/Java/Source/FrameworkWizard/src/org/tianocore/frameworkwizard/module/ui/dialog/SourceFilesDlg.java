@@ -304,30 +304,30 @@ public class SourceFilesDlg extends IDialog {
             this.jTextFieldFileName.setText(inSourceFilesIdentifications.getFilename());
             this.jTextFieldTagName.setText(inSourceFilesIdentifications.getTagName());
 
-            //
-            // Generate Tool Code selection list
-            //
-            Vector<String> v = ed.getVToolCode();
-            boolean isFind = false;
-            String strToolCode = inSourceFilesIdentifications.getToolCode();
+//            //
+//            // Generate Tool Code selection list
+//            //
+//            Vector<String> v = ed.getVToolCode();
+//            boolean isFind = false;
+//            String strToolCode = inSourceFilesIdentifications.getToolCode();
+//
+//            //
+//            // If the input value is not in the default list, add it to the list
+//            //
+//            if (strToolCode != null) {
+//                for (int index = 0; index < v.size(); index++) {
+//                    if (v.elementAt(index).equals(strToolCode)) {
+//                        isFind = true;
+//                        break;
+//                    }
+//                }
+//                if (!isFind && !isEmpty(strToolCode)) {
+//                    v.addElement(strToolCode);
+//                }
+//            }
 
-            //
-            // If the input value is not in the default list, add it to the list
-            //
-            if (strToolCode != null) {
-                for (int index = 0; index < v.size(); index++) {
-                    if (v.elementAt(index).equals(strToolCode)) {
-                        isFind = true;
-                        break;
-                    }
-                }
-                if (!isFind && !isEmpty(strToolCode)) {
-                    v.addElement(strToolCode);
-                }
-            }
-
-            Tools.generateComboBoxByVector(iComboBoxToolCode, v);
-            this.iComboBoxToolCode.setSelectedItem(strToolCode);
+            Tools.generateComboBoxByVector(iComboBoxToolCode, ed.getVToolCode());
+            this.iComboBoxToolCode.setSelectedItem(inSourceFilesIdentifications.getToolCode());
 
             this.jTextFieldToolChainFamily.setText(inSourceFilesIdentifications.getToolChainFamily());
             jTextFieldFeatureFlag.setText(inSourceFilesIdentifications.getFeatureFlag());

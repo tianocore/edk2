@@ -32,6 +32,7 @@ import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -68,7 +69,7 @@ public class SystemTablesDlg extends IDialog {
 
     private StarLabel jStarLabel2 = null;
 
-    private JComboBox jComboBoxGuidC_Name = null;
+    private IComboBox iComboBoxGuidC_Name = null;
 
     private JLabel jLabelFeatureFlag = null;
 
@@ -100,19 +101,19 @@ public class SystemTablesDlg extends IDialog {
     private WorkspaceTools wt = new WorkspaceTools();
 
     /**
-     * This method initializes jComboBoxGuidC_Name
+     * This method initializes iComboBoxGuidC_Name
      * 
-     * @return javax.swing.JComboBox jComboBoxGuidC_Name
+     * @return javax.swing.JComboBox iComboBoxGuidC_Name
      * 
      */
-    private JComboBox getJComboBoxGuidC_Name() {
-        if (jComboBoxGuidC_Name == null) {
-            jComboBoxGuidC_Name = new JComboBox();
-            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
-            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the System Table");
+    private IComboBox getIComboBoxGuidC_Name() {
+        if (iComboBoxGuidC_Name == null) {
+            iComboBoxGuidC_Name = new IComboBox();
+            iComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
+            iComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+            iComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the System Table");
         }
-        return jComboBoxGuidC_Name;
+        return iComboBoxGuidC_Name;
     }
 
     /**
@@ -276,12 +277,12 @@ public class SystemTablesDlg extends IDialog {
         // Init guids drop down list
         //
         Tools
-             .generateComboBoxByVector(jComboBoxGuidC_Name,
+             .generateComboBoxByVector(iComboBoxGuidC_Name,
                                        wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_EFI_SYSTEM_CONFIGURATION_TABLE));
 
 
         if (this.id != null) {
-            this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
+            this.iComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
@@ -354,7 +355,7 @@ public class SystemTablesDlg extends IDialog {
             jContentPane.add(jLabelEntry, null);
             jContentPane.add(jLabelFeatureFlag, null);
             jContentPane.add(getJTextFieldFeatureFlag(), null);
-            jContentPane.add(getJComboBoxGuidC_Name(), null);
+            jContentPane.add(getIComboBoxGuidC_Name(), null);
             jContentPane.add(jLabelArch, null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxUsage(), null);
@@ -417,7 +418,7 @@ public class SystemTablesDlg extends IDialog {
         //
         // Check Name
         //
-        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+        if (this.iComboBoxGuidC_Name.getSelectedItem() == null) {
             Log.wrn("Update Guids", "Please select one System Table Name");
             return false;
         }
@@ -436,7 +437,7 @@ public class SystemTablesDlg extends IDialog {
     }
 
     private SystemTablesIdentification getCurrentSystemTables() {
-        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
+        String arg0 = this.iComboBoxGuidC_Name.getSelectedItem().toString();
         String arg1 = this.jComboBoxUsage.getSelectedItem().toString();
 
         String arg2 = this.jTextFieldFeatureFlag.getText();
