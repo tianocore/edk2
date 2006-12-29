@@ -18,7 +18,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -32,6 +31,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.FrameworkWizardUI;
 import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
@@ -64,8 +64,6 @@ public class FpdFrameworkModules extends IInternalFrame {
     String searchField = "";
     
     public static final int forceDbgColForFpdModTable = 7;
-
-    static JFrame frame;
 
     private JSplitPane jSplitPane = null;
 
@@ -394,7 +392,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         vArchs = WorkspaceProfile.getModuleSupArchs(mi);
 
         if (vArchs == null) {
-            JOptionPane.showMessageDialog(frame, "No Supported Architectures specified in MSA file.");
+            JOptionPane.showMessageDialog(this, "No Supported Architectures specified in MSA file.");
             return;
         }
 
@@ -402,7 +400,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         ffc.getPlatformDefsSupportedArchs(platformSupArch);
         platformSupArch.retainAll(vArchs);
         if (platformSupArch.size() == 0) {
-            JOptionPane.showMessageDialog(frame, "This Module does not support this platform architectures.");
+            JOptionPane.showMessageDialog(this, "This Module does not support this platform architectures.");
             return;
         }
         
@@ -446,7 +444,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         // Archs this Module supported have already been added.
         //
         if (vArchs.size() == 0) {
-            JOptionPane.showMessageDialog(frame, "This Module has already been added.");
+            JOptionPane.showMessageDialog(this, "This Module has already been added.");
             return;
         }
         //ToDo put Arch instead of null
@@ -474,7 +472,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 //ToDo : specify archs need to add.
                 ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
             } catch (Exception exception) {
-                JOptionPane.showMessageDialog(frame, "Adding " + row[modNameColForFpdModTable] + " with Supporting Architectures: " + arch
+                JOptionPane.showMessageDialog(this, "Adding " + row[modNameColForFpdModTable] + " with Supporting Architectures: " + arch
                                                      + ": " + exception.getMessage());
                 errorOccurred = true;
             }
@@ -486,7 +484,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         } else {
             s += " was added Successfully.";
         }
-        JOptionPane.showMessageDialog(frame, s);
+        JOptionPane.showMessageDialog(this, s);
         TableSorter sorterFpdModules = (TableSorter)jTableFpdModules.getModel();
         int viewIndex = sorterFpdModules.getViewIndexArray()[modelFpdModules.getRowCount() - 1];
         jTableFpdModules.changeSelection(viewIndex, 0, false, false);
@@ -776,7 +774,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         ffc.removeModuleSA(selectedRow);    
                     }
                     catch (Exception exp) {
-                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                        JOptionPane.showMessageDialog(FpdFrameworkModules.this, exp.getMessage());
                         return;
                     }
                     
@@ -857,7 +855,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         docConsole = opt;
         Vector<String> vExceptions = new Vector<String>();
         if (pcdSync(vExceptions)) {
-            JOptionPane.showMessageDialog(frame, "PCD in this platform are synchronized with those in MSA files.");    
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "PCD in this platform are synchronized with those in MSA files.");    
             docConsole.setSaved(false);
         }
         if (vExceptions.size() > 0) {
@@ -865,7 +863,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             for (int i = 0; i < vExceptions.size(); ++i) {
                 errorMsg += " " + vExceptions.get(i) + "\n";
             }
-            JOptionPane.showMessageDialog(frame, "Error occurred during synchronization:\n" + errorMsg);
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Error occurred during synchronization:\n" + errorMsg);
         }
     }
 
@@ -897,7 +895,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     try {
                         row[pathColForFpdModTable] = mi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(frame, "Show FPD Modules:" + e.getMessage());
+                        JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Show FPD Modules:" + e.getMessage());
                     }
                     
                     String fpdMsaKey = saa[i][ffcModGuid] + row[modVerColForFpdModTable]
@@ -964,7 +962,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 try {
                     s[pathColForAllModTable] = mi.getPath().substring(Workspace.getCurrentWorkspace().length() + 1);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(frame, "Show All Modules:" + e.getMessage());
+                    JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Show All Modules:" + e.getMessage());
                 }
                 modelAllModules.addRow(s);
                 miList.add(mi);

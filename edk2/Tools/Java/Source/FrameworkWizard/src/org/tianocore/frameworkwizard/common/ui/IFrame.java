@@ -217,7 +217,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener, Co
     }
 
     public int showSaveDialog() {
-        return JOptionPane.showConfirmDialog(null, "Save all changed files?", "Save", JOptionPane.YES_NO_CANCEL_OPTION,
+        return JOptionPane.showConfirmDialog(this, "Save all changed files?", "Save", JOptionPane.YES_NO_CANCEL_OPTION,
                                              JOptionPane.WARNING_MESSAGE);
     }
 

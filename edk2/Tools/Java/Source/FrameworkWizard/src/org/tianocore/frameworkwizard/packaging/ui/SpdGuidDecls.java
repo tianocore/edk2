@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.util.Vector;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -26,7 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -58,8 +58,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
      * 
      */
     private static final long serialVersionUID = 1L;
-
-    static JFrame frame;
+    
+    private JFrame topFrame = null;
     
     private SpdFileContents sfc = null;
     
@@ -219,8 +219,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            column = jTable.getColumnModel().getColumn(6);
            column.setMinWidth(this.guidTypeMinWidth);
            
-           jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
-           jTable.getColumnModel().getColumn(3).setCellEditor(new LongTextEditor());
+           jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor(topFrame));
+           jTable.getColumnModel().getColumn(3).setCellEditor(new LongTextEditor(topFrame));
 
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
@@ -229,7 +229,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            vArch.add("EBC");
            vArch.add("ARM");
            vArch.add("PPC");
-           jTable.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
+           jTable.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch, topFrame));
            
            Vector<String> vModule = new Vector<String>();
            vModule.add("BASE");
@@ -244,7 +244,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            vModule.add("UEFI_DRIVER");
            vModule.add("UEFI_APPLICATION");
            vModule.add("USER_DEFINED");
-           jTable.getColumnModel().getColumn(5).setCellEditor(new ListEditor(vModule));
+           jTable.getColumnModel().getColumn(5).setCellEditor(new ListEditor(vModule, topFrame));
            
            Vector<String> vGuid = new Vector<String>();
            vGuid.add("DATA_HUB_RECORD");
@@ -255,7 +255,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            vGuid.add("HII_PACKAGE_LIST");
            vGuid.add("HOB");
            vGuid.add("TOKEN_SPACE_GUID");
-           ListEditor le = new ListEditor(vGuid);
+           ListEditor le = new ListEditor(vGuid, topFrame);
            le.setCanNotBeEmpty(true);
            jTable.getColumnModel().getColumn(6).setCellEditor(le);
            
@@ -416,24 +416,25 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     /**
       This is the default constructor
      **/
-    public SpdGuidDecls() {
+    public SpdGuidDecls(JFrame frame) {
         super();
+        topFrame = frame;
         initialize();
         init();
         
     }
 
-    public SpdGuidDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa){
-        this();
+    public SpdGuidDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame){
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdGuidDecls(OpeningPackageType opt) {
-        this(opt.getXmlSpd());
+    public SpdGuidDecls(OpeningPackageType opt, JFrame frame) {
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(this, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
     }
@@ -894,10 +895,6 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             iCheckBoxListMod.setAllItems(v);
         }
         return iCheckBoxListMod;
-    }
-
-    public static void main(String[] args){
-        new SpdGuidDecls().setVisible(true);
     }
 
     protected DefaultTableModel getModel() {

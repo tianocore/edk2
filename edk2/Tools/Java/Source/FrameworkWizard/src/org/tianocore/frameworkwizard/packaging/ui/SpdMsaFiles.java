@@ -54,7 +54,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
      */
     private static final long serialVersionUID = 1L;
 
-    static JFrame frame;
+    private JFrame topFrame;
     
     private JScrollPane jScrollPane = null;  //  @jve:decl-index=0:visual-constraint="10,95"
 
@@ -229,21 +229,21 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     /**
       This is the default constructor
      **/
-    public SpdMsaFiles() {
+    public SpdMsaFiles(JFrame frame) {
         super();
         initialize();
         init();
-        
+        topFrame = frame;
     }
 
-    public SpdMsaFiles(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa){
-        this();
+    public SpdMsaFiles(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame){
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdMsaFiles(OpeningPackageType opt){
-        this(opt.getXmlSpd());
+    public SpdMsaFiles(OpeningPackageType opt, JFrame frame){
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
     }
     /**
@@ -269,7 +269,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     private void init(SpdFileContents sfc){
 
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(topFrame, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
         
@@ -477,13 +477,13 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
                     
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(SpdMsaFiles.this);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current package!");
+                            JOptionPane.showMessageDialog(SpdMsaFiles.this, "You can only select files in current package!");
                             return;
                         }
                         
@@ -512,9 +512,6 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
         Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 25);
     }
     
-    public static void main(String[] args){
-        new SpdMsaFiles().setVisible(true);
-    }
 }
 
 

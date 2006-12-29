@@ -30,7 +30,6 @@ import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JFrame;
 
 import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Tools;
@@ -97,8 +96,6 @@ public class Preferences extends IFrame {
     private static Preferences bTarget = null;
 
     private WorkspaceTools wt = new WorkspaceTools();
-
-    private JFrame frame;
 
     private final int activePlatformId = 0;
 
@@ -467,13 +464,13 @@ public class Preferences extends IFrame {
 
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(Preferences.this);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in the Tools"
+                            JOptionPane.showMessageDialog(Preferences.this, "You can only select files in the Tools"
                                                                  + System.getProperty("file.separator")
                                                                  + "Conf directory!");
 

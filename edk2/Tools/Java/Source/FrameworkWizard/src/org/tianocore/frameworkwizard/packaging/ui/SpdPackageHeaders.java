@@ -57,7 +57,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
      */
     private static final long serialVersionUID = 1L;
 
-    static JFrame frame;
+    private JFrame topFrame;
     
     private SpdFileContents sfc = null;
     
@@ -213,21 +213,21 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     /**
       This is the default constructor
      **/
-    public SpdPackageHeaders() {
+    public SpdPackageHeaders(JFrame frame) {
         super();
         initialize();
         init();
-        
+        topFrame = frame;
     }
 
-    public SpdPackageHeaders(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa){
-        this();
+    public SpdPackageHeaders(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame){
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdPackageHeaders(OpeningPackageType opt) {
-        this(opt.getXmlSpd());
+    public SpdPackageHeaders(OpeningPackageType opt, JFrame frame) {
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
     }
     /**
@@ -253,7 +253,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private void init(SpdFileContents sfc){
 
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(topFrame, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
         
@@ -445,13 +445,13 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
                     
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(SpdPackageHeaders.this);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current package!");
+                            JOptionPane.showMessageDialog(SpdPackageHeaders.this, "You can only select files in current package!");
                             return;
                         }
                         
@@ -573,10 +573,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         Tools.resizeComponentWidth(this.jScrollPanePkgHdr, this.getWidth(), intPreferredWidth);
         Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);
     }
-    
-    public static void main(String[] args){
-        new SpdPackageHeaders().setVisible(true);
-    }
+
 }
 
 

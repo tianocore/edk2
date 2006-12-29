@@ -271,15 +271,6 @@ public class GenGuidDialog extends JDialog implements ActionListener{
         return jButtonOk;
     }
 
-    /**
-     
-     @param args
-     **/
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        new GenGuidDialog().setVisible(true);
-    }
-
     public String getGuid(){
         return jTextField.getText();
     }
@@ -295,8 +286,8 @@ public class GenGuidDialog extends JDialog implements ActionListener{
         initialize();
     }
     
-    public GenGuidDialog(ActionListener i){
-        super();
+    public GenGuidDialog(ActionListener i, JFrame frame){
+        super(frame);
         outerListener = i;
         initialize();
         jButtonOk.addActionListener(i);

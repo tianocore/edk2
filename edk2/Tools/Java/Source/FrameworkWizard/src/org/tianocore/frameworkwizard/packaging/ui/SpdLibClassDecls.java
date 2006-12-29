@@ -70,7 +70,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      */
     private static final long serialVersionUID = 1L;
 
-    static JFrame frame;
+    private JFrame topFrame;
     
     private JTable jTable = null;
 
@@ -249,7 +249,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            model.addColumn("Supported Architectures");
            model.addColumn("Supported Module Types");
            
-           jTable.getColumnModel().getColumn(cnHelpText).setCellEditor(new LongTextEditor());
+           jTable.getColumnModel().getColumn(cnHelpText).setCellEditor(new LongTextEditor(topFrame));
            
            jTable.removeColumn(jTable.getColumnModel().getColumn(3));
            jTable.removeColumn(jTable.getColumnModel().getColumn(3));
@@ -261,7 +261,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vArch.add("EBC");
            vArch.add("ARM");
            vArch.add("PPC");
-           jTable.getColumnModel().getColumn(cnSupArch - 2).setCellEditor(new ListEditor(vArch));
+           jTable.getColumnModel().getColumn(cnSupArch - 2).setCellEditor(new ListEditor(vArch, topFrame));
            
            Vector<String> vModule = new Vector<String>();
            vModule.add("BASE");
@@ -277,7 +277,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vModule.add("UEFI_APPLICATION");
            vModule.add("USER_DEFINED");
 
-           jTable.getColumnModel().getColumn(cnSupMod - 2).setCellEditor(new ListEditor(vModule));
+           jTable.getColumnModel().getColumn(cnSupMod - 2).setCellEditor(new ListEditor(vModule, topFrame));
            
            TableColumn column = jTable.getColumnModel().getColumn(this.cnClassName);
            column.setMinWidth(this.classNameMinWidth);
@@ -435,21 +435,22 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     /**
       This is the default constructor
      **/
-    public SpdLibClassDecls() {
+    public SpdLibClassDecls(JFrame frame) {
         super();
+        topFrame = frame;
         initialize();
         init();
         
     }
 
-    public SpdLibClassDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa){
-        this();
+    public SpdLibClassDecls(PackageSurfaceAreaDocument.PackageSurfaceArea inPsa, JFrame frame){
+        this(frame);
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
     
-    public SpdLibClassDecls(OpeningPackageType opt) {
-        this(opt.getXmlSpd());
+    public SpdLibClassDecls(OpeningPackageType opt, JFrame frame) {
+        this(opt.getXmlSpd(), frame);
         docConsole = opt;
     }
     /**
@@ -475,7 +476,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private void init(SpdFileContents sfc) {
 
         if (sfc.getSpdPkgDefsRdOnly().equals("true")) {
-            JOptionPane.showMessageDialog(frame, "This is a read-only package. You will not be able to edit contents in table.");
+            JOptionPane.showMessageDialog(topFrame, "This is a read-only package. You will not be able to edit contents in table.");
         }
         initFrame();
         
@@ -662,15 +663,15 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private boolean dataValidation(String[] row) {
         if (!DataValidation.isKeywordType(row[cnClassName])) {
-            JOptionPane.showMessageDialog(frame, "Library Class name entered does not match KeyWord datatype.");
+            JOptionPane.showMessageDialog(this, "Library Class name entered does not match KeyWord datatype.");
             return false;
         }
         if (!DataValidation.isPathAndFilename(row[cnHdrFile])) {
-            JOptionPane.showMessageDialog(frame, "Include Header does not match the PathAndFilename datatype.");
+            JOptionPane.showMessageDialog(this, "Include Header does not match the PathAndFilename datatype.");
             return false;
         }
         if (row[cnHelpText].length() == 0) {
-            JOptionPane.showMessageDialog(frame, "Help Text must be entered!");
+            JOptionPane.showMessageDialog(this, "Help Text must be entered!");
             return false;
         }
 //        if (row[cnRecInstVer] != null && row[cnRecInstVer].length() > 0) {
@@ -737,13 +738,13 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                     
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    int retval = chooser.showOpenDialog(frame);
+                    int retval = chooser.showOpenDialog(topFrame);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current package directory structure!");
+                            JOptionPane.showMessageDialog(topFrame, "You can only select files in current package directory structure!");
                             return;
                         }
                         

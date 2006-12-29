@@ -15,7 +15,6 @@ package org.tianocore.frameworkwizard.platform.ui;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
-import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
@@ -104,8 +103,6 @@ public class FpdPlatformDefs extends IInternalFrame {
     private final int tableHeight = fourRowHeight;
 
     private final int tableWidth = valueWidth;
-
-    static JFrame frame;
 
     private JPanel jContentPane = null;
 
@@ -473,7 +470,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE Architecture.");
                         jCheckBoxIa32.setSelected(true);
                         return;
                     }
@@ -499,7 +496,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE Architecture.");
                         jCheckBoxX64.setSelected(true);
                         return;
                     }
@@ -525,7 +522,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE Architecture.");
                         jCheckBoxIpf.setSelected(true);
                         return;
                     }
@@ -553,7 +550,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE Architecture.");
                         jCheckBoxEbc.setSelected(true);
                         return;
                     }
@@ -581,7 +578,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE Architecture.");
                         jCheckBoxArm.setSelected(true);
                         return;
                     }
@@ -609,7 +606,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getSupportedArchitectures(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must support at least ONE  Architecture.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "Platform must support at least ONE  Architecture.");
                         jCheckBoxPpc.setSelected(true);
                         return;
                     }
@@ -740,7 +737,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                         return;
                     }
                     if (jTableBuildTargets.getRowCount() == 1) {
-                        JOptionPane.showMessageDialog(frame, "At least one build target should be set for this platform.");
+                        JOptionPane.showMessageDialog(FpdPlatformDefs.this, "At least one build target should be set for this platform.");
                         return;
                     }
                     buildTargetTableModel.removeRow(jTableBuildTargets.getSelectedRow());

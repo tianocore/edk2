@@ -2784,31 +2784,31 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             getJDesktopPanePackage().add(frmSpdHeader, 1);
             break;
         case IDefaultMutableTreeNode.SPD_LIBRARYCLASSDECLARATIONS:
-            SpdLibClassDecls frmSlcd = new SpdLibClassDecls(spd);
+            SpdLibClassDecls frmSlcd = new SpdLibClassDecls(spd, this);
             getJDesktopPanePackage().add(frmSlcd, 1);
             break;
         case IDefaultMutableTreeNode.SPD_MSAFILES:
-            SpdMsaFiles frmSmf = new SpdMsaFiles(spd);
+            SpdMsaFiles frmSmf = new SpdMsaFiles(spd, this);
             getJDesktopPanePackage().add(frmSmf, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PACKAGEHEADERS:
-            SpdPackageHeaders frmSph = new SpdPackageHeaders(spd);
+            SpdPackageHeaders frmSph = new SpdPackageHeaders(spd, this);
             getJDesktopPanePackage().add(frmSph, 1);
             break;
         case IDefaultMutableTreeNode.SPD_GUIDDECLARATIONS:
-            SpdGuidDecls frmSgd = new SpdGuidDecls(spd);
+            SpdGuidDecls frmSgd = new SpdGuidDecls(spd, this);
             getJDesktopPanePackage().add(frmSgd, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PROTOCOLDECLARATIONS:
-            SpdProtocolDecls frmSprod = new SpdProtocolDecls(spd);
+            SpdProtocolDecls frmSprod = new SpdProtocolDecls(spd, this);
             getJDesktopPanePackage().add(frmSprod, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PPIDECLARATIONS:
-            SpdPpiDecls frmSppid = new SpdPpiDecls(spd);
+            SpdPpiDecls frmSppid = new SpdPpiDecls(spd, this);
             getJDesktopPanePackage().add(frmSppid, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PCDDECLARATIONS:
-            SpdPcdDefs frmSpcdd = new SpdPcdDefs(spd);
+            SpdPcdDefs frmSpcdd = new SpdPcdDefs(spd, this);
             getJDesktopPanePackage().add(frmSpcdd, 1);
             break;
         }
@@ -3409,7 +3409,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         int result = cso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             String strReturn = "Far Creation Completed!";
-            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
         }
         cso.dispose();
@@ -3424,7 +3424,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         int result = iso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             String strReturn = "<html>Far Installalation completed!<br>Refreshing the WORKSPACE!</html>";
-            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
             this.refresh();
@@ -3442,7 +3442,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         int result = dso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             String strReturn = "<html>Far Deletion completed!<br>Refreshing the WORKSPACE!</html>";
-            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
             this.refresh();
@@ -3460,7 +3460,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         int result = uso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             String strReturn = "<html>Far Update completed!<br>Refreshing the WORKSPACE!</html>";
-            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
             this.refresh();
@@ -3707,7 +3707,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 return;
             }
 
-            JOptionPane.showConfirmDialog(null, "File is created", "Generate guids.xref", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, "File is created", "Generate guids.xref", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -3723,7 +3723,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         case Workspace.WORKSPACE_NOT_DEFINED:
             JOptionPane
                        .showConfirmDialog(
-                                          null,
+                                          this,
                                           "WORKSPACE Environment Variable Is Not Defined, Please select a valid WORKSPACE directory. "
                                                           + DataType.LINE_SEPARATOR
                                                           + DataType.LINE_SEPARATOR
@@ -3743,22 +3743,22 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                 break;
             }
         case Workspace.WORKSPACE_NOT_EXIST:
-            JOptionPane.showConfirmDialog(null, "Defined WORKSPACE Is Not Existed", "Error",
+            JOptionPane.showConfirmDialog(this, "Defined WORKSPACE Is Not Existed", "Error",
                                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
         case Workspace.WORKSPACE_NOT_DIRECTORY:
-            JOptionPane.showConfirmDialog(null, "Defined WORKSPACE Is Not A Directory", "Error",
+            JOptionPane.showConfirmDialog(this, "Defined WORKSPACE Is Not A Directory", "Error",
                                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
         case Workspace.WORKSPACE_NOT_VALID:
-            JOptionPane.showConfirmDialog(null, "WORKSPACE Environment Variable Is Not Valid", "Error",
+            JOptionPane.showConfirmDialog(this, "WORKSPACE Environment Variable Is Not Valid", "Error",
                                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
         case Workspace.WORKSPACE_NO_TARGET_FILE:
-            JOptionPane.showConfirmDialog(null, "Target.txt File Is Not Existed", "Error", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.showConfirmDialog(this, "Target.txt File Is Not Existed", "Error", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.ERROR_MESSAGE);
             this.dispose();
             System.exit(0);
