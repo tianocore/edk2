@@ -32,6 +32,7 @@ import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.find.Find;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -60,7 +61,7 @@ public class LibraryClassDefsDlg extends IDialog {
     //
     private JPanel jContentPane = null;
 
-    private JComboBox jComboBoxLibraryClassName = null;
+    private IComboBox iComboBoxLibraryClassName = null;
 
     private JLabel jLabelUsage = null;
 
@@ -121,14 +122,14 @@ public class LibraryClassDefsDlg extends IDialog {
      @return javax.swing.JComboBox jComboBoxSelect
      
      **/
-    private JComboBox getJComboBoxLibraryClassName() {
-        if (jComboBoxLibraryClassName == null) {
-            jComboBoxLibraryClassName = new JComboBox();
-            jComboBoxLibraryClassName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
-            jComboBoxLibraryClassName.setPreferredSize(new Dimension(320, 20));
-            jComboBoxLibraryClassName.setEnabled(true);
+    private IComboBox getIComboBoxLibraryClassName() {
+        if (iComboBoxLibraryClassName == null) {
+            iComboBoxLibraryClassName = new IComboBox();
+            iComboBoxLibraryClassName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
+            iComboBoxLibraryClassName.setPreferredSize(new Dimension(320, 20));
+            iComboBoxLibraryClassName.setEnabled(true);
         }
-        return jComboBoxLibraryClassName;
+        return iComboBoxLibraryClassName;
     }
 
     /**
@@ -349,13 +350,13 @@ public class LibraryClassDefsDlg extends IDialog {
 
         Tools
              .generateComboBoxByVector(
-                                       this.jComboBoxLibraryClassName,
+                                       this.iComboBoxLibraryClassName,
                                        wt
                                          .getAllLibraryClassDefinitionsFromPackages(wt
                                                                                       .getPackageDependenciesOfModule(mid)));
 
         if (lcid != null) {
-            this.jComboBoxLibraryClassName.setSelectedItem(lcid.getLibraryClassName());
+            this.iComboBoxLibraryClassName.setSelectedItem(lcid.getLibraryClassName());
             this.jComboBoxUsage.setSelectedItem(lcid.getUsage());
             this.jTextFieldRecommendedInstanceVersion.setText(lcid.getRecommendedInstanceVersion());
             this.jTextFieldRecommendedInstanceGuid.setText(lcid.getRecommendedInstanceGuid());
@@ -375,7 +376,7 @@ public class LibraryClassDefsDlg extends IDialog {
      **/
     public void setViewMode(boolean isView) {
         if (isView) {
-            this.jComboBoxLibraryClassName.setEnabled(!isView);
+            this.iComboBoxLibraryClassName.setEnabled(!isView);
             this.jComboBoxUsage.setEnabled(!isView);
         }
     }
@@ -422,7 +423,7 @@ public class LibraryClassDefsDlg extends IDialog {
             jContentPane.setLayout(null);
             jContentPane.setPreferredSize(new java.awt.Dimension(495, 255));
 
-            jContentPane.add(getJComboBoxLibraryClassName(), null);
+            jContentPane.add(getIComboBoxLibraryClassName(), null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxUsage(), null);
             jContentPane.add(jLabelLibraryClassName, null);
@@ -497,11 +498,11 @@ public class LibraryClassDefsDlg extends IDialog {
         //
         // Check LibraryClass
         //
-        if (this.jComboBoxLibraryClassName.getSelectedItem() == null) {
+        if (this.iComboBoxLibraryClassName.getSelectedItem() == null) {
             Log.wrn("Update Library Class Definitions", "Please select one Library Class");
             return false;
         }
-        if (!DataValidation.isLibraryClass(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
+        if (!DataValidation.isLibraryClass(this.iComboBoxLibraryClassName.getSelectedItem().toString())) {
             Log.wrn("Update Library Class Definitions", "Incorrect data type for Library Class");
             return false;
         }
@@ -548,7 +549,7 @@ public class LibraryClassDefsDlg extends IDialog {
             boolean isFind = false;
             for (int index = 0; index < v.size(); index++) {
                 LibraryClassIdentification lid = v.getLibraryClass(index);
-                if (lid.getLibraryClassName().equals(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
+                if (lid.getLibraryClassName().equals(this.iComboBoxLibraryClassName.getSelectedItem().toString())) {
                     if (lid.getUsage().equals(DataType.USAGE_TYPE_ALWAYS_PRODUCED)
                         || lid.getUsage().equals(DataType.USAGE_TYPE_SOMETIMES_PRODUCED)) {
                         isFind = true;
@@ -566,7 +567,7 @@ public class LibraryClassDefsDlg extends IDialog {
     }
 
     private LibraryClassIdentification getCurrentLibraryClass() {
-        String name = this.jComboBoxLibraryClassName.getSelectedItem().toString();
+        String name = this.iComboBoxLibraryClassName.getSelectedItem().toString();
         String usage = this.jComboBoxUsage.getSelectedItem().toString();
         String version = this.jTextFieldRecommendedInstanceVersion.getText();
         String guid = this.jTextFieldRecommendedInstanceGuid.getText();

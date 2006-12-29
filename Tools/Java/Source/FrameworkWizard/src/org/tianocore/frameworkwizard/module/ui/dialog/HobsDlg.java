@@ -31,6 +31,7 @@ import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -59,7 +60,7 @@ public class HobsDlg extends IDialog {
 
     private JLabel jLabelC_Name = null;
 
-    private JComboBox jComboBoxGuidC_Name = null;
+    private IComboBox iComboBoxGuidC_Name = null;
 
     private JLabel jLabelUsage = null;
 
@@ -110,14 +111,14 @@ public class HobsDlg extends IDialog {
      * @return javax.swing.JTextField jTextFieldC_Name
      * 
      */
-    private JComboBox getJComboBoxGuidC_Name() {
-        if (jComboBoxGuidC_Name == null) {
-            jComboBoxGuidC_Name = new JComboBox();
-            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
-            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
+    private IComboBox getIComboBoxGuidC_Name() {
+        if (iComboBoxGuidC_Name == null) {
+            iComboBoxGuidC_Name = new IComboBox();
+            iComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
+            iComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+            iComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
         }
-        return jComboBoxGuidC_Name;
+        return iComboBoxGuidC_Name;
     }
 
     /**
@@ -307,12 +308,12 @@ public class HobsDlg extends IDialog {
         // Init guids drop down list
         //
         Tools
-             .generateComboBoxByVector(jComboBoxGuidC_Name,
+             .generateComboBoxByVector(iComboBoxGuidC_Name,
                                        wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_HOB));
 
 
         if (this.id != null) {
-            this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
+            this.iComboBoxGuidC_Name.setSelectedItem(id.getName());
             this.jComboBoxHobType.setSelectedItem(id.getType());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
@@ -342,7 +343,7 @@ public class HobsDlg extends IDialog {
      */
     public void setViewMode(boolean isView) {
         if (isView) {
-            this.jComboBoxGuidC_Name.setEnabled(!isView);
+            this.iComboBoxGuidC_Name.setEnabled(!isView);
             this.jComboBoxUsage.setEnabled(!isView);
             this.jComboBoxHobType.setEnabled(!isView);
         }
@@ -396,7 +397,7 @@ public class HobsDlg extends IDialog {
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelC_Name, null);
-            jContentPane.add(getJComboBoxGuidC_Name(), null);
+            jContentPane.add(getIComboBoxGuidC_Name(), null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jLabelHobType, null);
             jContentPane.add(getJComboBoxHobType(), null);
@@ -462,20 +463,20 @@ public class HobsDlg extends IDialog {
         //
         // Check Name
         //
-        if (this.jComboBoxGuidC_Name.getSelectedItem() == null) {
+        if (this.iComboBoxGuidC_Name.getSelectedItem() == null) {
             Log.wrn("Update Guids", "Please select one Hob Name");
             return false;
         }
         //
         // Check Name
         //
-        if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+        if (isEmpty(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
             Log.wrn("Update Hobs", "Hob Guid C Name must be entered!");
             return false;
         }
 
-        if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+        if (!isEmpty(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
                 Log.wrn("Update Hobs", "Incorrect data type for Hob Name");
                 return false;
             }
@@ -495,7 +496,7 @@ public class HobsDlg extends IDialog {
     }
 
     private HobsIdentification getCurrentHobs() {
-        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
+        String arg0 = this.iComboBoxGuidC_Name.getSelectedItem().toString();
         String arg1 = this.jComboBoxHobType.getSelectedItem().toString();
         String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
 
