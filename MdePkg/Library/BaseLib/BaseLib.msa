@@ -83,7 +83,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>SwapBytes32.c</Filename>
     <Filename>SwapBytes64.c</Filename>
     <Filename>SwitchStack.c</Filename>
-    
+
     <Filename SupArchList="IA32">x86DisablePaging32.c</Filename>
     <Filename SupArchList="IA32">x86DisablePaging64.c</Filename>
     <Filename SupArchList="IA32">x86EnablePaging32.c</Filename>
@@ -200,7 +200,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuBreakpoint.S</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/CpuFlushTlb.S</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/Thunk16.S</Filename>
-    
+
     <Filename SupArchList="X64" ToolChainFamily="GCC">X64/CpuBreakpoint.S</Filename>
     <Filename SupArchList="X64" ToolChainFamily="GCC">X64/CpuFlushTlb.S</Filename>
     <Filename SupArchList="X64" ToolChainFamily="GCC">X64/CpuIdEx.S</Filename>
@@ -303,7 +303,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnableInterrupts.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnablePaging32.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EnablePaging64.asm</Filename>
-    
+
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/FlushCacheLine.c</Filename>
 
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/FxSave.c</Filename>
@@ -314,7 +314,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedCompareExchange32.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/InterlockedCompareExchange64.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Invd.c</Filename>
-    
+
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LongJump.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LRotU64.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/LShiftU64.c</Filename>
@@ -391,7 +391,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm6.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/WriteMm7.c</Filename>
     <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/Wbinvd.c</Filename>
-                                
+
     <Filename SupArchList="X64">x86DisablePaging32.c</Filename>
     <Filename SupArchList="X64">x86DisablePaging64.c</Filename>
     <Filename SupArchList="X64">x86EnablePaging32.c</Filename>
@@ -493,7 +493,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/CpuBreakpoint.c</Filename>
     <Filename SupArchList="X64">X64/CpuFlushTlb.asm</Filename>
     <Filename SupArchList="X64">X64/Thunk16.asm</Filename>
-    
+
     <Filename SupArchList="IPF">Math64.c</Filename>
     <Filename SupArchList="IPF">Ipf/asm.h</Filename>
     <Filename SupArchList="IPF">Ipf/ia_64gen.h</Filename>
@@ -512,7 +512,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IPF">Ipf/Non-existing.c</Filename>
     <Filename SupArchList="IPF">Ipf/FlushCacheRange.s</Filename>
     <Filename SupArchList="IPF">Ipf/ReadItc.s</Filename>
-    
+
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>
     <Filename SupArchList="EBC">Ebc/SwitchStack.c</Filename>
@@ -520,6 +520,104 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="EBC">Ebc/CpuBreakpoint.c</Filename>
     <Filename SupArchList="EBC">Ebc/Synchronization.c</Filename>
   </SourceFiles>
+  <NonProcessedFiles>
+    <Filename>Ia32/ARShiftU64.asm</Filename>
+    <Filename>Ia32/CpuBreakpoint.asm</Filename>
+    <Filename>Ia32/CpuFlushTlb.asm</Filename>
+    <Filename>Ia32/CpuId.asm</Filename>
+    <Filename>Ia32/CpuIdEx.asm</Filename>
+    <Filename>Ia32/CpuPause.asm</Filename>
+    <Filename>Ia32/CpuSleep.asm</Filename>
+    <Filename>Ia32/DisableInterrupts.asm</Filename>
+    <Filename>Ia32/DisablePaging32.asm</Filename>
+    <Filename>Ia32/DivU64x32.asm</Filename>
+    <Filename>Ia32/DivU64x32Remainder.asm</Filename>
+    <Filename>Ia32/DivU64x64Remainder.asm</Filename>
+    <Filename>Ia32/EnableDisableInterrupts.asm</Filename>
+    <Filename>Ia32/EnableInterrupts.asm</Filename>
+    <Filename>Ia32/EnablePaging32.asm</Filename>
+    <Filename>Ia32/EnablePaging64.asm</Filename>
+    <Filename>Ia32/FlushCacheLine.asm</Filename>
+    <Filename>Ia32/FxRestore.asm</Filename>
+    <Filename>Ia32/FxSave.asm</Filename>
+    <Filename>Ia32/InterlockedCompareExchange32.asm</Filename>
+    <Filename>Ia32/InterlockedCompareExchange64.asm</Filename>
+    <Filename>Ia32/InterlockedDecrement.asm</Filename>
+    <Filename>Ia32/InterlockedIncrement.asm</Filename>
+    <Filename>Ia32/Invd.asm</Filename>
+    <Filename>Ia32/LongJump.asm</Filename>
+    <Filename>Ia32/LRotU64.asm</Filename>
+    <Filename>Ia32/LShiftU64.asm</Filename>
+    <Filename>Ia32/ModU64x32.asm</Filename>
+    <Filename>Ia32/Monitor.asm</Filename>
+    <Filename>Ia32/MultU64x32.asm</Filename>
+    <Filename>Ia32/MultU64x64.asm</Filename>
+    <Filename>Ia32/Mwait.asm</Filename>
+    <Filename>Ia32/ReadCr0.asm</Filename>
+    <Filename>Ia32/ReadCr2.asm</Filename>
+    <Filename>Ia32/ReadCr3.asm</Filename>
+    <Filename>Ia32/ReadCr4.asm</Filename>
+    <Filename>Ia32/ReadCs.asm</Filename>
+    <Filename>Ia32/ReadDr0.asm</Filename>
+    <Filename>Ia32/ReadDr1.asm</Filename>
+    <Filename>Ia32/ReadDr2.asm</Filename>
+    <Filename>Ia32/ReadDr3.asm</Filename>
+    <Filename>Ia32/ReadDr4.asm</Filename>
+    <Filename>Ia32/ReadDr5.asm</Filename>
+    <Filename>Ia32/ReadDr6.asm</Filename>
+    <Filename>Ia32/ReadDr7.asm</Filename>
+    <Filename>Ia32/ReadDs.asm</Filename>
+    <Filename>Ia32/ReadEflags.asm</Filename>
+    <Filename>Ia32/ReadEs.asm</Filename>
+    <Filename>Ia32/ReadFs.asm</Filename>
+    <Filename>Ia32/ReadGdtr.asm</Filename>
+    <Filename>Ia32/ReadGs.asm</Filename>
+    <Filename>Ia32/ReadIdtr.asm</Filename>
+    <Filename>Ia32/ReadLdtr.asm</Filename>
+    <Filename>Ia32/ReadMm0.asm</Filename>
+    <Filename>Ia32/ReadMm1.asm</Filename>
+    <Filename>Ia32/ReadMm2.asm</Filename>
+    <Filename>Ia32/ReadMm3.asm</Filename>
+    <Filename>Ia32/ReadMm4.asm</Filename>
+    <Filename>Ia32/ReadMm5.asm</Filename>
+    <Filename>Ia32/ReadMm6.asm</Filename>
+    <Filename>Ia32/ReadMm7.asm</Filename>
+    <Filename>Ia32/ReadMsr64.asm</Filename>
+    <Filename>Ia32/ReadPmc.asm</Filename>
+    <Filename>Ia32/ReadSs.asm</Filename>
+    <Filename>Ia32/ReadTr.asm</Filename>
+    <Filename>Ia32/ReadTsc.asm</Filename>
+    <Filename>Ia32/RRotU64.asm</Filename>
+    <Filename>Ia32/RShiftU64.asm</Filename>
+    <Filename>Ia32/SetJump.asm</Filename>
+    <Filename>Ia32/SwapBytes64.asm</Filename>
+    <Filename>Ia32/Thunk16.asm</Filename>
+    <Filename>Ia32/Wbinvd.asm</Filename>
+    <Filename>Ia32/WriteCr0.asm</Filename>
+    <Filename>Ia32/WriteCr2.asm</Filename>
+    <Filename>Ia32/WriteCr3.asm</Filename>
+    <Filename>Ia32/WriteCr4.asm</Filename>
+    <Filename>Ia32/WriteDr0.asm</Filename>
+    <Filename>Ia32/WriteDr1.asm</Filename>
+    <Filename>Ia32/WriteDr2.asm</Filename>
+    <Filename>Ia32/WriteDr3.asm</Filename>
+    <Filename>Ia32/WriteDr4.asm</Filename>
+    <Filename>Ia32/WriteDr5.asm</Filename>
+    <Filename>Ia32/WriteDr6.asm</Filename>
+    <Filename>Ia32/WriteDr7.asm</Filename>
+    <Filename>Ia32/WriteGdtr.asm</Filename>
+    <Filename>Ia32/WriteIdtr.asm</Filename>
+    <Filename>Ia32/WriteLdtr.asm</Filename>
+    <Filename>Ia32/WriteMm0.asm</Filename>
+    <Filename>Ia32/WriteMm1.asm</Filename>
+    <Filename>Ia32/WriteMm2.asm</Filename>
+    <Filename>Ia32/WriteMm3.asm</Filename>
+    <Filename>Ia32/WriteMm4.asm</Filename>
+    <Filename>Ia32/WriteMm5.asm</Filename>
+    <Filename>Ia32/WriteMm6.asm</Filename>
+    <Filename>Ia32/WriteMm7.asm</Filename>
+    <Filename>Ia32/WriteMsr64.asm</Filename>
+  </NonProcessedFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
