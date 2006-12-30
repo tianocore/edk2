@@ -999,26 +999,26 @@ UsbFloppyDetectMedia (
         Status = USBFloppyReadCapacity (UsbFloppyDevice);
         break;
 
-      case USBFLOPPY:
+      case USBFLOPPY2:
         UsbMassStorageModeSense (UsbFloppyDevice);
         Status = USBFloppyReadFormatCapacity (UsbFloppyDevice);
         if (EFI_ERROR (Status) || !UsbFloppyDevice->BlkMedia.MediaPresent) {
           //
           // retry the ReadCapacity command
           //
-          UsbFloppyDevice->DeviceType = USBFLOPPY2;
+          UsbFloppyDevice->DeviceType = USBFLOPPY;
           Status                      = EFI_DEVICE_ERROR;
         }
         break;
 
-      case USBFLOPPY2:
+      case USBFLOPPY:
         UsbMassStorageModeSense (UsbFloppyDevice);
         Status = USBFloppyReadCapacity (UsbFloppyDevice);
         if (EFI_ERROR (Status)) {
           //
           // retry the ReadFormatCapacity command
           //
-          UsbFloppyDevice->DeviceType = USBFLOPPY;
+          UsbFloppyDevice->DeviceType = USBFLOPPY2;
         }
         //
         // force the BlockSize to be 0x200.
