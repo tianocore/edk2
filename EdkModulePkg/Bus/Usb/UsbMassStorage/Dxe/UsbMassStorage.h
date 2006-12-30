@@ -33,8 +33,8 @@ Revision History
 #define PROTOCOL_CBI0             0
 #define PROTOCOL_CBI1             1
 
-#define USBFLOPPY                 1
-#define USBFLOPPY2                2 // for those that use ReadCapacity(0x25) command to retrieve media capacity
+#define USBFLOPPY                 1 // for those that use ReadCapacity(0x25) command to retrieve media capacity
+#define USBFLOPPY2                2 // for those that use ReadFormatCapacity(0x23) command to retrieve media capacity
 #define USBCDROM                  3
 
 #define USB_FLOPPY_DEV_SIGNATURE  EFI_SIGNATURE_32 ('u', 'f', 'l', 'p')
