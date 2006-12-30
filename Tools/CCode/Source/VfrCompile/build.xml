@@ -81,6 +81,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         debug="true"
         optimize="speed">
 
+      <compilerarg value="-fpermissive" if="gcc"/>
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" />
 
