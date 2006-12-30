@@ -51,11 +51,11 @@ public class PeiReBaseTask extends Task implements EfiDefine {
     private ToolArg baseAddr = new ToolArg();
     //
     // Fv.inf file
-    // 
+    //
     private FileArg fvinfFile = new FileArg();
     //
     // map file
-    // 
+    //
     private FileArg mapFile = new FileArg();
     //
     // Architecture
@@ -64,10 +64,10 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       execute
-     
+
       PeiReBaseTask execute function is to assemble tool command line & execute
       tool command line
-     
+
       @throws BuidException
      **/
     public void execute() throws BuildException {
@@ -103,7 +103,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         if (mapFile.getValue().length() == 0) {
             mapFile.setArg(" -M ", outputFile.getValue() + ".map");
         }
-        argument = "" + inputFile + outputFile + baseAddr + fvinfFile + mapFile;
+        argument = "" + inputFile + outputFile + baseAddr + fvinfFile;
 
         //
         // return value of fwimage execution
@@ -125,7 +125,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, inputFile.toFileList() + " => " 
+            EdkLog.log(this, EdkLog.EDK_INFO, inputFile.toFileList() + " => "
                                               + outputFile.toFileList()
                                               + mapFile.toFileList());
 
@@ -150,9 +150,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       getInputFile
-     
+
       This function is to get class member "inputFile".
-     
+
       @return string of input file name.
      **/
     public String getInputFile() {
@@ -161,9 +161,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       setComponentType
-     
+
       This function is to set class member "inputFile".
-     
+
       @param inputFile
                  string of input file name.
      **/
@@ -173,9 +173,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       getOutputFile
-     
+
       This function is to get class member "outputFile"
-     
+
       @return outputFile string of output file name.
      **/
     public String getOutputFile() {
@@ -184,9 +184,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       setOutputFile
-     
+
       This function is to set class member "outputFile"
-     
+
       @param outputFile
                  string of output file name.
      **/
@@ -196,9 +196,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       getBaseAddr
-     
+
       This function is to get class member "baseAddr"
-     
+
       @return baseAddr   string of base address.
      **/
     public String getBaseAddr() {
@@ -207,9 +207,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       setBaseAddr
-     
+
       This function is to set class member "baseAddr"
-     
+
       @param baseAddr    string of base address
      **/
     public void setBaseAddr(String baseAddr) {
@@ -218,9 +218,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       getArch
-     
+
       This function is to get class member "arch".
-     
+
       @return arch       Architecture
      **/
     public String getArch() {
@@ -229,9 +229,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
       setArch
-     
+
       This function is to set class member "arch"
-     
+
       @param arch         Architecture
      **/
     public void setArch(String arch) {
@@ -276,7 +276,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     //
     // Dependency check
-    // 
+    //
     private boolean isUptodate() {
         File srcFile = new File(inputFile.getValue());
         File dstFile = new File(outputFile.getValue());

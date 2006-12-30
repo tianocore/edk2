@@ -1,8 +1,8 @@
 /*++
 
 Copyright (c)  1999-2006 Intel Corporation. All rights reserved
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which accompanies this 
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 Module Name:
-  
+
   PeiRebaseExe.h
 
 Abstract:
@@ -43,7 +43,7 @@ Abstract:
 //
 // The maximum number of arguments accepted from the command line.
 //
-#define MAX_ARGS  9
+#define MAX_ARGS  7
 
 //
 // The file copy buffer size
@@ -130,9 +130,12 @@ Returns:
 
 EFI_STATUS
 FfsRebase (
-  IN OUT EFI_FFS_FILE_HEADER    *FfsFile,
-  IN EFI_PHYSICAL_ADDRESS       BaseAddress,
-  IN FILE                       *MapFile      OPTIONAL
+  IN OUT  EFI_FFS_FILE_HEADER       *FfsFile,
+  IN      UINT32                    Flags,
+  IN OUT  EFI_PHYSICAL_ADDRESS      XipBase,
+  IN OUT  EFI_PHYSICAL_ADDRESS      *BsBase,
+  IN OUT  EFI_PHYSICAL_ADDRESS      *RtBase,
+  OUT     FILE                      *LogFile
   )
 /*++
 
