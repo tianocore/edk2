@@ -13,8 +13,8 @@
       updates either the OS or the HOST tool chain, these tools should be rebuilt.</Description>
     <Copyright>Copyright 2006, Intel Corporation</Copyright>
     <License URL="http://opensource.org/licenses/bsd-license.php">All rights reserved.  This program and the accompanying materials
-are licensed and made available under the terms and conditions of the 
-BSD License which accompanies this distribution.  The full text of the 
+are licensed and made available under the terms and conditions of the
+BSD License which accompanies this distribution.  The full text of the
 license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -96,6 +96,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</L
     <Filename>GenFvImage/GenFvImageLib.c</Filename>
     <Filename>GenFvImage/GenFvImageLib.h</Filename>
     <Filename>GenFvImage/GenFvImageLibInternal.h</Filename>
+    <Filename>GenFvMap/build.xml</Filename>
+    <Filename>GenFvMap/GenFvMap.cpp</Filename>
     <Filename>GenSection/build.xml</Filename>
     <Filename>GenSection/GenSection.c</Filename>
     <Filename>GenSection/GenSection.h</Filename>

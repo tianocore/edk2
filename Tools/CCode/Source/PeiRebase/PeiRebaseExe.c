@@ -1,8 +1,8 @@
 /*++
 
 Copyright (c)  1999-2006 Intel Corporation. All rights reserved
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which accompanies this 
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -59,23 +59,21 @@ Arguments:
 
   argc          - Number of command line arguments
   argv[]:
-  BaseAddress     The base address to use for rebasing the FV.  The correct 
+  BaseAddress     The base address to use for rebasing the FV.  The correct
                   format is a hex number preceded by 0x.
   InputFileName   The name of the input FV file.
   OutputFileName  The name of the output FV file.
-  MapFileName     The name of the map file of relocation info.
 
   Arguments come in pair in any order.
-    -I InputFileName 
+    -I InputFileName
     -O OutputFileName
-    -B BaseAddress 
-    -M MapFileName 
+    -B BaseAddress
 
 Returns:
 
   0   No error conditions detected.
   1   One or more of the input parameters is invalid.
-  2   A resource required by the utility was unavailable.  
+  2   A resource required by the utility was unavailable.
       Most commonly this will be memory allocation or file creation.
   3   PeiRebase.dll could not be loaded.
   4   Error executing the PEI rebase.
@@ -84,14 +82,13 @@ Returns:
 {
   UINT8                       Index;
   CHAR8                       InputFileName[_MAX_PATH];
-  CHAR8                       OutputFileName[_MAX_PATH];
-  CHAR8                       MapFileName[_MAX_PATH];
-  EFI_PHYSICAL_ADDRESS        BaseAddress;
-  BOOLEAN                     BaseAddressSet;
+  CHAR8                       *OutputFileName;
+  EFI_PHYSICAL_ADDRESS        XipBase, BsBase, RtBase;
+  UINT32                      BaseTypes;
   EFI_STATUS                  Status;
   FILE                        *InputFile;
   FILE                        *OutputFile;
-  FILE                        *MapFile;
+  FILE                        *LogFile;
   UINT64                      FvOffset;
   UINT32                      FileCount;
   int                         BytesRead;
@@ -99,11 +96,8 @@ Returns:
   UINT32                      FvSize;
   EFI_FFS_FILE_HEADER         *CurrentFile;
   BOOLEAN                     ErasePolarity;
-  EFI_PHYSICAL_ADDRESS        CurrentFileBaseAddress;
-  CHAR8                       InfFileName[_MAX_PATH];
-  CHAR8                       *InfFileImage;
-  UINTN                       InfFileSize;
   MEMORY_FILE                 InfMemoryFile;
+  CHAR8                       StringBuffer[0x100];
 
   ErasePolarity = FALSE;
   //
@@ -121,21 +115,17 @@ Returns:
   //
   // Initialize variables
   //
-  InputFileName[0]  = 0;
-  OutputFileName[0] = 0;
-  MapFileName[0]    = 0;
-  BaseAddress       = 0;
-  BaseAddressSet    = FALSE;
+  InputFileName[0]  = '\0';
+  OutputFileName    = NULL;
+  XipBase = BsBase = RtBase = 0;
+  BaseTypes         = 0;
   FvOffset          = 0;
   FileCount         = 0;
   ErasePolarity     = FALSE;
   InputFile         = NULL;
   OutputFile        = NULL;
-  MapFile           = NULL;
+  LogFile           = NULL;
   FvImage           = NULL;
-  InfFileImage      = NULL;
-  InfFileSize       = 0;
-  strcpy (InfFileName, "");
 
   //
   // Parse the command line arguments
@@ -156,7 +146,7 @@ Returns:
       PrintUsage ();
       Error (NULL, 0, 0, argv[Index], "unrecognized option");
       return STATUS_ERROR;
-    }    
+    }
     //
     // Determine argument to read
     //
@@ -174,8 +164,8 @@ Returns:
 
     case 'O':
     case 'o':
-      if (strlen (OutputFileName) == 0) {
-        strcpy (OutputFileName, argv[Index + 1]);
+      if (OutputFileName == NULL) {
+        OutputFileName = argv[Index + 1];
       } else {
         PrintUsage ();
         Error (NULL, 0, 0, argv[Index + 1], "only one -o OutputFileName may be specified");
@@ -183,79 +173,86 @@ Returns:
       }
       break;
 
-    case 'B':
-    case 'b':
-      if (!BaseAddressSet) {
-        Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &BaseAddress);
-        if (EFI_ERROR (Status)) {
-          PrintUsage ();
-          Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for the base address");
-          return STATUS_ERROR;
-        }
-
-        BaseAddressSet = TRUE;
-      } else {
-        PrintUsage ();
-        Error (NULL, 0, 0, argv[Index + 1], "-b BaseAddress may only be specified once");
-        return STATUS_ERROR;
-      }
-      break;
-
     case 'F':
     case 'f':
-      if (!BaseAddressSet) {
-        strcpy (InfFileName, argv[Index + 1]);
-        //
-        // Read the INF file image
-        //
-        Status = GetFileImage (InfFileName, &InfFileImage, &InfFileSize);
-        if (EFI_ERROR (Status)) {
-          PrintUsage ();
-          Error (NULL, 0, 0, argv[Index + 1], "-f FvInfFile can't be opened.");
-          return STATUS_ERROR;
-        }
-        //
-        // Initialize file structures
-        //
-        InfMemoryFile.FileImage           = InfFileImage;
-        InfMemoryFile.CurrentFilePointer  = InfFileImage;
-        InfMemoryFile.Eof                 = InfFileImage + InfFileSize;
-        //
-        // Read BaseAddress from fv.inf file.
-        //
-        FindToken (&InfMemoryFile, "[options]", "EFI_BASE_ADDRESS", 0, InfFileName);
-        //
-        // free Inf File Image
-        //
-        free (InfFileImage);
-        
-        //
-        // Convert string to UINT64 base address.
-        //
-        Status = AsciiStringToUint64 (InfFileName, FALSE, &BaseAddress);
-        if (EFI_ERROR (Status)) {
-          PrintUsage ();
-          Error (NULL, 0, 0, argv[Index + 1], "can't find the base address in the specified fv.inf file.");
-          return STATUS_ERROR;
-        }
-
-        BaseAddressSet = TRUE;
-      } else {
-        PrintUsage ();
-        Error (NULL, 0, 0, argv[Index + 1], "BaseAddress has been got once from fv.inf or the specified base address.");
+      //
+      // Load INF file into memory & initialize MEMORY_FILE structure
+      //
+      Status = GetFileImage (argv[Index + 1], &InfMemoryFile.FileImage, (UINT32*)&InfMemoryFile.Eof);
+      InfMemoryFile.Eof = InfMemoryFile.FileImage + (UINT32)(UINTN)InfMemoryFile.Eof;
+      InfMemoryFile.CurrentFilePointer = InfMemoryFile.FileImage;
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 0, argv[Index + 1], "Error opening FvInfFile");
         return STATUS_ERROR;
       }
+
+      //
+      // Read BaseAddress from fv.inf file
+      //
+      FindToken (&InfMemoryFile, "[options]", "EFI_BASE_ADDRESS", 0, StringBuffer);
+
+      //
+      // Free INF file image
+      //
+      free (InfMemoryFile.FileImage);
+
+      //
+      // Point argv[Index + 1] to StringBuffer so that it could be processed as "-b"
+      //
+      argv[Index + 1] = StringBuffer;
+
+    case 'B':
+    case 'b':
+      if (BaseTypes & 1) {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "XipBaseAddress may be specified only once by either -b or -f");
+        return STATUS_ERROR;
+      }
+
+      Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &XipBase);
+      if (EFI_ERROR (Status)) {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for XIP base address");
+        return STATUS_ERROR;
+      }
+
+      BaseTypes |= 1;
       break;
 
-    case 'M':
-    case 'm':
-      if (strlen (MapFileName) == 0) {
-        strcpy (MapFileName, argv[Index + 1]);
-      } else {
+    case 'D':
+    case 'd':
+      if (BaseTypes & 2) {
         PrintUsage ();
-        Error (NULL, 0, 0, argv[Index + 1], "only one -m MapFileName may be specified");
+        Error (NULL, 0, 0, argv[Index + 1], "-d BsBaseAddress may be specified only once");
         return STATUS_ERROR;
       }
+
+      Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &BsBase);
+      if (EFI_ERROR (Status)) {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for BS_DRIVER base address");
+        return STATUS_ERROR;
+      }
+
+      BaseTypes |= 2;
+      break;
+
+    case 'R':
+    case 'r':
+      if (BaseTypes & 4) {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "-r RtBaseAddress may be specified only once");
+        return STATUS_ERROR;
+      }
+
+      Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &RtBase);
+      if (EFI_ERROR (Status)) {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for RT_DRIVER base address");
+        return STATUS_ERROR;
+      }
+
+      BaseTypes |= 4;
       break;
 
     default:
@@ -265,18 +262,6 @@ Returns:
       break;
     }
   }
-  
-  //
-  // Create the Map file if we need it
-  //
-  if (strlen (MapFileName) != 0) {
-    MapFile = fopen (MapFileName, "w");
-    if (MapFile == NULL) {
-      Error (NULL, 0, 0, MapFileName, "failed to open map file");
-      goto Finish;
-    }
-  } 
-
   //
   // Open the file containing the FV
   //
@@ -285,6 +270,16 @@ Returns:
     Error (NULL, 0, 0, InputFileName, "could not open input file for reading");
     return STATUS_ERROR;
   }
+
+  //
+  // Open the log file
+  //
+  strcat (InputFileName, ".log");
+  LogFile = fopen (InputFileName, "a");
+  if (LogFile == NULL) {
+    Error (NULL, 0, 0, InputFileName, "could not append to log file");
+  }
+
   //
   // Determine size of FV
   //
@@ -330,8 +325,14 @@ Returns:
     //
     // Rebase this file
     //
-    CurrentFileBaseAddress  = BaseAddress + ((UINTN) CurrentFile - (UINTN) FvImage);
-    Status                  = FfsRebase (CurrentFile, CurrentFileBaseAddress, MapFile);
+    FfsRebase (
+      CurrentFile,
+      BaseTypes,
+      XipBase + (UINTN)CurrentFile - (UINTN)FvImage,
+      &BsBase,
+      &RtBase,
+      LogFile
+      );
 
     if (EFI_ERROR (Status)) {
       switch (Status) {
@@ -359,7 +360,6 @@ Returns:
 
       goto Finish;
     }
-
     //
     // Get the next file
     //
@@ -399,8 +399,8 @@ Finish:
     fclose (OutputFile);
   }
 
-  if (MapFile != NULL) {
-    fclose (MapFile);
+  if (LogFile != NULL) {
+    fclose (LogFile);
   }
 
   if (FvImage != NULL) {
@@ -420,7 +420,7 @@ ReadHeader (
 
 Routine Description:
 
-  This function determines the size of the FV and the erase polarity.  The 
+  This function determines the size of the FV and the erase polarity.  The
   erase polarity is the FALSE value for file state.
 
 Arguments:
@@ -428,9 +428,9 @@ Arguments:
   InputFile       The file that contains the FV image.
   FvSize          The size of the FV.
   ErasePolarity   The FV erase polarity.
-    
+
 Returns:
- 
+
   EFI_SUCCESS             Function completed successfully.
   EFI_INVALID_PARAMETER   A required parameter was NULL or is out of range.
   EFI_ABORTED             The function encountered an error.
@@ -539,38 +539,36 @@ Returns:
 --*/
 {
   printf (
-    "Usage: %s -I InputFileName -O OutputFileName [-B BaseAddress] -F FvInfFileName -M MapFile\n",
+    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress\n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
-  printf ("    InputFileName  is the name of the EFI FV file to rebase.\n");
+  printf ("    InputFileName is the name of the EFI FV file to rebase.\n");
   printf ("    OutputFileName is the desired output file name.\n");
-  printf ("    BaseAddress    is the FV base address to rebase agains.\n");
-  printf ("    FvInfFileName  is the fv.inf to be used to generate this fv image.\n");
-  printf ("                   BaseAddress can also be got from the fv.inf file.\n");
-  printf ("                   Choose only one method to input BaseAddress.\n");
-  printf ("    MapFileName    is an optional map file of the relocations\n");
-  printf ("    Argument pair may be in any order.\n\n");
+  printf ("    BaseAddress is the FV base address to rebase agains.\n");
+  printf ("  Argument pair may be in any order.\n\n");
 }
 
 EFI_STATUS
 FfsRebase (
-  IN OUT EFI_FFS_FILE_HEADER    *FfsFile,
-  IN EFI_PHYSICAL_ADDRESS       BaseAddress,
-  IN FILE                       *MapFile      OPTIONAL
+  IN OUT  EFI_FFS_FILE_HEADER       *FfsFile,
+  IN      UINT32                    Flags,
+  IN OUT  EFI_PHYSICAL_ADDRESS      XipBase,
+  IN OUT  EFI_PHYSICAL_ADDRESS      *BsBase,
+  IN OUT  EFI_PHYSICAL_ADDRESS      *RtBase,
+  OUT     FILE                      *LogFile
   )
 /*++
 
 Routine Description:
 
-  This function determines if a file is XIP and should be rebased.  It will 
+  This function determines if a file is XIP and should be rebased.  It will
   rebase any PE32 sections found in the file using the base address.
-  
+
 Arguments:
 
   FfsFile           A pointer to Ffs file image.
   BaseAddress       The base address to use for rebasing the file image.
-  MapFile           Optional file to dump relocation information into
 
 Returns:
 
@@ -590,20 +588,21 @@ Returns:
   UINT64                                ImageSize;
   EFI_PHYSICAL_ADDRESS                  EntryPoint;
   UINT32                                Pe32ImageSize;
-  UINT32                                NewPe32BaseAddress;
+  EFI_PHYSICAL_ADDRESS                  NewPe32BaseAddress;
   UINTN                                 Index;
   EFI_FILE_SECTION_POINTER              CurrentPe32Section;
   EFI_FFS_FILE_STATE                    SavedState;
-  EFI_IMAGE_NT_HEADERS                  *PeHdr;
+  EFI_IMAGE_NT_HEADERS32                *PeHdr;
+  EFI_IMAGE_NT_HEADERS64                *PePlusHdr;
   UINT32                                *PeHdrSizeOfImage;
   UINT32                                *PeHdrChecksum;
-  UINT32                                FoundCount;
   EFI_TE_IMAGE_HEADER                   *TEImageHeader;
   UINT8                                 *TEBuffer;
   EFI_IMAGE_DOS_HEADER                  *DosHeader;
   UINT8                                 FileGuidString[80];
   UINT32                                TailSize;
   EFI_FFS_FILE_TAIL                     TailValue;
+  EFI_PHYSICAL_ADDRESS                  *BaseToUpdate;
 
   //
   // Verify input parameters
@@ -611,7 +610,6 @@ Returns:
   if (FfsFile == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
   //
   // Convert the GUID to a string so we can at least report which file
   // if we find an error.
@@ -622,7 +620,6 @@ Returns:
   } else {
     TailSize = 0;
   }
-  
   //
   // Do some cursory checks on the FFS file contents
   //
@@ -632,36 +629,31 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  memset (&ImageContext, 0, sizeof (ImageContext));
-
   //
-  // Check if XIP file type. If not XIP, don't rebase.
+  // We only process files potentially containing PE32 sections.
   //
-  if (FfsFile->Type != EFI_FV_FILETYPE_PEI_CORE &&
-      FfsFile->Type != EFI_FV_FILETYPE_PEIM &&
-      FfsFile->Type != EFI_FV_FILETYPE_SECURITY_CORE &&
-      FfsFile->Type != EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER
-      ) {
-    return EFI_SUCCESS;
+  switch (FfsFile->Type) {
+    case EFI_FV_FILETYPE_SECURITY_CORE:
+    case EFI_FV_FILETYPE_PEI_CORE:
+    case EFI_FV_FILETYPE_PEIM:
+    case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
+    case EFI_FV_FILETYPE_DRIVER:
+    case EFI_FV_FILETYPE_DXE_CORE:
+      break;
+    default:
+      return EFI_SUCCESS;
   }
 
   //
   // Rebase each PE32 section
   //
   Status      = EFI_SUCCESS;
-  FoundCount  = 0;
   for (Index = 1;; Index++) {
     Status = GetSectionByType (FfsFile, EFI_SECTION_PE32, Index, &CurrentPe32Section);
     if (EFI_ERROR (Status)) {
       break;
     }
 
-    FoundCount++;
-
-    //
-    // Calculate the PE32 base address, the FFS file base plus the offset of the PE32 section
-    //
-    NewPe32BaseAddress = ((UINT32) BaseAddress) + ((UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER) - (UINTN) FfsFile);
 
     //
     // Initialize context
@@ -669,25 +661,102 @@ Returns:
     memset (&ImageContext, 0, sizeof (ImageContext));
     ImageContext.Handle     = (VOID *) ((UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION));
     ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
-
     Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
-
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "GetImageInfo() call failed on rebase", FileGuidString);
       return Status;
     }
+
+    //
+    // Calculate the PE32 base address, based on file type
+    //
+    switch (FfsFile->Type) {
+      case EFI_FV_FILETYPE_SECURITY_CORE:
+      case EFI_FV_FILETYPE_PEI_CORE:
+      case EFI_FV_FILETYPE_PEIM:
+      case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
+        if ((Flags & 1) == 0) {
+          //
+          // We aren't relocating XIP code, so skip it.
+          //
+          return EFI_SUCCESS;
+        }
+
+        NewPe32BaseAddress =
+          XipBase +
+          (UINTN)CurrentPe32Section.Pe32Section +
+          sizeof (EFI_COMMON_SECTION_HEADER) -
+          (UINTN)FfsFile;
+        BaseToUpdate = &XipBase;
+        break;
+
+      case EFI_FV_FILETYPE_DRIVER:
+        PeHdr = (EFI_IMAGE_NT_HEADERS32*)(
+          (UINTN)CurrentPe32Section.Pe32Section +
+          sizeof (EFI_COMMON_SECTION_HEADER) +
+          ImageContext.PeCoffHeaderOffset
+          );
+        switch (PeHdr->OptionalHeader.Subsystem) {
+          case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
+            if ((Flags & 4) == 0) {
+              //
+              // RT drivers aren't supposed to be relocated
+              //
+              continue;
+            }
+
+            NewPe32BaseAddress = *RtBase;
+            BaseToUpdate = RtBase;
+            break;
+
+          default:
+            //
+            // We treat all other subsystems the same as BS_DRIVER
+            //
+            if ((Flags & 2) == 0) {
+              //
+              // Skip all BS_DRIVER's
+              //
+              continue;
+            }
+
+            NewPe32BaseAddress = *BsBase;
+            BaseToUpdate = BsBase;
+            break;
+        }
+        break;
+
+      case EFI_FV_FILETYPE_DXE_CORE:
+        if ((Flags & 2) == 0) {
+          //
+          // Skip DXE core
+          //
+          return EFI_SUCCESS;
+        }
+
+        NewPe32BaseAddress = *BsBase;
+        BaseToUpdate = BsBase;
+        break;
+
+      default:
+        //
+        // Not supported file type
+        //
+        return EFI_SUCCESS;
+    }
+
     //
     // Allocate a buffer for the image to be loaded into.
     //
     Pe32ImageSize       = GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION);
-    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x10000));
+    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x1000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation failure", NULL);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
-    
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x1000);
+    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFF) & (-1 << 12);
+
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
 
@@ -696,24 +765,6 @@ Returns:
       Error (NULL, 0, 0, "LoadImage() call failed on rebase", FileGuidString);
       free ((VOID *) MemoryImagePointer);
       return Status;
-    }
-    
-    //
-    // Check if section-alignment and file-alignment match or not
-    //
-    if (!(ImageContext.IsTeImage)) {
-      PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext.ImageAddress + 
-                                              ImageContext.PeCoffHeaderOffset);
-      if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
-        Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
-        free ((VOID *) MemoryImagePointer);
-        return EFI_ABORTED;
-      }
-    }
-    else {
-      //
-      // BUGBUG: TE Image Header lack section-alignment and file-alignment info
-      //
     }
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
@@ -742,21 +793,34 @@ Returns:
       free ((VOID *) MemoryImagePointer);
       return EFI_ABORTED;
     }
+
+    //
+    // Update BASE address
+    //
+    fprintf (
+      LogFile,
+      "%s %016I64X\n",
+      FileGuidString,
+      ImageContext.DestinationAddress
+      );
+    *BaseToUpdate += EFI_SIZE_TO_PAGES (ImageContext.ImageSize) * EFI_PAGE_SIZE;
+
     //
     // Since we may have updated the Codeview RVA, we need to insure the PE
     // header indicates the image is large enough to contain the Codeview data
     // so it will be loaded properly later if the PEIM is reloaded into memory...
     //
     PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
+    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
     if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage  = (UINT32 *) (&(PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PeHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_X64) {
-      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
     } else {
       Error (
         NULL,
@@ -779,24 +843,6 @@ Returns:
     }
 
     memcpy (CurrentPe32Section.Pe32Section + 1, (VOID *) MemoryImagePointerAligned, (UINT32) ImageSize);
-    
-    //
-    // Get EntryPoint in Flash Region.
-    //
-    EntryPoint = NewPe32BaseAddress + EntryPoint - ImageAddress;
-
-    //
-    // If a map file was selected output mapping information for any file that
-    // was rebased.
-    //
-    if (MapFile != NULL) {
-      fprintf (MapFile, "PE32 File: %s Base:%08lx", FileGuidString, BaseAddress);
-      fprintf (MapFile, " EntryPoint:%08lx", EntryPoint);
-      if (ImageContext.PdbPointer != NULL) {
-        fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
-      }
-      fprintf (MapFile, "\n");
-    }
 
     free ((VOID *) MemoryImagePointer);
 
@@ -832,6 +878,20 @@ Returns:
       *(EFI_FFS_FILE_TAIL *) (((UINTN) FfsFile + GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_TAIL))) = TailValue;
     }
   }
+
+  if ((Flags & 1) == 0 || (
+      FfsFile->Type != EFI_FV_FILETYPE_SECURITY_CORE &&
+      FfsFile->Type != EFI_FV_FILETYPE_PEI_CORE &&
+
+      FfsFile->Type != EFI_FV_FILETYPE_PEIM &&
+      FfsFile->Type != EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER
+      )) {
+    //
+    // Only XIP code may have a TE section
+    //
+    return EFI_SUCCESS;
+  }
+
   //
   // Now process TE sections
   //
@@ -841,15 +901,13 @@ Returns:
       break;
     }
 
-    FoundCount++;
-
     //
     // Calculate the TE base address, the FFS file base plus the offset of the TE section less the size stripped off
     // by GenTEImage
     //
     TEImageHeader = (EFI_TE_IMAGE_HEADER *) ((UINT8 *) CurrentPe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER));
 
-    NewPe32BaseAddress = ((UINT32) BaseAddress) +
+    NewPe32BaseAddress = ((UINT32) XipBase) +
       (
         (UINTN) CurrentPe32Section.Pe32Section +
         sizeof (EFI_COMMON_SECTION_HEADER) +
@@ -880,6 +938,7 @@ Returns:
     DosHeader->e_magic = EFI_IMAGE_DOS_SIGNATURE;
     *(UINT32 *) (TEBuffer + 0x3C) = 0x40;
     PeHdr = (EFI_IMAGE_NT_HEADERS *) (TEBuffer + 0x40);
+    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
     PeHdr->Signature = EFI_IMAGE_NT_SIGNATURE;
     PeHdr->FileHeader.Machine = TEImageHeader->Machine;
     PeHdr->FileHeader.NumberOfSections = TEImageHeader->NumberOfSections;
@@ -889,39 +948,89 @@ Returns:
     // the 0x40 bytes for our DOS header.
     //
     PeHdr->FileHeader.SizeOfOptionalHeader = (UINT16) (TEImageHeader->StrippedSize - 0x40 - sizeof (UINT32) - sizeof (EFI_IMAGE_FILE_HEADER));
-    PeHdr->OptionalHeader.ImageBase = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
-    PeHdr->OptionalHeader.AddressOfEntryPoint = TEImageHeader->AddressOfEntryPoint;
-    PeHdr->OptionalHeader.BaseOfCode  = TEImageHeader->BaseOfCode;
-    PeHdr->OptionalHeader.SizeOfImage = Pe32ImageSize;
-    PeHdr->OptionalHeader.Subsystem   = TEImageHeader->Subsystem;
-    PeHdr->OptionalHeader.SizeOfImage = Pe32ImageSize;
-    PeHdr->OptionalHeader.SizeOfHeaders = TEImageHeader->StrippedSize + TEImageHeader->NumberOfSections *
-    sizeof (EFI_IMAGE_SECTION_HEADER) - 12;
-
-    //
-    // Set NumberOfRvaAndSizes in the optional header to what we had available in the original image
-    //
-    if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0) ||
-        (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size != 0)
-        ) {
-      PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC + 1;
-      PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
-      PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
+    if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_IA32) {
+      PeHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
+    } else if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_IA64) {
+      PePlusHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+    } else if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_X64) {
+      PePlusHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+    } else {
+      Error (
+        NULL,
+        0,
+        0,
+        "unknown machine type in TE image",
+        "machine type=0x%X, file=%s",
+        (UINT32) TEImageHeader->Machine,
+        FileGuidString
+        );
+      free (TEBuffer);
+      return EFI_ABORTED;
     }
 
-    if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) ||
-        (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0)
-        ) {
-      PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
-      PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
-      if (PeHdr->OptionalHeader.NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1) {
-        PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1;
+    if (PeHdr->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      PeHdr->OptionalHeader.ImageBase     = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+      PeHdr->OptionalHeader.SizeOfImage   = Pe32ImageSize;
+      PeHdr->OptionalHeader.Subsystem     = TEImageHeader->Subsystem;
+      PeHdr->OptionalHeader.SizeOfHeaders = TEImageHeader->StrippedSize + TEImageHeader->NumberOfSections *
+                                            sizeof (EFI_IMAGE_SECTION_HEADER) - 12;
+
+      //
+      // Set NumberOfRvaAndSizes in the optional header to what we had available in the original image
+      //
+      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0) ||
+          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size != 0)
+          ) {
+        PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC + 1;
+        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
+        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
       }
+
+      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) ||
+          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0)
+          ) {
+        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
+        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
+        if (PeHdr->OptionalHeader.NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1) {
+          PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1;
+        }
+      }
+      //
+      // NOTE: These values are defaults, and should be verified to be correct in the GenTE utility
+      //
+      PeHdr->OptionalHeader.SectionAlignment = 0x10;
+    } else {
+      PePlusHdr->OptionalHeader.ImageBase     = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+      PePlusHdr->OptionalHeader.SizeOfImage   = Pe32ImageSize;
+      PePlusHdr->OptionalHeader.Subsystem     = TEImageHeader->Subsystem;
+      PePlusHdr->OptionalHeader.SizeOfHeaders = TEImageHeader->StrippedSize + TEImageHeader->NumberOfSections *
+                                                sizeof (EFI_IMAGE_SECTION_HEADER) - 12;
+
+      //
+      // Set NumberOfRvaAndSizes in the optional header to what we had available in the original image
+      //
+      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0) ||
+          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size != 0)
+          ) {
+        PePlusHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC + 1;
+        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
+        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
+      }
+
+      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) ||
+          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0)
+          ) {
+        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
+        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
+        if (PePlusHdr->OptionalHeader.NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1) {
+          PePlusHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1;
+        }
+      }
+      //
+      // NOTE: These values are defaults, and should be verified to be correct in the GenTE utility
+      //
+      PePlusHdr->OptionalHeader.SectionAlignment = 0x10;
     }
-    //
-    // NOTE: These values are defaults, and should be verified to be correct in the GenTE utility
-    //
-    PeHdr->OptionalHeader.SectionAlignment = 0x10;
 
     //
     // Copy the rest of the image to its original offset
@@ -950,15 +1059,15 @@ Returns:
     //
     // Allocate a buffer for the image to be loaded into.
     //
-    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x10000));
+    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x1000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation error on rebase of TE image", FileGuidString);
       free (TEBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
-    
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x1000);
+    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFF) & (-1 << 12);
+
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
     Status                    = PeCoffLoaderLoadImage (&ImageContext);
@@ -968,11 +1077,6 @@ Returns:
       free ((VOID *) MemoryImagePointer);
       return Status;
     }
-    
-    //
-    // Check if section-alignment and file-alignment match or not
-	// BUGBUG: TE Image Header lack section-alignment and file-alignment info
-    //
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
@@ -993,12 +1097,16 @@ Returns:
     // so it will be loaded properly later if the PEIM is reloaded into memory...
     //
     PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
+    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
     if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage  = (UINT32 *) (&(PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PeHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
+    } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_X64) {
+      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
     } else {
       Error (
         NULL,
@@ -1028,25 +1136,6 @@ Returns:
       GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
       sizeof (EFI_TE_IMAGE_HEADER)
       );
-    
-    //
-    // Get EntryPoint in Flash Region.
-    //
-    EntryPoint = NewPe32BaseAddress + EntryPoint - ImageAddress;
-
-    //
-    // If a map file was selected output mapping information for any file that
-    // was rebased.
-    //
-    if (MapFile != NULL) {
-      fprintf (MapFile, "TE   File: %s Base:%08lx", FileGuidString, BaseAddress);
-      fprintf (MapFile, " EntryPoint:%08lx", EntryPoint);
-      if (ImageContext.PdbPointer != NULL) {
-        fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
-      }
-      fprintf (MapFile, "\n");
-    }
-
     free ((VOID *) MemoryImagePointer);
     free (TEBuffer);
     if (FfsFile->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
@@ -1079,18 +1168,15 @@ Returns:
       TailValue = (EFI_FFS_FILE_TAIL) (~(FfsFile->IntegrityCheck.TailReference));
       *(EFI_FFS_FILE_TAIL *) (((UINTN) FfsFile + GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_TAIL))) = TailValue;
     }
+
+    fprintf (
+      LogFile,
+      "%s %016I64X\n",
+      FileGuidString,
+      ImageContext.DestinationAddress
+      );
   }
-  //
-  // If we found no files, then emit an error if no compressed sections either
-  //
-  if (FoundCount == 0) {
-    Status = GetSectionByType (FfsFile, EFI_SECTION_COMPRESSION, Index, &CurrentPe32Section);
-    if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 0, "no PE32, TE, nor compressed section found in FV file", FileGuidString);
-      return EFI_NOT_FOUND;
-    }
-  }
-  
+
   return EFI_SUCCESS;
 }
 
