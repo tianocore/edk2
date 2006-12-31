@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         optimize="speed">
       <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <compilerarg value="/EHsc" unless="GCC"/>
+      <compilerarg value="/Za" unless="GCC"/>
 
       <fileset dir="${basedir}/${ToolName}"
         includes="${FileSet}"

@@ -219,8 +219,8 @@ Returns:
 
   if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
     //
-    // The PE/COFF loader can support loading image types that can be executed. 
-    // If we loaded an image type that we can not execute return EFI_UNSUPORTED. 
+    // The PE/COFF loader can support loading image types that can be executed.
+    // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
     //
     return EFI_UNSUPPORTED;
   }
@@ -247,17 +247,30 @@ Returns:
     // If the image relocations have not been stripped, then load at any address.
     // Otherwise load at the address at which it was linked.
     //
-    Status = CoreAllocatePages (
-               (Image->ImageContext.RelocationsStripped) ? AllocateAddress : AllocateAnyPages,
-               Image->ImageContext.ImageCodeMemoryType,
-               Image->NumberOfPages,
-               &Image->ImageContext.ImageAddress
-               );
+    // Memory below 1MB should be treated reserved for CSM and there should be
+    // no modules whose preferred load addresses are below 1MB.
+    //
+    Status = EFI_OUT_OF_RESOURCES;
+    if (Image->ImageContext.ImageAddress >= 0x100000 || Image->ImageContext.RelocationsStripped) {
+      Status = CoreAllocatePages (
+                 AllocateAddress,
+                 Image->ImageContext.ImageCodeMemoryType,
+                 Image->NumberOfPages,
+                 &Image->ImageContext.ImageAddress
+                 );
+    }
+    if (EFI_ERROR (Status) && !Image->ImageContext.RelocationsStripped) {
+      Status = CoreAllocatePages (
+                 AllocateAnyPages,
+                 Image->ImageContext.ImageCodeMemoryType,
+                 Image->NumberOfPages,
+                 &Image->ImageContext.ImageAddress
+                 );
+    }
     if (EFI_ERROR (Status)) {
       return Status;
     }
     DstBufAlocated = TRUE;
-
   } else {
     //
     // Caller provided the destination buffer
@@ -394,7 +407,7 @@ Returns:
       InsertTailList (&gRuntime->ImageHead, &Image->RuntimeData->Link);
     }
   }
-  
+
   //
   // Fill in the entry point of the image if it is available
   //
@@ -407,7 +420,7 @@ Returns:
   //
 
   DEBUG_CODE_BEGIN ();
- 
+
     UINTN Index;
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
@@ -439,7 +452,7 @@ Returns:
       DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a", EfiFileName)); // &Image->ImageContext.PdbPointer[StartIndex]));
     }
     DEBUG ((EFI_D_INFO | EFI_D_LOAD, "\n"));
-  
+
   DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
@@ -449,11 +462,11 @@ Done:
   //
   // Free memory.
   //
-  
+
   if (DstBufAlocated) {
     CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
   }
-  
+
   if (Image->ImageContext.FixupData != NULL) {
     CoreFreePool (Image->ImageContext.FixupData);
   }
@@ -927,8 +940,8 @@ Returns:
 
   SetJumpFlag = SetJump (Image->JumpContext);
   //
-  // The initial call to SetJump() must always return 0.  
-  // Subsequent calls to LongJump() cause a non-zero value to be returned by SetJump(). 
+  // The initial call to SetJump() must always return 0.
+  // Subsequent calls to LongJump() cause a non-zero value to be returned by SetJump().
   //
   if (!SetJumpFlag) {
     //
@@ -1142,7 +1155,7 @@ Returns:
     }
     CoreFreePool (Image->RuntimeData);
   }
-  
+
   //
   // Free the Image from memory
   //

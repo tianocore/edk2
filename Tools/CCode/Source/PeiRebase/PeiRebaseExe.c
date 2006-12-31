@@ -799,9 +799,10 @@ Returns:
     //
     fprintf (
       LogFile,
-      "%s %016I64X\n",
+      "%s %016I64X %s\n",
       FileGuidString,
-      ImageContext.DestinationAddress
+      ImageContext.DestinationAddress,
+      ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
       );
     *BaseToUpdate += EFI_SIZE_TO_PAGES (ImageContext.ImageSize) * EFI_PAGE_SIZE;
 
@@ -1136,8 +1137,6 @@ Returns:
       GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
       sizeof (EFI_TE_IMAGE_HEADER)
       );
-    free ((VOID *) MemoryImagePointer);
-    free (TEBuffer);
     if (FfsFile->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
       TailSize = sizeof (EFI_FFS_FILE_TAIL);
     } else {
@@ -1171,10 +1170,17 @@ Returns:
 
     fprintf (
       LogFile,
-      "%s %016I64X\n",
+      "%s %016I64X %s\n",
       FileGuidString,
-      ImageContext.DestinationAddress
+      ImageContext.DestinationAddress,
+      ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
       );
+
+    //
+    // Free buffers
+    //
+    free ((VOID *) MemoryImagePointer);
+    free (TEBuffer);
   }
 
   return EFI_SUCCESS;
