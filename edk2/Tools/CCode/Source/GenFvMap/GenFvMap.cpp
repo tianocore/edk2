@@ -1,10 +1,10 @@
 //****************************************************************************
 //**
-//**  Copyright  (C) 2006 Intel Corporation. All rights reserved. 
+//**  Copyright  (C) 2006 Intel Corporation. All rights reserved.
 //**
-//** The information and source code contained herein is the exclusive 
+//** The information and source code contained herein is the exclusive
 //** property of Intel Corporation and may not be disclosed, examined
-//** or reproduced in whole or in part without explicit written authorization 
+//** or reproduced in whole or in part without explicit written authorization
 //** from the company.
 //**
 //****************************************************************************
@@ -78,6 +78,7 @@ public:
 
     bool operator < (const CIdentity&) const;
     friend istream& operator >> (istream&, CIdentity&);
+    friend ostream& operator << (ostream&, const CIdentity&);
 
     static const string::size_type s_nIdStrLen;
 
@@ -134,6 +135,16 @@ istream& operator >> (istream& is, CIdentity& idRight)
     return is;
 }
 
+ostream& operator << (ostream& os, const CIdentity& idRight)
+{
+    return os << hex << setfill('0')
+        << setw(8) << (unsigned long)(idRight.m_ullId[0] >> 32) << '-'
+        << setw(4) << (unsigned short)(idRight.m_ullId[0] >> 16) << '-'
+        << setw(4) << (unsigned short)idRight.m_ullId[0] << '-'
+        << setw(4) << (unsigned short)(idRight.m_ullId[1] >> 48) << '-'
+        << setw(12) <<  (idRight.m_ullId[1] & 0xffffffffffff);
+}
+
 class CInputFile : public CObjRoot
 {
 protected:
@@ -183,72 +194,20 @@ istream& CInputFile::GetLine(string& strALine)
     return m_is;
 }
 
-class CIdAddressMap : public CInputFile, public map<CIdentity, ulonglong_t>
+class CIdAddressPathMap : public CInputFile, public map<CIdentity, pair<ulonglong_t, string> >
 {
 public:
-    CIdAddressMap(istream&);
+    CIdAddressPathMap(istream&);
 };
 
-CIdAddressMap::CIdAddressMap(istream& is)
+CIdAddressPathMap::CIdAddressPathMap(istream& is)
 : CInputFile(is)
 {
-    CIdentity id;
-    ulonglong_t ullBase;
-
-    while (!!(m_is >> hex >> id >> ullBase))
-        if (!insert(value_type(id, ullBase)).second)
+    key_type k;
+    mapped_type m;
+    while (!!(m_is >> hex >> k >> m.first) && !!GetLine(m.second))
+        if (!insert(value_type(k, m)).second)
             throw runtime_error(__FUNCTION__ ": Duplicated files");
-}
-
-class CIdPathMap : public CInputFile, public map<CIdentity, string>
-{
-public:
-    CIdPathMap(istream&);
-};
-
-CIdPathMap::CIdPathMap(istream& is)
-: CInputFile(is)
-{
-    static const char cszFileSec[] = "[files]";
-    static const char cszFfsFile[] = "EFI_FILE_NAME";
-
-    string strALine;
-
-    // Find the [files] section
-    while (!!GetLine(strALine) && strALine.compare(0, sizeof(cszFileSec) - 1, cszFileSec));
-
-    // m_is error means no FFS files listed in this INF file
-    if (!m_is)
-        return;
-
-    // Parse FFS files one by one
-    while (!!GetLine(strALine))
-    {
-        // Test if this begins a new section
-        if (strALine[0] == '[')
-            break;
-
-        // Is it a line of FFS file?
-        if (strALine.compare(0, sizeof(cszFfsFile) - 1, cszFfsFile))
-            continue;
-
-        string::size_type pos = strALine.find_first_not_of(' ', sizeof(cszFfsFile) - 1);
-        if (pos == string::npos || strALine[pos] != '=')
-            throw runtime_error(__FUNCTION__ ": Invalid FV INF format");
-        pos = strALine.find_first_not_of(' ', pos + 1);
-        if (pos == string::npos)
-            throw runtime_error(__FUNCTION__ ": Incomplete line");
-
-        strALine.erase(0, pos);
-        pos = strALine.rfind('\\');
-        if (pos == string::npos)
-            pos = 0;
-        else pos++;
-
-        CIdentity id(strALine.substr(pos, CIdentity::s_nIdStrLen));
-        if (!insert(value_type(id, strALine)).second)
-            throw runtime_error(__FUNCTION__ ": Duplicated FFS files");
-    }
 }
 
 class CSymbol : public CObjRoot
@@ -286,7 +245,7 @@ ostream& operator << (ostream& os, const CSymbol& symbol)
     os << hex << setw(16) << setfill('0') << symbol.m_ullRva << setw(0);
     os << ' ' << (symbol.m_bFunction ? 'F' : ' ')
         << (symbol.m_bStatic ? 'S' : ' ') << ' ';
-    return os << symbol.m_strName << endl;
+    return os << symbol.m_strName;
 }
 
 class CMapFile : public CInputFile, public list<CSymbol>
@@ -295,7 +254,6 @@ public:
     CMapFile(const string&);
 
     void SetLoadAddress(ulonglong_t);
-    friend ostream& operator << (ostream&, const CMapFile&);
 
     string m_strModuleName;
     ulonglong_t m_ullLoadAddr;
@@ -344,30 +302,9 @@ CMapFile::CMapFile(const string& strFName)
 void CMapFile::SetLoadAddress(ulonglong_t ullLoadAddr)
 {
     for (iterator i = begin(); i != end(); i++)
-        if (i->m_ullRva != 0)
+        if (i->m_ullRva >= m_ullLoadAddr)
             i->m_ullRva += ullLoadAddr - m_ullLoadAddr;
     m_ullLoadAddr = ullLoadAddr;
-}
-
-ostream& operator << (ostream& os, const CMapFile& mapFile)
-{
-    CMapFile::const_iterator i = mapFile.begin();
-    while (i != mapFile.end() && i->m_strAddress != mapFile.m_strEntryPoint)
-        i++;
-    if (i == mapFile.end())
-        throw runtime_error(
-            __FUNCTION__ ": Entry point not found for module " +
-            mapFile.m_strModuleName);
-
-    os << endl << hex
-        << mapFile.m_strModuleName << " (EP=" << i->m_ullRva
-        << ", BA=" << mapFile.m_ullLoadAddr << ')' << endl
-        << endl;
-
-    for (i = mapFile.begin(); i != mapFile.end(); i++)
-        os << "  " << *i;
-
-    return os << endl;
 }
 
 class COutputFile : public CObjRoot
@@ -384,7 +321,7 @@ private:
 class CFvMapFile : public CObjRoot, public map<CIdentity, CMapFile*>
 {
 public:
-    CFvMapFile(const CIdAddressMap&, const CIdPathMap&);
+    CFvMapFile(const CIdAddressPathMap&);
     ~CFvMapFile(void);
 
     friend ostream& operator << (ostream&, const CFvMapFile&);
@@ -393,27 +330,16 @@ private:
     void Cleanup(void);
 };
 
-CFvMapFile::CFvMapFile(const CIdAddressMap& idAddr, const CIdPathMap& idPath)
+CFvMapFile::CFvMapFile(const CIdAddressPathMap& idAddrPath)
 {
-    for (CIdAddressMap::const_iterator i = idAddr.begin(); i != idAddr.end(); i++)
+    for (CIdAddressPathMap::const_iterator i = idAddrPath.begin(); i != idAddrPath.end(); i++)
     {
-        CIdPathMap::const_iterator j = idPath.find(i->first);
-        if (j == idPath.end())
-            throw runtime_error(__FUNCTION__ ": Map file not found");
+        if (i->second.second == "*")
+            continue;
 
-        try
-        {
-            pair<iterator, bool> k = insert(value_type(i->first,
-                new CMapFile(j->second.substr(0, j->second.rfind('.')) + ".map")));
-            if (!k.second)
-                throw logic_error(__FUNCTION__ ": Duplicated file found in rebase log");
-
-            k.first->second->SetLoadAddress(i->second);
-        }
-        catch (const runtime_error& e)
-        {
-            cerr << e.what() << endl;
-        }
+        pair<iterator, bool> r = insert(value_type(i->first,
+            new CMapFile(i->second.second.substr(0, i->second.second.rfind('.')) + ".map")));
+        r.first->second->SetLoadAddress(i->second.first);
     }
 }
 
@@ -426,7 +352,27 @@ void CFvMapFile::Cleanup(void)
 ostream& operator << (ostream& os, const CFvMapFile& fvMap)
 {
     for (CFvMapFile::const_iterator i = fvMap.begin(); !!os && i != fvMap.end(); i++)
-        os << *i->second;
+    {
+        CMapFile::const_iterator j = i->second->begin();
+        while (j != i->second->end() && j->m_strAddress != i->second->m_strEntryPoint) j++;
+        if (j == i->second->end())
+            throw runtime_error(
+                __FUNCTION__ ":Entry point not found for module " +
+                i->second->m_strModuleName);
+
+        os << hex
+            << i->second->m_strModuleName
+            << " (EP=" << j->m_ullRva
+            << ", BA=" << i->second->m_ullLoadAddr
+            << ", GUID=" << i->first
+            << ")" << endl << endl;
+
+        for (j = i->second->begin(); j != i->second->end(); j++)
+            os << "  " << *j << endl;
+
+        os << endl << endl;
+    }
+
     return os;
 }
 
@@ -446,7 +392,7 @@ private:
     static const char s_szUsage[];
 };
 
-const char CGenFvMapUsage::s_szUsage[] = "Usage: GenFvMap <LOG> <INF> <MAP>";
+const char CGenFvMapUsage::s_szUsage[] = "Usage: GenFvMap <LOG> <MAP>";
 
 class CGenFvMapApp : public CObjRoot
 {
@@ -465,7 +411,7 @@ CGenFvMapApp::CGenFvMapApp(int cArgc, char *ppszArgv[])
 : m_cArgc(cArgc)
 , m_ppszArgv(ppszArgv)
 {
-    if (cArgc != 4)
+    if (cArgc != 3)
         throw CGenFvMapUsage();
 }
 
@@ -476,14 +422,10 @@ CGenFvMapApp::~CGenFvMapApp(void)
 int CGenFvMapApp::Run(void)
 {
     ifstream isLog(m_ppszArgv[1]);
-    ifstream isInf(m_ppszArgv[2]);
+    CIdAddressPathMap idAddrPath(isLog);
+    CFvMapFile fvMap(idAddrPath);
 
-    CIdAddressMap idAddress(isLog);
-    CIdPathMap idPath(isInf);
-
-    CFvMapFile fvMap(idAddress, idPath);
-
-    ofstream osMap(m_ppszArgv[3], ios_base::out | ios_base::trunc);
+    ofstream osMap(m_ppszArgv[2], ios_base::out | ios_base::trunc);
     osMap << fvMap;
 
     if (!osMap)
