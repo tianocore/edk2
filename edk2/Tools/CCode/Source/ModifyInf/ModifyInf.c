@@ -247,7 +247,7 @@ Returns:
 }
 
 void 
-MIVersion(
+Version(
   void
   )
 /*++
@@ -290,7 +290,7 @@ Returns:
   
 --*/ 
 {
-  MIVersion();
+  Version();
   printf ("\nUsage: %s InputFile OutputFile Pattern_String [Pattern_String бн]\n\
    Where: \n\
      Pattern_String is of the format (note that the section name must be \n\
@@ -345,7 +345,7 @@ Returns:
   }
   
   if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
-    MIVersion();
+    Version();
     return 0;
   }
   
