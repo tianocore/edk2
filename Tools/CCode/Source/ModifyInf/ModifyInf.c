@@ -271,7 +271,7 @@ Returns:
 }
 
 void 
-MIUsage(
+Usage(
   void
   )
 /*++
@@ -291,7 +291,7 @@ Returns:
 --*/ 
 {
   MIVersion();
-  printf ("\n Usage: %s InputFile OutputFile Pattern_String [Pattern_String бн]\n\
+  printf ("\nUsage: %s InputFile OutputFile Pattern_String [Pattern_String бн]\n\
    Where: \n\
      Pattern_String is of the format (note that the section name must be \n\
      enclosed within square brackets):\n\
@@ -334,13 +334,13 @@ Returns:
   FILE  *fpout;
 
   if (argc < 1) {
-    MIUsage();
+    Usage();
     return -1;
   }
   
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
       (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
-    MIUsage();
+    Usage();
     return 0;
   }
   
@@ -350,7 +350,7 @@ Returns:
   }
   
   if (argc < 3) {
-    MIUsage();
+    Usage();
     return -1;
   }
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c)  1999 - 2002 Intel Corporation. All rights reserved
+Copyright (c)  1999 - 2006 Intel Corporation. All rights reserved
 This software and associated documentation (if any) is furnished
 under a license and may only be used or copied in accordance
 with the terms of the license. Except as permitted by such
@@ -42,7 +42,10 @@ Abstract:
 //           A lot of the file-header stuff has been ported, but
 //           not the section information.
 //
-#define TOOLVERSION "0.1"
+
+#define UTILITY_NAME "GenBsfFixup"
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 1
 
 UINT32  gFixup;
 
@@ -76,6 +79,26 @@ Returns:
   }
 
   return OccupiedSize;
+}
+
+static
+void
+Version (
+  VOID
+  )
+{
+  printf ("%s v%d.%d -EDK Utility to Fixup the SEC component for IA32.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+
+
+VOID
+Usage (
+  VOID
+  )
+{
+  Version();
+  printf ("\nUsage: " UTILITY_NAME " FvVolumeImageFile AddressOfFvInMemory OffsetOfFixup OutputFileName \n");
 }
 
 int
@@ -370,14 +393,25 @@ Returns:
 
   Index   = 0;
   Invert  = 0;
-  printf (
-    "GenBsfFixup EFI 2.0.  Version %s, %s\n""Copyright (c) 2000-2001, Intel Corporation\n\n",
-    TOOLVERSION,
-    __DATE__
-    );
-
+ 
+  if (argc < 1) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
+ 
   if (argc != 5) {
-    printf ("Usage:\n""  GenBsfFixup FvVolumeImageFile AddressOfFvInMemory OffsetOfFixup OutputFileName\n");
+    Usage();
     return -1;
   }
 

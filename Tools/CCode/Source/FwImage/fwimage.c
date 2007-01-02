@@ -35,7 +35,12 @@ Abstract:
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.c"
 
-#define UTILITY_NAME  "FwImage"
+//
+// Version of this utility
+//
+#define UTILITY_NAME "FwImage"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 0
 
 #ifdef __GNUC__
 typedef unsigned long ULONG;
@@ -44,12 +49,27 @@ typedef unsigned char *PUCHAR;
 typedef unsigned short USHORT;
 #endif
 
+static
+void
+Version (
+  VOID
+  )
+{
+  printf ("%s v%d.%d -EDK Utility for Converting a pe32+ image to an FW image type.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+
+
 VOID
 Usage (
   VOID
   )
 {
-  printf ("Usage: " UTILITY_NAME "  {-t time-date} [BASE|SEC|PEI_CORE|PEIM|DXE_CORE|DXE_DRIVER|DXE_RUNTIME_DRIVER|DXE_SAL_DRIVER|DXE_SMM_DRIVER|TOOL|UEFI_DRIVER|UEFI_APPLICATION|USER_DEFINED] peimage [outimage]");
+  Version();
+  printf ("\nUsage: " UTILITY_NAME "  {-t time-date} {-h|--help|-?|/?|-V|--version} \n\
+         [BASE|SEC|PEI_CORE|PEIM|DXE_CORE|DXE_DRIVER|DXE_RUNTIME_DRIVER|\n\
+         DXE_SAL_DRIVER|DXE_SMM_DRIVER|TOOL|UEFI_DRIVER|UEFI_APPLICATION|\n\
+         USER_DEFINED] peimage [outimage]");
 }
 
 static
@@ -185,6 +205,22 @@ Returns:
   TimeStamp         = 0;
   TimeStampPresent  = FALSE;
 
+  if (argc < 1) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Look for -t time-date option first. If the time is "0", then
   // skip it.

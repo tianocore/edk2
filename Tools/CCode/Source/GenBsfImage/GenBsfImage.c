@@ -2357,7 +2357,7 @@ Returns:
 }
 
 VOID
-PrintUtilityInfo (
+Version (
   VOID
   )
 /*++
@@ -2377,16 +2377,15 @@ Returns:
 --*/
 {
   printf (
-    "%s, EFI 2.0 BootStrap File Generation Utility. Version %i.%i, %s.\n\n",
+    "%s, EFI 2.0 BootStrap File Generation Utility. Version %i.%i.\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION,
-    UTILITY_DATE
+    UTILITY_MINOR_VERSION
     );
 }
 
 VOID
-PrintUsage (
+Usage (
   VOID
   )
 /*++
@@ -2405,13 +2404,16 @@ Returns:
 
 --*/
 {
+  Version();
+  
   printf (
-    "Usage: %s -B BaseAddress -S FwVolumeSize\n",
+    "\nUsage: %s -B BaseAddress -S FwVolumeSize\n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
-  printf ("\tBaseAddress is the starting address of Firmware Volume where\n\tBoot Strapped Image will reside.\n\n");
-  printf ("\tFwVolumeSize is the size of Firmware Volume.\n\n");
+  printf ("     BaseAddress is the starting address of Firmware Volume where Boot\n");
+  printf ("              Strapped Image will reside.\n");
+  printf ("     FwVolumeSize is the size of Firmware Volume.\n");
 }
 
 EFI_STATUS
@@ -2455,11 +2457,6 @@ Returns:
   BOOLEAN     IsIA32;
 
   //
-  // Display utility information
-  //
-  PrintUtilityInfo ();
-
-  //
   // Verify the correct number of IA32 arguments
   //
   IsIA32 = FALSE;
@@ -2486,7 +2483,7 @@ Returns:
       // Make sure argument pair begin with - or /
       //
       if (argv[Index][0] != '-' && argv[Index][0] != '/') {
-        PrintUsage ();
+        Usage ();
         printf ("ERROR: Argument pair must begin with \"-\" or \"/\"\n");
         return 1;
       }
@@ -2495,7 +2492,7 @@ Returns:
       // Make sure argument specifier is only one letter
       //
       if (argv[Index][2] != 0) {
-        PrintUsage ();
+        Usage ();
         printf ("ERROR: Unrecognized argument \"%s\".\n", argv[Index]);
         return 1;
       }
@@ -2515,7 +2512,7 @@ Returns:
         break;
 
       default:
-        PrintUsage ();
+        Usage ();
         printf ("Unrecognized IA32 argument \"%s\".\n", argv[Index]);
         IsIA32 = FALSE;
         break;
@@ -2562,8 +2559,24 @@ Returns:
   //
   // Verify the correct number of arguments
   //
+  if (argc < 1) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
+ 
   if (argc != ONE_BSF_ARGS && argc != TWO_BSF_ARGS) {
-    PrintUsage ();
+    Usage ();
     return 1;
   }
 
@@ -2586,7 +2599,7 @@ Returns:
     // Make sure argument pair begin with - or /
     //
     if (argv[Index][0] != '-' && argv[Index][0] != '/') {
-      PrintUsage ();
+      Usage ();
       printf ("ERROR: Argument pair must begin with \"-\" or \"/\"\n");
       return 1;
     }
@@ -2595,7 +2608,7 @@ Returns:
     // Make sure argument specifier is only one letter
     //
     if (argv[Index][2] != 0) {
-      PrintUsage ();
+      Usage ();
       printf ("ERROR: Unrecognized argument \"%s\".\n", argv[Index]);
       return 1;
     }
@@ -2636,7 +2649,7 @@ Returns:
       break;
 
     default:
-      PrintUsage ();
+      Usage ();
       printf ("ERROR: Unrecognized argument \"%s\".\n", argv[Index]);
       return 1;
       break;

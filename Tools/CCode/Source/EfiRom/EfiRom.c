@@ -37,7 +37,9 @@ Abstract:
 //
 // Version of this utility
 //
-#define UTILITY_VERSION "v2.5"
+#define UTILITY_NAME "EfiRom"
+#define UTILITY_MAJOR_VERSION 2
+#define UTILITY_MINOR_VERSION 5
 
 //
 // Define some status return values
@@ -132,6 +134,12 @@ static STRING_LOOKUP  mSubsystemTypes[] = {
 //
 //  Function prototypes
 //
+static
+void
+Version (
+  VOID
+  );
+
 static
 void
 Usage (
@@ -978,6 +986,18 @@ Returns:
     Usage ();
     return STATUS_ERROR;
   }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Process until no more arguments
   //
@@ -1226,6 +1246,30 @@ Returns:
 
 static
 void
+Version (
+  VOID
+  )
+/*++
+
+Routine Description:
+  
+  Print version information for this utility.
+
+Arguments:
+
+  None.
+
+Returns:
+
+  Nothing.
+--*/
+{
+  printf ("%s v%d.%d -EDK utility to create an option ROM image from a list of input files\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+   
+static
+void
 Usage (
   VOID
   )
@@ -1247,12 +1291,9 @@ Returns:
 {
   int               Index;
   static const char *Msg[] = {
-    "EfiRom "UTILITY_VERSION " - Intel EFI Make Option ROM utility",
-    "  Copyright (C), 1999-2002 Intel Coproration\n",
-    "  Create an option ROM image from a list of input files",
-    "  Usage: efirom {-p} [-v VendorId] [-d DeviceId] {-o OutFileName} ",
+    "\nUsage: efirom {-p} [-v VendorId] [-d DeviceId] {-o OutFileName} ",
     "                [-e|-b] [FileName(s)]",
-    "    where:",
+    "   where:",
     "      VendorId       - required hex PCI Vendor ID for the device",
     "      DeviceId       - required hex PCI Device ID for the device",
     "      OutFileName    - optional output file name. Default is the first input",
@@ -1270,12 +1311,15 @@ Returns:
     "      -rev Revision  - to use hex Revision in the PCI data structure header for",
     "                       the following FileName",
     "      -dump          - to dump the headers of an existing option ROM image",
+    "      -h,--help,-?,/? - to display help messages",
+    "      -V,--version   - to display version information",
     "",
     "Example usage: EfiRom -v 0xABCD -d 0x1234 -b File1.bin File2.bin -e File1.efi File2.efi ",
     "",
     NULL
   };
 
+  Version();
   for (Index = 0; Msg[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Msg[Index]);
   }

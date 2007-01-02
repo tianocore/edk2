@@ -32,7 +32,13 @@ Abstract:
 #include "FlashDefFile.h"
 #include "Symbols.h"
 
-#define UTILITY_NAME  "FlashMap"
+//
+// Version of this utility
+//
+#define UTILITY_NAME "FlashMap"
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 0
+
 
 typedef struct _STRING_LIST {
   struct _STRING_LIST *Next;
@@ -79,6 +85,12 @@ MergeMicrocodeFiles (
   STRING_LIST     *FileNames,
   unsigned int    Alignment,
   char            PadByteValue
+  );
+
+static
+void
+Version (
+  VOID
   );
 
 static
@@ -346,6 +358,18 @@ Returns:
     Usage ();
     return STATUS_ERROR;
   }
+  
+  if ((strcmp(argv[0], "-h") == 0) || (strcmp(argv[0], "--help") == 0) ||
+      (strcmp(argv[0], "-?") == 0) || (strcmp(argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[0], "-V") == 0) || (strcmp(argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Clear out our globals, then start walking the arguments
   //
@@ -697,6 +721,30 @@ Returns:
 
 static
 void
+Version (
+  VOID
+  )
+/*++
+
+Routine Description:
+  
+  Print version information for this utility.
+
+Arguments:
+
+  None.
+
+Returns:
+
+  Nothing.
+--*/
+{
+  printf ("%s v%d.%d -EDK Utility for flash management for EFI build environment.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+ 
+static
+void
 Usage (
   VOID
   )
@@ -715,12 +763,14 @@ Returns:
 {
   int   i;
   char  *Msg[] = {
-    "Usage: FlashTool -fdf FlashDefFile -flashdevice FlashDevice",
+    "\nUsage: FlashTool -fdf FlashDefFile -flashdevice FlashDevice",
     "                 -flashdeviceimage FlashDeviceImage -mci MCIFile -mco MCOFile",
     "                 -discover FDImage -dsc DscFile -asmincfile AsmIncFile",
     "                 -imageOut ImageOutFile -hfile HFile -strsub InStrFile OutStrFile",
     "                 -baseaddr BaseAddr -align Alignment -padvalue PadValue",
     "                 -mcmerge MCIFile(s)",
+    "                 -h,--help,-?,/? - to display help messages",
+    "                 -V,--version   - to display version information",
     "  where",
     "    FlashDefFile     - input Flash Definition File",
     "    FlashDevice      - flash device to use (from flash definition file)",
@@ -737,9 +787,10 @@ Returns:
     "    Alignment        - alignment to use when merging microcode binaries",
     "    PadValue         - byte value to use as pad value when aligning microcode binaries",
     "    MCIFile(s)       - one or more microcode binary files to merge/concatenate",
-    "",
     NULL
   };
+  
+  Version();
   for (i = 0; Msg[i] != NULL; i++) {
     fprintf (stdout, "%s\n", Msg[i]);
   }

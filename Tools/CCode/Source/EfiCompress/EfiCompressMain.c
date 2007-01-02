@@ -34,7 +34,7 @@ Abstract:
 #define UTILITY_MINOR_VERSION 1
 
 void 
-ECVersion(
+Version(
   void
   )
 /*++
@@ -58,7 +58,7 @@ Returns:
 }
 
 void 
-ECUsage(
+Usage(
   void
   )
 /*++
@@ -77,8 +77,8 @@ Returns:
   
 --*/ 
 {
-  ECVersion();
-  printf ("\n  Usage: %s Inputfile Outputfile\n", UTILITY_NAME);
+  Version();
+  printf ("\nUsage: %s Inputfile Outputfile\n", UTILITY_NAME);
 }
 
 
@@ -122,23 +122,23 @@ Returns:
   infile                = outfile = NULL;
 
   if (argc < 1) {
-    ECUsage();
+    Usage();
     goto Done;
   }
   
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
       (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
-    ECUsage();
+    Usage();
     goto Done;
   }
   
   if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
-    ECVersion();
+    Version();
     goto Done;
   }
   
   if (argc != 3) {
-    ECUsage();
+    Usage();
     goto Done;
   }
 

@@ -46,13 +46,13 @@ ProcessArgs (
 
 static
 void
-CMFUsage (
+Usage (
   VOID
   );
 
 static
 void
-CMFVersion (
+Version (
   VOID
   );
 
@@ -157,30 +157,30 @@ Returns:
   Argc--;
   
   if (Argc < 1) {
-    CMFUsage();
+    Usage();
     return EFI_INVALID_PARAMETER;
   }
   
   if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
       (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
-    CMFUsage();
+    Usage();
     return EFI_INVALID_PARAMETER;
   }
   
   if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
-    CMFVersion();
+    Version();
     return EFI_INVALID_PARAMETER;
   }
  
   if (Argc < 2) {
-    CMFUsage ();
+    Usage ();
     return EFI_INVALID_PARAMETER;
   }
   //
   // If first arg is dash-option, then print usage.
   //
   if (Argv[0][0] == '-') {
-    CMFUsage ();
+    Usage ();
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -212,7 +212,7 @@ Returns:
   if ((Argv[0][0] == '0') && ((Argv[0][1] == 'x') || (Argv[0][1] == 'X'))) {
     if (sscanf (Argv[0], "%x", &Options->FileSize) != 1) {
       printf ("ERROR: Invalid file size '%s'\n", Argv[0]);
-      CMFUsage ();
+      Usage ();
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -221,7 +221,7 @@ Returns:
   } else {
     if (sscanf (Argv[0], "%d", &Options->FileSize) != 1) {
       printf ("ERROR: Invalid file size '%s'\n", Argv[0]);
-      CMFUsage ();
+      Usage ();
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -237,14 +237,14 @@ Returns:
 
 static
 void 
-CMFVersion(
+Version(
   void
   )
 /*++
 
 Routine Description:
 
-  Print out version information for Strip.
+  Print out version information for this utility.
 
 Arguments:
 
@@ -265,7 +265,7 @@ Returns:
 //
 static
 void
-CMFUsage (
+Usage (
   VOID
   )
 /*++
@@ -284,14 +284,14 @@ Returns:
 
 --*/
 { 
-  CMFVersion();
+  Version();
   
-  printf ("\n  Usage: %s OutFileName FileSize \n\
-      where: \n\
-        OutFileName is the name of the output file to generate \n\
-        FileSize is the size of the file to create \n\
-      Examples: \n\
-        %s OutFile.bin 32K \n\
-        %s OutFile.bin 0x1000 \n",UTILITY_NAME, UTILITY_NAME, UTILITY_NAME);
+  printf ("\nUsage: %s OutFileName FileSize \n\
+   where: \n\
+      OutFileName is the name of the output file to generate \n\
+      FileSize is the size of the file to create \n\
+   Examples: \n\
+      %s OutFile.bin 32K \n\
+      %s OutFile.bin 0x1000 \n",UTILITY_NAME, UTILITY_NAME, UTILITY_NAME);
 } 
 
