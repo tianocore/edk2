@@ -86,7 +86,7 @@ ParseDepex (
   );
 
 VOID
-GDVersion (
+Version (
   VOID
   )
 /*++
@@ -115,7 +115,7 @@ Returns:
 }
 
 VOID
-GDUsage (
+Usage (
   VOID
   )
 /*++
@@ -134,9 +134,9 @@ Returns:
 
 --*/
 {
-  GDVersion();
+  Version();
   printf (
-    "\n  Usage: %s -I InputFile -O OutputFile [-P <Optional Boundary for padding up>] \n",
+    "\nUsage: %s -I InputFile -O OutputFile [-P <Optional Boundary for padding up>] \n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
@@ -857,24 +857,24 @@ Returns:
   Pad_Flag    = FALSE;
 
   if (argc < 1) {
-    GDUsage();
+    Usage();
     return -1;
   }
   
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
       (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
-    GDUsage();
+    Usage();
     return 0;
   }
   
   if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
-    GDVersion();
+    Version();
     return 0;
   }
   
   if (argc < 5) {
     printf ("Not enough arguments\n");
-    GDUsage();
+    Usage();
     return EFI_INVALID_PARAMETER;
   }
 
@@ -920,13 +920,13 @@ Returns:
 
   if (InFile == NULL) {
     printf ("Can not open <INFILE> for reading.\n");
-    GDUsage();
+    Usage();
     return EFI_ABORTED;
   }
 
   if (OutFile == NULL) {
     printf ("Can not open <OUTFILE> for writting.\n");
-    GDUsage();
+    Usage();
     return EFI_ABORTED;
   }
 

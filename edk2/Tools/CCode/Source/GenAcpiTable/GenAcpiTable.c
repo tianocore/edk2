@@ -32,8 +32,9 @@ Abstract:
 //
 // Version of this utility
 //
-#define UTILITY_NAME    "GenAcpiTable"
-#define UTILITY_VERSION "v0.11"
+#define UTILITY_NAME  "GenAcpiTable"
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 11
 
 //
 // Define the max length of a filename
@@ -81,6 +82,12 @@ static STRING_LOOKUP  mSubsystemTypes[] = {
 //
 //  Function prototypes
 //
+static
+void
+Version (
+  VOID
+  );
+
 static
 void
 Usage (
@@ -489,6 +496,22 @@ Returns:
   Argc--;
   Argv++;
 
+  if (Argc < 1) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+
   if (Argc != 2) {
     Usage ();
     return STATUS_ERROR;
@@ -505,6 +528,17 @@ Returns:
 
   return STATUS_SUCCESS;
 }
+
+static
+void
+Version (
+  VOID
+  )
+{
+  printf ("%s v%d.%d -EDK Utility for generating ACPI Table image from an EFI PE32 image.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+
 
 static
 void
@@ -529,15 +563,14 @@ Returns:
 {
   int               Index;
   static const char *Msg[] = {
-    UTILITY_NAME " version "UTILITY_VERSION " - Generate ACPI Table image utility",
-    "  Generate an ACPI Table image from an EFI PE32 image",
-    "  Usage: "UTILITY_NAME " InFileName OutFileName",
-    "    where:",
-    "      InFileName     - name of the input PE32 file",
-    "      OutFileName    - to write output to OutFileName rather than InFileName"DEFAULT_OUTPUT_EXTENSION,
-    "",
+    "\nUsage: "UTILITY_NAME " {-h|--help|-?|/?|-V|--version} InFileName OutFileName",
+    "  where:",
+    "    InFileName  - name of the input PE32 file",
+    "    OutFileName - to write output to OutFileName rather than InFileName"DEFAULT_OUTPUT_EXTENSION,
     NULL
   };
+  
+  Version();
   for (Index = 0; Msg[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Msg[Index]);
   }
