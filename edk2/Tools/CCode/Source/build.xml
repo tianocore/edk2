@@ -252,8 +252,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <target name="Tools" depends="Libraries">
     <subant target="" inheritall="true">
-      <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"
-        excludes="${Libs}"/>
+      <fileset dir="${PACKAGE_DIR}" includes="*/build.xml" 
+        excludes="${Libs} GenFvMap/build.xml"/>
     </subant>
   </target>
 
