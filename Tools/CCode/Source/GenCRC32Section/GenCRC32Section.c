@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004-2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,9 +22,9 @@ Abstract:
 
 #include "GenCRC32Section.h"
 
-#define TOOLVERSION   "0.2"
-
-#define UTILITY_NAME  "GenCrc32Section"
+#define UTILITY_NAME           "GenCrc32Section"
+#define UTILITY_MAJOR_VERSION  0
+#define UTILITY_MINOR_VERSION  2
 
 EFI_GUID  gEfiCrc32SectionGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
@@ -117,16 +117,45 @@ Returns:
 }
 
 VOID
-PrintUsage (
+Version (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf (
+    "%s v%d.%d -Utility for generating Firmware File System files.\n",
+    UTILITY_NAME,
+    UTILITY_MAJOR_VERSION,
+    UTILITY_MINOR_VERSION
+    );
+}
+
+
+VOID
+Usage (
   VOID
   )
 {
-  printf ("Usage:\n");
-  printf (UTILITY_NAME " -i \"inputfile1\" \"inputfile2\" -o \"outputfile\" \n");
-  printf ("   -i \"inputfile\":\n ");
-  printf ("       specifies the input files that would be signed to CRC32 Guided section.\n");
-  printf ("   -o \"outputfile\":\n");
-  printf ("       specifies the output file that is a CRC32 Guided section.\n");
+  Version();
+  
+  printf ("\nUsage:\n");
+  printf (UTILITY_NAME " -i Inputfile1 Inputfile2 -o Outputfile\n");
+  printf ("   -i Inputfile: specifies the input files signed to CRC32 Guided section.\n");
+  printf ("   -o Outputfile: specifies the output file that is a CRC32 Guided section.\n");
 }
 
 INT32
@@ -211,8 +240,19 @@ main (
 
   SetUtilityName (UTILITY_NAME);
 
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
+  
   if (argc == 1) {
-    PrintUsage ();
+    Usage ();
     return -1;
   }
 

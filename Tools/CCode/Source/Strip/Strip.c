@@ -50,7 +50,7 @@ Returns:
   
 --*/ 
 {
-  printf ("%s v%d.%d -EDK Convert EXE to BIN\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("%s v%d.%d -EDK Utility to Convert EXE to BIN\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
   printf ("Copyright (c) 2005-2006 Intel Corporation. All rights reserved.\n");
 }
 

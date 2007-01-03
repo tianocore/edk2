@@ -41,7 +41,10 @@ Abstract:
 #include "EfiUtilityMsgs.h"
 
 #define MAX_PATH                  256
-#define PROGRAM_NAME              "GenCapsuleHdr"
+
+#define UTILITY_NAME              "GenCapsuleHdr"
+#define UTILITY_MAJOR_VERSION     1
+#define UTILITY_MINOR_VERSION     0
 
 #define UNICODE_BACKSLASH         L'\\'
 #define UNICODE_FILE_START        0xFEFF
@@ -160,6 +163,12 @@ SplitCapsule (
 
 static
 void
+Version (
+  VOID
+  );
+
+static
+void
 Usage (
   VOID
   );
@@ -273,7 +282,7 @@ Returns:
   //
   // Specify our program name to the error printing routines.
   //
-  SetUtilityName (PROGRAM_NAME);
+  SetUtilityName (UTILITY_NAME);
   //
   // Process the command-line arguments
   //
@@ -2355,10 +2364,22 @@ Returns:
   Argc--;
   Argv++;
 
-  if (Argc == 0) {
+  if (Argc < 1) {
     Usage ();
     return STATUS_ERROR;
   }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Process until no more options
   //
@@ -2623,6 +2644,31 @@ Returns:
 }
 
 static
+void 
+Version(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for this utility.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -EDK utility to create a capsule header.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2006 Intel Corporation. All rights reserved.\n");
+}
+
+static
 void
 Usage (
   VOID
@@ -2645,13 +2691,13 @@ Returns:
 {
   int               Index;
   static const char *Str[] = {
-    PROGRAM_NAME " -- create a capsule header",
-    "  Usage: "PROGRAM_NAME " {options} [CapsuleFV]",
+    "\nUsage: "UTILITY_NAME " {options} [CapsuleFV]",
     //
     // {FfsFileNames}",
     //
     "    Options include:",
-    "      -h or -?         for this help information",
+    "      -h,--help,-?,/?  to display help messages",
+    "      -V,--version     to display version information",
     "      -script fname    to take capsule header info from unicode script",
     "                       file fname",
     "      -o fname         write output to file fname (required)",
@@ -2668,6 +2714,9 @@ Returns:
     //
     NULL
   };
+  
+  Version();
+  
   for (Index = 0; Str[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Str[Index]);
   }
