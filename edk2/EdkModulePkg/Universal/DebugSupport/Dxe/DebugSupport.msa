@@ -53,7 +53,8 @@
     <Filename SupArchList="IPF">ipf/ds64macros.i</Filename>
     <Filename SupArchList="IPF">ipf/plDebugSupport.c</Filename>
     <Filename SupArchList="IPF">ipf/plDebugSupport.h</Filename>
-    <Filename SupArchList="X64">x64/AsmFuncs.asm</Filename>
+    <Filename ToolChainFamily="MSFT" SupArchList="X64">x64/AsmFuncs.asm</Filename>
+    <Filename ToolChainFamily="GCC" SupArchList="X64">x64/AsmFuncs.S</Filename>
     <Filename SupArchList="X64">x64/plDebugSupport.h</Filename>
     <Filename SupArchList="X64">x64/plDebugSupport.c</Filename>
   </SourceFiles>
