@@ -395,11 +395,11 @@ public class EnumerationData {
 
     private void initLibraryUsage() {
         vLibraryUsage.removeAllElements();
-        vLibraryUsage.addElement("ALWAYS_CONSUMED");
-        vLibraryUsage.addElement("SOMETIMES_CONSUMED");
-        vLibraryUsage.addElement("ALWAYS_PRODUCED");
-        vLibraryUsage.addElement("SOMETIMES_PRODUCED");
-        vLibraryUsage.addElement("PRIVATE");
+        vLibraryUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vLibraryUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vLibraryUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vLibraryUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vLibraryUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initFrameworkModuleTypes() {
@@ -571,25 +571,25 @@ public class EnumerationData {
 
     private void initPackageUsage() {
         vPackageUsage.removeAllElements();
-        vPackageUsage.addElement("ALWAYS_CONSUMED");
-        vPackageUsage.addElement("ALWAYS_PRODUCED");
+        vPackageUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vPackageUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
     }
 
     private void initProtocolUsage() {
         vProtocolUsage.removeAllElements();
-        vProtocolUsage.addElement("ALWAYS_CONSUMED");
-        vProtocolUsage.addElement("SOMETIMES_CONSUMED");
-        vProtocolUsage.addElement("ALWAYS_PRODUCED");
-        vProtocolUsage.addElement("SOMETIMES_PRODUCED");
-        vProtocolUsage.addElement("TO_START");
-        vProtocolUsage.addElement("BY_START");
-        vProtocolUsage.addElement("PRIVATE");
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_TO_START);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_BY_START);
+        vProtocolUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initProtocolType() {
         vProtocolType.removeAllElements();
-        vProtocolType.addElement("Protocol");
-        vProtocolType.addElement("Protocol Notify");
+        vProtocolType.addElement(DataType.PROTOCOL_TYPE_PROTOCOL);
+        vProtocolType.addElement(DataType.PROTOCOL_TYPE_PROTOCOL_NOTIFY);
     }
 
     private void initEventType() {
@@ -600,11 +600,11 @@ public class EnumerationData {
 
     private void initEventUsage() {
         vEventUsage.removeAllElements();
-        vEventUsage.addElement("ALWAYS_CONSUMED");
-        vEventUsage.addElement("SOMETIMES_CONSUMED");
-        vEventUsage.addElement("ALWAYS_PRODUCED");
-        vEventUsage.addElement("SOMETIMES_PRODUCED");
-        vEventUsage.addElement("PRIVATE");
+        vEventUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vEventUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vEventUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vEventUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vEventUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initEventGroup() {
@@ -628,44 +628,44 @@ public class EnumerationData {
 
     private void initHobUsage() {
         vHobUsage.removeAllElements();
-        vHobUsage.addElement("ALWAYS_CONSUMED");
-        vHobUsage.addElement("SOMETIMES_CONSUMED");
-        vHobUsage.addElement("ALWAYS_PRODUCED");
-        vHobUsage.addElement("SOMETIMES_PRODUCED");
-        vHobUsage.addElement("PRIVATE");
+        vHobUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vHobUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vHobUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vHobUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vHobUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initPpiType() {
         vPpiType.removeAllElements();
-        vPpiType.addElement("Ppi");
-        vPpiType.addElement("Ppi Notify");
+        vPpiType.addElement(DataType.PPI_TYPE_PPI);
+        vPpiType.addElement(DataType.PPI_TYPE_PPI_NOTIFY);
     }
 
     private void initPpiUsage() {
         vPpiUsage.removeAllElements();
-        vPpiUsage.addElement("ALWAYS_CONSUMED");
-        vPpiUsage.addElement("SOMETIMES_CONSUMED");
-        vPpiUsage.addElement("ALWAYS_PRODUCED");
-        vPpiUsage.addElement("SOMETIMES_PRODUCED");
-        vPpiUsage.addElement("PRIVATE");
+        vPpiUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vPpiUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vPpiUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vPpiUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vPpiUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initPpiNotifyUsage() {
         vPpiNotifyUsage.removeAllElements();
-        vPpiNotifyUsage.addElement("SOMETIMES_CONSUMED");
+        vPpiNotifyUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
     }
 
     private void initProtocolNotifyUsage() {
-        vProtocolNotifyUsage.addElement("SOMETIMES_CONSUMED");
+        vProtocolNotifyUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
     }
 
     private void initVariableUsage() {
         vVariableUsage.removeAllElements();
-        vVariableUsage.addElement("ALWAYS_CONSUMED");
-        vVariableUsage.addElement("SOMETIMES_CONSUMED");
-        vVariableUsage.addElement("ALWAYS_PRODUCED");
-        vVariableUsage.addElement("SOMETIMES_PRODUCED");
-        vVariableUsage.addElement("PRIVATE");
+        vVariableUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vVariableUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vVariableUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vVariableUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vVariableUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initBootModeNames() {
@@ -694,44 +694,44 @@ public class EnumerationData {
 
     private void initBootModeUsage() {
         vBootModeUsage.removeAllElements();
-        vBootModeUsage.addElement("ALWAYS_CONSUMED");
-        vBootModeUsage.addElement("SOMETIMES_CONSUMED");
-        vBootModeUsage.addElement("ALWAYS_PRODUCED");
-        vBootModeUsage.addElement("SOMETIMES_PRODUCED");
+        vBootModeUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vBootModeUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vBootModeUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vBootModeUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
     }
 
     private void initSystemTableUsage() {
         vSystemTableUsage.removeAllElements();
-        vSystemTableUsage.addElement("ALWAYS_CONSUMED");
-        vSystemTableUsage.addElement("SOMETIMES_CONSUMED");
-        vSystemTableUsage.addElement("ALWAYS_PRODUCED");
-        vSystemTableUsage.addElement("SOMETIMES_PRODUCED");
-        vSystemTableUsage.addElement("PRIVATE");
+        vSystemTableUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vSystemTableUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vSystemTableUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vSystemTableUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vSystemTableUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initDataHubUsage() {
         vDataHubUsage.removeAllElements();
-        vDataHubUsage.addElement("ALWAYS_CONSUMED");
-        vDataHubUsage.addElement("SOMETIMES_CONSUMED");
-        vDataHubUsage.addElement("ALWAYS_PRODUCED");
-        vDataHubUsage.addElement("SOMETIMES_PRODUCED");
-        vDataHubUsage.addElement("PRIVATE");
+        vDataHubUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vDataHubUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vDataHubUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vDataHubUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vDataHubUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initHiiPackages() {
         vHiiPackageUsage.removeAllElements();
-        vHiiPackageUsage.addElement("ALWAYS_PRODUCED");
-        vHiiPackageUsage.addElement("SOMETIMES_PRODUCED");
-        vHiiPackageUsage.addElement("PRIVATE");
+        vHiiPackageUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vHiiPackageUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vHiiPackageUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initGuidUsage() {
         vGuidUsage.removeAllElements();
-        vGuidUsage.addElement("ALWAYS_CONSUMED");
-        vGuidUsage.addElement("SOMETIMES_CONSUMED");
-        vGuidUsage.addElement("ALWAYS_PRODUCED");
-        vGuidUsage.addElement("SOMETIMES_PRODUCED");
-        vGuidUsage.addElement("PRIVATE");
+        vGuidUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vGuidUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vGuidUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vGuidUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
+        vGuidUsage.addElement(DataType.USAGE_TYPE_PRIVATE);
     }
 
     private void initExternTypes() {
@@ -761,10 +761,10 @@ public class EnumerationData {
 
     private void initPcdUsage() {
         vPcdUsage.removeAllElements();
-        vPcdUsage.addElement("ALWAYS_CONSUMED");
-        vPcdUsage.addElement("SOMETIMES_CONSUMED");
-        vPcdUsage.addElement("ALWAYS_PRODUCED");
-        vPcdUsage.addElement("SOMETIMES_PRODUCED");
+        vPcdUsage.addElement(DataType.USAGE_TYPE_ALWAYS_CONSUMED);
+        vPcdUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_CONSUMED);
+        vPcdUsage.addElement(DataType.USAGE_TYPE_ALWAYS_PRODUCED);
+        vPcdUsage.addElement(DataType.USAGE_TYPE_SOMETIMES_PRODUCED);
     }
     
     private void initBuildTargets() {
