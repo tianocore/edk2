@@ -95,6 +95,25 @@ Compiler Tool Chains:
     Microsoft ACPI Source Language Assembler, Version 1.0.13NT or later
     Intel ACPI Component Architecture, version 20060113
 
+Python
+
+    There are several tools implemented in Python and wxPython Widgets in the
+    Tools/Python directory. These are optional tools, and are not necessary in
+    order to use or build the edk2 code.  In order to use them you must
+    install Python 2.4.x and wxWidgets 2.8.x for your platform.  The tools
+    have been tested and work correctly on OS X, Linux and Windows.
+
+    There is a script called Install_Python_OSX.sh that will download and
+    install the correct versions for OS X. For other platforms, please find
+    the installers for your platform at the following sites:
+
+    - http://www.python.org/download/releases/2.4.4/ (Python interpreter)
+    - http://www.wxpython.org/download.php#binaries  (Python GUI extensions)
+
+    Your linux distribution may contain packages of python and wxPython, which
+    should work, provided they are are compatible with the above specified
+    versions.
+
 -----------------------------------------------
 Notes on Required Tools (Source Control System)
 -----------------------------------------------
@@ -667,3 +686,5 @@ Of particular note:
 =======================================================
 Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4890, no
 virus detected.
+
+vim:tw=78:ts=2:fo=qa:com=fb\:- :ai
