@@ -24,6 +24,12 @@ using namespace std;
 
 typedef UINT64 ulonglong_t;
 
+#ifdef __GNUC__
+#if __STDC_VERSION__ < 199901L
+#define __FUNCTION__ __FILE__
+#endif
+#endif
+
 template <class T>
 class CMemoryLeakChecker : public list<T*>
 {
