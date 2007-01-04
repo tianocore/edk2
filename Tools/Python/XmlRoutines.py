@@ -27,13 +27,13 @@ def XmlList(Dom, String):
 def XmlElement (Dom, String):
   """Return a single element that matches the String which is XPath style syntax."""
   try:
-    return XmlList (Dom, String)[0].firstChild.data.strip(' ')
+    return XmlList (Dom, String)[0].firstChild.data.strip()
   except:
     return ''
 
 def XmlElementData (Dom):
   """Get the text for this element."""
-  return Dom.firstChild.data.strip(' ')
+  return Dom.firstChild.data.strip()
 
 def XmlAttribute (Dom, String):
   """Return a single attribute that named by String."""
@@ -44,7 +44,84 @@ def XmlAttribute (Dom, String):
 
 def XmlTopTag(Dom):
   """Return the name of the Root or top tag in the XML tree."""
-  return Dom.documentElement.nodeName
+  return Dom.firstChild.nodeName
+  
+def XmlParseFile (FileName):
+  """Parse an XML file into a DOM and return the DOM."""
+  try:
+    f = open(FileName, 'r')
+    Dom = xml.dom.minidom.parse(f)
+    f.close()
+    return Dom
+  except:
+    return xml.dom.minidom.parseString('<empty/>')
+
+def XmlParseFileSection (FileName, Tag):
+  """Parse a section of an XML file into a DOM(Document Object Model) and return the DOM."""
+  try:
+    f = open(FileName, 'r')
+  except:
+    return xml.dom.minidom.parseString('<empty/>')
+  Start = '<' + Tag
+  End = '</' + Tag + '>'
+  File = ''
+  while File.find(Start) < 0 or File.find(End) < 0:
+    Section = f.read(0x1000)
+    if Section == '':
+      break
+    File += Section
+  f.close()
+  if File.find(Start) < 0 or File.find(End) < 0:
+    return xml.dom.minidom.parseString('<empty/>')
+  File = File[File.find(Start):File.find(End)+len(End)]
+  try:
+    return xml.dom.minidom.parseString(File)
+  except:
+    return xml.dom.minidom.parseString('<empty/>')
+
+def XmlSaveFile (Dom, FileName, Encoding='UTF-8'):
+  """Save a DOM(Document Object Model) into an XML file."""
+  try:
+    f = open(FileName, 'w')
+    f.write(Dom.toxml(Encoding).replace('&quot;','"').replace('&gt;','>'))
+    f.close()
+    return True
+  except:
+    return False
+
+def XmlRemoveElement(Node):
+  """Remove an element node from DOM(Document Object Model) tree."""
+  ParentNode = Node.parentNode
+  if ParentNode == None:
+    return False
+  PreviousSibling = Node.previousSibling
+  while PreviousSibling != None and PreviousSibling.nodeType == PreviousSibling.TEXT_NODE and PreviousSibling.data.strip() == '':
+    Temp = PreviousSibling
+    PreviousSibling = PreviousSibling.previousSibling
+    ParentNode.removeChild(Temp)
+  ParentNode.removeChild(Node)
+  return True
+
+def XmlAppendChildElement(ParentNode, TagName, ElementText='', AttributeDictionary = {}):
+  """Add a child element to a DOM(Document Object Model) tree with optional Attributes."""
+  TagName = TagName.strip()
+  if TagName == '':
+    return False
+  Depth = 0
+  Dom = ParentNode
+  while Dom != None and Dom.nodeType != Dom.DOCUMENT_NODE:
+    Dom = Dom.parentNode
+    Depth += 1
+  if Dom == None:
+    return False
+  ParentNode.appendChild(Dom.createTextNode('\n%*s' % (Depth * 2, '')))
+  ElementNode = Dom.createElement(TagName)
+  if ElementText != '':
+    ElementNode.appendChild(Dom.createTextNode(ElementText))
+  for Item in AttributeDictionary:
+    ElementNode.setAttribute(Item, AttributeDictionary[Item])
+  ParentNode.appendChild(ElementNode)
+  return True
   
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
