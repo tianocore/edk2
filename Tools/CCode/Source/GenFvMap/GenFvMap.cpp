@@ -8,11 +8,11 @@
 //** from the company.
 //**
 //****************************************************************************
-
+#include "ProcessorBind.h"
+#include <iostream>
 #include <stdexcept>
 #include <list>
 #include <map>
-#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
@@ -22,7 +22,7 @@
 #include <functional>
 using namespace std;
 
-typedef unsigned __int64 ulonglong_t;
+typedef UINT64 ulonglong_t;
 
 template <class T>
 class CMemoryLeakChecker : public list<T*>
@@ -142,7 +142,7 @@ ostream& operator << (ostream& os, const CIdentity& idRight)
         << setw(4) << (unsigned short)(idRight.m_ullId[0] >> 16) << '-'
         << setw(4) << (unsigned short)idRight.m_ullId[0] << '-'
         << setw(4) << (unsigned short)(idRight.m_ullId[1] >> 48) << '-'
-        << setw(12) <<  (idRight.m_ullId[1] & 0xffffffffffff);
+        << setw(12) <<  (idRight.m_ullId[1] & 0xffffffffffffULL);
 }
 
 class CInputFile : public CObjRoot
