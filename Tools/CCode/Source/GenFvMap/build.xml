@@ -54,7 +54,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <compilerarg value="-x" if="gcc"/>
       <compilerarg value="c++" if="gcc"/>
       <compilerarg value="/EHsc" unless="gcc"/>
-      <compilerarg value="/Za" unless="gcc"/>
       
       
       <fileset dir="${basedir}/${ToolName}"
