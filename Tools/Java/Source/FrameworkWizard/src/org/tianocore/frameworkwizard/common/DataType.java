@@ -266,6 +266,10 @@ public class DataType {
     
     public final static String USAGE_TYPE_PRIVATE = "PRIVATE";
     
+    public final static String USAGE_TYPE_TO_START = "TO_START";
+    
+    public final static String USAGE_TYPE_BY_START = "BY_START";
+    
     //
     // The String for PCD type
     //
