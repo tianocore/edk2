@@ -810,39 +810,45 @@ Returns:
 
   if (Status == EFI_INVALID_PARAMETER) {
     return Status;
-  }
-  //
-  //  The size of the VariableName, including the Unicode Null in bytes plus
-  //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
-  //
-  else if ((DataSize > MAX_VARIABLE_SIZE) ||
-           (sizeof (VARIABLE_HEADER) + ArrayLength (VariableName) + DataSize > MAX_VARIABLE_SIZE)) {
+  } else if (!EFI_ERROR (Status) && Variable.Volatile && EfiAtRuntime()) {
+    //
+    // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
+    // the volatile is ReadOnly, and SetVariable should be aborted and 
+    // return EFI_WRITE_PROTECTED.
+    //
+    return EFI_WRITE_PROTECTED;
+  } else if (sizeof (VARIABLE_HEADER) + ArrayLength (VariableName) + DataSize > MAX_VARIABLE_SIZE) {
+    //
+    //  The size of the VariableName, including the Unicode Null in bytes plus
+    //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
+    //
     return EFI_INVALID_PARAMETER;
-  }
-  //
-  //  Make sure if runtime bit is set, boot service bit is set also
-  //
-  else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS
-          ) {
+  } else if (Attributes == EFI_VARIABLE_NON_VOLATILE) {
+    //
+    //  Make sure not only EFI_VARIABLE_NON_VOLATILE is set 
+    //
     return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Runtime but Attribute is not Runtime
-  //
-  else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+  } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 
+                EFI_VARIABLE_RUNTIME_ACCESS) {
+    //
+    //  Make sure if runtime bit is set, boot service bit is set also
+    //
     return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Cannot set volatile variable in Runtime
-  //
-  else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_NON_VOLATILE)) {
+  } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+    //
+    // Runtime but Attribute is not Runtime
+    //
     return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Setting a data variable with no access, or zero DataSize attributes
-  // specified causes it to be deleted.
-  //
-  else if (DataSize == 0 || Attributes == 0) {
+  } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_NON_VOLATILE)) {
+    //
+    // Cannot set volatile variable in Runtime
+    //
+    return EFI_INVALID_PARAMETER;
+  } else if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
+    //
+    // Setting a data variable with no access, or zero DataSize attributes
+    // specified causes it to be deleted.
+    //
     if (!EFI_ERROR (Status)) {
       State = Variable.CurrPtr->State;
       State &= VAR_DELETED;
