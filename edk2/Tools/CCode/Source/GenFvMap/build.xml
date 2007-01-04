@@ -51,9 +51,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         debug="true"
         optimize="speed">
       <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
+      <compilerarg value="-x" if="gcc"/>
+      <compilerarg value="c++" if="gcc"/>
       <compilerarg value="/EHsc" unless="gcc"/>
       <compilerarg value="/Za" unless="gcc"/>
-      <compilerarg value="-x c++" if="gcc"/>
+      
       
       <fileset dir="${basedir}/${ToolName}"
         includes="${FileSet}"
