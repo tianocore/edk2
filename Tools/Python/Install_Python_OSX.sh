@@ -1,6 +1,6 @@
 echo "You proxy is currently set to \"$http_proxy\"."
 echo "It needs to set in order to download through a firewall."
-echo "For example: \"export http://proxy.company.com:911\""
+echo "For example: \"export http_proxy=proxy.company.com:911\""
 set -e
 echo "After the download, get ready to enter the root password."
 curl -C - --remote-name http://www.python.org/ftp/python/2.4.4/python-2.4.4-macosx2006-10-18.dmg --progress-bar
