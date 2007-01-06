@@ -527,7 +527,7 @@ UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
   int title_len;
 
   drv = (UGA_IO_PRIVATE *)
-    malloc (sizeof (UGA_IO_PRIVATE));
+    calloc (1, sizeof (UGA_IO_PRIVATE));
   if (drv == NULL)
     return EFI_OUT_OF_RESOURCES;
 
