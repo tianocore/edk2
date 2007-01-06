@@ -28,8 +28,8 @@
 #   OUT IA32_DESCRIPTOR  *Idtr
 #   );
 #------------------------------------------------------------------------------
-.globl _InternalX86WriteIdtr
-_InternalX86WriteIdtr:
+.globl ASM_PFX(InternalX86WriteIdtr)
+ASM_PFX(InternalX86WriteIdtr):
     movl    4(%esp), %eax
     lidt    (%eax)
     ret

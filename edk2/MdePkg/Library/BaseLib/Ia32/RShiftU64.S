@@ -22,7 +22,7 @@
     .686:
     .code:
 
-.globl _InternalMathRShiftU64
+.globl ASM_PFX(InternalMathRShiftU64)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -32,7 +32,7 @@
 #   IN      UINTN                     Count
 #   );
 #------------------------------------------------------------------------------
-_InternalMathRShiftU64:
+ASM_PFX(InternalMathRShiftU64):
     movb    12(%esp), %cl
     xorl    %edx, %edx
     movl    8(%esp), %eax

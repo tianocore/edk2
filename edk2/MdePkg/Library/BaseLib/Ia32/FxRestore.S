@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalX86FxRestore
+.globl ASM_PFX(InternalX86FxRestore)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -30,7 +30,7 @@
 #   IN CONST IA32_FX_BUFFER *Buffer
 #   );
 #------------------------------------------------------------------------------
-_InternalX86FxRestore:
+ASM_PFX(InternalX86FxRestore):
     movl    4(%esp), %eax
     fxrstor (%eax)
     ret

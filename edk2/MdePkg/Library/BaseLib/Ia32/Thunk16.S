@@ -19,14 +19,14 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _m16Start, _m16Size, _mThunk16Attr, _m16Gdt, _m16GdtrBase, _mTransition
-.globl _InternalAsmThunk16
+.globl ASM_PFX(m16Start), ASM_PFX(m16Size), ASM_PFX(mThunk16Attr), ASM_PFX(m16Gdt), ASM_PFX(m16GdtrBase), ASM_PFX(mTransition)
+.globl ASM_PFX(InternalAsmThunk16)
 
-_m16Start:
+ASM_PFX(m16Start):
 
 SavedGdt:     .space  6
 
-_BackFromUserCode:
+ASM_PFX(BackFromUserCode):
     push    %ss
     push    %cs
     .byte   0x66
@@ -40,7 +40,7 @@ L_Base1:
     push    %ds
     pushaw                              # pushad actually
     .byte   0x66, 0xba                  # mov edx, imm32
-_ThunkAttr: .space  4
+ASM_PFX(ThunkAttr): .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
     jz      1f
     movl    $0x15cd2401, %eax           # mov ax, 2401h & int 15h
@@ -74,14 +74,14 @@ SavedEsp:   .space  4
     .byte   0x66
     lret                                # return to protected mode
 
-_EntryPoint:    .long      _ToUserCode - _m16Start
+_EntryPoint:    .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
                 .word      0x8
 _16Idtr:        .word      0x3ff
                 .long      0
 _16Gdtr:        .word      GdtEnd - _NullSegDesc - 1
-_16GdtrBase:    .long     _NullSegDesc
+_16GdtrBase:    .long      _NullSegDesc
 
-_ToUserCode:
+ASM_PFX(ToUserCode):
     movl    %ss, %edx
     movl    %ecx, %ss                   # set new segment selectors
     movl    %ecx, %ds
@@ -136,7 +136,7 @@ GdtEnd:
 #   @param  Transition  Pointer to the transition code
 #   @return The address of the 16-bit stack after returning from user code
 #
-_InternalAsmThunk16:
+ASM_PFX(InternalAsmThunk16):
     push    %ebp
     push    %ebx
     push    %esi
@@ -193,8 +193,8 @@ _InternalAsmThunk16:
 
     .const:
 
-_m16Size:        .word      _InternalAsmThunk16 - _m16Start
-_mThunk16Attr:   .word      _ThunkAttr          - _m16Start
-_m16Gdt:         .word      _NullSegDesc        - _m16Start
-_m16GdtrBase:    .word      _16GdtrBase         - _m16Start
-_mTransition:    .word      _EntryPoint         - _m16Start
+ASM_PFX(m16Size):        .word      _InternalAsmThunk16 - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr):   .word      _ThunkAttr          - ASM_PFX(m16Start)
+ASM_PFX(m16Gdt):         .word      _NullSegDesc        - ASM_PFX(m16Start)
+ASM_PFX(m16GdtrBase):    .word      _16GdtrBase         - ASM_PFX(m16Start)
+ASM_PFX(mTransition):    .word      _EntryPoint         - ASM_PFX(m16Start)

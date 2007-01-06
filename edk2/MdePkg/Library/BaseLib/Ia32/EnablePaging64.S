@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalX86EnablePaging64
+.globl ASM_PFX(InternalX86EnablePaging64)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -34,7 +34,7 @@
 #   IN      UINT64                    NewStack
 #   );
 #------------------------------------------------------------------------------
-_InternalX86EnablePaging64:
+ASM_PFX(InternalX86EnablePaging64):
     cli
     movl    $LongStart, (%esp)
     movl    %cr4, %eax

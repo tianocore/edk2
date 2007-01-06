@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMathDivRemU64x32
+.globl ASM_PFX(InternalMathDivRemU64x32)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -30,7 +30,7 @@
 #   OUT     UINT32                    *Remainder
 #   );
 #------------------------------------------------------------------------------
-_InternalMathDivRemU64x32:
+ASM_PFX(InternalMathDivRemU64x32):
     movl    12(%esp), %ecx
     movl    8(%esp), %eax
     xorl    %edx, %edx

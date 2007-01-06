@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMathMultU64x64
+.globl ASM_PFX(InternalMathMultU64x64)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -29,7 +29,7 @@
 #   IN      UINT64                    Multiplier
 #   );
 #------------------------------------------------------------------------------
-_InternalMathMultU64x64:
+ASM_PFX(InternalMathMultU64x64):
     push    %ebx
     movl    8(%esp), %ebx
     movl    16(%esp), %edx

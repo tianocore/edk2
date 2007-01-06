@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _EnableDisableInterrupts
+.globl ASM_PFX(EnableDisableInterrupts)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -30,7 +30,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-_EnableDisableInterrupts:
+ASM_PFX(EnableDisableInterrupts):
     sti
     cli
     ret

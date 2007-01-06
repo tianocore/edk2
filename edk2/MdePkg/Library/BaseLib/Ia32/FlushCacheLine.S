@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _AsmFlushCacheLine
+.globl ASM_PFX(AsmFlushCacheLine)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -30,7 +30,7 @@
 #   IN      VOID                      *LinearAddress
 #   );
 #------------------------------------------------------------------------------
-_AsmFlushCacheLine:
+ASM_PFX(AsmFlushCacheLine):
     movl    4(%esp), %eax
     clflush (%eax)
     ret

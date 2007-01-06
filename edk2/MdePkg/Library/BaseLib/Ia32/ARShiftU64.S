@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMathARShiftU64
+.globl ASM_PFX(InternalMathARShiftU64)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -29,7 +29,7 @@
 #   IN      UINTN                     Count
 #   );
 #------------------------------------------------------------------------------
-_InternalMathARShiftU64:
+ASM_PFX(InternalMathARShiftU64):
     movb    12(%esp), %cl
     movl    8(%esp), %eax
     cltd
