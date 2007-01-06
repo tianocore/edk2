@@ -28,8 +28,8 @@
 #   IN UINTN Value
 #   );
 #------------------------------------------------------------------------------
-.globl _AsmWriteDr3
-_AsmWriteDr3:
+.globl ASM_PFX(AsmWriteDr3)
+ASM_PFX(AsmWriteDr3):
     movl    4(%esp), %eax
     movl    %eax, %dr3
     ret

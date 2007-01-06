@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalSyncIncrement
+.globl ASM_PFX(InternalSyncIncrement)
 
 #------------------------------------------------------------------------------
 # UINT32
@@ -30,7 +30,7 @@
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-_InternalSyncIncrement:
+ASM_PFX(InternalSyncIncrement):
     movl    4(%esp), %eax
     lock
     incl    (%eax)

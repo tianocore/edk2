@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _SetJump, _InternalAssertJumpBuffer
+.globl ASM_PFX(SetJump), ASM_PFX(InternalAssertJumpBuffer)
 
 #------------------------------------------------------------------------------
 # UINTN
@@ -28,9 +28,9 @@
 #   OUT     BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
 #   );
 #------------------------------------------------------------------------------
-_SetJump:
+ASM_PFX(SetJump):
     pushl   0x4(%esp)
-    call    _InternalAssertJumpBuffer
+    call    ASM_PFX(InternalAssertJumpBuffer)
     pop     %ecx
     pop     %ecx
     movl    (%esp), %edx

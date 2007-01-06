@@ -28,8 +28,8 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.globl _AsmWriteLdtr
-_AsmWriteLdtr:
+.globl ASM_PFX(AsmWriteLdtr)
+ASM_PFX(AsmWriteLdtr):
     movl    4(%esp), %eax
     lldtw   %ax
     ret

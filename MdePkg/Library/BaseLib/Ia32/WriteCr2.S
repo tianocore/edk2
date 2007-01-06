@@ -28,8 +28,8 @@
 #   IN      UINTN                     Cr2
 #   );
 #------------------------------------------------------------------------------
-.globl _AsmWriteCr2
-_AsmWriteCr2:
+.globl ASM_PFX(AsmWriteCr2)
+ASM_PFX(AsmWriteCr2):
     movl    4(%esp), %eax
     movl    %eax, %cr2
     ret

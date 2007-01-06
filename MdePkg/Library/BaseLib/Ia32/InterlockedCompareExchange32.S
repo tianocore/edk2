@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalSyncCompareExchange32
+.globl ASM_PFX(InternalSyncCompareExchange32)
 
 #------------------------------------------------------------------------------
 # UINT32
@@ -32,7 +32,7 @@
 #   IN      UINT32                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-_InternalSyncCompareExchange32:
+ASM_PFX(InternalSyncCompareExchange32):
     movl    4(%esp), %ecx
     movl    8(%esp), %eax
     movl    12(%esp), %edx

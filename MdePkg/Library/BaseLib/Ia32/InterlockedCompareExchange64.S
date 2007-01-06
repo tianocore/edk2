@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalSyncCompareExchange64
+.globl ASM_PFX(InternalSyncCompareExchange64)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -32,7 +32,7 @@
 #   IN      UINT64                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-_InternalSyncCompareExchange64:
+ASM_PFX(InternalSyncCompareExchange64):
     push    %esi
     push    %ebx
     movl    12(%esp), %esi

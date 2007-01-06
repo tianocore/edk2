@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalX86ReadIdtr
+.globl ASM_PFX(InternalX86ReadIdtr)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -30,7 +30,7 @@
 #   OUT IA32_DESCRIPTOR  *Idtr
 #   );
 #------------------------------------------------------------------------------
-_InternalX86ReadIdtr:
+ASM_PFX(InternalX86ReadIdtr):
     movl    4(%esp), %eax
     sidt    (%eax)
     ret

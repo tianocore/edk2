@@ -20,7 +20,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMathDivRemU64x32, _InternalMathDivRemU64x64
+.globl ASM_PFX(InternalMathDivRemU64x32), ASM_PFX(InternalMathDivRemU64x64)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -31,7 +31,7 @@
 #   OUT     UINT64                    *Remainder    OPTIONAL
 #   );
 #------------------------------------------------------------------------------
-_InternalMathDivRemU64x64:
+ASM_PFX(InternalMathDivRemU64x64):
     movl    16(%esp), %ecx
     testl   %ecx, %ecx
     jnz     Hard
@@ -40,7 +40,7 @@ _InternalMathDivRemU64x64:
     and     $0, 4(%ecx)
     movl    %ecx, 16(%esp)
 L1:
-    jmp     _InternalMathDivRemU64x32
+    jmp     ASM_PFX(InternalMathDivRemU64x32)
 Hard:
     push    %ebx
     push    %esi

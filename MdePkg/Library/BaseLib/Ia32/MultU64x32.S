@@ -22,7 +22,7 @@
     .386:
     .code:
 
-.globl _InternalMathMultU64x32
+.globl ASM_PFX(InternalMathMultU64x32)
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -32,7 +32,7 @@
 #   IN      UINT32                    Multiplier
 #   );
 #------------------------------------------------------------------------------
-_InternalMathMultU64x32:
+ASM_PFX(InternalMathMultU64x32):
     movl    12(%esp), %ecx
     movl    %ecx, %eax
     imull   8(%esp), %ecx

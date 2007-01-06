@@ -28,7 +28,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.globl _AsmWbinvd
-_AsmWbinvd:
+.globl ASM_PFX(AsmWbinvd)
+ASM_PFX(AsmWbinvd):
     wbinvd
     ret

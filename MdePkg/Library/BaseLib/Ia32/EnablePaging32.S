@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalX86EnablePaging32
+.globl ASM_PFX(InternalX86EnablePaging32)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -33,7 +33,7 @@
 #   IN      VOID                      *NewStack
 #   );
 #------------------------------------------------------------------------------
-_InternalX86EnablePaging32:
+ASM_PFX(InternalX86EnablePaging32):
     movl    4(%esp), %ebx
     movl    8(%esp), %ecx
     movl    12(%esp), %edx
