@@ -11,22 +11,22 @@
 #*
 #******************************************************************************
 
-.globl _OrigVector
-.globl _InterruptEntryStub
-.globl _StubSize
-.globl _CommonIdtEntry
-.globl _FxStorSupport
+.globl ASM_PFX(OrigVector)
+.globl ASM_PFX(InterruptEntryStub)
+.globl ASM_PFX(StubSize)
+.globl ASM_PFX(CommonIdtEntry)
+.globl ASM_PFX(FxStorSupport)
 
-_AppEsp:         .long   0x11111111 # ?
-_DebugEsp:       .long   0x22222222 # ?
-_ExtraPush:      .long   0x33333333 # ?
-_ExceptData:     .long   0x44444444 # ?
-_Eflags:         .long   0x55555555 # ?
-_OrigVector:     .long   0x66666666 # ?
-_StubSize:       .long   _InterruptEntryStubEnd - _InterruptEntryStub
+ASM_PFX(AppEsp):         .long   0x11111111 # ?
+ASM_PFX(DebugEsp):       .long   0x22222222 # ?
+ASM_PFX(ExtraPush):      .long   0x33333333 # ?
+ASM_PFX(ExceptData):     .long   0x44444444 # ?
+ASM_PFX(Eflags):         .long   0x55555555 # ?
+ASM_PFX(OrigVector):     .long   0x66666666 # ?
+ASM_PFX(StubSize):       .long   ASM_PFX(InterruptEntryStubEnd) - ASM_PFX(InterruptEntryStub)
 
-.globl _FxStorSupport
-_FxStorSupport:
+.globl ASM_PFX(FxStorSupport)
+ASM_PFX(FxStorSupport):
         push   %ebx
         mov    $0x1,%eax
         cpuid  
@@ -36,8 +36,8 @@ _FxStorSupport:
         pop    %ebx
         ret    
 
-.globl _GetIdtr
-_GetIdtr:
+.globl ASM_PFX(GetIdtr)
+ASM_PFX(GetIdtr):
         push   %ebp
         mov    %esp,%ebp
         add    $0xfffffff8,%esp
@@ -46,8 +46,8 @@ _GetIdtr:
         leave  
         ret    
 
-.globl _WriteInterruptFlag
-_WriteInterruptFlag:
+.globl ASM_PFX(WriteInterruptFlag)
+ASM_PFX(WriteInterruptFlag):
         push   %ebp
         mov    %esp,%ebp
         pushf  
@@ -56,15 +56,15 @@ _WriteInterruptFlag:
         shr    $0x9,%eax
         mov    0x8(%ebp),%ecx
         or     %ecx,%ecx
-        jne    _WriteInterruptFlag+0x17
+        jne    ASM_PFX(WriteInterruptFlag+0x17)
         cli    
-        jmp    _WriteInterruptFlag+0x18
+        jmp    ASM_PFX(WriteInterruptFlag+0x18)
         sti    
         leave  
         ret    
 
-.globl _Vect2Desc
-_Vect2Desc:
+.globl ASM_PFX(Vect2Desc)
+ASM_PFX(Vect2Desc):
         push   %ebp
         mov    %esp,%ebp
         mov    0xc(%ebp),%eax
@@ -77,58 +77,58 @@ _Vect2Desc:
         leave  
         ret    
 
-.globl _InterruptEntryStub
-_InterruptEntryStub:
+.globl ASM_PFX(InterruptEntryStub)
+ASM_PFX(InterruptEntryStub):
         mov    %esp,0x0
         mov    $0x0,%esp
         push   $0x0
-        jmp    _CommonIdtEntry
-.globl _InterruptEntryStubEnd
-_InterruptEntryStubEnd:
+        jmp    ASM_PFX(CommonIdtEntry)
+.globl ASM_PFX(InterruptEntryStubEnd)
+ASM_PFX(InterruptEntryStubEnd):
 
-.globl _CommonIdtEntry
-_CommonIdtEntry:
+.globl ASM_PFX(CommonIdtEntry)
+ASM_PFX(CommonIdtEntry):
         pusha  
         pushf  
         pop    %eax
         mov    %eax,0x0
         cmpl   $0x8,0x0
-        jne    _CommonIdtEntry+0x20
+        jne    ASM_PFX(CommonIdtEntry+0x20)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0xa,0x0
-        jne    _CommonIdtEntry+0x35
+        jne    ASM_PFX(CommonIdtEntry+0x35)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0xb,0x0
-        jne    _CommonIdtEntry+0x4a
+        jne    ASM_PFX(CommonIdtEntry+0x4a)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0xc,0x0
-        jne    _CommonIdtEntry+0x5f
+        jne    ASM_PFX(CommonIdtEntry+0x5f)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0xd,0x0
-        jne    _CommonIdtEntry+0x74
+        jne    ASM_PFX(CommonIdtEntry+0x74)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0xe,0x0
-        jne    _CommonIdtEntry+0x89
+        jne    ASM_PFX(CommonIdtEntry+0x89)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         cmpl   $0x11,0x0
-        jne    _CommonIdtEntry+0x9e
+        jne    ASM_PFX(CommonIdtEntry+0x9e)
         movl   $0x1,0x0
-        jmp    _CommonIdtEntry+0xa8
+        jmp    ASM_PFX(CommonIdtEntry+0xa8)
         movl   $0x0,0x0
         cmpl   $0x1,0x0
-        jne    _CommonIdtEntry+0xc8
+        jne    ASM_PFX(CommonIdtEntry+0xc8)
         mov    0x0,%eax
         mov    (%eax),%ebx
         mov    %ebx,0x0
         add    $0x4,%eax
         mov    %eax,0x0
-        jmp    _CommonIdtEntry+0xd2
+        jmp    ASM_PFX(CommonIdtEntry+0xd2)
         movl   $0x0,0x0
         mov    0xc(%esp),%eax
         mov    %eax,0x0
@@ -199,7 +199,7 @@ _CommonIdtEntry:
         push   %eax
         mov    0x0,%eax
         push   %eax
-        call   _CommonIdtEntry+0x184
+        call   ASM_PFX(CommonIdtEntry+0x184)
         add    $0x8,%esp
         add    $0x4,%esp
         mov    %esp,%esi
@@ -239,7 +239,7 @@ _CommonIdtEntry:
         mov    0x0,%eax
         add    $0xc,%eax
         cmp    %eax,%ebx
-        je     _CommonIdtEntry+0x202
+        je     ASM_PFX(CommonIdtEntry+0x202)
         mov    0x0,%eax
         mov    (%eax),%ecx
         mov    %ecx,(%ebx)

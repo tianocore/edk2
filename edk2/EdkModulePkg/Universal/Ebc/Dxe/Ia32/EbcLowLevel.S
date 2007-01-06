@@ -10,8 +10,8 @@
 #*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 #*                                                                          
 #****************************************************************************
-.globl _EbcLLCALLEXNative
-_EbcLLCALLEXNative:
+.globl ASM_PFX(EbcLLCALLEXNative)
+ASM_PFX(EbcLLCALLEXNative):
         push   %ebp
         mov    %esp,%ebp
         mov    0x8(%esp),%ecx
@@ -23,16 +23,16 @@ _EbcLLCALLEXNative:
         pop    %ebp
         ret    
 
-.globl _EbcLLGetEbcEntryPoint
-_EbcLLGetEbcEntryPoint:
+.globl ASM_PFX(EbcLLGetEbcEntryPoint)
+ASM_PFX(EbcLLGetEbcEntryPoint):
         ret    
 
-.globl _EbcLLGetStackPointer
-_EbcLLGetStackPointer:
+.globl ASM_PFX(EbcLLGetStackPointer)
+ASM_PFX(EbcLLGetStackPointer):
         mov    %esp,%eax
         add    $0x4,%eax
         ret    
 
-.globl _EbcLLGetReturnValue
-_EbcLLGetReturnValue:
+.globl ASM_PFX(EbcLLGetReturnValue)
+ASM_PFX(EbcLLGetReturnValue):
         ret    
