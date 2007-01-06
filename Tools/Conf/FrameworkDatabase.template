@@ -23,11 +23,13 @@
     <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
     <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
     <Filename>EdkShellBinPkg/EdkShellBinPkg.spd</Filename>
+    <Filename>EdkUnixPkg/EdkUnixPkg.spd</Filename>
   </PackageList>
   <PlatformList>
     <Filename>MdePkg/MdePkg.fpd</Filename>
     <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
     <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
+    <Filename>EdkUnixPkg/Unix.fpd</Filename>
   </PlatformList>
   <FarList>
     <Filename FarGuid="91062dfe-0bce-45b1-b3ad-3387d8d29d3f">Dummy</Filename>
