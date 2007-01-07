@@ -313,18 +313,28 @@ MapMemory (
   INTN   prot,
   INTN   flags)
 {
-  static UINTN base = 0x40000000;
-  const UINTN align = (1 << 24);
-  void *res;
+  STATIC UINTN base = 0x40000000;
+  CONST UINTN align = (1 << 24);
+  VOID *res;
+  BOOLEAN isAligned = 0;
 
-  res = mmap ((void *)base, length, prot, flags, fd, 0);
-  if (res == MAP_FAILED)
-    return NULL;
-
-  // Guard page.
-  base += length + 4096;
-  base = (base + align - 1) & ~(align - 1);
-
+  //
+  // Try to get an aligned block somewhere in the address space of this
+  // process.
+  //
+  while((!isAligned) && (base != 0)) {
+    res = mmap ((void *)base, length, prot, flags, fd, 0);
+    if (res == MAP_FAILED) {
+      return NULL;
+    }
+    if ((((UINTN)res) & ~(align-1)) == (UINTN)res) {
+      isAligned=1;
+    }
+    else {
+      munmap(res, length);
+      base += align;
+    }
+  }
   return res;
 }
 
