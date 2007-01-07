@@ -21,6 +21,8 @@ Package Contents
   EdkFatBinPkg   - Binary DXE drivers for the Fat 32 file system
   EdkShellBinPkg - Binary Shell applications and commands
   EdkNt32Pkg     - NT32 Emulation platform reference
+  EdkUnixPkg     - Posix/Unix Emulation platform reference (Currently this
+                   builds only on ia32 Linux, but is meant to be portable.)
 
 Note: MDE and MDK that appear in other documentation refer to the MdePkg and
 Tools packages, respectively.  While, these two packages are the minimum 
@@ -213,10 +215,10 @@ Cygwin, Linux, and many other POSIX-compliant host operating environments. To
 compile the custom gcc tool chain, you need the following tools on your host
 computer: bash, gcc, gmake, curl (or wget).
 
-Only the MdePkg and EdkModulePkg are currently supported by gcc builds. Other
-builds, such as the EdkNt32Pkg, will not compile with gcc. By default, the edk2
-will try to build the NT32.fpd, which is not supported by gcc. So, you need to
-change the Tools/Conf/target.txt.
+Only the MdePkg, EdkModulePkg and EdkUnixPkg are currently supported by gcc
+builds. Other builds, such as the EdkNt32Pkg, will not compile with gcc. By
+default, the edk2 will try to build the NT32.fpd, which is not supported by
+gcc. So, you need to change the Tools/Conf/target.txt.
 
 The cross-compile build script has been tested on Cygwin, OS X and Linux. You
 should expect to hack on these scripts to make them work on your system. You
@@ -318,7 +320,36 @@ not support the EFIAPI calling convention the x64 tools do not support generatin
 PE32+ image.  The EFIAPI calling convention is very similar to the Microsoft x64 
 calling convention.
 
+We have added prelinary support for the MinGW64 Tool chain. This gcc tool
+chain is ported to follow the Microsft X64 ABI, and therefore is compatible
+with the EFI specification.
+
 On Itanium?Processors the gcc compiler does not support generating a PE32+ image.
+
+----------------------------------------
+A Word on EdkUnixPkg -- The Unix simulator
+----------------------------------------
+
+A unix port of the Nt32 simulator has been added to the project. It currently
+builds and runs on 32 bit Linux, but should be portable to other Unix
+variants. In order to build it, you should use the ELFGCC tool chain defintion
+in tools_def.txt, which is set in target.txt. These are two settings to make
+in Tools/Conf/target.txt:
+
+ACTIVE_PLATFORM       = EdkUnixPkg/Unix.fpd
+TOOL_CHAIN_TAG        = ELFGCC
+
+Once that is setup, type build, and then you will end up with the simulator in
+Build/Unix/DEBUG_ELFGCC/IA32/SecMain.exe. 
+
+In order to use the gdb debugger with the simulator, you may need to load the
+correct symbol file for the various modules that are loaded. For example,
+
+add-symbol-file EdkModulePkg/Bus/Pci/PciBus/Dxe/PciBus/DEBUG/./PciBus.dll
+0x45dc6000
+
+You can see the names of the symbol files (they are in ELF format even though
+the extension is .dll) printed on the screen as the simulator comes up.
 
 -----------------------
 Notes on Documentation
@@ -687,4 +718,4 @@ Of particular note:
 Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4890, no
 virus detected.
 
-vim:tw=78:ts=2:fo=qa:com=fb\:- :ai
+vim:tw=78:ts=2:com=fb\:- :ai
