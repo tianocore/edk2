@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Console based on Win32 APIs. 
+  Console based on Posix APIs. 
 
 --*/
 

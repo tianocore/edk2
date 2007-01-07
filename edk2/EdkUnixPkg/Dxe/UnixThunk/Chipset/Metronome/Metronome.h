@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  NT Emulation Metronome Architectural Protocol Driver as defined in DXE CIS
+  UNIX Emulation Metronome Architectural Protocol Driver as defined in DXE CIS
 
 --*/
 

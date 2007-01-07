@@ -14,10 +14,10 @@ Module Name:
   SecMain.c
 
 Abstract:
-  WinNt emulator of SEC phase. It's really a Win32 application, but this is
-  Ok since all the other modules for NT32 are NOT Win32 applications.
+  WinNt emulator of SEC phase. It's really a Posix application, but this is
+  Ok since all the other modules for NT32 are NOT Posix applications.
 
-  This program processes Windows environment variables and figures out
+  This program processes host environment variables and figures out
   what the memory layout will be, how may FD's will be loaded and also
   what the boot mode is.
 
@@ -25,9 +25,9 @@ Abstract:
   is a list of PPI's produced by the SEC that are availble for usage in PEI.
 
   This code produces 128 K of temporary memory for the PEI stack by opening a
-  Windows file and mapping it directly to memory addresses.
+  host file and mapping it directly to memory addresses.
 
-  The system.cmd script is used to set windows environment variables that drive
+  The system.cmd script is used to set host environment variables that drive
   the configuration opitons of the SEC.
 
 --*/
@@ -103,7 +103,7 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
 //
 // Default information about where the FD is located.
 //  This array gets filled in with information from EFI_FIRMWARE_VOLUMES
-//  EFI_FIRMWARE_VOLUMES is a Windows environment variable set by system.cmd.
+//  EFI_FIRMWARE_VOLUMES is a host environment variable set by system.cmd.
 //  The number of array elements is allocated base on parsing
 //  EFI_FIRMWARE_VOLUMES and the memory is never freed.
 //
@@ -147,7 +147,7 @@ main (
 /*++
 
 Routine Description:
-  Main entry point to SEC for WinNt. This is a Windows program
+  Main entry point to SEC for WinNt. This is a unix program
 
 Arguments:
   Argc - Number of command line arguments
@@ -176,7 +176,7 @@ Returns:
   MemorySizeStr      = (CHAR16 *)PcdGetPtr (PcdUnixMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *)PcdGetPtr (PcdUnixFirmwareVolume);
 
-  printf ("\nEDK SEC Main NT Emulation Environment from www.TianoCore.org\n");
+  printf ("\nEDK SEC Main UNIX Emulation Environment from www.TianoCore.org\n");
 
   //
   // Allocate space for gSystemMemory Array
@@ -485,7 +485,7 @@ Routine Description:
   This routine produces the ReportStatusCode PEI service. It's passed
   up to the PEI Core via a PPI. T
 
-  This code currently uses the NT clib printf. This does not work the same way
+  This code currently uses the UNIX clib printf. This does not work the same way
   as the EFI Print (), as %t, %g, %s as Unicode are not supported.
 
 Arguments:
@@ -647,7 +647,7 @@ Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
   It allows discontiguous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
-  parsing the Windows environment variable EFI_MEMORY_SIZE.
+  parsing the host environment variable EFI_MEMORY_SIZE.
   The size comes from the varaible and the address comes from the call to
   WinNtOpenFile.
 
@@ -689,7 +689,7 @@ SecWinNtWinNtThunkAddress (
 /*++
 
 Routine Description:
-  Since the SEC is the only Windows program in stack it must export
+  Since the SEC is the only Unix program in stack it must export
   an interface to do Win API calls. That's what the WinNtThunk address
   is for. gWinNt is initailized in WinNtThunk.c.
 
@@ -744,7 +744,7 @@ Returns:
     return Status;
   }
   //
-  // Allocate space in NT (not emulator) memory. Extra space is for alignment
+  // Allocate space in UNIX (not emulator) memory. Extra space is for alignment
   //
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) malloc ((UINTN) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)));
   if (ImageContext.ImageAddress == 0) {
@@ -789,7 +789,7 @@ SecWinNtFdAddress (
 
 Routine Description:
   Return the FD Size and base address. Since the FD is loaded from a
-  file into Windows memory only the SEC will know it's address.
+  file into host memory only the SEC will know it's address.
 
 Arguments:
   Index  - Which FD, starts at zero.

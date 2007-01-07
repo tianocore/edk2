@@ -15,8 +15,8 @@ Module Name:
 
 Abstract:
 
-  Produce Simple File System abstractions for directories on your PC using Win32 APIs.
-  The configuration of what devices to mount or emulate comes from NT 
+  Produce Simple File System abstractions for directories on your PC using Posix APIs.
+  The configuration of what devices to mount or emulate comes from UNIX 
   environment variables. The variables must be visible to the Microsoft* 
   Developer Studio for them to work.
 
@@ -1398,7 +1398,7 @@ Returns:
   return EFI_SUCCESS;
 
   //
-  // bugbug: need to access windows error reporting
+  // bugbug: need to access unix error reporting
   //
 }
 
@@ -2100,7 +2100,7 @@ Returns:
   return PrivateFile->UnixThunk->FSync (PrivateFile->fd) == 0 ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 
   //
-  // bugbug: - Use Windows error reporting.
+  // bugbug: - Use Unix error reporting.
   //
 }
 

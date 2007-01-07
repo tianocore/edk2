@@ -53,7 +53,7 @@ Returns:
   DEBUG ((EFI_D_ERROR, "Unix Autoscan PEIM Loaded\n"));
 
   //
-  // Get the PEI NT Autoscan PPI
+  // Get the PEI UNIX Autoscan PPI
   //
   Status = (**PeiServices).LocatePpi (
                             PeiServices,

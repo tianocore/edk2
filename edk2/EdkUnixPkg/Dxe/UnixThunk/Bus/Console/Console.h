@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Console based on Win32 APIs.
+  Console based on Posix APIs.
 
   This file attaches a SimpleTextIn protocol to a previously open window.
   
@@ -44,7 +44,7 @@ typedef struct {
   EFI_UNIX_THUNK_PROTOCOL     *UnixThunk;
 
   //
-  // SimpleTextOut Private Data including Win32 types.
+  // SimpleTextOut Private Data including Posix types.
   //
   //  HANDLE                        NtOutHandle;
   //  HANDLE                        NtInHandle;

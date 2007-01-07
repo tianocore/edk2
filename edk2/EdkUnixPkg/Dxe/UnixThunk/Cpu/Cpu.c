@@ -70,7 +70,7 @@ UnixFlushCpuDataCache (
 Routine Description:
 
   This routine would provide support for flushing the CPU data cache.
-  In the case of NT emulation environment, this flushing is not necessary and
+  In the case of UNIX emulation environment, this flushing is not necessary and
   is thus not implemented.
 
 Arguments:
@@ -92,13 +92,13 @@ Returns:
 {
   if (FlushType == EfiCpuFlushTypeWriteBackInvalidate) {
     //
-    // Only WB flush is supported. We actually need do nothing on NT emulator
+    // Only WB flush is supported. We actually need do nothing on UNIX emulator
     // environment. Classify this to follow EFI spec
     //
     return EFI_SUCCESS;
   }
   //
-  // Other flush types are not supported by NT emulator
+  // Other flush types are not supported by UNIX emulator
   //
   return EFI_UNSUPPORTED;
 }

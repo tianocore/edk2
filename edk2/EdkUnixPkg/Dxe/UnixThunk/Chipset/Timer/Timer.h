@@ -15,8 +15,8 @@ Module Name:
 
 Abstract:
 
-  NT Emulation Architectural Protocol Driver as defined in Tiano.
-  This Timer module uses an NT Thread to simulate the timer-tick driven
+  UNIX Emulation Architectural Protocol Driver as defined in Tiano.
+  This Timer module uses an UNIX Thread to simulate the timer-tick driven
   timer service.
 
 --*/

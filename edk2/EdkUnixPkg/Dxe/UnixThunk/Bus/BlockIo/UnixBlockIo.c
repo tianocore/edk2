@@ -15,8 +15,8 @@ Module Name:
 
 Abstract:
 
-  Produce block IO abstractions for real devices on your PC using Win32 APIs.
-  The configuration of what devices to mount or emulate comes from NT 
+  Produce block IO abstractions for real devices on your PC using Posix APIs.
+  The configuration of what devices to mount or emulate comes from UNIX 
   environment variables. The variables must be visible to the Microsoft* 
   Developer Studio for them to work.
 
@@ -27,7 +27,7 @@ Abstract:
   <block count> - Decimal number of blocks a device supports.
   <block size>  - Decimal number of bytes per block.
 
-  NT envirnonment variable contents. '<' and '>' are not part of the variable, 
+  UNIX envirnonment variable contents. '<' and '>' are not part of the variable, 
   they are just used to make this help more readable. There should be no 
   spaces between the ';'. Extra spaces will break the variable. A '!' is 
   used to seperate multiple devices in a variable.
@@ -47,7 +47,7 @@ Abstract:
     A 1.44MB emulated floppy with a block size of 1024 would look like:
     EFI_UNIX_VIRTUAL_DISKS=RW;1440;1024
 
-  Physical Disks: These devices use NT to open a real device in your system
+  Physical Disks: These devices use UNIX to open a real device in your system
 
     Thus a 120 MB floppy would look like:
     EFI_UNIX_PHYSICAL_DISKS=B:RW;245760;512
