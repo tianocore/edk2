@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Console based on Win32 APIs. 
+  Console based on Posix APIs. 
 
   This file attaches a SimpleTextIn protocol to a previously open window.
   

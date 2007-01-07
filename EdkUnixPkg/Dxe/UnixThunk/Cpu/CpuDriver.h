@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  NT Emulation Architectural Protocol Driver as defined in Tiano.
+  UNIX Emulation Architectural Protocol Driver as defined in Tiano.
 
 --*/
 

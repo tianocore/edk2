@@ -15,7 +15,7 @@ Module Name:
    
 Abstract:
 
-  Tiano PEIM to provide the platform support functionality within Windows
+  Tiano PEIM to provide the platform support functionality within unix
 
 --*/
 

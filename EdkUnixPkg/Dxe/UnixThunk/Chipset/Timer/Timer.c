@@ -15,9 +15,9 @@ Module Name:
 
 Abstract:
 
-  NT Emulation Timer Architectural Protocol Driver as defined in DXE CIS
+  UNIX Emulation Timer Architectural Protocol Driver as defined in DXE CIS
 
-  This Timer module uses an NT Thread to simulate the timer-tick driven
+  This Timer module uses an UNIX Thread to simulate the timer-tick driven
   timer service.  In the future, the Thread creation should possibly be 
   abstracted by the CPU architectural protocol
 

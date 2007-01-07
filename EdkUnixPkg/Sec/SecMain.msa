@@ -85,7 +85,7 @@
       <C_Name>PcdUnixMemorySizeForSecMain</C_Name>
       <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
-        the size of PcdUnixMemorySizeForSecMain in windows platform.</HelpText>
+        the size of PcdUnixMemorySizeForSecMain in host platform.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdUnixFirmwareVolume</C_Name>

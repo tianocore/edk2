@@ -132,7 +132,7 @@
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdUnixFileSystem</C_Name>
       <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the windows directory who will be mounted as
+      <HelpText>This PCD defines the unix directory who will be mounted as
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>

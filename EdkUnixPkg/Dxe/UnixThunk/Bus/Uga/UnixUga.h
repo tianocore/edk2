@@ -136,7 +136,7 @@ Returns:
 ;
 
 //
-// EFI 1.1 driver model prototypes for Win NT UGA
+// EFI 1.1 driver model prototypes for Win UNIX UGA
 //
 
 EFI_STATUS

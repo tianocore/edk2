@@ -15,9 +15,9 @@ Module Name:
 
 Abstract:
 
-This following section documents the envirnoment variables for the Win NT 
+This following section documents the envirnoment variables for the Win UNIX 
 build.  These variables are used to define the (virtual) hardware 
-configuration of the NT environment
+configuration of the UNIX environment
 
 A ! can be used to seperate multiple instances in a variable. Each 
 instance represents a seperate hardware device. 
@@ -35,7 +35,7 @@ EFI_UNIX_UGA            - Builds UGA Windows of Width and Height
  <block count> - Decimal number of blocks a device supports.
  <block size>  - Decimal number of bytes per block.
 
- NT envirnonment variable contents. '<' and '>' are not part of the variable, 
+ UNIX envirnonment variable contents. '<' and '>' are not part of the variable, 
  they are just used to make this help more readable. There should be no 
  spaces between the ';'. Extra spaces will break the variable. A '!' is  
  used to seperate multiple devices in a variable.
@@ -55,7 +55,7 @@ EFI_UNIX_UGA            - Builds UGA Windows of Width and Height
    A 1.44MB emulated floppy with a block size of 1024 would look like:
    EFI_UNIX_VIRTUAL_DISKS=RW;1440;1024
 
- Physical Disks: These devices use NT to open a real device in your system
+ Physical Disks: These devices use UNIX to open a real device in your system
 
    Thus a 120 MB floppy would look like:
    EFI_UNIX_PHYSICAL_DISKS=B:RW;245760;512
@@ -115,7 +115,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gUnixBusDriverBinding = {
 #define UNIX_PCD_ARRAY_SIZE (sizeof(mPcdEnvironment)/sizeof(UNIX_PCD_ENTRY))
 
 //
-// Table to map NT Environment variable to the GUID that should be in
+// Table to map UNIX Environment variable to the GUID that should be in
 // device path.
 //
 static UNIX_PCD_ENTRY  mPcdEnvironment[] = {

@@ -14,7 +14,7 @@ Module Name:
   SecMain.h
 
 Abstract:
-  Include file for Windows API based SEC
+  Include file for host API based SEC
 
 --*/
 

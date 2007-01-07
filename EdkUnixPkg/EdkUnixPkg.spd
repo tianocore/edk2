@@ -261,7 +261,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
-      <HelpText>This PCD defines the windows directory who will be mounted as 
+      <HelpText>This PCD defines the host directory who will be mounted as 
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
@@ -273,7 +273,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
-        the size of PcdUnixMemorySize in windows platform.
+        the size of PcdUnixMemorySize in host platform.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -324,7 +324,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>L"..\\Fv\\Fv_Recovery.fd"</DefaultValue>
-      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
+      <HelpText>This PCD defines the FD file path string. Simulator will load the FD file and execute.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdUnixConsole</C_Name>
@@ -354,7 +354,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
-        the size of PcdUnixMemorySizeForSecMain in windows platform.</HelpText>
+        the size of PcdUnixMemorySizeForSecMain in host platform.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

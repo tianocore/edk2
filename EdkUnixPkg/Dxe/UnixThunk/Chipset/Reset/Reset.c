@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Reset Architectural Protocol as defined in Tiano under NT Emulation
+  Reset Architectural Protocol as defined in Tiano under UNIX Emulation
 
 --*/
 

@@ -15,8 +15,8 @@ Module Name:
 
 Abstract:
 
-  Produce block IO abstractions for real devices on your PC using Win32 APIs.
-  The configuration of what devices to mount or emulate comes from NT 
+  Produce block IO abstractions for real devices on your PC using Posix APIs.
+  The configuration of what devices to mount or emulate comes from UNIX 
   environment variables. The variables must be visible to the Microsoft* 
   Developer Studio for them to work.
 

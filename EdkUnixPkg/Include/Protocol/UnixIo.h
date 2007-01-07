@@ -36,7 +36,7 @@ extern EFI_GUID gEfiUnixIoProtocolGuid;
 
 //
 // The following GUIDs are used in EFI_UNIX_IO_PROTOCOL_GUID
-// Device paths. They map 1:1 with NT envirnment variables. The variables
+// Device paths. They map 1:1 with UNIX envirnment variables. The variables
 // define what virtual hardware the emulator/UnixBusDriver will produce.
 //
 //
