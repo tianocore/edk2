@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004-2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -46,8 +46,10 @@ Abstract:
 #include "EfiUtilityMsgs.h"
 #include "SimpleFileParsing.h"
 
-#define UTILITY_NAME    "GenFfsFile"
-#define TOOLVERSION     "0.32"
+#define UTILITY_NAME            "GenFfsFile"
+#define UTILITY_MAJOR_VERSION   0
+#define UTILITY_MINOR_VERSION   32
+
 #define MAX_ARRAY_SIZE  100
 
 static
@@ -83,7 +85,13 @@ ProcessCommandLineArgs (
 
 static
 void
-PrintUsage (
+Version (
+  void
+  );
+
+static
+void
+Usage (
   void
   );
 
@@ -135,8 +143,33 @@ Returns:
 }
 
 static
+void 
+Version(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for this utility.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -EDK utility to generate a Firmware File System files.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+static
 void
-PrintUsage (
+Usage (
   void
   )
 /*++
@@ -155,7 +188,9 @@ Returns:
 
 --*/
 {
-  printf ("Usage:\n");
+  Version();
+  
+  printf ("\nUsage:\n");
   printf (UTILITY_NAME " -b \"build directory\" -p1 \"package1.inf\" -p2 \"package2.inf\" -v\n");
   printf ("   -b \"build directory\":\n ");
   printf ("       specifies the full path to the component build directory.\n");
@@ -2545,14 +2580,27 @@ Returns:
   //
   // If no args, then print usage instructions and return an error
   //
-  if (Argc == 1) {
-    PrintUsage ();
-    return STATUS_ERROR;
-  }
-
-  memset (&mGlobals, 0, sizeof (mGlobals));
   Argc--;
   Argv++;
+  
+  if (Argc < 1) {
+    Usage ();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+  
+  memset (&mGlobals, 0, sizeof (mGlobals));
+ 
   while (Argc > 0) {
     if (strcmpi (Argv[0], "-b") == 0) {
       //
@@ -2617,17 +2665,17 @@ Returns:
       //
       // OPTION: -h      help
       //
-      PrintUsage ();
+      Usage ();
       return STATUS_ERROR;
     } else if (strcmpi (Argv[0], "-?") == 0) {
       //
       // OPTION:  -?      help
       //
-      PrintUsage ();
+      Usage ();
       return STATUS_ERROR;
     } else {
       Error (NULL, 0, 0, Argv[0], "unrecognized option");
-      PrintUsage ();
+      Usage ();
       return STATUS_ERROR;
     }
 

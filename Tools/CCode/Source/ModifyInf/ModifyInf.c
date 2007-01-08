@@ -333,7 +333,7 @@ Returns:
   FILE  *fpin;
   FILE  *fpout;
 
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     return -1;
   }

@@ -36,6 +36,9 @@ Abstract:
 
 
 #define UTILITY_NAME            "GenSection"
+#define UTILITY_MAJOR_VERSION   0
+#define UTILITY_MINOR_VERSION   1
+
 
 #define PARAMETER_NOT_SPECIFIED "Parameter not specified"
 #define MAXIMUM_INPUT_FILE_NUM  10
@@ -76,15 +79,42 @@ char      *GUIDedSectionTypeName[]  = { "CRC32" };
 EFI_GUID  gEfiCrc32SectionGuid      = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
 static
+void 
+Version(
+  void
+  )
+/*++
+
+Routine Description:
+
+  Print out version information for this utility.
+
+Arguments:
+
+  None
+  
+Returns:
+
+  None
+  
+--*/ 
+{
+  printf ("%s v%d.%d -Utility to create output file with formed section per the FV spec.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+static
 VOID
-PrintUsageMessage (
+Usage (
   VOID
   )
 {
   UINTN SectionType;
   UINTN DisplayCount;
 
-  printf ("Usage: "UTILITY_NAME "  -i InputFile -o OutputFile -s SectionType [SectionType params]\n\n");
+  Version();
+  
+  printf ("\nUsage: "UTILITY_NAME "  -i InputFile -o OutputFile -s SectionType [SectionType params]\n\n");
   printf ("    Where SectionType is one of the following section types:\n\n");
 
   DisplayCount = 0;
@@ -659,10 +689,23 @@ Returns:
   Status                = EFI_SUCCESS;
 
   SetUtilityName (UTILITY_NAME);
+  
   if (argc == 1) {
-    PrintUsageMessage ();
+    Usage ();
     return STATUS_ERROR;
   }
+ 
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+
   //
   // Parse command line
   //
@@ -758,7 +801,7 @@ Returns:
       Index++;
       ParamDigitalSignature = argv[Index];
     } else if (strcmpi (argv[Index], "-?") == 0) {
-      PrintUsageMessage ();
+      Usage ();
       return STATUS_ERROR;
     } else {
       Error (NULL, 0, 0, argv[Index], "unknown option");
@@ -781,7 +824,7 @@ Returns:
       SectionSubType = EFI_STANDARD_COMPRESSION;
     } else {
       Error (NULL, 0, 0, ParamSectionSubType, "unknown compression type");
-      PrintUsageMessage ();
+      Usage ();
       return GetUtilityStatus ();
     }
   } else if (stricmp (ParamSectionType, SectionTypeName[EFI_SECTION_GUID_DEFINED]) == 0) {
@@ -791,7 +834,7 @@ Returns:
       SectionSubType = EFI_SECTION_CRC32_GUID_DEFINED;
     } else {
       Error (NULL, 0, 0, ParamSectionSubType, "unknown GUID defined section type", ParamSectionSubType);
-      PrintUsageMessage ();
+      Usage ();
       return GetUtilityStatus ();
     }
   } else if (stricmp (ParamSectionType, SectionTypeName[EFI_SECTION_PE32]) == 0) {
@@ -808,7 +851,7 @@ Returns:
     Index             = sscanf (ParamVersion, "%d", &VersionNumber);
     if (Index != 1 || VersionNumber < 0 || VersionNumber > 65565) {
       Error (NULL, 0, 0, ParamVersion, "illegal version number");
-      PrintUsageMessage ();
+      Usage ();
       return GetUtilityStatus ();
     }
 
@@ -820,7 +863,7 @@ Returns:
     InputFileRequired = FALSE;
     if (strcmp (AuxString, PARAMETER_NOT_SPECIFIED) == 0) {
       Error (NULL, 0, 0, "user interface string not specified", NULL);
-      PrintUsageMessage ();
+      Usage ();
       return GetUtilityStatus ();
     }
   } else if (stricmp (ParamSectionType, SectionTypeName[EFI_SECTION_COMPATIBILITY16]) == 0) {
@@ -835,7 +878,7 @@ Returns:
     SectionType = EFI_SECTION_PEI_DEPEX;
   } else {
     Error (NULL, 0, 0, ParamSectionType, "unknown section type");
-    PrintUsageMessage ();
+    Usage ();
     return GetUtilityStatus ();
   }
   //

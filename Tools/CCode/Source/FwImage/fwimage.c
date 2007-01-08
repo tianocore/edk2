@@ -762,7 +762,7 @@ Returns:
   TimeStamp         = 0;
   TimeStampPresent  = FALSE;
 
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     return STATUS_ERROR;
   }

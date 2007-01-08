@@ -121,7 +121,7 @@ Returns:
   SrcBuffer             = DstBuffer = NULL;
   infile                = outfile = NULL;
 
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     goto Done;
   }
