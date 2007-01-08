@@ -31,6 +31,10 @@ public class ModuleIdentification extends Identification {
     
     private boolean isLibrary = false;
 
+    private String constructor = "";
+
+    private String destructor = "";
+
     /**
       @param guid Guid
       @param version Version
@@ -188,5 +192,25 @@ public class ModuleIdentification extends Identification {
     
     public String getName() {
         return name;
+    }
+
+    public boolean hasConstructor() {
+        return constructor != "";
+    }
+
+    public boolean hasDestructor() {
+        return destructor != "";
+    }
+
+    public void setConstructor(String name) {
+        if (name != null) {
+            constructor = name;
+        }
+    }
+
+    public void setDestructor(String name) {
+        if (name != null) {
+            destructor = name;
+        }
     }
 }

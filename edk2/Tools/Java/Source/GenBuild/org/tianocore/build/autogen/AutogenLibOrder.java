@@ -40,18 +40,28 @@ public class AutogenLibOrder {
     ///
     /// The map of library class and its library instance.
     ///
-    private Map<String, ModuleIdentification> libClassMap = new HashMap<String, ModuleIdentification>();
+    private Map<String, ModuleIdentification> libClassProducer = new HashMap<String, ModuleIdentification>();
 
     ///
-    /// The map of library instance and its implemet libraryClass.
+    /// The map of library instance and its consumed Library Classes.
     ///
-    private Map<ModuleIdentification, String[]> libInstanceMap = new HashMap<ModuleIdentification, String[]>();
+    private Map<ModuleIdentification, String[]> libInstanceConsumes = new HashMap<ModuleIdentification, String[]>();
+
+    ///
+    /// The map of library instance and its implemeted Library Classes.
+    ///
+    private Map<ModuleIdentification, String[]> libInstanceProduces = new HashMap<ModuleIdentification, String[]>();
+
+    ///
+    /// The map of library instance and its consumers.
+    ///
+    private Map<ModuleIdentification, HashSet<ModuleIdentification>> libInstanceConsumedBy = new HashMap<ModuleIdentification, HashSet<ModuleIdentification>>();
 
     ///
     /// List of library instance. It is String[3] list, String[0] is libraryName,
     /// String[1] is libraryConstructor name, String[2] is libDestructor name.
     ///
-    private List<LibraryInstanceNode> libInstanceList = new ArrayList<LibraryInstanceNode>();
+    private ModuleIdentification[] libInstanceList = null;
     
     /**
       Constructor function
@@ -62,35 +72,40 @@ public class AutogenLibOrder {
       @throws Exception
     **/
     AutogenLibOrder(ModuleIdentification[] libraryList, String arch) throws EdkException {
-        LibraryInstanceNode libInstanceNode;
+        ModuleIdentification libInstance;
         String[]       libClassDeclList = null;
         String[]       libClassConsmList = null;
-        
+
+        libInstanceList = new ModuleIdentification[libraryList.length];
         for (int i = 0; i < libraryList.length; i++) {
+            libInstance = libraryList[i];
+            libInstanceList[i] = libInstance;
             //
             // Add libraryInstance in to libInstanceList.
             // 
-            Map<String, XmlObject> libDoc = GlobalData.getDoc(libraryList[i], arch);
+            Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstance, arch);
             SurfaceAreaQuery saq = new SurfaceAreaQuery(libDoc);
-            libInstanceNode = new LibraryInstanceNode (libraryList[i],saq.getLibConstructorName(), saq.getLibDestructorName());
-            libInstanceList.add(libInstanceNode);
+            libInstance.setConstructor(saq.getLibConstructorName());
+            libInstance.setDestructor(saq.getLibDestructorName());
             
             //
             // Add library instance and consumed library class list to
-            // libInstanceMap.
+            // libInstanceConsumes.
             //
             libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
             if (libClassConsmList != null) {
+                /*
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
                     classStr[k] = libClassConsmList[k];
                 }
-                if (this.libInstanceMap.containsKey(libraryList[i])) {
+                */
+                if (this.libInstanceConsumes.containsKey(libInstance)) {
                     throw new AutoGenException(
                             libraryList[i].getName()
                                     + "-- this library instance already exists, please check the library instance list!");
                 } else {
-                    this.libInstanceMap.put(libraryList[i], classStr);
+                    this.libInstanceConsumes.put(libInstance, libClassConsmList);
                 }
             }
 
@@ -99,15 +114,33 @@ public class AutogenLibOrder {
             //
             libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
             if (libClassDeclList != null) {
+                this.libInstanceProduces.put(libInstance, libClassDeclList);
                 for (int j = 0; j < libClassDeclList.length; j++) {
-                    if (this.libClassMap.containsKey(libClassDeclList[j])) {
+                    if (this.libClassProducer.containsKey(libClassDeclList[j])) {
                         EdkLog.log(EdkLog.EDK_ERROR,libClassDeclList[j]
-                                + " class is already implement by "
-                                + this.libClassMap.get(libClassDeclList[j]));
+                                + " class is already implemented by "
+                                + this.libClassProducer.get(libClassDeclList[j]));
                         throw new AutoGenException("Library Class: " + libClassDeclList
                                 + " already has a library instance!");
                     } else {
-                        this.libClassMap.put(libClassDeclList[j], libraryList[i]);
+                        this.libClassProducer.put(libClassDeclList[j], libInstance);
+                    }
+                }
+            }
+        }
+
+        for (Iterator it = libClassProducer.keySet().iterator(); it.hasNext();) {
+            String className = (String)it.next();
+            libInstance = libClassProducer.get(className);
+            libInstanceConsumedBy.put(libInstance, new HashSet<ModuleIdentification>());
+
+            for (int k = 0; k < libraryList.length; ++k) {
+                ModuleIdentification consumer = libraryList[k];
+                String[] consumedClassList = libInstanceConsumes.get(consumer);
+
+                for (int l = 0; l < consumedClassList.length; ++l) {
+                    if (consumedClassList[l].equals(className)) {
+                        libInstanceConsumedBy.get(libInstance).add(consumer);
                     }
                 }
             }
@@ -116,190 +149,83 @@ public class AutogenLibOrder {
 
     /**
       orderLibInstance
-      
+
       This function reorder the library instance according the library class 
       dependency.
-      
+
       @return     List which content the ordered library instance.
     **/
-    List<ModuleIdentification> orderLibInstance() {
+    List<ModuleIdentification> orderLibInstance() throws EdkException {
         LinkedList<ModuleIdentification> orderList = new LinkedList<ModuleIdentification>();
-        for (int i = 0; i < libInstanceList.size(); ++i) {
-            ModuleIdentification current = libInstanceList.get(i).libId;
-            int insertPoint = orderList.size();
-            //
-            // check current library instance against orderred ones in orderList
-            // 
-            for (int j = 0; j < orderList.size(); ++j) {
-                ModuleIdentification old = orderList.get(j);
-                if (consumes(current, old)) {
-                    //
-                    // if current library instance consumes the one in orderList
-                    // it must be put after
-                    // 
-                    insertPoint = j + 1;
-                } else if (consumes(old, current)) {
-                    //
-                    // if current library instance is consumed by the one in orderList
-                    // it must be put before. And no further check is needed.
-                    // 
-                    insertPoint = j;
-                    break;
-                }
+        LinkedList<ModuleIdentification> noConsumerList = new LinkedList<ModuleIdentification>();
+
+        for (int i = 0; i < libInstanceList.length; ++i) {
+            if (libInstanceConsumedBy.get(libInstanceList[i]).size() == 0) {
+                noConsumerList.add(libInstanceList[i]);
             }
-            orderList.add(insertPoint, current);
         }
 
-        return orderList;
-    }
+        while (noConsumerList.size() > 0) {
+            ModuleIdentification n = noConsumerList.poll();
+            orderList.addFirst(n);
 
-    //
-    // Test if one library consumes another library
-    // 
-    private boolean consumes(ModuleIdentification lib1, ModuleIdentification lib2) {
-        LinkedList<ModuleIdentification> stack = new LinkedList<ModuleIdentification>();
-
-        stack.add(lib1);
-        int j = 0;
-        while (j < stack.size()) {
-            //
-            // get the last library instance in stack, which hasn't been checked
-            // 
-            ModuleIdentification lib = stack.get(j++);
-            //
-            // get the library classes consumed by it
-            // 
-            String[] consumedClasses = libInstanceMap.get(lib);
-            for (int i = 0; i < consumedClasses.length; ++i) {
-                //
-                // for each library class, find its corresponding library instance
-                // 
-                ModuleIdentification consumedLib = libClassMap.get(consumedClasses[i]);
-                //
-                // if the corresponding instance is the "lib2", we can say that
-                // "lib1"  consumes "lib2"
-                // 
-                if (consumedLib == lib2) {
-                    EdkLog.log(EdkLog.EDK_DEBUG, lib1 + "\n   consumes\n" + lib2 + "\n");
-                    return true;
+            String[] consumedClassList = libInstanceConsumes.get(n);
+            for (int i = 0; i < consumedClassList.length; ++i) {
+                ModuleIdentification m = libClassProducer.get(consumedClassList[i]);
+                if (m == null) {
+                    continue;
                 }
-                //
-                // otherwise, we put it back into the stack to check it later
-                // to see if it consumes "lib2" or not. If the library instance
-                // consumed by "lib1" consumes "lib2", we can also say that "lib1"
-                // consumes "lib2"
-                // 
-                if (consumedLib != null && !stack.contains(consumedLib)) {
-                    stack.offer(consumedLib);
-                } else if (consumedLib == lib1) {
-                    //
-                    // found circular consume, do nothing now but just print
-                    // out message for debugging
-                    // 
-                    String msg = "!!! Library consumes circularly: ";
-                    for (int k = 0; k < j; k++) {
-                        msg += stack.get(k).getName() + "->";
+                HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(m);
+                consumedBy.remove(n);
+                if (consumedBy.size() == 0) {
+                    noConsumerList.addLast(m);
+                }
+            }
+
+            boolean circularlyConsumed = false;
+            while (noConsumerList.size() == 0 && !circularlyConsumed) {
+                circularlyConsumed = true;
+                for (int i = 0; i < libInstanceList.length; ++i) {
+                    ModuleIdentification libInstance = libInstanceList[i];
+                    if (!libInstance.hasConstructor()) {
+                        continue;
                     }
-                    msg += lib1.getName();
-                    EdkLog.log(EdkLog.EDK_DEBUG, msg);
+
+                    HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstance);
+                    if (consumedBy.size() == 0) {
+                        continue;
+                    }
+
+                    ModuleIdentification[] consumedByList = consumedBy.toArray(new ModuleIdentification[consumedBy.size()]);
+                    for (int j = 0; j < consumedByList.length; ++j) {
+                        ModuleIdentification consumer = consumedByList[j];
+                        if (consumer.hasConstructor()) {
+                            continue;
+                        }
+                        //
+                        // if there's no constructor in the library instance's consumer, 
+                        // remove it from the consumer list
+                        // 
+                        consumedBy.remove(consumer);
+                        circularlyConsumed = false;
+                        if (consumedBy.size() == 0) {
+                            noConsumerList.addLast(libInstance);
+                            break;
+                        }
+                    }
+
+                    if (noConsumerList.size() > 0) {
+                        break;
+                    }
                 }
             }
         }
-        return false;
-    }
 
-    /**
-      isInLibInstance
-    
-      This function check does the library instance already in the list.
-    
-      @param list             List of the library instance.
-      @param instanceName     Name of library instance.
-      @return                 "true" the library instance in list |
-                              "false" the library instance is not in list.
-    **/
-    private boolean isInLibInstance(List<ModuleIdentification> list, ModuleIdentification instanceId) {
-        for (int i = 0; i < list.size(); i++) {
-            
-            if (instanceId.equals(list.get(i))) {
-                return true;
+        for (int i = 0; i < libInstanceList.length; ++i) {
+            if (!orderList.contains(libInstanceList[i])) {
+                orderList.add(libInstanceList[i]);
             }
         }
-        return false;
-    }
-
-    /**
-      isInStackList 
-      
-      This function check if the node already in the stack.
-       
-      @param list        Stack.
-      @param nodeName    Name of node.
-      @return            "true" if node have in stack |
-                         "false" if node don't in stack.
-    **/ 
-    private boolean isInStackList(List<Node> list, ModuleIdentification instanceId) {
-        for (int i = 0; i < list.size(); i++) {
-            if (instanceId.equals(list.get(i).nodeId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-      isHaveConsDestructor
-      
-      This function check if the library have constructor or destructor 
-      function.
-      
-      @param  libName    Name of library
-      @return            "true" if library have constructor or desconstructor |
-                         "false" if library don't have constructor 
-                         and desconstructor.
-    **/
-    private boolean isHaveConsDestructor (ModuleIdentification libNode){
-        for (int i = 0; i < libInstanceList.size(); i++){
-            if (libInstanceList.get(i).libId.equals(libNode)){
-                if (libInstanceList.get(i).constructorName != null || libInstanceList.get(i).deconstructorName != null){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-}
-
-/**
-  Node 
- 
-  This class is used as stack node.
- 
- **/
-class Node {
-    ModuleIdentification nodeId;
-
-    boolean isVisit;
-
-    Node(ModuleIdentification nodeId, boolean isVisit) {
-        this.nodeId = nodeId;
-        this.isVisit = false;
-    }
-}  
-/**
-  LibraryInstance Node   
-  
-  This class is used to store LibrayInstance and it's deconstructor and constructor
-**/
-    
-class LibraryInstanceNode {
-    ModuleIdentification libId;
-    String deconstructorName;
-    String constructorName;
-    
-    LibraryInstanceNode (ModuleIdentification libId, String deconstructor, String constructor){
-        this.libId = libId;
-        this.deconstructorName = deconstructor;
-        this.constructorName   = constructor;
+        return orderList;
     }
 }
