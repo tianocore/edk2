@@ -264,7 +264,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiFormBrowserProtocolGuid,
                   NULL,
-                  &gBrowser
+                  (VOID**)&gBrowser
                   );
 
   //
@@ -657,7 +657,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiDataHubProtocolGuid,
                   NULL,
-                  &DataHub
+                  (VOID**)&DataHub
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -895,7 +895,7 @@ Returns:
   // Note: The following lines of code only execute when Auto boot
   // takes affect
   //
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, &ConsoleControl);
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
   ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
 
 }

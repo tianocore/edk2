@@ -274,7 +274,7 @@ Returns:
     return ;
   }
 
-  Freq                = DivU64x32 (1000000000000UL, (UINTN) TimerPeriod);
+  Freq                = DivU64x32 (1000000000000ULL, (UINTN) TimerPeriod);
 
   mPerfHeader.CpuFreq = Freq;
 

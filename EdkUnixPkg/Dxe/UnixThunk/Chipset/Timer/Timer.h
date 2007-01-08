@@ -31,7 +31,7 @@ Abstract:
 // Legal timer value range in 100 ns units
 //
 #define TIMER_MINIMUM_VALUE 0
-#define TIMER_MAXIMUM_VALUE (0x100000000 - 1)
+#define TIMER_MAXIMUM_VALUE (0x100000000ULL - 1)
 
 //
 // Default timer value in 100 ns units (10 ms)

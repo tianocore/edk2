@@ -231,13 +231,13 @@ typedef enum {
 //
 // All of the signatures that will be used in list structure
 //
-#define BM_MENU_OPTION_SIGNATURE      'menu'
-#define BM_LOAD_OPTION_SIGNATURE      'load'
-#define BM_CONSOLE_OPTION_SIGNATURE   'cnsl'
-#define BM_FILE_OPTION_SIGNATURE      'file'
-#define BM_HANDLE_OPTION_SIGNATURE    'hndl'
-#define BM_TERMINAL_OPTION_SIGNATURE  'trml'
-#define BM_MENU_ENTRY_SIGNATURE       'entr'
+#define BM_MENU_OPTION_SIGNATURE      EFI_SIGNATURE_32 ('m', 'e', 'n', 'u')
+#define BM_LOAD_OPTION_SIGNATURE      EFI_SIGNATURE_32 ('l', 'o', 'a', 'd')
+#define BM_CONSOLE_OPTION_SIGNATURE   EFI_SIGNATURE_32 ('c', 'n', 's', 'l')
+#define BM_FILE_OPTION_SIGNATURE      EFI_SIGNATURE_32 ('f', 'i', 'l', 'e')
+#define BM_HANDLE_OPTION_SIGNATURE    EFI_SIGNATURE_32 ('h', 'n', 'd', 'l')
+#define BM_TERMINAL_OPTION_SIGNATURE  EFI_SIGNATURE_32 ('t', 'r', 'm', 'l')
+#define BM_MENU_ENTRY_SIGNATURE       EFI_SIGNATURE_32 ('e', 'n', 't', 'r')
 
 #define BM_LOAD_CONTEXT_SELECT        0x0
 #define BM_CONSOLE_CONTEXT_SELECT     0x1

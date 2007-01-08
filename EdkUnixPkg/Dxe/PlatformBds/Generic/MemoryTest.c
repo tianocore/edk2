@@ -78,7 +78,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  &GraphicsOutput
+                  (VOID**)&GraphicsOutput
                   );
   if (EFI_ERROR (Status)) {
     GraphicsOutput = NULL;
@@ -86,7 +86,7 @@ Returns:
     Status = gBS->HandleProtocol (
                     gST->ConsoleOutHandle,
                     &gEfiUgaDrawProtocolGuid,
-                    &UgaDraw
+                    (VOID**)&UgaDraw
                     );
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
@@ -271,7 +271,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiGenericMemTestProtocolGuid,
                   NULL,
-                  &GenMemoryTest
+                  (VOID**)&GenMemoryTest
                   );
   if (EFI_ERROR (Status)) {
     gBS->FreePool (Pos);

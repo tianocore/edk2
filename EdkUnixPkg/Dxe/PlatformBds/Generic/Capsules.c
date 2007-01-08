@@ -80,7 +80,7 @@ BdsLockNonUpdatableFlash (
   EFI_STATUS                Status;
   EFI_CPU_IO_PROTOCOL       *CpuIo;
 
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, &CpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID**)&CpuIo);
   ASSERT_EFI_ERROR (Status);
   
   GuidHob.Raw = GetHobList ();

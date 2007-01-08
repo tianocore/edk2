@@ -469,7 +469,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
-                  &Hii
+                  (VOID**) &Hii
                   );
   if (EFI_ERROR (Status)) {
     *String = NULL;
@@ -579,7 +579,7 @@ EfiLibStrFromDatahub (
   Status = gBS->LocateProtocol (
                   &gEfiDataHubProtocolGuid,
                   NULL,
-                  &Datahub
+                  (VOID**) &Datahub
                   );
   if (EFI_ERROR (Status)) {
     return NULL;

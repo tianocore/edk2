@@ -39,10 +39,14 @@ typedef struct {
 } FONT_PACK;
 
 FONT_PACK mFontPack = {
-  sizeof (EFI_HII_FONT_PACK) + (NARROW_GLYPH_NUMBER * sizeof (EFI_NARROW_GLYPH)) + (WIDE_GLYPH_NUMBER * sizeof (EFI_WIDE_GLYPH)),
-  EFI_HII_FONT,
-  NARROW_GLYPH_NUMBER,
-  WIDE_GLYPH_NUMBER,
+  {
+    {
+      sizeof (EFI_HII_FONT_PACK) + (NARROW_GLYPH_NUMBER * sizeof (EFI_NARROW_GLYPH)) + (WIDE_GLYPH_NUMBER * sizeof (EFI_WIDE_GLYPH)),
+      EFI_HII_FONT
+    },
+    NARROW_GLYPH_NUMBER,
+    WIDE_GLYPH_NUMBER
+  },
   {     // Narrow Glyphs
     {
       0x05d0,

@@ -24,7 +24,7 @@ AgBStract:
 #include "BdsPlatform.h"
 
 EFI_GUID gTerminalDriverGuid = {
-  0x10634d8e, 0x1c05, 0x46cb, 0xbb, 0xc, 0x5a, 0xfd, 0xc8, 0x29, 0xa8, 0xc8
+  0x10634d8e, 0x1c05, 0x46cb, {0xbb, 0xc, 0x5a, 0xfd, 0xc8, 0x29, 0xa8, 0xc8}
 };
 
 VOID
@@ -179,7 +179,7 @@ BootThisFile (
   CHAR16            *ExitData;
   BDS_COMMON_OPTION *Option;
 
-  Status                  = gBS->AllocatePool (EfiBootServicesData, sizeof (BDS_COMMON_OPTION), &Option);
+  Status                  = gBS->AllocatePool (EfiBootServicesData, sizeof (BDS_COMMON_OPTION), (VOID**) &Option);
   Option->Description     = FileContext->FileName;
   Option->DevicePath      = FileContext->DevicePath;
   Option->LoadOptionsSize = 0;

@@ -27,7 +27,7 @@ Revision History
 
 extern UINT8  BdsStrings[];
 
-EFI_GUID      gBdsStringPackGuid = { 0x7bac95d3, 0xddf, 0x42f3, 0x9e, 0x24, 0x7c, 0x64, 0x49, 0x40, 0x37, 0x9a };
+EFI_GUID      gBdsStringPackGuid = { 0x7bac95d3, 0xddf, 0x42f3, {0x9e, 0x24, 0x7c, 0x64, 0x49, 0x40, 0x37, 0x9a} };
 
 EFI_HII_HANDLE    gStringPackHandle;
 EFI_HII_PROTOCOL  *Hii;
@@ -58,7 +58,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
-                  &Hii
+                  (VOID**)&Hii
                   );
   if (!EFI_ERROR (Status)) {
     PackageList = PreparePackages (1, &gBdsStringPackGuid, BdsStrings);

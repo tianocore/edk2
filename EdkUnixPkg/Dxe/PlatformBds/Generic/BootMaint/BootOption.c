@@ -292,7 +292,7 @@ Returns:
       Status = gBS->HandleProtocol (
                       SimpleFsHandle[Index],
                       &gEfiBlockIoProtocolGuid,
-                      &BlkIo
+                      (VOID**) &BlkIo
                       );
       if (EFI_ERROR (Status)) {
         //
@@ -426,7 +426,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiLegacyBiosProtocolGuid,
                   NULL,
-                  &LegacyBios
+                  (VOID**) &LegacyBios
                   );
   if (!EFI_ERROR (Status)) {
 
@@ -719,7 +719,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiLegacyBiosProtocolGuid,
                   NULL,
-                  &LegacyBios
+                  (VOID**) &LegacyBios
                   );
   if (!EFI_ERROR (Status)) {
     Status = LegacyBios->GetBbsInfo (
@@ -1119,7 +1119,7 @@ Returns:
   while (*Ptr != 0) {
     if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '.' && *(Ptr + 3) != 0) {
       //
-      // Convert \Name\..\ to \
+      // Convert "\Name\..\" to "\"
       // DO NOT convert the .. if it is at the end of the string. This will
       // break the .. behavior in changing directories.
       //
@@ -1127,7 +1127,7 @@ Returns:
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
-      // Convert a \.\ to a \
+      // Convert a "\.\" to a "\"
       //
       BdsStrCpy (Ptr, Ptr + 2);
       Ptr = LastSlash;
@@ -1321,7 +1321,7 @@ Returns:
     Status = gBS->HandleProtocol (
                     CurHandle,
                     &gEfiSimpleFileSystemProtocolGuid,
-                    &SimpleFs
+                    (VOID**) &SimpleFs
                     );
     if (Status == EFI_SUCCESS) {
       continue;
@@ -1330,7 +1330,7 @@ Returns:
     Status = gBS->HandleProtocol (
                     CurHandle,
                     &gEfiLoadFileProtocolGuid,
-                    &LoadFile
+                    (VOID**) &LoadFile
                     );
     if (Status == EFI_SUCCESS) {
       continue;
