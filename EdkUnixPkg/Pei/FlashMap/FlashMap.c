@@ -61,8 +61,8 @@ static EFI_FLASH_AREA_DATA    mFlashAreaData[] = {
     EFI_VARIABLE_STORE_LENGTH,
     EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV,
     EFI_FLASH_AREA_EFI_VARIABLES,
-    0, 0, 0,
-    { 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+    { 0, 0, 0},
+    { 0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} }
   },
   //
   // FTW spare (backup) block
@@ -72,8 +72,8 @@ static EFI_FLASH_AREA_DATA    mFlashAreaData[] = {
     EFI_WINNT_FTW_SPARE_BLOCK_LENGTH,
     EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV,
     EFI_FLASH_AREA_FTW_BACKUP,
-    0, 0, 0,
-    { 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+    { 0, 0, 0},
+    { 0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} }
   },
   //
   // FTW private working (state) area
@@ -83,8 +83,8 @@ static EFI_FLASH_AREA_DATA    mFlashAreaData[] = {
     EFI_FTW_WORKING_LENGTH,
     EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV,
     EFI_FLASH_AREA_FTW_STATE,
-    0, 0, 0,
-    { 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+    {0, 0, 0},
+    { 0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} }
   },
   //
   // Recovery FV
@@ -94,8 +94,8 @@ static EFI_FLASH_AREA_DATA    mFlashAreaData[] = {
     EFI_WINNT_FIRMWARE_LENGTH,
     EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV,
     EFI_FLASH_AREA_RECOVERY_BIOS,
-    0, 0, 0,
-    { 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+    {0, 0, 0},
+    { 0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} }
   },
   //
   // System Non-Volatile Storage FV
@@ -105,7 +105,7 @@ static EFI_FLASH_AREA_DATA    mFlashAreaData[] = {
     EFI_WINNT_RUNTIME_UPDATABLE_LENGTH + EFI_WINNT_FTW_SPARE_BLOCK_LENGTH,
     EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV,
     EFI_FLASH_AREA_GUID_DEFINED,
-    0, 0, 0,
+    {0, 0, 0},
     EFI_SYSTEM_NV_DATA_HOB_GUID
   },
 };
