@@ -1471,7 +1471,7 @@ public class PcdDatabase {
 
         for (i = 0; i < t.skuData.size(); i++) {
             if (t.isUnicodeStringType()) {
-                s += tab + tab + String.format("{ %d }", stringTable.add(t.skuData.get(i).value.value, t));
+                s += tab + tab + String.format(" %d ", stringTable.add(t.skuData.get(i).value.value, t));
             } else if (t.isHiiEnable()) {
                 /* VPD_HEAD definition
                    typedef struct {
