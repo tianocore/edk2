@@ -189,25 +189,44 @@ public class ModuleIdentification extends Identification {
     public void setModuleType(String moduleType) {
         this.moduleType = moduleType;
     }
-    
+
+    /**
+       @return String The module name
+     **/
     public String getName() {
         return name;
     }
 
+    /**
+       @return boolean
+     **/
     public boolean hasConstructor() {
         return constructor != "";
     }
 
+    /**
+       @return boolean
+     */
     public boolean hasDestructor() {
         return destructor != "";
     }
 
+    /**
+       Set the constructor function name if this module is a library
+
+       @param name
+     */
     public void setConstructor(String name) {
         if (name != null) {
             constructor = name;
         }
     }
 
+    /**
+       Set the destructor function name if this module is a library
+
+       @param name
+     */
     public void setDestructor(String name) {
         if (name != null) {
             destructor = name;

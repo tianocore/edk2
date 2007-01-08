@@ -76,12 +76,11 @@ public class AutogenLibOrder {
         String[]       libClassDeclList = null;
         String[]       libClassConsmList = null;
 
-        libInstanceList = new ModuleIdentification[libraryList.length];
+        libInstanceList = libraryList;
         for (int i = 0; i < libraryList.length; i++) {
             libInstance = libraryList[i];
-            libInstanceList[i] = libInstance;
             //
-            // Add libraryInstance in to libInstanceList.
+            // Fetch the constructor & destructor.
             // 
             Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstance, arch);
             SurfaceAreaQuery saq = new SurfaceAreaQuery(libDoc);
@@ -89,17 +88,10 @@ public class AutogenLibOrder {
             libInstance.setDestructor(saq.getLibDestructorName());
             
             //
-            // Add library instance and consumed library class list to
-            // libInstanceConsumes.
+            // Create library class consume database.
             //
             libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
             if (libClassConsmList != null) {
-                /*
-                String[] classStr = new String[libClassConsmList.length];
-                for (int k = 0; k < libClassConsmList.length; k++) {
-                    classStr[k] = libClassConsmList[k];
-                }
-                */
                 if (this.libInstanceConsumes.containsKey(libInstance)) {
                     throw new AutoGenException(
                             libraryList[i].getName()
@@ -110,7 +102,7 @@ public class AutogenLibOrder {
             }
 
             //
-            // Add library class and library instance map.
+            // Create library class implementer database
             //
             libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
             if (libClassDeclList != null) {
@@ -129,6 +121,9 @@ public class AutogenLibOrder {
             }
         }
 
+        //
+        // Create a consumed-by database 
+        // 
         for (Iterator it = libClassProducer.keySet().iterator(); it.hasNext();) {
             String className = (String)it.next();
             libInstance = libClassProducer.get(className);
@@ -151,7 +146,7 @@ public class AutogenLibOrder {
       orderLibInstance
 
       This function reorder the library instance according the library class 
-      dependency.
+      dependency, using DAG anaylysis algothim
 
       @return     List which content the ordered library instance.
     **/
@@ -159,6 +154,9 @@ public class AutogenLibOrder {
         LinkedList<ModuleIdentification> orderList = new LinkedList<ModuleIdentification>();
         LinkedList<ModuleIdentification> noConsumerList = new LinkedList<ModuleIdentification>();
 
+        //
+        // First, add the library instance without consumers to the Q
+        // 
         for (int i = 0; i < libInstanceList.length; ++i) {
             if (libInstanceConsumedBy.get(libInstanceList[i]).size() == 0) {
                 noConsumerList.add(libInstanceList[i]);
@@ -221,6 +219,9 @@ public class AutogenLibOrder {
             }
         }
 
+        //
+        // Append the remaining library instance to the end of sorted list
+        // 
         for (int i = 0; i < libInstanceList.length; ++i) {
             if (!orderList.contains(libInstanceList[i])) {
                 orderList.add(libInstanceList[i]);
