@@ -108,7 +108,7 @@ Returns:
   char  *Buffer;
   char  *Ptrx;
   
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     return -1;
   }

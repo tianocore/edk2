@@ -239,6 +239,11 @@ main (
   OutputFileName  = NULL;
 
   SetUtilityName (UTILITY_NAME);
+  
+  if (argc == 1) {
+    Usage ();
+    return -1;
+  }
 
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
       (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
@@ -248,11 +253,6 @@ main (
   
   if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
     Version();
-    return -1;
-  }
-  
-  if (argc == 1) {
-    Usage ();
     return -1;
   }
 

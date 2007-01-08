@@ -394,7 +394,7 @@ Returns:
   Index   = 0;
   Invert  = 0;
  
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     return -1;
   }

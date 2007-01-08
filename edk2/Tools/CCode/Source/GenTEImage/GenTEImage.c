@@ -34,7 +34,8 @@ Abstract:
 // Version of this utility
 //
 #define UTILITY_NAME    "GenTEImage"
-#define UTILITY_VERSION "v0.11"
+#define UTILITY_MAJOR_VERSION   0
+#define UTILITY_MINOR_VERSION   11
 
 //
 // Define the max length of a filename
@@ -84,6 +85,12 @@ static STRING_LOOKUP  mSubsystemTypes[] = {
 //
 //  Function prototypes
 //
+static
+void
+Version (
+  VOID
+  );
+
 static
 void
 Usage (
@@ -669,6 +676,18 @@ Returns:
     Usage ();
     return STATUS_ERROR;
   }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+  
   //
   // Process until no more arguments
   //
@@ -734,6 +753,31 @@ Returns:
 }
 
 static
+void 
+Version(
+  void
+)
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf ("%s v%d.%d -Utility to generate a TE image from an EFI PE32 image.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+static
 void
 Usage (
   VOID
@@ -756,19 +800,21 @@ Returns:
 {
   int               Index;
   static const char *Msg[] = {
-    UTILITY_NAME " version "UTILITY_VERSION " - TE image utility",
-    "  Generate a TE image from an EFI PE32 image",
-    "  Usage: "UTILITY_NAME " {-v} {-dump} {-h|-?} {-o OutFileName} InFileName",
+    "\nUsage: "UTILITY_NAME " {-v} {-dump} {-h|-?} {-o OutFileName} InFileName",
     "                [-e|-b] [FileName(s)]",
     "    where:",
+    "      -h,--help,-?,/?  to display help messages",
+    "      -V,--version     to display version information",
     "      -v             - for verbose output",
     "      -dump          - to dump the input file to a text file",
-    "      -h -?          - for this help information",
     "      -o OutFileName - to write output to OutFileName rather than InFileName"DEFAULT_OUTPUT_EXTENSION,
     "      InFileName     - name of the input PE32 file",
     "",
     NULL
   };
+  
+  Version();
+  
   for (Index = 0; Msg[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Msg[Index]);
   }

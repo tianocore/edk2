@@ -2379,6 +2379,11 @@ Returns:
     Version();
     return STATUS_ERROR;
   }
+  
+  if (Argc == 1) {
+    Usage ();
+    return STATUS_ERROR;
+  }
  
   //
   // Process until no more options

@@ -106,7 +106,7 @@ Returns:
 --*/
 {
   printf (
-    "%s, Tiano Dependency Expression Generation Utility. Version %d.%d.\n",
+    "%s v%d.%d -Tiano utility to generate dependency expression.\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION
@@ -855,16 +855,22 @@ Returns:
   Output_Flag = FALSE;
   Pad_Flag    = FALSE;
 
-  //
-  //  Output the calling arguments
-  //
-  printf ("\n\n");
-  for (Index = 0; Index < argc; Index++) {
-    printf ("%s ", argv[Index]);
+  if (argc == 1) {
+    Usage();
+    return EFI_INVALID_PARAMETER;
   }
-
-  printf ("\n\n");
-
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return EFI_INVALID_PARAMETER;
+  }
+ 
   if (argc < 5) {
     printf ("Not enough arguments\n");
     Usage();

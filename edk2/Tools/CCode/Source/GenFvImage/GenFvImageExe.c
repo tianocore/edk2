@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004-2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,10 +29,11 @@ Abstract:
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 
-VOID
-PrintUtilityInfo (
-  VOID
-  )
+static
+void 
+Version(
+  void
+)
 /*++
 
 Routine Description:
@@ -49,17 +50,15 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s - Tiano Firmware Volume Generation Utility."" Version %i.%i\n\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION
-    );
+  printf ("%s v%d.%d -Tiano Firmware Volume Generation Utility.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
 }
+ 
 
-VOID
-PrintUsage (
-  VOID
+static
+void 
+Usage(
+  void
   )
 /*++
 
@@ -77,9 +76,11 @@ Returns:
 
 --*/
 {
-  printf ("Usage: %s -I FvInfFileName\n", UTILITY_NAME);
+  Version();
+  
+  printf ("\nUsage: %s -I FvInfFileName\n", UTILITY_NAME);
   printf ("  Where:\n");
-  printf ("\tFvInfFileName is the name of the image description file.\n\n");
+  printf ("    FvInfFileName is the name of the image description file.\n\n");
 }
 
 int
@@ -133,17 +134,29 @@ Returns:
   SymFileName = SymFileNameBuffer;
 
   SetUtilityName (UTILITY_NAME);
-  //
-  // Display utility information
-  //
-  PrintUtilityInfo ();
-
+  
+  if (argc == 1) {
+    Usage ();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return GetUtilityStatus ();
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return GetUtilityStatus ();
+  }
+  
   //
   // Verify the correct number of arguments
   //
   if (argc != MAX_ARGS) {
     Error (NULL, 0, 0, "invalid number of input parameters specified", NULL);
-    PrintUsage ();
+    Usage ();
     return GetUtilityStatus ();
   }
   //
@@ -160,7 +173,7 @@ Returns:
     //
     if (argv[Index][0] != '-' && argv[Index][0] != '/') {
       Error (NULL, 0, 0, argv[Index], "argument pair must begin with \"-\" or \"/\"");
-      PrintUsage ();
+      Usage ();
       return GetUtilityStatus ();
     }
     //
@@ -168,7 +181,7 @@ Returns:
     //
     if (argv[Index][2] != 0) {
       Error (NULL, 0, 0, argv[Index], "unrecognized argument");
-      PrintUsage ();
+      Usage ();
       return GetUtilityStatus ();
     }
     //
@@ -182,14 +195,14 @@ Returns:
         strcpy (InfFileName, argv[Index + 1]);
       } else {
         Error (NULL, 0, 0, argv[Index + 1], "FvInfFileName may only be specified once");
-        PrintUsage ();
+        Usage ();
         return GetUtilityStatus ();
       }
       break;
 
     default:
       Error (NULL, 0, 0, argv[Index], "unrecognized argument");
-      PrintUsage ();
+      Usage ();
       return GetUtilityStatus ();
       break;
     }

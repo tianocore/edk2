@@ -2559,7 +2559,7 @@ Returns:
   //
   // Verify the correct number of arguments
   //
-  if (argc < 1) {
+  if (argc == 1) {
     Usage();
     return 1;
   }
