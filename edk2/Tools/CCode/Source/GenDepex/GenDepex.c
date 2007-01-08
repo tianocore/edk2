@@ -839,7 +839,6 @@ Returns:
   EFI_ABORTED             Unable to open/create a file or a misc error.
 
 --*/
-// TODO:    ] - add argument and description to function comment
 {
   FILE    *OutFile;
   FILE    *InFile;
@@ -856,22 +855,16 @@ Returns:
   Output_Flag = FALSE;
   Pad_Flag    = FALSE;
 
-  if (argc < 1) {
-    Usage();
-    return -1;
+  //
+  //  Output the calling arguments
+  //
+  printf ("\n\n");
+  for (Index = 0; Index < argc; Index++) {
+    printf ("%s ", argv[Index]);
   }
-  
-  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
-      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
-    Usage();
-    return 0;
-  }
-  
-  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
-    Version();
-    return 0;
-  }
-  
+
+  printf ("\n\n");
+
   if (argc < 5) {
     printf ("Not enough arguments\n");
     Usage();
