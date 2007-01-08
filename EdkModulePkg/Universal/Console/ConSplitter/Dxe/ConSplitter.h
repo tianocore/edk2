@@ -28,7 +28,7 @@ typedef struct {
 } TEXT_OUT_SPLITTER_QUERY_DATA;
 
 //
-// Private data for the EFI_SIMPLE_INPUT_PROTOCOL splitter
+// Private data for the EFI_SIMPLE_TEXT_INPUT_PROTOCOL splitter
 //
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE EFI_SIGNATURE_32 ('T', 'i', 'S', 'p')
 
