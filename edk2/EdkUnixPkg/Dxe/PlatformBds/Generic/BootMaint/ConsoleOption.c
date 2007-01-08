@@ -273,7 +273,7 @@ Returns:
     gBS->HandleProtocol (
           Handles[Index],
           &gEfiDevicePathProtocolGuid,
-          &DevicePath
+          (VOID**) &DevicePath
           );
     Ptr = (UINT8 *) DevicePath;
     while (*Ptr != END_DEVICE_PATH_TYPE) {
@@ -309,7 +309,7 @@ Returns:
       gBS->HandleProtocol (
             Handles[Index],
             &gEfiSerialIoProtocolGuid,
-            &SerialIo
+            (VOID**) &SerialIo
             );
 
       CopyMem (

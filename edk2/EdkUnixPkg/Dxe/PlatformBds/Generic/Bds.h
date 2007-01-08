@@ -74,7 +74,7 @@ BdsInitialize (
   IN EFI_SYSTEM_TABLE               *SystemTable
   );
 
-EFI_STATUS
+VOID
 EFIAPI
 BdsEntry (
   IN  EFI_BDS_ARCH_PROTOCOL *This

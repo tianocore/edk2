@@ -26,7 +26,9 @@ Abstract:
 EFI_BDS_ARCH_PROTOCOL_INSTANCE  gBdsInstanceTemplate = {
   EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE,
   NULL,
-  BdsEntry,
+  {
+    BdsEntry
+  },
   0xFFFF,
   TRUE,
   EXTENSIVE
@@ -267,7 +269,7 @@ Returns:
 
 }
 
-EFI_STATUS
+VOID
 EFIAPI
 BdsEntry (
   IN EFI_BDS_ARCH_PROTOCOL  *This
@@ -339,7 +341,7 @@ Returns:
   // Setup some platform policy here
   //
   PlatformBdsPolicyBehavior (PrivateData, &DriverOptionList, &BootOptionList);
-  PERF_END (0, L"PlatformBds", L"BDS", 0);
+  PERF_END (0, "PlatformBds", "BDS", 0);
 
   //
   // BDS select the boot device to load OS
@@ -351,6 +353,5 @@ Returns:
   // return back to DxeCore.
   //
   ASSERT (FALSE);
-
-  return EFI_SUCCESS;
 }
+
