@@ -34,7 +34,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename SupArchList="IA32">MemLibInternals.h</Filename>
+    <Filename>MemLibInternals.h</Filename>
     <Filename SupArchList="IA32">MemLibGuid.c</Filename>
     <Filename SupArchList="IA32">CopyMemWrapper.c</Filename>
     <Filename SupArchList="IA32">SetMemWrapper.c</Filename>
