@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c)  2004-2006 Intel Corporation. All rights reserved
+Copyright (c)  2004-2007 Intel Corporation. All rights reserved
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -63,7 +63,7 @@ EFI_GUID  NewFvPadFileNameGuid     = { 0x145372bc, 0x66b9, 0x476d, 0x81, 0xbc, 0
 UINT8 ApResetVector[5] = {0xEA, 0xD0, 0xFF, 0x00, 0xF0};
 
 VOID
-PrintUtilityInfo (
+Version (
   VOID
   )
 /*++
@@ -82,16 +82,12 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s - Tiano IA32 SEC Ap Reset Vector Fixup Utility."" Version %i.%i\n\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION
-    );
+  printf ("%s v%d.%d -Tiano IA32 SEC Ap Reset Vector Fixup Utility.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
 }
 
 VOID
-PrintUsage (
+Usage (
   VOID
   )
 /*++
@@ -110,10 +106,12 @@ Returns:
 
 --*/
 {
-  printf ("Usage: %s InputFvrecoveryFile OutputFvrecoveryFile\n", UTILITY_NAME);
+  Version();
+  
+  printf ("\nUsage: %s InputFvrecoveryFile OutputFvrecoveryFile\n", UTILITY_NAME);
   printf ("  Where:\n");
-  printf ("\tInputFvrecoveryFile   - Name of the IA32 input Fvrecovery.fv file.\n");
-  printf ("\tOutputFvrecoveryFile  - Name of the IA32 output Fvrecovery.fv file.\n");
+  printf ("    InputFvrecoveryFile   - Name of the IA32 input Fvrecovery.fv file.\n");
+  printf ("    OutputFvrecoveryFile  - Name of the IA32 output Fvrecovery.fv file.\n");
 }
 
 
@@ -216,17 +214,28 @@ Returns:
   TempGuid = NULL;
   SetUtilityName (UTILITY_NAME);
 
-  //
-  // Display utility information
-  //
-  PrintUtilityInfo ();
-
+  if (argc == 1) {
+    Usage();
+    return STATUS_ERROR;
+  }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Verify the correct number of arguments
   //
   if (argc != MAX_ARGS) {
     Error (NULL, 0, 0, "invalid number of input parameters specified", NULL);
-    PrintUsage ();
+    Usage ();
     return STATUS_ERROR;
   }
   //
