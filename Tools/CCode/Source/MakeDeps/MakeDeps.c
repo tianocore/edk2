@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 20077, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -38,7 +38,9 @@ typedef struct _STRING_LIST {
   char                *Str;
 } STRING_LIST;
 
-#define UTILITY_NAME      "MakeDeps"
+#define UTILITY_NAME              "MakeDeps"
+#define UTILITY_MAJOR_VERSION     1
+#define UTILITY_MINOR_VERSION     0
 
 #define MAX_LINE_LEN      2048
 #define MAX_PATH          2048
@@ -161,6 +163,12 @@ STATUS
 ProcessArgs (
   int   Argc,
   char  *Argv[]
+  );
+
+static
+void
+Version (
+  VOID
   );
 
 static
@@ -828,6 +836,23 @@ ProcessArgs (
   //
   Argc--;
   Argv++;
+  
+  if (Argc == 0) {
+    Usage ();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+
   //
   // Initialize locals
   //
@@ -1234,6 +1259,31 @@ FreeLists (
 }
 
 static
+void 
+Version(
+  void
+)
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf ("%s v%d.%d -Utility for generating file dependency lists for files in a given directory.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+static
 void
 Usage (
   VOID
@@ -1259,7 +1309,8 @@ Returns:
     UTILITY_NAME " -- make dependencies",
     "  Usage: MakeDeps [options]",
     "    Options include:",
-    "      -h or -?         for this help information",
+    "      -h,--help,-?,/?  display help messages",
+    "      -V,--version     display version information",
     "      -f SourceFile    add SourceFile to list of files to scan",
     "      -i IncludePath   add IncludePath to list of search paths",
     "      -o OutputFile    write output dependencies to OutputFile",
@@ -1278,6 +1329,9 @@ Returns:
     "",
     NULL
   };
+  
+  Version();
+  
   for (Index = 0; Str[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Str[Index]);
   }

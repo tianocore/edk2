@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -33,6 +33,11 @@ Abstract:
 // Define a structure that correlates filename extensions to an enumerated
 // type.
 //
+
+#define UTILITY_NAME              "GuidChk"
+#define UTILITY_MAJOR_VERSION     1
+#define UTILITY_MINOR_VERSION     0
+
 typedef struct {
   INT8  *Extension;
   INT8  ExtensionCode;
@@ -117,6 +122,12 @@ STATUS
 ProcessArgs (
   int     Argc,
   char    *Argv[]
+  );
+
+static
+VOID
+Version (
+  VOID
   );
 
 static
@@ -352,7 +363,18 @@ ProcessArgs (
     Usage ();
     return STATUS_ERROR;
   }
-
+  
+  if ((strcmp(Argv[0], "-h") == 0) || (strcmp(Argv[0], "--help") == 0) ||
+      (strcmp(Argv[0], "-?") == 0) || (strcmp(Argv[0], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(Argv[0], "-V") == 0) || (strcmp(Argv[0], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   while (Argc > 0) {
     //
     // Look for options
@@ -570,6 +592,32 @@ ProcessArgs (
 
   return STATUS_SUCCESS;
 }
+
+static
+void 
+Version(
+  void
+)
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf ("%s v%d.%d -Utility for checking guid duplication for files in a given directory.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
 //
 // Print usage instructions
 //
@@ -585,21 +633,25 @@ Usage (
     "",
     "Usage:  GuidChk {options}\n",
     "  Options: ",
-    "    -d dirname     exclude searching of a directory",
-    "    -f filename    exclude searching of a file",
-    "    -e extension   exclude searching of files by extension",
-    "    -p             print all GUIDS found",
-    "    -g             check for duplicate guids",
-    "    -s             check for duplicate signatures",
-    "    -x             print guid+defined symbol name",
-    "    -b outfile     write internal GUID+basename list to outfile",
-    "    -u dirname     exclude searching all subdirectories of a directory",
-    "    -h -?          print this help text",
+    "    -d dirname      exclude searching of a directory",
+    "    -f filename     exclude searching of a file",
+    "    -e extension    exclude searching of files by extension",
+    "    -p              print all GUIDS found",
+    "    -g              check for duplicate guids",
+    "    -s              check for duplicate signatures",
+    "    -x              print guid+defined symbol name",
+    "    -b outfile      write internal GUID+basename list to outfile",
+    "    -u dirname      exclude searching all subdirectories of a directory",
+    "    -h,--help,-?,/? display help messages",
+    "    -V,--version    display version information",
     " ",
     "   Example: GuidChk -g -u build -d fv -f make.inf -e .pkg",
     "",
     NULL
   };
+  
+  Version();
+  
   for (Index = 0; Str[Index] != NULL; Index++) {
     fprintf (stdout, "%s\n", Str[Index]);
   }

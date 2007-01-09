@@ -2364,7 +2364,7 @@ Returns:
   Argc--;
   Argv++;
 
-  if (Argc < 1) {
+  if (Argc == 0) {
     Usage ();
     return STATUS_ERROR;
   }
