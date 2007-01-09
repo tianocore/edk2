@@ -85,7 +85,7 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_IO_MEM) (
-  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN     EFI_ISA_IO_PROTOCOL          *This,
   IN     EFI_ISA_IO_PROTOCOL_WIDTH    Width,
   IN     UINT32                       Offset,
   IN     UINTN                        Count,
@@ -100,7 +100,7 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_COPY_MEM) (
-  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN     EFI_ISA_IO_PROTOCOL          *This,
   IN     EFI_ISA_IO_PROTOCOL_WIDTH    Width,
   IN     UINT32                       DestOffset,
   IN     UINT32                       SrcOffset,
@@ -110,7 +110,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_MAP) (
-  IN EFI_ISA_IO_PROTOCOL    *This,
+  IN     EFI_ISA_IO_PROTOCOL            *This,
   IN     EFI_ISA_IO_PROTOCOL_OPERATION  Operation,
   IN     UINT8                          ChannelNumber      OPTIONAL,
   IN     UINT32                         ChannelAttributes,
@@ -123,14 +123,14 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_UNMAP) (
-  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN  EFI_ISA_IO_PROTOCOL          *This,
   IN  VOID                         *Mapping
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_ALLOCATE_BUFFER) (
-  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN  EFI_ISA_IO_PROTOCOL          *This,
   IN  EFI_ALLOCATE_TYPE            Type,
   IN  EFI_MEMORY_TYPE              MemoryType,
   IN  UINTN                        Pages,
@@ -141,7 +141,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_FREE_BUFFER) (
-  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN  EFI_ISA_IO_PROTOCOL          *This,
   IN  UINTN                        Pages,
   IN  VOID                         *HostAddress
   );
@@ -149,7 +149,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_IO_PROTOCOL_FLUSH) (
-  IN EFI_ISA_IO_PROTOCOL  *This
+  IN EFI_ISA_IO_PROTOCOL                  *This
   );
 
 //
