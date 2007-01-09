@@ -749,14 +749,13 @@ Returns:
     // Allocate a buffer for the image to be loaded into.
     //
     Pe32ImageSize       = GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION);
-    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x10000));
+    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x100000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation failure", NULL);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x100000);
     MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
-    
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
 
@@ -1078,13 +1077,13 @@ Returns:
     //
     // Allocate a buffer for the image to be loaded into.
     //
-    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x10000));
+    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x100000));
     if (MemoryImagePointer == 0) {
       Error (NULL, 0, 0, "memory allocation error on rebase of TE image", FileGuidString);
       free (TEBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x10000);
+    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x100000);
     MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
     
 
