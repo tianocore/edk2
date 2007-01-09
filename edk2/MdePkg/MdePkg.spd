@@ -6,7 +6,7 @@
     <Version>0.3</Version>
     <Abstract>Framework Module Development Environment Industry Standards</Abstract>
     <Description>This Package provides headers and libraries that conform to EFI/Framework Industry standards.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved.
       This program and the accompanying materials are licensed and made available under
       the terms and conditions of the BSD License which accompanies this distribution.
@@ -173,6 +173,10 @@
     <LibraryClass Name="UefiRuntimeServicesTableLib">
       <IncludeHeader>Include/Library/UefiRuntimeServicesTableLib.h</IncludeHeader>
       <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiApplicationEntryPoint" SupArchList="IA32 X64 IPF EBC ARM PPC" SupModuleList="UEFI_APPLICATION">
+      <IncludeHeader>Include/Library/UefiApplicationEntryPoint.h</IncludeHeader>
+      <HelpText>Library to abstract entry point to a EFI Application.</HelpText>
     </LibraryClass>
   </LibraryClassDeclarations>
   <IndustryStdIncludes>
@@ -1180,6 +1184,7 @@
     <Filename>Library/UefiLib/UefiLib.msa</Filename>
     <Filename>Library/DxeMemoryLib/DxeMemoryLib.msa</Filename>
     <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
+    <Filename>Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="BASE">Include/Base.h</IncludePkgHeader>
