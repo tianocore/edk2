@@ -31,6 +31,10 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteDr4 PROC
+    ;
+    ; There's no obvious reason to access this register, since it's aliased to
+    ; DR6 when DE=0 or an exception generated when DE=1
+    ;
     DB      0fh, 23h, 0e1h
     mov     rax, rcx
     ret

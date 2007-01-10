@@ -40,14 +40,14 @@ InternalX86EnablePaging32 PROC
     mov     ecx, [esp + 8]
     mov     edx, [esp + 12]
     pushfd
-    pop     edi
+    pop     edi                         ; save flags in edi
     cli
     mov     eax, cr0
     bts     eax, 31
     mov     esp, [esp + 16]
     mov     cr0, eax
     push    edi
-    popfd
+    popfd                               ; restore flags
     push    edx
     push    ecx
     call    ebx

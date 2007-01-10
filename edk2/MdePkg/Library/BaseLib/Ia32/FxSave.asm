@@ -34,7 +34,7 @@
 ;   );
 ;------------------------------------------------------------------------------
 InternalX86FxSave PROC
-    mov     eax, [esp + 4]
+    mov     eax, [esp + 4]              ; Buffer must be 16-byte aligned
     fxsave  [eax]
     ret
 InternalX86FxSave ENDP

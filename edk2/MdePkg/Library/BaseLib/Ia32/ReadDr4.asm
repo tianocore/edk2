@@ -33,6 +33,13 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmReadDr4  PROC
+    ;
+    ; DR4 is alias to DR6 only if DE (in CR4) is cleared. Otherwise, reading
+    ; this register will cause a #UD exception.
+    ;
+    ; MS assembler doesn't support this instruction since no one would use it
+    ; under normal circustances. Here opcode is used.
+    ;
     DB      0fh, 21h, 0e0h
     ret
 AsmReadDr4  ENDP

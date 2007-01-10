@@ -34,16 +34,16 @@ InternalAssertJumpBuffer    PROTO   C
 ;------------------------------------------------------------------------------
 SetJump     PROC
     push    [esp + 4]
-    call    InternalAssertJumpBuffer
+    call    InternalAssertJumpBuffer    ; To validate JumpBuffer
     pop     ecx
-    pop     ecx
+    pop     ecx                         ; ecx <- return address
     mov     edx, [esp]
     mov     [edx], ebx
     mov     [edx + 4], esi
     mov     [edx + 8], edi
     mov     [edx + 12], ebp
     mov     [edx + 16], esp
-    mov     [edx + 20], ecx
+    mov     [edx + 20], ecx             ; eip value to restore in LongJump
     xor     eax, eax
     jmp     ecx
 SetJump     ENDP
