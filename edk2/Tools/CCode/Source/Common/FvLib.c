@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -180,7 +180,7 @@ Returns:
       //
       // Verify file is in this FV.
       //
-      if ((UINTN) CurrentFile >= (UINTN) mFvHeader + mFvLength - sizeof (EFI_FFS_FILE_HEADER)) {
+      if ((UINTN) CurrentFile + GetLength (CurrentFile->Size) > (UINTN) mFvHeader + mFvLength) {
         *NextFile = NULL;
         return EFI_SUCCESS;
       }
@@ -192,9 +192,9 @@ Returns:
   //
   // Verify current file is in range
   //
-  if (((UINTN) CurrentFile < (UINTN) mFvHeader + sizeof (EFI_FIRMWARE_VOLUME_HEADER)) ||
-      ((UINTN) CurrentFile >= (UINTN) mFvHeader + mFvLength - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
-      ) {
+  if (((UINTN) CurrentFile < (UINTN) mFvHeader + mFvHeader->HeaderLength) ||
+      ((UINTN) CurrentFile + GetLength (CurrentFile->Size) > (UINTN) mFvHeader + mFvLength)
+     ) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -205,7 +205,9 @@ Returns:
   //
   // Verify file is in this FV.
   //
-  if ((UINTN) *NextFile >= (UINTN) mFvHeader + mFvLength - sizeof (EFI_FFS_FILE_HEADER)) {
+  if (((UINTN) *NextFile + sizeof (EFI_FFS_FILE_HEADER) >= (UINTN) mFvHeader + mFvLength) ||
+      ((UINTN) *NextFile + GetLength ((*NextFile)->Size) > (UINTN) mFvHeader + mFvLength)
+     ) {
     *NextFile = NULL;
     return EFI_SUCCESS;
   }
