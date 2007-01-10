@@ -36,7 +36,7 @@ Abstract:
 #include "SecFixup.h"
 
 VOID
-PrintUtilityInfo (
+Version (
   VOID
   )
 /*++
@@ -55,16 +55,12 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s - Tiano IA32 SEC Fixup Utility."" Version %i.%i\n\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION
-    );
+  printf ("%s v%d.%d -Tiano IA32 SEC Fixup Utility.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
 }
 
 VOID
-PrintUsage (
+Usage (
   VOID
   )
 /*++
@@ -83,11 +79,13 @@ Returns:
 
 --*/
 {
-  printf ("Usage: %s SecExeFile ResetVectorDataFile OutputFile\n", UTILITY_NAME);
+  Version();
+  
+  printf ("\nUsage: %s SecExeFile ResetVectorDataFile OutputFile\n", UTILITY_NAME);
   printf ("  Where:\n");
-  printf ("\tSecExeFile           - Name of the IA32 SEC EXE file.\n");
-  printf ("\tResetVectorDataFile  - Name of the reset vector data binary file.\n");
-  printf ("\tOutputFileName       - Name of the output file.\n\n");
+  printf ("     SecExeFile           - Name of the IA32 SEC EXE file.\n");
+  printf ("     ResetVectorDataFile  - Name of the reset vector data binary file.\n");
+  printf ("     OutputFileName       - Name of the output file.\n");
 }
 
 STATUS
@@ -122,17 +120,28 @@ Returns:
 
   SetUtilityName (UTILITY_NAME);
 
-  //
-  // Display utility information
-  //
-  PrintUtilityInfo ();
-
+  if (argc == 1) {
+    Usage();
+    return STATUS_ERROR;
+  }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+  
   //
   // Verify the correct number of arguments
   //
   if (argc != MAX_ARGS) {
     Error (NULL, 0, 0, "invalid number of input parameters specified", NULL);
-    PrintUsage ();
+    Usage ();
     return STATUS_ERROR;
   }
   //
