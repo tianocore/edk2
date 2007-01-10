@@ -1,23 +1,35 @@
 #!/usr/bin/env python
 
-"""Create Makefiles for the MdePkg."""
+"""Create GNU Makefiles for the Libraries of the MdePkg."""
 
 import os, sys, getopt, string, xml.dom.minidom, shutil
 from XmlRoutines import *
 from WorkspaceRoutines import *
 
-ARCH = "X64"
+copyingSources = 1
 
-Makefile = """MAKEROOT ?= ..
+Makefile = string.Template("""ARCH = $ARCH
 
-LIBNAME = %s
+MAKEROOT ?= ../..
 
-OBJECTS = %s 
+VPATH = ..
 
-include $(MAKEROOT)/lib.makefile
-"""
+LIBNAME = $LIBNAME
 
-def openMdeSpd():
+OBJECTS = $OBJECTS
+
+include $$(MAKEROOT)/lib.makefile
+""")
+
+def mkdir(path):
+  """Make a directory if it is not there already."""
+
+  try:
+    os.makedirs(path)
+  except:
+    pass
+  
+def openMdeSpd(arch):
 
   """Open the MdePkg.spd and process the msa files."""
 
@@ -25,7 +37,7 @@ def openMdeSpd():
 
   for msaFile in XmlList(db, "/PackageSurfaceArea/MsaFiles/Filename"):
     msaFileName = XmlElementData(msaFile)
-    DoLib(msaFileName)
+    doLib(msaFileName, arch)
 
   return db
 
@@ -33,7 +45,7 @@ def inMde(f):
   """Make a path relative to the Mde Pkg root dir."""
   return inWorkspace(os.path.join("MdePkg", f))
 
-def DoLib(msafile):
+def doLib(msafile, arch):
 
   """Create a directory with the sources, AutoGen.h and a makefile."""
 
@@ -45,45 +57,43 @@ def DoLib(msafile):
   msabase = os.path.basename(base)
 
   suppArch = str(XmlElement(msa, "/ModuleSurfaceArea/ModuleDefinitions/SupportedArchitectures"))
-  if not ARCH in string.split(suppArch, " "):
+  if not arch in string.split(suppArch, " "):
     return
 
-  try:
-    os.path.isdir(libName) or os.mkdir(libName);
-  except:
-    print "Error: file %s exists" % libName
-    sys.exit()
-    
+  mkdir(libName);
 
-  for msaFile in XmlList(msa, "/ModuleSurfaceArea/SourceFiles/Filename"):
+  buildDir = os.path.join(libName, "build-%s" % arch )
+  mkdir(buildDir)
 
-    msaFileName = str(XmlElementData(msaFile))
-    arch = msaFile.getAttribute("SupArchList")
-    toolchain = msaFile.getAttribute("ToolChainFamily")
-    base, ext = os.path.splitext(msaFileName)
+  for sourceFile in XmlList(msa, "/ModuleSurfaceArea/SourceFiles/Filename"):
 
-    if arch in ["", ARCH] and (ext in [".c", ".h"] or toolchain in ["GCC"]):
+    sourceFileName = str(XmlElementData(sourceFile))
+    suppArchs = sourceFile.getAttribute("SupArchList").split(" ")
+    toolchain = sourceFile.getAttribute("ToolChainFamily")
+    base, ext = os.path.splitext(sourceFileName)
+
+    if ( suppArchs == [""] or arch in suppArchs) and (ext in [".c", ".h", ".S"] or toolchain in ["GCC"]):
       if ext in [".c", ".S"]:
         sources.append(str(base+".o"))
-      targetDir = os.path.join(libName, os.path.dirname(msaFileName))
-      try:
-        os.makedirs(targetDir)
-      except:
-        pass
-      shutil.copy(inMde(os.path.join(os.path.dirname(msafile), msaFileName)), 
-        targetDir)
+      sourceDir = os.path.join(libName, os.path.dirname(sourceFileName))
+      mkdir(sourceDir)
+      mkdir(os.path.join(buildDir, os.path.dirname(sourceFileName)))
+      if copyingSources :
+        shutil.copy(inMde(os.path.join(os.path.dirname(msafile), sourceFileName)), 
+          sourceDir)
 
     # Write a Makefile for this module
-    f = open(os.path.join(libName, "Makefile"), "w")
-    f.write(Makefile % (libName, string.join(sources, " ")))
+    f = open(os.path.join(buildDir, "Makefile"), "w")
+    f.write(Makefile.substitute(ARCH=arch, LIBNAME=libName, OBJECTS=string.join(sources, " ")))
     f.close()
 
     # Right now we are getting the AutoGen.h file from a previous build. We
     # could create it from scratch also.
-    shutil.copy(inWorkspace("Build/Mde/DEBUG_UNIXGCC/%s/MdePkg/Library/%s/%s/DEBUG/AutoGen.h") % (ARCH, libName, msabase), libName)
+    shutil.copy(inWorkspace("Build/Mde/DEBUG_UNIXGCC/%s/MdePkg/Library/%s/%s/DEBUG/AutoGen.h") % (arch, libName, msabase), buildDir)
 
 # This acts like the main() function for the script, unless it is 'import'ed
 # into another script.
 if __name__ == '__main__':
 
-  openMdeSpd();
+  for arch in ["IA32", "X64"]:
+    openMdeSpd(arch);
