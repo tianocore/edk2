@@ -33,8 +33,8 @@
 ;   );
 ;------------------------------------------------------------------------------
 InternalMathSwapBytes64 PROC
-    mov     eax, [esp + 8]
-    mov     edx, [esp + 4]
+    mov     eax, [esp + 8]              ; eax <- upper 32 bits
+    mov     edx, [esp + 4]              ; edx <- lower 32 bits
     bswap   eax
     bswap   edx
     ret

@@ -31,6 +31,9 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmReadMm2  PROC
+    ;
+    ; 64-bit MASM doesn't support MMX instructions, so use opcode here
+    ;
     DB      48h, 0fh, 7eh, 0d0h
     ret
 AsmReadMm2  ENDP

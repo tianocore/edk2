@@ -40,7 +40,7 @@ InternalMathRRotU64 PROC    USES    ebx
     rol     ebx, cl
     shrd    edx, ebx, cl
     test    cl, 32                      ; Count >= 32?
-    cmovnz  ecx, eax
+    cmovnz  ecx, eax                    ; switch eax & edx if Count >= 32
     cmovnz  eax, edx
     cmovnz  edx, ecx
     ret

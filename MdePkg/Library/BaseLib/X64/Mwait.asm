@@ -34,7 +34,7 @@
 AsmMwait    PROC
     mov     eax, ecx
     mov     ecx, edx
-    DB      0fh, 1, 0c9h
+    DB      0fh, 1, 0c9h                ; mwait
     ret
 AsmMwait    ENDP
 

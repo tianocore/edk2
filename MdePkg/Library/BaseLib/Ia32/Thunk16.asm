@@ -75,6 +75,11 @@ SavedGdt    LABEL   FWORD
 ; by user code. It will be shadowed to somewhere in memory below 1MB.
 ;------------------------------------------------------------------------------
 _BackFromUserCode   PROC
+    ;
+    ; The order of saved registers on the stack matches the order they appears
+    ; in IA32_REGS structure. This facilitates wrapper function to extract them
+    ; into that structure.
+    ;
     push    ss
     push    cs
     DB      66h
@@ -104,6 +109,11 @@ _ThunkAttr  DD      ?
     mov     eax, ss
     DB      67h
     lea     bp, [esp + sizeof (IA32_REGS)]
+    ;
+    ; esi's in the following 2 instructions are indeed bp in 16-bit code. Fact
+    ; is "esi" in 32-bit addressing mode has the same encoding of "bp" in 16-
+    ; bit addressing mode.
+    ;
     mov     word ptr (IA32_REGS ptr [esi - sizeof (IA32_REGS)])._ESP, bp
     mov     ebx, (IA32_REGS ptr [esi - sizeof (IA32_REGS)])._EIP
     shl     ax, 4                       ; shl eax, 4
@@ -167,7 +177,7 @@ _ToUserCode PROC
     pop     fs
     pop     gs
     popf                                ; popfd
-    DB      66h
+    DB      66h                         ; Use 32-bit addressing for "retf" below
     retf                                ; transfer control to user code
 _ToUserCode ENDP
 
@@ -197,7 +207,7 @@ GdtEnd          LABEL   QWORD
 ;   );
 ;------------------------------------------------------------------------------
 InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
-    mov     esi, [esp + 36]             ; esi <- RegSet
+    mov     esi, [esp + 36]             ; esi <- RegSet, the 1st parameter
     movzx   edx, (IA32_REGS ptr [esi])._SS
     mov     edi, (IA32_REGS ptr [esi])._ESP
     add     edi, - (sizeof (IA32_REGS) + 4) ; reserve stack space
@@ -227,11 +237,11 @@ InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
     lgdt    fword ptr [edx + (_16Gdtr - SavedCr0)]
-    pushfd
+    pushfd                              ; Save df/if indeed
     call    fword ptr [edx + (_EntryPoint - SavedCr0)]
     popfd
     lidt    fword ptr [esp + 36]        ; restore protected mode IDTR
-    lea     eax, [ebp - sizeof (IA32_REGS)]
+    lea     eax, [ebp - sizeof (IA32_REGS)] ; eax <- the address of IA32_REGS
     ret
 InternalAsmThunk16  ENDP
 

@@ -36,15 +36,14 @@
 ;------------------------------------------------------------------------------
 InternalX86DisablePaging64    PROC
     cli
-    shl     rcx, 32
+    shl     rcx, 32                     ; rcx[32..47] <- Cs
     lea     eax, @F
-    mov     ecx, eax
-    push    rcx
-    mov     ebx, edx
     mov     esi, r8d
+    or      rcx, rax                    ; rcx[0..47] <- Cs:@F
     mov     edi, r9d
-    mov     eax, [rsp + 28h]
-    retf
+    mov     eax, [rsp + 28h]            ; eax <- New Stack
+    push    rcx
+    retf                                ; switch to compatibility mode
 @@:
     mov     esp, eax                    ; set up new stack
     mov     rax, cr0
@@ -57,10 +56,10 @@ InternalX86DisablePaging64    PROC
     mov     rax, cr4
     and     al, NOT (1 SHL 5)           ; clear PAE
     mov     cr4, rax
-    push    rdi
-    push    rsi
-    call    rbx
-    jmp     $
+    push    rdi                         ; push Context2
+    push    rsi                         ; push Context1
+    call    rdx                         ; transfer control to EntryPoint
+    hlt                                 ; no one should get here
 InternalX86DisablePaging64    ENDP
 
     END

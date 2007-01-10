@@ -31,6 +31,9 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteMm3 PROC
+    ;
+    ; 64-bit MASM doesn't support MMX instructions, so use opcode here
+    ;
     DB      48h, 0fh, 6eh, 0d9h
     ret
 AsmWriteMm3 ENDP

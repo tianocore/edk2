@@ -39,7 +39,7 @@ InternalLongJump    PROC
     mov     r13, [rcx + 30h]
     mov     r14, [rcx + 38h]
     mov     r15, [rcx + 40h]
-    mov     rax, rdx
+    mov     rax, rdx                    ; set return value
     jmp     qword ptr [rcx + 48h]
 InternalLongJump    ENDP
 

@@ -36,7 +36,7 @@
 ;------------------------------------------------------------------------------
 InternalX86EnablePaging64 PROC
     cli
-    pop     rax
+    pop     rax                         ; skip the return address
     call    @Base
 @Base:
     add     dword ptr [rsp], @F - @Base ; offset for far retf, seg is the 1st arg
@@ -58,7 +58,7 @@ InternalX86EnablePaging64 PROC
     mov     rsp, [esp + 18h]
     add     rsp, -20h
     call    rbx
-    jmp     $                           ; halt processor if EntryPoint() returned
+    hlt                                 ; halt processor if EntryPoint() returned
 InternalX86EnablePaging64 ENDP
 
     END

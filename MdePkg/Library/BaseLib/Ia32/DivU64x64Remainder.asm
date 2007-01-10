@@ -36,13 +36,13 @@ EXTERN  InternalMathDivRemU64x32:PROC
 ;   );
 ;------------------------------------------------------------------------------
 InternalMathDivRemU64x64    PROC
-    mov     ecx, [esp + 16]
+    mov     ecx, [esp + 16]             ; ecx <- divisor[32..63]
     test    ecx, ecx
     jnz     _@DivRemU64x64              ; call _@DivRemU64x64 if Divisor > 2^32
     mov     ecx, [esp + 20]
     jecxz   @F
-    and     dword ptr [ecx + 4], 0
-    mov     [esp + 16], ecx
+    and     dword ptr [ecx + 4], 0      ; zero high dword of remainder
+    mov     [esp + 16], ecx             ; set up stack frame to match DivRemU64x32
 @@:
     jmp     InternalMathDivRemU64x32
 InternalMathDivRemU64x64    ENDP
@@ -61,11 +61,11 @@ _@DivRemU64x64  PROC    USES    ebx esi edi
     jnz     @B
     div     ebx
     mov     ebx, eax                    ; ebx <- quotient
-    mov     ecx, [esp + 28]
-    mul     dword ptr [esp + 24]
-    imul    ecx, ebx
-    add     edx, ecx
-    mov     ecx, dword ptr [esp + 32]
+    mov     ecx, [esp + 28]             ; ecx <- high dword of divisor
+    mul     dword ptr [esp + 24]        ; edx:eax <- quotient * divisor[0..31]
+    imul    ecx, ebx                    ; ecx <- quotient * divisor[32..63]
+    add     edx, ecx                    ; edx <- (quotient * divisor)[32..63]
+    mov     ecx, dword ptr [esp + 32]   ; ecx <- addr for Remainder
     jc      @TooLarge                   ; product > 2^64
     cmp     edi, edx                    ; compare high 32 bits
     ja      @Correct
@@ -76,7 +76,7 @@ _@DivRemU64x64  PROC    USES    ebx esi edi
     dec     ebx                         ; adjust quotient by -1
     jecxz   @Return                     ; return if Remainder == NULL
     sub     eax, dword ptr [esp + 24]
-    sbb     edx, dword ptr [esp + 28]
+    sbb     edx, dword ptr [esp + 28]   ; edx:eax <- (quotient - 1) * divisor
 @Correct:
     jecxz   @Return
     sub     esi, eax
@@ -85,7 +85,7 @@ _@DivRemU64x64  PROC    USES    ebx esi edi
     mov     [ecx + 4], edi
 @Return:
     mov     eax, ebx                    ; eax <- quotient
-    xor     edx, edx
+    xor     edx, edx                    ; quotient is 32 bits long
     ret
 _@DivRemU64x64  ENDP
 

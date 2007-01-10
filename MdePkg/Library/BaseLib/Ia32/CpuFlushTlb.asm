@@ -33,7 +33,7 @@
 ;------------------------------------------------------------------------------
 CpuFlushTlb PROC
     mov     eax, cr3
-    mov     cr3, eax
+    mov     cr3, eax                    ; moving to CR3 flushes TLB
     ret
 CpuFlushTlb ENDP
 

@@ -34,7 +34,7 @@
 ;   );
 ;------------------------------------------------------------------------------
 InternalX86FxRestore  PROC
-    mov     eax, [esp + 4]
+    mov     eax, [esp + 4]              ; Buffer must be 16-byte aligned
     fxrstor [eax]
     ret
 InternalX86FxRestore  ENDP

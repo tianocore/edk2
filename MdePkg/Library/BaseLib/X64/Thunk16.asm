@@ -66,6 +66,14 @@ SavedGdt    LABEL   FWORD
 ; by user code. It will be shadowed to somewhere in memory below 1MB.
 ;------------------------------------------------------------------------------
 _BackFromUserCode   PROC
+    ;
+    ; The order of saved registers on the stack matches the order they appears
+    ; in IA32_REGS structure. This facilitates wrapper function to extract them
+    ; into that structure.
+    ;
+    ; Some instructions for manipulation of segment registers have to be written
+    ; in opcode since 64-bit MASM prevents accesses to those registers.
+    ;
     DB      16h                         ; push ss
     DB      0eh                         ; push cs
     DB      66h
@@ -115,7 +123,7 @@ SavedCr4    DD      ?
     ;
     ; rdi in the instruction below is indeed bx in 16-bit code
     ;
-    DB      66h, 2eh
+    DB      66h, 2eh                    ; 2eh is "cs:" segment override
     lgdt    fword ptr [rdi + (SavedGdt - @Base)]
     DB      66h
     mov     ecx, 0c0000080h
@@ -129,9 +137,8 @@ SavedCr0    DD      ?
 @64Eip      DD      ?
 SavedCs     DW      ?
 @64BitCode:
-    DB      48h, 0b8h                   ; mov rax, imm64
-SavedRip    DQ      ?
-    jmp     rax                         ; return to caller
+    mov     rsp, r8                     ; restore stack
+    ret
 _BackFromUserCode   ENDP
 
 _EntryPoint DD      _ToUserCode - m16Start
@@ -160,14 +167,14 @@ _ToUserCode PROC
     mov     cr4, rbp
     mov     ss, esi                     ; set up 16-bit stack segment
     mov     sp, bx                      ; set up 16-bit stack pointer
-    DB      66h
+    DB      66h                         ; make the following call 32-bit
     call    @Base                       ; push eip
 @Base:
     pop     bp                          ; ebp <- address of @Base
     push    [esp + sizeof (IA32_REGS) + 2]
-    lea     eax, [rsi + (@RealMode - @Base)]
+    lea     eax, [rsi + (@RealMode - @Base)]    ; rsi is "bp" in 16-bit code
     push    rax
-    retf
+    retf                                ; execution begins at next instruction
 @RealMode:
     DB      66h, 2eh                    ; CS and operand size override
     lidt    fword ptr [rsi + (_16Idtr - @Base)]
@@ -178,7 +185,7 @@ _ToUserCode PROC
     pop     gs
     popf                                ; popfd
     lea     sp, [esp + 4]               ; skip high order 32 bits of EFlags
-    DB      66h
+    DB      66h                         ; make the following retf 32-bit
     retf                                ; transfer control to user code
 _ToUserCode ENDP
 
@@ -220,8 +227,8 @@ GDT_SIZE = $ - _NullSeg
 ;   );
 ;------------------------------------------------------------------------------
 InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
-    mov     r10d, ds
-    mov     r11d, es
+    mov     r10d, ds                    ; r9 ~ r11 are not accessible in 16-bit
+    mov     r11d, es                    ; so use them for saving seg registers
     mov     r9d, ss
     push    fs
     push    gs
@@ -238,8 +245,8 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     lea     ecx, [rdx + (SavedCr4 - m16Start)]
     mov     eax, edx                    ; eax <- transition code address
     and     edx, 0fh
-    shl     eax, 12
-    lea     ax, [rdx + (_BackFromUserCode - m16Start)]
+    shl     eax, 12                     ; segment address in high order 16 bits
+    lea     ax, [rdx + (_BackFromUserCode - m16Start)]  ; offset address
     stosd                               ; [edi] <- return address of user code
     sgdt    fword ptr [rcx + (SavedGdt - SavedCr4)]
     sidt    fword ptr [rsp + 38h]       ; save IDT stack in argument space
@@ -257,13 +264,12 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     pushfq
     lea     edx, [rdx + DATA16 - DATA32]
     lea     r8, @RetFromRealMode
-    mov     [rcx + (SavedRip - SavedCr4)], r8
+    push    r8
     mov     r8d, cs
     mov     [rcx + (SavedCs - SavedCr4)], r8w
     mov     r8, rsp
     jmp     fword ptr [rcx + (_EntryPoint - SavedCr4)]
 @RetFromRealMode:
-    mov     rsp, r8
     popfq
     lidt    fword ptr [rsp + 38h]       ; restore protected mode IDTR
     lea     eax, [rbp - sizeof (IA32_REGS)]

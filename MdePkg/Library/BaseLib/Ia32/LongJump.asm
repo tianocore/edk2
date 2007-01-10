@@ -40,7 +40,7 @@ InternalLongJump    PROC
     mov     edi, [edx + 8]
     mov     ebp, [edx + 12]
     mov     esp, [edx + 16]
-    jmp     dword ptr [edx + 20]
+    jmp     dword ptr [edx + 20]        ; restore "eip"
 InternalLongJump    ENDP
 
     END

@@ -36,7 +36,7 @@ AsmMonitor  PROC
     mov     eax, ecx
     mov     ecx, edx
     mov     edx, r8d
-    DB      0fh, 1, 0c8h
+    DB      0fh, 1, 0c8h                ; monitor
     ret
 AsmMonitor  ENDP
 

@@ -47,11 +47,11 @@ InternalX86EnablePaging64 PROC
     or      ah, 1                       ; set LME
     wrmsr
     mov     eax, cr0
-    bts     eax, 31
+    bts     eax, 31                     ; set PG
     mov     cr0, eax                    ; enable paging
-    retf
+    retf                                ; topmost 2 dwords hold the address
 @@:                                     ; long mode starts here
-    DB      67h, 48h
+    DB      67h, 48h                    ; 32-bit address size, 64-bit operand size
     mov     ebx, [esp]                  ; mov rbx, [esp]
     DB      67h, 48h
     mov     ecx, [esp + 8]              ; mov rcx, [esp + 8]
@@ -62,7 +62,7 @@ InternalX86EnablePaging64 PROC
     DB      48h
     add     esp, -20h                   ; add rsp, -20h
     call    ebx                         ; call rbx
-    jmp     $
+    hlt                                 ; no one should get here
 InternalX86EnablePaging64 ENDP
 
     END

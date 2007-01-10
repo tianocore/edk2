@@ -32,8 +32,8 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteMsr64   PROC
-    mov     rax, rdx
-    shr     rdx, 20h
+    mov     rax, rdx                    ; meanwhile, rax <- return value
+    shr     rdx, 20h                    ; edx:eax contains the value to write
     wrmsr
     ret
 AsmWriteMsr64   ENDP

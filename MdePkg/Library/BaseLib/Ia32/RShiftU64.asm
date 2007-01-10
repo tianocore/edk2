@@ -32,10 +32,10 @@
 ;   );
 ;------------------------------------------------------------------------------
 InternalMathRShiftU64   PROC
-    mov     cl, [esp + 12]
+    mov     cl, [esp + 12]              ; cl <- Count
     xor     edx, edx
     mov     eax, [esp + 8]
-    test    cl, 32
+    test    cl, 32                      ; Count >= 32?
     cmovz   edx, eax
     cmovz   eax, [esp + 4]
     shrd    eax, edx, cl
