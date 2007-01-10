@@ -785,14 +785,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
     
     <sequential>
-      <!-- Lack Dependency Check -->
-      <exec dir="${DEST_DIR_OUTPUT}" executable="${ASM}" failonerror="true">
-        <arg line="/nologo /omf ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT} /Bl${ASMLINK} ${ASMLINK_FLAGS}"/>
-      </exec>
-      <concat destfile="${DEST_DIR_OUTPUT}/@{FILENAME}.cat" binary="yes">
-        <filelist dir="${MODULE_DIR}" files="Blank2.pad"/>
-        <filelist dir="${DEST_DIR_OUTPUT}" files="@{FILENAME}.com"/>
-      </concat>
+      <OnDependency>
+        <sourcefiles>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.cat"/>
+        </targetfiles>
+  
+        <sequential>
+          <exec dir="${DEST_DIR_OUTPUT}" executable="${ASM}" failonerror="true">
+            <arg line="/nologo /omf ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT} /Bl${ASMLINK} ${ASMLINK_FLAGS}"/>
+          </exec>
+          <concat destfile="${DEST_DIR_OUTPUT}/@{FILENAME}.cat" binary="yes">
+            <filelist dir="${MODULE_DIR}" files="Blank2.pad"/>
+            <filelist dir="${DEST_DIR_OUTPUT}" files="@{FILENAME}.com"/>
+          </concat>
+        </sequential>
+      </OnDependency>
     </sequential>
   </macrodef>
 
