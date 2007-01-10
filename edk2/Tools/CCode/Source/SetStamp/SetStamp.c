@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,8 +23,43 @@ Abstract:
 
 #define LINE_MAXLEN 80
 
+//
+// Utility Name
+//
+#define UTILITY_NAME  "SetStamp"
+
+//
+// Utility version information
+//
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 1
+
 void
-PrintUsage (
+Version (
+  void
+  )
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf ("%s v%d.%d -Utility to set Date/Time Stamp for Portable Executable (PE) format file.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+void
+Usage (
   void
   )
 /*++
@@ -38,10 +73,12 @@ Returns:
   None
 --*/
 {
+  Version();
+  
   //
   // print usage of command
   //
-  printf ("Usage: SetStamp <PE-File> <TIME-File>\n");
+  printf ("\nUsage: SetStamp <PE-File> <TIME-File>\n");
 }
 
 int
@@ -422,11 +459,26 @@ main (
   FILE    *fp;
   time_t  ltime;
 
+  if (argc == 1) {
+    Usage();
+    return -1;
+  }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
   //
   // check the number of parameters
   //
   if (argc != 3) {
-    PrintUsage ();
+    Usage ();
     return -1;
   }
   //
