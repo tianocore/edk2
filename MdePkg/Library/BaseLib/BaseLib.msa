@@ -415,8 +415,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/CpuId.asm</Filename>
     <Filename SupArchList="X64">X64/CpuIdEx.asm</Filename>
     <Filename SupArchList="X64">X64/ReadEflags.asm</Filename>
-    <Filename SupArchList="X64">X64/ReadMsr64.c</Filename>
-    <Filename SupArchList="X64">X64/WriteMsr64.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/ReadMsr64.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/WriteMsr64.c</Filename>
     <Filename SupArchList="X64">X64/ReadCr0.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr2.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr3.asm</Filename>
@@ -481,8 +481,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/Wbinvd.asm</Filename>
     <Filename SupArchList="X64">X64/Invd.asm</Filename>
     <Filename SupArchList="X64">X64/FlushCacheLine.asm</Filename>
-    <Filename SupArchList="X64">X64/InterlockedIncrement.c</Filename>
-    <Filename SupArchList="X64">X64/InterlockedDecrement.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedIncrement.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedDecrement.c</Filename>
     <Filename SupArchList="X64">X64/InterlockedCompareExchange32.asm</Filename>
     <Filename SupArchList="X64">X64/InterlockedCompareExchange64.asm</Filename>
     <Filename SupArchList="X64">X64/EnableInterrupts.asm</Filename>
@@ -490,7 +490,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/EnableDisableInterrupts.asm</Filename>
     <Filename SupArchList="X64">X64/CpuSleep.asm</Filename>
     <Filename SupArchList="X64">X64/CpuPause.asm</Filename>
-    <Filename SupArchList="X64">X64/CpuBreakpoint.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/CpuBreakpoint.c</Filename>
     <Filename SupArchList="X64">X64/CpuFlushTlb.asm</Filename>
     <Filename SupArchList="X64">X64/Thunk16.asm</Filename>
 
