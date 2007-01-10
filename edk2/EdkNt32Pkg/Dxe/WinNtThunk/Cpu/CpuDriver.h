@@ -24,7 +24,7 @@ Abstract:
 
 
 
-extern UINT8  STRING_ARRAY_NAME[];
+extern UINT8  CpuStrings[];
 
 //
 // Internal Data Structures
