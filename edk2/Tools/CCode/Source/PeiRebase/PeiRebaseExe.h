@@ -54,7 +54,7 @@ Abstract:
 // The function that displays general utility information
 //
 VOID
-PrintUtilityInfo (
+Version (
   VOID
   )
 /*++
@@ -78,7 +78,7 @@ Returns:
 // The function that displays the utility usage message.
 //
 VOID
-PrintUsage (
+Usage (
   VOID
   )
 /*++

@@ -104,11 +104,28 @@ Returns:
   // Set utility name for error/warning reporting purposes.
   //
   SetUtilityName (UTILITY_NAME);
+  
+  if (argc == 1) {
+    Usage();
+    return STATUS_ERROR;
+  }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return STATUS_ERROR;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return STATUS_ERROR;
+  }
+ 
   //
   // Verify the correct number of arguments
   //
   if (argc != MAX_ARGS) {
-    PrintUsage ();
+    Usage ();
     return STATUS_ERROR;
   }
 
@@ -135,7 +152,7 @@ Returns:
     // Make sure argument pair begin with - or /
     //
     if (argv[Index][0] != '-' && argv[Index][0] != '/') {
-      PrintUsage ();
+      Usage ();
       Error (NULL, 0, 0, argv[Index], "unrecognized option");
       return STATUS_ERROR;
     }
@@ -143,7 +160,7 @@ Returns:
     // Make sure argument specifier is only one letter
     //
     if (argv[Index][2] != 0) {
-      PrintUsage ();
+      Usage ();
       Error (NULL, 0, 0, argv[Index], "unrecognized option");
       return STATUS_ERROR;
     }
@@ -156,7 +173,7 @@ Returns:
       if (strlen (InputFileName) == 0) {
         strcpy (InputFileName, argv[Index + 1]);
       } else {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "only one -i InputFileName may be specified");
         return STATUS_ERROR;
       }
@@ -167,7 +184,7 @@ Returns:
       if (OutputFileName == NULL) {
         OutputFileName = argv[Index + 1];
       } else {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "only one -o OutputFileName may be specified");
         return STATUS_ERROR;
       }
@@ -204,14 +221,14 @@ Returns:
     case 'B':
     case 'b':
       if (BaseTypes & 1) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "XipBaseAddress may be specified only once by either -b or -f");
         return STATUS_ERROR;
       }
 
       Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &XipBase);
       if (EFI_ERROR (Status)) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for XIP base address");
         return STATUS_ERROR;
       }
@@ -222,14 +239,14 @@ Returns:
     case 'D':
     case 'd':
       if (BaseTypes & 2) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "-d BsBaseAddress may be specified only once");
         return STATUS_ERROR;
       }
 
       Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &BsBase);
       if (EFI_ERROR (Status)) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for BS_DRIVER base address");
         return STATUS_ERROR;
       }
@@ -240,14 +257,14 @@ Returns:
     case 'R':
     case 'r':
       if (BaseTypes & 4) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "-r RtBaseAddress may be specified only once");
         return STATUS_ERROR;
       }
 
       Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &RtBase);
       if (EFI_ERROR (Status)) {
-        PrintUsage ();
+        Usage ();
         Error (NULL, 0, 0, argv[Index + 1], "invalid hex digit given for RT_DRIVER base address");
         return STATUS_ERROR;
       }
@@ -256,7 +273,7 @@ Returns:
       break;
 
     default:
-      PrintUsage ();
+      Usage ();
       Error (NULL, 0, 0, argv[Index], "unrecognized argument");
       return STATUS_ERROR;
       break;
@@ -490,7 +507,7 @@ Returns:
 }
 
 VOID
-PrintUtilityInfo (
+Version (
   VOID
   )
 /*++
@@ -509,17 +526,12 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s, PEI Rebase Utility. Version %i.%i, %s.\n\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION,
-    UTILITY_DATE
-    );
+  printf ("%s v%d.%d -PEI Rebase Utility.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
 }
 
 VOID
-PrintUsage (
+Usage (
   VOID
   )
 /*++
@@ -538,15 +550,17 @@ Returns:
 
 --*/
 {
+  Version();
+  
   printf (
-    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress\n",
+    "\nUsage: %s -I InputFileName -O OutputFileName -B BaseAddress\n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
-  printf ("    InputFileName is the name of the EFI FV file to rebase.\n");
-  printf ("    OutputFileName is the desired output file name.\n");
-  printf ("    BaseAddress is the FV base address to rebase against.\n");
-  printf ("  Argument pair may be in any order.\n\n");
+  printf ("     InputFileName is the name of the EFI FV file to rebase.\n");
+  printf ("     OutputFileName is the desired output file name.\n");
+  printf ("     BaseAddress is the FV base address to rebase agains.\n");
+  printf ("  Argument pair may be in any order.\n");
 }
 
 EFI_STATUS
