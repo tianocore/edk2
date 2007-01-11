@@ -517,7 +517,7 @@ public class SelectModuleBelong extends IDialog {
         // Check if path is valid
         //
         File f = new File(path);
-        if (!f.isFile()) {
+        if (!f.isAbsolute()) {
             Log.wrn("New File", "Please type a complete file path!");
             return false;
         }
@@ -539,15 +539,13 @@ public class SelectModuleBelong extends IDialog {
             }
             
             //
-            // Check if path already exists
-            // Currently we allow user to add multiple msa files in one same directory
-            // Remove this checkpoint
+            // Check if the module is in selected package
             //
-//            if (GlobalData.isDuplicateRelativePath(Tools.getFilePathOnly(modulePath), mode)) {
-//                Log.wrn("New File", "There already exists a same directory with a module");
-//                return false;
-//            }
-            
+            if (Tools.getFilePathOnly(modulePath).indexOf(Tools.getFilePathOnly(packagePath)) < 0) {
+                Log.wrn("New File", "This module should be in the directory of selected package!");
+                return false;
+            }
+                      
             //
             // Check if Guid+Version is unique
             //
