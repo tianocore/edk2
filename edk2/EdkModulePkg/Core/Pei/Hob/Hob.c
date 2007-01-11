@@ -117,6 +117,9 @@ Returns:
                HandOffHob->EfiFreeMemoryBottom;
 
   if (FreeMemory < Length) {
+    DEBUG ((EFI_D_ERROR, "PeiCreateHob fail: Length - 0x%08x\n", (UINTN)Length));
+    DEBUG ((EFI_D_ERROR, "  FreeMemoryTop    - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryTop));
+    DEBUG ((EFI_D_ERROR, "  FreeMemoryBottom - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryBottom));
     return EFI_OUT_OF_RESOURCES;
   }
   
