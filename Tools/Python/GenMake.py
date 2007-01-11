@@ -29,11 +29,11 @@ def mkdir(path):
   except:
     pass
   
-def openMdeSpd(arch):
+def openSpd(spdFile, arch):
 
-  """Open the MdePkg.spd and process the msa files."""
+  """Open the spdFile and process the msa files it contains."""
 
-  db = xml.dom.minidom.parse(inWorkspace("MdePkg/MdePkg.spd"))
+  db = xml.dom.minidom.parse(inWorkspace(spdFile))
 
   for msaFile in XmlList(db, "/PackageSurfaceArea/MsaFiles/Filename"):
     msaFileName = XmlElementData(msaFile)
@@ -76,7 +76,7 @@ def doLib(msafile, arch):
       if ext in [".c", ".S"]:
         obj = str(base+".o")
         if obj in objects:
-          print "Error: The msa file %s is ambigous. There are mutliple sources that can produce the object file %s. Please fix it." % (msafile, obj)
+          print "Error: The msa file %s is ambiguous. There are mutliple sources that can produce the object file %s. Please fix it." % (msafile, obj)
           sys.exit()
         else:
           objects.append(obj)
@@ -101,4 +101,4 @@ def doLib(msafile, arch):
 if __name__ == '__main__':
 
   for arch in ["IA32", "X64"]:
-    openMdeSpd(arch);
+    openSpd("MdePkg/MdePkg.spd", arch);
