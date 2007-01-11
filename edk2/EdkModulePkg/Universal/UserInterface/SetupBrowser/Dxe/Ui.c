@@ -3003,7 +3003,10 @@ Returns:
         FileFormTags->VariableDefinitions->VariableFakeSize = (UINT16) (FileFormTags->VariableDefinitions->VariableFakeSize + FileFormTags->VariableDefinitions->VariableSize);
         
         FileFormTags->VariableDefinitions->NvRamMap = AllocateZeroPool (FileFormTags->VariableDefinitions->VariableSize);
+        ASSERT (FileFormTags->VariableDefinitions->NvRamMap != NULL);
+
         FileFormTags->VariableDefinitions->FakeNvRamMap = AllocateZeroPool (NvMapSize + FileFormTags->VariableDefinitions->VariableFakeSize);
+        ASSERT (FileFormTags->VariableDefinitions->FakeNvRamMap != NULL);
 
         CopyMem (FileFormTags->VariableDefinitions->NvRamMap, NvMap, NvMapSize);
         gBS->FreePool (NvMapListHead);

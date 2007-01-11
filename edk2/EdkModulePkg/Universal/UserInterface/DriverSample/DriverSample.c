@@ -94,11 +94,13 @@ Returns:
     // Need some memory for OptionList. Allow for up to 8 options.
     //
     OptionList = AllocateZeroPool (sizeof (IFR_OPTION) * 8);
+    ASSERT (OptionList != NULL);
 
     //
     // Allocate space for creation of Buffer
     //
     UpdateData = AllocateZeroPool (0x1000);
+    ASSERT (UpdateData != NULL);
 
     //
     // Remove all the op-codes starting with Label 0x2222 to next Label (second label is for convenience
@@ -170,11 +172,13 @@ Returns:
     // Need some memory for OptionList. Allow for up to 8 options.
     //
     OptionList = AllocateZeroPool (sizeof (IFR_OPTION) * 8);
+    ASSERT (OptionList != NULL);
 
     //
     // Allocate space for creation of Buffer
     //
     UpdateData = AllocateZeroPool (0x1000);
+    ASSERT (UpdateData != NULL);
 
     //
     // Remove all the op-codes starting with Label 0x2222 to next Label (second label is for convenience
@@ -244,6 +248,7 @@ Returns:
                     0x1000,
                     (VOID **) &UpdateData
                     );
+    ASSERT_EFI_ERROR (Status);
 
     ZeroMem (UpdateData, 0x1000);
 
@@ -297,6 +302,7 @@ Returns:
                     0x1000,
                     (VOID **)&UpdateData
                     );
+    ASSERT_EFI_ERROR (Status);
 
     ZeroMem (UpdateData, 0x1000);
 
@@ -366,6 +372,7 @@ Returns:
                     sizeof (EFI_HII_CALLBACK_PACKET) + sizeof (SAMPLE_STRING) + 2,
                     (VOID **) Packet
                     );
+    ASSERT_EFI_ERROR (Status);
 
     ZeroMem (*Packet, sizeof (EFI_HII_CALLBACK_PACKET) + sizeof (SAMPLE_STRING) + 2);
 
@@ -384,6 +391,7 @@ Returns:
                     sizeof (EFI_HII_CALLBACK_PACKET) + 2,
                     (VOID **) Packet
                     );
+    ASSERT_EFI_ERROR (Status);
 
     ZeroMem (*Packet, sizeof (EFI_HII_CALLBACK_PACKET) + 2);
 
@@ -585,6 +593,7 @@ DriverSampleInit (
                   0x1000,
                   (VOID **) &UpdateData
                   );
+  ASSERT_EFI_ERROR (Status);
 
   ZeroMem (UpdateData, 0x1000);
 

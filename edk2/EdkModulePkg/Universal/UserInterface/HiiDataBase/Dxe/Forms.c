@@ -1409,6 +1409,8 @@ Returns:
   TempBufferSize += PackageInstance->IfrSize + PackageInstance->StringSize;
 
   TempBuffer      = AllocateZeroPool (TempBufferSize);
+  ASSERT (TempBuffer != NULL);
+
   OrigTempBuffer  = TempBuffer;
 
   //

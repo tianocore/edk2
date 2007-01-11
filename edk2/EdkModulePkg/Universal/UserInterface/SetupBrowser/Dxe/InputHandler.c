@@ -1233,6 +1233,7 @@ GetSelectionInputPopUp (
         //
         if (StrLen (StringPtr) > (PopUpWidth - 1)) {
           TempStringPtr = AllocateZeroPool (sizeof (CHAR16) * (PopUpWidth - 1));
+          ASSERT (TempStringPtr != NULL);
           CopyMem (TempStringPtr, StringPtr, (sizeof (CHAR16) * (PopUpWidth - 5)));
           gBS->FreePool (StringPtr);
           StringPtr = TempStringPtr;
