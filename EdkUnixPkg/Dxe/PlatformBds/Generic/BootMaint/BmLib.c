@@ -464,8 +464,12 @@ Returns:
   EFI_GUID          HiiGuid;
   EFI_HII_PROTOCOL  *Hii;
 
-  HandleBufferLength  = 0x1000;
+  //
+  // Initialize params.
+  //
+  HandleBufferLength  = 0;
   HiiHandleBuffer     = NULL;
+  
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
@@ -478,12 +482,9 @@ Returns:
   //
   // Get all the Hii handles
   //
-  HiiHandleBuffer = AllocateZeroPool (HandleBufferLength);
-  ASSERT (HiiHandleBuffer != NULL);
-
-  Status = Hii->FindHandles (Hii, &HandleBufferLength, HiiHandleBuffer);
+  Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandleBuffer);
   ASSERT_EFI_ERROR (Status);
-
+  
   //
   // Get the Hii Handle that matches the StructureNode->ProducerName
   //
