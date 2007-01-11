@@ -2997,6 +2997,7 @@ Returns:
   UINT32              TransferResult;
   UINT8               *ReceiveBuffer;
   UINT8               *ProcessBuffer;
+  EHCI_ASYNC_REQUEST  *NextPtr;
 
   Status          = EFI_SUCCESS;
   QtdHwPtr        = NULL;
@@ -3042,6 +3043,8 @@ Returns:
 
     UpdateAsyncRequestTransfer (AsyncRequestPtr, TransferResult, ErrQtdPos);
 
+    NextPtr = AsyncRequestPtr->Next;
+
     if (EFI_USB_NOERROR == TransferResult) {
 
       if (AsyncRequestPtr->CallBackFunc != NULL) {
@@ -3069,8 +3072,7 @@ Returns:
       gBS->FreePool (ProcessBuffer);
     }
 
-    AsyncRequestPtr = AsyncRequestPtr->Next;
-
+    AsyncRequestPtr = NextPtr;
   }
 
 exit:
