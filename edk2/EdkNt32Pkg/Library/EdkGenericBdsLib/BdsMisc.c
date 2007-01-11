@@ -975,3 +975,56 @@ Returns:
     } 
   } 
 } 
+
+EFI_STATUS
+BdsLibGetHiiHandles (
+  IN     EFI_HII_PROTOCOL *Hii,
+  IN OUT UINT16           *HandleBufferLength,
+  OUT    EFI_HII_HANDLE   **HiiHandleBuffer
+  )
+/*++
+
+Routine Description:
+
+  Determines the handles that are currently active in the database.
+  It's the caller's responsibility to free handle buffer.
+
+Arguments:
+
+  This                  - A pointer to the EFI_HII_PROTOCOL instance.
+  HandleBufferLength    - On input, a pointer to the length of the handle buffer. On output, 
+                          the length of the handle buffer that is required for the handles found.
+  HiiHandleBuffer       - Pointer to an array of EFI_HII_PROTOCOL instances returned.
+
+Returns:
+
+  EFI_SUCCESS           - Get an array of EFI_HII_PROTOCOL instances successfully.
+  EFI_INVALID_PARAMETER - Hii is NULL.
+  EFI_NOT_FOUND         - Database not found.
+  
+--*/
+{
+  UINT16      TempBufferLength;
+  EFI_STATUS  Status;
+  
+  TempBufferLength = 0;
+  
+  //
+  // Try to find the actual buffer size for HiiHandle Buffer.
+  //
+  Status = Hii->FindHandles (Hii, &TempBufferLength, *HiiHandleBuffer);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    *HiiHandleBuffer = AllocateZeroPool (TempBufferLength);
+    Status = Hii->FindHandles (Hii, &TempBufferLength, *HiiHandleBuffer);
+    //
+    // we should not fail here.
+    //
+    ASSERT_EFI_ERROR (Status);
+  }
+  
+  *HandleBufferLength = TempBufferLength;
+  
+  return Status;
+  
+}

@@ -485,15 +485,16 @@ Returns:
   UINT16          Length;
   EFI_GUID        HiiGuid;
 
-  HandleBufferLength  = 0x1000;
+  //
+  // Initialize params.
+  //
+  HandleBufferLength  = 0;
   HiiHandleBuffer     = NULL;
 
   //
   // Get all the Hii handles
   //
-  HiiHandleBuffer = AllocateZeroPool (HandleBufferLength);
-
-  Status          = Hii->FindHandles (Hii, &HandleBufferLength, HiiHandleBuffer);
+  Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandleBuffer);
   ASSERT_EFI_ERROR (Status);
 
   //

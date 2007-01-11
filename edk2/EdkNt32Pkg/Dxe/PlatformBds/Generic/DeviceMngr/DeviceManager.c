@@ -201,6 +201,7 @@ Returns:
 
   IfrOptionList       = NULL;
   VideoOption         = NULL;
+  HiiHandles          = NULL;
   HandleBufferLength  = 0;
 
   //
@@ -268,8 +269,11 @@ Returns:
   CreateSubTitleOpCode (STR_EMPTY_STRING, &UpdateData->Data);
   Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
 
-  HiiHandles = AllocateZeroPool (HandleBufferLength);
-  Hii->FindHandles (Hii, &HandleBufferLength, HiiHandles);
+  //
+  // Get all the Hii handles
+  //
+  Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandles);
+  ASSERT_EFI_ERROR (Status);
 
   for (Index = 1, BufferSize = 0; Index < HandleBufferLength; Index++) {
     //
@@ -487,6 +491,7 @@ Returns:
   }
 
   gBS->FreePool (UpdateData);
+  gBS->FreePool (HiiHandles);
 
   return Status;
 }
