@@ -49,7 +49,7 @@ def doLib(msafile, arch):
 
   """Create a directory with the sources, AutoGen.h and a makefile."""
 
-  sources = []
+  objects = []
 
   msa = xml.dom.minidom.parse(inMde(msafile))
   libName = str(XmlElement(msa, "/ModuleSurfaceArea/MsaHeader/ModuleName"))
@@ -72,9 +72,14 @@ def doLib(msafile, arch):
     toolchain = sourceFile.getAttribute("ToolChainFamily")
     base, ext = os.path.splitext(sourceFileName)
 
-    if ( suppArchs == [""] or arch in suppArchs) and (ext in [".c", ".h", ".S"] or toolchain in ["GCC"]):
+    if ( suppArchs == [""] or arch in suppArchs) and toolchain in ["", "GCC"] and ext in [".c", ".h", ".S"]:
       if ext in [".c", ".S"]:
-        sources.append(str(base+".o"))
+        obj = str(base+".o")
+        if obj in objects:
+          print "Error: The msa file %s is ambigous. There are mutliple sources that can produce the object file %s. Please fix it." % (msafile, obj)
+          sys.exit()
+        else:
+          objects.append(obj)
       sourceDir = os.path.join(libName, os.path.dirname(sourceFileName))
       mkdir(sourceDir)
       mkdir(os.path.join(buildDir, os.path.dirname(sourceFileName)))
@@ -84,7 +89,7 @@ def doLib(msafile, arch):
 
     # Write a Makefile for this module
     f = open(os.path.join(buildDir, "Makefile"), "w")
-    f.write(Makefile.substitute(ARCH=arch, LIBNAME=libName, OBJECTS=string.join(sources, " ")))
+    f.write(Makefile.substitute(ARCH=arch, LIBNAME=libName, OBJECTS=string.join(objects, " ")))
     f.close()
 
     # Right now we are getting the AutoGen.h file from a previous build. We
