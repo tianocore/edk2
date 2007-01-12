@@ -20,7 +20,7 @@
 .file  "IpfCpuCore.s"
 
 #include  "IpfMacro.i"
-#include  "Ipf\IpfCpuCore.i"
+#include  "Ipf/IpfCpuCore.i"
 
 //----------------------------------------------------------------------------------
 // This module supports terminating CAR (Cache As RAM) stage. It copies all the
