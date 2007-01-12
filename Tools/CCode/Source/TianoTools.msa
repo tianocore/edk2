@@ -128,7 +128,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</L
     <Filename>Include/Guid/Capsule.h</Filename>
     <Filename>Include/Guid/FirmwareFileSystem.h</Filename>
     <Filename>Include/Ia32/ProcessorBind.h</Filename>
+    <Filename>Include/IndustryStandard/EfiPci.h</Filename>
     <Filename>Include/IndustryStandard/pci22.h</Filename>
+    <Filename>Include/IndustryStandard/pci23.h</Filename>
+    <Filename>Include/IndustryStandard/pci30.h</Filename>
+    <Filename>Include/IndustryStandard/Acpi1_0.h</Filename>
+    <Filename>Include/IndustryStandard/Acpi2_0.h</Filename>
+    <Filename>Include/IndustryStandard/Acpi3_0.h</Filename>
+    <Filename>Include/IndustryStandard/Acpi.h</Filename>
+    <Filename>Include/IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h</Filename>
     <Filename>Include/Library/PeCoffLib.h</Filename>
     <Filename>Include/Library/PrintLib.h</Filename>
     <Filename>Include/Protocol/DevicePath.h</Filename>
