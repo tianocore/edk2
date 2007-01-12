@@ -90,10 +90,19 @@ SerialStatusCodeReportWorker (
   UINTN           CharCount;
   VA_LIST         Marker;
   EFI_DEBUG_INFO  *DebugInfo;
+  EFI_TPL         CurrentTpl;
 
 
-  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial) && EfiAtRuntime ()) {
-    return EFI_DEVICE_ERROR;
+  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial)) {
+    if (EfiAtRuntime ()) {
+      return EFI_DEVICE_ERROR;
+    }
+    CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    gBS->RestoreTPL (CurrentTpl);
+
+    if (CurrentTpl > EFI_TPL_CALLBACK ) {
+      return EFI_DEVICE_ERROR;
+    }
   }
 
   Buffer[0] = '\0';
