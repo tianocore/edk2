@@ -56,7 +56,7 @@ AcquireRecordBuffer (
     Node = GetFirstNode (&mRecordsBuffer);
     RemoveEntryList (Node);
 
-    Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
+    Record = _CR (Node, DATAHUB_STATUSCODE_RECORD, Node);
   } else {
     if (CurrentTpl > EFI_TPL_NOTIFY) {
       gBS->RestoreTPL (CurrentTpl);
@@ -85,26 +85,36 @@ AcquireRecordBuffer (
 
 
 /**
-  Release a mRecordBuffer entry allocated by AcquirRecordBuffer ().
+  Retrieve one record from Records FIFO. The record would be removed from FIFO and 
+  release to free record buffer.
 
-  @param   Record        Point to record buffer which is acquired by AcquirRecordBuffer()
+  @return   !NULL   Point to record, which is ready to be logged.
+  @return   NULL    the FIFO of record is empty.
  
 **/
-VOID
-FreeRecordBuffer (
-  IN  DATAHUB_STATUSCODE_RECORD  *Record
+DATAHUB_STATUSCODE_RECORD *
+RetrieveRecord (
+  VOID
   )
 {
-  EFI_TPL  CurrentTpl;
-
-  ASSERT (Record != NULL);
+  DATAHUB_STATUSCODE_RECORD   *Record = NULL;
+  LIST_ENTRY                  *Node;
+  EFI_TPL                     CurrentTpl;
 
   CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
 
-  RemoveEntryList (&Record->Node);
-  InsertTailList (&mRecordsBuffer, &Record->Node);
+  if (!IsListEmpty (&mRecordsFifo)) {
+    Node = GetFirstNode (&mRecordsFifo);
+    Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
+
+    RemoveEntryList (&Record->Node);
+    InsertTailList (&mRecordsBuffer, &Record->Node);
+    Record->Signature = 0;
+  }
 
   gBS->RestoreTPL (CurrentTpl);
+
+  return Record;
 }
 
 
@@ -229,20 +239,16 @@ LogDataHubEventCallBack (
   DATAHUB_STATUSCODE_RECORD         *Record;
   UINT32                            Size;
   UINT64                            DataRecordClass;
-  LIST_ENTRY                        *Node;
-  EFI_TPL                           CurrentTpl;
 
   //
   // Log DataRecord in Data Hub.
   // Journal records fifo to find all record entry.
   //
-  //
-  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
-
-  for (Node = mRecordsFifo.ForwardLink; Node != &mRecordsFifo;) {
-    Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
-    Node   = Node->ForwardLink;
-
+  while (1) {
+    Record = RetrieveRecord ();
+    if (Record == NULL) {
+      break;
+    }
     //
     // Add in the size of the header we added.
     //
@@ -277,12 +283,7 @@ LogDataHubEventCallBack (
                         Size
                         );
 
-
-
-    FreeRecordBuffer (Record);
   }
-
-  gBS->RestoreTPL (CurrentTpl);
 }
 
 
