@@ -226,15 +226,11 @@ public class AutogenLibOrder {
             if (libInstanceConsumedBy.get(libInstanceList[i]).size() > 0 && libInstanceList[i].hasConstructor()) {
                 EdkLog.log(EdkLog.EDK_ERROR, libInstanceList[i].getName()
                            + " with constructor has a circular dependency!");
-                // throw new AutoGenException("Circular dependency in library instances is found!");
+                throw new AutoGenException("Circular dependency in library instances is found!");
             }
 
             if (!orderList.contains(libInstanceList[i])) {
-                if (libInstanceList[i].getName().equals("UefiBootServicesTableLib")) {
-                    orderList.addFirst(libInstanceList[i]);
-                } else {
-                    orderList.add(libInstanceList[i]);
-                }
+                orderList.add(libInstanceList[i]);
             }
         }
         return orderList;
