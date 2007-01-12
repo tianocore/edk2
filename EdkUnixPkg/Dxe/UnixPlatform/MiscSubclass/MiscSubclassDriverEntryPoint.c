@@ -175,7 +175,7 @@ Returns:
   //
   // Locate data hub protocol.
   //
-  EfiStatus = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  EfiStatus = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**) &DataHub);
 
   if (EFI_ERROR (EfiStatus)) {
     DEBUG ((EFI_D_ERROR, "Could not locate DataHub protocol.  %r\n", EfiStatus));
@@ -187,7 +187,7 @@ Returns:
   //
   // Locate hii protocol.
   //
-  EfiStatus = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
+  EfiStatus = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, (VOID**)&Hii);
 
   if (EFI_ERROR (EfiStatus)) {
     DEBUG ((EFI_D_ERROR, "Could not locate Hii protocol.  %r\n", EfiStatus));
@@ -436,7 +436,7 @@ Returns:
   //
   // Locate DataHub protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**)&DataHub);
   if (EFI_ERROR (Status)) {
     return ;
   }
@@ -447,7 +447,7 @@ Returns:
     Status = gBS->OpenProtocol (
                     HandleBuffer[HandleIndex],
                     &gEfiUnixIoProtocolGuid,
-                    &UnixIo,
+                    (VOID**)&UnixIo,
                     Context,
                     NULL,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL

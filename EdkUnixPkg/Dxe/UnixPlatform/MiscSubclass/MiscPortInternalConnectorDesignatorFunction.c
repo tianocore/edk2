@@ -74,15 +74,15 @@ Returns:
   STATIC PS2_CONN_DEVICE_PATH       mPs2MouseDevicePath     = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0303, 1), DP_END };
   STATIC SERIAL_CONN_DEVICE_PATH    mCom1DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0501, 0), DP_END };
   STATIC SERIAL_CONN_DEVICE_PATH    mCom2DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0501, 1), DP_END };
-  STATIC PARALLEL_CONN_DEVICE_PATH  mLpt1DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0401, 0), DP_END };
+  //STATIC PARALLEL_CONN_DEVICE_PATH  mLpt1DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0401, 0), DP_END };
   STATIC FLOOPY_CONN_DEVICE_PATH    mFloopyADevicePath      = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0604, 0), DP_END };
-  STATIC FLOOPY_CONN_DEVICE_PATH    mFloopyBDevicePath      = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0604, 1), DP_END };
-  STATIC USB_PORT_DEVICE_PATH       mUsb0DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x00), DP_END };
-  STATIC USB_PORT_DEVICE_PATH       mUsb1DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x01), DP_END };
-  STATIC USB_PORT_DEVICE_PATH       mUsb2DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x02), DP_END };
-  STATIC USB_PORT_DEVICE_PATH       mUsb3DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x07), DP_END };
-  STATIC IDE_DEVICE_PATH            mIdeDevicePath          = { DP_ACPI, DP_PCI (0x1F, 0x01), DP_END };
-  STATIC GB_NIC_DEVICE_PATH         mGbNicDevicePath        = { DP_ACPI, DP_PCI( 0x03,0x00 ),DP_PCI( 0x1F,0x00 ),DP_PCI( 0x07,0x00 ), DP_END };
+  //STATIC FLOOPY_CONN_DEVICE_PATH    mFloopyBDevicePath      = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0604, 1), DP_END };
+  //STATIC USB_PORT_DEVICE_PATH       mUsb0DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x00), DP_END };
+  //STATIC USB_PORT_DEVICE_PATH       mUsb1DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x01), DP_END };
+  //STATIC USB_PORT_DEVICE_PATH       mUsb2DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x02), DP_END };
+  //STATIC USB_PORT_DEVICE_PATH       mUsb3DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x07), DP_END };
+  //STATIC IDE_DEVICE_PATH            mIdeDevicePath          = { DP_ACPI, DP_PCI (0x1F, 0x01), DP_END };
+  //STATIC GB_NIC_DEVICE_PATH         mGbNicDevicePath        = { DP_ACPI, DP_PCI( 0x03,0x00 ),DP_PCI( 0x1F,0x00 ),DP_PCI( 0x07,0x00 ), DP_END };
   EFI_DEVICE_PATH_PROTOCOL          EndDevicePath           = DP_END;
 
   //

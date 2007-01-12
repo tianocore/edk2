@@ -147,7 +147,7 @@ GetErrno(void)
 }
 
 extern EFI_STATUS
-UgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, CONST CHAR16 *Title);
+UgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
 
 EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   EFI_UNIX_THUNK_PROTOCOL_SIGNATURE,

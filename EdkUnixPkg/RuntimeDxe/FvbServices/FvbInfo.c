@@ -62,13 +62,17 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       },  // Reserved[3]
       1,  // Revision
       {
-        RECOVERY_BOIS_BLOCK_NUM,
-        FVB_MEDIA_BLOCK_SIZE,
+        {
+          RECOVERY_BOIS_BLOCK_NUM,
+          FVB_MEDIA_BLOCK_SIZE
+        }
       }
     },
     {
-      0,
-      0
+      {
+        0,
+        0
+      }
     }
   },
   //
@@ -95,13 +99,17 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       },  // Reserved[3]
       1,  // Revision
       {
-        SYSTEM_NV_BLOCK_NUM,
-        FVB_MEDIA_BLOCK_SIZE,
+        {
+          SYSTEM_NV_BLOCK_NUM,
+          FVB_MEDIA_BLOCK_SIZE
+        }
       }
     },
     {
-      0,
-      0
+      {
+        0,
+        0
+      }
     }
   }
 };

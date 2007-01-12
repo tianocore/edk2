@@ -173,7 +173,7 @@ UnixSimpleFileSystemComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimpleFileSystemProtocolGuid,
-                  &SimpleFileSystem,
+                  (VOID**)&SimpleFileSystem,
                   gUnixSimpleFileSystemDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

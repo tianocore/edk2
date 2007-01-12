@@ -1255,7 +1255,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
                   sizeof (ESAL_FWB_GLOBAL),
-                  &mFvbModuleGlobal
+                  (VOID**) &mFvbModuleGlobal
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -1309,7 +1309,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
                   BufferSize,
-                  &mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]
+                  (VOID**) &mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -1395,7 +1395,7 @@ Returns:
     Status = gBS->AllocatePool (
                     EfiRuntimeServicesData,
                     sizeof (EFI_FW_VOL_BLOCK_DEVICE),
-                    &FvbDevice
+                    (VOID**) &FvbDevice
                     );
     ASSERT_EFI_ERROR (Status);
 
@@ -1437,7 +1437,7 @@ Returns:
       Status = gBS->HandleProtocol (
                       FwbHandle,
                       &gEfiFirmwareVolumeBlockProtocolGuid,
-                      &OldFwbInterface
+                      (VOID**)&OldFwbInterface
                       );
       ASSERT_EFI_ERROR (Status);
 
@@ -1484,7 +1484,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
                   MaxLbaSize,
-                  &mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL]
+                  (VOID**)&mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL]
                   );
   ASSERT_EFI_ERROR (Status);
 

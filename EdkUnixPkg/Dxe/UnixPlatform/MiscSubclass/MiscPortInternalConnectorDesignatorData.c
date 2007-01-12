@@ -31,7 +31,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortConnectorTypeOther,  // PortInternalConnectorType
   EfiPortConnectorTypeOther,  // PortExternalConnectorType
   EfiPortTypeNone,            // PortType
-  0                           // PortPath
+  {0, 0, 0}                         // PortPath
 };
 
 //
@@ -45,7 +45,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortTypeKeyboard,      // PortType
   // mPs2KbyboardDevicePath                          // PortPath
   //
-  0
+  {0}
 };
 
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortMouse) = {
@@ -56,7 +56,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortTypeMouse,         // PortType
   // mPs2MouseDevicePath                // PortPath
   //
-  0
+  {0}
 };
 
 
@@ -66,7 +66,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortConnectorTypeNone,
   EfiPortConnectorTypeDB9Female,
   EfiPortTypeSerial16550ACompatible,
-  0
+  {0}
 };
 
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortCom2) = {
@@ -84,7 +84,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortConnectorTypeOther,
   EfiPortConnectorTypeNone,
   EfiPortTypeOther,
-  0
+  {0}
 };
 
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortFloppy) = {
@@ -93,7 +93,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscP
   EfiPortConnectorTypeOnboardFloppy,
   EfiPortConnectorTypeNone,
   EfiPortTypeOther,
-  0
+  {0}
 };
 
 /* eof - MiscPortInternalConnectorDesignatorData.c */

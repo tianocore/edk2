@@ -757,7 +757,7 @@ Returns:
   //
   // There should be only one EFI_HII_PROTOCOL Image
   //
-  Status = EfiLibLocateProtocol (&gEfiHiiProtocolGuid, &Hii);
+  Status = EfiLibLocateProtocol (&gEfiHiiProtocolGuid, (VOID**)&Hii);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -893,7 +893,7 @@ Returns:
   }
 
   Location  = (UINT8 *) &UpdateData->Data;
-  Status    = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, &LegacyBios);
+  Status    = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID**) &LegacyBios);
   if (!EFI_ERROR (Status)) {
     //
     // If LegacyBios Protocol is installed, add 3 tags about legacy boot option
@@ -1240,7 +1240,7 @@ Returns:
   //
   // There should only be one Form Configuration protocol
   //
-  Status = EfiLibLocateProtocol (&gEfiFormBrowserProtocolGuid, &FormConfig);
+  Status = EfiLibLocateProtocol (&gEfiFormBrowserProtocolGuid, (VOID**) &FormConfig);
   if (EFI_ERROR (Status)) {
     return Status;
   }
