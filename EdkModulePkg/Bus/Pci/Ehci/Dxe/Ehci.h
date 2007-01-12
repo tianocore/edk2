@@ -2681,4 +2681,18 @@ Returns:
 --*/
 ;
 
+VOID
+ClearLegacySupport (
+  IN USB2_HC_DEV     *HcDev
+  );
+
+VOID
+HostReset (
+  IN USB2_HC_DEV    *HcDev
+  );
+
+VOID 
+DumpEHCIPortsStatus (
+  IN USB2_HC_DEV    *HcDev
+  );
 #endif
