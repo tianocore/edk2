@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -58,16 +58,6 @@ DxeSalLibInitialize (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-EFIAPI
-DxeSalLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return DxeSalLibInitialize ();
-}
-
 VOID
 EFIAPI
 DxeSalVirtualNotifyEvent (
@@ -83,10 +73,10 @@ Routine Description:
 Arguments:
 
   Event   - The Event that is being processed
-  
+
   Context - Event Context
 
-Returns: 
+Returns:
 
   None
 
@@ -115,11 +105,11 @@ Routine Description:
 
 Arguments:
   FunctionId    - ID of function to register
-  ClassGuid     - GUID of function class 
+  ClassGuid     - GUID of function class
   Function      - Function to register under ClassGuid/FunctionId pair
   ModuleGlobal  - Module global for Function.
 
-Returns: 
+Returns:
   EFI_SUCCESS - If ClassGuid/FunctionId Function was registered.
 
 --*/
@@ -149,12 +139,12 @@ Routine Description:
   This function is boot service only!
 
 Arguments:
-  ClassGuid     - GUID of function class 
+  ClassGuid     - GUID of function class
   ModuleGlobal  - Module global for Function.
-  ...           - SAL_INTERNAL_EXTENDED_SAL_PROC and FunctionId pairs. NULL 
+  ...           - SAL_INTERNAL_EXTENDED_SAL_PROC and FunctionId pairs. NULL
                   indicates the end of the list.
 
-Returns: 
+Returns:
   EFI_SUCCESS - All members of ClassGuid registered
 
 --*/
@@ -209,7 +199,7 @@ EfiCallEsalService (
 
 Routine Description:
 
-  Call module that is not linked direclty to this module. This code is IP 
+  Call module that is not linked direclty to this module. This code is IP
   relative and hides the binding issues of virtual or physical calling. The
   function that gets dispatched has extra arguments that include the registered
   module global and a boolean flag to indicate if the system is in virutal mode.
@@ -225,7 +215,7 @@ Arguments:
   Arg7        - Argument 7 ClassGuid/FunctionId defined
   Arg8        - Argument 8 ClassGuid/FunctionId defined
 
-Returns: 
+Returns:
   Status of ClassGuid/FuncitonId
 
 --*/
