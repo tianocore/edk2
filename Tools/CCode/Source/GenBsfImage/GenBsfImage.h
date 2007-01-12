@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c)  1999 - 2002 Intel Corporation. All rights reserved
+Copyright (c) 1999 - 2007 Intel Corporation. All rights reserved
 This software and associated documentation (if any) is furnished
 under a license and may only be used or copied in accordance
 with the terms of the license. Except as permitted by such
@@ -98,7 +98,7 @@ Abstract:
 //
 // IPF processor address is cached bit
 //
-#define IPF_CACHE_BIT 0x8000000000000000
+#define IPF_CACHE_BIT 0x8000000000000000ULL
 
 //
 // Size definition to calculate the location from top of address for
