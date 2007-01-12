@@ -242,7 +242,7 @@ Returns:
     //
     // Allocate space for creation of Buffer
     //
-    QuestionId = (UINT16) ((UINTN) (&NVStruc.DynamicCheck));
+    QuestionId = (UINT16) ((UINTN) (&NVStruc.DynamicCheck) - (UINTN) (&NVStruc));
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     0x1000,

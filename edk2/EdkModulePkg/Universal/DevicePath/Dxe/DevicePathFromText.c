@@ -510,7 +510,7 @@ TrimHexStr (
     Str += 1;
   }
   //
-  // skip preceeding white space
+  // skip preceeding character 'x' or 'X'
   //
   if (*Str && (*Str == 'x' || *Str == 'X')) {
     Str += 1;
