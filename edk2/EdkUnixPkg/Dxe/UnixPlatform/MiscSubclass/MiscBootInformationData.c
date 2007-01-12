@@ -27,7 +27,7 @@ Abstract:
 //
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_BOOT_INFORMATION_STATUS_DATA, BootInformationStatus) = {
   EfiBootInformationStatusNoError,  // BootInformationStatus
-  0                                 // BootInformationData
+  {0}                                 // BootInformationData
 };
 
 /* eof - MiscBootInformationData.c */

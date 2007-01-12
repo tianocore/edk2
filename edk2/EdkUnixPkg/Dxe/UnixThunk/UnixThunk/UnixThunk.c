@@ -33,17 +33,23 @@ Abstract:
 //
 static UNIX_THUNK_DEVICE_PATH mUnixThunkDevicePath = {
   {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
     EFI_UNIX_THUNK_PROTOCOL_GUID,
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    END_DEVICE_PATH_LENGTH,
-    0
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
   }
 };
 

@@ -167,7 +167,7 @@ UnixBusDriverComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiUnixIoProtocolGuid,
-                  &UnixIo,
+                  (VOID**)&UnixIo,
                   gUnixBusDriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

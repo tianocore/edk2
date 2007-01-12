@@ -632,7 +632,7 @@ Returns:
   CHAR16                            *Src;
   char                              *Dst;
   CHAR8                             *RealFileName;
-  CHAR16                            *TempFileName;
+  //CHAR16                            *TempFileName;
   char                              *ParseFileName;
   char                              *GuardPointer;
   CHAR8                             TempChar;
@@ -863,7 +863,7 @@ OpenRoot:
 
         LastError = PrivateFile->UnixThunk->GetErrno ();
         if (LastError != EEXIST) {
-          gBS->FreePool (TempFileName);
+          //gBS->FreePool (TempFileName);
           Status = EFI_ACCESS_DENIED;
           goto Done;
         }

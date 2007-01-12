@@ -24,10 +24,14 @@ Abstract:
 #include "BBSsupport.h"
 
 EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
-  END_DEVICE_PATH_TYPE,
-  END_ENTIRE_DEVICE_PATH_SUBTYPE,
-  END_DEVICE_PATH_LENGTH,
-  0
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
 };
 
 VOID
@@ -446,7 +450,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
   LocalBbsTable = NULL;
   BbsEntry      = NULL;
 
-  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, &LegacyBios);
+  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID**) &LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -680,7 +684,7 @@ Returns:
   LocalHddInfo  = NULL;
   LocalBbsTable = NULL;
 
-  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, &LegacyBios);
+  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID**)&LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -985,7 +989,7 @@ Index# is a 16 bit integer, the low byte of it stands for the index in BBS table
   BEVIndex      = 0;
   NewDevPtr     = NULL;
 
-  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, &LegacyBios);
+  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID**) &LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1497,7 +1501,7 @@ BdsRefreshBbsTableForBoot (
   LocalBbsTable = NULL;
   DevType       = BBS_UNKNOWN;
 
-  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, &LegacyBios);
+  Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID**) &LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }

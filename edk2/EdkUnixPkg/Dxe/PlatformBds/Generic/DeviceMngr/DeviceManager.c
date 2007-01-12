@@ -411,7 +411,7 @@ Returns:
 
   ASSERT (FPCallbackInfo.Data.VideoBIOS <= 1);
 
-  Status = gBS->AllocatePool (EfiBootServicesData, 2 * sizeof (IFR_OPTION), &IfrOptionList);
+  Status = gBS->AllocatePool (EfiBootServicesData, 2 * sizeof (IFR_OPTION), (VOID**) &IfrOptionList);
   if (IfrOptionList != NULL) {
     IfrOptionList[0].Flags        = EFI_IFR_FLAG_INTERACTIVE;
     IfrOptionList[0].Key          = SET_VIDEO_BIOS_TYPE_QUESTION_ID + 0x2000;

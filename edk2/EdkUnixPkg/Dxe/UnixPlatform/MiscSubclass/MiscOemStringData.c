@@ -26,7 +26,7 @@ Abstract:
 // Static (possibly build generated) Bios Vendor data.
 //
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_OEM_STRING_DATA, OemString) = {
-  STRING_TOKEN(STR_MISC_OEM_STRING)
+  { STRING_TOKEN(STR_MISC_OEM_STRING) }
 };
 
 /* eof - MiscOemStringData.c */
