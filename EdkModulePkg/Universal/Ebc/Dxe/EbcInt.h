@@ -104,7 +104,8 @@ EbcDebugSignalException (
 // Define a constant of how often to call the debugger periodic callback
 // function.
 //
-#define EBC_VM_PERIODIC_CALLBACK_RATE 1000
+#define EFI_TIMER_UNIT_1MS            (1000 * 10)
+#define EBC_VM_PERIODIC_CALLBACK_RATE (1000 * EFI_TIMER_UNIT_1MS)
 
 EFI_STATUS
 EbcDebugSignalPeriodic (
