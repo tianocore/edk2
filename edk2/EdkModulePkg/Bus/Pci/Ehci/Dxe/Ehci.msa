@@ -49,6 +49,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Ehci.c</Filename>
+    <Filename>Debug.c</Filename>
     <Filename>EhciMem.c</Filename>
     <Filename>EhciReg.c</Filename>
     <Filename>EhciSched.c</Filename>

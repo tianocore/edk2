@@ -22,6 +22,75 @@ Revision History
 #include "Ehci.h"
 
 
+VOID
+HostReset (
+  IN USB2_HC_DEV    *HcDev
+  )
+{
+  UINT32  Value;
+  UINT32  TimeOut;
+ 
+  ReadEhcOperationalReg (
+    HcDev,
+    USBCMD,
+    &Value
+    );
+
+  Value = Value & (~USBCMD_RS);
+  WriteEhcOperationalReg (
+    HcDev,
+    USBCMD,
+    Value
+    );
+
+  TimeOut = 40;
+  while (TimeOut --) {
+    gBS->Stall (500);
+    ReadEhcOperationalReg (
+      HcDev,
+      USBSTS,
+      &Value
+      );
+    if ((Value & USBSTS_HCH) != 0) {
+      break;
+    }
+  }
+
+  if (TimeOut == 0) {
+    DEBUG((gEHCErrorLevel, "TimeOut for clearing Run/Stop bit\n"));
+  }
+
+  ReadEhcOperationalReg (
+    HcDev,
+    USBCMD,
+    &Value
+    );
+  Value = Value | USBCMD_HCRESET;
+  WriteEhcOperationalReg (
+    HcDev,
+    USBCMD,
+    Value
+    );
+
+  TimeOut = 40;
+  while (TimeOut --) {
+    gBS->Stall (500);
+    ReadEhcOperationalReg (
+      HcDev,
+      USBCMD,
+      &Value
+      );
+    if ((Value & USBCMD_HCRESET) == 0) {
+      break;
+    }
+  }
+
+  if (TimeOut == 0) {
+    DEBUG((gEHCErrorLevel, "TimeOut for Host Reset\n"));
+  }
+
+}
+
 EFI_STATUS
 ReadEhcCapabiltiyReg (
   IN USB2_HC_DEV             *HcDev,
@@ -127,6 +196,126 @@ Returns:
                              1,
                              &Data
                              );
+}
+
+VOID
+ClearLegacySupport (
+  IN USB2_HC_DEV     *HcDev
+  )
+/*++
+
+Routine Description:
+
+  Stop the legacy USB SMI
+
+Arguments:
+
+  HcDev - USB2_HC_DEV
+
+Returns:
+
+  EFI_SUCCESS       Success
+  EFI_DEVICE_ERROR  Fail
+
+--*/
+{
+  UINT32  EECP;
+  UINT32  Value;
+  UINT32  TimeOut;
+
+  ReadEhcCapabiltiyReg (
+    HcDev,
+    HCCPARAMS,
+    &EECP
+    );
+
+  EECP = (EECP >> 8) & 0xFF;
+
+  DEBUG ((gEHCDebugLevel, "EHCI: EECPBase = 0x%x\n", EECP));
+
+
+  HcDev->PciIo->Pci.Read (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP,
+                     1,
+                     &Value 
+                     );
+
+  DEBUG((gEHCDebugLevel, "EECP[0] = 0x%x\n", Value));
+
+  HcDev->PciIo->Pci.Read (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP + 0x4,
+                     1,
+                     &Value 
+                     );
+
+  DEBUG((gEHCDebugLevel, "EECP[4] = 0x%x\n", Value));
+
+  HcDev->PciIo->Pci.Read (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP,
+                     1,
+                     &Value 
+                     );
+
+  Value = Value | (0x1 << 24);
+  DEBUG((gEHCErrorLevel, "Value Written = 0x%x\n", Value));
+
+  HcDev->PciIo->Pci.Write (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP,
+                     1,
+                     &Value 
+                     );
+
+ TimeOut = 40;
+ while (TimeOut --) {
+   gBS->Stall (500);
+
+   HcDev->PciIo->Pci.Read (
+                      HcDev->PciIo,
+                      EfiPciIoWidthUint32,
+                      EECP,
+                      1,
+                      &Value 
+                      );
+  if ((Value & 0x01010000) == 0x01000000) {
+    break;
+  }
+ }
+
+  if (TimeOut == 0) {
+    DEBUG((gEHCErrorLevel, "Timeout for getting HC OS Owned Semaphore\n" ));
+  } 
+  
+  DEBUG((gEHCErrorLevel, "After Release Value\n" ));
+
+  HcDev->PciIo->Pci.Read (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP,
+                     1,
+                     &Value 
+                     );
+
+  DEBUG((gEHCDebugLevel, "EECP[0] = 0x%x\n", Value));
+
+  HcDev->PciIo->Pci.Read (
+                     HcDev->PciIo,
+                     EfiPciIoWidthUint32,
+                     EECP + 0x4,
+                     1,
+                     &Value 
+                     );
+
+  DEBUG((gEHCDebugLevel, "EECP[4] = 0x%x\n", Value));
+
+
 }
 
 EFI_STATUS

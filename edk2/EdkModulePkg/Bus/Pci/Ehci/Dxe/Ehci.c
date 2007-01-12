@@ -441,6 +441,13 @@ EhciDriverBindingStart (
     Status = EFI_DEVICE_ERROR;
     goto uninstall_usb2hc_protocol;
   }
+
+  ClearLegacySupport (HcDev);
+  HostReset (HcDev);
+
+  DEBUG_CODE (
+   DumpEHCIPortsStatus (HcDev);
+  );
   
   //
   // Create and Init Perodic Frame List
