@@ -651,6 +651,95 @@ Returns:
   return Buffer;
 }
 
+VOID
+BdsLibSafeFreePool (
+  IN  VOID             *Buffer
+  )
+/*++
+
+Routine Description:
+
+  Free pool safely.
+
+Arguments:
+  
+  Buffer          - The allocated pool entry to free
+
+Returns:
+
+  Pointer of the buffer allocated.
+
+--*/
+{
+  if (Buffer != NULL) {
+    gBS->FreePool (Buffer);
+    Buffer = NULL;
+  }
+}
+
+EFI_DEVICE_PATH_PROTOCOL *
+BdsLibDelPartMatchInstance (
+  IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
+  IN     EFI_DEVICE_PATH_PROTOCOL  *Single
+  )
+/*++
+
+Routine Description:
+
+  Delete the instance in Multi which matches partly with Single instance
+
+Arguments:
+
+  Multi        - A pointer to a multi-instance device path data structure.
+
+  Single       - A pointer to a single-instance device path data structure.
+
+Returns:
+
+  This function will remove the device path instances in Multi which partly 
+  match with the Single, and return the result device path. If there is no
+  remaining device path as a result, this function will return NULL.
+
+--*/
+{
+  EFI_DEVICE_PATH_PROTOCOL  *Instance;
+  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempNewDevicePath;
+  UINTN                     InstanceSize;
+  UINTN                     SingleDpSize;  
+  UINTN                     Size; 
+  
+  NewDevicePath     = NULL;
+  TempNewDevicePath = NULL;
+
+  if (Multi == NULL || Single == NULL) {
+    return Multi;
+  }
+  
+  Instance        =  GetNextDevicePathInstance (&Multi, &InstanceSize);
+  SingleDpSize    =  GetDevicePathSize (Single) - END_DEVICE_PATH_LENGTH;
+  InstanceSize    -= END_DEVICE_PATH_LENGTH;
+
+  while (Instance != NULL) {
+
+    Size = (SingleDpSize < InstanceSize) ? SingleDpSize : InstanceSize;    
+        
+    if ((CompareMem (Instance, Single, Size) != 0)) {
+      //
+      // Append the device path instance which does not match with Single
+      //
+      TempNewDevicePath = NewDevicePath;
+      NewDevicePath = AppendDevicePathInstance (NewDevicePath, Instance);
+      BdsLibSafeFreePool(TempNewDevicePath);
+    }
+    BdsLibSafeFreePool(Instance);
+    Instance = GetNextDevicePathInstance (&Multi, &InstanceSize);
+    InstanceSize  -= END_DEVICE_PATH_LENGTH;
+  }
+  
+  return NewDevicePath;
+}
+
 BOOLEAN
 BdsLibMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,

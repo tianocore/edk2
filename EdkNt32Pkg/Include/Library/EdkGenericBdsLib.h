@@ -246,6 +246,17 @@ BdsLibUnpackDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   );
 
+VOID
+BdsLibSafeFreePool (
+  IN  VOID             *Buffer
+  );
+
+EFI_DEVICE_PATH_PROTOCOL *
+BdsLibDelPartMatchInstance (
+  IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
+  IN     EFI_DEVICE_PATH_PROTOCOL  *Single
+  );
+
 BOOLEAN
 BdsLibMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
