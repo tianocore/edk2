@@ -1,15 +1,15 @@
 /**@file
  AutogenLibOrder class.
 
- This class is to reorder library instance sequence according to library 
+ This class is to reorder library instance sequence according to library
  dependence.
- 
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -62,12 +62,12 @@ public class AutogenLibOrder {
     /// String[1] is libraryConstructor name, String[2] is libDestructor name.
     ///
     private ModuleIdentification[] libInstanceList = null;
-    
+
     /**
       Constructor function
-    
+
       This function mainly initialize some member variable.
-     
+
       @param  libraryList   List of the library instance.
       @throws Exception
     **/
@@ -81,12 +81,12 @@ public class AutogenLibOrder {
             libInstance = libraryList[i];
             //
             // Fetch the constructor & destructor.
-            // 
+            //
             Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstance, arch);
             SurfaceAreaQuery saq = new SurfaceAreaQuery(libDoc);
             libInstance.setConstructor(saq.getLibConstructorName());
             libInstance.setDestructor(saq.getLibDestructorName());
-            
+
             //
             // Create library class consume database.
             //
@@ -122,8 +122,8 @@ public class AutogenLibOrder {
         }
 
         //
-        // Create a consumed-by database 
-        // 
+        // Create a consumed-by database
+        //
         for (Iterator it = libClassProducer.keySet().iterator(); it.hasNext();) {
             String className = (String)it.next();
             libInstance = libClassProducer.get(className);
@@ -145,7 +145,7 @@ public class AutogenLibOrder {
     /**
       orderLibInstance
 
-      This function reorder the library instance according the library class 
+      This function reorder the library instance according the library class
       dependency, using DAG anaylysis algothim
 
       @return     List which content the ordered library instance.
@@ -156,7 +156,7 @@ public class AutogenLibOrder {
 
         //
         // First, add the library instance without consumers to the Q
-        // 
+        //
         for (int i = 0; i < libInstanceList.length; ++i) {
             if (libInstanceConsumedBy.get(libInstanceList[i]).size() == 0) {
                 noConsumerList.add(libInstanceList[i]);
@@ -174,6 +174,10 @@ public class AutogenLibOrder {
                     continue;
                 }
                 HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(m);
+                if (consumedBy.size() == 0) {
+                  continue;
+                }
+
                 consumedBy.remove(n);
                 if (consumedBy.size() == 0) {
                     noConsumerList.addLast(m);
@@ -200,10 +204,11 @@ public class AutogenLibOrder {
                         if (consumer.hasConstructor()) {
                             continue;
                         }
+
                         //
-                        // if there's no constructor in the library instance's consumer, 
+                        // if there's no constructor in the library instance's consumer,
                         // remove it from the consumer list
-                        // 
+                        //
                         consumedBy.remove(consumer);
                         circularlyConsumed = false;
                         if (consumedBy.size() == 0) {
@@ -216,12 +221,16 @@ public class AutogenLibOrder {
                         break;
                     }
                 }
+
+                if (noConsumerList.size() == 0 && !circularlyConsumed) {
+                  break;
+                }
             }
         }
 
         //
         // Append the remaining library instance to the end of sorted list
-        // 
+        //
         for (int i = 0; i < libInstanceList.length; ++i) {
             if (libInstanceConsumedBy.get(libInstanceList[i]).size() > 0 && libInstanceList[i].hasConstructor()) {
                 EdkLog.log(EdkLog.EDK_ERROR, libInstanceList[i].getName()
