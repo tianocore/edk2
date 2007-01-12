@@ -79,7 +79,7 @@ Returns:
                           0
                           );
   if (EFI_ERROR (Status)) {
-    DEBUG ((gEHCErrorLevel, "PciIo->AllocateBuffer Failed\n"));
+    DEBUG ((gEHCErrorLevel, "EHCI: PciIo->AllocateBuffer Failed\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto exit;
   }
@@ -93,7 +93,7 @@ Returns:
                           &Map
                           );
   if (EFI_ERROR (Status) || (BufferSizeInBytes != EFI_PAGE_SIZE)) {
-    DEBUG ((gEHCErrorLevel, "PciIo->MapBuffer Failed\n"));
+    DEBUG ((gEHCErrorLevel, "EHCI: PciIo->MapBuffer Failed\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto free_buffer;
   }
@@ -107,7 +107,7 @@ Returns:
 	
   	Status = SetCtrlDataStructSeg (HcDev);
     if (EFI_ERROR (Status)) {
-      DEBUG ((gEHCErrorLevel, "SetCtrlDataStructSeg Failed\n"));
+      DEBUG ((gEHCErrorLevel, "EHCI: SetCtrlDataStructSeg Failed\n"));
       Status = EFI_DEVICE_ERROR;
       goto unmap_buffer;
     }

@@ -223,8 +223,6 @@ EFI_DRIVER_BINDING_PROTOCOL gEhciDriverBinding = {
   NULL
 };
 
-UINT32                      mUsbCapabilityLen;
-UINT32                      mDeviceSpeed[16];
 
 EFI_STATUS
 EFIAPI
@@ -1283,9 +1281,9 @@ EhciGetRootHubPortStatus (
     // Not Low Speed Device Attached
     //
     if ((PORTSC_CCS & PortStatusControlReg) && (PORTSC_CSC & PortStatusControlReg)) {
-      mDeviceSpeed[PortNumber] = IsHighSpeedDevice (This, PortNumber) ? USB_PORT_STAT_HIGH_SPEED : 0;
+      HcDev->DeviceSpeed[PortNumber] = IsHighSpeedDevice (This, PortNumber) ? USB_PORT_STAT_HIGH_SPEED : 0;
     }
-    PortStatus->PortStatus |= mDeviceSpeed[PortNumber];
+    PortStatus->PortStatus |= HcDev->DeviceSpeed[PortNumber];
   }
   //
   // Fill Port Status Change bits
@@ -1410,7 +1408,7 @@ EhciSetRootHubPortFeature (
       }
       Status = WaitForEhcNotHalt (HcDev, EHCI_GENERIC_TIMEOUT);
       if (EFI_ERROR (Status)) {
-        DEBUG ((gEHCDebugLevel, "WaitForEhcNotHalt TimeOut\n"));
+        DEBUG ((gEHCDebugLevel, "EHCI: WaitForEhcNotHalt TimeOut\n"));
         Status = EFI_DEVICE_ERROR;
         goto exit;
       }
