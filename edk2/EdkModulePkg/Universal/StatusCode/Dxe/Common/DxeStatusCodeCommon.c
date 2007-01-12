@@ -148,6 +148,9 @@ ReportDispatcher (
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   )
 {
+	volatile int tt = 1;
+	while (tt) {
+	}
   //
   // Use atom operation to avoid the reentant of report.
   // If current status is not zero, then the function is reentrancy.

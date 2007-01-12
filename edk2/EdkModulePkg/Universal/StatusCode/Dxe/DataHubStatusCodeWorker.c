@@ -18,12 +18,10 @@
 //
 // Initialize FIFO to cache records.
 //
-STATIC 
-EFI_LOCK                  mFifoLock        = EFI_INITIALIZE_LOCK_VARIABLE  (EFI_TPL_HIGH_LEVEL);
 STATIC
-LIST_ENTRY                mRecordsFifo     = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsFifo);
+LIST_ENTRY                mRecordsFifo          = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsFifo);
 STATIC
-UINTN                     mNumberOfRecords = 0;
+LIST_ENTRY                mRecordsBuffer        = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsBuffer);
 STATIC
 EFI_EVENT                 mLogDataHubEvent;
 //
@@ -34,7 +32,9 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 
 /**
-  Return buffer of length DATAHUB_STATUSCODE_RECORD
+  Return one DATAHUB_STATUSCODE_RECORD space.
+  The size of free record pool would be extend, if the pool is empty. 
+
  
   @retval  NULL   Can not allocate free memeory for record.
   @retval  !NULL  Point to buffer of record.
@@ -46,17 +46,39 @@ AcquireRecordBuffer (
   )
 {
   DATAHUB_STATUSCODE_RECORD *Record;
+  EFI_TPL                   CurrentTpl;
+  LIST_ENTRY                *Node;
+  UINT32                    Index;
 
-  Record   = (DATAHUB_STATUSCODE_RECORD *) AllocateZeroPool (sizeof (DATAHUB_STATUSCODE_RECORD));
-  if (NULL == Record) {
-    return NULL;
+  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+
+  if (!IsListEmpty (&mRecordsBuffer)) {
+    Node = GetFirstNode (&mRecordsBuffer);
+    RemoveEntryList (Node);
+
+    Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
+  } else {
+    if (CurrentTpl > EFI_TPL_NOTIFY) {
+      gBS->RestoreTPL (CurrentTpl);
+      return NULL;
+    }
+
+    gBS->RestoreTPL (CurrentTpl);
+    Record   = (DATAHUB_STATUSCODE_RECORD *) AllocateZeroPool (sizeof (DATAHUB_STATUSCODE_RECORD) * 16);
+    if (NULL == Record) {
+      return NULL;
+    }
+
+    CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    for (Index = 1; Index < 16; Index++) {
+      InsertTailList (&mRecordsBuffer, &Record[Index].Node);
+    }
   }
-  Record->Signature = DATAHUB_STATUS_CODE_SIGNATURE;
 
-  EfiAcquireLock (&mFifoLock);
+  Record->Signature = DATAHUB_STATUS_CODE_SIGNATURE;
   InsertTailList (&mRecordsFifo, &Record->Node);
-  mNumberOfRecords++;
-  EfiReleaseLock (&mFifoLock);
+
+  gBS->RestoreTPL (CurrentTpl);
 
   return Record;
 }
@@ -73,15 +95,16 @@ FreeRecordBuffer (
   IN  DATAHUB_STATUSCODE_RECORD  *Record
   )
 {
+  EFI_TPL  CurrentTpl;
+
   ASSERT (Record != NULL);
-  ASSERT (mNumberOfRecords != 0);
 
-  EfiAcquireLock (&mFifoLock);
+  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+
   RemoveEntryList (&Record->Node);
-  mNumberOfRecords--;
-  EfiReleaseLock (&mFifoLock);
+  InsertTailList (&mRecordsBuffer, &Record->Node);
 
-  FreePool (Record);
+  gBS->RestoreTPL (CurrentTpl);
 }
 
 
@@ -207,12 +230,15 @@ LogDataHubEventCallBack (
   UINT32                            Size;
   UINT64                            DataRecordClass;
   LIST_ENTRY                        *Node;
+  EFI_TPL                           CurrentTpl;
 
   //
   // Log DataRecord in Data Hub.
   // Journal records fifo to find all record entry.
   //
   //
+  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+
   for (Node = mRecordsFifo.ForwardLink; Node != &mRecordsFifo;) {
     Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
     Node   = Node->ForwardLink;
@@ -251,8 +277,12 @@ LogDataHubEventCallBack (
                         Size
                         );
 
+
+
     FreeRecordBuffer (Record);
   }
+
+  gBS->RestoreTPL (CurrentTpl);
 }
 
 
