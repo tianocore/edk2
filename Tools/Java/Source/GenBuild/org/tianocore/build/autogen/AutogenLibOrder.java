@@ -231,17 +231,28 @@ public class AutogenLibOrder {
         //
         // Append the remaining library instance to the end of sorted list
         //
+	boolean HasError = false;
         for (int i = 0; i < libInstanceList.length; ++i) {
-            if (libInstanceConsumedBy.get(libInstanceList[i]).size() > 0 && libInstanceList[i].hasConstructor()) {
+	    HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstanceList[i]);
+            if (consumedBy.size() > 0 && libInstanceList[i].hasConstructor()) {
                 EdkLog.log(EdkLog.EDK_ERROR, libInstanceList[i].getName()
                            + " with constructor has a circular dependency!");
-                throw new AutoGenException("Circular dependency in library instances is found!");
+		ModuleIdentification[] consumedByList = consumedBy.toArray(new ModuleIdentification[consumedBy.size()]);
+		for (int j = 0; j < consumedByList.length; ++j) {
+		    EdkLog.log(EdkLog.EDK_ERROR,
+			       " consumed by " + consumedByList[j].getName());
+		}
+		HasError = true;
             }
 
             if (!orderList.contains(libInstanceList[i])) {
                 orderList.add(libInstanceList[i]);
             }
         }
+	if (HasError) {
+	    throw new AutoGenException("Circular dependency in library instances is found!");
+	}
+
         return orderList;
     }
 }
