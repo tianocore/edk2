@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciDeviceSupport.c
-  
+
 Abstract:
 
   This file provides routine to support Pci device node manipulation
@@ -119,7 +119,7 @@ DestroyRootBridge (
 
 Routine Description:
 
-  
+
 Arguments:
 
   RootBridge   - A pointer to the PCI_IO_DEVICE.
@@ -147,7 +147,7 @@ FreePciDevice (
 Routine Description:
 
   Destroy a pci device node.
-  Also all direct or indirect allocated resource for this node will be freed.   
+  Also all direct or indirect allocated resource for this node will be freed.
 
 Arguments:
 
@@ -232,7 +232,7 @@ DestroyRootBridgeByHandle (
 Routine Description:
 
   Destroy all device nodes under the root bridge
-  specified by Controller. 
+  specified by Controller.
   The root bridge itself is also included.
 
 Arguments:
@@ -283,7 +283,7 @@ RegisterPciDevice (
 
 Routine Description:
 
-  This function registers the PCI IO device. It creates a handle for this PCI IO device 
+  This function registers the PCI IO device. It creates a handle for this PCI IO device
   (if the handle does not exist), attaches appropriate protocols onto the handle, does
   necessary initialization, and sets up parent/child relationship with its bus controller.
 
@@ -335,12 +335,17 @@ Returns:
   if (!EFI_ERROR (Status)) {
     PciIoDevice->IsPciExp = TRUE;
   }
-  
+
   //
   // Force Interrupt line to "Unknown" or "No Connection"
+  // based on the PCI spec, the Interrupt line for x86 should be set as 0xFF for unknown.
   //
   PciIo = &(PciIoDevice->PciIo);
+#ifndef MDE_CPU_IPF
   Data8 = PCI_INT_LINE_UNKNOWN;
+#else
+  Data8 = 0;
+#endif
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
 
   //
@@ -436,7 +441,7 @@ RemoveAllPciDeviceOnBridge (
 Routine Description:
 
   This function is used to remove the whole PCI devices from the bridge.
-  
+
 Arguments:
 
   RootBridgeHandle   - An efi handle.
@@ -465,7 +470,7 @@ Returns:
     if (Temp->Registered) {
       DeRegisterPciDevice (RootBridgeHandle, Temp->Handle);
     }
-    
+
     //
     // Remove this node from the linked list
     //
@@ -491,7 +496,7 @@ DeRegisterPciDevice (
 Routine Description:
 
   This function is used to de-register the PCI device from the EFI,
-  That includes un-installing PciIo protocol from the specified PCI 
+  That includes un-installing PciIo protocol from the specified PCI
   device handle.
 
 Arguments:
@@ -603,7 +608,7 @@ Returns:
             );
       return Status;
     }
-    
+
     //
     // The Device Driver should disable this device after disconnect
     // so the Pci Bus driver will not touch this device any more.
@@ -671,7 +676,7 @@ Returns:
 
       Node.DevPath = RemainingDevicePath;
 
-      if (Node.Pci->Device != Temp->DeviceNumber || 
+      if (Node.Pci->Device != Temp->DeviceNumber ||
           Node.Pci->Function != Temp->FunctionNumber) {
         CurrentLink = CurrentLink->ForwardLink;
         continue;
@@ -683,7 +688,7 @@ Returns:
       if (!Temp->Allocated) {
         return EFI_NOT_READY;
       }
-      
+
       //
       // Check if the current node has been registered before
       // If it is not, register it
@@ -703,7 +708,7 @@ Returns:
         ChildHandleBuffer[*NumberOfChildren] = Temp->Handle;
         (*NumberOfChildren)++;
       }
-      
+
       //
       // Get the next device path
       //
@@ -711,7 +716,7 @@ Returns:
       if (EfiIsDevicePathEnd (CurrentDevicePath)) {
         return EFI_SUCCESS;
       }
-  
+
       //
       // If it is a PPB
       //
@@ -814,7 +819,7 @@ StartPciDevices (
 Routine Description:
 
   Start to manage the PCI device according to RemainingDevicePath
-  If RemainingDevicePath == NULL, the PCI bus driver will start 
+  If RemainingDevicePath == NULL, the PCI bus driver will start
   to manage all the PCI devices it found previously
 
 Arguments:
@@ -1044,7 +1049,7 @@ PciDeviceExisted (
 /*++
 
 Routine Description:
-  
+
 Arguments:
 
   Bridge       - A pointer to the PCI_IO_DEVICE.
@@ -1093,7 +1098,7 @@ Routine Description:
 Arguments:
 
   VgaDevice    - A pointer to the PCI_IO_DEVICE.
-  
+
 Returns:
 
   None
@@ -1151,7 +1156,7 @@ Returns:
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
-    if (IS_PCI_VGA(&Temp->Pci) && 
+    if (IS_PCI_VGA(&Temp->Pci) &&
         (Temp->Attributes &
          (EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY |
           EFI_PCI_IO_ATTRIBUTE_VGA_IO     |
@@ -1189,7 +1194,7 @@ Arguments:
   PciRootBridgeIo       - A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   HpcDevicePath         - A pointer to the EFI_DEVICE_PATH_PROTOCL.
   PciAddress            - A pointer to the pci address.
-  
+
 Returns:
 
   None
