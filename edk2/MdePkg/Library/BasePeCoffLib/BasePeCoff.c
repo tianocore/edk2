@@ -391,7 +391,7 @@ PeCoffLoaderGetImageInfo (
       }
 
       if (DebugDirectoryEntryFileOffset != 0) {
-        for (Index = 0; Index < DebugDirectoryEntry->Size; Index++) {
+        for (Index = 0; Index < DebugDirectoryEntry->Size; Index += Size) {
           //
           // Read next debug directory entry
           //
@@ -406,9 +406,8 @@ PeCoffLoaderGetImageInfo (
             ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
             return Status;
           }
-
           if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-            ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index * sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+            ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index);
             if (DebugEntry.RVA == 0 && DebugEntry.FileOffset != 0) {
               ImageContext->ImageSize += DebugEntry.SizeOfData;
             }
@@ -480,7 +479,7 @@ PeCoffLoaderGetImageInfo (
     }
 
     if (DebugDirectoryEntryFileOffset != 0) {
-      for (Index = 0; Index < DebugDirectoryEntry->Size; Index++) {
+      for (Index = 0; Index < DebugDirectoryEntry->Size; Index += Size) {
         //
         // Read next debug directory entry
         //
@@ -497,7 +496,7 @@ PeCoffLoaderGetImageInfo (
         }
 
         if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-          ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index * sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+          ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index);
           return RETURN_SUCCESS;
         }
       }
