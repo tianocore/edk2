@@ -151,12 +151,12 @@ Returns:
     
 --*/
 {
-  ASSERT (mUsbCapabilityLen);
+  ASSERT (HcDev->UsbCapabilityLen);
   return HcDev->PciIo->Mem.Read (
                              HcDev->PciIo,
                              EfiPciIoWidthUint32,
                              USB_BAR_INDEX,
-                             (UINT64) (OperationalRegAddr + mUsbCapabilityLen),
+                             (UINT64) (OperationalRegAddr + HcDev->UsbCapabilityLen),
                              1,
                              Data
                              );
@@ -187,12 +187,12 @@ Returns:
   
 --*/
 {
-  ASSERT (mUsbCapabilityLen);
+  ASSERT (HcDev->UsbCapabilityLen);
   return HcDev->PciIo->Mem.Write (
                              HcDev->PciIo,
                              EfiPciIoWidthUint32,
                              USB_BAR_INDEX,
-                             (UINT64) (OperationalRegAddr + mUsbCapabilityLen),
+                             (UINT64) (OperationalRegAddr + HcDev->UsbCapabilityLen),
                              1,
                              &Data
                              );
@@ -347,9 +347,9 @@ Returns:
   Status = ReadEhcCapabiltiyReg (
              HcDev,
              CapabilityLenAddr,
-             &mUsbCapabilityLen
+             &(HcDev->UsbCapabilityLen)
              );
-  mUsbCapabilityLen = (UINT8) mUsbCapabilityLen;
+  HcDev->UsbCapabilityLen = (UINT8) HcDev->UsbCapabilityLen;
 
   return Status;
 }
@@ -1004,7 +1004,7 @@ Returns:
 
   HcCapParamsAddr = HCCPARAMS;
 
-  ReadEhcOperationalReg (
+  ReadEhcCapabiltiyReg(
     HcDev,
     HcCapParamsAddr,
     &HcCapParamsReg

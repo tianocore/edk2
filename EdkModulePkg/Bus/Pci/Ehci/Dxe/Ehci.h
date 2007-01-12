@@ -100,7 +100,6 @@ extern UINTN  gEHCErrorLevel;
 //
 // Enhanced Host Controller Registers definitions
 //
-extern UINT32                       mUsbCapabilityLen;
 extern EFI_DRIVER_BINDING_PROTOCOL  gEhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName;
 
@@ -393,6 +392,8 @@ typedef struct _USB2_HC_DEV {
   MEMORY_MANAGE_HEADER      *MemoryHeader;
   UINT8						Is64BitCapable;
   UINT32                    High32BitAddr;
+  UINT32                    UsbCapabilityLen;
+  UINT16                    DeviceSpeed[16];
 } USB2_HC_DEV;
 
 
