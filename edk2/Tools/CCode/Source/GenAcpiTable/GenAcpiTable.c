@@ -30,6 +30,15 @@ Abstract:
 #include "EfiUtilityMsgs.h"
 
 //
+// Acpi Table definition
+//
+#include "Acpi.h"
+#include "Acpi1_0.h"
+#include "Acpi2_0.h"
+#include "Acpi3_0.h"
+#include "MemoryMappedConfigurationSpaceAccessTable.h"
+
+//
 // Version of this utility
 //
 #define UTILITY_NAME  "GenAcpiTable"
@@ -99,6 +108,13 @@ STATUS
 ParseCommandLine (
   int       Argc,
   char      *Argv[]
+  );
+
+static
+STATUS
+CheckAcpiTable (
+  VOID      *AcpiTable,
+  UINT32    Length
   );
 
 static
@@ -303,6 +319,15 @@ Returns:
         Error (NULL, 0, 0, InFileName, "failed to .data section");
         goto Finish;
       }
+
+      //
+      // Check Acpi Table
+      //
+      if (CheckAcpiTable (Buffer, SectionHeader.Misc.VirtualSize) != STATUS_SUCCESS) {
+        Error (NULL, 0, 0, InFileName, "failed to check ACPI table");
+        goto Finish;
+      }
+
       //
       // Now open our output file
       //
@@ -346,6 +371,147 @@ Finish:
   }
 
   return Status;
+}
+
+static
+STATUS
+CheckAcpiTable (
+  VOID      *AcpiTable,
+  UINT32    Length
+  )
+/*++
+
+Routine Description:
+  
+  Check Acpi Table 
+
+Arguments:
+
+  AcpiTable     Buffer for AcpiSection
+  Length        AcpiSection Length
+
+Returns:
+
+  0             success
+  non-zero      otherwise
+
+--*/
+{
+  EFI_ACPI_DESCRIPTION_HEADER                   *AcpiHeader;
+  EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
+  UINT32                                        ExpectedLength;
+
+  AcpiHeader = (EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable;
+
+  //
+  // Generic check for AcpiTable length.
+  //
+  if (AcpiHeader->Length > Length) {
+    Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass AcpiTable Length check");
+    return STATUS_ERROR;
+  }
+
+  //
+  // Currently, we only check must-have tables: FADT, FACS, DSDT,
+  // and some important tables: MADT, MCFG.
+  //
+  switch (AcpiHeader->Signature) {
+
+  //
+  // "FACP" Fixed ACPI Description Table
+  //
+  case EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE:
+    switch (AcpiHeader->Revision) {
+    case EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION:
+      ExpectedLength = sizeof(EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE);
+      break;
+    case EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION:
+      ExpectedLength = sizeof(EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE);
+      break;
+    case EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION:
+      ExpectedLength = sizeof(EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE);
+      break;
+    default:
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass FACP revision check");
+      return STATUS_ERROR;
+    }
+    if (ExpectedLength != AcpiHeader->Length) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass FACP Length check");
+      return STATUS_ERROR;
+    }
+    break;
+
+  //
+  // "FACS" Firmware ACPI Control Structure
+  //
+  case EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE:
+    Facs = (EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)AcpiTable;
+    if ((Facs->Version != 0) &&
+        (Facs->Version != EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+        (Facs->Version != EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION)){
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass FACS version check");
+      return STATUS_ERROR;
+    }
+    if ((Facs->Length != sizeof(EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE)) &&
+        (Facs->Length != sizeof(EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE)) &&
+        (Facs->Length != sizeof(EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE))) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass FACS Length check");
+      return STATUS_ERROR;
+    }
+    break;
+
+  //
+  // "DSDT" Differentiated System Description Table
+  //
+  case EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE:
+    if (AcpiHeader->Revision > EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_REVISION) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass DSDT revision check");
+      return STATUS_ERROR;
+    }
+    if (AcpiHeader->Length <= sizeof(EFI_ACPI_DESCRIPTION_HEADER)) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass DSDT Length check");
+      return STATUS_ERROR;
+    }
+    break;
+
+  //
+  // "APIC" Multiple APIC Description Table
+  //
+  case EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE:
+    if ((AcpiHeader->Revision != EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) &&
+        (AcpiHeader->Revision != EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) &&
+        (AcpiHeader->Revision != EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION)) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass APIC revision check");
+      return STATUS_ERROR;
+    }
+    if (AcpiHeader->Length <= sizeof(EFI_ACPI_DESCRIPTION_HEADER) + sizeof(UINT32) + sizeof(UINT32)) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass APIC Length check");
+      return STATUS_ERROR;
+    }
+    break;
+
+  //
+  // "MCFG" PCI Express Memory Mapped Configuration Space Base Address Description Table
+  //
+  case EFI_ACPI_3_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE:
+    if (AcpiHeader->Revision != EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass MCFG revision check");
+      return STATUS_ERROR;
+    }
+    if (AcpiHeader->Length <= sizeof(EFI_ACPI_DESCRIPTION_HEADER) + sizeof(UINT64)) {
+      Error (NULL, 0, 0, "CheckAcpiTable", "failed to pass MCFG Length check");
+      return STATUS_ERROR;
+    }
+    break;
+
+  //
+  // Other table pass check
+  //
+  default:
+    break;
+  }
+
+  return STATUS_SUCCESS;
 }
 
 static
