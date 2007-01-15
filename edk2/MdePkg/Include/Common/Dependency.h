@@ -12,6 +12,9 @@
 
   Module Name:  Dependency.h
 
+  @par Revision Reference:
+  These definitions are from DxeCis 0.91 spec.
+
 **/
 
 #ifndef __DEPENDENCY_H__
@@ -33,17 +36,5 @@
 
 /// EFI_DEP_SOR          - If present, this must be the first opcode
 #define EFI_DEP_SOR           0x09
-
-///
-/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
-///                        to save time.  A EFI_DEP_PUSH is evauated one an
-///                        replaced with EFI_DEP_REPLACE_TRUE
-///
-#define EFI_DEP_REPLACE_TRUE  0xff
-
-///
-/// Define the initial size of the dependency expression evaluation stack
-///
-#define DEPEX_STACK_SIZE_INCREMENT  0x1000
 
 #endif

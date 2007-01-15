@@ -208,7 +208,7 @@ Returns:
     }
 
     if (DebugEntry != NULL && DirectoryEntry != NULL) {
-      for (DirCount = 0; DirCount < DirectoryEntry->Size; DirCount++, DebugEntry++) {
+      for (DirCount = 0; DirCount < DirectoryEntry->Size; DirCount += sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY), DebugEntry++) {
         if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
           if (DebugEntry->SizeOfData > 0) {
             CodeViewEntryPointer = (VOID *) ((UINTN) DebugEntry->RVA + (UINTN) ImageAddress + (UINTN)TEImageAdjust);
