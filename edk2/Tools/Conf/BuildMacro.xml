@@ -29,15 +29,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </not>
         </and>
         <then>
-          <if>
-            <available type="file" file="${DEST_DIR_OUTPUT}/AutoGen.h.gch"/>
-            <then>
-              <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep">
-                <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-                <EXTRA.INC/>
-              </makedeps>
-            </then>
-          </if>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep" 
+                    TargetFile="${DEST_DIR_OUTPUT}/AutoGen.h.gch">
+            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
+            <EXTRA.INC/>
+          </makedeps>
     
           <OnDependency>
             <sourcefiles>
@@ -102,20 +98,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="@{FILEPATH}" />
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
-      <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
-        <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-            <EXTRA.INC/>
-          </makedeps>
-        </then>
-      </if>
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC/>
+      </makedeps>
 
       <OnDependency>
         <sourcefiles>
           <file ListFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -161,20 +153,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="@{FILEPATH}" />
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
-      <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
-        <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-            <EXTRA.INC/>
-          </makedeps>
-        </then>
-      </if>
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC/>
+      </makedeps>
 
       <OnDependency>
         <sourcefiles>
           <file ListFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -304,9 +292,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="@{FILEPATH}" />
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC.1/>
+      </makedeps>
+
       <OnDependency>
         <sourcefiles>
-          <file Name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+          <file Listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -379,9 +374,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="@{FILEPATH}" />
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC.1/>
+      </makedeps>
+
       <OnDependency>
         <sourcefiles>
-          <file Name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+          <file Listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -429,20 +431,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
-      <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
-        <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-            <EXTRA.INC.1/>
-          </makedeps>
-        </then>
-      </if>
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC.1/>
+      </makedeps>
 
       <OnDependency>
         <sourcefiles>
           <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -485,6 +483,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </macrodef>
 
 
+  <!-- 
+    Assembly the preprocessed IPF assembly code
+  -->
   <macrodef name="Build_IPF_PP_Code">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
@@ -515,9 +516,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </macrodef>
   
   
-    <!--
-    Library    private HashMap map = new HashMap();
-    -->
+  <!--
+    Library
+  -->
   <macrodef name="Build_Library">
     <attribute name="FILENAME" />
     <attribute name="FILEEXT" default="obj"/>
@@ -563,10 +564,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
     <sequential>
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC/>
+      </makedeps>
 
       <OnDependency>
         <sourcefiles>
-          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+          <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
@@ -689,20 +695,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <mkdir dir="${DEST_DIR_DEBUG}/@{FILEPATH}"/>
 
-      <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
-        <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
-            <EXTRA.INC/>
-          </makedeps>
-        </then>
-      </if>
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC/>
+      </makedeps>
 
       <OnDependency>
         <sourcefiles>
           <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
@@ -911,7 +913,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </macrodef> 
 
   <!--
-    DUMMY
+    DUMMY - for skipping the source file which should not be built
     -->
   <macrodef name="Build_DUMMY">
     <attribute name="FILEPATH"/>
