@@ -803,8 +803,6 @@ public class AutoGen {
                 fileBuffer.append("  IN VOID                        *OldCoreData\r\n");
                 fileBuffer.append("  )\r\n\r\n");
                 fileBuffer.append("{\r\n");
-                // fileBuffer.append("  DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[0] + "));\n");
-                fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                 fileBuffer.append("  return ");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (PeiStartupDescriptor, OldCoreData);\r\n");
@@ -829,8 +827,6 @@ public class AutoGen {
                 fileBuffer.append("  IN VOID  *HobStart\r\n");
                 fileBuffer.append("  )\r\n\r\n");
                 fileBuffer.append("{\r\n");
-                //fileBuffer.append("  DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[0] + "));\n");
-                fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                 fileBuffer.append("  ");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (HobStart);\r\n");
@@ -871,7 +867,6 @@ public class AutoGen {
             fileBuffer.append("  )\r\n\r\n");
             fileBuffer.append("{\r\n");
             if (entryPointCount == 1) {
-                //fileBuffer.append("  DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[0] + "));\n");
                 fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                 fileBuffer.append("  return ");
                 fileBuffer.append(entryPointList[0]);
@@ -882,7 +877,6 @@ public class AutoGen {
                 fileBuffer.append("  CombinedStatus = EFI_LOAD_ERROR;\r\n\r\n");
                 for (int i = 0; i < entryPointList.length; i++) {
                     if (!entryPointList[i].equals("")) {
-                        //fileBuffer.append("  DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[i] + "));\n");
                         fileBuffer.append(String.format("  " + debugStr, entryPointList[i], entryPointList[i]));
                         fileBuffer.append("  Status = ");
                         fileBuffer.append(entryPointList[i]);
@@ -945,7 +939,6 @@ public class AutoGen {
 
                 for (int i = 0; i < entryPointList.length; i++) {
                     fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\r\n");
-                    //fileBuffer.append("    DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[i] + "));\n");
                     fileBuffer.append(String.format("    " + debugStr, entryPointList[i], entryPointList[i]));
                     fileBuffer.append("    ExitDriver (");
                     fileBuffer.append(entryPointList[i]);
@@ -1084,7 +1077,6 @@ public class AutoGen {
                 fileBuffer.append("{\r\n");
 
                 if (entryPointCount == 1) {
-                    //fileBuffer.append("  DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[0] + "));\n");
                     fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                     fileBuffer.append("  return ");
                     fileBuffer.append(entryPointList[0]);
@@ -1093,7 +1085,6 @@ public class AutoGen {
                     for (int i = 0; i < entryPointList.length; i++) {
                         if (!entryPointList[i].equals("")) {
                             fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\r\n");
-                            //fileBuffer.append("    DEBUG ((EFI_D_INFO, \"Module Entry Point 0x%08x\\n\", (UINTN)" + entryPointList[i] + "));\n");
                             fileBuffer.append(String.format("    " + debugStr, entryPointList[i], entryPointList[i]));
                             fileBuffer.append("    ExitDriver (");
                             fileBuffer.append(entryPointList[i]);
