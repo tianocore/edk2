@@ -60,13 +60,6 @@
                                  EFI_FILE_HEADER_INVALID \
           )
 
-#define EFI_TEST_FFS_ATTRIBUTES_BIT(FvbAttributes, TestAttributes, Bit) \
-    ( \
-      (BOOLEAN) ( \
-          (FvbAttributes & EFI_FVB_ERASE_POLARITY) ? (((~TestAttributes) & Bit) == Bit) : ((TestAttributes & Bit) == Bit) \
-        ) \
-    )
-
 typedef UINT16  EFI_FFS_FILE_TAIL;
 
 ///

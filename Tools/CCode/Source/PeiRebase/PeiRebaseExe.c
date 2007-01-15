@@ -279,6 +279,7 @@ Returns:
       break;
     }
   }
+
   //
   // Open the file containing the FV
   //
@@ -553,14 +554,18 @@ Returns:
   Version();
   
   printf (
-    "\nUsage: %s -I InputFileName -O OutputFileName -B BaseAddress\n",
+    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress [-F InputFvInfName]\n",
     UTILITY_NAME
     );
+  printf ("  [-D BootDriverBaseAddress] [-R RuntimeDriverBaseAddress]\n");
   printf ("  Where:\n");
-  printf ("     InputFileName is the name of the EFI FV file to rebase.\n");
-  printf ("     OutputFileName is the desired output file name.\n");
-  printf ("     BaseAddress is the FV base address to rebase agains.\n");
-  printf ("  Argument pair may be in any order.\n");
+  printf ("      InputFileName is the name of the EFI FV file to rebase.\n");
+  printf ("      OutputFileName is the desired output file name.\n");
+  printf ("      BaseAddress is the rebase address for all drivers run in Flash.\n");
+  printf ("      InputFvInfName is the Fv.inf file that contains this FV base address to rebase against.\n");
+  printf ("      BootDriverBaseAddress is the rebase address for all boot drivers in this fv image.\n");
+  printf ("      RuntimeDriverBaseAddress is the rebase address for all runtime drivers in this fv image.\n");
+  printf ("  Argument pair may be in any order.\n\n");
 }
 
 EFI_STATUS
@@ -596,27 +601,18 @@ Returns:
 {
   EFI_STATUS                            Status;
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
-  UINTN                                 MemoryImagePointer;
-  UINTN                                 MemoryImagePointerAligned;
-  EFI_PHYSICAL_ADDRESS                  ImageAddress;
-  UINT64                                ImageSize;
-  EFI_PHYSICAL_ADDRESS                  EntryPoint;
-  UINT32                                Pe32ImageSize;
   EFI_PHYSICAL_ADDRESS                  NewPe32BaseAddress;
   UINTN                                 Index;
   EFI_FILE_SECTION_POINTER              CurrentPe32Section;
   EFI_FFS_FILE_STATE                    SavedState;
   EFI_IMAGE_NT_HEADERS32                *PeHdr;
-  EFI_IMAGE_NT_HEADERS64                *PePlusHdr;
-  UINT32                                *PeHdrSizeOfImage;
-  UINT32                                *PeHdrChecksum;
   EFI_TE_IMAGE_HEADER                   *TEImageHeader;
-  UINT8                                 *TEBuffer;
-  EFI_IMAGE_DOS_HEADER                  *DosHeader;
   UINT8                                 FileGuidString[80];
   UINT32                                TailSize;
   EFI_FFS_FILE_TAIL                     TailValue;
   EFI_PHYSICAL_ADDRESS                  *BaseToUpdate;
+  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY       *DebugEntry;
+  
 
   //
   // Verify input parameters
@@ -668,7 +664,6 @@ Returns:
       break;
     }
 
-
     //
     // Initialize context
     //
@@ -679,6 +674,50 @@ Returns:
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "GetImageInfo() call failed on rebase", FileGuidString);
       return Status;
+    }
+
+    //
+    // Don't Load PeImage, only to relocate current image.
+    //
+    ImageContext.ImageAddress = (UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION);
+
+    //
+    // Check if section-alignment and file-alignment match or not
+    //
+    PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext.ImageAddress + ImageContext.PeCoffHeaderOffset);
+    if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
+      //
+      // Nor XIP module can be ignored. 
+      //
+      if ((Flags & 1) == 0) {
+        continue;
+      }
+      Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
+      return EFI_ABORTED;
+    } 
+
+    //
+    // Update CodeView and PdbPointer in ImageContext
+    //
+    DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)(UINTN)(
+                    ImageContext.ImageAddress +
+                    ImageContext.DebugDirectoryEntryRva
+                    );
+    ImageContext.CodeView = (VOID *)(UINTN)( 
+                              ImageContext.ImageAddress + 
+                              DebugEntry->RVA
+                              );
+    switch (*(UINT32 *) ImageContext.CodeView) {
+    case CODEVIEW_SIGNATURE_NB10:
+      ImageContext.PdbPointer = (CHAR8 *) ImageContext.CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
+      break;
+
+    case CODEVIEW_SIGNATURE_RSDS:
+      ImageContext.PdbPointer = (CHAR8 *) ImageContext.CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
+      break;
+
+    default:
+      break;
     }
 
     //
@@ -697,19 +736,12 @@ Returns:
         }
 
         NewPe32BaseAddress =
-          XipBase +
-          (UINTN)CurrentPe32Section.Pe32Section +
-          sizeof (EFI_COMMON_SECTION_HEADER) -
-          (UINTN)FfsFile;
+          XipBase + (UINTN)ImageContext.ImageAddress - (UINTN)FfsFile;
         BaseToUpdate = &XipBase;
         break;
 
       case EFI_FV_FILETYPE_DRIVER:
-        PeHdr = (EFI_IMAGE_NT_HEADERS32*)(
-          (UINTN)CurrentPe32Section.Pe32Section +
-          sizeof (EFI_COMMON_SECTION_HEADER) +
-          ImageContext.PeCoffHeaderOffset
-          );
+        PeHdr = (EFI_IMAGE_NT_HEADERS32*)(ImageContext.ImageAddress + ImageContext.PeCoffHeaderOffset);
         switch (PeHdr->OptionalHeader.Subsystem) {
           case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
             if ((Flags & 4) == 0) {
@@ -759,70 +791,11 @@ Returns:
         return EFI_SUCCESS;
     }
 
-    //
-    // Allocate a buffer for the image to be loaded into.
-    //
-    Pe32ImageSize       = GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION);
-    MemoryImagePointer  = (UINTN) (malloc (Pe32ImageSize + 0x100000));
-    if (MemoryImagePointer == 0) {
-      Error (NULL, 0, 0, "memory allocation failure", NULL);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x100000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
-
-    ImageContext.ImageAddress = MemoryImagePointerAligned;
-
-    Status                    = PeCoffLoaderLoadImage (&ImageContext);
-    if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 0, "LoadImage() call failed on rebase", FileGuidString);
-      free ((VOID *) MemoryImagePointer);
-      return Status;
-    }
-    
-    //
-    // Check if section-alignment and file-alignment match or not
-    //
-    if (!(ImageContext.IsTeImage)) {
-      PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext.ImageAddress + 
-                                              ImageContext.PeCoffHeaderOffset);
-      if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
-        Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
-        free ((VOID *) MemoryImagePointer);
-        return EFI_ABORTED;
-      }
-    }
-    else {
-      //
-      // BUGBUG: TE Image Header lack section-alignment and file-alignment info
-      //
-    }
-
     ImageContext.DestinationAddress = NewPe32BaseAddress;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "RelocateImage() call failed on rebase", FileGuidString);
-      free ((VOID *) MemoryImagePointer);
       return Status;
-    }
-
-    ImageAddress  = ImageContext.ImageAddress;
-    ImageSize     = ImageContext.ImageSize;
-    EntryPoint    = ImageContext.EntryPoint;
-
-    if (ImageSize > Pe32ImageSize) {
-      Error (
-        NULL,
-        0,
-        0,
-        "rebased image is larger than original PE32 image",
-        "0x%X > 0x%X, file %s",
-        ImageSize,
-        Pe32ImageSize,
-        FileGuidString
-        );
-      free ((VOID *) MemoryImagePointer);
-      return EFI_ABORTED;
     }
 
     //
@@ -836,47 +809,6 @@ Returns:
       ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
       );
     *BaseToUpdate += EFI_SIZE_TO_PAGES (ImageContext.ImageSize) * EFI_PAGE_SIZE;
-
-    //
-    // Since we may have updated the Codeview RVA, we need to insure the PE
-    // header indicates the image is large enough to contain the Codeview data
-    // so it will be loaded properly later if the PEIM is reloaded into memory...
-    //
-    PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
-    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
-    if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PeHdr->OptionalHeader).CheckSum);
-    } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
-    } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_X64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
-    } else {
-      Error (
-        NULL,
-        0,
-        0,
-        "unknown machine type in PE32 image",
-        "machine type=0x%X, file=%s",
-        (UINT32) PeHdr->FileHeader.Machine,
-        FileGuidString
-        );
-      free ((VOID *) MemoryImagePointer);
-      return EFI_ABORTED;
-    }
-
-    if (*PeHdrSizeOfImage != ImageContext.ImageSize) {
-      *PeHdrSizeOfImage = (UINT32) ImageContext.ImageSize;
-      if (*PeHdrChecksum) {
-        *PeHdrChecksum = 0;
-      }
-    }
-
-    memcpy (CurrentPe32Section.Pe32Section + 1, (VOID *) MemoryImagePointerAligned, (UINT32) ImageSize);
-
-    free ((VOID *) MemoryImagePointer);
 
     //
     // Now update file checksum
@@ -923,7 +855,7 @@ Returns:
     //
     return EFI_SUCCESS;
   }
-
+  
   //
   // Now process TE sections
   //
@@ -939,235 +871,65 @@ Returns:
     //
     TEImageHeader = (EFI_TE_IMAGE_HEADER *) ((UINT8 *) CurrentPe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER));
 
-    NewPe32BaseAddress = ((UINT32) XipBase) +
-      (
-        (UINTN) CurrentPe32Section.Pe32Section +
-        sizeof (EFI_COMMON_SECTION_HEADER) +
-        sizeof (EFI_TE_IMAGE_HEADER) -
-        TEImageHeader->StrippedSize -
-        (UINTN) FfsFile
-      );
-
     //
-    // Allocate a buffer to unshrink the image into.
-    //
-    Pe32ImageSize = GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
-    sizeof (EFI_TE_IMAGE_HEADER);
-    Pe32ImageSize += TEImageHeader->StrippedSize;
-    TEBuffer = (UINT8 *) malloc (Pe32ImageSize);
-    if (TEBuffer == NULL) {
-      Error (NULL, 0, 0, "failed to allocate memory", NULL);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // Expand the image into our buffer and fill in critical fields in the DOS header
-    // Fill in fields required by the loader.
-    // At offset 0x3C is the offset to the PE signature. We'll put it immediately following the offset value
-    // itself.
-    //
-    memset (TEBuffer, 0, Pe32ImageSize);
-    DosHeader = (EFI_IMAGE_DOS_HEADER *) TEBuffer;
-    DosHeader->e_magic = EFI_IMAGE_DOS_SIGNATURE;
-    *(UINT32 *) (TEBuffer + 0x3C) = 0x40;
-    PeHdr = (EFI_IMAGE_NT_HEADERS *) (TEBuffer + 0x40);
-    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
-    PeHdr->Signature = EFI_IMAGE_NT_SIGNATURE;
-    PeHdr->FileHeader.Machine = TEImageHeader->Machine;
-    PeHdr->FileHeader.NumberOfSections = TEImageHeader->NumberOfSections;
-
-    //
-    // Say the size of the optional header is the total we stripped off less the size of a PE file header and PE signature and
-    // the 0x40 bytes for our DOS header.
-    //
-    PeHdr->FileHeader.SizeOfOptionalHeader = (UINT16) (TEImageHeader->StrippedSize - 0x40 - sizeof (UINT32) - sizeof (EFI_IMAGE_FILE_HEADER));
-    if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
-    } else if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_IA64) {
-      PePlusHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-    } else if (TEImageHeader->Machine == EFI_IMAGE_MACHINE_X64) {
-      PePlusHdr->OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-    } else {
-      Error (
-        NULL,
-        0,
-        0,
-        "unknown machine type in TE image",
-        "machine type=0x%X, file=%s",
-        (UINT32) TEImageHeader->Machine,
-        FileGuidString
-        );
-      free (TEBuffer);
-      return EFI_ABORTED;
-    }
-
-    if (PeHdr->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-      PeHdr->OptionalHeader.ImageBase     = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
-      PeHdr->OptionalHeader.SizeOfImage   = Pe32ImageSize;
-      PeHdr->OptionalHeader.Subsystem     = TEImageHeader->Subsystem;
-      PeHdr->OptionalHeader.SizeOfHeaders = TEImageHeader->StrippedSize + TEImageHeader->NumberOfSections *
-                                            sizeof (EFI_IMAGE_SECTION_HEADER) - 12;
-
-      //
-      // Set NumberOfRvaAndSizes in the optional header to what we had available in the original image
-      //
-      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0) ||
-          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size != 0)
-          ) {
-        PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC + 1;
-        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
-        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
-      }
-
-      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) ||
-          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0)
-          ) {
-        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
-        PeHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
-        if (PeHdr->OptionalHeader.NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1) {
-          PeHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1;
-        }
-      }
-      //
-      // NOTE: These values are defaults, and should be verified to be correct in the GenTE utility
-      //
-      PeHdr->OptionalHeader.SectionAlignment = 0x10;
-    } else {
-      PePlusHdr->OptionalHeader.ImageBase     = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
-      PePlusHdr->OptionalHeader.SizeOfImage   = Pe32ImageSize;
-      PePlusHdr->OptionalHeader.Subsystem     = TEImageHeader->Subsystem;
-      PePlusHdr->OptionalHeader.SizeOfHeaders = TEImageHeader->StrippedSize + TEImageHeader->NumberOfSections *
-                                                sizeof (EFI_IMAGE_SECTION_HEADER) - 12;
-
-      //
-      // Set NumberOfRvaAndSizes in the optional header to what we had available in the original image
-      //
-      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0) ||
-          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size != 0)
-          ) {
-        PePlusHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC + 1;
-        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
-        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
-      }
-
-      if ((TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) ||
-          (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0)
-          ) {
-        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
-        PePlusHdr->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
-        if (PePlusHdr->OptionalHeader.NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1) {
-          PePlusHdr->OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_DIRECTORY_ENTRY_DEBUG + 1;
-        }
-      }
-      //
-      // NOTE: These values are defaults, and should be verified to be correct in the GenTE utility
-      //
-      PePlusHdr->OptionalHeader.SectionAlignment = 0x10;
-    }
-
-    //
-    // Copy the rest of the image to its original offset
-    //
-    memcpy (
-      TEBuffer + TEImageHeader->StrippedSize,
-      (UINT8 *) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION) + sizeof (EFI_TE_IMAGE_HEADER),
-      GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
-      sizeof (EFI_TE_IMAGE_HEADER)
-      );
-
-    //
-    // Initialize context
+    // Initialize context, load image info.
     //
     memset (&ImageContext, 0, sizeof (ImageContext));
-    ImageContext.Handle     = (VOID *) TEBuffer;
+    ImageContext.Handle     = (VOID *) TEImageHeader;
     ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
 
     Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
 
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "GetImageInfo() call failed on rebase of TE image", FileGuidString);
-      free (TEBuffer);
       return Status;
     }
     //
-    // Allocate a buffer for the image to be loaded into.
+    // Don't reload TeImage
     //
-    MemoryImagePointer = (UINTN) (malloc (Pe32ImageSize + 0x100000));
-    if (MemoryImagePointer == 0) {
-      Error (NULL, 0, 0, "memory allocation error on rebase of TE image", FileGuidString);
-      free (TEBuffer);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    memset ((void *) MemoryImagePointer, 0, Pe32ImageSize + 0x100000);
-    MemoryImagePointerAligned = (MemoryImagePointer + 0x0FFFF) & (-1 << 16);
-    
+    ImageContext.ImageAddress = (UINTN) TEImageHeader;
 
-    ImageContext.ImageAddress = MemoryImagePointerAligned;
-    Status                    = PeCoffLoaderLoadImage (&ImageContext);
-    if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 0, "LoadImage() call failed on rebase of TE image", FileGuidString);
-      free (TEBuffer);
-      free ((VOID *) MemoryImagePointer);
-      return Status;
+    //
+    // Update CodeView and PdbPointer in ImageContext
+    //
+    DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)(UINTN)(
+                   ImageContext.ImageAddress +
+                   ImageContext.DebugDirectoryEntryRva +
+                   sizeof(EFI_TE_IMAGE_HEADER) -
+                   TEImageHeader->StrippedSize
+                   );
+
+    ImageContext.CodeView = (VOID *)(UINTN)(
+                              ImageContext.ImageAddress +
+                              DebugEntry->RVA +
+                              sizeof(EFI_TE_IMAGE_HEADER) -
+                              TEImageHeader->StrippedSize
+                              );
+
+    switch (*(UINT32 *) ImageContext.CodeView) {
+    case CODEVIEW_SIGNATURE_NB10:
+      ImageContext.PdbPointer = (CHAR8 *) ImageContext.CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
+      break;
+
+    case CODEVIEW_SIGNATURE_RSDS:
+      ImageContext.PdbPointer = (CHAR8 *) ImageContext.CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
+      break;
+
+    default:
+      break;
     }
 
-    ImageContext.DestinationAddress = NewPe32BaseAddress;
+    //
+    // Reloacate TeImage
+    // 
+    ImageContext.DestinationAddress = XipBase + (UINTN) TEImageHeader + sizeof (EFI_TE_IMAGE_HEADER) \
+                                      - TEImageHeader->StrippedSize - (UINTN) FfsFile;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "RelocateImage() call failed on rebase of TE image", FileGuidString);
-      free ((VOID *) MemoryImagePointer);
-      free (TEBuffer);
       return Status;
     }
 
-    ImageAddress  = ImageContext.ImageAddress;
-    ImageSize     = ImageContext.ImageSize;
-    EntryPoint    = ImageContext.EntryPoint;
-
-    //
-    // Since we may have updated the Codeview RVA, we need to insure the PE
-    // header indicates the image is large enough to contain the Codeview data
-    // so it will be loaded properly later if the PEIM is reloaded into memory...
-    //
-    PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
-    PePlusHdr = (EFI_IMAGE_NT_HEADERS64*)PeHdr;
-    if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PeHdr->OptionalHeader).CheckSum);
-    } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
-    } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_X64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(PePlusHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(PePlusHdr->OptionalHeader).CheckSum);
-    } else {
-      Error (
-        NULL,
-        0,
-        0,
-        "unknown machine type in TE image",
-        "machine type=0x%X, file=%s",
-        (UINT32) PeHdr->FileHeader.Machine,
-        FileGuidString
-        );
-      free ((VOID *) MemoryImagePointer);
-      free (TEBuffer);
-      return EFI_ABORTED;
-    }
-
-    if (*PeHdrSizeOfImage != ImageContext.ImageSize) {
-      *PeHdrSizeOfImage = (UINT32) ImageContext.ImageSize;
-      if (*PeHdrChecksum) {
-        *PeHdrChecksum = 0;
-      }
-    }
-
-    TEImageHeader->ImageBase = (UINT64) (NewPe32BaseAddress + TEImageHeader->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
-    memcpy (
-      (UINT8 *) (CurrentPe32Section.Pe32Section + 1) + sizeof (EFI_TE_IMAGE_HEADER),
-      (VOID *) ((UINT8 *) MemoryImagePointerAligned + TEImageHeader->StrippedSize),
-      GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
-      sizeof (EFI_TE_IMAGE_HEADER)
-      );
     if (FfsFile->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
       TailSize = sizeof (EFI_FFS_FILE_TAIL);
     } else {
@@ -1206,14 +968,8 @@ Returns:
       ImageContext.DestinationAddress,
       ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
       );
-
-    //
-    // Free buffers
-    //
-    free ((VOID *) MemoryImagePointer);
-    free (TEBuffer);
   }
-
+ 
   return EFI_SUCCESS;
 }
 

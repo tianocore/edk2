@@ -272,6 +272,7 @@ Returns:
   //
   // Double-check the file to make sure it's what we expect it to be
   //
+
   if (CheckPE32File (InFileName, InFptr, &MachineType, &SubSystem) != STATUS_SUCCESS) {
     goto Finish;
   }
@@ -372,7 +373,7 @@ Returns:
 
     TEImageHeader.Subsystem   = (UINT8) OptionalHeader32.Subsystem;
     TEImageHeader.BaseOfCode  = OptionalHeader32.BaseOfCode;
-    TEImageHeader.ImageBase = (UINT64) (OptionalHeader32.ImageBase + TEImageHeader.StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
+    TEImageHeader.ImageBase   = (UINT64) (OptionalHeader32.ImageBase);
     if (OptionalHeader32.NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = OptionalHeader32.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = OptionalHeader32.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
@@ -413,7 +414,7 @@ Returns:
 
     TEImageHeader.Subsystem   = (UINT8) OptionalHeader64.Subsystem;
     TEImageHeader.BaseOfCode  = OptionalHeader32.BaseOfCode;
-    TEImageHeader.ImageBase = (UINT64) (OptionalHeader64.ImageBase + TEImageHeader.StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
+    TEImageHeader.ImageBase = (UINT64) (OptionalHeader64.ImageBase);
     if (OptionalHeader64.NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = OptionalHeader64.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = OptionalHeader64.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
@@ -617,6 +618,17 @@ Returns:
   //
   if (fread (&OptionalHdr, sizeof (OptionalHdr), 1, Fptr) != 1) {
     Error (NULL, 0, 0, FileName, "failed to read COFF optional header from input file");
+    goto Finish;
+  }
+
+  //
+  // Check FileAlginment and SectionAlignment match or not
+  // Because TeImage header doesn't record filealginment and sectionalignment info, 
+  // TeImage is used for PEIM and PeiCore XIP module. 
+  // So, check alignment match before generate TeImage to check.
+  //
+  if (OptionalHdr.SectionAlignment != OptionalHdr.FileAlignment) {
+    Error (NULL, 0, 0, FileName, "Section-Alignment and File-Alignment does not match");
     goto Finish;
   }
 

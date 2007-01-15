@@ -70,6 +70,13 @@ typedef UINT32  EFI_FVB_ATTRIBUTES;
                               EFI_FVB_LOCK_CAP \
                               )
 
+#define EFI_TEST_FFS_ATTRIBUTES_BIT(FvbAttributes, TestAttributes, Bit) \
+    ( \
+      (BOOLEAN) ( \
+          (FvbAttributes & EFI_FVB_ERASE_POLARITY) ? (((~TestAttributes) & Bit) == Bit) : ((TestAttributes & Bit) == Bit) \
+        ) \
+    )
+
 #define EFI_FVB_STATUS    (EFI_FVB_READ_STATUS | EFI_FVB_WRITE_STATUS | EFI_FVB_LOCK_STATUS)
 
 ///

@@ -260,7 +260,7 @@ Returns:
   if (!(ImageContext->IsTeImage)) {
     ImageContext->ImageAddress = PeHdr.OptionalHeader.ImageBase;
   } else {
-    ImageContext->ImageAddress = (PHYSICAL_ADDRESS) (TeHdr.ImageBase);
+    ImageContext->ImageAddress = (PHYSICAL_ADDRESS) (TeHdr.ImageBase + sizeof (EFI_TE_IMAGE_HEADER) - TeHdr.StrippedSize);
   }
   //
   // Initialize the alternate destination address to 0 indicating that it
@@ -345,12 +345,12 @@ Returns:
         SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
       }
 
-      if (DebugDirectoryEntryFileOffset != 0) {
-        for (Index = 0; Index < DebugDirectoryEntry->Size; Index++) {
+      if (DebugDirectoryEntryFileOffset != 0) {    
+        for (Index = 0; Index < (DebugDirectoryEntry->Size); Index += Size) {
           //
           // Read next debug directory entry
           //
-          Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+          Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);    
           Status = ImageContext->ImageRead (
                                    ImageContext->Handle,
                                    DebugDirectoryEntryFileOffset,
@@ -363,7 +363,7 @@ Returns:
           }
 
           if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-            ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index * sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+            ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index);
             if (DebugEntry.RVA == 0 && DebugEntry.FileOffset != 0) {
               ImageContext->ImageSize += DebugEntry.SizeOfData;
             }
@@ -438,7 +438,7 @@ Returns:
     }
 
     if (DebugDirectoryEntryFileOffset != 0) {
-      for (Index = 0; Index < DebugDirectoryEntry->Size; Index++) {
+      for (Index = 0; Index < (DebugDirectoryEntry->Size); Index += Size) {
         //
         // Read next debug directory entry
         //
@@ -455,7 +455,7 @@ Returns:
         }
 
         if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-          ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index * sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+          ImageContext->DebugDirectoryEntryRva = (UINT32) (DebugDirectoryEntryRva + Index);
           return RETURN_SUCCESS;
         }
       }

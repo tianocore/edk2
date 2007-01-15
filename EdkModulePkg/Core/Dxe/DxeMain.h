@@ -33,6 +33,18 @@ Revision History
 #include "Exec.h"
 #include "hand.h"
 
+///
+/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
+///                        to save time.  A EFI_DEP_PUSH is evauated one an
+///                        replaced with EFI_DEP_REPLACE_TRUE
+///
+#define EFI_DEP_REPLACE_TRUE  0xff
+
+///
+/// Define the initial size of the dependency expression evaluation stack
+///
+#define DEPEX_STACK_SIZE_INCREMENT  0x1000
+
 typedef struct {
   EFI_GUID                    *ProtocolGuid;
   VOID                        **Protocol;

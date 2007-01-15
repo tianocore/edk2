@@ -299,7 +299,7 @@ PeCoffLoaderGetImageInfo (
       ImageContext->ImageAddress = Hdr.Pe32Plus->OptionalHeader.ImageBase;
     }
   } else {
-    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase);
+    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
   }
 
   //
@@ -598,8 +598,11 @@ PeCoffLoaderRelocateImage (
   //
   if (ImageContext->DestinationAddress != 0) {
     BaseAddress = ImageContext->DestinationAddress;
-  } else {
+  } else if (!(ImageContext->IsTeImage)) {
     BaseAddress = ImageContext->ImageAddress;
+  } else {
+    Hdr.Te      = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
+    BaseAddress = ImageContext->ImageAddress + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize; 
   }
 
   if (!(ImageContext->IsTeImage)) {
