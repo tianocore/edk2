@@ -260,7 +260,7 @@ Returns:
   if (!(ImageContext->IsTeImage)) {
     ImageContext->ImageAddress = PeHdr.OptionalHeader.ImageBase;
   } else {
-    ImageContext->ImageAddress = (PHYSICAL_ADDRESS) (TeHdr.ImageBase + sizeof (EFI_TE_IMAGE_HEADER) - TeHdr.StrippedSize);
+    ImageContext->ImageAddress = (PHYSICAL_ADDRESS) (TeHdr.ImageBase + TeHdr.StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
   }
   //
   // Initialize the alternate destination address to 0 indicating that it
