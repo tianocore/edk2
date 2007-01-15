@@ -299,7 +299,7 @@ PeCoffLoaderGetImageInfo (
       ImageContext->ImageAddress = Hdr.Pe32Plus->OptionalHeader.ImageBase;
     }
   } else {
-    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
+    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
   }
 
   //
