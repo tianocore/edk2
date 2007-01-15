@@ -14,9 +14,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,6 +46,7 @@ public class MakeDeps extends Task {
     //
     // private members, use set/get to access them
     //
+    private String      targetFile = "";
     private String      depsFilePath = "";
     private IncludePath includePathList = new IncludePath();
     private Input       inputFileList = new Input();
@@ -54,7 +57,7 @@ public class MakeDeps extends Task {
     //
     // regular expression for "#include ..." directive
     // 
-    private static final Pattern incPattern = Pattern.compile("[\n\r \t]*#[ \t]*include[ \t\"<]+([^\n\r\"<>]+)");
+    private static final Pattern incPattern = Pattern.compile("[\n\r]+[ \t#]*[ \t]*include[ \t]+[\"<]*([^\n\r\"<>]+)[>\"]*[\n\r]+");
 
     public MakeDeps() {
 
@@ -69,6 +72,13 @@ public class MakeDeps extends Task {
      @throws    BuildException
      **/
     public void execute() throws BuildException {
+        //
+        // if target file is specified and it hasn't been generated, don't generate
+        // dep file
+        // 
+        if (targetFile.length() != 0 && (new File(targetFile)).exists() == false) {
+            return;
+        }
         //
         // check if the dependency list file is uptodate or not
         //
@@ -122,6 +132,14 @@ public class MakeDeps extends Task {
         // update time stamp of dependency file
         // 
         FileTimeStamp.update(depsFilePath, depsFile.lastModified());
+    }
+
+    public void setTargetFile(String name) {
+        targetFile = name;
+    }
+
+    public String getTargetFile() {
+        return targetFile;
     }
 
     /**
@@ -280,24 +298,30 @@ public class MakeDeps extends Task {
             if (!srcFile.exists()) {
                 continue;
             }
-
             //
             // try cache first
             // 
             Set<String> incFiles = includesCache.get(src);
             if (incFiles == null) {
                 incFiles = new HashSet<String>();
-                FileReader fileReader = null;
-                BufferedReader bufReader = null;
+                FileInputStream fileReader = null;
+                BufferedInputStream bufReader = null;
                 String fileContent = "";
                 int fileLength = (int)srcFile.length();
 
                 try {
-                    fileReader = new FileReader(srcFile);
-                    bufReader  = new BufferedReader(fileReader);
-                    char[] buf = new char[fileLength];
+                    fileReader = new FileInputStream(srcFile);
+                    bufReader  = new BufferedInputStream(fileReader);
+                    byte[] buf = new byte[fileLength];
 
                     bufReader.read(buf, 0, fileLength);
+                    //
+                    // check if the file is utf-16 encoded
+                    // 
+                    if (buf[0] == (byte)0xff || buf[0] == (byte)0xfe) {
+                        fileContent = new String(buf, "UTF-16");
+                        buf = fileContent.getBytes("UTF-8");
+                    }
                     fileContent = new String(buf);
                 } catch (IOException e) {
                     throw new BuildException(e.getMessage());
