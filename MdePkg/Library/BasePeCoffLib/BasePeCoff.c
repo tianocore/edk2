@@ -391,7 +391,7 @@ PeCoffLoaderGetImageInfo (
       }
 
       if (DebugDirectoryEntryFileOffset != 0) {
-        for (Index = 0; Index < DebugDirectoryEntry->Size; Index += Size) {
+        for (Index = 0; Index < DebugDirectoryEntry->Size; Index += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY)) {
           //
           // Read next debug directory entry
           //
@@ -479,7 +479,7 @@ PeCoffLoaderGetImageInfo (
     }
 
     if (DebugDirectoryEntryFileOffset != 0) {
-      for (Index = 0; Index < DebugDirectoryEntry->Size; Index += Size) {
+      for (Index = 0; Index < DebugDirectoryEntry->Size; Index += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY)) {
         //
         // Read next debug directory entry
         //
