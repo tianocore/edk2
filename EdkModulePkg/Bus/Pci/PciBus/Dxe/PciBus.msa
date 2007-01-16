@@ -62,7 +62,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>PciBus.h</Filename>
+    <Filename>pcibus.h</Filename>
     <Filename>PciIo.h</Filename>
     <Filename>PciCommand.h</Filename>
     <Filename>PciDeviceSupport.h</Filename>

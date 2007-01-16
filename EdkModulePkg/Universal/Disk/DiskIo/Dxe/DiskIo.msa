@@ -49,7 +49,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>diskio.c</Filename>
-    <Filename>diskio.h</Filename>
+    <Filename>DiskIo.h</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>
   <PackageDependencies>
