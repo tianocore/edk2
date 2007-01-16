@@ -54,7 +54,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>Cbi.h</Filename>
+    <Filename>cbi.h</Filename>
     <Filename>Cbi0.c</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>

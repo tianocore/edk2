@@ -90,10 +90,10 @@
     <Filename>Exec.h</Filename>
     <Filename>FwVolBlock.h</Filename>
     <Filename>FwVolDriver.h</Filename>
-    <Filename>Gcd.h</Filename>
-    <Filename>Hand.h</Filename>
+    <Filename>gcd.h</Filename>
+    <Filename>hand.h</Filename>
     <Filename>Image.h</Filename>
-    <Filename>Imem.h</Filename>
+    <Filename>imem.h</Filename>
     <Filename>Library.h</Filename>
   </SourceFiles>
   <PackageDependencies>

@@ -50,7 +50,7 @@
     <Filename SupArchList="IA32">Ia32/plDebugSupport.c</Filename>
     <Filename SupArchList="IPF">ipf/AsmFuncs.s</Filename>
     <Filename SupArchList="IPF">ipf/common.i</Filename>
-    <Filename SupArchList="IPF">ipf/ds64macros.i</Filename>
+    <Filename SupArchList="IPF">ipf/Ds64Macros.i</Filename>
     <Filename SupArchList="IPF">ipf/plDebugSupport.c</Filename>
     <Filename SupArchList="IPF">ipf/plDebugSupport.h</Filename>
     <Filename ToolChainFamily="MSFT" SupArchList="X64">x64/AsmFuncs.asm</Filename>

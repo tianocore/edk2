@@ -58,7 +58,7 @@
     <Filename>reset.c</Filename>
     <Filename>shutdown.c</Filename>
     <Filename>snp.c</Filename>
-    <Filename>snp.h</Filename>
+    <Filename>Snp.h</Filename>
     <Filename>start.c</Filename>
     <Filename>station_address.c</Filename>
     <Filename>statistics.c</Filename>

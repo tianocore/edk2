@@ -62,7 +62,7 @@
     <Filename>hton.h</Filename>
     <Filename>tftp.h</Filename>
     <Filename>dhcp.h</Filename>
-    <Filename>bc.h</Filename>
+    <Filename>Bc.h</Filename>
     <Filename>ip.h</Filename>
     <Filename>ComponentName.c</Filename>
     <Filename>Print.c</Filename>
