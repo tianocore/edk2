@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <list>
 #include <map>
+#include <vector>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
@@ -349,42 +350,53 @@ CFvMapFile::CFvMapFile(const CIdAddressPathMap& idAddrPath)
     }
 }
 
+CFvMapFile::~CFvMapFile(void)
+{
+    Cleanup();
+}
+
 void CFvMapFile::Cleanup(void)
 {
     for (iterator i = begin(); i != end(); i++)
         delete i->second;
 }
 
+static bool map_less(const CFvMapFile::const_iterator& l, const CFvMapFile::const_iterator& r)
+{
+    return l->second->m_ullLoadAddr < r->second->m_ullLoadAddr;
+}
+
 ostream& operator << (ostream& os, const CFvMapFile& fvMap)
 {
-    for (CFvMapFile::const_iterator i = fvMap.begin(); !!os && i != fvMap.end(); i++)
+    vector<CFvMapFile::const_iterator> rgIter;
+    rgIter.reserve(fvMap.size());
+    for (CFvMapFile::const_iterator i = fvMap.begin(); i != fvMap.end(); i++)
+        rgIter.push_back(i);
+    sort(rgIter.begin(), rgIter.end(), map_less);
+
+    for (vector<CFvMapFile::const_iterator>::const_iterator i = rgIter.begin(); i != rgIter.end(); i++)
     {
-        CMapFile::const_iterator j = i->second->begin();
-        while (j != i->second->end() && j->m_strAddress != i->second->m_strEntryPoint) j++;
-        if (j == i->second->end())
+        CMapFile::const_iterator j = (*i)->second->begin();
+        while (j != (*i)->second->end() && j->m_strAddress != (*i)->second->m_strEntryPoint) j++;
+        if (j == (*i)->second->end())
             throw runtime_error(
                 __FUNCTION__ ":Entry point not found for module " +
-                i->second->m_strModuleName);
+                (*i)->second->m_strModuleName);
 
         os << hex
-            << i->second->m_strModuleName
-            << " (EP=" << j->m_ullRva
-            << ", BA=" << i->second->m_ullLoadAddr
-            << ", GUID=" << i->first
+            << (*i)->second->m_strModuleName
+            << " (EntryPoint=" << j->m_ullRva
+            << ", BaseAddress=" << (*i)->second->m_ullLoadAddr
+            << ", GUID=" << (*i)->first
             << ")" << endl << endl;
 
-        for (j = i->second->begin(); j != i->second->end(); j++)
+        for (j = (*i)->second->begin(); j != (*i)->second->end(); j++)
             os << "  " << *j << endl;
 
         os << endl << endl;
     }
 
     return os;
-}
-
-CFvMapFile::~CFvMapFile(void)
-{
-    Cleanup();
 }
 
 class CGenFvMapUsage : public invalid_argument
