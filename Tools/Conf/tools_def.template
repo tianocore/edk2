@@ -309,7 +309,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_MINGW_IA32_VFRPP_NAME   = gcc
 
 *_MINGW_*_CC_FLAGS        = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
-*_MINGW_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_MINGW_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
 *_MINGW_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h  -DASM_PFX(name)=_##name
 *_MINGW_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_MINGW_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -342,7 +342,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_UNIXGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_UNIXGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
 *_UNIXGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
 *_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_UNIXGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -377,7 +377,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_CYGWINGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_CYGWINGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
 *_CYGWINGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
 *_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_CYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -434,7 +434,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_MIXED_X64_PP_NAME      = cl.exe
 
 *_MIXED_X64_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_MIXED_*_DLINK_FLAGS    = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT}
+*_MIXED_*_DLINK_FLAGS    = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
 *_MIXED_X64_PP_FLAGS     = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
 
 *_MIXED_X64_ASM_NAME     = ml64.exe
