@@ -34,6 +34,7 @@ typedef struct {
 //
 STATIC
 EFI_STATUS
+EFIAPI
 Crc32ExtractSection (
   IN  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
   IN  VOID                                    *InputSection,

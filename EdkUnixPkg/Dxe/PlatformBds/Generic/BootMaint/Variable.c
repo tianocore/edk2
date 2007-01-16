@@ -450,6 +450,7 @@ Var_UpdateConsoleOption (
                             NewTerminalContext->DevicePath,
                             (EFI_DEVICE_PATH_PROTOCOL *) &Vendor
                             );
+      ASSERT (TerminalDevicePath != NULL);
       ChangeTerminalDevicePath (TerminalDevicePath, TRUE);
       Temp = DevicePathToStr (TerminalDevicePath);
       ConDevicePath = AppendDevicePathInstance (

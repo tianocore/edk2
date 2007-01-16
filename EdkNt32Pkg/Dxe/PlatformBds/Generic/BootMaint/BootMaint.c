@@ -449,6 +449,7 @@ Returns:
       Index2                  = (UINT16) (KeyValue - HANDLE_OPTION_OFFSET);
 
       NewMenuEntry            = BOpt_GetMenuEntry (&DriverMenu, Index2);
+      ASSERT (NewMenuEntry != NULL);
       Private->HandleContext  = (BM_HANDLE_CONTEXT *) NewMenuEntry->VariableContext;
 
       CleanUpPage (FORM_DRV_ADD_HANDLE_DESC_ID, Private);
@@ -555,6 +556,8 @@ Returns:
 
   case FORM_CON_COM_ID:
     NewMenuEntry                      = BOpt_GetMenuEntry (&TerminalMenu, Private->CurrentTerminal);
+
+    ASSERT (NewMenuEntry != NULL);
 
     NewTerminalContext                = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
