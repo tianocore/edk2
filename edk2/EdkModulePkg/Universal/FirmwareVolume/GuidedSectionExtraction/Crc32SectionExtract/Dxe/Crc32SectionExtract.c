@@ -28,12 +28,14 @@ Abstract:
 #include <Crc32SectionExtract.h>
 
 EFI_STATUS
+EFIAPI
 InitializeCrc32GuidedSectionExtractionProtocol (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   );
 
 EFI_STATUS
+EFIAPI
 InitializeCrc32GuidedSectionExtractionProtocol (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
@@ -98,6 +100,7 @@ Returns:
 
 STATIC
 UINT32
+EFIAPI
 GetSectionLength (
   IN EFI_COMMON_SECTION_HEADER  *CommonHeader
   )
@@ -126,6 +129,7 @@ GetSectionLength (
 
 STATIC
 EFI_STATUS
+EFIAPI
 Crc32ExtractSection (
   IN  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
   IN  VOID                                    *InputSection,

@@ -175,6 +175,7 @@ ChangeVariableDevicePath (
                       &TerminalMenu,
                       Com
                       );
+      ASSERT (NewMenuEntry != NULL);
       NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
       Uart                = (UART_DEVICE_PATH *) Node;
       CopyMem (
