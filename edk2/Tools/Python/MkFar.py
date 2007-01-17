@@ -150,7 +150,8 @@ def makeFar(files, farname):
   zip = zipfile.ZipFile(farname, "w")
   for infile in set(files):
     if not os.path.exists(inWorkspace(infile)):
-      print "Skipping non-existent file '%s'." % infile
+      print "Error: Non-existent file '%s'." % infile
+      sys.exit()
     (_, extension) = os.path.splitext(infile)
     if extension == ".spd":
       filelist = parseSpd(infile)
@@ -219,9 +220,14 @@ def farFileNode(doc, filename):
   included in the far. An md5sum is calculated for that file."""
 
   content = doc.createElement("FarFilename")
-  f=open(filename, "rb")
-  content.setAttribute("Md5sum", md5.md5(f.read()).hexdigest())
-  f.close()
+  try:
+    f=open(filename, "rb")
+    content.setAttribute("Md5sum", md5.md5(f.read()).hexdigest())
+    f.close()
+  except IOError:
+    print "Error: Unable to open file: %s" % filename
+    sys.exit()
+
   return content
 
 # This acts like the main() function for the script, unless it is 'import'ed
@@ -241,10 +247,13 @@ if __name__ == '__main__':
 Pass a list of .spd and .fpd files to be placed into a far for distribution.
 You may give the name of the far with a -f or --far option. For example:
 
-  %s --far library.far MdePkg/MdePkg.spd
+  %s --template far-template --far library.far MdePkg/MdePkg.spd
 
 The file paths of .spd and .fpd are treated as relative to the WORKSPACE
 environment variable which must be set to a valid workspace root directory.
+
+A template file may be passed in with the --template option. This template file
+is a text file that allows more contol over the contents of the far.
 """ % os.path.basename(sys.argv[0])
 
       sys.exit()
