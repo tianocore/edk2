@@ -326,7 +326,7 @@ public class AutoGen {
         String[] specList = saq.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
             fileBuffer.append(CommonDefinition.DEFINE + specList[i]
-                              + "\r\n");
+                              + "\n");
         }
         //
         // Write consumed package's mdouleInfo related .h file to autogen.h
@@ -362,7 +362,7 @@ public class AutoGen {
                 fileBuffer.append(item.next().toString());
             }
         }
-        fileBuffer.append("\r\n");
+        fileBuffer.append("\n");
 
         //
         //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
@@ -371,21 +371,21 @@ public class AutoGen {
         if (saq.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
-            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
+            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\n");
             copyFlashMapHToDebugDir();
         }
 
         // Write PCD autogen information to AutoGen.h.
         //
         if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
+            fileBuffer.append("\n");
             fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
 
         //
         // Append the #endif at AutoGen.h
         //
-        fileBuffer.append("#endif\r\n");
+        fileBuffer.append("#endif\n");
 
         //
         // Save string buffer content in AutoGen.h.
@@ -410,11 +410,6 @@ public class AutoGen {
         // Write Autogen.c header notation
         //
         fileBuffer.append(CommonDefinition.AUTOGENCNOTATION);
-
-        //
-        // Write #include <AutoGen.h> at beginning of AutoGen.c
-        //
-        fileBuffer.append(CommonDefinition.INCLUDEAUTOGENH);
 
         //
         // Get the native MSA file infomation. Since before call autogen,
@@ -474,7 +469,7 @@ public class AutoGen {
         //
 
         fileBuffer.append(guid);
-        fileBuffer.append("};\r\n");
+        fileBuffer.append("};\n");
 
         //
         // Generate library instance consumed protocol, guid, ppi, pcd list.
@@ -514,7 +509,7 @@ public class AutoGen {
 
         this.myPcdAutogen.execute();
         if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
+            fileBuffer.append("\n");
             fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
@@ -569,7 +564,7 @@ public class AutoGen {
         String[] specList = saq.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
             fileBuffer.append(CommonDefinition.DEFINE + specList[i]
-                              + "\r\n");
+                              + "\n");
         }
         // fileBuffer.append(CommonDefinition.autoGenHLine1);
         // fileBuffer.append(CommonDefinition.autoGenHLine2);
@@ -614,7 +609,7 @@ public class AutoGen {
         if (saq.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
-            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
+            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\n");
             copyFlashMapHToDebugDir();
         }
 
@@ -622,14 +617,14 @@ public class AutoGen {
         // Write PCD information to library AutoGen.h.
         //
         if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
+            fileBuffer.append("\n");
             fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
 
         //
         // Append the #endif at AutoGen.h
         //
-        fileBuffer.append("#endif\r\n");
+        fileBuffer.append("#endif\n");
 
         //
         // Save content of string buffer to AutoGen.h file.
@@ -711,7 +706,7 @@ public class AutoGen {
                 String includeNameStr = includeName[j];
                 if (includeNameStr != null) {
                     str = CommonDefinition.INCLUDE + " " + "<";
-                    str = str + includeNameStr + ">\r\n";
+                    str = str + includeNameStr + ">\n";
                     includeStrList.add(str);
                     includeNameStr = null;
                 }
@@ -750,7 +745,7 @@ public class AutoGen {
                                            + "] declaration in any SPD package. ");
             } else if (!pkgHeader.equalsIgnoreCase("")) {
                 includeStr = CommonDefinition.INCLUDE + " <" + pkgHeader
-                             + ">\r\n";
+                             + ">\n";
                 includeStrList.add(includeStr);
             }
         }
@@ -789,108 +784,111 @@ public class AutoGen {
                 throw new AutoGenException(
                                           "Module type = 'PEI_CORE', can have only one module entry point!");
             } else {
-                fileBuffer.append("EFI_STATUS\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\r\n");
-                fileBuffer.append("  IN VOID                        *OldCoreData\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\n");
+                fileBuffer.append("  IN VOID                        *OldCoreData\n");
+                fileBuffer.append("  );\n\n");
 
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\r\n");
-                fileBuffer.append("  IN VOID                        *OldCoreData\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\n");
+                fileBuffer.append("  IN VOID                        *OldCoreData\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
                 fileBuffer.append("  return ");
                 fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (PeiStartupDescriptor, OldCoreData);\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append(" (PeiStartupDescriptor, OldCoreData);\n");
+                fileBuffer.append("}\n\n");
             }
             break;
 
         case CommonDefinition.ModuleTypeDxeCore:
-            fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\r\n");
+            fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\n");
             if (entryPointList == null || entryPointList.length != 1) {
                 throw new AutoGenException("Module type = 'DXE_CORE', can have only one module entry point!");
             } else {
-                fileBuffer.append("VOID\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (\n");
-                fileBuffer.append("  IN VOID  *HobStart\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                fileBuffer.append("  IN VOID  *HobStart\n");
+                fileBuffer.append("  );\n\n");
 
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN VOID  *HobStart\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN VOID  *HobStart\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
                 fileBuffer.append("  ");
                 fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (HobStart);\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append(" (HobStart);\n");
+                fileBuffer.append("}\n\n");
             }
             break;
 
         case CommonDefinition.ModuleTypePeim:
             entryPointCount = 0;
-            fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT32 _gPeimRevision = 0;\r\n");
+            fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT32 _gPeimRevision = 0;\n");
             if (entryPointList == null || entryPointList.length == 0) {
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\r\n");
-                fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
-                fileBuffer.append("  return EFI_SUCCESS;\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\n");
+                fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
+                fileBuffer.append("  return EFI_SUCCESS;\n");
+                fileBuffer.append("}\n\n");
                 break;
             }
             for (int i = 0; i < entryPointList.length; i++) {
-                fileBuffer.append("EFI_STATUS\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(entryPointList[i]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\r\n");
-                fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
-                fileBuffer.append("  );\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\n");
+                fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\n");
+                fileBuffer.append("  );\n");
                 entryPointCount++;
             }
 
-            fileBuffer.append("EFI_STATUS\r\n");
-            fileBuffer.append("EFIAPI\r\n");
-            fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-            fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\r\n");
-            fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
-            fileBuffer.append("  )\r\n\r\n");
-            fileBuffer.append("{\r\n");
+            fileBuffer.append("EFI_STATUS\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append("ProcessModuleEntryPointList (\n");
+            fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\n");
+            fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\n");
+            fileBuffer.append("  )\n\n");
+            fileBuffer.append("{\n");
             if (entryPointCount == 1) {
                 fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                 fileBuffer.append("  return ");
                 fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
+                fileBuffer.append(" (FfsHeader, PeiServices);\n");
             } else {
-                fileBuffer.append("  EFI_STATUS  Status;\r\n");
-                fileBuffer.append("  EFI_STATUS  CombinedStatus;\r\n\r\n");
-                fileBuffer.append("  CombinedStatus = EFI_LOAD_ERROR;\r\n\r\n");
+                fileBuffer.append("  EFI_STATUS  Status;\n");
+                fileBuffer.append("  EFI_STATUS  CombinedStatus;\n\n");
+                fileBuffer.append("  CombinedStatus = EFI_LOAD_ERROR;\n\n");
                 for (int i = 0; i < entryPointList.length; i++) {
                     if (!entryPointList[i].equals("")) {
                         fileBuffer.append(String.format("  " + debugStr, entryPointList[i], entryPointList[i]));
                         fileBuffer.append("  Status = ");
                         fileBuffer.append(entryPointList[i]);
-                        fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
-                        fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (CombinedStatus)) {\r\n");
-                        fileBuffer.append("    CombinedStatus = Status;\r\n");
-                        fileBuffer.append("  }\r\n\r\n");
+                        fileBuffer.append(" (FfsHeader, PeiServices);\n");
+                        fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (CombinedStatus)) {\n");
+                        fileBuffer.append("    CombinedStatus = Status;\n");
+                        fileBuffer.append("  }\n\n");
                     } else {
                         break;
                     }
                 }
-                fileBuffer.append("  return CombinedStatus;\r\n");
+                fileBuffer.append("  return CombinedStatus;\n");
             }
-            fileBuffer.append("}\r\n\r\n");
+            fileBuffer.append("}\n\n");
             break;
 
         case CommonDefinition.ModuleTypeDxeSmmDriver:
@@ -902,65 +900,66 @@ public class AutoGen {
             if (entryPointList == null || entryPointList.length == 0) {
                 fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED  const UINT8  _gDriverEntryPointCount = ");
                 fileBuffer.append(Integer.toString(entryPointCount));
-                fileBuffer.append(";\r\n");
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
-                fileBuffer.append("  return EFI_SUCCESS;\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append(";\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
+                fileBuffer.append("  return EFI_SUCCESS;\n");
+                fileBuffer.append("}\n\n");
 
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(entryPointList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                    fileBuffer.append("  );\n");
                     entryPointCount++;
                 }
                 fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED  const UINT8  _gDriverEntryPointCount = ");
                 fileBuffer.append(Integer.toString(entryPointCount));
-                fileBuffer.append(";\r\n");
-                fileBuffer.append("static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;\r\n");
-                fileBuffer.append("static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;\r\n\r\n");
+                fileBuffer.append(";\n");
+                fileBuffer.append("static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;\n");
+                fileBuffer.append("static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;\n\n");
 
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
 
                 for (int i = 0; i < entryPointList.length; i++) {
-                    fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\r\n");
+                    fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\n");
                     fileBuffer.append(String.format("    " + debugStr, entryPointList[i], entryPointList[i]));
                     fileBuffer.append("    ExitDriver (");
                     fileBuffer.append(entryPointList[i]);
-                    fileBuffer.append(" (ImageHandle, SystemTable));\r\n");
-                    fileBuffer.append("    ASSERT (FALSE);\r\n");
-                    fileBuffer.append("  }\r\n");
+                    fileBuffer.append(" (ImageHandle, SystemTable));\n");
+                    fileBuffer.append("    ASSERT (FALSE);\n");
+                    fileBuffer.append("  }\n");
                 }
-                fileBuffer.append("  return mDriverEntryPointStatus;\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append("  return mDriverEntryPointStatus;\n");
+                fileBuffer.append("}\n\n");
 
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ExitDriver (\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ExitDriver (\n");
                 fileBuffer.append("  IN EFI_STATUS  Status\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
-                fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\r\n");
-                fileBuffer.append("    mDriverEntryPointStatus = Status;\r\n");
-                fileBuffer.append("  }\r\n");
-                fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\r\n");
-                fileBuffer.append("  ASSERT (FALSE);\r\n");
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
+                fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\n");
+                fileBuffer.append("    mDriverEntryPointStatus = Status;\n");
+                fileBuffer.append("  }\n");
+                fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\n");
+                fileBuffer.append("  ASSERT (FALSE);\n");
+                fileBuffer.append("}\n\n");
             }
 
 
@@ -974,55 +973,55 @@ public class AutoGen {
             unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
                     fileBuffer.append(unloadImageList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\n");
+                    fileBuffer.append("  );\n");
                     unloadImageCount++;
                 }
             }
 
             fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverUnloadImageCount = ");
             fileBuffer.append(Integer.toString(unloadImageCount));
-            fileBuffer.append(";\r\n\r\n");
+            fileBuffer.append(";\n\n");
 
-            fileBuffer.append("EFI_STATUS\r\n");
-            fileBuffer.append("EFIAPI\r\n");
-            fileBuffer.append("ProcessModuleUnloadList (\r\n");
-            fileBuffer.append("  IN EFI_HANDLE  ImageHandle\r\n");
-            fileBuffer.append("  )\r\n");
-            fileBuffer.append("{\r\n");
+            fileBuffer.append("EFI_STATUS\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append("ProcessModuleUnloadList (\n");
+            fileBuffer.append("  IN EFI_HANDLE  ImageHandle\n");
+            fileBuffer.append("  )\n");
+            fileBuffer.append("{\n");
 
             if (unloadImageCount == 0) {
-                fileBuffer.append("  return EFI_SUCCESS;\r\n");
+                fileBuffer.append("  return EFI_SUCCESS;\n");
             } else if (unloadImageCount == 1) {
                 fileBuffer.append("  return ");
                 fileBuffer.append(unloadImageList[0]);
-                fileBuffer.append("(ImageHandle);\r\n");
+                fileBuffer.append("(ImageHandle);\n");
             } else {
-                fileBuffer.append("  EFI_STATUS  Status;\r\n\r\n");
-                fileBuffer.append("  Status = EFI_SUCCESS;\r\n\r\n");
+                fileBuffer.append("  EFI_STATUS  Status;\n\n");
+                fileBuffer.append("  Status = EFI_SUCCESS;\n\n");
                 for (int i = 0; i < unloadImageList.length; i++) {
                     if (i == 0) {
                         fileBuffer.append("     Status = ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
                     } else {
-                        fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
+                        fileBuffer.append("  if (EFI_ERROR (Status)) {\n");
                         fileBuffer.append("    ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
-                        fileBuffer.append("  } else {\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
+                        fileBuffer.append("  } else {\n");
                         fileBuffer.append("    Status = ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
-                        fileBuffer.append("  }\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
+                        fileBuffer.append("  }\n");
                     }
                 }
-                fileBuffer.append("  return Status;\r\n");
+                fileBuffer.append("  return Status;\n");
             }
-            fileBuffer.append("}\r\n\r\n");
+            fileBuffer.append("}\n\n");
             break;
 
         case CommonDefinition.ModuleTypeDxeRuntimeDriver:
@@ -1031,94 +1030,95 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeUefiDriver:
         case CommonDefinition.ModuleTypeUefiApplication:
             entryPointCount = 0;
-            fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\r\n");
+            fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\n");
             //
             // If entry point is null, create a empty ProcessModuleEntryPointList function.
             //
             if (entryPointList == null || entryPointList.length == 0) {
-                fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverEntryPointCount = 0;\r\n");
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
-                fileBuffer.append("  return EFI_SUCCESS;\r\n");
-                fileBuffer.append("}\r\n");
+                fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverEntryPointCount = 0;\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
+                fileBuffer.append("  return EFI_SUCCESS;\n");
+                fileBuffer.append("}\n");
 
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
 
-                    fileBuffer.append("EFI_STATUS\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(entryPointList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                    fileBuffer.append("  );\n");
                     entryPointCount++;
                 }
 
                 fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverEntryPointCount = ");
                 fileBuffer.append(Integer.toString(entryPointCount));
-                fileBuffer.append(";\r\n");
+                fileBuffer.append(";\n");
                 if (entryPointCount > 1) {
-                    fileBuffer.append("static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;\r\n");
-                    fileBuffer.append("static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;\r\n");
+                    fileBuffer.append("static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;\n");
+                    fileBuffer.append("static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;\n");
                 }
                 fileBuffer.append("\n");
 
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ProcessModuleEntryPointList (\r\n");
-                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ProcessModuleEntryPointList (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
 
                 if (entryPointCount == 1) {
                     fileBuffer.append(String.format("  " + debugStr, entryPointList[0], entryPointList[0]));
                     fileBuffer.append("  return ");
                     fileBuffer.append(entryPointList[0]);
-                    fileBuffer.append(" (ImageHandle, SystemTable);\r\n");
+                    fileBuffer.append(" (ImageHandle, SystemTable);\n");
                 } else {
                     for (int i = 0; i < entryPointList.length; i++) {
                         if (!entryPointList[i].equals("")) {
-                            fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\r\n");
+                            fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\n");
                             fileBuffer.append(String.format("    " + debugStr, entryPointList[i], entryPointList[i]));
                             fileBuffer.append("    ExitDriver (");
                             fileBuffer.append(entryPointList[i]);
-                            fileBuffer.append(" (ImageHandle, SystemTable));\r\n");
-                            fileBuffer.append("    ASSERT (FALSE);\r\n");
-                            fileBuffer.append("  }\r\n");
+                            fileBuffer.append(" (ImageHandle, SystemTable));\n");
+                            fileBuffer.append("    ASSERT (FALSE);\n");
+                            fileBuffer.append("  }\n");
                         } else {
                             break;
                         }
                     }
-                    fileBuffer.append("  return mDriverEntryPointStatus;\r\n");
+                    fileBuffer.append("  return mDriverEntryPointStatus;\n");
                 }
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append("}\n\n");
 
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ExitDriver (\r\n");
-                fileBuffer.append("  IN EFI_STATUS  Status\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("ExitDriver (\n");
+                fileBuffer.append("  IN EFI_STATUS  Status\n");
+                fileBuffer.append("  )\n\n");
+                fileBuffer.append("{\n");
                 if (entryPointCount <= 1) {
-                    fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
-                    fileBuffer.append("    ProcessLibraryDestructorList (gImageHandle, gST);\r\n");
-                    fileBuffer.append("  }\r\n");
+                    fileBuffer.append("  if (EFI_ERROR (Status)) {\n");
+                    fileBuffer.append("    ProcessLibraryDestructorList (gImageHandle, gST);\n");
+                    fileBuffer.append("  }\n");
                     fileBuffer
-                    .append("  gBS->Exit (gImageHandle, Status, 0, NULL);\r\n");
+                    .append("  gBS->Exit (gImageHandle, Status, 0, NULL);\n");
                 } else {
-                    fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\r\n");
-                    fileBuffer.append("    mDriverEntryPointStatus = Status;\r\n");
-                    fileBuffer.append("  }\r\n");
-                    fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\r\n");
-                    fileBuffer.append("  ASSERT (FALSE);\r\n");
+                    fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\n");
+                    fileBuffer.append("    mDriverEntryPointStatus = Status;\n");
+                    fileBuffer.append("  }\n");
+                    fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\n");
+                    fileBuffer.append("  ASSERT (FALSE);\n");
                 }
-                fileBuffer.append("}\r\n\r\n");
+                fileBuffer.append("}\n\n");
             }
 
             //
@@ -1133,56 +1133,56 @@ public class AutoGen {
             unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(unloadImageList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\n");
+                    fileBuffer.append("  );\n");
                     unloadImageCount++;
                 }
             }
 
             fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverUnloadImageCount = ");
             fileBuffer.append(Integer.toString(unloadImageCount));
-            fileBuffer.append(";\r\n\r\n");
+            fileBuffer.append(";\n\n");
 
             fileBuffer.append("EFI_STATUS\n");
-            fileBuffer.append("EFIAPI\r\n");
-            fileBuffer.append("ProcessModuleUnloadList (\r\n");
-            fileBuffer.append("  IN EFI_HANDLE  ImageHandle\r\n");
-            fileBuffer.append("  )\r\n");
-            fileBuffer.append("{\r\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append("ProcessModuleUnloadList (\n");
+            fileBuffer.append("  IN EFI_HANDLE  ImageHandle\n");
+            fileBuffer.append("  )\n");
+            fileBuffer.append("{\n");
 
             if (unloadImageCount == 0) {
-                fileBuffer.append("  return EFI_SUCCESS;\r\n");
+                fileBuffer.append("  return EFI_SUCCESS;\n");
             } else if (unloadImageCount == 1) {
                 fileBuffer.append("  return ");
                 fileBuffer.append(unloadImageList[0]);
-                fileBuffer.append("(ImageHandle);\r\n");
+                fileBuffer.append("(ImageHandle);\n");
             } else {
-                fileBuffer.append("  EFI_STATUS  Status;\r\n\r\n");
-                fileBuffer.append("  Status = EFI_SUCCESS;\r\n\r\n");
+                fileBuffer.append("  EFI_STATUS  Status;\n\n");
+                fileBuffer.append("  Status = EFI_SUCCESS;\n\n");
                 for (int i = 0; i < unloadImageList.length; i++) {
                     if (i == 0) {
                         fileBuffer.append("  Status = ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
                     } else {
-                        fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
+                        fileBuffer.append("  if (EFI_ERROR (Status)) {\n");
                         fileBuffer.append("    ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
-                        fileBuffer.append("  } else {\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
+                        fileBuffer.append("  } else {\n");
                         fileBuffer.append("    Status = ");
                         fileBuffer.append(unloadImageList[i]);
-                        fileBuffer.append("(ImageHandle);\r\n");
-                        fileBuffer.append("  }\r\n");
+                        fileBuffer.append("(ImageHandle);\n");
+                        fileBuffer.append("  }\n");
                     }
                 }
-                fileBuffer.append("  return Status;\r\n");
+                fileBuffer.append("  return Status;\n");
             }
-            fileBuffer.append("}\r\n\r\n");
+            fileBuffer.append("}\n\n");
             break;
         }
     }
@@ -1225,7 +1225,7 @@ public class AutoGen {
             ppiKeyWord = ppiIterator.next().toString();
             cNameGuid = GlobalData.getPpiGuid(this.mDepPkgList, ppiKeyWord);
             if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
+                fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
                 fileBuffer.append(cNameGuid[0]);
                 fileBuffer.append(" =     { ");
                 fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
@@ -1280,7 +1280,7 @@ public class AutoGen {
             protocolKeyWord = protocolIterator.next().toString();
             cNameGuid = GlobalData.getProtocolGuid(this.mDepPkgList, protocolKeyWord);
             if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
+                fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
                 fileBuffer.append(cNameGuid[0]);
                 fileBuffer.append(" =     { ");
                 fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
@@ -1322,7 +1322,7 @@ public class AutoGen {
             cNameGuid = GlobalData.getGuid(this.mDepPkgList, guidKeyWord);
 
             if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
+                fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
                 fileBuffer.append(cNameGuid[0]);
                 fileBuffer.append(" =     { ");
                 fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
@@ -1386,32 +1386,32 @@ public class AutoGen {
         //
         for (int i = 0; i < libInstanceList.size(); i++) {
             if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
-                fileBuffer.append("RETURN_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                fileBuffer.append("RETURN_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(libInstanceList.get(i)[0]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  VOID\r\n");
-                fileBuffer.append("  );\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  VOID\n");
+                fileBuffer.append("  );\n");
             } else {
                 switch (CommonDefinition.getModuleType(moduleType)) {
                 case CommonDefinition.ModuleTypeBase:
-                    fileBuffer.append("RETURN_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("RETURN_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  VOID\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  VOID\n");
+                    fileBuffer.append("  );\n");
                     break;
 
                 case CommonDefinition.ModuleTypePeiCore:
                 case CommonDefinition.ModuleTypePeim:
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
-                    fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\n");
+                    fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\n");
+                    fileBuffer.append("  );\n");
                     break;
 
                 case CommonDefinition.ModuleTypeDxeCore:
@@ -1421,13 +1421,13 @@ public class AutoGen {
                 case CommonDefinition.ModuleTypeDxeSalDriver:
                 case CommonDefinition.ModuleTypeUefiDriver:
                 case CommonDefinition.ModuleTypeUefiApplication:
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                    fileBuffer.append("  );\n");
                     break;
 
                 }
@@ -1437,19 +1437,19 @@ public class AutoGen {
         //
         // Add ProcessLibraryConstructorList in AutoGen.c
         //
-        fileBuffer.append("VOID\r\n");
-        fileBuffer.append("EFIAPI\r\n");
-        fileBuffer.append("ProcessLibraryConstructorList (\r\n");
+        fileBuffer.append("VOID\n");
+        fileBuffer.append("EFIAPI\n");
+        fileBuffer.append("ProcessLibraryConstructorList (\n");
         switch (CommonDefinition.getModuleType(moduleType)) {
         case CommonDefinition.ModuleTypeBase:
-            fileBuffer.append("  VOID\r\n");
+            fileBuffer.append("  VOID\n");
             break;
 
         case CommonDefinition.ModuleTypePeiCore:
         case CommonDefinition.ModuleTypePeim:
-            fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
+            fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\n");
             fileBuffer
-            .append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
+            .append("  IN EFI_PEI_SERVICES          **PeiServices\n");
             break;
 
         case CommonDefinition.ModuleTypeDxeCore:
@@ -1459,42 +1459,42 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeDxeSalDriver:
         case CommonDefinition.ModuleTypeUefiDriver:
         case CommonDefinition.ModuleTypeUefiApplication:
-            fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-            fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
+            fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+            fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
             break;
         }
 
-        fileBuffer.append("  )\r\n");
-        fileBuffer.append("{\r\n");
+        fileBuffer.append("  )\n");
+        fileBuffer.append("{\n");
         //
         // If no constructor function, return EFI_SUCCESS.
         //
         //if (libInstanceList.size() == 0){
-        //   fileBuffer.append("  return EFI_SUCCESS;\r\n");
+        //   fileBuffer.append("  return EFI_SUCCESS;\n");
         //}
         for (int i = 0; i < libInstanceList.size(); i++) {
             if (isFirst) {
-                fileBuffer.append("  EFI_STATUS  Status;\r\n");
-                fileBuffer.append("  Status = EFI_SUCCESS;\r\n");
-                fileBuffer.append("\r\n");
+                fileBuffer.append("  EFI_STATUS  Status;\n");
+                fileBuffer.append("  Status = EFI_SUCCESS;\n");
+                fileBuffer.append("\n");
                 isFirst = false;
             }
             if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
                 fileBuffer.append("  Status = ");
                 fileBuffer.append(libInstanceList.get(i)[0]);
-                fileBuffer.append("();\r\n");
+                fileBuffer.append("();\n");
             } else {
                 switch (CommonDefinition.getModuleType(moduleType)) {
                 case CommonDefinition.ModuleTypeBase:
                     fileBuffer.append("  Status = ");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append("();\r\n");
+                    fileBuffer.append("();\n");
                     break;
                 case CommonDefinition.ModuleTypePeiCore:
                 case CommonDefinition.ModuleTypePeim:
                     fileBuffer.append("  Status = ");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
+                    fileBuffer.append(" (FfsHeader, PeiServices);\n");
                     break;
                 case CommonDefinition.ModuleTypeDxeCore:
                 case CommonDefinition.ModuleTypeDxeDriver:
@@ -1505,16 +1505,16 @@ public class AutoGen {
                 case CommonDefinition.ModuleTypeUefiApplication:
                     fileBuffer.append("  Status = ");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (ImageHandle, SystemTable);\r\n");
+                    fileBuffer.append(" (ImageHandle, SystemTable);\n");
                     break;
                 default:
                     EdkLog.log(EdkLog.EDK_INFO,"Autogen doesn't know how to deal with module type - " + moduleType + "!");
                 }
 
             }
-            fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
+            fileBuffer.append("  ASSERT_EFI_ERROR (Status);\n");
         }
-        fileBuffer.append("}\r\n");
+        fileBuffer.append("}\n");
     }
 
     /**
@@ -1536,31 +1536,31 @@ public class AutoGen {
         boolean isFirst = true;
         for (int i = 0; i < libInstanceList.size(); i++) {
             if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
-                fileBuffer.append("RETURN_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                fileBuffer.append("RETURN_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(libInstanceList.get(i)[0]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  VOID\r\n");
-                fileBuffer.append("  );\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  VOID\n");
+                fileBuffer.append("  );\n");
             } else {
                 switch (CommonDefinition.getModuleType(moduleType)) {
                 case CommonDefinition.ModuleTypeBase:
-                    fileBuffer.append("RETURN_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("RETURN_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  VOID\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  VOID\n");
+                    fileBuffer.append("  );\n");
                     break;
                 case CommonDefinition.ModuleTypePeiCore:
                 case CommonDefinition.ModuleTypePeim:
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
-                    fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\n");
+                    fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\n");
+                    fileBuffer.append("  );\n");
                     break;
                 case CommonDefinition.ModuleTypeDxeCore:
                 case CommonDefinition.ModuleTypeDxeDriver:
@@ -1569,13 +1569,13 @@ public class AutoGen {
                 case CommonDefinition.ModuleTypeDxeSalDriver:
                 case CommonDefinition.ModuleTypeUefiDriver:
                 case CommonDefinition.ModuleTypeUefiApplication:
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFI_STATUS\n");
+                    fileBuffer.append("EFIAPI\n");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    fileBuffer.append(" (\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                    fileBuffer.append("  );\n");
                     break;
                 }
             }
@@ -1596,37 +1596,37 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeDxeSalDriver:
         case CommonDefinition.ModuleTypeUefiDriver:
         case CommonDefinition.ModuleTypeUefiApplication:
-            fileBuffer.append("VOID\r\n");
-            fileBuffer.append("EFIAPI\r\n");
-            fileBuffer.append("ProcessLibraryDestructorList (\r\n");
-            fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-            fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-            fileBuffer.append("  )\r\n");
-            fileBuffer.append("{\r\n");
+            fileBuffer.append("VOID\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append("ProcessLibraryDestructorList (\n");
+            fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+            fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+            fileBuffer.append("  )\n");
+            fileBuffer.append("{\n");
             //
             // If no library destructor function, return EFI_SUCCESS.
             //
 
             for (int i = 0; i < libInstanceList.size(); i++) {
                 if (isFirst) {
-                    fileBuffer.append("  EFI_STATUS  Status;\r\n");
-                    fileBuffer.append("  Status = EFI_SUCCESS;\r\n");
-                    fileBuffer.append("\r\n");
+                    fileBuffer.append("  EFI_STATUS  Status;\n");
+                    fileBuffer.append("  Status = EFI_SUCCESS;\n");
+                    fileBuffer.append("\n");
                     isFirst = false;
                 }
                 if (libInstanceList.get(i)[1].equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
                     fileBuffer.append("  Status = ");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append("();\r\n");
-                    fileBuffer.append("  VOID\r\n");
+                    fileBuffer.append("();\n");
+                    fileBuffer.append("  VOID\n");
                 } else {
                     fileBuffer.append("  Status = ");
                     fileBuffer.append(libInstanceList.get(i)[0]);
-                    fileBuffer.append("(ImageHandle, SystemTable);\r\n");
-                    fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
+                    fileBuffer.append("(ImageHandle, SystemTable);\n");
+                    fileBuffer.append("  ASSERT_EFI_ERROR (Status);\n");
                 }
             }
-            fileBuffer.append("}\r\n");
+            fileBuffer.append("}\n");
             break;
         }
     }
@@ -1662,7 +1662,7 @@ public class AutoGen {
             if (driverBindingGroup[i][0] != null) {
                 fileBuffer.append("extern EFI_DRIVER_BINDING_PROTOCOL ");
                 fileBuffer.append(driverBindingGroup[i][0]);
-                fileBuffer.append(";\r\n");
+                fileBuffer.append(";\n");
             }
         }
 
@@ -1676,7 +1676,7 @@ public class AutoGen {
                         BitMask |= 0x01;
                         fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
                         fileBuffer.append(driverBindingGroup[i][1]);
-                        fileBuffer.append(";\r\n");
+                        fileBuffer.append(";\n");
                     } else {
                         throw new AutoGenException("DriverBinding can't be empty!!");
                     }
@@ -1693,7 +1693,7 @@ public class AutoGen {
                     BitMask |= 0x02;
                     fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
                     fileBuffer.append(driverBindingGroup[i][2]);
-                    fileBuffer.append(";\r\n");
+                    fileBuffer.append(";\n");
                 } else {
                     throw new AutoGenException("DriverBinding can't be empty!!");
                 }
@@ -1710,7 +1710,7 @@ public class AutoGen {
                         BitMask |= 0x04;
                         fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
                         fileBuffer.append(driverBindingGroup[i][3]);
-                        fileBuffer.append(";\r\n");
+                        fileBuffer.append(";\n");
                     } else {
                         throw new AutoGenException("DriverBinding can't be empty!!");
                     }
@@ -1724,7 +1724,7 @@ public class AutoGen {
         //
         fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverModelProtocolBitmask = ");
         fileBuffer.append(Integer.toString(BitMask));
-        fileBuffer.append(";\r\n");
+        fileBuffer.append(";\n");
 
         //
         // Write driver module protocol list entry
@@ -1732,7 +1732,7 @@ public class AutoGen {
         fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINTN  _gDriverModelProtocolListEntries = ");
 
         fileBuffer.append(Integer.toString(driverBindingGroup.length));
-        fileBuffer.append(";\r\n");
+        fileBuffer.append(";\n");
 
         //
         // Write drive module protocol list to autogen.c
@@ -1749,10 +1749,10 @@ public class AutoGen {
             //
             //  DriverBinding
             // 
-            fileBuffer.append("\r\n {\r\n");
+            fileBuffer.append("\n {\n");
             fileBuffer.append("  &");
             fileBuffer.append(driverBindingGroup[i][0]);
-            fileBuffer.append(", \r\n");
+            fileBuffer.append(", \n");
 
             //
             //  ComponentName
@@ -1760,9 +1760,9 @@ public class AutoGen {
             if (driverBindingGroup[i][1] != null && componentNamePcd != true) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][1]);
-                fileBuffer.append(", \r\n");
+                fileBuffer.append(", \n");
             } else {
-                fileBuffer.append("  NULL, \r\n");
+                fileBuffer.append("  NULL, \n");
             }
 
             //
@@ -1771,9 +1771,9 @@ public class AutoGen {
             if (driverBindingGroup[i][2] != null) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][2]);
-                fileBuffer.append(", \r\n");
+                fileBuffer.append(", \n");
             } else {
-                fileBuffer.append("  NULL, \r\n");
+                fileBuffer.append("  NULL, \n");
             }
 
             //
@@ -1782,15 +1782,15 @@ public class AutoGen {
             if (driverBindingGroup[i][3] != null && driverDiagnostPcd != true) {
                 fileBuffer.append("  &");
                 fileBuffer.append(driverBindingGroup[i][3]);
-                fileBuffer.append(", \r\n");
+                fileBuffer.append(", \n");
             } else {
-                fileBuffer.append("  NULL, \r\n");
+                fileBuffer.append("  NULL, \n");
             }
             fileBuffer.append("  }");
         }
 
         if (driverBindingGroup.length > 0) {
-            fileBuffer.append("\r\n};\r\n");
+            fileBuffer.append("\n};\n");
         }
     }
 
@@ -2016,7 +2016,7 @@ public class AutoGen {
         // Entry point lib for these module types needs to know the count
         // of entryPoint.
         //
-        fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverSetVirtualAddressMapEventCount = ");
+        fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverSetVirtualAddressMapEventCount = ");
 
         //
         // If the list is not valid or has no entries set count to zero else
@@ -2034,14 +2034,14 @@ public class AutoGen {
         }
 
         fileBuffer.append(Integer.toString(Count));
-        fileBuffer.append(";\r\n\r\n");
+        fileBuffer.append(";\n\n");
         if (this.setVirtalAddList == null || this.setVirtalAddList.size() == 0) {
             //
             // No data so make a NULL list
             //
-            fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {\r\n");
-            fileBuffer.append("  NULL\r\n");
-            fileBuffer.append("};\r\n\r\n");
+            fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {\n");
+            fileBuffer.append("  NULL\n");
+            fileBuffer.append("};\n\n");
         } else {
             //
             // Write SetVirtualAddressMap function definition.
@@ -2050,28 +2050,28 @@ public class AutoGen {
                 if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
                     break;
                 }
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(this.setVirtalAddList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
-                fileBuffer.append("  IN VOID       *Context\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_EVENT  Event,\n");
+                fileBuffer.append("  IN VOID       *Context\n");
+                fileBuffer.append("  );\n\n");
             }
 
             //
             // Write SetVirtualAddressMap entry point array.
             //
-            fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {");
+            fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {");
             for (i = 0; i < this.setVirtalAddList.size(); i++) {
                 if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
                     break;
                 }
 
                 if (i == 0) {
-                    fileBuffer.append("\r\n  ");
+                    fileBuffer.append("\n  ");
                 } else {
-                    fileBuffer.append(",\r\n  ");
+                    fileBuffer.append(",\n  ");
                 }
 
                 fileBuffer.append(this.setVirtalAddList.get(i));
@@ -2079,8 +2079,8 @@ public class AutoGen {
             //
             // add the NULL at the end of _gDriverSetVirtualAddressMapEvent list.
             //
-            fileBuffer.append(",\r\n  NULL");
-            fileBuffer.append("\r\n};\r\n\r\n");
+            fileBuffer.append(",\n  NULL");
+            fileBuffer.append("\n};\n\n");
         }
     }
 
@@ -2090,7 +2090,7 @@ public class AutoGen {
         // Entry point lib for these module types needs to know the count.
         //
         fileBuffer
-        .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverExitBootServicesEventCount = ");
+        .append("\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverExitBootServicesEventCount = ");
 
         //
         // If the list is not valid or has no entries set count to zero else
@@ -2107,15 +2107,15 @@ public class AutoGen {
             Count = i;
         }
         fileBuffer.append(Integer.toString(Count));
-        fileBuffer.append(";\r\n\r\n");
+        fileBuffer.append(";\n\n");
 
         if (this.exitBootServiceList == null || this.exitBootServiceList.size() == 0) {
             //      
             // No data so make a NULL list.
             //
-            fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {\r\n");
-            fileBuffer.append("  NULL\r\n");
-            fileBuffer.append("};\r\n\r\n");
+            fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {\n");
+            fileBuffer.append("  NULL\n");
+            fileBuffer.append("};\n\n");
         } else {
             //
             // Write DriverExitBootServices function definition.
@@ -2125,34 +2125,34 @@ public class AutoGen {
                     break;
                 }
 
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                fileBuffer.append("VOID\n");
+                fileBuffer.append("EFIAPI\n");
                 fileBuffer.append(this.exitBootServiceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
-                fileBuffer.append("  IN VOID       *Context\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_EVENT  Event,\n");
+                fileBuffer.append("  IN VOID       *Context\n");
+                fileBuffer.append("  );\n\n");
             }
 
             //
             // Write DriverExitBootServices entry point array.
             //
-            fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {");
+            fileBuffer.append("\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {");
             for (i = 0; i < this.exitBootServiceList.size(); i++) {
                 if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
                     break;
                 }
 
                 if (i == 0) {
-                    fileBuffer.append("\r\n  ");
+                    fileBuffer.append("\n  ");
                 } else {
-                    fileBuffer.append(",\r\n  ");
+                    fileBuffer.append(",\n  ");
                 }
                 fileBuffer.append(this.exitBootServiceList.get(i));
             }
 
-            fileBuffer.append(",\r\n  NULL");
-            fileBuffer.append("\r\n};\r\n\r\n");
+            fileBuffer.append(",\n  NULL");
+            fileBuffer.append("\n};\n\n");
         }   
     }
     /**
