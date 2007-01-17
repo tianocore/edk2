@@ -171,6 +171,141 @@ Returns:
   
 }
 
+VOID
+SetHeaderChecksum (
+  IN EFI_FFS_FILE_HEADER *FfsHeader
+  )
+/*++
+
+  Routine Description:
+    Caculate the checksum for the FFS header.
+
+  Parameters:
+    FfsHeader     -   FFS File Header which needs to caculate the checksum
+
+  Return:
+    N/A
+
+--*/
+{
+  EFI_FFS_FILE_STATE  State;
+  UINT8               HeaderChecksum;
+  UINT8               FileChecksum;
+
+  //
+  // The state and the File checksum are not included
+  //
+  State = FfsHeader->State;
+  FfsHeader->State = 0;
+
+  FileChecksum = FfsHeader->IntegrityCheck.Checksum.File;
+  FfsHeader->IntegrityCheck.Checksum.File = 0;
+
+  FfsHeader->IntegrityCheck.Checksum.Header = 0;
+
+  HeaderChecksum = CalculateChecksum8 ((UINT8 *)FfsHeader,sizeof (EFI_FFS_FILE_HEADER));
+
+  FfsHeader->IntegrityCheck.Checksum.Header = (UINT8) (~(0x100-HeaderChecksum) + 1);
+
+  FfsHeader->State                          = State;
+  FfsHeader->IntegrityCheck.Checksum.File   = FileChecksum;
+
+  return ;
+}
+
+VOID
+SetFileChecksum (
+  IN EFI_FFS_FILE_HEADER *FfsHeader,
+  IN UINTN               ActualFileSize
+  )
+/*++
+
+  Routine Description:
+    Caculate the checksum for the FFS File, usually it is caculated before
+    the file tail is set.
+
+  Parameters:
+    FfsHeader         -   FFS File Header which needs to caculate the checksum
+    ActualFileSize    -   The whole Ffs File Length, including the FFS Tail
+                          if exists, but at this time, it is 0.
+  Return:
+    N/A
+
+--*/
+{
+  EFI_FFS_FILE_STATE  State;
+  UINT8               FileChecksum;
+  UINTN               ActualSize;
+
+  if (FfsHeader->Attributes & FFS_ATTRIB_CHECKSUM) {
+    //
+    // The file state is not included
+    //
+    State = FfsHeader->State;
+    FfsHeader->State = 0;
+
+    FfsHeader->IntegrityCheck.Checksum.File = 0;
+
+    if (FfsHeader->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
+      ActualSize = ActualFileSize - 2;
+    } else {
+      ActualSize = ActualFileSize;
+    }
+    //
+    // File checksum does not including the file tail
+    //
+    FileChecksum = CalculateChecksum8 ((UINT8 *)FfsHeader,sizeof (EFI_FFS_FILE_HEADER));
+
+    FfsHeader->IntegrityCheck.Checksum.File = (UINT8) (~(0x100-FileChecksum) + 1);
+
+    FfsHeader->State                        = State;
+
+  } else {
+
+    FfsHeader->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
+
+  }
+
+  return ;
+}
+
+VOID
+SetFileTail (
+  IN EFI_FFS_FILE_HEADER *FfsHeader,
+  IN UINTN               ActualFileSize
+  )
+/*++
+
+  Routine Description:
+    Set the file tail if needed
+
+  Parameters:
+    FfsHeader         -   FFS File Header which needs to caculate the checksum
+    ActualFileSize    -   The whole Ffs File Length, including the FFS Tail
+                          if exists.
+  Return:
+    N/A
+
+--*/
+{
+  UINT8   TailLow;
+  UINT8   TailHigh;
+  UINT16  Tail;
+
+  if (FfsHeader->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
+    //
+    // Insert tail here, since tail may not aligned on an even
+    // address, we need to do byte operation here.
+    //
+    Tail      = (UINT16)~FfsHeader->IntegrityCheck.TailReference;
+    TailLow   = (UINT8) Tail;
+    TailHigh  = (UINT8) (Tail >> 8);
+    *((UINT8 *) FfsHeader + ActualFileSize - 2) = TailLow;
+    *((UINT8 *) FfsHeader + ActualFileSize - 1) = TailHigh;
+  }
+
+  return ;
+}
 
 STATUS
 main (
@@ -210,6 +345,7 @@ Returns:
   UINT32                      TempResult;
   UINT32                      Index;
   UINT32                      IpiVector;
+  STATUS                      Status;
 
   TempGuid = NULL;
   SetUtilityName (UTILITY_NAME);
@@ -271,10 +407,17 @@ Returns:
     fclose (FpIn);
     return STATUS_ERROR;
   }
+  
+  //
+  // Prepare to walk the FV image
+  //
+  InitializeFvLib (FileBuffer, FvrecoveryFileSize);
+  
   //
   // Close the input Fvrecovery.fv file
   //
   fclose (FpIn);
+  
   //
   // Find the pad FFS file
   //
@@ -323,7 +466,8 @@ Returns:
     Error (NULL, 0, 0, "The position to place Ap reset vector is not in E and F segment!", NULL);
     free ((VOID *)FileBufferRaw);
     return STATUS_ERROR; 
-  }    
+  }
+
   //
   // Fix up Ap reset vector and calculate the IPI vector
   //
@@ -333,10 +477,33 @@ Returns:
   TempResult = 0x0FFFFFFFF - ((UINT32)FvHeader + (UINT32)FvLength - 1 - (UINT32)FixPoint);
   TempResult >>= 12;
   IpiVector = TempResult & 0x0FF;
-  
-  
+    
+  //
+  // Update Pad file and checksum
+  //
   UpdatePadFileGuid (FvHeader, FileHeader, FileLength, TempGuid);
+  
+  //
+  // Get FileHeader of SEC Ffs
+  //
+  Status     = GetFileByType (EFI_FV_FILETYPE_SECURITY_CORE, 1, &FileHeader);
+  
+  //
+  // Write IPI Vector at Offset FvrecoveryFileSize - 8
+  //
+  *(UINT32 *)((UINTN)(FileBuffer + FvrecoveryFileSize - 8)) = IpiVector;
 
+  if (Status == STATUS_SUCCESS) {
+    FileLength = (*(UINT32 *)(FileHeader->Size)) & 0x00FFFFFF;
+    //
+    // Update the Checksum of SEC ffs
+    //
+    SetHeaderChecksum (FileHeader);
+    SetFileChecksum (FileHeader, FileLength);
+    SetFileTail (FileHeader, FileLength);
+  } else {
+    Error (NULL, 0, 0, "Do not get SEC FFS File Header!", NULL);
+  }
   //
   // Open the output Fvrecovery.fv file
   //
@@ -353,15 +520,7 @@ Returns:
     free ((VOID *)FileBufferRaw);
     return STATUS_ERROR;   
   }
-  //
-  //
-  //
-  fseek (FpOut, -8, SEEK_END);
-  if ((fwrite (&IpiVector, 1, sizeof(UINT32), FpOut)) != sizeof(UINT32)) {
-    Error (NULL, 0, 0, "Write output file error!", NULL);
-    free ((VOID *)FileBufferRaw);
-    return STATUS_ERROR;
-  }  
+
   //
   // Close the output Fvrecovery.fv file
   //
