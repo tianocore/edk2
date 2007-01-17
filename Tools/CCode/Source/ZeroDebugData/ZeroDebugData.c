@@ -24,8 +24,35 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 
+#define UTILITY_NAME    "GenTEImage"
+#define UTILITY_MAJOR_VERSION   0
+#define UTILITY_MINOR_VERSION   1
+
 void
-PrintUsage (
+Version (
+  void
+  )
+/*++
+Routine Description:
+  print version information for this utility
+
+Arguments:
+  None
+
+Returns:
+  None
+--*/
+// GC_TODO:    void - add argument and description to function comment
+{
+  //
+  // print usage of command
+  //
+  printf ("%s v%d.%d -Utility to zero the Debug Data Fields of Portable Executable (PE) format file.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+void
+Usage (
   void
   )
 /*++
@@ -40,6 +67,7 @@ Returns:
 --*/
 // GC_TODO:    void - add argument and description to function comment
 {
+  Version();
   //
   // print usage of command
   //
@@ -334,13 +362,27 @@ Returns:
   FILE  *fpData;
   char  DataFile[1024] = "";
 
-  //
-  // check the number of parameters
-  //
-  if (argc < 2) {
-    printf ("\nUsage: ZeroDebugData <PE-File> [DebugData-File]\n");
+  if (argc == 1) {
+    Usage();
     return -1;
   }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
+
+  if (argc == 2) {
+    Usage();
+    return -1;
+  }
+
   //
   // open the DebugData file, if not exists, return
   //
