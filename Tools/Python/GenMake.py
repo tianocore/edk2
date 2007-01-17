@@ -6,15 +6,13 @@ import os, sys, getopt, string, xml.dom.minidom, shutil
 from XmlRoutines import *
 from WorkspaceRoutines import *
 
-copyingSources = 1
-
 Makefile = string.Template("""ARCH = $ARCH
 
 MAKEROOT ?= ../..
 
 VPATH = ..
 
-LIBNAME = $LIBNAME
+$IDENTIFIER
 
 OBJECTS = $OBJECTS
 
@@ -28,18 +26,29 @@ def mkdir(path):
     os.makedirs(path)
   except:
     pass
-  
-def openSpd(spdFile, arch):
+
+def openSpd(spdFile):
 
   """Open the spdFile and process the msa files it contains."""
 
   db = xml.dom.minidom.parse(inWorkspace(spdFile))
 
-  for msaFile in XmlList(db, "/PackageSurfaceArea/MsaFiles/Filename"):
-    msaFileName = XmlElementData(msaFile)
-    doLib(msaFileName, arch)
+  for arch in ["IA32", "X64"]:
+    for msaFile in XmlList(db, "/PackageSurfaceArea/MsaFiles/Filename"):
+      msaFileName = XmlElementData(msaFile)
+      doLib(msaFileName, arch)
 
-  return db
+  # Copy the Include tree for the Package
+  packageDir = os.path.dirname(spdFile)
+  mkdir(packageDir)
+  if not os.path.exists(os.path.join(packageDir, "Include")):
+    print "Exporting the include dir..."
+    os.system("svn export %s %s" % 
+      (inWorkspace(os.path.join(packageDir, "Include")), 
+      os.path.join(packageDir, "Include")))
+  else: 
+    print "Error: The directory '%s' is in the way. Please move it." % os.path.join(packageDir, "Include")
+    sys.exit()
 
 def inMde(f):
   """Make a path relative to the Mde Pkg root dir."""
@@ -52,7 +61,7 @@ def doLib(msafile, arch):
   objects = []
 
   msa = xml.dom.minidom.parse(inMde(msafile))
-  libName = str(XmlElement(msa, "/ModuleSurfaceArea/MsaHeader/ModuleName"))
+  modName = str(XmlElement(msa, "/ModuleSurfaceArea/MsaHeader/ModuleName"))
   base, _ = os.path.splitext(msafile)
   msabase = os.path.basename(base)
 
@@ -60,9 +69,20 @@ def doLib(msafile, arch):
   if not arch in string.split(suppArch, " "):
     return
 
-  mkdir(libName);
+  # What kind of module is this?
 
-  buildDir = os.path.join(libName, "build-%s" % arch )
+  # Assume it is a driver.
+  identifier = "DRIVERNAME = %s" % modName
+
+  # Let's see if it claims to produce a library class.
+  for libClass in XmlList(msa, "/ModuleSurfaceArea/LibraryClassDefinitions/LibraryClass"):
+    if libClass.getAttribute("Usage") == "ALWAYS_PRODUCED":
+      # It's a library.
+      identifier = "LIBNAME = %s" % modName
+
+  mkdir(modName)
+
+  buildDir = os.path.join(modName, "build-%s" % arch )
   mkdir(buildDir)
 
   for sourceFile in XmlList(msa, "/ModuleSurfaceArea/SourceFiles/Filename"):
@@ -72,7 +92,7 @@ def doLib(msafile, arch):
     toolchain = sourceFile.getAttribute("ToolChainFamily")
     base, ext = os.path.splitext(sourceFileName)
 
-    if ( suppArchs == [""] or arch in suppArchs) and toolchain in ["", "GCC"] and ext in [".c", ".h", ".S"]:
+    if (suppArchs == [""] or arch in suppArchs) and toolchain in ["", "GCC"] and ext in [".c", ".h", ".S"]:
       if ext in [".c", ".S"]:
         obj = str(base+".o")
         if obj in objects:
@@ -80,25 +100,23 @@ def doLib(msafile, arch):
           sys.exit()
         else:
           objects.append(obj)
-      sourceDir = os.path.join(libName, os.path.dirname(sourceFileName))
+      sourceDir = os.path.join(modName, os.path.dirname(sourceFileName))
       mkdir(sourceDir)
       mkdir(os.path.join(buildDir, os.path.dirname(sourceFileName)))
-      if copyingSources :
-        shutil.copy(inMde(os.path.join(os.path.dirname(msafile), sourceFileName)), 
-          sourceDir)
+      shutil.copy(inMde(os.path.join(os.path.dirname(msafile), sourceFileName)), 
+        sourceDir)
 
     # Write a Makefile for this module
     f = open(os.path.join(buildDir, "Makefile"), "w")
-    f.write(Makefile.substitute(ARCH=arch, LIBNAME=libName, OBJECTS=string.join(objects, " ")))
+    f.write(Makefile.substitute(ARCH=arch, IDENTIFIER=identifier, OBJECTS=string.join(objects, " ")))
     f.close()
 
     # Right now we are getting the AutoGen.h file from a previous build. We
     # could create it from scratch also.
-    shutil.copy(inWorkspace("Build/Mde/DEBUG_UNIXGCC/%s/MdePkg/Library/%s/%s/DEBUG/AutoGen.h") % (arch, libName, msabase), buildDir)
+    shutil.copy(inWorkspace("Build/Mde/DEBUG_UNIXGCC/%s/MdePkg/Library/%s/%s/DEBUG/AutoGen.h") % (arch, modName, msabase), buildDir)
 
 # This acts like the main() function for the script, unless it is 'import'ed
 # into another script.
 if __name__ == '__main__':
 
-  for arch in ["IA32", "X64"]:
-    openSpd("MdePkg/MdePkg.spd", arch);
+  openSpd("MdePkg/MdePkg.spd")
