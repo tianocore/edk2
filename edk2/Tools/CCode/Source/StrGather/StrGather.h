@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004-2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -25,7 +25,10 @@ Abstract:
 #define MALLOC(size)  malloc (size)
 #define FREE(ptr)     free (ptr)
 
-#define PROGRAM_NAME  "StrGather"
+#define UTILITY_NAME          "StrGather"
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 31
+
 
 typedef CHAR16  WCHAR;
 
