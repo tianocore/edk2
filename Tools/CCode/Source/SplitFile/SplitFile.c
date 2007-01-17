@@ -16,8 +16,43 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "string.h"
 #include "stdlib.h"
 
+//
+// Utility Name
+//
+#define UTILITY_NAME  "SplitFile"
+
+//
+// Utility version information
+//
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 1
+
 void
-helpmsg (
+Version (
+  void
+  )
+/*++
+
+Routine Description:
+
+  Displays the standard utility information to SDTOUT
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/
+{
+  printf ("%s v%d.%d -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("Copyright (c) 1999-2007 Intel Corporation. All rights reserved.\n");
+}
+
+void
+Usage (
   void
   )
 /*++
@@ -35,11 +70,14 @@ Returns:
 
 --*/
 {
-  printf (
-    "SplitFile Filename Offset\n""   Filename = Input file to split\n""   Offset = offset at which to split file\n"
-    "\n\n""SplitFile will break a file in two pieces at the requested offset\n"
-    "  outputting Filename1 and Filename2\n"
-    );
+  Version();
+  printf ("\nUsage: \n\
+   SplitFile Filename Offset\n\
+     where:\n\
+       Filename: Input file to split\n\
+       Offset: offset at which to split file\n\
+   The output files will be named <Filename>1 and <Filename>2 with \n\
+   <Filename> being given as the input file name.\n");
 }
 
 int
@@ -75,8 +113,24 @@ Returns:
   unsigned long splitpoint;
   char          CharC;
 
+  if (argc == 1) {
+    Usage();
+    return -1;
+  }
+    
+  if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
+      (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
+    Usage();
+    return -1;
+  }
+  
+  if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
+    Version();
+    return -1;
+  }
+  
   if (argc != 3) {
-    helpmsg ();
+    Usage ();
     return -1;
   }
 
