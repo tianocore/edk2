@@ -1,7 +1,7 @@
 /** @file
   Mde UEFI library functions.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -345,6 +345,130 @@ EfiReleaseLock (
   Lock->Lock = EfiLockReleased;
 
   gBS->RestoreTPL (Tpl);
+}
+
+/**
+  Tests whether a controller is managed by a specific driver.
+
+  This function tests whether a specific driver manages ControllerHandle by
+  opening on DriverBindingHandle a protocol specified by ProtocolGuid with
+  attribute EFI_OPEN_PROTOCOL_BY_DRIVER.  This library function is used to
+  implement the Component Name Protocol for EFI Drivers.
+  If ProtocolGuid is NULL, then ASSERT().
+
+  @param  ControllerHandle     A handle for a controller to test.
+  @param  DriverBindingHandle  Specifies the driver binding handle for the
+                               driver.
+  @param  ProtocolGuid         Supplies GUID for the protocol opened by the
+                               driver on the controller. 
+
+  @retval EFI_SUCCESS          ControllerHandle is managed by the specific
+                               driver.
+  @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the specific
+                               driver.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiTestManagedDevice (
+  IN CONST EFI_HANDLE       ControllerHandle,
+  IN CONST EFI_HANDLE       DriverBindingHandle,
+  IN CONST EFI_GUID         *ProtocolGuid
+  )
+{
+  EFI_STATUS     Status;
+  VOID           *ManagedInterface;
+
+  ASSERT (ProtocolGuid != NULL);
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  (EFI_GUID *) ProtocolGuid,
+                  &ManagedInterface,
+                  DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->CloseProtocol (
+           ControllerHandle,
+           (EFI_GUID *) ProtocolGuid,
+           DriverBindingHandle,
+           ControllerHandle
+           );
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Status != EFI_ALREADY_STARTED) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Tests whether a child handle is a children device of the controller.
+
+  This function tests whether ChildHandle is one of the children of
+  ControllerHandle which are consuming a protocol specified by ProtocolGuid
+  with the attribute bit EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER set.  This
+  library function is used to implement the Component Name Protocol for EFI
+  Drivers.
+  If ProtocolGuid is NULL, then ASSERT().
+
+  @param  ControllerHandle     A handle for a (parent) controller to test. 
+  @param  ChildHandle          A child handle to test.
+  @param  ConsumsedGuid        Supplies GUID for the protocol consumed by
+                               children from controller. 
+
+  @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
+  @retval EFI_UNSUPPORTED      ChildHandle is not a child of the
+                               ControllerHandle.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiTestChildHandle (
+  IN CONST EFI_HANDLE       ControllerHandle,
+  IN CONST EFI_HANDLE       ChildHandle,
+  IN CONST EFI_GUID         *ProtocolGuid
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY   *OpenInfoBuffer;
+  UINTN                                 EntryCount;
+  UINTN                                 Index;
+
+  ASSERT (ProtocolGuid != NULL);
+
+  //
+  // Retrieve the list of agents that are consuming the specific protocol
+  // on ControllerHandle.
+  //
+  Status = gBS->OpenProtocolInformation (
+                  ControllerHandle,
+                  (EFI_GUID *) ProtocolGuid,
+                  &OpenInfoBuffer,
+                  &EntryCount
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Inspect if ChildHandle is one of the agents.
+  //
+  Status = EFI_UNSUPPORTED;
+  for (Index = 0; Index < EntryCount; Index++) {
+    if ((OpenInfoBuffer[Index].ControllerHandle == ChildHandle) &&
+        (OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+      Status = EFI_SUCCESS;
+      break;
+    }
+  }
+  
+  FreePool (OpenInfoBuffer);
+  return Status;
 }
 
 /**
