@@ -53,7 +53,7 @@ Returns:
   
 --*/ 
 {
-  printf ("%s v%d.%d -Efi Compress Utility\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("%s v%d.%d -Efi File Compress Utility\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
   printf ("Copyright (c) 2005-2006 Intel Corporation. All rights reserved.\n");
 }
 
