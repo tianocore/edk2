@@ -17,6 +17,7 @@ Module Name: Pcd.c
 
 #include "Service.h"
 
+EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_CALLBACK);
 
 PCD_PROTOCOL mPcdInstance = {
   DxePcdSetSku,
@@ -472,9 +473,20 @@ DxeRegisterCallBackOnSet (
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
+  EFI_STATUS Status;
+  
   ASSERT (CallBackFunction != NULL);
   
-  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
+  //
+  // Aquire lock to prevent reentrance from TPL_CALLBACK level
+  //
+  EfiAcquireLock (&mPcdDatabaseLock);
+
+  Status = DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
+
+  EfiReleaseLock (&mPcdDatabaseLock);
+  
+  return Status;
 }
 
 
@@ -487,9 +499,20 @@ DxeUnRegisterCallBackOnSet (
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
-  ASSERT (CallBackFunction != NULL);
+  EFI_STATUS Status;
   
-  return DxeUnRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
+  ASSERT (CallBackFunction != NULL);
+
+  //
+  // Aquire lock to prevent reentrance from TPL_CALLBACK level
+  //
+  EfiAcquireLock (&mPcdDatabaseLock);
+  
+  Status = DxeUnRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
+
+  EfiReleaseLock (&mPcdDatabaseLock);
+  
+  return Status;
 }
 
 

@@ -29,24 +29,31 @@ GetWorker (
 {
   UINT32              *LocalTokenNumberTable;
   UINT16              *SizeTable;
-  BOOLEAN             IsPeiDb;
-  UINT32              Offset;
   EFI_GUID            *GuidTable;
   UINT16              *StringTable;
   EFI_GUID            *Guid;
   UINT16              *Name;
   VARIABLE_HEAD       *VariableHead;
   UINT8               *VaraiableDefaultBuffer;
-  EFI_STATUS          Status;
-  UINTN               DataSize;
   UINT8               *Data;
   VPD_HEAD            *VpdHead;
   UINT8               *PcdDb;
-  UINT16              StringTableIdx;      
-  UINT32              LocalTokenNumber;
+  VOID                *RetPtr;
   UINTN               MaxSize;
   UINTN               TmpTokenNumber;
+  UINTN               DataSize;
+  EFI_STATUS          Status;
+  UINT32              LocalTokenNumber;
+  UINT32              Offset;
+  UINT16              StringTableIdx;      
+  BOOLEAN             IsPeiDb;
 
+  //
+  // Aquire lock to prevent reentrance from TPL_CALLBACK level
+  //
+  EfiAcquireLock (&mPcdDatabaseLock);
+
+  RetPtr = NULL;
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
@@ -100,7 +107,8 @@ GetWorker (
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       VpdHead = (VPD_HEAD *) ((UINT8 *) PcdDb + Offset);
-      return (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+      RetPtr = (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+      break;
       
     case PCD_TYPE_HII:
       GuidTable   = IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
@@ -134,14 +142,16 @@ GetWorker (
       // Return 1) either the default value specified by Platform Integrator 
       //        2) Or the value Set by a PCD set operation.
       //
-      return (VOID *) VaraiableDefaultBuffer;
+      RetPtr = (VOID *) VaraiableDefaultBuffer;
+      break;
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
-      return (VOID *) &StringTable[StringTableIdx];
+      RetPtr = (VOID *) &StringTable[StringTableIdx];
+      break;
 
     case PCD_TYPE_DATA:
-      return (VOID *) ((UINT8 *) PcdDb + Offset);
+      RetPtr = (VOID *) ((UINT8 *) PcdDb + Offset);
       break;
 
     default:
@@ -150,9 +160,9 @@ GetWorker (
       
   }
 
-  ASSERT (FALSE);
-      
-  return NULL;
+  EfiReleaseLock (&mPcdDatabaseLock);
+  
+  return RetPtr;
   
 }
 
@@ -561,6 +571,11 @@ SetWorker (
   UINTN               TmpTokenNumber;
 
   //
+  // Aquire lock to prevent reentrance from TPL_CALLBACK level
+  //
+  EfiAcquireLock (&mPcdDatabaseLock);
+
+  //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
   // as the array index.
@@ -621,20 +636,23 @@ SetWorker (
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       ASSERT (FALSE);
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      break;
     
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TmpTokenNumber, Size)) {
         CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, *Size);
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
       } else {
-        return EFI_INVALID_PARAMETER;
+        Status = EFI_INVALID_PARAMETER;
       }
+      break;
 
     case PCD_TYPE_HII:
       if (PtrType) {
         if (!SetPtrTypeSize (TmpTokenNumber, Size)) {
-          return EFI_INVALID_PARAMETER;
+          Status = EFI_INVALID_PARAMETER;
+          break;
         }
       }
       
@@ -651,50 +669,55 @@ SetWorker (
 
       if (EFI_NOT_FOUND == Status) {
         CopyMem (PcdDb + VariableHead->DefaultValueOffset, Data, *Size);
-        return EFI_SUCCESS;
-      } else {
-        return Status;
-      }
+        Status = EFI_SUCCESS;
+      } 
+      break;
       
     case PCD_TYPE_DATA:
       if (PtrType) {
         if (SetPtrTypeSize (TmpTokenNumber, Size)) {
           CopyMem (InternalData, Data, *Size);
-          return EFI_SUCCESS;
+          Status = EFI_SUCCESS;
         } else {
-          return EFI_INVALID_PARAMETER;
+          Status = EFI_INVALID_PARAMETER;
         }
+        break;
       }
 
+      Status = EFI_SUCCESS;
       switch (*Size) {
         case sizeof(UINT8):
           *((UINT8 *) InternalData) = *((UINT8 *) Data);
-          return EFI_SUCCESS;
+          break;
 
         case sizeof(UINT16):
           *((UINT16 *) InternalData) = *((UINT16 *) Data);
-          return EFI_SUCCESS;
+          break;
 
         case sizeof(UINT32):
           *((UINT32 *) InternalData) = *((UINT32 *) Data);
-          return EFI_SUCCESS;
+          break;
 
         case sizeof(UINT64):
           *((UINT64 *) InternalData) = *((UINT64 *) Data);
-          return EFI_SUCCESS;
+          break;
 
         default:
           ASSERT (FALSE);
-          return EFI_NOT_FOUND;
+          Status = EFI_NOT_FOUND;
+          break;
       }
+      break;
 
     default:
       ASSERT (FALSE);
+      Status = EFI_NOT_FOUND;
       break;
     }
-      
-  ASSERT (FALSE);
-  return EFI_NOT_FOUND;
+
+  EfiReleaseLock (&mPcdDatabaseLock);
+  
+  return Status;
 }
 
 

@@ -475,4 +475,6 @@ extern PCD_DATABASE * mPcdDatabase;
 
 extern DXE_PCD_DATABASE_INIT gDXEPcdDbInit;
 
+extern EFI_LOCK mPcdDatabaseLock;
+
 #endif
