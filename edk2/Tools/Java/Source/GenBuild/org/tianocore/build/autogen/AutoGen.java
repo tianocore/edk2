@@ -620,12 +620,15 @@ public class AutoGen {
             fileBuffer.append("\n");
             fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
-
+        //
+        // generate function prototype for constructor and destructor
+        // 
+        LibConstructorToAutogenH(moduleType, fileBuffer);
+        LibDestructorToAutogenH(moduleType, fileBuffer);
         //
         // Append the #endif at AutoGen.h
         //
         fileBuffer.append("#endif\n");
-
         //
         // Save content of string buffer to AutoGen.h file.
         //
@@ -1360,6 +1363,152 @@ public class AutoGen {
         // Add library destructor to AutoGen.c
         //
         LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
+    }
+
+    /**
+      LibConstructorToAutogenH
+     
+      This function writes library constructor declarations AutoGen.h. The library
+      constructor's parameter and return value depend on module type.
+     
+      @param libInstanceList
+                 List of library construct name.
+      @param moduleType
+                 Module type.
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws Exception
+    **/
+    void LibConstructorToAutogenH(String moduleType, StringBuffer fileBuffer) throws EdkException {
+        boolean isFirst = true;
+
+        //
+        // If not yet parse this library instance's constructor
+        // element,parse it.
+        //
+        String libConstructName = saq.getLibConstructorName();
+        if (libConstructName == null) {
+            return;
+        }
+
+        //
+        // The library constructor's parameter and return value depend on
+        // module type.
+        //
+        if (moduleType.equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+            fileBuffer.append("RETURN_STATUS\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append(libConstructName);
+            fileBuffer.append(" (\n");
+            fileBuffer.append("  VOID\n");
+            fileBuffer.append("  );\n");
+        } else {
+            switch (CommonDefinition.getModuleType(moduleType)) {
+            case CommonDefinition.ModuleTypeBase:
+                fileBuffer.append("RETURN_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libConstructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  VOID\n");
+                fileBuffer.append("  );\n");
+                break;
+
+            case CommonDefinition.ModuleTypePeiCore:
+            case CommonDefinition.ModuleTypePeim:
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libConstructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\n");
+                fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\n");
+                fileBuffer.append("  );\n");
+                break;
+
+            case CommonDefinition.ModuleTypeDxeCore:
+            case CommonDefinition.ModuleTypeDxeDriver:
+            case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+            case CommonDefinition.ModuleTypeDxeSmmDriver:
+            case CommonDefinition.ModuleTypeDxeSalDriver:
+            case CommonDefinition.ModuleTypeUefiDriver:
+            case CommonDefinition.ModuleTypeUefiApplication:
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libConstructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  );\n");
+                break;
+
+            }
+        }
+    }
+
+    /**
+      LibDestructorToAutogenH
+     
+      This function writes library destructor declarations AutoGen.h. The library
+      destructor's parameter and return value depend on module type.
+     
+      @param libInstanceList
+                 List of library destructor name.
+      @param moduleType
+                 Module type.
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws Exception
+    **/
+    void LibDestructorToAutogenH(String moduleType, StringBuffer fileBuffer) throws EdkException {
+        boolean isFirst = true;
+        String libDestructName = saq.getLibDestructorName();
+        if (libDestructName == null) {
+            return;
+        }
+
+        if (moduleType.equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+            fileBuffer.append("RETURN_STATUS\n");
+            fileBuffer.append("EFIAPI\n");
+            fileBuffer.append(libDestructName);
+            fileBuffer.append(" (\n");
+            fileBuffer.append("  VOID\n");
+            fileBuffer.append("  );\n");
+        } else {
+            switch (CommonDefinition.getModuleType(moduleType)) {
+            case CommonDefinition.ModuleTypeBase:
+                fileBuffer.append("RETURN_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libDestructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  VOID\n");
+                fileBuffer.append("  );\n");
+                break;
+            case CommonDefinition.ModuleTypePeiCore:
+            case CommonDefinition.ModuleTypePeim:
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libDestructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\n");
+                fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\n");
+                fileBuffer.append("  );\n");
+                break;
+            case CommonDefinition.ModuleTypeDxeCore:
+            case CommonDefinition.ModuleTypeDxeDriver:
+            case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+            case CommonDefinition.ModuleTypeDxeSmmDriver:
+            case CommonDefinition.ModuleTypeDxeSalDriver:
+            case CommonDefinition.ModuleTypeUefiDriver:
+            case CommonDefinition.ModuleTypeUefiApplication:
+                fileBuffer.append("EFI_STATUS\n");
+                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append(libDestructName);
+                fileBuffer.append(" (\n");
+                fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\n");
+                fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\n");
+                fileBuffer.append("  );\n");
+                break;
+            }
+        }
     }
 
     /**
