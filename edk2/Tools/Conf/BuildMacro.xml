@@ -74,6 +74,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             </then>
           </if>
         </then>
+        <else>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep">
+            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
+            <EXTRA.INC/>
+          </makedeps>
+        </else>
       </if>
     </sequential>
   </macrodef>
