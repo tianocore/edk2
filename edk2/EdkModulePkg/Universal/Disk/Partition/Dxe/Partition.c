@@ -66,7 +66,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   PartitionDriverBindingSupported,
   PartitionDriverBindingStart,
   PartitionDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

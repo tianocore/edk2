@@ -217,7 +217,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConInDriverBinding = {
   ConSplitterConInDriverBindingSupported,
   ConSplitterConInDriverBindingStart,
   ConSplitterConInDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
@@ -226,7 +226,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterSimplePointerDriverBinding = {
   ConSplitterSimplePointerDriverBindingSupported,
   ConSplitterSimplePointerDriverBindingStart,
   ConSplitterSimplePointerDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
@@ -235,7 +235,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConOutDriverBinding = {
   ConSplitterConOutDriverBindingSupported,
   ConSplitterConOutDriverBindingStart,
   ConSplitterConOutDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
@@ -244,7 +244,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
   ConSplitterStdErrDriverBindingSupported,
   ConSplitterStdErrDriverBindingStart,
   ConSplitterStdErrDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

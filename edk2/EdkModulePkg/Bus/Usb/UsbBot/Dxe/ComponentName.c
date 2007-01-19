@@ -161,7 +161,17 @@ UsbBotComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-  
+  //
+  // Make sure this driver is currently managing ControllerHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gUsbBotDriverBinding.DriverBindingHandle,
+             &gEfiUsbIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   //
   // Get the device context
   //

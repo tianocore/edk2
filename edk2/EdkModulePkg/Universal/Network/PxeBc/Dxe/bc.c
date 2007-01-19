@@ -2119,7 +2119,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
   PxeBcDriverSupported,
   PxeBcDriverStart,
   PxeBcDriverStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

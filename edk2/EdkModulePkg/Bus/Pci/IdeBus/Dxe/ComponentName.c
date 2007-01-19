@@ -125,16 +125,13 @@ IDEBusComponentNameGetControllerName (
   IDE_BLK_IO_DEV        *IdeBlkIoDevice;
 
   //
-  // Get the controller context
+  // Make sure this driver is currently managing ControllHandle
   //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiCallerIdGuid,
-                  NULL,
-                  gIDEBusDriverBinding.DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gIDEBusDriverBinding.DriverBindingHandle,
+             &gEfiIdeControllerInitProtocolGuid
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -146,6 +143,15 @@ IDEBusComponentNameGetControllerName (
             mIDEBusControllerNameTable,
             ControllerName
             );
+  }
+
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiPciIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //

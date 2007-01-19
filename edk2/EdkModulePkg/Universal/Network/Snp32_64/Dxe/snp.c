@@ -79,7 +79,7 @@ EFI_DRIVER_BINDING_PROTOCOL mSimpleNetworkDriverBinding = {
   SimpleNetworkDriverSupported,
   SimpleNetworkDriverStart,
   SimpleNetworkDriverStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

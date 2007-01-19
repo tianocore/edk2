@@ -73,7 +73,7 @@ EFI_DRIVER_BINDING_PROTOCOL         gUsbCbi0DriverBinding = {
   Cbi0DriverBindingSupported,
   Cbi0DriverBindingStart,
   Cbi0DriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -57,7 +57,7 @@ EFI_DRIVER_BINDING_PROTOCOL gTerminalDriverBinding = {
   TerminalDriverBindingSupported,
   TerminalDriverBindingStart,
   TerminalDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -218,7 +218,7 @@ EFI_DRIVER_BINDING_PROTOCOL gEhciDriverBinding = {
   EhciDriverBindingSupported,
   EhciDriverBindingStart,
   EhciDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

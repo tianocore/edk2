@@ -26,7 +26,7 @@ EFI_DRIVER_BINDING_PROTOCOL gIDEBusDriverBinding = {
   IDEBusDriverBindingSupported,
   IDEBusDriverBindingStart,
   IDEBusDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
