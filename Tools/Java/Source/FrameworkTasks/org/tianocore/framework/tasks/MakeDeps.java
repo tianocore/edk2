@@ -57,7 +57,7 @@ public class MakeDeps extends Task {
     //
     // regular expression for "#include ..." directive
     // 
-    private static final Pattern incPattern = Pattern.compile("[\n\r]+[ \t#]*[ \t]*include[ \t]+[\"<]*([^\n\r\"<>]+)[>\"]*[\n\r]+");
+    private static final Pattern incPattern = Pattern.compile("[\n\r \t#]*include[ \t]+[\"<]*([^\n\r\"<>]+)[>\" \t]*");
 
     public MakeDeps() {
 
