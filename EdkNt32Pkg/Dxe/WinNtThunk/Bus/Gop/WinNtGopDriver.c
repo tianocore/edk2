@@ -28,7 +28,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtGopDriverBinding = {
   WinNtGopDriverBindingSupported,
   WinNtGopDriverBindingStart,
   WinNtGopDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

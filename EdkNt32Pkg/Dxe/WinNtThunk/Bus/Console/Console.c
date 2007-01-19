@@ -50,7 +50,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtConsoleDriverBinding = {
   WinNtConsoleDriverBindingSupported,
   WinNtConsoleDriverBindingStart,
   WinNtConsoleDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -30,7 +30,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtSimpleFileSystemDriverBinding = {
   WinNtSimpleFileSystemDriverBindingSupported,
   WinNtSimpleFileSystemDriverBindingStart,
   WinNtSimpleFileSystemDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

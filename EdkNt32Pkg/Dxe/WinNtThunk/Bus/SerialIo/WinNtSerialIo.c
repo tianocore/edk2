@@ -51,7 +51,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtSerialIoDriverBinding = {
   WinNtSerialIoDriverBindingSupported,
   WinNtSerialIoDriverBindingStart,
   WinNtSerialIoDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

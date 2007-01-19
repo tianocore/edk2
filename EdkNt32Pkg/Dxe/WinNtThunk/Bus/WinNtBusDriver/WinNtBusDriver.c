@@ -114,7 +114,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gWinNtBusDriverBinding = {
   WinNtBusDriverBindingSupported,
   WinNtBusDriverBindingStart,
   WinNtBusDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
