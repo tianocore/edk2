@@ -318,7 +318,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixBlockIoDriverBinding = {
   UnixBlockIoDriverBindingSupported,
   UnixBlockIoDriverBindingStart,
   UnixBlockIoDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -160,7 +160,17 @@ UnixBlockIoComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-
+  //
+  // Make sure this driver is currently managing ControllerHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gUnixBlockIoDriverBinding.DriverBindingHandle,
+             &gEfiUnixIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
   //
   // Get our context back
   //
