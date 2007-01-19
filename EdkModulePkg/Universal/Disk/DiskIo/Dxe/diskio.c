@@ -88,7 +88,7 @@ EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding = {
   DiskIoDriverBindingSupported,
   DiskIoDriverBindingStart,
   DiskIoDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

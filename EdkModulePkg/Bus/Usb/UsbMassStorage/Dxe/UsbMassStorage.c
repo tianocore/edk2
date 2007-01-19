@@ -109,7 +109,7 @@ EFI_DRIVER_BINDING_PROTOCOL         gUSBFloppyDriverBinding = {
   USBFloppyDriverBindingSupported,
   USBFloppyDriverBindingStart,
   USBFloppyDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

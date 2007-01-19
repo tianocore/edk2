@@ -117,7 +117,7 @@ EFI_DRIVER_BINDING_PROTOCOL   gCBI1DriverBinding = {
   CBI1DriverBindingSupported,
   CBI1DriverBindingStart,
   CBI1DriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

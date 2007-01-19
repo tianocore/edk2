@@ -67,7 +67,7 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
   PciBusDriverBindingSupported,
   PciBusDriverBindingStart,
   PciBusDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

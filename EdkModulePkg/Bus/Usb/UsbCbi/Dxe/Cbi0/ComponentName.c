@@ -163,7 +163,17 @@ UsbCbi0ComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-  
+  //
+  // Make sure this driver is currently managing ControllerHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gUsbCbi0DriverBinding.DriverBindingHandle,
+             &gEfiUsbIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   //
   // Get the device context
   //

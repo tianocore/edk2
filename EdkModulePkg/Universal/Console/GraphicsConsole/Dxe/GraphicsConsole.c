@@ -144,7 +144,7 @@ EFI_DRIVER_BINDING_PROTOCOL gGraphicsConsoleDriverBinding = {
   GraphicsConsoleControllerDriverSupported,
   GraphicsConsoleControllerDriverStart,
   GraphicsConsoleControllerDriverStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

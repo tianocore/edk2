@@ -30,7 +30,7 @@ EFI_DRIVER_BINDING_PROTOCOL gCirrusLogic5430DriverBinding = {
   CirrusLogic5430ControllerDriverSupported,
   CirrusLogic5430ControllerDriverStart,
   CirrusLogic5430ControllerDriverStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

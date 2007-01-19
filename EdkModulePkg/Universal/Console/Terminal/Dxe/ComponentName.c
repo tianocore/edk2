@@ -163,11 +163,33 @@ TerminalComponentNameGetControllerName (
   TERMINAL_DEV                  *TerminalDevice;
 
   //
+  // Make sure this driver is currently managing ControllHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gTerminalDriverBinding.DriverBindingHandle,
+             &gEfiSerialIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // This is a bus driver, so ChildHandle can not be NULL.
   //
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
   }
+
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiSerialIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   //
   // Get our context back
   //

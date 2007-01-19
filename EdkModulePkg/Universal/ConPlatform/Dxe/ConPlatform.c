@@ -23,7 +23,7 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding = {
   ConPlatformTextInDriverBindingSupported,
   ConPlatformTextInDriverBindingStart,
   ConPlatformDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
@@ -32,7 +32,7 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
   ConPlatformTextOutDriverBindingSupported,
   ConPlatformTextOutDriverBindingStart,
   ConPlatformDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

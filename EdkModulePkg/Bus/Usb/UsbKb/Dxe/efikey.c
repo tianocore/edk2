@@ -103,7 +103,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbKeyboardDriverBinding = {
   USBKeyboardDriverBindingSupported,
   USBKeyboardDriverBindingStart,
   USBKeyboardDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

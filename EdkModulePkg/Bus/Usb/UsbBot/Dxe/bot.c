@@ -62,7 +62,7 @@ EFI_DRIVER_BINDING_PROTOCOL   gUsbBotDriverBinding = {
   BotDriverBindingSupported,
   BotDriverBindingStart,
   BotDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -93,7 +93,7 @@ EFI_DRIVER_BINDING_PROTOCOL gAtapiScsiPassThruDriverBinding = {
   AtapiScsiPassThruDriverBindingSupported,
   AtapiScsiPassThruDriverBindingStart,
   AtapiScsiPassThruDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

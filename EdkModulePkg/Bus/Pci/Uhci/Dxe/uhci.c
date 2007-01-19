@@ -364,7 +364,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUhciDriverBinding = {
   UHCIDriverBindingSupported,
   UHCIDriverBindingStart,
   UHCIDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
