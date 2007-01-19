@@ -31,7 +31,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtUgaDriverBinding = {
   WinNtUgaDriverBindingSupported,
   WinNtUgaDriverBindingStart,
   WinNtUgaDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

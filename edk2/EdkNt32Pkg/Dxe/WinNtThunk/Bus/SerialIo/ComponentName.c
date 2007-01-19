@@ -155,10 +155,31 @@ WinNtSerialIoComponentNameGetControllerName (
   WIN_NT_SERIAL_IO_PRIVATE_DATA *Private;
 
   //
+  // Make sure this driver is currently managing ControllHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gWinNtSerialIoDriverBinding.DriverBindingHandle,
+             &gEfiWinNtIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // This is a bus driver, so ChildHandle must not be NULL.
   //
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
+  }
+
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiWinNtIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //

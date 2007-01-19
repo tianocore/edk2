@@ -160,7 +160,17 @@ WinNtBlockIoComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-
+  //
+  // Make sure this driver is currently managing ControllerHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gWinNtBlockIoDriverBinding.DriverBindingHandle,
+             &gEfiWinNtIoProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
   //
   // Get our context back
   //

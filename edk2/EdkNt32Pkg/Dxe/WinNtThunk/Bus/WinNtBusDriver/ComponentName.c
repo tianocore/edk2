@@ -155,10 +155,31 @@ WinNtBusDriverComponentNameGetControllerName (
   WIN_NT_IO_DEVICE        *Private;
 
   //
+  // Make sure this driver is currently managing ControllHandle
+  //
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gWinNtBusDriverBinding.DriverBindingHandle,
+             &gEfiWinNtThunkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // This is a bus driver, so ChildHandle can not be NULL.
   //
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
+  }
+
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiWinNtThunkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //

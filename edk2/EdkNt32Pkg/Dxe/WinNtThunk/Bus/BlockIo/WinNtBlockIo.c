@@ -66,7 +66,7 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtBlockIoDriverBinding = {
   WinNtBlockIoDriverBindingSupported,
   WinNtBlockIoDriverBindingStart,
   WinNtBlockIoDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
