@@ -107,7 +107,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gUnixBusDriverBinding = {
   UnixBusDriverBindingSupported,
   UnixBusDriverBindingStart,
   UnixBusDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

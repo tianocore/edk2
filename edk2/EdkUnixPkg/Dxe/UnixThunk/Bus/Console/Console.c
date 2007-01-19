@@ -50,7 +50,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixConsoleDriverBinding = {
   UnixConsoleDriverBindingSupported,
   UnixConsoleDriverBindingStart,
   UnixConsoleDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

@@ -30,7 +30,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixSimpleFileSystemDriverBinding = {
   UnixSimpleFileSystemDriverBindingSupported,
   UnixSimpleFileSystemDriverBindingStart,
   UnixSimpleFileSystemDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };

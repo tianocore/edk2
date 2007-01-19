@@ -31,7 +31,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixUgaDriverBinding = {
   UnixUgaDriverBindingSupported,
   UnixUgaDriverBindingStart,
   UnixUgaDriverBindingStop,
-  0x10,
+  0xa,
   NULL,
   NULL
 };
