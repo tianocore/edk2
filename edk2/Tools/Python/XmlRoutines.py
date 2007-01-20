@@ -16,12 +16,12 @@ import xml.dom.minidom
 
 def XmlList(Dom, String):
   """Get a list of XML Elements using XPath style syntax."""
+  if String == "" :
+    return []
   if Dom.nodeType==Dom.DOCUMENT_NODE:
     return XmlList(Dom.documentElement, String)
   if String[0] == "/":
     return XmlList(Dom, String[1:])
-  if String == "" :
-    return []
   TagList = String.split('/')
   nodes = []
   if Dom.nodeType == Dom.ELEMENT_NODE and Dom.tagName.strip() == TagList[0]:
@@ -32,6 +32,14 @@ def XmlList(Dom, String):
       for child in Dom.childNodes:
         nodes = nodes + XmlList(child, restOfPath)
   return nodes
+
+def XmlNode (Dom, String):
+  """Return a single node that matches the String which is XPath style syntax."""
+  try:
+    return XmlList (Dom, String)[0]
+  except:
+    return None
+
 
 def XmlElement (Dom, String):
   """Return a single element that matches the String which is XPath style syntax."""
@@ -80,6 +88,19 @@ def XmlParseFileSection (FileName, Tag):
       break
     File += Section
   f.close()
+  if File.find(Start) < 0 or File.find(End) < 0:
+    return xml.dom.minidom.parseString('<empty/>')
+  File = File[File.find(Start):File.find(End)+len(End)]
+  try:
+    return xml.dom.minidom.parseString(File)
+  except:
+    return xml.dom.minidom.parseString('<empty/>')
+
+def XmlParseStringSection (XmlString, Tag):
+  """Parse a section of an XML string into a DOM(Document Object Model) and return the DOM."""
+  Start = '<' + Tag
+  End = '</' + Tag + '>'
+  File = XmlString
   if File.find(Start) < 0 or File.find(End) < 0:
     return xml.dom.minidom.parseString('<empty/>')
   File = File[File.find(Start):File.find(End)+len(End)]
