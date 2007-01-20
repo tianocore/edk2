@@ -33,3 +33,12 @@ def lean(path):
   """Lean the slashes forward"""
 
   return os.path.normpath(path).replace("\\", "/")
+
+def mkdir(path):
+  """Make a directory if it is not there already."""
+
+  try:
+    os.makedirs(path)
+  except:
+    pass
+

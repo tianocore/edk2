@@ -19,14 +19,6 @@ OBJECTS = $OBJECTS
 include $$(MAKEROOT)/lib.makefile
 """)
 
-def mkdir(path):
-  """Make a directory if it is not there already."""
-
-  try:
-    os.makedirs(path)
-  except:
-    pass
-
 def openSpd(spdFile):
 
   """Open the spdFile and process the msa files it contains."""
