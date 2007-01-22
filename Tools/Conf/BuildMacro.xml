@@ -21,6 +21,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="OBJECTS" value="" />
       <var name="SDB_FILES" value="" />
 
+      <mkdir dir="${DEST_DIR_DEBUG}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}"/>
+
       <if>
         <and>
           <isset property="PCH"/>
