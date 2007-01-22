@@ -190,7 +190,7 @@ def makeFar(files, farname):
 
       for spdfile in filelist:
         content = farFileNode(man, inWorkspace(os.path.join(spdDir, spdfile))) 
-        zip.write(inWorkspace(os.path.join(spdDir, spdfile)), spdfile)
+        zip.write(inWorkspace(os.path.join(spdDir, spdfile)), os.path.join(spdDir,spdfile))
         content.appendChild(man.createTextNode(lean(spdfile)))
         packContents.appendChild(content)
 

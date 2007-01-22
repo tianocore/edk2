@@ -73,6 +73,13 @@ def XmlParseFile (FileName):
   except:
     return xml.dom.minidom.parseString('<empty/>')
 
+def XmlParseString (Str):
+  """Parse an XML string into a DOM and return the DOM."""
+  try:
+    return xml.dom.minidom.parseString(Str)
+  except:
+    return xml.dom.minidom.parseString('<empty/>')
+
 def XmlParseFileSection (FileName, Tag):
   """Parse a section of an XML file into a DOM(Document Object Model) and return the DOM."""
   try:

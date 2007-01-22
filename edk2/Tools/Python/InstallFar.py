@@ -57,18 +57,22 @@ class Database:
       self.lock.close()
       os.unlink(self.lockfile)
 
-  def HasPackage(self, spdString):
+  def HasPackage(self, (guid, version)):
     """Return true iff this package is already installed."""
-    spdHeader = XmlParseStringSection(spdString, "SpdHeader")
-    guid = XmlElement(spdHeader, "/SpdHeader/GuidValue")
-    version = XmlElement(spdHeader, "/SpdHeader/Version")
+    if version == "":
+      # Look for the guid.
+      for (g, v) in self.installedPackages.keys():
+        if g == guid:
+          return True
     return self.installedPackages.has_key((guid, version))
 
-  def HasPlatform(self, fpdString):
+  def HasPlatform(self, (guid, version)):
     """Return true iff this platform is already installed."""
-    fpdHeader = XmlParseStringSection(fpdString, "PlatformHeader")
-    guid = XmlElement(fpdHeader, "/PlatformHeader/GuidValue")
-    version = XmlElement(fpdHeader, "/PlatformHeader/Version")
+    if version == "":
+      # Look for the guid.
+      for (g, v) in self.installedPlatforms.keys():
+        if g == guid:
+          return True
     return self.installedPlatforms.has_key((guid, version))
 
   def HasFar(self, farguid):
@@ -113,6 +117,20 @@ def ExtractFile(zip, file, workspaceLocation=""):
   f.write(zip.read(file))
   f.close()
 
+def GetFpdGuidVersion(Dom):
+
+  """Get the Guid and version of the fpd from a dom object."""
+
+  return XmlElement(Dom, "/PlatformSurfaceArea/PlatformHeader/GuidValue"), \
+         XmlElement(Dom, "/PlatformSurfaceArea/PlatformHeader/Version")
+
+def GetSpdGuidVersion(Dom):
+
+  """Get the Guid and version of the spd from a dom object."""
+
+  return XmlElement(Dom, "/PackageSurfaceArea/SpdHeader/GuidValue"), \
+         XmlElement(Dom, "/PackageSurfaceArea/SpdHeader/Version")
+
 def InstallFar(farfile, workspaceLocation=""):
 
   far = zipfile.ZipFile(farfile, "r")
@@ -126,17 +144,48 @@ def InstallFar(farfile, workspaceLocation=""):
 
   # First we need to make sure that the far will install cleanly.
 
+  installError = False # Let's hope for the best.
+  spdDoms = []
+  farSpds = []
+
   # Check the packages
   for farPackage in XmlList(manifest, "/FrameworkArchiveManifest/FarPackageList/FarPackage/FarFilename"):
     spdfile = str(XmlElementData(farPackage))
-    if fdb.HasPackage(far.read(spdfile)):
+    spd = XmlParseString(far.read(spdfile))
+    packageGV = GetSpdGuidVersion(spd)
+    if fdb.HasPackage(packageGV):
       print "Error: This package is already installed: ", spdfile
       installError = True
+
+    # Build up a list of the package guid versions that this far is bringing in.
+    # This is needed to satisfy dependencies of msas that are in the other packages of
+    # this far.
+
+    farSpds.append(packageGV)
+
+    spdDoms.append(spd)
+
+  for spd in spdDoms:
+    # Now we need to get a list of every msa in this spd and check the package dependencies.
+    for msafile in XmlList(spd, "/PackageSurfaceArea/MsaFiles/Filename"):
+      msafilePath = str(os.path.join(os.path.dirname(spdfile), XmlElementData(msafile)))
+
+      msa = XmlParseString(far.read(msafilePath))
+
+      for package in XmlList(msa, "/ModuleSurfaceArea/PackageDependencies/Package"):
+        guid = package.getAttribute("PackageGuid")
+        version = package.getAttribute("PackageVersion")
+
+        if not fdb.HasPackage((guid, version)) and not (guid, version) in farSpds:
+          print "The module %s depends on the package guid % version %s, which is not installed in the workspace." \
+            % (msafilePath, guid, version)
+          installError = True
 
   # Check the platforms
   for farPlatform in XmlList(manifest, "/FrameworkArchiveManifest/FarPlatformList/FarPlatform/FarFilename"):
     fpdfile = str(XmlElementData(farPlatform))
-    if fdb.HasPlatform(far.read(fpdfile)):
+    fpd = XmlParseString(far.read(fpdfile))
+    if fdb.HasPlatform(GetFpdGuidVersion(fpd)):
       print "Error: This platform is already installed: ", fpdfile
       installError = True
 
