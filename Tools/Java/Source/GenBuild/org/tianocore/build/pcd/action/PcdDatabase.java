@@ -1205,7 +1205,7 @@ public class PcdDatabase {
         hString += result.get("initDeclStr");
         hString += result.get("uninitDeclStr");
 
-        hString += String.format("#define PCD_%s_SERVICE_DRIVER_VERSION         %d", phase, version);
+        hString += String.format("#define PCD_%s_SERVICE_DRIVER_AUTOGEN_VERSION         %d", phase, version);
 
         cString = newLine + newLine + result.get("initInstStr");
 
