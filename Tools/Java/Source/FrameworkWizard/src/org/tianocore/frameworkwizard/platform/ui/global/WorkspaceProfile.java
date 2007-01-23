@@ -122,12 +122,12 @@ public class WorkspaceProfile {
         return vArchs;
     }
     
-    public static String getModuleBaseName (ModuleIdentification mi) {
+    public static String getModuleType (ModuleIdentification mi) {
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = getModuleXmlObject(mi);
-        if (msa.getModuleDefinitions() == null || msa.getModuleDefinitions().getOutputFileBasename() == null) {
+        if (msa.getMsaHeader() == null || msa.getMsaHeader().getModuleType() == null) {
             return null;
         }
-        return msa.getModuleDefinitions().getOutputFileBasename();
+        return msa.getMsaHeader().getModuleType().toString();
     }
     
     public static boolean pcdInMsa (String cName, String tsGuid, String supArchList, ModuleIdentification mi) {
