@@ -1276,6 +1276,7 @@ UsbDeviceDeConfiguration (
   USB_IO_DEVICE             *ChildDevice;
   UINT8                     Index;
   EFI_USB_IO_PROTOCOL       *UsbIo;
+  EFI_STATUS                Status;
 
   //
   // Double check UsbIoDevice exists
@@ -1365,14 +1366,17 @@ UsbDeviceDeConfiguration (
     // Uninstall EFI_USB_IO_PROTOCOL & DEVICE_PATH_PROTOCOL
     // installed on this handle
     //
-    gBS->UninstallMultipleProtocolInterfaces (
-          UsbController->Handle,
-          &gEfiDevicePathProtocolGuid,
-          UsbController->DevicePath,
-          &gEfiUsbIoProtocolGuid,
-          &UsbController->UsbIo,
-          NULL
-          );
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    UsbController->Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    UsbController->DevicePath,
+                    &gEfiUsbIoProtocolGuid,
+                    &UsbController->UsbIo,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
     if (UsbController->DevicePath != NULL) {
       gBS->FreePool (UsbController->DevicePath);

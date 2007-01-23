@@ -23,7 +23,7 @@ Revision History
 
 #include "Partition.h"
 
-BOOLEAN
+EFI_STATUS
 PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
@@ -44,8 +44,9 @@ Arguments:
   DevicePath - Parent Device Path
 
 Returns:
-  TRUE       - some child handle(s) was added
-  FALSE      - no child handle was added
+  EFI_SUCCESS       - some child handle(s) was added
+  EFI_MEDIA_CHANGED - Media changed Detected
+  !EFI_SUCCESS      - no child handle was added
 
 --*/
 {
@@ -63,10 +64,10 @@ Returns:
   CDROM_DEVICE_PATH       CdDev;
   UINT32                  SubBlockSize;
   UINT32                  SectorCount;
-  BOOLEAN                 Found;
+  EFI_STATUS              Found;
   UINT32                  VolSpaceSize;
 
-  Found         = FALSE;
+  Found         = EFI_NOT_FOUND;
   Media         = BlockIo->Media;
   VolSpaceSize  = 0;
 
@@ -74,13 +75,13 @@ Returns:
   // CD_ROM has the fixed block size as 2048 bytes
   //
   if (Media->BlockSize != 2048) {
-    return FALSE;
+    return EFI_NOT_FOUND;
   }
 
   VolDescriptor = AllocatePool ((UINTN) Media->BlockSize);
 
   if (VolDescriptor == NULL) {
-    return FALSE;
+    return EFI_NOT_FOUND;
   }
 
   Catalog = (ELTORITO_CATALOG *) VolDescriptor;
@@ -114,6 +115,7 @@ Returns:
                         VolDescriptor
                         );
     if (EFI_ERROR (Status)) {
+      Found = Status;
       break;
     }
     //
@@ -272,7 +274,7 @@ Returns:
                 FALSE
                 );
       if (!EFI_ERROR (Status)) {
-        Found = TRUE;
+        Found = EFI_SUCCESS;
       }
     }
   }

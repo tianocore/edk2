@@ -92,7 +92,7 @@ PartitionInstallChildHandle (
   )
 ;
 
-BOOLEAN
+EFI_STATUS
 PartitionInstallGptChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
@@ -102,7 +102,7 @@ PartitionInstallGptChildHandles (
   )
 ;
 
-BOOLEAN
+EFI_STATUS
 PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
@@ -112,7 +112,7 @@ PartitionInstallElToritoChildHandles (
   )
 ;
 
-BOOLEAN
+EFI_STATUS
 PartitionInstallMbrChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
@@ -121,5 +121,15 @@ PartitionInstallMbrChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 ;
+
+typedef 
+EFI_STATUS
+(*PARTITION_DETECT_ROUTINE) (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Handle,
+  IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
+  );
 
 #endif
