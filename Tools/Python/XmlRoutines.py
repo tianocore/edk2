@@ -143,14 +143,14 @@ def XmlAppendChildElement(ParentNode, TagName, ElementText='', AttributeDictiona
   """Add a child element to a DOM(Document Object Model) tree with optional Attributes."""
   TagName = TagName.strip()
   if TagName == '':
-    return False
+    return None
   Depth = 0
   Dom = ParentNode
   while Dom != None and Dom.nodeType != Dom.DOCUMENT_NODE:
     Dom = Dom.parentNode
     Depth += 1
   if Dom == None:
-    return False
+    return None
   ParentNode.appendChild(Dom.createTextNode('\n%*s' % (Depth * 2, '')))
   ElementNode = Dom.createElement(TagName)
   if ElementText != '':
@@ -158,7 +158,7 @@ def XmlAppendChildElement(ParentNode, TagName, ElementText='', AttributeDictiona
   for Item in AttributeDictionary:
     ElementNode.setAttribute(Item, AttributeDictionary[Item])
   ParentNode.appendChild(ElementNode)
-  return True
+  return ElementNode
   
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
