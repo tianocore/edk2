@@ -38,6 +38,7 @@ import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.definitions.EdkDefinitions;
 import org.w3c.dom.Node;
 
 /**
@@ -593,7 +594,7 @@ public class SurfaceAreaQuery {
      *          xpath
      * @returns null if nothing is there
      */
-    public String[] getLibraryClasses(String usage, String arch) {
+    public String[] getLibraryClasses(String usage, String arch, String moduleType) {
         String[] xPath;
         if (usage == null || usage.equals("")) {
             xPath = new String[] { "/LibraryClass" };
@@ -610,8 +611,10 @@ public class SurfaceAreaQuery {
         List<String> libraryClassName = new ArrayList<String>();
         for (int i = 0; i < libraryClassList.length; i++) {
 			List archList = libraryClassList[i].getSupArchList();
-
-			if (arch == null || contains(archList, arch)) {
+            List moduleTypeList = libraryClassList[i].getSupModuleList();
+			if ((arch == null || contains(archList, arch))
+                && (moduleType == null || contains(moduleTypeList, moduleType)
+                    || contains(moduleTypeList, EdkDefinitions.MODULE_TYPE_BASE))) {
                 libraryClassName.add(libraryClassList[i].getKeyword());
 			}
         }
@@ -2008,15 +2011,8 @@ public class SurfaceAreaQuery {
 		if (list == null || list.size()== 0) {
 			return true;
 		}
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            String s = (String)it.next();
-            if (s.equalsIgnoreCase(str)) {
-                return true;
-            }
-        }
 
-        return false;
+        return list.contains(str);
     }
 
 	public boolean isHaveTianoR8FlashMap(){

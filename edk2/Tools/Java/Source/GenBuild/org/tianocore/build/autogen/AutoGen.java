@@ -347,8 +347,8 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h.
         //
-        String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED,this.arch);
-        if (libClassList != null) {
+        String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch, null);
+        if (libClassList.length > 0) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
             while (item.hasNext()) {
@@ -356,8 +356,8 @@ public class AutoGen {
             }
         }
 
-        libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
-        if (libClassList != null) {
+        libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch, null);
+        if (libClassList.length > 0) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
             while (item.hasNext()) {
@@ -584,7 +584,7 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h
         //
-        String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch);
+        String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch, null);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -593,7 +593,7 @@ public class AutoGen {
             }
         }
 
-        libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
+        libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch, null);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -1354,12 +1354,11 @@ public class AutoGen {
         //
         // Add library constructor to AutoGen.c
         //
-        LibConstructorToAutogenC(libConstructList, moduleType,
-                                 fileBuffer/* autogenC */);
+        LibConstructorToAutogenC(libConstructList, moduleType, fileBuffer);
         //
         // Add library destructor to AutoGen.c
         //
-        LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
+        LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer);
     }
 
     /**
@@ -2106,6 +2105,7 @@ public class AutoGen {
     private void collectLibInstanceInfo() throws EdkException{
         int index;
 
+        String moduleType = moduleId.getModuleType();
         String libConstructName = null;
         String libDestructName = null;
         String libModuleType   = null;
@@ -2113,111 +2113,117 @@ public class AutoGen {
         String[] exitBoots = null;
 
         ModuleIdentification[] libraryIdList = saq.getLibraryInstance(this.arch);
-
-        if (libraryIdList != null) {
+        if (libraryIdList.length <= 0) {
+            return;
+        }
+        //
+        // Reorder library instance sequence.
+        //
+        AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList, this.arch);
+        List<ModuleIdentification> orderList = libOrder.orderLibInstance();
+        //
+        // Process library instance one by one.
+        //
+        for (int i = 0; i < orderList.size(); i++) {
             //
-            // Reorder library instance sequence.
+            // Get library instance basename.
             //
-            AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList,
-                                                           this.arch);
-            List<ModuleIdentification> orderList = libOrder
-                                                   .orderLibInstance();
+            ModuleIdentification libInstanceId = orderList.get(i);
 
-            if (orderList != null) {
-                //
-                // Process library instance one by one.
-                //
-                for (int i = 0; i < orderList.size(); i++) {
-                    //
-                    // Get library instance basename.
-                    //
-                    ModuleIdentification libInstanceId = orderList.get(i);
+            //
+            // Get override map
+            //
 
-                    //
-                    // Get override map
-                    //
+            Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstanceId, this.arch);
+            saq.push(libDoc);
+            //
+            // check if the library instance support current module
+            // 
+            String[] libraryClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED,
+                                                              this.arch,
+                                                              moduleType
+                                                             );
+            if (libraryClassList.length <= 0) {
+                throw new EdkException("Library instance " + libInstanceId.getName() 
+                                       + " doesn't support module type " + moduleType);
+            }
+            //
+            // Get <PPis>, <Protocols>, <Guids> list of this library
+            // instance.
+            //
+            String[] ppiList = saq.getPpiArray(this.arch);
+            String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
+            String[] protocolList = saq.getProtocolArray(this.arch);
+            String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
+            String[] guidList = saq.getGuidEntryArray(this.arch);
+            PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
 
-                    Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstanceId, this.arch);
-                    saq.push(libDoc);
-                    //
-                    // Get <PPis>, <Protocols>, <Guids> list of this library
-                    // instance.
-                    //
-                    String[] ppiList = saq.getPpiArray(this.arch);
-                    String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
-                    String[] protocolList = saq.getProtocolArray(this.arch);
-                    String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
-                    String[] guidList = saq.getGuidEntryArray(this.arch);
-                    PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
+            //
+            // Add those ppi, protocol, guid in global ppi,
+            // protocol, guid
+            // list.
+            //
+            for (index = 0; index < ppiList.length; index++) {
+                this.mPpiList.add(ppiList[index]);
+            }
 
-                    //
-                    // Add those ppi, protocol, guid in global ppi,
-                    // protocol, guid
-                    // list.
-                    //
-                    for (index = 0; index < ppiList.length; index++) {
-                        this.mPpiList.add(ppiList[index]);
-                    }
+            for (index = 0; index < ppiNotifyList.length; index++) {
+                this.mPpiList.add(ppiNotifyList[index]);
+            }
 
-                    for (index = 0; index < ppiNotifyList.length; index++) {
-                        this.mPpiList.add(ppiNotifyList[index]);
-                    }
+            for (index = 0; index < protocolList.length; index++) {
+                this.mProtocolList.add(protocolList[index]);
+            }
 
-                    for (index = 0; index < protocolList.length; index++) {
-                        this.mProtocolList.add(protocolList[index]);
-                    }
+            for (index = 0; index < protocolNotifyList.length; index++) {
+                this.mProtocolList.add(protocolNotifyList[index]);
+            }
 
-                    for (index = 0; index < protocolNotifyList.length; index++) {
-                        this.mProtocolList.add(protocolNotifyList[index]);
-                    }
-
-                    for (index = 0; index < guidList.length; index++) {
-                        this.mGuidList.add(guidList[index]);
-                    }
-                    for (index = 0; index < pkgList.length; index++) {
-                        if (!this.mDepPkgList.contains(pkgList[index])) {
-                            this.mDepPkgList.add(pkgList[index]);
-                        }
-                    }
-
-                    //
-                    // If not yet parse this library instance's constructor
-                    // element,parse it.
-                    //
-                    libConstructName = saq.getLibConstructorName();
-                    libDestructName = saq.getLibDestructorName();
-                    libModuleType = saq.getModuleType();
-
-                    //
-                    // Collect SetVirtualAddressMapCallBack and
-                    // ExitBootServiceCallBack.
-                    //
-                    setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
-                    exitBoots = saq.getExitBootServicesCallBackArray();
-                    if (setVirtuals != null) {
-                        for (int j = 0; j < setVirtuals.length; j++) {
-                            this.setVirtalAddList.add(setVirtuals[j]);
-                        }
-                    }
-                    if (exitBoots != null) {
-                        for (int k = 0; k < exitBoots.length; k++) {
-                            this.exitBootServiceList.add(exitBoots[k]);
-                        }
-                    }
-                    saq.pop();
-                    //
-                    // Add dependent library instance constructor function.
-                    //
-                    if (libConstructName != null) {
-                        this.libConstructList.add(new String[] {libConstructName, libModuleType});
-                    }
-                    //
-                    // Add dependent library instance destructor fuction.
-                    //
-                    if (libDestructName != null) {
-                        this.libDestructList.add(new String[] {libDestructName, libModuleType});
-                    }
+            for (index = 0; index < guidList.length; index++) {
+                this.mGuidList.add(guidList[index]);
+            }
+            for (index = 0; index < pkgList.length; index++) {
+                if (!this.mDepPkgList.contains(pkgList[index])) {
+                    this.mDepPkgList.add(pkgList[index]);
                 }
+            }
+
+            //
+            // If not yet parse this library instance's constructor
+            // element,parse it.
+            //
+            libConstructName = saq.getLibConstructorName();
+            libDestructName = saq.getLibDestructorName();
+            libModuleType = saq.getModuleType();
+
+            //
+            // Collect SetVirtualAddressMapCallBack and
+            // ExitBootServiceCallBack.
+            //
+            setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
+            exitBoots = saq.getExitBootServicesCallBackArray();
+            if (setVirtuals != null) {
+                for (int j = 0; j < setVirtuals.length; j++) {
+                    this.setVirtalAddList.add(setVirtuals[j]);
+                }
+            }
+            if (exitBoots != null) {
+                for (int k = 0; k < exitBoots.length; k++) {
+                    this.exitBootServiceList.add(exitBoots[k]);
+                }
+            }
+            saq.pop();
+            //
+            // Add dependent library instance constructor function.
+            //
+            if (libConstructName != null) {
+                this.libConstructList.add(new String[] {libConstructName, libModuleType});
+            }
+            //
+            // Add dependent library instance destructor fuction.
+            //
+            if (libDestructName != null) {
+                this.libDestructList.add(new String[] {libDestructName, libModuleType});
             }
         }
     }
