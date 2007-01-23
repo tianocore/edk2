@@ -26,14 +26,11 @@ import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
-
-import org.tianocore.common.definitions.ToolDefinitions;
-import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.exception.AutoGenException;
 import org.tianocore.build.exception.GenBuildException;
@@ -48,6 +45,9 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.tools.ModuleItem;
+import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
 
 /**
   <p>
@@ -151,6 +151,10 @@ public class GenBuildTask extends Ant {
             BuildException buildException = new BuildException(e.getMessage());
             buildException.setStackTrace(e.getStackTrace());
             throw buildException;
+        } catch (Exception e) {
+            BuildException buildException = new BuildException(e.getMessage());
+            buildException.setStackTrace(e.getStackTrace());
+            throw buildException;
         }
     }
 
@@ -197,7 +201,7 @@ public class GenBuildTask extends Ant {
             moduleId.setMsaFile(msaFile);
         }
         
-        String[] producedLibraryClasses = saq.getLibraryClasses("ALWAYS_PRODUCED",null);
+        String[] producedLibraryClasses = saq.getLibraryClasses("ALWAYS_PRODUCED", null, null);
         if (producedLibraryClasses.length == 0) {
             moduleId.setLibrary(false);
         } else {

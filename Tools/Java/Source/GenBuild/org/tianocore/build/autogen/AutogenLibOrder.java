@@ -90,8 +90,8 @@ public class AutogenLibOrder {
             //
             // Create library class consume database.
             //
-            libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
-            if (libClassConsmList != null) {
+            libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch, null);
+            if (libClassConsmList.length > 0) {
                 if (this.libInstanceConsumes.containsKey(libInstance)) {
                     throw new AutoGenException(
                             libraryList[i].getName()
@@ -104,8 +104,8 @@ public class AutogenLibOrder {
             //
             // Create library class implementer database
             //
-            libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
-            if (libClassDeclList != null) {
+            libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch, null);
+            if (libClassDeclList.length > 0) {
                 this.libInstanceProduces.put(libInstance, libClassDeclList);
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassProducer.containsKey(libClassDeclList[j])) {
@@ -132,6 +132,9 @@ public class AutogenLibOrder {
             for (int k = 0; k < libraryList.length; ++k) {
                 ModuleIdentification consumer = libraryList[k];
                 String[] consumedClassList = libInstanceConsumes.get(consumer);
+                if (consumedClassList == null) {
+                    continue;
+                }
 
                 for (int l = 0; l < consumedClassList.length; ++l) {
                     if (consumedClassList[l].equals(className)) {
@@ -168,6 +171,9 @@ public class AutogenLibOrder {
             orderList.addFirst(n);
 
             String[] consumedClassList = libInstanceConsumes.get(n);
+            if (consumedClassList == null) {
+                continue;
+            }
             for (int i = 0; i < consumedClassList.length; ++i) {
                 ModuleIdentification m = libClassProducer.get(consumedClassList[i]);
                 if (m == null) {
@@ -231,27 +237,26 @@ public class AutogenLibOrder {
         //
         // Append the remaining library instance to the end of sorted list
         //
-	boolean HasError = false;
+        boolean HasError = false;
         for (int i = 0; i < libInstanceList.length; ++i) {
-	    HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstanceList[i]);
+            HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstanceList[i]);
             if (consumedBy.size() > 0 && libInstanceList[i].hasConstructor()) {
                 EdkLog.log(EdkLog.EDK_ERROR, libInstanceList[i].getName()
                            + " with constructor has a circular dependency!");
-		ModuleIdentification[] consumedByList = consumedBy.toArray(new ModuleIdentification[consumedBy.size()]);
-		for (int j = 0; j < consumedByList.length; ++j) {
-		    EdkLog.log(EdkLog.EDK_ERROR,
-			       " consumed by " + consumedByList[j].getName());
-		}
-		HasError = true;
+                ModuleIdentification[] consumedByList = consumedBy.toArray(new ModuleIdentification[consumedBy.size()]);
+                for (int j = 0; j < consumedByList.length; ++j) {
+                    EdkLog.log(EdkLog.EDK_ERROR, " consumed by " + consumedByList[j].getName());
+                }
+                HasError = true;
             }
 
             if (!orderList.contains(libInstanceList[i])) {
                 orderList.add(libInstanceList[i]);
             }
         }
-	if (HasError) {
-	    throw new AutoGenException("Circular dependency in library instances is found!");
-	}
+        if (HasError) {
+            throw new AutoGenException("Circular dependency in library instances is found!");
+        }
 
         return orderList;
     }
