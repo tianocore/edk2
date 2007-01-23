@@ -12,6 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+
+EFI_EVENT  _mDriverExitBootServicesNotifyEvent;
+
 /**
   Unload function that is registered in the LoadImage protocol.  It un-installs
   protocols produced and deallocates pool used by the driver.  Called by the core
@@ -22,9 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_SUCCESS
 
 **/
-
-EFI_EVENT  _mDriverExitBootServicesNotifyEvent;
-
 EFI_STATUS
 EFIAPI
 _DriverUnloadHandler (
@@ -61,29 +61,21 @@ _DriverUnloadHandler (
   return Status;
 }
 
+
+/**
+  Notification Entry of ExitBootService event. In the entry, all notifications in _gDriverExitBootServicesEvent[] 
+  would be invoked.
+
+  @param Event   The Event that is being processed.
+  @param Context Event Context.
+
+**/
 VOID
 EFIAPI
 _DriverExitBootServices (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   )
-/*++
-
-Routine Description:
-
-  Set AtRuntime flag as TRUE after ExitBootServices
-
-Arguments:
-
-  Event   - The Event that is being processed
-  
-  Context - Event Context
-
-Returns: 
-
-  None
-
---*/
 {
   EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
   UINTN             Index;
