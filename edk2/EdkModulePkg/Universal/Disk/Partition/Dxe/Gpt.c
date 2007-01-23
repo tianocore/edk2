@@ -75,7 +75,7 @@ PartitionSetCrc (
   IN OUT EFI_TABLE_HEADER *Hdr
   );
 
-BOOLEAN
+EFI_STATUS
 PartitionInstallGptChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
@@ -96,8 +96,9 @@ Arguments:
   DevicePath - Parent Device Path
 
 Returns:
-  TRUE       - Valid GPT disk
-  FALSE      - Not a valid GPT disk
+  EFI_SUCCESS  - Valid GPT disk
+  EFI_MEDIA_CHANGED - Media changed Detected
+  !EFI_SUCCESS - Not a valid GPT disk
 
 --*/
 {
@@ -110,7 +111,7 @@ Returns:
   EFI_PARTITION_ENTRY         *PartEntry;
   EFI_PARTITION_ENTRY_STATUS  *PEntryStatus;
   UINTN                       Index;
-  BOOLEAN                     GptValid;
+  EFI_STATUS                  GptValid;
   HARDDRIVE_DEVICE_PATH       HdDev;
 
   ProtectiveMbr = NULL;
@@ -125,14 +126,14 @@ Returns:
   DEBUG ((EFI_D_INFO, " BlockSize : %d \n", BlockSize));
   DEBUG ((EFI_D_INFO, " LastBlock : %x \n", LastBlock));
 
-  GptValid = FALSE;
+  GptValid = EFI_NOT_FOUND;
 
   //
   // Allocate a buffer for the Protective MBR
   //
   ProtectiveMbr = AllocatePool (BlockSize);
   if (ProtectiveMbr == NULL) {
-    return FALSE;
+    return EFI_NOT_FOUND;
   }
 
   //
@@ -146,6 +147,7 @@ Returns:
                       ProtectiveMbr
                       );
   if (EFI_ERROR (Status)) {
+    GptValid = Status;
     goto Done;
   }
   //
@@ -224,6 +226,7 @@ Returns:
                     PartEntry
                     );
   if (EFI_ERROR (Status)) {
+    GptValid = Status;
     DEBUG ((EFI_D_INFO, " Partition Entry ReadBlocks error\n"));
     goto Done;
   }
@@ -246,7 +249,7 @@ Returns:
   //
   // If we got this far the GPT layout of the disk is valid and we should return true
   //
-  GptValid = TRUE;
+  GptValid = EFI_SUCCESS;
 
   //
   // Create child device handles

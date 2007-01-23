@@ -71,6 +71,15 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   NULL
 };
 
+STATIC 
+PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
+  PartitionInstallGptChildHandles,
+  PartitionInstallElToritoChildHandles,
+  PartitionInstallMbrChildHandles,
+  NULL
+};
+
+
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingSupported (
@@ -212,6 +221,7 @@ PartitionDriverBindingStart (
   EFI_BLOCK_IO_PROTOCOL     *BlockIo;
   EFI_DISK_IO_PROTOCOL      *DiskIo;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
+  PARTITION_DETECT_ROUTINE  *Routine;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -269,32 +279,19 @@ PartitionDriverBindingStart (
     // media supports a given partition type install child handles to represent
     // the partitions described by the media.
     //
-    if (PartitionInstallGptChildHandles (
-          This,
-          ControllerHandle,
-          DiskIo,
-          BlockIo,
-          ParentDevicePath
-          ) ||
-
-    PartitionInstallElToritoChildHandles (
-          This,
-          ControllerHandle,
-          DiskIo,
-          BlockIo,
-          ParentDevicePath
-          ) ||
-
-    PartitionInstallMbrChildHandles (
-          This,
-          ControllerHandle,
-          DiskIo,
-          BlockIo,
-          ParentDevicePath
-          )) {
-      Status = EFI_SUCCESS;
-    } else {
-      Status = EFI_NOT_FOUND;
+    Routine = &mPartitionDetectRoutineTable[0];
+    while (*Routine != NULL) {
+      Status = (*Routine) (
+                   This,
+                   ControllerHandle,
+                   DiskIo,
+                   BlockIo,
+                   ParentDevicePath
+                   );
+      if (!EFI_ERROR (Status) || Status == EFI_MEDIA_CHANGED) {
+        break;
+      }
+      Routine++;
     }
   }
   //
@@ -303,7 +300,7 @@ PartitionDriverBindingStart (
   // driver. So don't try to close them. Otherwise, we will break the dependency
   // between the controller and the driver set up before.
   //
-  if (EFI_ERROR (Status) && !EFI_ERROR (OpenStatus)) {
+  if (EFI_ERROR (Status) && !EFI_ERROR (OpenStatus) && Status != EFI_MEDIA_CHANGED) {
     gBS->CloseProtocol (
           ControllerHandle,
           &gEfiDiskIoProtocolGuid,
