@@ -93,6 +93,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private DefaultTableModel optionsTableModel = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
+    private ModuleIdentification moduleId = null;
     private int moduleSaNum = -1;
     private HashMap<LibraryClassDescriptor, ArrayList<String>> classInstanceMap = null;
     //
@@ -198,6 +199,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         libClassTableModel.setRowCount(0);
         libInstanceTableModel.setRowCount(0);
         selectedInstancesTableModel.setRowCount(0);
+        moduleId = WorkspaceProfile.getModuleId(moduleKey);
         Vector<String> errorMsg = new Vector<String>();
         try {
             //
@@ -353,6 +355,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         // Get the lib class consumed, produced by this module itself.
         //
         Vector<LibraryClassDescriptor> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
+        for (int i = 0; i < vClassConsumed.size(); ++i) {
+            vClassConsumed.get(i).supModTypes = WorkspaceProfile.getModuleType(moduleId);
+        }
         filterClassConsumedByArch(vClassConsumed);
         if (this.classConsumed == null) {
             this.classConsumed = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
