@@ -91,7 +91,7 @@ public class AutogenLibOrder {
             // Create library class consume database.
             //
             libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch, null);
-            if (libClassConsmList.length > 0) {
+            if (libClassConsmList != null) {
                 if (this.libInstanceConsumes.containsKey(libInstance)) {
                     throw new AutoGenException(
                             libraryList[i].getName()
@@ -105,7 +105,7 @@ public class AutogenLibOrder {
             // Create library class implementer database
             //
             libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch, null);
-            if (libClassDeclList.length > 0) {
+            if (libClassDeclList != null) {
                 this.libInstanceProduces.put(libInstance, libClassDeclList);
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassProducer.containsKey(libClassDeclList[j])) {
@@ -132,9 +132,6 @@ public class AutogenLibOrder {
             for (int k = 0; k < libraryList.length; ++k) {
                 ModuleIdentification consumer = libraryList[k];
                 String[] consumedClassList = libInstanceConsumes.get(consumer);
-                if (consumedClassList == null) {
-                    continue;
-                }
 
                 for (int l = 0; l < consumedClassList.length; ++l) {
                     if (consumedClassList[l].equals(className)) {
@@ -171,9 +168,6 @@ public class AutogenLibOrder {
             orderList.addFirst(n);
 
             String[] consumedClassList = libInstanceConsumes.get(n);
-            if (consumedClassList == null) {
-                continue;
-            }
             for (int i = 0; i < consumedClassList.length; ++i) {
                 ModuleIdentification m = libClassProducer.get(consumedClassList[i]);
                 if (m == null) {
