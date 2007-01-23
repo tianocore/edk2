@@ -76,8 +76,8 @@
 // USB transation direction
 //
 typedef enum {
-  EfiUsbDataOut,
   EfiUsbDataIn,
+  EfiUsbDataOut,
   EfiUsbNoData
 } EFI_USB_DATA_DIRECTION;
 
