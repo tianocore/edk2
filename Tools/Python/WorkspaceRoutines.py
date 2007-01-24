@@ -42,3 +42,19 @@ def mkdir(path):
   except:
     pass
 
+def Md5(filename):
+
+  sum = ""
+
+  try:
+    f=open(filename, "rb")
+    sum = md5.md5(f.read()).hexdigest()
+    f.close()
+  except IOError:
+    print "Error: Unable to open file: %s" % filename
+    sys.exit()
+
+  return sum
+
+
+
