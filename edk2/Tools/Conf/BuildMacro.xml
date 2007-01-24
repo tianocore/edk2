@@ -10,6 +10,9 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project name="common">
+  <!-- for user extended tasks or macros -->
+  <import file="UserExtension.xml" optional="true"/>
+
   <!--
     Macro for intialize some properties. This Macro build will be called before source file build.  
     -->
