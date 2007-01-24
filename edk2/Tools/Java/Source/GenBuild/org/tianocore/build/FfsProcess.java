@@ -186,14 +186,18 @@ public class FfsProcess {
         //
         Element outofdateEle = document.createElement("OnDependency");
         Element sourceEle = document.createElement("sourcefiles");
-        String[] result = new String[sectionList.size()];
+        Vector<String> sections = new Vector<String>();
         for (int i = 0; i < sectionList.size(); i++) {
-            result[i] = (String) sectionList.get(i);
+            String section = (String) sectionList.get(i);
+            if (isSectionType(section)) {
+                sections.addElement(section);
+            }
             Element pathEle = document.createElement("file");
-            pathEle.setAttribute("name", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename
-                                         + getSectionExt(result[i]));
+            pathEle.setAttribute("name", getSectionFile(basename, section));
             sourceEle.appendChild(pathEle);
         }
+        String[] result = sections.toArray(new String[sections.size()]);
+
         outofdateEle.appendChild(sourceEle);
         Element targetEle = document.createElement("targetfiles");
         Element fileEle = document.createElement("file");
@@ -370,14 +374,17 @@ public class FfsProcess {
         
         if (fileName == null) {
             list.addElement(type);
+        } else {
+            list.addElement(fileName);
         }
+
         if (mode == MODE_GUID_DEFINED) {
             //
             // <input file="${DEST_DIR_OUTPUT}\Bds.pe32"/>
             //
             Element ele = doc.createElement("input");
             if (fileName == null) {
-                ele.setAttribute("file", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+                ele.setAttribute("file", getSectionFile(basename, type));
             } else {
                 ele.setAttribute("file", fileName);
             }
@@ -388,7 +395,7 @@ public class FfsProcess {
             //
             Element ele = doc.createElement("sectFile");
             if (fileName == null) {
-                ele.setAttribute("fileName", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+                ele.setAttribute("fileName", getSectionFile(basename, type));
             } else {
                 ele.setAttribute("fileName", fileName);
             }
@@ -402,13 +409,22 @@ public class FfsProcess {
       @param type Section type
       @return Corresponding section file extension
     **/
-    private String getSectionExt(String type) {
+    private String getSectionFile(String basename, String type) {
         for (int i = 0; i < sectionExt.length; i++) {
             if (sectionExt[i][0].equalsIgnoreCase(type)) {
-                return sectionExt[i][1];
+                return "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + sectionExt[i][1];
             }
         }
-        return ".sec";
+        return type;
+    }
+
+    private boolean isSectionType(String type) {
+        for (int i = 0; i < sectionExt.length; i++) {
+            if (sectionExt[i][0].equalsIgnoreCase(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
