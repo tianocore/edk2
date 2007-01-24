@@ -22,7 +22,7 @@
     <OutputFileBasename>Logo</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
-    <Filename>Logo.bmp</Filename>
+    <Filename>logo.bmp</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
