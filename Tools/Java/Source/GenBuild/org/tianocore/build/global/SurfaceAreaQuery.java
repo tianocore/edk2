@@ -613,8 +613,7 @@ public class SurfaceAreaQuery {
 			List archList = libraryClassList[i].getSupArchList();
             List moduleTypeList = libraryClassList[i].getSupModuleList();
 			if ((arch == null || contains(archList, arch))
-                && (moduleType == null || contains(moduleTypeList, moduleType)
-                    || contains(moduleTypeList, EdkDefinitions.MODULE_TYPE_BASE))) {
+                && (moduleType == null || contains(moduleTypeList, moduleType))) {
                 libraryClassName.add(libraryClassList[i].getKeyword());
 			}
         }
