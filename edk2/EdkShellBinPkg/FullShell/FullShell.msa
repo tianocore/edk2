@@ -28,7 +28,7 @@
   <SourceFiles>
     <Filename SupArchList="IA32">ia32/Shell_Full.efi</Filename>
     <Filename SupArchList="IPF">ipf/Shell_Full.efi</Filename>
-    <Filename SupArchList="X64">x64/Shell_Full.efi</Filename>
+    <Filename SupArchList="X64">x64/Shell_full.efi</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

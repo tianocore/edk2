@@ -124,7 +124,7 @@
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/stall.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/timezone.efi</Filename>
     <Filename SupArchList="IPF">ipf/Shell.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Shell_Full.efi</Filename>
+    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Shell_full.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Attrib.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Cls.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Cp.efi</Filename>
@@ -163,8 +163,8 @@
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/efidecompress.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/err.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/hexedit.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/legacyboot.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/loadfv.efi</Filename>
+    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/LegacyBoot.efi</Filename>
+    <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/LoadFv.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/mem.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/memmap.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/mm.efi</Filename>
