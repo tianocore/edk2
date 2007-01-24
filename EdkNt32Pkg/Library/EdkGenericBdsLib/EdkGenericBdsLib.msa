@@ -74,7 +74,7 @@
     <Filename>Performance.h</Filename>
     <Filename>Performance.c</Filename>
     <Filename>BdsMisc.c</Filename>
-    <Filename SupArchList="IPF">Ipf\ShadowRom.c</Filename>
+    <Filename SupArchList="IPF">Ipf/ShadowRom.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
