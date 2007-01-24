@@ -673,10 +673,6 @@ public class AutoGen {
             fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
             fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
-
-        if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
-            throw new AutoGenException("Failed to generate AutoGen.c !!!");
-        }
     }
 
     /**
