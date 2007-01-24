@@ -159,12 +159,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         classConsumed = null;
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
-        ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
-        if (mi == null) {
+        moduleId = WorkspaceProfile.getModuleId(moduleKey);
+        if (moduleId == null) {
             return;
         }
         int tabIndex = jTabbedPane.indexOfTab("Libraries");
-        if (mi.isLibrary()) {
+        if (moduleId.isLibrary()) {
             jTabbedPane.setEnabledAt(tabIndex, false);
         }
         else {
@@ -199,7 +199,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         libClassTableModel.setRowCount(0);
         libInstanceTableModel.setRowCount(0);
         selectedInstancesTableModel.setRowCount(0);
-        moduleId = WorkspaceProfile.getModuleId(moduleKey);
         Vector<String> errorMsg = new Vector<String>();
         try {
             //
@@ -350,7 +349,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // Get dependency pkg list into which we will search lib instances.
         //
-        depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
+        //depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
         //
         // Get the lib class consumed, produced by this module itself.
         //
@@ -416,7 +415,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         Iterator<LibraryClassDescriptor> lic = this.classConsumed.keySet().iterator();
         while (lic.hasNext()) {
             LibraryClassDescriptor cls = lic.next();
-            if (isBoundedClass(cls)) {
+            if (isBoundedClass(cls, errorMsg)) {
                 continue;
             }
             ArrayList<String> instances = getInstancesForClass(cls, depPkgList);
@@ -438,15 +437,28 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * @param cls
      * @return
      */
-    private boolean isBoundedClass (LibraryClassDescriptor cls) {
-        if (this.classProduced.containsKey(cls)) {
-            return true;
-        }
+    private boolean isBoundedClass (LibraryClassDescriptor cls, Vector<String> errorMsg) {
+//        if (this.classProduced.containsKey(cls)) {
+//            return true;
+//        }
         Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
         while (lcdi.hasNext()) {
             LibraryClassDescriptor lcd = lcdi.next();
-            if (cls.isSubSetByArchs(lcd) && cls.isSubSetByModTypes(lcd)) {
-                return true;
+            if (cls.className.equals(lcd.className)) {
+                if (cls.isSubSetByArchs(lcd) && cls.isSubSetByModTypes(lcd)) {
+                    return true;
+                }
+                else {
+                    ArrayList<String> producedBy = this.classProduced.get(lcd);
+                    String instancesName = "";
+                    for (int i = 0; i < producedBy.size(); ++i) {
+                        ModuleIdentification mi = WorkspaceProfile.getModuleId(producedBy.get(i));
+                        instancesName += mi.getName();
+                        instancesName += " ";
+                    }
+                    String msg = new ImproperInstanceException(lcd.className, instancesName, lcd.supArchs, lcd.supModTypes).getMessage();
+                    errorMsg.add(msg);
+                }
             }
         }
         
@@ -473,7 +485,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         isPotential = true;
                     }
                     
-                    if (hasBeenProduced(lcd)) {
+                    if (isPotential && hasBeenProduced(lcd)) {
                         isPotential = false;
                         break;
                     }
@@ -492,7 +504,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
         while (lcdi.hasNext()) {
             LibraryClassDescriptor lcd = lcdi.next();
-            if (cls.hasInterSectionWith(lcd)) {
+            if (cls.isSubSetByArchs(lcd) && cls.isSubSetByModTypes(lcd)) {
                 return true;
             }
         }
@@ -565,6 +577,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void showClassToResolved(){
+        Vector<String> errorMsg = new Vector<String>();
         libClassTableModel.setRowCount(0);
         libInstanceTableModel.setRowCount(0);
         if (classConsumed == null || classConsumed.size() == 0) {
@@ -578,11 +591,18 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 continue;
             }
             
-            if (!isBoundedClass(lcd)){
+            if (!isBoundedClass(lcd, errorMsg)){
                 libClassTableModel.addRow(s);
             }
         }
         
+        if (errorMsg.size() > 0) {
+            String errors = "";
+            for (int i = 0; i < errorMsg.size(); ++i) {
+                errors += " " + errorMsg.get(i) + "\n";
+            }
+            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), errors);
+        }
     }
     
     private String getModuleArch () {
@@ -2026,6 +2046,37 @@ class MultipleInstanceException extends Exception {
         // TODO Auto-generated method stub
         return " Library Class " + className + "is Produced by Two Instances: " 
             + libInstance1 + " and " + libInstance2 + ". Platform Build will Fail.";
+    }
+    
+}
+
+class ImproperInstanceException extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5279700566993277033L;
+    private String className = null;
+    private String libInstance = null;
+    private String instanceSupArch = null;
+    private String instanceSupModType = null;
+    
+    ImproperInstanceException (String libClass, String instance1, String arch, String type) {
+        super();
+        className = libClass;
+        libInstance = instance1;
+        instanceSupArch = arch;
+        instanceSupModType = type;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Throwable#getMessage()
+     */
+    @Override
+    public String getMessage() {
+        // TODO Auto-generated method stub
+        return " Library Class " + className + " Produced by Library Instance: " 
+            + libInstance + "\nOnly Supports " + instanceSupArch + " and Module Type " + instanceSupModType + ".\n This instance should be removed.\n";
     }
     
 }
