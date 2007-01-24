@@ -185,7 +185,7 @@ public class ModuleGuids extends IInternalFrame {
             model.addColumn("Guid C_Name");
             model.addColumn("Usage");
 
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(this);
             jTable.getModel().addTableModelListener(this);
             jTable.addMouseListener(this);
@@ -353,9 +353,14 @@ public class ModuleGuids extends IInternalFrame {
             if (jTable.isEditing()) {
                 jTable.getCellEditor().stopCellEditing();
             }
-            if (selectedRow > -1) {
-                this.model.removeRow(selectedRow);
-                this.vid.removeGuids(selectedRow);
+
+            int selectedRows[] = this.jTable.getSelectedRows();
+            
+            if (selectedRows != null) {
+                for (int index = selectedRows.length - 1; index > -1; index--) {
+                    this.model.removeRow(selectedRows[index]);
+                    this.vid.removeGuids(selectedRows[index]);
+                }
                 selectedRow = -1;
                 this.save();
             }
