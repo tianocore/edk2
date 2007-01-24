@@ -649,10 +649,11 @@ public class GenBuildTask extends Ant {
         // if it is CUSTOM_BUILD
         // then call the exist BaseName_build.xml directly.
         //
-        if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            EdkLog.log(this, "Call user-defined " + moduleId.getName() + "_build.xml");
+        String buildFilename = "";
+        if ((buildFilename = GetCustomizedBuildFile(fpdModuleId.getArch())) != "") {
+            EdkLog.log(this, "Call user-defined " + buildFilename);
             
-            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
+            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + buildFilename;
             antCall(antFilename, null);
             
             return ;
@@ -664,7 +665,7 @@ public class GenBuildTask extends Ant {
         //
         String ffsKeyword = saq.getModuleFfsKeyword();
         ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId, includes, saq);
-        String buildFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
+        buildFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
         fileGenerator.genBuildFile(buildFilename);
 
         //
@@ -814,5 +815,16 @@ public class GenBuildTask extends Ant {
    
    public void setExternalProperties(Vector<Property> v) {
        this.properties = v;
+   }
+
+   private String GetCustomizedBuildFile(String arch) {
+       String[][] files = saq.getSourceFiles(arch);
+       for (int i = 0; i < files.length; ++i) {
+           if (files[i][1].endsWith("build.xml")) {
+               return files[i][1];
+           }
+       }
+
+       return "";
    }
 }
