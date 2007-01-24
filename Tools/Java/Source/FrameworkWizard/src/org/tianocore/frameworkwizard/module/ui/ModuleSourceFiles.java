@@ -187,7 +187,7 @@ public class ModuleSourceFiles extends IInternalFrame {
             model.addColumn("Tool Code");
             model.addColumn("Tool Chain Family");
 
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(this);
             jTable.getModel().addTableModelListener(this);
             jTable.addMouseListener(this);
@@ -392,9 +392,14 @@ public class ModuleSourceFiles extends IInternalFrame {
             if (jTable.isEditing()) {
                 jTable.getCellEditor().stopCellEditing();
             }
-            if (selectedRow > -1) {
-                this.model.removeRow(selectedRow);
-                this.vSourceFiles.removeSourceFiles(selectedRow);
+            
+            int selectedRows[] = this.jTable.getSelectedRows();
+            
+            if (selectedRows != null) {
+                for (int index = selectedRows.length - 1; index > -1; index--) {
+                    this.model.removeRow(selectedRows[index]);
+                    this.vSourceFiles.removeSourceFiles(selectedRows[index]);
+                }
                 selectedRow = -1;
                 this.save();
             }
