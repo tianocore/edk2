@@ -87,32 +87,17 @@ def makeFarHeader(doc):
 
   """Create a dom tree for the Far Header. It will use information from the
   template file passed on the command line, if present."""
+  
+  header = XmlAppendChildElement(doc.documentElement, "FarHeader")
 
-  header = doc.createElement("FarHeader")
-  name = doc.createElement("FarName")
-  name.appendChild(doc.createTextNode(far.FarName))
-  header.appendChild(name)
-  guidVal = doc.createElement("GuidValue")
-  guidVal.appendChild(doc.createTextNode(genguid()))
-  header.appendChild(guidVal)
-  ver = doc.createElement("Version")
-  ver.appendChild(doc.createTextNode(far.Version))
-  header.appendChild(ver)
-  abstract = doc.createElement("Abstract")
-  abstract.appendChild(doc.createTextNode(far.Abstract))
-  header.appendChild(abstract)
-  desc = doc.createElement("Description")
-  desc.appendChild(doc.createTextNode(far.Description))
-  header.appendChild(desc)
-  copy = doc.createElement("Copyright")
-  copy.appendChild(doc.createTextNode(far.Copyright))
-  header.appendChild(copy)
-  lic = doc.createElement("License")
-  lic.appendChild(doc.createTextNode(far.License))
-  header.appendChild(lic)
-  spec = doc.createElement("Specification")
-  spec.appendChild(doc.createTextNode("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052"))
-  header.appendChild(spec)
+  XmlAppendChildElement(header, "FarName", far.FarName)
+  XmlAppendChildElement(header, "GuidValue", genguid())
+  XmlAppendChildElement(header, "Version", far.Version)
+  XmlAppendChildElement(header, "Abstract", far.Abstract)
+  XmlAppendChildElement(header, "Description", far.Description)
+  XmlAppendChildElement(header, "Copyright", far.Copyright)
+  XmlAppendChildElement(header, "License", far.License)
+  XmlAppendChildElement(header, "Specification", "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052")
 
   return header
 
@@ -135,17 +120,10 @@ def makeFar(files, farname):
 
   top_element.appendChild(makeFarHeader(man))
 
-  packList = man.createElement("FarPackageList")
-  top_element.appendChild(packList)
-
-  platList = man.createElement("FarPlatformList")
-  top_element.appendChild(platList)
-
-  contents = man.createElement("Contents")
-  top_element.appendChild(contents)
-
-  exts = man.createElement("UserExtensions")
-  top_element.appendChild(exts)
+  packList = XmlAppendChildElement(top_element, "FarPackageList")
+  platList = XmlAppendChildElement(top_element, "FarPlatformList")
+  contents = XmlAppendChildElement(top_element, "Contents")
+  XmlAppendChildElement(top_element, "UserExtensions")
 
   zip = zipfile.ZipFile(farname, "w")
   for infile in set(files):
@@ -159,76 +137,33 @@ def makeFar(files, farname):
 
       (spdGuid, spdVersion) = getSpdGuidVersion(infile)
 
-      package = man.createElement("FarPackage")
-      packList.appendChild(package)
-
-      spdfilename = farFileNode(man, inWorkspace(infile))
+      package = XmlAppendChildElement(packList, "FarPackage")
+      XmlAppendChildElement(package, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
       zip.write(inWorkspace(infile), infile)
-      spdfilename.appendChild(man.createTextNode(lean(infile)))
-      package.appendChild(spdfilename)
-
-      guidValue = man.createElement("GuidValue")
-      guidValue.appendChild(man.createTextNode(spdGuid))
-      package.appendChild(guidValue)
-
-      version = man.createElement("Version")
-      version.appendChild(man.createTextNode(spdVersion))
-      package.appendChild(version)
-
-      defaultPath = man.createElement("DefaultPath")
-      defaultPath.appendChild(man.createTextNode(spdDir))
-      package.appendChild(defaultPath)
-
-      farPlatformList = man.createElement("FarPlatformList")
-      package.appendChild(farPlatformList)
-
-      packContents = man.createElement("Contents")
-      package.appendChild(packContents)
-
-      ue = man.createElement("UserExtensions")
-      package.appendChild(ue)
+      XmlAppendChildElement(package, "GuidValue", spdGuid)
+      XmlAppendChildElement(package, "Version", spdVersion)
+      XmlAppendChildElement(package, "DefaultPath", spdDir)
+      XmlAppendChildElement(package, "FarPlatformList")
+      packContents = XmlAppendChildElement(package, "Contents")
+      XmlAppendChildElement(package, "UserExtensions")
 
       for spdfile in filelist:
-        content = farFileNode(man, inWorkspace(os.path.join(spdDir, spdfile))) 
+        XmlAppendChildElement(packContents, "FarFilename", lean(spdfile), {"Md5Sum": Md5(inWorkspace(os.path.join(spdDir, spdfile)))})
         zip.write(inWorkspace(os.path.join(spdDir, spdfile)), os.path.join(spdDir,spdfile))
-        content.appendChild(man.createTextNode(lean(spdfile)))
-        packContents.appendChild(content)
 
     elif extension == ".fpd":
 
-      platform = man.createElement("FarPlatform")
-      platList.appendChild(platform)
-
-      fpdfilename = farFileNode(man, inWorkspace(infile))
+      platform = XmlAppendChildElement(platList, "FarPlatform")
+      XmlAppendChildElement(platform, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
       zip.write(inWorkspace(infile), infile)
-      platform.appendChild(fpdfilename)
-      fpdfilename.appendChild(man.createTextNode(lean(infile)))
 
     else:
-      content = farFileNode(man, inWorkspace(infile))
+      XmlAppendChildElement(contents, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
       zip.write(inWorkspace(infile), infile)
-      content.appendChild(man.createTextNode(lean(infile)))
-      contents.appendChild(content)
 
-  zip.writestr("FrameworkArchiveManifest.xml", man.toprettyxml(2*" "))
+  zip.writestr("FrameworkArchiveManifest.xml", man.toxml('UTF-8'))
   zip.close()
   return
-
-def farFileNode(doc, filename):
-
-  """This is a function that returns a dom tree for a given file that is
-  included in the far. An md5sum is calculated for that file."""
-
-  content = doc.createElement("FarFilename")
-  try:
-    f=open(filename, "rb")
-    content.setAttribute("Md5sum", md5.md5(f.read()).hexdigest())
-    f.close()
-  except IOError:
-    print "Error: Unable to open file: %s" % filename
-    sys.exit()
-
-  return content
 
 # This acts like the main() function for the script, unless it is 'import'ed
 # into another script.
@@ -238,7 +173,7 @@ if __name__ == '__main__':
   # pp = pprint.PrettyPrinter(indent=2)
 
   # Process the command line args.
-  optlist, args = getopt.getopt(sys.argv[1:], 'hf:t:', [ 'template=', 'far=', 'help'])
+  optlist, args = getopt.getopt(sys.argv[1:], 'ho:t:v', [ 'template=', 'output=', 'far=', 'help', 'debug', 'verbose', 'version'])
 
   # First pass through the options list.
   for o, a in optlist:
@@ -268,7 +203,7 @@ is a text file that allows more contol over the contents of the far.
   # Second pass through the options list. These can override the first pass.
   for o, a in optlist:
     print o, a
-    if o in ["-f", "--far"]:
+    if o in ["-o", "--far", "--output"]:
       far.FileName = a
 
   # Let's err on the side of caution and not let people blow away data 
