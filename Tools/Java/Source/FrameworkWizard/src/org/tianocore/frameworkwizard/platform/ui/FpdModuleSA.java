@@ -457,7 +457,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         instancesName += " ";
                     }
                     String msg = new ImproperInstanceException(lcd.className, instancesName, lcd.supArchs, lcd.supModTypes).getMessage();
-                    errorMsg.add(msg);
+                    if (!errorMsg.contains(msg)) {
+                        errorMsg.add(msg);
+                    }
                 }
             }
         }
