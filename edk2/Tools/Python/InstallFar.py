@@ -13,6 +13,7 @@ class Flags:
     self.verbose = False
     self.force = False
     self.reinstall = False
+    self.dir = ''
 
 class Database:
 
@@ -52,7 +53,7 @@ class Database:
         XmlElement(fpd, "/PlatformHeader/PlatformName")
 
     for farfile in  XmlList(self.dom, "/FrameworkDatabase/FarList/Filename"):
-      farGuid = farfile.getAttribute("FarGuid")
+      farGuid = Guid(farfile.getAttribute("FarGuid"))
       self.installedFars[farGuid] = XmlElementData(farfile)
 
     self.packageList = XmlNode(self.dom, "/FrameworkDatabase/PackageList")
@@ -131,8 +132,8 @@ def GetFpdGuidVersion(Dom, strip=0):
   gpath = ["PlatformSurfaceArea", "PlatformHeader", "GuidValue"]
   vpath = ["PlatformSurfaceArea", "PlatformHeader", "Version"]
 
-  return string.lower(XmlElement(Dom, "/".join(gpath[strip:]))), \
-         XmlElement(Dom, "/".join(vpath[strip:]))
+  return Guid(XmlElement(Dom, "/".join(gpath[strip:]))), \
+              XmlElement(Dom, "/".join(vpath[strip:]))
 
 def GetSpdGuidVersion(Dom, strip=0):
 
@@ -141,8 +142,8 @@ def GetSpdGuidVersion(Dom, strip=0):
   gpath = ["PackageSurfaceArea", "SpdHeader", "GuidValue"]
   vpath = ["PackageSurfaceArea", "SpdHeader", "Version"]
 
-  return string.lower(XmlElement(Dom, "/".join(gpath[strip:]))), \
-         XmlElement(Dom, "/".join(vpath[strip:]))
+  return Guid(XmlElement(Dom, "/".join(gpath[strip:]))), \
+              XmlElement(Dom, "/".join(vpath[strip:]))
 
 def InstallFar(farfile, workspaceLocation=""):
 
@@ -189,7 +190,7 @@ def InstallFar(farfile, workspaceLocation=""):
       msa = XmlParseString(far.read(msafilePath))
 
       for package in XmlList(msa, "/ModuleSurfaceArea/PackageDependencies/Package"):
-        guid = package.getAttribute("PackageGuid")
+        guid = Guid(package.getAttribute("PackageGuid"))
         version = package.getAttribute("PackageVersion")
 
         # Does anyone provide this package?
@@ -215,8 +216,8 @@ def InstallFar(farfile, workspaceLocation=""):
     # Go through the dependencies
     for dependency in XmlList(fpd, "/PlatformSurfaceArea/FrameworkModules/ModuleSA") + \
                       XmlList(fpd, "/PlatformSurfaceArea/FrameworkModules/ModuleSA/Libraries/Instance"):
-      packagesNeeded.add((string.lower(dependency.getAttribute("PackageGuid")), 
-                                       dependency.getAttribute("PackageVersion")))
+      packagesNeeded.add((Guid(dependency.getAttribute("PackageGuid")), 
+                               dependency.getAttribute("PackageVersion")))
 
     # Let's see if all the packages are in the workspace 
     for guid, version in packagesNeeded:
@@ -228,7 +229,7 @@ def InstallFar(farfile, workspaceLocation=""):
         installError = True
 
   # Check the fars
-  thisFarGuid = string.lower(XmlElement(manifest, "/FrameworkArchiveManifest/FarHeader/GuidValue"))
+  thisFarGuid = Guid(XmlElement(manifest, "/FrameworkArchiveManifest/FarHeader/GuidValue"))
   if fdb.HasFar(thisFarGuid):
     if not flags.reinstall:
       print "Error: There is a far with this guid already installed."
@@ -301,7 +302,7 @@ if __name__ == '__main__':
   flags = Flags()
 
   # Process the command line args.
-  optlist, args = getopt.getopt(sys.argv[1:], '?hvf', ['help', 'verbose', 'force', 'reinstall'])
+  optlist, args = getopt.getopt(sys.argv[1:], '?hvfd:', ['directory=', 'help', 'verbose', 'force', 'reinstall'])
 
   # First pass through the options list.
   for o, a in optlist:
@@ -314,6 +315,8 @@ if __name__ == '__main__':
       optlist.remove((o,a))
     if o in ["-v", "--verbose"]:
       flags.verbose = True
+    if o in ["-d", "--directory"]:
+      flags.dir = a
     if o in ["-f", "--force"]:
       flags.force = True
     if o in ["--reinstall"]:

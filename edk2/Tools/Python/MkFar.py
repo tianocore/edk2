@@ -25,9 +25,16 @@ class Far:
 far = Far()
 """The far object is constructed from the template file the user passed in."""
 
+def AddToZip(zip, infile):
+
+  """Add a file to a zip file, provided it is not already there."""
+
+  if not infile in zip.namelist():
+    zip.write(inWorkspace(infile), infile)
+
 def parseMsa(msaFile, spdDir):
 
-  """ XXX Parse an msa file and return a list of all the files that this msa
+  """Parse an msa file and return a list of all the files that this msa
   includes."""
 
   filelist = [msaFile]
@@ -39,7 +46,7 @@ def parseMsa(msaFile, spdDir):
   xmlPaths = [
     "/ModuleSurfaceArea/SourceFiles/Filename",
     "/ModuleSurfaceArea/NonProcessedFiles/Filename" ]
-    
+
   for xmlPath in xmlPaths:
     for f in XmlList(msa, xmlPath):
       filelist.append(str(os.path.join(msaDir, XmlElementData(f))))
@@ -57,10 +64,16 @@ def parseSpd(spdFile):
 
   spd = xml.dom.minidom.parse(inWorkspace(spdFile))
 
+  # We are currently ignoring these hints.
+  readonly = XmlElement(spd, "/PackageSurfaceArea/PackageDefinitions/ReadOnly") != "false"
+  repackage = XmlElement(spd, "/PackageSurfaceArea/PackageDefinitions/RePackage") != "false"
+
   xmlPaths = [
     "/PackageSurfaceArea/LibraryClassDeclarations/LibraryClass/IncludeHeader",
-    "/PackageSurfaceArea/IndustryStdIncludes/IndustryStdHeader/IncludeHeader",
-    "/PackageSurfaceArea/PackageHeaders/IncludePkgHeader" ]
+    "/PackageSurfaceArea/IndustryStdIncludes/IndustryStdHeader/IncludeHeader" ]
+
+    # These are covered by the Industry Standard Includes.
+    # "/PackageSurfaceArea/PackageHeaders/IncludePkgHeader"
 
   for xmlPath in xmlPaths:
     for f in XmlList(spd, xmlPath):
@@ -87,7 +100,7 @@ def makeFarHeader(doc):
 
   """Create a dom tree for the Far Header. It will use information from the
   template file passed on the command line, if present."""
-  
+ 
   header = XmlAppendChildElement(doc.documentElement, "FarHeader")
 
   XmlAppendChildElement(header, "FarName", far.FarName)
@@ -125,7 +138,10 @@ def makeFar(files, farname):
   contents = XmlAppendChildElement(top_element, "Contents")
   XmlAppendChildElement(top_element, "UserExtensions")
 
-  zip = zipfile.ZipFile(farname, "w")
+  try:
+    zip = zipfile.ZipFile(farname, "w", zipfile.ZIP_DEFLATED)
+  except:
+    zip = zipfile.ZipFile(farname, "w", zipfile.ZIP_STORED)
   for infile in set(files):
     if not os.path.exists(inWorkspace(infile)):
       print "Error: Non-existent file '%s'." % infile
@@ -139,7 +155,7 @@ def makeFar(files, farname):
 
       package = XmlAppendChildElement(packList, "FarPackage")
       XmlAppendChildElement(package, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
-      zip.write(inWorkspace(infile), infile)
+      AddToZip(zip, infile)
       XmlAppendChildElement(package, "GuidValue", spdGuid)
       XmlAppendChildElement(package, "Version", spdVersion)
       XmlAppendChildElement(package, "DefaultPath", spdDir)
@@ -149,17 +165,17 @@ def makeFar(files, farname):
 
       for spdfile in filelist:
         XmlAppendChildElement(packContents, "FarFilename", lean(spdfile), {"Md5Sum": Md5(inWorkspace(os.path.join(spdDir, spdfile)))})
-        zip.write(inWorkspace(os.path.join(spdDir, spdfile)), os.path.join(spdDir,spdfile))
+        AddToZip(zip, os.path.join(spdDir,spdfile))
 
     elif extension == ".fpd":
 
       platform = XmlAppendChildElement(platList, "FarPlatform")
       XmlAppendChildElement(platform, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
-      zip.write(inWorkspace(infile), infile)
+      AddToZip(zip, infile)
 
     else:
       XmlAppendChildElement(contents, "FarFilename", lean(infile), {"Md5Sum": Md5(inWorkspace(infile))})
-      zip.write(inWorkspace(infile), infile)
+      AddToZip(zip, infile)
 
   zip.writestr("FrameworkArchiveManifest.xml", man.toxml('UTF-8'))
   zip.close()
@@ -202,7 +218,6 @@ is a text file that allows more contol over the contents of the far.
 
   # Second pass through the options list. These can override the first pass.
   for o, a in optlist:
-    print o, a
     if o in ["-o", "--far", "--output"]:
       far.FileName = a
 

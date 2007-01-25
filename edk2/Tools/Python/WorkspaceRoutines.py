@@ -27,7 +27,7 @@ def genguid():
         getpass.getuser() + 
         str(time.time()) + 
         socket.gethostbyname(socket.gethostname())).hexdigest()
-  return "%s-%s-%s-%s-%s" % (g[0:8], g[8:12], g[12:16], g[16:20], g[20:])
+  return Guid("%s-%s-%s-%s-%s" % (g[0:8], g[8:12], g[12:16], g[16:20], g[20:]))
 
 def lean(path):
   """Lean the slashes forward"""
@@ -56,5 +56,6 @@ def Md5(filename):
 
   return sum
 
-
-
+def Guid(guidString):
+  """Convert the guid string into a canonical form suitable for comparison."""
+  return string.lower(guidString)
