@@ -83,7 +83,7 @@
   </xs:simpleType>
   <xs:simpleType name="FfsDataAlignmentType">
     <xs:restriction base="xs:nonNegativeInteger">
-      <xs:pattern value="[0-7]{1}"/>
+      <xs:pattern value="\s*[0-7]{1}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="FfsNameType">
@@ -91,7 +91,7 @@
       <xs:documentation xml:lang="en"> This defines what an FFS Name can consist of.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="[a-zA-Z][_\-a-zA-Z0-9]*(\.)?[a-zA-Z0-9]*"/>
+      <xs:pattern value="\s*[a-zA-Z][_\-a-zA-Z0-9]*(\.)?[a-zA-Z0-9]*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="FlashSize">
