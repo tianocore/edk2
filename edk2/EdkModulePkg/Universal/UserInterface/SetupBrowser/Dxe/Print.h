@@ -22,6 +22,8 @@ Abstract:
 #ifndef _PRINT_H_
 #define _PRINT_H_
 
+#include "Setup.h"
+
 #define LEFT_JUSTIFY  0x01
 #define PREFIX_SIGN   0x02
 #define PREFIX_BLANK  0x04

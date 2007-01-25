@@ -20,6 +20,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_rcvfilter_enable (
   SNP_DRIVER      *snp,
@@ -112,6 +113,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 pxe_rcvfilter_disable (
   SNP_DRIVER *snp,
@@ -191,6 +193,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 pxe_rcvfilter_read (
   SNP_DRIVER *snp

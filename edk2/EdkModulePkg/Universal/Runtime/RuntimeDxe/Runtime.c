@@ -91,6 +91,7 @@ EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
 //
 // Worker Functions
 //
+STATIC
 VOID
 RuntimeDriverCalculateEfiHdrCrc (
   IN OUT EFI_TABLE_HEADER  *Hdr
@@ -224,6 +225,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+STATIC
 EFI_STATUS
 RuntimeDriverConvertInternalPointer (
   IN OUT VOID   **ConvertAddress

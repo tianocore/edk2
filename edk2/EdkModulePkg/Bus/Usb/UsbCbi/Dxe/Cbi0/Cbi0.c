@@ -457,7 +457,6 @@ Cbi0DriverBindingStop (
   EFI_STATUS              Status;
   EFI_USB_ATAPI_PROTOCOL  *Cbi0AtapiProtocol;
   USB_CBI_DEVICE          *UsbCbiDev;
-  EFI_USB_IO_PROTOCOL     *UsbIo;
 
   //
   // Get our context back.
@@ -475,8 +474,6 @@ Cbi0DriverBindingStop (
   }
 
   UsbCbiDev = USB_CBI_DEVICE_FROM_THIS (Cbi0AtapiProtocol);
-
-  UsbIo     = UsbCbiDev->UsbIo;
 
   Cbi0ReportStatusCode (
     UsbCbiDev->DevicePath,
@@ -850,11 +847,9 @@ Cbi0MassStorageReset (
 --*/
 {
   EFI_STATUS          Status;
-  EFI_USB_IO_PROTOCOL *UsbIo;
   USB_CBI_DEVICE      *UsbCbiDev;
 
   UsbCbiDev = USB_CBI_DEVICE_FROM_THIS (This);
-  UsbIo     = UsbCbiDev->UsbIo;
 
   if (ExtendedVerification) {
     //

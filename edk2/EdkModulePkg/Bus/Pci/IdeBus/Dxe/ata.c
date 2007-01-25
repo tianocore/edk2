@@ -2073,7 +2073,7 @@ AtaCommandIssue (
   Lba1  = (UINT8) RShiftU64 (LbaAddress, 8);
   Lba2  = (UINT8) RShiftU64 (LbaAddress, 16);
   Lba3  = (UINT8) RShiftU64 (LbaAddress, 24);
-  Device |= Lba3;
+  Device = (UINT8) (Device | Lba3);
 
   //
   // Pass parameter into device register block

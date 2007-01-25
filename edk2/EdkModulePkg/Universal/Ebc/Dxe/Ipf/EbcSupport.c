@@ -76,6 +76,7 @@ PushU64 (
   *(UINT64 *) VmPtr->R[0] = Arg;
 }
 
+STATIC
 UINT64
 EbcInterpret (
   UINT64      Arg1,
@@ -468,14 +469,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] = LShiftU64 (Imm7b, 13)
-          | LShiftU64 (0x00, 20)   // vc
-          | LShiftU64 (Ic, 21)
-          | LShiftU64 (Imm5c, 22)
-          | LShiftU64 (Imm9d, 27)
-          | LShiftU64 (I, 36)
-          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] = LShiftU64 (Imm7b, 13);
+  Code[2] = Code[2] | LShiftU64 (0x00, 20);   // vc
+  Code[2] = Code[2] | LShiftU64 (Ic, 21);
+  Code[2] = Code[2] | LShiftU64 (Imm5c, 22);
+  Code[2] = Code[2] | LShiftU64 (Imm9d, 27);
+  Code[2] = Code[2] | LShiftU64 (I, 36);
+  Code[2] = Code[2] | LShiftU64 ((UINT64)MOVL_OPCODE, 37);
+  Code[2] = Code[2] | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -533,14 +534,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] = LShiftU64 (Imm7b, 13)
-          | LShiftU64 (0x00, 20)   // vc
-          | LShiftU64 (Ic, 21)
-          | LShiftU64 (Imm5c, 22)
-          | LShiftU64 (Imm9d, 27)
-          | LShiftU64 (I, 36)
-          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] = LShiftU64 (Imm7b, 13);
+  Code[2] = Code[2] | LShiftU64 (0x00, 20);   // vc
+  Code[2] = Code[2] | LShiftU64 (Ic, 21);
+  Code[2] = Code[2] | LShiftU64 (Imm5c, 22);
+  Code[2] = Code[2] | LShiftU64 (Imm9d, 27);
+  Code[2] = Code[2] | LShiftU64 (I, 36);
+  Code[2] = Code[2] | LShiftU64 ((UINT64)MOVL_OPCODE, 37);
+  Code[2] = Code[2] | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -604,14 +605,14 @@ Returns:
   //
   // Next is jumbled data, including opcode and rest of address
   //
-  Code[2] =   LShiftU64(Imm7b, 13)
-          | LShiftU64 (0x00, 20)   // vc
-          | LShiftU64 (Ic, 21)
-          | LShiftU64 (Imm5c, 22)
-          | LShiftU64 (Imm9d, 27)
-          | LShiftU64 (I, 36)
-          | LShiftU64 ((UINT64)MOVL_OPCODE, 37)
-          | LShiftU64 ((RegNum & 0x7F), 6);
+  Code[2] =   LShiftU64(Imm7b, 13);
+  Code[2] = Code[2] | LShiftU64 (0x00, 20);   // vc
+  Code[2] = Code[2] | LShiftU64 (Ic, 21);
+  Code[2] = Code[2] | LShiftU64 (Imm5c, 22);
+  Code[2] = Code[2] | LShiftU64 (Imm9d, 27);
+  Code[2] = Code[2] | LShiftU64 (I, 36);
+  Code[2] = Code[2] | LShiftU64 ((UINT64)MOVL_OPCODE, 37);
+  Code[2] = Code[2] | LShiftU64 ((RegNum & 0x7F), 6);
 
   WriteBundle ((VOID *) Ptr, 0x05, Code[0], Code[1], Code[2]);
 
@@ -722,8 +723,11 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Low64   = LShiftU64 (Slot1, 46) | LShiftU64 (Slot0, 5) | Template;
-  High64  = RShiftU64 (Slot1, 18) | LShiftU64 (Slot2, 23);
+  Low64   = LShiftU64 (Slot1, 46);
+  Low64   = Low64 | LShiftU64 (Slot0, 5) | Template;
+
+  High64  = RShiftU64 (Slot1, 18);
+  High64  = High64 | LShiftU64 (Slot2, 23);
 
   //
   // Now write it all out
@@ -816,14 +820,13 @@ Returns:
   CodeTwo5c = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 45) & 0x1F;
   CodeTwo9d = RShiftU64 (*((UINT64 *)CalleeAddr + 3), 50) & 0x1FF;
 
-  TargetEbcAddr = CodeTwo7b
-                  | LShiftU64 (CodeTwo9d, 7)
-                  | LShiftU64 (CodeTwo5c, 16)
-                  | LShiftU64 (CodeTwoIc, 21)
-                  | LShiftU64 (CodeOne18, 22)
-                  | LShiftU64 (CodeOne23, 40)
-                  | LShiftU64 (CodeTwoI, 63)
-                  ;
+  TargetEbcAddr = CodeTwo7b;
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeTwo9d, 7);
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeTwo5c, 16);
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeTwoIc, 21);
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeOne18, 22);
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeOne23, 40);
+  TargetEbcAddr = TargetEbcAddr | LShiftU64 (CodeTwoI, 63);
 
 Action:
   if (IsThunk == 1){

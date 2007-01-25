@@ -21,6 +21,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_fillheader (
   SNP_DRIVER      *snp,
@@ -191,6 +192,7 @@ Returns:
   }
 }
 
+STATIC
 EFI_STATUS
 pxe_transmit (
   SNP_DRIVER *snp,

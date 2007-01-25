@@ -40,6 +40,7 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
   @retval  !NULL  Point to buffer of record.
 
 **/
+STATIC
 DATAHUB_STATUSCODE_RECORD *
 AcquireRecordBuffer (
   VOID
@@ -92,6 +93,7 @@ AcquireRecordBuffer (
   @return   NULL    the FIFO of record is empty.
  
 **/
+STATIC
 DATAHUB_STATUSCODE_RECORD *
 RetrieveRecord (
   VOID
@@ -229,6 +231,7 @@ DataHubStatusCodeReportWorker (
   @param  Context     Context of the event.
 
 **/
+STATIC
 VOID
 EFIAPI
 LogDataHubEventCallBack (

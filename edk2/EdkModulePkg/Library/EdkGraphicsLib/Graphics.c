@@ -105,7 +105,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
-
+STATIC
 EFI_STATUS
 ConvertBmpToGopBlt (
   IN  VOID      *BmpImage,
@@ -664,6 +664,7 @@ Returns:
   UINT32            VerticalResolution;
   UINT32            ColorDepth;
   UINT32            RefreshRate;
+  UINTN             BufferGlyphWidth;
 
   GlyphStatus = 0;
 
@@ -743,6 +744,7 @@ Returns:
   //
   // Blt a character to the screen
   //
+  BufferGlyphWidth = GLYPH_WIDTH * StrLen (Buffer);
   if (GraphicsOutput != NULL) {
     Status = GraphicsOutput->Blt (
                         GraphicsOutput,
@@ -752,9 +754,9 @@ Returns:
                         0,
                         X,
                         Y,
-                        GLYPH_WIDTH * StrLen (Buffer),
+                        BufferGlyphWidth,
                         GLYPH_HEIGHT,
-                        GLYPH_WIDTH * StrLen (Buffer) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                        BufferGlyphWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                         );
   } else {
     Status = UgaDraw->Blt (
@@ -765,9 +767,9 @@ Returns:
                         0,
                         X,
                         Y,
-                        GLYPH_WIDTH * StrLen (Buffer),
+                        BufferGlyphWidth,
                         GLYPH_HEIGHT,
-                        GLYPH_WIDTH * StrLen (Buffer) * sizeof (EFI_UGA_PIXEL)
+                        BufferGlyphWidth * sizeof (EFI_UGA_PIXEL)
                         );
   }
 

@@ -531,6 +531,7 @@ ConSplitterTextOutConstructor (
   return Status;
 }
 
+STATIC
 EFI_STATUS
 ConSplitterSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
@@ -717,6 +718,7 @@ Returns:
           );
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStart (
@@ -1026,6 +1028,7 @@ Returns:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterStop (
@@ -1499,6 +1502,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+STATIC
 EFI_STATUS
 ConSplitterGrowMapTable (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
@@ -1575,6 +1579,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 ConSplitterAddOutputMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
@@ -1642,6 +1647,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 VOID
 ConSplitterGetIntersection (
   IN  INT32                           *TextOutModeMap,
@@ -1694,6 +1700,7 @@ ConSplitterGetIntersection (
   return ;
 }
 
+STATIC
 VOID
 ConSplitterSyncOutputMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
@@ -1712,7 +1719,6 @@ Returns:
 
 --*/
 {
-  INT32                         CurrentMode;
   INT32                         CurrentMaxMode;
   INT32                         Mode;
   INT32                         Index;
@@ -1726,7 +1732,6 @@ Returns:
   //
   // Must make sure that current mode won't change even if mode number changes
   //
-  CurrentMode       = Private->TextOutMode.Mode;
   CurrentMaxMode    = Private->TextOutMode.MaxMode;
   TextOutModeMap    = Private->TextOutModeMap;
   StepSize          = Private->TextOutListCount;
@@ -1771,6 +1776,7 @@ Returns:
   return ;
 }
 
+STATIC
 EFI_STATUS
 ConSplitterGetIntersectionBetweenConOutAndStrErr (
   VOID
@@ -1796,8 +1802,6 @@ Returns:
   UINTN                         Indexj;
   UINTN                         Rows;
   UINTN                         Columns;
-  INT32                         ConOutCurrentMode;
-  INT32                         StdErrCurrentMode;
   INT32                         ConOutMaxMode;
   INT32                         StdErrMaxMode;
   INT32                         Mode;
@@ -1808,8 +1812,6 @@ Returns:
   INT32                         *StdErrMapTable;
   TEXT_OUT_SPLITTER_QUERY_DATA  *ConOutQueryData;
   TEXT_OUT_SPLITTER_QUERY_DATA  *StdErrQueryData;
-  UINTN                         ConOutStepSize;
-  UINTN                         StdErrStepSize;
   BOOLEAN                       FoundTheSameTextOut;
   UINTN                         ConOutMapTableSize;
   UINTN                         StdErrMapTableSize;
@@ -1843,16 +1845,12 @@ Returns:
   //
   // Must make sure that current mode won't change even if mode number changes
   //
-  ConOutCurrentMode = mConOut.TextOutMode.Mode;
   ConOutMaxMode     = mConOut.TextOutMode.MaxMode;
   ConOutModeMap     = mConOut.TextOutModeMap;
-  ConOutStepSize    = mConOut.TextOutListCount;
   ConOutQueryData   = mConOut.TextOutQueryData;
 
-  StdErrCurrentMode = mStdErr.TextOutMode.Mode;
   StdErrMaxMode     = mStdErr.TextOutMode.MaxMode;
   StdErrModeMap     = mStdErr.TextOutModeMap;
-  StdErrStepSize    = mStdErr.TextOutListCount;
   StdErrQueryData   = mStdErr.TextOutQueryData;
 
   //
@@ -1933,6 +1931,7 @@ Returns:
 }
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+STATIC
 EFI_STATUS
 ConSplitterAddGraphicsOutputMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
@@ -2726,6 +2725,7 @@ ConSplitterSimplePointerReset (
   return ReturnStatus;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerPrivateGetState (

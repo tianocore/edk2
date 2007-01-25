@@ -182,6 +182,7 @@ ReportDispatcher (
   @return Value returned in SAL_RETURN_REGS
 
 --*/
+STATIC
 SAL_RETURN_REGS
 EFIAPI
 ReportEsalServiceEntry (

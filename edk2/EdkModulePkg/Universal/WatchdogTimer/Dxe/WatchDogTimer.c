@@ -55,6 +55,7 @@ EFI_EVENT                         mWatchdogTimerEvent;
 //
 // Worker Functions
 //
+STATIC
 VOID
 EFIAPI
 WatchdogTimerDriverExpires (

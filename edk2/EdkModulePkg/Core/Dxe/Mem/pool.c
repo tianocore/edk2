@@ -111,7 +111,7 @@ Returns:
   for (Type=0; Type < EfiMaxMemoryType; Type++) {
     PoolHead[Type].Signature  = 0;
     PoolHead[Type].Used       = 0;
-    PoolHead[Type].MemoryType = Type;
+    PoolHead[Type].MemoryType = (EFI_MEMORY_TYPE) Type;
     for (Index=0; Index < MAX_POOL_LIST; Index++) {
         InitializeListHead (&PoolHead[Type].FreeList[Index]);
     }
@@ -119,7 +119,7 @@ Returns:
   InitializeListHead (&PoolHeadList);
 }
 
-
+STATIC
 POOL *
 LookupPoolHead (
   IN EFI_MEMORY_TYPE  MemoryType

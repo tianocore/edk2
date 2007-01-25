@@ -19,59 +19,7 @@ Abstract:
 
 --*/
 
-//
-// Decompression algorithm begins here
-//
-#define BITBUFSIZ 32
-#define MAXMATCH  256
-#define THRESHOLD 3
-#define CODE_BIT  16
-#define BAD_TABLE - 1
-
-//
-// C: Char&Len Set; P: Position Set; T: exTra Set
-//
-#define NC      (0xff + MAXMATCH + 2 - THRESHOLD)
-#define CBIT    9
-#define MAXPBIT 5
-#define TBIT    5
-#define MAXNP   ((1U << MAXPBIT) - 1)
-#define NT      (CODE_BIT + 3)
-#if NT > MAXNP
-#define NPT NT
-#else
-#define NPT MAXNP
-#endif
-
-typedef struct {
-  UINT8   *mSrcBase;  // Starting address of compressed data
-  UINT8   *mDstBase;  // Starting address of decompressed data
-  UINT32  mOutBuf;
-  UINT32  mInBuf;
-
-  UINT16  mBitCount;
-  UINT32  mBitBuf;
-  UINT32  mSubBitBuf;
-  UINT16  mBlockSize;
-  UINT32  mCompSize;
-  UINT32  mOrigSize;
-
-  UINT16  mBadTableFlag;
-
-  UINT16  mLeft[2 * NC - 1];
-  UINT16  mRight[2 * NC - 1];
-  UINT8   mCLen[NC];
-  UINT8   mPTLen[NPT];
-  UINT16  mCTable[4096];
-  UINT16  mPTTable[256];
-
-  //
-  // The length of the field 'Position Set Code Length Array Size' in Block Header.
-  // For EFI 1.1 de/compression algorithm, mPBit = 4
-  // For Tiano de/compression algorithm, mPBit = 5
-  //
-  UINT8   mPBit;
-} SCRATCH_DATA;
+#include "BaseUefiTianoDecompressLibInternals.h"
 
 VOID
 FillBuf (
@@ -196,6 +144,8 @@ Returns:
   UINT16  Avail;
   UINT16  NextCode;
   UINT16  Mask;
+  UINT16  WordOfStart;
+  UINT16  WordOfCount;
 
   for (Index = 1; Index <= 16; Index++) {
     Count[Index] = 0;
@@ -208,7 +158,9 @@ Returns:
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
-    Start[Index + 1] = (UINT16) (Start[Index] + (Count[Index] << (16 - Index)));
+    WordOfStart = Start[Index];
+    WordOfCount = Count[Index];
+    Start[Index + 1] = (UINT16) (WordOfStart + (WordOfCount << (16 - Index)));
   }
 
   if (Start[17] != 0) {
@@ -610,7 +562,7 @@ Returns: (VOID)
   for (;;) {
     CharC = DecodeC (Sd);
     if (Sd->mBadTableFlag != 0) {
-      return ;
+      goto Done ;
     }
 
     if (CharC < 256) {
@@ -618,7 +570,7 @@ Returns: (VOID)
       // Process an Original character
       //
       if (Sd->mOutBuf >= Sd->mOrigSize) {
-        return ;
+        goto Done ;
       } else {
         Sd->mDstBase[Sd->mOutBuf++] = (UINT8) CharC;
       }
@@ -637,7 +589,7 @@ Returns: (VOID)
       while ((INT16) (BytesRemain) >= 0) {
         Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
         if (Sd->mOutBuf >= Sd->mOrigSize) {
-          return ;
+          goto Done ;
         }
 
         BytesRemain--;
@@ -645,6 +597,7 @@ Returns: (VOID)
     }
   }
 
+Done:
   return ;
 }
 

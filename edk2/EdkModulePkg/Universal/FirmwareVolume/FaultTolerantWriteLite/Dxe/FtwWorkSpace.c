@@ -193,7 +193,7 @@ Notes:
   }
 
   State ^= FTW_POLARITY_REVERT;
-  State |= NewBit;
+  State = (UINT8) (State | NewBit);
   State ^= FTW_POLARITY_REVERT;
 
   //

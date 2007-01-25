@@ -268,9 +268,9 @@ TerminalConInCheckForKey (
                         Mode->BaudRate,
                         Mode->ReceiveFifoDepth,
                         (UINT32) SerialInTimeOut,
-                        Mode->Parity,
+                        (EFI_PARITY_TYPE) (Mode->Parity),
                         (UINT8) Mode->DataBits,
-                        Mode->StopBits
+                        (EFI_STOP_BITS_TYPE) (Mode->StopBits)
                         );
 
     if (EFI_ERROR (Status)) {
@@ -681,6 +681,7 @@ UnicodeFiFoGetKeyCount (
   }
 }
 
+STATIC
 VOID
 UnicodeToEfiKeyFlushState (
   IN  TERMINAL_DEV    *TerminalDevice
@@ -1162,6 +1163,7 @@ ESC R ESC r ESC R = Reset System
                       TimerRelative,
                       (UINT64)20000000
                       );
+      ASSERT_EFI_ERROR (Status);
       continue;
     }
 

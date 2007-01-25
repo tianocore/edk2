@@ -142,7 +142,6 @@ CirrusLogic5430ComponentNameGetControllerName (
 {
   EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
   EFI_STATUS                      Status;
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
   EFI_PCI_IO_PROTOCOL             *PciIoProtocol;
 
   //
@@ -196,8 +195,6 @@ CirrusLogic5430ComponentNameGetControllerName (
   //
   // Get the Cirrus Logic 5430's Device structure
   //
-  Private = CIRRUS_LOGIC_5430_PRIVATE_DATA_FROM_UGA_DRAW_THIS (UgaDraw);
-
   return LookupUnicodeString (
           Language,
           gCirrusLogic5430ComponentName.SupportedLanguages,

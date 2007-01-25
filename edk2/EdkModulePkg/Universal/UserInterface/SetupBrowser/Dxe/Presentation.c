@@ -348,6 +348,7 @@ DisplayPageFrame (
 | ^"=Move Highlight          <Spacebar> Toggles Checkbox   Esc=Discard Changes |
 +------------------------------------------------------------------------------+
 */
+STATIC
 UI_MENU_OPTION *
 DisplayForm (
   OUT UI_MENU_OPTION              *Selection,
@@ -796,6 +797,7 @@ Returns:
 
 }
 
+STATIC
 VOID
 ExtractFormHandle (
   IN  UI_MENU_OPTION              *Selection,
@@ -851,6 +853,7 @@ ExtractFormHandle (
   return ;
 }
 
+STATIC
 EFI_STATUS
 UpdateNewTagData (
   IN  UINT8                                     *FormData,
@@ -1092,6 +1095,7 @@ UpdateNewTagData (
   return Status;
 }
 
+STATIC
 VOID
 ExtractDynamicFormHandle (
   IN  UI_MENU_OPTION              *Selection,

@@ -211,7 +211,7 @@ OptionsStrucInit (
   CopyMem (DHCPOpStart.DhcpClassIdentifier.Data.UndiMajor, "yyy", sizeof ("yyy"));
   CopyMem (DHCPOpStart.DhcpClassIdentifier.Data.UndiMinor, "xxx", sizeof ("xxx"));
   DHCPOpStart.End[0] = OP_END;
-};
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -399,6 +399,7 @@ STATIC UINT8  OurDhcpOptions[MAX_OUR_OPT] = {
 #pragma pack()
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 CHAR8 *
 PxeBcLibGetSmbiosString (
   IN  SMBIOS_STRUCTURE_POINTER  *Smbios,
@@ -855,6 +856,7 @@ DecodeOptions (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 VOID
 Parse (
   DHCP_RECEIVE_BUFFER *RxBufPtr,
@@ -958,6 +960,7 @@ CopyParse (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 BOOLEAN
 AckEdit (
   DHCP_RECEIVE_BUFFER *DhcpRxBuf
@@ -984,6 +987,7 @@ AckEdit (
 //
 // if a discover type packet, make sure all required fields are present
 //
+STATIC
 BOOLEAN
 DHCPOfferAckEdit (
   DHCP_RECEIVE_BUFFER *DhcpRxBuf
@@ -1126,6 +1130,7 @@ DHCPOfferAckEdit (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 BOOLEAN
 DHCPAckEdit (
   DHCP_RECEIVE_BUFFER *RxBufPtr
@@ -1139,6 +1144,7 @@ DHCPAckEdit (
 //
 // get an offer/ack
 //
+STATIC
 EFI_STATUS
 GetOfferAck (
   PXE_BASECODE_DEVICE          *Private,
@@ -1249,6 +1255,7 @@ Returns:
 //
 // get DHCPOFFER's
 //
+STATIC
 EFI_STATUS
 GetOffers (
   PXE_BASECODE_DEVICE *Private
@@ -2146,6 +2153,7 @@ DoDhcpDora (
 //
 // determine if the server ip is in the ip list
 //
+STATIC
 BOOLEAN
 InServerList (
   EFI_IP_ADDRESS    *ServerIpPtr,
@@ -2172,6 +2180,7 @@ InServerList (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 BOOLEAN
 ExtractBootServerList (
   UINT16            Type,
@@ -2209,6 +2218,7 @@ ExtractBootServerList (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 VOID
 FreeMem (
   PXE_BASECODE_DEVICE *Private
@@ -2226,6 +2236,7 @@ FreeMem (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 BOOLEAN
 GetMem (
   PXE_BASECODE_DEVICE *Private
@@ -2443,6 +2454,7 @@ VerifyCredentialOption (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 EFI_STATUS
 DoDiscover (
   PXE_BASECODE_DEVICE *Private,
@@ -3210,13 +3222,11 @@ Returns:
 {
   EFI_PXE_BASE_CODE_MODE  *PxebcMode;
   EFI_STATUS              Status;
-  EFI_STATUS              StatCode;
   PXE_BASECODE_DEVICE     *Private;
 
   //
   // Lock the instance data and make sure started
   //
-  StatCode = EFI_SUCCESS;
 
   if (This == NULL) {
     DEBUG ((EFI_D_ERROR, "BC *This pointer == NULL"));

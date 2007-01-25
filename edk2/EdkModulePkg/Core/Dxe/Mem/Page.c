@@ -308,7 +308,7 @@ Returns:
     //
     // Make sure the memory type in the gMemoryTypeInformation[] array is valid
     //
-    Type = gMemoryTypeInformation[Index].Type;
+    Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[Index].Type);
     if (Type < 0 || Type > EfiMaxMemoryType) {
       continue;
     }
@@ -333,7 +333,7 @@ Returns:
           //
           // Make sure the memory type in the gMemoryTypeInformation[] array is valid
           //
-          Type = gMemoryTypeInformation[FreeIndex].Type;
+          Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[FreeIndex].Type);
           if (Type < 0 || Type > EfiMaxMemoryType) {
             continue;
           }
@@ -376,7 +376,7 @@ Returns:
     //
     // Make sure the memory type in the gMemoryTypeInformation[] array is valid
     //
-    Type = gMemoryTypeInformation[Index].Type;
+    Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[Index].Type);
     if (Type < 0 || Type > EfiMaxMemoryType) {
       continue;
     }
@@ -394,7 +394,7 @@ Returns:
   // If the number of pages reserved for a memory type is 0, then all allocations for that type
   // should be in the default range.
   //
-  for (Type = 0; Type < EfiMaxMemoryType; Type++) {
+  for (Type = (EFI_MEMORY_TYPE) 0; Type < EfiMaxMemoryType; Type++) {
     for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
       if (Type == (EFI_MEMORY_TYPE)gMemoryTypeInformation[Index].Type) {
         mMemoryTypeStatistics[Type].InformationIndex = Index;
@@ -1457,7 +1457,6 @@ Returns:
 
 --*/
 {
-  EFI_STATUS        Status;
   UINT64            Start;
 
   //
@@ -1471,7 +1470,7 @@ Returns:
   if (Start == 0) {
     DEBUG ((EFI_D_ERROR | EFI_D_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", NumberOfPages));
   } else {
-    Status = CoreConvertPages (Start, NumberOfPages, PoolType);
+    CoreConvertPages (Start, NumberOfPages, PoolType);
   }
 
   return (VOID *)(UINTN)Start;

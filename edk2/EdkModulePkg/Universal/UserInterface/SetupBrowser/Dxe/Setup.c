@@ -144,6 +144,7 @@ InstallPrint (
   VOID
   );
 
+STATIC
 EFI_STATUS
 EFIAPI
 SendForm (
@@ -189,7 +190,6 @@ Returns:
 
 --*/
 {
-  EFI_FORM_CONFIGURATION_DATA *FormData;
   EFI_FORM_CALLBACK_PROTOCOL  *FormCallback;
   EFI_FILE_FORM_TAGS          *FileFormTagsHead;
   UI_MENU_OPTION              *Selection;
@@ -279,7 +279,6 @@ Returns:
       ASSERT (gPreviousValue != NULL);
     }
 
-    FormData      = EFI_FORM_DATA_FROM_THIS (This);
     Callback      = FALSE;
     FormCallback  = NULL;
 
@@ -710,6 +709,7 @@ GetTagCount (
   (*NumberOfTags)++;
 }
 
+STATIC
 VOID
 AddNextInconsistentTag (
   IN OUT  EFI_INCONSISTENCY_DATA  **InconsistentTagsPtr
@@ -1643,6 +1643,7 @@ Returns:
   return Buffer;
 }
 
+STATIC
 EFI_STATUS
 PopulateHomePage (
   IN UINTN                                    NumberOfIfrImages,

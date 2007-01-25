@@ -294,4 +294,26 @@ Returns:
 --*/
 ;
 
+VOID
+CommonHandler (
+  IN EFI_EXCEPTION_TYPE ExceptionType,
+  IN EFI_SYSTEM_CONTEXT Context
+  )
+/*++
+
+Routine Description:
+  C routine that is called for all registered exceptions.  This is the main
+  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
+
+Arguments:
+  ExceptionType - Exception Type
+  Context       - System Context
+
+Returns:
+
+  Nothing
+  
+--*/
+;
+
 #endif

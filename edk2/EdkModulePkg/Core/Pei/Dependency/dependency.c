@@ -125,12 +125,10 @@ Returns:
                                   well-formed Grammar.
 --*/
 {
-  EFI_STATUS                     Status;
   DEPENDENCY_EXPRESSION_OPERAND  *Iterator;
   EVAL_STACK_ENTRY               *StackPtr;
   EVAL_STACK_ENTRY               EvalStack[MAX_GRAMMAR_SIZE];
 
-  Status    = EFI_SUCCESS;
   Iterator  = DependencyExpression;
   *Runnable = FALSE;
 

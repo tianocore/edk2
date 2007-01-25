@@ -14,6 +14,8 @@
 
 **/
 
+#include "PeiStatusCode.h"
+
 /**
   Create one memory status code GUID'ed HOB, use PacketIndex 
   to identify the packet.
@@ -23,6 +25,7 @@
   @return                 Always return pointer of memory status code packet.
 
 **/
+STATIC
 MEMORY_STATUSCODE_PACKET_HEADER *
 CreateMemoryStatusCodePacket (
   UINT16 PacketIndex

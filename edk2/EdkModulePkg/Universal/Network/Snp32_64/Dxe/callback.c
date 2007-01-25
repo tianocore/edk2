@@ -182,19 +182,19 @@ Returns:
 
   switch (NumBytes) {
   case 2:
-    Width = 1;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 1;
     break;
 
   case 4:
-    Width = 2;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 2;
     break;
 
   case 8:
-    Width = 3;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 3;
     break;
 
   default:
-    Width = 0;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 0;
   }
 
   switch (ReadOrWrite) {
@@ -344,18 +344,18 @@ Returns:
 
   snp   = (SNP_DRIVER *) (UINTN) UniqueId;
 
-  Width = 0;
+  Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 0;
   switch (NumBytes) {
   case 2:
-    Width = 1;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 1;
     break;
 
   case 4:
-    Width = 2;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 2;
     break;
 
   case 8:
-    Width = 3;
+    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 3;
     break;
   }
 

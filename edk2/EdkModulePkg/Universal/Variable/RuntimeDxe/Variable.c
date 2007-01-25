@@ -27,6 +27,7 @@ Revision History
 //
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
+STATIC
 UINT32
 EFIAPI
 ArrayLength (
@@ -63,6 +64,7 @@ Returns:
   return (Count * 2) + 2;
 }
 
+STATIC
 BOOLEAN
 EFIAPI
 IsValidVariableHeader (
@@ -93,6 +95,7 @@ Returns:
   return TRUE;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 UpdateVariableStore (
@@ -242,6 +245,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 VARIABLE_STORE_STATUS
 EFIAPI
 GetVariableStoreStatus (
@@ -283,6 +287,7 @@ Returns:
   }
 }
 
+STATIC
 UINT8 *
 EFIAPI
 GetVariableDataPtr (
@@ -310,6 +315,7 @@ Returns:
   return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
 }
 
+STATIC
 VARIABLE_HEADER *
 EFIAPI
 GetNextVariablePtr (
@@ -340,6 +346,7 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
 }
 
+STATIC
 VARIABLE_HEADER *
 EFIAPI
 GetEndPointer (
@@ -367,6 +374,7 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) VarStoreHeader + VarStoreHeader->Size);
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 Reclaim (
@@ -487,6 +495,7 @@ Returns:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 FindVariable (
@@ -707,7 +716,7 @@ Returns:
         Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (Global->VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
         Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase));
       } else {
-        return EFI_NOT_FOUND;
+        goto Error;
       }
 
       Variable.CurrPtr = Variable.StartPtr;
@@ -745,6 +754,7 @@ Returns:
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
 
+Error:
   return EFI_NOT_FOUND;
 }
 

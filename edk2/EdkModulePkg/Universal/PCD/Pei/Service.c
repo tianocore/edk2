@@ -154,6 +154,7 @@ BuildPcdDatabase (
   @retval EFI_SUCCESS         Operation successful.
   @retval EFI_NOT_FOUND         Variablel not found.
 --*/
+STATIC
 EFI_STATUS
 GetHiiVariable (
   IN  CONST EFI_GUID      *VariableGuid,
@@ -205,7 +206,7 @@ GetHiiVariable (
 
 }
 
-
+STATIC
 UINT32
 GetSkuEnabledTokenNumber (
   UINT32 LocalTokenNumber,
@@ -261,7 +262,7 @@ GetSkuEnabledTokenNumber (
 
 
 
-
+STATIC
 VOID
 InvokeCallbackOnSet (
   UINTN             ExTokenNumber,
@@ -651,7 +652,7 @@ GetPcdDatabase (
 }
 
 
-
+STATIC
 SKU_ID *
 GetSkuIdArray (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -672,7 +673,7 @@ GetSkuIdArray (
 }
 
 
-
+STATIC
 UINTN
 GetSizeTableIndex (
   IN    UINTN             LocalTokenNumberTableIdx,

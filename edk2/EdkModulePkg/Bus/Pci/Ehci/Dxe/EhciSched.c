@@ -2547,7 +2547,7 @@ Returns:
 
   MatchPtr        = NULL;
   QhHwPtr         = NULL;
-  EndPointNum     = EndPointAddress & 0x0f;
+  EndPointNum     = (UINT8) (EndPointAddress & 0x0f);
   AsyncRequestPtr = HcDev->AsyncRequestList;
 
   //
@@ -2916,13 +2916,11 @@ Returns:
   EFI_STATUS  Status;
   UINTN       ErrQtdPos;
   UINTN       Delay;
-  UINTN       RequireLen;
   BOOLEAN     Finished;
 
   Status          = EFI_SUCCESS;
   ErrQtdPos       = 0;
   *TransferResult = EFI_USB_NOERROR;
-  RequireLen      = *ActualLen;
   *ActualLen      = 0;
   Finished        = FALSE;
 

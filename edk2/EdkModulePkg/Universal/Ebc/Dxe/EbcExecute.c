@@ -1098,7 +1098,6 @@ Returns:
   UINT8       Operands;
   VOID        *EbcEntryPoint;
   VOID        *Thunk;
-  EFI_STATUS  Status;
   UINT64      U64EbcEntryPoint;
   INT32       Offset;
 
@@ -1162,7 +1161,7 @@ Returns:
     //
     // Now create a new thunk
     //
-    Status = EbcCreateThunks (VmPtr->ImageHandle, EbcEntryPoint, &Thunk, 0);
+    EbcCreateThunks (VmPtr->ImageHandle, EbcEntryPoint, &Thunk, 0);
 
     //
     // Finally replace the EBC entry point memory with the thunk address

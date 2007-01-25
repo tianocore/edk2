@@ -215,7 +215,6 @@ ReadPassword (
   )
 {
   EFI_STATUS                  Status;
-  UINTN                       PasswordSize;
   UINTN                       ScreenSize;
   CHAR16                      NullCharacter;
   CHAR16                      Space[2];
@@ -234,12 +233,12 @@ ReadPassword (
   UINTN                       DimensionsWidth;
   UINTN                       DimensionsHeight;
   EFI_IFR_DATA_ENTRY          *DataEntry;
+  UINTN                       WidthOfString;
 
   DimensionsWidth       = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
   DimensionsHeight      = gScreenDimensions.BottomRow - gScreenDimensions.TopRow;
 
   VariableDefinition    = NULL;
-  PasswordSize          = 0;
   NullCharacter         = CHAR_NULL;
   Space[0]              = L' ';
   Space[1]              = CHAR_NULL;
@@ -309,7 +308,8 @@ Error:
         // Upon error, we will likely receive a string to print out
         // Display error popup
         //
-        ScreenSize = EFI_MAX(GetStringWidth (Packet->String), GetStringWidth (gPressEnter)) / 2;
+        WidthOfString = GetStringWidth (Packet->String);
+        ScreenSize = EFI_MAX(WidthOfString, GetStringWidth (gPressEnter)) / 2;
         CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
         gBS->FreePool (Packet);
 
@@ -318,9 +318,8 @@ Error:
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
       }
 
-      gBS->FreePool (TempString);
-      gBS->FreePool (TempString2);
-      return EFI_NOT_READY;
+      Status = EFI_NOT_READY;
+      goto Done;
     }
   }
 
@@ -418,10 +417,12 @@ Error:
           if (Confirmation) {
             if (EFI_ERROR (Status)) {
               if (Packet->String == NULL) {
-                ScreenSize = EFI_MAX (GetStringWidth (gConfirmError), GetStringWidth (gPressEnter)) / 2;
+                WidthOfString = GetStringWidth (gConfirmError);
+                ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, gConfirmError, gPressEnter, &NullCharacter);
               } else {
-                ScreenSize = EFI_MAX (GetStringWidth (Packet->String), GetStringWidth (gPressEnter)) / 2;
+                WidthOfString = GetStringWidth (Packet->String);
+                ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
                 gBS->FreePool (Packet);
               }
@@ -431,15 +432,13 @@ Error:
                 Status = WaitForKeyStroke (&Key);
 
                 if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-                  gBS->FreePool (TempString);
-                  gBS->FreePool (TempString2);
-                  return EFI_NOT_READY;
+                  Status = EFI_NOT_READY;
+                  goto Done;
                 }
               } while (1);
             } else {
-              gBS->FreePool (TempString);
-              gBS->FreePool (TempString2);
-              return EFI_NOT_READY;
+                Status = EFI_NOT_READY;
+                goto Done;
             }
           } else {
             //
@@ -451,9 +450,8 @@ Error:
             }
 
             if (PromptForPassword && EFI_ERROR (Status)) {
-              gBS->FreePool (TempString);
-              gBS->FreePool (TempString2);
-              return EFI_DEVICE_ERROR;
+              Status = EFI_DEVICE_ERROR;
+              goto Done;
             }
           }
         }
@@ -464,19 +462,18 @@ Error:
           // Otherwise, kick and error box, and return an error
           //
           if (StrCmp (TempString, TempString2) == 0) {
-            gBS->FreePool (TempString);
-            gBS->FreePool (TempString2);
-            return EFI_SUCCESS;
+            Status = EFI_SUCCESS;
+            goto Done;
           } else {
-            ScreenSize = EFI_MAX (GetStringWidth (gConfirmError), GetStringWidth (gPressEnter)) / 2;
+            WidthOfString = GetStringWidth (gConfirmError);
+            ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
             CreatePopUp (ScreenSize, 4, &NullCharacter, gConfirmError, gPressEnter, &NullCharacter);
             StringPtr[0] = CHAR_NULL;
             do {
               Status = WaitForKeyStroke (&Key);
               if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-                gBS->FreePool (TempString);
-                gBS->FreePool (TempString2);
-                return EFI_DEVICE_ERROR;
+                Status = EFI_DEVICE_ERROR;
+                goto Done;
               }
             } while (1);
           }
@@ -486,9 +483,8 @@ Error:
           //
           // I was asked for a password, return it back in StringPtr
           //
-          gBS->FreePool (TempString);
-          gBS->FreePool (TempString2);
-          return EFI_SUCCESS;
+          Status = EFI_SUCCESS;
+          goto Done;
         } else {
           //
           // If the two passwords were not the same kick an error popup
@@ -575,6 +571,8 @@ Error:
     } while (!ConfirmationComplete);
 
   } while (1);
+
+Done:
   gBS->FreePool (TempString);
   gBS->FreePool (TempString2);
   return Status;
@@ -655,7 +653,6 @@ Returns:
   CHAR16                  NullCharacter;
   CHAR16                  *StringPtr;
   EFI_FILE_FORM_TAGS      *FileFormTags;
-  EFI_STATUS              Status;
   EFI_VARIABLE_DEFINITION *VariableDefinition;
   UINTN                   Loop;
 
@@ -689,7 +686,7 @@ Returns:
       goto TheKey2;
     }
 
-    Status = WaitForKeyStroke (&Key);
+    WaitForKeyStroke (&Key);
 
 TheKey2:
     switch (Key.UnicodeChar) {
@@ -879,7 +876,7 @@ EnterCarriageReturn:
           CreatePopUp (GetStringWidth (StringPtr) / 2, 3, &NullCharacter, StringPtr, &NullCharacter);
 
           do {
-            Status = WaitForKeyStroke (&Key);
+            WaitForKeyStroke (&Key);
 
             switch (Key.UnicodeChar) {
 
@@ -985,7 +982,6 @@ GetSelectionInputPopUp (
   OUT UINT16                      *KeyValue
   )
 {
-  EFI_STATUS    Status;
   EFI_INPUT_KEY Key;
   UINTN         Index;
   UINTN         TempIndex;
@@ -1005,7 +1001,6 @@ GetSelectionInputPopUp (
   UINTN         MenuLinesInView;
   UINTN         PopUpWidth;
   CHAR16        Character;
-  UINTN         FirstOption;
   BOOLEAN       FirstOptionFoundFlag;
   INT32         SavedAttribute;
   EFI_TAG       TagBackup;
@@ -1017,10 +1012,8 @@ GetSelectionInputPopUp (
   BOOLEAN       ShowDownArrow;
   BOOLEAN       ShowUpArrow;
   UINTN         DimensionsWidth;
-  UINTN         DimensionsHeight;
 
   DimensionsWidth   = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
-  DimensionsHeight  = gScreenDimensions.BottomRow - gScreenDimensions.TopRow;
 
   TempValue         = 0;
   TempIndex         = 0;
@@ -1050,7 +1043,6 @@ GetSelectionInputPopUp (
   Count                 = 0;
   PopUpWidth            = 0;
 
-  FirstOption           = MenuOption->TagIndex;
   FirstOptionFoundFlag  = FALSE;
 
   StringPtr             = AllocateZeroPool ((gOptionBlockWidth + 1) * 2);
@@ -1066,7 +1058,6 @@ GetSelectionInputPopUp (
     if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP &&
         !MenuOption->Tags[Index].Suppress) {
       if (!FirstOptionFoundFlag) {
-        FirstOption           = Index;
         FirstOptionFoundFlag  = TRUE;
       }
 
@@ -1309,7 +1300,7 @@ GetSelectionInputPopUp (
       KeyInitialized = TRUE;
     }
 
-    Status = WaitForKeyStroke (&Key);
+    WaitForKeyStroke (&Key);
 
 TheKey:
     switch (Key.UnicodeChar) {
@@ -1553,14 +1544,14 @@ TheKey:
         *Value = TempValue;
       }
 
-      gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-      return EFI_SUCCESS;
+      goto Done;
 
     default:
       break;
     }
   } while (1);
 
+Done:
   gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
   return EFI_SUCCESS;
 }

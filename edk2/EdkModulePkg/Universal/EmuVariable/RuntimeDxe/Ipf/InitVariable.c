@@ -26,6 +26,7 @@ Revision History
 //
 extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
 
+STATIC
 SAL_RETURN_REGS
 EsalVariableCommonEntry (
   IN  UINT64                                      FunctionId,

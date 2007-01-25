@@ -51,6 +51,7 @@ EFI_GUID    mEfiMtcGuid = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0,
 //
 // Worker functions
 //
+STATIC
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverGetNextMonotonicCount (
@@ -132,6 +133,7 @@ Returns:
   @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverGetNextHighMonotonicCount (
@@ -181,6 +183,7 @@ Returns:
 
 }
 
+STATIC
 VOID
 EFIAPI
 EfiMtcEventHandler (

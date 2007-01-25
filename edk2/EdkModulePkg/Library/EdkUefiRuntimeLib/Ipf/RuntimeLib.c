@@ -52,6 +52,7 @@ Returns:
   }
 }
 
+STATIC
 VOID
 EFIAPI
 RuntimeLibVirtualNotifyEvent (

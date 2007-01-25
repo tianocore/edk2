@@ -68,6 +68,7 @@ Returns:
 
 }
 
+STATIC
 VARIABLE_HEADER *
 GetNextVariablePtr (
   IN VARIABLE_HEADER  *Variable
@@ -90,6 +91,7 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) GET_VARIABLE_DATA_PTR (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
 }
 
+STATIC
 BOOLEAN
 EFIAPI
 IsValidVariableHeader (
@@ -120,6 +122,7 @@ Returns:
   return TRUE;
 }
 
+STATIC
 VARIABLE_STORE_STATUS
 EFIAPI
 GetVariableStoreStatus (
@@ -163,6 +166,7 @@ Returns:
   }
 }
 
+STATIC
 EFI_STATUS
 CompareWithValidVariable (
   IN  VARIABLE_HEADER         *Variable,
@@ -215,6 +219,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 FindVariable (

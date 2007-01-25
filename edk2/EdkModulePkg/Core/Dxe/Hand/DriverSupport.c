@@ -149,6 +149,7 @@ Returns:
   return ReturnStatus;
 }
 
+STATIC
 VOID
 AddSortedDriverBindingProtocol (
   IN      EFI_HANDLE                   DriverBindingHandle,
@@ -265,8 +266,6 @@ Returns:
   EFI_STATUS                                 Status;
   UINTN                                      Index;
   EFI_HANDLE                                 DriverImageHandle;
-  UINTN                                      PlatformDriverOverrideHandleCount;
-  EFI_HANDLE                                 *PlatformDriverOverrideHandleBuffer;
   EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL      *PlatformDriverOverride;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *BusSpecificDriverOverride;
   UINTN                                      DriverBindingHandleCount;
@@ -290,8 +289,6 @@ Returns:
   //
   DriverBindingHandleCount              = 0;
   DriverBindingHandleBuffer             = NULL;
-  PlatformDriverOverrideHandleCount     = 0;
-  PlatformDriverOverrideHandleBuffer    = NULL;
   NumberOfSortedDriverBindingProtocols  = 0;
   SortedDriverBindingProtocols          = NULL;
 

@@ -20,13 +20,6 @@ Revision history:
 
 #include "Snp.h"
 
-VOID
-EFIAPI
-SnpWaitForPacketNotify (
-  IN EFI_EVENT  Event,
-  IN VOID       *SnpPtr
-  );
-
 EFI_STATUS
 pxe_init (
   SNP_DRIVER *snp,

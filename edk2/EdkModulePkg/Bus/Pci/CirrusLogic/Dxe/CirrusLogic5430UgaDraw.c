@@ -176,6 +176,7 @@ inw (
   @retval  EFI_SUCCESS TODO: Add description for return value
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawGetMode (
@@ -223,6 +224,7 @@ CirrusLogic5430UgaDrawGetMode (
   @retval  EFI_NOT_FOUND TODO: Add description for return value
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawSetMode (
@@ -301,6 +303,7 @@ CirrusLogic5430UgaDrawSetMode (
   @retval  EFI_SUCCESS TODO: Add description for return value
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawBlt (

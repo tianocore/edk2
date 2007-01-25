@@ -87,7 +87,7 @@ UINT32 mEventTable[] = {
   EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_WAIT,
 };
 
-
+STATIC
 VOID
 CoreAcquireEventLock (
   VOID
@@ -111,7 +111,7 @@ Returns:
   CoreAcquireLock (&gEventQueueLock);
 }
 
-
+STATIC
 VOID
 CoreReleaseEventLock (
   VOID
@@ -232,8 +232,8 @@ Returns:
 }
 
 
-VOID
 STATIC
+VOID
 CoreNotifyEvent (
   IN  IEVENT      *Event
   )

@@ -264,7 +264,6 @@ Returns:
   UINT32                    TotalTokenNumber;
   UINT8                     *Local;
   EFI_NARROW_GLYPH          *NarrowGlyph;
-  EFI_WIDE_GLYPH            *WideGlyph;
 
   if (Packages->NumberOfPackages == 0 || This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -439,7 +438,7 @@ Returns:
       // we go down one level deeper, increment the handle value that will be passed back.
       //
       if (Database->Handle >= *Handle) {
-        *Handle = Database->Handle + 1;
+        *Handle = (EFI_HII_HANDLE) (Database->Handle + 1);
       }
     }
 
@@ -518,7 +517,6 @@ Returns:
         Local = (UINT8 *) (&FontPack->NumberOfWideGlyphs + sizeof (UINT8)) +
           (sizeof (EFI_NARROW_GLYPH)) *
           NumNarrowGlyphs;
-        WideGlyph = (EFI_WIDE_GLYPH *) Local;
         CopyMem (
           &Member,
           (UINTN *) (Local + sizeof (EFI_WIDE_GLYPH) * Count),
@@ -530,7 +528,6 @@ Returns:
         CopyMem (&Unicode, &GlobalData->WideGlyphs[Member].UnicodeWeight, sizeof (UINT16));
         if (Unicode == 0) {
           Local = (UINT8*)(&FontPack->NumberOfWideGlyphs + sizeof(UINT8)) + (sizeof(EFI_NARROW_GLYPH)) * NumNarrowGlyphs;
-          WideGlyph = (EFI_WIDE_GLYPH *) Local;
           CopyMem (
             &GlobalData->WideGlyphs[Member],
             (UINTN *) (Local + sizeof (EFI_WIDE_GLYPH) * Count),
@@ -619,7 +616,6 @@ Returns:
   EFI_HII_DATA              *HiiData;
   EFI_HII_HANDLE_DATABASE   *HandleDatabase;
   EFI_HII_HANDLE_DATABASE   *PreviousHandleDatabase;
-  UINTN                     Count;
 
   if (This == NULL || Handle == 0) {
     return EFI_INVALID_PARAMETER;
@@ -635,7 +631,7 @@ Returns:
   //
   PreviousHandleDatabase = HandleDatabase;
 
-  for (Count = 0; HandleDatabase != NULL; HandleDatabase = HandleDatabase->NextHandleDatabase) {
+  for (; HandleDatabase != NULL; HandleDatabase = HandleDatabase->NextHandleDatabase) {
     //
     // Match the numeric value with the database entry - if matched,
     // free the package instance and apply fix-up to database linked list

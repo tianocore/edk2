@@ -30,6 +30,7 @@ Abstract:
 EFI_GUID  mFormSetGuid    = FORMSET_GUID;
 EFI_GUID  mStringPackGuid = STRING_PACK_GUID; 
 
+STATIC
 EFI_STATUS
 EFIAPI
 DriverCallback (

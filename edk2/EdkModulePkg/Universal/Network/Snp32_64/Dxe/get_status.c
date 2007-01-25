@@ -20,6 +20,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_getstatus (
   SNP_DRIVER *snp,

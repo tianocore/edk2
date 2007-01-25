@@ -525,12 +525,17 @@ DxePcdGetNextToken (
   )
 {
   EFI_STATUS          Status;
+  BOOLEAN             PeiExMapTableEmpty;
+  BOOLEAN             DxeExMapTableEmpty;
 
   if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
     return EFI_UNSUPPORTED;
   }
 
   Status = EFI_NOT_FOUND;
+  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
+  DxeExMapTableEmpty = DXE_EXMAP_TABLE_EMPTY;
+
   //
   // Scan the local token space
   //
@@ -557,12 +562,12 @@ DxePcdGetNextToken (
     return EFI_SUCCESS;
   }
 
-  if (PEI_EXMAP_TABLE_EMPTY && DXE_EXMAP_TABLE_EMPTY) {
+  if (PeiExMapTableEmpty && DxeExMapTableEmpty) {
     *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     return EFI_NOT_FOUND;
   }
 
-  if (!PEI_EXMAP_TABLE_EMPTY) {
+  if (!PeiExMapTableEmpty) {
     Status = ExGetNextTokeNumber (
                         Guid,
                         TokenNumber,
@@ -577,7 +582,7 @@ DxePcdGetNextToken (
     return Status;
   }
 
-  if (!DXE_EXMAP_TABLE_EMPTY) {
+  if (!DxeExMapTableEmpty) {
     Status = ExGetNextTokeNumber (
                         Guid,
                         TokenNumber,
@@ -591,7 +596,7 @@ DxePcdGetNextToken (
   return Status;
 }
 
-
+STATIC
 EFI_GUID **
 GetDistinctTokenSpace (
   IN OUT    UINTN             *ExMapTableSize,
@@ -649,6 +654,8 @@ DxePcdGetNextTokenSpace (
   EFI_GUID            **PeiTokenSpaceTable;
   EFI_GUID            **DxeTokenSpaceTable;
   BOOLEAN             Match;
+  BOOLEAN             PeiExMapTableEmpty;
+  BOOLEAN             DxeExMapTableEmpty;
 
   if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
     return EFI_UNSUPPORTED;
@@ -656,7 +663,10 @@ DxePcdGetNextTokenSpace (
 
   ASSERT (Guid != NULL);
   
-  if (PEI_EXMAP_TABLE_EMPTY && DXE_EXMAP_TABLE_EMPTY) {
+  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
+  DxeExMapTableEmpty = DXE_EXMAP_TABLE_EMPTY;
+
+  if (PeiExMapTableEmpty && DxeExMapTableEmpty) {
     if (*Guid != NULL) {
       return EFI_NOT_FOUND;
     } else {
@@ -668,7 +678,7 @@ DxePcdGetNextTokenSpace (
   if (TmpTokenSpaceBuffer[0] == NULL) {
     PeiTokenSpaceTableSize = 0;
 
-    if (!PEI_EXMAP_TABLE_EMPTY) {
+    if (!PeiExMapTableEmpty) {
       PeiTokenSpaceTableSize = PEI_EXMAPPING_TABLE_SIZE;
       PeiTokenSpaceTable = GetDistinctTokenSpace (&PeiTokenSpaceTableSize,
                             mPcdDatabase->PeiDb.Init.ExMapTable,
@@ -677,7 +687,7 @@ DxePcdGetNextTokenSpace (
       CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID*) * PeiTokenSpaceTableSize);
     }
 
-    if (!DXE_EXMAP_TABLE_EMPTY) {
+    if (!DxeExMapTableEmpty) {
       DxeTokenSpaceTableSize = DXE_EXMAPPING_TABLE_SIZE;
       DxeTokenSpaceTable = GetDistinctTokenSpace (&DxeTokenSpaceTableSize,
                             mPcdDatabase->DxeDb.Init.ExMapTable,

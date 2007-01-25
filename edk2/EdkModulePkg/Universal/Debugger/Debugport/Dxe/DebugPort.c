@@ -29,19 +29,91 @@ Revision History
 #include "DebugPort.h"
 
 //
-// Misc. functions local to this module
+// Misc. functions local to this module..
 //
 STATIC
 VOID
 GetDebugPortVariable (
-  DEBUGPORT_DEVICE  *DebugPortDevice
-  );
+  DEBUGPORT_DEVICE            *DebugPortDevice
+  )
+/*++
 
-EFI_STATUS
-EFIAPI
-ImageUnloadHandler (
-  EFI_HANDLE ImageHandle
-  );
+Routine Description:
+  Local worker function to obtain device path information from DebugPort variable.
+  Records requested settings in DebugPort device structure.
+  
+Arguments:
+  DEBUGPORT_DEVICE  *DebugPortDevice,
+
+Returns:
+
+  Nothing
+
+--*/
+{
+  UINTN                     DataSize;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_STATUS                Status;
+
+  DataSize = 0;
+
+  Status = gRT->GetVariable (
+                  (CHAR16 *) EFI_DEBUGPORT_VARIABLE_NAME,
+                  &gEfiDebugPortVariableGuid,
+                  NULL,
+                  &DataSize,
+                  DebugPortDevice->DebugPortVariable
+                  );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    if (gDebugPortDevice->DebugPortVariable != NULL) {
+      gBS->FreePool (gDebugPortDevice->DebugPortVariable);
+    }
+
+    DebugPortDevice->DebugPortVariable = AllocatePool (DataSize);
+    if (DebugPortDevice->DebugPortVariable != NULL) {
+      gRT->GetVariable (
+            (CHAR16 *) EFI_DEBUGPORT_VARIABLE_NAME,
+            &gEfiDebugPortVariableGuid,
+            NULL,
+            &DataSize,
+            DebugPortDevice->DebugPortVariable
+            );
+      DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DebugPortDevice->DebugPortVariable;
+      while (!EfiIsDevicePathEnd (DevicePath) && !EfiIsUartDevicePath (DevicePath)) {
+        DevicePath = EfiNextDevicePathNode (DevicePath);
+      }
+
+      if (EfiIsDevicePathEnd (DevicePath)) {
+        gBS->FreePool (gDebugPortDevice->DebugPortVariable);
+        DebugPortDevice->DebugPortVariable = NULL;
+      } else {
+        gBS->CopyMem (
+              &DebugPortDevice->BaudRate,
+              &((UART_DEVICE_PATH *) DevicePath)->BaudRate,
+              sizeof (((UART_DEVICE_PATH *) DevicePath)->BaudRate)
+              );
+        DebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
+        DebugPortDevice->Timeout          = DEBUGPORT_UART_DEFAULT_TIMEOUT;
+        gBS->CopyMem (
+              &DebugPortDevice->Parity,
+              &((UART_DEVICE_PATH *) DevicePath)->Parity,
+              sizeof (((UART_DEVICE_PATH *) DevicePath)->Parity)
+              );
+        gBS->CopyMem (
+              &DebugPortDevice->DataBits,
+              &((UART_DEVICE_PATH *) DevicePath)->DataBits,
+              sizeof (((UART_DEVICE_PATH *) DevicePath)->DataBits)
+              );
+        gBS->CopyMem (
+              &DebugPortDevice->StopBits,
+              &((UART_DEVICE_PATH *) DevicePath)->StopBits,
+              sizeof (((UART_DEVICE_PATH *) DevicePath)->StopBits)
+              );
+      }
+    }
+  }
+}
 
 //
 // Globals
@@ -57,8 +129,6 @@ EFI_DRIVER_BINDING_PROTOCOL gDebugPortDriverBinding = {
 };
 
 DEBUGPORT_DEVICE  *gDebugPortDevice;
-static UINT32     mHid16550;
-static UINT32     mHidStdPcComPort;
 
 //
 // implementation code
@@ -90,9 +160,6 @@ Returns:
 
 --*/
 {
-  mHid16550         = EFI_ACPI_16550UART_HID;
-  mHidStdPcComPort  = EFI_ACPI_PC_COMPORT_HID;
-
   //
   // Allocate and Initialize dev structure
   //
@@ -113,9 +180,9 @@ Returns:
   gDebugPortDevice->BaudRate = DEBUGPORT_UART_DEFAULT_BAUDRATE;
   gDebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
   gDebugPortDevice->Timeout = DEBUGPORT_UART_DEFAULT_TIMEOUT;
-  gDebugPortDevice->Parity = DEBUGPORT_UART_DEFAULT_PARITY;
+  gDebugPortDevice->Parity = (EFI_PARITY_TYPE) DEBUGPORT_UART_DEFAULT_PARITY;
   gDebugPortDevice->DataBits = DEBUGPORT_UART_DEFAULT_DATA_BITS;
-  gDebugPortDevice->StopBits = DEBUGPORT_UART_DEFAULT_STOP_BITS;
+  gDebugPortDevice->StopBits = (EFI_STOP_BITS_TYPE) DEBUGPORT_UART_DEFAULT_STOP_BITS;
 
   return EFI_SUCCESS;
 }
@@ -521,11 +588,9 @@ Returns:
 
 --*/
 {
-  DEBUGPORT_DEVICE  *DebugPortDevice;
   UINTN             BufferSize;
   UINTN             BitBucket;
 
-  DebugPortDevice = DEBUGPORT_DEVICE_FROM_THIS (This);
   while (This->Poll (This) == EFI_SUCCESS) {
     BufferSize = 1;
     This->Read (This, 0, &BufferSize, &BitBucket);
@@ -693,92 +758,6 @@ Returns:
   }
 
   return Status;
-}
-//
-// Misc. functions local to this module..
-//
-STATIC
-VOID
-GetDebugPortVariable (
-  DEBUGPORT_DEVICE            *DebugPortDevice
-  )
-/*++
-
-Routine Description:
-  Local worker function to obtain device path information from DebugPort variable.
-  Records requested settings in DebugPort device structure.
-  
-Arguments:
-  DEBUGPORT_DEVICE  *DebugPortDevice,
-
-Returns:
-
-  Nothing
-
---*/
-{
-  UINTN                     DataSize;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_STATUS                Status;
-
-  DataSize = 0;
-
-  Status = gRT->GetVariable (
-                  (CHAR16 *) EFI_DEBUGPORT_VARIABLE_NAME,
-                  &gEfiDebugPortVariableGuid,
-                  NULL,
-                  &DataSize,
-                  DebugPortDevice->DebugPortVariable
-                  );
-
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    if (gDebugPortDevice->DebugPortVariable != NULL) {
-      gBS->FreePool (gDebugPortDevice->DebugPortVariable);
-    }
-
-    DebugPortDevice->DebugPortVariable = AllocatePool (DataSize);
-    if (DebugPortDevice->DebugPortVariable != NULL) {
-      gRT->GetVariable (
-            (CHAR16 *) EFI_DEBUGPORT_VARIABLE_NAME,
-            &gEfiDebugPortVariableGuid,
-            NULL,
-            &DataSize,
-            DebugPortDevice->DebugPortVariable
-            );
-      DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DebugPortDevice->DebugPortVariable;
-      while (!EfiIsDevicePathEnd (DevicePath) && !EfiIsUartDevicePath (DevicePath)) {
-        DevicePath = EfiNextDevicePathNode (DevicePath);
-      }
-
-      if (EfiIsDevicePathEnd (DevicePath)) {
-        gBS->FreePool (gDebugPortDevice->DebugPortVariable);
-        DebugPortDevice->DebugPortVariable = NULL;
-      } else {
-        gBS->CopyMem (
-              &DebugPortDevice->BaudRate,
-              &((UART_DEVICE_PATH *) DevicePath)->BaudRate,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->BaudRate)
-              );
-        DebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
-        DebugPortDevice->Timeout          = DEBUGPORT_UART_DEFAULT_TIMEOUT;
-        gBS->CopyMem (
-              &DebugPortDevice->Parity,
-              &((UART_DEVICE_PATH *) DevicePath)->Parity,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->Parity)
-              );
-        gBS->CopyMem (
-              &DebugPortDevice->DataBits,
-              &((UART_DEVICE_PATH *) DevicePath)->DataBits,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->DataBits)
-              );
-        gBS->CopyMem (
-              &DebugPortDevice->StopBits,
-              &((UART_DEVICE_PATH *) DevicePath)->StopBits,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->StopBits)
-              );
-      }
-    }
-  }
 }
 
 EFI_STATUS

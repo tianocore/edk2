@@ -101,6 +101,7 @@ Returns:
   mNumberOfPciRomImages++;
 }
 
+STATIC
 VOID
 HexToString (
   CHAR16  *String,
@@ -134,6 +135,8 @@ Returns:
     }
   }
 }
+
+STATIC
 EFI_STATUS
 PciRomLoadEfiDriversFromRomImage (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
@@ -307,6 +310,7 @@ Returns:
   return retStatus;
 }
 
+STATIC
 EFI_STATUS
 PciRomLoadEfiDriversFromOptionRomTable (
   IN EFI_DRIVER_BINDING_PROTOCOL      *This,

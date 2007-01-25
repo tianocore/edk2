@@ -128,6 +128,8 @@ Returns:
   UINT8               *Destination;
   UINTN               Index;
   BOOLEAN             Finished;
+  UINTN               SizeofLanguage;
+  UINTN               SizeofString;
 
   StringPack  = (EFI_HII_STRING_PACK *) StringBuffer;
   Finished    = FALSE;
@@ -248,14 +250,16 @@ Returns:
     //
     // Pointing to a new string pack location
     //
+    SizeofLanguage = StrSize (Language);
+    SizeofString   = StrSize (String);
     StringPackBuffer->Header.Length = (UINT32)
       (
         sizeof (EFI_HII_STRING_PACK) -
         sizeof (EFI_STRING) +
         sizeof (RELOFST) +
         sizeof (RELOFST) +
-        StrSize (Language) +
-        StrSize (String)
+        SizeofLanguage +
+        SizeofString
       );
     StringPackBuffer->Header.Type           = EFI_HII_STRING;
     StringPackBuffer->LanguageNameString    = (UINT16) ((UINTN) &PackDestination[3] - (UINTN) StringPackBuffer);
@@ -423,7 +427,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
+STATIC
 EFI_STATUS
 GetHiiInterface (
   OUT     EFI_HII_PROTOCOL    **Hii

@@ -402,9 +402,9 @@ TerminalDriverBindingStart (
                                       Mode->BaudRate,
                                       Mode->ReceiveFifoDepth,
                                       (UINT32) SerialInTimeOut,
-                                      Mode->Parity,
+                                      (EFI_PARITY_TYPE) (Mode->Parity),
                                       (UINT8) Mode->DataBits,
-                                      Mode->StopBits
+                                      (EFI_STOP_BITS_TYPE) (Mode->StopBits)
                                       );
   if (EFI_ERROR (Status)) {
     //
@@ -897,6 +897,7 @@ TerminalUpdateConsoleDevVariable (
                   VariableSize,
                   Variable
                   );
+  ASSERT_EFI_ERROR (Status);
   gBS->FreePool (Variable);
 
   return ;
@@ -1015,6 +1016,7 @@ TerminalRemoveConsoleDevVariable (
                     VariableSize,
                     NewVariable
                     );
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (NewVariable != NULL) {
