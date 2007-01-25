@@ -32,6 +32,7 @@ import org.apache.tools.ant.types.Commandline;
 import org.tianocore.common.logger.EdkLog;
 
 public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes {
+    private int alignment = 0;
     //
     // Tool name
     // 
@@ -269,6 +270,18 @@ public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes
         this.sectFileList.add(task);
     }
     
+    public int getAlignment() {
+        return alignment;
+    }
+
+    public void setAlignment(int alignment) {
+        if (alignment > 7) {
+            this.alignment = 7;
+        } else {
+            this.alignment = alignment;
+        }
+    }
+
     public void toBuffer(DataOutputStream buffer){
         //
         // Search SectionList find earch section and call it's

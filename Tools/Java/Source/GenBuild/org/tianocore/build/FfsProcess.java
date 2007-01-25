@@ -347,6 +347,7 @@ public class FfsProcess {
     **/
     private void dealSection(int mode, Document doc, Element root, XmlCursor cursor, Vector<String> list) {
         String type = cursor.getAttributeText(new QName("SectionType"));
+        String alignment = cursor.getAttributeText(new QName("Alignment"));
         
         //
         // Judge if file is specified? Yes, just use the file, else call Build Macro
@@ -398,6 +399,9 @@ public class FfsProcess {
                 ele.setAttribute("fileName", getSectionFile(basename, type));
             } else {
                 ele.setAttribute("fileName", fileName);
+            }
+            if (alignment != null) {
+                ele.setAttribute("Alignment", alignment);
             }
             root.appendChild(ele);
         }

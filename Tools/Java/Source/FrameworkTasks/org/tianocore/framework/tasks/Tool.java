@@ -32,6 +32,7 @@ import org.tianocore.common.logger.EdkLog;
  **/
 public class Tool implements EfiDefine, Section {
 
+    private int alignment = 0;
     private String toolName     = "";
     private ToolArg toolArgList = new ToolArg();
     private Input inputFiles = new Input();
@@ -247,6 +248,19 @@ public class Tool implements EfiDefine, Section {
     public synchronized int getRand() {
         return ran.nextInt();
     }
+
+    public int getAlignment() {
+        return alignment;
+    }
+
+    public void setAlignment(int alignment) {
+        if (alignment > 7) {
+            this.alignment = 7;
+        } else {
+            this.alignment = alignment;
+        }
+    }
+
 }
 
 

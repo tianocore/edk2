@@ -741,15 +741,53 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
        return value;
    }
-    
-    /**
-      genFfs
-      
-      This function is to generate FFS file.
-      
-       @param ffsFile          Name of FFS file.
-       @param isOrg            Flag to indicate generate ORG ffs file or not.
-    **/
+
+   private void alignSection(DataOutputStream dataBuffer, int dataSize, int alignment) throws BuildException {
+       if (alignment == 0) {
+           return;
+       }
+       dataSize += 4; // take the section header into account
+       int[] alignedBytes = {0, 16, 128, 512, 1024, 4096, 32768, 65536};
+       int padSize = (alignedBytes[alignment] - dataSize) & (alignedBytes[alignment] - 1);
+       if (padSize == 0) {
+           //
+           // already aligned
+           // 
+           return;
+       }
+       //
+       // if the pad size is not times of 4, there must be something wrong in previous sections
+       // 
+       if (((4 - padSize) & (4 - 1)) != 0) {
+           EdkLog.log(this, EdkLog.EDK_ERROR, "PAD section size must be 4-byte aligned (" + padSize + ")!");
+           throw new BuildException ("Alignment can't be satisfied!");
+       }
+       byte[] pad = new byte[padSize];
+       //
+       // first three byte stores the section size
+       // 
+       pad[0] = (byte)(padSize & 0xff);
+       pad[1] = (byte)((padSize >> 8) & 0xff);
+       pad[2] = (byte)((padSize >> 16) & 0xff);
+       //
+       // the fourth byte are section type. use raw type (0x19)
+       // 
+       pad[3] = 0x19;
+       try {
+           dataBuffer.write(pad);
+       } catch (Exception e) {
+           throw new BuildException(e.getMessage());
+       }
+   }
+
+   /**
+     genFfs
+     
+     This function is to generate FFS file.
+     
+      @param ffsFile          Name of FFS file.
+      @param isOrg            Flag to indicate generate ORG ffs file or not.
+   **/
     private void genFfs(File ffsFile) throws BuildException {
         Section           sect;
         int               fileSize;
@@ -775,6 +813,11 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                 sect = (Section)sectionIter.next(); 
 
                 try {
+                    int alignment = sect.getAlignment();
+                    if (this.ffsAttribDataAlignment < alignment) {
+                        this.ffsAttribDataAlignment = alignment;
+                    }
+                    alignSection(dataBuffer, dataBuffer.size(), alignment);
                     //
                     //  The last section don't need 4 byte ffsAligment.
                     //
@@ -811,6 +854,12 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             if (this.ffsFileGuid != null) {
                 stringToGuid (this.ffsFileGuid, ffsHeader.name);
             }
+
+            //
+            // because we may have changed the ffsAttribDataAlignment, we need to refresh attributes
+            // 
+            this.attributes &= ~(((byte)7) << 3);
+            this.attributes |= (((byte)this.ffsAttribDataAlignment) << 3);
 
             ffsHeader.ffsAttributes = this.attributes;
             if ((ffsHeader.fileType = stringToType(this.ffsFileType))== -1) {

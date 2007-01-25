@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
  **/
 public class SectFile implements Section {
     private String fileName = ""; /// section file name
+    private int alignment = 0;
 
     /**
      Get method of ANT task/datatype for "FileName" attribute
@@ -42,6 +43,18 @@ public class SectFile implements Section {
      **/
     public void setFileName(String fileName) {
         this.fileName = fileName;   
+    }
+
+    public int getAlignment() {
+        return alignment;
+    }
+
+    public void setAlignment(int alignment) {
+        if (alignment > 7) {
+            this.alignment = 7;
+        } else {
+            this.alignment = alignment;
+        }
     }
 
     public SectFile (){

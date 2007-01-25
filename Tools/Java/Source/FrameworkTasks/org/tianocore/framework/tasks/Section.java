@@ -19,5 +19,8 @@ import java.io.DataOutputStream;
  Section interface is for geting the contain buffer form compress, tool, and sectFile  
  **/
 public interface Section {
+    int alignment = 0;
     public void toBuffer (DataOutputStream buffer);
+    public void setAlignment(int alignment);
+    public int getAlignment();
 }

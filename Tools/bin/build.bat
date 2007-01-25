@@ -8,5 +8,30 @@
 @REM THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 @REM
+@echo off
 
-ant -logger org.tianocore.build.global.GenBuildLogger -f %WORKSPACE%/build.xml %*
+set _ARGS= 
+:check_arg
+if ""%1""=="""" goto arg_end
+if ""%1""==""-q"" goto ant_arg
+if ""%1""==""-v"" goto ant_arg
+if ""%1""==""-d"" goto ant_arg
+
+goto ant_target
+
+:ant_arg    
+    set _ARGS=%_ARGS% %1
+    shift
+    goto check_arg
+
+:ant_target
+    set _ARGS=%_ARGS% -DBUILD_TARGET=%1
+    shift
+    goto check_arg
+
+:arg_end
+ant -logger org.tianocore.build.global.GenBuildLogger -f %WORKSPACE%/build.xml %_ARGS%
+
+set _ARGS=
+@echo on
+

@@ -17,8 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property environment="env" />
   
   <property name="WORKSPACE_DIR" value="${env.WORKSPACE}" />
-  
-  <!--property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml" /-->
+  <property name="BUILD_TARGET" value="all"/>
   
   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
   
@@ -36,7 +35,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   
   <target name="build">
-    <FrameworkBuild />
+    <echo message="TARGET: ${BUILD_TARGET}" level="info"/>
+    <FrameworkBuild type="${BUILD_TARGET}"/>
   </target>
 
   <target name="clean" depends="init">
