@@ -64,48 +64,6 @@ Returns:
 }
 
 STATIC
-VARIABLE_STORE_STATUS
-EFIAPI
-GetVariableStoreStatus (
-  IN VARIABLE_STORE_HEADER *VarStoreHeader
-  )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the variable name.
-
-Arguments:
-
-  VarStoreHeader  Pointer to the Variable Store Header.
-
-Returns:
-
-  EfiHealthy    Variable store is healthy
-  EfiRaw        Variable store is raw
-  EfiInvalid    Variable store is invalid
-
---*/
-{
-  if (VarStoreHeader->Signature == VARIABLE_STORE_SIGNATURE &&
-      VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
-      VarStoreHeader->State == VARIABLE_STORE_HEALTHY
-      ) {
-
-    return EfiValid;
-  } else if (VarStoreHeader->Signature == 0xffffffff &&
-           VarStoreHeader->Size == 0xffffffff &&
-           VarStoreHeader->Format == 0xff &&
-           VarStoreHeader->State == 0xff
-          ) {
-
-    return EfiRaw;
-  } else {
-    return EfiInvalid;
-  }
-}
-
-STATIC
 UINT8 *
 EFIAPI
 GetVariableDataPtr (

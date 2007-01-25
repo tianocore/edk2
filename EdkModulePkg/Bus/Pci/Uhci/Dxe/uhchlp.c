@@ -61,44 +61,6 @@ Returns:
 
 STATIC
 EFI_STATUS
-USBReadPortDW (
-  IN       EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN       UINT32                  PortOffset,
-  IN OUT   UINT32                  *Data
-  )
-/*++
-
-Routine Description:
-
-  USBReadPort DWord
-
-Arguments:
-
-  PciIo       - EFI_PCI_IO_PROTOCOL
-  PortOffset  - Port offset
-  Data        - Data to reutrn
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
-{
-  //
-  // Perform 32bit Read in PCI IO Space
-  //
-  return PciIo->Io.Read (
-                     PciIo,
-                     EfiPciIoWidthUint32,
-                     USB_BAR_INDEX,
-                     (UINT64) PortOffset,
-                     1,
-                     Data
-                     );
-}
-
-STATIC
-EFI_STATUS
 USBWritePortW (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN UINT32                  PortOffset,

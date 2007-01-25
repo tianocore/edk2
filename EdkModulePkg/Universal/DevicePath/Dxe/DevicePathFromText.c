@@ -319,32 +319,6 @@ IsHexDigit (
 }
 
 STATIC
-CHAR16
-NibbleToHexChar (
-  IN UINT8      Nibble
-  )
-/*++
-
-  Routine Description:
-    Converts the low nibble of a byte  to hex unicode character.
-
-  Arguments:
-    Nibble - lower nibble of a byte.
-
-  Returns:
-    Hex unicode character.
-
---*/
-{
-  Nibble &= 0x0F;
-  if (Nibble <= 0x9) {
-    return (CHAR16)(Nibble + L'0');
-  }
-
-  return (CHAR16)(Nibble - 0xA + L'A');
-}
-
-STATIC
 EFI_STATUS
 HexStringToBuf (
   IN OUT UINT8                     *Buf,   
@@ -426,65 +400,6 @@ HexStringToBuf (
 
   if (ConvertedStrLen != NULL) {
     *ConvertedStrLen = HexCnt;
-  }
-
-  return EFI_SUCCESS;
-}
-
-STATIC
-EFI_STATUS
-BufToHexString (
-  IN OUT CHAR16                    *Str,
-  IN OUT UINTN                     *HexStringBufferLength,
-  IN     UINT8                     *Buf,
-  IN     UINTN                     Len
-  )
-/*++
-
-  Routine Description:
-    Converts binary buffer to Unicode string.
-    At a minimum, any blob of data could be represented as a hex string.
-
-  Arguments:
-    Str - Pointer to the string.
-    HexStringBufferLength - Length in bytes of buffer to hold the hex string. Includes tailing '\0' character.
-                                        If routine return with EFI_SUCCESS, containing length of hex string buffer.
-                                        If routine return with EFI_BUFFER_TOO_SMALL, containg length of hex string buffer desired.
-    Buf - Buffer to be converted from.
-    Len - Length in bytes of the buffer to be converted.
-
-  Returns:
-    EFI_SUCCESS: Routine success.
-    EFI_BUFFER_TOO_SMALL: The hex string buffer is too small.
-
---*/
-{
-  UINTN       Idx;
-  UINT8       Byte;
-  UINTN       StrLen;
-
-  //
-  // Make sure string is either passed or allocate enough.
-  // It takes 2 Unicode characters (4 bytes) to represent 1 byte of the binary buffer.
-  // Plus the Unicode termination character.
-  //
-  StrLen = Len * 2;
-  if (StrLen > ((*HexStringBufferLength) - 1)) {
-    *HexStringBufferLength = StrLen + 1;
-    return EFI_BUFFER_TOO_SMALL;
-  }
-
-  *HexStringBufferLength = StrLen + 1;
-  //
-  // Ends the string.
-  //
-  Str[StrLen] = L'\0'; 
-
-  for (Idx = 0; Idx < Len; Idx++) {
-
-    Byte = Buf[Idx];
-    Str[StrLen - 1 - Idx * 2] = NibbleToHexChar (Byte);
-    Str[StrLen - 2 - Idx * 2] = NibbleToHexChar ((UINT8)(Byte >> 4));
   }
 
   return EFI_SUCCESS;
