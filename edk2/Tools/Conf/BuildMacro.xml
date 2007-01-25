@@ -540,6 +540,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="." />
       <mkdir dir="${BIN_DIR}"/>
 
+      <if>
+        <equals arg1="${OBJECTS}" arg2="" trim="true"/>
+        <then>
+          <fail message="No object files"/>
+        </then>
+      </if>
+
       <OnDependency>
         <sourcefiles>
           <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
