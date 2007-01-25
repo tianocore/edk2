@@ -20,6 +20,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_nvdata_read (
   IN SNP_DRIVER *snp,

@@ -96,7 +96,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
+STATIC
 VOID
 EFIAPI
 GenericArchProtocolNotify (

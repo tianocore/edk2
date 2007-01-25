@@ -15,6 +15,8 @@
 
 **/
 
+#include "DxeStatusCode.h"
+
 STATIC
 EFI_SERIAL_IO_PROTOCOL *mSerialIoProtocol;
 

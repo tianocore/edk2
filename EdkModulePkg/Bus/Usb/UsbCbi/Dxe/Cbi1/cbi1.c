@@ -400,7 +400,6 @@ CBI1DriverBindingStop (
   EFI_STATUS              Status;
   EFI_USB_ATAPI_PROTOCOL  *CBI1AtapiProtocol;
   USB_CBI_DEVICE          *UsbCbiDev;
-  EFI_USB_IO_PROTOCOL     *UsbIo;
 
   //
   // Get our context back.
@@ -418,8 +417,6 @@ CBI1DriverBindingStop (
   }
 
   UsbCbiDev = USB_CBI_DEVICE_FROM_THIS (CBI1AtapiProtocol);
-
-  UsbIo     = UsbCbiDev->UsbIo;
 
   Cbi1ReportStatusCode (
     UsbCbiDev->DevicePath,
@@ -644,7 +641,6 @@ CBI1MassStorageReset (
 --*/
 {
   UINT8               ResetCommand[12];
-  EFI_STATUS          Status;
   EFI_USB_IO_PROTOCOL *UsbIo;
   USB_CBI_DEVICE      *UsbCbiDev;
   UINT8               EndpointAddr;
@@ -669,12 +665,12 @@ CBI1MassStorageReset (
   ResetCommand[0] = 0x1d;
   ResetCommand[1] = 0x04;
 
-  Status = CBI1CommandPhase (
-            UsbCbiDev,
-            ResetCommand,
-            12,
-            &Result
-            );
+  CBI1CommandPhase (
+    UsbCbiDev,
+    ResetCommand,
+    12,
+    &Result
+    );
 
   //
   // clear bulk in endpoint stall feature

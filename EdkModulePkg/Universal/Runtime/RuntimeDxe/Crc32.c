@@ -74,6 +74,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 UINT32
 ReverseBits (
   UINT32  Value

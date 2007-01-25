@@ -210,14 +210,17 @@ Returns:
 
     if (Narrow) {
       for (Value = 0; Value != Count; Value++) {
-        *GlyphBuffer[Location + Value] |= GlobalData->NarrowGlyphs[Character].GlyphCol1[Value];
+        *GlyphBuffer[Location + Value] = (UINT8) (*GlyphBuffer[Location + Value] |
+                                                  GlobalData->NarrowGlyphs[Character].GlyphCol1[Value]);
       }
 
       Attributes = GlobalData->NarrowGlyphs[Character].Attributes & EFI_GLYPH_NON_SPACING;
     } else {
       for (Value = 0; Value != Count; Value++) {
-        *GlyphBuffer[Location + Value] |= GlobalData->WideGlyphs[Character].GlyphCol1[Value];
-        *GlyphBuffer[Location + Value + Count] |= GlobalData->WideGlyphs[Character].GlyphCol2[Value];
+        *GlyphBuffer[Location + Value] = (UINT8) (*GlyphBuffer[Location + Value] | 
+                                                  GlobalData->WideGlyphs[Character].GlyphCol1[Value]);
+        *GlyphBuffer[Location + Value + Count] = (UINT8) (*GlyphBuffer[Location + Value + Count] |
+                                                          GlobalData->WideGlyphs[Character].GlyphCol2[Value]);
       }
 
       Attributes = GlobalData->WideGlyphs[Character].Attributes & EFI_GLYPH_NON_SPACING;

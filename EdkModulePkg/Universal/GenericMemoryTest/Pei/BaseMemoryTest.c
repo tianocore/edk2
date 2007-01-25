@@ -91,7 +91,6 @@ Returns:
 --*/    
 {
   UINT32                TestPattern;
-  UINT32                TestMask;
   EFI_PHYSICAL_ADDRESS  TempAddress;
   UINT32                SpanSize;
 
@@ -101,7 +100,6 @@ Returns:
     );
 
   TestPattern = TEST_PATTERN;
-  TestMask    = 0;
   SpanSize    = 0;
 
   //

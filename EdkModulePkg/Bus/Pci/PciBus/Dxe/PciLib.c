@@ -94,6 +94,7 @@ Returns:
                     EFI_NATIVE_INTERFACE,
                     NULL
                     );
+    ASSERT_EFI_ERROR (Status);
   }
 }
 
@@ -1446,7 +1447,7 @@ Returns:
   SecondBus       = 0;
   Register        = 0;
   State           = 0;
-  Attributes      = 0;
+  Attributes      = (EFI_HPC_PADDING_ATTRIBUTES) 0;
   BusRange        = 0;
 
   ResetAllPpbBusReg (Bridge, StartBusNumber);

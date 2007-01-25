@@ -906,11 +906,8 @@ UsbMouseReset (
 --*/
 {
   USB_MOUSE_DEV       *UsbMouseDevice;
-  EFI_USB_IO_PROTOCOL *UsbIo;
 
   UsbMouseDevice  = USB_MOUSE_DEV_FROM_MOUSE_PROTOCOL (This);
-
-  UsbIo           = UsbMouseDevice->UsbIo;
 
   MouseReportStatusCode (
     UsbMouseDevice->DevicePath,

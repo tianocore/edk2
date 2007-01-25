@@ -211,6 +211,7 @@ Returns:
   }
 }
 
+STATIC
 VOID
 UpdateDateAndTime (
   VOID
@@ -492,7 +493,6 @@ Returns:
   UINTN         Start;
   UINTN         Top;
   UINTN         Index;
-  EFI_STATUS    Status;
   BOOLEAN       SelectionComplete;
   UINTN         InputOffset;
   UINTN         CurrentAttribute;
@@ -570,12 +570,12 @@ Returns:
   // Take the first key typed and report it back?
   //
   if (HotKey) {
-    Status = WaitForKeyStroke (&Key);
+    WaitForKeyStroke (&Key);
     CopyMem (KeyValue, &Key, sizeof (EFI_INPUT_KEY));
 
   } else {
     do {
-      Status = WaitForKeyStroke (&Key);
+      WaitForKeyStroke (&Key);
 
       switch (Key.UnicodeChar) {
       case CHAR_NULL:
@@ -1046,6 +1046,7 @@ Returns:
   return ;
 }
 
+STATIC
 BOOLEAN
 SelectionsAreValid (
   IN  UI_MENU_OPTION               *MenuOption,
@@ -1068,7 +1069,6 @@ Returns:
   EFI_FILE_FORM_TAGS      *FileFormTags;
   CHAR16                  *StringPtr;
   CHAR16                  NullCharacter;
-  EFI_STATUS              Status;
   UINTN                   Index;
   UINT16                  *NvRamMap;
   STRING_REF              PopUp;
@@ -1103,7 +1103,7 @@ Returns:
           CreatePopUp (GetStringWidth (StringPtr) / 2, 3, &NullCharacter, StringPtr, &NullCharacter);
 
           do {
-            Status = WaitForKeyStroke (&Key);
+            WaitForKeyStroke (&Key);
 
             switch (Key.UnicodeChar) {
 
@@ -1284,6 +1284,7 @@ Returns:
   }
 }
 
+STATIC
 VOID
 UpdateOptionSkipLines (
   IN EFI_IFR_DATA_ARRAY           *PageData,

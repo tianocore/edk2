@@ -467,11 +467,15 @@ Returns:
 {
   EFI_STATUS    Status;
   CHAR16       *NameSuffixed;
+  UINTN         NameLength;
+  UINTN         SuffixLength;
 
   //
   // enough to concatenate both strings.
   //
-  NameSuffixed = AllocateZeroPool ((StrLen (Name) + StrLen (Suffix) + 1) * sizeof (CHAR16)); 
+  NameLength   = StrLen (Name);
+  SuffixLength = StrLen (Suffix);
+  NameSuffixed = AllocateZeroPool ((NameLength + SuffixLength + 1) * sizeof (CHAR16)); 
   
   StrCpy (NameSuffixed, Name);
   StrCat (NameSuffixed, Suffix);

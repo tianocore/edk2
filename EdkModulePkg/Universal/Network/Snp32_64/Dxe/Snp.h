@@ -385,11 +385,45 @@ snp_undi32_receive (
   )
 ;
 
+VOID
+EFIAPI
+SnpWaitForPacketNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *SnpPtr
+  );
+
+EFI_STATUS
+pxe_start (
+  SNP_DRIVER *snp
+  );
+
+EFI_STATUS
+pxe_stop (
+  SNP_DRIVER *snp
+  );
+
+EFI_STATUS
+pxe_init (
+  SNP_DRIVER *snp,
+  UINT16     OpFlags
+  );
+
+EFI_STATUS
+pxe_shutdown (
+  SNP_DRIVER *snp
+  );
+
+EFI_STATUS
+pxe_get_stn_addr (
+  SNP_DRIVER *snp
+  );
+
 typedef
 EFI_STATUS
 (*issue_undi32_command) (
   UINT64 cdb
   );
+
 typedef
 VOID
 (*ptr) (

@@ -355,14 +355,12 @@ Returns:
 {
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
   EFI_FFS_FILE_HEADER         *FfsFileHeader;
-  VOID                        *SectionData;
   EFI_STATUS                  Status;
   EFI_PEI_HOB_POINTERS        Hob;
 
 
   FwVolHeader   = NULL;
   FfsFileHeader = NULL;
-  SectionData   = NULL;
   Status        = EFI_SUCCESS;
 
   //
@@ -654,7 +652,6 @@ Returns:
   UINTN                           SectionLength;
   UINTN                           OccupiedSectionLength;
   UINT64                          FileSize;
-  EFI_GUID_DEFINED_SECTION        *GuidedSectionHeader;
   UINT32                          AuthenticationStatus;
   EFI_PEI_SECTION_EXTRACTION_PPI  *SectionExtract;
   UINT32                          BufferSize;
@@ -697,10 +694,6 @@ Returns:
       // Was the DXE Core file encapsulated in a GUID'd section?
       //
       if (Section->Type == EFI_SECTION_GUID_DEFINED) {
-        //
-        // Locate the GUID'd Section Extractor
-        //
-        GuidedSectionHeader = (VOID *) (Section + 1);
 
         //
         // This following code constitutes the addition of the security model

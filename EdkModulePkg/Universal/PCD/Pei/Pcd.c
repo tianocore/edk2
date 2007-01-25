@@ -502,11 +502,14 @@ PeiPcdGetNextToken (
   DYNAMICEX_MAPPING   *ExMapTable;
   UINTN               i;
   BOOLEAN             Found;
-    
+  BOOLEAN             PeiExMapTableEmpty;
+
   if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
     return EFI_UNSUPPORTED;
   }
-    
+
+  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
+
   if (Guid == NULL) {
     if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
       return EFI_NOT_FOUND;
@@ -517,7 +520,7 @@ PeiPcdGetNextToken (
     }
     return EFI_SUCCESS;
   } else {
-    if (PEI_EXMAP_TABLE_EMPTY) {
+    if (PeiExMapTableEmpty) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_SUCCESS;
     }
@@ -597,6 +600,7 @@ PeiPcdGetNextTokenSpace (
   DYNAMICEX_MAPPING   *ExMapTable;
   UINTN               i;
   BOOLEAN             Found;
+  BOOLEAN             PeiExMapTableEmpty;
 
   if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
     return EFI_UNSUPPORTED;
@@ -604,7 +608,9 @@ PeiPcdGetNextTokenSpace (
 
   ASSERT (Guid != NULL);
 
-  if (PEI_EXMAP_TABLE_EMPTY) {
+  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
+
+  if (PeiExMapTableEmpty) {
     if (*Guid != NULL) {
       return EFI_NOT_FOUND;
     } else {

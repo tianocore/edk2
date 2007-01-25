@@ -714,11 +714,6 @@ PioReadWriteData (
   UINT16      *PtrBuffer;
 
   //
-  // containing status byte read from Status Register.
-  //
-  UINT8       StatusRegister;
-
-  //
   // No data transfer is premitted.
   //
   if (ByteCount == 0) {
@@ -750,16 +745,14 @@ PioReadWriteData (
     //
     // read Status Register will clear interrupt
     //
-    StatusRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
+    IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
 
     //
     // get current data transfer size from Cylinder Registers.
     //
-    WordCount =
-      (
-        (IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderMsb) << 8) |
-        IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderLsb)
-      ) & 0xffff;
+    WordCount = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderMsb) << 8;
+    WordCount = WordCount | IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderLsb);
+    WordCount = WordCount & 0xffff;
     WordCount /= 2;
 
     WordCount = EFI_MIN (WordCount, (RequiredWordCount - ActualWordCount));

@@ -20,6 +20,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_ip2mac (
   IN SNP_DRIVER          *snp,

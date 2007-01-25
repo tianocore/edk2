@@ -236,6 +236,7 @@ IDEWritePortWMultiple (
   TODO: add return values
 
 **/
+STATIC
 BOOLEAN
 BadIdeDeviceCheck (
   IN IDE_BLK_IO_DEV *IdeDev

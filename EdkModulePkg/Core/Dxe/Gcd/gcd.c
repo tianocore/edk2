@@ -61,7 +61,7 @@ EFI_GCD_MAP_ENTRY mGcdMemorySpaceMapEntryTemplate = {
   0,
   0,
   EfiGcdMemoryTypeNonExistent,
-  0,
+  (EFI_GCD_IO_TYPE) 0,
   NULL,
   NULL
 };
@@ -73,7 +73,7 @@ EFI_GCD_MAP_ENTRY mGcdIoSpaceMapEntryTemplate = {
   0,
   0,
   0,
-  0,
+  (EFI_GCD_MEMORY_TYPE) 0,
   EfiGcdIoTypeNonExistent,
   NULL,
   NULL
@@ -136,7 +136,7 @@ Returns:
 }
 
 
-
+STATIC
 VOID
 CoreAcquireGcdIoLock (
   VOID
@@ -157,7 +157,7 @@ Returns:
   CoreAcquireLock (&mGcdIoSpaceLock);
 }
 
-
+STATIC
 VOID
 CoreReleaseGcdIoLock (
   VOID
@@ -183,6 +183,7 @@ Returns:
 //
 // GCD Initialization Worker Functions
 //
+STATIC
 UINT64
 AlignValue (
   IN UINT64   Value,
@@ -217,6 +218,7 @@ Returns:
   return Value & (~AlignmentMask);
 }
 
+STATIC
 UINT64
 PageAlignAddress (
   IN UINT64 Value
@@ -240,6 +242,7 @@ Returns:
   return AlignValue (Value, EFI_PAGE_SHIFT, TRUE);
 }
 
+STATIC
 UINT64
 PageAlignLength (
   IN UINT64 Value
@@ -266,6 +269,7 @@ Returns:
 //
 // GCD Memory Space Worker Functions
 //
+STATIC
 EFI_STATUS
 CoreAllocateGcdMapEntry (
   IN OUT EFI_GCD_MAP_ENTRY  **TopEntry,
@@ -303,6 +307,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 CoreInsertGcdMapEntry (
   IN LIST_ENTRY           *Link,
@@ -359,6 +364,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 CoreMergeGcdMapEntry (
   IN LIST_ENTRY      *Link,
@@ -440,6 +446,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 CoreCleanupGcdMapEntry (
   IN EFI_GCD_MAP_ENTRY  *TopEntry,
@@ -491,6 +498,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 CoreSearchGcdMapEntry (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -551,6 +559,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+STATIC
 UINTN
 CoreCountGcdMapEntry (
   IN LIST_ENTRY  *Map
@@ -584,7 +593,7 @@ Returns:
 }
 
 
-
+STATIC
 UINT64
 ConverToCpuArchAttributes (
   UINT64 Attributes
@@ -629,7 +638,7 @@ Returns:
 
 }
 
-
+STATIC
 EFI_STATUS
 CoreConvertSpace (
   IN UINTN                 Operation,
@@ -897,6 +906,7 @@ Done:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 CoreAllocateSpaceCheckEntry (
   IN UINTN                Operation,
@@ -950,6 +960,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 CoreAllocateSpace (
   IN     UINTN                  Operation,
@@ -1218,7 +1229,7 @@ Done:
   return Status;
 }
 
-
+STATIC
 EFI_STATUS
 CoreInternalAddMemorySpace (
   IN EFI_GCD_MEMORY_TYPE   GcdMemoryType,
@@ -1257,7 +1268,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  return CoreConvertSpace (GCD_ADD_MEMORY_OPERATION, GcdMemoryType, 0, BaseAddress, Length, Capabilities, 0);
+  return CoreConvertSpace (GCD_ADD_MEMORY_OPERATION, GcdMemoryType, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, Capabilities, 0);
 }
 
 //
@@ -1310,7 +1321,7 @@ Returns:
            GCD_ALLOCATE_MEMORY_OPERATION, 
            GcdAllocateType, 
            GcdMemoryType, 
-           0, 
+           (EFI_GCD_IO_TYPE) 0, 
            Alignment, 
            Length, 
            BaseAddress, 
@@ -1427,7 +1438,7 @@ Returns:
 
 --*/
 {
-  return CoreConvertSpace (GCD_FREE_MEMORY_OPERATION, 0, 0, BaseAddress, Length, 0, 0);
+  return CoreConvertSpace (GCD_FREE_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
 EFI_STATUS
@@ -1454,9 +1465,10 @@ Returns:
 
 --*/
 {
-  return CoreConvertSpace (GCD_REMOVE_MEMORY_OPERATION, 0, 0, BaseAddress, Length, 0, 0);
+  return CoreConvertSpace (GCD_REMOVE_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
+STATIC
 VOID
 BuildMemoryDescriptor (
   IN OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor,
@@ -1574,7 +1586,7 @@ Returns:
 
 --*/
 {
-  return CoreConvertSpace (GCD_SET_ATTRIBUTES_MEMORY_OPERATION, 0, 0, BaseAddress, Length, 0, Attributes);
+  return CoreConvertSpace (GCD_SET_ATTRIBUTES_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, Attributes);
 }
 
 EFI_STATUS
@@ -1687,7 +1699,7 @@ Returns:
   if (GcdIoType <= EfiGcdIoTypeNonExistent || GcdIoType >= EfiGcdIoTypeMaximum) {
     return EFI_INVALID_PARAMETER;
   }
-  return CoreConvertSpace (GCD_ADD_IO_OPERATION, 0, GcdIoType, BaseAddress, Length, 0, 0);
+  return CoreConvertSpace (GCD_ADD_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, GcdIoType, BaseAddress, Length, 0, 0);
 }
 
 EFI_STATUS
@@ -1736,7 +1748,7 @@ Returns:
   return CoreAllocateSpace (
            GCD_ALLOCATE_IO_OPERATION, 
            GcdAllocateType, 
-           0, 
+           (EFI_GCD_MEMORY_TYPE) 0, 
            GcdIoType, 
            Alignment, 
            Length, 
@@ -1770,7 +1782,7 @@ Returns:
 
 --*/
 {
-  return CoreConvertSpace (GCD_FREE_IO_OPERATION, 0, 0, BaseAddress, Length, 0, 0);
+  return CoreConvertSpace (GCD_FREE_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
 EFI_STATUS
@@ -1797,9 +1809,10 @@ Returns:
 
 --*/
 {
-  return CoreConvertSpace (GCD_REMOVE_IO_OPERATION, 0, 0, BaseAddress, Length, 0, 0);
+  return CoreConvertSpace (GCD_REMOVE_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
+STATIC
 VOID
 BuildIoDescriptor (
   IN EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor,
@@ -1964,6 +1977,7 @@ Done:
   return Status;
 }  
 
+STATIC
 UINT64
 CoreConvertResourceDescriptorHobAttributesToCapabilities (
   EFI_GCD_MEMORY_TYPE  GcdMemoryType,

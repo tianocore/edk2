@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-
+#include "EdkPeCoffLoaderLibInternals.h"
 
 EFI_STATUS
 EFIAPI

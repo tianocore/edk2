@@ -71,9 +71,9 @@ Returns:
   }
 
   if (Operation == EFI_ENABLE_REGISTER) {
-    OldCommand |= Command;
+    OldCommand = (UINT16) (OldCommand | Command);
   } else if (Operation == EFI_DISABLE_REGISTER) {
-    OldCommand &= ~(Command);
+    OldCommand = (UINT16) (OldCommand & ~(Command));
   } else {
     OldCommand = Command;
   }

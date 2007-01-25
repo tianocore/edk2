@@ -978,6 +978,7 @@ Returns:
   return Status;
 }    
 
+STATIC
 PROTOCOL_INTERFACE  *
 CoreGetProtocolInterface (
   IN  EFI_HANDLE                UserHandle,

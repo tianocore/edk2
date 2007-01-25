@@ -969,6 +969,7 @@ Returns:
 
 }
 
+STATIC
 EFI_STATUS
 ProcessOptionRomLight (
   IN PCI_IO_DEVICE                      *PciIoDevice
@@ -1432,7 +1433,6 @@ Returns:
 // TODO:    BarIndex - add argument and description to function comment
 {
   UINT32      Value;
-  UINT64      BarValue64;
   UINT32      OriginalValue;
   UINT32      Mask;
   UINT32      Data;
@@ -1441,7 +1441,6 @@ Returns:
 
   OriginalValue = 0;
   Value         = 0;
-  BarValue64    = 0;
 
   Status = BarExisted (
             PciIoDevice,
@@ -1491,7 +1490,7 @@ Returns:
     // Need to treat it as no-bar
     //
     if (PciIoDevice->PciBar[BarIndex].Length == 0) {
-      PciIoDevice->PciBar[BarIndex].BarType = 0;
+      PciIoDevice->PciBar[BarIndex].BarType = (PCI_BAR_TYPE) 0;
     }
 
     PciIoDevice->PciBar[BarIndex].Prefetchable  = FALSE;

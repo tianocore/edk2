@@ -254,7 +254,7 @@ Returns:
     if (Image->ImageContext.ImageAddress >= 0x100000 || Image->ImageContext.RelocationsStripped) {
       Status = CoreAllocatePages (
                  AllocateAddress,
-                 Image->ImageContext.ImageCodeMemoryType,
+                 (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
                  Image->NumberOfPages,
                  &Image->ImageContext.ImageAddress
                  );
@@ -262,7 +262,7 @@ Returns:
     if (EFI_ERROR (Status) && !Image->ImageContext.RelocationsStripped) {
       Status = CoreAllocatePages (
                  AllocateAnyPages,
-                 Image->ImageContext.ImageCodeMemoryType,
+                 (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
                  Image->NumberOfPages,
                  &Image->ImageContext.ImageAddress
                  );
@@ -389,8 +389,8 @@ Returns:
   Image->Type               = Image->ImageContext.ImageType;
   Image->Info.ImageBase     = (VOID *)(UINTN)Image->ImageContext.ImageAddress;
   Image->Info.ImageSize     = Image->ImageContext.ImageSize;
-  Image->Info.ImageCodeType = Image->ImageContext.ImageCodeMemoryType;
-  Image->Info.ImageDataType = Image->ImageContext.ImageDataMemoryType;
+  Image->Info.ImageCodeType = (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType);
+  Image->Info.ImageDataType = (EFI_MEMORY_TYPE) (Image->ImageContext.ImageDataMemoryType);
   if (Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) {
     if (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
       //
@@ -514,7 +514,7 @@ Returns:
   return Image;
 }
 
-
+STATIC
 EFI_STATUS
 CoreLoadImageCommon (
   IN  BOOLEAN                          BootPolicy,

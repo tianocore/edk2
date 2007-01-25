@@ -45,7 +45,7 @@ static IDE_BASE_REGISTERS   gAtapiIoPortRegisters[2] = {
   { 0x170, { 0x171 }, 0x172, 0x173, 0x174, 0x175, 0x176, { 0x177 }, { 0x376 }, 0x377, 0 } 
 };
 
-static SCSI_COMMAND_SET     gEndTable = { 0xff, 0xff };
+static SCSI_COMMAND_SET     gEndTable = { 0xff, (DATA_DIRECTION) 0xff };
 
 ///
 /// This table contains all the supported ATAPI commands.
@@ -83,7 +83,7 @@ static SCSI_COMMAND_SET     gSupportedATAPICommands[] = {
   { OP_WRITE_10,                    DataOut },
   { OP_WRITE_12,                    DataOut },
   { OP_WRITE_AND_VERIFY,            DataOut },
-  { 0xff,                           0xff    } 
+  { 0xff,                           (DATA_DIRECTION) 0xff    } 
 };
 
 static CHAR16               *gControllerNameString  = (CHAR16 *) L"ATAPI Controller";
@@ -595,13 +595,7 @@ AtapiScsiPassThruBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
   )
 {
-  ATAPI_SCSI_PASS_THRU_DEV  *AtapiScsiPrivate;
   EFI_DEV_PATH              *Node;
-
-  //
-  // Retrieve Device Private Data Structure.
-  //
-  AtapiScsiPrivate = ATAPI_SCSI_PASS_THRU_DEV_FROM_THIS (This);
 
   //
   // Validate parameters passed in.
@@ -995,7 +989,7 @@ SubmitBlockingIoCommand (
                           PacketCommand,
                           Packet->DataBuffer,
                           &(Packet->TransferLength),
-                          Packet->DataDirection,
+                          (DATA_DIRECTION) Packet->DataDirection,
                           TimeoutInMicroSeconds
                           );
   if (!EFI_ERROR (PacketCommandStatus) || (Packet->SenseData == NULL)) {
@@ -1319,11 +1313,9 @@ AtapiPassThruPioReadWriteData (
     //
     // get current data transfer size from Cylinder Registers.
     //
-    WordCount =
-      (
-        (ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->CylinderMsb) << 8) |
-        ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->CylinderLsb)
-      ) & 0xffff;
+    WordCount = ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->CylinderMsb) << 8;
+    WordCount = WordCount | ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->CylinderLsb);
+    WordCount = WordCount & 0xffff;
     WordCount /= 2;
 
     //

@@ -21,6 +21,7 @@ Abstract:
 
 #include "DevicePath.h"
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 UnpackDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
@@ -95,6 +96,7 @@ UnpackDevicePath (
   return NewPath;
 }
 
+STATIC
 VOID *
 ReallocatePool (
   IN VOID                 *OldPool,
@@ -136,6 +138,7 @@ ReallocatePool (
   return NewPool;
 }
 
+STATIC
 CHAR16 *
 CatPrint (
   IN OUT POOL_PRINT   *Str,
@@ -177,7 +180,8 @@ CatPrint (
     Str->Str  = AllocateZeroPool (Size);
     ASSERT (Str->Str != NULL);
   } else {
-    Size = StrSize (AppendStr) + StrSize (Str->Str) - sizeof (UINT16);
+    Size = StrSize (AppendStr)  - sizeof (UINT16);
+    Size = Size + StrSize (Str->Str);
     Str->Str = ReallocatePool (
                 Str->Str,
                 StrSize (Str->Str),
@@ -196,6 +200,7 @@ CatPrint (
   return Str->Str;
 }
 
+STATIC
 VOID
 DevPathToTextPci (
   IN OUT POOL_PRINT  *Str,
@@ -210,6 +215,7 @@ DevPathToTextPci (
   CatPrint (Str, L"Pci(%x,%x)", Pci->Function, Pci->Device);
 }
 
+STATIC
 VOID
 DevPathToTextPccard (
   IN OUT POOL_PRINT  *Str,
@@ -224,6 +230,7 @@ DevPathToTextPccard (
   CatPrint (Str, L"PcCard(%x)", Pccard->FunctionNumber);
 }
 
+STATIC
 VOID
 DevPathToTextMemMap (
   IN OUT POOL_PRINT  *Str,
@@ -243,6 +250,7 @@ DevPathToTextMemMap (
     );
 }
 
+STATIC
 VOID
 DevPathToTextVendor (
   IN OUT POOL_PRINT  *Str,
@@ -357,6 +365,7 @@ DevPathToTextVendor (
   CatPrint (Str, L")");
 }
 
+STATIC
 VOID
 DevPathToTextController (
   IN OUT POOL_PRINT  *Str,
@@ -375,6 +384,7 @@ DevPathToTextController (
     );
 }
 
+STATIC
 VOID
 DevPathToTextAcpi (
   IN OUT POOL_PRINT  *Str,
@@ -424,6 +434,7 @@ DevPathToTextAcpi (
 
 #define NextStrA(a) ((UINT8 *) (((UINT8 *) (a)) + AsciiStrLen ((CHAR8 *) (a)) + 1))
 
+STATIC
 VOID
 DevPathToTextExtAcpi (
   IN OUT POOL_PRINT  *Str,
@@ -433,12 +444,14 @@ DevPathToTextExtAcpi (
   )
 {
   ACPI_EXTENDED_HID_DEVICE_PATH_WITH_STR  *AcpiExt;
+  UINT8                                   *NextString;
 
   AcpiExt = DevPath;
 
   if (AllowShortcuts) {
+    NextString = NextStrA (AcpiExt->HidUidCidStr);
     if ((*(AcpiExt->HidUidCidStr) == '\0') &&
-        (*(NextStrA (NextStrA (AcpiExt->HidUidCidStr))) == '\0') &&
+        (*(NextStrA (NextString)) == '\0') &&
         (AcpiExt->UID == 0)
         ) {
       if ((AcpiExt->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
@@ -462,6 +475,8 @@ DevPathToTextExtAcpi (
     return ;
   }
 
+  NextString = NextStrA (AcpiExt->HidUidCidStr);
+  NextString = NextStrA (NextString);
   if ((AcpiExt->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
     CatPrint (
       Str,
@@ -470,7 +485,7 @@ DevPathToTextExtAcpi (
       AcpiExt->CID,
       AcpiExt->UID,
       AcpiExt->HidUidCidStr,
-      NextStrA (NextStrA (AcpiExt->HidUidCidStr)),
+      NextString,
       NextStrA (AcpiExt->HidUidCidStr)
       );
   } else {
@@ -481,12 +496,13 @@ DevPathToTextExtAcpi (
       AcpiExt->CID,
       AcpiExt->UID,
       AcpiExt->HidUidCidStr,
-      NextStrA (NextStrA (AcpiExt->HidUidCidStr)),
+      NextString,
       NextStrA (AcpiExt->HidUidCidStr)
       );
   }
 }
 
+STATIC
 VOID
 DevPathToTextAtapi (
   IN OUT POOL_PRINT  *Str,
@@ -512,6 +528,7 @@ DevPathToTextAtapi (
   }
 }
 
+STATIC
 VOID
 DevPathToTextScsi (
   IN OUT POOL_PRINT  *Str,
@@ -526,6 +543,7 @@ DevPathToTextScsi (
   CatPrint (Str, L"Scsi(%x,%x)", Scsi->Pun, Scsi->Lun);
 }
 
+STATIC
 VOID
 DevPathToTextFibre (
   IN OUT POOL_PRINT  *Str,
@@ -540,6 +558,7 @@ DevPathToTextFibre (
   CatPrint (Str, L"Fibre(%lx,%lx)", Fibre->WWN, Fibre->Lun);
 }
 
+STATIC
 VOID
 DevPathToText1394 (
   IN OUT POOL_PRINT  *Str,
@@ -554,6 +573,7 @@ DevPathToText1394 (
   CatPrint (Str, L"I1394(%lx)", F1394->Guid);
 }
 
+STATIC
 VOID
 DevPathToTextUsb (
   IN OUT POOL_PRINT  *Str,
@@ -568,6 +588,7 @@ DevPathToTextUsb (
   CatPrint (Str, L"USB(%x,%x)", Usb->ParentPortNumber, Usb->InterfaceNumber);
 }
 
+STATIC
 VOID
 DevPathToTextUsbWWID (
   IN OUT POOL_PRINT  *Str,
@@ -588,6 +609,7 @@ DevPathToTextUsbWWID (
     );
 }
 
+STATIC
 VOID
 DevPathToTextLogicalUnit (
   IN OUT POOL_PRINT  *Str,
@@ -602,6 +624,7 @@ DevPathToTextLogicalUnit (
   CatPrint (Str, L"Unit(%x)", LogicalUnit->Lun);
 }
 
+STATIC
 VOID
 DevPathToTextUsbClass (
   IN OUT POOL_PRINT  *Str,
@@ -794,6 +817,7 @@ DevPathToTextUsbClass (
     );
 }
 
+STATIC
 VOID
 DevPathToTextI2O (
   IN OUT POOL_PRINT  *Str,
@@ -808,6 +832,7 @@ DevPathToTextI2O (
   CatPrint (Str, L"I2O(%x)", I2O->Tid);
 }
 
+STATIC
 VOID
 DevPathToTextMacAddr (
   IN OUT POOL_PRINT  *Str,
@@ -836,6 +861,7 @@ DevPathToTextMacAddr (
   CatPrint (Str, L",%x)", MAC->IfType);
 }
 
+STATIC
 VOID
 DevPathToTextIPv4 (
   IN OUT POOL_PRINT  *Str,
@@ -875,6 +901,7 @@ DevPathToTextIPv4 (
     );
 }
 
+STATIC
 VOID
 DevPathToTextIPv6 (
   IN OUT POOL_PRINT  *Str,
@@ -950,6 +977,7 @@ DevPathToTextIPv6 (
     );
 }
 
+STATIC
 VOID
 DevPathToTextInfiniBand (
   IN OUT POOL_PRINT  *Str,
@@ -972,6 +1000,7 @@ DevPathToTextInfiniBand (
     );
 }
 
+STATIC
 VOID
 DevPathToTextUart (
   IN OUT POOL_PRINT  *Str,
@@ -1051,6 +1080,7 @@ DevPathToTextUart (
   }
 }
 
+STATIC
 VOID
 DevPathToTextiSCSI (
   IN OUT POOL_PRINT  *Str,
@@ -1086,6 +1116,7 @@ DevPathToTextiSCSI (
   CatPrint (Str, L"%s)", (iSCSI->NetworkProtocol == 0) ? L"TCP" : L"reserved");
 }
 
+STATIC
 VOID
 DevPathToTextHardDrive (
   IN OUT POOL_PRINT  *Str,
@@ -1134,6 +1165,7 @@ DevPathToTextHardDrive (
   CatPrint (Str, L"%lx,%lx)", Hd->PartitionStart, Hd->PartitionSize);
 }
 
+STATIC
 VOID
 DevPathToTextCDROM (
   IN OUT POOL_PRINT  *Str,
@@ -1153,6 +1185,7 @@ DevPathToTextCDROM (
   CatPrint (Str, L"CDROM(%x,%lx,%lx)", Cd->BootEntry, Cd->PartitionStart, Cd->PartitionSize);
 }
 
+STATIC
 VOID
 DevPathToTextFilePath (
   IN OUT POOL_PRINT  *Str,
@@ -1167,6 +1200,7 @@ DevPathToTextFilePath (
   CatPrint (Str, L"%s", Fp->PathName);
 }
 
+STATIC
 VOID
 DevPathToTextMediaProtocol (
   IN OUT POOL_PRINT  *Str,
@@ -1181,6 +1215,7 @@ DevPathToTextMediaProtocol (
   CatPrint (Str, L"Media(%g)", &MediaProt->Protocol);
 }
 
+STATIC
 VOID
 DevPathToTextBBS (
   IN OUT POOL_PRINT  *Str,
@@ -1233,6 +1268,7 @@ DevPathToTextBBS (
   CatPrint (Str, L",%x)", Bbs->StatusFlag);
 }
 
+STATIC
 VOID
 DevPathToTextEndInstance (
   IN OUT POOL_PRINT  *Str,
@@ -1244,6 +1280,7 @@ DevPathToTextEndInstance (
   CatPrint (Str, L",");
 }
 
+STATIC
 VOID
 DevPathToTextNodeUnknown (
   IN OUT POOL_PRINT  *Str,

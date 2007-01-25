@@ -494,6 +494,23 @@ typedef union {
 #include "dhcp.h"
 #include "tftp.h"
 
+VOID
+InitArpHeader (
+  VOID
+  )
+/*++
+Routine description:
+  Initialize ARP packet header.
+
+Parameters:
+  none
+
+Returns:
+  none
+
+--*/
+;
+
 #endif /* _BC_H */
 
 /* EOF - bc.h */

@@ -22,6 +22,7 @@ Abstract:
 
 #include "HiiDatabase.h"
 
+STATIC
 VOID
 AsciiToUnicode (
   IN    UINT8     *Lang,
@@ -138,6 +139,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 HiiNewString2 (
   IN     EFI_HII_PROTOCOL       *This,
@@ -766,7 +768,7 @@ Returns:
               &NewString,
               TRUE
               );
-
+    ASSERT_EFI_ERROR (Status);
   }
 
   gBS->FreePool (LangCodes);

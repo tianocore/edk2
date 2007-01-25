@@ -28,7 +28,6 @@ GetWorker (
   )
 {
   UINT32              *LocalTokenNumberTable;
-  UINT16              *SizeTable;
   EFI_GUID            *GuidTable;
   UINT16              *StringTable;
   EFI_GUID            *Guid;
@@ -76,13 +75,10 @@ GetWorker (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  IsPeiDb = (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE;
+  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE);
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
-
-  SizeTable              = IsPeiDb ? mPcdDatabase->PeiDb.Init.SizeTable: 
-                                     mPcdDatabase->DxeDb.Init.SizeTable;
 
   TokenNumber            = IsPeiDb ? TokenNumber :
                                      TokenNumber - PEI_LOCAL_TOKEN_NUMBER;
@@ -496,7 +492,7 @@ GetSkuEnabledTokenNumber (
 
 
 
-
+STATIC
 VOID
 InvokeCallbackOnSet (
   UINT32            ExTokenNumber,
@@ -597,7 +593,7 @@ SetWorker (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  IsPeiDb = (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE;
+  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE);
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
@@ -895,7 +891,7 @@ GetExPcdTokenNumber (
 }
 
 
-
+STATIC
 SKU_ID *
 GetSkuIdArray (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -923,7 +919,7 @@ GetSkuIdArray (
 }
 
 
-
+STATIC
 UINTN
 GetSizeTableIndexA (
   IN UINTN        LocalTokenNumberTableIdx,
@@ -980,7 +976,7 @@ GetSizeTableIndexA (
 
 
 
-
+STATIC
 UINTN
 GetSizeTableIndex (
   IN    UINTN             LocalTokenNumberTableIdx,

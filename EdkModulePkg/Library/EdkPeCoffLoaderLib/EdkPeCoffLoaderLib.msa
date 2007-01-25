@@ -31,6 +31,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>EdkPeCoffLoader.c</Filename>
+    <Filename>EdkPeCoffLoaderLibInternals.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

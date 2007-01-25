@@ -189,7 +189,6 @@ IDEBusDriverBindingStart (
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeInit;
   BOOLEAN                           EnumAll;
   BOOLEAN                           ChannelEnabled;
-  UINT8                             ChannelCount;
   UINT8                             MaxDevices;
   EFI_IDENTIFY_DATA                 IdentifyData;
   EFI_ATA_COLLECTIVE_MODE           *SupportedModes;
@@ -239,10 +238,9 @@ IDEBusDriverBindingStart (
   }
 
   //
-  // Save Enumall and ChannelCount. Step7.2
+  // Save Enumall. Step7.2
   //
   EnumAll       = IdeInit->EnumAll;
-  ChannelCount  = IdeInit->ChannelCount;
 
   //
   // Consume PCI I/O protocol. Note that the OpenProtocol with _GET_PROTOCOL
@@ -453,8 +451,8 @@ IDEBusDriverBindingStart (
       ZeroMem (IdeBlkIoDevicePtr, sizeof (IDE_BLK_IO_DEV));
 
       IdeBlkIoDevicePtr->Signature  = IDE_BLK_IO_DEV_SIGNATURE;
-      IdeBlkIoDevicePtr->Channel    = IdeChannel;
-      IdeBlkIoDevicePtr->Device     = IdeDevice;
+      IdeBlkIoDevicePtr->Channel    = (EFI_IDE_CHANNEL) IdeChannel;
+      IdeBlkIoDevicePtr->Device     = (EFI_IDE_DEVICE) IdeDevice;
 
       //
       // initialize Block IO interface's Media pointer
@@ -666,7 +664,7 @@ IDEBusDriverBindingStart (
       //
       // Record PIO mode used in private data
       //
-      IdeBlkIoDevicePtr->PioMode = SupportedModes->PioMode.Mode;
+      IdeBlkIoDevicePtr->PioMode = (ATA_PIO_MODE) SupportedModes->PioMode.Mode;
 
       //
       // Set IDE controller Timing Blocks in the PCI Configuration Space

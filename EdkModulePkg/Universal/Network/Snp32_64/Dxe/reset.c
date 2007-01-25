@@ -20,6 +20,7 @@ Revision history:
 
 #include "Snp.h"
 
+STATIC
 EFI_STATUS
 pxe_reset (
   SNP_DRIVER *snp
@@ -95,11 +96,6 @@ Returns:
 --*/
 {
   SNP_DRIVER  *snp;
-
-  //
-  // Resolve Warning 4 unreferenced parameter problem
-  //
-  ExtendedVerification = 0;
 
   if (this == NULL) {
     return EFI_INVALID_PARAMETER;

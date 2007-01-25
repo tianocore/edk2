@@ -1032,10 +1032,8 @@ GraphicsConsoleConOutTestString (
   UINT16                GlyphWidth;
   UINT32                GlyphStatus;
   UINT16                Count;
-  GRAPHICS_CONSOLE_DEV  *Private;
   GLYPH_UNION           *Glyph;
 
-  Private     = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GlyphStatus = 0;
   Count       = 0;
 

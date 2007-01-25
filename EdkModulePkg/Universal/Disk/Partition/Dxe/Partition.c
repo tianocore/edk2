@@ -437,6 +437,7 @@ PartitionDriverBindingStop (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 PartitionReset (
@@ -469,6 +470,7 @@ PartitionReset (
                                   );
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 PartitionReadBlocks (
@@ -524,6 +526,7 @@ PartitionReadBlocks (
   return Private->DiskIo->ReadDisk (Private->DiskIo, MediaId, Offset, BufferSize, Buffer);
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 PartitionWriteBlocks (
@@ -580,6 +583,7 @@ PartitionWriteBlocks (
   return Private->DiskIo->WriteDisk (Private->DiskIo, MediaId, Offset, BufferSize, Buffer);
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 PartitionFlushBlocks (

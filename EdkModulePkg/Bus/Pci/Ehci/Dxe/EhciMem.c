@@ -380,7 +380,7 @@ Returns:
       // reset associated bits in bit arry
       //
       for (Index = StartBytePos, Index2 = StartBitPos, Count = 0; Count < (RealAllocSize / 32); Count++) {
-        TempHeaderPtr->BitArrayPtr[Index] ^= (UINT8) (bit (Index2));
+        TempHeaderPtr->BitArrayPtr[Index] = (UINT8) (TempHeaderPtr->BitArrayPtr[Index] ^ (bit (Index2)));
         Index2++;
         if (Index2 == 8) {
           Index += 1;
@@ -595,7 +595,7 @@ Returns:
   //
   for (TempBytePos = FoundBytePos, Index = FoundBitPos, Count = 0; Count < NumberOfMemoryUnit; Count++) {
 
-    MemoryHeader->BitArrayPtr[TempBytePos] |= bit (Index);
+    MemoryHeader->BitArrayPtr[TempBytePos] = (UINT8) (MemoryHeader->BitArrayPtr[TempBytePos] | (bit (Index)));
     Index++;
     if (Index == 8) {
       TempBytePos += 1;

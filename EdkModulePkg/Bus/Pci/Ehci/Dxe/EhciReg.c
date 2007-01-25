@@ -1136,7 +1136,7 @@ Returns:
     &PortStatusControlReg
     );
 
-  return ((PortStatusControlReg & PORTSC_PED) ? TRUE : FALSE);
+  return ((BOOLEAN) ((PortStatusControlReg & PORTSC_PED) ? TRUE : FALSE));
 }
 
 BOOLEAN
@@ -1347,7 +1347,7 @@ Returns:
   //
   gBS->Stall (EHCI_CLEAR_PORT_RESET_RECOVERY_TIME);
 
-  return (IsEhcPortEnabled (HcDev, PortNum) ? TRUE : FALSE);
+  return ((BOOLEAN) (IsEhcPortEnabled (HcDev, PortNum) ? TRUE : FALSE));
 }
 
 EFI_STATUS

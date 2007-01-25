@@ -136,7 +136,7 @@ CoreProcessFvImageFile (
   IN  EFI_GUID                        *DriverName
   );
 
-
+STATIC
 VOID
 CoreAcquireDispatcherLock (
   VOID
@@ -161,6 +161,7 @@ Returns:
   CoreAcquireLock (&mDispatcherLock);
 }
 
+STATIC
 VOID
 CoreReleaseDispatcherLock (
   VOID
@@ -184,7 +185,7 @@ Returns:
   CoreReleaseLock (&mDispatcherLock);
 }
 
-
+STATIC
 EFI_STATUS
 CoreGetDepexSectionAndPreProccess (
   IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry
@@ -593,7 +594,7 @@ Returns:
   }
 }
 
-
+STATIC
 BOOLEAN
 FvHasBeenProcessed (
   IN  EFI_HANDLE      FvHandle
@@ -628,7 +629,7 @@ Returns:
   return FALSE;
 }
 
-
+STATIC
 VOID
 FvIsBeingProcesssed (
   IN  EFI_HANDLE    FvHandle

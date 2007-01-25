@@ -31,6 +31,7 @@ Abstract:
 
 #include "Partition.h"
 
+STATIC
 BOOLEAN
 PartitionValidMbr (
   IN  MASTER_BOOT_RECORD      *Mbr,

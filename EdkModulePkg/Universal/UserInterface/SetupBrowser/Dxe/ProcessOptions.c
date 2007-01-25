@@ -77,6 +77,7 @@ ExtractNvValue (
   return Status;
 }
 
+STATIC
 VOID
 AdjustNvMap (
   IN  EFI_FILE_FORM_TAGS          *FileFormTags,

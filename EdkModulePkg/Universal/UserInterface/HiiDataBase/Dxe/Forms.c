@@ -22,6 +22,7 @@ Abstract:
 
 #include "HiiDatabase.h"
 
+STATIC
 CHAR16*
 Ascii2Unicode (
   OUT CHAR16         *UnicodeStr,
@@ -54,6 +55,7 @@ Ascii2Unicode (
   }
 }
 
+STATIC
 CHAR8*
 Unicode2Ascii (
   OUT CHAR8          *AsciiStr,
@@ -86,6 +88,7 @@ Unicode2Ascii (
   }
 }
 
+STATIC
 VOID
 ExtractDevicePathData (
   IN     EFI_HII_DATA_TABLE   *DataTable,
@@ -129,6 +132,7 @@ Returns:
   *ExportBufferPtr  = ExportBuffer;
 }
 
+STATIC
 VOID
 ExtractVariableData (
   IN OUT EFI_HII_DATA_TABLE   *DataTable,
@@ -205,6 +209,7 @@ Returns:
                         &gEfiFormCallbackProtocolGuid,
                         (VOID *) &FormCallback
                         );
+        ASSERT_EFI_ERROR (Status);
       }
       //
       // Since we have a "Setup" variable that wasn't specified by a variable op-code
@@ -240,6 +245,7 @@ Returns:
                                  &TempValue,
                                  ExportBuffer
                                  );
+        ASSERT_EFI_ERROR (Status);
       } else {
         Status = gRT->GetVariable (
                         (CHAR16 *) SETUP_MAP_NAME,
@@ -248,6 +254,7 @@ Returns:
                         &TempValue,
                         ExportBuffer
                         );
+        ASSERT_EFI_ERROR (Status);
       }
 
       ExportBuffer = (UINT8 *) (UINTN) (((UINTN) ExportBuffer) + TempValue);
@@ -306,6 +313,7 @@ Returns:
                                  &TempValue,
                                  ExportBuffer
                                  );
+        ASSERT_EFI_ERROR (Status);
       } else {
         Status = gRT->GetVariable (
                         String,
@@ -314,6 +322,7 @@ Returns:
                         &TempValue,
                         ExportBuffer
                         );
+        ASSERT_EFI_ERROR (Status);
       }
 
       ExportBuffer = (UINT8 *) (UINTN) (((UINTN) ExportBuffer) + TempValue);
@@ -367,7 +376,6 @@ Returns:
   UINT8                     *ExportBuffer;
   EFI_HII_EXPORT_TABLE      *ExportTable;
   EFI_HII_DATA_TABLE        *DataTable;
-  BOOLEAN                   InsufficientSize;
   BOOLEAN                   VariableExist;
   UINT16                    NumberOfHiiDataTables;
   UINTN                     SizeNeeded;
@@ -386,7 +394,6 @@ Returns:
   FormPack              = NULL;
   RawData               = NULL;
   PackageInstance       = NULL;
-  InsufficientSize      = FALSE;
   NumberOfHiiDataTables = 0;
   VariableSize          = 0;
   TempValue             = 0;

@@ -50,6 +50,7 @@ GetNextDataRecord (
   IN OUT  UINT64          *PtrCurrentMTC
   );
 
+STATIC
 EFI_STATUS
 EFIAPI
 DataHubLogData (
@@ -177,6 +178,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 DataHubGetNextRecord (
@@ -306,6 +308,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 DataHubRegisterFilterDriver (
@@ -404,6 +407,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 DataHubUnregisterFilterDriver (

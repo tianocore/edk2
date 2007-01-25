@@ -443,12 +443,10 @@ USBFloppyReadBlocks (
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
   EFI_TPL             OldTpl;
-  UINT32              Retry;
 
   OldTpl          = gBS->RaiseTPL (EFI_TPL_NOTIFY);
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
-  Retry           = 0;
 
   UsbFloppyDevice = USB_FLOPPY_DEV_FROM_THIS (This);
 
@@ -594,12 +592,10 @@ USBFloppyWriteBlocks (
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
   EFI_TPL             OldTpl;
-  UINT32              Retry;
 
   OldTpl          = gBS->RaiseTPL (EFI_TPL_NOTIFY);
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
-  Retry           = 0;
 
   UsbFloppyDevice = USB_FLOPPY_DEV_FROM_THIS (This);
 

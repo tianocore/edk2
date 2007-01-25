@@ -1281,9 +1281,9 @@ EhciGetRootHubPortStatus (
     // Not Low Speed Device Attached
     //
     if ((PORTSC_CCS & PortStatusControlReg) && (PORTSC_CSC & PortStatusControlReg)) {
-      HcDev->DeviceSpeed[PortNumber] = IsHighSpeedDevice (This, PortNumber) ? USB_PORT_STAT_HIGH_SPEED : 0;
+      HcDev->DeviceSpeed[PortNumber] = (UINT16) (IsHighSpeedDevice (This, PortNumber) ? USB_PORT_STAT_HIGH_SPEED : 0);
     }
-    PortStatus->PortStatus |= HcDev->DeviceSpeed[PortNumber];
+    PortStatus->PortStatus = (UINT16) (PortStatus->PortStatus | HcDev->DeviceSpeed[PortNumber]);
   }
   //
   // Fill Port Status Change bits

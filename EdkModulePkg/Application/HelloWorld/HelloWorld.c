@@ -12,6 +12,7 @@
 
 **/
 
+STATIC
 VOID
 Print (
   IN CONST CHAR16  *Format,
@@ -26,6 +27,13 @@ Print (
   gST->ConOut->OutputString (gST->ConOut, PrintBuffer);
   return;
 }
+
+EFI_STATUS
+EFIAPI
+UefiMain (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
 
 EFI_STATUS
 EFIAPI

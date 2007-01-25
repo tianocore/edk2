@@ -355,6 +355,7 @@ Routine Description:
   return ReturnStatus;
 }
 
+STATIC
 EFI_STATUS
 DevNullGraphicsOutputBlt (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,

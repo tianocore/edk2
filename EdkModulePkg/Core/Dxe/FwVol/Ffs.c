@@ -143,7 +143,7 @@ Returns:
   }
 }
 
-
+STATIC
 BOOLEAN
 VerifyHeaderChecksum (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
@@ -172,7 +172,7 @@ Returns:
     HeaderChecksum = (UINT8)(HeaderChecksum + ptr[Index]);
   }
 
-  HeaderChecksum = HeaderChecksum - FfsHeader->State - FfsHeader->IntegrityCheck.Checksum.File;
+  HeaderChecksum = (UINT8) (HeaderChecksum - FfsHeader->State - FfsHeader->IntegrityCheck.Checksum.File);
 
   if (HeaderChecksum == 0) {
     return TRUE;

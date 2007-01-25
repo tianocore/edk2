@@ -362,6 +362,7 @@ ScsiGetDeviceType (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 ScsiGetDeviceLocation (

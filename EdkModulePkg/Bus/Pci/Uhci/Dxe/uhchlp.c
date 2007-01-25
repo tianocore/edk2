@@ -21,6 +21,7 @@ Revision History
 
 #include "uhci.h"
 
+STATIC
 EFI_STATUS
 USBReadPortW (
   IN       EFI_PCI_IO_PROTOCOL     *PciIo,
@@ -58,6 +59,7 @@ Returns:
                      );
 }
 
+STATIC
 EFI_STATUS
 USBReadPortDW (
   IN       EFI_PCI_IO_PROTOCOL     *PciIo,
@@ -95,6 +97,7 @@ Returns:
                      );
 }
 
+STATIC
 EFI_STATUS
 USBWritePortW (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
@@ -132,6 +135,7 @@ Returns:
                      );
 }
 
+STATIC
 EFI_STATUS
 USBWritePortDW (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
@@ -654,13 +658,12 @@ Returns:
 --*/
 {
   UINT16      CommandContent;
-  EFI_STATUS  Status;
 
-  Status = ReadUHCCommandReg (
-             HcDev->PciIo,
-             (UINT32) (USBCMD),
-             &CommandContent
-             );
+  ReadUHCCommandReg (
+    HcDev->PciIo,
+    (UINT32) (USBCMD),
+    &CommandContent
+    );
 
   if ((CommandContent & USBCMD_MAXP) != USBCMD_MAXP) {
     CommandContent |= USBCMD_MAXP;
@@ -835,6 +838,7 @@ Returns:
 //
 // functions for QH
 //
+STATIC
 EFI_STATUS
 AllocateQHStruct (
   IN  USB_HC_DEV     *HcDev,
@@ -1196,6 +1200,7 @@ Returns:
   return (BOOLEAN) (!(PtrQH->QH.QHVerticalTerminate));
 }
 
+STATIC
 BOOLEAN
 GetQHHorizontalValidorInvalid (
   IN QH_STRUCT     *PtrQH
@@ -1769,6 +1774,7 @@ Returns:
   return (VOID *) ((UINTN) (ptrTDStruct->TDData.TDLinkPtr << 4));
 }
 
+STATIC
 BOOLEAN
 IsTDLinkPtrQHOrTD (
   IN TD_STRUCT     *ptrTDStruct
@@ -2325,6 +2331,7 @@ SetCurFrameListQHorTD (
   pCurEntry->FrameListPtrQSelect = (IsQH ? 1 : 0);
 }
 
+STATIC
 BOOLEAN
 IsCurFrameListQHorTD (
   IN FRAMELIST_ENTRY     *pCurEntry
@@ -3854,7 +3861,7 @@ Returns:
       //
       for (Index = StartBytePos, Index2 = StartBitPos, Count = 0; Count < (RealAllocSize / 32); Count++) {
 
-        TempHeaderPtr->BitArrayPtr[Index] ^= (UINT8) (bit (Index2));
+        TempHeaderPtr->BitArrayPtr[Index] = (UINT8) (TempHeaderPtr->BitArrayPtr[Index] ^ bit (Index2));
         Index2++;
         if (Index2 == 8) {
           Index += 1;
@@ -4067,7 +4074,7 @@ Returns:
   for (TempBytePos = FoundBytePos, Index = FoundBitPos,Count = 0;
        Count < NumberOfMemoryUnit; Count ++) {
 
-    MemoryHeader->BitArrayPtr[TempBytePos] |= bit (Index);
+    MemoryHeader->BitArrayPtr[TempBytePos] = (UINT8) (MemoryHeader->BitArrayPtr[TempBytePos] | bit (Index));
     Index++;
     if (Index == 8) {
       TempBytePos += 1;

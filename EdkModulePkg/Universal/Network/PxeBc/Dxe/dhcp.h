@@ -622,6 +622,11 @@ typedef struct DhcpReceiveBufferStruct {
 #define CREDENTIALS_TYPE  (1 << 3)
 #define USE_THREE_BYTE    (1 << 4)
 
+VOID
+OptionsStrucInit (
+  VOID
+  );
+
 #endif // _DHCP_H
 
 /* EOF - dhcp.h */

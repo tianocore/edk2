@@ -83,6 +83,7 @@ Returns:
   mBooleanEvaluationStackEnd  = NewStack + StackSizeInBoolean;
 }
 
+STATIC
 VOID
 InitializeBooleanEvaluator (
   VOID
@@ -176,6 +177,7 @@ Returns:
   return ReturnValue;
 }
 
+STATIC
 EFI_STATUS
 GrowBooleanExpression (
   IN      EFI_INCONSISTENCY_DATA  *InconsistentTags,
@@ -212,6 +214,7 @@ GrowBooleanExpression (
   return EFI_SUCCESS;
 }
 
+STATIC
 VOID
 CreateBooleanExpression (
   IN  EFI_FILE_FORM_TAGS    *FileFormTags,
@@ -311,6 +314,7 @@ NextEntry:
   GrowBooleanExpression (&FakeInconsistentTags, BooleanExpression, BooleanExpressionLength);
 }
 
+STATIC
 EFI_STATUS
 BooleanVariableWorker (
   IN     CHAR16                   *VariableName,
@@ -369,6 +373,7 @@ Returns:
   return Status;
 }
 
+STATIC
 UINT8
 PredicateIfrType (
   IN  EFI_INCONSISTENCY_DATA      *Iterator
@@ -416,6 +421,7 @@ Returns:
   return 0x2;
 }
 
+STATIC
 VOID
 PostOrderEvaluate (
   IN      EFI_FILE_FORM_TAGS          *FileFormTags,
@@ -616,7 +622,7 @@ Returns:
       break;
     case EFI_IFR_NOT_OP:
       Operator  = PopBool (StackPtr);
-      PushBool (StackPtr, !Operator);
+      PushBool (StackPtr, (BOOLEAN) (!Operator));
       break;
 
     case EFI_IFR_SUPPRESS_IF_OP:
@@ -1350,11 +1356,12 @@ Returns:
         return Operator;
       }
 
-      return FALSE;
+      goto Done;
     }
 
     Iterator++;
   }
 
+Done:
   return FALSE;
 }

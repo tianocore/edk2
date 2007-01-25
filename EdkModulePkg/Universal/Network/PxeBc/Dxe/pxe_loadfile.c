@@ -393,24 +393,23 @@ Returns:
     if (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key) == EFI_NOT_READY) {
       UINT8       Buffer[512];
       UINTN       BufferSize;
-      EFI_STATUS  Status;
 
       BufferSize = sizeof Buffer;
 
-      Status = Private->EfiBc.UdpRead (
-                                &Private->EfiBc,
-                                EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP |
-                                EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT |
-                                EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT,
-                                NULL, /* dest ip */
-                                NULL, /* dest port */
-                                NULL, /* src ip */
-                                NULL, /* src port */
-                                NULL, /* hdr size */
-                                NULL, /* hdr ptr */
-                                &BufferSize,
-                                Buffer
-                                );
+      Private->EfiBc.UdpRead (
+                       &Private->EfiBc,
+                       EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP |
+                       EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT |
+                       EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT,
+                       NULL, /* dest ip */
+                       NULL, /* dest port */
+                       NULL, /* src ip */
+                       NULL, /* src port */
+                       NULL, /* hdr size */
+                       NULL, /* hdr ptr */
+                       &BufferSize,
+                       Buffer
+                       );
 
       continue;
     }
@@ -870,6 +869,7 @@ Returns:
   return NULL;
 }
 
+STATIC
 UINT8 *
 PxeBcFindDhcpOpt (
   EFI_PXE_BASE_CODE_PACKET  *PacketPtr,
@@ -1088,7 +1088,6 @@ Returns:
 
   if (Private->EfiBc.Mode->BisSupported && Private->EfiBc.Mode->BisDetected && Private->EfiBc.Mode->PxeBisReplyReceived) {
     UINT64  CredentialLen;
-    UINTN   BlockSize;
     UINT8   CredentialFilename[256];
     UINT8   *op;
     VOID    *CredentialBuffer;
@@ -1397,11 +1396,6 @@ Returns:
   RemoveCallback  = FALSE;
 
   AsciiPrint ("Running LoadFile()\n");
-
-  //
-  // Resolve Warning 4 unreferenced parameter problem
-  //
-  FilePath = NULL;
 
   //
   // If either if these parameters are NULL, we cannot continue.

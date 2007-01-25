@@ -45,17 +45,6 @@ PxeBcDriverStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
-extern
-VOID
-InitArpHeader (
-  VOID
-  );
-extern
-VOID
-OptionsStrucInit (
-  VOID
-  );
-
 //
 // helper routines
 //
@@ -310,8 +299,8 @@ IpChecksum2 (
 {
   UINT32  Sum;
 
-  Sum = (UINT16)~IpChecksum (Header, HeaderLen) + (UINT16)~IpChecksum (Message, MessageLen);
-
+  Sum = (UINT16)~IpChecksum (Header, HeaderLen);
+  Sum = Sum + (UINT16)~IpChecksum (Message, MessageLen);
   //
   // in case above carried
   //
@@ -1597,7 +1586,6 @@ BcStop (
   //
   // Lock the instance data
   //
-  EFI_PXE_BASE_CODE_MODE      *PxebcMode;
   EFI_SIMPLE_NETWORK_PROTOCOL *SnpPtr;
   EFI_SIMPLE_NETWORK_MODE     *SnpModePtr;
   EFI_STATUS                  StatCode;
@@ -1619,7 +1607,6 @@ BcStop (
 
   EfiAcquireLock (&Private->Lock);
 
-  PxebcMode   = Private->EfiBc.Mode;
   SnpPtr      = Private->SimpleNetwork;
   SnpModePtr  = SnpPtr->Mode;
 
@@ -2069,13 +2056,11 @@ BcSetStationIP (
 --*/
 {
   EFI_PXE_BASE_CODE_MODE  *PxebcMode;
-  EFI_STATUS              StatCode;
   PXE_BASECODE_DEVICE     *Private;
 
   //
   // Lock the instance data and make sure started
   //
-  StatCode = EFI_SUCCESS;
 
   if (This == NULL) {
     DEBUG ((EFI_D_ERROR, "BC *This pointer == NULL"));

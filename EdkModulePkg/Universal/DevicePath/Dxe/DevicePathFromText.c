@@ -21,6 +21,7 @@ Abstract:
 
 #include "DevicePath.h"
 
+STATIC
 CHAR16 *
 StrDuplicate (
   IN CONST CHAR16  *Src
@@ -48,6 +49,7 @@ StrDuplicate (
   return ReturnStr;
 }
 
+STATIC
 CHAR16 *
 GetParamByNodeName (
   IN CHAR16 *Str,
@@ -118,6 +120,7 @@ GetParamByNodeName (
   return ParamStr;
 }
 
+STATIC
 CHAR16 *
 SplitStr (
   IN OUT CHAR16 **List,
@@ -176,6 +179,7 @@ SplitStr (
   return ReturnStr;
 }
 
+STATIC
 CHAR16 *
 GetNextParamStr (
   IN OUT CHAR16 **List
@@ -187,6 +191,7 @@ GetNextParamStr (
   return SplitStr (List, L',');
 }
 
+STATIC
 CHAR16 *
 GetNextDeviceNodeStr (
   IN OUT CHAR16   **DevicePath,
@@ -273,6 +278,7 @@ GetNextDeviceNodeStr (
   return ReturnStr;
 }
 
+STATIC
 BOOLEAN
 IsHexDigit (
   OUT UINT8      *Digit,
@@ -312,6 +318,7 @@ IsHexDigit (
   return FALSE;
 }
 
+STATIC
 CHAR16
 NibbleToHexChar (
   IN UINT8      Nibble
@@ -337,6 +344,7 @@ NibbleToHexChar (
   return (CHAR16)(Nibble - 0xA + L'A');
 }
 
+STATIC
 EFI_STATUS
 HexStringToBuf (
   IN OUT UINT8                     *Buf,   
@@ -410,7 +418,7 @@ HexStringToBuf (
     } else {
       Byte = Buf[Idx / 2];
       Byte &= 0x0F;
-      Byte |= Digit << 4;
+      Byte = (UINT8) (Byte | Digit << 4);
     }
 
     Buf[Idx / 2] = Byte;
@@ -423,6 +431,7 @@ HexStringToBuf (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 BufToHexString (
   IN OUT CHAR16                    *Str,
@@ -481,6 +490,7 @@ BufToHexString (
   return EFI_SUCCESS;
 }
 
+STATIC
 CHAR16 *
 TrimHexStr (
   IN CHAR16  *Str
@@ -519,6 +529,7 @@ TrimHexStr (
   return Str;
 }
 
+STATIC
 UINTN
 Xtoi (
   IN CHAR16  *Str
@@ -552,6 +563,7 @@ Returns:
   return Rvalue;
 }
 
+STATIC
 VOID
 Xtoi64 (
   IN CHAR16  *Str,
@@ -578,6 +590,7 @@ Returns:
   HexStringToBuf ((UINT8 *) Data, &Length, TrimHexStr (Str), NULL);
 }
 
+STATIC
 UINTN
 Atoi (
   IN CHAR16  *str
@@ -633,6 +646,7 @@ Returns:
   return Rvalue;
 }
 
+STATIC
 EFI_STATUS 
 StrToBuf (
   OUT UINT8    *Buf,
@@ -659,11 +673,11 @@ StrToBuf (
     // and for even characters, the lower nibble.
     //
     if ((Index & 1) == 0) {
-      Byte = Digit << 4;
+      Byte = (UINT8) (Digit << 4);
     } else {
       Byte = Buf[Index / 2];
       Byte &= 0xF0;
-      Byte |= Digit;
+      Byte = (UINT8) (Byte | Digit);
     }
 
     Buf[Index / 2] = Byte;
@@ -672,6 +686,7 @@ StrToBuf (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 StrToGuid (
   IN  CHAR16   *Str,
@@ -734,6 +749,7 @@ StrToGuid (
   return EFI_SUCCESS;
 }
 
+STATIC
 VOID
 StrToIPv4Addr (
   IN OUT CHAR16           **Str,
@@ -747,6 +763,7 @@ StrToIPv4Addr (
   }
 }
 
+STATIC
 VOID
 StrToIPv6Addr (
   IN OUT CHAR16           **Str,
@@ -763,6 +780,7 @@ StrToIPv6Addr (
   }
 }
 
+STATIC
 VOID
 StrToAscii (
   IN     CHAR16 *Str,
@@ -783,6 +801,7 @@ StrToAscii (
   *AsciiStr = Dest + 1;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPci (
   IN CHAR16 *TextDeviceNode
@@ -806,6 +825,7 @@ DevPathFromTextPci (
   return (EFI_DEVICE_PATH_PROTOCOL *) Pci;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPcCard (
   IN CHAR16 *TextDeviceNode
@@ -826,6 +846,7 @@ DevPathFromTextPcCard (
   return (EFI_DEVICE_PATH_PROTOCOL *) Pccard;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMemoryMapped (
   IN CHAR16 *TextDeviceNode
@@ -851,6 +872,7 @@ DevPathFromTextMemoryMapped (
   return (EFI_DEVICE_PATH_PROTOCOL *) MemMap;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextVendor (
   IN CHAR16 *TextDeviceNode,
@@ -884,6 +906,7 @@ ConvertFromTextVendor (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenHw (
   IN CHAR16 *TextDeviceNode
@@ -896,6 +919,7 @@ DevPathFromTextVenHw (
            );
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextCtrl (
   IN CHAR16 *TextDeviceNode
@@ -915,6 +939,7 @@ DevPathFromTextCtrl (
   return (EFI_DEVICE_PATH_PROTOCOL *) Controller;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpi (
   IN CHAR16 *TextDeviceNode
@@ -942,6 +967,7 @@ DevPathFromTextAcpi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Acpi;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextAcpi (
   IN CHAR16 *TextDeviceNode,
@@ -964,6 +990,7 @@ ConvertFromTextAcpi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Acpi;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPciRoot (
   IN CHAR16 *TextDeviceNode
@@ -972,6 +999,7 @@ DevPathFromTextPciRoot (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0a0341d0);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFloppy (
   IN CHAR16 *TextDeviceNode
@@ -980,6 +1008,7 @@ DevPathFromTextFloppy (
   return ConvertFromTextAcpi (TextDeviceNode, 0x060441d0);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextKeyboard (
   IN CHAR16 *TextDeviceNode
@@ -988,6 +1017,7 @@ DevPathFromTextKeyboard (
   return ConvertFromTextAcpi (TextDeviceNode, 0x030141d0);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextSerial (
   IN CHAR16 *TextDeviceNode
@@ -996,6 +1026,7 @@ DevPathFromTextSerial (
   return ConvertFromTextAcpi (TextDeviceNode, 0x050141d0);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextParallelPort (
   IN CHAR16 *TextDeviceNode
@@ -1004,6 +1035,7 @@ DevPathFromTextParallelPort (
   return ConvertFromTextAcpi (TextDeviceNode, 0x040141d0);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpiEx (
   IN CHAR16 *TextDeviceNode
@@ -1025,10 +1057,10 @@ DevPathFromTextAcpiEx (
   HIDSTRStr = GetNextParamStr (&TextDeviceNode);
   CIDSTRStr = GetNextParamStr (&TextDeviceNode);
   UIDSTRStr = GetNextParamStr (&TextDeviceNode);
-  Length    = sizeof (ACPI_EXTENDED_HID_DEVICE_PATH) + 
-                  (UINT16) StrLen (HIDSTRStr) + 1 +
-                  (UINT16) StrLen (UIDSTRStr) + 1 +
-                  (UINT16) StrLen (CIDSTRStr) + 1;
+
+  Length    = (UINT16) (sizeof (ACPI_EXTENDED_HID_DEVICE_PATH) + StrLen (HIDSTRStr) + 1);
+  Length    = (UINT16) (Length + StrLen (UIDSTRStr) + 1);
+  Length    = (UINT16) (Length + StrLen (CIDSTRStr) + 1);
   AcpiExt = (ACPI_EXTENDED_HID_DEVICE_PATH_WITH_STR *) CreateDeviceNode (
                                                          ACPI_DEVICE_PATH,
                                                          ACPI_EXTENDED_DP,
@@ -1053,6 +1085,7 @@ DevPathFromTextAcpiEx (
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiExt;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpiExp (
   IN CHAR16 *TextDeviceNode
@@ -1103,6 +1136,7 @@ DevPathFromTextAcpiExp (
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiExt;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAta (
   IN CHAR16 *TextDeviceNode
@@ -1123,13 +1157,14 @@ DevPathFromTextAta (
   SlaveMasterStr          = GetNextParamStr (&TextDeviceNode);
   LunStr                  = GetNextParamStr (&TextDeviceNode);
 
-  Atapi->PrimarySecondary = (StrCmp (PrimarySecondaryStr, L"Primary") == 0) ? (UINT8) 0 : (UINT8) 1;
-  Atapi->SlaveMaster      = (StrCmp (SlaveMasterStr, L"Master") == 0) ? (UINT8) 0 : (UINT8) 1;
+  Atapi->PrimarySecondary = (UINT8) ((StrCmp (PrimarySecondaryStr, L"Primary") == 0) ? 0 : 1);
+  Atapi->SlaveMaster      = (UINT8) ((StrCmp (SlaveMasterStr, L"Master") == 0) ? 0 : 1);
   Atapi->Lun              = (UINT16) Xtoi (LunStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Atapi;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextScsi (
   IN CHAR16 *TextDeviceNode
@@ -1153,6 +1188,7 @@ DevPathFromTextScsi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Scsi;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFibre (
   IN CHAR16 *TextDeviceNode
@@ -1177,6 +1213,7 @@ DevPathFromTextFibre (
   return (EFI_DEVICE_PATH_PROTOCOL *) Fibre;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromText1394 (
   IN CHAR16 *TextDeviceNode
@@ -1198,6 +1235,7 @@ DevPathFromText1394 (
   return (EFI_DEVICE_PATH_PROTOCOL *) F1394;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsb (
   IN CHAR16 *TextDeviceNode
@@ -1221,6 +1259,7 @@ DevPathFromTextUsb (
   return (EFI_DEVICE_PATH_PROTOCOL *) Usb;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextI2O (
   IN CHAR16 *TextDeviceNode
@@ -1241,6 +1280,7 @@ DevPathFromTextI2O (
   return (EFI_DEVICE_PATH_PROTOCOL *) I2O;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextInfiniband (
   IN CHAR16 *TextDeviceNode
@@ -1275,6 +1315,7 @@ DevPathFromTextInfiniband (
   return (EFI_DEVICE_PATH_PROTOCOL *) InfiniBand;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenMsg (
   IN CHAR16 *TextDeviceNode
@@ -1287,6 +1328,7 @@ DevPathFromTextVenMsg (
             );
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenPcAnsi (
   IN CHAR16 *TextDeviceNode
@@ -1303,6 +1345,7 @@ DevPathFromTextVenPcAnsi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenVt100 (
   IN CHAR16 *TextDeviceNode
@@ -1319,6 +1362,7 @@ DevPathFromTextVenVt100 (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenVt100Plus (
   IN CHAR16 *TextDeviceNode
@@ -1335,6 +1379,7 @@ DevPathFromTextVenVt100Plus (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenUtf8 (
   IN CHAR16 *TextDeviceNode
@@ -1351,6 +1396,7 @@ DevPathFromTextVenUtf8 (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUartFlowCtrl (
   IN CHAR16 *TextDeviceNode
@@ -1378,6 +1424,7 @@ DevPathFromTextUartFlowCtrl (
   return (EFI_DEVICE_PATH_PROTOCOL *) UartFlowControl;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextSAS (
   IN CHAR16 *TextDeviceNode
@@ -1442,6 +1489,7 @@ DevPathFromTextSAS (
   return (EFI_DEVICE_PATH_PROTOCOL *) Sas;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextDebugPort (
   IN CHAR16 *TextDeviceNode
@@ -1460,6 +1508,7 @@ DevPathFromTextDebugPort (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vend;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMAC (
   IN CHAR16 *TextDeviceNode
@@ -1486,6 +1535,7 @@ DevPathFromTextMAC (
   return (EFI_DEVICE_PATH_PROTOCOL *) MAC;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextIPv4 (
   IN CHAR16 *TextDeviceNode
@@ -1508,7 +1558,7 @@ DevPathFromTextIPv4 (
                                                  );
 
   StrToIPv4Addr (&RemoteIPStr, &IPv4->RemoteIpAddress);
-  IPv4->Protocol = (StrCmp (ProtocolStr, L"UDP") == 0) ? (UINT16) 0 : (UINT16) 1;
+  IPv4->Protocol = (UINT16) ((StrCmp (ProtocolStr, L"UDP") == 0) ? 0 : 1);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv4->StaticIpAddress = TRUE;
   } else {
@@ -1523,6 +1573,7 @@ DevPathFromTextIPv4 (
   return (EFI_DEVICE_PATH_PROTOCOL *) IPv4;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextIPv6 (
   IN CHAR16 *TextDeviceNode
@@ -1545,7 +1596,7 @@ DevPathFromTextIPv6 (
                                                  );
 
   StrToIPv6Addr (&RemoteIPStr, &IPv6->RemoteIpAddress);
-  IPv6->Protocol        = (StrCmp (ProtocolStr, L"UDP") == 0) ? (UINT16) 0 : (UINT16) 1;
+  IPv6->Protocol        = (UINT16) ((StrCmp (ProtocolStr, L"UDP") == 0) ? 0 : 1);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv6->StaticIpAddress = TRUE;
   } else {
@@ -1560,6 +1611,7 @@ DevPathFromTextIPv6 (
   return (EFI_DEVICE_PATH_PROTOCOL *) IPv6;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUart (
   IN CHAR16 *TextDeviceNode
@@ -1582,7 +1634,7 @@ DevPathFromTextUart (
                                            );
 
   Uart->BaudRate  = (StrCmp (BaudStr, L"DEFAULT") == 0) ? 115200 : Atoi (BaudStr);
-  Uart->DataBits  = (StrCmp (DataBitsStr, L"DEFAULT") == 0) ? (UINT8) 8 : (UINT8) Atoi (DataBitsStr);
+  Uart->DataBits  = (UINT8) ((StrCmp (DataBitsStr, L"DEFAULT") == 0) ? 8 : Atoi (DataBitsStr));
   switch (*ParityStr) {
   case L'D':
     Uart->Parity = 0;
@@ -1626,6 +1678,7 @@ DevPathFromTextUart (
   return (EFI_DEVICE_PATH_PROTOCOL *) Uart;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextUsbClass (
   IN CHAR16         *TextDeviceNode,
@@ -1670,6 +1723,7 @@ ConvertFromTextUsbClass (
 }
 
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbClass (
   IN CHAR16 *TextDeviceNode
@@ -1683,6 +1737,7 @@ DevPathFromTextUsbClass (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbAudio (
   IN CHAR16 *TextDeviceNode
@@ -1697,6 +1752,7 @@ DevPathFromTextUsbAudio (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbCDCControl (
   IN CHAR16 *TextDeviceNode
@@ -1711,6 +1767,7 @@ DevPathFromTextUsbCDCControl (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbHID (
   IN CHAR16 *TextDeviceNode
@@ -1725,6 +1782,7 @@ DevPathFromTextUsbHID (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbImage (
   IN CHAR16 *TextDeviceNode
@@ -1739,6 +1797,7 @@ DevPathFromTextUsbImage (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbPrinter (
   IN CHAR16 *TextDeviceNode
@@ -1753,6 +1812,7 @@ DevPathFromTextUsbPrinter (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbMassStorage (
   IN CHAR16 *TextDeviceNode
@@ -1767,6 +1827,7 @@ DevPathFromTextUsbMassStorage (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbHub (
   IN CHAR16 *TextDeviceNode
@@ -1781,6 +1842,7 @@ DevPathFromTextUsbHub (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbCDCData (
   IN CHAR16 *TextDeviceNode
@@ -1795,6 +1857,7 @@ DevPathFromTextUsbCDCData (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbSmartCard (
   IN CHAR16 *TextDeviceNode
@@ -1809,6 +1872,7 @@ DevPathFromTextUsbSmartCard (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbVideo (
   IN CHAR16 *TextDeviceNode
@@ -1823,6 +1887,7 @@ DevPathFromTextUsbVideo (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbDiagnostic (
   IN CHAR16 *TextDeviceNode
@@ -1837,6 +1902,7 @@ DevPathFromTextUsbDiagnostic (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbWireless (
   IN CHAR16 *TextDeviceNode
@@ -1851,6 +1917,7 @@ DevPathFromTextUsbWireless (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbDeviceFirmwareUpdate (
   IN CHAR16 *TextDeviceNode
@@ -1866,6 +1933,7 @@ DevPathFromTextUsbDeviceFirmwareUpdate (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbIrdaBridge (
   IN CHAR16 *TextDeviceNode
@@ -1881,6 +1949,7 @@ DevPathFromTextUsbIrdaBridge (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbTestAndMeasurement (
   IN CHAR16 *TextDeviceNode
@@ -1896,6 +1965,7 @@ DevPathFromTextUsbTestAndMeasurement (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbWwid (
   IN CHAR16 *TextDeviceNode
@@ -1922,6 +1992,7 @@ DevPathFromTextUsbWwid (
   return (EFI_DEVICE_PATH_PROTOCOL *) UsbWwid;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUnit (
   IN CHAR16 *TextDeviceNode
@@ -1942,6 +2013,7 @@ DevPathFromTextUnit (
   return (EFI_DEVICE_PATH_PROTOCOL *) LogicalUnit;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextiSCSI (
   IN CHAR16 *TextDeviceNode
@@ -1999,6 +2071,7 @@ DevPathFromTextiSCSI (
   return (EFI_DEVICE_PATH_PROTOCOL *) iSCSI;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextHD (
   IN CHAR16 *TextDeviceNode
@@ -2054,6 +2127,7 @@ DevPathFromTextHD (
   return (EFI_DEVICE_PATH_PROTOCOL *) Hd;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextCDROM (
   IN CHAR16 *TextDeviceNode
@@ -2080,6 +2154,7 @@ DevPathFromTextCDROM (
   return (EFI_DEVICE_PATH_PROTOCOL *) CDROM;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenMEDIA (
   IN CHAR16 *TextDeviceNode
@@ -2092,6 +2167,7 @@ DevPathFromTextVenMEDIA (
            );
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFilePath (
   IN CHAR16 *TextDeviceNode
@@ -2110,6 +2186,7 @@ DevPathFromTextFilePath (
   return (EFI_DEVICE_PATH_PROTOCOL *) File;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMedia (
   IN CHAR16 *TextDeviceNode
@@ -2130,6 +2207,7 @@ DevPathFromTextMedia (
   return (EFI_DEVICE_PATH_PROTOCOL *) Media;
 }
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextBBS (
   IN CHAR16 *TextDeviceNode

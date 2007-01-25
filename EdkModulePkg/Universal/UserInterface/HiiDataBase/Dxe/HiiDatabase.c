@@ -154,7 +154,6 @@ Returns:
 
 --*/
 {
-  EFI_HII_GLOBAL_DATA     *GlobalData;
   EFI_HII_HANDLE_DATABASE *Database;
   EFI_HII_DATA            *HiiData;
   UINTN                   HandleCount;
@@ -164,8 +163,6 @@ Returns:
   }
 
   HiiData     = EFI_HII_DATA_FROM_THIS (This);
-
-  GlobalData  = HiiData->GlobalData;
 
   Database    = HiiData->DatabaseHead;
 
@@ -333,7 +330,6 @@ Returns:
   EFI_HII_DATA              *HiiData;
   EFI_HII_HANDLE_DATABASE   *HandleDatabase;
   EFI_HII_STRING_PACK       *StringPack;
-  EFI_HII_STRING_PACK       *Location;
   RELOFST                   Token;
   UINT32                    Length;
 
@@ -375,8 +371,6 @@ Returns:
   } else {
     StringPack = (EFI_HII_STRING_PACK *) (&StringPackageInstance->IfrData);
   }
-
-  Location = StringPack;
 
   //
   // Remember that the string packages are formed into contiguous blocks of language data.

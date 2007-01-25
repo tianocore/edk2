@@ -1614,11 +1614,9 @@ Returns:
   UINT8               MaxRetry;
   BOOLEAN             NeedRetry;
   EFI_SCSI_SENSE_DATA *SenseData;
-  UINT8               SenseDataLength;
   UINTN               NumberOfSenseKeys;
 
   SenseData         = NULL;
-  SenseDataLength   = 0;
   NumberOfSenseKeys = 0;
 
   Status            = EFI_SUCCESS;
@@ -1728,11 +1726,9 @@ Returns:
   UINT8               MaxRetry;
   BOOLEAN             NeedRetry;
   EFI_SCSI_SENSE_DATA *SenseData;
-  UINT8               SenseDataLength;
   UINTN               NumberOfSenseKeys;
 
   SenseData         = NULL;
-  SenseDataLength   = 0;
   NumberOfSenseKeys = 0;
 
   Status            = EFI_SUCCESS;

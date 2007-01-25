@@ -86,6 +86,7 @@ GetFvbHandleByAddress (
   return Status;
 }
 
+STATIC
 EFI_STATUS
 GetLbaAndOffsetByAddress (
   IN  EFI_PHYSICAL_ADDRESS   Address,

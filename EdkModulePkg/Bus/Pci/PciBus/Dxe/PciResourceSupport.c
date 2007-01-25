@@ -647,10 +647,8 @@ Returns:
 // TODO:    ResType - add argument and description to function comment
 // TODO:    ResUsage - add argument and description to function comment
 {
-  EFI_STATUS        Status;
   PCI_RESOURCE_NODE *Node;
 
-  Status  = 0;
   Node    = NULL;
 
   Node    = AllocatePool (sizeof (PCI_RESOURCE_NODE));
@@ -704,7 +702,6 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE     *Temp;
-  EFI_STATUS        Status;
   PCI_RESOURCE_NODE *IoBridge;
   PCI_RESOURCE_NODE *Mem32Bridge;
   PCI_RESOURCE_NODE *PMem32Bridge;
@@ -789,14 +786,14 @@ Returns:
       //
       // Recursively create resouce map on this bridge
       //
-      Status = CreateResourceMap (
-                Temp,
-                IoBridge,
-                Mem32Bridge,
-                PMem32Bridge,
-                Mem64Bridge,
-                PMem64Bridge
-                );
+      CreateResourceMap (
+        Temp,
+        IoBridge,
+        Mem32Bridge,
+        PMem32Bridge,
+        Mem64Bridge,
+        PMem64Bridge
+        );
 
       if (ResourceRequestExisted (IoBridge)) {
         InsertResourceNode (
@@ -895,14 +892,14 @@ Returns:
   //
   // To do some platform specific resource padding ...
   //
-  Status = ResourcePaddingPolicy (
-            Bridge,
-            IoNode,
-            Mem32Node,
-            PMem32Node,
-            Mem64Node,
-            PMem64Node
-            );
+  ResourcePaddingPolicy (
+    Bridge,
+    IoNode,
+    Mem32Node,
+    PMem32Node,
+    Mem64Node,
+    PMem64Node
+    );
 
   //
   // Degrade resource if necessary

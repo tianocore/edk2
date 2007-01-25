@@ -36,6 +36,7 @@ Revision History
 #include "Bc.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 UINT64
 Swap64 (
   UINT64 n
@@ -1182,6 +1183,7 @@ Returns:
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 EFI_STATUS
 MtftpDownload (
   PXE_BASECODE_DEVICE           *Private,
@@ -1930,6 +1932,7 @@ Returns:
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+STATIC
 EFI_STATUS
 PxeBcMtftp (
   PXE_BASECODE_DEVICE               *Private,

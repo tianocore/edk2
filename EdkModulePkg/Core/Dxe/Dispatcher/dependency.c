@@ -432,7 +432,7 @@ Returns:
       break;
 
     default:      
-      return FALSE;
+      goto Done;
     }
     
     //
@@ -445,6 +445,8 @@ Returns:
     //
     Iterator++;
   }
+
+Done:
   return FALSE;
 }
 

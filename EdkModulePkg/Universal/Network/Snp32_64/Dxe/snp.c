@@ -18,72 +18,6 @@ Abstract:
 
 #include "Snp.h"
 
-EFI_STATUS
-pxe_start (
-  SNP_DRIVER *snp
-  );
-EFI_STATUS
-pxe_stop (
-  SNP_DRIVER *snp
-  );
-EFI_STATUS
-pxe_init (
-  SNP_DRIVER *snp,
-  UINT16     OpFlags
-  );
-EFI_STATUS
-pxe_shutdown (
-  SNP_DRIVER *snp
-  );
-EFI_STATUS
-pxe_get_stn_addr (
-  SNP_DRIVER *snp
-  );
-
-EFI_STATUS
-EFIAPI
-InitializeSnpNiiDriver (
-  IN EFI_HANDLE       image_handle,
-  IN EFI_SYSTEM_TABLE *system_table
-  );
-
-EFI_STATUS
-EFIAPI
-SimpleNetworkDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-SimpleNetworkDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-SimpleNetworkDriverStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
-//
-// Simple Network Protocol Driver Global Variables
-//
-EFI_DRIVER_BINDING_PROTOCOL mSimpleNetworkDriverBinding = {
-  SimpleNetworkDriverSupported,
-  SimpleNetworkDriverStart,
-  SimpleNetworkDriverStop,
-  0xa,
-  NULL,
-  NULL
-};
-
 //
 //  Module global variables needed to support undi 3.0 interface
 //
@@ -91,202 +25,6 @@ EFI_PCI_IO_PROTOCOL         *mPciIoFncs;
 struct s_v2p                *_v2p = NULL; // undi3.0 map_list head
 // End Global variables
 //
-EFI_STATUS
-add_v2p (
-  IN OUT struct s_v2p           **v2p,
-  EFI_PCI_IO_PROTOCOL_OPERATION type,
-  VOID                          *vaddr,
-  UINTN                         bsize
-  )
-/*++
-
-Routine Description:
- This routine maps the given CPU address to a Device address. It creates a
- an entry in the map list with the virtual and physical addresses and the 
- un map cookie.
-
-Arguments:
- v2p - pointer to return a map list node pointer.
- type - the direction in which the data flows from the given virtual address
-        device->cpu or cpu->device or both ways.
- vaddr - virtual address (or CPU address) to be mapped
- bsize - size of the buffer to be mapped.
-
-Returns:
-
-  EFI_SUCEESS - routine has completed the mapping
-  other - error as indicated.
-
---*/
-{
-  EFI_STATUS  Status;
-
-  if ((v2p == NULL) || (vaddr == NULL) || (bsize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (struct s_v2p),
-                  (VOID **) v2p
-                  );
-
-  if (Status != EFI_SUCCESS) {
-    return Status;
-  }
-
-  Status = mPciIoFncs->Map (
-                        mPciIoFncs,
-                        type,
-                        vaddr,
-                        &bsize,
-                        &(*v2p)->paddr,
-                        &(*v2p)->unmap
-                        );
-  if (Status != EFI_SUCCESS) {
-    gBS->FreePool (*v2p);
-    return Status;
-  }
-  (*v2p)->vaddr = vaddr;
-  (*v2p)->bsize = bsize;
-  (*v2p)->next  = _v2p;
-  _v2p          = *v2p;
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-find_v2p (
-  struct s_v2p **v2p,
-  VOID         *vaddr
-  )
-/*++
-
-Routine Description:
- This routine searches the linked list of mapped address nodes (for undi3.0 
- interface) to find the node that corresponds to the given virtual address and
- returns a pointer to that node.
-
-Arguments:
- v2p - pointer to return a map list node pointer.
- vaddr - virtual address (or CPU address) to be searched in the map list
-
-Returns:
-
-  EFI_SUCEESS - if a match found!
-  Other       - match not found
-
---*/
-{
-  struct s_v2p  *v;
-
-  if (v2p == NULL || vaddr == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  for (v = _v2p; v != NULL; v = v->next) {
-    if (v->vaddr == vaddr) {
-      *v2p = v;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-EFI_STATUS
-del_v2p (
-  VOID *vaddr
-  )
-/*++
-
-Routine Description:
- This routine unmaps the given virtual address and frees the memory allocated 
- for the map list node corresponding to that address.
- 
-Arguments:
- vaddr - virtual address (or CPU address) to be unmapped
-
-Returns:
- EFI_SUCEESS -  if successfully unmapped
- Other - as indicated by the error
-
-
---*/
-{
-  struct s_v2p  *v;
-  struct s_v2p  *t;
-  EFI_STATUS    Status;
-
-  if (vaddr == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (_v2p == NULL) {
-    return EFI_NOT_FOUND;
-  }
-  //
-  // Is our node at the head of the list??
-  //
-  if ((v = _v2p)->vaddr == vaddr) {
-    _v2p    = _v2p->next;
-
-    Status  = mPciIoFncs->Unmap (mPciIoFncs, v->unmap);
-
-    gBS->FreePool (v);
-
-#if SNP_DEBUG
-    if (Status) {
-      Print (L"Unmap failed with status = %x\n", Status);
-    }
-#endif
-    return Status;
-  }
-
-  for (; v->next != NULL; v = t) {
-    if ((t = v->next)->vaddr == vaddr) {
-      v->next = t->next;
-      Status  = mPciIoFncs->Unmap (mPciIoFncs, t->unmap);
-      gBS->FreePool (t);
-#if SNP_DEBUG
-      if (Status) {
-        Print (L"Unmap failed with status = %x\n", Status);
-      }
-#endif
-      return Status;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-#if SNP_DEBUG
-VOID
-snp_wait_for_key (
-  VOID
-  )
-/*++
-
-Routine Description:
- Wait for a key stroke, used for debugging purposes
-
-Arguments:
- none
-
-Returns:
- none
-
---*/
-{
-  EFI_INPUT_KEY key;
-
-  Aprint ("\nPress any key to continue\n");
-
-  while (gST->ConIn->ReadKeyStroke (gST->ConIn, &key) == EFI_NOT_READY) {
-    ;
-  }
-}
-#endif
 
 STATIC
 EFI_STATUS
@@ -355,6 +93,7 @@ Returns:
   return cksum;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 SimpleNetworkDriverSupported (
@@ -531,6 +270,7 @@ Done:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 SimpleNetworkDriverStart (
@@ -1190,6 +930,7 @@ NiiError:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 SimpleNetworkDriverStop (
@@ -1313,3 +1054,211 @@ Returns:
   return Status;
 }
 
+//
+// Simple Network Protocol Driver Global Variables
+//
+EFI_DRIVER_BINDING_PROTOCOL mSimpleNetworkDriverBinding = {
+  SimpleNetworkDriverSupported,
+  SimpleNetworkDriverStart,
+  SimpleNetworkDriverStop,
+  0xa,
+  NULL,
+  NULL
+};
+
+EFI_STATUS
+add_v2p (
+  IN OUT struct s_v2p           **v2p,
+  EFI_PCI_IO_PROTOCOL_OPERATION type,
+  VOID                          *vaddr,
+  UINTN                         bsize
+  )
+/*++
+
+Routine Description:
+ This routine maps the given CPU address to a Device address. It creates a
+ an entry in the map list with the virtual and physical addresses and the 
+ un map cookie.
+
+Arguments:
+ v2p - pointer to return a map list node pointer.
+ type - the direction in which the data flows from the given virtual address
+        device->cpu or cpu->device or both ways.
+ vaddr - virtual address (or CPU address) to be mapped
+ bsize - size of the buffer to be mapped.
+
+Returns:
+
+  EFI_SUCEESS - routine has completed the mapping
+  other - error as indicated.
+
+--*/
+{
+  EFI_STATUS  Status;
+
+  if ((v2p == NULL) || (vaddr == NULL) || (bsize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  sizeof (struct s_v2p),
+                  (VOID **) v2p
+                  );
+
+  if (Status != EFI_SUCCESS) {
+    return Status;
+  }
+
+  Status = mPciIoFncs->Map (
+                        mPciIoFncs,
+                        type,
+                        vaddr,
+                        &bsize,
+                        &(*v2p)->paddr,
+                        &(*v2p)->unmap
+                        );
+  if (Status != EFI_SUCCESS) {
+    gBS->FreePool (*v2p);
+    return Status;
+  }
+  (*v2p)->vaddr = vaddr;
+  (*v2p)->bsize = bsize;
+  (*v2p)->next  = _v2p;
+  _v2p          = *v2p;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+find_v2p (
+  struct s_v2p **v2p,
+  VOID         *vaddr
+  )
+/*++
+
+Routine Description:
+ This routine searches the linked list of mapped address nodes (for undi3.0 
+ interface) to find the node that corresponds to the given virtual address and
+ returns a pointer to that node.
+
+Arguments:
+ v2p - pointer to return a map list node pointer.
+ vaddr - virtual address (or CPU address) to be searched in the map list
+
+Returns:
+
+  EFI_SUCEESS - if a match found!
+  Other       - match not found
+
+--*/
+{
+  struct s_v2p  *v;
+
+  if (v2p == NULL || vaddr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (v = _v2p; v != NULL; v = v->next) {
+    if (v->vaddr == vaddr) {
+      *v2p = v;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+del_v2p (
+  VOID *vaddr
+  )
+/*++
+
+Routine Description:
+ This routine unmaps the given virtual address and frees the memory allocated 
+ for the map list node corresponding to that address.
+ 
+Arguments:
+ vaddr - virtual address (or CPU address) to be unmapped
+
+Returns:
+ EFI_SUCEESS -  if successfully unmapped
+ Other - as indicated by the error
+
+
+--*/
+{
+  struct s_v2p  *v;
+  struct s_v2p  *t;
+  EFI_STATUS    Status;
+
+  if (vaddr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (_v2p == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  //
+  // Is our node at the head of the list??
+  //
+  if ((v = _v2p)->vaddr == vaddr) {
+    _v2p    = _v2p->next;
+
+    Status  = mPciIoFncs->Unmap (mPciIoFncs, v->unmap);
+
+    gBS->FreePool (v);
+
+#if SNP_DEBUG
+    if (Status) {
+      Print (L"Unmap failed with status = %x\n", Status);
+    }
+#endif
+    return Status;
+  }
+
+  for (; v->next != NULL; v = t) {
+    if ((t = v->next)->vaddr == vaddr) {
+      v->next = t->next;
+      Status  = mPciIoFncs->Unmap (mPciIoFncs, t->unmap);
+      gBS->FreePool (t);
+#if SNP_DEBUG
+      if (Status) {
+        Print (L"Unmap failed with status = %x\n", Status);
+      }
+#endif
+      return Status;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+#if SNP_DEBUG
+VOID
+snp_wait_for_key (
+  VOID
+  )
+/*++
+
+Routine Description:
+ Wait for a key stroke, used for debugging purposes
+
+Arguments:
+ none
+
+Returns:
+ none
+
+--*/
+{
+  EFI_INPUT_KEY key;
+
+  Aprint ("\nPress any key to continue\n");
+
+  while (gST->ConIn->ReadKeyStroke (gST->ConIn, &key) == EFI_NOT_READY) {
+    ;
+  }
+}
+#endif

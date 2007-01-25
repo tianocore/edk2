@@ -759,7 +759,7 @@ UHCIDriverBindingStart (
   return EFI_SUCCESS;
 }
 
-
+STATIC
 EFI_STATUS
 UnInstallUHCInterface (
   IN  EFI_HANDLE              Controller,
@@ -3845,7 +3845,7 @@ UHCI2ControlTransfer (
 --*/
 {
   USB_HC_DEV *HcDev;
-  BOOLEAN IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+  BOOLEAN IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
 
   HcDev = USB2_HC_DEV_FROM_THIS (This);
   
@@ -4056,7 +4056,7 @@ UHCI2AsyncInterruptTransfer (
 --*/  
 {
   USB_HC_DEV *HcDev;
-  BOOLEAN IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+  BOOLEAN IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
    
   HcDev = USB2_HC_DEV_FROM_THIS (This);
   return UHCIAsyncInterruptTransfer(
@@ -4155,7 +4155,7 @@ UHCI2SyncInterruptTransfer (
   if(DeviceSpeed==EFI_USB_SPEED_HIGH)
   	return EFI_INVALID_PARAMETER;
   
-  IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;  
+  IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);  
   HcDev = USB2_HC_DEV_FROM_THIS (This);
   
   return UHCISyncInterruptTransfer(
@@ -4437,11 +4437,9 @@ MonitorInterruptTrans (
   UINTN           DataLen;
   UINTN           ActualLen;
   UINTN           ErrTDPos;
-  UINT32          StatusAddr;
   LIST_ENTRY      *NextLink;
 
   HcDev       = (USB_HC_DEV *) Context;
-  StatusAddr  = (UINT32) (USBSTS);
 
   //
   // interrupt transfer list is empty, means that no interrupt transfer
