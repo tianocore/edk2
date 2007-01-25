@@ -1492,6 +1492,22 @@ public class SurfaceAreaQuery {
         return a.getDomNode();
     }
 
+    public Node[] getFpdUserExtensions() {
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and not(@Identifier='1') and not(@Identifier='0')]" };
+
+        Object[] queryResult = get("PlatformSurfaceArea", xPath);
+        if (queryResult == null || queryResult.length == 0) {
+            return new Node[0];
+        }
+
+        Node[] nodeList = new Node[queryResult.length];
+        for (int i = 0; i < queryResult.length; ++i) {
+            UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[i];
+            nodeList[i] = a.getDomNode();
+        }
+
+        return nodeList;
+    }
     /**
      * Retrieve FV image option information
      *

@@ -33,6 +33,7 @@ import org.apache.tools.ant.BuildException;
  
 **/
 public class CompressSection implements Section, FfsTypes {
+    private int alignment = 0;
     //
     // The attribute of compressName.
     //
@@ -196,5 +197,17 @@ public class CompressSection implements Section, FfsTypes {
     **/
     public void addTool (Tool tool) {
         sectList.add(tool);
+    }
+
+    public int getAlignment() {
+        return alignment;
+    }
+
+    public void setAlignment(int alignment) {
+        if (alignment > 7) {
+            this.alignment = 7;
+        } else {
+            this.alignment = alignment;
+        }
     }
 }

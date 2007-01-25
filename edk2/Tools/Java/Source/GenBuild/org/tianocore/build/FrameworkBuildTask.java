@@ -323,11 +323,7 @@ public class FrameworkBuildTask extends Task{
     }
 
     public void setType(String type) {
-        if (type.equalsIgnoreCase("clean") || type.equalsIgnoreCase("cleanall")) {
-            this.type = type.toLowerCase();
-        } else {
-            this.type = "all";
-        }
+        this.type = type.toLowerCase();
     }
     
     private void readTargetFile() throws EdkException{

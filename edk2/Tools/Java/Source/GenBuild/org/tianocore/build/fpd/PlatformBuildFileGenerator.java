@@ -159,7 +159,8 @@ public class PlatformBuildFileGenerator {
             // User Extension Post build
             //
             applyUserExtensionsPostBuild(document, root);
-            
+            applyUserExtensions(document, root);
+
             document.appendChild(rootComment);
             document.appendChild(root);
             //
@@ -630,7 +631,59 @@ public class PlatformBuildFileGenerator {
         
         root.appendChild(ele);
     }
-    
+
+    private void applyUserExtensions(Document document, Node root) {
+        Node[] nodeList = saq.getFpdUserExtensions();
+        for (int nodeIndex = 0; nodeIndex < nodeList.length; ++nodeIndex) {
+            Node node = nodeList[nodeIndex];
+            //
+            // User Extensions
+            //
+            root.appendChild(document.createComment("User Defined Target"));
+            Element ele = document.createElement("target");
+            ele.setAttribute("name", node.getAttributes().getNamedItem("Identifier").getNodeValue());
+
+            if (node != null) {
+                //
+                // For every Target and ToolChain
+                //
+                String[] targetList = GlobalData.getToolChainInfo().getTargets();
+                for (int i = 0; i < targetList.length; i++){
+                    String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+                    for(int j = 0; j < toolchainList.length; j++){
+                        //
+                        // Prepare FV_DIR
+                        //
+                        String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
+                                        + targetList[i] + "_" 
+                                        + toolchainList[j];
+                        File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                        Element fvEle = document.createElement("var");
+                        fvEle.setAttribute("name", "FV_DIR");
+                        fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
+                        ele.appendChild(fvEle);
+
+                        Element targetDirEle = document.createElement("var");
+                        targetDirEle.setAttribute("name", "TARGET_DIR");
+                        targetDirEle.setAttribute("value", ffsCommonDir.replaceAll("(\\\\)", "/"));
+                        ele.appendChild(targetDirEle);
+
+                        NodeList childNodes = node.getChildNodes();
+                        for (int k = 0; k < childNodes.getLength(); k++) {
+                            Node childItem = childNodes.item(k);
+                            if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                                ele.appendChild(recursiveNode(childItem, document));
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            root.appendChild(ele);
+        }
+    }
+
     private Element recursiveNode(Node node, Document document) {
         Element root = document.createElement(node.getNodeName());
         NamedNodeMap attr = node.getAttributes();

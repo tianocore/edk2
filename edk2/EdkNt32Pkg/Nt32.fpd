@@ -7916,11 +7916,10 @@
     <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" force="no">
       <fileset dir="${FV_DIR}" includes="*.fv"/>
     </concat>
-    <!--Generate Run.cmd file. This file will call SecMain.exe to start shell.-->
     <pathconvert property="SecMainPath" targetos="windows">
       <path path="${TARGET_DIR}/IA32"/>
     </pathconvert>
-    <echo file="${BUILD_DIR}/run.cmd">@REM
+    <echo file="${TARGET_DIR}/run.cmd">@REM
       @REM Copyright (c) 2006, Intel Corporation
       @REM All rights reserved. This program and the accompanying materials
       @REM are licensed and made available under the terms and conditions of the BSD License
@@ -7937,5 +7936,9 @@
       SecMain.exe
       popd
       @echo on</echo>
+  </UserExtensions>
+  <UserExtensions UserID="TianoCore" Identifier="run">
+    <!-- execute the NT32 simulator -->
+    <exec executable="${TARGET_DIR}/IA32/SecMain.exe" dir="${TARGET_DIR}/IA32" spawn="false"/>
   </UserExtensions>
 </PlatformSurfaceArea>

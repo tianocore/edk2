@@ -327,10 +327,8 @@ public class GenBuildTask extends Ant {
 
                     if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase("build")) {
                         applyBuild(targetList[i], toolchainList[j], fpdModuleId);
-                    } else if (type.equalsIgnoreCase("clean")) {
-                        applyClean(fpdModuleId);
-                    } else if (type.equalsIgnoreCase("cleanall")) {
-                        applyCleanall(fpdModuleId);
+                    } else {
+                        applyNonBuildTarget(fpdModuleId);
                     }
                 }
             }
@@ -673,6 +671,24 @@ public class GenBuildTask extends Ant {
         //
         String antFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
         antCall(antFilename, null);
+    }
+
+    private void applyNonBuildTarget(FpdModuleIdentification fpdModuleId){
+        //
+        // if it is CUSTOM_BUILD
+        // then call the exist BaseName_build.xml directly.
+        //
+        if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
+            EdkLog.log(this, "Calling user-defined " + moduleId.getName() + "_build.xml");
+            
+            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
+            antCall(antFilename, this.type);
+            
+            return ;
+        }
+
+        String antFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
+        antCall(antFilename, this.type);
     }
 
     private void applyClean(FpdModuleIdentification fpdModuleId){

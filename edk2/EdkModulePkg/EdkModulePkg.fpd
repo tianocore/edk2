@@ -19886,15 +19886,9 @@
       <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM"/>
       <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
       <Attribute Name="FFS_ATTRIB_DATA_ALIGNMENT" Value="1"/>
-      <!--FFS DATA should align 16 bytes.-->
+      <!--The PE32 should align on 16 bytes boundary.-->
       <Sections>
-        <Section SectionType="EFI_SECTION_RAW">
-          <!--add 12 bytes blank.pad file-->
-          <Filenames>
-            <Filename>${PLATFORM_DIR}/Blank.pad</Filename>
-          </Filenames>
-        </Section>
-        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_PE32" Alignment="1"/>
         <Section SectionType="EFI_SECTION_PEI_DEPEX"/>
         <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
         <Section SectionType="EFI_SECTION_VERSION"/>
@@ -19904,15 +19898,9 @@
       <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEI_CORE"/>
       <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
       <Attribute Name="FFS_ATTRIB_DATA_ALIGNMENT" Value="1"/>
-      <!--FFS DATA should align 16 bytes.-->
+      <!--The PE32 should align on 16 bytes boundary.-->
       <Sections>
-        <Section SectionType="EFI_SECTION_RAW">
-          <!--add 12 bytes blank.pad file-->
-          <Filenames>
-            <Filename>${PLATFORM_DIR}/Blank.pad</Filename>
-          </Filenames>
-        </Section>
-        <Section SectionType="EFI_SECTION_PE32"/>
+        <Section SectionType="EFI_SECTION_PE32" Alignment="1"/>
         <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
         <Section SectionType="EFI_SECTION_VERSION"/>
       </Sections>
