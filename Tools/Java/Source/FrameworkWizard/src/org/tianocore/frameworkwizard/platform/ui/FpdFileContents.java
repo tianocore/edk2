@@ -1836,7 +1836,7 @@ public class FpdFileContents {
         
         UserExtensionsDocument.UserExtensions userExts = getfpdBuildOpts().addNewUserExtensions();
         userExts.setUserID(userId);
-        userExts.setIdentifier(new BigInteger(id));
+        userExts.setIdentifier(id);
         XmlCursor cursor = userExts.newCursor();
         cursor.toEndToken();
         
@@ -1879,7 +1879,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier() == null || ues.getIdentifier().intValue() != id) {
+            if (ues.getIdentifier() == null || ues.getIdentifier() != new Integer(id).toString()) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();
@@ -1979,7 +1979,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier()== null || ues.getIdentifier().intValue() != id) {
+            if (ues.getIdentifier()== null || ues.getIdentifier() != new Integer(id).toString()) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();
@@ -2151,7 +2151,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier() == null || ues.getIdentifier().intValue() != id) {
+            if (ues.getIdentifier() == null || ues.getIdentifier() != new Integer(id).toString()) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();
