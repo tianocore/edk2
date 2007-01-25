@@ -930,7 +930,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </OnDependency>
     </sequential>
   </macrodef> 
+ <!--
+      Build ACPI Bin File
+    -->
+  <macrodef name="Build_ACPIBIN">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="bin"/>
 
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+    
+    <sequential>
+      <mkdir dir="${DEST_DIR_OUTPUT}"/>
+
+      <OnDependency>
+        <sourcefiles>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
+        </targetfiles>
+
+        <sequential>
+          <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" tofile="${DEST_DIR_OUTPUT}/@{FILENAME}.acpi" />
+  
+          <exec executable="attrib">
+            <arg line="-r ${DEST_DIR_OUTPUT}/@{FILENAME}.acpi"/>
+          </exec>
+
+          <EFI_SECTION_RAW FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="acpi"/>
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef> 
+  
   <!--
     DUMMY - for skipping the source file which should not be built
     -->

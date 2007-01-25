@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -128,7 +128,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <IncludePkgHeader ModuleType="DXE_SMM_DRIVER">Include/WinNtDxe.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="DXE_SAL_DRIVER">Include/WinNtDxe.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="UEFI_DRIVER">Include/WinNtDxe.h</IncludePkgHeader>
-    <IncludePkgHeader ModuleType="USER_DEFINED">Include/WinNtPeim.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
     <Entry Name="EdkNt32PkgTokenSpace">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>MdePkg</PackageName>
@@ -1198,7 +1198,6 @@
     <IncludePkgHeader ModuleType="DXE_SAL_DRIVER">Include/Dxe.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="UEFI_DRIVER">Include/Uefi.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="UEFI_APPLICATION">Include/Uefi.h</IncludePkgHeader>
-    <IncludePkgHeader ModuleType="USER_DEFINED">Include/Peim.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
     <Entry Name="MdePkgTokenSpace">

@@ -2,7 +2,7 @@
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>SecMain</ModuleName>
-    <ModuleType>USER_DEFINED</ModuleType>
+    <ModuleType>SEC</ModuleType>
     <GuidValue>f43be88c-8985-11db-8f78-0040d02b1835</GuidValue>
     <Version>1.0</Version>
     <Abstract>Entry Point of Unix Emulator</Abstract>

@@ -2,7 +2,7 @@
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>SecMain</ModuleName>
-    <ModuleType>USER_DEFINED</ModuleType>
+    <ModuleType>SEC</ModuleType>
     <GuidValue>4b837b03-6587-4d19-b82b-edfad836c0a0</GuidValue>
     <Version>1.0</Version>
     <Abstract>Entry Point of NT32 Emulator</Abstract>
