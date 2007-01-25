@@ -25,6 +25,7 @@ Module Name: PeiPcdLib.c
   @retval PCD_PPI * The pointer to the PCD_PPI.
 
 **/
+STATIC
 PCD_PPI  *
 GetPcdPpiPtr (
   VOID

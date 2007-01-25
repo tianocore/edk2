@@ -636,7 +636,7 @@ AsciiToUpper (
   IN      CHAR8                     Chr
   )
 {
-  return (Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr;
+  return (UINT8) ((Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr);
 }
 
 /**
@@ -675,19 +675,25 @@ AsciiStriCmp (
   IN      CONST CHAR8               *SecondString
   )
 {
+  CHAR8  UpperFirstString;
+  CHAR8  UpperSecondString;
+
   //
   // ASSERT both strings are less long than PcdMaximumAsciiStringLength
   //
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
 
-  while ((*FirstString != '\0') &&
-         (AsciiToUpper (*FirstString) == AsciiToUpper (*SecondString))) {
+  UpperFirstString  = AsciiToUpper (*FirstString);
+  UpperSecondString = AsciiToUpper (*SecondString);
+  while ((*FirstString != '\0') && (UpperFirstString == UpperSecondString)) {
     FirstString++;
     SecondString++;
+    UpperFirstString  = AsciiToUpper (*FirstString);
+    UpperSecondString = AsciiToUpper (*SecondString);
   }
 
-  return AsciiToUpper (*FirstString) - AsciiToUpper (*SecondString);
+  return UpperFirstString - UpperSecondString;
 }
 
 /**
@@ -861,7 +867,7 @@ DecimalToBcd8 (
   )
 {
   ASSERT (Value < 100);
-  return ((Value / 10) << 4) | (Value % 10);
+  return (UINT8) (((Value / 10) << 4) | (Value % 10));
 }
 
 /**
@@ -886,5 +892,5 @@ BcdToDecimal8 (
 {
   ASSERT (Value < 0xa0);
   ASSERT ((Value & 0xf) < 0xa);
-  return (Value >> 4) * 10 + (Value & 0xf);
+  return (UINT8) ((Value >> 4) * 10 + (Value & 0xf));
 }

@@ -14,6 +14,8 @@
 
 **/
 
+#include "DxeCpuIoLibInternal.h"
+
 //
 // Globle varible to cache pointer to CpuIo protocol.
 //

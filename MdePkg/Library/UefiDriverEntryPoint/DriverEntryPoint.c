@@ -25,6 +25,7 @@ EFI_EVENT  _mDriverExitBootServicesNotifyEvent;
   @retval EFI_SUCCESS
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 _DriverUnloadHandler (
@@ -70,6 +71,7 @@ _DriverUnloadHandler (
   @param Context Event Context.
 
 **/
+STATIC
 VOID
 EFIAPI
 _DriverExitBootServices (

@@ -17,66 +17,7 @@
 
 **/
 
-
-/**
-  Performs an Itanium-based specific relocation fixup and is a no-op on other
-  instruction sets.
-
-  @param  Reloc       Pointer to the relocation record.
-  @param  Fixup       Pointer to the address to fix up.
-  @param  FixupData   Pointer to a buffer to log the fixups.
-  @param  Adjust      The offset to adjust the fixup.
-
-  @return Status code.
-
-**/
-RETURN_STATUS
-PeCoffLoaderRelocateImageEx (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
-
-
-/**
-  Performs an Itanium-based specific re-relocation fixup and is a no-op on other
-  instruction sets. This is used to re-relocated the image into the EFI virtual
-  space for runtime calls.
-
-  @param  Reloc       Pointer to the relocation record.
-  @param  Fixup       Pointer to the address to fix up.
-  @param  FixupData   Pointer to a buffer to log the fixups.
-  @param  Adjust      The offset to adjust the fixup.
-
-  @return Status code.
-
-**/
-RETURN_STATUS
-PeHotRelocateImageEx (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
-
-
-/**
-  Returns TRUE if the machine type of PE/COFF image is supported. Supported
-  does not mean the image can be executed it means the PE/COFF loader supports
-  loading and relocating of the image type. It's up to the caller to support
-  the entry point.
-
-  @param  Machine   Machine type from the PE Header.
-
-  @return TRUE if this PE/COFF loader can load the image
-
-**/
-BOOLEAN
-PeCoffLoaderImageFormatSupported (
-  IN  UINT16  Machine
-  );
-
+#include "BasePeCoffLibInternals.h"
 
 /**
   Retrieves the magic value from the PE/COFF header.

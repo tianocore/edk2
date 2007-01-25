@@ -25,6 +25,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Declaration for internal functions
 //
+
+/**
+  Gets Smbus PPIs.
+
+  This internal function retrieves Smbus PPI from PPI database.
+
+  @param  PeiServices   An indirect pointer to the EFI_PEI_SERVICES published by the PEI Foundation.
+
+  @return The pointer to Smbus PPI.
+
+**/
+EFI_PEI_SMBUS_PPI *
+InternalGetSmbusPpi (
+  EFI_PEI_SERVICES      **PeiServices
+  );
+
 /**
   Executes an SMBus operation to an SMBus controller. 
 

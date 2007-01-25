@@ -20,30 +20,7 @@ Abstract:
   
 --*/
 
-
-/**
-  Reads the current value of Kr1.
-
-  @return The current value of Kr1.
-
-**/
-UINT64
-EFIAPI
-AsmReadKr1 (
-  VOID
-  );
-
-/**
-  Writes the current value of Kr1.
-
-  @param  Value The 64-bit value to write to Kr1.
-
-**/
-VOID
-EFIAPI
-AsmWriteKr1 (
-  IN      UINT64                    Value
-  );
+#include "PeiServicesTablePointerLibInternals.h"
 
 /**
   The function returns the pointer to PeiServices.

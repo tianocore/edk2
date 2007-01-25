@@ -32,8 +32,11 @@ SwapBytes32 (
   IN      UINT32                    Operand
   )
 {
-  return (UINT32)(
-           ((UINT32)SwapBytes16 ((UINT16)Operand) << 16) |
-           ((UINT32)SwapBytes16 ((UINT16)(Operand >> 16)))
-           );
+  UINT32  LowerBytes;
+  UINT32  HigherBytes;
+
+  LowerBytes  = (UINT32) SwapBytes16 ((UINT16) Operand);
+  HigherBytes = (UINT32) SwapBytes16 ((UINT16) (Operand >> 16));
+
+  return (LowerBytes << 16 | HigherBytes);
 }

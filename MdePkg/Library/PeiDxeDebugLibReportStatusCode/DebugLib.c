@@ -122,11 +122,15 @@ DebugAssert (
   EFI_DEBUG_ASSERT_DATA  *AssertData;
   UINTN                  TotalSize;
   CHAR8                  *Temp;
+  UINTN                  FileNameLength;
+  UINTN                  DescriptionLength;
 
   //
   // Make sure it will all fit in the passed in buffer
   //
-  TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + AsciiStrLen (FileName) + 1 + AsciiStrLen (Description) + 1;
+  FileNameLength    = AsciiStrLen (FileName);
+  DescriptionLength = AsciiStrLen (Description);
+  TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + FileNameLength + 1 + DescriptionLength + 1;
   if (TotalSize <= EFI_STATUS_CODE_DATA_MAX_SIZE) {
     //
     // Fill in EFI_DEBUG_ASSERT_DATA
@@ -216,7 +220,7 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
 
 
@@ -237,7 +241,7 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
 
 
@@ -258,7 +262,7 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
 
 
@@ -279,5 +283,5 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }

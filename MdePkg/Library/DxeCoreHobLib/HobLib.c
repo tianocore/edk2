@@ -14,10 +14,7 @@
 
 **/
 
-
-
-extern VOID *gHobList;
-
+#include "HobLib.h"
 
 /**
   Returns the pointer to the HOB list.

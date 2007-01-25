@@ -40,6 +40,7 @@ static EFI_STATUS_CODE_PROTOCOL  *gStatusCode = NULL;
   @retval  EFI_UNSUPPORTED       Status Code Protocol is not available.
 
 **/
+STATIC
 EFI_STATUS
 InternalReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     Type,
@@ -78,6 +79,7 @@ InternalReportStatusCode (
   @return  The size, in bytes, of DevicePath.
 
 **/
+STATIC
 UINTN
 InternalReportStatusCodeDevicePathSize (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
@@ -139,8 +141,8 @@ CodeTypeToPostCode (
   //
   if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
       ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)       ) {
-    *PostCode  = (UINT8) (((Value & EFI_STATUS_CODE_CLASS_MASK) >> 24) << 5);
-    *PostCode |= (UINT8) (((Value & EFI_STATUS_CODE_SUBCLASS_MASK) >> 16) & 0x1f);
+    *PostCode  = (UINT8) ((((Value & EFI_STATUS_CODE_CLASS_MASK) >> 24) << 5) |
+                          (((Value & EFI_STATUS_CODE_SUBCLASS_MASK) >> 16) & 0x1f));
     return TRUE;
   }
   return FALSE;
@@ -533,7 +535,7 @@ ReportProgressCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED) != 0);
 }
 
 
@@ -555,7 +557,7 @@ ReportErrorCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED) != 0);
 }
 
 
@@ -577,5 +579,5 @@ ReportDebugCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }

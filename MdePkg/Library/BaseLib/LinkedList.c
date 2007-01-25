@@ -14,6 +14,8 @@
 
 **/
 
+#include "BaseLibInternals.h"
+
 /**
   Worker function that locates the Node in the List
 

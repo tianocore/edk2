@@ -17,6 +17,8 @@
 
 **/
 
+#include "MemLibInternals.h"
+
 /**
   Copy Length bytes from Source to Destination.
 
