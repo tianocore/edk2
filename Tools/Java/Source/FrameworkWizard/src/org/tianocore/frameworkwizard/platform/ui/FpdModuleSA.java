@@ -1401,7 +1401,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     //
                     oldFvList.removeAll(newFvList);
                     for (int j = 0; j < oldFvList.size(); ++j) {
-                        ffc.removeModuleInBuildOptionsUserExtensions(oldFvList.get(j), "IMAGES", 1, moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);    
+                        ffc.removeModuleInBuildOptionsUserExtensions(oldFvList.get(j), "IMAGES", "1", moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);    
                     }
                     //
                     // add module to Fvs that were not in oldFvList.
@@ -1409,7 +1409,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     oldFvList = getVectorFromString (originalFvBinding);
                     newFvList.removeAll(oldFvList);
                     for (int i = 0; i < newFvList.size(); ++i) {
-                        ffc.addModuleIntoBuildOptionsUserExtensions(newFvList.get(i), "IMAGES", 1, moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);
+                        ffc.addModuleIntoBuildOptionsUserExtensions(newFvList.get(i), "IMAGES", "1", moduleInfo[0], moduleInfo[1], moduleInfo[2], moduleInfo[3], moduleInfo[4]);
                     }
                     docConsole.setSaved(false);
                 }

@@ -1824,8 +1824,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         //
         // Show splash screen
         //
-        SplashScreen ss = new SplashScreen();
-        ss.setVisible(true);
+        //SplashScreen ss = new SplashScreen();
+        //ss.setVisible(true);
 
         //
         // Init Global Data
@@ -1835,7 +1835,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         //
         // Close splash screen
         //
-        ss.dispose();
+        //ss.dispose();
                 
         //
         // Init the frame
@@ -2655,7 +2655,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         String path = null;
         IDefaultMutableTreeNode belongNode = null;
 
-        try {
+//        try {
             //
             // Get selected tree node
             //
@@ -2720,12 +2720,12 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
                                                                                  .findIndexOfListById(new PlatformIdentification(
                                                                                                                                  id));
             }
-        } catch (Exception e) {
-            Log.err("double click category: " + intCategory);
-            Log.err("double click belong node: " + belongNode.toString());
-            Log.err("double click id path: " + id);
-            Log.err("double click exception: " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            Log.err("double click category: " + intCategory);
+//            Log.err("double click belong node: " + belongNode.toString());
+//            Log.err("double click id path: " + id);
+//            Log.err("double click exception: " + e.getMessage());
+//        }
     }
 
     /**

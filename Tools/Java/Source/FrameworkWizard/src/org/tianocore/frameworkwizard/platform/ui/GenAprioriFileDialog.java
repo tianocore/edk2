@@ -207,9 +207,9 @@ private class AprioriModuleOrderPane extends ModuleOrderPane {
     }
     
     public void showModulesInFv (String fvName) {
-        int id = 1;
+        String id = "1";
         if (forPEI) {
-            id = 0;
+            id = "0";
         }
         int size = ffc.getUserExtsIncModCount(fvName, "APRIORI", id);
         
@@ -233,9 +233,9 @@ private class AprioriModuleOrderPane extends ModuleOrderPane {
     
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equals("ModuleOrderPaneOk")) {
-            int id = 1;
+            String id = "1";
             if (forPEI) {
-                id = 0;
+                id = "0";
             }
             
             Vector<String[]> vModInFv = new Vector<String[]>();
@@ -257,7 +257,7 @@ private class AprioriModuleOrderPane extends ModuleOrderPane {
             }
             
             ffc.removeBuildOptionsUserExtensions(fvName, "APRIORI", id);
-            ffc.genBuildOptionsUserExtensions(fvName, "APRIORI", id+"", "", vModInFv);
+            ffc.genBuildOptionsUserExtensions(fvName, "APRIORI", id, "", vModInFv);
             
         }
     }
