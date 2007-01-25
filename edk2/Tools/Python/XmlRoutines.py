@@ -16,44 +16,70 @@ import xml.dom.minidom
 
 def XmlList(Dom, String):
   """Get a list of XML Elements using XPath style syntax."""
-  if String == "" :
+  if String == None or String == "" or Dom == None or Dom == "":
     return []
   if Dom.nodeType==Dom.DOCUMENT_NODE:
-    return XmlList(Dom.documentElement, String)
+    Dom = Dom.documentElement
   if String[0] == "/":
-    return XmlList(Dom, String[1:])
-  TagList = String.split('/')
-  nodes = []
-  if Dom.nodeType == Dom.ELEMENT_NODE and Dom.tagName.strip() == TagList[0]:
-    if len(TagList) == 1:
-      nodes = [Dom]
-    else:
-      restOfPath = "/".join(TagList[1:])
-      for child in Dom.childNodes:
-        nodes = nodes + XmlList(child, restOfPath)
+    String = String[1:]
+  tagList = String.split('/')
+  nodes = [Dom]
+  index = 0
+  end = len(tagList) - 1
+  while index <= end:
+    childNodes = []
+    for node in nodes:
+      if node.nodeType == node.ELEMENT_NODE and node.tagName == tagList[index]:
+        if index < end:
+          childNodes.extend(node.childNodes)
+        else:
+          childNodes.append(node)
+    nodes = childNodes
+    childNodes = []
+    index += 1
+
   return nodes
 
 def XmlNode (Dom, String):
   """Return a single node that matches the String which is XPath style syntax."""
-  try:
-    return XmlList (Dom, String)[0]
-  except:
-    return None
-
+  if String == None or String == ""  or Dom == None or Dom == "":
+    return ""
+  if Dom.nodeType==Dom.DOCUMENT_NODE:
+    Dom = Dom.documentElement
+  if String[0] == "/":
+    String = String[1:]
+  tagList = String.split('/')
+  index = 0
+  end = len(tagList) - 1
+  childNodes = [Dom]
+  while index <= end:
+    for node in childNodes:
+      if node.nodeType == node.ELEMENT_NODE and node.tagName == tagList[index]:
+        if index < end:
+          childNodes = node.childNodes
+        else:
+          return node
+        break
+    index += 1
+  return ""
 
 def XmlElement (Dom, String):
   """Return a single element that matches the String which is XPath style syntax."""
   try:
-    return XmlList (Dom, String)[0].firstChild.data.strip()
+    return XmlNode (Dom, String).firstChild.data.strip()
   except:
     return ''
 
 def XmlElementData (Dom):
   """Get the text for this element."""
+  if Dom == None or Dom == '' or Dom.firstChild == None:
+    return ''
   return Dom.firstChild.data.strip()
 
 def XmlAttribute (Dom, AttName):
   """Return a single attribute named AttName."""
+  if Dom == None or Dom == '':
+    return ''
   try:
     return Dom.getAttribute(AttName)
   except:
