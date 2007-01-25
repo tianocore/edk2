@@ -1867,7 +1867,7 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
-    public int getUserExtsIncModCount (String fvName, String userId, int id) {
+    public int getUserExtsIncModCount (String fvName, String userId, String id) {
         if (getfpdBuildOpts().getUserExtensionsList() == null) {
             return -1;
         }
@@ -1879,7 +1879,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier() == null || ues.getIdentifier() != new Integer(id).toString()) {
+            if (ues.getIdentifier() == null || !ues.getIdentifier().equals(id)) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();
@@ -1901,7 +1901,7 @@ public class FpdFileContents {
         return -1;
     }
     
-    public void getUserExtsIncMods(String fvName, String userId, int id, String[][] saa) {
+    public void getUserExtsIncMods(String fvName, String userId, String id, String[][] saa) {
         if (getfpdBuildOpts().getUserExtensionsList() == null) {
             return;
         }
@@ -1921,7 +1921,7 @@ public class FpdFileContents {
         if (cursor.toChild(elementUserExts)) {
             do {
                 cursor.push();
-                if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id+"")) {
+                if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id)) {
                     cursor.toChild(elementFvName);
                     String elementName = cursor.getTextValue();
                     if (elementName.equals(fvName)) {
@@ -1968,7 +1968,7 @@ public class FpdFileContents {
         
     }
     
-    public void removeBuildOptionsUserExtensions (String fvName, String userId, int id) {
+    public void removeBuildOptionsUserExtensions (String fvName, String userId, String id) {
         if (getfpdBuildOpts().getUserExtensionsList() == null) {
             return;
         }
@@ -1979,7 +1979,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier()== null || ues.getIdentifier() != new Integer(id).toString()) {
+            if (ues.getIdentifier()== null || !ues.getIdentifier().equals(id)) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();
@@ -2010,7 +2010,7 @@ public class FpdFileContents {
         return false;
     }
     
-    public boolean moduleInBuildOptionsUserExtensions (String fvName, String userId, int id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+    public boolean moduleInBuildOptionsUserExtensions (String fvName, String userId, String id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
         boolean inList = false;
         if (getUserExtsIncModCount(fvName, userId, id) > 0) {
             XmlCursor cursor = getfpdBuildOpts().newCursor();
@@ -2028,7 +2028,7 @@ public class FpdFileContents {
             if (cursor.toChild(elementUserExts)) {
                 do {
                     cursor.push();
-                    if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id+"")) {
+                    if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id)) {
                         cursor.toChild(elementFvName);
                         String elementName = cursor.getTextValue();
                         if (elementName.equals(fvName)) {
@@ -2071,7 +2071,7 @@ public class FpdFileContents {
         return inList;
     }
     
-    public void removeModuleInBuildOptionsUserExtensions (String fvName, String userId, int id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+    public void removeModuleInBuildOptionsUserExtensions (String fvName, String userId, String id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
         //
         // if there is only one module before remove operation, the whole user extension should be removed.
         //
@@ -2097,7 +2097,7 @@ public class FpdFileContents {
             if (cursor.toChild(elementUserExts)) {
                 do {
                     cursor.push();
-                    if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id+"")) {
+                    if (cursor.getAttributeText(attribUserId).equals(userId) && cursor.getAttributeText(attribId).equals(id)) {
                         cursor.toChild(elementFvName);
                         String elementName = cursor.getTextValue();
                         if (elementName.equals(fvName)) {
@@ -2138,7 +2138,7 @@ public class FpdFileContents {
         }
     }
     
-    public void addModuleIntoBuildOptionsUserExtensions (String fvName, String userId, int id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
+    public void addModuleIntoBuildOptionsUserExtensions (String fvName, String userId, String id, String moduleGuid, String moduleVersion, String packageGuid, String packageVersion, String arch) {
         if (moduleInBuildOptionsUserExtensions (fvName, userId, id, moduleGuid, moduleVersion, packageGuid, packageVersion, arch)) {
             return;
         }
@@ -2151,7 +2151,7 @@ public class FpdFileContents {
             if (!ues.getUserID().equals(userId)) {
                 continue;
             }
-            if (ues.getIdentifier() == null || ues.getIdentifier() != new Integer(id).toString()) {
+            if (ues.getIdentifier() == null || !ues.getIdentifier().equals(id)) {
                 continue;
             }
             XmlCursor cursor = ues.newCursor();

@@ -2546,11 +2546,11 @@ class ModuleOrderPane extends JPanel implements ActionListener{
         if (modInFvTableModel == null) {
             return;
         }
-        int size = ffc.getUserExtsIncModCount(fvName, "IMAGES", 1);
+        int size = ffc.getUserExtsIncModCount(fvName, "IMAGES", "1");
         
         if (size != -1) {
             String[][] saa = new String[size][5];
-            ffc.getUserExtsIncMods(fvName, "IMAGES", 1, saa);
+            ffc.getUserExtsIncMods(fvName, "IMAGES", "1", saa);
 
             for (int i = 0; i < size; ++i) {
                 String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
@@ -3110,7 +3110,7 @@ class ModuleOrderPane extends JPanel implements ActionListener{
                 ffc.updateFvBindingInModuleSA(moduleInfo, title);
                 
             }
-            ffc.removeBuildOptionsUserExtensions(title, "IMAGES", 1);
+            ffc.removeBuildOptionsUserExtensions(title, "IMAGES", "1");
             ffc.genBuildOptionsUserExtensions(title, "IMAGES", "1", outputFileName, vModInFv);
             
         }

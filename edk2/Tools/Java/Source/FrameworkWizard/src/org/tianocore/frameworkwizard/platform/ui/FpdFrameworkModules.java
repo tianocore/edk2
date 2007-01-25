@@ -760,7 +760,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (fvBindings != null) {
                         String[] fvArray = fvBindings.split(" ");
                         for (int i = 0; i < fvArray.length; ++i) {
-                            ffc.removeModuleInBuildOptionsUserExtensions(fvArray[i].trim(), "IMAGES", 1, mg, mv, pg, pv, arch);
+                            ffc.removeModuleInBuildOptionsUserExtensions(fvArray[i].trim(), "IMAGES", "1", mg, mv, pg, pv, arch);
                         }
                     }
                     
