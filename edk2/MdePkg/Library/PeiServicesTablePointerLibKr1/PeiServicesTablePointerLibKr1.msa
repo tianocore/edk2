@@ -35,6 +35,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeiServicesTablePointer.c</Filename>
+    <Filename>PeiServicesTablePointerLibInternals.h</Filename>
     <Filename SupArchList="IPF">Ipf/ReadKr1.s</Filename>
     <Filename SupArchList="IPF">Ipf/WriteKr1.s</Filename>
   </SourceFiles>

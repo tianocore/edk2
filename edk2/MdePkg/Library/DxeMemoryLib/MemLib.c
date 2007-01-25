@@ -14,6 +14,8 @@
 
 **/
 
+#include "MemLibInternals.h"
+
 VOID *
 EFIAPI
 InternalMemCopyMem (

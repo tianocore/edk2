@@ -85,10 +85,13 @@ InternalMathARShiftU64 (
   IN      UINTN                     Count
   )
 {
+  INTN  TestValue;
+
   //
   // Test if this compiler supports arithmetic shift
   //
-  if ((((-1) << (sizeof (-1) * 8 - 1)) >> (sizeof (-1) * 8 - 1)) == -1) {
+  TestValue = (((-1) << (sizeof (-1) * 8 - 1)) >> (sizeof (-1) * 8 - 1));
+  if (TestValue == -1) {
     //
     // Arithmetic shift is supported
     //
@@ -169,10 +172,13 @@ InternalMathSwapBytes64 (
   IN      UINT64                    Operand
   )
 {
-  return (UINT64)(
-           ((UINT64)SwapBytes32 ((UINT32)Operand) << 32) |
-           ((UINT64)SwapBytes32 ((UINT32)(Operand >> 32)))
-           );
+  UINT64  LowerBytes;
+  UINT64  HigherBytes;
+
+  LowerBytes  = (UINT64) SwapBytes32 ((UINT32) Operand);
+  HigherBytes = (UINT64) SwapBytes32 ((UINT32) (Operand >> 32));
+
+  return (LowerBytes << 32 | HigherBytes);
 }
 
 /**

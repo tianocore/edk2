@@ -14,6 +14,7 @@
 
 **/
 
+#include "MemoryAllocationLibInternals.h"
 
 /**
   Allocates one or more 4KB pages of a certain memory type.

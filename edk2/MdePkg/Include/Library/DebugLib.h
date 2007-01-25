@@ -351,7 +351,7 @@ DebugClearMemoryEnabled (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_END()    __DebugCodeLocal = 0; } } while (FALSE)
+#define DEBUG_CODE_END()    __DebugCodeLocal = 0; __DebugCodeLocal++; } } while (FALSE)
 
 
 /**

@@ -17,6 +17,7 @@
 
 **/
 
+#include "MemLibInternals.h"
 
 /**
   Set Buffer to Value for Size bytes.

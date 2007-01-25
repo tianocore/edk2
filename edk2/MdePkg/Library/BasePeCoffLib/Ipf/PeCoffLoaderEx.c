@@ -14,7 +14,7 @@
 
 **/
 
-
+#include "BasePeCoffLibInternals.h"
 
 
 

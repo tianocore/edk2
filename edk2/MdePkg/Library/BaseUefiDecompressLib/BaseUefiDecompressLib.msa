@@ -34,6 +34,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>BaseUefiDecompressLib.c</Filename>
+    <Filename>BaseUefiDecompressLibInternals.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

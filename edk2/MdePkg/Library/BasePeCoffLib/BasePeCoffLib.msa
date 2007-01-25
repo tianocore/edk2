@@ -34,6 +34,7 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>BasePeCoff.c</Filename>
+    <Filename>BasePeCoffLibInternals.h</Filename>
     <Filename SupArchList="IA32">Ia32/PeCoffLoaderEx.c</Filename>
     <Filename SupArchList="X64">x64/PeCoffLoaderEx.c</Filename>
     <Filename SupArchList="IPF">Ipf/PeCoffLoaderEx.c</Filename>

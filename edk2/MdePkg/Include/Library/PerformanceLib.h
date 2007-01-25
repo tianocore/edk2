@@ -195,7 +195,7 @@ PerformanceMeasurementEnabled (
   Otherwise, the source lines between PERF_CODE_BEGIN() and PERF_CODE_END() are not included in a module.
 
 **/
-#define PERF_CODE_END()    __PerformanceCodeLocal = 0; } } while (FALSE)
+#define PERF_CODE_END()    __PerformanceCodeLocal = 0; __PerformanceCodeLocal++; } } while (FALSE)
 
 /**
   Macro that declares a section of performance measurement source code.

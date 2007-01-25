@@ -24,13 +24,20 @@
   @retval FALSE     Language 1 and language 2 are not the same.
 
 **/
+STATIC
 BOOLEAN
 CompareIso639LanguageCode (
   IN CONST CHAR8  *Language1,
   IN CONST CHAR8  *Language2
   )
 {
-  return (BOOLEAN) (ReadUnaligned24 ((CONST UINT32 *) Language1) == ReadUnaligned24 ((CONST UINT32 *) Language2));
+  UINT32  Name1;
+  UINT32  Name2;
+
+  Name1 = ReadUnaligned24 ((CONST UINT32 *) Language1);
+  Name2 = ReadUnaligned24 ((CONST UINT32 *) Language2);
+
+  return (BOOLEAN) (Name1 == Name2);
 }
 
 /**

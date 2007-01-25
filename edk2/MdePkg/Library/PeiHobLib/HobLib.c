@@ -178,6 +178,7 @@ GetFirstGuidHob (
   @return The address of new HOB.
 
 **/
+STATIC
 VOID *
 InternalPeiCreateHob (
   IN UINT16                      Type,
