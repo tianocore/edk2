@@ -13,7 +13,7 @@
 #
 # TODO: FFS layout, Flash, FV, PCD
 #
-import os, sys, re, getopt, string, glob, xml.dom.minidom, pprint, time, copy, shelve
+import os, sys, re, getopt, string, glob, xml.dom.minidom, pprint, time, copy, shelve, pickle
 from XmlRoutines import *
 import FrameworkElement
 import BuildConfig
@@ -243,7 +243,7 @@ class LibraryDeclaration(FrameworkElement.LibraryInterface, SurfaceAreaElement):
     def Parse(self):
         dom = self._Root
         self.Name = XmlAttribute(dom, "Name")
-        self.Path = os.path.normpath(XmlElementData(XmlElement(dom, "/LibraryClass/IncludeHeader")))
+        self.Path = os.path.normpath(XmlElementData(XmlNode(dom, "/LibraryClass/IncludeHeader")))
         self.Dir  = os.path.dirname(self.Path)
         
         attribute = XmlAttribute(dom, "RecommendedInstanceGuid")
@@ -268,7 +268,7 @@ class LibraryClass(FrameworkElement.LibraryClass, SurfaceAreaElement):
     def Parse(self):
         dom = self._Root
         
-        self.Name = XmlElementData(XmlElement(dom, "/LibraryClass/Keyword"))
+        self.Name = XmlElementData(XmlNode(dom, "/LibraryClass/Keyword"))
         self.Usage = self.GetUsage(dom)
         self.Features = self.GetFeatureList(dom)
         self.Archs  = self.GetArchList(dom)
@@ -336,7 +336,7 @@ class Protocol(FrameworkElement.Protocol, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.CName = XmlElementData(XmlElement(dom, "/Protocol/ProtocolCName"))
+        self.CName = XmlElementData(XmlNode(dom, "/Protocol/ProtocolCName"))
         self.Usage = self.GetUsage(dom)
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
@@ -354,7 +354,7 @@ class ProtocolNotify(FrameworkElement.ProtocolNotify, SurfaceAreaElement):
     def Parse(self):
         dom = self._Root
         
-        self.CName = XmlElementData(XmlElement(dom, "/ProtocolNotify/ProtocolCName"))
+        self.CName = XmlElementData(XmlNode(dom, "/ProtocolNotify/ProtocolCName"))
         self.Usage = self.GetUsage(dom)
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
@@ -371,7 +371,7 @@ class Ppi(FrameworkElement.Ppi, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.CName = XmlElementData(XmlElement(dom, "/Ppi/PpiCName"))
+        self.CName = XmlElementData(XmlNode(dom, "/Ppi/PpiCName"))
         self.Usage = self.GetUsage(dom)
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
@@ -388,7 +388,7 @@ class PpiNotify(FrameworkElement.PpiNotify, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.CName = XmlElementData(XmlElement(dom, "/PpiNotify/PpiCName"))
+        self.CName = XmlElementData(XmlNode(dom, "/PpiNotify/PpiCName"))
         self.Usage = self.GetUsage(dom)
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
@@ -405,7 +405,7 @@ class Guid(FrameworkElement.Guid, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.CName = XmlElementData(XmlElement(dom, "/GuidCNames/GuidCName"))
+        self.CName = XmlElementData(XmlNode(dom, "/GuidCNames/GuidCName"))
         self.Usage = self.GetUsage(dom)
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
@@ -425,43 +425,43 @@ class Extern(FrameworkElement.Extern, SurfaceAreaElement):
         self.Archs = self.GetArchList(dom)
         self.Features = self.GetFeatureList(dom)
         
-        extern = XmlElement(dom, "/Extern/ModuleEntryPoint")
+        extern = XmlNode(dom, "/Extern/ModuleEntryPoint")
         if extern is not None and extern is not '':
             self.ModuleEntryPoints.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/ModuleUnloadImage")
+        extern = XmlNode(dom, "/Extern/ModuleUnloadImage")
         if extern is not None and extern is not '':
             self.ModuleUnloadImages.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/Constructor")
+        extern = XmlNode(dom, "/Extern/Constructor")
         if extern is not None and extern is not '':
             self.Constructors.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/Destructor")
+        extern = XmlNode(dom, "/Extern/Destructor")
         if extern is not None and extern is not '':
             self.Destructors.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/DriverBinding")
+        extern = XmlNode(dom, "/Extern/DriverBinding")
         if extern is not None and extern is not '':
             self.DriverBindings.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/ComponentName")
+        extern = XmlNode(dom, "/Extern/ComponentName")
         if extern is not None and extern is not '':
             self.ComponentNames.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/DriverConfig")
+        extern = XmlNode(dom, "/Extern/DriverConfig")
         if extern is not None and extern is not '':
             self.DriverConfigs.append(XmlElementData(extern))
             
-        extern = XmlElement(dom, "/Extern/DriverDiag")
+        extern = XmlNode(dom, "/Extern/DriverDiag")
         if extern is not None and extern is not '':
             self.DriverDiags.append(XmlElementData(extern))
 
-        extern = XmlElement(dom, "/Extern/SetVirtualAddressMapCallBacks")
+        extern = XmlNode(dom, "/Extern/SetVirtualAddressMapCallBacks")
         if extern is not None and extern is not '':
             self.SetVirtualAddressMapCallBacks.append(XmlElementData(extern))
 
-        extern = XmlElement(dom, "/Extern/ExitBootServicesCallBack")
+        extern = XmlNode(dom, "/Extern/ExitBootServicesCallBack")
         if extern is not None and extern is not '':
             self.ExitBootServicesCallBacks.append(XmlElementData(extern))
 
@@ -472,7 +472,7 @@ class IndustryStdHeader(FrameworkElement.IncludeFile, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.Path = os.path.normpath(XmlElementData(XmlElement(dom, "/IndustryStdHeader/IncludeHeader")))
+        self.Path = os.path.normpath(XmlElementData(XmlNode(dom, "/IndustryStdHeader/IncludeHeader")))
         self.Dir  = os.path.dirname(self.Path)
         self.Archs = self.GetArchList(dom)
         self.ModuleTypes = self.GetModuleTypeList(dom)
@@ -495,8 +495,8 @@ class GuidDeclaration(FrameworkElement.Guid, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.CName = XmlElementData(XmlElement(dom, "/Entry/C_Name"))
-        self.GuidValue = XmlElementData(XmlElement(dom, "/Entry/GuidValue")).upper()
+        self.CName = XmlElementData(XmlNode(dom, "/Entry/C_Name"))
+        self.GuidValue = XmlElementData(XmlNode(dom, "/Entry/GuidValue")).upper()
         self.Name = XmlAttribute(dom, "Name")
         self.Types = self.GetGuidTypeList(dom)
         self.Archs = self.GetArchList(dom)
@@ -518,12 +518,12 @@ class PcdDeclaration(FrameworkElement.Pcd, SurfaceAreaElement):
 
     def Parse(self):
         dom = self._Root
-        self.Types      = XmlElementData(XmlElement(dom, "/PcdEntry/ValidUsage")).split()
-        self.CName      = XmlElementData(XmlElement(dom, "/PcdEntry/C_Name"))
-        self.Token      = XmlElementData(XmlElement(dom, "/PcdEntry/Token"))
-        self.TokenSpace = XmlElementData(XmlElement(dom, "/PcdEntry/TokenSpaceGuidCName"))
-        self.DatumType  = XmlElementData(XmlElement(dom, "/PcdEntry/DatumType"))
-        self.Default    = XmlElementData(XmlElement(dom, "/PcdEntry/DefaultValue"))
+        self.Types      = XmlElementData(XmlNode(dom, "/PcdEntry/ValidUsage")).split()
+        self.CName      = XmlElementData(XmlNode(dom, "/PcdEntry/C_Name"))
+        self.Token      = XmlElementData(XmlNode(dom, "/PcdEntry/Token"))
+        self.TokenSpace = XmlElementData(XmlNode(dom, "/PcdEntry/TokenSpaceGuidCName"))
+        self.DatumType  = XmlElementData(XmlNode(dom, "/PcdEntry/DatumType"))
+        self.Default    = XmlElementData(XmlNode(dom, "/PcdEntry/DefaultValue"))
         self.Archs      = self.GetArchList(dom)
         self.ModuleTypes= self.GetModuleTypeList(dom)
 
@@ -566,10 +566,10 @@ class PlatformModule(FrameworkElement.PlatformModule, SurfaceAreaElement):
         for lib in libraryList:
             self.Libraries.append(LibraryInstance(self._Workspace, self, lib))
             
-        dom = XmlElement(dom, "/ModuleSA/ModuleSaBuildOptions")
-        self.FvBindings = self.GetFvBindingList(XmlElement(dom, "/ModuleSaBuildOptions/FvBinding"))
-        self.FfsLayouts = XmlElementData(XmlElement(dom, "/ModuleSaBuildOptions/FfsFormatKey")).split()
-        self.BuildOptions = self.GetBuildOptionList(XmlElement(dom, "/ModuleSaBuildOptions/Options"))
+        dom = XmlNode(dom, "/ModuleSA/ModuleSaBuildOptions")
+        self.FvBindings = self.GetFvBindingList(XmlNode(dom, "/ModuleSaBuildOptions/FvBinding"))
+        self.FfsLayouts = XmlElementData(XmlNode(dom, "/ModuleSaBuildOptions/FfsFormatKey")).split()
+        self.BuildOptions = self.GetBuildOptionList(XmlNode(dom, "/ModuleSaBuildOptions/Options"))
 
     def Postprocess(self):
         self.Module = self._Workspace.GetModule(self.GuidValue, self.Version,
@@ -602,22 +602,22 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         SurfaceAreaElement.__init__(self, workspace, package)
 
     def _MsaHeader(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.Name = XmlElementData(XmlElement(dom, "/MsaHeader/ModuleName"))
-        self.Type = XmlElementData(XmlElement(dom, "/MsaHeader/ModuleType"))
-        self.GuidValue = XmlElementData(XmlElement(dom, "/MsaHeader/GuidValue")).upper()
-        self.Version = XmlElementData(XmlElement(dom, "/MsaHeader/Version"))
+        self.Name = XmlElementData(XmlNode(dom, "/MsaHeader/ModuleName"))
+        self.Type = XmlElementData(XmlNode(dom, "/MsaHeader/ModuleType"))
+        self.GuidValue = XmlElementData(XmlNode(dom, "/MsaHeader/GuidValue")).upper()
+        self.Version = XmlElementData(XmlNode(dom, "/MsaHeader/Version"))
         
     def _ModuleDefinitions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.Archs = XmlElementData(XmlElement(dom, "/ModuleDefinitions/SupportedArchitectures")).split()
-        self.IsBinary = self.GetBoolean(XmlElement(dom, "/ModuleDefinitions/BinaryModule"))
-        self.BaseName = XmlElementData(XmlElement(dom, "/ModuleDefinitions/OutputFileBasename"))
+        self.Archs = XmlElementData(XmlNode(dom, "/ModuleDefinitions/SupportedArchitectures")).split()
+        self.IsBinary = self.GetBoolean(XmlNode(dom, "/ModuleDefinitions/BinaryModule"))
+        self.BaseName = XmlElementData(XmlNode(dom, "/ModuleDefinitions/OutputFileBasename"))
         
     def _LibraryClassDefinitions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         lcList = []
         for lc in XmlList(dom, "/LibraryClassDefinitions/LibraryClass"):
@@ -625,7 +625,7 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["LibraryClassDefinitions"] = lcList
 
     def _SourceFiles(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         srcList = []
         for f in XmlList(dom, "/SourceFiles/Filename"):
@@ -633,13 +633,13 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["SourceFiles"] = srcList
 
     def _NonProcessedFiles(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         for f in XmlList(dom, "/NonProcessedFiles/Filename"):
             self.NonProcessedFiles.append(SourceFile(self._Workspace, self, f))
 
     def _PackageDependencies(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         pdList = []
         for pkg in XmlList(dom, "/PackageDependencies/Package"):
@@ -647,7 +647,7 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["PackageDependencies"] = pdList
 
     def _Protocols(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
     
         protocolList = []
@@ -659,7 +659,7 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["Protocols"] = protocolList
 
     def _Ppis(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
     
         ppiList = []
@@ -671,7 +671,7 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["PPIs"] = ppiList
 
     def _Guids(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         guidList = []
         for g in XmlList(dom, "/Guids/GuidCNames"):
@@ -679,10 +679,10 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["Guids"] = guidList
 
     def _Externs(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.PcdIsDriver = self.GetBoolean(XmlElement(dom, "/Externs/PcdIsDriver"))
-        self.NeedsFlashMap_h = self.GetBoolean(XmlElement(dom, "/Externs/TianoR8FlashMap_h"))
+        self.PcdIsDriver = self.GetBoolean(XmlNode(dom, "/Externs/PcdIsDriver"))
+        self.NeedsFlashMap_h = self.GetBoolean(XmlNode(dom, "/Externs/TianoR8FlashMap_h"))
 
         externList = []
         specs = FrameworkElement.Extern()
@@ -695,9 +695,9 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         self._Elements["Externs"] = externList
 
     def _ModuleBuildOptions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.BuildOptions = self.GetBuildOptionList(XmlElement(dom, "/ModuleBuildOptions/Options"))
+        self.BuildOptions = self.GetBuildOptionList(XmlNode(dom, "/ModuleBuildOptions/Options"))
 
     def _UserExtensions(self, xpath):
         domList = XmlList(self._Root, xpath)
@@ -837,14 +837,14 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
         self.Postprocess()
 
     def _FdbHeader(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.Name = XmlElementData(XmlElement(dom, "/FdbHeader/DatabaseName"))
-        self.GuidValue = XmlElementData(XmlElement(dom, "/FdbHeader/GuidValue")).upper()
-        self.Version = XmlElementData(XmlElement(dom, "/FdbHeader/Version"))
+        self.Name = XmlElementData(XmlNode(dom, "/FdbHeader/DatabaseName"))
+        self.GuidValue = XmlElementData(XmlNode(dom, "/FdbHeader/GuidValue")).upper()
+        self.Version = XmlElementData(XmlNode(dom, "/FdbHeader/Version"))
 
     def _PackageList(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
     
         fileList = XmlList(dom, "/PackageList/Filename")
@@ -857,7 +857,7 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
         if len(self._Elements["PlatformList"]) > 0:
             return
         
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
     
         fileList = XmlList(dom, "/PlatformList/Filename")
@@ -867,7 +867,7 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
         self._Elements["PlatformList"] = platforms
 
     def _FarList(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
     
         fileList = XmlList(dom, "/FarList/Filename")
@@ -1199,18 +1199,18 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         SurfaceAreaElement.__init__(self, workspace, workspace, None, True, True)
         
     def _SpdHeader(self, xpath):
-        dom = XmlElement(self._Root, xpath)
-        self.Name = XmlElementData(XmlElement(dom, "/SpdHeader/PackageName"))
-        self.GuidValue = XmlElementData(XmlElement(dom, "/SpdHeader/GuidValue")).upper()
-        self.Version = XmlElementData(XmlElement(dom, "/SpdHeader/Version"))
+        dom = XmlNode(self._Root, xpath)
+        self.Name = XmlElementData(XmlNode(dom, "/SpdHeader/PackageName"))
+        self.GuidValue = XmlElementData(XmlNode(dom, "/SpdHeader/GuidValue")).upper()
+        self.Version = XmlElementData(XmlNode(dom, "/SpdHeader/Version"))
 
     def _PackageDefinitions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
-        self.ReadOnly = XmlElementData(XmlElement(dom, "/PackageDefinitions/ReadOnly"))
-        self.Repackage = XmlElementData(XmlElement(dom, "/PackageDefinitions/RePackage"))
+        dom = XmlNode(self._Root, xpath)
+        self.ReadOnly = XmlElementData(XmlNode(dom, "/PackageDefinitions/ReadOnly"))
+        self.Repackage = XmlElementData(XmlNode(dom, "/PackageDefinitions/RePackage"))
 
     def _LibraryClassDeclarations(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         lcdList = XmlList(dom, "/LibraryClassDeclarations/LibraryClass")
         lcds = []
         for lc in lcdList:
@@ -1218,7 +1218,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["LibraryClassDeclarations"] = lcds
         
     def _IndustryStdIncludes(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         headerList = XmlList(dom, "/IndustryStdIncludes/IndustryStdHeader")
         headers = []
         for h in headerList:
@@ -1226,7 +1226,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["IndustryStdIncludes"] = headers
         
     def _MsaFiles(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         msaFileList = XmlList(dom, "/MsaFiles/Filename")
         msaFiles = []
         for msa in msaFileList:
@@ -1235,7 +1235,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["MsaFiles"] = msaFiles
 
     def _PackageHeaders(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         headerList = XmlList(dom, "/PackageHeaders/IncludePkgHeader")
         headers = []
         for h in headerList:
@@ -1243,7 +1243,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["PackageHeaders"] = headers
 
     def _GuidDeclarations(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         guidList = XmlList(dom, "/GuidDeclarations/Entry")
         guids = []
         for guid in guidList:
@@ -1251,7 +1251,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["GuidDeclarations"] = guids
             
     def _ProtocolDeclarations(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         protocolList = XmlList(dom, "/ProtocolDeclarations/Entry")
         protocols = []
         for p in protocolList:
@@ -1259,7 +1259,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["ProtocolDeclarations"] = protocols
 
     def _PpiDeclarations(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         ppiList = XmlList(dom, "/PpiDeclarations/Entry")
         ppis = []
         for p in ppiList:
@@ -1267,7 +1267,7 @@ class PackageSurfaceArea(FrameworkElement.Package, SurfaceAreaElement):
         self._Elements["PpiDeclarations"] = ppis
 
     def _PcdDeclarations(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         pcdList = XmlList(dom, "/PcdDeclarations/PcdEntry")
         pcds = []
         for p in pcdList:
@@ -1339,27 +1339,27 @@ class PlatformSurfaceArea(FrameworkElement.Platform, SurfaceAreaElement):
         SurfaceAreaElement.__init__(self, workspace)
         
     def _PlatformHeader(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.Name = XmlElementData(XmlElement(dom, "/PlatformHeader/PlatformName"))
-        self.GuidValue = XmlElementData(XmlElement(dom, "/PlatformHeader/GuidValue")).upper()
-        self.Version = XmlElementData(XmlElement(dom, "/PlatformHeader/Version"))
+        self.Name = XmlElementData(XmlNode(dom, "/PlatformHeader/PlatformName"))
+        self.GuidValue = XmlElementData(XmlNode(dom, "/PlatformHeader/GuidValue")).upper()
+        self.Version = XmlElementData(XmlNode(dom, "/PlatformHeader/Version"))
 
     def _PlatformDefinitions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.Archs = XmlElementData(XmlElement(dom, "/PlatformDefinitions/SupportedArchitectures")).split()
+        self.Archs = XmlElementData(XmlNode(dom, "/PlatformDefinitions/SupportedArchitectures")).split()
         if self.Archs == []:
             raise Exception("No ARCH specified in platform " + self.Path)
-        self.Targets = XmlElementData(XmlElement(dom, "/PlatformDefinitions/BuildTargets")).split()
-        self.OutputPath = os.path.normpath(XmlElementData(XmlElement(dom, "/PlatformDefinitions/OutputDirectory")))
+        self.Targets = XmlElementData(XmlNode(dom, "/PlatformDefinitions/BuildTargets")).split()
+        self.OutputPath = os.path.normpath(XmlElementData(XmlNode(dom, "/PlatformDefinitions/OutputDirectory")))
 
     def _Flash(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
 
     def _FrameworkModules(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
         moduleList = XmlList(dom, "/FrameworkModules/ModuleSA")
         modules = []
@@ -1368,13 +1368,13 @@ class PlatformSurfaceArea(FrameworkElement.Platform, SurfaceAreaElement):
         self._Elements["FrameworkModules"] = modules
 
     def _DynamicPcdBuildDefinitions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
 
     def _BuildOptions(self, xpath):
-        dom = XmlElement(self._Root, xpath)
+        dom = XmlNode(self._Root, xpath)
         if dom == '': return
-        self.BuildOptions = self.GetBuildOptionList(XmlElement(dom, "/BuildOptions/Options"))
+        self.BuildOptions = self.GetBuildOptionList(XmlNode(dom, "/BuildOptions/Options"))
         # print self.BuildOptions
 
     def _UserExtensions(self, xpath):
@@ -1519,6 +1519,7 @@ def PrintWorkspace(ws):
 if __name__ == "__main__":
     # os.environ["WORKSPACE"]
     workspacePath = os.getenv("WORKSPACE", os.getcwd())
+    workspacePath = "C:\\home\\src\\R9\\pbuild"
     saFile = ""
     if len(sys.argv) <= 1:
         saFile = os.path.join(workspacePath, "Tools/Conf/FrameworkDatabase.db")
@@ -1529,16 +1530,6 @@ if __name__ == "__main__":
 
     startTime = time.clock()
     sa = Workspace(workspacePath, [], [])
-##    dbak = None
-##    if os.path.exists("workspace.bak"):
-##        dbak = shelve.open("workspace.bak", protocol=2)
-##        sa = dbak.db
-##        dbak.close()
-##    else:
-##        sa = FrameworkDatabase(saFile)
-##        dbak = shelve.open("workspace.bak", protocol=2)
-##        dbak.db = sa
-##        dbak.close()
     # sa = PackageSurfaceArea(saFile)
     # sa = PlatformSurfaceArea(saFile)
     # sa = ModuleSurfaceArea(saFile)
