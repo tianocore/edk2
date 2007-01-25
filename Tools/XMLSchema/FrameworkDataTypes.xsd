@@ -26,7 +26,7 @@
   </xs:simpleType>
   <xs:simpleType name="BlockNameType">
     <xs:restriction base="UCNameType">
-      <xs:pattern value="BLOCK[A-F0-9]{2}"/>
+      <xs:pattern value="\s*BLOCK[A-F0-9]{2}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="BootModeNames">
@@ -104,7 +104,6 @@
   </xs:simpleType>
   <xs:simpleType name="DatumSizeLimitation">
     <xs:restriction base="xs:nonNegativeInteger">
-      <xs:minExclusive value="0"/>
       <xs:maxExclusive value="13777216"/>
       <xs:pattern value="(\s)*[1-9][0-9]*(\s)*"/>
     </xs:restriction>
@@ -264,7 +263,7 @@
   <xs:simpleType name="HexByteArrayListType">
     <xs:restriction base="xs:normalizedString">
       <xs:minLength value="4"/>
-      <xs:pattern value="((( )?0x[a-fA-F0-9]{2})(,)?)+( )?"/>
+      <xs:pattern value="\s*((( )?0x[a-fA-F0-9]{2})(,)?)+( )?"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexByteArrayType">
@@ -341,7 +340,7 @@
   </xs:simpleType>
   <xs:simpleType name="Md5sumType">
     <xs:restriction base="xs:normalizedString">
-      <xs:pattern value="[a-fA-F0-9]{32}"/>
+      <xs:pattern value="\s*[a-fA-F0-9]{32}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="PrimaryModuleListType">
@@ -453,7 +452,7 @@
   <xs:simpleType name="SkuListType">
     <xs:restriction base="xs:normalizedString">
       <xs:minLength value="1"/>
-      <xs:pattern value="(\d)+((,)?(\s)*(\d)+)*"/>
+      <xs:pattern value="\s*(\d)+((,)?(\s)*(\d)+)*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="SupportedArchitectures">
@@ -522,7 +521,7 @@
   <xs:simpleType name="VariableOffsetValues">
     <xs:restriction base="xs:string">
       <xs:minLength value="1"/>
-      <xs:pattern value="\d+(:)?\d*"/>
+      <xs:pattern value="\s*\d+(:)?\d*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="VariableUsage">

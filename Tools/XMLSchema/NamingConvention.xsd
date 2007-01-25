@@ -20,7 +20,7 @@
       <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="(_)*[a-zA-Z]+((_)*[a-zA-Z0-9]*)*"/>
+      <xs:pattern value="\s*(_)*[a-zA-Z]+((_)*[a-zA-Z0-9]*)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="FileNameConvention">
@@ -28,7 +28,7 @@
       <xs:documentation xml:lang="en"> This defines what a Filename is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a optional dot and more alphanumeric characters. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="[a-zA-Z](\.?[-_a-zA-Z0-9]+)*"/>
+      <xs:pattern value="\s*[a-zA-Z](\.?[\-_a-zA-Z0-9]+)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="GuidType">
@@ -42,7 +42,7 @@
       <xs:documentation xml:lang="en"> This defines the minimum specification for a GUID Array which is 8 Hex Digits - 4 Hex Digits - 4 Hex Digits - 8 Hex Bytes, the last 16 Hex Digits can be enclosed in sqiggle {} brackets.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?"/>
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="GuidType2">
@@ -50,7 +50,7 @@
       <xs:documentation xml:lang="en"> A GUID must contain five different Hexadecimal character sets that are separated by a dash (-) character. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+      <xs:pattern value="\s*[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="Hex64BitDataType">
@@ -58,7 +58,7 @@
       <xs:documentation xml:lang="en">Define a Hex 64 Bit Value to be 0x[a-f0-9]{16}</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="(0x)?[a-fA-F0-9]{1,16}"/>
+      <xs:pattern value="\s*(0x)?[a-fA-F0-9]{1,16}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexAddressType">
@@ -66,7 +66,7 @@
       <xs:documentation xml:lang="en">Define a Hex Address, 0x[a-fA-F0-9]{1,16}</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[a-fA-F0-9]{1,16}"/>
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,16}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexByteDataType">
@@ -74,7 +74,7 @@
       <xs:documentation xml:lang="en">Define a Hex Byte Value to be 0x[a-f0-9]{2}</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="(0x)?[a-fA-F0-9]{1,2}"/>
+      <xs:pattern value="\s*(0x)?[a-fA-F0-9]{1,2}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexDataType">
@@ -82,7 +82,7 @@
       <xs:documentation xml:lang="en">Define a Hex Value to be 0x[a-f0-9]+</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[a-fA-F0-9]+"/>
+      <xs:pattern value="\s*0x[a-fA-F0-9]+\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexDigitType">
@@ -90,7 +90,7 @@
       <xs:documentation xml:lang="en">Define a Hex Diget to be 0x[a-f0-9]</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="[a-fA-F0-9]{1}"/>
+      <xs:pattern value="\s*[a-fA-F0-9]{1}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexDoubleWordDataType">
@@ -98,7 +98,7 @@
       <xs:documentation xml:lang="en">Define a Hex Double Word Value to be 0x[a-f0-9]{8}</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[a-fA-F0-9]{1,8}"/>
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,8}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="HexWordDataType">
@@ -106,18 +106,18 @@
       <xs:documentation xml:lang="en">Define a Hex Word Value to be 0x[a-f0-9]{4}</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[a-fA-F0-9]{1,4}"/>
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,4}\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="KeywordList">
     <xs:restriction base="xs:string">
       <xs:minLength value="1"/>
-      <xs:pattern value="[a-zA-Z]+(\ *_*[a-zA-Z0-9]*)*"/>
+      <xs:pattern value="\s*[a-zA-Z]+(\ *_*[a-zA-Z0-9]*)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="KeywordType">
     <xs:restriction base="xs:normalizedString">
-      <xs:pattern value="[a-zA-Z]+(_*[a-zA-Z0-9]*)*"/>
+      <xs:pattern value="\s*[a-zA-Z]+(_*[a-zA-Z0-9]*)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="Paragraph">
@@ -137,7 +137,7 @@
       <xs:documentation xml:lang="en">Limit Polarity vaild values to 0 and 1</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:int">
-      <xs:pattern value="0|1"/>
+      <xs:pattern value="\s*0|1\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="Sentence">
@@ -145,7 +145,7 @@
       <xs:documentation xml:lang="en"> This data type requires two or more words </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:normalizedString">
-      <xs:pattern value="(\w+\W*)+( )+(\W*\w*\W*\s*)*"/>
+      <xs:pattern value="\s*(\w+\W*)+( )+(\W*\w*\W*\s*)*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="ToolsNameConvention">
@@ -153,7 +153,7 @@
       <xs:documentation xml:lang="en">This data type is used for ToolCommand, ToolChainFamily and TagName.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:NCName">
-      <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*"/>
+      <xs:pattern value="\s*[a-zA-Z][a-zA-Z0-9]*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="UCNameType">
@@ -161,7 +161,7 @@
       <xs:documentation xml:lang="en"> Definition of a UpperCase Name, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="[A-Z]+(_*[A-Z0-9]*)*"/>
+      <xs:pattern value="\s*[A-Z]+(_*[A-Z0-9]*)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="VersionDataType">
@@ -172,7 +172,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="\d+(\.\d+)*"/>
+      <xs:pattern value="\s*\d+(\.\d+)*\s*"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="Zero">
@@ -180,7 +180,7 @@
       <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:int">
-      <xs:pattern value="0"/>
+      <xs:pattern value="\s*0\s*"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

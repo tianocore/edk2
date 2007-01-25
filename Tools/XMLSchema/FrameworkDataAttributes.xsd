@@ -266,6 +266,7 @@
     <xs:attribute name="Compressible" type="xs:boolean" default="true" use="optional"/>
     <xs:attribute name="SectionType" type="EfiSectionType" use="optional"/>
     <xs:attribute name="EncapsulationType" type="xs:normalizedString" use="optional"/>
+    <xs:attribute name="Alignment" type="xs:string" use="optional"/>
     <xs:attribute name="ToolName" type="xs:string" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
