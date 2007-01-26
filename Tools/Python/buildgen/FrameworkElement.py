@@ -487,7 +487,7 @@ class Workspace(Element):
                                         "PATH"  : {},
                                         "NAME"  : {},
                                       }
-        ## "NAME" : {name : library interface}
+        ## "NAME" : {name : [library interface]}
         ## "PATH" : {path : library interface}
         self.LibraryInterfaceXref   = {
                                         "PATH"  : {},
