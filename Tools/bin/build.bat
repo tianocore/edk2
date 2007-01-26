@@ -16,6 +16,8 @@ if ""%1""=="""" goto arg_end
 if ""%1""==""-q"" goto ant_arg
 if ""%1""==""-v"" goto ant_arg
 if ""%1""==""-d"" goto ant_arg
+if ""%1""==""-e"" goto ant_arg
+if ""%1""==""-emacs"" goto ant_arg
 
 goto ant_target
 
