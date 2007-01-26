@@ -284,9 +284,6 @@ class LibraryClass(FrameworkElement.LibraryClass, SurfaceAreaElement):
                 self.FavoriteIntance = FrameworkElement.Module()
             self.FavoriteIntance.Version = attribute
 
-    def Postprocess(self):
-        self.Interface = self._Workspace.GetLibraryInterface(self.Name)
-
 class SourceFile(FrameworkElement.SourceFile, SurfaceAreaElement):
     def __init__(self, workspace, module, dom):
         FrameworkElement.SourceFile.__init__(self)
@@ -758,7 +755,7 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
         # resolve library class
         if self._Elements.has_key("LibraryClassDefinitions"):
             for lc in self._Elements["LibraryClassDefinitions"]:
-                lc.Interface = self._Workspace.GetLibraryInterface(lc.Name)
+                lc.Interface = self.GetLibraryInterface(lc.Name)
                 if "ALWAYS_PRODUCED" in lc.Usage:
                     self.IsLibrary = True
                     lc.Interface.Instances.append(self)
@@ -811,6 +808,14 @@ class ModuleSurfaceArea(FrameworkElement.Module, SurfaceAreaElement):
                     if arch not in self.Externs:
                         self.Externs[arch] = []
                     self.Externs[arch].append(extern)
+                    
+    def GetLibraryInterface(self, name):
+        if name in self.Package.LibraryInterfaces:
+            return self.Package.LibraryInterfaces[name]
+        for pd in self._Elements["PackageDependencies"]:
+            if name in pd.Package.LibraryInterfaces:
+                return pd.Package.LibraryInterfaces[name]
+        return ""
 ##    def SetupEnvironment(self):
 ##        self.Environment["MODULE"] = self.Name
 ##        self.Environment["MODULE_GUID"] = self.GuidValue
@@ -1027,10 +1032,14 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
                 return platform
         return ""
 
-    def GetLibraryInterface(self, name):
+    def GetLibraryInterface(self, name, package):
         if name not in self.LibraryInterfaceXref["NAME"]:
             return ""
-        return self.LibraryInterfaceXref["NAME"][name]
+        liList = self.LibraryInterfaceXref["NAME"][name]
+        for li in liList:
+            if li.Package == package:
+                return li
+        return ""
     
     def SubPath(self, *relativePathList):
         return os.path.normpath(os.path.join(self.Path, *relativePathList))
@@ -1084,14 +1093,17 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
             ##      library class name -> library class object
             ##
             for lcname in p.LibraryInterfaces:
-                if lcname in self.LibraryInterfaceXref["NAME"]:
-                    raise Exception("Duplicate library class: %s in package %s" % (lcname, name))
+                if lcname not in self.LibraryInterfaceXref["NAME"]:
+                    # raise Exception("Duplicate library class: %s in package %s" % (lcname, name))
+                    self.LibraryInterfaceXref["NAME"][lcname] = []
                 lcInterface = p.LibraryInterfaces[lcname]
-                self.LibraryInterfaceXref["NAME"][lcname] = lcInterface
+                self.LibraryInterfaceXref["NAME"][lcname].append(lcInterface)
                 
-                if lcInterface not in self.LibraryInterfaceXref["PATH"]:
-                    self.LibraryInterfaceXref["PATH"][lcInterface] = []
-                self.LibraryInterfaceXref["PATH"][lcInterface].append(lcname)
+                lcHeader = p.SubPath(lcInterface.Path)
+                if lcHeader not in self.LibraryInterfaceXref["PATH"]:
+                    # raise Exception("Duplicate library class interface: %s in package %s" % (lcInterface, name))
+                    self.LibraryInterfaceXref["PATH"][lcHeader] = []
+                self.LibraryInterfaceXref["PATH"][lcHeader].append(lcInterface)
 
         ##
         ## setup package cross reference as nest-dict
@@ -1111,7 +1123,10 @@ class Workspace(FrameworkElement.Workspace, SurfaceAreaElement):
                 if guid not in moduleGuidIndex:
                     moduleGuidIndex[guid] = {}
                 else:
-                    print "! Duplicate module GUID found:", guid, path
+                    print "! Duplicate module GUID found:", guid, p.SubPath(path)
+                    dm = moduleGuidIndex[guid].values()[0][0]
+                    print "                              ", dm.GuidValue,\
+                                                    dm.Package.SubPath(dm.Path)
 
                 if version not in moduleGuidIndex[guid]:
                     moduleGuidIndex[guid][version] = []
@@ -1483,17 +1498,18 @@ def PrintWorkspace(ws):
                 print "\n"
     print "\nLibrary Classes:"
     for name in ws.LibraryInterfaceXref["NAME"]:
-        lc = ws.LibraryInterfaceXref["NAME"][name]
-        pkgPath = os.path.dirname(lc.Package.Path)
-        print "\n  [%s] <%s>" % (lc.Name, pkgPath + os.path.sep + lc.Path)
+        lcList = ws.LibraryInterfaceXref["NAME"][name]
+        for lc in lcList:
+            pkgPath = os.path.dirname(lc.Package.Path)
+            print "\n  [%s] <%s>" % (lc.Name, pkgPath + os.path.sep + lc.Path)
 
-        print "    Produced By:"
-        for li in lc.Instances:
-            print "      %-40s <%s>" % (li.Name+"-"+li.Version, li.Package.SubPath(li.Path))
+            print "    Produced By:"
+            for li in lc.Instances:
+                print "      %-40s <%s>" % (li.Name+"-"+li.Version, li.Package.SubPath(li.Path))
 
-        print "    Consumed By:"
-        for li in lc.Consumers:
-            print "      %-40s <%s>" % (li.Name+"-"+li.Version, li.Package.SubPath(li.Path))
+            print "    Consumed By:"
+            for li in lc.Consumers:
+                print "      %-40s <%s>" % (li.Name+"-"+li.Version, li.Package.SubPath(li.Path))
 
     print "\nActive Platform:"
     for arch in ws.ActivePlatform.Libraries:

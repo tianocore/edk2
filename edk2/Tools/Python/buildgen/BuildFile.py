@@ -230,18 +230,19 @@ class AntPlatformBuildFile(BuildFile):
         """Generate ${ARCH}_build.opt which contains the default build&tool definitions"""
         tools = self.Workspace.ToolConfig.ToolCodes
         for arch in self.Workspace.ActiveArchs:
+            validTools = []
+            for tool in tools:
+                key = (self.Toolchain, self.Target, arch, tool, "NAME")
+                if self.Workspace.ToolConfig[key] == "": continue
+                validTools.append(tool)
+                
             optFileDir = os.path.join(self.Workspace.Path, self.Platform.OutputPath,
                                       self.Target + "_" + self.Toolchain)
             optFileName = arch + "_build.opt"
             if not os.path.exists(optFileDir): os.makedirs(optFileDir)
             f = open(os.path.join(optFileDir, optFileName), "w")
-            for tool in tools:
-                key = (self.Toolchain, self.Target, arch, tool, "FLAGS")
-                flag = self.Workspace.ToolConfig[key]
-                f.write("DEFAULT_%s_FLAGS=%s\n" % (tool, flag))
-
-            f.write("\n")
-            for tool in tools:
+            
+            for tool in validTools:
                 key = (self.Toolchain, self.Target, arch, tool, "FLAGS")
                 if key in self.Platform.BuildOptions:
                     flag = self.Platform.BuildOptions[key]
@@ -254,15 +255,22 @@ class AntPlatformBuildFile(BuildFile):
                     else:
                         flag = ""
                 f.write("PLATFORM_%s_FLAGS=%s\n" % (tool, flag))
+            f.write("\n")
+
+            for tool in validTools:
+                key = (self.Toolchain, self.Target, arch, tool, "FLAGS")
+                flag = self.Workspace.ToolConfig[key]
+                f.write("DEFAULT_%s_FLAGS=%s\n" % (tool, flag))
 
             f.write("\n")
-            for tool in tools:
+            for tool in validTools:
                 for attr in self.Workspace.ToolConfig.Attributes:
                     if attr == "FLAGS": continue
                     key = (self.Toolchain, self.Target, arch, tool, attr)
                     value = self.Workspace.ToolConfig[key]
                     if attr == "NAME":
-                        f.write("%s=%s\n" % (tool, value))
+                        path = self.Workspace.ToolConfig[(self.Toolchain, self.Target, arch, tool, "PATH")]
+                        f.write("%s=%s\n" % (tool, os.path.join(path, value)))
                     else:
                         f.write("%s_%s=%s\n" % (tool, attr, value))
                 f.write("%s_FLAGS=${DEFAULT_%s_FLAGS} ${DEFAULT_MODULE_%s_FLAGS} ${PLATFORM_%s_FLAGS} ${MODULE_%s_FLAGS}\n" %
