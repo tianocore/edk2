@@ -189,6 +189,7 @@ EbcInterpret (
   return (UINT64) VmContext.R[7];
 }
 
+STATIC
 UINT64
 ExecuteEbcImageEntryPoint (
   IN EFI_HANDLE           ImageHandle,

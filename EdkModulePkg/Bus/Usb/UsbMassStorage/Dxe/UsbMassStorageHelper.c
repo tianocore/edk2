@@ -234,9 +234,7 @@ USBFloppyInquiry (
 {
   ATAPI_PACKET_COMMAND    Packet;
   EFI_STATUS              Status;
-  EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   //
   // prepare command packet for the Inquiry Packet Command.
@@ -309,10 +307,8 @@ USBFloppyRead10 (
   VOID                    *ptrBuffer;
   EFI_STATUS              Status;
   UINT16                  TimeOut;
-  EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
   UINT8                   Index;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   //
   // prepare command packet for the Inquiry Packet Command.
@@ -387,6 +383,7 @@ USBFloppyRead10 (
   return Status;
 }
 
+STATIC
 EFI_STATUS
 USBFloppyReadCapacity (
   IN  USB_FLOPPY_DEV    *UsbFloppyDevice
@@ -410,7 +407,6 @@ USBFloppyReadCapacity (
   //
   EFI_STATUS              Status;
   ATAPI_PACKET_COMMAND    Packet;
-  EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
 
   //
   // used for capacity data returned from Usb Floppy
@@ -419,7 +415,6 @@ USBFloppyReadCapacity (
 
   ZeroMem (&Data, sizeof (Data));
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.Inquiry.opcode = READ_CAPACITY;
@@ -473,7 +468,6 @@ USBFloppyReadFormatCapacity (
   //
   EFI_STATUS                Status;
   ATAPI_PACKET_COMMAND      Packet;
-  EFI_USB_ATAPI_PROTOCOL    *UsbAtapiInterface;
 
   //
   // used for capacity data returned from Usb Floppy
@@ -482,7 +476,6 @@ USBFloppyReadFormatCapacity (
 
   ZeroMem (&FormatData, sizeof (FormatData));
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.ReadFormatCapacity.opcode                = READ_FORMAT_CAPACITY;
@@ -556,9 +549,7 @@ UsbFloppyRequestSense (
   UINT8                   *Ptr;
   BOOLEAN                 SenseReq;
   ATAPI_PACKET_COMMAND    Packet;
-  EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   *SenseCounts      = 0;
 
@@ -672,11 +663,9 @@ UsbFloppyTestUnitReady (
 {
   ATAPI_PACKET_COMMAND      Packet;
   EFI_STATUS                Status;
-  EFI_USB_ATAPI_PROTOCOL    *UsbAtapiInterface;
   UINT32                    RetryIndex;
   UINT32                    MaximumRetryTimes;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
   MaximumRetryTimes = 2;
   //
   // fill command packet
@@ -748,10 +737,8 @@ USBFloppyWrite10 (
   VOID                    *ptrBuffer;
   EFI_STATUS              Status;
   UINT16                  TimeOut;
-  EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
   UINT8                   Index;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   //
   // prepare command packet for the Write10 Packet Command.
@@ -863,8 +850,6 @@ UsbFloppyDetectMedia (
   // a flag used to determine whether need to perform Read Capacity command.
   //
 
-  REQUEST_SENSE_DATA  *SensePtr;
-
   //
   // init
   //
@@ -883,8 +868,6 @@ UsbFloppyDetectMedia (
   Status      = UsbFloppyRequestSense (UsbFloppyDevice, &SenseCounts);
 
   if (!EFI_ERROR (Status)) {
-
-    SensePtr = UsbFloppyDevice->SenseData;
 
     //
     // No Media
@@ -1124,7 +1107,6 @@ UsbFloppyModeSense5APage5 (
   //
   EFI_STATUS                Status;
   ATAPI_PACKET_COMMAND      Packet;
-  EFI_USB_ATAPI_PROTOCOL    *UsbAtapiInterface;
   UFI_MODE_PARAMETER_PAGE_5 ModePage5;
   EFI_LBA                   LastBlock;
   UINT32                    SectorsPerTrack;
@@ -1132,7 +1114,6 @@ UsbFloppyModeSense5APage5 (
   UINT32                    NumberOfHeads;
   UINT32                    DataBytesPerSector;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   ZeroMem (&ModePage5, sizeof (UFI_MODE_PARAMETER_PAGE_5));
 
@@ -1210,10 +1191,8 @@ UsbFloppyModeSense5APage1C (
   //
   EFI_STATUS                  Status;
   ATAPI_PACKET_COMMAND        Packet;
-  EFI_USB_ATAPI_PROTOCOL      *UsbAtapiInterface;
   UFI_MODE_PARAMETER_PAGE_1C  ModePage1C;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   ZeroMem (&ModePage1C, sizeof (UFI_MODE_PARAMETER_PAGE_1C));
 
@@ -1285,11 +1264,9 @@ UsbFloppyModeSense5APage3F (
   //
   EFI_STATUS                Status;
   ATAPI_PACKET_COMMAND      Packet;
-  EFI_USB_ATAPI_PROTOCOL    *UsbAtapiInterface;
   UFI_MODE_PARAMETER_HEADER Header;
   UINT32                    Size;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   Size              = sizeof (UFI_MODE_PARAMETER_HEADER);
 
@@ -1343,11 +1320,9 @@ UsbSCSIModeSense1APage3F (
   //
   EFI_STATUS                  Status;
   ATAPI_PACKET_COMMAND        Packet;
-  EFI_USB_ATAPI_PROTOCOL      *UsbAtapiInterface;
   SCSI_MODE_PARAMETER_HEADER6 Header;
   UINT32                      Size;
 
-  UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
   Size              = sizeof (SCSI_MODE_PARAMETER_HEADER6);
 

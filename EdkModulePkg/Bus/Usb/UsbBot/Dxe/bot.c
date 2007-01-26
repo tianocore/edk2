@@ -441,8 +441,6 @@ BotDriverBindingStop (
   EFI_USB_ATAPI_PROTOCOL  *BotAtapiProtocol;
   USB_BOT_DEVICE          *UsbBotDev;
 
-  EFI_USB_IO_PROTOCOL     *UsbIo;
-
   //
   // Get our context back.
   //
@@ -464,7 +462,6 @@ BotDriverBindingStop (
   // After installing Usb-Atapi protocol onto this handle
   // it will be called by upper layer drivers such as Fat
   //
-  UsbIo = UsbBotDev->UsbIo;
 
   BotReportStatusCode (
     UsbBotDev->DevicePath,

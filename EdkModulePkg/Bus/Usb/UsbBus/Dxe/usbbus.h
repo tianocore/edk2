@@ -1111,4 +1111,45 @@ UsbVirtualHcAsyncIsochronousTransfer (
 --*/
 ;
 
+EFI_STATUS
+EFIAPI
+UsbPortReset (
+  IN EFI_USB_IO_PROTOCOL     *This
+  )
+/*++
+
+  Routine Description:
+    Resets and reconfigures the USB controller.  This function will
+    work for all USB devices except USB Hub Controllers.
+
+  Arguments:
+    This          -   Indicates the calling context.
+
+  Returns:
+    EFI_SUCCESS
+    EFI_INVALID_PARAMETER
+    EFI_DEVICE_ERROR
+
+--*/
+;
+
+VOID
+InitializeUsbIoInstance (
+  IN USB_IO_CONTROLLER_DEVICE     *UsbIoController
+  )
+/*++
+
+Routine Description:
+
+  Initialize the instance of UsbIo controller
+
+Arguments:
+
+  UsbIoController - A pointer to controller structure of UsbIo
+
+Returns:
+
+--*/
+;
+
 #endif

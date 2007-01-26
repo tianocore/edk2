@@ -22,15 +22,6 @@ Abstract:
 
 --*/
 
-EFI_STATUS
-ConvertBmpToGopBlt (
-  IN  VOID      *BmpImage,
-  IN  UINTN     BmpImageSize,
-  IN OUT VOID   **GopBlt,
-  IN OUT UINTN  *GopBltSize,
-  OUT UINTN     *PixelHeight,
-  OUT UINTN     *PixelWidth
-  );
 
 EFI_STATUS
 GetGraphicsBitMapFromFV (
@@ -115,6 +106,7 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+STATIC
 EFI_STATUS
 ConvertBmpToGopBlt (
   IN  VOID      *BmpImage,
@@ -450,6 +442,7 @@ Returns:
     }
 
     Blt = NULL;
+    BltSize = 0;
     Status = ConvertBmpToGopBlt (
               ImageData,
               ImageSize,

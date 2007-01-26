@@ -48,7 +48,7 @@ IoOr8 (
   IN      UINT8                     OrData
   )
 {
-  return IoWrite8 (Port, IoRead8 (Port) | OrData);
+  return IoWrite8 (Port, (UINT8) (IoRead8 (Port) | OrData));
 }
 
 /**
@@ -76,7 +76,7 @@ IoAnd8 (
   IN      UINT8                     AndData
   )
 {
-  return IoWrite8 (Port, IoRead8 (Port) & AndData);
+  return IoWrite8 (Port, (UINT8) (IoRead8 (Port) & AndData));
 }
 
 /**
@@ -107,7 +107,7 @@ IoAndThenOr8 (
   IN      UINT8                     OrData
   )
 {
-  return IoWrite8 (Port, (IoRead8 (Port) & AndData) | OrData);
+  return IoWrite8 (Port, (UINT8) ((IoRead8 (Port) & AndData) | OrData));
 }
 
 /**
@@ -328,7 +328,7 @@ IoOr16 (
   IN      UINT16                    OrData
   )
 {
-  return IoWrite16 (Port, IoRead16 (Port) | OrData);
+  return IoWrite16 (Port, (UINT16) (IoRead16 (Port) | OrData));
 }
 
 /**
@@ -356,7 +356,7 @@ IoAnd16 (
   IN      UINT16                    AndData
   )
 {
-  return IoWrite16 (Port, IoRead16 (Port) & AndData);
+  return IoWrite16 (Port, (UINT16) (IoRead16 (Port) & AndData));
 }
 
 /**
@@ -387,7 +387,7 @@ IoAndThenOr16 (
   IN      UINT16                    OrData
   )
 {
-  return IoWrite16 (Port, (IoRead16 (Port) & AndData) | OrData);
+  return IoWrite16 (Port, (UINT16) ((IoRead16 (Port) & AndData) | OrData));
 }
 
 /**
@@ -1168,7 +1168,7 @@ MmioOr8 (
   IN      UINT8                     OrData
   )
 {
-  return MmioWrite8 (Address, MmioRead8 (Address) | OrData);
+  return MmioWrite8 (Address, (UINT8) (MmioRead8 (Address) | OrData));
 }
 
 /**
@@ -1196,7 +1196,7 @@ MmioAnd8 (
   IN      UINT8                     AndData
   )
 {
-  return MmioWrite8 (Address, MmioRead8 (Address) & AndData);
+  return MmioWrite8 (Address, (UINT8) (MmioRead8 (Address) & AndData));
 }
 
 /**
@@ -1228,7 +1228,7 @@ MmioAndThenOr8 (
   IN      UINT8                     OrData
   )
 {
-  return MmioWrite8 (Address, (MmioRead8 (Address) & AndData) | OrData);
+  return MmioWrite8 (Address, (UINT8) ((MmioRead8 (Address) & AndData) | OrData));
 }
 
 /**
@@ -1450,7 +1450,7 @@ MmioOr16 (
   IN      UINT16                    OrData
   )
 {
-  return MmioWrite16 (Address, MmioRead16 (Address) | OrData);
+  return MmioWrite16 (Address, (UINT16) (MmioRead16 (Address) | OrData));
 }
 
 /**
@@ -1478,7 +1478,7 @@ MmioAnd16 (
   IN      UINT16                    AndData
   )
 {
-  return MmioWrite16 (Address, MmioRead16 (Address) & AndData);
+  return MmioWrite16 (Address, (UINT16) (MmioRead16 (Address) & AndData));
 }
 
 /**
@@ -1510,7 +1510,7 @@ MmioAndThenOr16 (
   IN      UINT16                    OrData
   )
 {
-  return MmioWrite16 (Address, (MmioRead16 (Address) & AndData) | OrData);
+  return MmioWrite16 (Address, (UINT16) ((MmioRead16 (Address) & AndData) | OrData));
 }
 
 /**

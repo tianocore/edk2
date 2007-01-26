@@ -99,13 +99,6 @@ UsbAsyncIsochronousTransfer (
   IN        VOID                                *Context OPTIONAL
   );
 
-extern
-EFI_STATUS
-EFIAPI
-UsbPortReset (
-  IN EFI_USB_IO_PROTOCOL     *This
-  );
-
 STATIC
 EFI_STATUS
 EFIAPI
