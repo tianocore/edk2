@@ -344,9 +344,15 @@ CFvMapFile::CFvMapFile(const CIdAddressPathMap& idAddrPath)
         if (i->second.second == "*")
             continue;
 
-        pair<iterator, bool> r = insert(value_type(i->first,
-            new CMapFile(i->second.second.substr(0, i->second.second.rfind('.')) + ".map")));
-        r.first->second->SetLoadAddress(i->second.first);
+        try
+        {
+            pair<iterator, bool> r = insert(value_type(i->first,
+              new CMapFile(i->second.second.substr(0, i->second.second.rfind('.')) + ".map")));
+            r.first->second->SetLoadAddress(i->second.first);
+        }
+        catch (const runtime_error& e)
+        {
+        }
     }
 }
 
