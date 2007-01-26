@@ -485,6 +485,7 @@ UHCIDriverBindingStart (
   UINTN                   FlBaseAddrReg; 
   EFI_PCI_IO_PROTOCOL     *PciIo; 
   USB_HC_DEV              *HcDev;
+  UINT64                  Supports;
   
   HcDev = NULL;
 
@@ -510,10 +511,19 @@ UHCIDriverBindingStart (
   //
   Status = PciIo->Attributes (
                     PciIo,
-                    EfiPciIoAttributeOperationEnable,
-                    EFI_PCI_DEVICE_ENABLE,
-                    NULL
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
                     );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      Supports,
+                      NULL
+                      );
+  }
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
            Controller,
@@ -777,6 +787,8 @@ UnInstallUHCInterface (
 --*/
 {
   USB_HC_DEV  *HcDev;
+  EFI_STATUS  Status;
+  UINT64      Supports;
 
   HcDev = USB_HC_DEV_FROM_THIS (This);
 
@@ -823,12 +835,21 @@ UnInstallUHCInterface (
   //
   // Disable the USB Host Controller
   //
-  HcDev->PciIo->Attributes (
-                  HcDev->PciIo,
-                  EfiPciIoAttributeOperationDisable,
-                  EFI_PCI_DEVICE_ENABLE,
-                  NULL
-                  );
+  Status = HcDev->PciIo->Attributes (
+                           HcDev->PciIo,
+                           EfiPciIoAttributeOperationSupported,
+                           0,
+                           &Supports
+                           );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = HcDev->PciIo->Attributes (
+                             HcDev->PciIo,
+                             EfiPciIoAttributeOperationDisable,
+                             Supports,
+                             NULL
+                             );
+  }
 
   gBS->FreePool (HcDev);
 

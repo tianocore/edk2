@@ -1,20 +1,20 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                     
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
     Ehchlp.c
-    
-Abstract: 
-    
+
+Abstract:
+
 
 Revision History
 --*/
@@ -29,7 +29,7 @@ HostReset (
 {
   UINT32  Value;
   UINT32  TimeOut;
- 
+
   ReadEhcOperationalReg (
     HcDev,
     USBCMD,
@@ -102,18 +102,18 @@ ReadEhcCapabiltiyReg (
 Routine Description:
 
   Read  Ehc Capabitlity register
-  
+
 Arguments:
 
-  HcDev              - USB2_HC_DEV 
+  HcDev              - USB2_HC_DEV
   CapabiltiyRegAddr  - Ehc Capability register address
   Data               - A pointer to data read from register
-  
+
 Returns:
 
   EFI_SUCCESS        Success
   EFI_DEVICE_ERROR   Fail
-    
+
 --*/
 {
   return HcDev->PciIo->Mem.Read (
@@ -137,18 +137,18 @@ ReadEhcOperationalReg (
 Routine Description:
 
   Read  Ehc Operation register
-  
+
 Arguments:
 
-  HcDev                - USB2_HC_DEV 
+  HcDev                - USB2_HC_DEV
   OperationalRegAddr   - Ehc Operation register address
   Data                 - A pointer to data read from register
-  
+
 Returns:
 
   EFI_SUCCESS        Success
   EFI_DEVICE_ERROR   Fail
-    
+
 --*/
 {
   ASSERT (HcDev->UsbCapabilityLen);
@@ -173,18 +173,18 @@ WriteEhcOperationalReg (
 Routine Description:
 
   Write  Ehc Operation register
-  
+
 Arguments:
 
-  HcDev                - USB2_HC_DEV 
+  HcDev                - USB2_HC_DEV
   OperationalRegAddr   - Ehc Operation register address
   Data                 - 32bit write to register
-  
+
 Returns:
 
   EFI_SUCCESS        Success
   EFI_DEVICE_ERROR   Fail
-  
+
 --*/
 {
   ASSERT (HcDev->UsbCapabilityLen);
@@ -197,6 +197,8 @@ Returns:
                              &Data
                              );
 }
+
+
 
 VOID
 ClearLegacySupport (
@@ -239,7 +241,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP,
                      1,
-                     &Value 
+                     &Value
                      );
 
   DEBUG((gEHCDebugLevel, "EECP[0] = 0x%x\n", Value));
@@ -249,7 +251,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP + 0x4,
                      1,
-                     &Value 
+                     &Value
                      );
 
   DEBUG((gEHCDebugLevel, "EECP[4] = 0x%x\n", Value));
@@ -259,7 +261,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP,
                      1,
-                     &Value 
+                     &Value
                      );
 
   Value = Value | (0x1 << 24);
@@ -270,7 +272,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP,
                      1,
-                     &Value 
+                     &Value
                      );
 
  TimeOut = 40;
@@ -282,7 +284,7 @@ Returns:
                       EfiPciIoWidthUint32,
                       EECP,
                       1,
-                      &Value 
+                      &Value
                       );
   if ((Value & 0x01010000) == 0x01000000) {
     break;
@@ -291,8 +293,8 @@ Returns:
 
   if (TimeOut == 0) {
     DEBUG((gEHCErrorLevel, "Timeout for getting HC OS Owned Semaphore\n" ));
-  } 
-  
+  }
+
   DEBUG((gEHCErrorLevel, "After Release Value\n" ));
 
   HcDev->PciIo->Pci.Read (
@@ -300,7 +302,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP,
                      1,
-                     &Value 
+                     &Value
                      );
 
   DEBUG((gEHCDebugLevel, "EECP[0] = 0x%x\n", Value));
@@ -310,7 +312,7 @@ Returns:
                      EfiPciIoWidthUint32,
                      EECP + 0x4,
                      1,
-                     &Value 
+                     &Value
                      );
 
   DEBUG((gEHCDebugLevel, "EECP[4] = 0x%x\n", Value));
@@ -327,16 +329,16 @@ GetCapabilityLen (
 Routine Description:
 
   Get the length of capability register
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-    
+
 --*/
 {
   EFI_STATUS  Status;
@@ -364,18 +366,18 @@ SetFrameListLen (
 Routine Description:
 
   Set the length of Frame List
-  
+
 Arguments:
 
-  HcDev    - USB2_HC_DEV 
+  HcDev    - USB2_HC_DEV
   Length   - the required length of frame list
-  
+
 Returns:
 
   EFI_SUCCESS            Success
   EFI_INVALID_PARAMETER  Invalid parameter
   EFI_DEVICE_ERROR       Fail
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -428,14 +430,14 @@ SetFrameListBaseAddr (
 Routine Description:
 
   Set base address of frame list first entry
-  
+
 Arguments:
 
-  HcDev        - USB2_HC_DEV 
+  HcDev        - USB2_HC_DEV
   FrameBuffer  - base address of first entry of frame list
-  
+
 Returns:
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -474,17 +476,17 @@ SetAsyncListAddr (
 Routine Description:
 
   Set address of first Async schedule Qh
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   QhPtr   - A pointer to first Qh in the Async schedule
-  
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-    
+
 --*/
 {
   EFI_STATUS  Status;
@@ -512,16 +514,16 @@ SetCtrlDataStructSeg (
 Routine Description:
 
   Set register of control and data structure segment
-  
+
 Arguments:
 
-  HcDev  - USB2_HC_DEV 
-  
+  HcDev  - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-  
+
 
 --*/
 {
@@ -550,16 +552,16 @@ SetPortRoutingEhc (
 Routine Description:
 
   Set Ehc port routing bit
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-    
+
 --*/
 {
   EFI_STATUS  Status;
@@ -601,16 +603,16 @@ SetEhcDoorbell (
 Routine Description:
 
   Set Ehc door bell bit
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-     
+
 --*/
 {
   EFI_STATUS  Status;
@@ -652,16 +654,16 @@ ClearEhcAllStatus (
 Routine Description:
 
   Clear Ehc all status bits
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-     
+
 --*/
 {
   UINT32  UsbStatusAddr;
@@ -684,16 +686,16 @@ EnablePeriodicSchedule (
 Routine Description:
 
   Enable periodic schedule
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-   
+
 --*/
 {
   EFI_STATUS  Status;
@@ -735,16 +737,16 @@ DisablePeriodicSchedule (
 Routine Description:
 
   Disable periodic schedule
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-   
+
 --*/
 {
   EFI_STATUS  Status;
@@ -784,16 +786,16 @@ EnableAsynchronousSchedule (
 Routine Description:
 
   Enable asynchrounous schedule
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-    
+
 --*/
 {
   EFI_STATUS  Status;
@@ -835,16 +837,16 @@ DisableAsynchronousSchedule (
 Routine Description:
 
   Disable asynchrounous schedule
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-   
+
 --*/
 {
   EFI_STATUS  Status;
@@ -884,16 +886,16 @@ ResetEhc (
 Routine Description:
 
   Reset Ehc
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-   
+
 --*/
 {
   EFI_STATUS  Status;
@@ -935,16 +937,16 @@ StartScheduleExecution (
 Routine Description:
 
   Start Ehc schedule execution
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   EFI_SUCCESS       Success
   EFI_DEVICE_ERROR  Fail
-   
+
 --*/
 {
   EFI_STATUS  Status;
@@ -986,16 +988,16 @@ IsFrameListProgrammable (
 Routine Description:
 
   Whether frame list is programmable
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   Programmable
   FALSE  Unprogrammable
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1028,16 +1030,16 @@ IsPeriodicScheduleEnabled (
 Routine Description:
 
   Whether periodic schedule is enabled
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE    Enabled
   FALSE   Disabled
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1070,16 +1072,16 @@ IsAsyncScheduleEnabled (
 Routine Description:
 
   Whether asynchronous schedule is enabled
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   Enabled
   FALSE  Disabled
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1113,16 +1115,16 @@ IsEhcPortEnabled (
 Routine Description:
 
   Whether port is enabled
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   Enabled
   FALSE  Disabled
-  
+
 --*/
 {
   UINT32  PortStatusControlAddr;
@@ -1148,16 +1150,16 @@ IsEhcReseted (
 Routine Description:
 
   Whether Ehc is reseted
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   Reseted
   FALSE  Unreseted
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1190,16 +1192,16 @@ IsEhcHalted (
 Routine Description:
 
   Whether Ehc is halted
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   Halted
   FALSE  Not halted
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1232,16 +1234,16 @@ IsEhcSysError (
 Routine Description:
 
   Whether Ehc is system error
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   System error
   FALSE  No system error
-  
+
 --*/
 {
   BOOLEAN Value;
@@ -1268,29 +1270,29 @@ Returns:
 BOOLEAN
 IsHighSpeedDevice (
   IN EFI_USB2_HC_PROTOCOL *This,
-  IN UINT8                PortNum 
+  IN UINT8                PortNum
   )
 /*++
 
 Routine Description:
 
   Whether high speed device attached
-  
+
 Arguments:
 
-  HcDev - USB2_HC_DEV 
-  
+  HcDev - USB2_HC_DEV
+
 Returns:
 
   TRUE   High speed
   FALSE  Full speed
-  
+
 --*/
 {
   USB2_HC_DEV          *HcDev;
   UINT32               PortStatusControlAddr;
   UINT32               PortStatusControlReg;
-  
+
   HcDev = USB2_HC_DEV_FROM_THIS (This);
   PortStatusControlAddr = (UINT32) (PORTSC + (4 * PortNum));
 
@@ -1360,17 +1362,17 @@ WaitForEhcReset (
 Routine Description:
 
   wait for Ehc reset or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1406,17 +1408,17 @@ WaitForEhcHalt (
 Routine Description:
 
   wait for Ehc halt or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1452,17 +1454,17 @@ WaitForEhcNotHalt (
 Routine Description:
 
   wait for Ehc not halt or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1498,17 +1500,17 @@ WaitForAsyncScheduleEnable (
 Routine Description:
 
   Wait for Ehc asynchronous schedule enable or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1544,17 +1546,17 @@ WaitForAsyncScheduleDisable (
 Routine Description:
 
   Wait for Ehc asynchronous schedule disable or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1590,17 +1592,17 @@ WaitForPeriodicScheduleEnable (
 Routine Description:
 
   Wait for Ehc periodic schedule enable or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1636,17 +1638,17 @@ WaitForPeriodicScheduleDisable (
 Routine Description:
 
   Wait for periodic schedule disable or timeout
-  
+
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
-  
+
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1685,14 +1687,14 @@ Routine Description:
 
 Arguments:
 
-  HcDev   - USB2_HC_DEV 
+  HcDev   - USB2_HC_DEV
   Timeout - timeout threshold
 
 Returns:
 
   EFI_SUCCESS    Success
   EFI_TIMEOUT    Timeout
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -1702,7 +1704,7 @@ Returns:
 
   UsbCommandAddr  = USBCMD;
   Delay           = (Timeout / 50) + 1;
-  
+
   do {
     Status = ReadEhcOperationalReg (
                HcDev,

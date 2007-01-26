@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   UsbMassStorageHelper.c
-    
+
 Abstract:
 
   Helper functions for USB Mass Storage Driver
@@ -80,19 +80,19 @@ USBFloppyPacketCommand (
 
   Routine Description:
     Sends Packet Command to USB Floppy Drive.
-  
+
   Arguments:
     UsbFloppyDevice  -  The USB_FLOPPY_DEV instance.
     Command          -  A pointer to the command packet.
     CommandSize      -  Indicates the size of the command packet.
     DataBuffer       -  A pointer to the buffer for the data transfer
-                        after the command packet.              
+                        after the command packet.
     BufferLength     -  Indicates the size of the Data Buffer.
     Direction        -  Transfer Direction
     TimeOutInMilliSeconds - Timeout Value
-  Returns:  
+  Returns:
     EFI_SUCCESS  - Success
---*/    
+--*/
 {
   EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
   EFI_STATUS              Status;
@@ -123,14 +123,14 @@ USBFloppyIdentify (
 
   Routine Description:
     Retrieves device information to tell the device type.
-  
+
   Arguments:
     UsbFloppyDevice    The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/    
+--*/
 {
 
   EFI_STATUS        Status;
@@ -144,7 +144,7 @@ USBFloppyIdentify (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-   
+
   //
   // Get media removable info from INQUIRY data.
   //
@@ -201,7 +201,7 @@ USBFloppyIdentify (
     gBS->FreePool (Idata);
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // Get media information.
   //
@@ -221,16 +221,16 @@ USBFloppyInquiry (
 
   Routine Description:
     Send Inquiry Packet Command to device and retrieve Inquiry Data.
-  
+
   Arguments:
     UsbFloppyDevice    The USB_FLOPPY_DEV instance.
-    Idata              A pointer pointing to the address of 
+    Idata              A pointer pointing to the address of
                        Inquiry Data.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/      
+--*/
 {
   ATAPI_PACKET_COMMAND    Packet;
   EFI_STATUS              Status;
@@ -272,31 +272,31 @@ USBFloppyInquiry (
 
 EFI_STATUS
 USBFloppyRead10 (
-  IN    USB_FLOPPY_DEV    *UsbFloppyDevice,
-  IN    VOID              *Buffer,
-  IN    EFI_LBA           Lba,
-  IN    UINTN             NumberOfBlocks
+  IN  USB_FLOPPY_DEV    *UsbFloppyDevice,
+  IN  VOID              *Buffer,
+  IN  EFI_LBA           Lba,
+  IN  UINTN             NumberOfBlocks
   )
 /*++
 
   Routine Description:
     Sends Read10 Packet Command to device to perform data transfer
     from device to host.
-  
+
   Arguments:
     UsbFloppyDevice -   The USB_FLOPPY_DEV instance.
-    Buffer          -   A pointer to the destination buffer for the data. 
+    Buffer          -   A pointer to the destination buffer for the data.
                         The caller is responsible for either having implicit
                         or explicit ownership of the buffer.
-    Lba             -   The starting logical block address to read from 
+    Lba             -   The starting logical block address to read from
                         on the device.
-    NumberOfBlocks  -   Indicates the number of blocks that the read 
+    NumberOfBlocks  -   Indicates the number of blocks that the read
                         operation requests.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/      
+--*/
 {
   ATAPI_PACKET_COMMAND    Packet;
   READ10_CMD              *Read10Packet;
@@ -310,7 +310,7 @@ USBFloppyRead10 (
   EFI_STATUS              Status;
   UINT16                  TimeOut;
   EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
-  UINTN                   SenseCounts;
+  UINT8                   Index;
 
   UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
@@ -333,76 +333,50 @@ USBFloppyRead10 (
     } else {
       SectorCount = MaxBlock;
     }
-    //
-    // fill the Packet data structure
-    //
-    Read10Packet->opcode = READ_10;
 
-    //
-    // Lba0 ~ Lba3 specify the start logical block address of the data transfer.
-    // Lba0 is MSB, Lba3 is LSB
-    //
-    Read10Packet->Lba3  = (UINT8) (Lba32 & 0xff);
-    Read10Packet->Lba2  = (UINT8) (Lba32 >> 8);
-    Read10Packet->Lba1  = (UINT8) (Lba32 >> 16);
-    Read10Packet->Lba0  = (UINT8) (Lba32 >> 24);
+    for (Index = 0; Index < 3; Index ++) {
 
-    //
-    // TranLen0 ~ TranLen1 specify the transfer length in block unit.
-    // TranLen0 is MSB, TranLen is LSB
-    //
-    Read10Packet->TranLen1  = (UINT8) (SectorCount & 0xff);
-    Read10Packet->TranLen0  = (UINT8) (SectorCount >> 8);
-
-    ByteCount               = SectorCount * BlockSize;
-
-    TimeOut                 = (UINT16) (SectorCount * USBFLPTIMEOUT);
-
-    Status = USBFloppyPacketCommand (
-              UsbFloppyDevice,
-              &Packet,
-              sizeof (ATAPI_PACKET_COMMAND),
-              (VOID *) ptrBuffer,
-              ByteCount,
-              EfiUsbDataIn,
-              TimeOut
-              );
-    if (EFI_ERROR (Status)) {
-
-      Status = UsbFloppyRequestSense (UsbFloppyDevice, &SenseCounts);
-      if (!EFI_ERROR (Status)) {
-        if (IsLogicalUnitCommunicationOverRun (
-              UsbFloppyDevice->SenseData,
-              SenseCounts
-              )) {
-          Lba32           = (UINT32) Lba;
-          ptrBuffer       = Buffer;
-          BlocksRemaining = (UINT16) NumberOfBlocks;
-          MaxBlock        = (UINT16) (MaxBlock / 4);
-          if (MaxBlock < 1) {
-            MaxBlock = 1;
-          }
-
-          continue;
-        }
-      } else {
-        return EFI_DEVICE_ERROR;
-      }
       //
-      // retry read10 command
+      // fill the Packet data structure
       //
+      Read10Packet->opcode = READ_10;
+      //
+      // Lba0 ~ Lba3 specify the start logical block address of the data transfer.
+      // Lba0 is MSB, Lba3 is LSB
+      //
+      Read10Packet->Lba3  = (UINT8) (Lba32 & 0xff);
+      Read10Packet->Lba2  = (UINT8) (Lba32 >> 8);
+      Read10Packet->Lba1  = (UINT8) (Lba32 >> 16);
+      Read10Packet->Lba0  = (UINT8) (Lba32 >> 24);
+
+      //
+      // TranLen0 ~ TranLen1 specify the transfer length in block unit.
+      // TranLen0 is MSB, TranLen is LSB
+      //
+      Read10Packet->TranLen1  = (UINT8) (SectorCount & 0xff);
+      Read10Packet->TranLen0  = (UINT8) (SectorCount >> 8);
+
+      ByteCount               = SectorCount * BlockSize;
+
+      TimeOut                 = (UINT16) (SectorCount * USBFLPTIMEOUT);
+
+
       Status = USBFloppyPacketCommand (
-                UsbFloppyDevice,
-                &Packet,
-                sizeof (ATAPI_PACKET_COMMAND),
-                (VOID *) ptrBuffer,
-                ByteCount,
-                EfiUsbDataIn,
-                TimeOut
-                );
-      if (EFI_ERROR (Status)) {
-        return EFI_DEVICE_ERROR;
+                 UsbFloppyDevice,
+                 &Packet,
+                 sizeof (ATAPI_PACKET_COMMAND),
+                 (VOID *) ptrBuffer,
+                 ByteCount,
+                 EfiUsbDataIn,
+                 TimeOut
+                 );
+      if (!EFI_ERROR (Status)) {
+         break;
       }
+    }
+
+    if (Index == 3) {
+      return EFI_DEVICE_ERROR;
     }
 
     Lba32 += SectorCount;
@@ -420,17 +394,17 @@ USBFloppyReadCapacity (
 /*++
 
   Routine Description:
-    Retrieves media capacity information via 
+    Retrieves media capacity information via
     sending Read Capacity Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice -   The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/        
-{ 
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -483,17 +457,17 @@ USBFloppyReadFormatCapacity (
 /*++
 
   Routine Description:
-    Retrieves media capacity information via sending Read Format 
+    Retrieves media capacity information via sending Read Format
     Capacity Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice  - The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/         
-{ 
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -537,7 +511,7 @@ USBFloppyReadFormatCapacity (
   } else {
 
     UsbFloppyDevice->BlkIo.Media->LastBlock = (FormatData.LastLba3 << 24) |
-                                              (FormatData.LastLba2 << 16) | 
+                                              (FormatData.LastLba2 << 16) |
                                               (FormatData.LastLba1 << 8)  |
                                                FormatData.LastLba0;
 
@@ -565,17 +539,17 @@ UsbFloppyRequestSense (
 /*++
 
   Routine Description:
-    Retrieves Sense Data from device via 
+    Retrieves Sense Data from device via
     sending Request Sense Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice - The USB_FLOPPY_DEV instance.
     SenseCounts     - A pointer to the number of Sense Data returned.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/         
+--*/
 {
   EFI_STATUS              Status;
   REQUEST_SENSE_DATA      *Sense;
@@ -598,7 +572,7 @@ UsbFloppyRequestSense (
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.RequestSense.opcode            = REQUEST_SENSE;
   Packet.RequestSense.allocation_length = sizeof (REQUEST_SENSE_DATA);
-  
+
   //
   // initialize pointer
   //
@@ -666,7 +640,7 @@ UsbFloppyRequestSense (
       //
       SenseReq = FALSE;
     }
-  
+
     //
     // If the sense key numbers exceed Sense Data Buffer size,
     // just skip the loop and do not fetch the sense key in this function.
@@ -687,25 +661,25 @@ UsbFloppyTestUnitReady (
 
   Routine Description:
     Sends Test Unit ReadyPacket Command to the device.
-  
+
   Arguments:
     UsbFloppyDevice -  The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/  
-{ 
-  ATAPI_PACKET_COMMAND      Packet; 
+--*/
+{
+  ATAPI_PACKET_COMMAND      Packet;
   EFI_STATUS                Status;
   EFI_USB_ATAPI_PROTOCOL    *UsbAtapiInterface;
   UINT32                    RetryIndex;
   UINT32                    MaximumRetryTimes;
-  
+
   UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
   MaximumRetryTimes = 2;
   //
-  // fill command packet  
+  // fill command packet
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.TestUnitReady.opcode = TEST_UNIT_READY;
@@ -737,31 +711,31 @@ UsbFloppyTestUnitReady (
 
 EFI_STATUS
 USBFloppyWrite10 (
-  IN    USB_FLOPPY_DEV    *UsbFloppyDevice,
-  IN    VOID              *Buffer,
-  IN    EFI_LBA           Lba,
-  IN    UINTN             NumberOfBlocks
+  IN  USB_FLOPPY_DEV    *UsbFloppyDevice,
+  IN  VOID              *Buffer,
+  IN  EFI_LBA           Lba,
+  IN  UINTN             NumberOfBlocks
   )
 /*++
 
   Routine Description:
     Sends Write10 Packet Command to device to perform data transfer
     from host to device.
-  
+
   Arguments:
     UsbFloppyDevice -   The USB_FLOPPY_DEV instance.
-    Buffer          -   A pointer to the source buffer for the data. 
+    Buffer          -   A pointer to the source buffer for the data.
                         The caller is responsible for either having implicit
                         or explicit ownership of the buffer.
-    Lba             -   The starting logical block address to written to 
+    Lba             -   The starting logical block address to written to
                         the device.
-    NumberOfBlocks  -   Indicates the number of blocks that the write 
+    NumberOfBlocks  -   Indicates the number of blocks that the write
                         operation requests.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
---*/      
+--*/
 {
   ATAPI_PACKET_COMMAND    Packet;
   READ10_CMD              *Write10Packet;
@@ -775,7 +749,7 @@ USBFloppyWrite10 (
   EFI_STATUS              Status;
   UINT16                  TimeOut;
   EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
-  UINTN                   SenseCounts;
+  UINT8                   Index;
 
   UsbAtapiInterface = UsbFloppyDevice->AtapiProtocol;
 
@@ -795,80 +769,54 @@ USBFloppyWrite10 (
   while (BlocksRemaining > 0) {
 
     if (BlocksRemaining <= MaxBlock) {
-
       SectorCount = BlocksRemaining;
     } else {
-
       SectorCount = MaxBlock;
     }
-    //
-    // fill the Packet data structure
-    //
-    Write10Packet->opcode = WRITE_10;
 
-    //
-    // Lba0 ~ Lba3 specify the start logical block address
-    // of the data transfer.
-    // Lba0 is MSB, Lba3 is LSB
-    //
-    Write10Packet->Lba3 = (UINT8) (Lba32 & 0xff);
-    Write10Packet->Lba2 = (UINT8) (Lba32 >> 8);
-    Write10Packet->Lba1 = (UINT8) (Lba32 >> 16);
-    Write10Packet->Lba0 = (UINT8) (Lba32 >> 24);
-
-    //
-    // TranLen0 ~ TranLen1 specify the transfer length in block unit.
-    // TranLen0 is MSB, TranLen is LSB
-    //
-    Write10Packet->TranLen1 = (UINT8) (SectorCount & 0xff);
-    Write10Packet->TranLen0 = (UINT8) (SectorCount >> 8);
-
-    ByteCount               = SectorCount * BlockSize;
-
-    TimeOut                 = (UINT16) (SectorCount * USBFLPTIMEOUT);
-
-    Status = USBFloppyPacketCommand (
-              UsbFloppyDevice,
-              &Packet,
-              sizeof (ATAPI_PACKET_COMMAND),
-              (VOID *) ptrBuffer,
-              ByteCount,
-              EfiUsbDataOut,
-              TimeOut
-              );
-    if (EFI_ERROR (Status)) {
-      Status = UsbFloppyRequestSense (UsbFloppyDevice, &SenseCounts);
-      if (!EFI_ERROR (Status)) {
-        if (IsLogicalUnitCommunicationOverRun (
-              UsbFloppyDevice->SenseData,
-              SenseCounts
-              )) {
-          Lba32           = (UINT32) Lba;
-          ptrBuffer       = Buffer;
-          BlocksRemaining = (UINT16) NumberOfBlocks;
-          MaxBlock        = (UINT16) (MaxBlock / 4);
-          if (MaxBlock < 1) {
-            MaxBlock = 1;
-          }
-
-          continue;
-        }
-      }
+    for (Index = 0; Index < 3; Index ++) {
       //
-      // retry write10 command
+      // fill the Packet data structure
       //
+      Write10Packet->opcode = WRITE_10;
+
+      //
+      // Lba0 ~ Lba3 specify the start logical block address
+      // of the data transfer.
+      // Lba0 is MSB, Lba3 is LSB
+      //
+      Write10Packet->Lba3 = (UINT8) (Lba32 & 0xff);
+      Write10Packet->Lba2 = (UINT8) (Lba32 >> 8);
+      Write10Packet->Lba1 = (UINT8) (Lba32 >> 16);
+      Write10Packet->Lba0 = (UINT8) (Lba32 >> 24);
+
+      //
+      // TranLen0 ~ TranLen1 specify the transfer length in block unit.
+      // TranLen0 is MSB, TranLen is LSB
+      //
+      Write10Packet->TranLen1 = (UINT8) (SectorCount & 0xff);
+      Write10Packet->TranLen0 = (UINT8) (SectorCount >> 8);
+
+      ByteCount               = SectorCount * BlockSize;
+
+      TimeOut                 = (UINT16) (SectorCount * USBFLPTIMEOUT);
+
       Status = USBFloppyPacketCommand (
-                UsbFloppyDevice,
-                &Packet,
-                sizeof (ATAPI_PACKET_COMMAND),
-                (VOID *) ptrBuffer,
-                ByteCount,
-                EfiUsbDataOut,
-                TimeOut
-                );
-      if (EFI_ERROR (Status)) {
-        return EFI_DEVICE_ERROR;
+                 UsbFloppyDevice,
+                 &Packet,
+                 sizeof (ATAPI_PACKET_COMMAND),
+                 (VOID *) ptrBuffer,
+                 ByteCount,
+                 EfiUsbDataOut,
+                 TimeOut
+                 );
+      if (!EFI_ERROR (Status)) {
+         break;
       }
+    }
+
+    if (Index == 3) {
+      return EFI_DEVICE_ERROR;
     }
 
     Lba32 += SectorCount;
@@ -888,16 +836,16 @@ UsbFloppyDetectMedia (
 
   Routine Description:
     Retrieves media information.
-  
+
   Arguments:
     UsbFloppyDevice  -  The USB_FLOPPY_DEV instance.
     MediaChange      -  Indicates whether media was changed.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
     EFI_INVALID_PARAMETER - Parameter is error
---*/        
+--*/
 {
   EFI_STATUS          Status;
   EFI_STATUS          FloppyStatus;
@@ -910,11 +858,10 @@ UsbFloppyDetectMedia (
   UINTN               RetryTimes;
   UINTN               MaximumRetryTimes;
   BOOLEAN             NeedRetry;
-
+  BOOLEAN             NeedReadCapacity;
   //
   // a flag used to determine whether need to perform Read Capacity command.
   //
-  BOOLEAN             NeedReadCapacity;
 
   REQUEST_SENSE_DATA  *SensePtr;
 
@@ -955,14 +902,14 @@ UsbFloppyDetectMedia (
       if (IsMediaChange (UsbFloppyDevice->SenseData, SenseCounts)) {
         UsbFloppyDevice->BlkIo.Media->MediaId++;
       }
-        
+
       //
       // Media Write-protected
       //
       if (IsMediaWriteProtected (UsbFloppyDevice->SenseData, SenseCounts)) {
         UsbFloppyDevice->BlkIo.Media->ReadOnly = TRUE;
       }
-        
+
       //
       // Media Error
       //
@@ -1078,7 +1025,7 @@ UsbFloppyDetectMedia (
       }
 
       if (!IsDriveReady (UsbFloppyDevice->SenseData, SenseCounts, &NeedRetry)) {
-          
+
         //
         // Drive not ready: if NeedRetry, then retry once more;
         // else return error
@@ -1160,18 +1107,18 @@ UsbFloppyModeSense5APage5 (
 /*++
 
   Routine Description:
-    Retrieves media capacity information via sending Read Format 
+    Retrieves media capacity information via sending Read Format
     Capacity Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice  - The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
-    
---*/         
-{ 
+
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -1246,18 +1193,18 @@ UsbFloppyModeSense5APage1C (
 /*++
 
   Routine Description:
-    Retrieves media capacity information via sending Read Format 
+    Retrieves media capacity information via sending Read Format
     Capacity Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice  - The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
-    
---*/         
-{ 
+
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -1323,16 +1270,16 @@ UsbFloppyModeSense5APage3F (
   Routine Description:
     Retrieves mode sense information via sending Mode Sense
     Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice  - The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
 
---*/         
-{ 
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -1381,16 +1328,16 @@ UsbSCSIModeSense1APage3F (
   Routine Description:
     Retrieves mode sense information via sending Mode Sense
     Packet Command.
-  
+
   Arguments:
     UsbFloppyDevice  - The USB_FLOPPY_DEV instance.
-      
-  Returns:  
+
+  Returns:
     EFI_DEVICE_ERROR - Hardware error
     EFI_SUCCESS      - Success
-    
---*/  
-{ 
+
+--*/
+{
   //
   // status returned by Read Capacity Packet Command
   //
@@ -1450,7 +1397,7 @@ IsNoMedia (
 
   for (Index = 0; Index < SenseCounts; Index++) {
 
-    if ((SensePtr->sense_key == SK_NOT_READY) && 
+    if ((SensePtr->sense_key == SK_NOT_READY) &&
         (SensePtr->addnl_sense_code == ASC_NO_MEDIA)) {
 
       NoMedia = TRUE;
@@ -1479,7 +1426,7 @@ IsMediaError (
   for (Index = 0; Index < SenseCounts; Index++) {
 
     switch (SensePtr->sense_key) {
-      
+
     //
     // Medium error case
     //
