@@ -780,6 +780,20 @@ public class FpdFileContents {
         }
     }
     
+    public boolean instanceExistsInModuleSA (String key, String mg, String mv, String pg, String pv) {
+        int count = 0;
+        if ((count = getLibraryInstancesCount(key)) > 0) {
+            String[][] saa = new String[count][5];
+            getLibraryInstances (key, saa);
+            for (int i = 0; i < count; ++i) {
+                if (mg.equalsIgnoreCase(saa[i][1]) && mv.equalsIgnoreCase(saa[i][2]) && pg.equalsIgnoreCase(saa[i][3]) && pv.equalsIgnoreCase(saa[i][4])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     public void removeLibraryInstance(String key, int i) {
         ModuleSADocument.ModuleSA msa = getModuleSA(key);
         if (msa == null || msa.getLibraries() == null){
