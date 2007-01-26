@@ -20,6 +20,8 @@ Abstract:
 
 #include "cbi.h"
 
+extern EFI_COMPONENT_NAME_PROTOCOL  gUsbCbi1ComponentName;
+
 EFI_STATUS
 EFIAPI
 UsbCBI1DriverEntryPoint (
@@ -113,7 +115,7 @@ Cbi1ReportStatusCode (
   );
 
 
-EFI_DRIVER_BINDING_PROTOCOL   gCBI1DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL   gUsbCbi1DriverBinding = {
   CBI1DriverBindingSupported,
   CBI1DriverBindingStart,
   CBI1DriverBindingStop,
@@ -351,6 +353,14 @@ CBI1DriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
+
+  UsbCbiDev->ControllerNameTable = NULL;
+  AddUnicodeString (
+    "eng",
+    gUsbCbi1ComponentName.SupportedLanguages,
+    &UsbCbiDev->ControllerNameTable,
+    (CHAR16 *) L"Usb Cbi1 Mass Storage"
+    );
 
   return EFI_SUCCESS;
 
