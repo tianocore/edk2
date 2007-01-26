@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   UsbMassStorage.c
-    
+
 Abstract:
 
   USB Mass Storage Driver
@@ -192,11 +192,11 @@ USBFloppyDriverBindingStart (
     EFI_OUT_OF_RESOURCES- Can't allocate memory resources
     EFI_ALREADY_STARTED - Thios driver has been started
 --*/
-{ 
-  EFI_STATUS                Status; 
+{
+  EFI_STATUS                Status;
   EFI_USB_ATAPI_PROTOCOL    *AtapiProtocol;
   USB_FLOPPY_DEV            *UsbFloppyDevice;
-  
+
   UsbFloppyDevice = NULL;
   //
   // Check whether Usb Atapi Protocol attached on the controller handle.
@@ -311,7 +311,7 @@ USBFloppyDriverBindingStop (
     EFI_DEVICE_ERROR
     others
 
---*/  
+--*/
 {
   EFI_STATUS            Status;
   USB_FLOPPY_DEV        *UsbFloppyDevice;
@@ -373,17 +373,17 @@ USBFloppyReset (
 
   Routine Description:
     Implements EFI_BLOCK_IO_PROTOCOL.Reset() function.
-  
+
   Arguments:
     This     The EFI_BLOCK_IO_PROTOCOL instance.
     ExtendedVerification
               Indicates that the driver may perform a more exhaustive
               verification operation of the device during reset.
               (This parameter is ingored in this driver.)
-    
-  Returns:  
+
+  Returns:
     EFI_SUCCESS - Success
---*/      
+--*/
 {
   USB_FLOPPY_DEV          *UsbFloppyDevice;
   EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
@@ -396,7 +396,7 @@ USBFloppyReset (
   //
   // directly calling EFI_USB_ATAPI_PROTOCOL.Reset() to implement reset.
   //
-  Status = UsbAtapiInterface->UsbAtapiReset (UsbAtapiInterface, TRUE);
+  Status = UsbAtapiInterface->UsbAtapiReset (UsbAtapiInterface, ExtendedVerification);
 
   return Status;
 }
@@ -415,26 +415,26 @@ USBFloppyReadBlocks (
 
   Routine Description:
     Implements EFI_BLOCK_IO_PROTOCOL.ReadBlocks() function.
-  
+
   Arguments:
     This     The EFI_BLOCK_IO_PROTOCOL instance.
     MediaId  The media id that the read request is for.
     LBA      The starting logical block address to read from on the device.
     BufferSize
-              The size of the Buffer in bytes. This must be a multiple of 
+              The size of the Buffer in bytes. This must be a multiple of
               the intrinsic block size of the device.
-    Buffer    A pointer to the destination buffer for the data. The caller 
+    Buffer    A pointer to the destination buffer for the data. The caller
               is responsible for either having implicit or explicit ownership
-              of the buffer.                               
-  
-  Returns:  
+              of the buffer.
+
+  Returns:
     EFI_INVALID_PARAMETER - Parameter is error
-    EFI_SUCCESS           - Success  
+    EFI_SUCCESS           - Success
     EFI_DEVICE_ERROR      - Hardware Error
     EFI_NO_MEDIA          - No media
     EFI_MEDIA_CHANGED     - Media Change
     EFI_BAD_BUFFER_SIZE   - Buffer size is bad
- --*/      
+ --*/
 {
   USB_FLOPPY_DEV      *UsbFloppyDevice;
   EFI_STATUS          Status;
@@ -442,12 +442,9 @@ USBFloppyReadBlocks (
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
-  EFI_TPL             OldTpl;
 
-  OldTpl          = gBS->RaiseTPL (EFI_TPL_NOTIFY);
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
-
   UsbFloppyDevice = USB_FLOPPY_DEV_FROM_THIS (This);
 
   //
@@ -473,14 +470,12 @@ USBFloppyReadBlocks (
   }
 
   if (MediaChange) {
-    gBS->RestoreTPL (OldTpl);
     gBS->ReinstallProtocolInterface (
           UsbFloppyDevice->Handle,
           &gEfiBlockIoProtocolGuid,
           &UsbFloppyDevice->BlkIo,
           &UsbFloppyDevice->BlkIo
           );
-    gBS->RaiseTPL (EFI_TPL_NOTIFY);
   }
 
   Media           = UsbFloppyDevice->BlkIo.Media;
@@ -517,33 +512,31 @@ USBFloppyReadBlocks (
     goto Done;
   }
 
-  if (!EFI_ERROR (Status)) {
+  while (NumberOfBlocks > 0) {
 
-    Status = USBFloppyRead10 (UsbFloppyDevice, Buffer, LBA, 1);
-    if (EFI_ERROR (Status)) {
-      This->Reset (This, TRUE);
-      Status = EFI_DEVICE_ERROR;
-      goto Done;
+    if (NumberOfBlocks > BLOCK_UNIT) {
+      Status = USBFloppyRead10 (UsbFloppyDevice, Buffer, LBA, BLOCK_UNIT);
+    } else {
+      Status = USBFloppyRead10 (UsbFloppyDevice, Buffer, LBA, NumberOfBlocks);
     }
 
-    LBA += 1;
-    NumberOfBlocks -= 1;
-    Buffer = (UINT8 *) Buffer + This->Media->BlockSize;
-
-    if (NumberOfBlocks == 0) {
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-
-    Status = USBFloppyRead10 (UsbFloppyDevice, Buffer, LBA, NumberOfBlocks);
     if (EFI_ERROR (Status)) {
       This->Reset (This, TRUE);
       Status = EFI_DEVICE_ERROR;
     }
-  }
 
-Done:
-  gBS->RestoreTPL (OldTpl);
+    if (NumberOfBlocks > BLOCK_UNIT) {
+       NumberOfBlocks -= BLOCK_UNIT;
+       LBA += BLOCK_UNIT;
+       Buffer = (UINT8 *) Buffer + This->Media->BlockSize * BLOCK_UNIT;
+    } else {
+       NumberOfBlocks -= NumberOfBlocks;
+       LBA += NumberOfBlocks;
+       Buffer = (UINT8 *) Buffer + This->Media->BlockSize * NumberOfBlocks;
+    }
+ }
+
+ Done:
   return Status;
 }
 
@@ -561,29 +554,29 @@ USBFloppyWriteBlocks (
 
   Routine Description:
     Implements EFI_BLOCK_IO_PROTOCOL.WriteBlocks() function.
-  
+
   Arguments:
     This     The EFI_BLOCK_IO_PROTOCOL instance.
     MediaId  The media id that the write request is for.
     LBA      The starting logical block address to be written.
-             The caller is responsible for writing to only 
+             The caller is responsible for writing to only
              legitimate locations.
     BufferSize
-              The size of the Buffer in bytes. This must be a multiple of 
+              The size of the Buffer in bytes. This must be a multiple of
               the intrinsic block size of the device.
-    Buffer    A pointer to the source buffer for the data. The caller 
+    Buffer    A pointer to the source buffer for the data. The caller
               is responsible for either having implicit or explicit ownership
-              of the buffer.                               
-  
-  Returns:  
+              of the buffer.
+
+  Returns:
     EFI_INVALID_PARAMETER - Parameter is error
-    EFI_SUCCESS           - Success  
+    EFI_SUCCESS           - Success
     EFI_DEVICE_ERROR      - Hardware Error
     EFI_NO_MEDIA          - No media
     EFI_MEDIA_CHANGED     - Media Change
     EFI_BAD_BUFFER_SIZE   - Buffer size is bad
 
---*/        
+--*/
 {
   USB_FLOPPY_DEV      *UsbFloppyDevice;
   EFI_STATUS          Status;
@@ -591,9 +584,7 @@ USBFloppyWriteBlocks (
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
-  EFI_TPL             OldTpl;
 
-  OldTpl          = gBS->RaiseTPL (EFI_TPL_NOTIFY);
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
 
@@ -622,14 +613,12 @@ USBFloppyWriteBlocks (
   }
 
   if (MediaChange) {
-    gBS->RestoreTPL (OldTpl);
     gBS->ReinstallProtocolInterface (
           UsbFloppyDevice->Handle,
           &gEfiBlockIoProtocolGuid,
           &UsbFloppyDevice->BlkIo,
           &UsbFloppyDevice->BlkIo
           );
-    gBS->RaiseTPL (EFI_TPL_NOTIFY);
   }
 
   Media           = UsbFloppyDevice->BlkIo.Media;
@@ -671,32 +660,32 @@ USBFloppyWriteBlocks (
     goto Done;
   }
 
-  if (!EFI_ERROR (Status)) {
-    Status = USBFloppyWrite10 (UsbFloppyDevice, Buffer, LBA, 1);
-    if (EFI_ERROR (Status)) {
-      This->Reset (This, TRUE);
-      Status = EFI_DEVICE_ERROR;
-      goto Done;
+  while (NumberOfBlocks > 0) {
+
+    if (NumberOfBlocks > BLOCK_UNIT) {
+      Status = USBFloppyWrite10 (UsbFloppyDevice, Buffer, LBA, BLOCK_UNIT);
+    } else {
+      Status = USBFloppyWrite10 (UsbFloppyDevice, Buffer, LBA, NumberOfBlocks);
     }
 
-    LBA += 1;
-    NumberOfBlocks -= 1;
-    Buffer = (UINT8 *) Buffer + This->Media->BlockSize;
-
-    if (NumberOfBlocks == 0) {
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-
-    Status = USBFloppyWrite10 (UsbFloppyDevice, Buffer, LBA, NumberOfBlocks);
     if (EFI_ERROR (Status)) {
       This->Reset (This, TRUE);
       Status = EFI_DEVICE_ERROR;
     }
-  }
+
+    if (NumberOfBlocks > BLOCK_UNIT) {
+       NumberOfBlocks -= BLOCK_UNIT;
+       LBA += BLOCK_UNIT;
+       Buffer = (UINT8 *) Buffer + This->Media->BlockSize * BLOCK_UNIT;
+    } else {
+       NumberOfBlocks -= NumberOfBlocks;
+       LBA += NumberOfBlocks;
+       Buffer = (UINT8 *) Buffer + This->Media->BlockSize * NumberOfBlocks;
+    }
+ }
 
 Done:
-  gBS->RestoreTPL (OldTpl);
+
   return Status;
 }
 
@@ -711,13 +700,13 @@ USBFloppyFlushBlocks (
   Routine Description:
     Implements EFI_BLOCK_IO_PROTOCOL.FlushBlocks() function.
     (In this driver, this function just returns EFI_SUCCESS.)
-  
+
   Arguments:
     This     The EFI_BLOCK_IO_PROTOCOL instance.
-  
-  Returns:  
+
+  Returns:
     EFI_SUCCESS - Success
---*/    
+--*/
 {
   return EFI_SUCCESS;
 }

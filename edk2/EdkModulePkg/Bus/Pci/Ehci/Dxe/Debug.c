@@ -22,7 +22,8 @@ Revision History
 
 #include "Ehci.h"
 
-void 
+
+VOID
 DumpEHCIPortsStatus (
   IN USB2_HC_DEV    *HcDev
   )
@@ -47,6 +48,8 @@ DumpEHCIPortsStatus (
       );
      DEBUG((gEHCDebugLevel, "Port[%d] = 0x%x\n", Index, Value));
   }
+
+
 }
 
 
