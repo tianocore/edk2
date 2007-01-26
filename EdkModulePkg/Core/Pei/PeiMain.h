@@ -119,38 +119,6 @@ typedef union {
   VOID                         *Raw;
 } PEI_CORE_TEMP_POINTERS;
 
-
-//
-// Main PEI entry
-//
-
-EFI_STATUS
-EFIAPI
-PeiCore (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN PEI_CORE_INSTANCE           *OldCoreData
-  )
-/*++
-
-Routine Description:
-
-  Main entry point to Pei Core. After switching stack in the PEI core,
-  it will restart with the old core data.
-
-Arguments:
-
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-  OldCoreData          - Pointer to old core data that is used to initialize the
-                         core's data areas.
-
-Returns:
-
-  This function never returns
-
---*/
-;
-
-
 //
 // Dispatcher support functions
 //

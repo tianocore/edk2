@@ -76,7 +76,7 @@ EFI_STATUS
 EFIAPI
 PeiCore (
   IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN PEI_CORE_INSTANCE           *OldCoreData
+  IN VOID                        *Data
   )
 /*++
 
@@ -104,8 +104,10 @@ Returns:
   PEI_CORE_TEMP_POINTERS                                TempPtr;
   PEI_CORE_DISPATCH_DATA                                *DispatchData;
   UINT64                                                mTick;
+  PEI_CORE_INSTANCE                                     *OldCoreData;
 
   mTick = 0;
+  OldCoreData = (PEI_CORE_INSTANCE *) Data;
 
   if (PerformanceMeasurementEnabled()) {
     if (OldCoreData == NULL) {
