@@ -84,14 +84,6 @@ ReportUsbStatusCode (
   IN EFI_STATUS_CODE_VALUE         Code
   );
 
-//
-// Supported function
-//
-VOID
-InitializeUsbIoInstance (
-  IN USB_IO_CONTROLLER_DEVICE     *UsbIoController
-  );
-
 STATIC
 USB_IO_CONTROLLER_DEVICE    *
 CreateUsbIoControllerDevice (
@@ -213,7 +205,7 @@ UsbAllocateAddress (
         //
         // Found one, covert to address, and mark it use
         //
-        AddressPool[ByteIndex] |= (1 << BitIndex);
+        AddressPool[ByteIndex] = (UINT8) (AddressPool[ByteIndex] | (1 << BitIndex));
         return (UINT8) (ByteIndex * 8 + BitIndex);
       }
     }
@@ -251,7 +243,7 @@ UsbFreeAddress (
   WhichByte = (UINT8) (DevAddress / 8);
   WhichBit  = (UINT8) (DevAddress & 0x7);
 
-  AddressPool[WhichByte] &= (~(1 << WhichBit));
+  AddressPool[WhichByte] = (UINT8) (AddressPool[WhichByte] & (~(1 << WhichBit)));
 }
 
 EFI_STATUS
@@ -2277,7 +2269,7 @@ ParentPortReset (
     ResetRootPort (ParentIoDev->BusController, HubPort, RetryTimes);
   } else {
     DEBUG ((gUSBDebugLevel, "Reset from Hub, Addr 0x%x\n", ParentIoDev->DeviceAddress));
-    ResetHubPort (ParentController, HubPort + 1);
+    ResetHubPort (ParentController, (UINT8) (HubPort + 1));
   }
   //
   // If we only need port reset, just return
@@ -2580,16 +2572,13 @@ IsDeviceDisconnected (
 --*/
 {
   USB_IO_DEVICE             *ParentIoDev;
-  USB_IO_DEVICE             *UsbIoDev;
   USB_IO_CONTROLLER_DEVICE  *ParentController;
   UINT8                     HubPort;
   EFI_STATUS                Status;
-  EFI_USB_IO_PROTOCOL       *UsbIo;
   EFI_USB_PORT_STATUS       PortStatus;
 
   ParentController  = UsbIoController->Parent;
   ParentIoDev       = ParentController->UsbDevice;
-  UsbIoDev          = UsbIoController->UsbDevice;
   HubPort           = UsbIoController->ParentPort;
 
   if (ParentIoDev->DeviceAddress == 1) {
@@ -2603,10 +2592,9 @@ IsDeviceDisconnected (
       );
 
   } else {
-    UsbIo = &UsbIoController->UsbIo;
     Status = HubGetPortStatus (
               &ParentController->UsbIo,
-              HubPort + 1,
+              (UINT8) (HubPort + 1),
               (UINT32 *) &PortStatus
               );
 
@@ -3308,7 +3296,7 @@ UsbVirtualHcControlTransfer (
                                           TransferResult
                                           );
   } else {
-    IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+    IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
     Status = UsbBusDev->UsbHCInterface->ControlTransfer (
                                           UsbBusDev->UsbHCInterface,
                                           DeviceAddress,
@@ -3530,7 +3518,7 @@ UsbVirtualHcAsyncInterruptTransfer (
                                           Context
                                           );
   } else {
-    IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+    IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
     Status = UsbBusDev->UsbHCInterface->AsyncInterruptTransfer (
                                           UsbBusDev->UsbHCInterface,
                                           DeviceAddress,
@@ -3639,7 +3627,7 @@ UsbVirtualHcSyncInterruptTransfer (
                                           TransferResult
                                           );
   } else {
-    IsSlowDevice = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+    IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
     Status = UsbBusDev->UsbHCInterface->SyncInterruptTransfer (
                                           UsbBusDev->UsbHCInterface,
                                           DeviceAddress,
