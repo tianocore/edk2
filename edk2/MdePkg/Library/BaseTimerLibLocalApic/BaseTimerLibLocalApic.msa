@@ -25,7 +25,7 @@
     <OutputFileBasename>BaseTimerLibLocalApic</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="BASE DXE_CORE DXE_DRIVER PEIM PEI_CORE SEC UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
       <Keyword>TimerLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
