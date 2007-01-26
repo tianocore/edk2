@@ -689,6 +689,32 @@ OpenRoot:
   }
 
   //
+  // If file name does not equal to "." or "..", 
+  // then we trim the leading/trailing blanks and trailing dots
+  //
+  if (StrCmp (FileName, L".") != 0 && StrCmp (FileName, L"..") != 0) {
+    //
+    // Trim leading blanks
+    //
+    Count = 0;
+    for (TempFileName = FileName;
+      *TempFileName != 0 && *TempFileName == L' ';
+      TempFileName++) {
+      Count++;
+    }
+    CutPrefix (FileName, Count);
+    //
+    // Trim trailing dots and blanks
+    //
+    for (TempFileName = FileName + StrLen (FileName) - 1; 
+      TempFileName >= FileName && (*TempFileName == L' ' || *TempFileName == L'.');
+      TempFileName--) {
+      ;
+    }
+    *(TempFileName + 1) = 0;
+  }
+
+  //
   // Attempt to open the file
   //
   Status = gBS->AllocatePool (
@@ -738,8 +764,13 @@ OpenRoot:
     StrCat (NewPrivateFile->FileName, FileName + 1);
   } else {
     StrCpy (NewPrivateFile->FileName, NewPrivateFile->FilePath);
-    StrCat (NewPrivateFile->FileName, L"\\");
-    StrCat (NewPrivateFile->FileName, FileName);
+    if (StrCmp (FileName, L"") != 0) {
+      //
+      // In case the filename becomes empty, especially after trimming dots and blanks
+      //    
+      StrCat (NewPrivateFile->FileName, L"\\");
+      StrCat (NewPrivateFile->FileName, FileName);
+    }
   }
 
   //

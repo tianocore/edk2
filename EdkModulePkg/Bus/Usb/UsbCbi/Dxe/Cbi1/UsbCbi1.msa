@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>UsbCbi1</ModuleName>
@@ -56,6 +56,7 @@
   <SourceFiles>
     <Filename>cbi.h</Filename>
     <Filename>cbi1.c</Filename>
+    <Filename>ComponentName.c</Filename>    
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -76,7 +77,8 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
-      <DriverBinding>gCBI1DriverBinding</DriverBinding>
+      <DriverBinding>gUsbCbi1DriverBinding</DriverBinding>
+      <ComponentName>gUsbCbi1ComponentName</ComponentName>      
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
