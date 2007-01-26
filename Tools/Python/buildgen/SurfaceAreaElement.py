@@ -1535,7 +1535,6 @@ def PrintWorkspace(ws):
 if __name__ == "__main__":
     # os.environ["WORKSPACE"]
     workspacePath = os.getenv("WORKSPACE", os.getcwd())
-    workspacePath = "C:\\home\\src\\R9\\pbuild"
     saFile = ""
     if len(sys.argv) <= 1:
         saFile = os.path.join(workspacePath, "Tools/Conf/FrameworkDatabase.db")
