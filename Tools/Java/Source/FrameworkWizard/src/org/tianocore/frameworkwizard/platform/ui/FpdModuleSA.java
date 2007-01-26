@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Stack;
 import java.util.Vector;
 
 import javax.swing.JTextField;
@@ -204,7 +205,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             //
             // display library classes that need to be resolved. also potential instances for them.
             //
-            resolveLibraryInstances(moduleKey, errorMsg);
+            resolveLibraryInstances(moduleKey, true, errorMsg);
         } catch (Exception e) {
             String exceptionMsg = e.getCause() + " " + e.getMessage();
             errorMsg.add(exceptionMsg);
@@ -232,7 +233,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     // re-evaluate lib instance usage when adding a already-selected lib instance.
                     //
                     try {
-                        resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4], errorMsg);
+                        resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4], true, errorMsg);
                     } catch (Exception e) {
                         String exceptionMsg = e.getCause() + " " + e.getMessage();
                         if (!errorMsg.contains(exceptionMsg)) {
@@ -251,7 +252,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             }
             JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), errors);
         }
-        showClassToResolved();
     }
     
     public void initFvInfo (String key) {
@@ -342,35 +342,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
     }
     
-    private void resolveLibraryInstances(String key, Vector<String> errorMsg) throws MultipleInstanceException, NoInstanceException{
+    private void addProducedClassFromModule (String key) {
         ModuleIdentification mi = WorkspaceProfile.getModuleId(key);
-        PackageIdentification[] depPkgList = null;
-        
-        //
-        // Get dependency pkg list into which we will search lib instances.
-        //
-        //depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
-        //
-        // Get the lib class consumed, produced by this module itself.
-        //
-        Vector<LibraryClassDescriptor> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
-        for (int i = 0; i < vClassConsumed.size(); ++i) {
-            vClassConsumed.get(i).supModTypes = WorkspaceProfile.getModuleType(moduleId);
-        }
-        filterClassConsumedByArch(vClassConsumed);
-        if (this.classConsumed == null) {
-            this.classConsumed = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
-        }
-
-        for (int i = 0; i < vClassConsumed.size(); ++i) {
-            ArrayList<String> consumedBy = this.classConsumed.get(vClassConsumed.get(i));
-            if (consumedBy == null) {
-                consumedBy = new ArrayList<String>();
-            }
-            consumedBy.add(key);
-            this.classConsumed.put(vClassConsumed.get(i), consumedBy);
-        }
-
         Vector<LibraryClassDescriptor> vClassProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
         if (this.classProduced == null) {
             this.classProduced = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
@@ -405,20 +378,60 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             this.classProduced.put(vClassProduced.get(i), producedBy);
             
         }
+    }
+    
+    private Vector<LibraryClassDescriptor> addConsumedClassFromModule (String key) {
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(key);
+//        PackageIdentification[] depPkgList = null;
 
         //
-        // find potential instances in all pkgs for classes still in classConsumed.
+        // Get dependency pkg list into which we will search lib instances.
         //
+        //depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
+        //
+        // Get the lib class consumed, produced by this module itself.
+        //
+        Vector<LibraryClassDescriptor> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
+        for (int i = 0; i < vClassConsumed.size(); ++i) {
+            vClassConsumed.get(i).supModTypes = WorkspaceProfile.getModuleType(moduleId);
+        }
+        filterClassConsumedByArch(vClassConsumed);
+        if (this.classConsumed == null) {
+            this.classConsumed = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
+        }
+
+        for (int i = 0; i < vClassConsumed.size(); ++i) {
+            ArrayList<String> consumedBy = this.classConsumed.get(vClassConsumed.get(i));
+            if (consumedBy == null) {
+                consumedBy = new ArrayList<String>();
+            }
+            consumedBy.add(key);
+            this.classConsumed.put(vClassConsumed.get(i), consumedBy);
+        }
+
+        return vClassConsumed;
+    }
+    
+    private void resolveLibraryInstances(String key, boolean autoSelectSingleInstance, Vector<String> errorMsg) throws MultipleInstanceException, NoInstanceException{
+                
+        Vector<LibraryClassDescriptor> vLcd = addConsumedClassFromModule (key);
+        addProducedClassFromModule (key);
+        
+        Stack<LibraryClassDescriptor> lcdStack = new Stack<LibraryClassDescriptor>();
+        for (int i = 0; i < vLcd.size(); ++i) {
+            LibraryClassDescriptor cls = vLcd.get(i);
+            lcdStack.push(cls);
+        }
+        
         if (classInstanceMap == null) {
             classInstanceMap = new HashMap<LibraryClassDescriptor, ArrayList<String>>();
         }
-        Iterator<LibraryClassDescriptor> lic = this.classConsumed.keySet().iterator();
-        while (lic.hasNext()) {
-            LibraryClassDescriptor cls = lic.next();
+        while (!lcdStack.empty()) {
+            LibraryClassDescriptor cls = lcdStack.pop();
             if (isBoundedClass(cls, errorMsg)) {
                 continue;
             }
-            ArrayList<String> instances = getInstancesForClass(cls, depPkgList);
+            ArrayList<String> instances = getInstancesForClass(cls, null);
             if (instances.size() == 0) {
 //                throw new NoInstanceException (cls.className);
                 String exceptionMsg = new NoInstanceException (cls.className).getMessage();
@@ -428,10 +441,35 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 
             }
             classInstanceMap.put(cls, instances);
-
+            if (instances.size() == 1 && autoSelectSingleInstance) {
+                String instanceInfo = instances.get(0);
+                ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceInfo);
+                try {
+                    Object[] row = {libMi.getName(), libMi.getGuid(), libMi.getVersion(), 
+                                    libMi.getPackageId().getGuid(), libMi.getPackageId().getVersion()};
+                    if (!ffc.instanceExistsInModuleSA(moduleKey, row[1]+"", row[2]+"", row[3]+"", row[4]+"")) {
+                        addLibInstance(libMi);
+                        docConsole.setSaved(false);
+                        selectedInstancesTableModel.addRow(row);
+                        addProducedClassFromModule (instanceInfo);
+                        vLcd = addConsumedClassFromModule(instanceInfo);
+                        for (int i = 0; i < vLcd.size(); ++i) {
+                            LibraryClassDescriptor lcd = vLcd.get(i);
+                            lcdStack.push(lcd);
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    if (!errorMsg.contains(e.getMessage())) {
+                        errorMsg.add(e.getMessage());
+                    }
+                }
+            }
         }
-//            showClassToResolved();
-    }
+
+        showClassToResolved();
+        }
+//            
 
     /**Search classProduced map to see if this class has been produced by some instance (module).
      * @param cls
@@ -585,15 +623,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (classConsumed == null || classConsumed.size() == 0) {
             return;
         }
+
         Iterator<LibraryClassDescriptor> li = classConsumed.keySet().iterator();
         while(li.hasNext()){
             LibraryClassDescriptor lcd = li.next();
-            String[] s = {lcd.className, lcd.supArchs, lcd.supModTypes};
             if (classConsumed.get(lcd) == null || classConsumed.get(lcd).size() == 0) {
                 continue;
             }
             
             if (!isBoundedClass(lcd, errorMsg)){
+     
+                String[] s = { lcd.className, lcd.supArchs, lcd.supModTypes };
                 libClassTableModel.addRow(s);
             }
         }
@@ -1235,7 +1275,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     
                     Vector<String> errorMsg = new Vector<String>();
                     try {
-                        resolveLibraryInstances(instanceValue, errorMsg);
+                        resolveLibraryInstances(instanceValue, true, errorMsg);
                     }
                     catch (Exception exp) {
                         JOptionPane.showMessageDialog(FpdModuleSA.this, exp.getMessage());
@@ -1248,7 +1288,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         }
                         JOptionPane.showMessageDialog(FpdModuleSA.this, errors);
                     }
-                    showClassToResolved();
                 }
             });
         }
