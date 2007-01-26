@@ -784,13 +784,13 @@ public class AutoGen {
             if (entryPointList == null ||entryPointList.length != 1 ) {
                 throw new AutoGenException("Module type = 'PEI_CORE', can have only one module entry point!");
             } else {
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\r\n");
-                fileBuffer.append("  IN VOID                        *OldCoreData\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                functionDeclarations.append("EFI_STATUS\r\n");
+                functionDeclarations.append("EFIAPI\r\n");
+                functionDeclarations.append(entryPointList[0]);
+                functionDeclarations.append(" (\r\n");
+                functionDeclarations.append("  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,\r\n");
+                functionDeclarations.append("  IN VOID                        *OldCoreData\r\n");
+                functionDeclarations.append("  );\r\n\r\n");
 
                 fileBuffer.append("EFI_STATUS\r\n");
                 fileBuffer.append("EFIAPI\r\n");
@@ -811,12 +811,12 @@ public class AutoGen {
             if (entryPointList == null || entryPointList.length != 1) {
                 throw new AutoGenException("Module type = 'DXE_CORE', can have only one module entry point!");
             } else {
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(entryPointList[0]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN VOID  *HobStart\r\n");
-                fileBuffer.append("  );\r\n\r\n");
+                functionDeclarations.append("VOID\r\n");
+                functionDeclarations.append("EFIAPI\r\n");
+                functionDeclarations.append(entryPointList[0]);
+                functionDeclarations.append(" (\r\n");
+                functionDeclarations.append("  IN VOID  *HobStart\r\n");
+                functionDeclarations.append("  );\r\n\r\n");
 
                 fileBuffer.append("VOID\r\n");
                 fileBuffer.append("EFIAPI\r\n");
@@ -847,13 +847,13 @@ public class AutoGen {
                 break;
             }
             for (int i = 0; i < entryPointList.length; i++) {
-                fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(entryPointList[i]);
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\r\n");
-                fileBuffer.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
-                fileBuffer.append("  );\r\n");
+                functionDeclarations.append("EFI_STATUS\r\n");
+                functionDeclarations.append("EFIAPI\r\n");
+                functionDeclarations.append(entryPointList[i]);
+                functionDeclarations.append(" (\r\n");
+                functionDeclarations.append("  IN EFI_FFS_FILE_HEADER  *FfsHeader,\r\n");
+                functionDeclarations.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
+                functionDeclarations.append("  );\r\n");
                 entryPointCount++;
             }
 
@@ -913,13 +913,13 @@ public class AutoGen {
 
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
-                    fileBuffer.append(entryPointList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    functionDeclarations.append("EFI_STATUS\r\n");
+                    functionDeclarations.append("EFIAPI\r\n");
+                    functionDeclarations.append(entryPointList[i]);
+                    functionDeclarations.append(" (\r\n");
+                    functionDeclarations.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+                    functionDeclarations.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
+                    functionDeclarations.append("  );\r\n");
                     entryPointCount++;
                 }
                 fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED  const UINT8  _gDriverEntryPointCount = ");
@@ -970,11 +970,11 @@ public class AutoGen {
             unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append(unloadImageList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\r\n");
-                    fileBuffer.append("  );\r\n");
+                    functionDeclarations.append("EFI_STATUS\r\n");
+                    functionDeclarations.append(unloadImageList[i]);
+                    functionDeclarations.append(" (\r\n");
+                    functionDeclarations.append("  IN EFI_HANDLE        ImageHandle\r\n");
+                    functionDeclarations.append("  );\r\n");
                     unloadImageCount++;
                 }
             }
@@ -1045,13 +1045,13 @@ public class AutoGen {
 
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
-                    fileBuffer.append(entryPointList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
-                    fileBuffer.append("  );\r\n");
+                    functionDeclarations.append("EFI_STATUS\r\n");
+                    functionDeclarations.append("EFIAPI\r\n");
+                    functionDeclarations.append(entryPointList[i]);
+                    functionDeclarations.append(" (\r\n");
+                    functionDeclarations.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+                    functionDeclarations.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
+                    functionDeclarations.append("  );\r\n");
                     entryPointCount++;
                 }
 
@@ -1129,12 +1129,12 @@ public class AutoGen {
             unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
-                    fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
-                    fileBuffer.append(unloadImageList[i]);
-                    fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle\r\n");
-                    fileBuffer.append("  );\r\n");
+                    functionDeclarations.append("EFI_STATUS\r\n");
+                    functionDeclarations.append("EFIAPI\r\n");
+                    functionDeclarations.append(unloadImageList[i]);
+                    functionDeclarations.append(" (\r\n");
+                    functionDeclarations.append("  IN EFI_HANDLE        ImageHandle\r\n");
+                    functionDeclarations.append("  );\r\n");
                     unloadImageCount++;
                 }
             }
