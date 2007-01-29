@@ -23,11 +23,12 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.tianocore.ExternsDocument.Externs.Extern;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.tianocore.*;
+import org.tianocore.ExternsDocument.Externs.Extern;
 import org.tianocore.FilenameDocument.Filename;
+import org.tianocore.ModuleDefinitionsDocument.ModuleDefinitions;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
@@ -37,8 +38,8 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
-import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.definitions.EdkDefinitions;
+import org.tianocore.common.exception.EdkException;
 import org.w3c.dom.Node;
 
 /**
@@ -541,6 +542,24 @@ public class SurfaceAreaQuery {
         }
 
         return null;
+    }
+
+    /**
+     * Retrieve <ModuleDefinitions>/<BinaryModule>
+     *
+     * @returns The module type name if elements are found at the known xpath
+     * @returns null if nothing is there
+     */
+    public boolean getBinaryModule() {
+        String[] xPath = new String[] { "/" };
+
+        Object[] returns = get("ModuleDefinitions", xPath);
+        if (returns != null && returns.length > 0) {
+            ModuleDefinitionsDocument.ModuleDefinitions def = (ModuleDefinitionsDocument.ModuleDefinitions)returns[0];
+            return def.getBinaryModule();
+        }
+
+        return false;
     }
 
     /**
