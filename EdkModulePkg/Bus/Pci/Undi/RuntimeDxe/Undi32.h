@@ -176,24 +176,113 @@ TmpMemIo (
 //
 // functions defined in decode.c
 //
-VOID UNDI_GetState();
-VOID UNDI_Start();
-VOID UNDI_Stop();
-VOID UNDI_GetInitInfo();
-VOID UNDI_GetConfigInfo();
-VOID UNDI_Initialize();
-VOID UNDI_Reset();
-VOID UNDI_Shutdown();
-VOID UNDI_Interrupt();
-VOID UNDI_RecFilter();
-VOID UNDI_StnAddr();
-VOID UNDI_Statistics();
-VOID UNDI_ip2mac();
-VOID UNDI_NVData();
-VOID UNDI_Status();
-VOID UNDI_FillHeader();
-VOID UNDI_Transmit();
-VOID UNDI_Receive();
+VOID
+UNDI_GetState (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Start (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Stop (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_GetInitInfo (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_GetConfigInfo (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Initialize (
+  IN  PXE_CDB       *CdbPtr,
+  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Reset (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Shutdown (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Interrupt (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_RecFilter (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_StnAddr (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Statistics (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_ip2mac (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_NVData (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Status (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_FillHeader (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Transmit (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
+
+VOID
+UNDI_Receive (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  );
 
 VOID UNDI_APIEntry_new(UINT64);
 VOID UNDI_APIEntry_old(UINT64);

@@ -31,6 +31,7 @@ Abstract:
 
 
 #include "Common/FirmwareFileSystem.h"
+#include "GuidedSection.h"
 
 EFI_STATUS
 GuidedSectionExtractionProtocolConstructor (

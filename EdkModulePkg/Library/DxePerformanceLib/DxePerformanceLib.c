@@ -31,6 +31,7 @@ STATIC PERFORMANCE_PROTOCOL    *mPerformance = NULL;
   @retval Other           Performance protocol is not located to log performance.  
 
 **/
+STATIC
 EFI_STATUS
 GetPerformanceProtocol (
   VOID
@@ -245,5 +246,5 @@ PerformanceMeasurementEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 }

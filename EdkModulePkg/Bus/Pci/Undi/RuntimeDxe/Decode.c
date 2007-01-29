@@ -89,7 +89,7 @@ Returns:
 
 --*/
 {
-  CdbPtr->StatFlags |= AdapterInfo->State;
+  CdbPtr->StatFlags = (PXE_STATFLAGS) (CdbPtr->StatFlags | AdapterInfo->State);
   return ;
 }
 
@@ -377,7 +377,6 @@ Returns:
 --*/
 {
   PXE_CPB_INITIALIZE  *CpbPtr;
-  PXE_DB_INITIALIZE   *DbPtr;
 
   if ((CdbPtr->OpFlags != PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) &&
       (CdbPtr->OpFlags != PXE_OPFLAGS_INITIALIZE_DO_NOT_DETECT_CABLE)) {
@@ -396,7 +395,6 @@ Returns:
   }
 
   CpbPtr  = (PXE_CPB_INITIALIZE *) (UINTN) CdbPtr->CPBaddr;
-  DbPtr   = (PXE_DB_INITIALIZE *) (UINTN) CdbPtr->DBaddr;
 
   if (CpbPtr->MemoryLength < (UINT32) MEMORY_NEEDED) {
     CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
@@ -553,7 +551,7 @@ Returns:
 
   case PXE_OPFLAGS_INTERRUPT_DISABLE:
     if (IntMask != 0) {
-      AdapterInfo->int_mask &= ~(IntMask);
+      AdapterInfo->int_mask = (UINT16) (AdapterInfo->int_mask & ~(IntMask));
       E100bSetInterruptState (AdapterInfo);
       break;
     }
@@ -633,7 +631,7 @@ Returns:
 
     }
 
-    NewFilter |= AdapterInfo->Rx_Filter;
+    NewFilter = (UINT16) (NewFilter | AdapterInfo->Rx_Filter);
     //
     // all other flags are ignored except mcast_reset
     //
@@ -695,7 +693,7 @@ Returns:
     // if you want to enable anything, you got to have unicast
     // and you have what you already enabled!
     //
-    NewFilter |= (PXE_OPFLAGS_RECEIVE_FILTER_UNICAST | AdapterInfo->Rx_Filter);
+    NewFilter = (UINT16) (NewFilter | (PXE_OPFLAGS_RECEIVE_FILTER_UNICAST | AdapterInfo->Rx_Filter));
 
     break;
 
@@ -754,7 +752,7 @@ JustRead:
   // give the stat flags here
   //
   if (AdapterInfo->Receive_Started) {
-    CdbPtr->StatFlags |= AdapterInfo->Rx_Filter;
+    CdbPtr->StatFlags = (PXE_STATFLAGS) (CdbPtr->StatFlags | AdapterInfo->Rx_Filter);
 
   }
 
@@ -1112,7 +1110,7 @@ Returns:
   if ((CdbPtr->OpFlags & PXE_OPFLAGS_GET_INTERRUPT_STATUS) != 0) {
 
     Status = InWord (AdapterInfo, AdapterInfo->ioaddr + SCBStatus);
-    AdapterInfo->Int_Status |= Status;
+    AdapterInfo->Int_Status = (UINT16) (AdapterInfo->Int_Status | Status);
 
     //
     // acknoledge the interrupts
@@ -1282,7 +1280,6 @@ Returns:
 
 --*/
 {
-  PXE_CPB_RECEIVE *cpbptr;
 
   //
   // check if RU has started...
@@ -1293,7 +1290,6 @@ Returns:
     return ;
   }
 
-  cpbptr            = (PXE_CPB_RECEIVE *) (UINTN) CdbPtr->CPBaddr;
 
   CdbPtr->StatCode  = (UINT16) E100bReceive (AdapterInfo, CdbPtr->CPBaddr, CdbPtr->DBaddr);
   if (CdbPtr->StatCode != PXE_STATCODE_SUCCESS) {
@@ -1513,6 +1509,7 @@ badcdb:
   return ;
 }
 
+STATIC
 UINT8
 ChkSum (
   IN  VOID   *Buffer,

@@ -22,6 +22,7 @@ Abstract:
 EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *mEsalBootService = NULL;
 EFI_PLABEL                          mPlabel;
 
+STATIC
 EFI_STATUS
 EFIAPI
 DxeSalLibInitialize (
@@ -43,7 +44,7 @@ DxeSalLibInitialize (
   // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
   // away. We cache it in a module global, so we can register the vitrual version.
   //
-  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
+  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, (VOID **) &mEsalBootService);
   if (EFI_ERROR (Status)) {
     mEsalBootService = NULL;
     return EFI_SUCCESS;
@@ -58,6 +59,7 @@ DxeSalLibInitialize (
   return EFI_SUCCESS;
 }
 
+STATIC
 VOID
 EFIAPI
 DxeSalVirtualNotifyEvent (

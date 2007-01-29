@@ -21,7 +21,7 @@ Revision History
 
 #include "Ehci.h"
 
-
+STATIC
 EFI_STATUS
 SetAndWaitDoorBell (
   IN  USB2_HC_DEV     *HcDev,

@@ -144,6 +144,7 @@ PERFORMANCE_PROTOCOL mPerformanceInterface = {
   @retval The index of gauge entry in the array.
 
 **/
+STATIC
 UINT32
 InternalSearchForGaugeEntry (
   IN CONST VOID                 *Handle,  OPTIONAL
@@ -363,6 +364,7 @@ GetGauge (
   to DXE performance data structures.
 
 **/
+STATIC
 VOID
 InternalGetPeiPerformance (
   VOID
@@ -625,5 +627,5 @@ PerformanceMeasurementEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 }

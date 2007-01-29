@@ -36,6 +36,7 @@ Abstract:
   @retval The index of log entry in the array.
 
 **/
+STATIC
 PEI_PERFORMANCE_LOG_HEADER *
 InternalGetPerformanceHobLog (
   VOID
@@ -83,6 +84,7 @@ InternalGetPerformanceHobLog (
   @retval The index of log entry in the array.
 
 **/
+STATIC
 UINT32
 InternalSearchForLogEntry (
   IN PEI_PERFORMANCE_LOG_HEADER *PeiPerformanceLog,
@@ -326,5 +328,5 @@ PerformanceMeasurementEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 }
