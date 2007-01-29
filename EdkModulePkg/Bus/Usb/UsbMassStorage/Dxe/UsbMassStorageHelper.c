@@ -59,12 +59,6 @@ IsMediaWriteProtected (
   IN  UINTN                 SenseCounts
   );
 
-STATIC
-BOOLEAN
-IsLogicalUnitCommunicationOverRun (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  );
 
 EFI_STATUS
 USBFloppyPacketCommand (
@@ -1546,29 +1540,3 @@ IsMediaWriteProtected (
   return IsWriteProtected;
 }
 
-BOOLEAN
-IsLogicalUnitCommunicationOverRun (
-  IN  REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                 SenseCounts
-  )
-{
-  REQUEST_SENSE_DATA  *SensePtr;
-  UINTN               Index;
-  BOOLEAN             IsOverRun;
-
-  IsOverRun = FALSE;
-  SensePtr  = SenseData;
-
-  for (Index = 0; Index < SenseCounts; Index++) {
-
-    if ((SensePtr->sense_key == SK_NOT_READY) &&
-        (SensePtr->addnl_sense_code == ASC_LOGICAL_UNIT_STATUS) &&
-        (SensePtr->addnl_sense_code_qualifier == ASCQ_LOGICAL_UNIT_OVERRUN)) {
-      IsOverRun = TRUE;
-    }
-
-    SensePtr++;
-  }
-
-  return IsOverRun;
-}
