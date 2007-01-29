@@ -31,6 +31,8 @@ public class ModuleIdentification extends Identification {
     
     private boolean isLibrary = false;
 
+    private boolean isBinary = false;
+
     private String constructor = "";
 
     private String destructor = "";
@@ -85,6 +87,20 @@ public class ModuleIdentification extends Identification {
     **/
     public void setLibrary(boolean isLibrary) {
         this.isLibrary = isLibrary;
+    }
+
+    /**
+      @return boolean is this module is binary
+    **/
+    public boolean isBinary() {
+        return isBinary;
+    }
+
+    /**
+      @param isBinary
+    **/
+    public void setBinary(boolean isBinary) {
+        this.isBinary = isBinary;
     }
 
     /**

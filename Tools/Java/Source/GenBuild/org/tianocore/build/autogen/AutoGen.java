@@ -120,6 +120,7 @@ public class AutoGen {
     private List<String> exitBootServiceList = new ArrayList<String>();
 
     private StringBuffer functionDeclarations = new StringBuffer(10240);
+    private StringBuffer globalDeclarations = new StringBuffer(10240);
 
     //
     // flag of PcdComponentNameDisable, PcdDriverDiagnosticDisable 
@@ -384,6 +385,7 @@ public class AutoGen {
             fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
 
+        fileBuffer.append(globalDeclarations);
         fileBuffer.append(functionDeclarations);
         //
         // Append the #endif at AutoGen.h
@@ -1798,9 +1800,9 @@ public class AutoGen {
         //
         for (int i = 0; i < driverBindingGroup.length; i++) {
             if (driverBindingGroup[i][0] != null) {
-                fileBuffer.append("extern EFI_DRIVER_BINDING_PROTOCOL ");
-                fileBuffer.append(driverBindingGroup[i][0]);
-                fileBuffer.append(";\r\n");
+                globalDeclarations.append("extern EFI_DRIVER_BINDING_PROTOCOL ");
+                globalDeclarations.append(driverBindingGroup[i][0]);
+                globalDeclarations.append(";\r\n");
             }
         }
 
@@ -1812,9 +1814,9 @@ public class AutoGen {
                 if (driverBindingGroup[i][1]!= null) {
                     if (driverBindingGroup[i][0] != null) {
                         BitMask |= 0x01;
-                        fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
-                        fileBuffer.append(driverBindingGroup[i][1]);
-                        fileBuffer.append(";\r\n");
+                        globalDeclarations.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
+                        globalDeclarations.append(driverBindingGroup[i][1]);
+                        globalDeclarations.append(";\r\n");
                     } else {
                         throw new AutoGenException("DriverBinding can't be empty!!");
                     }
@@ -1829,9 +1831,9 @@ public class AutoGen {
             if (driverBindingGroup[i][2] != null) {
                 if (driverBindingGroup[i][0] != null) {
                     BitMask |= 0x02;
-                    fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
-                    fileBuffer.append(driverBindingGroup[i][2]);
-                    fileBuffer.append(";\r\n");
+                    globalDeclarations.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
+                    globalDeclarations.append(driverBindingGroup[i][2]);
+                    globalDeclarations.append(";\r\n");
                 } else {
                     throw new AutoGenException("DriverBinding can't be empty!!");
                 }
@@ -1846,9 +1848,9 @@ public class AutoGen {
                 if (driverBindingGroup[i][3] != null) {
                     if (driverBindingGroup[i][0] != null) {
                         BitMask |= 0x04;
-                        fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
-                        fileBuffer.append(driverBindingGroup[i][3]);
-                        fileBuffer.append(";\r\n");
+                        globalDeclarations.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
+                        globalDeclarations.append(driverBindingGroup[i][3]);
+                        globalDeclarations.append(";\r\n");
                     } else {
                         throw new AutoGenException("DriverBinding can't be empty!!");
                     }

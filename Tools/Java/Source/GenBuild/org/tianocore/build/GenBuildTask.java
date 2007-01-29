@@ -207,6 +207,7 @@ public class GenBuildTask extends Ant {
         } else {
             moduleId.setLibrary(true);
         }
+        moduleId.setBinary(saq.getBinaryModule());
 
         //
         // Judge whether it is single module build or not

@@ -424,7 +424,7 @@ public class ModuleBuildFileGenerator {
         // Parse AutoGen.c & AutoGen.h
         //
         if (!fpdModuleId.getModule().isLibrary()
-            && !fpdModuleId.getModule().getName().equalsIgnoreCase("Shell")) {
+            && !fpdModuleId.getModule().isBinary()) {
             fileProcess.parseFile(project.getProperty("DEST_DIR_DEBUG") + File.separatorChar + "AutoGen.c", null, root, false);
         }
         
