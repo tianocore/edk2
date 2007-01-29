@@ -65,7 +65,7 @@ DebugPrint (
   //
   // Send the print string to a Serial Port 
   //
-  SerialPortWrite (Buffer, AsciiStrLen(Buffer));
+  SerialPortWrite ((UINT8 *) Buffer, AsciiStrLen(Buffer));
 }
 
 
@@ -110,7 +110,7 @@ DebugAssert (
   //
   // Send the print string to the Console Output device
   //
-  SerialPortWrite (Buffer, AsciiStrLen(Buffer));
+  SerialPortWrite ((UINT8 *) Buffer, AsciiStrLen(Buffer));
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
@@ -176,7 +176,7 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
 
 
@@ -197,7 +197,7 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
 
 
@@ -218,7 +218,7 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
 
 
@@ -239,5 +239,5 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }

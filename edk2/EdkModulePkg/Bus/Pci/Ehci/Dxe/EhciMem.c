@@ -388,7 +388,7 @@ Returns:
       for (Index = StartBytePos, Index2 = StartBitPos, Count = 0; Count < (RealAllocSize / MEM_UNIT_SIZE); Count++) {
         ASSERT ((TempHeaderPtr->BitArrayPtr[Index] & bit (Index2) )== bit (Index2));
 
-        TempHeaderPtr->BitArrayPtr[Index] ^= (UINT8) (bit (Index2));
+        TempHeaderPtr->BitArrayPtr[Index] = (UINT8) (TempHeaderPtr->BitArrayPtr[Index] ^ (bit (Index2)));
         Index2++;
         if (Index2 == 8) {
           Index += 1;
@@ -516,7 +516,7 @@ Returns:
     //
     // right shift the byte
     //
-    ByteValue = ByteValue >> 1;
+    ByteValue = (UINT8) (ByteValue >> 1);
 
     if (BitValue == 0) {
       //
@@ -604,7 +604,7 @@ Returns:
   for (TempBytePos = FoundBytePos, Index = FoundBitPos, Count = 0; Count < NumberOfMemoryUnit; Count++) {
 
     ASSERT ((MemoryHeader->BitArrayPtr[TempBytePos] & bit (Index) )== 0);
-    MemoryHeader->BitArrayPtr[TempBytePos] |= bit (Index);
+    MemoryHeader->BitArrayPtr[TempBytePos] = (UINT8) (MemoryHeader->BitArrayPtr[TempBytePos] | bit (Index));
     Index++;
     if (Index == 8) {
       TempBytePos += 1;

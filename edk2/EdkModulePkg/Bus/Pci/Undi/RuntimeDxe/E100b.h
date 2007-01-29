@@ -124,7 +124,7 @@ enum speedo_offsets {
   SCBEarlyRx = 20,               // Early receive byte count. 
   SCBEarlyRxInt = 24, SCBFlowCtrlReg = 25, SCBPmdr = 27,
   // offsets for general control registers (GCRs)
-  SCBGenCtrl = 28, SCBGenStatus = 29, SCBGenCtrl2 = 30, SCBRsvd = 31,
+  SCBGenCtrl = 28, SCBGenStatus = 29, SCBGenCtrl2 = 30, SCBRsvd = 31
 };
 
 #define GCR2_EEPROM_ACCESS_SEMAPHORE 0x80 // bit offset into the gcr2
@@ -137,7 +137,7 @@ enum commands {
   CmdTx = 4, CmdTDR = 5, CmdDump = 6, CmdDiagnose = 7,
   CmdSuspend = 0x4000,    /* Suspend after completion. */
   CmdIntr = 0x2000,      /* Interrupt after completion. */
-  CmdTxFlex = 0x0008,      /* Use "Flexible mode" for CmdTx command. */
+  CmdTxFlex = 0x0008      /* Use "Flexible mode" for CmdTx command. */
 };
 
 //-------------------------------------------------------------------------

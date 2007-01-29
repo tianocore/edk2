@@ -39,12 +39,4 @@ Abstract:
 //
 #include <Guid/PeiPerformanceHob.h>
 
-EFI_STATUS
-EFIAPI
-PeiCore (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN VOID                        *Data
-  )
-;
-
 #endif

@@ -43,10 +43,10 @@ static UINT8 basic_config_cmd[22] = {
 //
 #define wait_for_cmd_done(cmd_ioaddr) \
 {                      \
-  INT16 wait = 2000;              \
-  while ((InByte (AdapterInfo, cmd_ioaddr) != 0) && --wait >= 0)  \
+  INT16 wait_count = 2000;              \
+  while ((InByte (AdapterInfo, cmd_ioaddr) != 0) && --wait_count >= 0)  \
     DelayIt (AdapterInfo, 10);  \
-  if (wait == 0) \
+  if (wait_count == 0) \
     DelayIt (AdapterInfo, 50);    \
 }
 
@@ -269,6 +269,7 @@ Returns:
   return ;
 }
 
+STATIC
 UINTN
 MapIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -337,6 +338,7 @@ Returns:
   return PXE_STATCODE_SUCCESS;
 }
 
+STATIC
 VOID
 UnMapIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -384,6 +386,7 @@ Returns:
   return ;
 }
 
+STATIC
 VOID
 DelayIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -409,6 +412,7 @@ Returns:
   }
 }
 
+STATIC
 VOID
 BlockIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -434,6 +438,7 @@ Returns:
   }
 }
 
+STATIC
 UINT8
 Load_Base_Regs (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -483,6 +488,7 @@ Returns:
   return 0;
 }
 
+STATIC
 UINT8
 IssueCB (
   NIC_DATA_INSTANCE *AdapterInfo,
@@ -549,6 +555,7 @@ Returns:
   return 0;
 }
 
+STATIC
 UINT8
 Configure (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -588,9 +595,9 @@ Returns:
   }
 
   my_filter = (UINT8) ((AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS) ? 1 : 0);
-  my_filter |= (AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST) ? 0 : 2;
+  my_filter = (UINT8) ((my_filter | (AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST) ? 0 : 2));
 
-  data_ptr[15] |= my_filter;
+  data_ptr[15]  = (UINT8) (data_ptr[15] | my_filter);
   data_ptr[19]  = (UINT8) (AdapterInfo->Duplex ? 0xC0 : 0x80);
   data_ptr[21]  = (UINT8) ((AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST) ? 0x0D : 0x05);
 
@@ -686,6 +693,7 @@ Returns:
   return 0;
 }
 
+STATIC
 VOID
 StopRU (
   IN NIC_DATA_INSTANCE *AdapterInfo
@@ -721,6 +729,7 @@ Returns:
   return ;
 }
 
+STATIC
 INT8
 StartRU (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -1049,7 +1058,7 @@ Returns:
     //
     // enable unicast and start the RU
     //
-    AdapterInfo->Rx_Filter |= (new_filter | PXE_OPFLAGS_RECEIVE_FILTER_UNICAST);
+    AdapterInfo->Rx_Filter = (UINT8) (AdapterInfo->Rx_Filter | (new_filter | PXE_OPFLAGS_RECEIVE_FILTER_UNICAST));
     StartRU (AdapterInfo);
   } else {
     //
@@ -1290,7 +1299,7 @@ Returns:
   ret_code  = PXE_STATCODE_NO_DATA;
   pkt_type  = PXE_FRAME_TYPE_NONE;
   status    = InWord (AdapterInfo, AdapterInfo->ioaddr + SCBStatus);
-  AdapterInfo->Int_Status |= status;
+  AdapterInfo->Int_Status = (UINT16) (AdapterInfo->Int_Status | status);
   //
   // acknoledge the interrupts
   //
@@ -1774,7 +1783,6 @@ Returns:
 --*/
 {
   RxFD    *rx_ptr;
-  RxFD    *head_ptr;
   RxFD    *tail_ptr;
   UINT16  Index;
 
@@ -1804,7 +1812,6 @@ Returns:
     }
   }
 
-  head_ptr                    = (&AdapterInfo->rx_ring[0]);
   tail_ptr                    = (&AdapterInfo->rx_ring[AdapterInfo->RxBufCnt - 1]);
   tail_ptr->cb_header.link    = (UINT32) AdapterInfo->rx_phy_addr;
 
@@ -1890,6 +1897,7 @@ Returns:
 #define EE_READ_CMD   6 // 110b
 #define EE_ERASE_CMD  (7 << 6)
 
+STATIC
 VOID
 shift_bits_out (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -1932,7 +1940,7 @@ Returns:
     // mask off the data_in bit
     //
     Tmp = (UINT8) (InByte (AdapterInfo, EEAddr) &~EE_DI);
-    Tmp |= dataval;
+    Tmp = (UINT8) (Tmp | dataval);
     OutByte (AdapterInfo, Tmp, EEAddr);
     eeprom_delay (100);
     //
@@ -1948,6 +1956,7 @@ Returns:
   }
 }
 
+STATIC
 UINT16
 shift_bits_in (
   IN NIC_DATA_INSTANCE *AdapterInfo
@@ -1999,6 +2008,7 @@ Returns:
   return retval;
 }
 
+STATIC
 BOOLEAN
 E100bSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
@@ -2047,6 +2057,7 @@ Returns:
   return TRUE;
 }
 
+STATIC
 VOID
 E100bReSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
@@ -3199,17 +3210,6 @@ Returns:
 
     MdiMiscReg |= (NSC_TX_CONG_TXREADY | NSC_TX_CONG_F_CONNECT);
 
-#if CONGESTION_CONTROL
-    //
-    // If we are configured to do congestion control, then enable the
-    // congestion control bit in the National Phy
-    //
-    if (AdapterInfo->Congest) {
-      MdiMiscReg |= NSC_TX_CONG_ENABLE;
-    } else {
-      MdiMiscReg &= ~NSC_TX_CONG_ENABLE;
-    }
-#endif
     MdiWrite (
       AdapterInfo,
       NSC_CONG_CONTROL_REG,
@@ -3225,21 +3225,6 @@ Returns:
   // described below.  The following code is only compiled in, if we wanted
   // to attempt a software workaround to the PHY_100 A/B step problem.
   //
-
-#if DO_PHY_100B_SOFTWARE_FIX
-  //
-  // Handle the Intel PHY_100 (A and B steps)
-  //
-  if ((PhyId == PHY_100_A) && (AdapterInfo->LinkSpeed == 100)) {
-    //
-    // The PHY_100 is very sensitive to collisions at 100mb, so increase
-    // the Adaptive IFS value with the intention of reducing the number of
-    // collisions that the adapter generates.
-    //
-    AdapterInfo->CurrentIFSValue  = 0x18;
-    AdapterInfo->AdaptiveIFS      = 0;
-  }
-#endif
 
   return (TRUE);
 }
@@ -3395,7 +3380,7 @@ Returns:
     // AND the two advertisement registers together, and get rid of any
     // extraneous bits.
     //
-    MdiOwnAdReg &= (MdiLinkPartnerAdReg & NWAY_LP_ABILITY);
+    MdiOwnAdReg = (UINT16) (MdiOwnAdReg & (MdiLinkPartnerAdReg & NWAY_LP_ABILITY));
 
     //
     // Get speed setting
@@ -3540,6 +3525,7 @@ Returns:
   return 0;
 }
 
+STATIC
 INT8
 SoftwareReset (
   NIC_DATA_INSTANCE *AdapterInfo
