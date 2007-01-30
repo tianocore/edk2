@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>EdkNullCustomizedDecompressLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>4a024320-0648-49c3-84d4-3d04670a1c77</GuidValue>
     <Version>1.0</Version>
     <Abstract>NULL customized decompression library</Abstract>
-    <Description>
-      NULL implementation of customized decompression library, all 
-      interfaces return EFI_UNSUPPORTED.
-    </Description>
+    <Description>NULL implementation of customized decompression library, all 
+      interfaces return EFI_UNSUPPORTED.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +23,7 @@
     <OutputFileBasename>EdkNullCustomizedDecompressLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER">
       <Keyword>CustomDecompressLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
