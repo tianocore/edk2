@@ -23,7 +23,7 @@
     <OutputFileBasename>DxeCoreHobLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_CORE">
       <Keyword>HobLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">

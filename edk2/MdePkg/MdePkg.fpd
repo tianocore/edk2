@@ -653,12 +653,6 @@
         <FfsFormatKey>LIBRARY</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="d458a654-f64c-49db-b8d1-3821306bf1f6">
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
     <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7">
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -812,12 +806,6 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3">
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IPF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="e6e9c1f8-2c8a-4f4b-a27c-c382e4bb8e67">
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>
@@ -1785,12 +1773,6 @@
         <FfsFormatKey>LIBRARY</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="d458a654-f64c-49db-b8d1-3821306bf1f6">
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
     <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7">
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -1944,12 +1926,6 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3">
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="EBC" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="e6e9c1f8-2c8a-4f4b-a27c-c382e4bb8e67">
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>LIBRARY</FfsFormatKey>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>BaseMemoryLibMmx</ModuleName>
     <ModuleType>BASE</ModuleType>
@@ -18,7 +18,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>BaseMemoryLibMmx</OutputFileBasename>
   </ModuleDefinitions>

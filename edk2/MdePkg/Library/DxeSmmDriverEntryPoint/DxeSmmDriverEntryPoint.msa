@@ -22,7 +22,7 @@
     <OutputFileBasename>DxeSmmDriverEntryPoint</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_SMM_DRIVER">
       <Keyword>DxeSmmDriverEntryPoint</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
