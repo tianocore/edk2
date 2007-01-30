@@ -237,11 +237,10 @@ public class CreateStepThree extends IDialog implements MouseListener {
 
             if (stepFour == null) {
                 stepFour = new CreateStepFour(this, true, this);
-                stepFour.setVisible(true);
-            } else {
-                stepFour.setVisible(true);
             }
+            
             this.setVisible(false);
+            stepFour.setVisible(true);
         } else if (e.getSource() == jButtonPrevious) {
             this.setVisible(false);
             stepTwo.setVisible(true);

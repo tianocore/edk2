@@ -174,7 +174,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
             jButtonPrevious.setBounds(new java.awt.Rectangle(370, 330, 90, 20));
             jButtonPrevious.setText("Previous");
             jButtonPrevious.addMouseListener(this);
-            jButtonPrevious.setVisible(false);
+            jButtonPrevious.setVisible(true);
         }
         return jButtonPrevious;
     }
@@ -260,9 +260,6 @@ public class CreateStepFour extends IDialog implements MouseListener {
             getPreviousStep().dispose();
             this.setVisible(false);
             this.dispose();
-        } else if (e.getSource() == jButtonPrevious) {
-            stepThree.setVisible(true);
-            this.setVisible(false);
         } else if (e.getSource() == jButtonBrowser) {
             JFileChooser fc = new JFileChooser();
             fc.setAcceptAllFileFilterUsed(false);
@@ -274,6 +271,9 @@ public class CreateStepFour extends IDialog implements MouseListener {
                 this.jTextFieldSaveToFile.setText(Tools.addPathExt(fc.getSelectedFile().getPath(),
                                                                    DataType.RETURN_TYPE_FAR_SURFACE_AREA));
             }
+        } else if (e.getSource() == jButtonPrevious) {
+            this.setVisible(false);
+            stepThree.setVisible(true);
         }
     }
 
@@ -301,29 +301,6 @@ public class CreateStepFour extends IDialog implements MouseListener {
         return stepThree;
     }
 
-    /**
-     * This method initializes jTable	
-     * 	
-     * @return javax.swing.JTable	
-     */
-    //  private JTable getJTable() {
-    //    if (jTable == null) {
-    //      jTable = new JTable();
-    //      model = new PartialTableModel();
-    //      jTable = new JTable(model);
-    //      jTable.setRowHeight(20);
-    //      jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-    //      model.addColumn("GUID");
-    //      model.addColumn("Version");
-    //      model.addColumn("Name");
-    //      
-    //      jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    //    }
-    //    if (this.stepThree != null) {
-    //      prepareTable();
-    //    }
-    //    return jTable;
-    //  }
     public void prepareTable() {
         model.setRowCount(0);
 
