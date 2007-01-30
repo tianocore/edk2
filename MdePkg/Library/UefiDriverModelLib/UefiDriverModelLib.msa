@@ -22,7 +22,7 @@
     <OutputFileBasename>UefiDriverModelLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER">
       <Keyword>UefiDriverModelLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
