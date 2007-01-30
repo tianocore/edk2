@@ -22,10 +22,10 @@
     <OutputFileBasename>PeiCoreEntryPoint</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="PEI_CORE">
       <Keyword>PeiCoreEntryPoint</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED" SupModuleList="PEI_CORE">
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
