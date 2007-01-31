@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -56,6 +56,7 @@ Returns:
   UINT64                      ImageSize;
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
   EFI_TE_IMAGE_HEADER         *TEImageHeader;
+  UINT16                      Machine;
 
   *EntryPoint   = NULL;
   TEImageHeader = NULL;
@@ -114,7 +115,7 @@ Returns:
       // Retrieve the entry point from the TE image header
       //
       ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) TEImageHeader;
-      *EntryPoint = (VOID *)((UINTN) TEImageHeader + sizeof (EFI_TE_IMAGE_HEADER) +
+      *EntryPoint  = (VOID *)((UINTN) TEImageHeader + sizeof (EFI_TE_IMAGE_HEADER) +
                     TEImageHeader->AddressOfEntryPoint - TEImageHeader->StrippedSize);
     }
   } else {
@@ -126,6 +127,17 @@ Returns:
     if (EFI_ERROR (Status)) {
       return EFI_NOT_FOUND;
     }
+  }
+
+  if (((EFI_TE_IMAGE_HEADER *) (UINTN) ImageAddress)->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+    TEImageHeader = (EFI_TE_IMAGE_HEADER *) (UINTN) ImageAddress;
+    Machine = TEImageHeader->Machine;
+  } else {
+    Machine = PeCoffLoaderGetMachineType (Pe32Data);
+  } 
+  
+  if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Machine)) {
+    return EFI_UNSUPPORTED;  
   }
 
   //

@@ -1,11 +1,11 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
-
+                                                                                          
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -189,7 +189,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName;
 //
 // USB Base Class Code,Sub-Class Code and Programming Interface
 //
-#define PCI_CLASSC_PI_EHCI      0x20
+#define PCI_CLASSC_PI_EHCI      PCI_IF_EHCI
 
 #define SETUP_PACKET_ID         0x2D
 #define INPUT_PACKET_ID         0x69

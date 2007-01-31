@@ -1,7 +1,7 @@
 /** @file
   Support for PCI 2.2 standard.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -232,6 +232,7 @@ typedef struct {
 #define PCI_CLASS_SERIAL_ACCESS_BUS   0x01
 #define PCI_CLASS_SERIAL_SSA          0x02
 #define PCI_CLASS_SERIAL_USB          0x03
+#define PCI_IF_EHCI                   0x20
 #define PCI_CLASS_SERIAL_FIBRECHANNEL 0x04
 #define PCI_CLASS_SERIAL_SMB          0x05
 
@@ -270,6 +271,7 @@ typedef struct {
 #define IS_PCI_LPC(_p)                IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA, 0)
 #define IS_PCI_P2P(_p)                IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_P2P, 0)
 #define IS_PCI_P2P_SUB(_p)            IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_P2P, 1)
+#define IS_PCI_16550_SERIAL(_p)       IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
 #define IS_PCI_USB(_p)                IS_CLASS2 (_p, PCI_CLASS_SERIAL, PCI_CLASS_SERIAL_USB)
 
 #define HEADER_TYPE_DEVICE            0x00
