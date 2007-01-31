@@ -113,8 +113,8 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
   /* Can this fail ?  */
   shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
 
-  drv->xshm_info.shmaddr = drv->image_data;
-  drv->image->data = drv->image_data;
+  drv->xshm_info.shmaddr = (char*)drv->image_data;
+  drv->image->data = (char*)drv->image_data;
 	  
   if (!XShmAttach (drv->display, &drv->xshm_info))
     {
@@ -189,7 +189,7 @@ UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
       
       drv->image_data = malloc((drv->width * drv->height) << drv->pixel_shift);
       drv->image = XCreateImage (drv->display, drv->visual, drv->depth,
-				 ZPixmap, 0, drv->image_data,
+				 ZPixmap, 0, (char *)drv->image_data,
 				 drv->width, drv->height,
 				 8 << drv->pixel_shift, 0);
     }
@@ -328,6 +328,7 @@ UgaColorToPixel (UGA_IO_PRIVATE *drv, unsigned long val)
 {
   EFI_UGA_PIXEL res;
 
+  memset (&res, 0, sizeof (EFI_UGA_PIXEL));
   /* FIXME: should round instead of truncate.  */
   res.Red = (val >> drv->r.shift) << drv->r.csize;
   res.Green = (val >> drv->g.shift) << drv->g.csize;

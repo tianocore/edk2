@@ -313,10 +313,10 @@ MapMemory (
   INTN   prot,
   INTN   flags)
 {
-  STATIC UINTN base = 0x40000000;
-  CONST UINTN align = (1 << 24);
-  VOID *res;
-  BOOLEAN isAligned = 0;
+  STATIC UINTN base  = 0x40000000;
+  CONST UINTN  align = (1 << 24);
+  VOID         *res  = NULL;
+  BOOLEAN      isAligned = 0;
 
   //
   // Try to get an aligned block somewhere in the address space of this
