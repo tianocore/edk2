@@ -324,12 +324,22 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      @return FrameworkWizardUI The instance of this class
      
      **/
-    public static FrameworkWizardUI getInstance() {
+    public static FrameworkWizardUI getInstance(String[] args) {
         if (fwui == null) {
-            fwui = new FrameworkWizardUI();
+            fwui = new FrameworkWizardUI(args);
         }
         return fwui;
     }
+    
+    /**
+    If the class hasn't an instnace, new one.
+    
+    @return FrameworkWizardUI The instance of this class
+    
+    **/
+   public static FrameworkWizardUI getInstance() {
+       return fwui;
+   }
 
     /**
      This method initializes jMenuBar 
@@ -1794,8 +1804,11 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      * Main class, start the GUI
      * 
      */
-    public static void main(String[] args) {
-        FrameworkWizardUI module = FrameworkWizardUI.getInstance();
+    public static void main(String[] args) {      
+        //
+        // Start Main UI
+        //
+        FrameworkWizardUI module = FrameworkWizardUI.getInstance(args);
         module.setVisible(true);
     }
 
@@ -1803,9 +1816,9 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      This is the default constructor
      
      **/
-    public FrameworkWizardUI() {
+    public FrameworkWizardUI(String[] args) {
         super();
-        init();
+        init(args);
     }
 
     /**
@@ -1813,7 +1826,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
      
      
      **/
-    private void init() {
+    private void init(String[] args) {
         //
         // Set current workspace and check
         // Check if exists WORKSPACE
@@ -1826,6 +1839,15 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         //
         SplashScreen ss = new SplashScreen();
         ss.setVisible(true);
+        
+        //
+        // Go through args to check if enable log
+        //
+        for (int index = 0; index < args.length; index++) {
+            if (args[index].equals("--log") || args[index].equals("-l")) {
+                Log.setSaveLog(true);
+            }
+        }
 
         //
         // Init Global Data

@@ -10,4 +10,4 @@
 #
 
 # Run Framework Wizard
-java -Xmx256m -cp "$CLASSPATH:$WORKSPACE/Tools/bin/FrameworkWizard.jar" org.tianocore.frameworkwizard.FrameworkWizardUI
+java -Xmx256m -cp "$CLASSPATH:$WORKSPACE/Tools/bin/FrameworkWizard.jar" org.tianocore.frameworkwizard.FrameworkWizardUI $1
