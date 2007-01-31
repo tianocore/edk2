@@ -23,12 +23,18 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.tianocore.frameworkwizard.FrameworkWizardUI;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 
 /**
  The class is used to provides static interfaces to save log and error information
  
  **/
 public class Log {
+    //
+    //Log file directory path
+    //
+    private static String strLogDir = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + "Tools"
+                                      + DataType.FILE_SEPARATOR + "Logs";
 
     //
     //Log file
@@ -48,17 +54,22 @@ public class Log {
     //
     //Log file name
     //
-    static String strLogFileName = "Log.log";
+    private static String strLogFileName = strLogDir + DataType.FILE_SEPARATOR + "frameworkwizard.log";
 
     //
     //Wrn file name
     //
-    static String strWrnFileName = "Wrn.log";
+    private static String strWrnFileName = strLogDir + DataType.FILE_SEPARATOR + "frameworkwizard.wrn";
 
     //
     //Err file name
     //
-    static String strErrFileName = "Err.log";
+    private static String strErrFileName = strLogDir + DataType.FILE_SEPARATOR + "frameworkwizard.err";
+
+    //
+    //Flag for create log or not
+    //
+    private static boolean isSaveLog = false;
 
     /**
      Main class, used for test
@@ -88,7 +99,7 @@ public class Log {
     public static void log(String strItem, String strLog) {
         try {
             writeToLogFile(strItem + ":" + strLog);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -102,7 +113,7 @@ public class Log {
     public static void log(String strLog) {
         try {
             writeToLogFile(strLog);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -118,7 +129,7 @@ public class Log {
         try {
             writeToWrnFile("Warning when " + strItem + "::" + strWrn);
             showWrnMessage(strWrn);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -133,7 +144,7 @@ public class Log {
         try {
             writeToWrnFile("Warning::" + strWrn);
             showWrnMessage("Warning::" + strWrn);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -148,7 +159,7 @@ public class Log {
     public static void err(String strItem, String strErr) {
         try {
             writeToErrFile("Error when " + strItem + "::" + strErr);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -162,7 +173,7 @@ public class Log {
     public static void err(String strErr) {
         try {
             writeToErrFile("Error::" + strErr);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -176,8 +187,8 @@ public class Log {
      **/
     private static void showWrnMessage(String strErr) {
         String strReturn = Tools.wrapStringByWord(strErr);
-        JOptionPane
-                   .showConfirmDialog(FrameworkWizardUI.getInstance(), strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showConfirmDialog(FrameworkWizardUI.getInstance(), strReturn, "Warning",
+                                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -187,21 +198,25 @@ public class Log {
      @throws IOException
      
      **/
-    private static void writeToLogFile(String strLog) throws IOException {
-        try {
-            if (fleLogFile == null) {
-                fleLogFile = new File(strLogFileName);
-                fleLogFile.createNewFile();
+    private static void writeToLogFile(String strLog) throws Exception {
+        if (isSaveLog) {
+            try {
+                createLogDir();
+                if (fleLogFile == null) {
+                    fleLogFile = new File(strLogFileName);
+                    fleLogFile.delete();
+                    fleLogFile.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(fleLogFile, true);
+                fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileOutputStream fos = new FileOutputStream(fleLogFile, true);
-            fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -209,24 +224,28 @@ public class Log {
      Open wrn file and write wrn information
      
      @param strLog The log information
-     @throws IOException
+     * @throws Exception 
      
      **/
-    private static void writeToWrnFile(String strLog) throws IOException {
-        try {
-            if (fleWrnFile == null) {
-                fleWrnFile = new File(strWrnFileName);
-                fleWrnFile.createNewFile();
+    private static void writeToWrnFile(String strLog) throws Exception {
+        if (isSaveLog) {
+            try {
+                createLogDir();
+                if (fleWrnFile == null) {
+                    fleWrnFile = new File(strWrnFileName);
+                    fleWrnFile.delete();
+                    fleWrnFile.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(fleWrnFile, true);
+                fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileOutputStream fos = new FileOutputStream(fleWrnFile, true);
-            fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -237,21 +256,46 @@ public class Log {
      @throws IOException
      
      **/
-    private static void writeToErrFile(String strLog) throws IOException {
-        try {
-            if (fleErrFile == null) {
-                fleErrFile = new File(strErrFileName);
-                fleErrFile.createNewFile();
+    private static void writeToErrFile(String strLog) throws Exception {
+        if (isSaveLog) {
+            try {
+                createLogDir();
+                if (fleErrFile == null) {
+                    fleErrFile = new File(strErrFileName);
+                    fleErrFile.delete();
+                    fleErrFile.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(fleErrFile, true);
+                fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileOutputStream fos = new FileOutputStream(fleErrFile, true);
-            fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    /**
+     Check if directory for Logs exists or not
+     Create the directory if it doesn't exist  
+     * @throws Exception 
+     
+     **/
+    private static void createLogDir() throws Exception {
+        File f = new File(strLogDir);
+        if (!f.exists()) {
+            FileOperation.newFolder(strLogDir);
+        }
+    }
+
+    public static boolean isSaveLog() {
+        return isSaveLog;
+    }
+
+    public static void setSaveLog(boolean isSaveLog) {
+        Log.isSaveLog = isSaveLog;
     }
 }

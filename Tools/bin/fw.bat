@@ -29,7 +29,7 @@ if not exist %WORKSPACE%\Tools\bin\FrameworkWizard.jar (
 )
 
 @REM Run Framework Wizard
-call "java" -Xmx256m org.tianocore.frameworkwizard.FrameworkWizardUI
+call "java" -Xmx256m org.tianocore.frameworkwizard.FrameworkWizardUI %%1
 
 goto end
 
