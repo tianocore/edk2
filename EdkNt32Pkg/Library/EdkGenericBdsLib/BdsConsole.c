@@ -367,11 +367,18 @@ Returns:
   //
   // Connect all default console variables
   //
-  Status = BdsLibConnectConsoleVariable (L"ConIn");
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
+  //
+  // Because possibly the platform is legacy free, in such case,
+  // ConIn devices (Serial Port and PS2 Keyboard ) does not exist, 
+  // so we need not check the status.
+  //  
+  BdsLibConnectConsoleVariable (L"ConIn");
+
+  // 
+  // It seems impossible not to have any ConOut device on platform,
+  // so we check the status here.
+  //
   Status = BdsLibConnectConsoleVariable (L"ConOut");
   if (EFI_ERROR (Status)) {
     return Status;

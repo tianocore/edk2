@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,9 @@ PeCoffLoaderGetEntryPoint (
 
 Routine Description:
 
-  Loads a PE/COFF image into memory
+  Loads a PE/COFF image into memory, this is not follow the original purpose of 
+  PeCoffGetEntryPoint library class.  But it's ok that Unix package not run on a real 
+  platform and this is for source level debug.
 
 Arguments:
 
@@ -73,3 +75,39 @@ Returns:
   *EntryPoint = (VOID*)(UINTN)ImageEntryPoint;
   return Status;
 }
+
+/**
+  Returns the machine type of PE/COFF image. 
+  This is copied from MDE BasePeCoffGetEntryPointLib, the code should be sync with it.
+  The reason is NT32 package needs to load the image to memory to support source
+  level debug.
+   
+
+  @param  Image   Pointer to a PE/COFF header
+
+  @return         Machine type or zero if not a valid iamge
+
+**/
+UINT16
+EFIAPI
+PeCoffLoaderGetMachineType (
+  IN  VOID  *Pe32Data
+  )
+{  
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+
+  DosHdr = (EFI_IMAGE_DOS_HEADER  *)Pe32Data;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + DosHdr->e_lfanew);
+  } else {
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data);
+  }
+
+  if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
+    return Hdr.Pe32->FileHeader.Machine;
+  }
+
+  return 0x0000;
+}
+
