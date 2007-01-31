@@ -161,6 +161,56 @@ PxeDhcp4Release (
   )
 ;
 
+//
+// Prototypes
+// Driver model protocol interface
+//
+EFI_STATUS
+EFIAPI
+PxeDhcp4DriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PxeDhcp4DriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PxeDhcp4DriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN  EFI_HANDLE                     ControllerHandle,
+  IN  UINTN                          NumberOfChildren,
+  IN  EFI_HANDLE                     *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+PxeDhcp4ComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+PxeDhcp4ComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 //

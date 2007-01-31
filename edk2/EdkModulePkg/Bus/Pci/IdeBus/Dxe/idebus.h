@@ -172,6 +172,49 @@ IDEBusDriverBindingStop (
 ;
 
 //
+// EFI Driver Configuration Functions
+//
+EFI_STATUS
+IDEBusDriverConfigurationSetOptions (
+  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
+  IN  EFI_HANDLE                                             ControllerHandle,
+  IN  EFI_HANDLE                                             ChildHandle  OPTIONAL,
+  IN  CHAR8                                                  *Language,
+  OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
+  );
+
+EFI_STATUS
+IDEBusDriverConfigurationOptionsValid (
+  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL               *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle  OPTIONAL
+  );
+
+EFI_STATUS
+IDEBusDriverConfigurationForceDefaults (
+  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
+  IN  EFI_HANDLE                                             ControllerHandle,
+  IN  EFI_HANDLE                                             ChildHandle  OPTIONAL,
+  IN  UINT32                                                 DefaultType,
+  OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
+  );
+
+//
+// EFI Driver Diagnostics Functions
+//
+EFI_STATUS
+IDEBusDriverDiagnosticsRunDiagnostics (
+  IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
+  IN  EFI_HANDLE                                    ControllerHandle,
+  IN  EFI_HANDLE                                    ChildHandle  OPTIONAL,
+  IN  EFI_DRIVER_DIAGNOSTIC_TYPE                    DiagnosticType,
+  IN  CHAR8                                         *Language,
+  OUT EFI_GUID                                      **ErrorType,
+  OUT UINTN                                         *BufferSize,
+  OUT CHAR16                                        **Buffer
+  );
+
+//
 // Block I/O Protocol Interface
 //
 /**

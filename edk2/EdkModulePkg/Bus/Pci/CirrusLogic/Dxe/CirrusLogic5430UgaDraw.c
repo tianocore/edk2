@@ -16,18 +16,11 @@
 
 #include "CirrusLogic5430.h"
 
-///
-/// Video Mode structure
-///
-typedef struct {
-  UINT32  Width;
-  UINT32  Height;
-  UINT32  ColorDepth;
-  UINT32  RefreshRate;
-  UINT8   *CrtcSettings;
-  UINT16  *SeqSettings;
-  UINT8   MiscSetting;
-} CIRRUS_LOGIC_5430_VIDEO_MODES;
+STATIC
+VOID
+ClearScreen (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
+  );
 
 ///
 /// Generic Attribute Controller Register Settings
@@ -98,66 +91,6 @@ static CIRRUS_LOGIC_5430_VIDEO_MODES  CirrusLogic5430VideoModes[] = {
   {  800, 600, 8, 60, Crtc_800_600_256_60,  Seq_800_600_256_60,  0xef }, 
   { 1024, 768, 8, 60, Crtc_1024_768_256_60, Seq_1024_768_256_60, 0xef } 
 };
-
-//
-// Local Function Prototypes
-//
-VOID
-InitializeGraphicsMode (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  CIRRUS_LOGIC_5430_VIDEO_MODES   *ModeData
-  );
-
-VOID
-SetPaletteColor (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  UINTN                           Index,
-  UINT8                           Red,
-  UINT8                           Green,
-  UINT8                           Blue
-  );
-
-VOID
-SetDefaultPalette (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  );
-
-STATIC
-VOID
-ClearScreen (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  );
-
-VOID
-DrawLogo (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  );
-
-VOID
-outb (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  UINTN                           Address,
-  UINT8                           Data
-  );
-
-VOID
-outw (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  UINTN                           Address,
-  UINT16                          Data
-  );
-
-UINT8
-inb (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  UINTN                           Address
-  );
-
-UINT16
-inw (
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
-  UINTN                           Address
-  );
 
 //
 // UGA Draw Protocol Member Functions

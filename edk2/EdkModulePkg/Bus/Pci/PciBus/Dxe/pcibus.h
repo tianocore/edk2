@@ -240,4 +240,32 @@ extern EFI_PCI_PLATFORM_PROTOCOL                    *gPciPlatformProtocol;
 #include "PciHotPlugSupport.h"
 #include "PciLib.h"
 
+//
+// PCI Bus Support Function Prototypes
+//
+EFI_STATUS
+EFIAPI
+PciBusDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PciBusDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PciBusDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
+  IN  EFI_HANDLE                    Controller,
+  IN  UINTN                         NumberOfChildren,
+  IN  EFI_HANDLE                    *ChildHandleBuffer
+  );
+
 #endif

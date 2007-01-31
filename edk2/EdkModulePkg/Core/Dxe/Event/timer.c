@@ -33,6 +33,7 @@ CoreCurrentSystemTime (
   VOID
   );
 
+STATIC
 VOID
 EFIAPI
 CoreCheckTimers (
@@ -173,6 +174,7 @@ Returns:
   CoreReleaseLock (&mEfiSystemTimeLock);
 }
 
+STATIC
 VOID
 EFIAPI
 CoreCheckTimers (

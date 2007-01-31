@@ -21,27 +21,6 @@ Abstract:
 #include "Terminal.h"
 
 //
-// EFI Component Name Functions
-//
-EFI_STATUS
-EFIAPI
-TerminalComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-TerminalComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
-//
 // EFI Component Name Protocol
 //
 EFI_COMPONENT_NAME_PROTOCOL     gTerminalComponentName = {

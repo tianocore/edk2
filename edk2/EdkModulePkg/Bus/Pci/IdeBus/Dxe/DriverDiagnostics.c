@@ -15,21 +15,6 @@
 #define IDE_BUS_DIAGNOSTIC_ERROR  L"PCI IDE/ATAPI Driver Diagnostics Failed"
 
 //
-// EFI Driver Diagnostics Functions
-//
-EFI_STATUS
-IDEBusDriverDiagnosticsRunDiagnostics (
-  IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
-  IN  EFI_HANDLE                                    ControllerHandle,
-  IN  EFI_HANDLE                                    ChildHandle  OPTIONAL,
-  IN  EFI_DRIVER_DIAGNOSTIC_TYPE                    DiagnosticType,
-  IN  CHAR8                                         *Language,
-  OUT EFI_GUID                                      **ErrorType,
-  OUT UINTN                                         *BufferSize,
-  OUT CHAR16                                        **Buffer
-  );
-
-//
 // EFI Driver Diagnostics Protocol
 //
 EFI_DRIVER_DIAGNOSTICS_PROTOCOL gIDEBusDriverDiagnostics = {

@@ -24,42 +24,6 @@ Revision History
 #include "pcibus.h"
 
 //
-// PCI Bus Support Function Prototypes
-//
-
-EFI_STATUS
-EFIAPI
-PciBusEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
-
-EFI_STATUS
-EFIAPI
-PciBusDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PciBusDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PciBusDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN  EFI_HANDLE                    Controller,
-  IN  UINTN                         NumberOfChildren,
-  IN  EFI_HANDLE                    *ChildHandleBuffer
-  );
-
-//
 // PCI Bus Driver Global Variables
 //
 

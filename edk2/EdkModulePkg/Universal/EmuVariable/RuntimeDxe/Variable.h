@@ -74,6 +74,8 @@ typedef struct {
   UINT32          FvbInstance;
 } ESAL_VARIABLE_GLOBAL;
 
+extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
+
 //
 // Functions
 //

@@ -41,16 +41,6 @@ typedef struct _EBC_IMAGE_LIST {
   EBC_THUNK_LIST          *ThunkList;
 } EBC_IMAGE_LIST;
 
-//
-// Function prototypes
-//
-EFI_STATUS
-EFIAPI
-InitializeEbcDriver (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
 STATIC
 EFI_STATUS
 EFIAPI
@@ -77,12 +67,14 @@ EbcGetVersion (
   IN OUT UINT64           *Version
   );
 
+STATIC
 EFI_STATUS
 EFIAPI
 InitializeEbcCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL  *This
   );
 
+STATIC
 VOID
 EFIAPI
 CommonEbcExceptionHandler (
@@ -90,6 +82,7 @@ CommonEbcExceptionHandler (
   IN EFI_SYSTEM_CONTEXT   SystemContext
   );
 
+STATIC
 VOID
 EFIAPI
 EbcPeriodicNotifyFunction (
@@ -97,6 +90,7 @@ EbcPeriodicNotifyFunction (
   IN VOID          *Context
   );
 
+STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugPeriodic (
@@ -646,6 +640,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 InitializeEbcCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL  *This
@@ -707,6 +702,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 VOID
 CommonEbcExceptionHandler (
   IN EFI_EXCEPTION_TYPE   InterruptType,
@@ -739,6 +735,7 @@ Returns:
   return ;
 }
 
+STATIC
 VOID
 EFIAPI
 EbcPeriodicNotifyFunction (
@@ -774,7 +771,7 @@ Returns:
   return ;
 }
 
-
+STATIC
 EFI_STATUS
 EbcDebugPeriodic (
   IN VM_CONTEXT *VmPtr

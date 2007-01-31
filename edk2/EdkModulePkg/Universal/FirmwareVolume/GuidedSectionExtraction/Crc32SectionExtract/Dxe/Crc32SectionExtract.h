@@ -63,4 +63,33 @@ Returns:
 --*/
 ;
 
+EFI_STATUS
+EFIAPI
+InitializeCrc32GuidedSectionExtractionProtocol (
+  IN EFI_HANDLE                   ImageHandle,
+  IN EFI_SYSTEM_TABLE             *SystemTable
+  )
+/*++
+
+Routine Description: 
+
+  Entry point of the CRC32 GUIDed section extraction protocol. 
+  Creates and initializes an instance of the GUIDed section 
+  extraction protocol with CRC32 GUID.
+
+Arguments:  
+
+  ImageHandle   EFI_HANDLE: A handle for the image that is initializing 
+                this driver
+  SystemTable   EFI_SYSTEM_TABLE: A pointer to the EFI system table        
+
+Returns:  
+
+  EFI_SUCCESS:          Driver initialized successfully
+  EFI_LOAD_ERROR:       Failed to Initialize or has been loaded 
+  EFI_OUT_OF_RESOURCES: Could not allocate needed resources
+
+--*/
+;
+
 #endif

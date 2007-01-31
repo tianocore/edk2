@@ -2507,4 +2507,256 @@ CoreDisplayDiscoveredNotDispatched (
     NONE 
 
 --*/;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg0 (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  None
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg1 (
+  UINTN Arg1
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  Arg1        - Undefined
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg2 (
+  UINTN Arg1,
+  UINTN Arg2
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  Arg1        - Undefined
+  
+  Arg2        - Undefined
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg3 (
+  UINTN Arg1,
+  UINTN Arg2,
+  UINTN Arg3
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  Arg1        - Undefined
+  
+  Arg2        - Undefined
+  
+  Arg3        - Undefined
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg4 (
+  UINTN Arg1,
+  UINTN Arg2,
+  UINTN Arg3,
+  UINTN Arg4
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  Arg1        - Undefined
+  
+  Arg2        - Undefined
+  
+  Arg3        - Undefined
+  
+  Arg4        - Undefined
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetArg5 (
+  UINTN Arg1,
+  UINTN Arg2,
+  UINTN Arg3,
+  UINTN Arg4,
+  UINTN Arg5
+  )
+/*++
+
+Routine Description:
+
+  Place holder function until all the Boot Services and Runtime Services are available
+
+Arguments:
+
+  Arg1        - Undefined
+  
+  Arg2        - Undefined
+  
+  Arg3        - Undefined
+  
+  Arg4        - Undefined
+  
+  Arg5        - Undefined
+
+Returns:
+
+  EFI_NOT_AVAILABLE_YET
+
+--*/
+;
+
+EFI_STATUS
+CoreGetPeiProtocol (
+  IN EFI_GUID  *ProtocolGuid,
+  IN VOID      **Interface
+  )
+/*++
+
+Routine Description:
+
+  Searches for a Protocol Interface passed from PEI through a HOB
+
+Arguments:
+
+  ProtocolGuid - The Protocol GUID to search for in the HOB List
+
+  Interface    - A pointer to the interface for the Protocol GUID
+
+Returns:
+
+  EFI_SUCCESS   - The Protocol GUID was found and its interface is returned in Interface
+
+  EFI_NOT_FOUND - The Protocol GUID was not found in the HOB List
+
+--*/
+;
+  
+EFI_STATUS
+DxeMainUefiDecompressGetInfo (
+  IN EFI_DECOMPRESS_PROTOCOL            *This,
+  IN   VOID                             *Source,
+  IN   UINT32                           SourceSize,
+  OUT  UINT32                           *DestinationSize,
+  OUT  UINT32                           *ScratchSize
+  );
+
+EFI_STATUS
+EFIAPI
+DxeMainUefiDecompress (
+  IN EFI_DECOMPRESS_PROTOCOL              *This,
+  IN     VOID                             *Source,
+  IN     UINT32                           SourceSize,
+  IN OUT VOID                             *Destination,
+  IN     UINT32                           DestinationSize,
+  IN OUT VOID                             *Scratch,
+  IN     UINT32                           ScratchSize
+  );
+
+EFI_STATUS
+DxeMainTianoDecompressGetInfo (
+  IN EFI_TIANO_DECOMPRESS_PROTOCOL      *This,
+  IN   VOID                             *Source,
+  IN   UINT32                           SourceSize,
+  OUT  UINT32                           *DestinationSize,
+  OUT  UINT32                           *ScratchSize
+  );
+
+EFI_STATUS
+EFIAPI
+DxeMainTianoDecompress (
+  IN EFI_TIANO_DECOMPRESS_PROTOCOL        *This,
+  IN     VOID                             *Source,
+  IN     UINT32                           SourceSize,
+  IN OUT VOID                             *Destination,
+  IN     UINT32                           DestinationSize,
+  IN OUT VOID                             *Scratch,
+  IN     UINT32                           ScratchSize
+  );
+
+EFI_STATUS
+DxeMainCustomDecompressGetInfo (
+  IN EFI_CUSTOMIZED_DECOMPRESS_PROTOCOL  *This,
+  IN   VOID                              *Source,
+  IN   UINT32                            SourceSize,
+  OUT  UINT32                            *DestinationSize,
+  OUT  UINT32                            *ScratchSize
+  );
+
+EFI_STATUS
+EFIAPI
+DxeMainCustomDecompress (
+  IN EFI_CUSTOMIZED_DECOMPRESS_PROTOCOL  *This,
+  IN     VOID                            *Source,
+  IN     UINT32                          SourceSize,
+  IN OUT VOID                            *Destination,
+  IN     UINT32                          DestinationSize,
+  IN OUT VOID                            *Scratch,
+  IN     UINT32                          ScratchSize
+  );
+
 #endif

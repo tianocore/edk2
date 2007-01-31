@@ -31,73 +31,7 @@ PXE_SW_UNDI             *pxe_31 = 0;  // 3.1 entry
 UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 
 NII_TABLE               *UnidiDataPointer=NULL;    
-//
-// external Global Variables
-//
-extern UNDI_CALL_TABLE  api_table[];
 
-//
-// function prototypes
-//
-EFI_STATUS
-InstallConfigTable (
-  IN VOID
-  );
-
-EFI_STATUS
-EFIAPI
-InitializeUNDIDriver (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
-VOID
-UNDI_notify_virtual (
-  EFI_EVENT event,
-  VOID      *context
-  );
-
-VOID
-EFIAPI
-UndiNotifyExitBs (
-  EFI_EVENT Event,
-  VOID      *Context
-  );
-
-EFI_STATUS
-EFIAPI
-UndiDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-UndiDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-UndiDriverStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
-EFI_STATUS
-AppendMac2DevPath (
-  IN OUT  EFI_DEVICE_PATH_PROTOCOL **DevPtr,
-  IN      EFI_DEVICE_PATH_PROTOCOL *BaseDevPtr,
-  IN      NIC_DATA_INSTANCE        *AdapterInfo
-  );
-//
-// end function prototypes
-//
 VOID
 EFIAPI
 UndiNotifyVirtual (

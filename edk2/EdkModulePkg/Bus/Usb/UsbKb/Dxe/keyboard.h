@@ -24,6 +24,27 @@ Revision History
 
 #include "efikey.h"
 
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+UsbKeyboardComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+UsbKeyboardComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 BOOLEAN
 IsUSBKeyboard (
   IN  EFI_USB_IO_PROTOCOL       *UsbIo

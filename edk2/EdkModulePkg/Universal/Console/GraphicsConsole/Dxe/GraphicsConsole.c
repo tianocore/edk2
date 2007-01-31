@@ -19,34 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "GraphicsConsole.h"
 
-//
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-GraphicsConsoleControllerDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-GraphicsConsoleControllerDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-GraphicsConsoleControllerDriverStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
+STATIC
 EFI_STATUS
 GetTextColors (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This,
@@ -54,12 +27,7 @@ GetTextColors (
   OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Background
   );
 
-EFI_STATUS
-DrawUnicodeWeightAtCursor (
-  IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This,
-  IN  CHAR16                        UnicodeWeight
-  );
-
+STATIC
 EFI_STATUS
 DrawUnicodeWeightAtCursorN (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This,
@@ -67,6 +35,7 @@ DrawUnicodeWeightAtCursorN (
   IN  UINTN                         Count
   );
 
+STATIC
 EFI_STATUS
 EraseCursor (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This
@@ -1532,6 +1501,7 @@ GraphicsConsoleConOutEnableCursor (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 GetTextColors (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This,
@@ -1549,6 +1519,7 @@ GetTextColors (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 DrawUnicodeWeightAtCursorN (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This,
@@ -1689,6 +1660,7 @@ DrawUnicodeWeightAtCursorN (
   return ReturnStatus;
 }
 
+STATIC
 EFI_STATUS
 EraseCursor (
   IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *This

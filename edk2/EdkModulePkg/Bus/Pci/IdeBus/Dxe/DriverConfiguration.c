@@ -18,33 +18,6 @@ CHAR16 *OptionString[4] = {
   L"Enable Secondary Master  (Y/N)? -->",
   L"Enable Secondary Slave   (Y/N)? -->"
 };
-//
-// EFI Driver Configuration Functions
-//
-EFI_STATUS
-IDEBusDriverConfigurationSetOptions (
-  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
-  IN  EFI_HANDLE                                             ControllerHandle,
-  IN  EFI_HANDLE                                             ChildHandle  OPTIONAL,
-  IN  CHAR8                                                  *Language,
-  OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
-  );
-
-EFI_STATUS
-IDEBusDriverConfigurationOptionsValid (
-  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL               *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle  OPTIONAL
-  );
-
-EFI_STATUS
-IDEBusDriverConfigurationForceDefaults (
-  IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
-  IN  EFI_HANDLE                                             ControllerHandle,
-  IN  EFI_HANDLE                                             ChildHandle  OPTIONAL,
-  IN  UINT32                                                 DefaultType,
-  OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
-  );
 
 //
 // EFI Driver Configuration Protocol

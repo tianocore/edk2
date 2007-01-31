@@ -33,7 +33,6 @@ STATIC EFI_LOCK             mLock;
 //
 // End Global variables
 //
-extern EFI_PCI_IO_PROTOCOL  *mPciIoFncs;
 
 VOID
 snp_undi32_callback_v2p_30 (

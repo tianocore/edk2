@@ -20,14 +20,9 @@ Abstract:
 Revision History
 
 --*/
-#include <PeiMain.h>
-#include "IpfCpuCore.i"
 
-extern 
-SAL_RETURN_REGS
-GetHandOffStatus (
-  VOID
-  );
+#include "IpfPeiMain.h"
+#include "IpfCpuCore.i"
 
 VOID
 SwitchToCacheMode (

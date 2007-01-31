@@ -67,4 +67,28 @@ typedef struct {
 #define USB_CBI_DEVICE_FROM_THIS(a) \
     CR(a, USB_CBI_DEVICE, UsbAtapiProtocol, USB_CBI_DEVICE_SIGNATURE)
 
+extern EFI_DRIVER_BINDING_PROTOCOL  gUsbCbi1DriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL  gUsbCbi1ComponentName;
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+UsbCbi1ComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+UsbCbi1ComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 #endif

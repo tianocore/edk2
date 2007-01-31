@@ -32,13 +32,6 @@ EFIAPI
 InitializeCrc32GuidedSectionExtractionProtocol (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
-  );
-
-EFI_STATUS
-EFIAPI
-InitializeCrc32GuidedSectionExtractionProtocol (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
   )
 /*++
 

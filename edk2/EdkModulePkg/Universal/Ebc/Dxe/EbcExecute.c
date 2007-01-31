@@ -134,20 +134,6 @@ VmWriteMem32 (
   IN UINT32     Data
   );
 
-EFI_STATUS
-VmWriteMemN (
-  IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
-  IN UINTN      Data
-  );
-
-EFI_STATUS
-VmWriteMem64 (
-  IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
-  IN UINT64     Data
-  );
-
 STATIC
 UINT16
 VmReadCode16 (

@@ -24,44 +24,6 @@ Revision History
 #include "UsbMassStorage.h"
 #include "UsbMassStorageHelper.h"
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gUsbMassStorageComponentName;
-
-//
-// Prototypes
-// Driver model protocol interface
-//
-EFI_STATUS
-EFIAPI
-USBMassStorageDriverBindingEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
-EFI_STATUS
-EFIAPI
-USBFloppyDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-USBFloppyDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-USBFloppyDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
 //
 // Block I/O Protocol Interface
 //

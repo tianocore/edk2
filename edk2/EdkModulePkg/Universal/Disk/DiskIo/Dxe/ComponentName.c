@@ -20,27 +20,6 @@ Abstract:
 #include "DiskIo.h"
 
 //
-// EFI Component Name Functions
-//
-EFI_STATUS
-EFIAPI
-DiskIoComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-DiskIoComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
-//
 // EFI Component Name Protocol
 //
 EFI_COMPONENT_NAME_PROTOCOL     gDiskIoComponentName = {

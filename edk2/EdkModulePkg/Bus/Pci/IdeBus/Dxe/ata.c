@@ -23,43 +23,6 @@
 
 #include "idebus.h"
 
-
-EFI_STATUS
-AtaReadSectorsExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  OUT VOID        *DataBuffer,
-  IN  EFI_LBA         StartLba,
-  IN  UINTN           NumberOfBlocks
-  );
-
-EFI_STATUS
-AtaWriteSectorsExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  VOID            *DataBuffer,
-  IN  EFI_LBA         StartLba,
-  IN  UINTN           NumberOfBlocks
-  );
-
-EFI_STATUS
-AtaPioDataInExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  OUT VOID        *Buffer,
-  IN  UINT32          ByteCount,
-  IN  UINT8           AtaCommand,
-  IN  EFI_LBA         StartLba,
-  IN  UINT16          SectorCount
-  );
-
-EFI_STATUS
-AtaPioDataOutExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  VOID            *Buffer,
-  IN  UINT32          ByteCount,
-  IN  UINT8           AtaCommand,
-  IN  EFI_LBA         StartLba,
-  IN  UINT16          SectorCount
-  );
-
 /**
   Sends out an ATA Identify Command to the specified device.
 

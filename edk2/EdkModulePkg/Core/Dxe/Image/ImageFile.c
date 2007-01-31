@@ -25,15 +25,6 @@ Revision History
 
 #include <DxeMain.h>
 
-
-VOID
-CoreDevicePathToFileName (
-  IN  FILEPATH_DEVICE_PATH      *FilePath,
-  OUT CHAR16                    **String
-  );
-
-
-
 EFI_STATUS
 CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
@@ -431,67 +422,6 @@ Returns:
   }
   return Status;
 }
-
-
-VOID
-CoreDevicePathToFileName (
-  IN  FILEPATH_DEVICE_PATH      *FilePath,
-  OUT CHAR16                    **String
-  )
-/*++
-
-Routine Description:
-
-  Transfer a device's full path a string.
-
-Arguments:
-
-  FilePath      - Device path
-  
-  String        - The string represent the device's full path
-
-Returns:
-
-  None
-
---*/
-{
-  UINTN                     StringSize;
-  FILEPATH_DEVICE_PATH      *FilePathNode;
-  CHAR16                    *Str;
-
-  *String = NULL;
-  StringSize = 0;
-  FilePathNode = FilePath;
-  while (!IsDevicePathEnd (&FilePathNode->Header)) {
-
-    //
-    // For filesystem access each node should be a filepath component
-    //
-    if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
-        DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP) {
-
-      return;
-    }
-
-    StringSize += StrLen (FilePathNode->PathName);
-
-    FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header);
-  }
-
-  *String = CoreAllocateBootServicesPool (StringSize);
-  if (*String == NULL) {
-    return;
-  }
-
-  FilePathNode = FilePath;
-  Str = *String;
-  while (!IsDevicePathEnd (&FilePathNode->Header)) {
-    StrCat (Str, FilePathNode->PathName);
-    FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header);
-  }
-}
-
 
 BOOLEAN
 CoreGrowBuffer (
