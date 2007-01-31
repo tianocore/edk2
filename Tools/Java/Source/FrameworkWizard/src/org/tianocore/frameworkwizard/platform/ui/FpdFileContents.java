@@ -786,8 +786,23 @@ public class FpdFileContents {
             String[][] saa = new String[count][5];
             getLibraryInstances (key, saa);
             for (int i = 0; i < count; ++i) {
-                if (mg.equalsIgnoreCase(saa[i][1]) && mv.equalsIgnoreCase(saa[i][2]) && pg.equalsIgnoreCase(saa[i][3]) && pv.equalsIgnoreCase(saa[i][4])) {
+                if (mg.equalsIgnoreCase(saa[i][1]) && pg.equalsIgnoreCase(saa[i][3])) {
+                    boolean modVerMatch = false;
+                    boolean pkgVerMatch = false;
+                    if ((mv.equals("null") || saa[i][2] == null)) {
+                        modVerMatch = true;
+                    }
+                    if (pv.equals("null") || saa[i][4] == null) {
+                        pkgVerMatch = true;
+                    }
+                    if (modVerMatch && pkgVerMatch) {
                     return true;
+                }
+                    else {
+                        if (mv.equals(saa[i][2]) && pv.equals(saa[i][4])) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
