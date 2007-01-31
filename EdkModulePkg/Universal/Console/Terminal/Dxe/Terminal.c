@@ -23,34 +23,6 @@ Revision History:
 #include "Terminal.h"
 
 //
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-TerminalDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-TerminalDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-TerminalDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
-//
 // Globals
 //
 EFI_DRIVER_BINDING_PROTOCOL gTerminalDriverBinding = {

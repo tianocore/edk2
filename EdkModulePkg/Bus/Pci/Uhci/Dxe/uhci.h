@@ -285,6 +285,27 @@ typedef struct {
 extern EFI_DRIVER_BINDING_PROTOCOL  gUhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gUhciComponentName;
 
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+UhciComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
+  IN  CHAR8                           *Language,
+  OUT CHAR16                          **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+UhciComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
+  IN  CHAR8                           *Language,
+  OUT CHAR16                          **ControllerName
+  );
+
 EFI_STATUS
 WriteUHCCommandReg (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
@@ -2634,5 +2655,341 @@ Returns:
 
 --*/
 ;
+
+//
+// Prototypes
+// Driver model protocol interface
+//
+
+EFI_STATUS
+EFIAPI
+UHCIDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      Controller,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  );
+
+//
+// UHCI interface functions
+//
+
+EFI_STATUS
+EFIAPI
+UHCIReset (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  IN  UINT16                  Attributes
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIGetState (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  OUT EFI_USB_HC_STATE        *State
+  );
+
+EFI_STATUS
+EFIAPI
+UHCISetState (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  IN  EFI_USB_HC_STATE        State
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIControlTransfer (
+  IN       EFI_USB_HC_PROTOCOL        *This,
+  IN       UINT8                      DeviceAddress,
+  IN       BOOLEAN                    IsSlowDevice,
+  IN       UINT8                      MaximumPacketLength,
+  IN       EFI_USB_DEVICE_REQUEST     *Request,
+  IN       EFI_USB_DATA_DIRECTION     TransferDirection,
+  IN OUT   VOID                       *Data, OPTIONAL
+  IN OUT   UINTN                      *DataLength, OPTIONAL
+  IN       UINTN                      TimeOut,
+  OUT      UINT32                     *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIBulkTransfer (
+  IN       EFI_USB_HC_PROTOCOL     *This,
+  IN       UINT8                   DeviceAddress,
+  IN       UINT8                   EndPointAddress,
+  IN       UINT8                   MaximumPacketLength,
+  IN OUT   VOID                    *Data,
+  IN OUT   UINTN                   *DataLength,
+  IN OUT   UINT8                   *DataToggle,
+  IN       UINTN                   TimeOut,
+  OUT      UINT32                  *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIAsyncInterruptTransfer (
+  IN       EFI_USB_HC_PROTOCOL                * This,
+  IN       UINT8                              DeviceAddress,
+  IN       UINT8                              EndPointAddress,
+  IN       BOOLEAN                            IsSlowDevice,
+  IN       UINT8                              MaximumPacketLength,
+  IN       BOOLEAN                            IsNewTransfer,
+  IN OUT   UINT8                              *DataToggle,
+  IN       UINTN                              PollingInterval, OPTIONAL
+  IN       UINTN                              DataLength, OPTIONAL
+  IN       EFI_ASYNC_USB_TRANSFER_CALLBACK    CallBackFunction, OPTIONAL
+  IN       VOID                               *Context OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+UHCISyncInterruptTransfer (
+  IN       EFI_USB_HC_PROTOCOL     *This,
+  IN       UINT8                   DeviceAddress,
+  IN       UINT8                   EndPointAddress,
+  IN       BOOLEAN                 IsSlowDevice,
+  IN       UINT8                   MaximumPacketLength,
+  IN OUT   VOID                    *Data,
+  IN OUT   UINTN                   *DataLength,
+  IN OUT   UINT8                   *DataToggle,
+  IN       UINTN                   TimeOut,
+  OUT      UINT32                  *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIIsochronousTransfer (
+  IN       EFI_USB_HC_PROTOCOL     *This,
+  IN       UINT8                   DeviceAddress,
+  IN       UINT8                   EndPointAddress,
+  IN       UINT8                   MaximumPacketLength,
+  IN OUT   VOID                    *Data,
+  IN       UINTN                   DataLength,
+  OUT      UINT32                  *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIAsyncIsochronousTransfer (
+  IN       EFI_USB_HC_PROTOCOL                 * This,
+  IN       UINT8                               DeviceAddress,
+  IN       UINT8                               EndPointAddress,
+  IN       UINT8                               MaximumPacketLength,
+  IN OUT   VOID                                *Data,
+  IN       UINTN                               DataLength,
+  IN       EFI_ASYNC_USB_TRANSFER_CALLBACK     IsochronousCallBack,
+  IN       VOID                                *Context OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIGetRootHubPortNumber (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  OUT UINT8                   *PortNumber
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIGetRootHubPortStatus (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  IN  UINT8                   PortNumber,
+  OUT EFI_USB_PORT_STATUS     *PortStatus
+  );
+
+EFI_STATUS
+EFIAPI
+UHCISetRootHubPortFeature (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  IN  UINT8                   PortNumber,
+  IN  EFI_USB_PORT_FEATURE    PortFeature
+  );
+
+EFI_STATUS
+EFIAPI
+UHCIClearRootHubPortFeature (
+  IN  EFI_USB_HC_PROTOCOL     *This,
+  IN  UINT8                   PortNumber,
+  IN  EFI_USB_PORT_FEATURE    PortFeature
+  );
+
+//
+// UEFI 2.0 Protocol
+//
+
+EFI_STATUS
+EFIAPI
+UHCI2GetCapability(
+  IN  EFI_USB2_HC_PROTOCOL  * This,
+  OUT UINT8                 *MaxSpeed,
+  OUT UINT8                 *PortNumber,
+  OUT UINT8                 *Is64BitCapable
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2Reset (
+  IN EFI_USB2_HC_PROTOCOL   * This,
+  IN UINT16                 Attributes
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2GetState (
+  IN  EFI_USB2_HC_PROTOCOL   * This,
+  OUT EFI_USB_HC_STATE       * State
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2SetState (
+  IN EFI_USB2_HC_PROTOCOL   * This,
+  IN EFI_USB_HC_STATE       State
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2ControlTransfer (
+  IN     EFI_USB2_HC_PROTOCOL      * This,
+  IN     UINT8                     DeviceAddress,
+  IN     UINT8                     DeviceSpeed,
+  IN     UINTN                     MaximumPacketLength,
+  IN     EFI_USB_DEVICE_REQUEST    * Request,
+  IN     EFI_USB_DATA_DIRECTION    TransferDirection,
+  IN OUT VOID                      *Data, OPTIONAL
+  IN OUT UINTN                     *DataLength, OPTIONAL
+  IN     UINTN                     TimeOut,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR            *Translator,
+  OUT    UINT32                    *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2BulkTransfer (
+  IN     EFI_USB2_HC_PROTOCOL   * This,
+  IN     UINT8                  DeviceAddress,
+  IN     UINT8                  EndPointAddress,
+  IN     UINT8                  DeviceSpeed,
+  IN     UINTN                  MaximumPacketLength,
+  IN     UINT8                  DataBuffersNumber,
+  IN OUT VOID                   *Data[EFI_USB_MAX_BULK_BUFFER_NUM],
+  IN OUT UINTN                  *DataLength,
+  IN OUT UINT8                  *DataToggle,
+  IN     UINTN                  TimeOut,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR            *Translator,
+  OUT    UINT32                 *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2AsyncInterruptTransfer (
+  IN     EFI_USB2_HC_PROTOCOL   * This,
+  IN     UINT8                  DeviceAddress,
+  IN     UINT8                  EndPointAddress,
+  IN     UINT8                  DeviceSpeed,
+  IN     UINTN                  MaximumPacketLength,
+  IN     BOOLEAN                IsNewTransfer,
+  IN OUT UINT8                  *DataToggle,
+  IN     UINTN                  PollingInterval, OPTIONAL
+  IN     UINTN                  DataLength, OPTIONAL
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR            *Translator,
+  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK               CallBackFunction, OPTIONAL
+  IN     VOID                   *Context OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2SyncInterruptTransfer (
+  IN     EFI_USB2_HC_PROTOCOL   * This,
+  IN     UINT8                  DeviceAddress,
+  IN     UINT8                  EndPointAddress,
+  IN     UINT8                  DeviceSpeed,
+  IN     UINTN                  MaximumPacketLength,
+  IN OUT VOID                   *Data,
+  IN OUT UINTN                  *DataLength,
+  IN OUT UINT8                  *DataToggle,
+  IN     UINTN                  TimeOut,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR           *Translator,
+  OUT    UINT32                 *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2IsochronousTransfer (
+  IN     EFI_USB2_HC_PROTOCOL   * This,
+  IN     UINT8                  DeviceAddress,
+  IN     UINT8                  EndPointAddress,
+  IN     UINT8                  DeviceSpeed,
+  IN     UINTN                  MaximumPacketLength,
+  IN     UINT8                  DataBuffersNumber,
+  IN OUT VOID                   *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
+  IN     UINTN                  DataLength,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR           *Translator,
+  OUT    UINT32                 *TransferResult
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2AsyncIsochronousTransfer (
+  IN     EFI_USB2_HC_PROTOCOL   * This,
+  IN     UINT8                  DeviceAddress,
+  IN     UINT8                  EndPointAddress,
+  IN     UINT8                  DeviceSpeed,
+  IN     UINTN                  MaximumPacketLength,
+  IN     UINT8                  DataBuffersNumber,
+  IN OUT VOID                   *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
+  IN     UINTN                  DataLength,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR           *Translator,
+  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK              IsochronousCallBack,
+  IN     VOID                   *Context OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2GetRootHubPortStatus (
+  IN  EFI_USB2_HC_PROTOCOL   * This,
+  IN  UINT8                  PortNumber,
+  OUT EFI_USB_PORT_STATUS    * PortStatus
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2SetRootHubPortFeature (
+  IN EFI_USB2_HC_PROTOCOL    * This,
+  IN UINT8                   PortNumber,
+  IN EFI_USB_PORT_FEATURE    PortFeature
+  );
+
+EFI_STATUS
+EFIAPI
+UHCI2ClearRootHubPortFeature (
+  IN EFI_USB2_HC_PROTOCOL    * This,
+  IN UINT8                   PortNumber,
+  IN EFI_USB_PORT_FEATURE    PortFeature
+  );
+
+//
+// Asynchronous interrupt transfer monitor function
+//
+VOID
+EFIAPI
+MonitorInterruptTrans (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  );
 
 #endif

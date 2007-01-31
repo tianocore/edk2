@@ -108,6 +108,7 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   },
 };
 
+STATIC
 EFI_STATUS
 InitializeBinaryStructures (
   IN  EFI_HII_HANDLE                           *Handle,
@@ -118,12 +119,14 @@ InitializeBinaryStructures (
   EFI_FILE_FORM_TAGS                           **FileFormTagsHead
   );
 
+STATIC
 EFI_STATUS
 InitializeTagStructures (
   IN  EFI_IFR_BINARY                            *BinaryData,
   OUT EFI_FILE_FORM_TAGS                        *FileFormTags
   );
 
+STATIC
 UI_MENU_OPTION        *
 DisplayHomePage (
   IN UINTN                                    NumberOfIfrImages,
@@ -131,6 +134,7 @@ DisplayHomePage (
   IN UINT8                                    *CallbackData
   );
 
+STATIC
 EFI_STATUS
 GetIfrBinaryData (
   IN EFI_HII_PROTOCOL *Hii,
@@ -139,6 +143,7 @@ GetIfrBinaryData (
   IN EFI_IFR_BINARY   *BinaryData
   );
 
+STATIC
 EFI_STATUS
 InstallPrint (
   VOID
@@ -759,6 +764,7 @@ Returns:
   return ;
 }
 
+STATIC
 EFI_STATUS
 InitializeTagStructures (
   IN  EFI_IFR_BINARY                            *BinaryData,
@@ -1706,6 +1712,7 @@ PopulateHomePage (
   return Status;
 }
 
+STATIC
 UI_MENU_OPTION *
 DisplayHomePage (
   IN UINTN                                    NumberOfIfrImages,
@@ -1733,6 +1740,7 @@ DisplayHomePage (
   return Selection;
 }
 
+STATIC
 EFI_STATUS
 InitializeBinaryStructures (
   IN  EFI_HII_HANDLE                        *Handle,
@@ -2044,6 +2052,7 @@ InitializeBinaryStructures (
   return Status;
 }
 
+STATIC
 EFI_STATUS
 GetIfrBinaryData (
   IN      EFI_HII_PROTOCOL *Hii,
@@ -2204,6 +2213,7 @@ Returns:
 EFI_HANDLE          PrintHandle     = NULL;
 EFI_PRINT_PROTOCOL  mPrintProtocol  = { UnicodeVSPrint };
 
+STATIC
 EFI_STATUS
 InstallPrint (
   VOID

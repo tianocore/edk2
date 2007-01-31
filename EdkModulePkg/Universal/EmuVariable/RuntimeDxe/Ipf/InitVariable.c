@@ -24,7 +24,6 @@ Revision History
 //
 // Don't use module globals after the SetVirtualAddress map is signaled
 //
-extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
 
 STATIC
 SAL_RETURN_REGS

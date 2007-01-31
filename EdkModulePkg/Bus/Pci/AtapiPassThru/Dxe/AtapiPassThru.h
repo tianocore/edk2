@@ -236,6 +236,53 @@ typedef struct {
 //
 // function prototype
 //
+
+EFI_STATUS
+EFIAPI
+AtapiScsiPassThruDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+AtapiScsiPassThruDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+AtapiScsiPassThruDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      Controller,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+AtapiScsiPassThruComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+AtapiScsiPassThruComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 /**
   AtapiScsiPassThruDriverEntryPoint
 

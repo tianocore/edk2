@@ -19,29 +19,6 @@ Abstract:
 
 #include "cbi.h"
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gUsbCbi0DriverBinding;
-
-//
-// EFI Component Name Functions
-//
-EFI_STATUS
-EFIAPI
-UsbCbi0ComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-UsbCbi0ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
 //
 // EFI Component Name Protocol
 //

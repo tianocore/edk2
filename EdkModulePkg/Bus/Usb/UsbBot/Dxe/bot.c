@@ -21,44 +21,6 @@ Abstract:
 
 GLOBAL_REMOVE_IF_UNREFERENCED UINT32     gBOTDebugLevel  = EFI_D_INFO;
 GLOBAL_REMOVE_IF_UNREFERENCED UINT32     gBOTErrorLevel  = EFI_D_INFO;
-//
-// Function prototypes
-//
-EFI_STATUS
-EFIAPI
-UsbBotDriverEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
-//
-// Bot Driver Binding Protocol
-//
-EFI_STATUS
-EFIAPI
-BotDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-BotDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-BotDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     ControllerHandle,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
 
 EFI_DRIVER_BINDING_PROTOCOL   gUsbBotDriverBinding = {
   BotDriverBindingSupported,
@@ -124,6 +86,7 @@ BotMassStorageReset (
   IN  BOOLEAN                   ExtendedVerification
   );
 
+STATIC
 VOID
 BotReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
@@ -979,6 +942,7 @@ BotMassStorageReset (
   return Status;
 }
 
+STATIC
 VOID
 BotReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,

@@ -94,6 +94,7 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
 //
 // Internal prototypes
 //
+STATIC
 VOID 
 PromoteMemoryResource (
   VOID
@@ -175,6 +176,7 @@ Returns:
   CoreReleaseLock (&gMemoryLock);
 }
 
+STATIC
 VOID
 PromoteMemoryResource (
   VOID

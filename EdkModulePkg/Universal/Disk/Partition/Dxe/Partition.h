@@ -77,6 +77,55 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gPartitionComponentName;
                                    (((UINT8 *) a)[2] << 16) |    \
                                    (((UINT8 *) a)[3] << 24) )
 
+//
+// Function Prototypes
+//
+EFI_STATUS
+EFIAPI
+PartitionDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PartitionDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+PartitionDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+PartitionComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+PartitionComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 EFI_STATUS
 PartitionInstallChildHandle (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,

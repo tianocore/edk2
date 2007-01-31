@@ -25,41 +25,6 @@ Abstract:
 #include "Partition.h"
 
 //
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-PartitionEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
-
-EFI_STATUS
-EFIAPI
-PartitionDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PartitionDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PartitionDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN  EFI_HANDLE                   ControllerHandle,
-  IN  UINTN                        NumberOfChildren,
-  IN  EFI_HANDLE                   *ChildHandleBuffer
-  );
-
-//
 // Partition Driver Global Variables
 //
 EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {

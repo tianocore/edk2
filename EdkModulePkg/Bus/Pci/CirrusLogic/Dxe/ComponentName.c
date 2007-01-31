@@ -13,27 +13,6 @@
 #include "CirrusLogic5430.h"
 
 //
-// EFI Component Name Functions
-//
-EFI_STATUS
-EFIAPI
-CirrusLogic5430ComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-CirrusLogic5430ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
-//
 // EFI Component Name Protocol
 //
 EFI_COMPONENT_NAME_PROTOCOL     gCirrusLogic5430ComponentName = {

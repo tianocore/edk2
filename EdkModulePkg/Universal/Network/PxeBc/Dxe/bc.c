@@ -18,34 +18,6 @@ Abstract:
 #include "Bc.h"
 
 //
-//
-//
-EFI_STATUS
-EFIAPI
-PxeBcDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PxeBcDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-PxeBcDriverStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
-  );
-
-//
 // helper routines
 //
 VOID

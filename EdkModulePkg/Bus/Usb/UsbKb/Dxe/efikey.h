@@ -117,4 +117,34 @@ typedef struct {
   UINT8 ScrollLock : 1;
   UINT8 Resrvd : 5;
 } LED_MAP;
+
+//
+// Prototypes
+// Driver model protocol interface
+//
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN  EFI_HANDLE                     Controller,
+  IN  UINTN                          NumberOfChildren,
+  IN  EFI_HANDLE                     *ChildHandleBuffer
+  );
+
 #endif

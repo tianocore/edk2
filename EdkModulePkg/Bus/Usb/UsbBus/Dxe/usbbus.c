@@ -34,36 +34,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED    UINTN    gUSBErrorLevel  = EFI_D_ERROR;
 //
 STATIC EFI_GUID             mUsbBusProtocolGuid = EFI_USB_BUS_PROTOCOL_GUID;
 
-
-
-//
-// EFI_DRIVER_BINDING_PROTOCOL Protocol Interface
-//
-EFI_STATUS
-EFIAPI
-UsbBusControllerDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-UsbBusControllerDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-UsbBusControllerDriverStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      Controller,
-  IN UINTN                           NumberOfChildren,
-  IN EFI_HANDLE                      *ChildHandleBuffer
-  );
-
 EFI_DRIVER_BINDING_PROTOCOL gUsbBusDriverBinding = {
   UsbBusControllerDriverSupported,
   UsbBusControllerDriverStart,
@@ -154,6 +124,7 @@ ReleasePortToCHC (
   UINT8                     PortNum
   );
 
+STATIC
 EFI_STATUS
 ResetRootPort (
   IN USB_BUS_CONTROLLER_DEVICE *UsbBusDev,
@@ -161,6 +132,7 @@ ResetRootPort (
   IN UINT8                     RetryTimes
   );
 
+STATIC
 EFI_STATUS
 ResetHubPort (
   IN USB_IO_CONTROLLER_DEVICE    *UsbIoController,
@@ -2341,6 +2313,7 @@ UsbPortReset (
   return ParentPortReset (UsbIoController, TRUE, 0);
 }
 
+STATIC
 EFI_STATUS
 ResetRootPort (
   IN USB_BUS_CONTROLLER_DEVICE *UsbBusDev,
@@ -2433,6 +2406,7 @@ ResetRootPort (
   return EFI_SUCCESS;
 }
 
+STATIC
 EFI_STATUS
 ResetHubPort (
   IN USB_IO_CONTROLLER_DEVICE    *UsbIoController,

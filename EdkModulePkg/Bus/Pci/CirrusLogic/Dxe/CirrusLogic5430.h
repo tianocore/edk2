@@ -62,6 +62,19 @@ typedef struct {
   UINT8                                 *LineBuffer;
 } CIRRUS_LOGIC_5430_PRIVATE_DATA;
 
+///
+/// Video Mode structure
+///
+typedef struct {
+  UINT32  Width;
+  UINT32  Height;
+  UINT32  ColorDepth;
+  UINT32  RefreshRate;
+  UINT8   *CrtcSettings;
+  UINT16  *SeqSettings;
+  UINT8   MiscSetting;
+} CIRRUS_LOGIC_5430_VIDEO_MODES;
+
 #define CIRRUS_LOGIC_5430_PRIVATE_DATA_FROM_UGA_DRAW_THIS(a) \
   CR(a, CIRRUS_LOGIC_5430_PRIVATE_DATA, UgaDraw, CIRRUS_LOGIC_5430_PRIVATE_DATA_SIGNATURE)
 
@@ -199,5 +212,80 @@ CirrusLogic5430ControllerDriverStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
 ;
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+CirrusLogic5430ComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+CirrusLogic5430ComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
+//
+// Local Function Prototypes
+//
+VOID
+InitializeGraphicsMode (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  CIRRUS_LOGIC_5430_VIDEO_MODES   *ModeData
+  );
+
+VOID
+SetPaletteColor (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  UINTN                           Index,
+  UINT8                           Red,
+  UINT8                           Green,
+  UINT8                           Blue
+  );
+
+VOID
+SetDefaultPalette (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
+  );
+
+VOID
+DrawLogo (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
+  );
+
+VOID
+outb (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  UINTN                           Address,
+  UINT8                           Data
+  );
+
+VOID
+outw (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  UINTN                           Address,
+  UINT16                          Data
+  );
+
+UINT8
+inb (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  UINTN                           Address
+  );
+
+UINT16
+inw (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
+  UINTN                           Address
+  );
 
 #endif

@@ -131,6 +131,7 @@ CreateGuidedExtractionRpnEvent (
   IN CORE_SECTION_CHILD_NODE                  *ChildNode
   );
 
+STATIC
 EFI_STATUS
 EFIAPI
 OpenSectionStream (
@@ -140,6 +141,7 @@ OpenSectionStream (
      OUT UINTN                                *SectionStreamHandle
   );
   
+STATIC
 EFI_STATUS
 EFIAPI
 GetSection (
@@ -153,6 +155,7 @@ GetSection (
   OUT UINT32                                  *AuthenticationStatus
   );
   
+STATIC
 EFI_STATUS
 EFIAPI
 CloseSectionStream (
@@ -262,7 +265,7 @@ Returns:
   return Status;
 }
 
-
+STATIC
 EFI_STATUS
 EFIAPI
 OpenSectionStream (
@@ -308,7 +311,7 @@ Returns:
           );
 }
   
-
+STATIC
 EFI_STATUS
 EFIAPI
 GetSection (
@@ -451,7 +454,7 @@ GetSection_Done:
 }
 
 
-
+STATIC
 EFI_STATUS
 EFIAPI
 CloseSectionStream (

@@ -21,6 +21,7 @@ Abstract:
 
 #include <PeiMain.h>
 
+STATIC
 EFI_STATUS
 EFIAPI
 SecurityPpiNotifyCallback (
@@ -63,6 +64,7 @@ Returns:
   return;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 SecurityPpiNotifyCallback (

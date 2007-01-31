@@ -101,11 +101,13 @@ FV_FILEPATH_DEVICE_PATH mFvDevicePath;
 //
 // Function Prototypes
 //
+STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
   );
  
+STATIC
 VOID
 EFIAPI
 CoreFwVolEventProtocolNotify (
@@ -113,6 +115,7 @@ CoreFwVolEventProtocolNotify (
   IN  VOID            *Context
   );
 
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
   IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
@@ -523,7 +526,7 @@ Returns:
   return ReturnStatus;
 }
 
-
+STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
@@ -664,7 +667,7 @@ Returns:
 
 
 
-
+STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
   IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
@@ -858,7 +861,7 @@ Returns:
   return Status;
 }
 
-
+STATIC
 VOID
 EFIAPI
 CoreFwVolEventProtocolNotify (

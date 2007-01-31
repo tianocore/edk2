@@ -44,6 +44,7 @@
   @return               Always return EFI_SUCCESS.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
@@ -100,6 +101,7 @@ DXE_STATUS_CODE_CONTROLLER gDxeStatusCode = {
   @return               Always return EFI_SUCCESS.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 ReportDispatcher (

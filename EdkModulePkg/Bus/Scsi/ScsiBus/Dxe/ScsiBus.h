@@ -58,6 +58,52 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gScsiBusComponentName;
 
 EFI_STATUS
 EFIAPI
+SCSIBusDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+SCSIBusDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+SCSIBusDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      Controller,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+ScsiBusComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+ScsiBusComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
+EFI_STATUS
+EFIAPI
 ScsiGetDeviceType (
   IN  EFI_SCSI_IO_PROTOCOL     *This,
   OUT UINT8                    *DeviceType

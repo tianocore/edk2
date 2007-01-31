@@ -19,31 +19,6 @@ Abstract:
 
 #include "ScsiDisk.h"
 
-EFI_STATUS
-EFIAPI
-ScsiDiskDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-ScsiDiskDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-ScsiDiskDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
-  );
-
 EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
   ScsiDiskDriverBindingSupported,
   ScsiDiskDriverBindingStart,

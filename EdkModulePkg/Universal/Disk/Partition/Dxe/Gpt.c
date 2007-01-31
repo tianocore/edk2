@@ -22,6 +22,7 @@ Abstract:
 
 #include "Partition.h"
 
+STATIC
 BOOLEAN
 PartitionValidGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -30,6 +31,7 @@ PartitionValidGptTable (
   OUT EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
+STATIC
 BOOLEAN
 PartitionCheckGptEntryArrayCRC (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -37,6 +39,7 @@ PartitionCheckGptEntryArrayCRC (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
+STATIC
 BOOLEAN
 PartitionRestoreGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -44,6 +47,7 @@ PartitionRestoreGptTable (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
+STATIC
 VOID
 PartitionCheckGptEntry (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
@@ -51,6 +55,7 @@ PartitionCheckGptEntry (
   OUT EFI_PARTITION_ENTRY_STATUS  *PEntryStatus
   );
 
+STATIC
 BOOLEAN
 PartitionCheckCrcAltSize (
   IN UINTN                 MaxSize,
@@ -58,18 +63,21 @@ PartitionCheckCrcAltSize (
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
+STATIC
 BOOLEAN
 PartitionCheckCrc (
   IN UINTN                 MaxSize,
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
+STATIC
 VOID
 PartitionSetCrcAltSize (
   IN UINTN                 Size,
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
+STATIC
 VOID
 PartitionSetCrc (
   IN OUT EFI_TABLE_HEADER *Hdr
@@ -320,6 +328,7 @@ Done:
   return GptValid;
 }
 
+STATIC
 BOOLEAN
 PartitionValidGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -391,6 +400,7 @@ Returns:
   return TRUE;
 }
 
+STATIC
 BOOLEAN
 PartitionCheckGptEntryArrayCRC (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -457,6 +467,7 @@ Returns:
   return (BOOLEAN) (PartHeader->PartitionEntryArrayCRC32 == Crc);
 }
 
+STATIC
 BOOLEAN
 PartitionRestoreGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -554,6 +565,7 @@ Done:
   return TRUE;
 }
 
+STATIC
 VOID
 PartitionCheckGptEntry (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
@@ -622,6 +634,7 @@ Returns:
   DEBUG ((EFI_D_INFO, " End check partition entries\n"));
 }
 
+STATIC
 VOID
 PartitionSetCrc (
   IN OUT EFI_TABLE_HEADER *Hdr
@@ -645,6 +658,7 @@ Returns:
   PartitionSetCrcAltSize (Hdr->HeaderSize, Hdr);
 }
 
+STATIC
 VOID
 PartitionSetCrcAltSize (
   IN UINTN                 Size,
@@ -674,6 +688,7 @@ Returns:
   Hdr->CRC32 = Crc;
 }
 
+STATIC
 BOOLEAN
 PartitionCheckCrc (
   IN UINTN                 MaxSize,
@@ -699,6 +714,7 @@ Returns:
   return PartitionCheckCrcAltSize (MaxSize, Hdr->HeaderSize, Hdr);
 }
 
+STATIC
 BOOLEAN
 PartitionCheckCrcAltSize (
   IN UINTN                 MaxSize,

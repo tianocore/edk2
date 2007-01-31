@@ -45,6 +45,7 @@ Abstract:
   @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 StartGauge (
@@ -78,6 +79,7 @@ StartGauge (
   @retval EFI_NOT_FOUND           The specified measurement record could not be found.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 EndGauge (
@@ -105,6 +107,7 @@ EndGauge (
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL. 
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 GetGauge (
@@ -202,6 +205,7 @@ InternalSearchForGaugeEntry (
   @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 StartGauge (
@@ -284,6 +288,7 @@ StartGauge (
   @retval EFI_NOT_FOUND           The specified measurement record could not be found.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 EndGauge (
@@ -328,6 +333,7 @@ EndGauge (
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL. 
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 GetGauge (

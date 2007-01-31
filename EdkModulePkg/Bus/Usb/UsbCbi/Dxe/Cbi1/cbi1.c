@@ -20,15 +20,6 @@ Abstract:
 
 #include "cbi.h"
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gUsbCbi1ComponentName;
-
-EFI_STATUS
-EFIAPI
-UsbCBI1DriverEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
 //
 // CBI Function prototypes
 //
@@ -107,6 +98,7 @@ CBI1DriverBindingStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
+STATIC
 VOID
 Cbi1ReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
@@ -827,6 +819,7 @@ CBI1AtapiCommand (
   return EFI_DEVICE_ERROR;
 }
 
+STATIC
 VOID
 Cbi1ReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,

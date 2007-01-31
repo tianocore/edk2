@@ -23,6 +23,7 @@ Revision History
 
 #include <PeiMain.h>
 
+STATIC
 VOID *
 TransferOldDataToNewDataRange (
   IN PEI_CORE_INSTANCE        *PrivateData
@@ -506,7 +507,7 @@ Returns:
   return Runnable;
 }
 
-
+STATIC
 VOID *
 TransferOldDataToNewDataRange (
   IN PEI_CORE_INSTANCE        *PrivateData

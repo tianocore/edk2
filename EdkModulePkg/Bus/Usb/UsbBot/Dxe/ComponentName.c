@@ -20,27 +20,6 @@ Abstract:
 #include "bot.h"
 
 //
-// EFI Component Name Functions
-//
-EFI_STATUS
-EFIAPI
-UsbBotComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-UsbBotComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
-//
 // EFI Component Name Protocol
 //
 EFI_COMPONENT_NAME_PROTOCOL     gUsbBotComponentName = {

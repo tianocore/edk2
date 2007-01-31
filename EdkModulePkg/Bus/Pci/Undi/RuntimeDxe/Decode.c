@@ -25,13 +25,6 @@ Revision history:
 #pragma data_seg("rtdata")
 
 //
-// Global variables defined outside this file
-//
-extern PXE_SW_UNDI  *pxe;     // !pxe structure
-extern PXE_SW_UNDI  *pxe_31;  // !pxe structure for 3.1 drivers
-extern UNDI32_DEV   *UNDI32DeviceList[MAX_NIC_INTERFACES];
-
-//
 // Global variables defined in this file
 //
 UNDI_CALL_TABLE api_table[PXE_OPCODE_LAST_VALID+1] = { \

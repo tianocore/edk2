@@ -12,31 +12,6 @@
 
 #include "AtapiPassThru.h"
 
-EFI_STATUS
-EFIAPI
-AtapiScsiPassThruDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-AtapiScsiPassThruDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-AtapiScsiPassThruDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
-  );
-
 ///
 /// IDE registers' fixed address
 ///

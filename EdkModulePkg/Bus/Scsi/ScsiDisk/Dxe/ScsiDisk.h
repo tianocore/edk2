@@ -65,6 +65,52 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gScsiDiskComponentName;
 
 EFI_STATUS
 EFIAPI
+ScsiDiskDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+ScsiDiskDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+ScsiDiskDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      Controller,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+ScsiDiskComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+ScsiDiskComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
+EFI_STATUS
+EFIAPI
 ScsiDiskReset (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  BOOLEAN                 ExtendedVerification

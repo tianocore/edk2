@@ -21,31 +21,6 @@ Revision History
 
 #include "ScsiBus.h"
 
-EFI_STATUS
-EFIAPI
-SCSIBusDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-SCSIBusDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-EFIAPI
-SCSIBusDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
-  );
-
 EFI_DRIVER_BINDING_PROTOCOL gSCSIBusDriverBinding = {
   SCSIBusDriverBindingSupported,
   SCSIBusDriverBindingStart,

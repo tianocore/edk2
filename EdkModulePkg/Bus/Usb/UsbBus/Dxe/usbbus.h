@@ -176,6 +176,55 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gUsbBusComponentName;
 extern EFI_GUID                     gUSBBusDriverGuid;
 
 //
+// EFI_DRIVER_BINDING_PROTOCOL Protocol Interface
+//
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN UINTN                           NumberOfChildren,
+  IN EFI_HANDLE                      *ChildHandleBuffer
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+UsbBusComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
+  IN  CHAR8                           *Language,
+  OUT CHAR16                          **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+UsbBusComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
+  IN  CHAR8                           *Language,
+  OUT CHAR16                          **ControllerName
+  );
+
+//
 // Usb Device Configuration functions
 //
 BOOLEAN

@@ -121,6 +121,29 @@ SNP_DRIVER;
 extern EFI_COMPONENT_NAME_PROTOCOL  gSimpleNetworkComponentName;
 extern EFI_DRIVER_BINDING_PROTOCOL  gSimpleNetworkDriverBinding;
 
+extern EFI_PCI_IO_PROTOCOL          *mPciIoFncs;
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+SimpleNetworkComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+SimpleNetworkComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
 //
 //  Virtual to physical mapping for all UNDI 3.0s.
 //

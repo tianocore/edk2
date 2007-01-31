@@ -94,6 +94,11 @@ typedef VOID (*map_mem)(UINT64, UINT64, UINT32, UINT32, UINT64);
 typedef VOID (*unmap_mem)(UINT64, UINT64, UINT32, UINT32, UINT64);
 typedef VOID (*sync_mem)(UINT64, UINT64, UINT32, UINT32, UINT64);
 
+extern UNDI_CALL_TABLE  api_table[];
+extern PXE_SW_UNDI      *pxe;     // !pxe structure
+extern PXE_SW_UNDI      *pxe_31;  // !pxe structure for 3.1 drivers
+extern UNDI32_DEV       *UNDI32DeviceList[MAX_NIC_INTERFACES];
+
 //
 // functions defined in e100b.c
 //
@@ -158,6 +163,63 @@ VOID FindPhySpeedAndDpx (NIC_DATA_INSTANCE *AdapterInfo, UINT32 PhyId);
 //
 // functions defined in init.c
 //
+EFI_STATUS
+InstallConfigTable (
+  IN VOID
+  );
+
+EFI_STATUS
+EFIAPI
+InitializeUNDIDriver (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  );
+
+VOID
+UNDI_notify_virtual (
+  EFI_EVENT event,
+  VOID      *context
+  );
+
+VOID
+EFIAPI
+UndiNotifyExitBs (
+  EFI_EVENT Event,
+  VOID      *Context
+  );
+
+EFI_STATUS
+EFIAPI
+UndiDriverSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UndiDriverStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+UndiDriverStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN  EFI_HANDLE                     Controller,
+  IN  UINTN                          NumberOfChildren,
+  IN  EFI_HANDLE                     *ChildHandleBuffer
+  );
+
+EFI_STATUS
+AppendMac2DevPath (
+  IN OUT  EFI_DEVICE_PATH_PROTOCOL **DevPtr,
+  IN      EFI_DEVICE_PATH_PROTOCOL *BaseDevPtr,
+  IN      NIC_DATA_INSTANCE        *AdapterInfo
+  );
+
 VOID
 TmpDelay (
   IN UINT64 UnqId,

@@ -74,6 +74,7 @@
     <Filename SupArchList="IPF">Ipf/SwitchToCacheMode.c</Filename>
     <Filename SupArchList="IPF">Ipf/IpfCpuCore.i</Filename>
     <Filename SupArchList="IPF">Ipf/IpfCpuCore.s</Filename>
+    <Filename SupArchList="IPF">Ipf/IpfPeiMain.h</Filename>
     <Filename SupArchList="IPF">Ipf/Stack.c</Filename>
     <Filename SupArchList="IA32 X64 EBC">Dispatcher/Stack.c</Filename>
   </SourceFiles>
