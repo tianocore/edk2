@@ -59,37 +59,6 @@ DxeSalLibInitialize (
   return EFI_SUCCESS;
 }
 
-STATIC
-VOID
-EFIAPI
-DxeSalVirtualNotifyEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-/*++
-
-Routine Description:
-
-  Fixup virtual address pointer of label.
-
-Arguments:
-
-  Event   - The Event that is being processed
-
-  Context - Event Context
-
-Returns:
-
-  None
-
---*/
-{
-  EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
-  EfiConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
-
-  SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
-}
-
 EFI_STATUS
 EFIAPI
 RegisterEsalFunction (
