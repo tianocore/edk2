@@ -116,6 +116,13 @@ ConSpliterConsoleControlSetMode (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Judge current mode with wanted mode at first.
+  // 
+  if (Private->ConsoleOutputMode == Mode) {
+    return EFI_SUCCESS;
+  }
+
   Supported   = FALSE;
   TextAndGop  = &Private->TextOutList[0];
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++, TextAndGop++) {
