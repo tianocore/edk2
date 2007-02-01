@@ -29,7 +29,7 @@ Revision History
 //
 #define EFI_PEI_CORE_PRIVATE_GUID  \
   {0xd641a0f5, 0xcb7c, 0x4846, { 0xa3, 0x80, 0x1d, 0x01, 0xb4, 0xd9, 0xe3, 0xb9 } }
-
+ 
 //
 // Pei Core private data structures
 //
@@ -118,6 +118,38 @@ typedef union {
   EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor;
   VOID                         *Raw;
 } PEI_CORE_TEMP_POINTERS;
+
+
+//
+// PeiCore function
+//
+EFI_STATUS
+EFIAPI
+PeiCore (
+  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
+  IN VOID                        *Data
+  )
+/*++
+
+Routine Description:
+
+  The entry routine to Pei Core, invoked by PeiMain during transition
+  from SEC to PEI. After switching stack in the PEI core, it will restart
+  with the old core data.
+
+Arguments:
+
+  PeiStartupDescriptor - Information and services provided by SEC phase.
+  OldCoreData          - Pointer to old core data that is used to initialize the
+                         core's data areas.
+
+Returns:
+
+  This function never returns
+  EFI_NOT_FOUND        - Never reach
+
+--*/
+;
 
 //
 // Dispatcher support functions
