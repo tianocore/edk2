@@ -415,8 +415,19 @@ BuildPcdDatabase (
   )
 ;
 
+SKU_ID *
+GetSkuIdArray (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  IN    PEI_PCD_DATABASE  *Database
+  )
+;
 
-
+UINTN
+GetSizeTableIndex (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  IN    PEI_PCD_DATABASE  *Database
+  )
+;
 
 UINTN
 GetPtrTypeSize (

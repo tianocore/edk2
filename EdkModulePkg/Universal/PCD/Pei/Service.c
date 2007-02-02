@@ -652,7 +652,7 @@ GetPcdDatabase (
 }
 
 
-STATIC
+
 SKU_ID *
 GetSkuIdArray (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -673,7 +673,7 @@ GetSkuIdArray (
 }
 
 
-STATIC
+
 UINTN
 GetSizeTableIndex (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -725,135 +725,4 @@ GetSizeTableIndex (
   }
 
   return SizeTableIdx;
-}
-
-
-
-
-UINTN
-GetPtrTypeSize (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  OUT   UINTN             *MaxSize,
-  IN    PEI_PCD_DATABASE  *Database
-  )
-{
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SKU_ID      *SkuIdTable;
-  SIZE_INFO   *SizeTable;
-  UINTN       i;
-
-  SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
-
-  LocalTokenNumber = Database->Init.LocalTokenNumberTable[LocalTokenNumberTableIdx];
-
-  ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
-  
-  SizeTable = Database->Init.SizeTable;
-
-  *MaxSize = SizeTable[SizeTableIdx];
-  //
-  // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
-  // PCD entry.
-  //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
-      //
-      // We have only one entry for VPD enabled PCD entry:
-      // 1) MAX Size.
-      // We consider current size is equal to MAX size.
-      //
-      return *MaxSize;
-  } else {
-    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
-      //
-      // We have only two entry for Non-Sku enabled PCD entry:
-      // 1) MAX SIZE
-      // 2) Current Size
-      //
-      return SizeTable[SizeTableIdx + 1];
-    } else {
-      //
-      // We have these entry for SKU enabled PCD entry
-      // 1) MAX SIZE
-      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
-      //
-      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == Database->Init.SystemSkuId) {
-          return SizeTable[SizeTableIdx + 1 + i];
-        }
-      }
-      return SizeTable[SizeTableIdx + 1];
-    }
-  }
-}
-
-
-
-BOOLEAN
-SetPtrTypeSize (
-  IN          UINTN             LocalTokenNumberTableIdx,
-  IN    OUT   UINTN             *CurrentSize,
-  IN          PEI_PCD_DATABASE  *Database
-  )
-{
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SKU_ID      *SkuIdTable;
-  SIZE_INFO   *SizeTable;
-  UINTN       i;
-  UINTN       MaxSize;
-  
-  SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
-
-  LocalTokenNumber = Database->Init.LocalTokenNumberTable[LocalTokenNumberTableIdx];
-
-  ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
-  
-  SizeTable = Database->Init.SizeTable;
-
-  MaxSize = SizeTable[SizeTableIdx];
-  //
-  // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
-  // PCD entry.
-  //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
-      //
-      // We shouldn't come here as we don't support SET for VPD
-      //
-      ASSERT (FALSE);
-      return FALSE;
-  } else {
-    if ((*CurrentSize > MaxSize) ||
-      (*CurrentSize == MAX_ADDRESS)) {
-       *CurrentSize = MaxSize;
-       return FALSE;
-    } 
-    
-    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
-      //
-      // We have only two entry for Non-Sku enabled PCD entry:
-      // 1) MAX SIZE
-      // 2) Current Size
-      //
-      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
-      return TRUE;
-    } else {
-      //
-      // We have these entry for SKU enabled PCD entry
-      // 1) MAX SIZE
-      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
-      //
-      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == Database->Init.SystemSkuId) {
-          SizeTable[SizeTableIdx + 1 + i] = (SIZE_INFO) *CurrentSize;
-          return TRUE;
-        }
-      }
-      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
-      return TRUE;
-    }
-  }
-
 }

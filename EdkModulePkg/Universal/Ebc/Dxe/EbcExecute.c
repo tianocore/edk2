@@ -4541,7 +4541,7 @@ Returns:
 --*/
 {
   UINTN   Data;
-  UINT32  Size;
+  volatile UINT32  Size;
   UINT8   *FromPtr;
   UINT8   *ToPtr;
   //
