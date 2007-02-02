@@ -7,7 +7,7 @@
     <Abstract>EFI/Framework Emulation Platform</Abstract>
     <Description>The Emulation Platform can be used to debug individual modules, prior to creating
       a real platform. This also provides an example for how an FPD is created.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -235,8 +235,8 @@
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b2585b69-fb63-4220-844a-8fbea8bf01af" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <!--Pkg: EdkUnixPkg Mod: UnixTimerLib Path: EdkUnixPkg\Library\UnixTimerLibNull\UnixTimerLib.msa-->
-        <Instance ModuleGuid="f3db5724-8985-11db-acbc-0040d02b1835" ModuleVersion="1.0" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseTimerLibNullTemplate Path: MdePkg\Library\BaseTimerLibNullTemplate\BaseTimerLibNullTemplate.msa-->
+        <Instance ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -7771,11 +7771,11 @@
       # are licensed and made available under the terms and conditions of the BSD License
       # which accompanies this distribution.  The full text of the license may be found at
       # http://opensource.org/licenses/bsd-license.php
-      # 
+      #
       # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-      # 
-      
+      #
+
       cd ${SecMainPath}
       ./SecMain.exe</echo>
   </UserExtensions>
