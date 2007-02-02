@@ -50,7 +50,7 @@ Returns:
 {
   CHAR8 *Destination8;
   CHAR8 *Source8;
-  UINTN Length;
+  volatile UINTN Length;
 
   Destination8  = Buffer;
   Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);

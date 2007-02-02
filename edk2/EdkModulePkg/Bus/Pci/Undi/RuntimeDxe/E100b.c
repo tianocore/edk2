@@ -581,7 +581,7 @@ Returns:
   //
   TxCB  *cmd_ptr;
   UINT8 *data_ptr;
-  INT16 Index;
+  volatile INT16 Index;
   UINT8 my_filter;
 
   cmd_ptr   = GetFreeCB (AdapterInfo);
