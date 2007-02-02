@@ -1150,7 +1150,6 @@
     <Filename>Library/BasePciExpressLib/BasePciExpressLib.msa</Filename>
     <Filename>Library/BasePciLibCf8/BasePciLibCf8.msa</Filename>
     <Filename>Library/BasePciLibPciExpress/BasePciLibPciExpress.msa</Filename>
-    <Filename>Library/BaseTimerLibLocalApic/BaseTimerLibLocalApic.msa</Filename>
     <Filename>Library/DxeCoreEntryPoint/DxeCoreEntryPoint.msa</Filename>
     <Filename>Library/DxeCoreHobLib/DxeCoreHobLib.msa</Filename>
     <Filename>Library/DxeHobLib/DxeHobLib.msa</Filename>
@@ -1185,6 +1184,8 @@
     <Filename>Library/DxeMemoryLib/DxeMemoryLib.msa</Filename>
     <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
     <Filename>Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.msa</Filename>
+    <Filename>Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.msa</Filename>
+    <Filename>Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="BASE">Include/Base.h</IncludePkgHeader>

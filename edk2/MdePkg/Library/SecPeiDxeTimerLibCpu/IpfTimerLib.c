@@ -1,7 +1,7 @@
 /** @file
-  Timer Library functions for EBC.
+  Timer Library functions built upon ITC on IA32/x64.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -10,9 +10,42 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  EbcTimerLib.c
+  Module Name:  IpfTimerLib.c
 
 **/
+
+
+
+
+/**
+  Performs a delay measured as number of ticks.
+
+  An internal function to perform a delay measured as number of ticks. It's
+  invoked by MicroSecondDelay() and NanoSecondDelay().
+
+  @param  Delay Number of ticks to delay.
+
+**/
+STATIC
+VOID
+InternalIpfDelay (
+  IN      INT64                     Delay
+  )
+{
+  INT64                             Ticks;
+
+  //
+  // The target timer count is calculated here
+  //
+  Ticks = IpfReadItc () + Delay;
+
+  //
+  // Wait until time out
+  // Delay > 2^63 could not be handled by this function
+  // Timer wrap-arounds are handled correctly by this function
+  //
+  while (Ticks - IpfReadItc () >= 0);
+}
 
 /**
   Stalls the CPU for at least the given number of microseconds.
@@ -30,10 +63,11 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  //
-  // EBC architecture does not support local APIC timer.
-  //
-  ASSERT (FALSE);
+  InternalIpfDelay (
+    GetPerformanceCounterProperties (NULL, NULL) *
+    MicroSeconds /
+    1000000
+    );
   return MicroSeconds;
 }
 
@@ -53,10 +87,11 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  //
-  // EBC architecture does not support local APIC timer.
-  //
-  ASSERT (FALSE);
+  InternalIpfDelay (
+    GetPerformanceCounterProperties (NULL, NULL) *
+    NanoSeconds /
+    1000000000
+    );
   return NanoSeconds;
 }
 
@@ -78,11 +113,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  //
-  // EBC architecture does not support local APIC timer.
-  //
-  ASSERT (FALSE);
-  return 0;
+  return IpfReadItc ();
 }
 
 /**
@@ -115,9 +146,23 @@ GetPerformanceCounterProperties (
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-  //
-  // EBC architecture does not support local APIC timer.
-  //
-  ASSERT (FALSE);
-  return 0;
+  PAL_PROC_RETURN                   PalRet;
+  UINT64                            BaseFrequence;
+
+  PalRet = PalCallStatic (NULL, 13, 0, 0, 0);
+  ASSERT (PalRet.Status == 0);
+  BaseFrequence = PalRet.r9;
+
+  PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
+  ASSERT (PalRet.Status == 0);
+
+  if (StartValue != NULL) {
+    *StartValue = 0;
+  }
+
+  if (EndValue != NULL) {
+    *EndValue = (UINT64)(-1);
+  }
+
+  return BaseFrequence * (PalRet.r11 >> 32) / (UINT32)PalRet.r11;
 }
