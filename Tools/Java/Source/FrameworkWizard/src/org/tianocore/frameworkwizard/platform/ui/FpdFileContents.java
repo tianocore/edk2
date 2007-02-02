@@ -58,6 +58,7 @@ import org.tianocore.PlatformHeaderDocument;
 import org.tianocore.SkuInfoDocument;
 import org.tianocore.UserDefinedAntTasksDocument;
 import org.tianocore.UserExtensionsDocument;
+import org.tianocore.LibrariesDocument.Libraries.Instance;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
@@ -384,7 +385,7 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
-    public boolean adjustPcd (int seqModuleSa, Vector<String> vExceptions) throws Exception {
+    public boolean adjustPcd (String seqModuleSa, Vector<String> vExceptions) throws Exception {
         boolean dataModified = false;
         ModuleSADocument.ModuleSA moduleSa = getModuleSA(seqModuleSa);
         int pcdCount = getPcdDataCount(seqModuleSa);
@@ -523,8 +524,8 @@ public class FpdFileContents {
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer Arch"
     //
-    public int getPcdDataCount (int i){
-        ModuleSADocument.ModuleSA msa = getModuleSA(i);
+    public int getPcdDataCount (String key){
+        ModuleSADocument.ModuleSA msa = getModuleSA(key);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return 0;
@@ -533,8 +534,8 @@ public class FpdFileContents {
         
     }
     
-    public void getPcdData (int i, String[][] saa) {
-        ModuleSADocument.ModuleSA msa = getModuleSA(i);
+    public void getPcdData (String key, String[][] saa) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(key);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return;
@@ -553,8 +554,8 @@ public class FpdFileContents {
         }
     }
     
-    public void removePcdData (int seqModuleSa, String cName, String tsGuid) {
-        ModuleSADocument.ModuleSA moduleSa = getModuleSA(seqModuleSa);
+    public void removePcdData (String key, String cName, String tsGuid) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(key);
         if (moduleSa == null || moduleSa.getPcdBuildDefinition() == null){
             return;
         }
@@ -573,7 +574,7 @@ public class FpdFileContents {
                 PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
                 if (pcdData.getCName().equals(cName) && pcdData.getTokenSpaceGuidCName().equals(tsGuid)) {
                     maintainDynPcdMap(cName + " " + tsGuid, moduleKey);
-                    if (getPcdDataCount(seqModuleSa) == 1) {
+                    if (getPcdDataCount(key) == 1) {
                         cursor.toParent();
                     }
                     cursor.removeXml();
@@ -809,17 +810,21 @@ public class FpdFileContents {
         return false;
     }
     
-    public void removeLibraryInstance(String key, int i) {
+    public void removeLibraryInstance(String key, String instanceKey) {
         ModuleSADocument.ModuleSA msa = getModuleSA(key);
         if (msa == null || msa.getLibraries() == null){
             return ;
         }
         
+        String[] instanceInfo = instanceKey.split(" ");
         XmlCursor cursor = msa.getLibraries().newCursor();
         if (cursor.toFirstChild()) {
-            for (int j = 0; j < i; ++j) {
-                cursor.toNextSibling();
+            do {
+                Instance libIns = (Instance)cursor.getObject();
+                if (libIns.getModuleGuid().equalsIgnoreCase(instanceInfo[0]) && libIns.getPackageGuid().equalsIgnoreCase(instanceInfo[2])) {
+                    break;
             }
+            }while (cursor.toNextSibling());
             cursor.push();
             while (cursor.hasPrevToken()) {
                 cursor.toPrevToken();

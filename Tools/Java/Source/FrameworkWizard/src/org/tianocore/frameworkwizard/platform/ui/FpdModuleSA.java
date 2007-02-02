@@ -96,7 +96,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private FpdFileContents ffc = null;
     private String moduleKey = null;
     private ModuleIdentification moduleId = null;
-    private int moduleSaNum = -1;
     private HashMap<LibraryClassDescriptor, ArrayList<String>> classInstanceMap = null;
     //
     // map of <{libName, supArch, supMod}, list of Module information>
@@ -154,13 +153,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     public void setKey(String k, int i, OpeningPlatformType dc){
         this.moduleKey = k;
-        moduleSaNum = i;
         this.docConsole = dc;
         classInstanceMap = null;
         classProduced = null;
         classConsumed = null;
         jTabbedPane.setSelectedIndex(0);
-        initPcdBuildDefinition(i);
+        initPcdBuildDefinition(moduleKey);
         moduleId = WorkspaceProfile.getModuleId(moduleKey);
         if (moduleId == null) {
             return;
@@ -178,7 +176,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
       init will be called each time FpdModuleSA object is to be shown.
       @param key Module information.
      **/
-    public void initPcdBuildDefinition(int i) {
+    public void initPcdBuildDefinition(String key) {
         //
         // display pcd for key.
         //
@@ -187,10 +185,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         jComboBoxItemType.setSelectedIndex(-1);
         jTextFieldMaxDatumSize.setText("");
         jTextFieldPcdDefault.setText("");
-        int pcdCount = ffc.getPcdDataCount(i);
+        int pcdCount = ffc.getPcdDataCount(key);
         if (pcdCount != 0) {
             String[][] saa = new String[pcdCount][7];
-            ffc.getPcdData(i, saa);
+            ffc.getPcdData(key, saa);
             for (int j = 0; j < saa.length; ++j) {
                 model.addRow(saa[j]);
             }
@@ -236,6 +234,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         Stack<LibraryClassDescriptor> lcdStack = new Stack<LibraryClassDescriptor>();
         while (iter.hasNext()) {
             LibraryClassDescriptor lcd = iter.next();
+            if (this.classConsumed.get(lcd) == null || this.classConsumed.get(lcd).size() == 0) {
+                continue;
+            }
             if (isBoundedClass(lcd, errorMsg)) {
                 continue;
             }
@@ -575,12 +576,41 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         return null;
     }
     
+    private ArrayList<String> getProducedBy (String className) {
+        Iterator<LibraryClassDescriptor> lcdi = this.classProduced.keySet().iterator();
+        while (lcdi.hasNext()) {
+            LibraryClassDescriptor lcd = lcdi.next();
+            if ((lcd.className != null) && lcd.className.equals(className)) {
+                return this.classProduced.get(lcd);
+            }
+        }
+        return null;
+    }
+    //
+    // Get class name list related with instanceKey from HashMap m<LibraryClass, ArrayList<instanceKey>>.
+    //
+    private ArrayList<String> getLibraryClassList (String instanceKey, HashMap<LibraryClassDescriptor, ArrayList<String>> m) {
+        ArrayList<String> libraryClass = new ArrayList<String>();
+        Iterator<LibraryClassDescriptor> lcdi = m.keySet().iterator();
+        while (lcdi.hasNext()) {
+            LibraryClassDescriptor lcd = lcdi.next();
+            if ((m.get(lcd) != null) && m.get(lcd).contains(instanceKey)) {
+                libraryClass.add(lcd.className);
+            }
+        }
+        return libraryClass;
+    }
+    
     private void removeInstance(String key) {
         ModuleIdentification mi = WorkspaceProfile.getModuleId(key); 
         //
         // remove pcd information of instance from current ModuleSA
+        // Note that Pcd data SHOULD be removed prior to library instance
+        // because Multi-Sourced PCD could not be removed, if we remove library instance first,
+        // it will impact the judgement of whether a PCD entry is Multi-Sourced.
         //
         ffc.removePcdData(moduleKey, mi);
+        ffc.removeLibraryInstance(moduleKey, key);
         //
         // remove class produced by this instance and add back these produced class to be bound.
         //
@@ -600,7 +630,25 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 continue;
             }
             al.remove(key);
-            
+            if (al.size() == 0) {
+                ArrayList<String> from = getProducedBy (clsConsumed[i]);
+                if (from == null) {
+                    continue;
+                }
+                boolean noUse = true;
+                for (int j = 0; j < from.size(); ++j) {
+                    ArrayList<String> libClasses = getLibraryClassList(from.get(j), classProduced);
+                    for (int k = 0; k < libClasses.size(); ++k) {
+                        if (getConsumedBy (libClasses.get(k)) != null && getConsumedBy (libClasses.get(k)).size() > 0) {
+                            noUse = false;
+                        }
+                    }
+                    if (noUse) {
+                        removeInstance(from.get(j));
+                    }
+                    noUse = true;
+                }
+            }
         }
         
     }
@@ -738,7 +786,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanelPcd.add(getJPanelPcdSouth(), java.awt.BorderLayout.SOUTH);
             jPanelPcd.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    initPcdBuildDefinition(moduleSaNum);
+                    initPcdBuildDefinition(moduleKey);
                 }
             });
             
@@ -1124,9 +1172,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         String cls = libClassTableModel.getValueAt(selectedRow2, 0).toString();
                         String arch = libClassTableModel.getValueAt(selectedRow2, 1).toString();
                         String modType = libClassTableModel.getValueAt(selectedRow2, 2).toString();
-                        ArrayList<String> al = classInstanceMap.get(new LibraryClassDescriptor(cls, arch, modType));
+                        LibraryClassDescriptor lcd = new LibraryClassDescriptor(cls, arch, modType);
+                        ArrayList<String> al = classInstanceMap.get(lcd);
                         if (al == null) {
-                            return;
+                            al = getInstancesForClass(lcd, null);
+                            if (al.size() != 0) {
+                                classInstanceMap.put(lcd, al);
+                            }
+                            
                         }
                         ListIterator<String> li = al.listIterator();
                         while(li.hasNext()) {
@@ -1335,12 +1388,31 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         return;
                     }
                     docConsole.setSaved(false);
-                    removeInstance(selectedInstancesTableModel.getValueAt(row, 1) + " " +
-                                   selectedInstancesTableModel.getValueAt(row, 2) + " " +
-                                   selectedInstancesTableModel.getValueAt(row, 3) + " " +
-                                   selectedInstancesTableModel.getValueAt(row, 4));
-                    ffc.removeLibraryInstance(moduleKey, row);
-                    selectedInstancesTableModel.removeRow(row);
+                    String instanceKey = selectedInstancesTableModel.getValueAt(row, 1) + " "
+                                         + selectedInstancesTableModel.getValueAt(row, 2) + " "
+                                         + selectedInstancesTableModel.getValueAt(row, 3) + " "
+                                         + selectedInstancesTableModel.getValueAt(row, 4);
+                    removeInstance(instanceKey);
+                    
+                    selectedInstancesTableModel.setRowCount(0);
+                    int instanceCount = ffc.getLibraryInstancesCount(moduleKey);
+                    if (instanceCount != 0) {
+                        String[][] saa = new String[instanceCount][5];
+                        ffc.getLibraryInstances(moduleKey, saa);
+                        for (int i = 0; i < saa.length; ++i) {
+                            String libInstanceKey = saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4];
+                            ModuleIdentification mi = WorkspaceProfile.getModuleId(libInstanceKey);
+                            if (mi != null) {
+                                //
+                                // ToDo: verify this instance first.
+                                //
+                                saa[i][0] = mi.getName();
+                                saa[i][2] = mi.getVersion();
+                                saa[i][4] = mi.getPackageId().getVersion();
+                                selectedInstancesTableModel.addRow(saa[i]);
+                            }
+                        }
+                    }
                     showClassToResolved();
                 }
             });

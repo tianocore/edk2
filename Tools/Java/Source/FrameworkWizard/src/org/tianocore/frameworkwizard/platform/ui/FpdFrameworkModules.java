@@ -928,9 +928,17 @@ public class FpdFrameworkModules extends IInternalFrame {
 
     private boolean pcdSync(Vector<String> v) {
         boolean synced = false;
+        String[] sa = new String[5];
         for (int i = 0; i < jTableFpdModules.getRowCount(); ++i) {
             try {
-                if (ffc.adjustPcd(i, v)) {
+                ffc.getFrameworkModuleInfo(i, sa);
+                String mg = sa[ffcModGuid];
+                String mv = sa[ffcModVer];
+                String pg = sa[ffcPkgGuid];
+                String pv = sa[ffcPkgVer];
+                String arch = sa[ffcModArch];
+                String key = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+                if (ffc.adjustPcd(key, v)) {
                     synced = true;
                 }
             }
