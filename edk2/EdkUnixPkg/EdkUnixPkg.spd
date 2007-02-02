@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -108,7 +108,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Dxe/UnixThunk/Cpu/Cpu.msa</Filename>
     <Filename>Dxe/UnixThunk/UnixThunk/UnixThunk.msa</Filename>
     <Filename>Library/DxeUnixLib/DxeUnixLib.msa</Filename>
-    <Filename>Library/UnixTimerLibNull/UnixTimerLib.msa</Filename>
     <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
     <Filename>Library/EdkUnixPeiPeCoffGetEntryPointLib/EdkUnixPeiPeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/UnixPeCoffLoaderLib/UnixPeCoffLoaderLib.msa</Filename>
@@ -136,7 +135,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <C_Name>gEfiEdkUnixPkgTokenSpaceGuid</C_Name>
       <GuidValue>f2b6838c-8985-11db-9d1c-0040d02b1835</GuidValue>
       <HelpText>All PCD define in EdkUnixPkg is in this token space scope</HelpText>
-    </Entry>  
+    </Entry>
     <Entry Name="UnixVirtualDisks">
       <C_Name>gEfiUnixVirtualDisksGuid</C_Name>
       <GuidValue>f2ba331a-8985-11db-a406-0040d02b1835</GuidValue>
