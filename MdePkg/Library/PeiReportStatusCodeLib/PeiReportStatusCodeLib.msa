@@ -40,9 +40,6 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PcdLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>IoLib</Keyword>
-    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>ReportStatusCodeLib.c</Filename>

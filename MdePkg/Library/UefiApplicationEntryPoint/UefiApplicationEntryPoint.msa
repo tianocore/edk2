@@ -2,7 +2,7 @@
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>UefiApplicationEntryPoint</ModuleName>
-    <ModuleType>UEFI_DRIVER</ModuleType>
+    <ModuleType>UEFI_APPLICATION</ModuleType>
     <GuidValue>DADE8301-CB29-4fd5-8148-56FD246C5B88</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for the entry point to a EFI Application</Abstract>

@@ -2,7 +2,7 @@
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>EdkUefiRuntimeLib</ModuleName>
-    <ModuleType>DXE_DRIVER</ModuleType>
+    <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
     <GuidValue>b1ee6c28-54aa-4d17-b705-3e28ccb27b2e</GuidValue>
     <Version>1.0</Version>
     <Abstract>Runtime driver library</Abstract>
