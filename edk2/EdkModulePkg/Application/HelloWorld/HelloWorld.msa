@@ -32,7 +32,7 @@
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiDriverEntryPoint</Keyword>
+      <Keyword>UefiApplicationEntryPoint</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
