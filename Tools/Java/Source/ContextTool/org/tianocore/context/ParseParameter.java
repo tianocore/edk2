@@ -78,7 +78,11 @@ public class ParseParameter {
                 // argstr is "-p ", display current setting
                 //
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curpstr);
+                    if (curpstr != null) {
+                        System.out.printf("%s\n", curpstr);
+                    } else {
+                        System.out.printf("No ACTIVE_PLATFORM defined \n");
+                    }
                     return 1;
                 }
                 //
@@ -106,7 +110,11 @@ public class ParseParameter {
                 npflag = true;
             } else if (argstr.charAt(1) == 't') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curtstr);
+                    if (curtstr != null) {
+                        System.out.printf("%s\n", curtstr);
+                    } else {
+                        System.out.printf("No TARGET defined\n");
+                    }
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
@@ -122,7 +130,11 @@ public class ParseParameter {
                 ntflag = true;
             } else if (argstr.charAt(1) == 'a') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curastr);
+                    if (curastr != null) {
+                        System.out.printf("%s\n", curastr);
+                    } else {
+                        System.out.printf("No TARGET_ARCH defined\n");
+                    }
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
@@ -138,7 +150,11 @@ public class ParseParameter {
                 naflag = true;
             } else if (argstr.charAt(1) == 'c') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curcstr);
+                    if (curcstr != null) {
+                        System.out.printf("%s\n", curcstr);
+                    } else {
+                        System.out.printf("No TOOL_CHAIN_CONF defined\n");
+                    }
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
@@ -160,7 +176,11 @@ public class ParseParameter {
                 ncflag = true;
             } else if (argstr.charAt(1) == 'n') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curnstr);
+                    if (curnstr != null) {
+                        System.out.printf("%s\n", curnstr);
+                    } else {
+                        System.out.printf("No TOOL_CHAIN_TAG defined\n");
+                    }
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
@@ -176,7 +196,11 @@ public class ParseParameter {
                 nnflag = true;
             } else if (argstr.charAt(1) == 'm') {
                 if(argstr.length() < 4 && argstr.charAt(2) == ' '){
-                    System.out.printf("%s\n", curmstr);
+                    if (curmstr != null) {
+                        System.out.printf("%s\n", curmstr);
+                    } else {
+                        System.out.printf("No MAX_CONCURRENT_THREAD_NUMBER defined\n");
+                    }
                     return 1;
                 }
                 if(argstr.length() < 6 && argstr.charAt(3) == '?'){
