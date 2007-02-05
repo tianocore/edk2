@@ -14,6 +14,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.security.MessageDigest;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
@@ -55,6 +60,7 @@ public class FfsProcess {
 
     private BuildOptionsDocument.BuildOptions.Ffs ffsXmlObject;
 
+    private Project project = null;
     ///
     /// ANT script to call GenFfs
     ///
@@ -113,6 +119,7 @@ public class FfsProcess {
               If can't find FFS Layout in FPD.
     **/
     public boolean initSections(String buildType, Project project, FpdModuleIdentification fpdModuleId) throws BuildException {
+        this.project = project;
         //
         // Try to find Ffs layout from FPD file
         //
@@ -121,6 +128,7 @@ public class FfsProcess {
         for (int i = 0; i < ffsArray.length; i++) {
             if (isMatch(ffsArray[i].getFfsKey(), buildType)) {
                 ffsXmlObject = ffsArray[i];
+                genDigest();
                 return true;
             }
         }
@@ -196,6 +204,13 @@ public class FfsProcess {
             pathEle.setAttribute("name", getSectionFile(basename, section));
             sourceEle.appendChild(pathEle);
         }
+        //
+        // add FFS layout digest into the source file list
+        // 
+        Element pathEle = document.createElement("file");
+        pathEle.setAttribute("name", "${DEST_DIR_OUTPUT}" + File.separator + "ffs.md5");
+        sourceEle.appendChild(pathEle);
+
         String[] result = sections.toArray(new String[sections.size()]);
 
         outofdateEle.appendChild(sourceEle);
@@ -438,5 +453,74 @@ public class FfsProcess {
     **/
     public Element getFfsNode() {
         return ffsNode;
+    }
+
+    private void genDigest() {
+        String digestFilePath = project.getProperty("DEST_DIR_OUTPUT");
+        if (digestFilePath == null) {
+            EdkLog.log(EdkLog.EDK_WARNING, "Warning: cannot get DEST_DIR_OUTPUT!");
+            return;
+        }
+
+        //
+        // use MD5 algorithm
+        // 
+        MessageDigest md5 = null;
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+            //
+            // convert the FFS layout XML DOM tree into string and use it to
+            // calculate its MD5 digest value
+            // 
+            md5.update(ffsXmlObject.xmlText().getBytes());
+        } catch (Exception e) {
+            EdkLog.log(EdkLog.EDK_WARNING, "Warning: " + e.getMessage());
+            return;
+        }
+
+        //
+        // get the MD5 digest value
+        // 
+        byte[] digest = md5.digest();
+
+        //
+        // put the digest in a file named "ffs.md5" if it doesn't exist, otherwise
+        // we will compare the digest in the file with the one just calculated
+        // 
+        digestFilePath += File.separator + "ffs.md5";
+        File digestFile = new File(digestFilePath);
+        if (digestFile.exists()) {
+            byte[] oldDigest = new byte[digest.length];
+            try {
+                FileInputStream fIn = new FileInputStream(digestFile);
+                fIn.read(oldDigest);
+                fIn.close();
+            } catch (Exception e) {
+                throw new BuildException(e.getMessage());
+            }
+
+            boolean noChange = true;
+            for (int i = 0; i < oldDigest.length; ++i) {
+                if (digest[i] != oldDigest[i]) {
+                    noChange = false;
+                    break;
+                }
+            }
+
+            if (noChange) {
+                return;
+            }
+        }
+
+        //
+        // update the "ffs.md5" file content with new digest value
+        // 
+        try {
+            FileOutputStream fOut = new FileOutputStream(digestFile);
+            fOut.write(digest);
+            fOut.close();
+        } catch (Exception e) {
+            throw new BuildException(e.getMessage());
+        }
     }
 }
