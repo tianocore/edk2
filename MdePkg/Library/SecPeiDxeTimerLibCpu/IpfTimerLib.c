@@ -1,5 +1,5 @@
 /** @file
-  Timer Library functions built upon ITC on IA32/x64.
+  Timer Library functions built upon ITC on IPF.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials

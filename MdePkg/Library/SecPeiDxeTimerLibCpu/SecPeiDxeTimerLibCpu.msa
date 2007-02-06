@@ -5,7 +5,7 @@
     <ModuleType>BASE</ModuleType>
     <GuidValue>b5a05743-9b71-489b-a0ed-a0eb3950d23b</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Timer Library implementation for boot time drivers.</Abstract>
+    <Abstract>Timer Library implementation for Boot Timer moudles that require timer services.</Abstract>
     <Description>Timer Library that uses CPU resources to provide calibrated
       delays on IA-32 and x64, and uses ITC on IPF. Note: Because CpuLocalApci
       and ITC could be programmed by OS, it cannot be used by SMM drivers

@@ -1,5 +1,5 @@
 /** @file
-  Timer Library functions for runtime drivers.
+  A non-functional instance of the Timer Library.
 
   Copyright (c) 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,7 +10,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  RuntimeTimerLib.c
+  Module Name:  TimerLibNull.c
 
 **/
 

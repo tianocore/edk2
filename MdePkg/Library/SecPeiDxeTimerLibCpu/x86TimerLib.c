@@ -1,10 +1,6 @@
 /** @file
   Timer Library functions built upon local APIC on IA32/x64.
 
-  @bug Should use PCD to retrieve all the constants including index of
-  the IA32_APIC_BASE MSR, the offsets of InitialCount, CorrentCount
-  and DivideConfiguration.
-
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
