@@ -232,7 +232,7 @@ public class GenBuildTask extends Ant {
 
         Set<String> archSet = new LinkedHashSet<String>();
         String archString = getProject().getProperty("ARCH");
-        if (archString != null) {
+        if (archString != null && archString.length() > 0) {
             String[] fpdArchList = archString.split(" ");
 
             for (int i = 0; i < fpdArchList.length; i++) {
