@@ -252,8 +252,9 @@ public class GenBuildTask extends Ant {
         List moduleSupportedArchs = saq.getModuleSupportedArchs();
         if (moduleSupportedArchs != null) {
             for (int k = 0; k < archList.length; k++) {
-                if ( ! moduleSupportedArchs.contains(archList[k])) {
-                    throw new BuildException("Specified architecture [" + archList[k] + "] is not supported by " + moduleId + ". The module " + moduleId + " only supports [" + moduleSupportedArchs + "] architectures.");
+                if (!moduleSupportedArchs.contains(archList[k])) {
+                    EdkLog.log(this, EdkLog.EDK_WARNING, "Specified architecture [" + archList[k] + "] is not supported by " + moduleId + ". The module " + moduleId + " only supports [" + moduleSupportedArchs + "] architectures.");
+                    archList[k] = "";
                 }
             }
         }
@@ -263,6 +264,9 @@ public class GenBuildTask extends Ant {
         }
 
         for (int k = 0; k < archList.length; k++) {
+            if (archList[k] == "") {
+                continue;
+            }
 
             getProject().setProperty("ARCH", archList[k]);
 
