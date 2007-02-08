@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -50,7 +50,10 @@ UINTN     mMemoryMapKey = 0;
 UINTN         mMapDepth = 0;
 MEMORY_MAP    mMapStack[MAX_MAP_DEPTH];
 UINTN         mFreeMapStack = 0;
-
+//
+// This list maintain the free memory map list
+//
+LIST_ENTRY   mFreeMemoryMapEntryList  = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
 BOOLEAN mMemoryTypeInformationInitialized = FALSE;
 
 EFI_MEMORY_TYPE_STAISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
@@ -128,7 +131,12 @@ VOID
 RemoveMemoryMapEntry (
   MEMORY_MAP      *Entry
   );
-
+  
+STATIC
+MEMORY_MAP *
+AllocateMemoryMapEntry ( 
+ );
+ 
 VOID
 CoreAcquireMemoryLock (
   VOID
@@ -509,7 +517,7 @@ Returns:
   //
 
   mMapStack[mMapDepth].Signature     = MEMORY_MAP_SIGNATURE;
-  mMapStack[mMapDepth].FromPool      = FALSE;
+  mMapStack[mMapDepth].FromPages      = FALSE;
   mMapStack[mMapDepth].Type          = Type;
   mMapStack[mMapDepth].Start         = Start;
   mMapStack[mMapDepth].End           = End;
@@ -564,11 +572,10 @@ Returns:
   mFreeMapStack += 1;
 
   while (mMapDepth) {
-
     //
-    // Allocate memory for a entry
+    // Deque an memory map entry from mFreeMemoryMapEntryList 
     //
-    Entry = CoreAllocatePoolI (EfiRuntimeServicesData, sizeof(MEMORY_MAP));
+    Entry = AllocateMemoryMapEntry ();
     
     ASSERT (Entry);
 
@@ -580,20 +587,20 @@ Returns:
     if (mMapStack[mMapDepth].Link.ForwardLink != NULL) {
 
       //
-      // Move this entry to general pool
+      // Move this entry to general memory
       //
       RemoveEntryList (&mMapStack[mMapDepth].Link);
       mMapStack[mMapDepth].Link.ForwardLink = NULL;
 
       CopyMem (Entry , &mMapStack[mMapDepth], sizeof (MEMORY_MAP));
-      Entry->FromPool = TRUE;
+      Entry->FromPages = TRUE;
 
       //
       // Find insertion location
       //
       for (Link2 = gMemoryMap.ForwardLink; Link2 != &gMemoryMap; Link2 = Link2->ForwardLink) {
         Entry2 = CR (Link2, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-        if (Entry2->FromPool && Entry2->Start > Entry->Start) {
+        if (Entry2->FromPages && Entry2->Start > Entry->Start) {
           break;
         }
       }
@@ -601,12 +608,11 @@ Returns:
       InsertTailList (Link2, &Entry->Link);
 
     } else {
-
+      // 
+      // This item of mMapStack[mMapDepth] has already been dequeued from gMemoryMap list,
+      // so here no need to move it to memory.
       //
-      // It was removed, don't move it
-      //
-      CoreFreePoolI (Entry);
-
+      InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
     }
   }
 
@@ -637,11 +643,68 @@ Returns:
   RemoveEntryList (&Entry->Link);
   Entry->Link.ForwardLink = NULL;
 
-  if (Entry->FromPool) {
-    CoreFreePoolI (Entry);
+  if (Entry->FromPages) {
+  	//
+  	// Insert the free memory map descriptor to the end of mFreeMemoryMapEntryList
+  	//
+    InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
   }
 }
 
+MEMORY_MAP *
+AllocateMemoryMapEntry ( 
+ )
+/*++
+
+Routine Description:
+
+  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
+  If the list is emtry, then allocate a new page to refuel the list. 
+  Please Note this algorithm to allocate the memory map descriptor has a property
+  that the memory allocated for memory entries always grows, and will never really be freed 
+  For example, if the current boot uses 2000 memory map entries at the maximum point, but
+  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950 
+  memory map entries is still allocated from EfiBootServicesMemory.  
+
+Arguments:
+
+  NONE
+
+Returns:
+
+  The Memory map descriptor dequed from the mFreeMemoryMapEntryList
+
+--*/ 
+{
+  MEMORY_MAP*            FreeDescriptorEntries;
+  MEMORY_MAP*            Entry;
+  UINTN                  Index;
+  
+  if (IsListEmpty (&mFreeMemoryMapEntryList)) {
+    // 
+    // The list is empty, to allocate one page to refuel the list
+    //
+    FreeDescriptorEntries = CoreAllocatePoolPages (EfiBootServicesData, 1, DEFAULT_PAGE_ALLOCATION);
+    if(FreeDescriptorEntries != NULL) {
+      //
+      // Enque the free memmory map entries into the list
+      //
+      for (Index = 0; Index< DEFAULT_PAGE_ALLOCATION / sizeof(MEMORY_MAP); Index++) {
+        FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
+        InsertTailList (&mFreeMemoryMapEntryList, &FreeDescriptorEntries[Index].Link);
+      }     
+    } else {
+      return NULL;
+    }
+  }
+  //
+  // dequeue the first descriptor from the list
+  //
+  Entry = CR (mFreeMemoryMapEntryList.ForwardLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+  RemoveEntryList (&Entry->Link);
+  
+  return Entry;
+}    
 
 STATIC
 EFI_STATUS
@@ -790,7 +853,7 @@ Returns:
       // Add a new one
       //
       mMapStack[mMapDepth].Signature = MEMORY_MAP_SIGNATURE;
-      mMapStack[mMapDepth].FromPool  = FALSE;
+      mMapStack[mMapDepth].FromPages  = FALSE;
       mMapStack[mMapDepth].Type      = Entry->Type;
       mMapStack[mMapDepth].Start     = RangeEnd+1;
       mMapStack[mMapDepth].End       = Entry->End;
