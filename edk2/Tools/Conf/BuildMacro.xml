@@ -744,25 +744,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 </command>
               </cc>
             </then>
-          </if>
-          
-          <if>
-            <not>
-              <equals arg1="${CC_FAMILY}" arg2="GCC"/>
-            </not>
-            <then>
+            <else>
               <cc userdefine="on">
                 <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}" 
                          dpath="${PP_DPATH}" libpath="${PP_LIBPATH}" include="${PP_INCLUDEPATH}">
-              <argument value="${VFRPP_FLAGS} ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+                  <argument value="${VFRPP_FLAGS}"/>
                   <!-- Output file of the preprocess -->   
                   <EXTRA.INC/>            
                   <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>              
                 </command>
               </cc>
-            </then>
+            </else>
           </if>
-          
           
           <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
             <EXTRA.INC/>
