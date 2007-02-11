@@ -1135,7 +1135,7 @@ Returns:
 }
 
 //
-// Function only used in debug buils
+// Function only used in debug builds
 //
 VOID
 CoreDisplayDiscoveredNotDispatched (
