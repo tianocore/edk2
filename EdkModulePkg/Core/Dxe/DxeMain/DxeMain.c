@@ -350,7 +350,7 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Initialize the ReportStatusCode with PEI version, if availible
+  // Initialize the ReportStatusCode with PEI version, if available
   //
   CoreGetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **)&gStatusCode->ReportStatusCode);
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
