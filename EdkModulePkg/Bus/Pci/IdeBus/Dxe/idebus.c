@@ -91,7 +91,7 @@ IDEBusDriverBindingSupported (
   }
  
   //
-  // Clsoe protocol, don't use device path protocol in the .Support() function
+  // Close protocol, don't use device path protocol in the .Support() function
   //
   gBS->CloseProtocol (
         Controller,
