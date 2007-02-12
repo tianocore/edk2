@@ -26,7 +26,7 @@ Abstract:
 // Static (possibly build generated) Bios Vendor data.
 //
 MISC_SUBCLASS_TABLE_DATA(EFI_MISC_SYSTEM_OPTION_STRING_DATA, SystemOptionString) = {
-  STRING_TOKEN(STR_MISC_SYSTEM_OPTION_STRING)
+  {STRING_TOKEN(STR_MISC_SYSTEM_OPTION_STRING)}
 };
 
 /* eof - MiscSystemOptionStringData.c */

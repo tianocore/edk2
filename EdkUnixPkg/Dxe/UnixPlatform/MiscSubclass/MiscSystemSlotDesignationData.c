@@ -46,7 +46,7 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA, MiscSystemSlotDe
     0,                      // SmbusSignalSupported    :1;
     0                       // Reserved                :21;
   },
-  0                         // SlotDevicePath
+  {0, 0, {0, 0}}            // SlotDevicePath
 };
 
 /* eof - MiscSystemSlotsData.c */

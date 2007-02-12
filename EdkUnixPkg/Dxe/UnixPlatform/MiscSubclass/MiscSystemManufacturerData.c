@@ -39,14 +39,16 @@ MISC_SUBCLASS_TABLE_DATA(EFI_MISC_SYSTEM_MANUFACTURER_DATA, MiscSystemManufactur
     0xbadfaced,
     0xdead,
     0xbeef,
-    0x13,
-    0x13,
-    0x13,
-    0x13,
-    0x13,
-    0x13,
-    0x13,
-    0x13
+    {
+      0x13,
+      0x13,
+      0x13,
+      0x13,
+      0x13,
+      0x13,
+      0x13,
+      0x13
+    }
   },
   // SystemUuid
   EfiSystemWakeupTypePowerSwitch  // SystemWakeupType

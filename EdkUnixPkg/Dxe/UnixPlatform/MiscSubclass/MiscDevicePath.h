@@ -43,23 +43,23 @@ Abstract:
 //
 #define DP_ACPI \
   { \
-    ACPI_DEVICE_PATH, ACPI_DP, (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
-      ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8), EISA_PNP_ID (0x0A03), 0 \
+      {ACPI_DEVICE_PATH, ACPI_DP, {(UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
+      ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)}}, EISA_PNP_ID (0x0A03), 0 \
   }
 #define DP_PCI(device, function) \
   { \
-    HARDWARE_DEVICE_PATH, HW_PCI_DP, (UINT8) (sizeof (PCI_DEVICE_PATH)), (UINT8) \
-      ((sizeof (PCI_DEVICE_PATH)) >> 8), function, device \
+      {HARDWARE_DEVICE_PATH, HW_PCI_DP, {(UINT8) (sizeof (PCI_DEVICE_PATH)), (UINT8) \
+       ((sizeof (PCI_DEVICE_PATH)) >> 8)}}, function, device \
   }
 #define DP_END \
   { \
-    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, END_DEVICE_PATH_LENGTH, 0 \
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, {END_DEVICE_PATH_LENGTH, 0} \
   }
 
 #define DP_LPC(eisaid, function) \
   { \
-    ACPI_DEVICE_PATH, ACPI_DP, (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
-      ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8), EISA_PNP_ID (eisaid), function \
+    {ACPI_DEVICE_PATH, ACPI_DP, {(UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), (UINT8) \
+     ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)}}, EISA_PNP_ID (eisaid), function \
   }
 
 //
