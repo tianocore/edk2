@@ -528,7 +528,7 @@ InternalCharToUpper (
   )
 {
   if (Char >= L'a' && Char <= L'z') {
-    return Char - (L'a' - L'A');
+    return (CHAR16) (Char - (L'a' - L'A'));
   }
 
   return Char;
@@ -919,7 +919,8 @@ StrHexToUint64 (
       (InternalHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
       );
 
-    Result = LShiftU64 (Result, 4) + InternalHexCharToUintn (*String);
+    Result = LShiftU64 (Result, 4);
+    Result = Result + InternalHexCharToUintn (*String);
     String++;
   }
 
@@ -1930,7 +1931,8 @@ AsciiStrHexToUint64 (
       (InternalAsciiHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
       );
 
-    Result = LShiftU64 (Result, 4) + InternalAsciiHexCharToUintn (*String);
+    Result = LShiftU64 (Result, 4);
+    Result = Result + InternalAsciiHexCharToUintn (*String);
     String++;
   }
 

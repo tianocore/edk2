@@ -134,8 +134,9 @@ RemoveMemoryMapEntry (
   
 STATIC
 MEMORY_MAP *
-AllocateMemoryMapEntry ( 
- );
+AllocateMemoryMapEntry (
+  VOID
+  );
  
 VOID
 CoreAcquireMemoryLock (
@@ -651,9 +652,11 @@ Returns:
   }
 }
 
+STATIC
 MEMORY_MAP *
-AllocateMemoryMapEntry ( 
- )
+AllocateMemoryMapEntry (
+  VOID
+  )
 /*++
 
 Routine Description:
