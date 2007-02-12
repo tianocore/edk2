@@ -684,7 +684,7 @@ Returns:
     // 
     // The list is empty, to allocate one page to refuel the list
     //
-    FreeDescriptorEntries = CoreAllocatePoolPages (EfiBootServicesData, 1, DEFAULT_PAGE_ALLOCATION);
+    FreeDescriptorEntries = CoreAllocatePoolPages (EfiBootServicesData, EFI_SIZE_TO_PAGES(DEFAULT_PAGE_ALLOCATION), DEFAULT_PAGE_ALLOCATION);
     if(FreeDescriptorEntries != NULL) {
       //
       // Enque the free memmory map entries into the list
