@@ -1,7 +1,7 @@
 /** @file
-  Print Library.
+  Print Library Internal Functions.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,7 +27,7 @@
 #define LONG_TYPE         0x10
 //#define PREFIX_ZERO       0x20
 #define OUTPUT_UNICODE    0x40
-#define RADIX_HEX         0x80
+//#define RADIX_HEX         0x80
 #define FORMAT_UNICODE    0x100
 #define PAD_TO_WIDTH      0x200
 #define ARGUMENT_UNICODE  0x400

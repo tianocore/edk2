@@ -1,7 +1,7 @@
 /** @file
   HOB Library.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -160,6 +160,29 @@ GetFirstGuidHob (
   return GetNextGuidHob (Guid, HobList);
 }
 
+/**
+  Get the Boot Mode from the HOB list.
+
+  This function returns the system boot mode information from the 
+  PHIT HOB in HOB list.
+
+  @param  VOID
+
+  @return The Boot Mode.
+
+**/
+EFI_BOOT_MODE
+EFIAPI
+GetBootModeHob (
+  VOID
+  )
+{
+  EFI_HOB_HANDOFF_INFO_TABLE    *HandOffHob;
+
+  HandOffHob = (EFI_HOB_HANDOFF_INFO_TABLE *) GetHobList ();
+
+  return  HandOffHob->BootMode;
+}
 /**
   Builds a HOB for a loaded PE32 module.
 

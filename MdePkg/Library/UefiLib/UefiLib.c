@@ -243,6 +243,34 @@ EfiNamedEventSignal (
   return EFI_SUCCESS;
 }
 
+/** 
+  Returns the current TPL.
+
+  This function returns the current TPL.  There is no EFI service to directly 
+  retrieve the current TPL. Instead, the RaiseTPL() function is used to raise 
+  the TPL to TPL_HIGH_LEVEL.  This will return the current TPL.  The TPL level 
+  can then immediately be restored back to the current TPL level with a call 
+  to RestoreTPL().
+
+  @param  VOID
+
+  @retvale EFI_TPL              The current TPL.
+
+**/
+EFI_TPL
+EFIAPI
+EfiGetCurrentTpl (
+  VOID
+  )
+{
+  EFI_TPL Tpl;
+
+  Tpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL); 
+  gBS->RestoreTPL (Tpl);
+
+  return Tpl;
+}
+
 
 /**
   This function initializes a basic mutual exclusion lock to the released state 
@@ -779,3 +807,4 @@ FreeUnicodeStringTable (
 
   return EFI_SUCCESS;
 }
+

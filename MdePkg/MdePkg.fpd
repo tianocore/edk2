@@ -2276,6 +2276,19 @@
     <ModuleSA ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3" SupArchList="IPF"/>
     <!--Mod: BaseTimerLibNullTemplate Type: BASE Path: MdePkg\Library\BaseTimerLibNullTemplate\BaseTimerLibNullTemplate.msa-->
     <ModuleSA ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3" SupArchList="EBC"/>
+    <!--Mod: BaseIoLibIntrinsic Type: BASE Path: MdePkg\Library\BaseIoLibIntrinsic\BaseIoLibIntrinsic.msa-->
+    <ModuleSA ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3" SupArchList="IPF">
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdIoBlockBaseAddressForIpf</C_Name>
+          <Token>0x0000000c</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT64</DatumType>
+          <MaxDatumSize>8</MaxDatumSize>
+          <Value>0x0ffffc000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+    </ModuleSA>
   </FrameworkModules>
   <BuildOptions>
     <Ffs FfsKey="APPLICATION">

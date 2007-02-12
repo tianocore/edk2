@@ -1,7 +1,7 @@
 /** @file
   Print Library worker functions.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -105,11 +105,13 @@ BasePrintLibValueToString (
   If Width is 0, PREFIX_ZERO is ignored in Flags.
   If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and commas
   are inserted every 3rd digit starting from the right.
-  If Value is < 0, then the fist character in Buffer is a '-'.
+  If HEX_RADIX is set in Flags, then the output buffer will be formatted in hexadecimal format.
+  If Value is < 0 and HEX_RADIX is not set in Flags, then the fist character in Buffer is a '-'.
   If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, 
   then Buffer is padded with '0' characters so the combination of the optional '-' 
   sign character, '0' characters, digit characters for Value, and the Null-terminator
   add up to Width characters.
+  If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
 
   If Buffer is NULL, then ASSERT().
   If unsupported bits are set in Flags, then ASSERT().
@@ -142,13 +144,19 @@ BasePrintLibConvertValueToString (
   UINTN  Count;
   UINTN  Digits;
   UINTN  Index;
+  UINTN  Radix;
 
   ASSERT (Buffer != NULL);
   ASSERT (Width < MAXIMUM_VALUE_CHARACTERS);
   //
   // Make sure Flags can only contain supported bits.
   //
-  ASSERT ((Flags & ~(LEFT_JUSTIFY | COMMA_TYPE | PREFIX_ZERO)) == 0);
+  ASSERT ((Flags & ~(LEFT_JUSTIFY | COMMA_TYPE | PREFIX_ZERO | RADIX_HEX)) == 0);
+
+  //
+  // If both COMMA_TYPE and HEX_RADIX are set, then ASSERT ()
+  //
+  ASSERT (((Flags & COMMA_TYPE) != 0 && (Flags & RADIX_HEX) != 0) == FALSE);
 
   OriginalBuffer = Buffer;
 
@@ -164,13 +172,14 @@ BasePrintLibConvertValueToString (
   //
   EndBuffer = Buffer + Width * Increment;
 
-  if (Value < 0) {
+  if ((Value < 0) && ((Flags & RADIX_HEX) == 0)) {
     Value = -Value;
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, '-', Increment);
     Width--;
   }
 
-  Count = BasePrintLibValueToString (ValueBuffer, Value, 10);
+  Radix = ((Flags & RADIX_HEX) == 0)? 10 : 16;
+  Count = BasePrintLibValueToString (ValueBuffer, Value, Radix);
 
   if ((Flags & PREFIX_ZERO) != 0) {
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Count, '0', Increment);
@@ -197,3 +206,4 @@ BasePrintLibConvertValueToString (
 
   return ((Buffer - OriginalBuffer) / Increment);
 }
+
