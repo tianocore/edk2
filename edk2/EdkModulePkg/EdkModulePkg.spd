@@ -64,6 +64,14 @@
       <IncludeHeader>Include/Library/OemHookStatusCodeLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
+    <LibraryClass Name="EdkGenericBdsLib">
+      <IncludeHeader>Include/Library/EdkGenericBdsLib.h</IncludeHeader>
+      <HelpText>Library to implement a Bbs</HelpText>
+    </LibraryClass>
+    <LibraryClass Name="EdkGenericPlatformBdsLib">
+      <IncludeHeader>Include/Library/EdkGenericPlatformBdsLib.h</IncludeHeader>
+      <HelpText>Generic Platform Bds library</HelpText>
+    </LibraryClass>
   </LibraryClassDeclarations>
   <IndustryStdIncludes>
     <IndustryStdHeader Name="CapsuleName">
@@ -398,6 +406,8 @@
     <Filename>Library/EdkUsbLib/EdkUsbLib.msa</Filename>
     <Filename>Library/EdkSerialPortLibNull/EdkSerialPortLibNull.msa</Filename>
     <Filename>Library/EdkOemHookStatusCodeLibNull/EdkOemHookStatusCodeLibNull.msa</Filename>
+    <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
+    <Filename>Library/EdkGenericPlatformBdsLib/EdkGenericPlatformBdsLib.msa</Filename>
     <Filename>Universal/Console/ConSplitter/Dxe/ConSplitter.msa</Filename>
     <Filename>Universal/Console/GraphicsConsole/Dxe/GraphicsConsole.msa</Filename>
     <Filename>Universal/Console/Terminal/Dxe/Terminal.msa</Filename>
@@ -435,6 +445,7 @@
     <Filename>Universal/StatusCode/Pei/PeiStatusCode.msa</Filename>
     <Filename>Universal/StatusCode/Dxe/DxeStatusCode.msa</Filename>
     <Filename>Universal/ConPlatform/Dxe/ConPlatform.msa</Filename>
+    <Filename>Logo/Logo.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="SEC">Include/EdkPeim.h</IncludePkgHeader>
