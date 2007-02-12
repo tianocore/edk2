@@ -1,7 +1,7 @@
 /** @file
   Declaration of internal functions in BaseLib.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,18 @@
 
 #ifndef __BASE_LIB_INTERNALS__
 #define __BASE_LIB_INTERNALS__
+
+#define QUIENT_MAX_UINTN_DIVIDED_BY_10      ((UINTN) -1 / 10)
+#define REMINDER_MAX_UINTN_DIVIDED_BY_10    ((UINTN) -1 % 10)
+
+#define QUIENT_MAX_UINTN_DIVIDED_BY_16      ((UINTN) -1 / 16)
+#define REMINDER_MAX_UINTN_DIVIDED_BY_16    ((UINTN) -1 % 16)
+
+#define QUIENT_MAX_UINT64_DIVIDED_BY_10      ((UINT64) -1 / 10)
+#define REMINDER_MAX_UINT64_DIVIDED_BY_10    ((UINT64) -1 % 10)
+
+#define QUIENT_MAX_UINT64_DIVIDED_BY_16      ((UINT64) -1 / 16)
+#define REMINDER_MAX_UINT64_DIVIDED_BY_16    ((UINT64) -1 % 16)
 
 //
 // Math functions

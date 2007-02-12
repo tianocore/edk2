@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Version>1.0</Version>
     <Abstract>Component description file for Base Library</Abstract>
     <Description>Base Library implementation.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -83,7 +83,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>SwapBytes32.c</Filename>
     <Filename>SwapBytes64.c</Filename>
     <Filename>SwitchStack.c</Filename>
-
+	  <Filename>CheckSum.c</Filename>
     <Filename SupArchList="IA32">x86DisablePaging32.c</Filename>
     <Filename SupArchList="IA32">x86DisablePaging64.c</Filename>
     <Filename SupArchList="IA32">x86EnablePaging32.c</Filename>
@@ -519,6 +519,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="EBC">Ebc/SetJumpLongJump.c</Filename>
     <Filename SupArchList="EBC">Ebc/CpuBreakpoint.c</Filename>
     <Filename SupArchList="EBC">Ebc/Synchronization.c</Filename>
+    <Filename>CheckSum.c</Filename>
   </SourceFiles>
   <NonProcessedFiles>
     <Filename>Ia32/ARShiftU64.asm</Filename>
@@ -628,28 +629,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>If PcdMaximumUnicodeStringLength is not zero, the maximum
                 number of characters (not counting the NULL-terminator) in a
                 Unicode string cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>If PcdMaximumAsciiStringLength is not zero, the maximum number
                 of characters (not counting the NULL-terminator) in an ASCII
                 string cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>If PcdMaximumLinkedListLength is not zero, the maximum number
                 of nodes (not counting the list header) in a linked list
                 cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdSpinLockTimeout</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>If PcdSpinLockTimeout is not zero, it stands for the timeout
                 value (unit: millisecond) for spin lock.</HelpText>
     </PcdEntry>

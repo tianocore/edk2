@@ -8,7 +8,7 @@
     <Abstract>Component description file for Cpu Io Pei Io Library</Abstract>
     <Description>I/O Library implementation that uses the CPU I/O PPI for I/O
       and MMIO operations.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+  	<Filename>IoLibMmioBuffer.c</Filename>
     <Filename>IoLib.c</Filename>
     <Filename>IoHighLevel.c</Filename>
   </SourceFiles>

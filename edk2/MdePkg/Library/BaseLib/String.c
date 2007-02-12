@@ -1,7 +1,7 @@
 /** @file
-  Unicode string primatives.
+  Unicode and ASCII string primatives.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,8 @@
   Module Name:  String.c
 
 **/
+
+#include "BaseLibInternals.h"
 
 /**
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
@@ -396,6 +398,655 @@ StrnCat (
 }
 
 /**
+  Returns the first occurance of a Null-terminated Unicode sub-string 
+  in a Null-terminated Unicode string.
+
+  This function scans the contents of the Null-terminated Unicode string 
+  specified by String and returns the first occurrence of SearchString.  
+  If SearchString is not found in String, then NULL is returned.  If 
+  the length of SearchString is zero, then String is 
+  returned.
+  
+  If String is NULL, then ASSERT().
+  If String is not aligned on a 16-bit boundary, then ASSERT().
+  If SearchString is NULL, then ASSERT().
+  If SearchString is not aligned on a 16-bit boundary, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero, and SearchString 
+  or String contains more than PcdMaximumUnicodeStringLength Unicode 
+  characters not including the Null-terminator, then ASSERT().
+
+  @param  String				  Pointer to a Null-terminated Unicode string.
+  @param  SearchString	Pointer to a Null-terminated Unicode string to search for.
+
+  @retval NULL            If the SearchString does not appear in String.
+  @retval !NULL           If there is a match.
+
+**/
+CHAR16 *
+EFIAPI
+StrStr (
+  IN      CONST CHAR16      	      *String,
+  IN      CONST CHAR16      	      *SearchString
+  )
+{
+  CONST CHAR16 *FirstMatch;
+  CONST CHAR16 *SearchStringTmp;
+
+  ASSERT (String != NULL);
+  ASSERT (((UINTN) String & 0x01) == 0);
+  ASSERT (SearchString != NULL);
+  ASSERT (((UINTN) SearchString & 0x01) == 0);
+
+  //
+  // If PcdMaximumUnicodeStringLength is not zero,
+  // length of String should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
+    ASSERT (StrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  }
+
+  //
+  // If PcdMaximumUnicodeStringLength is not zero,
+  // length of SearchString should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
+    ASSERT (StrLen (SearchString) < PcdGet32 (PcdMaximumAsciiStringLength));
+  }
+
+  while (*String != '\0') {
+    SearchStringTmp = SearchString;
+    FirstMatch = String;
+    
+    while ((*String == *SearchStringTmp) 
+            && (*SearchStringTmp != '\0') 
+            && (*String != '\0')) {
+      String++;
+      SearchStringTmp++;
+    } 
+    
+    if (*SearchStringTmp == '\0') {
+      return (CHAR16 *) FirstMatch;
+    }
+
+    if (SearchStringTmp == SearchString) {
+      //
+      // If no character from SearchString match,
+      // move the pointer to the String under search
+      // by one character.
+      //
+      String++;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Check if a Unicode character is a decimal character.
+
+  This internal function checks if a Unicode character is a 
+  decimal character. The valid decimal character is from
+  L'0' to L'9'.
+
+
+  @param  Char  The character to check against.
+
+  @retval TRUE  If the Char is a decmial character.
+  @retval FALSE Otherwise.
+
+**/
+STATIC
+BOOLEAN
+InternalIsDecimalDigitCharacter (
+  IN      CHAR16                    Char
+  )
+{
+  return (BOOLEAN) (Char >= L'0' && Char <= L'9');
+}
+
+/**
+  Convert a Unicode character to upper case only if 
+  it maps to a valid small-case ASCII character.
+
+  This internal function only deal with Unicode character
+  which maps to a valid small-case ASII character, i.e.
+  L'a' to L'z'. For other Unicode character, the input character
+  is returned directly.
+
+
+  @param  Char  The character to convert.
+
+  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
+  @retval Unchanged        Otherwise.
+
+**/
+STATIC
+CHAR16
+InternalCharToUpper (
+  IN      CHAR16                    Char
+  )
+{
+  if (Char >= L'a' && Char <= L'z') {
+    return Char - (L'a' - L'A');
+  }
+
+  return Char;
+}
+
+/**
+  Convert a Unicode character to numerical value.
+
+  This internal function only deal with Unicode character
+  which maps to a valid hexadecimal ASII character, i.e.
+  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other 
+  Unicode character, the value returned does not make sense.
+
+  @param  Char  The character to convert.
+
+  @retval UINTN   The numerical value converted.
+
+**/
+STATIC
+UINTN
+InternalHexCharToUintn (
+  IN      CHAR16                    Char
+  )
+{
+  if (InternalIsDecimalDigitCharacter (Char)) {
+    return Char - L'0';
+  }
+
+  return (UINTN) (10 + InternalCharToUpper (Char) - L'A');
+}
+
+/**
+  Check if a Unicode character is a hexadecimal character.
+
+  This internal function checks if a Unicode character is a 
+  decimal character.  The valid hexadecimal character is 
+  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+
+
+  @param  Char  The character to check against.
+
+  @retval TRUE  If the Char is a hexadecmial character.
+  @retval FALSE Otherwise.
+
+**/
+STATIC
+BOOLEAN
+InternalIsHexaDecimalDigitCharacter (
+  IN      CHAR16                    Char
+  )
+{
+
+  return (BOOLEAN) (InternalIsDecimalDigitCharacter (Char) ||
+    (Char >= L'A' && Char <= L'F') ||
+    (Char >= L'a' && Char <= L'f'));
+}
+
+/**
+  Convert a Null-terminated Unicode decimal string to a value of 
+  type UINTN.
+
+  This function returns a value of type UINTN by interpreting the contents 
+  of the Unicode string specified by String as a decimal number. The format 
+  of the input Unicode string String is:
+  
+                  [spaces] [decimal digits].
+                  
+  The valid decimal digit character is in the range [0-9]. The 
+  function will ignore the pad space, which includes spaces or 
+  tab characters, before [decimal digits]. The running zero in the 
+  beginning of [decimal digits] will be ignored. Then, the function 
+  stops at the first character that is a not a valid decimal character 
+  or a Null-terminator, whichever one comes first. 
+  
+  If String is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().  
+  If String has only pad spaces, then 0 is returned.
+  If String has no pad spaces or valid decimal digits, 
+  then 0 is returned.
+  If the number represented by String overflows according 
+  to the range defined by UINTN, then ASSERT().
+  
+  If PcdMaximumUnicodeStringLength is not zero, and String contains 
+  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+  the Null-terminator, then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated Unicode string.
+
+  @retval UINTN           
+
+**/
+UINTN
+EFIAPI
+StrDecimalToUintn (
+  IN      CONST CHAR16      	      *String
+  )
+{
+  UINTN     Result;
+  
+  ASSERT (String != NULL);
+  ASSERT (((UINTN) String & 0x01) == 0);
+  ASSERT (StrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  Result = 0;
+
+  while (InternalIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_10) ||
+      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_10) &&
+      (*String - L'0') <= REMINDER_MAX_UINTN_DIVIDED_BY_10)
+      );
+
+    Result = Result * 10 + (*String - L'0');
+    String++;
+  }
+  
+  return Result;
+}
+
+
+/**
+  Convert a Null-terminated Unicode decimal string to a value of 
+  type UINT64.
+
+  This function returns a value of type UINT64 by interpreting the contents 
+  of the Unicode string specified by String as a decimal number. The format 
+  of the input Unicode string String is:
+  
+                  [spaces] [decimal digits].
+                  
+  The valid decimal digit character is in the range [0-9]. The 
+  function will ignore the pad space, which includes spaces or 
+  tab characters, before [decimal digits]. The running zero in the 
+  beginning of [decimal digits] will be ignored. Then, the function 
+  stops at the first character that is a not a valid decimal character 
+  or a Null-terminator, whichever one comes first. 
+  
+  If String is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().  
+  If String has only pad spaces, then 0 is returned.
+  If String has no pad spaces or valid decimal digits, 
+  then 0 is returned.
+  If the number represented by String overflows according 
+  to the range defined by UINT64, then ASSERT().
+  
+  If PcdMaximumUnicodeStringLength is not zero, and String contains 
+  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+  the Null-terminator, then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated Unicode string.
+
+  @retval UINT64           
+
+**/
+UINT64
+EFIAPI
+StrDecimalToUint64 (
+  IN      CONST CHAR16      	      *String
+  )
+{
+  UINT64     Result;
+  
+  ASSERT (String != NULL);
+  ASSERT (((UINTN) String & 0x01) == 0);
+  ASSERT (StrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  Result = 0;
+
+  while (InternalIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_10) || 
+      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_10) && 
+      (*String - L'0') <= REMINDER_MAX_UINT64_DIVIDED_BY_10)
+      );
+
+    Result = MultU64x32 (Result, 10) + (*String - L'0');
+    String++;
+  }
+  
+  return Result;
+}
+
+/**
+  Convert a Null-terminated Unicode hexadecimal string to a value of type UINTN.
+
+  This function returns a value of type UINTN by interpreting the contents 
+  of the Unicode string specified by String as a hexadecimal number. 
+  The format of the input Unicode string String is:
+  
+                  [spaces][zeros][x][hexadecimal digits]. 
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. 
+  If "x" appears in the input string, it must be prefixed with at least one 0. 
+  The function will ignore the pad space, which includes spaces or tab characters, 
+  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or 
+  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the 
+  first valid hexadecimal digit. Then, the function stops at the first character that is 
+  a not a valid hexadecimal character or NULL, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If String has only pad spaces, then zero is returned.
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, 
+  then zero is returned.
+  If the number represented by String overflows according to the range defined by 
+  UINTN, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than 
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, 
+  then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated Unicode string.
+
+  @retval UINTN
+
+**/
+UINTN
+EFIAPI
+StrHexToUintn (
+  IN      CONST CHAR16      	      *String
+  )
+{
+  UINTN     Result;
+
+  ASSERT (String != NULL);
+  ASSERT (StrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  
+  //
+  // Ignore the pad spaces (space or tab) 
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  if (InternalCharToUpper (*String) == L'X') {
+    ASSERT (*(String - 1)  == L'0');
+    if (*(String - 1)  != L'0') {
+      return 0;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  Result = 0;
+  
+  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the Hex Number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_16) ||
+      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_16) && 
+      (InternalHexCharToUintn (*String) <= REMINDER_MAX_UINTN_DIVIDED_BY_16))
+      );
+
+    Result = (Result << 4) + InternalHexCharToUintn (*String);
+    String++;
+  }
+
+  return Result;
+}
+
+
+/**
+  Convert a Null-terminated Unicode hexadecimal string to a value of type UINT64.
+
+  This function returns a value of type UINT64 by interpreting the contents 
+  of the Unicode string specified by String as a hexadecimal number. 
+  The format of the input Unicode string String is 
+  
+                  [spaces][zeros][x][hexadecimal digits]. 
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. 
+  If "x" appears in the input string, it must be prefixed with at least one 0. 
+  The function will ignore the pad space, which includes spaces or tab characters, 
+  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or 
+  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the 
+  first valid hexadecimal digit. Then, the function stops at the first character that is 
+  a not a valid hexadecimal character or NULL, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If String has only pad spaces, then zero is returned.
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, 
+  then zero is returned.
+  If the number represented by String overflows according to the range defined by 
+  UINT64, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than 
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, 
+  then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated Unicode string.
+
+  @retval UINT64
+
+**/
+UINT64
+EFIAPI
+StrHexToUint64 (
+  IN      CONST CHAR16      	      *String
+  )
+{
+  UINT64    Result;
+
+  ASSERT (String != NULL);
+  ASSERT (StrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  
+  //
+  // Ignore the pad spaces (space or tab) 
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  if (InternalCharToUpper (*String) == L'X') {
+    ASSERT (*(String - 1)  == L'0');
+    if (*(String - 1)  != L'0') {
+      return 0;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  Result = 0;
+  
+  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the Hex Number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_16)|| 
+      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_16) && 
+      (InternalHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
+      );
+
+    Result = LShiftU64 (Result, 4) + InternalHexCharToUintn (*String);
+    String++;
+  }
+
+  return Result;
+}
+
+/**
+  Check if a ASCII character is a decimal character.
+
+  This internal function checks if a Unicode character is a 
+  decimal character. The valid decimal character is from
+  '0' to '9'.
+
+  @param  Char  The character to check against.
+
+  @retval TRUE  If the Char is a decmial character.
+  @retval FALSE Otherwise.
+
+**/
+STATIC
+BOOLEAN
+InternalAsciiIsDecimalDigitCharacter (
+  IN      CHAR8                     Char
+  )
+{
+  return (BOOLEAN) (Char >= '0' && Char <= '9');
+}
+
+/**
+  Check if a ASCII character is a hexadecimal character.
+
+  This internal function checks if a ASCII character is a 
+  decimal character.  The valid hexadecimal character is 
+  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+
+
+  @param  Char  The character to check against.
+
+  @retval TRUE  If the Char is a hexadecmial character.
+  @retval FALSE Otherwise.
+
+**/
+STATIC
+BOOLEAN
+InternalAsciiIsHexaDecimalDigitCharacter (
+  IN      CHAR8                    Char
+  )
+{
+
+  return (BOOLEAN) (InternalAsciiIsDecimalDigitCharacter (Char) ||
+    (Char >= 'A' && Char <= 'F') ||
+    (Char >= 'a' && Char <= 'f'));
+}
+
+/**
+  Convert a Null-terminated Unicode string to a Null-terminated 
+  ASCII string and returns the ASCII string.
+  
+  This function converts the content of the Unicode string Source 
+  to the ASCII string Destination by copying the lower 8 bits of 
+  each Unicode character. It returns Destination. The function terminates 
+  the ASCII string Destination  by appending a Null-terminator character 
+  at the end. The caller is responsible to make sure Destination points 
+  to a buffer with size equal or greater than (StrLen (Source) + 1) in bytes.
+
+  If Destination is NULL, then ASSERT().
+  If Source is NULL, then ASSERT().
+  If Source is not aligned on a 16-bit boundary, then ASSERT().
+  If Source and Destination overlap, then ASSERT().
+
+  If any Unicode characters in Source contain non-zero value in 
+  the upper 8 bits, then ASSERT().
+  
+  If PcdMaximumUnicodeStringLength is not zero, and Source contains 
+  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+  the Null-terminator, then ASSERT().
+  
+  If PcdMaximumAsciiStringLength is not zero, and Source contains more 
+  than PcdMaximumAsciiStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
+
+  @param  Source        Pointer to a Null-terminated Unicode string.
+  @param  Destination   Pointer to a Null-terminated ASCII string.
+
+  @reture Destination
+
+**/
+CHAR8 *
+EFIAPI
+UnicodeStrToAsciiStr (
+  IN      CONST CHAR16      	      *Source,
+  OUT 	  CHAR8  	                  *Destination
+  )
+{
+  ASSERT (Destination != NULL);
+  ASSERT (Source != NULL);
+
+  //
+  // Source and Destination should not overlap
+  //
+  ASSERT ((UINTN) ((CHAR16 *) Destination -  Source) > StrLen (Source));
+  ASSERT ((UINTN) ((CHAR8 *) Source - Destination) > StrLen (Source));
+
+  //
+  // If PcdMaximumUnicodeStringLength is not zero,
+  // length of Source should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
+    ASSERT (StrLen (Source) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  }
+
+  while (*Source != '\0') {
+    //
+    // If any Unicode characters in Source contain 
+    // non-zero value in the upper 8 bits, then ASSERT().
+    //
+    ASSERT (*Source < 0x100);
+    *(Destination++) = (CHAR8) *(Source++);
+  }
+
+  *Destination = '\0';
+  
+  return Destination;
+}
+
+
+/**
   Copies one Null-terminated ASCII string to another Null-terminated ASCII
   string and returns the new ASCII string.
 
@@ -640,6 +1291,33 @@ AsciiToUpper (
 }
 
 /**
+  Convert a ASCII character to numerical value.
+
+  This internal function only deal with Unicode character
+  which maps to a valid hexadecimal ASII character, i.e.
+  '0' to '9', 'a' to 'f' or 'A' to 'F'. For other 
+  ASCII character, the value returned does not make sense.
+
+  @param  Char  The character to convert.
+
+  @retval UINTN   The numerical value converted.
+
+**/
+STATIC
+UINTN
+InternalAsciiHexCharToUintn (
+  IN      CHAR8                    Char
+  )
+{
+  if (InternalIsDecimalDigitCharacter (Char)) {
+    return Char - '0';
+  }
+
+  return (UINTN) (10 + AsciiToUpper (Char) - 'A');
+}
+
+
+/**
   Performs a case insensitive comparison of two Null-terminated ASCII strings,
   and returns the difference between the first mismatched ASCII characters.
 
@@ -848,6 +1526,481 @@ AsciiStrnCat (
 }
 
 /**
+  Returns the first occurance of a Null-terminated ASCII sub-string 
+  in a Null-terminated ASCII string.
+
+  This function scans the contents of the ASCII string specified by String 
+  and returns the first occurrence of SearchString. If SearchString is not 
+  found in String, then NULL is returned. If the length of SearchString is zero, 
+  then String is returned.
+  
+  If String is NULL, then ASSERT().
+  If SearchString is NULL, then ASSERT().
+
+  If PcdMaximumAsciiStringLength is not zero, and SearchString or 
+  String contains more than PcdMaximumAsciiStringLength Unicode characters 
+  not including the Null-terminator, then ASSERT().
+
+  @param  String				  Pointer to a Null-terminated ASCII string.
+  @param  SearchString	  Pointer to a Null-terminated ASCII string to search for.
+
+  @retval NULL            If the SearchString does not appear in String.
+  @retval !NULL           If there is a match.
+
+**/
+CHAR8 *
+EFIAPI
+AsciiStrStr (
+  IN      CONST CHAR8      	      *String,
+  IN      CONST CHAR8             *SearchString
+  )
+{
+  CONST CHAR8 *FirstMatch;
+  CONST CHAR8 *SearchStringTmp;
+
+  ASSERT (String != NULL);
+  ASSERT (SearchString != NULL);
+
+  //
+  // If PcdMaximumUnicodeStringLength is not zero,
+  // length of String should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumAsciiStringLength) != 0) {
+    ASSERT (AsciiStrLen (String) < PcdGet32 (PcdMaximumAsciiStringLength));
+  }
+
+  //
+  // If PcdMaximumUnicodeStringLength is not zero,
+  // length of SearchString should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumAsciiStringLength) != 0) {
+    ASSERT (AsciiStrLen (SearchString) < PcdGet32 (PcdMaximumAsciiStringLength));
+  }
+
+  while (*String != '\0') {
+    SearchStringTmp = SearchString;
+    FirstMatch = String;
+    
+    while ((*String == *SearchStringTmp) 
+            && (*SearchStringTmp != '\0') 
+            && (*String != '\0')) {
+      String++;
+      SearchStringTmp++;
+    } 
+    
+    if (*SearchStringTmp == '\0') {
+      return (CHAR8 *) FirstMatch;
+    }
+
+    if (SearchStringTmp == SearchString) {
+      //
+      // If no character from SearchString match,
+      // move the pointer to the String under search
+      // by one character.
+      //
+      String++;
+    }
+
+  }
+
+  return NULL;
+}
+
+/**
+  Convert a Null-terminated ASCII decimal string to a value of type 
+  UINTN.
+
+  This function returns a value of type UINTN by interpreting the contents 
+  of the ASCII string String as a decimal number. The format of the input 
+  ASCII string String is:
+  
+                    [spaces] [decimal digits].
+  
+  The valid decimal digit character is in the range [0-9]. The function will 
+  ignore the pad space, which includes spaces or tab characters, before the digits. 
+  The running zero in the beginning of [decimal digits] will be ignored. Then, the 
+  function stops at the first character that is a not a valid decimal character or 
+  Null-terminator, whichever on comes first.
+  
+  If String has only pad spaces, then 0 is returned.
+  If String has no pad spaces or valid decimal digits, then 0 is returned.
+  If the number represented by String overflows according to the range defined by 
+  UINTN, then ASSERT().
+  If String is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than 
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated ASCII string.
+
+  @retval UINTN           
+
+**/
+UINTN
+EFIAPI
+AsciiStrDecimalToUintn (
+  IN      CONST CHAR8      	        *String
+  )
+{
+  UINTN     Result;
+  
+  ASSERT (String != NULL);
+  ASSERT (AsciiStrLen (String) < PcdGet32 (PcdMaximumAsciiStringLength));
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  Result = 0;
+
+  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_10) ||
+      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_10) && 
+      (*String - '0') <= REMINDER_MAX_UINTN_DIVIDED_BY_10)
+      );
+
+    Result = Result * 10 + (*String - '0');
+    String++;
+  }
+  
+  return Result;
+}
+
+
+/**
+  Convert a Null-terminated ASCII decimal string to a value of type 
+  UINT64.
+
+  This function returns a value of type UINT64 by interpreting the contents 
+  of the ASCII string String as a decimal number. The format of the input 
+  ASCII string String is:
+  
+                    [spaces] [decimal digits].
+  
+  The valid decimal digit character is in the range [0-9]. The function will 
+  ignore the pad space, which includes spaces or tab characters, before the digits. 
+  The running zero in the beginning of [decimal digits] will be ignored. Then, the 
+  function stops at the first character that is a not a valid decimal character or 
+  Null-terminator, whichever on comes first.
+  
+  If String has only pad spaces, then 0 is returned.
+  If String has no pad spaces or valid decimal digits, then 0 is returned.
+  If the number represented by String overflows according to the range defined by 
+  UINT64, then ASSERT().
+  If String is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than 
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated ASCII string.
+
+  @retval UINT64           
+
+**/
+UINT64
+EFIAPI
+AsciiStrDecimalToUint64 (
+  IN      CONST CHAR8      	      *String
+  )
+{
+  UINT64     Result;
+  
+  ASSERT (String != NULL);
+  ASSERT (AsciiStrLen (String) < PcdGet32 (PcdMaximumAsciiStringLength));
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  Result = 0;
+
+  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_10) || 
+      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_10) && 
+      (*String - '0') <= REMINDER_MAX_UINT64_DIVIDED_BY_10)
+      );
+
+    Result = MultU64x32 (Result, 10) + (*String - '0');
+    String++;
+  }
+  
+  return Result;
+}
+
+/**
+  Convert a Null-terminated ASCII hexadecimal string to a value of type UINTN.
+
+  This function returns a value of type UINTN by interpreting the contents of 
+  the ASCII string String as a hexadecimal number. The format of the input ASCII 
+  string String is:
+  
+                  [spaces][zeros][x][hexadecimal digits].
+                  
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x" 
+  appears in the input string, it must be prefixed with at least one 0. The function 
+  will ignore the pad space, which includes spaces or tab characters, before [zeros], 
+  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits] 
+  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal 
+  digit. Then, the function stops at the first character that is a not a valid 
+  hexadecimal character or Null-terminator, whichever on comes first.
+  
+  If String has only pad spaces, then 0 is returned.
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, then
+  0 is returned.
+
+  If the number represented by String overflows according to the range defined by UINTN, 
+  then ASSERT().
+  If String is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, 
+  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including 
+  the Null-terminator, then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated ASCII string.
+
+  @retval UINTN
+
+**/
+UINTN
+EFIAPI
+AsciiStrHexToUintn (
+  IN      CONST CHAR8      	      *String
+  )
+{
+  UINTN     Result;
+
+  ASSERT (String != NULL);
+  ASSERT (AsciiStrLen (String) < PcdGet32 (PcdMaximumAsciiStringLength));
+  
+  //
+  // Ignore the pad spaces (space or tab) 
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  if (AsciiToUpper (*String) == 'X') {
+    ASSERT (*(String - 1)  == '0');
+    if (*(String - 1)  != '0') {
+      return 0;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  Result = 0;
+  
+  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the Hex Number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+     ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_16) ||
+       ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_16) && 
+       (InternalAsciiHexCharToUintn (*String) <= REMINDER_MAX_UINTN_DIVIDED_BY_16))
+       );
+
+    Result = (Result << 4) + InternalAsciiHexCharToUintn (*String);
+    String++;
+  }
+
+  return Result;
+}
+
+
+/**
+  Convert a Null-terminated ASCII hexadecimal string to a value of type UINT64.
+
+  This function returns a value of type UINT64 by interpreting the contents of 
+  the ASCII string String as a hexadecimal number. The format of the input ASCII 
+  string String is:
+  
+                  [spaces][zeros][x][hexadecimal digits].
+                  
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x" 
+  appears in the input string, it must be prefixed with at least one 0. The function 
+  will ignore the pad space, which includes spaces or tab characters, before [zeros], 
+  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits] 
+  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal 
+  digit. Then, the function stops at the first character that is a not a valid 
+  hexadecimal character or Null-terminator, whichever on comes first.
+  
+  If String has only pad spaces, then 0 is returned.
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, then
+  0 is returned.
+
+  If the number represented by String overflows according to the range defined by UINT64, 
+  then ASSERT().
+  If String is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, 
+  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including 
+  the Null-terminator, then ASSERT().
+
+  @param  String			    Pointer to a Null-terminated ASCII string.
+
+  @retval UINT64
+
+**/
+UINT64
+EFIAPI
+AsciiStrHexToUint64 (
+  IN      CONST CHAR8      	      *String
+  )
+{
+  UINT64    Result;
+
+  ASSERT (String != NULL);
+  ASSERT (AsciiStrLen (String) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  
+  //
+  // Ignore the pad spaces (space or tab) and leading Zeros
+  //
+  //
+  // Ignore the pad spaces (space or tab) 
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  if (AsciiToUpper (*String) == 'X') {
+    ASSERT (*(String - 1)  == '0');
+    if (*(String - 1)  != '0') {
+      return 0;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  Result = 0;
+  
+  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the Hex Number represented by String overflows according 
+    // to the range defined by UINTN, then ASSERT().
+    //
+    ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_16) ||
+      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_16) && 
+      (InternalAsciiHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
+      );
+
+    Result = LShiftU64 (Result, 4) + InternalAsciiHexCharToUintn (*String);
+    String++;
+  }
+
+  return Result;
+}
+
+
+/**
+  Convert one Null-terminated ASCII string to a Null-terminated 
+  Unicode string and returns the Unicode string.
+
+  This function converts the contents of the ASCII string Source to the Unicode 
+  string Destination, and returns Destination.  The function terminates the 
+  Unicode string Destination by appending a Null-terminator character at the end. 
+  The caller is responsible to make sure Destination points to a buffer with size 
+  equal or greater than ((AsciiStrLen (Source) + 1) * sizeof (CHAR16)) in bytes.
+  
+  If Destination is NULL, then ASSERT().
+  If Destination is not aligned on a 16-bit boundary, then ASSERT().
+  If Source is NULL, then ASSERT().
+  If Source and Destination overlap, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and Source contains more than 
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than 
+  PcdMaximumUnicodeStringLength ASCII characters not including the 
+  Null-terminator, then ASSERT().
+
+  @param  Source        Pointer to a Null-terminated ASCII string.
+  @param  Destination   Pointer to a Null-terminated Unicode string.
+
+  @reture Destination
+
+**/
+CHAR16 *
+EFIAPI
+AsciiStrToUnicodeStr (
+  IN      CONST CHAR8       	      *Source,
+  OUT 	  CHAR16  	                *Destination
+  )
+{
+  ASSERT (Destination != NULL);
+  ASSERT (Source != NULL);
+
+  //
+  // Source and Destination should not overlap
+  //
+  ASSERT ((UINTN) ((CHAR8 *) Destination - Source) > AsciiStrLen (Source));
+  ASSERT ((UINTN) (Source - (CHAR8 *) Destination) > (AsciiStrLen (Source) * sizeof (CHAR16)));
+
+  //
+  // If PcdMaximumAsciiStringLength is not zero,
+  // length of Source should not more than PcdMaximumUnicodeStringLength
+  //
+  if (PcdGet32 (PcdMaximumAsciiStringLength) != 0) {
+    ASSERT (AsciiStrLen (Source) < PcdGet32 (PcdMaximumAsciiStringLength));
+  }
+
+  while (*Source != '\0') {
+    *(Destination++) = (CHAR16) *(Source++);
+  }
+  //
+  // End the Destination with a NULL.
+  //
+  *Destination = '\0';
+
+  return Destination;
+}
+
+/**
   Converts an 8-bit value to an 8-bit BCD value.
 
   Converts the 8-bit value specified by Value to BCD. The BCD value is
@@ -894,3 +2047,5 @@ BcdToDecimal8 (
   ASSERT ((Value & 0xf) < 0xa);
   return (UINT8) ((Value >> 4) * 10 + (Value & 0xf));
 }
+
+

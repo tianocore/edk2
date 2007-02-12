@@ -128,6 +128,26 @@ EfiNamedEventSignal (
   IN CONST EFI_GUID  *Name
   );
 
+/** 
+  Returns the current TPL.
+
+  This function returns the current TPL.  There is no EFI service to directly 
+  retrieve the current TPL. Instead, the RaiseTPL() function is used to raise 
+  the TPL to TPL_HIGH_LEVEL.  This will return the current TPL.  The TPL level 
+  can then immediately be restored back to the current TPL level with a call 
+  to RestoreTPL().
+
+  @param  VOID
+
+  @retvale EFI_TPL              The current TPL.
+
+**/
+EFI_TPL
+EFIAPI
+EfiGetCurrentTpl (
+  VOID
+  );
+
 /**
   This function initializes a basic mutual exclusion lock to the released state 
   and returns the lock.  Each lock provides mutual exclusion access at its task 
@@ -594,6 +614,5 @@ EFIAPI
 EfiGetNameGuidFromFwVolDevicePathNode (
   IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
   );
-
 
 #endif
