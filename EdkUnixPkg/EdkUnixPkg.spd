@@ -102,7 +102,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Library/DxeUnixLib/DxeUnixLib.msa</Filename>
     <Filename>Library/EdkUnixPeiPeCoffGetEntryPointLib/EdkUnixPeiPeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/UnixPeCoffLoaderLib/UnixPeCoffLoaderLib.msa</Filename>
-    <Filename>Library/UnixOemHookStatusCodeLib/UnixOemHookStatusCodeLib.msa</Filename>
+    <Filename>Library/PeiUnixOemHookStatusCodeLib/PeiUnixOemHookStatusCodeLib.msa</Filename>
+    <Filename>Library/DxeUnixOemHookStatusCodeLib/DxeUnixOemHookStatusCodeLib.msa</Filename>
     <Filename>Pei/AutoScan/UnixAutoScan.msa</Filename>
     <Filename>Pei/BootMode/BootMode.msa</Filename>
     <Filename>Pei/FirmwareVolume/UnixFwh.msa</Filename>
@@ -324,15 +325,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText>This PCD declares the title string of the text console window. 
         such as "My EFI Console".
         The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdUnixStatusCodeLibUseForPei</C_Name>
-      <Token>0x0000100b</Token>
-      <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>BOOLEAN</DatumType>
-      <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
-      <HelpText>Select which type of driver the library links against.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdUnixMemorySizeForSecMain</C_Name>

@@ -1,42 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>UnixOemHookStatusCodeLib</ModuleName>
-    <ModuleType>PEIM</ModuleType>
-    <GuidValue>f3c32014-8985-11db-bae7-0040d02b1835</GuidValue>
+    <ModuleName>DxeUnixOemHookStatusCodeLib</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>0BB6F68A-2FC5-4394-9375-2B43F1C34B59</GuidValue>
     <Version>1.0</Version>
     <Abstract>Memory Status Code Library for UEFI drivers</Abstract>
     <Description>Lib to provide memory journal status code reporting Routines</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
-    <License>
-      All rights reserved.
+    <Copyright>Copyright (c) 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved.
       This software and associated documentation (if any) is furnished
       under a license and may only be used or copied in accordance
       with the terms of the license. Except as permitted by such
       license, no part of this software or documentation may be
       reproduced, stored in a retrieval system, or transmitted in any
       form or by any means without the express written consent of
-      Intel Corporation.
-    </License>
+      Intel Corporation.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
     <SupportedArchitectures>IA32</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>UnixOemHookStatusCodeLib</OutputFileBasename>
+    <OutputFileBasename>DxeUnixOemHookStatusCodeLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER">
       <Keyword>OemHookStatusCodeLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PcdLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>HobLib</Keyword>
@@ -49,12 +41,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>ReportStatusCodeLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PeiServicesLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UnixLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -70,20 +56,13 @@
       <ProtocolCName>gEfiUnixThunkProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
-  <PPIs>
-    <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>gPeiUnixThunkPpiGuid</PpiCName>
-    </Ppi>
-  </PPIs>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
-  <PcdCoded xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <PcdEntry PcdItemType="FEATURE_FLAG">
-      <C_Name>PcdUnixStatusCodeLibUseForPei</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>Select which type of driver the library links against.</HelpText>
-    </PcdEntry>
-  </PcdCoded>
 </ModuleSurfaceArea>

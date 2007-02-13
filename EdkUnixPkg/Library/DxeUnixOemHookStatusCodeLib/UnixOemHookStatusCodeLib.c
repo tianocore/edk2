@@ -39,34 +39,15 @@ OemHookStatusCodeInitialize (
   VOID
   )
 {
-  PEI_UNIX_THUNK_PPI  *UnixThunkPpi;
-  EFI_STATUS        Status;
+  EFI_HOB_GUID_TYPE        *GuidHob;
 
-  if (FeaturePcdGet (PcdUnixStatusCodeLibUseForPei)) {
-    //
-    // Locate NtThunkPpi for retrieving standard output handle
-    //
-    Status = PeiServicesLocatePpi (
-               &gPeiUnixThunkPpiGuid,
-               0,
-               NULL,
-               (VOID **) &UnixThunkPpi
-               );
-
-    ASSERT_EFI_ERROR (Status);
-
-    mUnix  = (EFI_UNIX_THUNK_PROTOCOL *) UnixThunkPpi->UnixThunk ();
-  } else {
-    EFI_HOB_GUID_TYPE        *GuidHob;
-
-    //
-    // Retrieve UnixThunkProtocol from GUID'ed HOB
-    //
-    GuidHob = GetFirstGuidHob (&gEfiUnixThunkProtocolGuid);
-    ASSERT (GuidHob != NULL);
-    mUnix = (EFI_UNIX_THUNK_PROTOCOL *)(*(UINTN *)(GET_GUID_HOB_DATA (GuidHob)));
-    ASSERT (mUnix != NULL);
-  }
+  //
+  // Retrieve UnixThunkProtocol from GUID'ed HOB
+  //
+  GuidHob = GetFirstGuidHob (&gEfiUnixThunkProtocolGuid);
+  ASSERT (GuidHob != NULL);
+  mUnix = (EFI_UNIX_THUNK_PROTOCOL *)(*(UINTN *)(GET_GUID_HOB_DATA (GuidHob)));
+  ASSERT (mUnix != NULL);
 
   //
   // Cache standard output handle.
