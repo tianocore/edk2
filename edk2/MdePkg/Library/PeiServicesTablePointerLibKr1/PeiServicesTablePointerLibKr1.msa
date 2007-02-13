@@ -8,7 +8,7 @@
     <Abstract>Component description file for IPF KR1 Pei Services Table Pointer Library</Abstract>
     <Description>PEI Services Table Library implementation that retrieves a pointer to the PEI
       Services Table from the KR1 register on IPF.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -25,9 +25,6 @@
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="PEIM PEI_CORE">
       <Keyword>PeiServicesTablePointerLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
