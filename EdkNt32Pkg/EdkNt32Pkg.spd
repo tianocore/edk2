@@ -109,7 +109,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
     <Filename>Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.msa</Filename>
-    <Filename>Library/Nt32OemHookStatusCodeLib/Nt32OemHookStatusCodeLib.msa</Filename>
+    <Filename>Library/PeiNt32OemHookStatusCodeLib/PeiNt32OemHookStatusCodeLib.msa</Filename>
+    <Filename>Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.msa</Filename>
     <Filename>Logo/Logo.msa</Filename>
     <Filename>Pei/Autoscan/WinNtAutoScan.msa</Filename>
     <Filename>Pei/BootMode/BootMode.msa</Filename>
@@ -352,15 +353,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText>This PCD declares the title string of the text console window. 
         such as "My EFI Console".
         The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdNt32StatusCodeLibUseForPei</C_Name>
-      <Token>0x0000100b</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>BOOLEAN</DatumType>
-      <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
-      <HelpText>Select which type of driver the library links against.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
