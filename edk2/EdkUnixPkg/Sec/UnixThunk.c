@@ -90,6 +90,18 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
 }
 
 void
+msSleep (unsigned long Milliseconds)
+{
+  struct timespec ts;
+
+  ts.tv_sec = Milliseconds / 1000;
+  ts.tv_nsec = (Milliseconds % 1000) * 1000000;
+
+  while (nanosleep (&ts, &ts) != 0 && errno == EINTR)
+    ;
+}
+
+void
 GetLocalTime (EFI_TIME *Time)
 {
   struct tm *tm;
@@ -108,12 +120,6 @@ GetLocalTime (EFI_TIME *Time)
   Time->TimeZone = timezone;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
-}
-
-void
-msSleep (unsigned long Milliseconds)
-{
-  usleep (Milliseconds * 1000);
 }
 
 static void

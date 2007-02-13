@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern void msSleep (unsigned long Milliseconds);
+
 /* XQueryPointer  */
 
 struct uga_drv_shift_mask
@@ -347,7 +349,7 @@ UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
     return EFI_SUCCESS;
   else {
     /* EFI is certainly polling.  Be CPU-friendly.  */
-    usleep (50000);
+    msSleep (20);
     return EFI_NOT_READY;
   }
 }
