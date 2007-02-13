@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
     <Description>Entry point library to a EFI/DXE driver</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -29,13 +29,7 @@
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiRuntimeServicesTableLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>

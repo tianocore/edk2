@@ -32,13 +32,13 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
       <Keyword>IoLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
       <Keyword>PcdLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
@@ -55,7 +55,7 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
   <PcdCoded>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+    <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
       <C_Name>PcdFSBClock</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This value is FSB Clock frequency. Its unit is Hz and its default value is 200000000, that means FSB frequency is 200Mhz.</HelpText>
