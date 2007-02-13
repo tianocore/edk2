@@ -9,7 +9,7 @@
     <Description>PEI Services Table Library implementation that retrieves a pointer to the
       PEI Services Table from a global variable.  Not available to modules that execute from
       read-only memory.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@
     <OutputFileBasename>PeiServicesTablePointerLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_RUNTIME_DRIVER PEIM PEI_CORE">
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="PEIM PEI_CORE">
       <Keyword>PeiServicesTablePointerLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
