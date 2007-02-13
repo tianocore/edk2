@@ -30,10 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <RePackage>false</RePackage>
   </PackageDefinitions>
   <LibraryClassDeclarations>
-    <LibraryClass Name="EdkGenericBdsLib">
-      <IncludeHeader>Include/Library/EdkGenericBdsLib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
     <LibraryClass Name="UnixLib">
       <IncludeHeader>Include/Library/UnixLib.h</IncludeHeader>
       <HelpText/>
@@ -42,10 +38,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <IndustryStdIncludes>
     <IndustryStdHeader Name="UnixInclude">
       <IncludeHeader>Include/Common/UnixInclude.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkGenericBdsLib">
-      <IncludeHeader>Include/Library/EdkGenericBdsLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="UnixLib">
@@ -108,11 +100,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Dxe/UnixThunk/Cpu/Cpu.msa</Filename>
     <Filename>Dxe/UnixThunk/UnixThunk/UnixThunk.msa</Filename>
     <Filename>Library/DxeUnixLib/DxeUnixLib.msa</Filename>
-    <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
     <Filename>Library/EdkUnixPeiPeCoffGetEntryPointLib/EdkUnixPeiPeCoffGetEntryPointLib.msa</Filename>
     <Filename>Library/UnixPeCoffLoaderLib/UnixPeCoffLoaderLib.msa</Filename>
     <Filename>Library/UnixOemHookStatusCodeLib/UnixOemHookStatusCodeLib.msa</Filename>
-    <Filename>Logo/Logo.msa</Filename>
     <Filename>Pei/AutoScan/UnixAutoScan.msa</Filename>
     <Filename>Pei/BootMode/BootMode.msa</Filename>
     <Filename>Pei/FirmwareVolume/UnixFwh.msa</Filename>
