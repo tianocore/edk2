@@ -48,12 +48,8 @@ EFI_TIMER_NOTIFY        mTimerNotifyFunction = NULL;
 //
 // The current period of the timer interrupt
 //
-UINT64                  mTimerPeriod;
+UINT64                  mTimerPeriodMs;
 
-//
-// The timer value from the last timer interrupt
-//
-UINT32                  mNtLastTick;
 
 VOID
 TimerCallback (UINT64 DeltaMs)
@@ -83,14 +79,16 @@ Returns:
 
   OriginalTPL = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
 
-  CallbackFunction = mTimerNotifyFunction;
+  if (OriginalTPL < EFI_TPL_HIGH_LEVEL) {
+    CallbackFunction = mTimerNotifyFunction;
 
-  //
-  // Only invoke the callback function if a Non-NULL handler has been
-  // registered. Assume all other handlers are legal.
-  //
-  if (CallbackFunction != NULL) {
-    CallbackFunction ((UINT64) (DeltaMs * 10000));
+    //
+    // Only invoke the callback function if a Non-NULL handler has been
+    // registered. Assume all other handlers are legal.
+    //
+    if (CallbackFunction != NULL) {
+      CallbackFunction ((UINT64) (DeltaMs * 10000));
+    }
   }
 
   gBS->RestoreTPL (OriginalTPL);
@@ -161,7 +159,7 @@ Returns:
     gUnix->SetTimer (0, TimerCallback);
   } else if (mTimerNotifyFunction == NULL) {
     /* Enable Timer.  */
-    gUnix->SetTimer (mTimerPeriod * 10, TimerCallback);
+    gUnix->SetTimer (mTimerPeriodMs, TimerCallback);
   }
   mTimerNotifyFunction = NotifyFunction;
 
@@ -219,9 +217,9 @@ Returns:
   if (TimerPeriod == 0
       || ((TimerPeriod > TIMER_MINIMUM_VALUE)
 	  && (TimerPeriod < TIMER_MAXIMUM_VALUE))) {
-    mTimerPeriod = TimerPeriod;
+    mTimerPeriodMs = DivU64x32 (TimerPeriod + 5000, 10000);
 
-    gUnix->SetTimer (TimerPeriod * 10, TimerCallback);
+    gUnix->SetTimer (mTimerPeriodMs, TimerCallback);
   }
 
   return EFI_SUCCESS;
@@ -261,7 +259,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  *TimerPeriod = mTimerPeriod;
+  *TimerPeriod = mTimerPeriodMs * 10000;
 
   return EFI_SUCCESS;
 }
@@ -350,6 +348,14 @@ Returns:
                   EFI_NATIVE_INTERFACE,
                   &mTimer
                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Start the timer thread at the default timer period
+  //
+  Status = mTimer.SetTimerPeriod (&mTimer, DEFAULT_TIMER_TICK_DURATION);
   if (EFI_ERROR (Status)) {
     return Status;
   }

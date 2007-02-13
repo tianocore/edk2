@@ -34,9 +34,9 @@ Abstract:
 #define TIMER_MAXIMUM_VALUE (0x100000000ULL - 1)
 
 //
-// Default timer value in 100 ns units (10 ms)
+// Default timer value in 100 ns units (50 ms)
 //
-#define DEFAULT_TIMER_TICK_DURATION 100000
+#define DEFAULT_TIMER_TICK_DURATION 500000
 
 //
 // Function Prototypes
