@@ -42,18 +42,46 @@ PeCoffLoaderGetEntryPoint (
   );
 
 /**
-  Returns the machine type of PE/COFF image. 
+  Returns the machine type of a PE/COFF image.
 
-  @param  Image   Pointer to a PE/COFF header
+  Returns the machine type from the PE/COFF image specified by Pe32Data.
+  If Pe32Data is NULL, then ASSERT().
 
-  @return         Machine type or zero if not a valid iamge
+  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+                     memory.
+
+  @return Machine type or zero if not a valid iamge.
 
 **/
 UINT16
 EFIAPI
 PeCoffLoaderGetMachineType (
-  IN  VOID    *Image
+  IN VOID  *Pe32Data
   );
 
+/**
+  Returns a pointer to the PDB file name for a PE/COFF image that has been
+  loaded into system memory with the PE/COFF Loader Library functions. 
+
+  Returns the PDB file name for the PE/COFF image specified by Pe32Data.  If
+  the PE/COFF image specified by Pe32Data is not a valid, then NULL is
+  returned.  If the PE/COFF image specified by Pe32Data does not contain a
+  debug directory entry, then NULL is returned.  If the debug directory entry
+  in the PE/COFF image specified by Pe32Data does not contain a PDB file name,
+  then NULL is returned.
+  If Pe32Data is NULL, then ASSERT().
+
+  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+                     memory.
+
+  @return The PDB file name for the PE/COFF image specified by Pe32Data or NULL
+          if it cannot be retrieved.
+
+**/
+VOID *
+EFIAPI
+PeCoffLoaderGetPdbPointer (
+  IN VOID  *Pe32Data
+  );
 
 #endif
