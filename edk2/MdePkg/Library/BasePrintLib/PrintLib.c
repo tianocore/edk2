@@ -16,8 +16,9 @@
 
 #include "PrintLibInternal.h"
 
-#define WARNING_STATUS_NUMBER          4
-#define ERROR_STATUS_NUMBER            24
+#define WARNING_STATUS_NUMBER         4
+#define ERROR_STATUS_NUMBER           24
+#define ASSERT_UNICODE_BUFFER(Buffer) ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *StatusString [] = {
   "Success",                      //  RETURN_SUCCESS                = 0
@@ -613,7 +614,9 @@ BasePrintLibSPrint (
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
+  If BufferSize > 1 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
   ASSERT().
@@ -640,6 +643,8 @@ UnicodeVSPrint (
   IN  VA_LIST       Marker
   )
 {
+  ASSERT_UNICODE_BUFFER(StartOfBuffer);
+  ASSERT_UNICODE_BUFFER(FormatString);
   return BasePrintLibVSPrint ((CHAR8 *)StartOfBuffer, BufferSize >> 1, FORMAT_UNICODE | OUTPUT_UNICODE, (CHAR8 *)FormatString, Marker);
 }
 
@@ -656,7 +661,9 @@ UnicodeVSPrint (
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
+  If BufferSize > 1 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
   ASSERT().
@@ -702,6 +709,7 @@ UnicodeSPrint (
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
@@ -729,6 +737,7 @@ UnicodeVSPrintAsciiFormat (
   IN  VA_LIST      Marker
   )
 {
+  ASSERT_UNICODE_BUFFER(StartOfBuffer);
   return BasePrintLibVSPrint ((CHAR8 *)StartOfBuffer, BufferSize >> 1, OUTPUT_UNICODE,FormatString, Marker);
 }
 
@@ -746,6 +755,7 @@ UnicodeVSPrintAsciiFormat (
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
@@ -804,6 +814,7 @@ UnicodeSPrintAsciiFormat (
   add up to Width characters.
   If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
   If Buffer is NULL, then ASSERT().
+  If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If unsupported bits are set in Flags, then ASSERT().
   If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
@@ -827,6 +838,7 @@ UnicodeValueToString (
   IN UINTN       Width
   )
 {
+  ASSERT_UNICODE_BUFFER(Buffer);
   return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 2);
 }
 
@@ -935,6 +947,7 @@ AsciiSPrint (
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
+  If BufferSize > 0 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
   ASSERT().
@@ -961,6 +974,7 @@ AsciiVSPrintUnicodeFormat (
   IN  VA_LIST       Marker
   )
 {
+  ASSERT_UNICODE_BUFFER (FormatString);
   return BasePrintLibVSPrint (StartOfBuffer, BufferSize, FORMAT_UNICODE, (CHAR8 *)FormatString, Marker);
 }
 
@@ -979,6 +993,7 @@ AsciiVSPrintUnicodeFormat (
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
+  If BufferSize > 0 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
   ASSERT().
@@ -1060,6 +1075,6 @@ AsciiValueToString (
   IN UINTN      Width
   )
 {
-  return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 1);
+  return BasePrintLibConvertValueToString (Buffer, Flags, Value, Width, 1);
 }
 

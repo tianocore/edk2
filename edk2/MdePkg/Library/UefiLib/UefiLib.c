@@ -383,24 +383,26 @@ EfiReleaseLock (
 }
 
 /**
-  Tests whether a controller is managed by a specific driver.
+  Tests whether a controller handle is being managed by a specific driver.
 
-  This function tests whether a specific driver manages ControllerHandle by
-  opening on DriverBindingHandle a protocol specified by ProtocolGuid with
-  attribute EFI_OPEN_PROTOCOL_BY_DRIVER.  This library function is used to
-  implement the Component Name Protocol for EFI Drivers.
+  This function tests whether the driver specified by DriverBindingHandle is
+  currently managing the controller specified by ControllerHandle.  This test
+  is performed by evaluating if the the protocol specified by ProtocolGuid is
+  present on ControllerHandle and is was opened by DriverBindingHandle with an
+  attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. 
   If ProtocolGuid is NULL, then ASSERT().
 
   @param  ControllerHandle     A handle for a controller to test.
   @param  DriverBindingHandle  Specifies the driver binding handle for the
                                driver.
-  @param  ProtocolGuid         Supplies GUID for the protocol opened by the
-                               driver on the controller. 
+  @param  ProtocolGuid         Specifies the protocol that the driver specified
+                               by DriverBindingHandle opens in its Start()
+                               function.
 
-  @retval EFI_SUCCESS          ControllerHandle is managed by the specific
-                               driver.
-  @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the specific
-                               driver.
+  @retval EFI_SUCCESS          ControllerHandle is managed by the driver
+                               specifed by DriverBindingHandle.
+  @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the driver
+                               specifed by DriverBindingHandle.
 
 **/
 EFI_STATUS
@@ -442,19 +444,18 @@ EfiTestManagedDevice (
 }
 
 /**
-  Tests whether a child handle is a children device of the controller.
+  Tests whether a child handle is a child device of the controller.
 
   This function tests whether ChildHandle is one of the children of
-  ControllerHandle which are consuming a protocol specified by ProtocolGuid
-  with the attribute bit EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER set.  This
-  library function is used to implement the Component Name Protocol for EFI
-  Drivers.
+  ControllerHandle.  This test is performed by checking to see if the protocol
+  specified by ProtocolGuid is present on ControllerHandle and opened by
+  ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   If ProtocolGuid is NULL, then ASSERT().
 
   @param  ControllerHandle     A handle for a (parent) controller to test. 
   @param  ChildHandle          A child handle to test.
-  @param  ConsumsedGuid        Supplies GUID for the protocol consumed by
-                               children from controller. 
+  @param  ConsumsedGuid        Supplies the protocol that the child controller
+                               opens on its parent controller. 
 
   @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
   @retval EFI_UNSUPPORTED      ChildHandle is not a child of the
