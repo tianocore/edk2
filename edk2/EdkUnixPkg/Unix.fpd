@@ -445,7 +445,6 @@
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
-        <Instance ModuleGuid="f3c32014-8985-11db-bae7-0040d02b1835" ModuleVersion="1.0" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835" PackageVersion="0.3"/>
         <!--Pkg: EdkUnixPkg Mod: PeiUnixOemHookStatusCodeLib Path: EdkUnixPkg\Library\PeiUnixOemHookStatusCodeLib\PeiUnixOemHookStatusCodeLib.msa-->
         <Instance ModuleGuid="23E378C1-B199-49ad-9F14-DAF5D3C7EC28" ModuleVersion="1.0" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: PeiServicesTablePointerLib Path: MdePkg\Library\PeiServicesTablePointerLib\PeiServicesTablePointerLib.msa-->
@@ -2368,7 +2367,6 @@
         <Instance ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <Instance ModuleGuid="f3c32014-8985-11db-bae7-0040d02b1835" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835"/>
         <!--Pkg: MdePkg Mod: UefiRuntimeServicesTableLib Path: MdePkg\Library\UefiRuntimeServicesTableLib\UefiRuntimeServicesTableLib.msa-->
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: EdkUnixPkg Mod: DxeUnixOemHookStatusCodeLib Path: EdkUnixPkg\Library\DxeUnixOemHookStatusCodeLib\DxeUnixOemHookStatusCodeLib.msa-->
