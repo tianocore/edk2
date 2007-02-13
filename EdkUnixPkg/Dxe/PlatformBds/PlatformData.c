@@ -20,7 +20,6 @@ Abstract:
 
 --*/
 
-#include "Generic/Bds.h"
 #include "BdsPlatform.h"
 
 //

@@ -9,42 +9,19 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name: 
+Module Name:
 
-  BootManager.h
+  Bds.dxs
 
 Abstract:
 
-  The platform boot manager reference implement
-
-Revision History
-
+  Dependency expression source file.  This driver produces an arch protocol, so
+  must dipatch early.
+  
 --*/
+#include <AutoGen.h>
+#include <DxeDepex.h>
 
-#ifndef _EFI_BOOT_MANAGER_H
-#define _EFI_BOOT_MANAGER_H
-
-#include "Generic/Bds.h"
-#include "BdsPlatform.h"
-#include "Generic/String.h"
-
-EFI_STATUS
-EFIAPI
-BootManagerCallbackRoutine (
-  IN EFI_FORM_CALLBACK_PROTOCOL       *This,
-  IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
-  OUT EFI_HII_CALLBACK_PACKET         **Packet
-  );
-
-VOID
-CallBootManager (
-  VOID
-);
-
-#define BOOT_MANAGER_GUID \
-  { \
-    0x847bc3fe, 0xb974, 0x446d, {0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b } \
-  }
-
-#endif
+DEPENDENCY_START
+  EFI_HII_PROTOCOL_GUID
+DEPENDENCY_END

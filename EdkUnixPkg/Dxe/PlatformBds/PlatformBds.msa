@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>Bds</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>f392b762-8985-11db-be87-0040d02b1835</GuidValue>
     <Version>1.0</Version>
     <Abstract>Platfrom BDS driver</Abstract>
-    <Description>
-      Do platform action customized by IBV/OEM.
-    </Description>
+    <Description>Do platform action customized by IBV/OEM.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -78,48 +76,15 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>HiiLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>EdkGenericPlatformBdsLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PlatformData.c</Filename>
     <Filename>BdsPlatform.h</Filename>
     <Filename>BdsPlatform.c</Filename>
-    <Filename>Generic/Bds.h</Filename>
-    <Filename>Generic/BdsEntry.c</Filename>
-    <Filename>Generic/FrontPage.h</Filename>
-    <Filename>Generic/FrontPage.c</Filename>
-    <Filename>Generic/FrontPageStrings.uni</Filename>
-    <Filename>Generic/FrontPageVfr.Vfr</Filename>
-    <Filename>Generic/Language.h</Filename>
-    <Filename>Generic/Language.c</Filename>
-    <Filename>Generic/String.h</Filename>
-    <Filename>Generic/String.c</Filename>
-    <Filename>Generic/Strings.uni</Filename>
-    <Filename>Generic/Capsules.c</Filename>
-    <Filename>Generic/MemoryTest.c</Filename>
-    <Filename>Generic/BootMaint/BmString.uni</Filename>
-    <Filename>Generic/BootMaint/Bm.vfr</Filename>
-    <Filename>Generic/BootMaint/BBSsupport.h</Filename>
-    <Filename>Generic/BootMaint/BootMaint.h</Filename>
-    <Filename>Generic/BootMaint/FormGuid.h</Filename>
-    <Filename>Generic/BootMaint/BmLib.c</Filename>
-    <Filename>Generic/BootMaint/BootOption.c</Filename>
-    <Filename>Generic/BootMaint/ConsoleOption.c</Filename>
-    <Filename>Generic/BootMaint/Data.c</Filename>
-    <Filename>Generic/BootMaint/Variable.c</Filename>
-    <Filename>Generic/BootMaint/UpdatePage.c</Filename>
-    <Filename>Generic/BootMaint/BBSsupport.c</Filename>
-    <Filename>Generic/BootMaint/BootMaint.c</Filename>
-    <Filename>Generic/BootMaint/FileExplorer.c</Filename>
-    <Filename>Generic/BootMaint/FE.vfr</Filename>
-    <Filename>Generic/BootMngr/BootManager.h</Filename>
-    <Filename>Generic/BootMngr/BootManager.c</Filename>
-    <Filename>Generic/BootMngr/BootManagerStrings.uni</Filename>
-    <Filename>Generic/BootMngr/BootManagerVfr.Vfr</Filename>
-    <Filename>Generic/DeviceMngr/DeviceManager.h</Filename>
-    <Filename>Generic/DeviceMngr/DeviceManager.c</Filename>
-    <Filename>Generic/DeviceMngr/DeviceManagerStrings.uni</Filename>
-    <Filename>Generic/DeviceMngr/DeviceManagerVfr.Vfr</Filename>
-    <Filename>Generic/Bds.dxs</Filename>
+    <Filename>Bds.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -180,6 +145,15 @@
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiUnixThunkProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiUnixIoProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiUnixUgaIoProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <DataHubs>
