@@ -139,7 +139,9 @@ typedef struct {
   overlap, then the results are undefined.
 
   If Destination is NULL, then ASSERT().
+  If Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Source is NULL, then ASSERT().
+  If Source is not aligned on a 16-bit boundary, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the
@@ -170,8 +172,10 @@ StrCpy (
   characters. If Source and Destination overlap, then the results are
   undefined.
 
-  If Destination is NULL, then ASSERT().
-  If Source is NULL, then ASSERT().
+  If Length > 0 and Destination is NULL, then ASSERT().
+  If Length > 0 and Destination is not aligned on a 16-bit boundary, then ASSERT().
+  If Length > 0 and Source is NULL, then ASSERT().
+  If Length > 0 and Source is not aligned on a 16-bit bounadry, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the
@@ -198,6 +202,7 @@ StrnCpy (
   Unicode string specified by String.
 
   If String is NULL, then ASSERT().
+  If String is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -220,6 +225,7 @@ StrLen (
   string specified by String.
 
   If String is NULL, then ASSERT().
+  If String is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -245,7 +251,9 @@ StrSize (
   mismatched Unicode character in FirstString.
 
   If FirstString is NULL, then ASSERT().
+  If FirstString is not aligned on a 16-bit boundary, then ASSERT().
   If SecondString is NULL, then ASSERT().
+  If SecondString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
   than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -277,8 +285,10 @@ StrCmp (
   value returned is the first mismatched Unicode character in SecondString
   subtracted from the first mismatched Unicode character in FirstString.
 
-  If FirstString is NULL, then ASSERT().
-  If SecondString is NULL, then ASSERT().
+  If Length > 0 and FirstString is NULL, then ASSERT().
+  If Length > 0 and FirstString is not aligned on a 16-bit bounadary, then ASSERT().
+  If Length > 0 and SecondString is NULL, then ASSERT().
+  If Length > 0 and SecondString is not aligned on a 16-bit bounadary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
   than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -312,7 +322,9 @@ StrnCmp (
   results are undefined.
 
   If Destination is NULL, then ASSERT().
+  If Destination is not aligned on a 16-bit bounadary, then ASSERT().
   If Source is NULL, then ASSERT().
+  If Source is not aligned on a 16-bit bounadary, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
   than PcdMaximumUnicodeStringLength Unicode characters not including the
@@ -351,7 +363,9 @@ StrCat (
   the results are undefined.
 
   If Destination is NULL, then ASSERT().
-  If Source is NULL, then ASSERT().
+  If Length > 0 and Destination is not aligned on a 16-bit boundary, then ASSERT().
+  If Length > 0 and Source is NULL, then ASSERT().
+  If Length > 0 and Source is not aligned on a 16-bit boundary, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
   than PcdMaximumUnicodeStringLength Unicode characters not including the
@@ -588,6 +602,7 @@ StrHexToUint64 (
   
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
+  If Source is not aligned on a 16-bit boundary, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   
   If PcdMaximumUnicodeStringLength is not zero, and Source contains 
@@ -677,7 +692,8 @@ AsciiStrnCpy (
   This function returns the number of ASCII characters in the Null-terminated
   ASCII string specified by String.
 
-  If String is NULL, then ASSERT().
+  If Length > 0 and Destination is NULL, then ASSERT().
+  If Length > 0 and Source is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and String contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
@@ -792,8 +808,8 @@ AsciiStriCmp (
   is the first mismatched ASCII character in SecondString subtracted from the
   first mismatched ASCII character in FirstString.
 
-  If FirstString is NULL, then ASSERT().
-  If SecondString is NULL, then ASSERT().
+  If Length > 0 and FirstString is NULL, then ASSERT().
+  If Length > 0 and SecondString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
@@ -861,8 +877,8 @@ AsciiStrCat (
   Destination is returned unmodified. If Source and Destination overlap, then
   the results are undefined.
 
-  If Destination is NULL, then ASSERT().
-  If Source is NULL, then ASSERT().
+  If Length > 0 and Destination is NULL, then ASSERT().
+  If Length > 0 and Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and Destination contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
