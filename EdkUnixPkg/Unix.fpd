@@ -2063,7 +2063,6 @@
         <Instance ModuleGuid="baa1baa3-0a8d-402c-8042-985115fae953" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="f3aaea62-8985-11db-baff-0040d02b1835" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835"/>
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
@@ -2073,6 +2072,10 @@
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: EdkModulePkg Mod: EdkPlatformGenericBdsLib Path: EdkModulePkg/Library/EdkGenericPlatformBdsLib/EdkGenericPlatformBdsLib.msa-->
+        <Instance ModuleGuid="f392b762-8985-11db-be87-0040d02b1835" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkGenericBdsLib Path: EdkModulePkg/Library/EdkGenericBdsLib/EdkGenericBdsLib.msa-->
+        <Instance ModuleGuid="f3aaea62-8985-11db-baff-0040d02b1835" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -4371,12 +4374,6 @@
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835" ModuleGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D">
-      <ModuleSaBuildOptions>
-        <FvBinding>FV_RECOVERY</FvBinding>
-        <FfsFormatKey>Logo</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="93B80004-9FB3-11d4-9A3A-0090273FC14D">
@@ -7284,6 +7281,13 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
+    <!--Mod: Logo Type: BASE Path: EdkModulePkg/Logo/Logo.msa-->
+    <ModuleSA ModuleGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="IA32">
+      <ModuleSaBuildOptions>
+        <FvBinding>FV_RECOVERY</FvBinding>
+        <FfsFormatKey>Logo</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
   </FrameworkModules>
   <DynamicPcdBuildDefinitions>
     <PcdBuildData ItemType="DYNAMIC">
@@ -7491,7 +7495,6 @@
         <Module ModuleGuid="96B5C032-DF4C-4b6e-8232-438DCF448D0E" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="FCD337AB-B1D3-4EF8-957C-8048606FF670" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="1FA1F39E-FEFF-4aae-BD7B-38A070A3B609" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
-        <Module ModuleGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D" PackageGuid="f2805c44-8985-11db-9e98-0040d02b1835" Arch="IA32"/>
         <Module ModuleGuid="93B80004-9FB3-11d4-9A3A-0090273FC14D" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="EBf342FE-B1D3-4EF8-957C-8048606FF670" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="FE3542FE-C1D3-4EF8-657C-8048606FF670" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
@@ -7509,6 +7512,7 @@
         <Module ModuleGuid="2D2E62CF-9ECF-43b7-8219-94E7FC713DFE" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="A5C6D68B-E78A-4426-9278-A8F0D9EB4D8F" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="2D2E62AA-9ECF-43b7-8219-94E7FC713DFE" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
+        <Module ModuleGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" Arch="IA32"/>
         <Module ModuleGuid="A3f436EA-A127-4EF8-957C-8048606FF670" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="a46c3330-be36-4977-9d24-a7cf92eef0fe" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
         <Module ModuleGuid="A2f436EA-A127-4EF8-957C-8048606FF670" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" Arch="IA32"/>
