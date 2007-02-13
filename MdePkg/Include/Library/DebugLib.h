@@ -28,21 +28,40 @@
 //
 // Declare bits for PcdDebugPrintErrorLevel and the ErrorLevel parameter of DebugPrint()
 //
-#define EFI_D_INIT      0x00000001  // Initialization style messages
-#define EFI_D_WARN      0x00000002  // Warnings
-#define EFI_D_LOAD      0x00000004  // Load events
-#define EFI_D_FS        0x00000008  // EFI File system
-#define EFI_D_POOL      0x00000010  // Alloc & Free's
-#define EFI_D_PAGE      0x00000020  // Alloc & Free's
-#define EFI_D_INFO      0x00000040  // Verbose
-#define EFI_D_VARIABLE  0x00000100  // Variable
-#define EFI_D_BM        0x00000400  // Boot Manager (BDS)
-#define EFI_D_BLKIO     0x00001000  // BlkIo Driver
-#define EFI_D_NET       0x00004000  // SNI Driver
-#define EFI_D_UNDI      0x00010000  // UNDI Driver
-#define EFI_D_LOADFILE  0x00020000  // UNDI Driver
-#define EFI_D_EVENT     0x00080000  // Event messages
-#define EFI_D_ERROR     0x80000000  // Error
+#define DEBUG_INIT      0x00000001  // Initialization
+#define DEBUG_WARN      0x00000002  // Warnings
+#define DEBUG_LOAD      0x00000004  // Load events
+#define DEBUG_FS        0x00000008  // EFI File system
+#define DEBUG_POOL      0x00000010  // Alloc & Free's
+#define DEBUG_PAGE      0x00000020  // Alloc & Free's
+#define DEBUG_INFO      0x00000040  // Verbose
+#define DEBUG_VARIABLE  0x00000100  // Variable
+#define DEBUG_BM        0x00000400  // Boot Manager
+#define DEBUG_BLKIO     0x00001000  // BlkIo Driver
+#define DEBUG_NET       0x00004000  // SNI Driver
+#define DEBUG_UNDI      0x00010000  // UNDI Driver
+#define DEBUG_LOADFILE  0x00020000  // UNDI Driver
+#define DEBUG_EVENT     0x00080000  // Event messages
+#define DEBUG_ERROR     0x80000000  // Error
+
+//
+// Aliases of debug message mask bits
+//
+#define EFI_D_INIT      DEBUG_INIT
+#define EFI_D_WARN      DEBUG_WARN
+#define EFI_D_LOAD      DEBUG_LOAD
+#define EFI_D_FS        DEBUG_FS
+#define EFI_D_POOL      DEBUG_POOL
+#define EFI_D_PAGE      DEBUG_PAGE
+#define EFI_D_INFO      DEBUG_INFO
+#define EFI_D_VARIABLE  DEBUG_VARIABLE
+#define EFI_D_BM        DEBUG_BM
+#define EFI_D_BLKIO     DEBUG_BLKIO
+#define EFI_D_NET       DEBUG_NET
+#define EFI_D_UNDI      DEBUG_UNDI
+#define EFI_D_LOADFILE  DEBUG_LOADFILE
+#define EFI_D_EVENT     DEBUG_EVENT
+#define EFI_D_ERROR     DEBUG_ERROR
 
 /**
 
