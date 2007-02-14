@@ -616,4 +616,96 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
   );
 
+/** 
+  Prints a formatted Unicode string to the console output device specified by 
+  ConOut defined in the EFI_SYSTEM_TABLE.
+
+  This function prints a formatted Unicode string to the console output device 
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of Unicode 
+  characters that printed to ConOut.  If the length of the formatted Unicode 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+
+  @param Format   Null-terminated Unicode format string.
+  @param ...      VARARG list consumed to process Format.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+**/
+UINTN
+EFIAPI
+Print (
+  IN CONST CHAR16  *Format,
+  ...
+  );
+
+/** 
+  Prints a formatted Unicode string to the console output device specified by 
+  StdErr defined in the EFI_SYSTEM_TABLE.
+
+  This function prints a formatted Unicode string to the console output device 
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of Unicode 
+  characters that printed to StdErr.  If the length of the formatted Unicode 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
+
+  @param Format   Null-terminated Unicode format string.
+  @param ...      VARARG list consumed to process Format.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+**/
+UINTN
+EFIAPI
+ErrorPrint (
+  IN CONST CHAR16  *Format,
+  ...
+  );
+
+/** 
+  Prints a formatted ASCII string to the console output device specified by 
+  ConOut defined in the EFI_SYSTEM_TABLE.
+
+  This function prints a formatted ASCII string to the console output device 
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of ASCII 
+  characters that printed to ConOut.  If the length of the formatted ASCII 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+
+  @param Format   Null-terminated ASCII format string.
+  @param ...      VARARG list consumed to process Format.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+**/
+UINTN
+EFIAPI
+AsciiPrint (
+  IN CONST CHAR8  *Format,
+  ...
+  );
+
+/** 
+  Prints a formatted ASCII string to the console output device specified by 
+  StdErr defined in the EFI_SYSTEM_TABLE.
+
+  This function prints a formatted ASCII string to the console output device 
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of ASCII 
+  characters that printed to StdErr.  If the length of the formatted ASCII 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
+
+  @param Format   Null-terminated ASCII format string.
+  @param ...      VARARG list consumed to process Format.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+**/
+UINTN
+EFIAPI
+AsciiErrorPrint (
+  IN CONST CHAR8  *Format,
+  ...
+  );
+
 #endif
