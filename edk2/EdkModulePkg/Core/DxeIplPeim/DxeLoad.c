@@ -383,7 +383,10 @@ Returns:
                  &Hob
                  );
       CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
-      if (!EFI_ERROR (Status)) {
+      //
+      // Find all Fv type ffs to get all FvImage and add them into FvHob
+      //
+      if (!EFI_ERROR (Status) && (Type != EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE)) {
         return EFI_SUCCESS;
       }
     }
@@ -661,7 +664,6 @@ Returns:
   EFI_GUID                        TempGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
-  UINT32                          FvAlignment;
 
   //
   // Initialize local variables.
@@ -877,83 +879,66 @@ Returns:
             return EFI_NOT_FOUND;
           }
         }
-        
-        CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
-        if (CmpSection->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
-          // 
-          // Firmware Volume Image in this Section
-          // Skip the section header to get FvHeader
-          //
-          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
 
-          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {            
-            //
-            // Adjust Fv Base Address Alignment based on Align Attributes in Fv Header
-            //
-            
-            //
-            // When FvImage support Alignment, we need to check whether 
-            // its alignment is correct. 
-            //
-            if (FvHeader->Attributes | EFI_FVB_ALIGNMENT_CAP) {
-              
-              //
-              // Calculate the mini alignment for this FvImage
-              //
-              FvAlignment = 1 << (LowBitSet32 (FvHeader->Attributes >> 16) + 1);
-              
-              //
-              // If current FvImage base address doesn't meet the its alignment,
-              // we need to reload this FvImage to another correct memory address.
-              //
-              if (((UINTN) FvHeader % FvAlignment) != 0) {
-                DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength), FvAlignment);
-                if (DstBuffer == NULL) {
-                  return EFI_OUT_OF_RESOURCES;
-                }
-                CopyMem (DstBuffer, FvHeader, (UINTN) FvHeader->FvLength);
-                FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
-              }
-            }
-            //
-            // Build new FvHob for new decompressed Fv image.
-            //
-            BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
-            
-            //
-            // Set the original FvHob to unused.
-            //
-            if (OrigHob != NULL) {
-              OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
-            }
-            
-            //
-            // when search FvImage Section return true.
-            //
-            if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
-              *Pe32Data = (VOID *) FvHeader;
-              return EFI_SUCCESS;
-            } else {
-              return EFI_NOT_FOUND;
-            }
-          }
-        }
         //
         // Decompress successfully.
         // Loop the decompressed data searching for expected section.
         //
+        CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
         CmpFileData = (VOID *) DstBuffer;
         CmpFileSize = DstBufferSize;
         do {
           CmpSectionLength = *(UINT32 *) (CmpSection->Size) & 0x00ffffff;
-          if (CmpSection->Type == EFI_SECTION_PE32) {
+          if (CmpSection->Type == SectionType) {
             //
             // This is what we want
             //
-            *Pe32Data = (VOID *) (CmpSection + 1);
-            return EFI_SUCCESS;
-          }
+            if (SectionType == EFI_SECTION_PE32) {
+              *Pe32Data = (VOID *) (CmpSection + 1);
+              return EFI_SUCCESS;
+            } else if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+              // 
+              // Firmware Volume Image in this Section
+              // Skip the section header to get FvHeader
+              //
+              FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
+    
+              if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
+                //
+                // Because FvLength in FvHeader is UINT64 type, 
+                // so FvHeader must meed at least 8 bytes alignment.
+                // If current FvImage base address doesn't meet its alignment,
+                // we need to reload this FvImage to another correct memory address.
+                //
+                if (((UINTN) FvHeader % sizeof (UINT64)) != 0) {
+                  DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) CmpSectionLength - sizeof (EFI_COMMON_SECTION_HEADER)), sizeof (UINT64));
+                  if (DstBuffer == NULL) {
+                    return EFI_OUT_OF_RESOURCES;
+                  }
+                  CopyMem (DstBuffer, FvHeader, (UINTN) CmpSectionLength - sizeof (EFI_COMMON_SECTION_HEADER));
+                  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
+                }
 
+                //
+                // Build new FvHob for new decompressed Fv image.
+                //
+                BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
+                
+                //
+                // Set the original FvHob to unused.
+                //
+                if (OrigHob != NULL) {
+                  OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
+                }
+                
+                //
+                // return found FvImage data.
+                //
+                *Pe32Data = (VOID *) FvHeader;
+                return EFI_SUCCESS;
+              }
+            }
+          }
           OccupiedCmpSectionLength  = GET_OCCUPIED_SIZE (CmpSectionLength, 4);
           CmpSection                = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) CmpSection + OccupiedCmpSectionLength);
         } while (CmpSection->Type != 0 && (UINTN) ((UINT8 *) CmpSection - (UINT8 *) CmpFileData) < CmpFileSize);
