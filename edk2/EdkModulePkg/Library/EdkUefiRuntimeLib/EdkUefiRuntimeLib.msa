@@ -8,7 +8,7 @@
     <Abstract>Runtime driver library</Abstract>
     <Description>Instance of runtime driver library, Hook VitualAddressChange and 
       BooterviceExit event and provide runtime service.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -25,12 +25,6 @@
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_RUNTIME_DRIVER DXE_SAL_DRIVER">
       <Keyword>UefiRuntimeLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
@@ -55,13 +49,8 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" SupArchList="IPF"/>
   </PackageDependencies>
-  <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiExtendedSalBootServiceProtocolGuid</ProtocolCName>
-    </Protocol>
-  </Protocols>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
