@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Debug Library for UEFI drivers</Abstract>
     <Description>This library uses PrintLib to send messages to CONOUT.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -53,11 +53,6 @@
       <ProtocolCName>gEfiDebugLevelProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
-  <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiStatusCodeDataTypeDebugGuid</GuidCName>
-    </GuidCNames>
-  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
@@ -73,17 +68,17 @@
                 Assert, Debug Print, Debug Code, Clear Memory, Assert
                 Breakpoint and Assert Deadloop.</HelpText>
     </PcdEntry>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD">
-      <C_Name>PcdDebugClearMemoryValue</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
-      <HelpText>The value used by DebugClearMemory () to fill a certain range
-                of memory.</HelpText>
-    </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>The bitmask of flags that specify the kind of debug message
                 output when Debug Print is enabled.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugClearMemoryValue</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The value used by DebugClearMemory () to fill a certain range
+                of memory.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
