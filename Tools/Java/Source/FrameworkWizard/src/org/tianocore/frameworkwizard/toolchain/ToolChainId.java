@@ -158,53 +158,70 @@ public class ToolChainId {
                 String rLine = null;
                 String inLine[] = new String[2];
                 while ((rLine = reader.readLine()) != null) {
+                	rLine = rLine.trim();
                     if ((rLine.startsWith("ACTIVE_PLATFORM")) && (activePlatform == null)) {
                         // Only one active platform is permitted!
-                        inLine = rLine.trim().split("=");
-                        activePlatform = inLine[1].trim();
+                        inLine = rLine.split("=");
+                        if (inLine.length > 1) {
+                        	activePlatform = inLine[1].trim();
+                        }
                     }
                     if ((rLine.startsWith("TARGET" + " ")) || (rLine.startsWith("TARGET" + "\t"))
                         || (rLine.startsWith("TARGET="))) {
                         // Handle multiple Target Names
                         if (rLine.contains(",")) {
-                            inLine = rLine.trim().split("=");
-                            buildTargets = inLine[1].trim().replaceAll(",", " ");
+                            inLine = rLine.split("=");
+                            if (inLine.length > 1) {
+                            	buildTargets = inLine[1].trim().replaceAll(",", " ");
+                            }
                         } else {
                             inLine = rLine.trim().split("=");
-                            buildTargets = inLine[1].trim();
+                            if (inLine.length > 1) {
+                            	buildTargets = inLine[1].trim();
+                            }
                         }
                     }
                     if (rLine.startsWith("TARGET_ARCH")) {
                         // Handle multiple Target Architectures
                         if (rLine.contains(",")) {
-                            inLine = rLine.trim().split("=");
-                            targetArchs = inLine[1].trim().replaceAll(",", " ");
+                            inLine = rLine.split("=");
+                            if (inLine.length > 1) {
+                            	targetArchs = inLine[1].trim().replaceAll(",", " ");
+                            }
                         } else {
-                            inLine = rLine.trim().split("=");
-                            targetArchs = inLine[1].trim();
+                            inLine = rLine.split("=");
+                            if (inLine.length > 1) {
+                            	targetArchs = inLine[1].trim();
+                            }
                         }
                     }
                     if (rLine.startsWith("TOOL_CHAIN_CONF")) {
                         // Only one file is permitted
-                        inLine = rLine.trim().split("=");
-                        toolDefinitionFile = inLine[1].trim();
+                        inLine = rLine.split("=");
+                        if (inLine.length > 1) {
+                        	toolDefinitionFile = inLine[1].trim();
+                        }
                     }
 
                     if (rLine.startsWith("TOOL_CHAIN_TAG")) {
                         // Handle multiple Tool TagNames
                         if (rLine.contains(",")) {
-                            inLine = rLine.trim().split("=");
-                            tagNames = inLine[1].trim().replaceAll(",", " ");
+                            inLine = rLine.split("=");
+                            if (inLine.length > 1) {
+                            	tagNames = inLine[1].trim().replaceAll(",", " ");
+                            }
                         } else {
-                            inLine = rLine.trim().split("=");
-                            tagNames = inLine[1].trim();
+                            inLine = rLine.split("=");
+                            if (inLine.length > 1) {
+                            	tagNames = inLine[1].trim();
+                            }
                         }
                     }
 
                     if (rLine.startsWith("MULTIPLE_THREAD")) {
                         // Handle Thread Enable flag
-                        if ((rLine.trim().toLowerCase().contains("enabled"))
-                            || (rLine.trim().toLowerCase().contains("true"))) {
+                        if ((rLine.toLowerCase().contains("enabled"))
+                            || (rLine.toLowerCase().contains("true"))) {
                             threadEnabled = true;
                         } else {
                             threadEnabled = false;
@@ -213,8 +230,10 @@ public class ToolChainId {
 
                     if (rLine.startsWith("MAX_CONCURRENT_THREAD_NUMBER")) {
                         // Handle Thread Enable flag
-                        inLine = rLine.trim().split("=");
-                        maxThreadCount = Integer.valueOf(inLine[1].trim());
+                        inLine = rLine.split("=");
+                        if (inLine.length > 1) {
+                        	maxThreadCount = Integer.valueOf(inLine[1].trim());
+                        }
                     }
                 }
                 reader.close();
