@@ -51,4 +51,9 @@
       <ModuleEntryPoint>UefiMain</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <ModuleBuildOptions>
+    <Options>
+      <Option ToolChainFamily="INTEL" ToolCode="CC">/WX-</Option>
+    </Options>
+  </ModuleBuildOptions>
 </ModuleSurfaceArea>
