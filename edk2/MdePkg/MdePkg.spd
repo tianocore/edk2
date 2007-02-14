@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>MdePkg</PackageName>
@@ -2365,6 +2365,15 @@
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdUefiLibMaxPrintBufferSize</C_Name>
+      <Token>0x101</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>320</DefaultValue>
+      <HelpText>This PCD is used by UefiLib APIs, which are Print, ErrorPrint, AsciiPrint, AsciiErrorPrint. If the length of the formatted Unicode or ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then only the first (PcdUefiLibMaxPrintBufferSize / Sizeof(CHAR16)) Unicode characters or PcdUefiLibMaxPrintBufferSize Ascii characters are sent to the respective console.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

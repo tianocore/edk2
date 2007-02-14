@@ -43,11 +43,18 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>MemoryAllocationLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PrintLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>UefiLib.c</Filename>
     <Filename>Console.c</Filename>
     <Filename>UefiNotTiano.c</Filename>
+    <Filename>UefiLibPrint.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -67,4 +74,11 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdUefiLibMaxPrintBufferSize</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD is used by UefiLib APIs, which are Print, ErrorPrint, AsciiPrint, AsciiErrorPrint. If the length of the formatted Unicode or ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then only the first (PcdUefiLibMaxPrintBufferSize / Sizeof(CHAR16)) Unicode characters or PcdUefiLibMaxPrintBufferSize Ascii characters are sent to the respective console.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
