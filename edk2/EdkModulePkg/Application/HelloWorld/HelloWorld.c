@@ -20,7 +20,6 @@ UefiMain (
   )
 
 {
-  CHAR16  Ptr16;
   
   Print ((CHAR16 *)L"UEFI Hello World!\n");
 
