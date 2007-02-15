@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Emulation Variable for EFI_RUNTIME_SERVICES.</Abstract>
     <Description>This module provides three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -23,9 +23,6 @@
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -40,7 +37,7 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>EdkDxeSalLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -59,22 +56,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiExtendedSalVariableServicesProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiExtendedSalBootServiceProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>PeiVariable</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for PeiVariable module.</Abstract>
     <Description>Framework PEIM to provide the Variable functionality.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -32,14 +32,11 @@
       <Keyword>PeimEntryPoint</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PeiServicesLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>HobLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PcdLib</Keyword>
-    </LibraryClass>    
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Variable.h</Filename>
@@ -56,9 +53,6 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>gPeiFlashMapPpiGuid</PpiCName>
-    </Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">
       <PpiCName>gEfiPeiReadOnlyVariablePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
@@ -73,10 +67,8 @@
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdFlashNvStorageVariableBase</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>
-        The driver gets the Variable store base address from this PCD.  This base address point to
-        an EFI_FIRMWARE_VOLUMN_HEADER struct.
-      </HelpText>
-    </PcdEntry>     
-  </PcdCoded> 
+      <HelpText>The driver gets the Variable store base address from this PCD.  This base address point to
+        an EFI_FIRMWARE_VOLUMN_HEADER struct.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
