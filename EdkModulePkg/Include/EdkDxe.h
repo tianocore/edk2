@@ -87,6 +87,7 @@ Abstract:
 #include <Protocol/ExtendedSalBootService.h>
 #endif
 #include <Protocol/IsaAcpi.h>
+#include <Protocol/IsaIo.h>
 
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
 //
