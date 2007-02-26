@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>UsbBot</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for UsbBot module</Abstract>
     <Description>This module provides support for USB Bulk-Only Transport</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -30,9 +30,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiLib</Keyword>

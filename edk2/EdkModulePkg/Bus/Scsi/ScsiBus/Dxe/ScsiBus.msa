@@ -1,15 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>ScsiBus</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Scsi Bus module.</Abstract>
-    <Description>
-      SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol
-    </Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -41,9 +39,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>EdkScsiLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
