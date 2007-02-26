@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for DxeIpl module</Abstract>
     <Description>The responsibility of this module is to load the DXE Core from a Firmware Volume.  This implementation i used to load a 32-bit DXE Core.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -33,9 +33,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>HobLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PerformanceLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeiServicesLib</Keyword>
@@ -69,6 +66,9 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeCoffLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -134,7 +134,7 @@
     </Extern>
   </Externs>
   <PcdCoded>
-    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED" SupArchList="IA32">
       <C_Name>PcdDxeIplSwitchToLongMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DefaultValue>TRUE</DefaultValue>

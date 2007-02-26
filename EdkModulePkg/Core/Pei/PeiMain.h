@@ -24,12 +24,8 @@ Revision History
 #ifndef _PEI_MAIN_H_
 #define _PEI_MAIN_H_
 
-//
-//Build private HOB to PEI core to transfer old NEM-range data to new NEM-range
-//
-#define EFI_PEI_CORE_PRIVATE_GUID  \
-  {0xd641a0f5, 0xcb7c, 0x4846, { 0xa3, 0x80, 0x1d, 0x01, 0xb4, 0xd9, 0xe3, 0xb9 } }
- 
+extern EFI_GUID gEfiPeiCorePrivateGuid;
+
 //
 // Pei Core private data structures
 //

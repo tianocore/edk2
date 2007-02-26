@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for PeiMain module</Abstract>
     <Description>This module provide an DXE CIS compliant implementation.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -51,9 +51,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>TimerLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="SOMETIMES_CONSUMED">
-      <Keyword>PeCoffLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -105,6 +102,11 @@
       <PpiNotifyCName>gEfiPeiSecurityPpiGuid</PpiNotifyCName>
     </PpiNotify>
   </PPIs>
+  <Guids>
+    <GuidCNames Usage="PRIVATE">
+      <GuidCName>gEfiPeiCorePrivateGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>

@@ -76,7 +76,6 @@ typedef struct {
 //
 extern EFI_DRIVER_BINDING_PROTOCOL  gUsbBotDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gUsbBotComponentName;
-extern EFI_GUID                     gUsbBotDriverGuid;
 
 //
 // Bot Driver Binding Protocol

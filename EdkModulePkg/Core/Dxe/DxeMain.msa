@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>DxeMain</ModuleName>
     <ModuleType>DXE_CORE</ModuleType>
     <GuidValue>D6A2CB7F-6A18-4e2f-B43B-9920A733700A</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for DxeMain module.</Abstract>
-    <Description>This module provide an DXE CIS compliant implementation.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>This module provide an DXE CIS compliant implementation of DXE Core.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
@@ -104,7 +104,7 @@
     <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiEbcProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
@@ -113,16 +113,16 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFirmwareVolumeDispatchProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiSectionExtractionProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
@@ -173,7 +173,7 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiLoadPeImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
@@ -187,6 +187,9 @@
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiCapsuleArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
@@ -215,12 +218,6 @@
       <GuidCName>gEfiHobMemoryAllocModuleGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
-    </GuidCNames>
-    <!--<GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>LoadPeImage</GuidCName>
-    </GuidCNames>-->
-    <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiEventExitBootServicesGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
@@ -228,6 +225,12 @@
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiEventMemoryMapChangeGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventReadyToBootGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventLegacyBootGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

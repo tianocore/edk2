@@ -73,7 +73,6 @@ USBMouseRecoveryHandler (
 //
 extern EFI_DRIVER_BINDING_PROTOCOL  gUsbMouseDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseComponentName;
-extern EFI_GUID                     gEfiUsbMouseDriverGuid;
 
 VOID
 MouseReportStatusCode (

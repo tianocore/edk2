@@ -1,22 +1,20 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>CirrusLogic5430UgaDraw</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>555F76EA-785F-40d7-9174-153C43636C68</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for CirrusLogic5430 module</Abstract>
-    <Description>
-      Cirrus Logic 5430 Controller Driver.This driver is a sample implementation
+    <Description>Cirrus Logic 5430 Controller Driver.This driver is a sample implementation
       of the UGA Draw Protocol for the Cirrus Logic 5430 family of PCI video controllers.
       This driver is only usable in the EFI pre-boot environment.  This sample is
       intended to show how the UGA Draw Protocol is able to function.  The UGA I/O
       Protocol is not implemented in this sample.  A fully compliant EFI UGA driver
       requires both the UGA Draw and the UGA I/O Protocol.  Please refer to Microsoft's
       documentation on UGA for details on how to write a UGA driver that is able
-      to function both in the EFI pre-boot environment and from the OS runtime.
-    </Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+      to function both in the EFI pre-boot environment and from the OS runtime.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -41,13 +39,7 @@
       <Keyword>UefiDriverEntryPoint</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>MemoryAllocationLib</Keyword>

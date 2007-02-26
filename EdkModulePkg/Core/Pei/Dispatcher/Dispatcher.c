@@ -29,9 +29,6 @@ TransferOldDataToNewDataRange (
   IN PEI_CORE_INSTANCE        *PrivateData
   );
 
-EFI_GUID gEfiPeiCorePrivateGuid = EFI_PEI_CORE_PRIVATE_GUID;
-
-
 EFI_STATUS
 PeiDispatcher (
   IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
@@ -529,6 +526,9 @@ Returns:
 
 --*/
 {
+  //
+  //Build private HOB to PEI core to transfer old NEM-range data to new NEM-range
+  //
   return BuildGuidDataHob (&gEfiPeiCorePrivateGuid, PrivateData, sizeof (PEI_CORE_INSTANCE));
 }
 

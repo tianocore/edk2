@@ -173,7 +173,6 @@ typedef struct _usb_bus_controller_device {
 //
 extern EFI_DRIVER_BINDING_PROTOCOL  gUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gUsbBusComponentName;
-extern EFI_GUID                     gUSBBusDriverGuid;
 
 //
 // EFI_DRIVER_BINDING_PROTOCOL Protocol Interface
