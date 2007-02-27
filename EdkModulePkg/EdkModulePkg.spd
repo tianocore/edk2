@@ -397,7 +397,6 @@
     <Filename>Library/EdkFvbServiceLib/EdkFvbServiceLib.msa</Filename>
     <Filename>Library/EdkGraphicsLib/EdkGraphicsLib.msa</Filename>
     <Filename>Library/EdkIfrSupportLib/EdkIfrSupportLib.msa</Filename>
-    <Filename>Library/EdkNullCustomizedDecompressLib/EdkNullCustomizedDecompressLib.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
     <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
     <Filename>Library/EdkScsiLib/EdkScsiLib.msa</Filename>
