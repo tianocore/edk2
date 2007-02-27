@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>BootMode</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for BootMode module</Abstract>
     <Description>This module provides platform specific function to detect boot mode.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -28,15 +28,6 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeimEntryPoint</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PeiServicesLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PeiServicesTablePointerLib</Keyword>
-    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>BootMode.c</Filename>
@@ -44,8 +35,6 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-    <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="SOMETIMES_PRODUCED">

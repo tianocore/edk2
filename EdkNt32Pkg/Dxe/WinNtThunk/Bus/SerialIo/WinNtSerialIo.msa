@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>WinNtSerialIo</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>6B41B553-A649-11d4-BD02-0080C73C8881</GuidValue>
     <Version>1.0</Version>
     <Abstract>Serial I/O driver</Abstract>
-    <Description>
-      Our DriverBinding member functions operate on the handles
-      created by the NT Bus drive
-    </Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>Our DriverBinding member functions operate on the handles
+      created by the NT Bus drive</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -44,9 +42,6 @@
       <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -60,7 +55,6 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
   <Protocols>

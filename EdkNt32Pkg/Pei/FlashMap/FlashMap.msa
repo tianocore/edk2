@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>PeiFlashMap</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for FlashMap PEI module</Abstract>
     <Description>This module installs FlashMap PPI which is used to get flash layout information.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -33,9 +33,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeiServicesLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>PeiServicesTablePointerLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
@@ -73,9 +70,6 @@
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFirmwareFileSystemGuid</GuidCName>
     </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiSystemNvDataHobGuid</GuidCName>
-    </GuidCNames>
   </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
@@ -92,15 +86,12 @@
         This base address point to an EFI_FIRMWARE_VOLUMN_HEADER struct. Variable PEIM
         will get the base address from this PCD. In NT emulator, this PCD is a DYNAMIC
         type, as FD is mapped to process space by WinNT OS. On real platform, it is 
-        normally a FIXED_AT_BUILD type as system memory map is fixed to BIOS.
-      </HelpText>
+        normally a FIXED_AT_BUILD type as system memory map is fixed to BIOS.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdFlashNvStorageVariableSize</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>
-        To get the NvStorage Variable size from this PCD.
-      </HelpText>
+      <HelpText>To get the NvStorage Variable size from this PCD.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>WinNtBusDriver</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>BD7E9A27-D6C5-416a-B245-5F507D95B2BD</GuidValue>
     <Version>1.0</Version>
     <Abstract>Win NT Bus driver</Abstract>
-    <Description>
-      This following section documents the envirnoment variables for the Win NT
+    <Description>This following section documents the envirnoment variables for the Win NT
       build.  These variables are used to define the (virtual) hardware
-      configuration of the NT environment
-    </Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+      configuration of the NT environment</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -48,9 +46,6 @@
       <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -64,7 +59,6 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
   <Protocols>
@@ -76,9 +70,6 @@
     </Protocol>
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gPcdProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
@@ -112,6 +103,9 @@
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiWinNtCPUSpeedGuid</GuidCName>
     </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gWinNtBusDriverGuid</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
@@ -121,69 +115,4 @@
       <ComponentName>gWinNtBusDriverComponentName</ComponentName>
     </Extern>
   </Externs>
-  <PcdCoded>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtConsole</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD declares the title string of the text console window.
-        such as "My EFI Console".
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtUga</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD declares the resolutions for the UGA windows.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtGop</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD declares the resolutions for the GOP windows.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtSerialPort</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This Pcd declares two serial port for simulated environment.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtFileSystem</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the windows directory who will be mounted as
-        harddisk in simulator.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtVirtualDisk</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or
-        removable media device
-        The item type if this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtPhysicalDisk</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines physical disk which will be simualted as a
-        harddisk in simulator.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtCpuModel</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines simulated CPU model string.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtCpuSpeed</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines simulated CPU speed string.</HelpText>
-    </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdWinNtMemorySize</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the size of simulated memory size.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-  </PcdCoded>
 </ModuleSurfaceArea>
