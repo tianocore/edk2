@@ -3754,5 +3754,3 @@ Returns:
 
   return 0;
 }
-
-#pragma data_seg()
