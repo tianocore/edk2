@@ -22,7 +22,9 @@ Revision history:
 #include "undi32.h"
 
 
+#ifdef _MSC_EXTENSIONS
 #pragma data_seg("rtdata")
+#endif
 
 //
 // Global variables defined in this file
@@ -1648,4 +1650,6 @@ Returns:
   PxePtr->Fudge         = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
 }
 
+#ifdef _MSC_EXTENSIONS
 #pragma data_seg()
+#endif
