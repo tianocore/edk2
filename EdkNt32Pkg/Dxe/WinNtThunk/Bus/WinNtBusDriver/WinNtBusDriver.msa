@@ -115,4 +115,69 @@
       <ComponentName>gWinNtBusDriverComponentName</ComponentName>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtConsole</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD declares the title string of the text console window.
+        such as "My EFI Console".
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtUga</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD declares the resolutions for the UGA windows.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtGop</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD declares the resolutions for the GOP windows.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtSerialPort</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This Pcd declares two serial port for simulated environment.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtFileSystem</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the windows directory who will be mounted as
+        harddisk in simulator.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtVirtualDisk</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or
+        removable media device
+        The item type if this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtPhysicalDisk</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines physical disk which will be simualted as a
+        harddisk in simulator.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtCpuModel</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines simulated CPU model string.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtCpuSpeed</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines simulated CPU speed string.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtMemorySize</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the size of simulated memory size.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
