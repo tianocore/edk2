@@ -6863,86 +6863,6 @@
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtConsole</C_Name>
-          <Token>0x0000100a</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>50</MaxDatumSize>
-          <Value>L"Bus Driver Console Window"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtUga</C_Name>
-          <Token>0x00001003</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>50</MaxDatumSize>
-          <Value>L"UGA Window 1!UGA Window 2"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtGop</C_Name>
-          <Token>0x0000100d</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>50</MaxDatumSize>
-          <Value>L"GOP Window 1!GOP Window 2"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtSerialPort</C_Name>
-          <Token>0x00001002</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>18</MaxDatumSize>
-          <Value>L"COM1!COM2"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtFileSystem</C_Name>
-          <Token>0x00001004</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>106</MaxDatumSize>
-          <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtVirtualDisk</C_Name>
-          <Token>0x00001001</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>24</MaxDatumSize>
-          <Value>L"FW;40960;512"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtPhysicalDisk</C_Name>
-          <Token>0x00001000</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>30</MaxDatumSize>
-          <Value>L"E:RW;245760;512"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtCpuModel</C_Name>
-          <Token>0x00001007</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>48</MaxDatumSize>
-          <Value>L"Intel(R) Processor Model"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtCpuSpeed</C_Name>
-          <Token>0x00001008</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>8</MaxDatumSize>
-          <Value>L"3000"</Value>
-        </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtMemorySize</C_Name>
-          <Token>0x00001005</Token>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>VOID*</DatumType>
-          <MaxDatumSize>10</MaxDatumSize>
-          <Value>L"64!64"</Value>
-        </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
@@ -7030,6 +6950,86 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtConsole</C_Name>
+          <Token>0x0000100a</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>50</MaxDatumSize>
+          <Value>L"Bus Driver Console Window"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtUga</C_Name>
+          <Token>0x00001003</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>50</MaxDatumSize>
+          <Value>L"UGA Window 1!UGA Window 2"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtGop</C_Name>
+          <Token>0x0000100d</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>50</MaxDatumSize>
+          <Value>L"UGA Window 1!UGA Window 2"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtSerialPort</C_Name>
+          <Token>0x00001002</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>18</MaxDatumSize>
+          <Value>L"COM1!COM2"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtFileSystem</C_Name>
+          <Token>0x00001004</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>106</MaxDatumSize>
+          <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtVirtualDisk</C_Name>
+          <Token>0x00001001</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>24</MaxDatumSize>
+          <Value>L"FW;40960;512"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtPhysicalDisk</C_Name>
+          <Token>0x00001000</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>30</MaxDatumSize>
+          <Value>L"E:RW;245760;512"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtCpuModel</C_Name>
+          <Token>0x00001007</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>48</MaxDatumSize>
+          <Value>L"Intel(R) Processor Model"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtCpuSpeed</C_Name>
+          <Token>0x00001008</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>8</MaxDatumSize>
+          <Value>L"3000"</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdWinNtMemorySize</C_Name>
+          <Token>0x00001005</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>VOID*</DatumType>
+          <MaxDatumSize>10</MaxDatumSize>
+          <Value>L"64!64"</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -7909,7 +7909,7 @@
       <MaxDatumSize>50</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>L"GOP Window 1!GOP Window 2"</Value>
+        <Value>L"UGA Window 1!UGA Window 2"</Value>
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
