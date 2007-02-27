@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>SecMain</ModuleName>
     <ModuleType>SEC</ModuleType>
@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Entry Point of NT32 Emulator</Abstract>
     <Description>Main executable file of NT32 Emulator that loads PEI core after initialization finished.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -91,7 +91,7 @@
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
     </PcdEntry>
-    <PcdEntry PcdItemType="DYNAMIC">
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtBootMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD defines the boot mode for simualtor. 

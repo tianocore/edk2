@@ -1,24 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<PackageSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>EdkNt32Pkg</PackageName>
     <GuidValue>0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3</GuidValue>
     <Version>0.3</Version>
     <Abstract>This is the NT32 Emulation Environment Platform</Abstract>
     <Description>Reference platform implementation using an emulator.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved.
-      This program and the accompanying materials are licensed and made available 
+      This program and the accompanying materials are licensed and made available
       under the terms and conditions of the BSD License which accompanies this distribution.
       The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
@@ -134,7 +124,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <C_Name>gEfiEdkNt32PkgTokenSpaceGuid</C_Name>
       <GuidValue>0D79A645-1D91-40a6-A81F-61E6982B32B4</GuidValue>
       <HelpText>All PCD define in EdkNt32Pkg is in this token space scope</HelpText>
-    </Entry>  
+    </Entry>
     <Entry Name="WinNtVirtualDisks">
       <C_Name>gEfiWinNtVirtualDisksGuid</C_Name>
       <GuidValue>0C95A928-A006-11D4-BCFA-0080C73C8881</GuidValue>
@@ -195,6 +185,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <GuidValue>582E7CA1-68CD-4D44-B43B-F298ED587BA6</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="WinNtBusDriver">
+      <C_Name>gWinNtBusDriverGuid</C_Name>
+      <GuidValue>0419f582-0625-4531-8a33-85a9965c95bc</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="WinNtIo">
@@ -238,7 +233,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"E:RW;245760;512"</DefaultValue>
-      <HelpText>This PCD defines physical disk which will be simualted as a 
+      <HelpText>This PCD defines physical disk which will be simualted as a
         harddisk in simulator. The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -248,7 +243,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
-      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or 
+      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or
         removable media device.The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -278,7 +273,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
-      <HelpText>This PCD defines the windows directory who will be mounted as 
+      <HelpText>This PCD defines the windows directory who will be mounted as
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
@@ -300,7 +295,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>1</DefaultValue>
-      <HelpText>This PCD defines the boot mode for simualtor. 
+      <HelpText>This PCD defines the boot mode for simualtor.
         The boot mode can be set as following value:
           0x0:  Boot with full configuration.
           0x1:  Boot with minimal configuration.
@@ -309,7 +304,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           0x4:  Boot with default settings.
           0x5:  Boot on S4 resume.
           0x6:  Boot on S5 resume.
-          0x10: Boot on S2 resume. 
+          0x10: Boot on S2 resume.
           0x11: Boot on S3 resume.
           0x12: Boot on flash update.
           0x20: Boot in reovery mode.</HelpText>
@@ -350,7 +345,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"Bus Driver Console Window"</DefaultValue>
-      <HelpText>This PCD declares the title string of the text console window. 
+      <HelpText>This PCD declares the title string of the text console window.
         such as "My EFI Console".
         The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>

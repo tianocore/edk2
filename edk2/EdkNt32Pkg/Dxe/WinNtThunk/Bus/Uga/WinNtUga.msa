@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>WinNtUga</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>AB248E8D-ABE1-11d4-BD0D-0080C73C8881</GuidValue>
     <Version>1.0</Version>
     <Abstract>Uga driver</Abstract>
-    <Description>
-      UGA is short hand for Universal Graphics Abstraction protocol.
+    <Description>UGA is short hand for Universal Graphics Abstraction protocol.
       This file is a verision of UgaIo the uses WinNtThunk system calls as an IO
       abstraction. For a PCI device WinNtIo would be replaced with
-      a PCI IO abstraction that abstracted a specific PCI device.
-    </Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+      a PCI IO abstraction that abstracted a specific PCI device.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -31,9 +29,6 @@
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverModelLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -44,9 +39,6 @@
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
@@ -61,7 +53,6 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
   <Protocols>
