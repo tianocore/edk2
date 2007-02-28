@@ -339,7 +339,7 @@ Returns:
   // Setup some platform policy here
   //
   PlatformBdsPolicyBehavior (PrivateData, &DriverOptionList, &BootOptionList);
-  PERF_END (0, L"PlatformBds", L"BDS", 0);
+  PERF_END (0, "PlatformBds", "BDS", 0);
 
   //
   // BDS select the boot device to load OS
