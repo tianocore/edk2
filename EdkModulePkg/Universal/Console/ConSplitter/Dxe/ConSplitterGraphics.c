@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -378,6 +378,7 @@ DevNullGraphicsOutputBlt (
   )
 {
   UINTN                         SrcY;
+  BOOLEAN                       Forward; 
   UINTN                         Index;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltPtr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ScreenPtr;
@@ -434,9 +435,23 @@ DevNullGraphicsOutputBlt (
       return EFI_INVALID_PARAMETER;
     }
 
-    ScreenPtr = &Private->GraphicsOutputBlt[DestinationY * HorizontalResolution + DestinationX];
-    SrcY      = SourceY;
-    while (Height) {
+    if ((BltOperation == EfiBltVideoToVideo) && (DestinationY > SourceY)) {
+      //
+      // Copy backwards, only care the Video to Video Blt
+      //
+      ScreenPtr = &Private->GraphicsOutputBlt[(DestinationY + Height - 1) * HorizontalResolution + DestinationX];
+      SrcY      = SourceY + Height - 1;
+      Forward   = FALSE;
+    } else {
+      //
+      // Copy forwards, for other cases
+      //
+      ScreenPtr = &Private->GraphicsOutputBlt[DestinationY * HorizontalResolution + DestinationX];
+      SrcY      = SourceY;
+      Forward   = TRUE;
+    }
+
+    while (Height != 0) {
       if (BltOperation == EfiBltVideoFill) {
         for (Index = 0; Index < Width; Index++) {
           ScreenPtr[Index] = *BltBuffer;
@@ -451,8 +466,13 @@ DevNullGraphicsOutputBlt (
         CopyMem (ScreenPtr, BltPtr, Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
       }
 
-      ScreenPtr += HorizontalResolution;
-      SrcY++;
+      if (Forward) {
+        ScreenPtr += HorizontalResolution;
+        SrcY ++;
+      } else {
+        ScreenPtr -= HorizontalResolution;
+        SrcY --;
+      }
       Height--;
     }
   }
@@ -792,6 +812,7 @@ DevNullUgaBlt (
   )
 {
   UINTN         SrcY;
+  BOOLEAN       Forward;
   UINTN         Index;
   EFI_UGA_PIXEL *BltPtr;
   EFI_UGA_PIXEL *ScreenPtr;
@@ -848,9 +869,23 @@ DevNullUgaBlt (
       return EFI_INVALID_PARAMETER;
     }
 
-    ScreenPtr = &Private->UgaBlt[DestinationY * HorizontalResolution + DestinationX];
-    SrcY      = SourceY;
-    while (Height) {
+    if ((BltOperation == EfiUgaVideoToVideo) && (DestinationY > SourceY)) {
+      //
+      // Copy backwards, only care the Video to Video Blt
+      //
+      ScreenPtr = &Private->UgaBlt[(DestinationY + Height - 1) * HorizontalResolution + DestinationX];
+      SrcY      = SourceY + Height - 1;
+      Forward   = FALSE;
+    } else {
+      //
+      // Copy forwards, for other cases
+      //
+      ScreenPtr = &Private->UgaBlt[DestinationY * HorizontalResolution + DestinationX];
+      SrcY      = SourceY;
+      Forward   = TRUE;
+    }
+
+    while (Height != 0) {
       if (BltOperation == EfiUgaVideoFill) {
         for (Index = 0; Index < Width; Index++) {
           ScreenPtr[Index] = *BltBuffer;
@@ -865,8 +900,13 @@ DevNullUgaBlt (
         CopyMem (ScreenPtr, BltPtr, Width * sizeof (EFI_UGA_PIXEL));
       }
 
-      ScreenPtr += HorizontalResolution;
-      SrcY++;
+      if (Forward) {
+        ScreenPtr += HorizontalResolution;
+        SrcY ++;
+      } else {
+        ScreenPtr -= HorizontalResolution;
+        SrcY --;
+      }
       Height--;
     }
   }

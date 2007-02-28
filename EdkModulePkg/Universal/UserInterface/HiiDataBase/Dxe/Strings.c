@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -60,45 +60,44 @@ Returns:
 {
   EFI_HII_GLOBAL_DATA *GlobalData;
   EFI_HII_DATA        *HiiData;
-  UINTN               Count;
-  BOOLEAN             Narrow;
-  UINTN               Location;
-  UINT8               GlyphCol1[19];
+  BOOLEAN             WideChar;
+  INT32               Location;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   HiiData     = EFI_HII_DATA_FROM_THIS (This);
-
   GlobalData  = HiiData->GlobalData;
-  Count       = 0;
-  Narrow      = TRUE;
 
-  ZeroMem (GlyphCol1, sizeof (GlyphCol1));
+  
+  //
+  // Rewind through the string looking for a glyph width identifier
+  // If no width identifier exists, we assume string has narrow width identifier
+  //
+  for (WideChar = FALSE, Location = (INT32) *FirstMissing; Location >= 0; Location--) {
+    if ((StringToTest[Location] == NARROW_CHAR) || (StringToTest[Location] == WIDE_CHAR)) {
+      //
+      // We found something that identifies what glyph database to look in
+      //
+      WideChar = (BOOLEAN) (StringToTest[Location] == WIDE_CHAR);
+      break;
+    }
+  }
 
   //
   // Walk through the string until you hit the null terminator
   //
-  for (; StringToTest[*FirstMissing] != 0x00; (*FirstMissing)++) {
-    Location = *FirstMissing;
+  for (*GlyphBufferSize = 0; StringToTest[*FirstMissing] != CHAR_NULL; (*FirstMissing)++) {
     //
-    // Rewind through the string looking for a glyph width identifier
+    // We found something that identifies what glyph database to look in
     //
-    for (; Location != 0; Location--) {
-      if (StringToTest[Location] == NARROW_CHAR || StringToTest[Location] == WIDE_CHAR) {
-        //
-        // We found something that identifies what glyph database to look in
-        //
-        if (StringToTest[Location] == WIDE_CHAR) {
-          Narrow = FALSE;
-        } else {
-          Narrow = TRUE;
-        }
-      }
+    if ((StringToTest[*FirstMissing] == NARROW_CHAR) || (StringToTest[*FirstMissing] == WIDE_CHAR)) {
+      WideChar = (BOOLEAN) (StringToTest[*FirstMissing] == WIDE_CHAR);
+      continue;
     }
 
-    if (Narrow) {
+    if (!WideChar) {
       if (CompareMem (
           GlobalData->NarrowGlyphs[StringToTest[*FirstMissing]].GlyphCol1,
           &mUnknownGlyph,
@@ -127,13 +126,7 @@ Returns:
       }
     }
 
-    Count++;
-  }
-
-  if (Narrow) {
-    *GlyphBufferSize = (UINT32) (Count * sizeof (EFI_NARROW_GLYPH));
-  } else {
-    *GlyphBufferSize = (UINT32) (Count * sizeof (EFI_WIDE_GLYPH));
+    *GlyphBufferSize += (WideChar ? sizeof (EFI_WIDE_GLYPH) : sizeof (EFI_NARROW_GLYPH));
   }
 
   return EFI_SUCCESS;
