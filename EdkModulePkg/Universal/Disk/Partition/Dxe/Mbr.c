@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -276,8 +276,8 @@ Returns:
       HdDev.PartitionNumber = PartitionNumber ++;
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA) + ExtMbrStartingLba + ParentHdDev.PartitionStart;
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[0].SizeInLBA);
-      if (HdDev.PartitionStart + HdDev.PartitionSize - 1 >=
-            ParentHdDev.PartitionStart + ParentHdDev.PartitionSize) {
+      if ((HdDev.PartitionStart + HdDev.PartitionSize - 1 >= ParentHdDev.PartitionStart + ParentHdDev.PartitionSize) ||
+          (HdDev.PartitionStart <= ParentHdDev.PartitionStart)) {
         break;
       }
 
