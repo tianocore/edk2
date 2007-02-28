@@ -22,7 +22,12 @@ Revision history:
 #include "undi32.h"
 
 
-#ifdef _MSC_EXTENSIONS
+//
+// #pragma data_seg("rtdata") is only recognized by MSFT C compiler.
+// But EBC compiler "Intel(R) C Compiler for EFI Byte Code, Version 1.2 Build 20040123"
+// does not recognize this pragma.
+//
+#if defined(_MSC_EXTENSIONS) && !defined(MDE_CPU_EBC)
 #pragma data_seg("rtdata")
 #endif
 
@@ -1650,6 +1655,11 @@ Returns:
   PxePtr->Fudge         = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
 }
 
-#ifdef _MSC_EXTENSIONS
+//
+// #pragma data_seg("rtdata") is only recognized by MSFT C compiler.
+// But EBC compiler "Intel(R) C Compiler for EFI Byte Code, Version 1.2 Build 20040123"
+// does not recognize this pragma.
+//
+#if defined(_MSC_EXTENSIONS) && !defined(MDE_CPU_EBC)
 #pragma data_seg()
 #endif
