@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -305,7 +305,7 @@ BdsBootByDiskSignatureAndPartition (
 //
 // Notes: EFI 64 shadow all option rom
 //
-#ifdef EFI64
+#if   defined (MDE_CPU_IPF)
 #define EFI64_SHADOW_ALL_LEGACY_ROM() ShadowAllOptionRom ();
 VOID
 ShadowAllOptionRom();
@@ -316,7 +316,7 @@ ShadowAllOptionRom();
 //
 // BBS support macros and functions
 //
-#ifdef EFI32
+#if   defined (MDE_CPU_IA32)
 #define REFRESH_LEGACY_BOOT_OPTIONS \
         BdsDeleteAllInvalidLegacyBootOptions ();\
         BdsAddNonExistingLegacyBootOptions (); \
