@@ -1098,6 +1098,42 @@ AtaUdmaWriteExt (
 ;
 
 /**
+  Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
+  
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the source buffer for the data.
+
+  @param[in] StartLba
+  The starting logical block address to write to
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+  
+  @param[in] UdmaOp
+  The perform operations could be AtaUdmaReadOp, AtaUdmaReadExOp,
+  AtaUdmaWriteOp, AtaUdmaWriteExOp
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+**/
+EFI_STATUS
+DoAtaUdma (
+  IN  IDE_BLK_IO_DEV      *IdeDev,
+  IN  VOID                *DataBuffer,
+  IN  EFI_LBA             StartLba,
+  IN  UINTN               NumberOfBlocks,
+  IN  ATA_UDMA_OPERATION  UdmaOp
+  )
+;
+
+
+/**
   TODO: Add function description
 
   @param  IdeDev TODO: add argument description

@@ -1075,20 +1075,23 @@ AtaBlkIoReadBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
   if (IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
     //
     // For ATA/ATAPI-6 device(capcity > 120GB), use ATA-6 read block mechanism
     //
-    Status = AtaUdmaReadExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    if (EFI_ERROR (Status)) {
+    if (IdeBlkIoDevice->UdmaMode.Valid) {
+      Status = AtaUdmaReadExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+    } else {
       Status = AtaReadSectorsExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   } else {
     //
     // For ATA-3 compatible device, use ATA-3 read block mechanism
     //
-    Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    if (EFI_ERROR (Status)) {
+    if (IdeBlkIoDevice->UdmaMode.Valid) {
+      Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+    } else {
       Status = AtaReadSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   }
@@ -1196,20 +1199,23 @@ AtaBlkIoWriteBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
   if (IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
     //
     // For ATA/ATAPI-6 device(capcity > 120GB), use ATA-6 write block mechanism
     //
-    Status = AtaUdmaWriteExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    if (EFI_ERROR (Status)) {
+    if (IdeBlkIoDevice->UdmaMode.Valid) {
+      Status = AtaUdmaWriteExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+    } else {
       Status = AtaWriteSectorsExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   } else {
     //
     // For ATA-3 compatible device, use ATA-3 write block mechanism
     //
-    Status = AtaUdmaWrite (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
-    if (EFI_ERROR (Status)) {
+    if (IdeBlkIoDevice->UdmaMode.Valid) {
+      Status = AtaUdmaWrite (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+    } else {
       Status = AtaWriteSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
     }
   }
@@ -2107,29 +2113,198 @@ AtaUdmaReadExt (
   IN  UINTN           NumberOfBlocks
   )
 {
-  IDE_DMA_PRD                *PrdAddr;
-  IDE_DMA_PRD                *UsedPrdAddr;
-  IDE_DMA_PRD                *TempPrdAddr;
-  UINT8                      RegisterValue;
-  UINT8                      Device;
-  UINT64                     IoPortForBmic;
-  UINT64                     IoPortForBmis;
-  UINT64                     IoPortForBmid;
-  EFI_STATUS                 Status;
-  UINTN                      PrdTableNum;
-  UINTN                      ByteCount;
-  UINTN                      ByteAvailable;
-  UINT8                      *PrdBuffer;
-  UINTN                      RemainBlockNum;
-  UINT8                      DeviceControl;
-  UINT32                     Count;
-  UINTN                      PageCount;
-  VOID                       *Map;
-  VOID                       *MemPage;
-  EFI_PHYSICAL_ADDRESS       DeviceAddress;
+  return DoAtaUdma (IdeDev, DataBuffer, StartLba, NumberOfBlocks, AtaUdmaReadExtOp);
+}
+
+/**
+  This function is called by the AtaBlkIoReadBlocks() to perform
+  reading from media in block unit. The function has been enhanced to
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer    A pointer to the destination buffer for the data.
+  @param[in] StartLba       The starting logical block address to read from
+  on the device media.
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
+EFI_STATUS
+AtaUdmaRead (
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  IN  VOID            *DataBuffer,
+  IN  EFI_LBA         StartLba,
+  IN  UINTN           NumberOfBlocks
+  )
+{
+  return DoAtaUdma (IdeDev, DataBuffer, StartLba, NumberOfBlocks, AtaUdmaReadOp);
+}
+
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing to media in block unit. The function has been enhanced to
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer A pointer to the source buffer for the data.
+
+  @param[in] StartLba The starting logical block address to write to
+  on the device media.
+
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
+EFI_STATUS
+AtaUdmaWriteExt (
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  IN  VOID            *DataBuffer,
+  IN  EFI_LBA         StartLba,
+  IN  UINTN           NumberOfBlocks
+  )
+{
+  return DoAtaUdma (IdeDev, DataBuffer, StartLba, NumberOfBlocks, AtaUdmaWriteExtOp);
+}
+
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing to media in block unit. The function has been enhanced to
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the source buffer for the data.
+
+  @param[in] StartLba
+  The starting logical block address to write to
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
+EFI_STATUS
+AtaUdmaWrite (
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  IN  VOID            *DataBuffer,
+  IN  EFI_LBA         StartLba,
+  IN  UINTN           NumberOfBlocks
+  )
+{
+  return DoAtaUdma (IdeDev, DataBuffer, StartLba, NumberOfBlocks, AtaUdmaWriteOp);
+}
+
+/**
+  Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
+  
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the source buffer for the data.
+
+  @param[in] StartLba
+  The starting logical block address to write to
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+  
+  @param[in] UdmaOp
+  The perform operations could be AtaUdmaReadOp, AtaUdmaReadExOp,
+  AtaUdmaWriteOp, AtaUdmaWriteExOp
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+**/
+EFI_STATUS
+DoAtaUdma (
+  IN  IDE_BLK_IO_DEV      *IdeDev,
+  IN  VOID                *DataBuffer,
+  IN  EFI_LBA             StartLba,
+  IN  UINTN               NumberOfBlocks,
+  IN  ATA_UDMA_OPERATION  UdmaOp
+  )
+{
+  IDE_DMA_PRD                   *PrdAddr;
+  IDE_DMA_PRD                   *UsedPrdAddr;
+  IDE_DMA_PRD                   *TempPrdAddr;
+  UINT8                         RegisterValue;
+  UINT8                         Device;
+  UINT64                        IoPortForBmic;
+  UINT64                        IoPortForBmis;
+  UINT64                        IoPortForBmid;
+  EFI_STATUS                    Status;
+  UINTN                         PrdTableNum;
+  UINTN                         ByteCount;
+  UINTN                         ByteAvailable;
+  UINT8                         *PrdBuffer;
+  UINTN                         RemainBlockNum;
+  UINT8                         DeviceControl;
+  UINT32                        Count;
+  UINTN                         PageCount;
+  VOID                          *Map;
+  VOID                          *MemPage;
+  EFI_PHYSICAL_ADDRESS          DeviceAddress;
+  UINTN                         MaxDmaCommandSectors;
+  EFI_PCI_IO_PROTOCOL_OPERATION PciIoProtocolOp;
+  UINT8                         AtaCommand;
+
+  switch (UdmaOp) {
+  case AtaUdmaReadOp:
+    MaxDmaCommandSectors = MAX_DMA_COMMAND_SECTORS;
+    PciIoProtocolOp      = EfiPciIoOperationBusMasterWrite;
+    AtaCommand           = READ_DMA_CMD;
+    break;
+  case AtaUdmaReadExtOp:
+    MaxDmaCommandSectors = MAX_DMA_EXT_COMMAND_SECTORS;
+    PciIoProtocolOp      = EfiPciIoOperationBusMasterWrite;
+    AtaCommand           = READ_DMA_EXT_CMD;
+    break;
+  case AtaUdmaWriteOp:
+    MaxDmaCommandSectors = MAX_DMA_COMMAND_SECTORS;
+    PciIoProtocolOp      = EfiPciIoOperationBusMasterRead;
+    AtaCommand           = WRITE_DMA_CMD;
+    break;
+  case AtaUdmaWriteExtOp:
+    MaxDmaCommandSectors = MAX_DMA_EXT_COMMAND_SECTORS;
+    PciIoProtocolOp      = EfiPciIoOperationBusMasterRead;
+    AtaCommand           = WRITE_DMA_EXT_CMD;
+    break;
+  default:
+    return EFI_UNSUPPORTED;
+    break;
+  }
 
   //
-  // Channel and device differential. Select device.
+  // Channel and device differential
   //
   Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
 
@@ -2158,13 +2333,13 @@ AtaUdmaReadExt (
   RemainBlockNum = NumberOfBlocks;
   while (RemainBlockNum > 0) {
 
-    if (RemainBlockNum >= MAX_DMA_EXT_COMMAND_SECTORS) {
+    if (RemainBlockNum >= MaxDmaCommandSectors) {
       //
       //  SectorCount is used to record the number of sectors to be read
       //  Max 65536 sectors can be transfered at a time.
       //
-      NumberOfBlocks = MAX_DMA_EXT_COMMAND_SECTORS;
-      RemainBlockNum -= MAX_DMA_EXT_COMMAND_SECTORS;
+      NumberOfBlocks = MaxDmaCommandSectors;
+      RemainBlockNum -= MaxDmaCommandSectors;
     } else {
       NumberOfBlocks  = (UINT16) RemainBlockNum;
       RemainBlockNum  = 0;
@@ -2182,20 +2357,19 @@ AtaUdmaReadExt (
     //
     PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
     Status = IdeDev->PciIo->AllocateBuffer (
-                       IdeDev->PciIo,
-                       AllocateAnyPages,
-                       EfiBootServicesData,
-                       PageCount,
-                       &MemPage,
-                       0
-                       );
+                    IdeDev->PciIo,
+                    AllocateAnyPages,
+                    EfiBootServicesData,
+                    PageCount,
+                    &MemPage,
+                    0
+                    );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
     ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
-
+    
     PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
-
     //
     // To make sure PRD is allocated in one 64K page
     //
@@ -2213,17 +2387,17 @@ AtaUdmaReadExt (
     // Build the PRD table
     //
     Status = IdeDev->PciIo->Map (
-                       IdeDev->PciIo,
-                       EfiPciIoOperationBusMasterWrite,
-                       DataBuffer,
-                       &ByteCount,
+                       IdeDev->PciIo, 
+                       PciIoProtocolOp, 
+                       DataBuffer, 
+                       &ByteCount, 
                        &DeviceAddress,
                        &Map
                        );
     if (EFI_ERROR (Status)) {
       IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
-    }
+    }    
     PrdBuffer   = (VOID *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {
@@ -2269,7 +2443,11 @@ AtaUdmaReadExt (
                         &RegisterValue
                         );
 
-    RegisterValue |= BMIC_nREAD;
+    if (UdmaOp == AtaUdmaReadExtOp || UdmaOp == AtaUdmaReadOp) {
+      RegisterValue |= BMIC_nREAD;
+    } else {
+      RegisterValue &= ~((UINT8) BMIC_nREAD);
+    }
 
     IdeDev->PciIo->Io.Write (
                         IdeDev->PciIo,
@@ -2292,7 +2470,7 @@ AtaUdmaReadExt (
                         &RegisterValue
                         );
 
-    RegisterValue |= BMIS_INTERRUPT | BMIS_ERROR;
+    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
 
     IdeDev->PciIo->Io.Write (
                         IdeDev->PciIo,
@@ -2303,17 +2481,26 @@ AtaUdmaReadExt (
                         &RegisterValue
                         );
 
-    //
-    // Issue READ DMA EXT command
-    //
-    Status = AtaCommandIssueExt (
-               IdeDev,
-               READ_DMA_EXT_CMD,
-               Device,
-               0,
-               (UINT16) NumberOfBlocks,
-               StartLba
-               );
+    if (UdmaOp == AtaUdmaWriteExtOp || UdmaOp == AtaUdmaReadExtOp) {
+      Status = AtaCommandIssueExt (
+                 IdeDev,
+                 AtaCommand,
+                 Device,
+                 0,
+                 (UINT16) NumberOfBlocks,
+                 StartLba
+                 );
+    } else {
+      Status = AtaCommandIssue (
+                 IdeDev,
+                 AtaCommand,
+                 Device,
+                 0,
+                 (UINT16) NumberOfBlocks,
+                 StartLba
+                 );
+    }
+
     if (EFI_ERROR (Status)) {
       IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
@@ -2427,1100 +2614,6 @@ AtaUdmaReadExt (
     if (RegisterValue & BMIS_ERROR) {
       return EFI_DEVICE_ERROR;
     }
-
-    DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    StartLba += NumberOfBlocks;
-  }
-
-  //
-  // Disable interrupt of Select device
-  //
-  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
-  DeviceControl |= IEN_L;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  This function is called by the AtaBlkIoReadBlocks() to perform
-  reading from media in block unit. The function has been enhanced to
-  support >120GB access and transfer at most 65536 blocks per command
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *DataBuffer    A pointer to the destination buffer for the data.
-  @param[in] StartLba       The starting logical block address to read from
-  on the device media.
-  @param[in] NumberOfBlocks The number of transfer data blocks.
-
-  @return The device status of UDMA operation. If the operation is
-  successful, return EFI_SUCCESS.
-
-  TODO:    EFI_UNSUPPORTED - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-**/
-EFI_STATUS
-AtaUdmaRead (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  VOID            *DataBuffer,
-  IN  EFI_LBA         StartLba,
-  IN  UINTN           NumberOfBlocks
-  )
-{
-  IDE_DMA_PRD                *PrdAddr;
-  IDE_DMA_PRD                *UsedPrdAddr;
-  IDE_DMA_PRD                *TempPrdAddr;
-  UINT8                      RegisterValue;
-  UINT8                      Device;
-  UINT64                     IoPortForBmic;
-  UINT64                     IoPortForBmis;
-  UINT64                     IoPortForBmid;
-  EFI_STATUS                 Status;
-  UINTN                      PrdTableNum;
-  UINTN                      ByteCount;
-  UINTN                      ByteAvailable;
-  UINT8                      *PrdBuffer;
-  UINTN                      RemainBlockNum;
-  UINT8                      DeviceControl;
-  UINT32                     Count;
-  UINTN                      PageCount;
-  VOID                       *Map;
-  VOID                       *MemPage;
-  EFI_PHYSICAL_ADDRESS       DeviceAddress;
-
-  //
-  // Channel and device differential
-  //
-  Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
-
-  //
-  // Enable interrupt to support UDMA and Select device
-  //
-  DeviceControl = 0;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, Device);
-
-  if (IdePrimary == IdeDev->Channel) {
-    IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICP_OFFSET;
-    IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISP_OFFSET;
-    IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDP_OFFSET;
-  } else {
-    if (IdeSecondary == IdeDev->Channel) {
-      IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICS_OFFSET;
-      IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
-      IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDS_OFFSET;
-    } else {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  RemainBlockNum = NumberOfBlocks;
-  while (RemainBlockNum > 0) {
-
-    if (RemainBlockNum >= MAX_DMA_COMMAND_SECTORS) {
-      //
-      //  SectorCount is used to record the number of sectors to be read
-      //  Max 256 sectors can be transfered at a time.
-      //
-      NumberOfBlocks = MAX_DMA_COMMAND_SECTORS;
-      RemainBlockNum -= MAX_DMA_COMMAND_SECTORS;
-    } else {
-      NumberOfBlocks  = (UINT16) RemainBlockNum;
-      RemainBlockNum  = 0;
-    }
-
-    //
-    // Calculate the number of PRD table to make sure the memory region
-    // not cross 64K boundary
-    //
-    ByteCount   = NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    PrdTableNum = ((ByteCount >> 16) + 1) + 1;
-
-    //
-    // Build PRD table
-    //
-    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = IdeDev->PciIo->AllocateBuffer (
-                       IdeDev->PciIo,
-                       AllocateAnyPages,
-                       EfiBootServicesData,
-                       PageCount,
-                       &MemPage,
-                       0
-                       );
-    if (EFI_ERROR (Status)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
-
-    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
-    //
-    // To make sure PRD is allocated in one 64K page
-    //
-    if (((UINTN) PrdAddr & 0x0FFFF) > (((UINTN) PrdAddr + PrdTableNum * sizeof (IDE_DMA_PRD) - 1) & 0x0FFFF)) {
-      UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x10000) & 0xFFFF0000);
-    } else {
-      if ((UINTN) PrdAddr & 0x03) {
-        UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x04) & 0xFFFFFFFC);
-      } else {
-        UsedPrdAddr = PrdAddr;
-      }
-    }
-
-    //
-    // Build the PRD table
-    //
-    Status = IdeDev->PciIo->Map (
-                       IdeDev->PciIo,
-                       EfiPciIoOperationBusMasterWrite,
-                       DataBuffer,
-                       &ByteCount,
-                       &DeviceAddress,
-                       &Map
-                       );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
-    TempPrdAddr = UsedPrdAddr;
-    while (TRUE) {
-
-      ByteAvailable = 0x10000 - ((UINTN) PrdBuffer & 0xFFFF);
-
-      if (ByteCount <= ByteAvailable) {
-        TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-        TempPrdAddr->ByteCount      = (UINT16) ByteCount;
-        TempPrdAddr->EndOfTable     = 0x8000;
-        break;
-      }
-
-      TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-      TempPrdAddr->ByteCount      = (UINT16) ByteAvailable;
-
-      ByteCount -= ByteAvailable;
-      PrdBuffer += ByteAvailable;
-      TempPrdAddr++;
-    }
-
-    //
-    // Set the base address to BMID register
-    //
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint32,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmid,
-                        1,
-                        &UsedPrdAddr
-                        );
-
-    //
-    // Set BMIC register to identify the operation direction
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= BMIC_nREAD;
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Read BMIS register and clear ERROR and INTR bit
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Issue READ DMA command
-    //
-    Status = AtaCommandIssue (
-               IdeDev,
-               READ_DMA_CMD,
-               Device,
-               0,
-               (UINT16) NumberOfBlocks,
-               StartLba
-               );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-      return EFI_DEVICE_ERROR;
-    }
-
-    //
-    // Set START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= BMIC_START;
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Check the INTERRUPT and ERROR bit of BMIS
-    // Max transfer number of sectors for one command is 65536(32Mbyte),
-    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
-    // So set the variable Count to 2000, for about 2 second timeout time.
-    //
-    Count = 2000;
-    while (TRUE) {
-
-      IdeDev->PciIo->Io.Read (
-                          IdeDev->PciIo,
-                          EfiPciIoWidthUint8,
-                          EFI_PCI_IO_PASS_THROUGH_BAR,
-                          IoPortForBmis,
-                          1,
-                          &RegisterValue
-                          );
-      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
-        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
-          //
-          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
-          //
-          IdeDev->PciIo->Io.Read (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-
-          RegisterValue &= ~((UINT8)BMIC_START);
-
-          IdeDev->PciIo->Io.Write (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-          return EFI_DEVICE_ERROR;
-        }
-        break;
-      }
-
-      gBS->Stall (1000);
-      Count --;
-    }
-
-    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-    //
-    // Read Status Register of IDE device to clear interrupt
-    //
-    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
-    //
-    // Clear START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue &= ~((UINT8) BMIC_START);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    if (RegisterValue & BMIS_ERROR) {
-      return EFI_DEVICE_ERROR;
-    }
-
-    DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    StartLba += NumberOfBlocks;
-  }
-
-  //
-  // Disable interrupt of Select device
-  //
-  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
-  DeviceControl |= IEN_L;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing to media in block unit. The function has been enhanced to
-  support >120GB access and transfer at most 65536 blocks per command
-
-  @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *DataBuffer A pointer to the source buffer for the data.
-
-  @param[in] StartLba The starting logical block address to write to
-  on the device media.
-
-  @param[in] NumberOfBlocks The number of transfer data blocks.
-
-  @return The device status of UDMA operation. If the operation is
-  successful, return EFI_SUCCESS.
-
-  TODO:    EFI_UNSUPPORTED - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-**/
-EFI_STATUS
-AtaUdmaWriteExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  VOID            *DataBuffer,
-  IN  EFI_LBA         StartLba,
-  IN  UINTN           NumberOfBlocks
-  )
-{
-  IDE_DMA_PRD                *PrdAddr;
-  IDE_DMA_PRD                *UsedPrdAddr;
-  IDE_DMA_PRD                *TempPrdAddr;
-  UINT8                      RegisterValue;
-  UINT8                      Device;
-  UINT64                     IoPortForBmic;
-  UINT64                     IoPortForBmis;
-  UINT64                     IoPortForBmid;
-  EFI_STATUS                 Status;
-  UINTN                      PrdTableNum;
-  UINTN                      ByteCount;
-  UINTN                      ByteAvailable;
-  UINT8                      *PrdBuffer;
-  UINTN                      RemainBlockNum;
-  UINT8                      DeviceControl;
-  UINT32                     Count;
-  UINTN                      PageCount;
-  VOID                       *Map;
-  VOID                       *MemPage;
-  EFI_PHYSICAL_ADDRESS       DeviceAddress;
-
-  //
-  // Channel and device differential
-  //
-  Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
-
-  //
-  // Enable interrupt to support UDMA and Select device
-  //
-  DeviceControl = 0;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, Device);
-
-  if (IdePrimary == IdeDev->Channel) {
-    IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICP_OFFSET;
-    IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISP_OFFSET;
-    IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDP_OFFSET;
-  } else {
-    if (IdeSecondary == IdeDev->Channel) {
-      IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICS_OFFSET;
-      IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
-      IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDS_OFFSET;
-    } else {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  RemainBlockNum = NumberOfBlocks;
-  while (RemainBlockNum > 0) {
-
-    if (RemainBlockNum >= MAX_DMA_EXT_COMMAND_SECTORS) {
-      //
-      //  SectorCount is used to record the number of sectors to be read
-      //  Max 65536 sectors can be transfered at a time.
-      //
-      NumberOfBlocks = MAX_DMA_EXT_COMMAND_SECTORS;
-      RemainBlockNum -= MAX_DMA_EXT_COMMAND_SECTORS;
-    } else {
-      NumberOfBlocks  = (UINT16) RemainBlockNum;
-      RemainBlockNum  = 0;
-    }
-
-    //
-    // Calculate the number of PRD table to make sure the memory region
-    // not cross 64K boundary
-    //
-    ByteCount   = NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    PrdTableNum = ((ByteCount >> 16) + 1) + 1;
-
-    //
-    // Build PRD table
-    //
-    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = IdeDev->PciIo->AllocateBuffer (
-                       IdeDev->PciIo,
-                       AllocateAnyPages,
-                       EfiBootServicesData,
-                       PageCount,
-                       &MemPage,
-                       0
-                       );
-    if (EFI_ERROR (Status)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
-
-    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
-    //
-    // To make sure PRD is allocated in one 64K page
-    //
-    if (((UINTN) PrdAddr & 0x0FFFF) > (((UINTN) PrdAddr + PrdTableNum * sizeof (IDE_DMA_PRD) - 1) & 0x0FFFF)) {
-      UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x10000) & 0xFFFF0000);
-    } else {
-      if ((UINTN) PrdAddr & 0x03) {
-        UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x04) & 0xFFFFFFFC);
-      } else {
-        UsedPrdAddr = PrdAddr;
-      }
-    }
-
-    //
-    // Build the PRD table
-    //
-    Status = IdeDev->PciIo->Map (
-                       IdeDev->PciIo,
-                       EfiPciIoOperationBusMasterRead,
-                       DataBuffer,
-                       &ByteCount,
-                       &DeviceAddress,
-                       &Map
-                       );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
-    TempPrdAddr = UsedPrdAddr;
-    while (TRUE) {
-
-      ByteAvailable = 0x10000 - ((UINTN) PrdBuffer & 0xFFFF);
-
-      if (ByteCount <= ByteAvailable) {
-        TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-        TempPrdAddr->ByteCount      = (UINT16) ByteCount;
-        TempPrdAddr->EndOfTable     = 0x8000;
-        break;
-      }
-
-      TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-      TempPrdAddr->ByteCount      = (UINT16) ByteAvailable;
-
-      ByteCount -= ByteAvailable;
-      PrdBuffer += ByteAvailable;
-      TempPrdAddr++;
-    }
-
-    //
-    // Set the base address to BMID register
-    //
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint32,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmid,
-                        1,
-                        &UsedPrdAddr
-                        );
-
-    //
-    // Set BMIC register to identify the operation direction
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-    //
-    // 0000 1000
-    //
-    RegisterValue &= ~((UINT8) BMIC_nREAD);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Read BMIS register and clear ERROR and INTR bit
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Issue WRITE DMA EXT command
-    //
-    Status = AtaCommandIssueExt (
-               IdeDev,
-               WRITE_DMA_EXT_CMD,
-               Device,
-               0,
-               (UINT16) NumberOfBlocks,
-               StartLba
-               );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-      return EFI_DEVICE_ERROR;
-    }
-
-    //
-    // Set START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= BMIC_START;
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Check the INTERRUPT and ERROR bit of BMIS
-    // Max transfer number of sectors for one command is 65536(32Mbyte),
-    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
-    // So set the variable Count to 2000, for about 2 second timeout time.
-    //
-    Count = 2000;
-    while (TRUE) {
-
-      IdeDev->PciIo->Io.Read (
-                          IdeDev->PciIo,
-                          EfiPciIoWidthUint8,
-                          EFI_PCI_IO_PASS_THROUGH_BAR,
-                          IoPortForBmis,
-                          1,
-                          &RegisterValue
-                          );
-      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
-        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
-          //
-          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
-          //
-          IdeDev->PciIo->Io.Read (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-
-          RegisterValue &= ~((UINT8)BMIC_START);
-
-          IdeDev->PciIo->Io.Write (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-          return EFI_DEVICE_ERROR;
-        }
-        break;
-      }
-
-      gBS->Stall (1000);
-      Count --;
-    }
-
-    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-    //
-    // Read Status Register of IDE device to clear interrupt
-    //
-    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
-    //
-    // Clear START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue &= ~((UINT8) BMIC_START);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    StartLba += NumberOfBlocks;
-  }
-
-  //
-  // Disable interrupt of Select device
-  //
-  IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
-  DeviceControl |= IEN_L;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing to media in block unit. The function has been enhanced to
-  support >120GB access and transfer at most 65536 blocks per command
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *DataBuffer
-  A pointer to the source buffer for the data.
-
-  @param[in] StartLba
-  The starting logical block address to write to
-  on the device media.
-
-  @param[in] NumberOfBlocks
-  The number of transfer data blocks.
-
-  @return The device status of UDMA operation. If the operation is
-  successful, return EFI_SUCCESS.
-
-  TODO:    EFI_UNSUPPORTED - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
-**/
-EFI_STATUS
-AtaUdmaWrite (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  VOID            *DataBuffer,
-  IN  EFI_LBA         StartLba,
-  IN  UINTN           NumberOfBlocks
-  )
-{
-  IDE_DMA_PRD                *PrdAddr;
-  IDE_DMA_PRD                *UsedPrdAddr;
-  IDE_DMA_PRD                *TempPrdAddr;
-  UINT8                      RegisterValue;
-  UINT8                      Device;
-  UINT64                     IoPortForBmic;
-  UINT64                     IoPortForBmis;
-  UINT64                     IoPortForBmid;
-  EFI_STATUS                 Status;
-  UINTN                      PrdTableNum;
-  UINTN                      ByteCount;
-  UINTN                      ByteAvailable;
-  UINT8                      *PrdBuffer;
-  UINTN                      RemainBlockNum;
-  UINT8                      DeviceControl;
-  UINT32                     Count;
-  UINTN                      PageCount;
-  VOID                       *Map;
-  VOID                       *MemPage;
-  EFI_PHYSICAL_ADDRESS       DeviceAddress;
-
-  //
-  // Channel and device differential
-  //
-  Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
-
-  //
-  // Enable interrupt to support UDMA
-  //
-  DeviceControl = 0;
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, Device);
-
-  if (IdePrimary == IdeDev->Channel) {
-    IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICP_OFFSET;
-    IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISP_OFFSET;
-    IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDP_OFFSET;
-  } else {
-    if (IdeSecondary == IdeDev->Channel) {
-      IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICS_OFFSET;
-      IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
-      IoPortForBmid = IdeDev->IoPort->BusMasterBaseAddr + BMIDS_OFFSET;
-    } else {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  RemainBlockNum = NumberOfBlocks;
-  while (RemainBlockNum > 0) {
-
-    if (RemainBlockNum >= MAX_DMA_COMMAND_SECTORS) {
-      //
-      //  SectorCount is used to record the number of sectors to be read
-      //  Max 256 sectors can be transfered at a time.
-      //
-      NumberOfBlocks = MAX_DMA_COMMAND_SECTORS;
-      RemainBlockNum -= MAX_DMA_COMMAND_SECTORS;
-    } else {
-      NumberOfBlocks  = (UINT16) RemainBlockNum;
-      RemainBlockNum  = 0;
-    }
-
-    //
-    // Calculate the number of PRD table to make sure the memory region
-    // not cross 64K boundary
-    //
-    ByteCount   = NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
-    PrdTableNum = ((ByteCount >> 16) + 1) + 1;
-
-    //
-    // Build PRD table
-    //
-    PageCount = EFI_SIZE_TO_PAGES (2 * PrdTableNum * sizeof (IDE_DMA_PRD));
-    Status = IdeDev->PciIo->AllocateBuffer (
-                       IdeDev->PciIo,
-                       AllocateAnyPages,
-                       EfiBootServicesData,
-                       PageCount,
-                       &MemPage,
-                       0
-                       );
-    if (EFI_ERROR (Status)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
-
-    PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
-
-    //
-    // To make sure PRD is allocated in one 64K page
-    //
-    if (((UINTN) PrdAddr & 0x0FFFF) > (((UINTN) PrdAddr + PrdTableNum * sizeof (IDE_DMA_PRD) - 1) & 0x0FFFF)) {
-      UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x10000) & 0xFFFF0000);
-    } else {
-      if ((UINTN) PrdAddr & 0x03) {
-        UsedPrdAddr = (IDE_DMA_PRD *) ((UINTN) ((UINT8 *) PrdAddr + 0x04) & 0xFFFFFFFC);
-      } else {
-        UsedPrdAddr = PrdAddr;
-      }
-    }
-
-    //
-    // Build the PRD table
-    //
-    Status = IdeDev->PciIo->Map (
-                       IdeDev->PciIo,
-                       EfiPciIoOperationBusMasterRead,
-                       DataBuffer,
-                       &ByteCount,
-                       &DeviceAddress,
-                       &Map
-                       );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      return EFI_OUT_OF_RESOURCES;
-    }
-    PrdBuffer   = (UINT8 *) ((UINTN) DeviceAddress);
-    TempPrdAddr = UsedPrdAddr;
-    while (TRUE) {
-
-      ByteAvailable = 0x10000 - ((UINTN) PrdBuffer & 0xFFFF);
-
-      if (ByteCount <= ByteAvailable) {
-        TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-        TempPrdAddr->ByteCount      = (UINT16) ByteCount;
-        TempPrdAddr->EndOfTable     = 0x8000;
-        break;
-      }
-
-      TempPrdAddr->RegionBaseAddr = (UINT32) ((UINTN) PrdBuffer);
-      TempPrdAddr->ByteCount      = (UINT16) ByteAvailable;
-
-      ByteCount -= ByteAvailable;
-      PrdBuffer += ByteAvailable;
-      TempPrdAddr++;
-    }
-
-    //
-    // Set the base address to BMID register
-    //
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint32,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmid,
-                        1,
-                        &UsedPrdAddr
-                        );
-
-    //
-    // Set BMIC register to identify the operation direction
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-    //
-    // 0000 1000
-    //
-    RegisterValue &= ~((UINT8) BMIC_nREAD);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Read BMIS register and clear ERROR and INTR bit
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Issue WRITE DMA command
-    //
-    Status = AtaCommandIssue (
-               IdeDev,
-               WRITE_DMA_CMD,
-               Device,
-               0,
-               (UINT16) NumberOfBlocks,
-               StartLba
-               );
-    if (EFI_ERROR (Status)) {
-      IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-      IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-      return EFI_DEVICE_ERROR;
-    }
-
-    //
-    // Set START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= BMIC_START;
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    //
-    // Check the INTERRUPT and ERROR bit of BMIS
-    // Max transfer number of sectors for one command is 65536(32Mbyte),
-    // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
-    // So set the variable Count to 2000, for about 2 second timeout time.
-    //
-    Count = 2000;
-    while (TRUE) {
-
-      IdeDev->PciIo->Io.Read (
-                          IdeDev->PciIo,
-                          EfiPciIoWidthUint8,
-                          EFI_PCI_IO_PASS_THROUGH_BAR,
-                          IoPortForBmis,
-                          1,
-                          &RegisterValue
-                          );
-      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
-        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
-          //
-          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
-          //
-          IdeDev->PciIo->Io.Read (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-
-          RegisterValue &= ~((UINT8)BMIC_START);
-
-          IdeDev->PciIo->Io.Write (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-          return EFI_DEVICE_ERROR;
-        }
-        break;
-      }
-
-      gBS->Stall (1000);
-      Count --;
-    }
-
-    IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-    IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-
-    //
-    // Read Status Register of IDE device to clear interrupt
-    //
-    RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
-    //
-    // Clear START bit of BMIC register
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue &= ~((UINT8) BMIC_START);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmic,
-                        1,
-                        &RegisterValue
-                        );
 
     DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
     StartLba += NumberOfBlocks;
