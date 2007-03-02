@@ -65,7 +65,7 @@ typedef struct {
   INQUIRY_DATA                *pInquiryData;
   EFI_IDENTIFY_DATA           *pIdData;
   ATA_PIO_MODE                PioMode;
-  ATA_UDMA_MODE               UDma_Mode;
+  EFI_ATA_MODE                UdmaMode;
   CHAR8                       ModelName[41];
   REQUEST_SENSE_DATA          *SenseData;
   UINT8                       SenseDataNumber;
