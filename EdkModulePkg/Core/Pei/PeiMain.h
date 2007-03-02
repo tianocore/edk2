@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -347,7 +347,7 @@ Returns:
 --*/
 ;
 
-#ifdef EFI64
+#if   defined (MDE_CPU_IPF)
   //
   // In Ipf we should make special changes for the PHIT pointers to support
   // recovery boot in cache mode.
