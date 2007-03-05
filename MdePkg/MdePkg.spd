@@ -1718,11 +1718,6 @@
       <GuidValue>1ACED566-76ED-4218-BC81-767F1F977A89</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="NetworkInterfaceIdentifier2">
-      <C_Name>gEfiNetworkInterfaceIdentifierProtocolGuid_31</C_Name>
-      <GuidValue>1ACED566-76ED-4218-BC81-767F1F977A89</GuidValue>
-      <HelpText/>
-    </Entry>
     <Entry Name="LoadedImage">
       <C_Name>gEfiLoadedImageProtocolGuid</C_Name>
       <GuidValue>5B1B31A1-9562-11D2-8E3F-00A0C969723B</GuidValue>
