@@ -8204,11 +8204,10 @@
       </Sections>
     </Ffs>
     <Ffs FfsKey="APPLICATION_EFI">
-      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER"/>
+      <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION"/>
       <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE"/>
       <Sections EncapsulationType="Compress">
         <Sections EncapsulationType="Guid-Defined">
-          <Section SectionType="EFI_SECTION_DXE_DEPEX"/>
           <Section SectionType="EFI_SECTION_PE32"/>
           <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
           <Section SectionType="EFI_SECTION_VERSION"/>
