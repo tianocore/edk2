@@ -320,12 +320,6 @@ Returns:
   PlatformBdsInit (PrivateData);
 
   //
-  // Initialize the platform specific string and language
-  //
-  InitializeStringSupport ();
-  InitializeLanguage (TRUE);
-  InitializeFrontPage (FALSE);
-  //
   // Set up the device list based on EFI 1.1 variables
   // process Driver#### and Load the driver's in the
   // driver option list
