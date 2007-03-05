@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "undi32.h"
+#include "Undi32.h"
 
 static UINT8 basic_config_cmd[22] = {
                     22,        0x08,

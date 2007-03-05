@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "undi32.h"
+#include "Undi32.h"
 
 //
 // Global Variables

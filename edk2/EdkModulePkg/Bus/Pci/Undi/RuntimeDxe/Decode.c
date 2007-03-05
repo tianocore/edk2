@@ -19,7 +19,7 @@ Revision history:
 --*/
 
 // TODO: fix comment to add: Module Name: DECODE.C
-#include "undi32.h"
+#include "Undi32.h"
 
 
 //
