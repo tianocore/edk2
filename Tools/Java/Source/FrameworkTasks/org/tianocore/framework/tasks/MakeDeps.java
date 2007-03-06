@@ -295,7 +295,8 @@ public class MakeDeps extends Task {
         while (!pendingFiles.empty()) {
             String src = pendingFiles.pop();
             File srcFile = new File(src);
-            if (!srcFile.exists()) {
+			int fileLength = (int)srcFile.length();
+            if (!srcFile.exists() || fileLength == 0) {
                 continue;
             }
             //
@@ -307,7 +308,6 @@ public class MakeDeps extends Task {
                 FileInputStream fileReader = null;
                 BufferedInputStream bufReader = null;
                 String fileContent = "";
-                int fileLength = (int)srcFile.length();
 
                 try {
                     fileReader = new FileInputStream(srcFile);
