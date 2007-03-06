@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+	Implementation for EFI_SIMPLE_TEXT_IN_PROTOCOL protocol.
+	
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-    TerminalConIn.c
-    
-Abstract: 
-    
-
-Revision History
---*/
+**/
 
 #include "Terminal.h"
 
@@ -58,11 +51,11 @@ TerminalConInReset (
   //
   // Report progress code here
   //
-  Status = REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-            EFI_PROGRESS_CODE,
-            EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET,
-            TerminalDevice->DevicePath
-            );
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET,
+    TerminalDevice->DevicePath
+    );
 
   Status = TerminalDevice->SerialIo->Reset (TerminalDevice->SerialIo);
 
