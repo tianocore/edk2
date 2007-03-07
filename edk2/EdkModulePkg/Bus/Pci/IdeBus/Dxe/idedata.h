@@ -86,13 +86,6 @@ typedef enum {
   SenseOtherSense
 } SENSE_RESULT;
 
-typedef enum {
-  AtaUdmaReadOp,
-  AtaUdmaReadExtOp,
-  AtaUdmaWriteOp,
-  AtaUdmaWriteExtOp
-} ATA_UDMA_OPERATION;
-
 //
 // IDE Registers
 //
