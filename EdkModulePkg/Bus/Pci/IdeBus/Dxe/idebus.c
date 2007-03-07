@@ -629,11 +629,7 @@ IDEBusDriverBindingStart (
           IdeBlkIoDevicePtr = NULL;
           continue;
         }
-        //
-        // Record Udma Mode
-        //
-        IdeBlkIoDevicePtr->UdmaMode.Valid = TRUE;
-        IdeBlkIoDevicePtr->UdmaMode.Mode  = SupportedModes->UdmaMode.Mode;
+
         EnableInterrupt (IdeBlkIoDevicePtr);
       } else if (SupportedModes->MultiWordDmaMode.Valid) {
 
