@@ -330,9 +330,17 @@ public class EventsDlg extends IDialog {
         Tools
              .generateComboBoxByVector(iComboBoxGuidC_Name,
                                        wt.getAllGuidDeclarationsFromPackages(vpid, EnumerationData.GUID_TYPE_EFI_EVENT));
+        
+        this.iComboBoxGuidC_Name.insertItemAt(DataType.EMPTY_SELECT_ITEM, 0);
+        this.iComboBoxGuidC_Name.setSelectedIndex(0);
 
         if (this.id != null) {
-            this.iComboBoxGuidC_Name.setSelectedItem(id.getName());
+            String tmpName = id.getName();
+            if (isEmpty(tmpName)) {
+                tmpName = DataType.EMPTY_SELECT_ITEM;
+            }
+
+            this.iComboBoxGuidC_Name.setSelectedItem(tmpName);
             this.jComboBoxEventsType.setSelectedItem(id.getType());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
@@ -424,7 +432,7 @@ public class EventsDlg extends IDialog {
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelEventType, null);
             jContentPane.add(getJComboBoxEventsType(), null);
-            jContentPane.add(jStarLabel2, null);
+            //jContentPane.add(jStarLabel2, null);
             jContentPane.add(jLabelC_Name, null);
             jContentPane.add(getIComboBoxGuidC_Name(), null);
             jContentPane.add(jStarLabel3, null);
@@ -494,20 +502,8 @@ public class EventsDlg extends IDialog {
         //
         // Check Name
         //
-        if (this.iComboBoxGuidC_Name.getSelectedItem() == null) {
-            Log.wrn("Update Guids", "Please select one Event Name");
-            return false;
-        }
-
-        //
-        // Check Name
-        //
-        if (isEmpty(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
-            Log.wrn("Update Events", "Event Name couldn't be empty");
-            return false;
-        }
-
-        if (!isEmpty(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
+        String tmpName = this.iComboBoxGuidC_Name.getSelectedItem().toString();
+        if (!tmpName.equals(DataType.EMPTY_SELECT_ITEM) && isEmpty(tmpName)) {
             if (!DataValidation.isC_NameType(this.iComboBoxGuidC_Name.getSelectedItem().toString())) {
                 Log.wrn("Update Events", "Incorrect data type for Event Name");
                 return false;

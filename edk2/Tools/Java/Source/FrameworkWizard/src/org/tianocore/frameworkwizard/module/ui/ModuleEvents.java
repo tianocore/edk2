@@ -461,7 +461,7 @@ public class ModuleEvents extends IInternalFrame {
                             e.setEventType(EventTypes.Enum.forString(vid.getEvents(index).getGroup()));
                         }
                         se.addNewEventTypes();
-                        se.setEventTypesArray(ce.getEventTypesList().size() - 1, e);
+                        se.setEventTypesArray(se.getEventTypesList().size() - 1, e);
                     }
                 }
             }

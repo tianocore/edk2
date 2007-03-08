@@ -17,6 +17,8 @@ package org.tianocore.frameworkwizard.module.Identifications.Hobs;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.common.DataType;
+
 public class HobsIdentification {
 
     //
@@ -36,6 +38,7 @@ public class HobsIdentification {
 
     public HobsIdentification(String arg0, String arg1, String arg2, String arg3, Vector<String> arg4, String arg5) {
         this.name = (arg0 == null ? "" : arg0);
+        this.name = (this.name == DataType.EMPTY_SELECT_ITEM ? "" : this.name);
         this.type = (arg1 == null ? "" : arg1);
         this.usage = (arg2 == null ? "" : arg2);
         this.featureFlag = (arg3 == null ? "" : arg3);
