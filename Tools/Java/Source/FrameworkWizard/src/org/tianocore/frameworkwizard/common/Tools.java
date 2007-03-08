@@ -704,6 +704,9 @@ public class Tools {
      * 
      */
     public static boolean isEmpty(String strValue) {
+        if (strValue == null) {
+            return true;
+        }
         if (strValue.length() > 0) {
             return false;
         }
