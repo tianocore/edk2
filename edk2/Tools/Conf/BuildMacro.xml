@@ -974,16 +974,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </sequential>
   </macrodef>
 
-<!--############################################################################
-  Build Sections
-#############################################################################-->
   <!--
-    DLL
+    Generate efi file
     -->
-  <macrodef name="GenDll">
+  <macrodef name="GenEfi">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
-    <attribute name="FILEEXT"/>
+    <attribute name="FILEEXT" default="efi"/>
 
     <element name="LIB.ARG" optional="yes"/>
     <element name="LINK.ARG" optional="yes"/>
@@ -997,102 +994,152 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILENAME}.efi"/>
         </targetfiles>
 
         <sequential>
+          <!-- Generate a temporary lib file for object files -->
           <cc userdefine="on">
             <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}" dpath="${SLINK_DPATH}"
-                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib"
+                outputFile="${DEST_DIR_OUTPUT}/@{FILENAME}Local.lib"
                 libpath="${SLINKLIBPATH}" include="${SLINK_INCLUDEPATH}">
               <argument value="${SLINK_FLAGS}"/>
 
               <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
             </command>
           </cc>
+
+          <!-- Link the temporary lib file with dependent libraries -->
           <cc userdefine="on">
             <command type="DLINK" cmd="${DLINK}" family="${DLINK_FAMILY}"
-                     outputFile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll" dpath="${DLINK_DPATH}" 
+                     outputFile="${DEST_DIR_DEBUG}/@{FILENAME}.dll" dpath="${DLINK_DPATH}" 
                      libpath="${DLINK_LIBPATH}" include="${DLINK_INCLUDEPATH}">
               <argument value="${DLINK_FLAGS}"/>
-              <libset libs="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib ${LIBS} ${DLINK_SPATH}"/>
+              <libset libs="${DEST_DIR_OUTPUT}/@{FILENAME}Local.lib ${LIBS} ${DLINK_SPATH}"/>
               <LINK.ARG/>
             </command>
           </cc>
+
+          <!-- Convert the dll file to efi file -->
+          <fwimage componentType="${MODULE_TYPE}" outImage="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
+                   peImage="${DEST_DIR_DEBUG}/@{FILENAME}.dll" time="0"/>
+
+          <!-- Copy the efi file to BIN and OUTPUT directory -->
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />          
         </sequential>
       </OnDependency>
     </sequential>
   </macrodef>
 
   <!--
-    EFI
+    Binary
     -->
-  <macrodef name="GenEfi">
+  <macrodef name="Build_Binary">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="dll"/>
+    <attribute name="FILEEXT" default="bin"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <OnDependency>
-        <sourcefiles>
-          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-        </sourcefiles>
-        <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
-        </targetfiles>
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
+    </sequential>
+  </macrodef>
+  
+  <!--
+    Microcode
+   -->
+  <macrodef name="Build_MICROCODE">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="TXT"/>
 
-        <sequential>
-          <fwimage componentType="${MODULE_TYPE}" outImage="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
-                   peImage="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" time="0"/>
-        </sequential>
-      </OnDependency>
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+
+    <sequential>
+      <mkdir dir="${TARGET_DIR}/Microcode"/>
+      <flashmap MCIFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" MCOFILE="${TARGET_DIR}/Microcode/@{FILENAME}.bin"/>
+    </sequential>
+  </macrodef> 
+
+  <!--
+    Graphics (bmp, ...)
+    -->
+  <macrodef name="Build_BMP">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/> 
+    <attribute name="FILEEXT" default="bmp"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+
+    <sequential>
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
+    </sequential>
+  </macrodef> 
+
+  <!--
+    build EFI file
+  -->
+  <macrodef name="Build_EFI">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="efi"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+
+    <sequential>
+      <mkdir dir="${MODULE_DIR}/@{FILEPATH}" /> 
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+        tofile="${DEST_DIR_OUTPUT}/${BASE_NAME}.efi"/>
+    </sequential>
+  </macrodef>
+  
+  <!-- 
+    Build macro for Apriori
+  -->
+  <macrodef name="Build_Apriori">
+    <attribute name="FILEPATH" default="."/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="apr"/>
+    <attribute name="GUID"/>
+
+    <sequential>
+      <mkdir dir="${FV_DIR}/Apriori" />
+      <gensection inputfile="${FV_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                  outputfile="${FV_DIR}/Apriori/@{FILENAME}.sec" 
+                  sectiontype="EFI_SECTION_RAW"/>
+
+      <genffsfile BaseName="@{FILENAME}" ffsATTRIBCHECKSUM="TRUE" ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" 
+                  fileGuid="@{GUID}" moduleType="BASE" outputDir="${FV_DIR}">
+        <sectFile fileName="${FV_DIR}/Apriori/@{FILENAME}.sec"/>
+      </genffsfile>
+      
     </sequential>
   </macrodef>
 
-<!--
-  EFI_SECTION_FREEFORM_SUBTYPE_GUID
-  EFI_SECTION_VERSION
-  EFI_SECTION_USER_INTERFACE
-  EFI_SECTION_DXE_DEPEX
-  EFI_SECTION_PEI_DEPEX
-  EFI_SECTION_PE32
-  EFI_SECTION_PIC
-  EFI_SECTION_TE
-  EFI_SECTION_RAW
-  EFI_SECTION_COMPRESSION
-  EFI_SECTION_GUID_DEFINED
-  EFI_SECTION_COMPATIBILITY16
-  EFI_SECTION_FIRMWARE_VOLUME_IMAGE
-  -->
+<!--############################################################################
+  Build Sections
+#############################################################################-->
   <!--
-    EFI_SECTION_PE32
+    EFI_SECTION_TE
     -->
 
   <macrodef name="EFI_SECTION_TE">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="" />
+    <attribute name="FILEEXT" default="efi" />
 
     <element name="PRE.PROCESS" optional="yes"/>
     <element name="POST.PROCESS" optional="yes"/>
 
     <sequential>
-      <PRE.PROCESS/>
-      <if>
-        <not>
-          <equals arg1="${LIBS}" arg2=""/>
-        </not>
-
-        <then>
-          <GenDll FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="">
-            <LIB.ARG></LIB.ARG>
-            <LINK.ARG></LINK.ARG>
-          </GenDll>
-
-          <GenEfi FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="dll"/>
-        </then>
-      </if>
-
       <OnDependency>
         <sourcefiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
@@ -1102,44 +1149,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
-          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />          
+          <PRE.PROCESS/>
+
           <genteimage Dump="false" Verbose="false" OutputDir="" OutputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" InputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
           <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" 
                       outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.tes" 
                       sectiontype="EFI_SECTION_TE"/>
+
           <POST.PROCESS/>
         </sequential>
       </OnDependency>
     </sequential>
   </macrodef>
 
+  <!--
+    EFI_SECTION_PE32
+    -->
   <macrodef name="EFI_SECTION_PE32">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="" />
+    <attribute name="FILEEXT" default="efi"/>
 
     <element name="PRE.PROCESS" optional="yes"/>
     <element name="POST.PROCESS" optional="yes"/>
 
     <sequential>
-      <PRE.PROCESS/>
-      <if>
-        <not>
-          <!-- TBD ${OBJECTS} -->
-          <equals arg1="${LIBS}" arg2=""/>
-        </not>
-
-        <then>
-          <GenDll FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="">
-            <LIB.ARG></LIB.ARG>
-            <LINK.ARG></LINK.ARG>
-          </GenDll>
-
-          <GenEfi FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="dll"/>
-        </then>
-      </if>
-      
       <OnDependency>
         <sourcefiles>
           <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
@@ -1149,8 +1183,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
-          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />
+          <PRE.PROCESS/>
+
           <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
                       outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.pe32" 
                       sectiontype="EFI_SECTION_PE32"/>
@@ -1415,95 +1449,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </sequential>
   </macrodef>
 
-  <!--
-    Binary
-    -->
-  <macrodef name="Build_Binary">
-    <attribute name="FILEPATH"/>
-    <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="bin"/>
-
-    <element name="EXTRA.INC" optional="yes"/>
-    <element name="EXTRA.ARG" optional="yes"/>
-
-    <sequential>
-      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
-            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
-    </sequential>
-  </macrodef>
-  
-  <!--
-    Microcode
-   -->
-  <macrodef name="Build_MICROCODE">
-    <attribute name="FILEPATH"/>
-    <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="TXT"/>
-
-    <element name="EXTRA.INC" optional="yes"/>
-    <element name="EXTRA.ARG" optional="yes"/>
-
-    <sequential>
-      <mkdir dir="${TARGET_DIR}/Microcode"/>
-      <flashmap MCIFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" MCOFILE="${TARGET_DIR}/Microcode/@{FILENAME}.bin"/>
-    </sequential>
-  </macrodef> 
-
-  <!--
-    Graphics (bmp, ...)
-    -->
-  <macrodef name="Build_BMP">
-    <attribute name="FILEPATH"/>
-    <attribute name="FILENAME"/> 
-    <attribute name="FILEEXT" default="bmp"/>
-
-    <element name="EXTRA.INC" optional="yes"/>
-    <element name="EXTRA.ARG" optional="yes"/>
-
-    <sequential>
-      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
-            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
-    </sequential>
-  </macrodef> 
-
-  <!--
-    build EFI file
-  -->
-  <macrodef name="Build_EFI">
-    <attribute name="FILEPATH"/>
-    <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="efi"/>
-
-    <element name="EXTRA.INC" optional="yes"/>
-    <element name="EXTRA.ARG" optional="yes"/>
-
-    <sequential>
-      <mkdir dir="${MODULE_DIR}/@{FILEPATH}" /> 
-      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
-        tofile="${DEST_DIR_OUTPUT}/${BASE_NAME}.efi"/>
-    </sequential>
-  </macrodef>
-  
-  <!-- 
-    Build macro for Apriori
-  -->
-  <macrodef name="Build_Apriori">
-    <attribute name="FILEPATH" default="."/>
-    <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="apr"/>
-    <attribute name="GUID"/>
-
-    <sequential>
-      <mkdir dir="${FV_DIR}/Apriori" />
-      <gensection inputfile="${FV_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
-                  outputfile="${FV_DIR}/Apriori/@{FILENAME}.sec" 
-                  sectiontype="EFI_SECTION_RAW"/>
-
-      <genffsfile BaseName="@{FILENAME}" ffsATTRIBCHECKSUM="TRUE" ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" 
-                  fileGuid="@{GUID}" moduleType="BASE" outputDir="${FV_DIR}">
-        <sectFile fileName="${FV_DIR}/Apriori/@{FILENAME}.sec"/>
-      </genffsfile>
-      
-    </sequential>
-  </macrodef>
 </project>

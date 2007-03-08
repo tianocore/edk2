@@ -1107,8 +1107,7 @@ public class AutoGen {
                     fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
                     fileBuffer.append("    ProcessLibraryDestructorList (gImageHandle, gST);\r\n");
                     fileBuffer.append("  }\r\n");
-                    fileBuffer
-                    .append("  gBS->Exit (gImageHandle, Status, 0, NULL);\r\n");
+                    fileBuffer.append("  gBS->Exit (gImageHandle, Status, 0, NULL);\r\n");
                 } else {
                     fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\r\n");
                     fileBuffer.append("    mDriverEntryPointStatus = Status;\r\n");
@@ -1591,8 +1590,7 @@ public class AutoGen {
         case CommonDefinition.ModuleTypePeiCore:
         case CommonDefinition.ModuleTypePeim:
             fileBuffer.append("  IN EFI_FFS_FILE_HEADER       *FfsHeader,\r\n");
-            fileBuffer
-            .append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
+            fileBuffer.append("  IN EFI_PEI_SERVICES          **PeiServices\r\n");
             break;
 
         case CommonDefinition.ModuleTypeDxeCore:

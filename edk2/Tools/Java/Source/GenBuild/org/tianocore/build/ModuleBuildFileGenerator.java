@@ -371,19 +371,24 @@ public class ModuleBuildFileGenerator {
 
         FileProcess fileProcess = new FileProcess();
         fileProcess.init(project, includes, document);
-        
-        //
-        // Initialize some properties by user
-        //
-        Element initEle = document.createElement("Build_Init");
-        Element initIncEle = document.createElement("EXTRA.INC");
-        for (int i = 0; i < includes.length; i++) {
-            Element includeEle = document.createElement("includepath");
-            includeEle.setAttribute("path", includes[i]);
-            initIncEle.appendChild(includeEle);
+
+        boolean isBinaryModule  = fpdModuleId.getModule().isBinary();
+        boolean isLibraryModule = fpdModuleId.getModule().isLibrary();
+
+        if (!isBinaryModule) {
+            //
+            // Initialize some properties by user
+            //
+            Element initEle = document.createElement("Build_Init");
+            Element initIncEle = document.createElement("EXTRA.INC");
+            for (int i = 0; i < includes.length; i++) {
+                Element includeEle = document.createElement("includepath");
+                includeEle.setAttribute("path", includes[i]);
+                initIncEle.appendChild(includeEle);
+            }
+            initEle.appendChild(initIncEle);
+            root.appendChild(initEle);
         }
-        initEle.appendChild(initIncEle);
-        root.appendChild(initEle);
 
         String moduleDir = project.getProperty("MODULE_DIR");
         //
@@ -421,10 +426,9 @@ public class ModuleBuildFileGenerator {
         }
 
         //
-        // Parse AutoGen.c & AutoGen.h
+        // Don't build AutoGen.c for library and binary module
         //
-        if (!fpdModuleId.getModule().isLibrary()
-            && !fpdModuleId.getModule().isBinary()) {
+        if (!isLibraryModule && !isBinaryModule) {
             fileProcess.parseFile(project.getProperty("DEST_DIR_DEBUG") + File.separatorChar + "AutoGen.c", null, root, false);
         }
         
@@ -469,6 +473,18 @@ public class ModuleBuildFileGenerator {
                 String sectiontype = list[i];
                 if (sectiontype.equalsIgnoreCase("EFI_SECTION_RAW") && project.getProperty("MODULE_TYPE").equalsIgnoreCase("SEC")) {
                     sectiontype += "_SEC";
+                }
+                if ((sectiontype.equalsIgnoreCase("EFI_SECTION_PE32") || 
+                     sectiontype.equalsIgnoreCase("EFI_SECTION_TE"))
+                    && !fpdModuleId.getModule().isLibrary()
+                    && !fpdModuleId.getModule().isBinary()) {
+                    //
+                    // Generate code to generate efi file
+                    // 
+                    Element ele = document.createElement("GenEfi");
+                    ele.setAttribute("FILEPATH", ".");
+                    ele.setAttribute("FILENAME", "${BASE_NAME}");
+                    root.appendChild(ele);
                 }
                 Element ele = document.createElement(sectiontype);
                 ele.setAttribute("FILEPATH", ".");
