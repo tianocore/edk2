@@ -608,17 +608,7 @@ BotCommandPhase (
   cbw.dCBWSignature           = CBWSIG;
   cbw.dCBWTag                 = 0x01;
   cbw.dCBWDataTransferLength  = DataTransferLength;
-  switch (Direction) {
-  case EfiUsbDataOut:
-  case EfiUsbNoData:
-    cbw.bmCBWFlags            = 0;
-    break;
-  case EfiUsbDataIn:
-    cbw.bmCBWFlags            = 0x80;
-    break;
-  default:
-    break;
-  }
+  cbw.bmCBWFlags              = (UINT8) ((Direction == EfiUsbDataIn) ? 0x80 : 0);
   cbw.bCBWCBLength            = CommandSize;
 
   CopyMem (cbw.CBWCB, Command, CommandSize);

@@ -79,7 +79,7 @@ Returns:
 
 VOID
 CoreNewDebugImageInfoEntry (
-  UINTN                    ImageInfoType,
+  UINT32                    ImageInfoType,
   EFI_LOADED_IMAGE_PROTOCOL *LoadedImage,
   EFI_HANDLE                ImageHandle
   )
