@@ -124,6 +124,11 @@ Returns:
   EFI_BLOCK_IO_PROTOCOL     *BlkIo;
   VOID                      *Buffer;
 
+  //
+  // Record the performance data for End of BDS
+  //
+  PERF_END (0, BDS_TOK, NULL, 0);
+
   *ExitDataSize = 0;
   *ExitData     = NULL;
 

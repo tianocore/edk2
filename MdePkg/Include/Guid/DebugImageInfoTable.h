@@ -45,7 +45,7 @@ typedef struct {
 } EFI_DEBUG_IMAGE_INFO_NORMAL;
 
 typedef union {
-  UINTN                       *ImageInfoType;
+  UINT32                      *ImageInfoType;
   EFI_DEBUG_IMAGE_INFO_NORMAL *NormalImage;
 } EFI_DEBUG_IMAGE_INFO;
 

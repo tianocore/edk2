@@ -216,7 +216,6 @@ Returns:
     // All the driver options should have been processed since
     // now boot will be performed.
     //
-    PERF_END (0, BDS_TOK, NULL, 0);
     Status = BdsLibBootViaBootOption (BootOption, BootOption->DevicePath, &ExitDataSize, &ExitData);
     if (EFI_ERROR (Status)) {
       //
