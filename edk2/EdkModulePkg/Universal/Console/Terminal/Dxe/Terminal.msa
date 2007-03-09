@@ -6,8 +6,8 @@
     <GuidValue>9E863906-A40F-4875-977F-5B93FF237FC6</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Terminal module.</Abstract>
-    <Description>This drivre installs Simple Text In/Out protocol for terminal devices.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>This driver installs Simple Text In/Out protocol for terminal devices.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,9 @@
     <OutputFileBasename>Terminal</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverModelLib</Keyword>
@@ -83,15 +84,18 @@
   <Variables>
     <Variable Usage="SOMETIMES_CONSUMED">
       <VariableName>0x0043 0x006F 0x006E 0x0049 0x006E 0x0044 0x0065 0x0076</VariableName>
-      <GuidC_Name>gConInDevGuid</GuidC_Name>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>L"ConInDev" global variable will be updated if the serial device is not a hot plug device.</HelpText>
     </Variable>
     <Variable Usage="SOMETIMES_CONSUMED">
       <VariableName>0x0043 0x006F 0x006E 0x004F 0x0075 0x0074 0x0044 0x0065 0x0076</VariableName>
-      <GuidC_Name>gConOutDevGuid</GuidC_Name>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>L"ConOutDev" global variable will be updated if the serial device is not a hot plug device.</HelpText>
     </Variable>
     <Variable Usage="SOMETIMES_CONSUMED">
       <VariableName>0x0045 0x0072 0x0072 0x004F 0x0075 0x0074 0x0044 0x0065 0x0076</VariableName>
-      <GuidC_Name>gErrOutDevGuid</GuidC_Name>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>L"ErrOutDev" global variable will be updated if the serial device is not a hot plug device.</HelpText>
     </Variable>
   </Variables>
   <Guids>
