@@ -142,11 +142,6 @@ BdsLibGetTimeout (
   VOID
   );
 
-EFI_STATUS
-BdsLibGetBootMode (
-  OUT EFI_BOOT_MODE       *BootMode
-  );
-
 VOID
 BdsLibLoadDrivers (
   IN  LIST_ENTRY          *BdsDriverLists
