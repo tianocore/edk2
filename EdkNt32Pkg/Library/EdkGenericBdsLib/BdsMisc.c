@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -554,37 +554,6 @@ Returns:
   }
 
   gBS->FreePool (OptionOrder);
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-BdsLibGetBootMode (
-  OUT EFI_BOOT_MODE       *BootMode
-  )
-/*++
-
-Routine Description:
-
-  Get boot mode by looking up configuration table and parsing HOB list
-
-Arguments:
-
-  BootMode - Boot mode from PEI handoff HOB.
-
-Returns:
-
-  EFI_SUCCESS - Successfully get boot mode
-  
-  EFI_NOT_FOUND - Can not find the current system boot mode
-
---*/
-{
-  EFI_HOB_HANDOFF_INFO_TABLE        *HobList;
-
-  HobList = GetHobList ();
-  ASSERT (HobList->Header.HobType == EFI_HOB_TYPE_HANDOFF);
-  *BootMode = HobList->BootMode;
 
   return EFI_SUCCESS;
 }

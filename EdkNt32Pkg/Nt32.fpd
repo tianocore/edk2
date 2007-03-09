@@ -7615,7 +7615,7 @@
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
-          <Value>10</Value>
+          <Value>320</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
