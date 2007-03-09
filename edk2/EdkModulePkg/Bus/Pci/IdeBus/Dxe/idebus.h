@@ -1,7 +1,7 @@
 /** @file
   Header file for IDE Bus Driver.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007 Intel Corporation. <BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -65,7 +65,7 @@ typedef struct {
   INQUIRY_DATA                *pInquiryData;
   EFI_IDENTIFY_DATA           *pIdData;
   ATA_PIO_MODE                PioMode;
-  ATA_UDMA_MODE               UDma_Mode;
+  EFI_ATA_MODE                UdmaMode;
   CHAR8                       ModelName[41];
   REQUEST_SENSE_DATA          *SenseData;
   UINT8                       SenseDataNumber;
