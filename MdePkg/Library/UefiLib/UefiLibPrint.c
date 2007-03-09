@@ -55,7 +55,7 @@ InternalPrint (
 
   if (Console != NULL) {
     //
-    // To be extra safe make sure ConOut has been initialized
+    // To be extra safe make sure Console has been initialized
     //
     Console->OutputString (Console, Buffer);
   }
@@ -177,7 +177,7 @@ AsciiInternalPrint (
 
   if (Console != NULL) {
     //
-    // To be extra safe make sure ConOut has been initialized
+    // To be extra safe make sure Console has been initialized
     //
     Console->OutputString (Console, Buffer);
   }
