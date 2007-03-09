@@ -1,7 +1,7 @@
 /** @file
   Header file for IDE Bus Driver's Data Structures
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007 Intel Corporation. <BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -85,6 +85,13 @@ typedef enum {
   SenseMediaError,
   SenseOtherSense
 } SENSE_RESULT;
+
+typedef enum {
+  AtaUdmaReadOp,
+  AtaUdmaReadExtOp,
+  AtaUdmaWriteOp,
+  AtaUdmaWriteExtOp
+} ATA_UDMA_OPERATION;
 
 //
 // IDE Registers
