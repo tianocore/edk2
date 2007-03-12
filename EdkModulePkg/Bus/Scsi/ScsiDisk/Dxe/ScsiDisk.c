@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -332,17 +332,22 @@ Returns:
 {
   SCSI_DISK_DEV *ScsiDiskDevice;
   EFI_STATUS    Status;
+  EFI_TPL       OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   ScsiDiskDevice  = SCSI_DISK_DEV_FROM_THIS (This);
 
   Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
 
   if (!ExtendedVerification) {
-    return Status;
+    goto Done;
   }
 
   Status = ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
 
+Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -389,6 +394,7 @@ Returns:
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
 
   MediaChange = FALSE;
   if (!Buffer) {
@@ -399,13 +405,16 @@ Returns:
     return EFI_SUCCESS;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
   if (!IsDeviceFixed (ScsiDiskDevice)) {
 
     Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     if (MediaChange) {
@@ -426,27 +435,33 @@ Returns:
   NumberOfBlocks  = BufferSize / BlockSize;
 
   if (!(Media->MediaPresent)) {
-    return EFI_NO_MEDIA;
+    Status = EFI_NO_MEDIA;
+    goto Done;
   }
 
   if (MediaId != Media->MediaId) {
-    return EFI_MEDIA_CHANGED;
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
   }
 
   if (BufferSize % BlockSize != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
   }
 
   if (LBA > Media->LastBlock) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if ((Media->IoAlign > 1) && (((UINTN) Buffer & (Media->IoAlign - 1)) != 0)) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
   
   //
@@ -455,6 +470,8 @@ Returns:
   //
   Status = ScsiDiskReadSectors (ScsiDiskDevice, Buffer, LBA, NumberOfBlocks);
 
+Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -501,6 +518,7 @@ Returns:
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
 
   MediaChange = FALSE;
   if (!Buffer) {
@@ -511,13 +529,16 @@ Returns:
     return EFI_SUCCESS;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
   if (!IsDeviceFixed (ScsiDiskDevice)) {
 
     Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     if (MediaChange) {
@@ -538,27 +559,33 @@ Returns:
   NumberOfBlocks  = BufferSize / BlockSize;
 
   if (!(Media->MediaPresent)) {
-    return EFI_NO_MEDIA;
+    Status = EFI_NO_MEDIA;
+    goto Done;
   }
 
   if (MediaId != Media->MediaId) {
-    return EFI_MEDIA_CHANGED;
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
   }
 
   if (BufferSize % BlockSize != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
   }
 
   if (LBA > Media->LastBlock) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if ((Media->IoAlign > 1) && (((UINTN) Buffer & (Media->IoAlign - 1)) != 0)) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
   //
   // if all the parameters are valid, then perform read sectors command
@@ -566,6 +593,9 @@ Returns:
   //
   Status = ScsiDiskWriteSectors (ScsiDiskDevice, Buffer, LBA, NumberOfBlocks);
 
+Done:
+  gBS->RestoreTPL (OldTpl);
+  
   return Status;
 }
 
