@@ -1088,7 +1088,7 @@ public class SurfaceAreaQuery {
                 usageXpath = "/GuidEntry[@Usage='" + arch + "']";
                 xPath = new String[] { archXpath, usageXpath };
             } else {
-                return getProtocolNotifyArray(arch);
+                return getGuidEntryArray(arch);
             }
         }
 
@@ -1103,6 +1103,234 @@ public class SurfaceAreaQuery {
             guidList[i] = ((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName();
         }
         return guidList;
+    }
+
+    public String[] getEventCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{
+                "/CreateEvents/EventTypes[@EventGuidCName]",
+                "/SignalEvents/EventTypes[@EventGuidCName]",
+            };
+        } else {
+            xPath = new String[]{
+                "/CreateEvents/EventTypes[@EventGuidCName and not(@SupArchList)]",
+                "/SignalEvents/EventTypes[@EventGuidCName and not(@SupArchList)]",
+                "/CreateEvents/EventTypes[@EventGuidCName and contains(@SupArchList,'" + arch + "')]",
+                "/SignalEvents/EventTypes[@EventGuidCName and contains(@SupArchList,'" + arch + "')]",
+            };
+        }
+
+        Object[] returns = get("Events", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            if (returns[i] instanceof EventsDocument.Events.CreateEvents.EventTypes) {
+                cnameList[i] = ((EventsDocument.Events.CreateEvents.EventTypes) returns[i]).getEventGuidCName();
+            } else {
+                cnameList[i] = ((EventsDocument.Events.SignalEvents.EventTypes) returns[i]).getEventGuidCName();
+            }
+        }
+        return cnameList;
+    }
+
+    public String[] getHobCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{"/HobTypes[@HobGuidCName]"};
+        } else {
+            xPath = new String[]{
+                "/HobTypes[@HobGuidCName and not(@SupArchList)]",
+                "/HobTypes[@HobGuidCName and contains(@SupArchList,'" + arch + "')]",
+            };
+        }
+
+        Object[] returns = get("Hobs", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            cnameList[i] = ((HobsDocument.Hobs.HobTypes) returns[i]).getHobGuidCName();
+        }
+        return cnameList;
+    }
+
+    public String[] getVariableCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{"/Variable"};
+        } else {
+            xPath = new String[]{"/Variable[not(@SupArchList) or contains(@SupArchList,'" + arch + "')]"};
+        }
+
+        Object[] returns = get("Variables", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            cnameList[i] = ((VariablesDocument.Variables.Variable) returns[i]).getGuidCName();
+        }
+        return cnameList;
+    }
+
+    public String[] getSystemTableCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{"/SystemTableCNames"};
+        } else {
+            xPath = new String[]{
+                "/SystemTableCNames[not(@SupArchList) or contains(@SupArchList,'" + arch + "')]"
+            };
+        }
+
+        Object[] returns = get("SystemTables", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            cnameList[i] = ((SystemTablesDocument.SystemTables.SystemTableCNames) returns[i]).getSystemTableCName();
+        }
+        return cnameList;
+    }
+
+    public String[] getDataHubCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{"/DataHubRecord"};
+        } else {
+            xPath = new String[]{"/DataHubRecord[not(@SupArchList) or contains(@SupArchList,'" + arch + "')]"};
+        }
+
+        Object[] returns = get("DataHubs", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            cnameList[i] = ((DataHubsDocument.DataHubs.DataHubRecord) returns[i]).getDataHubCName();
+        }
+        return cnameList;
+    }
+
+    public String[] getHiiPackageCNameArray(String arch) {
+        String[] xPath = null;
+
+        if (arch == null || arch.equals("")) {
+            xPath = new String[]{"/HiiPackage"};
+        } else {
+            xPath = new String[]{"/HiiPackage[not(@SupArchList) or contains(@SupArchList,'" + arch + "')]"};
+        }
+
+        Object[] returns = get("HiiPackages", xPath);
+        if (returns == null) {
+            return new String[0];
+        }
+
+        String[] cnameList = new String[returns.length];
+        for (int i = 0; i < returns.length; i++) {
+            cnameList[i] = ((HiiPackagesDocument.HiiPackages.HiiPackage) returns[i]).getHiiCName();
+        }
+        return cnameList;
+    }
+
+    public String[] getCNameArray(String arch) {
+        List<String> cnameList = new ArrayList<String>(100);
+        String[] result = null;
+        // 
+        // "/Guids/GuidCNames/GuidCName",
+        // 
+        result = getGuidEntryArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/Protocols/Protocol/ProtocolCName",
+        // 
+        result = getProtocolArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        //
+        //  "/Protocols/ProtocolNotify/ProtocolNotifyCName",
+        // 
+        result = getProtocolNotifyArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/Events/CreateEvents/EventTypes[@EventGuidCName]",
+        // "/Events/SignalEvents/EventTypes[@EventGuidCName]",
+        // 
+        result = getEventCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        //
+        // "/Hobs/HobTypes[@HobGuidCName]",
+        // 
+        result = getHobCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/PPIs/Ppi/PpiCName",
+        //
+        result = getPpiArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/PPIs/PpiNotify/PpiNotifyCName",
+        // 
+        result = getPpiNotifyArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/Variables/Variable/GuidC_Name",
+        // 
+        result = getVariableCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        // 
+        // "/SystemTables/SystemTableCNames/SystemTableCName",
+        // 
+        result = getSystemTableCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        //
+        //  "/DataHubs/DataHubRecord/DataHubCName",
+        // 
+        result = getDataHubCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+        //
+        // "/HiiPackages/HiiPackage/HiiCName",
+        // 
+        result = getHiiPackageCNameArray(arch);
+        for (int i = 0; i < result.length; ++i) {
+            cnameList.add(result[i]);
+        }
+
+        return cnameList.toArray(new String[cnameList.size()]);
     }
 
     /**

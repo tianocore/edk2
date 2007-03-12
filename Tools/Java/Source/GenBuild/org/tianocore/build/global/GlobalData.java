@@ -434,6 +434,12 @@ public class GlobalData {
             msaMap.put("Protocols", cloneXmlObject(msa.getProtocols(), true));
             msaMap.put("PPIs", cloneXmlObject(msa.getPPIs(), true));
             msaMap.put("Guids", cloneXmlObject(msa.getGuids(), true));
+            msaMap.put("Events", cloneXmlObject(msa.getEvents(), true));
+            msaMap.put("Hobs", cloneXmlObject(msa.getHobs(), true));
+            msaMap.put("Variables", cloneXmlObject(msa.getVariables(), true));
+            msaMap.put("SystemTables", cloneXmlObject(msa.getSystemTables(), true));
+            msaMap.put("DataHubs", cloneXmlObject(msa.getDataHubs(), true));
+            msaMap.put("HiiPackages", cloneXmlObject(msa.getHiiPackages(), true));
             msaMap.put("Externs", cloneXmlObject(msa.getExterns(), true));
             msaMap.put("PcdCoded", cloneXmlObject(msa.getPcdCoded(), true));
             msaMap.put("ModuleBuildOptions", cloneXmlObject(msa.getModuleBuildOptions(), true));
