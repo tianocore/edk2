@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,37 @@ Revision History
 // Don't use module globals after the SetVirtualAddress map is signaled
 //
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
+
+//
+// This is a temperary function which will be removed 
+// when EfiAcquireLock in UefiLib can handle the
+// the call in UEFI Runtimer driver in RT phase.
+//
+VOID
+AcquireLockOnlyAtBootTime (
+  IN EFI_LOCK  *Lock
+  )
+{
+  if (!EfiAtRuntime ()) {
+    EfiAcquireLock (Lock);
+  }
+}
+
+//
+// This is a temperary function which will be removed 
+// when EfiAcquireLock in UefiLib can handle the
+// the call in UEFI Runtimer driver in RT phase.
+//
+VOID
+ReleaseLockOnlyAtBootTime (
+  IN EFI_LOCK  *Lock
+  )
+{
+  if (!EfiAtRuntime ()) {
+    EfiReleaseLock (Lock);
+  }
+}
+
 
 STATIC
 UINT32
@@ -198,6 +229,13 @@ Returns:
   UINTN                 Index;
 
   //
+  // We aquire the lock at the entry of FindVariable as GetVariable, GetNextVariableName
+  // SetVariable all call FindVariable at entry point. Please move "Aquire Lock" to
+  // the correct places if this assumption does not hold TRUE anymore.
+  //
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
+
+  //
   // 0: Non-Volatile, 1: Volatile
   //
   VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
@@ -293,7 +331,7 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
   //
   // Get data size
@@ -301,7 +339,8 @@ Returns:
   VarDataSize = Variable.CurrPtr->DataSize;
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
     }
 
     CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
@@ -310,11 +349,17 @@ Returns:
     }
 
     *DataSize = VarDataSize;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   } else {
     *DataSize = VarDataSize;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto Done;
   }
+
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
 }
 
 EFI_STATUS
@@ -357,7 +402,7 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   while (TRUE) {
@@ -377,7 +422,8 @@ Returns:
         Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (Global->VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
         Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase));
       } else {
-        goto Error;
+        Status = EFI_NOT_FOUND;
+        goto Done;
       }
 
       Variable.CurrPtr = Variable.StartPtr;
@@ -408,13 +454,15 @@ Returns:
         }
 
         *VariableNameSize = VarNameSize;
-        return Status;
+        goto Done;
       }
     }
   }
 
-Error:
-  return EFI_NOT_FOUND;
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
+ 
 }
 
 EFI_STATUS
@@ -470,36 +518,41 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Status == EFI_INVALID_PARAMETER) {
-    return Status;
+    goto Done;
   } else if (!EFI_ERROR (Status) && Variable.Volatile && EfiAtRuntime()) {
     //
     // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
     // the volatile is ReadOnly, and SetVariable should be aborted and 
     // return EFI_WRITE_PROTECTED.
     //
-    return EFI_WRITE_PROTECTED;
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
   } else if (sizeof (VARIABLE_HEADER) + (ArrayLength (VariableName) + DataSize) > MAX_VARIABLE_SIZE) {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
     //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS
           ) {
     //
     //  Make sure if runtime bit is set, boot service bit is set also
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
     //
     // Runtime but Attribute is not Runtime
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_NON_VOLATILE)) {
     //
     // Cannot set volatile variable in Runtime
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
     //
     // Setting a data variable with no access, or zero DataSize attributes
@@ -507,10 +560,12 @@ Returns:
     //
     if (!EFI_ERROR (Status)) {
       Variable.CurrPtr->State &= VAR_DELETED;
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Done;
     }
 
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   } else {
     if (!EFI_ERROR (Status)) {
       //
@@ -520,7 +575,8 @@ Returns:
       if (Variable.CurrPtr->DataSize == DataSize &&
           !CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize)
             ) {
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+        goto Done;
       } else if (Variable.CurrPtr->State == VAR_ADDED) {
         //
         // Mark the old variable as in delete transition
@@ -540,20 +596,23 @@ Returns:
       if ((UINT32) (VarSize +*NonVolatileOffset) >
             ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->NonVolatileVariableBase)))->Size
             ) {
-        return EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
       }
 
       NextVariable        = (VARIABLE_HEADER *) (UINT8 *) (*NonVolatileOffset + (UINTN) Global->NonVolatileVariableBase);
       *NonVolatileOffset  = *NonVolatileOffset + VarSize;
     } else {
       if (EfiAtRuntime ()) {
-        return EFI_INVALID_PARAMETER;
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
       }
 
       if ((UINT32) (VarSize +*VolatileOffset) >
             ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->VolatileVariableBase)))->Size
             ) {
-        return EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
       }
 
       NextVariable    = (VARIABLE_HEADER *) (UINT8 *) (*VolatileOffset + (UINTN) Global->VolatileVariableBase);
@@ -593,7 +652,10 @@ Returns:
     }
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
 }
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
@@ -666,6 +728,8 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
+  
   if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
     // Query is Volatile related.
@@ -716,6 +780,7 @@ Returns:
     Variable = NextVariable;
   }
 
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
 #endif
@@ -796,11 +861,14 @@ Returns:
   if (NULL == mVariableModuleGlobal) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_CALLBACK);
+  
   //
   // Intialize volatile variable store
   //
   Status = InitializeVariableStore (
-            &mVariableModuleGlobal->VariableBase[Physical].VolatileVariableBase,
+            &mVariableModuleGlobal->VariableGlobal[Physical].VolatileVariableBase,
             &mVariableModuleGlobal->VolatileLastVariableOffset
             );
 
@@ -811,7 +879,7 @@ Returns:
   // Intialize non volatile variable store
   //
   Status = InitializeVariableStore (
-            &mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase,
+            &mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase,
             &mVariableModuleGlobal->NonVolatileLastVariableOffset
             );
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,6 +26,36 @@ Revision History
 // Don't use module globals after the SetVirtualAddress map is signaled
 //
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
+
+//
+// This is a temperary function which will be removed 
+// when EfiAcquireLock in UefiLib can handle the
+// the call in UEFI Runtimer driver in RT phase.
+//
+VOID
+AcquireLockOnlyAtBootTime (
+  IN EFI_LOCK  *Lock
+  )
+{
+  if (!EfiAtRuntime ()) {
+    EfiAcquireLock (Lock);
+  }
+}
+
+//
+// This is a temperary function which will be removed 
+// when EfiAcquireLock in UefiLib can handle the
+// the call in UEFI Runtimer driver in RT phase.
+//
+VOID
+ReleaseLockOnlyAtBootTime (
+  IN EFI_LOCK  *Lock
+  )
+{
+  if (!EfiAtRuntime ()) {
+    EfiReleaseLock (Lock);
+  }
+}
 
 STATIC
 UINT32
@@ -530,6 +560,13 @@ Returns:
   UINTN                 Index;
 
   //
+  // We aquire the lock at the entry of FindVariable as GetVariable, GetNextVariableName
+  // SetVariable all call FindVariable at entry point. Please move "Aquire Lock" to
+  // the correct places if this assumption does not hold TRUE anymore.
+  //
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
+
+  //
   // 0: Non-Volatile, 1: Volatile
   //
   VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
@@ -631,7 +668,7 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
   //
   // Get data size
@@ -639,7 +676,8 @@ Returns:
   VarDataSize = Variable.CurrPtr->DataSize;
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
     }
 
     CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
@@ -648,11 +686,17 @@ Returns:
     }
 
     *DataSize = VarDataSize;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   } else {
     *DataSize = VarDataSize;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto Done;
   }
+
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
 }
 
 EFI_STATUS
@@ -695,7 +739,7 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (VariableName[0] != 0) {
@@ -716,7 +760,8 @@ Returns:
         Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (Global->VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
         Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase));
       } else {
-        goto Error;
+        Status = EFI_NOT_FOUND;
+        goto Done;
       }
 
       Variable.CurrPtr = Variable.StartPtr;
@@ -747,15 +792,16 @@ Returns:
         }
 
         *VariableNameSize = VarNameSize;
-        return Status;
+        goto Done;
       }
     }
 
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
 
-Error:
-  return EFI_NOT_FOUND;
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
 }
 
 EFI_STATUS
@@ -819,41 +865,47 @@ Returns:
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Status == EFI_INVALID_PARAMETER) {
-    return Status;
+    goto Done;
   } else if (!EFI_ERROR (Status) && Variable.Volatile && EfiAtRuntime()) {
     //
     // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
     // the volatile is ReadOnly, and SetVariable should be aborted and 
     // return EFI_WRITE_PROTECTED.
     //
-    return EFI_WRITE_PROTECTED;
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
   } else if (sizeof (VARIABLE_HEADER) + ArrayLength (VariableName) + DataSize > MAX_VARIABLE_SIZE) {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
     //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (Attributes == EFI_VARIABLE_NON_VOLATILE) {
     //
     //  Make sure not only EFI_VARIABLE_NON_VOLATILE is set 
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 
                 EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     //  Make sure if runtime bit is set, boot service bit is set also
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
     //
     // Runtime but Attribute is not Runtime
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (EfiAtRuntime () && Attributes && !(Attributes & EFI_VARIABLE_NON_VOLATILE)) {
     //
     // Cannot set volatile variable in Runtime
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
     //
     // Setting a data variable with no access, or zero DataSize attributes
@@ -873,13 +925,15 @@ Returns:
                 &State
                 );
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
 
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Done;
     }
 
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   } else {
     if (!EFI_ERROR (Status)) {
       //
@@ -889,7 +943,8 @@ Returns:
       if (Variable.CurrPtr->DataSize == DataSize &&
           !CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize)
             ) {
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+        goto Done;
       } else if (Variable.CurrPtr->State == VAR_ADDED) {
         //
         // Mark the old variable as in delete transition
@@ -907,7 +962,7 @@ Returns:
                   &State
                   );
         if (EFI_ERROR (Status)) {
-          return Status;
+          goto Done;
         }
       }
     }
@@ -959,14 +1014,15 @@ Returns:
             ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->NonVolatileVariableBase)))->Size
             ) {
         if (EfiAtRuntime ()) {
-          return EFI_OUT_OF_RESOURCES;
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
         }
         //
         // Perform garbage collection & reclaim operation
         //
         Status = Reclaim (Global->NonVolatileVariableBase, NonVolatileOffset, FALSE);
         if (EFI_ERROR (Status)) {
-          return Status;
+          goto Done;
         }
         //
         // If still no enough space, return out of resources
@@ -974,7 +1030,8 @@ Returns:
         if ((UINT32) (VarSize +*NonVolatileOffset) >
               ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->NonVolatileVariableBase)))->Size
               ) {
-          return EFI_OUT_OF_RESOURCES;
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
         }
         
         Reclaimed = TRUE;
@@ -999,7 +1056,7 @@ Returns:
                 );
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
       //
       // Step 2:
@@ -1015,7 +1072,7 @@ Returns:
                 );
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
       //
       // Step 3:
@@ -1032,14 +1089,15 @@ Returns:
                 );
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
 
       *NonVolatileOffset = *NonVolatileOffset + VarSize;
 
     } else {
       if (EfiAtRuntime ()) {
-        return EFI_INVALID_PARAMETER;
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
       }
 
       if ((UINT32) (VarSize +*VolatileOffset) >
@@ -1050,7 +1108,7 @@ Returns:
         //
         Status = Reclaim (Global->VolatileVariableBase, VolatileOffset, TRUE);
         if (EFI_ERROR (Status)) {
-          return Status;
+          goto Done;
         }
         //
         // If still no enough space, return out of resources
@@ -1058,7 +1116,8 @@ Returns:
         if ((UINT32) (VarSize +*VolatileOffset) >
               ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->VolatileVariableBase)))->Size
               ) {
-          return EFI_OUT_OF_RESOURCES;
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
         }
         
         Reclaimed = TRUE;
@@ -1076,7 +1135,7 @@ Returns:
                 );
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
 
       *VolatileOffset = *VolatileOffset + VarSize;
@@ -1099,12 +1158,15 @@ Returns:
                 );
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
     }
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+Done:
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
+  return Status;
 }
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
@@ -1150,7 +1212,7 @@ Returns:
   VARIABLE_HEADER        *NextVariable;
   UINT64                 VariableSize;
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
-  
+
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1172,6 +1234,8 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
+  
   if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
     // Query is Volatile related.
@@ -1232,6 +1296,7 @@ Returns:
     Variable = NextVariable;
   }
  
+  ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
 #endif
@@ -1289,6 +1354,9 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_CALLBACK);
+  
   //
   // Allocate memory for volatile variable store
   //
@@ -1308,7 +1376,7 @@ Returns:
   //
   //  Variable Specific Data
   //
-  mVariableModuleGlobal->VariableBase[Physical].VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
+  mVariableModuleGlobal->VariableGlobal[Physical].VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
   mVariableModuleGlobal->VolatileLastVariableOffset = sizeof (VARIABLE_STORE_HEADER);
 
   VolatileVariableStore->Signature                  = VARIABLE_STORE_SIGNATURE;
@@ -1354,7 +1422,7 @@ Returns:
   //
   // Get address of non volatile variable store base
   //
-  mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase = VariableStoreEntry.Base;
+  mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase = VariableStoreEntry.Base;
 
   //
   // Check Integrity
@@ -1363,7 +1431,7 @@ Returns:
   // Find the Correct Instance of the FV Block Service.
   //
   Instance  = 0;
-  CurrPtr   = (CHAR8 *) ((UINTN) mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase);
+  CurrPtr   = (CHAR8 *) ((UINTN) mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase);
   while (EfiFvbGetPhysicalAddress (Instance, &FvVolHdr) == EFI_SUCCESS) {
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
     if (CurrPtr >= (CHAR8 *) FwVolHeader && CurrPtr < (((CHAR8 *) FwVolHeader) + FwVolHeader->FvLength)) {
@@ -1378,7 +1446,7 @@ Returns:
   if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
     if (~VariableStoreHeader->Size == 0) {
       Status = UpdateVariableStore (
-                &mVariableModuleGlobal->VariableBase[Physical],
+                &mVariableModuleGlobal->VariableGlobal[Physical],
                 FALSE,
                 FALSE,
                 mVariableModuleGlobal->FvbInstance,
@@ -1392,7 +1460,7 @@ Returns:
       }
     }
 
-    mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) CurrPtr);
+    mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) CurrPtr);
     //
     // Parse non-volatile variable data and get last variable offset
     //
@@ -1410,7 +1478,7 @@ Returns:
     //
     if ((((VARIABLE_STORE_HEADER *)((UINTN) CurrPtr))->Size - mVariableModuleGlobal->NonVolatileLastVariableOffset) < VARIABLE_RECLAIM_THRESHOLD) {
       Status = Reclaim (
-                mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase,
+                mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase,
                 &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                 FALSE
                 );
@@ -1426,13 +1494,13 @@ Returns:
     // Check if the free area is really free.
     //
     for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreHeader->Size; Index++) {
-      Data = ((UINT8 *) (UINTN) mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase)[Index];
+      Data = ((UINT8 *) (UINTN) mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase)[Index];
       if (Data != 0xff) {
         //
         // There must be something wrong in variable store, do reclaim operation.
         //
         Status = Reclaim (
-                  mVariableModuleGlobal->VariableBase[Physical].NonVolatileVariableBase,
+                  mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase,
                   &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                   FALSE
                   );
