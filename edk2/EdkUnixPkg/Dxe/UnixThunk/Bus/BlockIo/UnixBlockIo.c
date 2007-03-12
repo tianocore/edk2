@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2005, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1064,25 +1064,32 @@ UnixBlockIoReadBlocks (
   UNIX_BLOCK_IO_PRIVATE *Private;
   ssize_t                 len;
   EFI_STATUS              Status;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Status  = UnixBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "UnixReadBlocks");
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   len = Private->UnixThunk->Read (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: ReadFile failed.\n"));
-    return UnixBlockIoError (Private);
+    Status = UnixBlockIoError (Private);
+    goto Done;
   }
 
   //
   // If we wrote then media is present.
   //
   This->Media->MediaPresent = TRUE;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 STATIC
@@ -1123,18 +1130,22 @@ UnixBlockIoWriteBlocks (
   UNIX_BLOCK_IO_PRIVATE *Private;
   ssize_t                 len;
   EFI_STATUS              Status;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Status  = UnixBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "UnixWriteBlocks");
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   len = Private->UnixThunk->Write (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: WriteFile failed.\n"));
-    return UnixBlockIoError (Private);
+    Status = UnixBlockIoError (Private);
+    goto Done;
   }
 
   //
@@ -1142,7 +1153,11 @@ UnixBlockIoWriteBlocks (
   //
   This->Media->MediaPresent = TRUE;
   This->Media->ReadOnly     = FALSE;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 STATIC
@@ -1193,13 +1208,18 @@ UnixBlockIoResetBlock (
 --*/
 {
   UNIX_BLOCK_IO_PRIVATE *Private;
+  EFI_TPL               OldTpl;
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   if (Private->fd >= 0) {
     Private->UnixThunk->Close (Private->fd);
     Private->fd = -1;
   }
+
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
