@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,9 @@ Abstract:
 //
 // Module Globals
 //
+
+EFI_LOCK mBsExitLock        = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_NOTIFY);
+EFI_LOCK mBsUnloadImageLock = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_NOTIFY);
 
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
 
@@ -1219,9 +1222,12 @@ Returns:
 {
   LOADED_IMAGE_PRIVATE_DATA  *Image;
 
+  EfiAcquireLock (&mBsExitLock);
+  
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL_HANDLE) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if (!Image->Started) {
@@ -1229,7 +1235,8 @@ Returns:
     // The image has not been started so just free its resources
     //
     CoreUnloadAndCloseImage (Image, TRUE);
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   //
@@ -1237,7 +1244,8 @@ Returns:
   //
   if (Image != mCurrentImage) {
     DEBUG ((EFI_D_LOAD|EFI_D_ERROR, "Exit: Image is not exitable image\n"));
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   //
@@ -1252,11 +1260,13 @@ Returns:
     Image->ExitDataSize = ExitDataSize;
     Image->ExitData = CoreAllocateBootServicesPool (Image->ExitDataSize);
     if (Image->ExitData == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
     }
     CopyMem (Image->ExitData, ExitData, Image->ExitDataSize);
   }
 
+  EfiReleaseLock (&mBsExitLock);
   //
   // return to StartImage
   //
@@ -1266,7 +1276,10 @@ Returns:
   // If we return from LongJump, then it is an error
   //
   ASSERT (FALSE);
-  return EFI_ACCESS_DENIED;
+  Status = EFI_ACCESS_DENIED;
+Done:
+  EfiReleaseLock (&mBsExitLock);
+  return Status;
 }
 
 
@@ -1297,12 +1310,15 @@ Returns:
   EFI_STATUS                 Status;
   LOADED_IMAGE_PRIVATE_DATA  *Image;
 
+  EfiAcquireLock (&mBsUnloadImageLock);
+  
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL ) {
     //
     // The image handle is not valid
     //
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if (Image->Started) {
@@ -1329,6 +1345,8 @@ Returns:
     CoreUnloadAndCloseImage (Image, TRUE);
   }
 
+Done:
+  EfiReleaseLock (&mBsUnloadImageLock);
   return Status;
 }
 
