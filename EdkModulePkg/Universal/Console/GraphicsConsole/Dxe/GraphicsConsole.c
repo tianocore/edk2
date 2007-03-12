@@ -6,7 +6,7 @@ Remaining Tasks
   Solve palette issues for mixed graphics and text
   When does this protocol reset the palette?
     
-Copyright (c) 2006 Intel Corporation. <BR>
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -720,8 +720,12 @@ GraphicsConsoleConOutOutputString (
   UINTN                 Count;
   UINTN                 Index;
   INT32                 OriginAttribute;
+  EFI_TPL               OldTpl;
   CHAR16                         SpaceStr[] = { NARROW_CHAR, ' ', 0 };
 
+  Status = EFI_SUCCESS;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
   //
   // Current mode
   //
@@ -959,10 +963,12 @@ GraphicsConsoleConOutOutputString (
   EraseCursor (This);
 
   if (Warning) {
-    return EFI_WARN_UNKNOWN_GLYPH;
+    Status = EFI_WARN_UNKNOWN_GLYPH;
   }
 
-  return EFI_SUCCESS;
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+
 }
 
 EFI_STATUS
@@ -1063,22 +1069,30 @@ GraphicsConsoleConOutQueryMode (
 --*/
 {
   GRAPHICS_CONSOLE_DEV  *Private;
+  EFI_STATUS            Status;
+  EFI_TPL               OldTpl;
 
   if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Status = EFI_SUCCESS;
+  
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
 
   *Columns  = Private->ModeData[ModeNumber].Columns;
   *Rows     = Private->ModeData[ModeNumber].Rows;
 
   if (*Columns <= 0 && *Rows <= 0) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
 
   }
 
-  return EFI_SUCCESS;
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 EFI_STATUS
@@ -1113,16 +1127,19 @@ GraphicsConsoleConOutSetMode (
                 
 --*/
 {
-  EFI_STATUS                  Status;
-  GRAPHICS_CONSOLE_DEV        *Private;
-  GRAPHICS_CONSOLE_MODE_DATA  *ModeData;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *NewLineBuffer;
-  UINT32                      HorizontalResolution;
-  UINT32                      VerticalResolution;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL         *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL                *UgaDraw;
-  UINT32                      ColorDepth;
-  UINT32                      RefreshRate;
+  EFI_STATUS                      Status;
+  GRAPHICS_CONSOLE_DEV            *Private;
+  GRAPHICS_CONSOLE_MODE_DATA      *ModeData;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *NewLineBuffer;
+  UINT32                          HorizontalResolution;
+  UINT32                          VerticalResolution;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
+  EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
+  UINT32                          ColorDepth;
+  UINT32                          RefreshRate;
+  EFI_TPL                         OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GraphicsOutput = Private->GraphicsOutput;
@@ -1130,18 +1147,21 @@ GraphicsConsoleConOutSetMode (
   ModeData  = &(Private->ModeData[ModeNumber]);
 
   if (ModeData->Columns <= 0 && ModeData->Rows <= 0) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
 
   //
   // Make sure the requested mode number is supported
   //
   if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
 
   if (ModeData->Columns <= 0 && ModeData->Rows <= 0) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
   //
   // Attempt to allocate a line buffer for the requested mode number
@@ -1156,7 +1176,7 @@ GraphicsConsoleConOutSetMode (
     // The new line buffer could not be allocated, so return an error.
     // No changes to the state of the current console have been made, so the current console is still valid
     //
-    return Status;
+    goto Done;
   }
   //
   // If the mode has been set at least one other time, then LineBuffer will not be NULL
@@ -1172,7 +1192,8 @@ GraphicsConsoleConOutSetMode (
     //
     if ((INT32) ModeNumber == This->Mode->Mode) {
       gBS->FreePool (NewLineBuffer);
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Done;
     }
     //
     // Otherwise, the size of the text console and/or the UGA mode will be changed,
@@ -1197,7 +1218,7 @@ GraphicsConsoleConOutSetMode (
         //
         // The mode set operation failed
         //
-        return Status;
+        goto Done;
       }
     } else {
       //
@@ -1242,7 +1263,7 @@ GraphicsConsoleConOutSetMode (
         //
         // The mode set operation failed
         //
-        return Status;
+        goto Done;
       }
     } else {
       //
@@ -1274,7 +1295,11 @@ GraphicsConsoleConOutSetMode (
   This->SetCursorPosition (This, 0, 0);
   This->EnableCursor (This, TRUE);
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 EFI_STATUS
@@ -1308,6 +1333,8 @@ GraphicsConsoleConOutSetAttribute (
                 
 --*/
 {
+  EFI_TPL               OldTpl;
+  
   if ((Attribute | 0xFF) != 0xFF) {
     return EFI_UNSUPPORTED;
   }
@@ -1316,11 +1343,15 @@ GraphicsConsoleConOutSetAttribute (
     return EFI_SUCCESS;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+
   EraseCursor (This);
 
   This->Mode->Attribute = (INT32) Attribute;
 
   EraseCursor (This);
+
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
@@ -1355,13 +1386,16 @@ GraphicsConsoleConOutClearScreen (
                 
 --*/
 {
-  EFI_STATUS                  Status;
-  GRAPHICS_CONSOLE_DEV        *Private;
-  GRAPHICS_CONSOLE_MODE_DATA  *ModeData;
+  EFI_STATUS                    Status;
+  GRAPHICS_CONSOLE_DEV          *Private;
+  GRAPHICS_CONSOLE_MODE_DATA    *ModeData;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL       *UgaDraw;
+  EFI_UGA_DRAW_PROTOCOL         *UgaDraw;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
+  EFI_TPL                       OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GraphicsOutput = Private->GraphicsOutput;
@@ -1402,6 +1436,8 @@ GraphicsConsoleConOutClearScreen (
 
   EraseCursor (This);
 
+  gBS->RestoreTPL (OldTpl);
+
   return Status;
 }
 
@@ -1441,16 +1477,24 @@ GraphicsConsoleConOutSetCursorPosition (
 {
   GRAPHICS_CONSOLE_DEV        *Private;
   GRAPHICS_CONSOLE_MODE_DATA  *ModeData;
+  EFI_STATUS                  Status;
+  EFI_TPL                     OldTpl;
+
+  Status = EFI_SUCCESS;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   ModeData  = &(Private->ModeData[This->Mode->Mode]);
 
   if ((Column >= ModeData->Columns) || (Row >= ModeData->Rows)) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
 
   if (((INT32) Column == This->Mode->CursorColumn) && ((INT32) Row == This->Mode->CursorRow)) {
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   EraseCursor (This);
@@ -1460,7 +1504,10 @@ GraphicsConsoleConOutSetCursorPosition (
 
   EraseCursor (This);
 
-  return EFI_SUCCESS;
+Done:
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
 }
 
 EFI_STATUS
@@ -1492,12 +1539,17 @@ GraphicsConsoleConOutEnableCursor (
                 
 --*/
 {
+  EFI_TPL               OldTpl;
+  
+  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+    
   EraseCursor (This);
 
   This->Mode->CursorVisible = Visible;
 
   EraseCursor (This);
 
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
 
