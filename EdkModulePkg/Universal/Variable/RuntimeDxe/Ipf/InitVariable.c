@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -60,7 +60,7 @@ Returns:
                         (UINT32 *) Arg4,
                         (UINTN *) Arg5,
                         (VOID *) Arg6,
-                        &Global->VariableBase[VirtualMode],
+                        &Global->VariableGlobal[VirtualMode],
                         Global->FvbInstance
                         );
     return ReturnVal;
@@ -70,7 +70,7 @@ Returns:
                         (UINTN *) Arg2,
                         (CHAR16 *) Arg3,
                         (EFI_GUID *) Arg4,
-                        &Global->VariableBase[VirtualMode],
+                        &Global->VariableGlobal[VirtualMode],
                         Global->FvbInstance
                         );
     return ReturnVal;
@@ -82,7 +82,7 @@ Returns:
                         (UINT32) Arg4,
                         (UINTN) Arg5,
                         (VOID *) Arg6,
-                        &Global->VariableBase[VirtualMode],
+                        &Global->VariableGlobal[VirtualMode],
                         (UINTN *) &Global->VolatileLastVariableOffset,
                         (UINTN *) &Global->NonVolatileLastVariableOffset,
                         Global->FvbInstance
@@ -96,7 +96,7 @@ Returns:
                         (UINT64 *) Arg3,
                         (UINT64 *) Arg4,
                         (UINT64 *) Arg5,
-                        &Global->VariableBase[VirtualMode],
+                        &Global->VariableGlobal[VirtualMode],
                         Global->FvbInstance
                         );
     return ReturnVal;
@@ -125,18 +125,18 @@ Returns:
 --*/
 {
   CopyMem (
-    &mVariableModuleGlobal->VariableBase[Virtual],
-    &mVariableModuleGlobal->VariableBase[Physical],
+    &mVariableModuleGlobal->VariableGlobal[Virtual],
+    &mVariableModuleGlobal->VariableGlobal[Physical],
     sizeof (VARIABLE_GLOBAL)
     );
 
   EfiConvertPointer (
     0x0,
-    (VOID **) &mVariableModuleGlobal->VariableBase[Virtual].NonVolatileVariableBase
+    (VOID **) &mVariableModuleGlobal->VariableGlobal[Virtual].NonVolatileVariableBase
     );
   EfiConvertPointer (
     0x0,
-    (VOID **) &mVariableModuleGlobal->VariableBase[Virtual].VolatileVariableBase
+    (VOID **) &mVariableModuleGlobal->VariableGlobal[Virtual].VolatileVariableBase
     );
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
 }
