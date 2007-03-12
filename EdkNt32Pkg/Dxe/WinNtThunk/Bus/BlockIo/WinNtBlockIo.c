@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -851,25 +851,33 @@ WinNtBlockIoReadBlocks (
   BOOL                    Flag;
   EFI_STATUS              Status;
   DWORD                   BytesRead;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Status  = WinNtBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "WinNtReadBlocks");
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   Flag = Private->WinNtThunk->ReadFile (Private->NtHandle, Buffer, (DWORD) BufferSize, (LPDWORD) &BytesRead, NULL);
   if (!Flag || (BytesRead != BufferSize)) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: ReadFile failed. (%d)\n", Private->WinNtThunk->GetLastError ()));
-    return WinNtBlockIoError (Private);
+    Status = WinNtBlockIoError (Private);
+    goto Done;
   }
 
   //
   // If we wrote then media is present.
   //
   This->Media->MediaPresent = TRUE;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 STATIC
@@ -911,18 +919,22 @@ WinNtBlockIoWriteBlocks (
   UINTN                   BytesWritten;
   BOOL                    Flag;
   EFI_STATUS              Status;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Status  = WinNtBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "WinNtWriteBlocks");
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   Flag = Private->WinNtThunk->WriteFile (Private->NtHandle, Buffer, (DWORD) BufferSize, (LPDWORD) &BytesWritten, NULL);
   if (!Flag || (BytesWritten != BufferSize)) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: WriteFile failed. (%d)\n", Private->WinNtThunk->GetLastError ()));
-    return WinNtBlockIoError (Private);
+    Status = WinNtBlockIoError (Private);
+    goto Done;
   }
 
   //
@@ -930,7 +942,12 @@ WinNtBlockIoWriteBlocks (
   //
   This->Media->MediaPresent = TRUE;
   This->Media->ReadOnly     = FALSE;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  return Status;
+
 }
 
 STATIC
@@ -981,6 +998,9 @@ WinNtBlockIoResetBlock (
 --*/
 {
   WIN_NT_BLOCK_IO_PRIVATE *Private;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -988,6 +1008,8 @@ WinNtBlockIoResetBlock (
     Private->WinNtThunk->CloseHandle (Private->NtHandle);
     Private->NtHandle = INVALID_HANDLE_VALUE;
   }
+
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }

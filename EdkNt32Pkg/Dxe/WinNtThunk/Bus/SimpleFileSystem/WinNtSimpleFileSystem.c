@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -478,10 +478,13 @@ Returns:
   EFI_STATUS                        Status;
   WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE *Private;
   WIN_NT_EFI_FILE_PRIVATE           *PrivateFile;
+  EFI_TPL                           OldTpl;
 
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private     = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (This);
 
@@ -556,6 +559,8 @@ Done:
       gBS->FreePool (PrivateFile);
     }
   }
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -662,9 +667,6 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  //
-  //
   PrivateFile     = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot     = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
   NewPrivateFile  = NULL;
@@ -1112,11 +1114,14 @@ Returns:
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   WIN_NT_EFI_FILE_PRIVATE *PrivateFile;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle != INVALID_HANDLE_VALUE) {
@@ -1139,6 +1144,9 @@ Returns:
   }
 
   gBS->FreePool (PrivateFile);
+
+  gBS->RestoreTPL (OldTpl);
+  
   return EFI_SUCCESS;
 }
 
@@ -1168,11 +1176,14 @@ Returns:
 {
   EFI_STATUS              Status;
   WIN_NT_EFI_FILE_PRIVATE *PrivateFile;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status      = EFI_WARN_DELETE_FAILURE;
@@ -1203,6 +1214,8 @@ Returns:
 
   gBS->FreePool (PrivateFile->FileName);
   gBS->FreePool (PrivateFile);
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -1297,21 +1310,26 @@ Returns:
   UINT64                  Pos;
   UINT64                  FileSize;
   UINTN                   FileInfoSize;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL || BufferSize == NULL || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   if (!PrivateFile->IsDirectoryPath) {
 
     if (This->GetPosition (This, &Pos) != EFI_SUCCESS) {
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     FileInfoSize = SIZE_OF_EFI_FILE_SYSTEM_INFO;
@@ -1344,7 +1362,8 @@ Returns:
     }
 
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     FileSize = FileInfo->FileSize;
@@ -1354,19 +1373,22 @@ Returns:
     if (Pos >= FileSize) {
       *BufferSize = 0;
       if (Pos == FileSize) {
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+        goto Done;
       } else {
-        return EFI_DEVICE_ERROR;
+        Status = EFI_DEVICE_ERROR;
+        goto Done;
       }
     }
 
-    return PrivateFile->WinNtThunk->ReadFile (
+    Status = PrivateFile->WinNtThunk->ReadFile (
                                       PrivateFile->LHandle,
                                       Buffer,
                                       *BufferSize,
                                       BufferSize,
                                       NULL
                                       ) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   //
@@ -1374,7 +1396,8 @@ Returns:
   //
   if (!PrivateFile->IsValidFindBuf) {
     *BufferSize = 0;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   Size        = SIZE_OF_EFI_FILE_INFO;
@@ -1454,6 +1477,8 @@ Returns:
 
   *BufferSize = ResultSize;
 
+Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1501,32 +1526,43 @@ Returns:
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   WIN_NT_EFI_FILE_PRIVATE *PrivateFile;
+  EFI_STATUS              Status;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL || BufferSize == NULL || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   if (PrivateFile->IsDirectoryPath) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
 
   if (PrivateFile->IsOpenedByRead) {
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    goto Done;
   }
 
-  return PrivateFile->WinNtThunk->WriteFile (
+  Status = PrivateFile->WinNtThunk->WriteFile (
                                     PrivateFile->LHandle,
                                     Buffer,
                                     *BufferSize,
                                     BufferSize,
                                     NULL
                                     ) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 
   //
   // bugbug: need to access windows error reporting
@@ -1565,16 +1601,20 @@ Returns:
   UINT32                  PosLow;
   UINT32                  PosHigh;
   CHAR16                  *FileName;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->IsDirectoryPath) {
     if (Position != 0) {
-      return EFI_UNSUPPORTED;
+      Status = EFI_UNSUPPORTED;
+      goto Done;
     }
 
     Status = gBS->AllocatePool (
@@ -1584,7 +1624,7 @@ Returns:
                     );
 
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
 
     StrCpy (FileName, PrivateFile->FileName);
@@ -1617,6 +1657,8 @@ Returns:
     Status = (PosLow == 0xFFFFFFFF) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
   }
 
+Done:
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
   return Status;
 }
 
@@ -1651,11 +1693,13 @@ Returns:
   WIN_NT_EFI_FILE_PRIVATE *PrivateFile;
   INT32                   PositionHigh;
   UINT64                  PosHigh64;
+  EFI_TPL                 OldTpl;
 
   if (This == NULL || Position == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
   PrivateFile   = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   PositionHigh  = 0;
@@ -1663,7 +1707,8 @@ Returns:
 
   if (PrivateFile->IsDirectoryPath) {
 
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
 
   } else {
 
@@ -1685,6 +1730,7 @@ Returns:
   }
 
 Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1868,10 +1914,13 @@ Returns:
   BOOL                              NtStatus;
   UINTN                             Index;
   WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE *PrivateRoot;
+  EFI_TPL                           OldTpl;
 
   if (This == NULL || InformationType == NULL || BufferSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -1885,7 +1934,8 @@ Returns:
   if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
     if (*BufferSize < SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel)) {
       *BufferSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel);
-      return EFI_BUFFER_TOO_SMALL;
+      Status = EFI_BUFFER_TOO_SMALL;
+      goto Done;
     }
 
     FileSystemInfoBuffer            = (EFI_FILE_SYSTEM_INFO *) Buffer;
@@ -1903,7 +1953,7 @@ Returns:
                     &DriveName
                     );
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
 
     StrCpy (DriveName, PrivateFile->FilePath);
@@ -1966,7 +2016,8 @@ Returns:
                                             NULL
                                             );
       if (!NtStatus) {
-        return EFI_DEVICE_ERROR;
+        Status = EFI_DEVICE_ERROR;
+        goto Done;
       }
     }
 
@@ -1978,7 +2029,8 @@ Returns:
   if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     if (*BufferSize < StrSize (PrivateRoot->VolumeLabel)) {
       *BufferSize = StrSize (PrivateRoot->VolumeLabel);
-      return EFI_BUFFER_TOO_SMALL;
+      Status = EFI_BUFFER_TOO_SMALL;
+      goto Done;
     }
 
     StrCpy ((CHAR16 *) Buffer, PrivateRoot->VolumeLabel);
@@ -1986,6 +2038,8 @@ Returns:
     Status      = EFI_SUCCESS;
   }
 
+Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -2063,6 +2117,7 @@ Returns:
   FILETIME                          NewLastWriteFileTime;
   WIN32_FIND_DATA                   FindBuf;
   EFI_FILE_SYSTEM_INFO              *NewFileSystemInfo;
+  EFI_TPL                           OldTpl;
 
   //
   // Check for invalid parameters.
@@ -2070,6 +2125,8 @@ Returns:
   if (This == NULL || InformationType == NULL || BufferSize == 0 || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   //
   // Initialise locals.
@@ -2087,7 +2144,8 @@ Returns:
   //
   if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
     if (BufferSize < SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel)) {
-      return EFI_BAD_BUFFER_SIZE;
+      Status = EFI_BAD_BUFFER_SIZE;
+      goto Done;
     }
 
     NewFileSystemInfo = (EFI_FILE_SYSTEM_INFO *) Buffer;
@@ -2107,7 +2165,8 @@ Returns:
 
     StrCpy (PrivateRoot->VolumeLabel, NewFileSystemInfo->VolumeLabel);
 
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   //
@@ -2115,20 +2174,24 @@ Returns:
   //
   if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     if (BufferSize < StrSize (PrivateRoot->VolumeLabel)) {
-      return EFI_BAD_BUFFER_SIZE;
+      Status = EFI_BAD_BUFFER_SIZE;
+      goto Done;
     }
 
     StrCpy (PrivateRoot->VolumeLabel, (CHAR16 *) Buffer);
 
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   if (!CompareGuid (InformationType, &gEfiFileInfoGuid)) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Done;
   }
 
   if (BufferSize < SIZE_OF_EFI_FILE_INFO) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
   }
 
   //
@@ -2144,7 +2207,8 @@ Returns:
       (NewFileInfo->Attribute &~(EFI_FILE_VALID_ATTR)) ||
       (sizeof (UINTN) == 4 && NewFileInfo->Size > 0xFFFFFFFF)
       ) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   //
@@ -2573,6 +2637,7 @@ Done:
     gBS->FreePool (NewFileName);
   }
 
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -2612,35 +2677,47 @@ Returns:
 {
   BY_HANDLE_FILE_INFORMATION  FileInfo;
   WIN_NT_EFI_FILE_PRIVATE     *PrivateFile;
+  EFI_STATUS                  Status;
+  EFI_TPL                     OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   if (PrivateFile->IsDirectoryPath) {
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   if (PrivateFile->IsOpenedByRead) {
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    goto Done;
   }
 
   PrivateFile->WinNtThunk->GetFileInformationByHandle (PrivateFile->LHandle, &FileInfo);
 
   if (FileInfo.dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    goto Done;
   }
 
-  return PrivateFile->WinNtThunk->FlushFileBuffers (PrivateFile->LHandle) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+  Status = PrivateFile->WinNtThunk->FlushFileBuffers (PrivateFile->LHandle) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
   //
   // bugbug: - Use Windows error reporting.
   //
 }
+
 
