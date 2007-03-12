@@ -82,22 +82,10 @@ public class AutoGen {
     private CommonDefinition.PCD_DRIVER_TYPE pcdDriverType;
 
     ///
-    /// The protocl list which records in module or library surface area and
-    /// it's dependence on library instance surface area.
+    /// The Guid CName list which recoreded in module or library surface area 
+    /// and it's dependence on library instance surface area.
     ///
-    private Set<String> mProtocolList = new HashSet<String>();
-
-    ///
-    /// The Ppi list which recorded in module or library surface area and its
-    /// dependency on library instance surface area.
-    ///
-    private Set<String> mPpiList = new HashSet<String>();
-
-    ///
-    /// The Guid list which recoreded in module or library surface area and it's
-    /// dependence on library instance surface area.
-    ///
-    private Set<String> mGuidList = new HashSet<String>();
+    private Set<String> mGuidCNameList = new HashSet<String>();
 
     ///
     /// The dependence package list which recoreded in module or library surface
@@ -348,23 +336,37 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h.
         //
+        List<String> libClasses = new ArrayList<String>(100);
         String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch, null);
-        if (libClassList.length > 0) {
-            libClassIncludeH = LibraryClassToAutogenH(libClassList);
-            item = libClassIncludeH.iterator();
-            while (item.hasNext()) {
-                fileBuffer.append(item.next().toString());
-            }
+        for (int i = 0; i < libClassList.length; ++i) {
+            libClasses.add(libClassList[i]);
         }
 
         libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch, null);
-        if (libClassList.length > 0) {
-            libClassIncludeH = LibraryClassToAutogenH(libClassList);
-            item = libClassIncludeH.iterator();
-            while (item.hasNext()) {
-                fileBuffer.append(item.next().toString());
-            }
+        for (int i = 0; i < libClassList.length; ++i) {
+            libClasses.add(libClassList[i]);
         }
+        //
+        // Add AutoGen used library class
+        // 
+        int moduleTypeId = CommonDefinition.getModuleType(moduleType);
+        if (!libClasses.contains("DebugLib") && moduleTypeId != CommonDefinition.ModuleTypeUnknown
+            && moduleTypeId != CommonDefinition.ModuleTypeBase) {
+            libClasses.add("DebugLib");
+        }
+        switch (moduleTypeId) {
+        case CommonDefinition.ModuleTypeDxeDriver:
+        case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+        case CommonDefinition.ModuleTypeDxeSalDriver:
+        case CommonDefinition.ModuleTypeDxeSmmDriver:
+        case CommonDefinition.ModuleTypeUefiDriver:
+        case CommonDefinition.ModuleTypeUefiApplication:
+            if (!libClasses.contains("UefiBootServicesTableLib")) {
+                libClasses.add("UefiBootServicesTableLib");
+            }
+            break;
+        }
+        LibraryClassToAutogenH(fileBuffer, libClasses.toArray(new String[libClasses.size()]));
         fileBuffer.append("\r\n");
 
         //
@@ -458,8 +460,10 @@ public class AutoGen {
         //
         String guid = CommonDefinition.formatGuidName(saq.getModuleGuid());
         if (this.moduleId.getModuleType().equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_BASE)) {
+            globalDeclarations.append("extern GUID gEfiCallerIdGuid;\r\n");
             fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED GUID gEfiCallerIdGuid = {");
-        } else {
+        } else if (!this.moduleId.getModuleType().equalsIgnoreCase(EdkDefinitions.MODULE_TYPE_USER_DEFINED)) {
+            globalDeclarations.append("extern EFI_GUID gEfiCallerIdGuid;\r\n");
             fileBuffer.append("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID gEfiCallerIdGuid = {");
         }
 
@@ -496,11 +500,9 @@ public class AutoGen {
         }
 
         //
-        // Write consumed ppi, guid, protocol to autogen.c
+        // Write consumed ppi, guid, protocol, etc to autogen.c
         //
-        ProtocolGuidToAutogenC(fileBuffer);
-        PpiGuidToAutogenC(fileBuffer);
-        GuidGuidToAutogenC(fileBuffer);
+        CNameToAutogenC(fileBuffer);
 
         //
         // Call pcd autogen.
@@ -586,23 +588,37 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h
         //
+        List<String> libClasses = new ArrayList<String>(100);
         String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch, null);
-        if (libClassList != null) {
-            libClassIncludeH = LibraryClassToAutogenH(libClassList);
-            item = libClassIncludeH.iterator();
-            while (item.hasNext()) {
-                fileBuffer.append(item.next().toString());
-            }
+        for (int i = 0; i < libClassList.length; ++i) {
+            libClasses.add(libClassList[i]);
         }
 
         libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch, null);
-        if (libClassList != null) {
-            libClassIncludeH = LibraryClassToAutogenH(libClassList);
-            item = libClassIncludeH.iterator();
-            while (item.hasNext()) {
-                fileBuffer.append(item.next().toString());
-            }
+        for (int i = 0; i < libClassList.length; ++i) {
+            libClasses.add(libClassList[i]);
         }
+        //
+        // Add AutoGen used library class
+        // 
+        int moduleTypeId = CommonDefinition.getModuleType(moduleType);
+        if (!libClasses.contains("DebugLib") && moduleTypeId != CommonDefinition.ModuleTypeUnknown
+            && moduleTypeId != CommonDefinition.ModuleTypeBase) {
+            libClasses.add("DebugLib");
+        }
+        switch (moduleTypeId) {
+        case CommonDefinition.ModuleTypeDxeDriver:
+        case CommonDefinition.ModuleTypeDxeRuntimeDriver:
+        case CommonDefinition.ModuleTypeDxeSalDriver:
+        case CommonDefinition.ModuleTypeDxeSmmDriver:
+        case CommonDefinition.ModuleTypeUefiDriver:
+        case CommonDefinition.ModuleTypeUefiApplication:
+            if (!libClasses.contains("UefiBootServicesTableLib")) {
+                libClasses.add("UefiBootServicesTableLib");
+            }
+            break;
+        }
+        LibraryClassToAutogenH(fileBuffer, libClasses.toArray(new String[libClasses.size()]));
         fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
 
         //
@@ -688,9 +704,8 @@ public class AutoGen {
                  build module or library.
       @return includeStrList List of *.h file.
     **/
-    Set<String> LibraryClassToAutogenH(String[] libClassList)
+    void LibraryClassToAutogenH(StringBuffer fileBuffer, String[] libClassList)
     throws EdkException {
-        Set<String> includeStrList = new LinkedHashSet<String>();
         String includeName[];
         String str = "";
 
@@ -709,14 +724,14 @@ public class AutoGen {
             for (int j = 0; j < includeName.length; j++) {
                 String includeNameStr = includeName[j];
                 if (includeNameStr != null) {
-                    str = CommonDefinition.INCLUDE + " " + "<";
-                    str = str + includeNameStr + ">\r\n";
-                    includeStrList.add(str);
+                    fileBuffer.append(CommonDefinition.INCLUDE);
+                    fileBuffer.append(" <");
+                    fileBuffer.append(includeNameStr);
+                    fileBuffer.append(">\r\n");
                     includeNameStr = null;
                 }
             }
         }
-        return includeStrList;
     }
 
     /**
@@ -1185,153 +1200,50 @@ public class AutoGen {
     }
 
     /**
-      PpiGuidToAutogenc
+      CNameToAutogenc
      
-      This function gets GUIDs from SPD file accrodeing to <PPIs> information
-      and write those GUIDs to AutoGen.c.
-     
-      @param fileBuffer
-                 String Buffer for Autogen.c file.
-      @throws BuildException
-                  Guid must set value!
-    **/
-    void PpiGuidToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
-        String[] cNameGuid = null;
-
-        //
-        // Get the all PPI adn PPI Notify from MSA file,
-        // then add those PPI ,and PPI Notify name to list.
-        //
-
-        String[] ppiList = saq.getPpiArray(this.arch);
-        for (int i = 0; i < ppiList.length; i++) {
-            this.mPpiList.add(ppiList[i]);
-        }
-
-        String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
-        for (int i = 0; i < ppiNotifyList.length; i++) {
-            this.mPpiList.add(ppiNotifyList[i]);
-        }
-
-        //
-        // Find CNAME and GUID from dependence SPD file and write to Autogen.c
-        //
-        Iterator ppiIterator = this.mPpiList.iterator();
-        String ppiKeyWord = null;
-        while (ppiIterator.hasNext()) {
-            ppiKeyWord = ppiIterator.next().toString();
-            cNameGuid = GlobalData.getPpiGuid(this.mDepPkgList, ppiKeyWord);
-            if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
-                fileBuffer.append(cNameGuid[0]);
-                fileBuffer.append(" =     { ");
-                fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
-                fileBuffer.append(" } ;");
-            } else {
-                //
-                // If can't find Ppi GUID declaration in every package
-                //
-                throw new AutoGenException("Can not find Ppi GUID ["
-                                           + ppiKeyWord + "] declaration in any SPD package!");
-            }
-        }
-    }
-
-    /**
-      ProtocolGuidToAutogenc
-     
-      This function gets GUIDs from SPD file accrodeing to <Protocol>
-      information and write those GUIDs to AutoGen.c.
-     
-      @param fileBuffer
-                 String Buffer for Autogen.c file.
-      @throws BuildException
-                  Protocol name must set.
-    **/
-    void ProtocolGuidToAutogenC(StringBuffer fileBuffer) throws EdkException {
-        String[] cNameGuid = null;
-
-        String[] protocolList = saq.getProtocolArray(this.arch);
-
-        //
-        // Add result to Autogen global list.
-        //
-        for (int i = 0; i < protocolList.length; i++) {
-            this.mProtocolList.add(protocolList[i]);
-        }
-
-        String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
-
-        for (int i = 0; i < protocolNotifyList.length; i++) {
-            this.mProtocolList.add(protocolNotifyList[i]);
-        }
-
-        //
-        // Get the NAME and GUID from dependence SPD and write to Autogen.c
-        //
-        Iterator protocolIterator = this.mProtocolList.iterator();
-        String protocolKeyWord = null;
-
-
-        while (protocolIterator.hasNext()) {
-            protocolKeyWord = protocolIterator.next().toString();
-            cNameGuid = GlobalData.getProtocolGuid(this.mDepPkgList, protocolKeyWord);
-            if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
-                fileBuffer.append(cNameGuid[0]);
-                fileBuffer.append(" =     { ");
-                fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
-                fileBuffer.append(" } ;");
-            } else {
-                //
-                // If can't find protocol GUID declaration in every package
-                //
-                throw new AutoGenException("Can not find protocol Guid ["
-                                           + protocolKeyWord + "] declaration in any SPD package!");
-            }
-        }
-    }
-
-    /**
-      GuidGuidToAutogenc
-     
-      This function gets GUIDs from SPD file accrodeing to <Guids> information
-      and write those GUIDs to AutoGen.c.
+      This function gets GUIDs from SPD file accrodeing to <Protocols> <Ppis> 
+      <Guids> information and write those GUIDs to AutoGen.c.
      
       @param fileBuffer
                  String Buffer for Autogen.c file.
      
     **/
-    void GuidGuidToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
+    void CNameToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
         String[] cNameGuid = null;
         String guidKeyWord = null;
 
-        String[] guidList = saq.getGuidEntryArray(this.arch);
-
-        for (int i = 0; i < guidList.length; i++) {
-            this.mGuidList.add(guidList[i]);
+        String[] cnameList = saq.getCNameArray(this.arch);
+        for (int i = 0; i < cnameList.length; i++) {
+            this.mGuidCNameList.add(cnameList[i]);
         }
 
 
-        Iterator guidIterator = this.mGuidList.iterator();
+        Iterator guidIterator = this.mGuidCNameList.iterator();
         while (guidIterator.hasNext()) {
             guidKeyWord = guidIterator.next().toString();
             cNameGuid = GlobalData.getGuid(this.mDepPkgList, guidKeyWord);
-
-            if (cNameGuid != null) {
-                fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
-                fileBuffer.append(cNameGuid[0]);
-                fileBuffer.append(" =     { ");
-                fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
-                fileBuffer.append("} ;");
-            } else {
-                //
-                // If can't find GUID declaration in every package
-                //
-                throw new AutoGenException("Can not find Guid [" + guidKeyWord
-                                           + "] declaration in any SPD package. ");
+            if (cNameGuid == null) {
+                cNameGuid = GlobalData.getProtocolGuid(this.mDepPkgList, guidKeyWord);
+                if (cNameGuid == null) {
+                    cNameGuid = GlobalData.getPpiGuid(this.mDepPkgList, guidKeyWord);
+                    if (cNameGuid == null) {
+                        //
+                        // If can't find GUID declaration in every package, stop the build
+                        //
+                        EdkLog.log(EdkLog.EDK_INFO,"WARN: Can not find Guid [" + guidKeyWord + "] declaration in any SPD file.");
+                        continue;
+                        //throw new AutoGenException("Can not find Guid [" + guidKeyWord
+                        //                           + "] declaration in any SPD package. ");
+                    }
+                }
             }
 
+            fileBuffer.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID ");
+            fileBuffer.append(cNameGuid[0]);
+            fileBuffer.append(" =     { ");
+            fileBuffer.append(CommonDefinition.formatGuidName(cNameGuid[1]));
+            fileBuffer.append("} ;");
         }
     }
 
@@ -2144,14 +2056,10 @@ public class AutoGen {
                                        + " doesn't support module type " + moduleType);
             }
             //
-            // Get <PPis>, <Protocols>, <Guids> list of this library
+            // Get CName list from <PPis>, <Protocols>, <Guids>, etc. of this library
             // instance.
             //
-            String[] ppiList = saq.getPpiArray(this.arch);
-            String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
-            String[] protocolList = saq.getProtocolArray(this.arch);
-            String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
-            String[] guidList = saq.getGuidEntryArray(this.arch);
+            String[] guidCNameList = saq.getCNameArray(this.arch);            
             PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
 
             //
@@ -2159,25 +2067,10 @@ public class AutoGen {
             // protocol, guid
             // list.
             //
-            for (index = 0; index < ppiList.length; index++) {
-                this.mPpiList.add(ppiList[index]);
+            for (index = 0; index < guidCNameList.length; index++) {
+                this.mGuidCNameList.add(guidCNameList[index]);
             }
 
-            for (index = 0; index < ppiNotifyList.length; index++) {
-                this.mPpiList.add(ppiNotifyList[index]);
-            }
-
-            for (index = 0; index < protocolList.length; index++) {
-                this.mProtocolList.add(protocolList[index]);
-            }
-
-            for (index = 0; index < protocolNotifyList.length; index++) {
-                this.mProtocolList.add(protocolNotifyList[index]);
-            }
-
-            for (index = 0; index < guidList.length; index++) {
-                this.mGuidList.add(guidList[index]);
-            }
             for (index = 0; index < pkgList.length; index++) {
                 if (!this.mDepPkgList.contains(pkgList[index])) {
                     this.mDepPkgList.add(pkgList[index]);
