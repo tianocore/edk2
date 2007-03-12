@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -350,6 +350,9 @@ USBFloppyReset (
   USB_FLOPPY_DEV          *UsbFloppyDevice;
   EFI_USB_ATAPI_PROTOCOL  *UsbAtapiInterface;
   EFI_STATUS              Status;
+  EFI_TPL                 OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   UsbFloppyDevice   = USB_FLOPPY_DEV_FROM_THIS (This);
 
@@ -359,6 +362,8 @@ USBFloppyReset (
   // directly calling EFI_USB_ATAPI_PROTOCOL.Reset() to implement reset.
   //
   Status = UsbAtapiInterface->UsbAtapiReset (UsbAtapiInterface, ExtendedVerification);
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -404,6 +409,7 @@ USBFloppyReadBlocks (
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
 
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
@@ -412,15 +418,15 @@ USBFloppyReadBlocks (
   //
   // Check parameters
   //
-  if (!Buffer) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Done;
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
-    Status = EFI_SUCCESS;
-    goto Done;
+    return EFI_SUCCESS;
   }
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   UsbFloppyTestUnitReady (UsbFloppyDevice);
 
@@ -485,6 +491,7 @@ USBFloppyReadBlocks (
     if (EFI_ERROR (Status)) {
       This->Reset (This, TRUE);
       Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     if (NumberOfBlocks > BLOCK_UNIT) {
@@ -499,6 +506,7 @@ USBFloppyReadBlocks (
  }
 
  Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -546,6 +554,7 @@ USBFloppyWriteBlocks (
   UINTN               BlockSize;
   UINTN               NumberOfBlocks;
   BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
 
   Status          = EFI_SUCCESS;
   MediaChange     = FALSE;
@@ -555,15 +564,15 @@ USBFloppyWriteBlocks (
   //
   // Check parameters
   //
-  if (!Buffer) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Done;
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
-    Status = EFI_SUCCESS;
-    goto Done;
+    return EFI_SUCCESS;
   }
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   UsbFloppyTestUnitReady (UsbFloppyDevice);
 
@@ -633,6 +642,7 @@ USBFloppyWriteBlocks (
     if (EFI_ERROR (Status)) {
       This->Reset (This, TRUE);
       Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     if (NumberOfBlocks > BLOCK_UNIT) {
@@ -647,7 +657,7 @@ USBFloppyWriteBlocks (
  }
 
 Done:
-
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

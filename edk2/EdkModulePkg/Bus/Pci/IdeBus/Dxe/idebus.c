@@ -1035,6 +1035,9 @@ IDEBlkIoReset (
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
   EFI_STATUS      Status;
+  EFI_TPL         OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
   //
@@ -1047,11 +1050,13 @@ IDEBlkIoReset (
   //
   if (IdeBlkIoDevice->Type == IdeHardDisk ||
       IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
-    return AtaSoftReset (IdeBlkIoDevice);
+    Status = AtaSoftReset (IdeBlkIoDevice);
+    goto Done;
   }
 
   if (IdeBlkIoDevice->Type == IdeUnknown) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   
   //
@@ -1062,6 +1067,8 @@ IDEBlkIoReset (
     Status = AtaSoftReset (IdeBlkIoDevice);
   }
 
+Done:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1089,6 +1096,10 @@ IDEBlkIoReadBlocks (
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
+  EFI_STATUS      Status;
+  EFI_TPL         OldTpl;
+
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
 
@@ -1102,23 +1113,25 @@ IDEBlkIoReadBlocks (
   //
   if (IdeBlkIoDevice->Type == IdeHardDisk ||
       IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
-    return AtaBlkIoReadBlocks (
+    Status = AtaBlkIoReadBlocks (
             IdeBlkIoDevice,
             MediaId,
             LBA,
             BufferSize,
             Buffer
             );
+    goto Done;
   }
 
   if (IdeBlkIoDevice->Type == IdeUnknown) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   
   //
   // for ATAPI device, using ATAPI read block's mechanism
   //
-  return AtapiBlkIoReadBlocks (
+  Status = AtapiBlkIoReadBlocks (
           IdeBlkIoDevice,
           MediaId,
           LBA,
@@ -1126,6 +1139,10 @@ IDEBlkIoReadBlocks (
           Buffer
           );
 
+Done:
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
 }
 
 /**
@@ -1152,7 +1169,11 @@ IDEBlkIoWriteBlocks (
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
+  EFI_STATUS      Status;
+  EFI_TPL         OldTpl;
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
   //
   // Requery IDE IO resources in case of the switch of native and legacy modes
@@ -1165,29 +1186,35 @@ IDEBlkIoWriteBlocks (
   if (IdeBlkIoDevice->Type == IdeHardDisk ||
       IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {        
 
-    return AtaBlkIoWriteBlocks (
+    Status = AtaBlkIoWriteBlocks (
             IdeBlkIoDevice,
             MediaId,
             LBA,
             BufferSize,
             Buffer
             );
+    goto Done;
   }
 
   if (IdeBlkIoDevice->Type == IdeUnknown) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   
   //
   // for ATAPI device, using ATAPI write block's mechanism
   //
-  return AtapiBlkIoWriteBlocks (
+  Status = AtapiBlkIoWriteBlocks (
           IdeBlkIoDevice,
           MediaId,
           LBA,
           BufferSize,
           Buffer
           );
+  
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 //
