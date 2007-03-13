@@ -945,7 +945,7 @@ WinNtBlockIoWriteBlocks (
   Status = EFI_SUCCESS;
 
 Done:
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 
 }
