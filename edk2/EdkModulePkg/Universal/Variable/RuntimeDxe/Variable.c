@@ -32,6 +32,7 @@ ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
+STATIC
 VOID
 AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -47,6 +48,7 @@ AcquireLockOnlyAtBootTime (
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
+STATIC
 VOID
 ReleaseLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
