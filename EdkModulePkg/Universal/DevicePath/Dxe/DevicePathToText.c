@@ -132,7 +132,7 @@ ReallocatePool (
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    gBS->FreePool (OldPool);
+    FreePool (OldPool);
   }
 
   return NewPool;
@@ -196,7 +196,7 @@ CatPrint (
     Str->Len = Size - sizeof (UINT16);
   }
 
-  gBS->FreePool (AppendStr);
+  FreePool (AppendStr);
   return Str->Str;
 }
 
@@ -1488,7 +1488,7 @@ ConvertDevicePathToText (
   //
   // Shrink pool used for string allocation
   //
-  gBS->FreePool (UnpackDevPath);
+  FreePool (UnpackDevPath);
 
   NewSize = (Str.Len + 1) * sizeof (CHAR16);
   Str.Str = ReallocatePool (Str.Str, NewSize, NewSize);

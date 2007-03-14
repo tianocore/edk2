@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  DevicePathDriver.h
+  DevicePath.h
   
 Abstract:
   Definition for Device Path Utilities driver

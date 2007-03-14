@@ -192,7 +192,6 @@ ConSpliterGraphicsOutputQueryMode (
 --*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
-  EFI_STATUS                      Status;
   TEXT_OUT_GOP_MODE               *Mode;
 
   if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
@@ -208,13 +207,10 @@ ConSpliterGraphicsOutputQueryMode (
     return EFI_NOT_STARTED;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
-                  (VOID **) Info
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+
+  if (*Info == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
@@ -282,7 +278,7 @@ Routine Description:
   // Free the old version
   //
   if (Private->GraphicsOutputBlt != NULL) {
-    gBS->FreePool (Private->GraphicsOutputBlt);
+    FreePool (Private->GraphicsOutputBlt);
   }
 
   //
@@ -316,10 +312,10 @@ Routine Description:
           return Status;
         }
         if ((Info->HorizontalResolution == Mode->HorizontalResolution) && (Info->VerticalResolution == Mode->VerticalResolution)) {
-          gBS->FreePool (Info);
+          FreePool (Info);
           break;
         }
-        gBS->FreePool (Info);
+        FreePool (Info);
       }
 
       Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32) NumberIndex);
@@ -754,7 +750,7 @@ ConSpliterUgaDrawSetMode (
   //
   // Free the old version
   //
-  gBS->FreePool (Private->UgaBlt);
+  FreePool (Private->UgaBlt);
 
   //
   // Allocate the virtual Blt buffer
@@ -1319,7 +1315,7 @@ DevNullTextOutSetMode (
     Private->DevNullColumns   = Column;
     Private->DevNullRows      = Row;
 
-    gBS->FreePool (Private->DevNullScreen);
+    FreePool (Private->DevNullScreen);
 
     Size                    = (Row * (Column + 1)) * sizeof (CHAR16);
     Private->DevNullScreen  = AllocateZeroPool (Size);
@@ -1327,7 +1323,7 @@ DevNullTextOutSetMode (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    gBS->FreePool (Private->DevNullAttributes);
+    FreePool (Private->DevNullAttributes);
 
     Size                        = Row * Column * sizeof (INT32);
     Private->DevNullAttributes  = AllocateZeroPool (Size);
@@ -1604,7 +1600,7 @@ DevNullSyncGopStdOut (
     }
   }
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
   return ReturnStatus;
 }

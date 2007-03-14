@@ -124,8 +124,9 @@ Returns:
     return Status;
   }
 
-  Status = gBS->AllocatePool (EfiBootServicesData, TotalSize, (VOID **) &LogEntry);
-  if (EFI_ERROR (Status)) {
+  LogEntry = AllocatePool (TotalSize);
+
+  if (LogEntry == NULL) {
     EfiReleaseLock (&Private->DataLock);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -386,7 +387,7 @@ Returns:
   // Search for duplicate entries
   //
   if (FindFilterDriverByEvent (&Private->FilterDriverListHead, FilterEvent) != NULL) {
-    gBS->FreePool (FilterDriver);
+    FreePool (FilterDriver);
     return EFI_ALREADY_STARTED;
   }
   //

@@ -107,7 +107,7 @@ Returns:
 
 --*/
 {
-  gBS->SetMem (IvtEntryTable, sizeof (IvtEntryTable), 0);
+  SetMem (IvtEntryTable, sizeof (IvtEntryTable), 0);
   ExternalInterruptCount = 0;
   return EFI_SUCCESS;
 }
@@ -298,7 +298,7 @@ Returns:
       //
       // re-init IvtEntryTable
       //
-      gBS->SetMem (&IvtEntryTable[ExceptionType], sizeof (IVT_ENTRY), 0);
+      SetMem (&IvtEntryTable[ExceptionType], sizeof (IVT_ENTRY), 0);
     }
   } else {
     //
@@ -356,15 +356,15 @@ Returns:
   //
   // copy original bundles from IVT to IvtEntryTable so we can restore them later
   //
-  gBS->CopyMem (
-        IvtEntryTable[ExceptionType].OrigBundles,
-        B0Ptr,
-        sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB
-        );
+  CopyMem (
+    IvtEntryTable[ExceptionType].OrigBundles,
+    B0Ptr,
+    sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB
+    );
   //
   // insert new B0
   //
-  gBS->CopyMem (B0Ptr, NewBundles, sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB);
+  CopyMem (B0Ptr, NewBundles, sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB);
 
   //
   // fixup IVT entry so it stores its index and whether or not to chain...
@@ -406,11 +406,11 @@ Returns:
   //
   // restore original bundles in IVT
   //
-  gBS->CopyMem (
-        B0Ptr,
-        IvtEntryTable[ExceptionType].OrigBundles,
-        sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB
-        );
+  CopyMem (
+    B0Ptr,
+    IvtEntryTable[ExceptionType].OrigBundles,
+    sizeof (BUNDLE) * NUM_BUNDLES_IN_STUB
+    );
   InstructionCacheFlush (B0Ptr, 5);
 }
 

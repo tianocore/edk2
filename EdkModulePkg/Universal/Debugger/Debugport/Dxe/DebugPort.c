@@ -67,7 +67,7 @@ Returns:
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
     if (gDebugPortDevice->DebugPortVariable != NULL) {
-      gBS->FreePool (gDebugPortDevice->DebugPortVariable);
+      FreePool (gDebugPortDevice->DebugPortVariable);
     }
 
     DebugPortDevice->DebugPortVariable = AllocatePool (DataSize);
@@ -85,31 +85,31 @@ Returns:
       }
 
       if (EfiIsDevicePathEnd (DevicePath)) {
-        gBS->FreePool (gDebugPortDevice->DebugPortVariable);
+        FreePool (gDebugPortDevice->DebugPortVariable);
         DebugPortDevice->DebugPortVariable = NULL;
       } else {
-        gBS->CopyMem (
-              &DebugPortDevice->BaudRate,
-              &((UART_DEVICE_PATH *) DevicePath)->BaudRate,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->BaudRate)
-              );
+        CopyMem (
+          &DebugPortDevice->BaudRate,
+          &((UART_DEVICE_PATH *) DevicePath)->BaudRate,
+          sizeof (((UART_DEVICE_PATH *) DevicePath)->BaudRate)
+          );
         DebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
         DebugPortDevice->Timeout          = DEBUGPORT_UART_DEFAULT_TIMEOUT;
-        gBS->CopyMem (
-              &DebugPortDevice->Parity,
-              &((UART_DEVICE_PATH *) DevicePath)->Parity,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->Parity)
-              );
-        gBS->CopyMem (
-              &DebugPortDevice->DataBits,
-              &((UART_DEVICE_PATH *) DevicePath)->DataBits,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->DataBits)
-              );
-        gBS->CopyMem (
-              &DebugPortDevice->StopBits,
-              &((UART_DEVICE_PATH *) DevicePath)->StopBits,
-              sizeof (((UART_DEVICE_PATH *) DevicePath)->StopBits)
-              );
+        CopyMem (
+          &DebugPortDevice->Parity,
+          &((UART_DEVICE_PATH *) DevicePath)->Parity,
+          sizeof (((UART_DEVICE_PATH *) DevicePath)->Parity)
+          );
+        CopyMem (
+          &DebugPortDevice->DataBits,
+          &((UART_DEVICE_PATH *) DevicePath)->DataBits,
+          sizeof (((UART_DEVICE_PATH *) DevicePath)->DataBits)
+          );
+        CopyMem (
+          &DebugPortDevice->StopBits,
+          &((UART_DEVICE_PATH *) DevicePath)->StopBits,
+          sizeof (((UART_DEVICE_PATH *) DevicePath)->StopBits)
+          );
       }
     }
   }
@@ -273,7 +273,7 @@ Returns:
       Status = EFI_UNSUPPORTED;
     }
 
-    gBS->FreePool (Dp1);
+    FreePool (Dp1);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -389,7 +389,7 @@ Returns:
   DebugPortDP.Header.Type     = MESSAGING_DEVICE_PATH;
   DebugPortDP.Header.SubType  = MSG_VENDOR_DP;
   SetDevicePathNodeLength (&(DebugPortDP.Header), sizeof (DebugPortDP));
-  gBS->CopyMem (&DebugPortDP.Guid, &gEfiDebugPortDevicePathGuid, sizeof (EFI_GUID));
+  CopyMem (&DebugPortDP.Guid, &gEfiDebugPortDevicePathGuid, sizeof (EFI_GUID));
 
   Dp1 = DevicePathFromHandle (ControllerHandle);
   if (Dp1 == NULL) {
@@ -516,7 +516,7 @@ Returns:
           ControllerHandle
           );
 
-    gBS->FreePool (gDebugPortDevice->DebugPortDevicePath);
+    FreePool (gDebugPortDevice->DebugPortDevicePath);
 
     return EFI_SUCCESS;
   } else {
@@ -803,10 +803,10 @@ Returns:
   // Clean up allocations
   //
   if (gDebugPortDevice->DebugPortVariable != NULL) {
-    gBS->FreePool (gDebugPortDevice->DebugPortVariable);
+    FreePool (gDebugPortDevice->DebugPortVariable);
   }
 
-  gBS->FreePool (gDebugPortDevice);
+  FreePool (gDebugPortDevice);
 
   return EFI_SUCCESS;
 }
