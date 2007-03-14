@@ -1333,7 +1333,7 @@ Returns:
   CopyMem (Ptr, *Buffer, OldSize);
 
   if (*Buffer != NULL) {
-    gBS->FreePool (*Buffer);
+    FreePool (*Buffer);
   }
 
   *Buffer = Ptr;
@@ -1573,7 +1573,7 @@ Returns:
     //
     // Free the old buffer
     //
-    gBS->FreePool (OldTextOutModeMap);
+    FreePool (OldTextOutModeMap);
   }
 
   return EFI_SUCCESS;
@@ -1924,8 +1924,8 @@ Returns:
     mStdErr.TextOut.SetMode (&(mStdErr.TextOut), 0);
   }
 
-  gBS->FreePool (ConOutMapTable);
-  gBS->FreePool (StdErrMapTable);
+  FreePool (ConOutMapTable);
+  FreePool (StdErrMapTable);
 
   return EFI_SUCCESS;
 }
@@ -1986,7 +1986,7 @@ Returns:
         if (ModeBuffer == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
-        gBS->FreePool (Private->GraphicsOutputModeBuffer);
+        FreePool (Private->GraphicsOutputModeBuffer);
         Private->GraphicsOutputModeBuffer = ModeBuffer;
 
         //
@@ -2001,7 +2001,7 @@ Returns:
           Mode->HorizontalResolution = Info->HorizontalResolution;
           Mode->VerticalResolution = Info->VerticalResolution;
           Mode++;
-          gBS->FreePool (Info);
+          FreePool (Info);
         }
     } else {
       //
@@ -2025,10 +2025,10 @@ Returns:
           if ((Info->HorizontalResolution == Mode->HorizontalResolution) &&
               (Info->VerticalResolution == Mode->VerticalResolution)){
             Match = TRUE;
-            gBS->FreePool (Info);
+            FreePool (Info);
             break;
           }
-          gBS->FreePool (Info);
+          FreePool (Info);
         }
 
         if (Match) {
@@ -2042,7 +2042,7 @@ Returns:
       //
       // Drop the old mode buffer, assign it to a new one
       //
-      gBS->FreePool (Private->GraphicsOutputModeBuffer);
+      FreePool (Private->GraphicsOutputModeBuffer);
       Private->GraphicsOutputModeBuffer = ModeBuffer;
 
       //
@@ -2305,7 +2305,7 @@ Returns:
     Private->TextOutQueryDataCount * sizeof (TEXT_OUT_SPLITTER_QUERY_DATA)
     );
 
-  gBS->FreePool (Private->TextOutModeMap);
+  FreePool (Private->TextOutModeMap);
   Private->TextOutModeMap = NULL;
   TextOutList             = Private->TextOutList;
 
@@ -3033,7 +3033,7 @@ ConSplitterTextOutOutputString (
   }
 
   if (BackSpaceCount) {
-    gBS->FreePool (TargetString);
+    FreePool (TargetString);
   }
 
   return ReturnStatus;

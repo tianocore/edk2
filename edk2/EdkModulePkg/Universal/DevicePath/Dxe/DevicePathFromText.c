@@ -2277,10 +2277,10 @@ ConvertTextToDeviceNode (
     DeviceNode = DumpNode (DeviceNodeStr);
   } else {
     DeviceNode = DumpNode (ParamStr);
-    gBS->FreePool (ParamStr);
+    FreePool (ParamStr);
   }
 
-  gBS->FreePool (DeviceNodeStr);
+  FreePool (DeviceNodeStr);
 
   return DeviceNode;
 }
@@ -2346,12 +2346,12 @@ ConvertTextToDevicePath (
       DeviceNode = DumpNode (DeviceNodeStr);
     } else {
       DeviceNode = DumpNode (ParamStr);
-      gBS->FreePool (ParamStr);
+      FreePool (ParamStr);
     }
 
     NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
-    gBS->FreePool (DevicePath);
-    gBS->FreePool (DeviceNode);
+    FreePool (DevicePath);
+    FreePool (DeviceNode);
     DevicePath = NewDevicePath;
 
     if (IsInstanceEnd) {
@@ -2359,12 +2359,12 @@ ConvertTextToDevicePath (
       SetDevicePathInstanceEndNode (DeviceNode);
 
       NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
-      gBS->FreePool (DevicePath);
-      gBS->FreePool (DeviceNode);
+      FreePool (DevicePath);
+      FreePool (DeviceNode);
       DevicePath = NewDevicePath;
     }
   }
 
-  gBS->FreePool (DevicePathStr);
+  FreePool (DevicePathStr);
   return DevicePath;
 }

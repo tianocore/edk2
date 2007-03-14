@@ -275,7 +275,7 @@ TerminalDriverBindingStart (
       }
     }
 
-    gBS->FreePool (OpenInfoBuffer);
+    FreePool (OpenInfoBuffer);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -566,7 +566,7 @@ TerminalDriverBindingStart (
   }
 
   if (DefaultNode != NULL) {
-    gBS->FreePool (DefaultNode);
+    FreePool (DefaultNode);
   }
   
   return EFI_SUCCESS;
@@ -604,15 +604,15 @@ Error:
       }
 
       if (TerminalDevice->DevicePath != NULL) {
-        gBS->FreePool (TerminalDevice->DevicePath);
+        FreePool (TerminalDevice->DevicePath);
       }
 
-      gBS->FreePool (TerminalDevice);
+      FreePool (TerminalDevice);
     }
   }
 
   if (DefaultNode != NULL) {
-    gBS->FreePool (DefaultNode);
+    FreePool (DefaultNode);
   }
   
   This->Stop (This, Controller, 0, NULL);
@@ -713,7 +713,7 @@ TerminalDriverBindingStop (
       // Free the ParentDevicePath that was duplicated in Start()
       //
       if (!EFI_ERROR (Status)) {
-        gBS->FreePool (ParentDevicePath);
+        FreePool (ParentDevicePath);
       }
     }
 
@@ -803,8 +803,8 @@ TerminalDriverBindingStop (
 
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
-        gBS->FreePool (TerminalDevice->DevicePath);
-        gBS->FreePool (TerminalDevice);
+        FreePool (TerminalDevice->DevicePath);
+        FreePool (TerminalDevice);
       }
     }
 
@@ -850,11 +850,11 @@ TerminalUpdateConsoleDevVariable (
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
     if (Variable != NULL) {
-      gBS->FreePool (Variable);
+      FreePool (Variable);
     }
 
     if (TempDevicePath != NULL) {
-      gBS->FreePool (TempDevicePath);
+      FreePool (TempDevicePath);
     }
 
     Variable = NewVariable;
@@ -870,7 +870,7 @@ TerminalUpdateConsoleDevVariable (
                   Variable
                   );
   ASSERT_EFI_ERROR (Status);
-  gBS->FreePool (Variable);
+  FreePool (Variable);
 
   return ;
 }
@@ -932,7 +932,7 @@ TerminalRemoveConsoleDevVariable (
   //
   Instance = GetNextDevicePathInstance (&Variable, &InstanceSize);
   if (Instance == NULL) {
-    gBS->FreePool (OriginalVariable);
+    FreePool (OriginalVariable);
     return ;
   }
   //
@@ -956,7 +956,7 @@ TerminalRemoveConsoleDevVariable (
           FoundOne  = TRUE;
         }
 
-        gBS->FreePool (TempDevicePath);
+        FreePool (TempDevicePath);
       }
     }
     //
@@ -966,17 +966,17 @@ TerminalRemoveConsoleDevVariable (
       SavedNewVariable  = NewVariable;
       NewVariable       = AppendDevicePathInstance (NewVariable, Instance);
       if (SavedNewVariable != NULL) {
-        gBS->FreePool (SavedNewVariable);
+        FreePool (SavedNewVariable);
       }
     }
     //
     // Get next device path instance from Variable
     //
-    gBS->FreePool (Instance);
+    FreePool (Instance);
     Instance = GetNextDevicePathInstance (&Variable, &InstanceSize);
   } while (Instance != NULL);
 
-  gBS->FreePool (OriginalVariable);
+  FreePool (OriginalVariable);
 
   if (FoundOne) {
     VariableSize = GetDevicePathSize (NewVariable);
@@ -992,7 +992,7 @@ TerminalRemoveConsoleDevVariable (
   }
 
   if (NewVariable != NULL) {
-    gBS->FreePool (NewVariable);
+    FreePool (NewVariable);
   }
 
   return ;
@@ -1051,7 +1051,7 @@ Returns:
     //
     // Allocate the buffer to return
     //
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     Buffer = AllocatePool (BufferSize);
     if (Buffer == NULL) {
       *VariableSize = 0;
@@ -1063,7 +1063,7 @@ Returns:
     Status = gRT->GetVariable (Name, VendorGuid, NULL, &BufferSize, Buffer);
     if (EFI_ERROR (Status)) {
       BufferSize = 0;
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       Buffer = NULL;
     }
   } else {
@@ -1071,7 +1071,7 @@ Returns:
     // Variable not found or other errors met.
     //
     BufferSize = 0;
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     Buffer = NULL;
   }
 

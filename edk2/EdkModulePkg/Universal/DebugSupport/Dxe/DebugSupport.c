@@ -96,12 +96,12 @@ Returns:
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
                       );
       if (Status == EFI_SUCCESS && DebugSupportProtocolPtr->Isa == EFI_ISA) {
-        gBS->FreePool (HandlePtr);
+        FreePool (HandlePtr);
         Status = EFI_ALREADY_STARTED;
         goto ErrExit;
       }
     } while (NumHandles > 0);
-    gBS->FreePool (HandlePtr);
+    FreePool (HandlePtr);
   }
 
   //

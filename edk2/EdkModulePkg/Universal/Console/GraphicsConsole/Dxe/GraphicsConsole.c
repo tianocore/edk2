@@ -320,12 +320,12 @@ GraphicsConsoleControllerDriverStart (
   //
   Package = PreparePackages (1, NULL, FontPack);
   mHii->NewPack (mHii, Package, &(Private->HiiHandle));
-  gBS->FreePool (Package);
+  FreePool (Package);
 
   //
   // Free the font database
   //
-  gBS->FreePool (FontPack);
+  FreePool (FontPack);
 
   //
   // If the current mode information can not be retrieved, then attemp to set the default mode
@@ -350,11 +350,11 @@ GraphicsConsoleControllerDriverStart (
             (Info->VerticalResolution == 600)) {
           Status = Private->GraphicsOutput->SetMode (Private->GraphicsOutput, ModeNumber);
           if (!EFI_ERROR (Status)) {
-            gBS->FreePool (Info);
+            FreePool (Info);
             break;
           }
         }
-        gBS->FreePool (Info);
+        FreePool (Info);
       }
     }
 
@@ -507,8 +507,8 @@ Error:
     // Free private data
     //
     if (Private != NULL) {
-      gBS->FreePool (Private->LineBuffer);
-      gBS->FreePool (Private);
+      FreePool (Private->LineBuffer);
+      FreePool (Private);
     }
   }
 
@@ -577,8 +577,8 @@ GraphicsConsoleControllerDriverStop (
     // Free our instance data
     //
     if (Private != NULL) {
-      gBS->FreePool (Private->LineBuffer);
-      gBS->FreePool (Private);
+      FreePool (Private->LineBuffer);
+      FreePool (Private);
     }
   }
 
@@ -1166,16 +1166,14 @@ GraphicsConsoleConOutSetMode (
   //
   // Attempt to allocate a line buffer for the requested mode number
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->Columns * GLYPH_WIDTH * GLYPH_HEIGHT,
-                  (VOID **) &NewLineBuffer
-                  );
-  if (EFI_ERROR (Status)) {
+  NewLineBuffer = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->Columns * GLYPH_WIDTH * GLYPH_HEIGHT);
+
+  if (NewLineBuffer == NULL) {
     //
     // The new line buffer could not be allocated, so return an error.
     // No changes to the state of the current console have been made, so the current console is still valid
     //
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
   //
@@ -1191,7 +1189,7 @@ GraphicsConsoleConOutSetMode (
     // If the new mode is the same as the old mode, then just return EFI_SUCCESS
     //
     if ((INT32) ModeNumber == This->Mode->Mode) {
-      gBS->FreePool (NewLineBuffer);
+      FreePool (NewLineBuffer);
       Status = EFI_SUCCESS;
       goto Done;
     }
@@ -1201,7 +1199,7 @@ GraphicsConsoleConOutSetMode (
     //
     This->EnableCursor (This, FALSE);
 
-    gBS->FreePool (Private->LineBuffer);
+    FreePool (Private->LineBuffer);
   }
   //
   // Assign the current line buffer to the newly allocated line buffer
