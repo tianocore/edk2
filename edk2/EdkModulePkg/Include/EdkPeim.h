@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -31,10 +31,6 @@ Abstract:
 //
 #include <Common/FlashMap.h>
 #include <Common/DecompressLibraryHob.h>
-// BUGBUG: We must include this lib here due to ordering issues
-//
-#include <Library/PeCoffLib.h>
-
 //
 // BUGBUG: Performance related Guid.
 // It is Tiano-private, but is required for PeiCore
