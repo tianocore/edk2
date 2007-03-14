@@ -1314,8 +1314,10 @@ DevNullTextOutSetMode (
     Private->TextOutMode.Mode = (INT32) ModeNumber;
     Private->DevNullColumns   = Column;
     Private->DevNullRows      = Row;
-
-    FreePool (Private->DevNullScreen);
+    
+    if (Private->DevNullScreen != NULL) {
+      FreePool (Private->DevNullScreen);
+    }
 
     Size                    = (Row * (Column + 1)) * sizeof (CHAR16);
     Private->DevNullScreen  = AllocateZeroPool (Size);
@@ -1323,7 +1325,9 @@ DevNullTextOutSetMode (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    FreePool (Private->DevNullAttributes);
+    if (Private->DevNullAttributes != NULL) {
+      FreePool (Private->DevNullAttributes);
+    }
 
     Size                        = Row * Column * sizeof (INT32);
     Private->DevNullAttributes  = AllocateZeroPool (Size);
