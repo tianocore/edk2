@@ -1,7 +1,7 @@
 /** @file
   Memory Only PE COFF loader. 
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -16,6 +16,8 @@
 
 #ifndef __BASE_PE_COFF_LIB_H__
 #define __BASE_PE_COFF_LIB_H__
+
+#include <Common/PeCoffLoaderImageContext.h>
 
 //
 // Return status codes from the PE/COFF Loader services
@@ -32,46 +34,6 @@
 #define IMAGE_ERROR_SECTION_NOT_LOADED           8
 #define IMAGE_ERROR_FAILED_RELOCATION            9
 #define IMAGE_ERROR_FAILED_ICACHE_FLUSH          10
-
-
-//
-// PE/COFF Loader Read Function passed in by caller
-//
-typedef
-RETURN_STATUS
-(EFIAPI *PE_COFF_LOADER_READ_FILE) (
-  IN     VOID   *FileHandle,
-  IN     UINTN  FileOffset,
-  IN OUT UINTN  *ReadSize,
-  OUT    VOID   *Buffer
-  );
-
-//
-// Context structure used while PE/COFF image is being loaded and relocated
-//
-typedef struct {
-  PHYSICAL_ADDRESS                  ImageAddress;
-  UINT64                            ImageSize;
-  PHYSICAL_ADDRESS                  DestinationAddress;
-  PHYSICAL_ADDRESS                  EntryPoint;
-  PE_COFF_LOADER_READ_FILE          ImageRead;
-  VOID                              *Handle;
-  VOID                              *FixupData;
-  UINT32                            SectionAlignment;
-  UINT32                            PeCoffHeaderOffset;
-  UINT32                            DebugDirectoryEntryRva;
-  VOID                              *CodeView;
-  CHAR8                             *PdbPointer;
-  UINTN                             SizeOfHeaders;
-  UINT32                            ImageCodeMemoryType;
-  UINT32                            ImageDataMemoryType;
-  UINT32                            ImageError;
-  UINTN                             FixupDataSize;
-  UINT16                            Machine;
-  UINT16                            ImageType;
-  BOOLEAN                           RelocationsStripped;
-  BOOLEAN                           IsTeImage;
-} PE_COFF_LOADER_IMAGE_CONTEXT;
 
 
 /**
