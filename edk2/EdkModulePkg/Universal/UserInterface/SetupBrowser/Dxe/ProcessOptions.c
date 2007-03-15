@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+	Implementation for handling the User Interface option processing.
+	
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,17 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  ProcessOptions.c
-
-Abstract:
-  
-  Implementation for handling the User Interface option processing.
-
-Revision History
-
---*/
+**/
 
 #include "Setup.h"
 #include "Ui.h"
@@ -1201,203 +1192,215 @@ ProcessOptions (
   return EFI_SUCCESS;
 }
 
+/**
+  Split StringPtr to several lines of strings stored in FormattedString and the glyph width of 
+  each line cannot exceed gHelpBlockWidth.
+
+  @param StringPtr          The pointer of string
+  @param FormattedString    The pointer of format string
+  @param RowCount           The count of row 
+  
+**/
 VOID
 ProcessHelpString (
-  IN  CHAR16                      *StringPtr,
-  OUT CHAR16                      **FormattedString,
-  IN  UINTN                       RowCount
+  IN  CHAR16  *StringPtr,
+  OUT CHAR16  **FormattedString,
+  IN  UINTN   RowCount
   )
 {
+  CONST UINTN BlockWidth = (UINTN) gHelpBlockWidth - 1;
+  UINTN AllocateSize;
+  //
+  // [PrevCurrIndex, CurrIndex) forms a range of a screen-line
+  //
   UINTN CurrIndex;
-  UINTN PrevIndex;
-  UINTN SearchIndex;
-  UINTN PrevSearchIndex;
-  UINTN StringCount;
-  UINTN PageCount;
+  UINTN PrevCurrIndex;
+  UINTN LineCount;
+  UINTN VirtualLineCount;
+  //
+  // GlyphOffset stores glyph width of current screen-line
+  //
+  UINTN GlyphOffset;
+  //
+  // GlyphWidth equals to 2 if we meet width directive
+  //
+  UINTN GlyphWidth;
+  //
+  // during scanning, we remember the position of last space character
+  // in case that if next word cannot put in current line, we could restore back to the position
+  // of last space character
+  // while we should also remmeber the glyph width of the last space character for restoring
+  //
+  UINTN LastSpaceIndex;
+  UINTN LastSpaceGlyphWidth;
+  //
+  // every time we begin to form a new screen-line, we should remember glyph width of single character
+  // of last line
+  //
+  UINTN LineStartGlyphWidth;
+  UINTN *IndexArray;
+  UINTN *OldIndexArray;
 
-  StringCount = 0;
-  PrevIndex   = 0;
-  CurrIndex   = gHelpBlockWidth - 1;
+  //
+  // every three elements of IndexArray form a screen-line of string:[ IndexArray[i*3], IndexArray[i*3+1] )
+  // IndexArray[i*3+2] stores the initial glyph width of single character. to save this is because we want
+  // to bring the width directive of the last line to current screen-line.
+  // e.g.: "\wideabcde ... fghi", if "fghi" also has width directive but is splitted to the next screen-line 
+  // different from that of "\wideabcde", we should remember the width directive.
+  //
+  AllocateSize  = 0x20;
+  IndexArray    = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
 
   if (*FormattedString != NULL) {
-    gBS->FreePool (*FormattedString);
+    FreePool (*FormattedString);
     *FormattedString = NULL;
   }
 
-  for (; CurrIndex > PrevIndex; CurrIndex--) {
-    //
-    // In the case where the string ended and a new one is immediately after it
-    // we need to check for the null-terminator and reset the CurrIndex
-    //
-    SearchIndex     = CurrIndex;
-    PrevSearchIndex = PrevIndex;
+  for (PrevCurrIndex = 0, CurrIndex  = 0, LineCount   = 0, LastSpaceIndex = 0, 
+       IndexArray[0] = 0, GlyphWidth = 1, GlyphOffset = 0, LastSpaceGlyphWidth = 1, LineStartGlyphWidth = 1; 
+       (StringPtr[CurrIndex] != CHAR_NULL); 
+       CurrIndex ++) {
 
-    for (; SearchIndex > PrevSearchIndex; PrevSearchIndex++) {
-      if ((StringPtr[PrevSearchIndex] == CHAR_NULL) || (StringPtr[PrevSearchIndex] == CHAR_LINEFEED)) {
-        CurrIndex = PrevSearchIndex;
-        break;
+    if (LineCount == AllocateSize) {
+      AllocateSize   += 0x10;
+      OldIndexArray  =  IndexArray;
+      IndexArray     =  AllocatePool (AllocateSize * sizeof (UINTN) * 3);
+      CopyMem (IndexArray, OldIndexArray, LineCount * sizeof (UINTN) * 3);
+      if (OldIndexArray != NULL) {
+        FreePool (OldIndexArray);
       }
+    }
 
-      if (StringPtr[PrevSearchIndex] == CHAR_CARRIAGE_RETURN) {
-        if (StringPtr[PrevSearchIndex + 1] == CHAR_LINEFEED) {
-          //
-          // Found a "\n",advance to the next new line.
-          //
-          CurrIndex = PrevSearchIndex + 1;
-          break;
-        } else {
-          //
-          // Found a "\r",return to the start of the current line.
-          //
-          PrevIndex = PrevSearchIndex + 1;
-          CurrIndex = PrevSearchIndex + gHelpBlockWidth;
-          continue;
+    switch (StringPtr[CurrIndex]) {
+    
+      case NARROW_CHAR:
+      case WIDE_CHAR:
+        GlyphWidth = ((StringPtr[CurrIndex] == WIDE_CHAR) ? 2 : 1);
+        if (CurrIndex == 0) {
+          LineStartGlyphWidth = GlyphWidth;
         }
-      }
-    }
-
-    //
-    // End of the string, thus stop counting.
-    //
-    if (StringPtr[CurrIndex] == CHAR_NULL) {
-      StringCount++;
-      break;
-    }
-    //
-    // The premise is that for every HELP_BLOCK_WIDTH we rewind
-    // until we find the first space.  That is the delimiter for
-    // the string, and we will then advance our CurrIndex another
-    // HELP_BLOCK_WIDTH and continue the process breaking the larger
-    // string into chunks that fit within the HELP_BLOCK_WIDTH requirements.
-    //
-    if (StringPtr[CurrIndex] == CHAR_SPACE) {
-      //
-      // How many strings have been found?
-      //
-      StringCount++;
-      PrevIndex = CurrIndex + 1;
-      CurrIndex = CurrIndex + gHelpBlockWidth;
-    }
-    //
-    // Found a Linefeed, advance to the next line.
-    //
-    if (StringPtr[CurrIndex] == CHAR_LINEFEED) {
-      StringCount++;
-      PrevIndex = CurrIndex + 1;
-      CurrIndex = CurrIndex + gHelpBlockWidth;
-    }
-  }
-  //
-  // endfor
-  //
-  // Round the value up one (doesn't hurt)
-  //
-  StringCount++;
-
-  //
-  // Determine the number of pages this help string occupies
-  //
-  PageCount = StringCount / RowCount;
-  if (StringCount % RowCount > 0) {
-    PageCount++;
-  }
-  //
-  // Convert the PageCount into lines so we can allocate the correct buffer size
-  //
-  StringCount = PageCount * RowCount;
-
-  //
-  // We now know how many strings we will have, so we can allocate the
-  // space required for the array or strings.
-  //
-  *FormattedString = AllocateZeroPool ((StringCount) * (gHelpBlockWidth + 1) * 2);
-  ASSERT (*FormattedString);
-
-  StringCount = 0;
-  PrevIndex   = 0;
-  CurrIndex   = gHelpBlockWidth - 1;
-
-  for (; CurrIndex > PrevIndex; CurrIndex--) {
-    //
-    // In the case where the string ended and a new one is immediately after it
-    // we need to check for the null-terminator and reset the CurrIndex
-    //
-    SearchIndex     = CurrIndex;
-    PrevSearchIndex = PrevIndex;
-
-    for (; SearchIndex > PrevSearchIndex; PrevSearchIndex++) {
-      if ((StringPtr[PrevSearchIndex] == CHAR_NULL) || (StringPtr[PrevSearchIndex] == CHAR_LINEFEED)) {
-        CurrIndex = PrevSearchIndex;
         break;
-      }
 
-      if (StringPtr[PrevSearchIndex] == CHAR_CARRIAGE_RETURN) {
-        if (StringPtr[PrevSearchIndex + 1] == CHAR_LINEFEED) {
+      //
+      // char is '\n'
+      // "\r\n" isn't handled here, handled by case CHAR_CARRIAGE_RETURN
+      //
+      case CHAR_LINEFEED:
+        //
+        // Store a range of string as a line
+        //
+        IndexArray[LineCount*3]   = PrevCurrIndex;
+        IndexArray[LineCount*3+1] = CurrIndex;
+        IndexArray[LineCount*3+2] = LineStartGlyphWidth;
+        LineCount ++;
+        //
+        // Reset offset and save begin position of line
+        //
+        GlyphOffset = 0;
+        LineStartGlyphWidth = GlyphWidth;
+        PrevCurrIndex = CurrIndex + 1;
+        break;
+
+      //
+      // char is '\r'
+      // "\r\n" and "\r" both are handled here
+      //
+      case CHAR_CARRIAGE_RETURN:
+        if (StringPtr[CurrIndex + 1] == CHAR_LINEFEED) {
           //
-          // Found a "\n",advance to the next new line.
+          // next char is '\n'
           //
-          CurrIndex = PrevSearchIndex + 1;
-          break;
-        } else {
-          //
-          // Found a "\r",return to the start of the current line.
-          //
-          PrevIndex = PrevSearchIndex + 1;
-          CurrIndex = PrevSearchIndex + gHelpBlockWidth;
-          continue;
+          IndexArray[LineCount*3]   = PrevCurrIndex;
+          IndexArray[LineCount*3+1] = CurrIndex;
+          IndexArray[LineCount*3+2] = LineStartGlyphWidth;
+          LineCount ++;
+          CurrIndex ++;
         }
-      }
-    }
+        GlyphOffset = 0;
+        LineStartGlyphWidth = GlyphWidth;
+        PrevCurrIndex = CurrIndex + 1;
+        break;
 
-    //
-    // End of the string, thus stop counting.
-    //
-    if (StringPtr[CurrIndex] == CHAR_NULL) {
       //
-      // Copy the fragment to the FormattedString buffer
+      // char is space or other char
       //
-      StrnCpy ((FormattedString[0] + StringCount * gHelpBlockWidth), &StringPtr[PrevIndex], CurrIndex - PrevIndex);
-      StringCount++;
-      break;
-    }
-    //
-    // The premise is that for every HELP_BLOCK_WIDTH we rewind
-    // until we find the first space.  That is the delimiter for
-    // the string, and we will then advance our CurrIndex another
-    // HELP_BLOCK_WIDTH and continue the process breaking the larger
-    // string into chunks that fit within the HELP_BLOCK_WIDTH requirements.
-    //
-    if (StringPtr[CurrIndex] == CHAR_SPACE) {
-      //
-      // Copy the fragment to the FormattedString buffer
-      //
-      StrnCpy ((FormattedString[0] + StringCount * gHelpBlockWidth), &StringPtr[PrevIndex], CurrIndex - PrevIndex);
-      StringCount++;
-      PrevIndex = CurrIndex + 1;
-      CurrIndex = CurrIndex + gHelpBlockWidth;
-    }
-    //
-    // Found a LineFeed, advance to the next line.
-    //
-    if (StringPtr[CurrIndex] == CHAR_LINEFEED) {
-      StringPtr[CurrIndex] = CHAR_SPACE;
-      //
-      // "\n" is represented as CHAR_CARRIAGE_RETURN + CHAR_LINEFEED,check this.
-      //
-      if (StringPtr[CurrIndex - 1] == CHAR_CARRIAGE_RETURN) {
-        StringPtr[CurrIndex - 1] = CHAR_SPACE;
-      }
+      default:
+        GlyphOffset     += GlyphWidth;
+        if (GlyphOffset >= BlockWidth) {
+          if (LastSpaceIndex > PrevCurrIndex) {
+            //
+            // LastSpaceIndex points to space inside current screen-line,
+            // restore to LastSpaceIndex
+            // (Otherwise the word is too long to fit one screen-line, just cut it)
+            //
+            CurrIndex  = LastSpaceIndex;
+            GlyphWidth = LastSpaceGlyphWidth;
+          } else if (GlyphOffset > BlockWidth) {
+            //
+            // the word is too long to fit one screen-line and we don't get the chance 
+            // of GlyphOffset == BlockWidth because GlyphWidth = 2
+            //
+            CurrIndex --;
+          }
+          
+          IndexArray[LineCount*3]   = PrevCurrIndex;
+          IndexArray[LineCount*3+1] = CurrIndex + 1;
+          IndexArray[LineCount*3+2] = LineStartGlyphWidth;
+          LineStartGlyphWidth = GlyphWidth;
+          LineCount ++;
+          //
+          // Reset offset and save begin position of line
+          //
+          GlyphOffset                 = 0;
+          PrevCurrIndex               = CurrIndex + 1;
+        }
 
-      StrnCpy ((FormattedString[0] + StringCount * gHelpBlockWidth), &StringPtr[PrevIndex], CurrIndex - PrevIndex);
-      StringCount++;
-      PrevIndex = CurrIndex + 1;
-      CurrIndex = CurrIndex + gHelpBlockWidth;
+        //
+        // LastSpaceIndex: remember position of last space
+        //
+        if (StringPtr[CurrIndex] == CHAR_SPACE) {
+          LastSpaceIndex      = CurrIndex;
+          LastSpaceGlyphWidth = GlyphWidth;
+        }
+        break;
     }
   }
-  //
-  // endfor
-  //
-  return ;
+
+  if (GlyphOffset > 0) {
+    IndexArray[LineCount*3]   = PrevCurrIndex;
+    IndexArray[LineCount*3+1] = CurrIndex;
+    IndexArray[LineCount*3+2] = GlyphWidth;
+    LineCount ++;
+  }
+
+  if (LineCount == 0) {
+    //
+    // in case we meet null string
+    //
+    IndexArray[0] = 0;
+    IndexArray[1] = 1;
+    //
+    // we assume null string's glyph width is 1
+    //
+    IndexArray[1] = 1;
+    LineCount ++;
+  }
+
+  VirtualLineCount = RowCount * (LineCount / RowCount + (LineCount % RowCount > 0));
+  *FormattedString = AllocateZeroPool (VirtualLineCount * (BlockWidth + 1) * sizeof (CHAR16) * 2);
+
+  for (CurrIndex = 0; CurrIndex < LineCount; CurrIndex ++) {
+    *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR;
+    StrnCpy (
+      *FormattedString + CurrIndex * 2 * (BlockWidth + 1) + 1, 
+      StringPtr + IndexArray[CurrIndex*3], 
+      IndexArray[CurrIndex*3+1]-IndexArray[CurrIndex*3]
+      );
+  }
+
+  if (IndexArray != NULL) {
+    FreePool (IndexArray);
+  }
 }
 
 VOID
@@ -1484,11 +1487,16 @@ IfrToFormTag (
     break;
 
   case EFI_IFR_STRING_OP:
+    //
+    // Convert EFI_IFR_STRING.MinSize and EFI_IFR_STRING.MaxSize to actual minimum and maximum bytes
+    // and store to EFI_TAG.Minimum and EFI_TAG.Maximum
+    //
     TempValue = 0;
     CopyMem (&TempValue, &((EFI_IFR_STRING *) FormData)->MinSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Minimum, &TempValue, sizeof (UINT16));
 
+    TempValue = 0;
     CopyMem (&TempValue, &((EFI_IFR_STRING *) FormData)->MaxSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Maximum, &TempValue, sizeof (UINT16));
@@ -1505,6 +1513,7 @@ IfrToFormTag (
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Minimum, &TempValue, sizeof (UINT16));
 
+    TempValue = 0;
     CopyMem (&TempValue, &((EFI_IFR_PASSWORD *) FormData)->MaxSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Maximum, &TempValue, sizeof (UINT16));

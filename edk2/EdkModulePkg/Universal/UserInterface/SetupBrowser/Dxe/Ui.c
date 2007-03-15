@@ -1,5 +1,6 @@
-/*++
-
+/**@file
+  Implementation for UI.
+  
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,17 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  Ui.c
-
-Abstract:
-   
-  Implementation for UI.
-
-Revision History
-
---*/
+**/
 
 #include "Setup.h"
 #include "Ui.h"
@@ -2053,14 +2044,14 @@ Returns:
           //
           // Pad String with spaces to simulate a clearing of the previous line
           //
-          for (; GetStringWidth (&FormattedString[Index * gHelpBlockWidth]) / 2 < gHelpBlockWidth;) {
-            StrCat (&FormattedString[Index * gHelpBlockWidth], (CHAR16 *) L" ");
+          for (; GetStringWidth (&FormattedString[Index * gHelpBlockWidth * 2]) / 2 < gHelpBlockWidth;) {
+            StrCat (&FormattedString[Index * gHelpBlockWidth * 2], (CHAR16 *) L" ");
           }
 
           PrintStringAt (
             LocalScreen.RightColumn - gHelpBlockWidth,
             Index + TopRow,
-            &FormattedString[Index * gHelpBlockWidth]
+            &FormattedString[Index * gHelpBlockWidth * 2]
             );
         }
       }
