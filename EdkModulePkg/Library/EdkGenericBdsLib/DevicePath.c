@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -19,11 +19,6 @@ Abstract:
   replaced by platform device path.
 
 --*/
-
-
-#ifdef TIANO_EXTENSION_FLAG
-EFI_GUID  UnknownDeviceGuid           = UNKNOWN_DEVICE_GUID;
-#endif 
 
 EFI_GUID  mEfiUnixThunkProtocolGuid  = EFI_UNIX_THUNK_PROTOCOL_GUID;
 EFI_GUID  mEfiUnixUgaGuid            = EFI_UNIX_UGA_GUID;
@@ -90,19 +85,19 @@ CatPrint (
 
 Routine Description:
 
-    Concatenates a formatted unicode string to allocated pool.  
+    Concatenates a formatted unicode string to allocated pool.
     The caller must free the resulting buffer.
 
 Arguments:
 
-    Str         - Tracks the allocated pool, size in use, and 
+    Str         - Tracks the allocated pool, size in use, and
                   amount of pool allocated.
 
     fmt         - The format string
 
 Returns:
 
-    Allocated buffer with the formatted string printed in it.  
+    Allocated buffer with the formatted string printed in it.
     The caller must free the allocated buffer.   The buffer
     allocation is not packed.
 
@@ -161,7 +156,7 @@ Arguments:
 
 Returns:
 
-  If the memory for the device path is successfully allocated, then a 
+  If the memory for the device path is successfully allocated, then a
   pointer to the new device path is returned.  Otherwise, NULL is returned.
 
 --*/
@@ -998,7 +993,7 @@ LibDuplicateDevicePathInstance (
 
 Routine Description:
 
-  Function creates a device path data structure that identically matches the 
+  Function creates a device path data structure that identically matches the
   device path passed in.
 
 Arguments:
@@ -1007,7 +1002,7 @@ Arguments:
 
 Returns:
 
-  The new copy of DevPath is created to identically match the input.  
+  The new copy of DevPath is created to identically match the input.
   Otherwise, NULL is returned.
 
 --*/

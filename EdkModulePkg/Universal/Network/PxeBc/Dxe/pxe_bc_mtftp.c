@@ -1,16 +1,16 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
     pxe_bc_mtftp.c
 
 Abstract:
@@ -91,21 +91,21 @@ Routine description:
   information in Mode structure and return TFTP_ERROR status.
 
 Parameters:
-  Private := 
-  Operation := 
-  HeaderPtr := 
-  BufferSizePtr := 
-  BufferPtr := 
-  ServerIpPtr := 
-  ServerPortPtr := 
-  OurIpPtr := 
-  OurPortPtr := 
-  Timeout := 
+  Private :=
+  Operation :=
+  HeaderPtr :=
+  BufferSizePtr :=
+  BufferPtr :=
+  ServerIpPtr :=
+  ServerPortPtr :=
+  OurIpPtr :=
+  OurPortPtr :=
+  Timeout :=
 
 Returns:
-  EFI_SUCCESS := 
-  EFI_TFTP_ERROR := 
-  other := 
+  EFI_SUCCESS :=
+  EFI_TFTP_ERROR :=
+  other :=
 --*/
 {
   EFI_PXE_BASE_CODE_MODE  *PxeBcMode;
@@ -191,10 +191,10 @@ Routine description:
   Send TFTP ERROR message to TFTP server
 
 Parameters:
-  Private := 
-  ServerIpPtr := 
-  ServerPortPtr := 
-  OurPortPtr := 
+  Private :=
+  ServerIpPtr :=
+  ServerPortPtr :=
+  OurPortPtr :=
 
 Returns:
 --*/
@@ -249,7 +249,7 @@ Parameters:
   ServerPortPtr := Pointer to TFTP server UDP port
   ReplyIpPtr := Pointer to TFTP DATA packet destination IP address
   OurPortPtr := Pointer to TFTP client UDP port
-  Timeout := 
+  Timeout :=
   ReplyLenPtr := Pointer to packet length
   PxeBcMode := Pointer to packet buffer
   BlockNumPtr := Pointer to block number
@@ -398,7 +398,7 @@ Parameters:
   ReplyIpPtr := Pointer to TFTP DATA packet destination IP address
   OurPortPtr := Pointer to TFTP client UDP port
   LastBlock := Last block number received
-  Timeout := 
+  Timeout :=
   DontUseBuffer := TRUE == throw away data, just count # of bytes
 
 Returns:
@@ -605,7 +605,7 @@ Parameters:
   OurPortPtr := Pointer to TFTP client UDP port
   FilenamePtr := Pointer to TFTP file or directory name
   PacketSizePtr := Pointer to block size
-  Buffer := 
+  Buffer :=
 
 Returns:
 --*/
@@ -713,16 +713,16 @@ Parameters:
   Req := TFTP request type
   Options := TFTP option bits
   Private := Pointer to PxeBc interface
-  HeaderPtr := 
+  HeaderPtr :=
   PacketSizePtr := Pointer to block size
-  ReplyLenPtr := 
-  BufferPtr := 
+  ReplyLenPtr :=
+  BufferPtr :=
   ServerIpPtr := Pointer to TFTP server IP address
   ServerPortPtr := Pointer to TFTP server UDP port
-  ServerReplyPortPtr := 
+  ServerReplyPortPtr :=
   OurPortPtr := Pointer to TFTP client UDP Port
   FilenamePtr := Pointer to file or directory name
-  Timeout := 
+  Timeout :=
 
 Returns:
 --*/
@@ -847,15 +847,15 @@ Routine description:
 
 Parameters:
   Private := Pointer to PxeBc interface
-  BufferSizePtr := 
-  BufferPtr := 
+  BufferSizePtr :=
+  BufferPtr :=
   ServerIpPtr := Pointer to TFTP server IP address
   MtftpInfoPtr := Pointer to MTFTP session information
   StartBlockPtr := IN=first block we are looking for  OUT=first block received
   NumMissedPtr := Number of blocks missed
-  TransTimeout := 
-  ListenTimeout := 
-  FinalBlock := 
+  TransTimeout :=
+  ListenTimeout :=
+  FinalBlock :=
   DontUseBuffer := TRUE == throw packets away, just count bytes
 
 Returns:
@@ -991,17 +991,17 @@ Routine description:
 Parameters:
   Private := Pointer to PxeBc interface
   BufferSizePtr := IN=buffer size  OUT=transfer size
-  BufferPtr := 
-  PacketSizePtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  MtftpInfoPtr := 
-  CompletionStatusPtr := 
-  DontUseBuffer := 
+  BufferPtr :=
+  PacketSizePtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  MtftpInfoPtr :=
+  CompletionStatusPtr :=
+  DontUseBuffer :=
 
 Returns:
 // mtftp open session
-// return code EFI_SUCCESS 
+// return code EFI_SUCCESS
 //      and *CompletionStatusPtr = GOTUNI | GOTMULTI means done
 //      and *CompletionStatusPtr = GOTMULTI means got first two multicast packets, use listen for rest
 //      and *CompletionStatusPtr = 0 means did not get first two multicast packets, use listen for all
@@ -1205,12 +1205,12 @@ Routine description:
 
 Parameters:
   Private := Pointer to PxeBc interface
-  BufferSizePtr := 
-  BufferPtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  MtftpInfoPtr := 
-  DontUseBuffer := 
+  BufferSizePtr :=
+  BufferPtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  MtftpInfoPtr :=
+  DontUseBuffer :=
 
 Returns:
 --*/
@@ -1255,17 +1255,8 @@ Returns:
       BufferPtrLocal = BufferPtr + Offset;
 
     }
-    //
-    // special !!! do not leave enabled in saved version on Source Safe
-    // Following code put in in order to create a special version for regression
-    // test of MTFTP server to make sure it handles mulitple opens correctly.
-    // This code should NOT be enabled normally.
-    //
-#ifdef SpecialNowaitVersion
-#pragma message ("This is special version for MTFTP regression test")
-    if (StartBlock || !LastBlock)
-#endif
-      if (((Status = MtftpListen (
+
+    if (((Status = MtftpListen (
                       Private,
                       &BufferSize,
                       BufferPtrLocal,
@@ -1278,11 +1269,11 @@ Returns:
                       LastBlock,
                       DontUseBuffer
                       )) != EFI_SUCCESS) && (Status != EFI_TIMEOUT)) {
-        return Status;
-        //
-        // failed
-        //
-      }
+      return Status;
+      //
+      // failed
+      //
+    }
     //
     // if none were received, start block is not reset
     //
@@ -1399,12 +1390,12 @@ Routine description:
 // if OACK received, set info
 
 Parameters:
-  Private := 
-  BufferSizePtr := 
-  ServerIpPtr := 
-  SrvPort := 
-  FilenamePtr := 
-  PacketSizePtr := 
+  Private :=
+  BufferSizePtr :=
+  ServerIpPtr :=
+  SrvPort :=
+  FilenamePtr :=
+  PacketSizePtr :=
 
 Returns:
 --*/
@@ -1581,15 +1572,15 @@ Routine description:
 //  while data size is max
 
 Parameters:
-  Private := 
-  BufferSizePtr := 
-  BufferPtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  PacketSizePtr := 
-  SrvPort := 
-  Req := 
-  DontUseBuffer := 
+  Private :=
+  BufferSizePtr :=
+  BufferPtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  PacketSizePtr :=
+  SrvPort :=
+  Req :=
+  DontUseBuffer :=
 
 Returns:
 --*/
@@ -1765,13 +1756,13 @@ Routine description:
 //  while data size is max
 
 Parameters:
-  Private := 
-  BufferSizePtr := 
-  BufferPtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  PacketSizePtr := 
-  Overwrite := 
+  Private :=
+  BufferSizePtr :=
+  BufferPtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  PacketSizePtr :=
+  Overwrite :=
 
 Returns:
 --*/
@@ -1951,16 +1942,16 @@ Routine description:
   MTFTP API entry point
 
 Parameters:
-  Private := 
-  Operation := 
-  BufferSizePtr := 
-  BufferPtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  PacketSizePtr := 
-  MtftpInfoPtr := 
-  Overwrite := 
-  DontUseBuffer := 
+  Private :=
+  Operation :=
+  BufferSizePtr :=
+  BufferPtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  PacketSizePtr :=
+  MtftpInfoPtr :=
+  Overwrite :=
+  DontUseBuffer :=
 
 Returns:
  *  EFI_INVALID_PARAMETER
@@ -2313,16 +2304,16 @@ Routine description:
   MTFTP API entry point.
 
 Parameters:
-  This := 
-  Operation := 
-  BufferPtr := 
-  Overwrite := 
-  BufferSizePtr := 
-  BlockSizePtr := 
-  ServerIpPtr := 
-  FilenamePtr := 
-  MtftpInfoPtr := 
-  DontUseBuffer := 
+  This :=
+  Operation :=
+  BufferPtr :=
+  Overwrite :=
+  BufferSizePtr :=
+  BlockSizePtr :=
+  ServerIpPtr :=
+  FilenamePtr :=
+  MtftpInfoPtr :=
+  DontUseBuffer :=
 
 Returns:
  *  EFI_INVALID_PARAMETER

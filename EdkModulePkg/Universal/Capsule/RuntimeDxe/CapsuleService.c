@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -43,7 +43,7 @@ Arguments:
   CapsuleHeaderArray             A array of pointers to capsule headers passed in
   CapsuleCount                   The number of capsule
   ScatterGatherList              Physical address of datablock list points to capsule
-  
+
 Returns:
 
   EFI STATUS
@@ -51,8 +51,8 @@ Returns:
                                  not set, the capsule has been successfully processed by the firmware.
                                  If it set, the ScattlerGatherList is successfully to be set.
   EFI_INVALID_PARAMETER          CapsuleCount is less than 1,CapsuleGuid is not supported.
-  EFI_DEVICE_ERROR               Failed to SetVariable or AllocatePool or ProcessFirmwareVolume. 
-  
+  EFI_DEVICE_ERROR               Failed to SetVariable or AllocatePool or ProcessFirmwareVolume.
+
 --*/
 {
   UINTN                     CapsuleSize;
@@ -76,17 +76,17 @@ Returns:
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
-      return EFI_INVALID_PARAMETER;      
+      return EFI_INVALID_PARAMETER;
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
-      }  
-    }   
+      }
+    }
   }
 
   //
-  //Assume that capsules have the same flags on reseting or not. 
+  //Assume that capsules have the same flags on reseting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
 
@@ -97,28 +97,28 @@ Returns:
     if (!FeaturePcdGet(PcdSupportUpdateCapsuleRest)) {
       return EFI_UNSUPPORTED;
     }
-    
+
     if (ScatterGatherList == 0) {
       return EFI_INVALID_PARAMETER;
     } else {
       Status = EfiSetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,  
-                 &gEfiCapsuleVendorGuid,     
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,  
-                 sizeof (UINTN), 
-                 (VOID *) &ScatterGatherList 
+                 EFI_CAPSULE_VARIABLE_NAME,
+                 &gEfiCapsuleVendorGuid,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                 sizeof (UINTN),
+                 (VOID *) &ScatterGatherList
                  );
-      if (Status != EFI_SUCCESS) { 
+      if (Status != EFI_SUCCESS) {
         return EFI_DEVICE_ERROR;
       }
     }
     return EFI_SUCCESS;
   }
-  
+
   //
   //The rest occurs in the condition of non-reset mode
   //
-  if (EfiAtRuntime ()) { 
+  if (EfiAtRuntime ()) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -128,34 +128,31 @@ Returns:
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     CapsuleSize = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize;
-    Status = gBS->AllocatePool (EfiBootServicesData, CapsuleSize, &BufferPtr);
-    if (Status != EFI_SUCCESS) {
-      goto Done;
+
+    BufferPtr = AllocatePool (CapsuleSize);
+    if (BufferPtr == NULL) {
+      return EFI_DEVICE_ERROR;
     }
-    gBS->CopyMem (BufferPtr, (UINT8*)CapsuleHeader+ CapsuleHeader->HeaderSize, CapsuleSize);
+
+    CopyMem (BufferPtr, (UINT8*)CapsuleHeader+ CapsuleHeader->HeaderSize, CapsuleSize);
 
     //
-    //Call DXE service ProcessFirmwareVolume to process immediatelly 
+    //Call DXE service ProcessFirmwareVolume to process immediatelly
     //
     Status = gDS->ProcessFirmwareVolume (BufferPtr, CapsuleSize, &FvHandle);
     if (Status != EFI_SUCCESS) {
-      gBS->FreePool (BufferPtr);
+      FreePool (BufferPtr);
       return EFI_DEVICE_ERROR;
     }
     gDS->Dispatch ();
-    gBS->FreePool (BufferPtr);
+    FreePool (BufferPtr);
   }
-  return EFI_SUCCESS;
 
-Done:
-  if (BufferPtr != NULL) {
-    gBS->FreePool (BufferPtr);
-  }     
-  return EFI_DEVICE_ERROR;
+  return EFI_SUCCESS;
 }
 
 
-  
+
 EFI_STATUS
 EFIAPI
 QueryCapsuleCapabilities (
@@ -196,10 +193,10 @@ Returns:
 
   if ((MaxiumCapsuleSize == NULL) ||(ResetType == NULL)) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   CapsuleHeader = NULL;
-  
+
   //
   //Compare GUIDs with EFI_CAPSULE_GUID, if capsule header contains CAPSULE_FLAGS_PERSIST_ACROSS_RESET
   //and CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flags,whatever the GUID is ,the service supports.
@@ -207,19 +204,19 @@ Returns:
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
-      return EFI_INVALID_PARAMETER;      
+      return EFI_INVALID_PARAMETER;
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }
-    }  
+    }
   }
 
   //
-  //Assume that capsules have the same flags on reseting or not. 
+  //Assume that capsules have the same flags on reseting or not.
   //
-  CapsuleHeader = CapsuleHeaderArray[0];  
+  CapsuleHeader = CapsuleHeaderArray[0];
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     //
     //Check if the platform supports update capsule across a system reset
@@ -228,11 +225,11 @@ Returns:
       return EFI_UNSUPPORTED;
     }
     *ResetType = EfiResetWarm;
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);    
+    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
   } else {
     *ResetType = EfiResetCold;
     *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
-  }  
+  }
   return EFI_SUCCESS;
-} 
+}
 

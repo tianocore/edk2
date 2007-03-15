@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module name:
     decode.c
@@ -20,16 +20,6 @@ Revision history:
 
 // TODO: fix comment to add: Module Name: DECODE.C
 #include "Undi32.h"
-
-
-//
-// #pragma data_seg("rtdata") is only recognized by MSFT C compiler.
-// But EBC compiler "Intel(R) C Compiler for EFI Byte Code, Version 1.2 Build 20040123"
-// does not recognize this pragma.
-//
-#if defined(_MSC_EXTENSIONS) && !defined(MDE_CPU_EBC)
-#pragma data_seg("rtdata")
-#endif
 
 //
 // Global variables defined in this file
@@ -1339,7 +1329,7 @@ Returns:
   }
 
   AdapterInfo               = &(UNDI32DeviceList[CdbPtr->IFnum]->NicInfo);
-  
+
   //
   // entering from older entry point
   //
@@ -1655,11 +1645,3 @@ Returns:
   PxePtr->Fudge         = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
 }
 
-//
-// #pragma data_seg("rtdata") is only recognized by MSFT C compiler.
-// But EBC compiler "Intel(R) C Compiler for EFI Byte Code, Version 1.2 Build 20040123"
-// does not recognize this pragma.
-//
-#if defined(_MSC_EXTENSIONS) && !defined(MDE_CPU_EBC)
-#pragma data_seg()
-#endif

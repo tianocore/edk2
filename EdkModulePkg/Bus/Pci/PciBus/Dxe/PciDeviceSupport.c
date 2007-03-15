@@ -338,14 +338,10 @@ Returns:
 
   //
   // Force Interrupt line to "Unknown" or "No Connection"
-  // based on the PCI spec, the Interrupt line for x86 should be set as 0xFF for unknown.
   //
   PciIo = &(PciIoDevice->PciIo);
-#ifndef MDE_CPU_IPF
   Data8 = PCI_INT_LINE_UNKNOWN;
-#else
-  Data8 = 0;
-#endif
+
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
 
   //
