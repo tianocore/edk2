@@ -430,8 +430,9 @@ public class AutoGen {
         // DriverBinding/ComponentName/DriverConfiguration/DriverDialog
         // to AutoGen.c
         //
-
-        ExternsDriverBindingToAutoGenC(fileBuffer);
+        if (!moduleId.getModuleType().equalsIgnoreCase("UEFI_APPLICATION")) {
+            ExternsDriverBindingToAutoGenC(fileBuffer);
+        }
 
         //
         // Write DriverExitBootServicesEvent/DriverSetVirtualAddressMapEvent
@@ -1133,6 +1134,9 @@ public class AutoGen {
                 fileBuffer.append("}\r\n\r\n");
             }
 
+            if (CommonDefinition.getModuleType(typeStr) == CommonDefinition.ModuleTypeUefiApplication) {
+                break;
+            }
             //
             // Add ModuleUnloadImage for DxeDriver and UefiDriver module type.
             //
@@ -1950,7 +1954,6 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeDxeRuntimeDriver:
         case CommonDefinition.ModuleTypeDxeSalDriver:
         case CommonDefinition.ModuleTypeUefiDriver:
-        case CommonDefinition.ModuleTypeUefiApplication:
             //
             //  If moduleType is one of above, call setVirtualAddressToAutogenC,
             //  and setExitBootServiceToAutogenC.
