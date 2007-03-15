@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   bc.h
@@ -39,9 +39,9 @@ Abstract:
 //
 // Determine the classes of IPv4 address
 //
-#define  IS_CLASSA_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0x80) == 0x00) 
-#define  IS_CLASSB_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0xc0) == 0x80) 
-#define  IS_CLASSC_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0xe0) == 0xc0) 
+#define  IS_CLASSA_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0x80) == 0x00)
+#define  IS_CLASSB_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0xc0) == 0x80)
+#define  IS_CLASSC_IPADDR(x)  ((((EFI_IP_ADDRESS*)x)->v4.Addr[0] & 0xe0) == 0xc0)
 #define  IS_INADDR_UNICAST(x) ((IS_CLASSA_IPADDR(x) || IS_CLASSB_IPADDR(x) || IS_CLASSC_IPADDR(x)) && (((EFI_IP_ADDRESS*)x)->Addr[0] != 0) )
 
 //
@@ -92,14 +92,7 @@ typedef struct {
   EFI_EVENT                                 IgmpGroupEvent[MAX_MCAST_GROUPS];
   UINT16                                    RandomPort;
 
-#if SUPPORT_IPV6
-  //
-  // TBD
-  //
-#else
   UINT32          MCastGroup[MAX_MCAST_GROUPS];
-#endif
-
   BOOLEAN         GoodStationIp;
   BOOLEAN         DidTransmit;
   UINTN           IpLength;

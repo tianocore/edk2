@@ -1,12 +1,13 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
         bc.c
@@ -162,7 +163,7 @@ SeedRandom (
   Arguments:
 
   Returns:
-    none                - 
+    none                -
 
 --*/
 {
@@ -216,7 +217,7 @@ IpChecksum (
     Length             - Length to be checksummed
 
   Returns:
-    Checksum           - Returns the 16 bit ones complement of 
+    Checksum           - Returns the 16 bit ones complement of
                          ones complement sum of 16 bit words
 
 --*/
@@ -264,7 +265,7 @@ IpChecksum2 (
     MessageLen    - Length to be checksummed
 
   Returns:
-    Checksum      - Returns the 16 bit ones complement of 
+    Checksum      - Returns the 16 bit ones complement of
                     ones complement sum of 16 bit words
 
 --*/
@@ -298,7 +299,7 @@ UpdateChecksum (
     NewWord            - New Value
 
   Returns:
-    Checksum           - Returns the 16 bit ones complement of 
+    Checksum           - Returns the 16 bit ones complement of
                          ones complement sum of 16 bit words
 
 --*/
@@ -328,7 +329,7 @@ SetMakeCallback (
 
   Returns:
     0                  - Callbacks are active on the handle
-    1                  - Callbacks are not active on the handle                         
+    1                  - Callbacks are not active on the handle
 
 --*/
 {
@@ -385,7 +386,7 @@ WaitForReceive (
   Arguments:
     Private       - Pointer to Pxe BaseCode Protocol
     Function      - What PXE function to callback
-    TimeoutEvent  - Timer event that will trigger when we have waited too 
+    TimeoutEvent  - Timer event that will trigger when we have waited too
                     long for an incoming packet
     HeaderSizePtr - Pointer to the size of the Header size
     BufferSizePtr - Pointer to the size of the Buffer size
@@ -446,52 +447,6 @@ WaitForReceive (
   //
   for (;;)
   {
-#if 0
-    //
-    // Check for received packet event.
-    //
-    if (!EFI_ERROR (gBS->CheckEvent (SnpPtr->WaitForPacket))) {
-      //
-      // Packet should be available.  Attempt to read it.
-      //
-      *BufferSizePtr = BUFFER_ALLOCATE_SIZE;
-
-      StatCode = SnpPtr->Receive (
-                          SnpPtr,
-                          HeaderSizePtr,
-                          BufferSizePtr,
-                          Private->ReceiveBufferPtr,
-                          0,
-                          0,
-                          ProtocolPtr
-                          );
-
-      if (EFI_ERROR (StatCode)) {
-        break;
-      }
-      //
-      // Packet was received.  Make received callback then return.
-      //
-      if (CallbackPtr != NULL) {
-        StatCode = CallbackPtr (
-                    Private->CallbackProtocolPtr,
-                    Function,
-                    TRUE,
-                    (UINT32) *BufferSizePtr,
-                    (EFI_PXE_BASE_CODE_PACKET *) Private->ReceiveBufferPtr
-                    );
-
-        if (StatCode != EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE) {
-          StatCode = EFI_ABORTED;
-        } else {
-          StatCode = EFI_SUCCESS;
-        }
-      }
-
-      break;
-    }
-
-#else
     //
     // Poll for received packet.
     //
@@ -533,7 +488,7 @@ WaitForReceive (
     if (StatCode != EFI_NOT_READY) {
       break;
     }
-#endif
+
     //
     // Check for callback event.
     //
@@ -599,7 +554,7 @@ SendPacket (
 
   Arguments:
     Private       - Pointer to Pxe BaseCode Protocol
-    HeaderPtr          - Pointer to the buffer 
+    HeaderPtr          - Pointer to the buffer
     PacketPtr          - Pointer to the packet to send
     PacketLen        - The length of the entire packet to send
     HardwareAddr        - Pointer to the MAC address of the destination
@@ -1263,7 +1218,6 @@ BcStart (
     return EFI_ALREADY_STARTED;
   }
 
-#if !SUPPORT_IPV6
   //
   // Fail if IPv6 is requested and not supported.
   //
@@ -1272,7 +1226,7 @@ BcStart (
     EfiReleaseLock (&Private->Lock);
     return EFI_UNSUPPORTED;
   }
-#endif
+
   //
   // Setup shortcuts to SNP protocol and data structure.
   //
@@ -1505,12 +1459,8 @@ BcStart (
   // supports IPv6.
   //
   Private->EfiBc.Mode->Ipv6Supported = SUPPORT_IPV6;
-
-#if SUPPORT_IPV6
-  Private->EfiBc.Mode->Ipv6Available = Private->NiiPtr->Ipv6Supported;
-#else
   Private->EfiBc.Mode->Ipv6Available = FALSE;
-#endif
+
   //
   // Set to TRUE by the BC constructor if this BC implementation
   // supports BIS.
@@ -1756,14 +1706,7 @@ IpFilter (
           //
           if (!Index2)
           {
-#if SUPPORT_IPV6
-            if (PxebcMode->UsingIpv6) {
-              //
-              // TBD
-              //
-            } else
-#endif
-              TmpIp = (EFI_IP_ADDRESS *) &AllSystemsGroup;
+            TmpIp = (EFI_IP_ADDRESS *) &AllSystemsGroup;
             --Index;
           } else {
             TmpIp = (EFI_IP_ADDRESS *) &Filter->IpList[Index];
@@ -2309,12 +2252,8 @@ PxeBcDriverStart (
   // implementation supports IPv6.
   //
   Private->EfiBc.Mode->Ipv6Supported = SUPPORT_IPV6;
-
-#if SUPPORT_IPV6
-  Private->EfiBc.Mode->Ipv6Available = Private->NiiPtr->Ipv6Supported;
-#else
   Private->EfiBc.Mode->Ipv6Available = FALSE;
-#endif
+
   //
   // Set to TRUE by the BC constructor if this BC
   // implementation supports BIS.

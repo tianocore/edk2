@@ -8,7 +8,7 @@
   We don't advocate putting compiler specifics in libraries or drivers but there
   is no other way to make this work.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,8 +21,6 @@
 
 **/
 
-
-#if _MSC_EXTENSIONS
 
 //
 // Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics
@@ -426,4 +424,3 @@ MmioWrite64 (
   return *(volatile UINT64*)Address = Value;
 }
 
-#endif

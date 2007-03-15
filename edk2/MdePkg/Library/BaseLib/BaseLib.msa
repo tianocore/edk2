@@ -473,8 +473,8 @@
     <Filename SupArchList="X64">X64/FlushCacheLine.asm</Filename>
     <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedIncrement.c</Filename>
     <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedDecrement.c</Filename>
-    <Filename SupArchList="X64">X64/InterlockedCompareExchange32.asm</Filename>
-    <Filename SupArchList="X64">X64/InterlockedCompareExchange64.asm</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedCompareExchange32.asm</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">X64/InterlockedCompareExchange64.asm</Filename>
     <Filename SupArchList="X64">X64/EnableInterrupts.asm</Filename>
     <Filename SupArchList="X64">X64/DisableInterrupts.asm</Filename>
     <Filename SupArchList="X64">X64/EnableDisableInterrupts.asm</Filename>

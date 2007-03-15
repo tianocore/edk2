@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 --*/
 
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Client architecture types
 //
-#if defined   MDE_CPU_IA32    
+#if defined   MDE_CPU_IA32
 #define       SYS_ARCH  0x6
 #elif defined MDE_CPU_X64
 #define       SYS_ARCH  0x7
@@ -332,7 +332,7 @@ typedef struct {
   // zero transmitted means checksum not computed
   // data follows
   //
-  UINT16  Checksum;      
+  UINT16  Checksum;
 } UDPV4_HEADER;
 
 typedef struct {
@@ -370,7 +370,7 @@ typedef struct {
   // zero checksum is transmitted as -0 (ones comp)
   // zero transmitted means checksum not computed
   //
-  UINT16  Checksum; 
+  UINT16  Checksum;
   UINT16  UrgentPointer;                // pointer to urgent data (allows sender to specify urgent data)
 } TCPV4_HEADER;
 
@@ -435,7 +435,7 @@ typedef struct {
 } IPV4_STRUCT;
 
 #pragma pack()  // reset to default
-  
+
   ////////////////////////////////////////////////////////////
 //
 //  BC IP Filter Routine
@@ -723,13 +723,6 @@ IpReceive (
   )
 ;
 
-#if 0
-VOID
-WaitForTxComplete (
-  IN PXE_BASECODE_DEVICE    *Private
-  )
-;
-#endif
 //
 // routine to cycle waiting for a receive or timeout
 //

@@ -39,12 +39,12 @@
   <SourceFiles>
     <Filename>IoLibMmioBuffer.c</Filename>
     <Filename SupArchList="IA32">IoLib.c</Filename>
-    <Filename SupArchList="IA32">IoLibMsc.c</Filename>
-    <Filename SupArchList="IA32">IoLibGcc.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">IoLibMsc.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">IoLibGcc.c</Filename>
     <Filename SupArchList="IA32">IoHighLevel.c</Filename>
     <Filename SupArchList="X64">IoLib.c</Filename>
-    <Filename SupArchList="X64">IoLibMsc.c</Filename>
-    <Filename SupArchList="X64">IoLibGcc.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">IoLibMsc.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="GCC">IoLibGcc.c</Filename>
     <Filename SupArchList="X64">IoHighLevel.c</Filename>
     <Filename SupArchList="IPF">IoLibIpf.c</Filename>
     <Filename SupArchList="IPF">IoHighLevel.c</Filename>
