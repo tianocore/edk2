@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+  This file contains the form processing code to the HII database.
+  
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  Forms.c
-
-Abstract:
-
-  This file contains the form processing code to the HII database.
-
---*/
+**/
 
 
 #include "HiiDatabase.h"
@@ -738,6 +731,7 @@ Returns:
   EFI_IFR_FORM              *Form;
   EFI_IFR_OP_HEADER         *Location;
   UINT16                    *BufferLength = (UINT16 *) BufferLengthTemp;
+  UINTN                     FormLength;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -748,6 +742,8 @@ Returns:
   HandleDatabase  = HiiData->DatabaseHead;
 
   PackageInstance = NULL;
+
+  FormLength      = 0;
 
   //
   // Check numeric value against the head of the database
@@ -809,19 +805,27 @@ Returns:
         // If we found a Form Op-code and it is of the correct Id, copy it and return
         //
         if (Form->FormId == FormId) {
-          if (Location->Length > *BufferLength || Buffer == NULL) {
-            *BufferLength = Location->Length;
-            return EFI_BUFFER_TOO_SMALL;
-          } else {
-            for (; Location->OpCode != EFI_IFR_END_FORM_OP;) {
-              CopyMem (Buffer, Location, Location->Length);
-              Buffer    = Buffer + Location->Length;
-              Location  = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (Location) + Location->Length);
-            }
-
-            CopyMem (Buffer, Location, Location->Length);
-            return EFI_SUCCESS;
+          //
+          // Calculate the total size of form
+          //
+          for (FormLength = 0; Location->OpCode != EFI_IFR_END_FORM_OP; ) {
+            FormLength += Location->Length;
+            Location    = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (Location) + Location->Length);
           }
+          FormLength += Location->Length;
+          Location    = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (Location) + Location->Length);
+
+          if ((Buffer == NULL) || (FormLength > *BufferLength)) {
+            *BufferLengthTemp = FormLength;
+            return EFI_BUFFER_TOO_SMALL;
+          }
+          
+          //
+          // Rewind to start offset of the found Form
+          //
+          Location   = (EFI_IFR_OP_HEADER *) ((CHAR8 *)Location - FormLength);
+          CopyMem (Buffer, Location, FormLength);
+          return EFI_SUCCESS;
         }
 
       default:
@@ -834,7 +838,7 @@ Returns:
     }
   }
 
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 //
