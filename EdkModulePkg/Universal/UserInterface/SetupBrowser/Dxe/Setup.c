@@ -1,5 +1,7 @@
-/*++
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+  Entry and initialization module for the browser.
+  
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -8,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-        Setup.c
-
-Abstract:
-
-  Entry and initialization module for the browser
-
-Revision History:
---*/
+**/
 
 #include "Setup.h"
 #include "Ui.h"
@@ -586,8 +580,6 @@ Returns:
         CopyMem (&Tag->Value, &Index, sizeof (UINT16));
       }
       break;
-    } else {
-      continue;
     }
   }
 }
@@ -669,9 +661,7 @@ Returns:
         CopyMem (&Tag->Value, &Tag->Default, sizeof (UINT16));
       }
       break;
-    } else {
-      continue;
-    }
+    } 
   }
 }
 
