@@ -1390,7 +1390,7 @@ ProcessHelpString (
   *FormattedString = AllocateZeroPool (VirtualLineCount * (BlockWidth + 1) * sizeof (CHAR16) * 2);
 
   for (CurrIndex = 0; CurrIndex < LineCount; CurrIndex ++) {
-    *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR;
+    *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (CHAR16)((IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR);
     StrnCpy (
       *FormattedString + CurrIndex * 2 * (BlockWidth + 1) + 1, 
       StringPtr + IndexArray[CurrIndex*3], 
