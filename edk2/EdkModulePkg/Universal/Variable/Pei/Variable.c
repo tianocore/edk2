@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -209,7 +209,7 @@ Returns:
         (((INT32 *) VendorGuid)[2] == ((INT32 *) &Variable->VendorGuid)[2]) &&
         (((INT32 *) VendorGuid)[3] == ((INT32 *) &Variable->VendorGuid)[3])
         ) {
-      if (!StrCmp (VariableName, GET_VARIABLE_NAME_PTR (Variable))) {
+      if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable), Variable->NameSize)) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }

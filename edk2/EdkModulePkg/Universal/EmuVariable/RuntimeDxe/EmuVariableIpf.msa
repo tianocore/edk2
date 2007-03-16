@@ -46,6 +46,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Variable.h</Filename>
