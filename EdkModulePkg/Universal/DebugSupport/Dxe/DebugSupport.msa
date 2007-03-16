@@ -43,6 +43,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>DebugSupport.c</Filename>
@@ -63,14 +66,14 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="SOMETIMES_PRODUCED">
       <ProtocolCName>gEfiDebugSupportProtocolGuid</ProtocolCName>
-      <HelpText>If the debug support protocol for this processor type is not 
+      <HelpText>If the debug support protocol for this processor type is not
         already installed, this protocol will be installed. Otherwise, it will
-        be not installed again.
-      </HelpText>
+        be not installed again.</HelpText>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
@@ -83,4 +86,11 @@
       <ModuleEntryPoint>InitializeDebugSupportDriver</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdNtEmulatorEnable</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this PCD is set as TRUE, NT emulator will be endabled.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>

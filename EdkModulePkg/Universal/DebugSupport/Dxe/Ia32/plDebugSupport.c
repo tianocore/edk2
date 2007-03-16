@@ -1,14 +1,14 @@
 /**@file
   IA32 specific debug support functions
-  
-Copyright (c) 2006 Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 IDT_ENTRY   *IdtEntryTable  = NULL;
 DESCRIPTOR  NullDesc        = 0;
 
-#ifndef EFI_NT_EMULATOR
 STATIC
 EFI_STATUS
 CreateEntryStub (
@@ -77,7 +76,7 @@ Returns:
     // fixup the jump target to point to the common entry
     //
     *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
-    
+
     return EFI_SUCCESS;
   }
 
@@ -158,7 +157,6 @@ Returns:
 
   return EFI_SUCCESS;
 }
-#endif
 
 EFI_STATUS
 ManageIdtEntryTable (
@@ -193,33 +191,34 @@ Returns:
 
   Status = EFI_SUCCESS;
 
-#ifndef EFI_NT_EMULATOR
-  if (CompareDescriptor (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc)) {
-    //
-    // we've already installed to this vector
-    //
-    if (NewCallback != NULL) {
+  if (FeaturePcdGet (PcdNtEmulatorEnable)) {
+    if (CompareDescriptor (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc)) {
       //
-      // if the input handler is non-null, error
+      // we've already installed to this vector
       //
-      Status = EFI_ALREADY_STARTED;
+      if (NewCallback != NULL) {
+        //
+        // if the input handler is non-null, error
+        //
+        Status = EFI_ALREADY_STARTED;
+      } else {
+        Status = UnhookEntry (ExceptionType);
+      }
     } else {
-      Status = UnhookEntry (ExceptionType);
-    }
-  } else {
-    //
-    // no user handler installed on this vector
-    //
-    if (NewCallback == NULL) {
       //
-      // if the input handler is null, error
+      // no user handler installed on this vector
       //
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      Status = HookEntry (ExceptionType, NewCallback);
+      if (NewCallback == NULL) {
+        //
+        // if the input handler is null, error
+        //
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        Status = HookEntry (ExceptionType, NewCallback);
+      }
     }
   }
-#endif
+
   return Status;
 }
 

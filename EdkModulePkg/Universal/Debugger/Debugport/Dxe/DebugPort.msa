@@ -6,7 +6,7 @@
     <GuidValue>73E9457A-CEA1-4917-9A9C-9F1F0F0FD322</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for DebugPort module.</Abstract>
-    <Description>This driver binds exclusively to serial io on the controller handle, 
+    <Description>This driver binds exclusively to serial io on the controller handle,
       and initializes serial Io interface, publishs DebugPort and device path Protocol.</Description>
     <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
@@ -60,11 +60,12 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="BY_START">
       <ProtocolCName>gEfiDebugPortProtocolGuid</ProtocolCName>
-      <HelpText>gEfiDebugPortVariableGuid, gEfiDebugPortDevicePathGuid are 
+      <HelpText>gEfiDebugPortVariableGuid, gEfiDebugPortDevicePathGuid are
         both the alias of gEfiDebugPortProtocolGuid. They are not separate guid variables,
         which are not required to be described in the followin Guids section.</HelpText>
     </Protocol>
@@ -86,7 +87,7 @@
       <VariableName>0x0044 0x0045 0x0042 0x0055 0x0047 0x0050 0x004F 0x0052 0x0054</VariableName>
       <GuidC_Name>gEfiDebugPortProtocolGuid</GuidC_Name>
       <HelpText>L"DEBUGPORT" variable is specified. gEfiDebugPortVariableGuid is
-       one virtual guid, which can't be described in this section. 
+       one virtual guid, which can't be described in this section.
        So gEfiDebugPortProtocolGuid name is instead of it.</HelpText>
     </Variable>
   </Variables>
