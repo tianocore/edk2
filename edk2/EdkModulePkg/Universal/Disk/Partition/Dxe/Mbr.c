@@ -162,8 +162,11 @@ Returns:
                       BlockIo->Media->BlockSize,
                       Mbr
                       );
-  if (EFI_ERROR (Status) || !PartitionValidMbr (Mbr, BlockIo->Media->LastBlock)) {
+  if (EFI_ERROR (Status)) {
     Found = Status;
+    goto Done;
+  }
+  if (!PartitionValidMbr (Mbr, BlockIo->Media->LastBlock)) {
     goto Done;
   }
   //
