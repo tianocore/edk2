@@ -58,44 +58,6 @@ ReleaseLockOnlyAtBootTime (
   }
 }
 
-
-STATIC
-UINT32
-EFIAPI
-ArrayLength (
-  IN CHAR16 *String
-  )
-/*++
-
-Routine Description:
-
-  Determine the length of null terminated char16 array.
-
-Arguments:
-
-  String    Null-terminated CHAR16 array pointer.
-
-Returns:
-
-  UINT32    Number of bytes in the string, including the double NULL at the end;
-
---*/
-{
-  UINT32  Count;
-
-  if (NULL == String) {
-    return 0;
-  }
-
-  Count = 0;
-
-  while (0 != String[Count]) {
-    Count++;
-  }
-
-  return (Count * 2) + 2;
-}
-
 STATIC
 UINT8 *
 EFIAPI
@@ -269,7 +231,7 @@ Returns:
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), ArrayLength (VariableName))) {
+              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), Variable[Index]->NameSize)) {
                 PtrTrack->CurrPtr   = Variable[Index];
                 PtrTrack->Volatile  = (BOOLEAN) Index;
                 return EFI_SUCCESS;
@@ -529,7 +491,7 @@ Returns:
     //
     Status = EFI_WRITE_PROTECTED;
     goto Done;
-  } else if (sizeof (VARIABLE_HEADER) + (ArrayLength (VariableName) + DataSize) > MAX_VARIABLE_SIZE) {
+  } else if (sizeof (VARIABLE_HEADER) + (StrSize (VariableName) + DataSize) > MAX_VARIABLE_SIZE) {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
     //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
@@ -590,7 +552,7 @@ Returns:
     // Create a new variable and copy the data.
     //
     VarNameOffset = sizeof (VARIABLE_HEADER);
-    VarNameSize   = ArrayLength (VariableName);
+    VarNameSize   = StrSize (VariableName);
     VarDataOffset = VarNameOffset + VarNameSize + GET_PAD_SIZE (VarNameSize);
     VarSize       = VarDataOffset + DataSize + GET_PAD_SIZE (DataSize);
 
