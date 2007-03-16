@@ -279,7 +279,7 @@ Returns:
     }
   }
 
-  gBS->FreePool (VolDescriptor);
+  FreePool (VolDescriptor);
 
   return Found;
 }

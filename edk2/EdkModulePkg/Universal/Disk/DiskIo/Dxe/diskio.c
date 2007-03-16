@@ -171,7 +171,7 @@ ErrorExit:
   if (EFI_ERROR (Status)) {
 
     if (Private != NULL) {
-      gBS->FreePool (Private);
+      FreePool (Private);
     }
 
     gBS->CloseProtocol (
@@ -249,7 +249,7 @@ DiskIoDriverBindingStop (
   }
 
   if (!EFI_ERROR (Status)) {
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;
@@ -474,7 +474,7 @@ DiskIoReadDisk (
 
 Done:
   if (PreData != NULL) {
-    gBS->FreePool (PreData);
+    FreePool (PreData);
   }
 
   return Status;
@@ -722,7 +722,7 @@ DiskIoWriteDisk (
 
 Done:
   if (PreData != NULL) {
-    gBS->FreePool (PreData);
+    FreePool (PreData);
   }
 
   return Status;

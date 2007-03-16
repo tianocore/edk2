@@ -222,12 +222,9 @@ Returns:
   //
   // Allocate memory for our protocol. Then fill in the blanks.
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_EBC_PROTOCOL),
-                  (VOID **) &EbcProtocol
-                  );
-  if (Status != EFI_SUCCESS) {
+  EbcProtocol = AllocatePool (sizeof (EFI_EBC_PROTOCOL));
+
+  if (EbcProtocol == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -273,7 +270,7 @@ Returns:
   }
 
   if (HandleBuffer != NULL) {
-    gBS->FreePool (HandleBuffer);
+    FreePool (HandleBuffer);
     HandleBuffer = NULL;
   }
   //
@@ -287,19 +284,16 @@ Returns:
                     EbcProtocol
                     );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (EbcProtocol);
+      FreePool (EbcProtocol);
       return Status;
     }
   }
   //
   // Allocate memory for our debug protocol. Then fill in the blanks.
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_DEBUG_SUPPORT_PROTOCOL),
-                  (VOID **) &EbcDebugProtocol
-                  );
-  if (Status != EFI_SUCCESS) {
+  EbcDebugProtocol = AllocatePool (sizeof (EFI_DEBUG_SUPPORT_PROTOCOL));
+
+  if (EbcDebugProtocol == NULL) {
     goto ErrorExit;
   }
 
@@ -322,7 +316,7 @@ Returns:
   // This is recoverable, so free the memory and continue.
   //
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (EbcDebugProtocol);
+    FreePool (EbcDebugProtocol);
     goto ErrorExit;
   }
   //
@@ -370,11 +364,11 @@ ErrorExit:
   }
 
   if (HandleBuffer != NULL) {
-    gBS->FreePool (HandleBuffer);
+    FreePool (HandleBuffer);
     HandleBuffer = NULL;
   }
 
-  gBS->FreePool (EbcProtocol);
+  FreePool (EbcProtocol);
 
   return Status;
 }
@@ -894,8 +888,8 @@ Returns:
   ThunkList = ImageList->ThunkList;
   while (ThunkList != NULL) {
     NextThunkList = ThunkList->Next;
-    gBS->FreePool (ThunkList->ThunkBuffer);
-    gBS->FreePool (ThunkList);
+    FreePool (ThunkList->ThunkBuffer);
+    FreePool (ThunkList);
     ThunkList = NextThunkList;
   }
   //
@@ -912,7 +906,7 @@ Returns:
   //
   // Now free up the image list element
   //
-  gBS->FreePool (ImageList);
+  FreePool (ImageList);
   return EFI_SUCCESS;
 }
 
@@ -970,12 +964,9 @@ Returns:
     //
     // Allocate a new one
     //
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (EBC_IMAGE_LIST),
-                    (VOID **) &ImageList
-                    );
-    if (Status != EFI_SUCCESS) {
+    ImageList = AllocatePool (sizeof (EBC_IMAGE_LIST));
+
+    if (ImageList == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -987,12 +978,9 @@ Returns:
   //
   // Ok, now create a new thunk element to add to the list
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EBC_THUNK_LIST),
-                  (VOID **) &ThunkList
-                  );
-  if (Status != EFI_SUCCESS) {
+  ThunkList = AllocatePool (sizeof (EBC_THUNK_LIST));
+
+  if (ThunkList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -1061,8 +1049,8 @@ Returns:
   //
   // Allocate memory for the protocol, then fill in the fields
   //
-  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_EBC_VM_TEST_PROTOCOL), (VOID **) &EbcVmTestProtocol);
-  if (Status != EFI_SUCCESS) {
+  EbcVmTestProtocol = AllocatePool (sizeof (EFI_EBC_VM_TEST_PROTOCOL));
+  if (EbcVmTestProtocol == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   EbcVmTestProtocol->Execute      = (EBC_VM_TEST_EXECUTE) EbcExecuteInstructions;
@@ -1078,7 +1066,7 @@ Returns:
   Handle  = NULL;
   Status  = gBS->InstallProtocolInterface (&Handle, &mEfiEbcVmTestProtocolGuid, EFI_NATIVE_INTERFACE, EbcVmTestProtocol);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (EbcVmTestProtocol);
+    FreePool (EbcVmTestProtocol);
   }
   return Status;
 }

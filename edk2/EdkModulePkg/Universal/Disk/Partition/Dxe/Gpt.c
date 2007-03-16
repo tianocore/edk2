@@ -310,19 +310,19 @@ Returns:
 
 Done:
   if (ProtectiveMbr != NULL) {
-    gBS->FreePool (ProtectiveMbr);
+    FreePool (ProtectiveMbr);
   }
   if (PrimaryHeader != NULL) {
-    gBS->FreePool (PrimaryHeader);
+    FreePool (PrimaryHeader);
   }
   if (BackupHeader != NULL) {
-    gBS->FreePool (BackupHeader);
+    FreePool (BackupHeader);
   }
   if (PartEntry != NULL) {
-    gBS->FreePool (PartEntry);
+    FreePool (PartEntry);
   }
   if (PEntryStatus != NULL) {
-    gBS->FreePool (PEntryStatus);
+    FreePool (PEntryStatus);
   }
 
   return GptValid;
@@ -376,7 +376,7 @@ Returns:
                       PartHdr
                       );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (PartHdr);
+    FreePool (PartHdr);
     return FALSE;
   }
 
@@ -385,18 +385,18 @@ Returns:
       PartHdr->MyLBA != Lba
       ) {
     DEBUG ((EFI_D_INFO, " !Valid efi partition table header\n"));
-    gBS->FreePool (PartHdr);
+    FreePool (PartHdr);
     return FALSE;
   }
 
   CopyMem (PartHeader, PartHdr, sizeof (EFI_PARTITION_TABLE_HEADER));
   if (!PartitionCheckGptEntryArrayCRC (BlockIo, DiskIo, PartHeader)) {
-    gBS->FreePool (PartHdr);
+    FreePool (PartHdr);
     return FALSE;
   }
 
   DEBUG ((EFI_D_INFO, " Valid efi partition table header\n"));
-  gBS->FreePool (PartHdr);
+  FreePool (PartHdr);
   return TRUE;
 }
 
@@ -449,7 +449,7 @@ Returns:
                     Ptr
                     );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Ptr);
+    FreePool (Ptr);
     return FALSE;
   }
 
@@ -458,11 +458,11 @@ Returns:
   Status  = gBS->CalculateCrc32 (Ptr, Size, &Crc);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "CheckPEntryArrayCRC: Crc calculation failed\n"));
-    gBS->FreePool (Ptr);
+    FreePool (Ptr);
     return FALSE;
   }
 
-  gBS->FreePool (Ptr);
+  FreePool (Ptr);
 
   return (BOOLEAN) (PartHeader->PartitionEntryArrayCRC32 == Crc);
 }
@@ -555,8 +555,8 @@ Returns:
                     );
 
 Done:
-  gBS->FreePool (PartHdr);
-  gBS->FreePool (Ptr);
+  FreePool (PartHdr);
+  FreePool (Ptr);
 
   if (EFI_ERROR (Status)) {
     return FALSE;
