@@ -184,7 +184,7 @@ Returns:
     if (DevicePathType (LastDevicePathNode) == MEDIA_DEVICE_PATH &&
         DevicePathSubType (LastDevicePathNode) == MEDIA_HARDDRIVE_DP
         ) {
-      gBS->CopyMem (&ParentHdDev, LastDevicePathNode, sizeof (ParentHdDev));
+      CopyMem (&ParentHdDev, LastDevicePathNode, sizeof (ParentHdDev));
     } else {
       LastDevicePathNode = NULL;
     }
@@ -319,7 +319,7 @@ Returns:
   }
 
 Done:
-  gBS->FreePool (Mbr);
+  FreePool (Mbr);
 
   return Found;
 }

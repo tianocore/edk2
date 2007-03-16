@@ -371,7 +371,6 @@ Returns:
   UINT32      Addr;
   INT32       Size;
   INT32       ThunkSize;
-  EFI_STATUS  Status;
 
   //
   // Check alignment of pointer to EBC code
@@ -383,12 +382,9 @@ Returns:
   Size      = EBC_THUNK_SIZE;
   ThunkSize = Size;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  Size,
-                  (VOID *) &Ptr
-                  );
-  if (Status != EFI_SUCCESS) {
+  Ptr = AllocatePool (Size);
+
+  if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //

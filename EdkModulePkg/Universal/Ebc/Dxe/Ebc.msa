@@ -6,8 +6,9 @@
     <GuidValue>13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Ebc module.</Abstract>
-    <Description>This module for the EBC virtual machine implementation.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>This module for the EBC virtual machine implementation produces 
+      EBC and EBC debug support protocols.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +18,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64 IPF</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>Ebc</OutputFileBasename>
   </ModuleDefinitions>
@@ -25,29 +26,22 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>ReportStatusCodeLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a">
       <Keyword>BaseMemoryLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
+      <HelpText>Recommended libary Instance is DxeMemoryLib instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -56,18 +50,18 @@
     <Filename>EbcExecute.c</Filename>
     <Filename>EbcExecute.h</Filename>
     <Filename>Ebc.dxs</Filename>
-    <Filename SupArchList="IA32">Ia32/EbcLowLevel.asm</Filename>
-    <Filename SupArchList="IA32">Ia32/EbcLowLevel.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/EbcLowLevel.asm</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/EbcLowLevel.S</Filename>
     <Filename SupArchList="IA32">Ia32/EbcSupport.c</Filename>
-    <Filename SupArchList="X64">x64/EbcLowLevel.asm</Filename>
-    <Filename SupArchList="X64" ToolChainFamily="gcc">x64/EbcLowLevel.S</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">x64/EbcLowLevel.asm</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="GCC">x64/EbcLowLevel.S</Filename>
     <Filename SupArchList="X64">x64/EbcSupport.c</Filename>
     <Filename SupArchList="IPF">Ipf/EbcLowLevel.s</Filename>
     <Filename SupArchList="IPF">Ipf/EbcSupport.c</Filename>
+    <Filename SupArchList="IPF">Ipf/EbcSupport.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">

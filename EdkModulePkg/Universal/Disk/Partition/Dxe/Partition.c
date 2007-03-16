@@ -384,8 +384,8 @@ PartitionDriverBindingStop (
               EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
               );
       } else {
-        gBS->FreePool (Private->DevicePath);
-        gBS->FreePool (Private);
+        FreePool (Private->DevicePath);
+        FreePool (Private);
       }
 
     }
@@ -653,7 +653,7 @@ Returns:
   Private->DevicePath           = AppendDevicePathNode (ParentDevicePath, DevicePathNode);
 
   if (Private->DevicePath == NULL) {
-    gBS->FreePool (Private);
+    FreePool (Private);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -693,8 +693,8 @@ Returns:
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
   } else {
-    gBS->FreePool (Private->DevicePath);
-    gBS->FreePool (Private);
+    FreePool (Private->DevicePath);
+    FreePool (Private);
   }
 
   return Status;

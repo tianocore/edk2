@@ -319,7 +319,6 @@ Returns:
   UINT64      *Data64Ptr;
   UINT32      ThunkSize;
   UINT32      Size;
-  EFI_STATUS  Status;
 
   //
   // Check alignment of pointer to EBC code, which must always be aligned
@@ -335,12 +334,9 @@ Returns:
   //
   Size      = EBC_THUNK_SIZE + EBC_THUNK_ALIGNMENT - 1;
   ThunkSize = Size;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  Size,
-                  (VOID *) &Ptr
-                  );
-  if (Status != EFI_SUCCESS) {
+  Ptr = AllocatePool (Size);
+
+  if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -872,6 +868,6 @@ Returns:
   Source      = (VOID *) EbcSp;
   Destination = (VOID *) ((UINT8 *) EbcSp - FrameSize - CPU_STACK_ALIGNMENT);
   Destination = (VOID *) ((UINTN) ((UINTN) Destination + CPU_STACK_ALIGNMENT - 1) &~((UINTN) CPU_STACK_ALIGNMENT - 1));
-  gBS->CopyMem (Destination, Source, FrameSize);
+  CopyMem (Destination, Source, FrameSize);
   EbcAsmLLCALLEX ((UINTN) CallAddr, (UINTN) Destination);
 }
