@@ -24,9 +24,6 @@ Abstract:
 // Module Globals
 //
 
-EFI_LOCK mBsExitLock        = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_NOTIFY);
-EFI_LOCK mBsUnloadImageLock = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_NOTIFY);
-
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
 
 LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
@@ -1221,9 +1218,14 @@ Returns:
 --*/
 {
   LOADED_IMAGE_PRIVATE_DATA  *Image;
+  EFI_TPL                    OldTpl;
 
-  EfiAcquireLock (&mBsExitLock);
-  
+  //
+  // Prevent possible reentrance to this function
+  // for the same ImageHandle
+  // 
+  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY); 
+ 
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL_HANDLE) {
     Status = EFI_INVALID_PARAMETER;
@@ -1266,7 +1268,7 @@ Returns:
     CopyMem (Image->ExitData, ExitData, Image->ExitDataSize);
   }
 
-  EfiReleaseLock (&mBsExitLock);
+  CoreRestoreTpl (OldTpl);
   //
   // return to StartImage
   //
@@ -1278,7 +1280,7 @@ Returns:
   ASSERT (FALSE);
   Status = EFI_ACCESS_DENIED;
 Done:
-  EfiReleaseLock (&mBsExitLock);
+  CoreRestoreTpl (OldTpl);
   return Status;
 }
 
@@ -1309,9 +1311,14 @@ Returns:
 {
   EFI_STATUS                 Status;
   LOADED_IMAGE_PRIVATE_DATA  *Image;
+  EFI_TPL                    OldTpl;
 
-  EfiAcquireLock (&mBsUnloadImageLock);
-  
+  //
+  // Prevent possible reentrance to this function
+  // for the same ImageHandle
+  // 
+  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+ 
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL ) {
     //
@@ -1346,7 +1353,7 @@ Returns:
   }
 
 Done:
-  EfiReleaseLock (&mBsUnloadImageLock);
+  CoreRestoreTpl (OldTpl);
   return Status;
 }
 
