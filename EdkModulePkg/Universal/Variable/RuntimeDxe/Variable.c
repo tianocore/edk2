@@ -1320,7 +1320,7 @@ Returns:
     return Status;
   }
 
-  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_CALLBACK);
+  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_NOTIFY);
   
   //
   // Allocate memory for volatile variable store
