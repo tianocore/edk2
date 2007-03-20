@@ -1,14 +1,14 @@
 /**@file
 	Implementation for handling the User Interface option processing.
-	
+
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -616,9 +616,9 @@ ProcessOptions (
           Number = *NvRamMap;
         }
         UnicodeValueToString (
-          FormattedNumber, 
-          FALSE, 
-          (UINTN) Number, 
+          FormattedNumber,
+          FALSE,
+          (UINTN) Number,
           (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
           );
         Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -634,9 +634,9 @@ ProcessOptions (
         Number = Tag->Default;
 
         UnicodeValueToString (
-          FormattedNumber, 
-          FALSE, 
-          (UINTN) Number, 
+          FormattedNumber,
+          FALSE,
+          (UINTN) Number,
           (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
           );
         Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -722,9 +722,9 @@ ProcessOptions (
       *OptionString[0]                          = LEFT_NUMERIC_DELIMITER;
 
       UnicodeValueToString (
-        FormattedNumber, 
-        FALSE, 
-        (UINTN) Time.Month, 
+        FormattedNumber,
+        FALSE,
+        (UINTN) Time.Month,
         (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
         );
       Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -765,9 +765,9 @@ ProcessOptions (
       SetUnicodeMem (OptionString[0], 4, L' ');
 
       UnicodeValueToString (
-        FormattedNumber, 
-        FALSE, 
-        (UINTN) Time.Day, 
+        FormattedNumber,
+        FALSE,
+        (UINTN) Time.Day,
         (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
         );
       Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -807,9 +807,9 @@ ProcessOptions (
       VariableDefinition->FakeNvRamMap[Tag->Id + 1] = (UINT8) (Tag->Value >> 8);
       SetUnicodeMem (OptionString[0], 7, L' ');
       UnicodeValueToString (
-        FormattedNumber, 
-        FALSE, 
-        (UINTN) Time.Year, 
+        FormattedNumber,
+        FALSE,
+        (UINTN) Time.Year,
         (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
         );
       Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -932,9 +932,9 @@ ProcessOptions (
       case 0:
         *OptionString[0] = LEFT_NUMERIC_DELIMITER;
         UnicodeValueToString (
-          FormattedNumber, 
-          FALSE, 
-          (UINTN) Time.Hour, 
+          FormattedNumber,
+          FALSE,
+          (UINTN) Time.Hour,
           (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
           );
         Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -953,9 +953,9 @@ ProcessOptions (
       case 1:
         SetUnicodeMem (OptionString[0], 4, L' ');
         UnicodeValueToString (
-          FormattedNumber, 
-          FALSE, 
-          (UINTN) Time.Minute, 
+          FormattedNumber,
+          FALSE,
+          (UINTN) Time.Minute,
           (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
           );
         Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -974,9 +974,9 @@ ProcessOptions (
       case 2:
         SetUnicodeMem (OptionString[0], 7, L' ');
         UnicodeValueToString (
-          FormattedNumber, 
-          FALSE, 
-          (UINTN) Time.Second, 
+          FormattedNumber,
+          FALSE,
+          (UINTN) Time.Second,
           (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
           );
         Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -1193,13 +1193,13 @@ ProcessOptions (
 }
 
 /**
-  Split StringPtr to several lines of strings stored in FormattedString and the glyph width of 
+  Split StringPtr to several lines of strings stored in FormattedString and the glyph width of
   each line cannot exceed gHelpBlockWidth.
 
   @param StringPtr          The pointer of string
   @param FormattedString    The pointer of format string
-  @param RowCount           The count of row 
-  
+  @param RowCount           The count of row
+
 **/
 VOID
 ProcessHelpString (
@@ -1245,7 +1245,7 @@ ProcessHelpString (
   // every three elements of IndexArray form a screen-line of string:[ IndexArray[i*3], IndexArray[i*3+1] )
   // IndexArray[i*3+2] stores the initial glyph width of single character. to save this is because we want
   // to bring the width directive of the last line to current screen-line.
-  // e.g.: "\wideabcde ... fghi", if "fghi" also has width directive but is splitted to the next screen-line 
+  // e.g.: "\wideabcde ... fghi", if "fghi" also has width directive but is splitted to the next screen-line
   // different from that of "\wideabcde", we should remember the width directive.
   //
   AllocateSize  = 0x20;
@@ -1256,9 +1256,9 @@ ProcessHelpString (
     *FormattedString = NULL;
   }
 
-  for (PrevCurrIndex = 0, CurrIndex  = 0, LineCount   = 0, LastSpaceIndex = 0, 
-       IndexArray[0] = 0, GlyphWidth = 1, GlyphOffset = 0, LastSpaceGlyphWidth = 1, LineStartGlyphWidth = 1; 
-       (StringPtr[CurrIndex] != CHAR_NULL); 
+  for (PrevCurrIndex = 0, CurrIndex  = 0, LineCount   = 0, LastSpaceIndex = 0,
+       IndexArray[0] = 0, GlyphWidth = 1, GlyphOffset = 0, LastSpaceGlyphWidth = 1, LineStartGlyphWidth = 1;
+       (StringPtr[CurrIndex] != CHAR_NULL);
        CurrIndex ++) {
 
     if (LineCount == AllocateSize) {
@@ -1272,7 +1272,7 @@ ProcessHelpString (
     }
 
     switch (StringPtr[CurrIndex]) {
-    
+
       case NARROW_CHAR:
       case WIDE_CHAR:
         GlyphWidth = ((StringPtr[CurrIndex] == WIDE_CHAR) ? 2 : 1);
@@ -1337,12 +1337,12 @@ ProcessHelpString (
             GlyphWidth = LastSpaceGlyphWidth;
           } else if (GlyphOffset > BlockWidth) {
             //
-            // the word is too long to fit one screen-line and we don't get the chance 
+            // the word is too long to fit one screen-line and we don't get the chance
             // of GlyphOffset == BlockWidth because GlyphWidth = 2
             //
             CurrIndex --;
           }
-          
+
           IndexArray[LineCount*3]   = PrevCurrIndex;
           IndexArray[LineCount*3+1] = CurrIndex + 1;
           IndexArray[LineCount*3+2] = LineStartGlyphWidth;
@@ -1392,8 +1392,8 @@ ProcessHelpString (
   for (CurrIndex = 0; CurrIndex < LineCount; CurrIndex ++) {
     *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (CHAR16)((IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR);
     StrnCpy (
-      *FormattedString + CurrIndex * 2 * (BlockWidth + 1) + 1, 
-      StringPtr + IndexArray[CurrIndex*3], 
+      *FormattedString + CurrIndex * 2 * (BlockWidth + 1) + 1,
+      StringPtr + IndexArray[CurrIndex*3],
       IndexArray[CurrIndex*3+1]-IndexArray[CurrIndex*3]
       );
   }
