@@ -863,7 +863,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             int moduleCount = jTableFpdModules.getRowCount();
             int start = 0;
             for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
-                int end = start + moduleCount/FpdFrameworkModules.pcdSyncThreadNumber;
+                int end = start + moduleCount/FpdFrameworkModules.pcdSyncThreadNumber + 1;
                 if (end > moduleCount) {
                     end = moduleCount;
                 }
@@ -871,12 +871,12 @@ public class FpdFrameworkModules extends IInternalFrame {
                 start = end;
             }
             
-            for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
+            for (int i = 0; i < vThreads.size(); ++i) {
                 vThreads.get(i).start();
             }
             
             try {
-                for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
+                for (int i = 0; i < vThreads.size(); ++i) {
                     vThreads.get(i).join();
                 }
             }
