@@ -826,7 +826,7 @@ Returns:
     return EFI_OUT_OF_RESOURCES;
   }
 
-  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_CALLBACK);
+  EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_NOTIFY);
   
   //
   // Intialize volatile variable store
