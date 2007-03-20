@@ -494,7 +494,7 @@ public class FpdFileContents {
         return dataModified;
     }
     
-    private void maintainDynPcdMap(String pcdKey, String moduleInfo) {
+    private synchronized void maintainDynPcdMap(String pcdKey, String moduleInfo) {
         
         ArrayList<String> al = dynPcdMap.get(pcdKey);
         if (al == null) {
@@ -1318,7 +1318,7 @@ public class FpdFileContents {
         return choosedType;
     }
     
-    private void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, 
+    private synchronized void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, 
                              ModuleSADocument.ModuleSA moduleSa, PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd) 
     throws PcdItemTypeConflictException, PcdValueMalFormed{
         if (moduleSa.getPcdBuildDefinition() == null){

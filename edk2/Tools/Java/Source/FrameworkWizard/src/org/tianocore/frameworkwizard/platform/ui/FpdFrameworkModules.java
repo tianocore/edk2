@@ -59,6 +59,8 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private static final int timeToWait = 2000;
     
+    private static final int pcdSyncThreadNumber = 10;
+    
     private long savedMs = 0;
     
     String searchField = "";
@@ -838,9 +840,11 @@ public class FpdFrameworkModules extends IInternalFrame {
 
     private class PcdSyncTask extends Thread {
         
+        boolean pcdSynced = false;
         public void run () {
             Vector<String> vExceptions = new Vector<String>();
-            if (pcdSync(vExceptions)) {
+            pcdSync(vExceptions);
+            if (pcdSynced) {
                 JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "PCD in this platform are synchronized with those in MSA files.");    
                 docConsole.setSaved(false);
             }
@@ -850,6 +854,70 @@ public class FpdFrameworkModules extends IInternalFrame {
                     errorMsg += " " + vExceptions.get(i) + "\n";
                 }
                 JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Error occurred during synchronization:\n" + errorMsg);
+            }
+        }
+        
+        private void pcdSync(Vector<String> v) {
+            
+            Vector<PcdSyncSubTask> vThreads = new Vector<PcdSyncSubTask> ();
+            int moduleCount = jTableFpdModules.getRowCount();
+            int start = 0;
+            for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
+                int end = start + moduleCount/FpdFrameworkModules.pcdSyncThreadNumber;
+                if (end > moduleCount) {
+                    end = moduleCount;
+                }
+                vThreads.add(new PcdSyncSubTask (start, end, v));
+                start = end;
+            }
+            
+            for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
+                vThreads.get(i).start();
+            }
+            
+            try {
+                for (int i = 0; i < FpdFrameworkModules.pcdSyncThreadNumber; ++i) {
+                    vThreads.get(i).join();
+                }
+            }
+            catch (InterruptedException e) {
+                
+            }
+            
+        }
+        
+        private class PcdSyncSubTask extends Thread {
+            
+            private int startModule = 0;
+            private int endModulePlusOne = 1;
+            private Vector<String> v = null;
+
+            PcdSyncSubTask (int start, int endPlusOne, Vector<String> vErr) {
+                startModule = start;
+                endModulePlusOne = endPlusOne;
+                v = vErr;
+            }
+            
+            public void run () {
+                String[] sa = new String[5];
+                for (int i = startModule; i < endModulePlusOne; ++i) {
+                    try {
+                        ffc.getFrameworkModuleInfo(i, sa);
+                        String mg = sa[ffcModGuid];
+                        String mv = sa[ffcModVer];
+                        String pg = sa[ffcPkgGuid];
+                        String pv = sa[ffcPkgVer];
+                        String arch = sa[ffcModArch];
+                        String key = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+                        if (ffc.adjustPcd(key, v)) {
+                            pcdSynced = true;
+                        }
+                    }
+                    catch (Exception exp) {
+//                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                        continue;
+                    }
+                }
             }
         }
     }
@@ -937,31 +1005,6 @@ public class FpdFrameworkModules extends IInternalFrame {
         
     }
 
-    private boolean pcdSync(Vector<String> v) {
-        boolean synced = false;
-        String[] sa = new String[5];
-        for (int i = 0; i < jTableFpdModules.getRowCount(); ++i) {
-            try {
-                ffc.getFrameworkModuleInfo(i, sa);
-                String mg = sa[ffcModGuid];
-                String mv = sa[ffcModVer];
-                String pg = sa[ffcPkgGuid];
-                String pv = sa[ffcPkgVer];
-                String arch = sa[ffcModArch];
-                String key = mg + " " + mv + " " + pg + " " + pv + " " + arch;
-                if (ffc.adjustPcd(key, v)) {
-                    synced = true;
-                }
-            }
-            catch (Exception exp) {
-//                JOptionPane.showMessageDialog(frame, exp.getMessage());
-                continue;
-            }
-        }
-        return synced;
-        
-    }
-    
     private void showAllModules() {
 
         if (miList == null) {
