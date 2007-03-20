@@ -2075,14 +2075,6 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
         </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdNtEmulatorEnable</C_Name>
-          <Token>0x0001003e</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -8030,14 +8022,6 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
         </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdNtEmulatorEnable</C_Name>
-          <Token>0x0001003e</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -12587,14 +12571,6 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
         </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdNtEmulatorEnable</C_Name>
-          <Token>0x0001003e</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -16965,14 +16941,6 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdNtEmulatorEnable</C_Name>
-          <Token>0x0001003e</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>

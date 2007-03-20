@@ -1,17 +1,17 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   pxe_bc_dhcp.c
-  
+
 Abstract:
   DHCP and PXE discovery protocol implementations.
 
@@ -411,7 +411,7 @@ Routine description:
 
 Arguments:
   Smbios - Pointer to SMBIOS structure
-  StringNumber - String number to return. 0 is used to skip all strings and 
+  StringNumber - String number to return. 0 is used to skip all strings and
     point to the next SMBIOS structure.
 
 Returns:
@@ -1165,11 +1165,11 @@ Parameters:
   Private := Pointer to PxeBc interface
   ExtraEdit := Pointer to extra option checking function
   OpFlags := UdpRead() option flags
-  ServerIpPtr := 
-  ServerPortPtr := 
-  ClientIpPtr := 
-  ClientPortPtr := 
-  DhcpRxBuf := 
+  ServerIpPtr :=
+  ServerPortPtr :=
+  ClientIpPtr :=
+  ClientPortPtr :=
+  DhcpRxBuf :=
   TimeoutEvent :=
 
 Returns:
@@ -2309,7 +2309,7 @@ Routine description:
 
 Parameters:
   This := Pointer to PxeBc interface
-  SortOffers := 
+  SortOffers :=
 
 Returns:
 --*/
@@ -2466,12 +2466,12 @@ DoDiscover (
   PXE_SERVER_LISTS    *ServerListPtr
   )
 /*++
-Routine description: 
+Routine description:
   This function tries to complete the PXE Bootserver and/or boot image
   discovery sequence.  When this command completes successfully, the
   PXEdiscover and PXEreply fields in the BC instance data structure are
   updated.  If the Info pointer is set to NULL, the discovery information
-  in the DHCPack and ProxyOffer packets must be valid and will be used. 
+  in the DHCPack and ProxyOffer packets must be valid and will be used.
   If Info is not set to NULL, the discovery methods in the Info field
   must be set and will be used.  When discovering any layer number other
   than zero (the credential flag does not count), only unicast discovery
@@ -2479,12 +2479,12 @@ Routine description:
 
 Parameters:
   Private := Pointer to PxeBc interface
-  OpFlags := 
-  Type := 
-  LayerPtr := 
-  UseBis := 
-  DestPtr := 
-  ServerListPtr := 
+  OpFlags :=
+  Type :=
+  LayerPtr :=
+  UseBis :=
+  DestPtr :=
+  ServerListPtr :=
 
 Returns:
 --*/
@@ -2771,12 +2771,12 @@ Routine Description:
 
 Parameters:
   Private := Pointer to PxeBc interface
-  Type := 
-  LayerPtr := 
-  UseBis := 
-  DiscoverInfoPtr := 
-  McastServerListPtr := 
-  ServerListPtr := 
+  Type :=
+  LayerPtr :=
+  UseBis :=
+  DiscoverInfoPtr :=
+  McastServerListPtr :=
+  ServerListPtr :=
 
 Returns:
 --*/
@@ -2907,11 +2907,11 @@ BcDiscover (
 Routine description:
 
 Parameters:
-  This := 
-  Type := 
-  LayerPtr := 
-  UseBis := 
-  DiscoverInfoPtr := 
+  This :=
+  Type :=
+  LayerPtr :=
+  UseBis :=
+  DiscoverInfoPtr :=
 
 Returns:
 --*/

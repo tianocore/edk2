@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>PeiVariable</ModuleName>
@@ -42,6 +42,8 @@
     <Filename>Variable.h</Filename>
     <Filename>Variable.c</Filename>
     <Filename>Variable.dxs</Filename>
+    <Filename SupArchList="IA32 X64 EBC">VariableWorker.c</Filename>
+    <Filename SupArchList="IPF">Ipf/VariableWorker.c</Filename>
     <Filename SupArchList="IA32">Ia32/VarMachine.h</Filename>
     <Filename SupArchList="EBC">Ebc/VarMachine.h</Filename>
     <Filename SupArchList="X64">x64/VarMachine.h</Filename>

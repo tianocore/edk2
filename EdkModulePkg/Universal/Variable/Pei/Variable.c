@@ -8,7 +8,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
 Module Name:
 
   Variable.c
@@ -50,7 +49,7 @@ Routine Description:
   Provide the functionality of the variable services.
 
 Arguments:
-  
+
   FfsHeadher  - The FFS file header
   PeiServices - General purpose services available to every PEIM.
 
@@ -192,7 +191,7 @@ Returns:
 
   EFI_SUCCESS    - Found match variable
   EFI_NOT_FOUND  - Variable not found
- 
+
 --*/
 {
   if (VariableName[0] == 0) {
@@ -265,7 +264,7 @@ Returns:
   // No Variable Address equals zero, so 0 as initial value is safe.
   //
   MaxIndex = 0;
-  
+
   GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
   if (GuidHob == NULL) {
     IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
@@ -277,13 +276,8 @@ Returns:
     IndexTable = GET_GUID_HOB_DATA (GuidHob);
     for (Count = 0; Count < IndexTable->Length; Count++)
     {
-#if ALIGNMENT <= 1
-      MaxIndex = (VARIABLE_HEADER *) (UINTN) (IndexTable->Index[Count] + ((UINTN) IndexTable->StartPtr & 0xFFFF0000));
-#else
-#if ALIGNMENT >= 4
-          MaxIndex = (VARIABLE_HEADER *) (UINTN) ((((UINT32)IndexTable->Index[Count]) << 2) + ((UINT32)(UINTN)IndexTable->StartPtr & 0xFFFC0000) );       
-#endif
-#endif
+      MaxIndex = GetVariableByIndex (IndexTable, Count);
+
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
         PtrTrack->StartPtr  = IndexTable->StartPtr;
         PtrTrack->EndPtr    = IndexTable->EndPtr;
@@ -308,7 +302,7 @@ Returns:
       VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
       VariableStoreHeader = (VARIABLE_STORE_HEADER *) (VariableBase + \
                             ((EFI_FIRMWARE_VOLUME_HEADER *) (VariableBase)) -> HeaderLength);
-      
+
       if (GetVariableStoreStatus (VariableStoreHeader) != EfiValid) {
         return EFI_UNSUPPORTED;
       }
@@ -342,13 +336,7 @@ Returns:
       //
       if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME)
       {
-#if ALIGNMENT <= 1
-        IndexTable->Index[IndexTable->Length++] = (UINT16) (UINTN) Variable;
-#else
-#if ALIGNMENT >= 4
-            IndexTable->Index[IndexTable->Length++] = (UINT16) (((UINT32)(UINTN) Variable) >> 2);
-#endif
-#endif
+        VariableIndexTableUpdate (IndexTable, Variable);
       }
 
       if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
