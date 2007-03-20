@@ -546,9 +546,7 @@ Returns:
 
   if (Index >= MAX_MAP_LENGTH)
   {
-#if SNP_DEBUG
-    Print (L"SNP could not find a mapping, failed to unmap.\n");
-#endif
+    DEBUG ((EFI_D_ERROR, "SNP could not find a mapping, failed to unmap.\n"));
     return ;
   }
 
