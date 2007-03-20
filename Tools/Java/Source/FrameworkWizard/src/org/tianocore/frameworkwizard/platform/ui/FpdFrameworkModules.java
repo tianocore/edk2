@@ -836,6 +836,24 @@ public class FpdFrameworkModules extends IInternalFrame {
         new FpdFrameworkModules().setVisible(true);
     }
 
+    private class PcdSyncTask extends Thread {
+        
+        public void run () {
+            Vector<String> vExceptions = new Vector<String>();
+            if (pcdSync(vExceptions)) {
+                JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "PCD in this platform are synchronized with those in MSA files.");    
+                docConsole.setSaved(false);
+            }
+            if (vExceptions.size() > 0) {
+                String errorMsg = "";
+                for (int i = 0; i < vExceptions.size(); ++i) {
+                    errorMsg += " " + vExceptions.get(i) + "\n";
+                }
+                JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Error occurred during synchronization:\n" + errorMsg);
+            }
+        }
+    }
+
     /**
      * This is the default constructor
      */
@@ -850,21 +868,14 @@ public class FpdFrameworkModules extends IInternalFrame {
 
     }
 
+    private PcdSyncTask pst = null;
     public FpdFrameworkModules(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
-        Vector<String> vExceptions = new Vector<String>();
-        if (pcdSync(vExceptions)) {
-            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "PCD in this platform are synchronized with those in MSA files.");    
-            docConsole.setSaved(false);
+        if (pst == null) {
+            pst = new PcdSyncTask();
         }
-        if (vExceptions.size() > 0) {
-            String errorMsg = "";
-            for (int i = 0; i < vExceptions.size(); ++i) {
-                errorMsg += " " + vExceptions.get(i) + "\n";
-            }
-            JOptionPane.showMessageDialog(FrameworkWizardUI.getInstance(), "Error occurred during synchronization:\n" + errorMsg);
-        }
+        pst.start();
     }
 
     private void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
