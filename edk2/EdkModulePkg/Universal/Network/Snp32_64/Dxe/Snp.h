@@ -1,12 +1,12 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module name:
     snp.h
@@ -22,16 +22,7 @@ Revision history:
 
 #include "IndustryStandard/pci22.h"
 
-#define SNP_DEBUG       0
 #define FOUR_GIGABYTES  (UINT64) 0x100000000ULL
-
-#if SNP_DEBUG
-#undef D_NET
-#define D_NET                 D_WARN
-#define SNP_PRINT(DebugInfo)  Print (DebugInfo)
-#else
-#define SNP_PRINT(DebugInfo)
-#endif
 
 #define SNP_DRIVER_SIGNATURE  EFI_SIGNATURE_32 ('s', 'n', 'd', 's')
 #define MAX_MAP_LENGTH        100
@@ -454,14 +445,5 @@ VOID
   );
 
 #define SNP_MEM_PAGES(x)  (((x) - 1) / 4096 + 1)
-
-#if SNP_DEBUG
-extern
-VOID
-snp_wait_for_key (
-  VOID
-  )
-;
-#endif
 
 #endif /*  _SNP_H  */

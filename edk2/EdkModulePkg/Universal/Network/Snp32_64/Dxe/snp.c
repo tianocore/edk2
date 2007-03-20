@@ -1,12 +1,12 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module name:
     snp.c
@@ -41,10 +41,8 @@ Returns:
 
 --*/
 {
-#if SNP_DEBUG
-  Aprint ("\nissue_hwundi_command() - This should not be called!");
-  snp_wait_for_key ();
-#endif
+  DEBUG ((EFI_D_ERROR, "\nissue_hwundi_command() - This should not be called!"));
+
   if (cdb == 0) {
     return EFI_INVALID_PARAMETER;
 
@@ -65,7 +63,7 @@ calc_8bit_cksum (
 
 Routine Description:
  Compute 8-bit checksum of a buffer.
- 
+
 Arguments:
  ptr - Pointer to buffer.
  len - Length of buffer in bytes.
@@ -147,19 +145,13 @@ SimpleNetworkDriverSupported (
                   );
   if (Status == EFI_ALREADY_STARTED)
   {
-#if SNP_DEBUG
-    Aprint ("Support(): Already Started. on handle %x\n", Controller);
-#endif
+    DEBUG ((EFI_D_INFO, "Support(): Already Started. on handle %x\n", Controller));
     return EFI_ALREADY_STARTED;
   }
 
   if (!EFI_ERROR (Status))
   {
-
-#if SNP_DEBUG
-    Aprint ("Support(): UNDI3.1 found on handle %x\n", Controller);
-    snp_wait_for_key ();
-#endif
+    DEBUG ((EFI_D_INFO, "Support(): UNDI3.1 found on handle %x\n", Controller));
     IsUndi31 = TRUE;
   } else {
     //
@@ -177,10 +169,7 @@ SimpleNetworkDriverSupported (
       return Status;
     }
 
-#if SNP_DEBUG
-    Aprint ("Support(): UNDI3.0 found on handle %x\n", Controller);
-    snp_wait_for_key ();
-#endif
+    DEBUG ((EFI_D_INFO, "Support(): UNDI3.0 found on handle %x\n", Controller));
   }
   //
   // check the version, we don't want to connect to the undi16
@@ -244,10 +233,7 @@ SimpleNetworkDriverSupported (
   }
 
   Status = EFI_SUCCESS;
-#if SNP_DEBUG
-  Aprint ("Support(): supported on %x\n", Controller);
-  snp_wait_for_key ();
-#endif
+  DEBUG ((EFI_D_INFO, "Support(): supported on %x\n", Controller));
 
 Done:
   if (IsUndi31) {
@@ -374,10 +360,8 @@ Arguments:
     // probably not a 3.1 UNDI
     //
     UndiNew = TRUE;
-#if SNP_DEBUG
-    Aprint ("Start(): UNDI3.1 found\n");
-    snp_wait_for_key ();
-#endif
+    DEBUG ((EFI_D_INFO, "Start(): UNDI3.1 found\n"));
+
   } else {
     UndiNew = FALSE;
     Status = gBS->OpenProtocol (
@@ -399,10 +383,7 @@ Arguments:
       return Status;
     }
 
-#if SNP_DEBUG
-    Aprint ("Start(): UNDI3.0 found\n");
-    snp_wait_for_key ();
-#endif
+    DEBUG ((EFI_D_INFO, "Start(): UNDI3.0 found\n"));
   }
 
   pxe = (PXE_UNDI *) (UINTN) (Nii->ID);
@@ -996,7 +977,7 @@ Returns:
                     Controller
                     );
   }
-  
+
   Status = gBS->CloseProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
@@ -1077,7 +1058,7 @@ add_v2p (
 
 Routine Description:
  This routine maps the given CPU address to a Device address. It creates a
- an entry in the map list with the virtual and physical addresses and the 
+ an entry in the map list with the virtual and physical addresses and the
  un map cookie.
 
 Arguments:
@@ -1138,7 +1119,7 @@ find_v2p (
 /*++
 
 Routine Description:
- This routine searches the linked list of mapped address nodes (for undi3.0 
+ This routine searches the linked list of mapped address nodes (for undi3.0
  interface) to find the node that corresponds to the given virtual address and
  returns a pointer to that node.
 
@@ -1176,9 +1157,9 @@ del_v2p (
 /*++
 
 Routine Description:
- This routine unmaps the given virtual address and frees the memory allocated 
+ This routine unmaps the given virtual address and frees the memory allocated
  for the map list node corresponding to that address.
- 
+
 Arguments:
  vaddr - virtual address (or CPU address) to be unmapped
 
@@ -1210,11 +1191,9 @@ Returns:
 
     gBS->FreePool (v);
 
-#if SNP_DEBUG
     if (Status) {
-      Print (L"Unmap failed with status = %x\n", Status);
+      DEBUG ((EFI_D_ERROR, "Unmap failed with status = %x\n", Status));
     }
-#endif
     return Status;
   }
 
@@ -1223,42 +1202,13 @@ Returns:
       v->next = t->next;
       Status  = mPciIoFncs->Unmap (mPciIoFncs, t->unmap);
       gBS->FreePool (t);
-#if SNP_DEBUG
+
       if (Status) {
-        Print (L"Unmap failed with status = %x\n", Status);
+        DEBUG ((EFI_D_ERROR, "Unmap failed with status = %x\n", Status));
       }
-#endif
       return Status;
     }
   }
 
   return EFI_NOT_FOUND;
 }
-
-#if SNP_DEBUG
-VOID
-snp_wait_for_key (
-  VOID
-  )
-/*++
-
-Routine Description:
- Wait for a key stroke, used for debugging purposes
-
-Arguments:
- none
-
-Returns:
- none
-
---*/
-{
-  EFI_INPUT_KEY key;
-
-  Aprint ("\nPress any key to continue\n");
-
-  while (gST->ConIn->ReadKeyStroke (gST->ConIn, &key) == EFI_NOT_READY) {
-    ;
-  }
-}
-#endif

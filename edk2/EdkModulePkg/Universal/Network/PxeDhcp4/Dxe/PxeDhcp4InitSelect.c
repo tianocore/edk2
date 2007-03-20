@@ -19,11 +19,6 @@ Abstract:
 
 #include "PxeDhcp4.h"
 
-#define DebugPrint(x)
-//
-// #define DebugPrint(x) Aprint x
-//
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 STATIC
 INTN
 offer_verify (
@@ -400,7 +395,7 @@ PxeDhcp4Init (
     Private->offer_list = NULL;
     Private->callback   = NULL;
 
-    DebugPrint (("%a:%d:%r\n", __FILE__, __LINE__, EfiStatus));
+    DEBUG ((EFI_D_ERROR, "%r\n", EfiStatus));
     return EfiStatus;
   }
 
@@ -687,7 +682,7 @@ PxeDhcp4Select (
   EfiStatus = add_opt (&request, srvid);
 
   if (EFI_ERROR (EfiStatus)) {
-    DebugPrint (("%a:%d:%r\n", __FILE__, __LINE__, EfiStatus));
+    DEBUG ((EFI_D_ERROR, "%r\n", EfiStatus));
     Private->callback = NULL;
     return EfiStatus;
   }
@@ -702,7 +697,7 @@ PxeDhcp4Select (
   EfiStatus = add_opt (&request, op);
 
   if (EFI_ERROR (EfiStatus)) {
-    DebugPrint (("%a:%d:%r\n", __FILE__, __LINE__, EfiStatus));
+    DEBUG ((EFI_D_ERROR, "%r\n", EfiStatus));
     Private->callback = NULL;
     return EfiStatus;
   }
@@ -724,7 +719,7 @@ PxeDhcp4Select (
                 );
 
   if (EFI_ERROR (EfiStatus)) {
-    DebugPrint (("%a:%d:%r\n", __FILE__, __LINE__, EfiStatus));
+    DEBUG ((EFI_D_ERROR, "%r\n", EfiStatus));
     Private->callback = NULL;
     return EfiStatus;
   }
