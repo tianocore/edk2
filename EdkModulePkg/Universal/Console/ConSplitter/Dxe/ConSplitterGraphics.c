@@ -1,16 +1,16 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
   ConSplitterGraphics.c
 
 Abstract:
@@ -96,7 +96,7 @@ ConSpliterConsoleControlSetMode (
 
   Arguments:
     This  - Protocol instance pointer.
-    Mode  - Mode to set the 
+    Mode  - Mode to set the
 
   Returns:
     EFI_SUCCESS     - Mode information returned.
@@ -118,7 +118,7 @@ ConSpliterConsoleControlSetMode (
 
   //
   // Judge current mode with wanted mode at first.
-  // 
+  //
   if (Private->ConsoleOutputMode == Mode) {
     return EFI_SUCCESS;
   }
@@ -147,11 +147,7 @@ ConSpliterConsoleControlSetMode (
     //
     if ((Mode == EfiConsoleControlScreenGraphics) &&((TextAndGop->GraphicsOutput != NULL) || (TextAndGop->UgaDraw != NULL))) {
       TextAndGop->TextOutEnabled = FALSE;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
       DevNullGopSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
-#else
-      DevNullUgaSync (Private, TextAndGop->UgaDraw);
-#endif
     }
   }
 
@@ -162,7 +158,6 @@ ConSpliterConsoleControlSetMode (
   return EFI_SUCCESS;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputQueryMode (
@@ -374,7 +369,7 @@ DevNullGraphicsOutputBlt (
   )
 {
   UINTN                         SrcY;
-  BOOLEAN                       Forward; 
+  BOOLEAN                       Forward;
   UINTN                         Index;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltPtr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ScreenPtr;
@@ -658,396 +653,6 @@ DevNullGopSync (
   }
 }
 
-#else
-
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawGetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  OUT UINT32                          *HorizontalResolution,
-  OUT UINT32                          *VerticalResolution,
-  OUT UINT32                          *ColorDepth,
-  OUT UINT32                          *RefreshRate
-  )
-/*++
-
-  Routine Description:
-    Return the current video mode information.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    HorizontalResolution  - Current video horizontal resolution in pixels
-    VerticalResolution    - Current video vertical resolution in pixels
-    ColorDepth            - Current video color depth in bits per pixel
-    RefreshRate           - Current video refresh rate in Hz.
-
-  Returns:
-    EFI_SUCCESS           - Mode information returned.
-    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode () 
-    EFI_INVALID_PARAMETER - One of the input args was NULL.
-
---*/
-{
-  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
-
-  if (!(HorizontalResolution && VerticalResolution && RefreshRate && ColorDepth)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  //
-  // retrieve private data
-  //
-  Private               = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  *HorizontalResolution = Private->UgaHorizontalResolution;
-  *VerticalResolution   = Private->UgaVerticalResolution;
-  *ColorDepth           = Private->UgaColorDepth;
-  *RefreshRate          = Private->UgaRefreshRate;
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawSetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  IN UINT32                           HorizontalResolution,
-  IN UINT32                           VerticalResolution,
-  IN UINT32                           ColorDepth,
-  IN UINT32                           RefreshRate
-  )
-/*++
-
-  Routine Description:
-    Return the current video mode information.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    HorizontalResolution  - Current video horizontal resolution in pixels
-    VerticalResolution    - Current video vertical resolution in pixels
-    ColorDepth            - Current video color depth in bits per pixel
-    RefreshRate           - Current video refresh rate in Hz.
-
-  Returns:
-    EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode () 
-    EFI_OUT_OF_RESOURCES - Out of resources.
-
---*/
-{
-  EFI_STATUS                      Status;
-  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
-  UINTN                           Index;
-  EFI_STATUS                      ReturnStatus;
-  UINTN                           Size;
-
-  Private = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // UgaDevNullSetMode ()
-  //
-  ReturnStatus = EFI_SUCCESS;
-
-  //
-  // Free the old version
-  //
-  FreePool (Private->UgaBlt);
-
-  //
-  // Allocate the virtual Blt buffer
-  //
-  Size            = HorizontalResolution * VerticalResolution * sizeof (EFI_UGA_PIXEL);
-  Private->UgaBlt = AllocateZeroPool (Size);
-  if (Private->UgaBlt == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Update the Mode data
-  //
-  Private->UgaHorizontalResolution  = HorizontalResolution;
-  Private->UgaVerticalResolution    = VerticalResolution;
-  Private->UgaColorDepth            = ColorDepth;
-  Private->UgaRefreshRate           = RefreshRate;
-
-  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
-    return ReturnStatus;
-  }
-  //
-  // return the worst status met
-  //
-  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
-    if (Private->TextOutList[Index].UgaDraw != NULL) {
-      Status = Private->TextOutList[Index].UgaDraw->SetMode (
-                                                      Private->TextOutList[Index].UgaDraw,
-                                                      HorizontalResolution,
-                                                      VerticalResolution,
-                                                      ColorDepth,
-                                                      RefreshRate
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
-    }
-  }
-
-  return ReturnStatus;
-}
-
-EFI_STATUS
-DevNullUgaBlt (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,
-  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION                         BltOperation,
-  IN  UINTN                                         SourceX,
-  IN  UINTN                                         SourceY,
-  IN  UINTN                                         DestinationX,
-  IN  UINTN                                         DestinationY,
-  IN  UINTN                                         Width,
-  IN  UINTN                                         Height,
-  IN  UINTN                                         Delta         OPTIONAL
-  )
-{
-  UINTN         SrcY;
-  BOOLEAN       Forward;
-  UINTN         Index;
-  EFI_UGA_PIXEL *BltPtr;
-  EFI_UGA_PIXEL *ScreenPtr;
-  UINT32        HorizontalResolution;
-  UINT32        VerticalResolution;
-
-  if ((BltOperation < 0) || (BltOperation >= EfiUgaBltMax)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width == 0 || Height == 0) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Delta == 0) {
-    Delta = Width * sizeof (EFI_UGA_PIXEL);
-  }
-
-  HorizontalResolution  = Private->UgaHorizontalResolution;
-  VerticalResolution    = Private->UgaVerticalResolution;
-
-  //
-  // We need to fill the Virtual Screen buffer with the blt data.
-  //
-  if (BltOperation == EfiUgaVideoToBltBuffer) {
-    //
-    // Video to BltBuffer: Source is Video, destination is BltBuffer
-    //
-    if ((SourceY + Height) > VerticalResolution) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if ((SourceX + Width) > HorizontalResolution) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    BltPtr    = (EFI_UGA_PIXEL *) ((UINT8 *) BltBuffer + DestinationY * Delta + DestinationX * sizeof (EFI_UGA_PIXEL));
-    ScreenPtr = &Private->UgaBlt[SourceY * HorizontalResolution + SourceX];
-    while (Height) {
-      CopyMem (BltPtr, ScreenPtr, Width * sizeof (EFI_UGA_PIXEL));
-      BltPtr = (EFI_UGA_PIXEL *) ((UINT8 *) BltPtr + Delta);
-      ScreenPtr += HorizontalResolution;
-      Height--;
-    }
-  } else {
-    //
-    // BltBuffer to Video: Source is BltBuffer, destination is Video
-    //
-    if (DestinationY + Height > VerticalResolution) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if (DestinationX + Width > HorizontalResolution) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if ((BltOperation == EfiUgaVideoToVideo) && (DestinationY > SourceY)) {
-      //
-      // Copy backwards, only care the Video to Video Blt
-      //
-      ScreenPtr = &Private->UgaBlt[(DestinationY + Height - 1) * HorizontalResolution + DestinationX];
-      SrcY      = SourceY + Height - 1;
-      Forward   = FALSE;
-    } else {
-      //
-      // Copy forwards, for other cases
-      //
-      ScreenPtr = &Private->UgaBlt[DestinationY * HorizontalResolution + DestinationX];
-      SrcY      = SourceY;
-      Forward   = TRUE;
-    }
-
-    while (Height != 0) {
-      if (BltOperation == EfiUgaVideoFill) {
-        for (Index = 0; Index < Width; Index++) {
-          ScreenPtr[Index] = *BltBuffer;
-        }
-      } else {
-        if (BltOperation == EfiUgaBltBufferToVideo) {
-          BltPtr = (EFI_UGA_PIXEL *) ((UINT8 *) BltBuffer + SrcY * Delta + SourceX * sizeof (EFI_UGA_PIXEL));
-        } else {
-          BltPtr = &Private->UgaBlt[SrcY * HorizontalResolution + SourceX];
-        }
-
-        CopyMem (ScreenPtr, BltPtr, Width * sizeof (EFI_UGA_PIXEL));
-      }
-
-      if (Forward) {
-        ScreenPtr += HorizontalResolution;
-        SrcY ++;
-      } else {
-        ScreenPtr -= HorizontalResolution;
-        SrcY --;
-      }
-      Height--;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL                         *This,
-  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION                         BltOperation,
-  IN  UINTN                                         SourceX,
-  IN  UINTN                                         SourceY,
-  IN  UINTN                                         DestinationX,
-  IN  UINTN                                         DestinationY,
-  IN  UINTN                                         Width,
-  IN  UINTN                                         Height,
-  IN  UINTN                                         Delta         OPTIONAL
-  )
-/*++
-
-  Routine Description:
-    The following table defines actions for BltOperations:
-    EfiUgaVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY) 
-      directly to every pixel of the video display rectangle 
-      (DestinationX, DestinationY) 
-      (DestinationX + Width, DestinationY + Height).
-      Only one pixel will be used from the BltBuffer. Delta is NOT used.
-    EfiUgaVideoToBltBuffer - Read data from the video display rectangle 
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in 
-      the BltBuffer rectangle (DestinationX, DestinationY ) 
-      (DestinationX + Width, DestinationY + Height). If DestinationX or 
-      DestinationY is not zero then Delta must be set to the length in bytes 
-      of a row in the BltBuffer.
-    EfiUgaBltBufferToVideo - Write data from the  BltBuffer rectangle 
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the 
-      video display rectangle (DestinationX, DestinationY) 
-      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is 
-      not zero then Delta must be set to the length in bytes of a row in the 
-      BltBuffer.
-    EfiUgaVideoToVideo - Copy from the video display rectangle 
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
-      to the video display rectangle (DestinationX, DestinationY) 
-      (DestinationX + Width, DestinationY + Height). 
-     The BltBuffer and Delta  are not used in this mode.
-
-  Arguments:
-    This          - Protocol instance pointer.
-    BltBuffer     - Buffer containing data to blit into video buffer. This 
-                    buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
-    BltOperation  - Operation to perform on BlitBuffer and video memory
-    SourceX       - X coordinate of source for the BltBuffer.
-    SourceY       - Y coordinate of source for the BltBuffer.
-    DestinationX  - X coordinate of destination for the BltBuffer.
-    DestinationY  - Y coordinate of destination for the BltBuffer.
-    Width         - Width of rectangle in BltBuffer in pixels.
-    Height        - Hight of rectangle in BltBuffer in pixels.
-    Delta         -
-  
-  Returns:
-    EFI_SUCCESS           - The Blt operation completed.
-    EFI_INVALID_PARAMETER - BltOperation is not valid.
-    EFI_DEVICE_ERROR      - A hardware error occured writting to the video 
-                             buffer.
-
---*/
-{
-  EFI_STATUS                      Status;
-  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
-  UINTN                           Index;
-  EFI_STATUS                      ReturnStatus;
-
-  Private = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Sync up DevNull UGA device
-  //
-  ReturnStatus = DevNullUgaBlt (
-                  Private,
-                  BltBuffer,
-                  BltOperation,
-                  SourceX,
-                  SourceY,
-                  DestinationX,
-                  DestinationY,
-                  Width,
-                  Height,
-                  Delta
-                  );
-  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
-    return ReturnStatus;
-  }
-  //
-  // return the worst status met
-  //
-  for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
-    if (Private->TextOutList[Index].UgaDraw != NULL) {
-      Status = Private->TextOutList[Index].UgaDraw->Blt (
-                                                      Private->TextOutList[Index].UgaDraw,
-                                                      BltBuffer,
-                                                      BltOperation,
-                                                      SourceX,
-                                                      SourceY,
-                                                      DestinationX,
-                                                      DestinationY,
-                                                      Width,
-                                                      Height,
-                                                      Delta
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      } else if (BltOperation == EfiUgaVideoToBltBuffer) {
-        //
-        // Only need to read the data into buffer one time
-        //
-        return EFI_SUCCESS;
-      }
-    }
-  }
-
-  return ReturnStatus;
-}
-
-EFI_STATUS
-DevNullUgaSync (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  )
-{
-  return UgaDraw->Blt (
-                    UgaDraw,
-                    Private->UgaBlt,
-                    EfiUgaBltBufferToVideo,
-                    0,
-                    0,
-                    0,
-                    0,
-                    Private->UgaHorizontalResolution,
-                    Private->UgaVerticalResolution,
-                    Private->UgaHorizontalResolution * sizeof (EFI_UGA_PIXEL)
-                    );
-}
-#endif
 
 EFI_STATUS
 DevNullTextOutOutputString (
@@ -1063,17 +668,17 @@ DevNullTextOutOutputString (
     Private - Pointer to the console output splitter's private data. It
               indicates the calling context.
     WString - The NULL-terminated Unicode string to be displayed on the output
-              device(s). All output devices must also support the Unicode 
+              device(s). All output devices must also support the Unicode
               drawing defined in this file.
 
   Returns:
     EFI_SUCCESS            - The string was output to the device.
-    EFI_DEVICE_ERROR       - The device reported an error while attempting to 
+    EFI_DEVICE_ERROR       - The device reported an error while attempting to
                               output the text.
-    EFI_UNSUPPORTED        - The output device's mode is not currently in a 
+    EFI_UNSUPPORTED        - The output device's mode is not currently in a
                               defined text mode.
-    EFI_WARN_UNKNOWN_GLYPH - This warning code indicates that some of the 
-                              characters in the Unicode string could not be 
+    EFI_WARN_UNKNOWN_GLYPH - This warning code indicates that some of the
+                              characters in the Unicode string could not be
                               rendered and were skipped.
 
 --*/
@@ -1285,7 +890,7 @@ DevNullTextOutSetMode (
 
   Returns:
     EFI_SUCCESS      - The requested text mode was set.
-    EFI_DEVICE_ERROR - The device had an error and 
+    EFI_DEVICE_ERROR - The device had an error and
                        could not complete the request.
     EFI_UNSUPPORTED - The mode number was not valid.
     EFI_OUT_OF_RESOURCES - Out of resources.
@@ -1314,7 +919,7 @@ DevNullTextOutSetMode (
     Private->TextOutMode.Mode = (INT32) ModeNumber;
     Private->DevNullColumns   = Column;
     Private->DevNullRows      = Row;
-    
+
     if (Private->DevNullScreen != NULL) {
       FreePool (Private->DevNullScreen);
     }
@@ -1348,7 +953,7 @@ DevNullTextOutClearScreen (
 /*++
 
   Routine Description:
-    Clears the output device(s) display to the currently selected background 
+    Clears the output device(s) display to the currently selected background
     color.
 
   Arguments:
@@ -1356,7 +961,7 @@ DevNullTextOutClearScreen (
 
   Returns:
     EFI_SUCCESS      - The operation completed successfully.
-    EFI_DEVICE_ERROR - The device had an error and 
+    EFI_DEVICE_ERROR - The device had an error and
                        could not complete the request.
     EFI_UNSUPPORTED - The output device is not in a valid text mode.
 
@@ -1412,9 +1017,9 @@ DevNullTextOutSetCursorPosition (
 
   Returns:
     EFI_SUCCESS      - The operation completed successfully.
-    EFI_DEVICE_ERROR - The device had an error and 
+    EFI_DEVICE_ERROR - The device had an error and
                        could not complete the request.
-    EFI_UNSUPPORTED - The output device is not in a valid text mode, or the 
+    EFI_UNSUPPORTED - The output device is not in a valid text mode, or the
                        cursor position is invalid for the current mode.
 
 --*/
@@ -1437,22 +1042,22 @@ DevNullTextOutEnableCursor (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
-    In this driver, the cursor cannot be hidden.        
-  
+    In this driver, the cursor cannot be hidden.
+
   Arguments:
-  
+
     Private - Indicates the calling context.
-        
-    Visible - If TRUE, the cursor is set to be visible, If FALSE, the cursor 
-              is set to be invisible.        
+
+    Visible - If TRUE, the cursor is set to be visible, If FALSE, the cursor
+              is set to be invisible.
 
   Returns:
-  
+
     EFI_SUCCESS - The request is valid.
-       
-               
+
+
 --*/
 {
   Private->TextOutMode.CursorVisible = Visible;
@@ -1467,15 +1072,15 @@ DevNullSyncGopStdOut (
 /*++
   Routine Description:
     Take the DevNull TextOut device and update the Simple Text Out on every
-    UGA device. 
- 
+    UGA device.
+
   Arguments:
     Private - Indicates the calling context.
 
   Returns:
     EFI_SUCCESS - The request is valid.
     other       - Return status of TextOut->OutputString ()
-               
+
 --*/
 {
   EFI_STATUS                    Status;

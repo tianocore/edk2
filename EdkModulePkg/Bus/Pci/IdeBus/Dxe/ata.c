@@ -594,12 +594,7 @@ CheckErrorStatus (
   )
 {
   UINT8 StatusRegister;
-
-//#ifdef EFI_DEBUG
-
   UINT8 ErrorRegister;
-
-//#endif
 
   StatusRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
 
@@ -2221,7 +2216,7 @@ AtaUdmaWrite (
 
 /**
   Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
-  
+
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
@@ -2235,7 +2230,7 @@ AtaUdmaWrite (
 
   @param[in] NumberOfBlocks
   The number of transfer data blocks.
-  
+
   @param[in] UdmaOp
   The perform operations could be AtaUdmaReadOp, AtaUdmaReadExOp,
   AtaUdmaWriteOp, AtaUdmaWriteExOp
@@ -2368,7 +2363,7 @@ DoAtaUdma (
       return EFI_OUT_OF_RESOURCES;
     }
     ZeroMem ((VOID *) ((UINTN) MemPage), EFI_PAGES_TO_SIZE (PageCount));
-    
+
     PrdAddr = (IDE_DMA_PRD *) ((UINTN) MemPage);
     //
     // To make sure PRD is allocated in one 64K page
@@ -2387,17 +2382,17 @@ DoAtaUdma (
     // Build the PRD table
     //
     Status = IdeDev->PciIo->Map (
-                       IdeDev->PciIo, 
-                       PciIoProtocolOp, 
-                       DataBuffer, 
-                       &ByteCount, 
+                       IdeDev->PciIo,
+                       PciIoProtocolOp,
+                       DataBuffer,
+                       &ByteCount,
                        &DeviceAddress,
                        &Map
                        );
     if (EFI_ERROR (Status)) {
       IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
       return EFI_OUT_OF_RESOURCES;
-    }    
+    }
     PrdBuffer   = (VOID *) ((UINTN) DeviceAddress);
     TempPrdAddr = UsedPrdAddr;
     while (TRUE) {

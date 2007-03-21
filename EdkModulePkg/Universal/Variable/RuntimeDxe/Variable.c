@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -28,7 +28,7 @@ Revision History
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
 //
-// This is a temperary function which will be removed 
+// This is a temperary function which will be removed
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
@@ -44,7 +44,7 @@ AcquireLockOnlyAtBootTime (
 }
 
 //
-// This is a temperary function which will be removed 
+// This is a temperary function which will be removed
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
@@ -260,7 +260,7 @@ Returns:
 
   EfiRaw        Variable store status is raw
   EfiValid      Variable store status is valid
-  EfiInvalid    Variable store status is invalid  
+  EfiInvalid    Variable store status is invalid
 
 --*/
 {
@@ -833,8 +833,8 @@ Returns:
     goto Done;
   } else if (!EFI_ERROR (Status) && Variable.Volatile && EfiAtRuntime()) {
     //
-    // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
-    // the volatile is ReadOnly, and SetVariable should be aborted and 
+    // If EfiAtRuntime and the variable is Volatile and Runtime Access,
+    // the volatile is ReadOnly, and SetVariable should be aborted and
     // return EFI_WRITE_PROTECTED.
     //
     Status = EFI_WRITE_PROTECTED;
@@ -848,11 +848,11 @@ Returns:
     goto Done;
   } else if (Attributes == EFI_VARIABLE_NON_VOLATILE) {
     //
-    //  Make sure not only EFI_VARIABLE_NON_VOLATILE is set 
+    //  Make sure not only EFI_VARIABLE_NON_VOLATILE is set
     //
     Status = EFI_INVALID_PARAMETER;
     goto Done;
-  } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 
+  } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) ==
                 EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     //  Make sure if runtime bit is set, boot service bit is set also
@@ -998,7 +998,7 @@ Returns:
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
-        
+
         Reclaimed = TRUE;
       }
       //
@@ -1084,7 +1084,7 @@ Returns:
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
-        
+
         Reclaimed = TRUE;
       }
 
@@ -1134,7 +1134,6 @@ Done:
   return Status;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 EFIAPI
 QueryVariableInfo (
@@ -1153,11 +1152,11 @@ Routine Description:
 
 Arguments:
 
-  Attributes                      Attributes bitmask to specify the type of variables 
+  Attributes                      Attributes bitmask to specify the type of variables
                                   on which to return information.
   MaximumVariableStorageSize      Pointer to the maximum size of the storage space available
                                   for the EFI variables associated with the attributes specified.
-  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available 
+  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available
                                   for the EFI variables associated with the attributes specified.
   MaximumVariableSize             Pointer to the maximum size of the individual EFI variables
                                   associated with the attributes specified.
@@ -1200,12 +1199,12 @@ Returns:
   }
 
   AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
-  
+
   if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
     // Query is Volatile related.
     //
-    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);    
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);
   } else {
     //
     // Query is Non-Volatile related.
@@ -1214,7 +1213,7 @@ Returns:
   }
 
   //
-  // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize 
+  // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize
   // with the storage size (excluding the storage header size).
   //
   *MaximumVariableStorageSize   = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
@@ -1239,15 +1238,15 @@ Returns:
 
     if (EfiAtRuntime ()) {
       //
-      // we don't take the state of the variables in mind 
+      // we don't take the state of the variables in mind
       // when calculating RemainingVariableStorageSize,
-      // since the space occupied by variables not marked with 
+      // since the space occupied by variables not marked with
       // VAR_ADDED is not allowed to be reclaimed in Runtime.
       //
       *RemainingVariableStorageSize -= VariableSize;
     } else {
       //
-      // Only care about Variables with State VAR_ADDED,because 
+      // Only care about Variables with State VAR_ADDED,because
       // the space not marked as VAR_ADDED is reclaimable now.
       //
       if (Variable->State == VAR_ADDED) {
@@ -1264,7 +1263,6 @@ Returns:
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
-#endif
 
 EFI_STATUS
 EFIAPI
@@ -1283,9 +1281,9 @@ Arguments:
   SystemTable   - A pointer to the EFI System Table.
 
 Returns:
-  
+
   Status code.
-  
+
   EFI_NOT_FOUND     - Variable store area not found.
   EFI_UNSUPPORTED   - Currently only one non-volatile variable store is supported.
   EFI_SUCCESS       - Variable services successfully initialized.
@@ -1321,7 +1319,7 @@ Returns:
   }
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_NOTIFY);
-  
+
   //
   // Allocate memory for volatile variable store
   //

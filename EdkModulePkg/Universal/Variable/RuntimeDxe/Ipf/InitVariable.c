@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -89,7 +89,6 @@ Returns:
                         );
     return ReturnVal;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   case EsalQueryVariableInfo:
     ReturnVal.Status = QueryVariableInfo (
                         (UINT32) Arg2,
@@ -100,7 +99,6 @@ Returns:
                         Global->FvbInstance
                         );
     return ReturnVal;
-#endif
 
   default:
     ReturnVal.Status = EFI_SAL_INVALID_ARGUMENT;
@@ -173,10 +171,8 @@ Returns:
     EsalGetNextVariableName,
     EsalVariableCommonEntry,
     EsalSetVariable,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
     EsalVariableCommonEntry,
     EsalQueryVariableInfo,
-#endif
     NULL
     );
 

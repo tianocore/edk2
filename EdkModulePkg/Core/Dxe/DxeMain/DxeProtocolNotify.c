@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,25 +43,14 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
   { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #ifndef MDE_CPU_IPF
   //
   // UEFI 2.0 added support for Capsule services. DXE CIS ??? Added support for this AP
   //
   { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE},
 #endif
-#endif
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
-#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION <  0x00020000))
-  //
-  // The ReportStatusCode Runtime service is in conflict with the UEFI 2.0 specificaiton
-  // Thus gEfiStatusCodeRuntimeProtocolGuid becomes a normal protocol in UEFI 2.0 systems
-  // It is only included if the EFI 1.10 with Tiano extensions is enabled for backward
-  // compatability
-  //
-  { &gEfiStatusCodeRuntimeProtocolGuid,    (VOID **)&gStatusCode,    NULL, NULL, FALSE },
-#endif
   { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
   { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
 };
@@ -182,7 +171,7 @@ Returns:
         CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
         InsertTailList (&gRuntime->EventHead, Link);
       }
-      
+
       //
       // Clean up gRuntimeTemplate
       //
@@ -271,9 +260,7 @@ static const GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (CHAR16 *)L"Runtime"            },
   { &gEfiVariableArchProtocolGuid,         (CHAR16 *)L"Variable"           },
   { &gEfiVariableWriteArchProtocolGuid,    (CHAR16 *)L"Variable Write"     },
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   { &gEfiCapsuleArchProtocolGuid,          (CHAR16 *)L"Capsule"            },
-  #endif
   { &gEfiMonotonicCounterArchProtocolGuid, (CHAR16 *)L"Monotonic Counter"  },
   { &gEfiResetArchProtocolGuid,            (CHAR16 *)L"Reset"              },
 //  { &gEfiStatusCodeRuntimeProtocolGuid,       (CHAR16 *)L"Status Code"        },

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,12 +150,32 @@ Returns:
 --*/
 ;
 
+/**
+  Get one variable by the index count.
+
+  @param  IndexTable  The pointer to variable index table.
+  @param  Count       The index count of variable in index table.
+
+  @return The pointer to variable header indexed by count.
+
+**/
 VARIABLE_HEADER *
 GetVariableByIndex (
   IN VARIABLE_INDEX_TABLE        *IndexTable,
   IN UINT32                      Count
   );
 
+/**
+  Record Variable in VariableIndex HOB.
+
+  Record Variable in VariableIndex HOB and update the length of variable index table.
+
+  @param  IndexTable  The pointer to variable index table.
+  @param  Variable    The pointer to the variable that will be recorded.
+
+  @retval VOID
+
+**/
 VOID
 VariableIndexTableUpdate (
   IN OUT  VARIABLE_INDEX_TABLE   *IndexTable,

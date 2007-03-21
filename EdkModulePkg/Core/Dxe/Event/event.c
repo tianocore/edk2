@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,7 +16,7 @@ Module Name:
 Abstract:
 
     EFI Event support
- 
+
 --*/
 
 
@@ -37,17 +37,17 @@ UINT32 mEventTable[] = {
   //
   EFI_EVENT_TIMER,
   //
-  // 0x00000100       Generic event with a notification function that 
+  // 0x00000100       Generic event with a notification function that
   // can be waited on with CheckEvent() or WaitForEvent()
   //
   EFI_EVENT_NOTIFY_WAIT,
   //
-  // 0x00000200       Generic event with a notification function that 
+  // 0x00000200       Generic event with a notification function that
   // is queue when the event is signaled with SignalEvent()
   //
   EFI_EVENT_NOTIFY_SIGNAL,
   //
-  // 0x00000201       ExitBootServicesEvent.  
+  // 0x00000201       ExitBootServicesEvent.
   //
   EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
   //
@@ -55,33 +55,14 @@ UINT32 mEventTable[] = {
   //
   EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
   //
-  // 0x00000203       ReadyToBootEvent.
-  //
-  EFI_EVENT_SIGNAL_READY_TO_BOOT,
-  //
-  // 0x00000204       LegacyBootEvent.
-  //
-  EFI_EVENT_SIGNAL_LEGACY_BOOT,
-  //
-  // 0x00000603       Signal all ReadyToBootEvents.
-  //
-  EFI_EVENT_NOTIFY_SIGNAL_ALL | EFI_EVENT_SIGNAL_READY_TO_BOOT,
-  //
-  // 0x00000604       Signal all LegacyBootEvents.
-  //
-  EFI_EVENT_NOTIFY_SIGNAL_ALL | EFI_EVENT_SIGNAL_LEGACY_BOOT,
-#endif
-
-  //
-  // 0x00000000       Generic event without a notification function. 
-  // It can be signaled with SignalEvent() and checked with CheckEvent() 
+  // 0x00000000       Generic event without a notification function.
+  // It can be signaled with SignalEvent() and checked with CheckEvent()
   // or WaitForEvent().
   //
   0x00000000,
   //
-  // 0x80000100       Timer event with a notification function that can be 
+  // 0x80000100       Timer event with a notification function that can be
   // waited on with CheckEvent() or WaitForEvent()
   //
   EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_WAIT,
@@ -149,7 +130,7 @@ Routine Description:
 Arguments:
 
   None
-    
+
 Returns:
 
   EFI_SUCCESS - Always return success
@@ -163,7 +144,7 @@ Returns:
   }
 
   CoreInitializeTimer ();
-  
+
   return EFI_SUCCESS;
 }
 
@@ -176,12 +157,12 @@ CoreDispatchEventNotifies (
 
 Routine Description:
 
-  Dispatches all pending events. 
+  Dispatches all pending events.
 
 Arguments:
 
   Priority - The task priority level of event notifications to dispatch
-    
+
 Returns:
 
   None
@@ -190,7 +171,7 @@ Returns:
 {
   IEVENT          *Event;
   LIST_ENTRY      *Head;
-  
+
   CoreAcquireEventLock ();
   ASSERT (gEventQueueLock.OwnerTpl == Priority);
   Head = &gEventQueue[Priority];
@@ -199,7 +180,7 @@ Returns:
   // Dispatch all the pending notifications
   //
   while (!IsListEmpty (Head)) {
-      
+
     Event = CR (Head->ForwardLink, IEVENT, NotifyLink, EVENT_SIGNATURE);
     RemoveEntryList (&Event->NotifyLink);
 
@@ -214,7 +195,7 @@ Returns:
     }
 
     CoreReleaseEventLock ();
-      
+
     //
     // Notify this event
     //
@@ -246,7 +227,7 @@ Routine Description:
 Arguments:
 
   Event       - The Event to notify
-    
+
 Returns:
 
   None
@@ -268,7 +249,7 @@ Returns:
     Event->NotifyLink.ForwardLink = NULL;
   }
 
-  // 
+  //
   // Queue the event to the pending notification list
   //
 
@@ -289,7 +270,7 @@ Routine Description:
 
 Arguments:
   EventGroup - The list to signal
-    
+
 Returns:
 
   None
@@ -312,33 +293,6 @@ Returns:
 
   CoreReleaseEventLock ();
 }
-
-
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-
-static
-VOID
-EFIAPI
-EventNotifySignalAllNullEvent (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-{
-  //
-  // This null event is a size efficent way to enusre that 
-  // EFI_EVENT_NOTIFY_SIGNAL_ALL is error checked correctly.
-  // EFI_EVENT_NOTIFY_SIGNAL_ALL is now mapped into 
-  // CreateEventEx() and this function is used to make the
-  // old error checking in CreateEvent() for Tiano extensions
-  // function.
-  //
-  return;
-}
-
-#endif
-
-
-
 
 EFI_STATUS
 EFIAPI
@@ -368,42 +322,22 @@ Returns:
   EFI_OUT_OF_RESOURCES  - The event could not be allocated
 
 --*/
-{ 
+{
   EFI_GUID            *GuidPtr;
   EFI_EVENT_NOTIFY    Function;
-  
+
   GuidPtr = NULL;
   Function = NotifyFunction;
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-  //
-  // Clear EFI_EVENT_NOFITY_SIGNAL_ALL (Tiano extension) as all events in the 
-  //  EventGroup now have this property. So we need to filter it out.
-  //
-  if (Type & EFI_EVENT_NOTIFY_SIGNAL_ALL) {
-    Type &= ~EFI_EVENT_NOTIFY_SIGNAL_ALL;
-    Function = EventNotifySignalAllNullEvent;
-  }
-
-  //
-  // Map the Tiano extensions Events to CreateEventEx form
-  //
-  if (Type == EFI_EVENT_SIGNAL_READY_TO_BOOT) {
-    GuidPtr = &gEfiEventReadyToBootGuid;
-  } else if (Type == EFI_EVENT_SIGNAL_LEGACY_BOOT) {
-    GuidPtr = &gEfiEventLegacyBootGuid
-  }
-#endif
-
   //
   // Convert EFI 1.10 Events to thier UEFI 2.0 CreateEventEx mapping
-  // 
+  //
   if (Type == EVENT_SIGNAL_EXIT_BOOT_SERVICES) {
     GuidPtr = &gEfiEventExitBootServicesGuid;
   } else if (Type == EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
     GuidPtr = &gEfiEventVirtualAddressChangeGuid;
   }
-  
+
   return CoreCreateEventEx (Type, NotifyTpl, Function, NotifyContext, GuidPtr, Event);
 }
 
@@ -469,8 +403,8 @@ Returns:
     //
     // Check for an invalid NotifyFunction or NotifyTpl
     //
-    if ((NotifyFunction == NULL) || 
-        (NotifyTpl < EFI_TPL_APPLICATION) || 
+    if ((NotifyFunction == NULL) ||
+        (NotifyTpl < EFI_TPL_APPLICATION) ||
        (NotifyTpl >= EFI_TPL_HIGH_LEVEL)) {
       return EFI_INVALID_PARAMETER;
     }
@@ -488,7 +422,7 @@ Returns:
   // Allcoate and initialize a new event structure.
   //
   Status = CoreAllocatePool (
-             (Type & EFI_EVENT_RUNTIME) ? EfiRuntimeServicesData: EfiBootServicesData, 
+             (Type & EFI_EVENT_RUNTIME) ? EfiRuntimeServicesData: EfiBootServicesData,
              sizeof (IEVENT),
              (VOID **)&IEvent
              );
@@ -500,7 +434,7 @@ Returns:
 
   IEvent->Signature = EVENT_SIGNATURE;
   IEvent->Type = Type;
-  
+
   IEvent->NotifyTpl      = NotifyTpl;
   IEvent->NotifyFunction = NotifyFunction;
   IEvent->NotifyContext  = (VOID *)NotifyContext;
@@ -524,16 +458,16 @@ Returns:
   }
 
   CoreAcquireEventLock ();
-  
+
   if ((Type & EFI_EVENT_NOTIFY_SIGNAL) != 0x00000000) {
     //
     // The Event's NotifyFunction must be queued whenever the event is signaled
     //
     InsertHeadList (&gEventSignalQueue, &IEvent->SignalLink);
   }
-  
+
   CoreReleaseEventLock ();
-  
+
   //
   // Done
   //
@@ -552,15 +486,15 @@ CoreSignalEvent (
 Routine Description:
 
   Signals the event.  Queues the event to be notified if needed
-    
+
 Arguments:
 
   UserEvent - The event to signal
-    
+
 Returns:
 
   EFI_INVALID_PARAMETER - Parameters are not valid.
-  
+
   EFI_SUCCESS - The event was signaled.
 
 --*/
@@ -592,8 +526,8 @@ Returns:
     if (Event->Type & EFI_EVENT_NOTIFY_SIGNAL) {
       if (Event->ExFlag) {
         //
-        // The CreateEventEx() style requires all members of the Event Group 
-        //  to be signaled. 
+        // The CreateEventEx() style requires all members of the Event Group
+        //  to be signaled.
         //
         CoreReleaseEventLock ();
         CoreNotifySignalList (&Event->EventGroup);
@@ -619,11 +553,11 @@ CoreCheckEvent (
 Routine Description:
 
   Check the status of an event
-    
+
 Arguments:
 
   UserEvent - The event to check
-    
+
 Returns:
 
   EFI_SUCCESS           - The event is in the signaled state
@@ -697,17 +631,17 @@ CoreWaitForEvent (
 Routine Description:
 
   Stops execution until an event is signaled.
-    
+
 Arguments:
 
   NumberOfEvents  - The number of events in the UserEvents array
   UserEvents      - An array of EFI_EVENT
   UserIndex       - Pointer to the index of the event which satisfied the wait condition
-    
+
 Returns:
 
   EFI_SUCCESS           - The event indicated by Index was signaled.
-  EFI_INVALID_PARAMETER - The event indicated by Index has a notification function or 
+  EFI_INVALID_PARAMETER - The event indicated by Index has a notification function or
                           Event was not a valid type
   EFI_UNSUPPORTED       - The current TPL is not TPL_APPLICATION
 
@@ -725,7 +659,7 @@ Returns:
   }
 
   for(;;) {
-      
+
     for(Index = 0; Index < NumberOfEvents; Index++) {
 
       Status = CoreCheckEvent (UserEvents[Index]);
@@ -742,7 +676,7 @@ Returns:
     //
     // This was the location of the Idle loop callback in EFI 1.x reference
     // code. We don't have that concept in this base at this point.
-    // 
+    //
   }
 }
 
@@ -757,15 +691,15 @@ CoreCloseEvent (
 Routine Description:
 
   Closes an event and frees the event structure.
-    
+
 Arguments:
 
   UserEvent - Event to close
-    
+
 Returns:
 
   EFI_INVALID_PARAMETER - Parameters are not valid.
-  
+
   EFI_SUCCESS - The event has been closed
 
 --*/
@@ -796,11 +730,11 @@ Returns:
   //
   // If the event is queued somewhere, remove it
   //
-  
+
   if (Event->RuntimeData.Link.ForwardLink != NULL) {
     RemoveEntryList (&Event->RuntimeData.Link);
   }
-  
+
   if (Event->NotifyLink.ForwardLink != NULL) {
     RemoveEntryList (&Event->NotifyLink);
   }
