@@ -65,6 +65,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PerformanceLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeCoffLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>BdsBoot.c</Filename>
