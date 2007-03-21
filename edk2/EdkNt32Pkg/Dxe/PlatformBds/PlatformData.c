@@ -1,20 +1,20 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name: 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
 
   PlatformData.c
 
 Abstract:
-  
+
   Defined the platform specific device path which will be used by
   platform Bbd to perform the platform policy connect.
 
@@ -68,7 +68,7 @@ NT_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
   },
   gEndEntire
 };
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+
 NT_PLATFORM_GOP_DEVICE_PATH gGopDevicePath0 = {
   {
     HARDWARE_DEVICE_PATH,
@@ -106,7 +106,6 @@ NT_PLATFORM_GOP_DEVICE_PATH gGopDevicePath1 = {
   },
   gEndEntire
 };
-#endif
 
 //
 // Platform specific serial device path
@@ -204,7 +203,6 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     (EFI_DEVICE_PATH_PROTOCOL *) &gUgaDevicePath1,
     (CONSOLE_OUT | CONSOLE_IN)
   },
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath0,
     (CONSOLE_OUT | CONSOLE_IN)
@@ -213,7 +211,6 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath1,
     (CONSOLE_OUT | CONSOLE_IN)
   },
-#endif
   {
     NULL,
     0

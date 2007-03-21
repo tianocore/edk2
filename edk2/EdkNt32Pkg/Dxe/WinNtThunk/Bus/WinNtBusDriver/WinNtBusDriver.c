@@ -1,6 +1,6 @@
 /*+++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -121,9 +121,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gWinNtBusDriverBinding = {
 static NT_PCD_ENTRY  mPcdEnvironment[] = {
   PcdToken(PcdWinNtConsole),       &gEfiWinNtConsoleGuid,
   PcdToken(PcdWinNtUga),           &gEfiWinNtUgaGuid,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   PcdToken(PcdWinNtGop),           &gEfiWinNtGopGuid,
-#endif
   PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,
   PcdToken(PcdWinNtFileSystem),    &gEfiWinNtFileSystemGuid,
   PcdToken(PcdWinNtVirtualDisk),   &gEfiWinNtVirtualDisksGuid,

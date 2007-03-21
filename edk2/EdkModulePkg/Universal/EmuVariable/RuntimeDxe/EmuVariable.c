@@ -27,7 +27,7 @@ Revision History
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
 //
-// This is a temperary function which will be removed 
+// This is a temperary function which will be removed
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
@@ -43,7 +43,7 @@ AcquireLockOnlyAtBootTime (
 }
 
 //
-// This is a temperary function which will be removed 
+// This is a temperary function which will be removed
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
@@ -426,7 +426,7 @@ Returns:
 Done:
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return Status;
- 
+
 }
 
 EFI_STATUS
@@ -485,8 +485,8 @@ Returns:
     goto Done;
   } else if (!EFI_ERROR (Status) && Variable.Volatile && EfiAtRuntime()) {
     //
-    // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
-    // the volatile is ReadOnly, and SetVariable should be aborted and 
+    // If EfiAtRuntime and the variable is Volatile and Runtime Access,
+    // the volatile is ReadOnly, and SetVariable should be aborted and
     // return EFI_WRITE_PROTECTED.
     //
     Status = EFI_WRITE_PROTECTED;
@@ -622,7 +622,6 @@ Done:
   return Status;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 EFIAPI
 QueryVariableInfo (
@@ -693,7 +692,7 @@ Returns:
   }
 
   AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
-  
+
   if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
     // Query is Volatile related.
@@ -747,7 +746,6 @@ Returns:
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
-#endif
 
 STATIC
 EFI_STATUS
@@ -827,7 +825,7 @@ Returns:
   }
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_NOTIFY);
-  
+
   //
   // Intialize volatile variable store
   //

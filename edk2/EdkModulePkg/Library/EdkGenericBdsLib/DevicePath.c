@@ -877,14 +877,6 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
     DevPathMediaProtocol
   },
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-  {
-    MEDIA_DEVICE_PATH,
-    MEDIA_FV_FILEPATH_DP,
-    DevPathFvFilePath
-  },
-#endif
-
   {
     BBS_DEVICE_PATH,
     BBS_BBS_DP,

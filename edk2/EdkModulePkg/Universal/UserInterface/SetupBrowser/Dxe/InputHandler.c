@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -25,12 +25,10 @@ Revision History
 #include "Ui.h"
 #include "Colors.h"
 
-#ifndef EFI_MAX
 #define EFI_MAX(_a, _b) ((_a) > (_b) ? (_a) : (_b))
-#endif
 
 EFI_STATUS
-ReadString (
+ReadString(
   IN  UI_MENU_OPTION              *MenuOption,
   OUT CHAR16                      *StringPtr
   )
@@ -619,7 +617,7 @@ GetNumericInput (
 
 Routine Description:
 
-  This routine reads a numeric value from the user input.  
+  This routine reads a numeric value from the user input.
 
 Arguments:
 
@@ -630,14 +628,14 @@ Arguments:
   ManualInput      -  If the input is manual or not.
 
   Tag              -  Pointer to all the attributes and values associated with a tag.
-                 
+
   Value            -  Pointer to the numeric value that is going to be read.
 
-Returns: 
+Returns:
 
   EFI_SUCCESS       - If numerical input is read successfully
   EFI_DEVICE_ERROR  - If operation fails
-  
+
 --*/
 {
   EFI_INPUT_KEY           Key;
@@ -735,9 +733,9 @@ TheKey2:
           Tag->Value  = (UINT16) Number;
           *Value      = (UINT16) Number;
           UnicodeValueToString (
-            FormattedNumber, 
-            FALSE, 
-            (UINTN) Number, 
+            FormattedNumber,
+            FALSE,
+            (UINTN) Number,
             (sizeof (FormattedNumber) / sizeof (FormattedNumber[0]))
             );
           Number = (UINT16) GetStringWidth (FormattedNumber);
@@ -1471,7 +1469,7 @@ TheKey:
             } else {
               if (Key.ScanCode == SCAN_UP) {
                 TempIndex = Index - 1;
-                
+
                 //
                 // Keep going until meets meaningful tag.
                 //

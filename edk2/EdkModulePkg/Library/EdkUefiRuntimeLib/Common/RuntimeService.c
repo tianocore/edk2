@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -62,7 +62,7 @@ EfiGetTime (
 
 Routine Description:
 
-  Returns the current time and date information, and the time-keeping 
+  Returns the current time and date information, and the time-keeping
   capabilities of the hardware platform.
 
 Arguments:
@@ -214,11 +214,11 @@ Arguments:
 
   VariableNameSize  - The size of the VariableName buffer.
   VariableName      - On input, supplies the last VariableName that was returned
-                      by GetNextVariableName(). 
+                      by GetNextVariableName().
                       On output, returns the Nullterminated Unicode string of the
                       current variable.
   VendorGuid        - On input, supplies the last VendorGuid that was returned by
-                      GetNextVariableName(). 
+                      GetNextVariableName().
                       On output, returns the VendorGuid of the current variable.
 
 Returns:
@@ -332,7 +332,7 @@ Arguments:
 
   ListHead         - Head of linked list to convert
 
-Returns: 
+Returns:
 
   EFI_SUCCESS
 
@@ -411,15 +411,11 @@ EfiUpdateCapsule (
   IN EFI_PHYSICAL_ADDRESS	ScatterGatherList	OPTIONAL
   )
 {
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   return mRT->UpdateCapsule (
                 CapsuleHeaderArray,
                 CapsuleCount,
                 ScatterGatherList
                 );
-#else
-  return EFI_UNSUPPORTED;
-#endif
 }
 
 EFI_STATUS
@@ -431,16 +427,12 @@ EfiQueryCapsuleCapabilities (
   OUT EFI_RESET_TYPE		*ResetType
   )
 {
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   return mRT->QueryCapsuleCapabilities (
           CapsuleHeaderArray,
           CapsuleCount,
           MaximumCapsuleSize,
           ResetType
           );
-#else
-  return EFI_UNSUPPORTED;
-#endif
 }
 
 
@@ -453,14 +445,10 @@ EfiQueryVariableInfo (
   OUT UINT64			*MaximumVariableSize
   )
 {
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   return mRT->QueryVariableInfo (
           Attributes,
           MaximumVariableStorageSize,
           RemainingVariableStorageSize,
           MaximumVariableSize
           );
-#else 
-  return EFI_UNSUPPORTED;
-#endif
 }

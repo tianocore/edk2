@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -114,7 +114,6 @@ Returns:
           );
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 EFIAPI
 RuntimeServiceQueryVariableInfo (
@@ -142,7 +141,6 @@ Returns:
           mVariableModuleGlobal->FvbInstance
           );
 }
-#endif
 
 VOID
 EFIAPI
@@ -196,9 +194,7 @@ Returns:
   SystemTable->RuntimeServices->GetVariable         = RuntimeServiceGetVariable;
   SystemTable->RuntimeServices->GetNextVariableName = RuntimeServiceGetNextVariableName;
   SystemTable->RuntimeServices->SetVariable         = RuntimeServiceSetVariable;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   SystemTable->RuntimeServices->QueryVariableInfo   = RuntimeServiceQueryVariableInfo;
-#endif
 
   //
   // Now install the Variable Runtime Architectural Protocol on a new handle

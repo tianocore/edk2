@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -67,7 +67,7 @@ EFI_BOOT_SERVICES mBootServices = {
     sizeof (EFI_BOOT_SERVICES),                                                           // HeaderSize
     0,                                                                                    // CRC32
     0                                                                                     // Reserved
-  },                                                                                      
+  },
   (EFI_RAISE_TPL)                               CoreRaiseTpl,                             // RaiseTPL
   (EFI_RESTORE_TPL)                             CoreRestoreTpl,                           // RestoreTPL
   (EFI_ALLOCATE_PAGES)                          CoreAllocatePages,                        // AllocatePages
@@ -110,11 +110,8 @@ EFI_BOOT_SERVICES mBootServices = {
   (EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES)  CoreUninstallMultipleProtocolInterfaces,  // UninstallMultipleProtocolInterfaces
   (EFI_CALCULATE_CRC32)                         CoreEfiNotAvailableYetArg3,               // CalculateCrc32
   (EFI_COPY_MEM)                                CopyMem,                                  // CopyMem
-  (EFI_SET_MEM)                                 SetMem                                    // SetMem
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  ,                                   
-  (EFI_CREATE_EVENT_EX)                          CoreCreateEventEx                         // CreateEventEx
-#endif
+  (EFI_SET_MEM)                                 SetMem,                                   // SetMem
+  (EFI_CREATE_EVENT_EX)                         CoreCreateEventEx                         // CreateEventEx
 };
 
 EFI_DXE_SERVICES mDxeServices = {
@@ -174,33 +171,20 @@ EFI_RUNTIME_SERVICES mEfiRuntimeServicesTableTemplate = {
     0,                                                            // CRC32
     0                                                             // Reserved
   },
-  (EFI_GET_TIME)                 CoreEfiNotAvailableYetArg2,      // GetTime
-  (EFI_SET_TIME)                 CoreEfiNotAvailableYetArg1,      // SetTime
-  (EFI_GET_WAKEUP_TIME)          CoreEfiNotAvailableYetArg3,      // GetWakeupTime
-  (EFI_SET_WAKEUP_TIME)          CoreEfiNotAvailableYetArg2,      // SetWakeupTime
-  (EFI_SET_VIRTUAL_ADDRESS_MAP)  CoreEfiNotAvailableYetArg4,      // SetVirtualAddressMap
-  (EFI_CONVERT_POINTER)          CoreEfiNotAvailableYetArg2,      // ConvertPointer
-  (EFI_GET_VARIABLE)             CoreEfiNotAvailableYetArg5,      // GetVariable
-  (EFI_GET_NEXT_VARIABLE_NAME)   CoreEfiNotAvailableYetArg3,      // GetNextVariableName
-  (EFI_SET_VARIABLE)             CoreEfiNotAvailableYetArg5,      // SetVariable
-  (EFI_GET_NEXT_HIGH_MONO_COUNT) CoreEfiNotAvailableYetArg1,      // GetNextHighMonotonicCount
-  (EFI_RESET_SYSTEM)             CoreEfiNotAvailableYetArg4       // ResetSystem 
-#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION <  0x00020000))
-  //
-  // This Tiano extension was removed when UEFI 2.0 support was added. 
-  // It's now just a protocol.
-  //
-  ,
-  (EFI_REPORT_STATUS_CODE)       CoreEfiNotAvailableYetArg5       // ReportStatusCode
-#elif (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  //
-  // New runtime services added by UEFI 2.0
-  //
-  ,
+  (EFI_GET_TIME)                    CoreEfiNotAvailableYetArg2,   // GetTime
+  (EFI_SET_TIME)                    CoreEfiNotAvailableYetArg1,   // SetTime
+  (EFI_GET_WAKEUP_TIME)             CoreEfiNotAvailableYetArg3,   // GetWakeupTime
+  (EFI_SET_WAKEUP_TIME)             CoreEfiNotAvailableYetArg2,   // SetWakeupTime
+  (EFI_SET_VIRTUAL_ADDRESS_MAP)     CoreEfiNotAvailableYetArg4,   // SetVirtualAddressMap
+  (EFI_CONVERT_POINTER)             CoreEfiNotAvailableYetArg2,   // ConvertPointer
+  (EFI_GET_VARIABLE)                CoreEfiNotAvailableYetArg5,   // GetVariable
+  (EFI_GET_NEXT_VARIABLE_NAME)      CoreEfiNotAvailableYetArg3,   // GetNextVariableName
+  (EFI_SET_VARIABLE)                CoreEfiNotAvailableYetArg5,   // SetVariable
+  (EFI_GET_NEXT_HIGH_MONO_COUNT)    CoreEfiNotAvailableYetArg1,   // GetNextHighMonotonicCount
+  (EFI_RESET_SYSTEM)                CoreEfiNotAvailableYetArg4,   // ResetSystem
   (EFI_UPDATE_CAPSULE)              CoreEfiNotAvailableYetArg3,   // UpdateCapsule
   (EFI_QUERY_CAPSULE_CAPABILITIES)  CoreEfiNotAvailableYetArg4,   // QueryCapsuleCapabilities
   (EFI_QUERY_VARIABLE_INFO)         CoreEfiNotAvailableYetArg4    // QueryVariableInfo
-#endif
 };
 
 EFI_RUNTIME_ARCH_PROTOCOL gRuntimeTemplate = {
@@ -212,8 +196,8 @@ EFI_RUNTIME_ARCH_PROTOCOL gRuntimeTemplate = {
   // prevent people from having pointer math bugs in their code.
   // now you have to use *DescriptorSize to make things work.
   //
-  sizeof (EFI_MEMORY_DESCRIPTOR) + sizeof (UINT64) - (sizeof (EFI_MEMORY_DESCRIPTOR) % sizeof (UINT64)),  
-  EFI_MEMORY_DESCRIPTOR_VERSION, 
+  sizeof (EFI_MEMORY_DESCRIPTOR) + sizeof (UINT64) - (sizeof (EFI_MEMORY_DESCRIPTOR) % sizeof (UINT64)),
+  EFI_MEMORY_DESCRIPTOR_VERSION,
   0,
   NULL,
   NULL,
@@ -224,7 +208,7 @@ EFI_RUNTIME_ARCH_PROTOCOL gRuntimeTemplate = {
 EFI_RUNTIME_ARCH_PROTOCOL *gRuntime = &gRuntimeTemplate;
 
 //
-// DXE Core Global Variables for the EFI System Table, Boot Services Table, 
+// DXE Core Global Variables for the EFI System Table, Boot Services Table,
 // DXE Services Table, and Runtime Services Table
 //
 EFI_BOOT_SERVICES     *gBS = &mBootServices;
@@ -311,7 +295,7 @@ Returns:
   ASSERT (gRT != NULL);
 
   gST->RuntimeServices = gRT;
-  
+
   //
   // Start the Image Services.
   //
@@ -353,13 +337,6 @@ Returns:
   // Initialize the ReportStatusCode with PEI version, if available
   //
   CoreGetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **)&gStatusCode->ReportStatusCode);
-#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
-  //
-  // This Tiano extension was removed when UEFI 2.0 support was added. 
-  // It's now just a protocol.
-  //
-  gRT->ReportStatusCode = gStatusCode->ReportStatusCode;
-#endif
 
   //
   // Report Status Code here for DXE_ENTRY_POINT once it is available
@@ -386,22 +363,22 @@ Returns:
   Status = CoreInitializeEventServices ();
   ASSERT_EFI_ERROR (Status);
 
-   
+
   //
   // Get the Protocols that were passed in from PEI to DXE through GUIDed HOBs
   //
-  // These Protocols are not architectural. This implementation is sharing code between 
-  // PEI and DXE in order to save FLASH space. These Protocols could also be implemented 
-  // as part of the DXE Core. However, that would also require the DXE Core to be ported 
-  // each time a different CPU is used, a different Decompression algorithm is used, or a 
-  // different Image type is used. By placing these Protocols in PEI, the DXE Core remains 
-  // generic, and only PEI and the Arch Protocols need to be ported from Platform to Platform, 
+  // These Protocols are not architectural. This implementation is sharing code between
+  // PEI and DXE in order to save FLASH space. These Protocols could also be implemented
+  // as part of the DXE Core. However, that would also require the DXE Core to be ported
+  // each time a different CPU is used, a different Decompression algorithm is used, or a
+  // different Image type is used. By placing these Protocols in PEI, the DXE Core remains
+  // generic, and only PEI and the Arch Protocols need to be ported from Platform to Platform,
   // and from CPU to CPU.
   //
 
   //
   // Publish the EFI, Tiano, and Custom Decompress protocols for use by other DXE components
-  //   
+  //
   Status = CoreInstallMultipleProtocolInterfaces (
               &mDecompressHandle,
               &gEfiDecompressProtocolGuid,           &gEfiDecompress,
@@ -430,7 +407,7 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Produce the Section Extraction Protocol 
+  // Produce the Section Extraction Protocol
   //
   Status = InitializeSectionExtraction (gDxeCoreImageHandle, gST);
   ASSERT_EFI_ERROR (Status);
@@ -455,7 +432,7 @@ Returns:
   DEBUG_CODE_BEGIN ();
     CoreDisplayMissingArchProtocols ();
   DEBUG_CODE_END ();
-  
+
   //
   // Assert if the Architectural Protocols are not present.
   //
@@ -477,7 +454,7 @@ Returns:
   // Transfer control to the BDS Architectural Protocol
   //
   gBds->Entry (gBds);
-  
+
   //
   // BDS should never return
   //
@@ -561,7 +538,7 @@ Routine Description:
 Arguments:
 
   Arg1        - Undefined
-  
+
   Arg2        - Undefined
 
 Returns:
@@ -595,9 +572,9 @@ Routine Description:
 Arguments:
 
   Arg1        - Undefined
-  
+
   Arg2        - Undefined
-  
+
   Arg3        - Undefined
 
 Returns:
@@ -632,11 +609,11 @@ Routine Description:
 Arguments:
 
   Arg1        - Undefined
-  
+
   Arg2        - Undefined
-  
+
   Arg3        - Undefined
-  
+
   Arg4        - Undefined
 
 Returns:
@@ -672,13 +649,13 @@ Routine Description:
 Arguments:
 
   Arg1        - Undefined
-  
+
   Arg2        - Undefined
-  
+
   Arg3        - Undefined
-  
+
   Arg4        - Undefined
-  
+
   Arg5        - Undefined
 
 Returns:
@@ -729,7 +706,7 @@ Returns:
   if (GuidHob == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   Buffer = GET_GUID_HOB_DATA (GuidHob);
   ASSERT (Buffer != NULL);
 
@@ -763,14 +740,14 @@ Returns:
   UINT32 Crc;
 
   Hdr->CRC32 = 0;
-  
+
   //
   // If gBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
   //  Crc will come back as zero if we set it to zero here
   //
   Crc = 0;
   gBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
-  Hdr->CRC32 = Crc; 
+  Hdr->CRC32 = Crc;
 }
 
 
@@ -853,12 +830,12 @@ Returns:
   //
   SetMem (gBS, sizeof (EFI_BOOT_SERVICES), 0);
   gBS = NULL;
-  
+
   //
   // Update the AtRuntime field in Runtiem AP.
   //
   gRuntime->AtRuntime = TRUE;
-  
+
   return Status;
 }
 

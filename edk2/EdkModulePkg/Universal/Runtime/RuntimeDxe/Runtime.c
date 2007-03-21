@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -22,24 +22,24 @@ Abstract:
   THIS IS VERY DANGEROUS CODE BE VERY CAREFUL IF YOU CHANGE IT
 
   The transition for calling EFI Runtime functions in physical mode to calling
-  them in virtual mode is very very complex. Every pointer in needs to be 
+  them in virtual mode is very very complex. Every pointer in needs to be
   converted from physical mode to virtual mode. Be very careful walking linked
   lists! Then to make it really hard the code it's self needs be relocated into
   the new virtual address space.
 
   So here is the concept. The code in this module will never ever be called in
   virtual mode. This is the code that collects the information needed to convert
-  to virtual mode (DXE core registers runtime stuff with this code). Since this 
+  to virtual mode (DXE core registers runtime stuff with this code). Since this
   code is used to fixup all runtime images, it CAN NOT fix it's self up. So some
   code has to stay behind and that is us.
 
-  Also you need to be careful about when you allocate memory, as once we are in 
-  runtime (including our EVT_SIGNAL_EXIT_BOOT_SERVICES event) you can no longer 
+  Also you need to be careful about when you allocate memory, as once we are in
+  runtime (including our EVT_SIGNAL_EXIT_BOOT_SERVICES event) you can no longer
   allocate memory.
 
-  Any runtime driver that gets loaded before us will not be callable in virtual 
-  mode. This is due to the fact that the DXE core can not register the info 
-  needed with us. This is good, since it keeps the code in this file from 
+  Any runtime driver that gets loaded before us will not be callable in virtual
+  mode. This is due to the fact that the DXE core can not register the info
+  needed with us. This is good, since it keeps the code in this file from
   getting registered.
 
 
@@ -79,8 +79,8 @@ EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
   // prevent people from having pointer math bugs in their code.
   // now you have to use *DescriptorSize to make things work.
   //
-  sizeof (EFI_MEMORY_DESCRIPTOR) + sizeof (UINT64) - (sizeof (EFI_MEMORY_DESCRIPTOR) % sizeof (UINT64)),  
-  EFI_MEMORY_DESCRIPTOR_VERSION, 
+  sizeof (EFI_MEMORY_DESCRIPTOR) + sizeof (UINT64) - (sizeof (EFI_MEMORY_DESCRIPTOR) % sizeof (UINT64)),
+  EFI_MEMORY_DESCRIPTOR_VERSION,
   0,
   NULL,
   NULL,
@@ -136,7 +136,7 @@ Routine Description:
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
 Arguments:
-  
+
   DebugDisposition    - Supplies type information for the pointer being converted.
   ConvertAddress      - A pointer to a pointer that is to be fixed to be the value needed
                         for the new virtual address mappings being applied.
@@ -234,11 +234,11 @@ RuntimeDriverConvertInternalPointer (
 
 Routine Description:
 
-  Determines the new virtual address that is to be used on subsequent memory accesses 
+  Determines the new virtual address that is to be used on subsequent memory accesses
   for internal pointers.
 
 Arguments:
-  
+
   ConvertAddress  - A pointer to a pointer that is to be fixed to be the value needed
                     for the new virtual address mappings being applied.
 
@@ -269,7 +269,7 @@ Routine Description:
   Changes the runtime addressing mode of EFI firmware from physical to virtual.
 
 Arguments:
-  
+
   MemoryMapSize     - The size in bytes of VirtualMap.
   DescriptorSize    - The size in bytes of an entry in the VirtualMap.
   DescriptorVersion - The version of the structure entries in VirtualMap.
@@ -287,7 +287,7 @@ Returns:
   EFI_NOT_FOUND         - A virtual address was supplied for an address that is not found
                           in the memory map.
 
---*/  
+--*/
 {
   EFI_STATUS                    Status;
   EFI_RUNTIME_EVENT_ENTRY       *RuntimeEvent;
@@ -298,9 +298,7 @@ Returns:
   EFI_DRIVER_OS_HANDOFF_HEADER  *DriverOsHandoffHeader;
   EFI_DRIVER_OS_HANDOFF         *DriverOsHandoff;
   EFI_PHYSICAL_ADDRESS          VirtImageBase;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  EFI_CAPSULE_TABLE             *CapsuleTable; 
-#endif
+  EFI_CAPSULE_TABLE             *CapsuleTable;
 
   //
   // Can only switch to virtual addresses once the memory map is locked down,
@@ -372,7 +370,7 @@ Returns:
         (UINTN) RuntimeImage->ImageSize,
         RuntimeImage->RelocationData
         );
-      
+
       InvalidateInstructionCacheRange (RuntimeImage->ImageBase, (UINTN)RuntimeImage->ImageSize);
     }
   }
@@ -386,18 +384,13 @@ Returns:
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetWakeupTime);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetWakeupTime);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->ResetSystem);
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->ReportStatusCode);
-#endif
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetNextHighMonotonicCount);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetVariable);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetVariable);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetNextVariableName);
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryVariableInfo);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->UpdateCapsule);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryCapsuleCapabilities);
-#endif
   RuntimeDriverCalculateEfiHdrCrc (&gRT->Hdr);
 
   //
@@ -421,15 +414,13 @@ Returns:
       RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &(gST->ConfigurationTable[Index].VendorTable));
     }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
     if (CompareGuid (&gEfiCapsuleGuid, &(gST->ConfigurationTable[Index].VendorGuid))) {
       CapsuleTable = gST->ConfigurationTable[Index].VendorTable;
       for (Index1 = 0; Index1 < CapsuleTable->CapsuleArrayNumber; Index1++) {
         RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &CapsuleTable->CapsulePtr[Index1]);
-      }     
+      }
       RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &(gST->ConfigurationTable[Index].VendorTable));
     }
-#endif
   }
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32
@@ -512,6 +503,6 @@ Returns:
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   return EFI_SUCCESS;
 }
