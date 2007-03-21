@@ -1088,6 +1088,7 @@ UnixBlockIoReadBlocks (
   This->Media->MediaPresent = TRUE;
   Status = EFI_SUCCESS;
 
+Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
