@@ -981,7 +981,7 @@ Returns:
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   UNIX_EFI_FILE_PRIVATE *PrivateFile;
-  EFITPL                OldTpl;
+  EFI_TPL                OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1538,7 +1538,6 @@ Returns:
     Status = (*Position == (UINT64) -1) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
   }
 
-Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -1635,7 +1634,7 @@ Returns:
     StrCpy ((CHAR16 *) FileSystemInfoBuffer->VolumeLabel, PrivateRoot->VolumeLabel);
     *BufferSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel);
     Status      = EFI_SUCCESS;
-  } else if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid){
+  } else if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     if (*BufferSize < StrSize (PrivateRoot->VolumeLabel)) {
       *BufferSize = StrSize (PrivateRoot->VolumeLabel);
       Status = EFI_BUFFER_TOO_SMALL;
