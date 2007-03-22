@@ -314,10 +314,16 @@ InternalMathDivRemS64x64 (
 /**
   Transfers control to a function starting with a new stack.
 
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
+  Transfers control to the function specified by EntryPoint using the
+  new stack specified by NewStack and passing in the parameters specified
+  by Context1 and Context2.  Context1 and Context2 are optional and may
+  be NULL.  The function EntryPoint must never return.
+  Marker will be ignored on IA-32, x64, and EBC.
+  IPF CPUs expect one additional parameter of type VOID * that specifies
+  the new backing store pointer.
+
+  If EntryPoint is NULL, then ASSERT().
+  If NewStack is NULL, then ASSERT().
 
   @param  EntryPoint  A pointer to function to call with the new stack.
   @param  Context1    A pointer to the context to pass into the EntryPoint
@@ -326,15 +332,17 @@ InternalMathDivRemS64x64 (
                       function.
   @param  NewStack    A pointer to the new stack to use for the EntryPoint
                       function.
+  @param  Marker      VA_LIST marker for the variable argument list.
 
 **/
 VOID
 EFIAPI
 InternalSwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,
-  IN      VOID                      *Context2,
-  IN      VOID                      *NewStack
+  IN      VOID                      *Context1,   OPTIONAL
+  IN      VOID                      *Context2,   OPTIONAL
+  IN      VOID                      *NewStack,
+  IN      VA_LIST                   Marker
   );
 
 //
@@ -656,9 +664,9 @@ InternalSyncDecrement (
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
 
   Performs an atomic compare exchange operation on the 32-bit unsigned integer
-  specified by Value.  If Value is equal to CompareValue, then Value is set to 
+  specified by Value.  If Value is equal to CompareValue, then Value is set to
   ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
-  then Value is returned.  The compare exchange operation must be performed using 
+  then Value is returned.  The compare exchange operation must be performed using
   MP safe mechanisms.
 
   @param  Value         A pointer to the 32-bit value for the compare exchange
@@ -680,9 +688,9 @@ InternalSyncCompareExchange32 (
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
 
-  Performs an atomic compare exchange operation on the 64-bit unsigned integer specified 
-  by Value.  If Value is equal to CompareValue, then Value is set to ExchangeValue and 
-  CompareValue is returned.  If Value is not equal to CompareValue, then Value is returned. 
+  Performs an atomic compare exchange operation on the 64-bit unsigned integer specified
+  by Value.  If Value is equal to CompareValue, then Value is set to ExchangeValue and
+  CompareValue is returned.  If Value is not equal to CompareValue, then Value is returned.
   The compare exchange operation must be performed using MP safe mechanisms.
 
   @param  Value         A pointer to the 64-bit value for the compare exchange
@@ -721,7 +729,7 @@ BitFieldReadUint (
   );
 
 /**
-  Worker function that reads a bit field from Operand, performs a bitwise OR, 
+  Worker function that reads a bit field from Operand, performs a bitwise OR,
   and returns the result.
 
   Performs a bitwise OR between the bit field specified by StartBit and EndBit
@@ -745,7 +753,7 @@ BitFieldOrUint (
   );
 
 /**
-  Worker function that reads a bit field from Operand, performs a bitwise AND, 
+  Worker function that reads a bit field from Operand, performs a bitwise AND,
   and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
@@ -784,6 +792,7 @@ InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );
 
+
 /**
   Restores the CPU context that was saved with SetJump().
 
@@ -800,6 +809,43 @@ EFIAPI
 InternalLongJump (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
   IN      UINTN                     Value
+  );
+
+
+//
+// IPF specific functions
+//
+
+/**
+  Transfers control to a function starting with a new stack.
+
+  Transfers control to the function specified by EntryPoint using the new stack
+  specified by NewStack and passing in the parameters specified by Context1 and
+  Context2. Context1 and Context2 are optional and may be NULL. The function
+  EntryPoint must never return.
+
+  If EntryPoint is NULL, then ASSERT().
+  If NewStack is NULL, then ASSERT().
+
+  @param  EntryPoint  A pointer to function to call with the new stack.
+  @param  Context1    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  Context2    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                      function.
+  @param  NewBsp      A pointer to the new memory location for RSE backing
+                      store.
+
+**/
+VOID
+EFIAPI
+AsmSwitchStackAndBackingStore (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *NewStack,
+  IN      VOID                      *NewBsp
   );
 
 #endif

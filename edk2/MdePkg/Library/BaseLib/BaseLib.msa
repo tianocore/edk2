@@ -499,7 +499,7 @@
     <Filename SupArchList="IPF">Ipf/CpuPause.s</Filename>
     <Filename SupArchList="IPF">Ipf/CpuFlushTlb.s</Filename>
     <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
-    <Filename SupArchList="IPF">Ipf/Non-existing.c</Filename>
+    <Filename SupArchList="IPF">Ipf/InternalSwitchStack.c</Filename>
     <Filename SupArchList="IPF">Ipf/FlushCacheRange.s</Filename>
     <Filename SupArchList="IPF">Ipf/ReadItc.s</Filename>
 
