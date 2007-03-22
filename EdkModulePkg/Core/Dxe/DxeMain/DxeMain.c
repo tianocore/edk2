@@ -848,6 +848,11 @@ DxeMainUefiDecompressGetInfo (
   OUT  UINT32                           *ScratchSize
   )
 {
+  if (Source == NULL 
+        || DestinationSize == NULL 
+        || ScratchSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   return UefiDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
 }
 
@@ -866,7 +871,13 @@ DxeMainUefiDecompress (
   EFI_STATUS  Status;
   UINT32      TestDestinationSize;
   UINT32      TestScratchSize;
-
+  
+  if (Source == NULL 
+        || Destination== NULL 
+        || Scratch == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   Status = UefiDecompressGetInfo (Source, SourceSize, &TestDestinationSize, &TestScratchSize);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -888,6 +899,12 @@ DxeMainTianoDecompressGetInfo (
   OUT  UINT32                           *ScratchSize
   )
 {
+  if (Source == NULL 
+        || DestinationSize == NULL 
+        || ScratchSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   return TianoDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
 }
 
@@ -906,7 +923,13 @@ DxeMainTianoDecompress (
   EFI_STATUS  Status;
   UINT32      TestDestinationSize;
   UINT32      TestScratchSize;
-
+  
+  if (Source == NULL 
+        || Destination== NULL 
+        || Scratch == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   Status = TianoDecompressGetInfo (Source, SourceSize, &TestDestinationSize, &TestScratchSize);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -928,6 +951,12 @@ DxeMainCustomDecompressGetInfo (
   OUT  UINT32                            *ScratchSize
   )
 {
+  if (Source == NULL 
+        || DestinationSize == NULL 
+        || ScratchSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   return CustomDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
 }
 
@@ -946,6 +975,12 @@ DxeMainCustomDecompress (
   EFI_STATUS  Status;
   UINT32      TestDestinationSize;
   UINT32      TestScratchSize;
+
+  if (Source == NULL 
+        || Destination== NULL 
+        || Scratch == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = CustomDecompressGetInfo (Source, SourceSize, &TestDestinationSize, &TestScratchSize);
   if (EFI_ERROR (Status)) {
