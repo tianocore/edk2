@@ -395,22 +395,22 @@ StrnCat (
   );
 
 /**
-  Returns the first occurance of a Null-terminated Unicode sub-string 
+  Returns the first occurance of a Null-terminated Unicode sub-string
   in a Null-terminated Unicode string.
 
-  This function scans the contents of the Null-terminated Unicode string 
-  specified by String and returns the first occurrence of SearchString.  
-  If SearchString is not found in String, then NULL is returned.  If 
-  the length of SearchString is zero, then String is 
+  This function scans the contents of the Null-terminated Unicode string
+  specified by String and returns the first occurrence of SearchString.
+  If SearchString is not found in String, then NULL is returned.  If
+  the length of SearchString is zero, then String is
   returned.
-  
+
   If String is NULL, then ASSERT().
   If String is not aligned on a 16-bit boundary, then ASSERT().
   If SearchString is NULL, then ASSERT().
   If SearchString is not aligned on a 16-bit boundary, then ASSERT().
 
-  If PcdMaximumUnicodeStringLength is not zero, and SearchString 
-  or String contains more than PcdMaximumUnicodeStringLength Unicode 
+  If PcdMaximumUnicodeStringLength is not zero, and SearchString
+  or String contains more than PcdMaximumUnicodeStringLength Unicode
   characters not including the Null-terminator, then ASSERT().
 
   @param  String				  Pointer to a Null-terminated Unicode string.
@@ -428,37 +428,37 @@ StrStr (
   );
 
 /**
-  Convert a Null-terminated Unicode decimal string to a value of 
+  Convert a Null-terminated Unicode decimal string to a value of
   type UINTN.
 
-  This function returns a value of type UINTN by interpreting the contents 
-  of the Unicode string specified by String as a decimal number. The format 
+  This function returns a value of type UINTN by interpreting the contents
+  of the Unicode string specified by String as a decimal number. The format
   of the input Unicode string String is:
-  
+
                   [spaces] [decimal digits].
-                  
-  The valid decimal digit character is in the range [0-9]. The 
-  function will ignore the pad space, which includes spaces or 
-  tab characters, before [decimal digits]. The running zero in the 
-  beginning of [decimal digits] will be ignored. Then, the function 
-  stops at the first character that is a not a valid decimal character 
-  or a Null-terminator, whichever one comes first. 
-  
+
+  The valid decimal digit character is in the range [0-9]. The
+  function will ignore the pad space, which includes spaces or
+  tab characters, before [decimal digits]. The running zero in the
+  beginning of [decimal digits] will be ignored. Then, the function
+  stops at the first character that is a not a valid decimal character
+  or a Null-terminator, whichever one comes first.
+
   If String is NULL, then ASSERT().
-  If String is not aligned in a 16-bit boundary, then ASSERT().  
+  If String is not aligned in a 16-bit boundary, then ASSERT().
   If String has only pad spaces, then 0 is returned.
-  If String has no pad spaces or valid decimal digits, 
+  If String has no pad spaces or valid decimal digits,
   then 0 is returned.
-  If the number represented by String overflows according 
+  If the number represented by String overflows according
   to the range defined by UINTN, then ASSERT().
-  
-  If PcdMaximumUnicodeStringLength is not zero, and String contains 
-  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains
+  more than PcdMaximumUnicodeStringLength Unicode characters not including
   the Null-terminator, then ASSERT().
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINTN           
+  @retval UINTN
 
 **/
 UINTN
@@ -468,37 +468,37 @@ StrDecimalToUintn (
   );
 
 /**
-  Convert a Null-terminated Unicode decimal string to a value of 
+  Convert a Null-terminated Unicode decimal string to a value of
   type UINT64.
 
-  This function returns a value of type UINT64 by interpreting the contents 
-  of the Unicode string specified by String as a decimal number. The format 
+  This function returns a value of type UINT64 by interpreting the contents
+  of the Unicode string specified by String as a decimal number. The format
   of the input Unicode string String is:
-  
+
                   [spaces] [decimal digits].
-                  
-  The valid decimal digit character is in the range [0-9]. The 
-  function will ignore the pad space, which includes spaces or 
-  tab characters, before [decimal digits]. The running zero in the 
-  beginning of [decimal digits] will be ignored. Then, the function 
-  stops at the first character that is a not a valid decimal character 
-  or a Null-terminator, whichever one comes first. 
-  
+
+  The valid decimal digit character is in the range [0-9]. The
+  function will ignore the pad space, which includes spaces or
+  tab characters, before [decimal digits]. The running zero in the
+  beginning of [decimal digits] will be ignored. Then, the function
+  stops at the first character that is a not a valid decimal character
+  or a Null-terminator, whichever one comes first.
+
   If String is NULL, then ASSERT().
-  If String is not aligned in a 16-bit boundary, then ASSERT().  
+  If String is not aligned in a 16-bit boundary, then ASSERT().
   If String has only pad spaces, then 0 is returned.
-  If String has no pad spaces or valid decimal digits, 
+  If String has no pad spaces or valid decimal digits,
   then 0 is returned.
-  If the number represented by String overflows according 
+  If the number represented by String overflows according
   to the range defined by UINT64, then ASSERT().
-  
-  If PcdMaximumUnicodeStringLength is not zero, and String contains 
-  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains
+  more than PcdMaximumUnicodeStringLength Unicode characters not including
   the Null-terminator, then ASSERT().
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINT64           
+  @retval UINT64
 
 **/
 UINT64
@@ -510,31 +510,31 @@ StrDecimalToUint64 (
 /**
   Convert a Null-terminated Unicode hexadecimal string to a value of type UINTN.
 
-  This function returns a value of type UINTN by interpreting the contents 
-  of the Unicode string specified by String as a hexadecimal number. 
+  This function returns a value of type UINTN by interpreting the contents
+  of the Unicode string specified by String as a hexadecimal number.
   The format of the input Unicode string String is:
-  
-                  [spaces][zeros][x][hexadecimal digits]. 
 
-  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
-  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. 
-  If "x" appears in the input string, it must be prefixed with at least one 0. 
-  The function will ignore the pad space, which includes spaces or tab characters, 
-  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or 
-  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the 
-  first valid hexadecimal digit. Then, the function stops at the first character that is 
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix.
+  If "x" appears in the input string, it must be prefixed with at least one 0.
+  The function will ignore the pad space, which includes spaces or tab characters,
+  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or
+  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the
+  first valid hexadecimal digit. Then, the function stops at the first character that is
   a not a valid hexadecimal character or NULL, whichever one comes first.
 
   If String is NULL, then ASSERT().
   If String is not aligned in a 16-bit boundary, then ASSERT().
   If String has only pad spaces, then zero is returned.
-  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, 
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
-  If the number represented by String overflows according to the range defined by 
+  If the number represented by String overflows according to the range defined by
   UINTN, then ASSERT().
 
-  If PcdMaximumUnicodeStringLength is not zero, and String contains more than 
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, 
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
   then ASSERT().
 
   @param  String			    Pointer to a Null-terminated Unicode string.
@@ -551,31 +551,31 @@ StrHexToUintn (
 /**
   Convert a Null-terminated Unicode hexadecimal string to a value of type UINT64.
 
-  This function returns a value of type UINT64 by interpreting the contents 
-  of the Unicode string specified by String as a hexadecimal number. 
-  The format of the input Unicode string String is 
-  
-                  [spaces][zeros][x][hexadecimal digits]. 
+  This function returns a value of type UINT64 by interpreting the contents
+  of the Unicode string specified by String as a hexadecimal number.
+  The format of the input Unicode string String is
 
-  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
-  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. 
-  If "x" appears in the input string, it must be prefixed with at least one 0. 
-  The function will ignore the pad space, which includes spaces or tab characters, 
-  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or 
-  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the 
-  first valid hexadecimal digit. Then, the function stops at the first character that is 
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix.
+  If "x" appears in the input string, it must be prefixed with at least one 0.
+  The function will ignore the pad space, which includes spaces or tab characters,
+  before [zeros], [x] or [hexadecimal digit]. The running zero before [x] or
+  [hexadecimal digit] will be ignored. Then, the decoding starts after [x] or the
+  first valid hexadecimal digit. Then, the function stops at the first character that is
   a not a valid hexadecimal character or NULL, whichever one comes first.
 
   If String is NULL, then ASSERT().
   If String is not aligned in a 16-bit boundary, then ASSERT().
   If String has only pad spaces, then zero is returned.
-  If String has no leading pad spaces, leading zeros or valid hexadecimal digits, 
+  If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
-  If the number represented by String overflows according to the range defined by 
+  If the number represented by String overflows according to the range defined by
   UINT64, then ASSERT().
 
-  If PcdMaximumUnicodeStringLength is not zero, and String contains more than 
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, 
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
   then ASSERT().
 
   @param  String			    Pointer to a Null-terminated Unicode string.
@@ -590,27 +590,27 @@ StrHexToUint64 (
   );
 
 /**
-  Convert one Null-terminated Unicode string to a Null-terminated 
+  Convert one Null-terminated Unicode string to a Null-terminated
   ASCII string and returns the ASCII string.
-  
-  This function converts the content of the Unicode string Source 
-  to the ASCII string Destination by copying the lower 8 bits of 
-  each Unicode character. It returns Destination. 
 
-  If any Unicode characters in Source contain non-zero value in 
+  This function converts the content of the Unicode string Source
+  to the ASCII string Destination by copying the lower 8 bits of
+  each Unicode character. It returns Destination.
+
+  If any Unicode characters in Source contain non-zero value in
   the upper 8 bits, then ASSERT().
-  
+
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source is not aligned on a 16-bit boundary, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains 
-  more than PcdMaximumUnicodeStringLength Unicode characters not including 
+
+  If PcdMaximumUnicodeStringLength is not zero, and Source contains
+  more than PcdMaximumUnicodeStringLength Unicode characters not including
   the Null-terminator, then ASSERT().
-  
-  If PcdMaximumAsciiStringLength is not zero, and Source contains more 
-  than PcdMaximumAsciiStringLength Unicode characters not including the 
+
+  If PcdMaximumAsciiStringLength is not zero, and Source contains more
+  than PcdMaximumAsciiStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  Source        Pointer to a Null-terminated Unicode string.
@@ -907,19 +907,19 @@ AsciiStrnCat (
   );
 
 /**
-  Returns the first occurance of a Null-terminated ASCII sub-string 
+  Returns the first occurance of a Null-terminated ASCII sub-string
   in a Null-terminated ASCII string.
 
-  This function scans the contents of the ASCII string specified by String 
-  and returns the first occurrence of SearchString. If SearchString is not 
-  found in String, then NULL is returned. If the length of SearchString is zero, 
+  This function scans the contents of the ASCII string specified by String
+  and returns the first occurrence of SearchString. If SearchString is not
+  found in String, then NULL is returned. If the length of SearchString is zero,
   then String is returned.
-  
+
   If String is NULL, then ASSERT().
   If SearchString is NULL, then ASSERT().
 
-  If PcdMaximumAsciiStringLength is not zero, and SearchString or 
-  String contains more than PcdMaximumAsciiStringLength Unicode characters 
+  If PcdMaximumAsciiStringLength is not zero, and SearchString or
+  String contains more than PcdMaximumAsciiStringLength Unicode characters
   not including the Null-terminator, then ASSERT().
 
   @param  String				  Pointer to a Null-terminated ASCII string.
@@ -937,33 +937,33 @@ AsciiStrStr (
   );
 
 /**
-  Convert a Null-terminated ASCII decimal string to a value of type 
+  Convert a Null-terminated ASCII decimal string to a value of type
   UINTN.
 
-  This function returns a value of type UINTN by interpreting the contents 
-  of the ASCII string String as a decimal number. The format of the input 
+  This function returns a value of type UINTN by interpreting the contents
+  of the ASCII string String as a decimal number. The format of the input
   ASCII string String is:
-  
+
                     [spaces] [decimal digits].
-  
-  The valid decimal digit character is in the range [0-9]. The function will 
-  ignore the pad space, which includes spaces or tab characters, before the digits. 
-  The running zero in the beginning of [decimal digits] will be ignored. Then, the 
-  function stops at the first character that is a not a valid decimal character or 
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before the digits.
+  The running zero in the beginning of [decimal digits] will be ignored. Then, the
+  function stops at the first character that is a not a valid decimal character or
   Null-terminator, whichever on comes first.
-  
+
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
-  If the number represented by String overflows according to the range defined by 
+  If the number represented by String overflows according to the range defined by
   UINTN, then ASSERT().
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and String contains more than 
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINTN           
+  @retval UINTN
 
 **/
 UINTN
@@ -973,33 +973,33 @@ AsciiStrDecimalToUintn (
   );
 
 /**
-  Convert a Null-terminated ASCII decimal string to a value of type 
+  Convert a Null-terminated ASCII decimal string to a value of type
   UINT64.
 
-  This function returns a value of type UINT64 by interpreting the contents 
-  of the ASCII string String as a decimal number. The format of the input 
+  This function returns a value of type UINT64 by interpreting the contents
+  of the ASCII string String as a decimal number. The format of the input
   ASCII string String is:
-  
+
                     [spaces] [decimal digits].
-  
-  The valid decimal digit character is in the range [0-9]. The function will 
-  ignore the pad space, which includes spaces or tab characters, before the digits. 
-  The running zero in the beginning of [decimal digits] will be ignored. Then, the 
-  function stops at the first character that is a not a valid decimal character or 
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before the digits.
+  The running zero in the beginning of [decimal digits] will be ignored. Then, the
+  function stops at the first character that is a not a valid decimal character or
   Null-terminator, whichever on comes first.
-  
+
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
-  If the number represented by String overflows according to the range defined by 
+  If the number represented by String overflows according to the range defined by
   UINT64, then ASSERT().
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and String contains more than 
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINT64           
+  @retval UINT64
 
 **/
 UINT64
@@ -1011,30 +1011,30 @@ AsciiStrDecimalToUint64 (
 /**
   Convert a Null-terminated ASCII hexadecimal string to a value of type UINTN.
 
-  This function returns a value of type UINTN by interpreting the contents of 
-  the ASCII string String as a hexadecimal number. The format of the input ASCII 
+  This function returns a value of type UINTN by interpreting the contents of
+  the ASCII string String as a hexadecimal number. The format of the input ASCII
   string String is:
-  
+
                   [spaces][zeros][x][hexadecimal digits].
-                  
-  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
-  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x" 
-  appears in the input string, it must be prefixed with at least one 0. The function 
-  will ignore the pad space, which includes spaces or tab characters, before [zeros], 
-  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits] 
-  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal 
-  digit. Then, the function stops at the first character that is a not a valid 
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x"
+  appears in the input string, it must be prefixed with at least one 0. The function
+  will ignore the pad space, which includes spaces or tab characters, before [zeros],
+  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits]
+  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal
+  digit. Then, the function stops at the first character that is a not a valid
   hexadecimal character or Null-terminator, whichever on comes first.
-  
+
   If String has only pad spaces, then 0 is returned.
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits, then
   0 is returned.
 
-  If the number represented by String overflows according to the range defined by UINTN, 
+  If the number represented by String overflows according to the range defined by UINTN,
   then ASSERT().
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, 
-  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including 
+  If PcdMaximumAsciiStringLength is not zero,
+  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
   the Null-terminator, then ASSERT().
 
   @param  String			    Pointer to a Null-terminated ASCII string.
@@ -1051,30 +1051,30 @@ AsciiStrHexToUintn (
 /**
   Convert a Null-terminated ASCII hexadecimal string to a value of type UINT64.
 
-  This function returns a value of type UINT64 by interpreting the contents of 
-  the ASCII string String as a hexadecimal number. The format of the input ASCII 
+  This function returns a value of type UINT64 by interpreting the contents of
+  the ASCII string String as a hexadecimal number. The format of the input ASCII
   string String is:
-  
+
                   [spaces][zeros][x][hexadecimal digits].
-                  
-  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F]. 
-  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x" 
-  appears in the input string, it must be prefixed with at least one 0. The function 
-  will ignore the pad space, which includes spaces or tab characters, before [zeros], 
-  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits] 
-  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal 
-  digit. Then, the function stops at the first character that is a not a valid 
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If "x"
+  appears in the input string, it must be prefixed with at least one 0. The function
+  will ignore the pad space, which includes spaces or tab characters, before [zeros],
+  [x] or [hexadecimal digits]. The running zero before [x] or [hexadecimal digits]
+  will be ignored. Then, the decoding starts after [x] or the first valid hexadecimal
+  digit. Then, the function stops at the first character that is a not a valid
   hexadecimal character or Null-terminator, whichever on comes first.
-  
+
   If String has only pad spaces, then 0 is returned.
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits, then
   0 is returned.
 
-  If the number represented by String overflows according to the range defined by UINT64, 
+  If the number represented by String overflows according to the range defined by UINT64,
   then ASSERT().
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, 
-  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including 
+  If PcdMaximumAsciiStringLength is not zero,
+  and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
   the Null-terminator, then ASSERT().
 
   @param  String			    Pointer to a Null-terminated ASCII string.
@@ -1089,24 +1089,24 @@ AsciiStrHexToUint64 (
   );
 
 /**
-  Convert one Null-terminated ASCII string to a Null-terminated 
+  Convert one Null-terminated ASCII string to a Null-terminated
   Unicode string and returns the Unicode string.
 
-  This function converts the contents of the ASCII string Source to the Unicode 
-  string Destination, and returns Destination.  The function terminates the 
-  Unicode string Destination by appending a Null-terminator character at the end. 
-  The caller is responsible to make sure Destination points to a buffer with size 
+  This function converts the contents of the ASCII string Source to the Unicode
+  string Destination, and returns Destination.  The function terminates the
+  Unicode string Destination by appending a Null-terminator character at the end.
+  The caller is responsible to make sure Destination points to a buffer with size
   equal or greater than ((AsciiStrLen (Source) + 1) * sizeof (CHAR16)) in bytes.
-  
+
   If Destination is NULL, then ASSERT().
   If Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and Source contains more than 
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, 
+  If PcdMaximumAsciiStringLength is not zero, and Source contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than 
-  PcdMaximumUnicodeStringLength ASCII characters not including the 
+  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
+  PcdMaximumUnicodeStringLength ASCII characters not including the
   Null-terminator, then ASSERT().
 
   @param  Source        Pointer to a Null-terminated ASCII string.
@@ -3018,16 +3018,16 @@ InterlockedCompareExchangePointer (
 //
 
 /**
-  Calculate the sum of all elements in a buffer in unit of UINT8. 
+  Calculate the sum of all elements in a buffer in unit of UINT8.
   During calculation, the carry bits are dropped.
 
-  This function calculates the sum of all elements in a buffer 
-  in unit of UINT8. The carry bits in result of addition are dropped. 
-  The result is returned as UINT8. If Length is Zero, then Zero is 
+  This function calculates the sum of all elements in a buffer
+  in unit of UINT8. The carry bits in result of addition are dropped.
+  The result is returned as UINT8. If Length is Zero, then Zero is
   returned.
-  
+
   If Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer			Pointer to the buffer to carry out the sum operation.
   @param  Length	    The size, in bytes, of Buffer .
@@ -3044,14 +3044,14 @@ CalculateSum8 (
 
 
 /**
-  Returns the two's complement checksum of all elements in a buffer 
+  Returns the two's complement checksum of all elements in a buffer
   of 8-bit values.
 
-  This function first calculates the sum of the 8-bit values in the 
-  buffer specified by Buffer and Length.  The carry bits in the result 
-  of addition are dropped. Then, the two's complement of the sum is 
+  This function first calculates the sum of the 8-bit values in the
+  buffer specified by Buffer and Length.  The carry bits in the result
+  of addition are dropped. Then, the two's complement of the sum is
   returned.  If Length is 0, then 0 is returned.
-  
+
   If Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
@@ -3070,13 +3070,13 @@ CalculateCheckSum8 (
   );
 
 /**
-  Returns the sum of all elements in a buffer of 16-bit values.  During 
+  Returns the sum of all elements in a buffer of 16-bit values.  During
   calculation, the carry bits are dropped.
 
-  This function calculates the sum of the 16-bit values in the buffer 
-  specified by Buffer and Length. The carry bits in result of addition are dropped. 
-  The 16-bit result is returned.  If Length is 0, then 0 is returned.  
-  
+  This function calculates the sum of the 16-bit values in the buffer
+  specified by Buffer and Length. The carry bits in result of addition are dropped.
+  The 16-bit result is returned.  If Length is 0, then 0 is returned.
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If Length is not aligned on a 16-bit boundary, then ASSERT().
@@ -3096,18 +3096,18 @@ CalculateSum16 (
   );
 
 /**
-  Returns the two's complement checksum of all elements in a buffer of 
+  Returns the two's complement checksum of all elements in a buffer of
   16-bit values.
 
-  This function first calculates the sum of the 16-bit values in the buffer 
-  specified by Buffer and Length.  The carry bits in the result of addition 
-  are dropped. Then, the two's complement of the sum is returned.  If Length 
+  This function first calculates the sum of the 16-bit values in the buffer
+  specified by Buffer and Length.  The carry bits in the result of addition
+  are dropped. Then, the two's complement of the sum is returned.  If Length
   is 0, then 0 is returned.
-  
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If Length is not aligned on a 16-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer			Pointer to the buffer to carry out the checksum operation.
   @param  Length	    The size, in bytes, of Buffer.
@@ -3123,13 +3123,13 @@ CalculateCheckSum16 (
   );
 
 /**
-  Returns the sum of all elements in a buffer of 32-bit values.  During 
+  Returns the sum of all elements in a buffer of 32-bit values.  During
   calculation, the carry bits are dropped.
 
-  This function calculates the sum of the 32-bit values in the buffer 
-  specified by Buffer and Length. The carry bits in result of addition are dropped. 
-  The 32-bit result is returned.  If Length is 0, then 0 is returned.  
-  
+  This function calculates the sum of the 32-bit values in the buffer
+  specified by Buffer and Length. The carry bits in result of addition are dropped.
+  The 32-bit result is returned.  If Length is 0, then 0 is returned.
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().
@@ -3149,18 +3149,18 @@ CalculateSum32 (
   );
 
 /**
-  Returns the two's complement checksum of all elements in a buffer of 
+  Returns the two's complement checksum of all elements in a buffer of
   32-bit values.
 
-  This function first calculates the sum of the 32-bit values in the buffer 
-  specified by Buffer and Length.  The carry bits in the result of addition 
-  are dropped. Then, the two's complement of the sum is returned.  If Length 
+  This function first calculates the sum of the 32-bit values in the buffer
+  specified by Buffer and Length.  The carry bits in the result of addition
+  are dropped. Then, the two's complement of the sum is returned.  If Length
   is 0, then 0 is returned.
-  
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer			Pointer to the buffer to carry out the checksum operation.
   @param  Length	    The size, in bytes, of Buffer.
@@ -3176,13 +3176,13 @@ CalculateCheckSum32 (
   );
 
 /**
-  Returns the sum of all elements in a buffer of 64-bit values.  During 
+  Returns the sum of all elements in a buffer of 64-bit values.  During
   calculation, the carry bits are dropped.
 
-  This function calculates the sum of the 64-bit values in the buffer 
-  specified by Buffer and Length. The carry bits in result of addition are dropped. 
-  The 64-bit result is returned.  If Length is 0, then 0 is returned.  
-  
+  This function calculates the sum of the 64-bit values in the buffer
+  specified by Buffer and Length. The carry bits in result of addition are dropped.
+  The 64-bit result is returned.  If Length is 0, then 0 is returned.
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
@@ -3202,18 +3202,18 @@ CalculateSum64 (
   );
 
 /**
-  Returns the two's complement checksum of all elements in a buffer of 
+  Returns the two's complement checksum of all elements in a buffer of
   64-bit values.
 
-  This function first calculates the sum of the 64-bit values in the buffer 
-  specified by Buffer and Length.  The carry bits in the result of addition 
-  are dropped. Then, the two's complement of the sum is returned.  If Length 
+  This function first calculates the sum of the 64-bit values in the buffer
+  specified by Buffer and Length.  The carry bits in the result of addition
+  are dropped. Then, the two's complement of the sum is returned.  If Length
   is 0, then 0 is returned.
-  
+
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer			Pointer to the buffer to carry out the checksum operation.
   @param  Length	    The size, in bytes, of Buffer.
@@ -3429,10 +3429,14 @@ CpuFlushTlb (
 /**
   Transfers control to a function starting with a new stack.
 
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
+  Transfers control to the function specified by EntryPoint using the
+  new stack specified by NewStack and passing in the parameters specified
+  by Context1 and Context2.  Context1 and Context2 are optional and may
+  be NULL.  The function EntryPoint must never return.  This function
+  supports a variable number of arguments following the NewStack parameter.
+  These additional arguments are ignored on IA-32, x64, and EBC.
+  IPF CPUs expect one additional parameter of type VOID * that specifies
+  the new backing store pointer.
 
   If EntryPoint is NULL, then ASSERT().
   If NewStack is NULL, then ASSERT().
@@ -3452,7 +3456,8 @@ SwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,  OPTIONAL
   IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack
+  IN      VOID                      *NewStack,
+  ...
   );
 
 /**
@@ -5666,38 +5671,6 @@ AsmPrepareAndThunk16 (
   IN OUT  THUNK_CONTEXT             *ThunkContext
   );
 
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new memory location for RSE backing
-                      store.
-
-**/
-VOID
-EFIAPI
-AsmSwitchStackAndBackingStore (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack,
-  IN      VOID                      *NewBsp
-  );
-
 typedef struct {
   UINT64                            Status;
   UINT64                            r9;
@@ -5751,21 +5724,21 @@ IpfReadItc (
 
 
 /**
-  Flush a range of  cache lines in the cache coherency domain of the calling 
+  Flush a range of  cache lines in the cache coherency domain of the calling
   CPU.
 
-  Invalidates the  cache lines specified by Address and Length. If Address is 
-  not aligned on a cache line boundary, then entire cache line containing 
-  Address is invalidated. If Address + Length is not aligned on a cache line 
+  Invalidates the  cache lines specified by Address and Length. If Address is
+  not aligned on a cache line boundary, then entire cache line containing
+  Address is invalidated. If Address + Length is not aligned on a cache line
   boundary, then the entire instruction cache line containing Address + Length
-  -1 is invalidated. This function may choose to invalidate the entire 
-  instruction cache if that is more efficient than invalidating the specified 
-  range. If Length is 0, the no instruction cache lines are invalidated. 
+  -1 is invalidated. This function may choose to invalidate the entire
+  instruction cache if that is more efficient than invalidating the specified
+  range. If Length is 0, the no instruction cache lines are invalidated.
   Address is returned.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
-  @param  Address The base address of the instruction lines to invalidate. If 
+  @param  Address The base address of the instruction lines to invalidate. If
                   the CPU is in a physical addressing mode, then Address is a
                   physical address. If the CPU is in a virtual addressing mode,
                   then Address is a virtual address.
