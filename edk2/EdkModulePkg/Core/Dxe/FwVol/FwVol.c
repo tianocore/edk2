@@ -1,6 +1,9 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+  Firmware File System driver that produce Firmware Volume protocol.
+  Layers on top of Firmware Block protocol to produce a file abstraction 
+  of FV based files.
+  
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,17 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  FwVol.c
-
-Abstract:
-
-  Firmware File System driver that produce Firmware Volume protocol.
-  Layers on top of Firmware Block protocol to produce a file abstraction 
-  of FV based files.
-
---*/
+**/
 
 #include <DxeMain.h>
 
@@ -228,7 +221,8 @@ Returns:
   // the header to check to make sure the volume is valid
   //
   Size = (UINTN)(FwVolHeader->FvLength - FwVolHeader->HeaderLength);
-  FvDevice->CachedFv = CoreAllocateZeroBootServicesPool (Size);
+  FvDevice->CachedFv = CoreAllocateBootServicesPool (Size);
+
   if (FvDevice->CachedFv == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
