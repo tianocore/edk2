@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006, Intel Corporation
+#  Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -413,6 +413,30 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_ELFGCC_IA32_*_PATH       = /usr/bin
 
+####################################################################################
+#
+# UnixPkg CYGWIN GCC - This configuration is used to compile on CYGWIN environment for UnixPkg.
+#
+####################################################################################
+
+
+*_UNIXPKGCYGWINGCC_*_*_FAMILY        = GCC
+
+*_UNIXPKGCYGWINGCC_IA32_CC_NAME      = gcc
+*_UNIXPKGCYGWINGCC_IA32_SLINK_NAME   = ar
+*_UNIXPKGCYGWINGCC_IA32_DLINK_NAME   = ld
+*_UNIXPKGCYGWINGCC_IA32_ASM_NAME     = gcc
+*_UNIXPKGCYGWINGCC_IA32_PP_NAME      = gcc
+*_UNIXPKGCYGWINGCC_IA32_VFRPP_NAME   = gcc
+
+*_UNIXPKGCYGWINGCC_IA32_CC_FLAGS     = -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include ${DEST_DIR_DEBUG}/AutoGen.h -DSTRING_ARRAY_NAME=${BASE_NAME}Strings -IC:/cygwin/usr/X11R6/include
+*_UNIXPKGCYGWINGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
+*_UNIXPKGCYGWINGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
+*_UNIXPKGCYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_UNIXPKGCYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
+*_UNIXPKGCYGWINGCC_*_ASM_EXT         = .S
+
+*_UNIXPKGCYGWINGCC_IA32_*_PATH       = c:/Cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 
 ####################################################################################
 #
