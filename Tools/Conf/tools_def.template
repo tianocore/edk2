@@ -436,7 +436,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXPKGCYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
 *_UNIXPKGCYGWINGCC_*_ASM_EXT         = .S
 
-*_UNIXPKGCYGWINGCC_IA32_*_PATH       = c:/Cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_UNIXPKGCYGWINGCC_IA32_*_PATH       = C:/cygwin/bin
 
 ####################################################################################
 #
