@@ -1100,7 +1100,11 @@ public class AutoGen {
                         if (!entryPointList[i].equals("")) {
                             fileBuffer.append("  if (SetJump (&mJumpContext) == 0) {\r\n");
                             fileBuffer.append(String.format("    " + debugStr, entryPointList[i], entryPointList[i]));
-                            fileBuffer.append("    ExitDriver (");
+                            if (CommonDefinition.getModuleType(typeStr) == CommonDefinition.ModuleTypeUefiApplication) {
+                                fileBuffer.append("    Exit (");
+                            } else {
+                                fileBuffer.append("    ExitDriver (");
+                            }
                             fileBuffer.append(entryPointList[i]);
                             fileBuffer.append(" (ImageHandle, SystemTable));\r\n");
                             fileBuffer.append("    ASSERT (FALSE);\r\n");
@@ -1113,25 +1117,27 @@ public class AutoGen {
                 }
                 fileBuffer.append("}\r\n\r\n");
 
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append("ExitDriver (\r\n");
-                fileBuffer.append("  IN EFI_STATUS  Status\r\n");
-                fileBuffer.append("  )\r\n\r\n");
-                fileBuffer.append("{\r\n");
-                if (entryPointCount <= 1) {
-                    fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
-                    fileBuffer.append("    ProcessLibraryDestructorList (gImageHandle, gST);\r\n");
-                    fileBuffer.append("  }\r\n");
-                    fileBuffer.append("  gBS->Exit (gImageHandle, Status, 0, NULL);\r\n");
-                } else {
-                    fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\r\n");
-                    fileBuffer.append("    mDriverEntryPointStatus = Status;\r\n");
-                    fileBuffer.append("  }\r\n");
-                    fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\r\n");
-                    fileBuffer.append("  ASSERT (FALSE);\r\n");
+                if (CommonDefinition.getModuleType(typeStr) != CommonDefinition.ModuleTypeUefiApplication) {
+                    fileBuffer.append("VOID\r\n");
+                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("ExitDriver (\r\n");
+                    fileBuffer.append("  IN EFI_STATUS  Status\r\n");
+                    fileBuffer.append("  )\r\n\r\n");
+                    fileBuffer.append("{\r\n");
+                    if (entryPointCount <= 1) {
+                        fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
+                        fileBuffer.append("    ProcessLibraryDestructorList (gImageHandle, gST);\r\n");
+                        fileBuffer.append("  }\r\n");
+                        fileBuffer.append("  gBS->Exit (gImageHandle, Status, 0, NULL);\r\n");
+                    } else {
+                        fileBuffer.append("  if (!EFI_ERROR (Status) || EFI_ERROR (mDriverEntryPointStatus)) {\r\n");
+                        fileBuffer.append("    mDriverEntryPointStatus = Status;\r\n");
+                        fileBuffer.append("  }\r\n");
+                        fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\r\n");
+                        fileBuffer.append("  ASSERT (FALSE);\r\n");
+                    }
+                    fileBuffer.append("}\r\n\r\n");
                 }
-                fileBuffer.append("}\r\n\r\n");
             }
 
             if (CommonDefinition.getModuleType(typeStr) == CommonDefinition.ModuleTypeUefiApplication) {
