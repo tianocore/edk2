@@ -2,13 +2,13 @@
   Private data structures for the Console Splitter driver
 
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -94,20 +94,11 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUT_PROTOCOL    TextOut;
   EFI_SIMPLE_TEXT_OUTPUT_MODE     TextOutMode;
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-  EFI_UGA_DRAW_PROTOCOL           UgaDraw;
-  UINT32                          UgaHorizontalResolution;
-  UINT32                          UgaVerticalResolution;
-  UINT32                          UgaColorDepth;
-  UINT32                          UgaRefreshRate;
-  EFI_UGA_PIXEL                   *UgaBlt;
-#else
   EFI_GRAPHICS_OUTPUT_PROTOCOL    GraphicsOutput;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *GraphicsOutputBlt;
   TEXT_OUT_GOP_MODE               *GraphicsOutputModeBuffer;
   UINTN                           CurrentNumberOfGraphicsOutput;
   BOOLEAN                         HardwareNeedsStarting;
-#endif
 
   EFI_CONSOLE_CONTROL_PROTOCOL    ConsoleControl;
 
@@ -626,52 +617,6 @@ DevNullGopSync (
   )
 ;
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawGetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  OUT UINT32                          *HorizontalResolution,
-  OUT UINT32                          *VerticalResolution,
-  OUT UINT32                          *ColorDepth,
-  OUT UINT32                          *RefreshRate
-  )
-;
-
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawSetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  IN UINT32                           HorizontalResolution,
-  IN UINT32                           VerticalResolution,
-  IN UINT32                           ColorDepth,
-  IN UINT32                           RefreshRate
-  )
-;
-
-EFI_STATUS
-EFIAPI
-ConSpliterUgaDrawBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL                         *This,
-  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION                         BltOperation,
-  IN  UINTN                                         SourceX,
-  IN  UINTN                                         SourceY,
-  IN  UINTN                                         DestinationX,
-  IN  UINTN                                         DestinationY,
-  IN  UINTN                                         Width,
-  IN  UINTN                                         Height,
-  IN  UINTN                                         Delta         OPTIONAL
-  )
-;
-
-EFI_STATUS
-DevNullUgaSync (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  )
-;
-#endif
 
 EFI_STATUS
 DevNullTextOutOutputString (
