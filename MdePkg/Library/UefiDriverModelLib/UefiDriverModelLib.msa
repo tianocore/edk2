@@ -42,13 +42,13 @@
     <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="SOMETIMES_PRODUCED">
       <ProtocolCName>gEfiComponentNameProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="SOMETIMES_PRODUCED">
       <ProtocolCName>gEfiDriverConfigurationProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="SOMETIMES_PRODUCED">
       <ProtocolCName>gEfiDriverDiagnosticsProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
