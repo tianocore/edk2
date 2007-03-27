@@ -158,7 +158,11 @@ public class AutogenLibOrder {
         // First, add the library instance without consumers to the Q
         //
         for (int i = 0; i < libInstanceList.length; ++i) {
-            if (libInstanceConsumedBy.get(libInstanceList[i]).size() == 0) {
+            if (libInstanceList[i] == null) {
+                continue;
+            }
+            
+            if (libInstanceConsumedBy.get(libInstanceList[i]) == null ||  libInstanceConsumedBy.get(libInstanceList[i]).size() == 0) {
                 noConsumerList.add(libInstanceList[i]);
             }
         }
@@ -174,7 +178,7 @@ public class AutogenLibOrder {
                     continue;
                 }
                 HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(m);
-                if (consumedBy.size() == 0) {
+                if (consumedBy == null || consumedBy.size() == 0) {
                   continue;
                 }
 
@@ -194,7 +198,7 @@ public class AutogenLibOrder {
                     }
 
                     HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstance);
-                    if (consumedBy.size() == 0) {
+                    if (consumedBy == null || consumedBy.size() == 0) {
                         continue;
                     }
 
@@ -234,7 +238,7 @@ public class AutogenLibOrder {
         boolean HasError = false;
         for (int i = 0; i < libInstanceList.length; ++i) {
             HashSet<ModuleIdentification> consumedBy = libInstanceConsumedBy.get(libInstanceList[i]);
-            if (consumedBy.size() > 0 && libInstanceList[i].hasConstructor()) {
+            if (consumedBy != null && consumedBy.size() > 0 && libInstanceList[i].hasConstructor()) {
                 EdkLog.log(EdkLog.EDK_ERROR, libInstanceList[i].getName()
                            + " with constructor has a circular dependency!");
                 ModuleIdentification[] consumedByList = consumedBy.toArray(new ModuleIdentification[consumedBy.size()]);
