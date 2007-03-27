@@ -48,7 +48,7 @@
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
   <Protocols>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
