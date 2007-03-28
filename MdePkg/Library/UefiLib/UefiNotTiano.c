@@ -109,7 +109,7 @@ EfiCreateEventLegacyBootEx (
                     NotifyContext,
                     LegacyBootEvent
                     );
-  } else if (gST->Hdr.Revision >= 0x00020000 ) {
+  } else {
     //
     // For UEFI 2.0 and the future use an Event Group
     //
@@ -121,11 +121,6 @@ EfiCreateEventLegacyBootEx (
                     &gEfiEventLegacyBootGuid,
                     LegacyBootEvent
                     );
-  } else {
-    //
-    // For EFI 1.10 with no Tiano extensions return unsupported
-    //
-    Status = EFI_UNSUPPORTED;
   }
 
   return Status;
@@ -204,7 +199,7 @@ EfiCreateEventReadyToBootEx (
                     NotifyContext,
                     ReadyToBootEvent
                     );
-  } else if (gST->Hdr.Revision >= 0x00020000) {
+  } else {
     //
     // For UEFI 2.0 and the future use an Event Group
     //
@@ -216,11 +211,6 @@ EfiCreateEventReadyToBootEx (
                     &gEfiEventReadyToBootGuid,
                     ReadyToBootEvent
                     );
-  } else {
-    //
-    // For EFI 1.10 with no Tiano extensions return unsupported
-    //
-    Status = EFI_UNSUPPORTED;
   }
 
   return Status;
