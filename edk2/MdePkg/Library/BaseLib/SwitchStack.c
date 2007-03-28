@@ -58,5 +58,8 @@ SwitchStack (
 
   InternalSwitchStack (EntryPoint, Context1, Context2, NewStack, Marker);
 
-  VA_END (Marker);
+  //
+  // InternalSwitchStack () will never return
+  //
+  ASSERT (FALSE);
 }
