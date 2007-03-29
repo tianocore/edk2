@@ -424,13 +424,9 @@ Returns:
     Variable = NextVariable;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  ValidBufferSize,
-                  (VOID **) &ValidBuffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  ValidBuffer = AllocatePool (ValidBufferSize);
+  if (ValidBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   SetMem (ValidBuffer, ValidBufferSize, 0xff);
@@ -481,7 +477,7 @@ Returns:
     }
   }
 
-  gBS->FreePool (ValidBuffer);
+  FreePool (ValidBuffer);
 
   if (EFI_ERROR (Status)) {
     *LastVariableOffset = 0;
@@ -1253,13 +1249,13 @@ Returns:
         *RemainingVariableStorageSize -= VariableSize;
       }
     }
-    
+
     //
     // Go to the next one
     //
     Variable = NextVariable;
   }
- 
+
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
@@ -1308,14 +1304,9 @@ Returns:
   UINTN                           Index;
   UINT8                           Data;
 
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  sizeof (ESAL_VARIABLE_GLOBAL),
-                  (VOID **) &mVariableModuleGlobal
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
+  mVariableModuleGlobal = AllocateRuntimePool (sizeof (ESAL_VARIABLE_GLOBAL));
+  if (mVariableModuleGlobal == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal[Physical].VariableServicesLock, EFI_TPL_NOTIFY);
@@ -1323,15 +1314,10 @@ Returns:
   //
   // Allocate memory for volatile variable store
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  VARIABLE_STORE_SIZE + SCRATCH_SIZE,
-                  (VOID **) &VolatileVariableStore
-                  );
-
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (mVariableModuleGlobal);
-    return Status;
+  VolatileVariableStore = AllocateRuntimePool (VARIABLE_STORE_SIZE + SCRATCH_SIZE);
+  if (VolatileVariableStore == NULL) {
+    FreePool (mVariableModuleGlobal);
+    return EFI_OUT_OF_RESOURCES;
   }
 
   SetMem (VolatileVariableStore, VARIABLE_STORE_SIZE + SCRATCH_SIZE, 0xff);
@@ -1367,8 +1353,8 @@ Returns:
 
   Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (mVariableModuleGlobal);
-    gBS->FreePool (VolatileVariableStore);
+    FreePool (mVariableModuleGlobal);
+    FreePool (VolatileVariableStore);
     return EFI_UNSUPPORTED;
   }
 
@@ -1378,8 +1364,8 @@ Returns:
                   GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (mVariableModuleGlobal);
-    gBS->FreePool (VolatileVariableStore);
+    FreePool (mVariableModuleGlobal);
+    FreePool (VolatileVariableStore);
     return EFI_UNSUPPORTED;
   }
   //
@@ -1448,8 +1434,8 @@ Returns:
     }
 
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (mVariableModuleGlobal);
-      gBS->FreePool (VolatileVariableStore);
+      FreePool (mVariableModuleGlobal);
+      FreePool (VolatileVariableStore);
       return Status;
     }
 
@@ -1473,8 +1459,8 @@ Returns:
   }
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (mVariableModuleGlobal);
-    gBS->FreePool (VolatileVariableStore);
+    FreePool (mVariableModuleGlobal);
+    FreePool (VolatileVariableStore);
   }
 
   return Status;

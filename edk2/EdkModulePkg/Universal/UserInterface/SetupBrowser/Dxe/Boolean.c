@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -49,7 +49,7 @@ Arguments:
 
 Returns:
 
-  NONE 
+  NONE
 
 --*/
 {
@@ -76,7 +76,7 @@ Returns:
     //
     // Free The Old Stack
     //
-    gBS->FreePool (mBooleanEvaluationStack);
+    FreePool (mBooleanEvaluationStack);
   }
 
   mBooleanEvaluationStack     = NewStack;
@@ -96,11 +96,11 @@ Routine Description:
 
 Arguments:
 
-  NONE 
+  NONE
 
 Returns:
 
-  NONE 
+  NONE
 
 --*/
 {
@@ -201,7 +201,7 @@ GrowBooleanExpression (
     //
     // Free The Old buffer
     //
-    gBS->FreePool (*BooleanExpression);
+    FreePool (*BooleanExpression);
   } else {
     //
     // Copy data into new buffer
@@ -484,7 +484,7 @@ Returns:
 
     Width = (*PIterator)->Width;
 
-    // 
+    //
     //  Because INVALID_OFFSET_VALUE - 1 is reserved for TRUE or FALSE, omit them.
     //
     if ((*PIterator)->QuestionId1 != INVALID_OFFSET_VALUE &&
@@ -498,7 +498,7 @@ Returns:
           MapValue = (UINT8) *MapBuffer;
         }
 
-        gBS->FreePool (MapBuffer);
+        FreePool (MapBuffer);
       }
 
       if (MapBuffer2 != NULL) {
@@ -508,16 +508,16 @@ Returns:
           MapValue2 = (UINT8) *MapBuffer2;
         }
 
-        gBS->FreePool (MapBuffer2);
+        FreePool (MapBuffer2);
       }
     }
 
     switch ((*PIterator)->Operand) {
     case EFI_IFR_EQ_VAR_VAL_OP:
       UnicodeValueToString (
-        VariableName, 
-        FALSE, 
-        (UINTN) (*PIterator)->QuestionId1, 
+        VariableName,
+        FALSE,
+        (UINTN) (*PIterator)->QuestionId1,
         (sizeof (VariableName) / sizeof (VariableName[0])) - 1
         );
 
@@ -727,7 +727,7 @@ Returns:
       return Operator;
     }
 
-    // 
+    //
     //  Because INVALID_OFFSET_VALUE - 1 is reserved for TRUE or FALSE, omit them.
     //
     if (Iterator->QuestionId1 != INVALID_OFFSET_VALUE &&
@@ -741,7 +741,7 @@ Returns:
           MapValue = (UINT8) *MapBuffer;
         }
 
-        gBS->FreePool (MapBuffer);
+        FreePool (MapBuffer);
       }
 
       if (MapBuffer2 != NULL) {
@@ -751,7 +751,7 @@ Returns:
           MapValue2 = (UINT8) *MapBuffer2;
         }
 
-        gBS->FreePool (MapBuffer2);
+        FreePool (MapBuffer2);
       }
     }
 
@@ -814,9 +814,9 @@ Returns:
       }
 
       UnicodeValueToString (
-        VariableName, 
-        FALSE, 
-        (UINTN) Iterator->QuestionId1, 
+        VariableName,
+        FALSE,
+        (UINTN) Iterator->QuestionId1,
         (sizeof (VariableName) / sizeof (VariableName[0])) - 1
         );
 
@@ -913,7 +913,7 @@ Returns:
             MapValue = (UINT8) *MapBuffer;
           }
 
-          gBS->FreePool (MapBuffer);
+          FreePool (MapBuffer);
         }
 
         if (MapBuffer2 != NULL) {
@@ -923,7 +923,7 @@ Returns:
             MapValue2 = (UINT8) *MapBuffer2;
           }
 
-          gBS->FreePool (MapBuffer2);
+          FreePool (MapBuffer2);
         }
       }
 
@@ -947,9 +947,9 @@ Returns:
       //
       case EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
-          VariableName, 
-          FALSE, 
-          (UINTN) Iterator->QuestionId1, 
+          VariableName,
+          FALSE,
+          (UINTN) Iterator->QuestionId1,
           (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
@@ -1049,7 +1049,7 @@ Returns:
             MapValue = (UINT8) *MapBuffer;
           }
 
-          gBS->FreePool (MapBuffer);
+          FreePool (MapBuffer);
         }
 
         if (MapBuffer2 != NULL) {
@@ -1059,7 +1059,7 @@ Returns:
             MapValue2 = (UINT8) *MapBuffer2;
           }
 
-          gBS->FreePool (MapBuffer2);
+          FreePool (MapBuffer2);
         }
       }
 
@@ -1083,9 +1083,9 @@ Returns:
       //
       case EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
-          VariableName, 
-          FALSE, 
-          (UINTN) Iterator->QuestionId1, 
+          VariableName,
+          FALSE,
+          (UINTN) Iterator->QuestionId1,
           (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
@@ -1205,7 +1205,7 @@ Returns:
             MapValue = (UINT8) *MapBuffer;
           }
 
-          gBS->FreePool (MapBuffer);
+          FreePool (MapBuffer);
         }
 
         if (MapBuffer2 != NULL) {
@@ -1215,7 +1215,7 @@ Returns:
             MapValue2 = (UINT8) *MapBuffer2;
           }
 
-          gBS->FreePool (MapBuffer2);
+          FreePool (MapBuffer2);
         }
       }
 
@@ -1231,9 +1231,9 @@ Returns:
       //
       case EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
-          VariableName, 
-          FALSE, 
-          (UINTN) Iterator->QuestionId1, 
+          VariableName,
+          FALSE,
+          (UINTN) Iterator->QuestionId1,
           (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
@@ -1295,7 +1295,7 @@ Returns:
         PushBool (&StackPtr, Operator);
       }
       break;
-    
+
     case EFI_IFR_TRUE_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.

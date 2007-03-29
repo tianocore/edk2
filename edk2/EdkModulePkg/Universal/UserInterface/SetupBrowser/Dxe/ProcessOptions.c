@@ -138,7 +138,7 @@ AdjustNvMap (
     }
   }
 
-  gBS->FreePool (VariableDefinition->NvRamMap);
+  FreePool (VariableDefinition->NvRamMap);
   VariableDefinition->NvRamMap          = NvRamMap;
   VariableDefinition->VariableFakeSize  = (UINT16) SizeRequired;
 }
@@ -226,7 +226,7 @@ ProcessOptions (
                   );
 
   if (*OptionString != NULL) {
-    gBS->FreePool (*OptionString);
+    FreePool (*OptionString);
     *OptionString = NULL;
   }
 
@@ -311,7 +311,7 @@ ProcessOptions (
       if (!EFI_ERROR (Status)) {
         if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
           CopyMem (NvRamMap, ValueArray, MenuOption->ThisTag->StorageWidth);
-          gBS->FreePool (ValueArray);
+          FreePool (ValueArray);
         } else {
           //
           // Since the value can be one byte long or two bytes long, do a CopyMem based on StorageWidth
@@ -359,7 +359,7 @@ ProcessOptions (
                 // Since the value can be one byte long or two bytes long, do a CopyMem based on StorageWidth
                 //
                 CopyMem (NvRamMap, &Number, MenuOption->ThisTag->StorageWidth);
-                gBS->FreePool (StringPtr);
+                FreePool (StringPtr);
                 break;
 
               default:
@@ -372,7 +372,7 @@ ProcessOptions (
         UpdateStatusBar (NV_UPDATE_REQUIRED, Tag->Flags, TRUE);
       } else {
         if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
-          gBS->FreePool (ValueArray);
+          FreePool (ValueArray);
         }
 
         return EFI_SUCCESS;
@@ -434,7 +434,7 @@ ProcessOptions (
             //
             // Remove Buffer allocated for StringPtr after it has been used.
             //
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
           } else {
             //
             // The option value is the same as what is stored in NV store.  Print this.
@@ -447,7 +447,7 @@ ProcessOptions (
               //
               // Remove Buffer allocated for StringPtr after it has been used.
               //
-              gBS->FreePool (StringPtr);
+              FreePool (StringPtr);
               Default = 0;
               break;
             }
@@ -475,7 +475,7 @@ ProcessOptions (
         //
         // Remove Buffer allocated for StringPtr after it has been used.
         //
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
       }
     }
     break;
@@ -1028,7 +1028,7 @@ ProcessOptions (
         UpdateStatusBar (NV_UPDATE_REQUIRED, Tag->Flags, TRUE);
       }
 
-      gBS->FreePool (StringPtr);
+      FreePool (StringPtr);
       return Status;
     } else {
       for (Index = 0; Index < gOptionBlockWidth; Index++) {
@@ -1073,13 +1073,13 @@ ProcessOptions (
 
         if (EFI_ERROR (Status)) {
           if (Status == EFI_NOT_READY) {
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return EFI_SUCCESS;
           }
         }
 
         Status = ReadPassword (MenuOption, TRUE, Tag, PageData, TRUE, FileFormTags, StringPtr);
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
         return EFI_SUCCESS;
       }
 
@@ -1090,7 +1090,7 @@ ProcessOptions (
           //
           Status = ReadPassword (MenuOption, TRUE, Tag, PageData, FALSE, FileFormTags, StringPtr);
           if (EFI_ERROR (Status)) {
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return EFI_SUCCESS;
           }
 
@@ -1102,7 +1102,7 @@ ProcessOptions (
           }
 
           if (Status != 0) {
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return EFI_SUCCESS;
           } else {
             break;
@@ -1123,7 +1123,7 @@ ProcessOptions (
         //
         // User couldn't figure out how to type two identical passwords
         //
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
         return EFI_SUCCESS;
       }
       //
@@ -1180,8 +1180,8 @@ ProcessOptions (
                         );
       }
 
-      gBS->FreePool (TmpNvRamMap);
-      gBS->FreePool (StringPtr);
+      FreePool (TmpNvRamMap);
+      FreePool (StringPtr);
       break;
     }
 

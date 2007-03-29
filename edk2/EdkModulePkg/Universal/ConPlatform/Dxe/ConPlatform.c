@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
     ConPlatform.c
-    
+
 Abstract:
 
 --*/
@@ -47,7 +47,7 @@ ConPlatformTextInDriverBindingSupported (
 /*++
 
 Routine Description:
-  Supported 
+  Supported
 
 Arguments:
   (Standard DriverBinding Protocol Supported() function)
@@ -76,7 +76,7 @@ ConPlatformTextOutDriverBindingSupported (
 /*++
 
 Routine Description:
-  Supported 
+  Supported
 
 Arguments:
   (Standard DriverBinding Protocol Supported() function)
@@ -105,7 +105,7 @@ ConPlatformDriverBindingSupported (
 /*++
 
 Routine Description:
-  Supported 
+  Supported
 
 Arguments:
   (Standard DriverBinding Protocol Supported() function)
@@ -551,7 +551,7 @@ Returns:
   Caller is repsoncible freeing the buffer.
 
   NULL - Variable was not read
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -576,8 +576,8 @@ Returns:
     //
     // Allocate the buffer to return
     //
-    Status = gBS->AllocatePool (EfiBootServicesData, BufferSize, &Buffer);
-    if (EFI_ERROR (Status)) {
+    Buffer = AllocatePool (BufferSize);
+    if (Buffer == NULL) {
       return NULL;
     }
     //
@@ -591,7 +591,7 @@ Returns:
                     Buffer
                     );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       Buffer = NULL;
     }
   }
@@ -616,18 +616,18 @@ Arguments:
   Multi        - A pointer to a multi-instance device path data structure.
 
   Single       - A pointer to a single-instance device path data structure.
-  
+
   NewDevicePath - If Delete is TRUE, this parameter must not be null, and it
-                  points to the remaining device path data structure. 
+                  points to the remaining device path data structure.
                   (remaining device path = Multi - Single.)
-  
+
   Delete        - If TRUE, means removing Single from Multi.
-                  If FALSE, the routine just check whether Single matches 
+                  If FALSE, the routine just check whether Single matches
                   with any instance in Multi.
 
 Returns:
 
-  The function returns EFI_SUCCESS if the Single is contained within Multi.  
+  The function returns EFI_SUCCESS if the Single is contained within Multi.
   Otherwise, EFI_NOT_FOUND is returned.
 
 --*/
@@ -658,7 +658,7 @@ Returns:
   while (DevicePathInst) {
     if (CompareMem (Single, DevicePathInst, Size) == 0) {
       if (!Delete) {
-        gBS->FreePool (DevicePathInst);
+        FreePool (DevicePathInst);
         return EFI_SUCCESS;
       }
     } else {
@@ -667,12 +667,14 @@ Returns:
                             TempDevicePath1,
                             DevicePathInst
                             );
-        gBS->FreePool (TempDevicePath1);
+        if (TempDevicePath1 != NULL) {
+          FreePool (TempDevicePath1);
+        }
         TempDevicePath1 = TempDevicePath2;
       }
     }
 
-    gBS->FreePool (DevicePathInst);
+    FreePool (DevicePathInst);
     DevicePathInst = GetNextDevicePathInstance (&DevicePath, &Size);
   }
 
@@ -693,7 +695,7 @@ ConPlatformUpdateDeviceVariable (
 /*++
 
 Routine Description:
-  
+
 
 Arguments:
 
@@ -730,7 +732,9 @@ Returns:
       //
       // The device path is already in the variable
       //
-      gBS->FreePool (VariableDevicePath);
+      if (VariableDevicePath != NULL) {
+        FreePool (VariableDevicePath);
+      }
 
       return Status;
     }
@@ -760,7 +764,9 @@ Returns:
               );
   }
 
-  gBS->FreePool (VariableDevicePath);
+  if (VariableDevicePath != NULL) {
+    FreePool (VariableDevicePath);
+  }
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -774,7 +780,7 @@ Returns:
                   NewVariableDevicePath
                   );
 
-  gBS->FreePool (NewVariableDevicePath);
+  FreePool (NewVariableDevicePath);
 
   return Status;
 }
