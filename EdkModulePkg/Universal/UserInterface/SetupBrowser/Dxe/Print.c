@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,9 +16,9 @@ Module Name:
 Abstract:
 
   Basic Ascii AvSPrintf() function named VSPrint(). VSPrint() enables very
-  simple implemenation of SPrint() and Print() to support debug. 
+  simple implemenation of SPrint() and Print() to support debug.
 
-  You can not Print more than EFI_DRIVER_LIB_MAX_PRINT_BUFFER characters at a 
+  You can not Print more than EFI_DRIVER_LIB_MAX_PRINT_BUFFER characters at a
   time. This makes the implementation very simple.
 
   VSPrint, Print, SPrint format specification has the follwoing form
@@ -122,8 +122,8 @@ _IPrint (
   //
   Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
 
-  gBS->FreePool (Buffer);
-  gBS->FreePool (BackupBuffer);
+  FreePool (Buffer);
+  FreePool (BackupBuffer);
   return EFI_SUCCESS;
 }
 
@@ -202,51 +202,6 @@ Returns:
   return Print ((CHAR16 *) L"%c", Character);
 }
 
-/*
-UINTN
-PrintToken (
-  IN EFI_HII_HANDLE   Handle,
-  IN UINT16           Token,
-  IN CHAR16           *Language,
-  ...
-  )
-{
-  VA_LIST             args;
-  UINTN               NumberOfHiiHandles;
-  EFI_HANDLE          *HandleBuffer;
-  EFI_HII_PROTOCOL    *Hii;
-
-  //
-  // There should only be one HII image
-  //
-  Status = gBS->LocateHandleBuffer (
-                 ByProtocol, 
-                 &gEfiHiiProtocolGuid, 
-                 NULL,
-                 &NumberOfHiiHandles, 
-                 &HandleBuffer
-                 );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Retrieve the Hii protocol interface
-  //
-  Status = gBS->HandleProtocol (
-                 HandleBuffer[0], 
-                 &gEfiHiiProtocolGuid, 
-                 &Hii
-                 );
-
-  Hii->GetString (Hii, Handle, Token, FALSE, Language, 
-
-  VA_START (args, fmt);
-  return _IPrint ((UINTN) -1, (UINTN) -1, gST->ConOut, fmt, args);
-}
-
-*/
 UINTN
 PrintAt (
   IN UINTN     Column,
@@ -258,7 +213,7 @@ PrintAt (
 
 Routine Description:
 
-  Prints a formatted unicode string to the default console, at 
+  Prints a formatted unicode string to the default console, at
   the supplied cursor position
 
 Arguments:
@@ -289,7 +244,7 @@ PrintStringAt (
 
 Routine Description:
 
-  Prints a unicode string to the default console, at 
+  Prints a unicode string to the default console, at
   the supplied cursor position, using L"%s" format.
 
 Arguments:
@@ -317,7 +272,7 @@ PrintCharAt (
 
 Routine Description:
 
-  Prints a chracter to the default console, at 
+  Prints a chracter to the default console, at
   the supplied cursor position, using L"%c" format.
 
 Arguments:

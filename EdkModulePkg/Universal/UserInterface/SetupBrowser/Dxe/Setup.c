@@ -1,14 +1,14 @@
 /**@file
   Entry and initialization module for the browser.
-  
+
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -21,7 +21,7 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   //
   {
     {
-      0x847bc3fe, 
+      0x847bc3fe,
       0xb974,
       0x446d,
       {
@@ -162,7 +162,7 @@ SendForm (
 Routine Description:
 
   This is the routine which an external caller uses to direct the browser
-  where to obtain it's information.  
+  where to obtain it's information.
 
 Arguments:
 
@@ -185,7 +185,7 @@ Arguments:
                     needs to provide to the browser the current settings for the "fake" NV variable.  If used, no saving
                     of an NV variable will be possible.  This parameter is also ignored if HandleCount > 1.
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -292,7 +292,7 @@ Returns:
                       );
 
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (CallbackData);
+        FreePool (CallbackData);
         return Status;;
       }
 
@@ -304,7 +304,7 @@ Returns:
     Status = InitializeBinaryStructures (Handle, UseDatabase, Packet, NvMapOverride, HandleCount, &FileFormTagsHead);
 
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (CallbackData);
+      FreePool (CallbackData);
       return Status;
     }
     //
@@ -327,7 +327,7 @@ Returns:
 
     if (UseDatabase && (HandleCount > 1)) {
       if (Selection == NULL) {
-        gBS->FreePool (CallbackData);
+        FreePool (CallbackData);
         return EFI_SUCCESS;
       }
     }
@@ -357,12 +357,12 @@ Returns:
     *Handle = BackupHandle;
 
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (CallbackData);
+      FreePool (CallbackData);
       return Status;
     }
 
     if (Callback && (AltSelection == NULL)) {
-      gBS->FreePool (CallbackData);
+      FreePool (CallbackData);
       return Status;
     }
 
@@ -379,7 +379,7 @@ Returns:
         //
         // If this is the FrontPage, return after every selection
         //
-        gBS->FreePool (Selection);
+        FreePool (Selection);
         UiFreeMenu ();
 
         //
@@ -390,11 +390,11 @@ Returns:
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->ClearScreen (gST->ConOut);
 
-        gBS->FreePool (CallbackData);
+        FreePool (CallbackData);
         return EFI_SUCCESS;
       }
 
-      gBS->FreePool (Selection);
+      FreePool (Selection);
       UiFreeMenu ();
 
       //
@@ -405,14 +405,14 @@ Returns:
       gST->ConOut->ClearScreen (gST->ConOut);
 
       if (!Callback) {
-        gBS->FreePool (CallbackData);
+        FreePool (CallbackData);
         return EFI_SUCCESS;
       }
     }
 
   } while (!EFI_ERROR (Status));
 
-  gBS->FreePool (CallbackData);
+  FreePool (CallbackData);
   return Status;
 }
 
@@ -426,11 +426,11 @@ InitializeSetup (
 
 Routine Description:
   Initialize Setup
-  
+
 Arguments:
   (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
 
-Returns: 
+Returns:
   EFI_SUCCESS - Setup loaded.
   other       - Setup Error
 
@@ -491,7 +491,7 @@ Returns:
 
   Status      = Hii->NewPack (Hii, PackageList, &gHiiHandle);
 
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   //
   // Install protocol interface
@@ -532,7 +532,7 @@ Arguments:
   Index            - Offset of the current opcode in the Ifr raw data.
   FileFormTags     - Pointer of current EFI_FILE_FORM_TAGS structure.
   CurrentVariable  - Current variable number.
-           
+
 Returns:
   None.
 --*/
@@ -605,7 +605,7 @@ Arguments:
   NumberOfLines    - Number of lines this opcode occupied.
   FileFormTags     - Pointer of current EFI_FILE_FORM_TAGS structure.
   CurrentVariable  - Current variable number.
-           
+
 Returns:
   None.
 --*/
@@ -661,7 +661,7 @@ Returns:
         CopyMem (&Tag->Value, &Tag->Default, sizeof (UINT16));
       }
       break;
-    } 
+    }
   }
 }
 
@@ -713,11 +713,11 @@ AddNextInconsistentTag (
 
 Routine Description:
   Initialize the next inconsistent tag data and add it to the inconsistent tag list.
-  
+
 Arguments:
  InconsistentTagsPtr   - Pointer of the inconsistent tag's pointer.
 
-Returns: 
+Returns:
   None.
 
 --*/
@@ -829,13 +829,14 @@ InitializeTagStructures (
       //
       for (Index = 0; Index < NumberOfTags; Index++) {
         if (FormTags->Tags[Index].IntList != NULL) {
-          gBS->FreePool (FormTags->Tags[Index].IntList);
+          FreePool (FormTags->Tags[Index].IntList);
         }
       }
 
-      gBS->FreePool (FormTags->Tags);
-      gBS->FreePool (FormTags->Next);
-      FormTags->Next  = NULL;
+      FreePool (FormTags->Tags);
+
+      ASSERT (FormTags->Next == NULL);
+
       FormTags->Tags  = NULL;
 
       FormTags        = SavedFormTags;
@@ -1350,7 +1351,7 @@ InitializeTagStructures (
       // Since this op-code doesn't use the next field(s), initialize them with something invalid.
       // Unfortunately 0 is a valid offset value for a QuestionId
       //
-      
+
       //
       // Reserve INVALID_OFFSET_VALUE - 1 for TRUE or FALSE because they are inconsistency tags also, but
       // have no coresponding id. The examination of id is needed by evaluating boolean expression.
@@ -1571,8 +1572,8 @@ InitPage (
     HomeEscapeString
     );
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-  gBS->FreePool (HomeEscapeString);
-  gBS->FreePool (HomePageString);
+  FreePool (HomeEscapeString);
+  FreePool (HomePageString);
 
   return ;
 }
@@ -1585,14 +1586,14 @@ GetToken (
 /*++
 
 Routine Description:
-  
+
   Get the string based on the TokenID and HII Handle.
 
 Arguments:
 
   Token       - The Token ID.
   HiiHandle   - Handle of Ifr to be fetched.
-           
+
 Returns:
 
   The output string.
@@ -1618,7 +1619,7 @@ Returns:
       //
       // Free the old pool
       //
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
 
       //
       // Allocate new pool with correct value
@@ -1955,8 +1956,8 @@ InitializeBinaryStructures (
             //
             // Free the buffer that was allocated that was too small
             //
-            gBS->FreePool (VariableDefinition->NvRamMap);
-            gBS->FreePool (VariableDefinition->FakeNvRamMap);
+            FreePool (VariableDefinition->NvRamMap);
+            FreePool (VariableDefinition->FakeNvRamMap);
 
             VariableDefinition->NvRamMap = AllocateZeroPool (SizeOfNvStore);
             VariableDefinition->FakeNvRamMap = AllocateZeroPool (SizeOfNvStore + VariableDefinition->VariableFakeSize);
@@ -1986,18 +1987,18 @@ InitializeBinaryStructures (
           // if the variable was not found, we will retrieve default values
           //
           if (Status == EFI_NOT_FOUND) {
-        
+
             if (0 == CompareMem (VariableDefinition->VariableName, L"Setup", 10)) {
 
               NvMapListHead = NULL;
-              
+
               Status = Hii->GetDefaultImage (Hii, Handle[HandleIndex], EFI_IFR_FLAG_DEFAULT, &NvMapListHead);
 
               if (!EFI_ERROR (Status)) {
                 ASSERT_EFI_ERROR (NULL != NvMapListHead);
-                
+
                 NvMapListNode = NvMapListHead;
-                
+
                 while (NULL != NvMapListNode) {
                   if (VariableDefinition->VariableId == NvMapListNode->VariablePack->VariableId) {
                     NvMap     = (VOID *) ((CHAR8 *) NvMapListNode->VariablePack + sizeof (EFI_HII_VARIABLE_PACK) + NvMapListNode->VariablePack->VariableNameLength);
@@ -2006,25 +2007,25 @@ InitializeBinaryStructures (
                     }
                   NvMapListNode = NvMapListNode->NextVariablePack;
                 }
-                
+
                 //
                 // Free the buffer that was allocated.
                 //
-                gBS->FreePool (VariableDefinition->NvRamMap);
-                gBS->FreePool (VariableDefinition->FakeNvRamMap);
-                
+                FreePool (VariableDefinition->NvRamMap);
+                FreePool (VariableDefinition->FakeNvRamMap);
+
                 //
                 // Allocate, copy the NvRamMap.
                 //
                 VariableDefinition->VariableFakeSize = (UINT16) (VariableDefinition->VariableFakeSize - VariableDefinition->VariableSize);
                 VariableDefinition->VariableSize = (UINT16) NvMapSize;
                 VariableDefinition->VariableFakeSize = (UINT16) (VariableDefinition->VariableFakeSize + VariableDefinition->VariableSize);
-                
+
                 VariableDefinition->NvRamMap = AllocateZeroPool (VariableDefinition->VariableSize);
                 VariableDefinition->FakeNvRamMap = AllocateZeroPool (NvMapSize + VariableDefinition->VariableFakeSize);
 
                 CopyMem (VariableDefinition->NvRamMap, NvMap, NvMapSize);
-                gBS->FreePool (NvMapListHead);
+                FreePool (NvMapListHead);
               }
 
             }
@@ -2060,7 +2061,7 @@ Arguments:
   HiiHandle   - Handle of Ifr to be fetched.
   Packet      - Pointer to IFR packet.
   BinaryData  - Buffer to copy the string into
-           
+
 Returns:
   Returns the number of CHAR16 characters that were copied into the OutputString buffer.
 
@@ -2098,7 +2099,7 @@ Returns:
 
     if (Status == EFI_BUFFER_TOO_SMALL) {
 
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
 
       //
       // Allocate memory for our Form binary
@@ -2121,7 +2122,7 @@ Returns:
 
     Status      = Hii->NewPack (Hii, PackageList, &HiiHandle);
 
-    gBS->FreePool (PackageList);
+    FreePool (PackageList);
   }
 
   if (EFI_ERROR (Status)) {

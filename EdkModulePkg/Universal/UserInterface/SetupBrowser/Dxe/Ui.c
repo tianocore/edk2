@@ -1,14 +1,14 @@
 /**@file
   Implementation for UI.
-  
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -63,7 +63,7 @@ Routine Description:
   Initialize Menu option list.
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -81,7 +81,7 @@ Routine Description:
   Initialize Menu option list.
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -100,7 +100,7 @@ Routine Description:
   Remove Menu option list.
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -119,7 +119,7 @@ Returns:
     (*PreviousSelection)->Handle    = UiMenuList->Selection.Handle;
     gEntryNumber                    = UiMenuList->FormerEntryNumber;
     RemoveEntryList (&UiMenuList->MenuLink);
-    gBS->FreePool (UiMenuList);
+    FreePool (UiMenuList);
   }
 }
 
@@ -133,7 +133,7 @@ Routine Description:
   Free Menu option linked list.
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -143,7 +143,7 @@ Returns:
   while (!IsListEmpty (&gMenuList)) {
     UiMenuList = CR (gMenuList.ForwardLink, UI_MENU_LIST, MenuLink, UI_MENU_LIST_SIGNATURE);
     RemoveEntryList (&UiMenuList->MenuLink);
-    gBS->FreePool (UiMenuList);
+    FreePool (UiMenuList);
   }
 }
 
@@ -157,7 +157,7 @@ Routine Description:
   Add one menu entry to the linked lst
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -183,7 +183,7 @@ Routine Description:
   Free Menu option linked list.
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -197,8 +197,8 @@ Returns:
     //
     // We allocated space for this description when we did a GetToken, free it here
     //
-    gBS->FreePool (MenuOption->Description);
-    gBS->FreePool (MenuOption);
+    FreePool (MenuOption->Description);
+    FreePool (MenuOption);
   }
 }
 
@@ -213,7 +213,7 @@ Routine Description:
   Refresh screen with current date and/or time based on screen context
 
 Arguments:
-           
+
 Returns:
 
 --*/
@@ -256,7 +256,7 @@ Returns:
   }
 
   if (OptionString != NULL) {
-    gBS->FreePool (OptionString);
+    FreePool (OptionString);
   }
 }
 
@@ -373,7 +373,7 @@ Routine Description:
 Arguments:
   String - String description for this option.
   Context - Context data for entry.
-           
+
 Returns:
 
 --*/
@@ -414,7 +414,7 @@ Routine Description:
 Arguments:
   String - String description for this option.
   Context - Context data for entry.
-           
+
 Returns:
 
 --*/
@@ -457,7 +457,7 @@ Routine Description:
 
 Arguments:
   NumberOfLines -     The number of lines for the dialog box
-  HotKey -            Defines whether a single character is parsed (TRUE) and returned in KeyValue 
+  HotKey -            Defines whether a single character is parsed (TRUE) and returned in KeyValue
                       or a string is returned in StringBuffer.  Two special characters are considered when entering a string, a SCAN_ESC and
                       an CHAR_CARRIAGE_RETURN.  SCAN_ESC terminates string input and returns
   MaximumStringSize - The maximum size in bytes of a typed in string (each character is a CHAR16) and the minimum string returned is two bytes
@@ -465,7 +465,7 @@ Arguments:
   KeyValue -          The EFI_KEY value returned if HotKey is TRUE..
   String -            Pointer to the first string in the list
   ... -               A series of (quantity == NumberOfLines) text strings which will be used to construct the dialog box
-           
+
 Returns:
   EFI_SUCCESS -           Displayed dialog and received user interaction
   EFI_INVALID_PARAMETER - One of the parameters was invalid (e.g. (StringBuffer == NULL) && (HotKey == FALSE))
@@ -572,8 +572,8 @@ Returns:
       case CHAR_NULL:
         switch (Key.ScanCode) {
         case SCAN_ESC:
-          gBS->FreePool (TempString);
-          gBS->FreePool (BufferedString);
+          FreePool (TempString);
+          FreePool (BufferedString);
           gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
           gST->ConOut->EnableCursor (gST->ConOut, TRUE);
           return EFI_DEVICE_ERROR;
@@ -586,8 +586,8 @@ Returns:
 
       case CHAR_CARRIAGE_RETURN:
         SelectionComplete = TRUE;
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
         gST->ConOut->EnableCursor (gST->ConOut, TRUE);
         return EFI_SUCCESS;
@@ -829,8 +829,8 @@ UpdateStatusBar (
     break;
   }
 
-  gBS->FreePool (InputErrorMessage);
-  gBS->FreePool (NvUpdateMessage);
+  FreePool (InputErrorMessage);
+  FreePool (NvUpdateMessage);
   return ;
 }
 
@@ -843,11 +843,11 @@ FreeData (
 /*++
 
 Routine Description:
-  
+
   Used to remove the allocated data instances
 
 Arguments:
-             
+
 Returns:
 
 --*/
@@ -867,11 +867,11 @@ Returns:
   FileForm = FileFormTagsHead;
 
   if (FormattedString != NULL) {
-    gBS->FreePool (FormattedString);
+    FreePool (FormattedString);
   }
 
   if (OptionString != NULL) {
-    gBS->FreePool (OptionString);
+    FreePool (OptionString);
   }
 
   for (; FileForm != NULL;) {
@@ -908,17 +908,17 @@ Returns:
         }
 
         if (FormTags->Tags[Index].IntList != NULL) {
-          gBS->FreePool (FormTags->Tags[Index].IntList);
+          FreePool (FormTags->Tags[Index].IntList);
         }
       }
 
       if (PreviousFormTags != NULL) {
-        gBS->FreePool (FormTags->Tags);
+        FreePool (FormTags->Tags);
         FormTags = PreviousFormTags;
-        gBS->FreePool (FormTags->Next);
+        FreePool (FormTags->Next);
         FormTags->Next = NULL;
       } else {
-        gBS->FreePool (FormTags->Tags);
+        FreePool (FormTags->Tags);
         FormTags = NULL;
       }
     }
@@ -942,7 +942,7 @@ Returns:
       //
       // Free the current entry
       //
-      gBS->FreePool (Inconsistent);
+      FreePool (Inconsistent);
 
       //
       // Restore the Previous pointer
@@ -963,26 +963,32 @@ Returns:
         PreviousVariableDefinition = VariableDefinition;
       }
 
-      gBS->FreePool (VariableDefinition->VariableName);
-      gBS->FreePool (VariableDefinition->NvRamMap);
-      gBS->FreePool (VariableDefinition->FakeNvRamMap);
+      FreePool (VariableDefinition->VariableName);
+
+      if (VariableDefinition->NvRamMap != NULL) {
+        FreePool (VariableDefinition->NvRamMap);
+      }
+
+      if (VariableDefinition->FakeNvRamMap != NULL) {
+        FreePool (VariableDefinition->FakeNvRamMap);
+      }
 
       if (PreviousVariableDefinition != NULL) {
         VariableDefinition = PreviousVariableDefinition;
-        gBS->FreePool (VariableDefinition->Next);
+        FreePool (VariableDefinition->Next);
         VariableDefinition->Next = NULL;
       } else {
-        gBS->FreePool (VariableDefinition);
+        FreePool (VariableDefinition);
         VariableDefinition = NULL;
       }
     }
 
     if (PreviousFileForm != NULL) {
       FileForm = PreviousFileForm;
-      gBS->FreePool (FileForm->NextFile);
+      FreePool (FileForm->NextFile);
       FileForm->NextFile = NULL;
     } else {
-      gBS->FreePool (FileForm);
+      FreePool (FileForm);
       FileForm = NULL;
     }
   }
@@ -1000,40 +1006,40 @@ Returns:
       PreviousIfrBinary = IfrBinary;
     }
 
-    gBS->FreePool (IfrBinary->IfrPackage);
+    FreePool (IfrBinary->IfrPackage);
 
     if (PreviousIfrBinary != NULL) {
       IfrBinary = PreviousIfrBinary;
-      gBS->FreePool (IfrBinary->Next);
+      FreePool (IfrBinary->Next);
       IfrBinary->Next = NULL;
     } else {
-      gBS->FreePool (IfrBinary);
+      FreePool (IfrBinary);
       IfrBinary = NULL;
     }
   }
 
-  gBS->FreePool (gPreviousValue);
+  FreePool (gPreviousValue);
   gPreviousValue = NULL;
 
   //
   // Free Browser Strings
   //
-  gBS->FreePool (gPressEnter);
-  gBS->FreePool (gConfirmError);
-  gBS->FreePool (gConfirmPassword);
-  gBS->FreePool (gPromptForNewPassword);
-  gBS->FreePool (gPromptForPassword);
-  gBS->FreePool (gToggleCheckBox);
-  gBS->FreePool (gNumericInput);
-  gBS->FreePool (gMakeSelection);
-  gBS->FreePool (gMoveHighlight);
-  gBS->FreePool (gEscapeString);
-  gBS->FreePool (gEnterCommitString);
-  gBS->FreePool (gEnterString);
-  gBS->FreePool (gFunctionOneString);
-  gBS->FreePool (gFunctionTwoString);
-  gBS->FreePool (gFunctionNineString);
-  gBS->FreePool (gFunctionTenString);
+  FreePool (gPressEnter);
+  FreePool (gConfirmError);
+  FreePool (gConfirmPassword);
+  FreePool (gPromptForNewPassword);
+  FreePool (gPromptForPassword);
+  FreePool (gToggleCheckBox);
+  FreePool (gNumericInput);
+  FreePool (gMakeSelection);
+  FreePool (gMoveHighlight);
+  FreePool (gEscapeString);
+  FreePool (gEnterCommitString);
+  FreePool (gEnterString);
+  FreePool (gFunctionOneString);
+  FreePool (gFunctionTwoString);
+  FreePool (gFunctionNineString);
+  FreePool (gFunctionTenString);
   return ;
 }
 
@@ -1046,11 +1052,11 @@ SelectionsAreValid (
 /*++
 
 Routine Description:
-  Initiate late consistency checks against the current page.  
+  Initiate late consistency checks against the current page.
 
 Arguments:
   None
-           
+
 Returns:
 
 --*/
@@ -1103,7 +1109,7 @@ Returns:
               // Since the value can be one byte long or two bytes long, do a CopyMem based on StorageWidth
               //
               CopyMem (NvRamMap, &Tag->OldValue, Tag->StorageWidth);
-              gBS->FreePool (StringPtr);
+              FreePool (StringPtr);
               break;
 
             default:
@@ -1133,7 +1139,7 @@ Routine Description:
 Arguments:
   Tag - The Tag structure passed in.
   Handle - The handle in the HII database being used
-  
+
 Returns:
   Returns the number of CHAR16 characters that is support.
 
@@ -1151,7 +1157,7 @@ Returns:
   if ((Tag->Operand == EFI_IFR_TEXT_OP) && (Tag->TextTwo != 0)) {
     String  = GetToken (Tag->TextTwo, Handle);
     Size    = StrLen (String);
-    gBS->FreePool (String);
+    FreePool (String);
   }
 
   if ((Tag->Operand == EFI_IFR_SUBTITLE_OP) ||
@@ -1188,7 +1194,7 @@ Arguments:
   LineWidth - Width of the desired string to extract in CHAR16 characters
   Index - Where in InputString to start the copy process
   OutputString - Buffer to copy the string into
-           
+
 Returns:
   Returns the number of CHAR16 characters that were copied into the OutputString buffer.
 
@@ -1213,14 +1219,14 @@ Returns:
   // Ensure we have got a valid buffer
   //
   if (*OutputString != NULL) {
-  
+
     //
     //NARROW_CHAR can not be printed in screen, so if a line only contain  the two CHARs: 'NARROW_CHAR + CHAR_CARRIAGE_RETURN' , it is a empty line  in Screen.
     //To avoid displaying this  empty line in screen,  just skip  the two CHARs here.
     //
    if ((InputString[*Index] == NARROW_CHAR) && (InputString[*Index + 1] == CHAR_CARRIAGE_RETURN)) {
      *Index = *Index + 2;
-   } 
+   }
 
     //
     // Fast-forward the string and see if there is a carriage-return in the string
@@ -1323,7 +1329,7 @@ UpdateOptionSkipLines (
         }
       }
 
-      gBS->FreePool (OutputString);
+      FreePool (OutputString);
       if (SkipValue != 0) {
         SkipValue--;
       }
@@ -1382,9 +1388,9 @@ Arguments:
   SubMenu          - Indicate is sub menu.
   FileFormTagsHead - A pointer to the EFI_FILE_FORM_TAGS structure.
   PageData         - A pointer to the EFI_IFR_DATA_ARRAY.
-           
+
 Returns:
-  Return the pointer of the menu which selected, 
+  Return the pointer of the menu which selected,
   otherwise return NULL.
 
 --*/
@@ -1548,7 +1554,7 @@ Returns:
         while (gMenuRefreshHead != NULL) {
           OldMenuRefreshEntry = gMenuRefreshHead->Next;
 
-          gBS->FreePool (gMenuRefreshHead);
+          FreePool (gMenuRefreshHead);
 
           gMenuRefreshHead = OldMenuRefreshEntry;
         }
@@ -1586,7 +1592,7 @@ Returns:
                 }
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
               if (Temp != 0) {
                 Temp--;
               }
@@ -1681,7 +1687,7 @@ Returns:
                   }
                 }
 
-                gBS->FreePool (OutputString);
+                FreePool (OutputString);
                 if (Temp2 != 0) {
                   Temp2--;
                 }
@@ -1723,14 +1729,14 @@ Returns:
                   }
                 }
 
-                gBS->FreePool (OutputString);
+                FreePool (OutputString);
                 if (Temp2 != 0) {
                   Temp2--;
                 }
               }
 
               Row = OriginalRow;
-              gBS->FreePool (StringPtr);
+              FreePool (StringPtr);
             }
           } else {
             //
@@ -1848,7 +1854,7 @@ Returns:
                 MenuOption->Row++;
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
             }
 
             MenuOption->Row = OriginalRow;
@@ -1876,7 +1882,7 @@ Returns:
                   MenuOption->Row++;
                 }
 
-                gBS->FreePool (OutputString);
+                FreePool (OutputString);
               }
 
               MenuOption->Row = OriginalRow;
@@ -1969,7 +1975,7 @@ Returns:
                 MenuOption->Row++;
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
             }
 
             MenuOption->Row = OriginalRow;
@@ -1990,7 +1996,7 @@ Returns:
                   MenuOption->Row++;
                 }
 
-                gBS->FreePool (OutputString);
+                FreePool (OutputString);
               }
 
               MenuOption->Row = OriginalRow;
@@ -2022,10 +2028,10 @@ Returns:
     case CfUpdateHelpString:
       ControlFlag = CfPrepareToReadKey;
 
-        if (SubMenu && 
-            (Repaint || NewLine || 
+        if (SubMenu &&
+            (Repaint || NewLine ||
              (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
-             (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) && 
+             (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) &&
             !(gClassOfVfr == EFI_GENERAL_APPLICATION_SUBCLASS)) {
         //
         // Don't print anything if it is a NULL help token
@@ -2305,7 +2311,7 @@ Returns:
       while (gMenuRefreshHead != NULL) {
         OldMenuRefreshEntry = gMenuRefreshHead->Next;
 
-        gBS->FreePool (gMenuRefreshHead);
+        FreePool (gMenuRefreshHead);
 
         gMenuRefreshHead = OldMenuRefreshEntry;
       }
@@ -2328,7 +2334,7 @@ Returns:
       ExtractRequestedNvMap (FileFormTags, MenuOption->ThisTag->VariableNumber, &VariableDefinition);
 
       if (SubMenu) {
-        if ((MenuOption->ThisTag->Operand == EFI_IFR_TEXT_OP && 
+        if ((MenuOption->ThisTag->Operand == EFI_IFR_TEXT_OP &&
             !(MenuOption->ThisTag->Flags & EFI_IFR_FLAG_INTERACTIVE)) ||
             (MenuOption->ThisTag->GrayOut) ||
             (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
@@ -2966,9 +2972,9 @@ Returns:
 
       if (!EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (NULL != NvMapListHead);
-        
+
         NvMapListNode = NvMapListHead;
-        
+
         while (NULL != NvMapListNode) {
           if (FileFormTags->VariableDefinitions->VariableId == NvMapListNode->VariablePack->VariableId) {
             NvMap     = (VOID *) ((CHAR8 *) NvMapListNode->VariablePack + sizeof (EFI_HII_VARIABLE_PACK) + NvMapListNode->VariablePack->VariableNameLength);
@@ -2977,20 +2983,20 @@ Returns:
             }
           NvMapListNode = NvMapListNode->NextVariablePack;
         }
-        
+
         //
         // Free the buffer that was allocated.
         //
-        gBS->FreePool (FileFormTags->VariableDefinitions->NvRamMap);
-        gBS->FreePool (FileFormTags->VariableDefinitions->FakeNvRamMap);
-        
+        FreePool (FileFormTags->VariableDefinitions->NvRamMap);
+        FreePool (FileFormTags->VariableDefinitions->FakeNvRamMap);
+
         //
         // Allocate, copy the NvRamMap.
         //
         FileFormTags->VariableDefinitions->VariableFakeSize = (UINT16) (FileFormTags->VariableDefinitions->VariableFakeSize - FileFormTags->VariableDefinitions->VariableSize);
         FileFormTags->VariableDefinitions->VariableSize = (UINT16) NvMapSize;
         FileFormTags->VariableDefinitions->VariableFakeSize = (UINT16) (FileFormTags->VariableDefinitions->VariableFakeSize + FileFormTags->VariableDefinitions->VariableSize);
-        
+
         FileFormTags->VariableDefinitions->NvRamMap = AllocateZeroPool (FileFormTags->VariableDefinitions->VariableSize);
         ASSERT (FileFormTags->VariableDefinitions->NvRamMap != NULL);
 
@@ -2998,7 +3004,7 @@ Returns:
         ASSERT (FileFormTags->VariableDefinitions->FakeNvRamMap != NULL);
 
         CopyMem (FileFormTags->VariableDefinitions->NvRamMap, NvMap, NvMapSize);
-        gBS->FreePool (NvMapListHead);
+        FreePool (NvMapListHead);
       }
 
       UpdateStatusBar (NV_UPDATE_REQUIRED, MenuOption->ThisTag->Flags, TRUE);
@@ -3017,7 +3023,7 @@ Returns:
       while (gMenuRefreshHead != NULL) {
         OldMenuRefreshEntry = gMenuRefreshHead->Next;
 
-        gBS->FreePool (gMenuRefreshHead);
+        FreePool (gMenuRefreshHead);
 
         gMenuRefreshHead = OldMenuRefreshEntry;
       }
@@ -3043,11 +3049,11 @@ ValueIsScroll (
 /*++
 
 Routine Description:
-  Determine if the menu is the last menu that can be selected. 
+  Determine if the menu is the last menu that can be selected.
 
 Arguments:
   Direction - the scroll direction. False is down. True is up.
-           
+
 Returns:
   FALSE -- the menu isn't the last menu that can be selected.
   TRUE  -- the menu is the last menu that can be selected.
@@ -3087,9 +3093,9 @@ Routine Description:
 Arguments:
   Direction - the up or down direction. False is down. True is up.
   CurrentPos - Current position.
-           
+
 Returns:
-  Return line number to pad. It is possible that we stand on a zero-advance 
+  Return line number to pad. It is possible that we stand on a zero-advance
   data or time opcode, so pad one line when we judge if we are going to scroll outside.
 --*/
 {

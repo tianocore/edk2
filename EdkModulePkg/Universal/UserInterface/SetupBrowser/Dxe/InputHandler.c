@@ -14,7 +14,7 @@ Module Name:
   InputHandler.C
 
 Abstract:
-  
+
   Implementation for handling user input from the User Interface
 
 Revision History
@@ -86,7 +86,7 @@ ReadString(
   //
   CreatePopUp (ScreenSize, 4, &NullCharacter, PromptForDataString, Space, &NullCharacter);
 
-  gBS->FreePool (PromptForDataString);
+  FreePool (PromptForDataString);
 
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_BLACK, EFI_LIGHTGRAY));
 
@@ -107,8 +107,8 @@ ReadString(
         break;
 
       case SCAN_ESC:
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_DEVICE_ERROR;
@@ -122,8 +122,8 @@ ReadString(
     case CHAR_CARRIAGE_RETURN:
       if (GetStringWidth (StringPtr) >= MenuOption->ThisTag->Minimum) {
         SelectionComplete = TRUE;
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_SUCCESS;
@@ -137,8 +137,8 @@ ReadString(
         do {
           Status = WaitForKeyStroke (&Key);
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_DEVICE_ERROR;
@@ -309,7 +309,7 @@ Error:
         WidthOfString = GetStringWidth (Packet->String);
         ScreenSize = EFI_MAX(WidthOfString, GetStringWidth (gPressEnter)) / 2;
         CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
-        gBS->FreePool (Packet);
+        FreePool (Packet);
 
         do {
           Status = WaitForKeyStroke (&Key);
@@ -422,7 +422,7 @@ Error:
                 WidthOfString = GetStringWidth (Packet->String);
                 ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
-                gBS->FreePool (Packet);
+                FreePool (Packet);
               }
 
               StringPtr[0] = CHAR_NULL;
@@ -571,8 +571,8 @@ Error:
   } while (1);
 
 Done:
-  gBS->FreePool (TempString);
-  gBS->FreePool (TempString2);
+  FreePool (TempString);
+  FreePool (TempString2);
   return Status;
 }
 
@@ -600,7 +600,7 @@ EncodePassword (
 
   CopyMem (Password, Buffer, MaxSize);
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
   return ;
 }
 
@@ -880,7 +880,7 @@ EnterCarriageReturn:
 
             case CHAR_CARRIAGE_RETURN:
               SelectionComplete = TRUE;
-              gBS->FreePool (StringPtr);
+              FreePool (StringPtr);
               break;
 
             default:
@@ -1083,7 +1083,7 @@ GetSelectionInputPopUp (
         PopUpWidth = StrLen (StringPtr);
       }
 
-      gBS->FreePool (StringPtr);
+      FreePool (StringPtr);
     }
   }
   //
@@ -1224,7 +1224,7 @@ GetSelectionInputPopUp (
           TempStringPtr = AllocateZeroPool (sizeof (CHAR16) * (PopUpWidth - 1));
           ASSERT (TempStringPtr != NULL);
           CopyMem (TempStringPtr, StringPtr, (sizeof (CHAR16) * (PopUpWidth - 5)));
-          gBS->FreePool (StringPtr);
+          FreePool (StringPtr);
           StringPtr = TempStringPtr;
           StrCat (StringPtr, (CHAR16 *) L"...");
         }
@@ -1256,7 +1256,7 @@ GetSelectionInputPopUp (
           PrintStringAt (Start + 2, Index2, StringPtr);
         }
 
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
         Index2 = Index2 + 1;
       }
     }
@@ -1520,7 +1520,7 @@ TheKey:
       case SCAN_ESC:
         gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
         if (ValueArrayBackup != NULL) {
-          gBS->FreePool (ValueArrayBackup);
+          FreePool (ValueArrayBackup);
         }
 
         return EFI_DEVICE_ERROR;
@@ -1537,7 +1537,7 @@ TheKey:
       //
       if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
         CopyMem (ValueArray, ValueArrayBackup, ValueCount);
-        gBS->FreePool (ValueArrayBackup);
+        FreePool (ValueArrayBackup);
       } else {
         *Value = TempValue;
       }

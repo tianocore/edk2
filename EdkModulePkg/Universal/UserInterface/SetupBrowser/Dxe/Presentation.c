@@ -1,12 +1,12 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   Presentation.c
@@ -60,7 +60,7 @@ ClearLines (
 
   gST->ConOut->SetCursorPosition (gST->ConOut, LeftColumn, TopRow);
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
   return ;
 }
 
@@ -237,7 +237,7 @@ DisplayPageFrame (
           break;
         }
 
-        gBS->FreePool (StrFrontPageBanner);
+        FreePool (StrFrontPageBanner);
       }
     }
   }
@@ -318,7 +318,7 @@ DisplayPageFrame (
     }
   }
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
 }
 
@@ -327,7 +327,7 @@ DisplayPageFrame (
 ?F2=Previous Page                 Setup Page                                  ?
 +------------------------------------------------------------------------------+
 
-    
+
 
 
 
@@ -437,7 +437,7 @@ DisplayForm (
   //
   // Remove Buffer allocated for StringPtr after it has been used.
   //
-  gBS->FreePool (StringPtr);
+  FreePool (StringPtr);
 
   for (Index = 0; FormTags.Tags[Index].Operand != EFI_IFR_END_FORM_OP; Index++) {
     GrayOut       = FALSE;
@@ -595,7 +595,7 @@ GetOut:
             FormTags.Tags[Index].NumberOfLines++;
           }
 
-          gBS->FreePool (OutputString);
+          FreePool (OutputString);
         }
 
         ArrayEntry = 0;
@@ -1113,9 +1113,9 @@ Routine Description:
   The function does the most of the works when the EFI_TAG that
   user selects on is EFI_IFR_FLAG_INTERACTIVE or EFI_IFR_PASSWORD_OP:
   invoke CallBack, update the new form data.
-  
+
 Arguments:
-  
+
   Selection         - The current selection of the form.
   CallbackData      - The pointer to host the data passed back by the callback function.
   FileFormTagsHead  - Prompt string token of the one-of box
@@ -1123,10 +1123,10 @@ Arguments:
   FormHandle        - Output the  the handle of the form.
   TitleToken        - Output the  TitleToken of the new page.
   FormTags          - Output the  FormFags of the new page.
-  
-Returns: 
+
+Returns:
   VOID
-  
+
 --*/
 {
   UINTN                       Index;
@@ -1212,7 +1212,7 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (LocalTags->Tags);
+    FreePool (LocalTags->Tags);
     return ;
   }
 
@@ -1317,7 +1317,7 @@ Returns:
   }
 
   if (Packet != NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   for (BackupIndex = 0; LocalTags->Tags[BackupIndex].Operand != EFI_IFR_END_FORM_OP; BackupIndex++) {
@@ -1347,7 +1347,7 @@ Returns:
   // Delete the buffer associated with previous dynamic page
   // We will re-allocate a buffer....
   //
-  gBS->FreePool (LocalTags->Tags);
+  FreePool (LocalTags->Tags);
 
   Length  = 0xF000;
   Buffer  = AllocateZeroPool (Length);
