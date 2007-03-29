@@ -1403,6 +1403,15 @@ Returns:
                 sizeof (UINT32),
                 (UINT8 *) &VariableStoreEntry.Length
                 );
+      // 
+      // As Variables are stored in NV storage, which are slow devices,such as flash.
+      // Variable operation may skip checking variable program result to improve performance,
+      // We can assume Variable program is OK through some check point.
+      // Variable Store Size Setting should be the first Variable write operation,
+      // We can assume all Read/Write is OK if we can set Variable store size successfully.
+      // If write fail, we will assert here
+      //
+      ASSERT(VariableStoreHeader->Size == VariableStoreEntry.Length);
 
       if (EFI_ERROR (Status)) {
         return Status;
