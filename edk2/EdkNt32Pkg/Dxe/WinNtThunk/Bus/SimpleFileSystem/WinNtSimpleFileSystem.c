@@ -138,11 +138,12 @@ Returns:
     ASSERT (0);
   }
 
-  for (Pointer = Str; *(Pointer + Count); Pointer++) {
-    *Pointer = *(Pointer + Count);
+  if (Count != 0) {
+    for (Pointer = Str; *(Pointer + Count); Pointer++) {
+      *Pointer = *(Pointer + Count);
+    }
+    *Pointer = *(Pointer + Count);    
   }
-
-  *Pointer = *(Pointer + Count);
 }
 
 
@@ -632,12 +633,9 @@ Returns:
   CHAR16                            TempChar;
   DWORD                             LastError;
   UINTN                             Count;
-  BOOLEAN                           TrailingDash;
   BOOLEAN                           LoopFinish;
   UINTN                             InfoSize;
   EFI_FILE_INFO                     *Info;
-
-  TrailingDash = FALSE;
 
   //
   // Check for obvious invalid parameters.
@@ -667,9 +665,26 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Init local variables
+  //
   PrivateFile     = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot     = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
   NewPrivateFile  = NULL;
+
+  //
+  // Allocate buffer for FileName as the passed in FileName may be read only
+  //
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  StrSize (FileName),
+                  &TempFileName
+                  );
+  if (EFI_ERROR (Status)) {
+    return  Status;
+  }
+  StrCpy (TempFileName, FileName);
+  FileName = TempFileName;
 
   //
   // BUGBUG: assume an open of root
@@ -686,7 +701,6 @@ OpenRoot:
   }
 
   if (FileName[StrLen (FileName) - 1] == L'\\') {
-    TrailingDash                        = TRUE;
     FileName[StrLen (FileName) - 1]  = 0;
   }
 
@@ -1067,10 +1081,7 @@ OpenRoot:
   }
 
 Done: ;
-  if (TrailingDash) {
-    FileName[StrLen (FileName) + 1]  = 0;
-    FileName[StrLen (FileName)]      = L'\\';
-  }
+  gBS->FreePool (FileName);
 
   if (EFI_ERROR (Status)) {
     if (NewPrivateFile) {
