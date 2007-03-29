@@ -1,5 +1,5 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -235,7 +235,6 @@ ATAPIIdentify (
   //
   // device select bit
   //
-  DeviceSelect          = 0;
   DeviceSelect          = (UINT8) ((IdeDev->Device) << 4);
 
   AtapiIdentifyPointer  = AllocatePool (sizeof (EFI_IDENTIFY_DATA));

@@ -67,7 +67,6 @@ ATAIdentify (
   //  use ATA PIO Data In protocol to send ATA Identify command
   //  and receive data from device
   //
-  DeviceSelect  = 0;
   DeviceSelect  = (UINT8) ((IdeDev->Device) << 4);
   Status = AtaPioDataIn (
             IdeDev,

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -630,6 +630,8 @@ Returns:
     case VK_F7:   Key.ScanCode = SCAN_F7;   break;
     case VK_F8:   Key.ScanCode = SCAN_F8;   break;
     case VK_F9:   Key.ScanCode = SCAN_F9;   break;
+    case VK_F11:  Key.ScanCode = SCAN_F11;  break;
+    case VK_F12:  Key.ScanCode = SCAN_F12;  break;    
     }
 
     if (Key.ScanCode != 0) {
