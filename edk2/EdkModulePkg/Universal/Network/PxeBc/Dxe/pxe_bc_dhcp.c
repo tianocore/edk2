@@ -621,8 +621,6 @@ AddRouters (
   DHCP_RECEIVE_BUFFER *RxBufPtr
   )
 {
-  Ip4AddRouter (Private, &RxBufPtr->u.Dhcpv4.giaddr);
-
   Ip4AddRouterList (
     Private,
     (DHCPV4_OP_IP_LIST *) RxBufPtr->OpAdds.PktOptAdds[OP_ROUTER_LIST_IX - 1]
