@@ -25,7 +25,7 @@
 //
 // SPIN_LOCK
 //
-typedef UINTN                       SPIN_LOCK;
+typedef volatile UINTN              SPIN_LOCK;
 
 #if   defined (MDE_CPU_IA32)
 //
