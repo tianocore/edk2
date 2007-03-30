@@ -25,6 +25,12 @@ Abstract:
 #define _EBC_EXECUTE_H_
 
 //
+// VM major/minor version
+//
+#define VM_MAJOR_VERSION  1
+#define VM_MINOR_VERSION  0
+
+//
 // Macros to check and set alignment
 //
 #define ASSERT_ALIGNED(addr, size)  ASSERT (!((UINT32) (addr) & (size - 1)))

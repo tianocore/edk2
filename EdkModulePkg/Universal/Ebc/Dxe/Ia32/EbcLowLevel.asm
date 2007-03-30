@@ -2,7 +2,7 @@
   title   VM ASSEMBLY LANGUAGE ROUTINES
 ;****************************************************************************
 ;*                                                                         
-;*  Copyright (c) 2006, Intel Corporation                                                         
+;*  Copyright (c) 2006 - 2007, Intel Corporation                                                         
 ;*  All rights reserved. This program and the accompanying materials                          
 ;*  are licensed and made available under the terms and conditions of the BSD License         
 ;*  which accompanies this distribution.  The full text of the license may be found at        
@@ -45,6 +45,7 @@
 ;---------------------------------------------------------------------------
 ;;GenericPostSegment      SEGMENT USE16
 ;---------------------------------------------------------------------------
+CopyMem  PROTO  C Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
 
 ;****************************************************************************
 ; EbcLLCALLEXNative
@@ -61,16 +62,29 @@
 ; VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 _EbcLLCALLEXNative        PROC    NEAR    PUBLIC
       push   ebp
+      push   ebx
       mov    ebp, esp              ; standard function prolog
       
       ; Get function address in a register
       ; mov ecx, FuncAddr => mov ecx, dword ptr [FuncAddr]
-      mov    ecx, dword ptr [esp]+8
-
+      mov    ecx, dword ptr [esp]+0Ch
+      
       ; Set stack pointer to new value
       ; mov eax, NewStackPointer => mov eax, dword ptr [NewSp]
-      mov    eax, dword ptr [esp] + 0Ch
-      mov    esp, eax      
+      mov    eax, dword ptr [esp] + 14h
+      mov    edx, dword ptr [esp] + 10h
+      sub    eax, edx
+      sub    esp, eax      
+      mov    ebx, esp
+      push   ecx
+      push   eax
+      push   edx
+      push   ebx
+      call   CopyMem
+      pop    eax
+      pop    eax
+      pop    eax
+      pop    ecx
 
       ; Now call the external routine
       call  ecx
@@ -81,6 +95,7 @@ _EbcLLCALLEXNative        PROC    NEAR    PUBLIC
 
       ; Standard function epilog
       mov      esp, ebp
+      pop      ebx
       pop      ebp
       ret
 _EbcLLCALLEXNative    ENDP

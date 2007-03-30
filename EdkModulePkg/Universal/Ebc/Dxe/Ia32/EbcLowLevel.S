@@ -10,18 +10,34 @@
 #*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 #*                                                                          
 #****************************************************************************
+.globl ASM_PFX(CopyMem)
+
 .globl ASM_PFX(EbcLLCALLEXNative)
 ASM_PFX(EbcLLCALLEXNative):
-        push   %ebp
-        mov    %esp,%ebp
-        mov    0x8(%esp),%ecx
-        mov    0xc(%esp),%eax
-        mov    %eax,%esp
-        call   *%ecx
-        mov    %ebp,%esp
-        mov    %ebp,%esp
-        pop    %ebp
-        ret    
+         push   %ebp
+         push   %ebx
+         mov    %esp,%ebp
+         mov    0xc(%esp),%ecx
+         mov    0x14(%esp),%eax
+         mov    0x10(%esp),%edx
+         sub    %edx,%eax
+         sub    %eax,%esp
+         mov    %esp,%ebx
+         push   %ecx
+         push   %eax
+         push   %edx
+         push   %ebx
+         call   ASM_PFX(CopyMem)
+         pop    %eax
+         pop    %eax
+         pop    %eax
+         pop    %ecx
+         call   *%ecx
+         mov    %ebp,%esp
+         mov    %ebp,%esp
+         pop    %ebx
+         pop    %ebp
+         ret    
 
 .globl ASM_PFX(EbcLLGetEbcEntryPoint)
 ASM_PFX(EbcLLGetEbcEntryPoint):

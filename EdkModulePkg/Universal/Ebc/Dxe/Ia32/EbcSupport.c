@@ -32,6 +32,7 @@ Abstract:
 #define VM_STACK_SIZE   (1024 * 4)
 #define EBC_THUNK_SIZE  32
 
+#define STACK_REMAIN_SIZE (1024 * 4)
 VOID
 EbcLLCALLEX (
   IN VM_CONTEXT   *VmPtr,
@@ -152,7 +153,15 @@ EbcInterpret (
   IN OUT UINTN      Arg5,
   IN OUT UINTN      Arg6,
   IN OUT UINTN      Arg7,
-  IN OUT UINTN      Arg8
+  IN OUT UINTN      Arg8,
+  IN OUT UINTN      Arg9,
+  IN OUT UINTN      Arg10,
+  IN OUT UINTN      Arg11,
+  IN OUT UINTN      Arg12,
+  IN OUT UINTN      Arg13,
+  IN OUT UINTN      Arg14,
+  IN OUT UINTN      Arg15,
+  IN OUT UINTN      Arg16
   )
 /*++
 
@@ -179,6 +188,8 @@ Returns:
   //
   VM_CONTEXT  VmContext;
   UINTN       Addr;
+  EFI_STATUS  Status;
+  UINTN       StackIndex;
 
   //
   // Get the EBC entry point from the processor register.
@@ -194,33 +205,72 @@ Returns:
   // Set the VM instruction pointer to the correct location in memory.
   //
   VmContext.Ip = (VMIP) Addr;
-
   //
   // Initialize the stack pointer for the EBC. Get the current system stack
   // pointer and adjust it down by the max needed for the interpreter.
   //
-  Addr            = EbcLLGetStackPointer ();
-
-  VmContext.R[0]  = (UINT64) Addr;
-  VmContext.R[0] -= VM_STACK_SIZE;
 
   //
   // Align the stack on a natural boundary
   //
+
+  //
+  // Allocate stack pool
+  //
+  Status = GetEBCStack((EFI_HANDLE)-1, &VmContext.StackPool, &StackIndex);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
+  VmContext.R[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.R[0];
   VmContext.R[0] &= ~(sizeof (UINTN) - 1);
+  VmContext.R[0] -= sizeof (UINTN);
 
   //
   // Put a magic value in the stack gap, then adjust down again
   //
   *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) VM_STACK_KEY_VALUE;
   VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
+  VmContext.LowStackTop   = (UINTN) VmContext.R[0];
 
   //
   // For IA32, this is where we say our return address is
   //
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg16;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg15;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg14;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg13;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg12;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg11;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg10;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg9;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg8;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg7;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg6;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg5;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg4;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg3;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg2;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg1;
+  VmContext.R[0] -= 16;
   VmContext.StackRetAddr  = (UINT64) VmContext.R[0];
-  VmContext.LowStackTop   = (UINTN) VmContext.R[0];
 
   //
   // We need to keep track of where the EBC stack starts. This way, if the EBC
@@ -235,7 +285,7 @@ Returns:
   // the stack too, so adjust accordingly.
   //  VmContext.HighStackBottom = (UINTN)(Addr + sizeof (VmContext) + sizeof (Addr));
   //
-  VmContext.HighStackBottom = (UINTN) &Arg1 - 16;
+
   //
   // Begin executing the EBC code
   //
@@ -244,6 +294,7 @@ Returns:
   //
   // Return the value in R[7] unless there was an error
   //
+  ReturnEBCStack(StackIndex);
   return (UINT64) VmContext.R[7];
 }
 
@@ -277,6 +328,8 @@ Returns:
   //
   VM_CONTEXT  VmContext;
   UINTN       Addr;
+  EFI_STATUS  Status;
+  UINTN       StackIndex;
 
   //
   // Get the EBC entry point from the processor register. Make sure you don't
@@ -308,26 +361,40 @@ Returns:
   // Initialize the stack pointer for the EBC. Get the current system stack
   // pointer and adjust it down by the max needed for the interpreter.
   //
-  Addr            = EbcLLGetStackPointer ();
-  VmContext.R[0]  = (UINT64) Addr;
-  VmContext.R[0] -= VM_STACK_SIZE;
+
+  //
+  // Allocate stack pool
+  //
+  Status = GetEBCStack(ImageHandle, &VmContext.StackPool, &StackIndex);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
+  VmContext.R[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.R[0];
+  VmContext.R[0] -= sizeof (UINTN);
+  
   //
   // Put a magic value in the stack gap, then adjust down again
   //
   *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) VM_STACK_KEY_VALUE;
   VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
 
   //
   // Align the stack on a natural boundary
   //  VmContext.R[0] &= ~(sizeof(UINTN) - 1);
   //
-  VmContext.StackRetAddr  = (UINT64) VmContext.R[0];
   VmContext.LowStackTop   = (UINTN) VmContext.R[0];
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) SystemTable;
+  VmContext.R[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) ImageHandle;
+
+  VmContext.R[0] -= 16; 
+  VmContext.StackRetAddr  = (UINT64) VmContext.R[0];
   //
   // VM pushes 16-bytes for return address. Simulate that here.
   //
-  VmContext.HighStackBottom = (UINTN) &ImageHandle - 16;
 
   //
   // Begin executing the EBC code

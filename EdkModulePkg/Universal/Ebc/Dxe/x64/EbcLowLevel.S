@@ -44,6 +44,8 @@
 #
 # Destroys no working registers.
 #****************************************************************************
+.global _CopyMem;
+
 # VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 .global _EbcLLCALLEXNative;
 _EbcLLCALLEXNative:
@@ -56,7 +58,12 @@ _EbcLLCALLEXNative:
       mov    %rcx, %rbx
 
       # Set stack pointer to new value
-      mov    %rdx, %rsp
+      sub    %r8,  %rdx
+      sub    %rsp, %r8
+      mov    %rsp, %rcx
+      sub    %rsp, 0x20
+      call   _CopyMem 
+      add    %rsp, 0x20
 
       # Considering the worst case, load 4 potiential arguments
       # into registers.

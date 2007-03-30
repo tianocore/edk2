@@ -49,6 +49,8 @@ typedef struct {
   VOID              *FramePtr;
   VOID              *EntryPoint;            // entry point of EBC image
   UINTN             ImageBase;
+  VOID              *StackPool;
+  VOID              *StackTop;
 } VM_CONTEXT;
 
 extern VM_CONTEXT                    *mVmPtr;
@@ -106,6 +108,8 @@ EbcDebugSignalException (
 //
 #define EFI_TIMER_UNIT_1MS            (1000 * 10)
 #define EBC_VM_PERIODIC_CALLBACK_RATE (1000 * EFI_TIMER_UNIT_1MS)
+#define STACK_POOL_SIZE               (1024 * 1020)
+#define MAX_STACK_NUM                 4
 
 EFI_STATUS
 EbcDebugSignalPeriodic (
@@ -152,6 +156,32 @@ EbcLLGetReturnValue (
   )
 ;
 
+EFI_STATUS
+GetEBCStack(
+  EFI_HANDLE Handle,
+  VOID       **StackBuffer,
+  UINTN      *BufferIndex
+  );
+
+EFI_STATUS
+ReturnEBCStack(
+  UINTN Index
+  );
+
+EFI_STATUS
+InitEBCStack (
+  VOID
+  );
+
+EFI_STATUS
+FreeEBCStack(
+  VOID
+  );
+
+EFI_STATUS
+ReturnEBCStackByHandle(
+  EFI_HANDLE Handle
+  );
 //
 // Defines for a simple EBC debugger interface
 //

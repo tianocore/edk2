@@ -27,6 +27,7 @@ Revision History
 #define VM_STACK_SIZE   (1024 * 32)
 
 #define EBC_THUNK_SIZE  128
+#define STACK_REMAIN_SIZE (1024 * 4)
 
 //
 // For code execution, thunks must be aligned on 16-byte boundary

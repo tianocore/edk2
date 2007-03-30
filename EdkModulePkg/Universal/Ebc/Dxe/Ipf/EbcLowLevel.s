@@ -40,6 +40,7 @@ name::
          mov ar##.##pfs=loc1 ;;\
          br##.##ret##.##dpnt  b0;;
 
+.type CopyMem, @function;  
 
 //-----------------------------------------------------------------------------
 //++
@@ -125,6 +126,35 @@ PROCEDURE_ENTRY(EbcAsmLLCALLEX)
   NESTED_RETURN
 
 PROCEDURE_EXIT(EbcAsmLLCALLEX)
+
+PROCEDURE_ENTRY(EbcLLCALLEXNative)
+  NESTED_SETUP (3,6,3,0)
+  
+  mov   loc2 = in2;;
+  mov   loc3 = in1;;
+  sub   loc2 = loc2, loc3
+  mov   loc4 = r12;;
+  or    loc5 = r1, r0
+  
+  sub   r12 = r12, loc2
+  mov   out2 = loc2;;
+
+  and   r12 = -0x10, r12
+  mov   out1 = in1;;
+  mov   out0 = r12;;
+  adds  r12 = -0x8, r12
+  (p0) br.call.dptk.many b0 = CopyMem;;
+  adds  r12 = 0x8, r12
+ 
+  mov   out0 = in0;;
+  mov   out1 = r12;;
+  (p0) br.call.dptk.many b0 = EbcAsmLLCALLEX;;
+  mov   r12 = loc4;;
+  or    r1 = loc5, r0
+  
+  NESTED_RETURN
+PROCEDURE_EXIT(EbcLLCALLEXNative)
+
 
 //
 // UINTN EbcLLGetEbcEntryPoint(VOID)
