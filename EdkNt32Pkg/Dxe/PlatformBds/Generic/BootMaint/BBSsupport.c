@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                          
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -486,19 +486,19 @@ BdsDeleteAllInvalidLegacyBootOptions (
       Index++;
       continue;
     }
- 
+
     //
     // Check if BBS Description String is changed
     //
     DescStringMatch = FALSE;
-    
+
     BdsBuildLegacyDevNameString (
-      &LocalBbsTable[BbsIndex], 
-      BbsIndex, 
-      sizeof(BootDesc), 
+      &LocalBbsTable[BbsIndex],
+      BbsIndex,
+      sizeof(BootDesc),
       BootDesc
       );
-    
+
     if (StrCmp (BootDesc, (UINT16*)(BootOptionVar + sizeof (UINT32) + sizeof (UINT16))) == 0) {
       DescStringMatch = TRUE;
     }
@@ -634,7 +634,7 @@ BdsCreateOneLegacyBootOption (
             );
   BbsItem->BootPriority = 0x00;
 
-  gBS->FreePool (DevPath);
+  FreePool (DevPath);
 
   return Status;
 }

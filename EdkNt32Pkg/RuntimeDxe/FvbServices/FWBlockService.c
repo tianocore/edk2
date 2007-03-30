@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   FWBlockService.c
-    
+
 Abstract:
 
 Revision History
@@ -81,14 +81,14 @@ Routine Description:
   date items to there virtual address.
 
   mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]  - Physical copy of instance data
-  mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]   - Virtual pointer to common 
+  mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]   - Virtual pointer to common
                                                 instance data.
 
 Arguments:
 
   (Standard EFI notify event - EFI_EVENT_NOTIFY)
 
-Returns: 
+Returns:
 
   None
 
@@ -138,7 +138,7 @@ Arguments:
   FwhInstance           - The EFI_FW_VOL_INSTANCE fimrware instance structure
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
   EFI_INVALID_PARAMETER - Instance not found
 
@@ -182,14 +182,14 @@ Routine Description:
 Arguments:
   Instance              - The FV instance whose base address is going to be
                           returned
-  Address               - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS 
+  Address               - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS
                           that on successful return, contains the base address
-                          of the firmware volume. 
+                          of the firmware volume.
   Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
   EFI_INVALID_PARAMETER - Instance not found
 
@@ -222,14 +222,14 @@ Routine Description:
   resulting attributes in output parameter
 
 Arguments:
-  Instance              - The FV instance whose attributes is going to be 
+  Instance              - The FV instance whose attributes is going to be
                           returned
   Attributes            - Output buffer which contains attributes
   Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
   EFI_INVALID_PARAMETER - Instance not found
 
@@ -266,7 +266,7 @@ Routine Description:
 Arguments:
   Instance              - The FV instance which the Lba belongs to
   Lba                   - The logical block address
-  LbaAddress            - On output, contains the physical starting address 
+  LbaAddress            - On output, contains the physical starting address
                           of the Lba
   LbaLength             - On output, contains the length of the block
   NumOfBlocks           - A pointer to a caller allocated UINTN in which the
@@ -277,7 +277,7 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
   EFI_INVALID_PARAMETER - Instance not found
 
@@ -369,14 +369,14 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
-  EFI_SUCCESS           - The firmware volume was read successfully and 
+Returns:
+  EFI_SUCCESS           - The firmware volume was read successfully and
                           contents are in Buffer
   EFI_BAD_BUFFER_SIZE   - Read attempted across a LBA boundary. On output,
                           NumBytes contains the total number of bytes returned
                           in Buffer
   EFI_ACCESS_DENIED     - The firmware volume is in the ReadDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be read
   EFI_INVALID_PARAMETER - Instance not found, or NumBytes, Buffer are NULL
 
@@ -455,13 +455,13 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The firmware volume was written successfully
   EFI_BAD_BUFFER_SIZE   - Write attempted across a LBA boundary. On output,
                           NumBytes contains the total number of bytes
                           actually written
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written
   EFI_INVALID_PARAMETER - Instance not found, or NumBytes, Buffer are NULL
 
@@ -533,10 +533,10 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The erase request was successfully completed
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written. Firmware device may have been
                           partially erased
   EFI_INVALID_PARAMETER - Instance not found
@@ -596,7 +596,7 @@ Routine Description:
 Arguments:
   Instance              - The FV instance to be erased
   StartLba              - The starting logical block index to be erased
-  OffsetStartLba        - Offset into the starting block at which to 
+  OffsetStartLba        - Offset into the starting block at which to
                           begin erasing
   LastLba               - The last logical block index to be erased
   OffsetStartLba        - Offset into the last block at which to end erasing
@@ -604,10 +604,10 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The firmware volume was erased successfully
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written. Firmware device may have been
                           partially erased
   EFI_INVALID_PARAMETER - Instance not found
@@ -681,13 +681,13 @@ FvbSetVolumeAttributes (
 /*++
 
 Routine Description:
-  Modifies the current settings of the firmware volume according to the 
+  Modifies the current settings of the firmware volume according to the
   input parameter, and returns the new setting of the volume
 
 Arguments:
-  Instance              - The FV instance whose attributes is going to be 
+  Instance              - The FV instance whose attributes is going to be
                           modified
-  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES
                           containing the desired firmware volume settings.
                           On successful return, it contains the new settings
                           of the firmware volume
@@ -695,7 +695,7 @@ Arguments:
                           instance data
   Virtual               - Whether CPU is in virtual or physical mode
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
   EFI_ACCESS_DENIED     - The volume setting is locked and cannot be modified
   EFI_INVALID_PARAMETER - Instance not found, or The attributes requested are
@@ -801,7 +801,7 @@ Arguments:
 
 Returns:
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
 
 --*/
@@ -836,8 +836,8 @@ Arguments:
                           returned. All blocks in this range have a size of
                           BlockSize
 
-Returns: 
-  EFI_SUCCESS           - The firmware volume was read successfully and 
+Returns:
+  EFI_SUCCESS           - The firmware volume was read successfully and
                           contents are in Buffer
 
 --*/
@@ -872,7 +872,7 @@ Arguments:
     This                - Calling context
     Attributes          - output buffer which contains attributes
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
 
 --*/
@@ -899,7 +899,7 @@ Arguments:
   This                  - Calling context
   Attributes            - output buffer which contains attributes
 
-Returns: 
+Returns:
   EFI_SUCCESS           - Successfully returns
 
 --*/
@@ -915,28 +915,28 @@ EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
-  ...  
+  ...
   )
 /*++
 
 Routine Description:
 
-  The EraseBlock() function erases one or more blocks as denoted by the 
+  The EraseBlock() function erases one or more blocks as denoted by the
   variable argument list. The entire parameter list of blocks must be verified
-  prior to erasing any blocks.  If a block is requested that does not exist 
-  within the associated firmware volume (it has a larger index than the last 
+  prior to erasing any blocks.  If a block is requested that does not exist
+  within the associated firmware volume (it has a larger index than the last
   block of the firmware volume), the EraseBlock() function must return
   EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
 
 Arguments:
   This                  - Calling context
-  ...                   - Starting LBA followed by Number of Lba to erase. 
+  ...                   - Starting LBA followed by Number of Lba to erase.
                           a -1 to terminate the list.
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The erase request was successfully completed
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written. Firmware device may have been
                           partially erased
 
@@ -1037,13 +1037,13 @@ Arguments:
                           output, indicates the actual number of bytes written
   Buffer                - Buffer containing source data for the write.
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The firmware volume was written successfully
   EFI_BAD_BUFFER_SIZE   - Write attempted across a LBA boundary. On output,
                           NumBytes contains the total number of bytes
                           actually written
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written
   EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
 
@@ -1085,14 +1085,14 @@ Arguments:
                           output, indicates the actual number of bytes Read
   Buffer                - Buffer containing source data for the Read.
 
-Returns: 
-  EFI_SUCCESS           - The firmware volume was read successfully and 
+Returns:
+  EFI_SUCCESS           - The firmware volume was read successfully and
                           contents are in Buffer
   EFI_BAD_BUFFER_SIZE   - Read attempted across a LBA boundary. On output,
                           NumBytes contains the total number of bytes returned
                           in Buffer
   EFI_ACCESS_DENIED     - The firmware volume is in the ReadDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be read
   EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
 
@@ -1125,15 +1125,15 @@ Routine Description:
 Arguments:
   This                  - Calling context
   StartLba              - The starting logical block index to be erased
-  OffsetStartLba        - Offset into the starting block at which to 
+  OffsetStartLba        - Offset into the starting block at which to
                           begin erasing
   LastLba               - The last logical block index to be erased
   OffsetStartLba        - Offset into the last block at which to end erasing
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The firmware volume was erased successfully
   EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
+  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
                           could not be written. Firmware device may have been
                           partially erased
 
@@ -1167,7 +1167,7 @@ Routine Description:
 Arguments:
   FwVolHeader           - A pointer to a firmware volume header
 
-Returns: 
+Returns:
   EFI_SUCCESS           - The firmware volume is consistent
   EFI_NOT_FOUND         - The firmware volume has corrupted. So it is not an FV
 
@@ -1252,12 +1252,8 @@ Returns:
   // Allocate runtime services data for global variable, which contains
   // the private data of all firmware volume block instances
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  sizeof (ESAL_FWB_GLOBAL),
-                  &mFvbModuleGlobal
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal = AllocateRuntimePool (sizeof (ESAL_FWB_GLOBAL));
+  ASSERT (mFvbModuleGlobal != NULL);
 
   //
   // Calculate the total size for all firmware volume block instances
@@ -1306,12 +1302,8 @@ Returns:
   // the private data of each FV instance. But in virtual mode or in physical
   // mode, the address of the the physical memory may be different.
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  BufferSize,
-                  &mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] = AllocateRuntimePool (BufferSize);
+  ASSERT (mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] != NULL);
 
   //
   // Make a virtual copy of the FvInstance pointer.
@@ -1392,12 +1384,8 @@ Returns:
     //
     // Add a FVB Protocol Instance
     //
-    Status = gBS->AllocatePool (
-                    EfiRuntimeServicesData,
-                    sizeof (EFI_FW_VOL_BLOCK_DEVICE),
-                    &FvbDevice
-                    );
-    ASSERT_EFI_ERROR (Status);
+    FvbDevice = AllocateRuntimePool (sizeof (EFI_FW_VOL_BLOCK_DEVICE));
+    ASSERT (FvbDevice != NULL);
 
     CopyMem (FvbDevice, &mFvbDeviceTemplate, sizeof (EFI_FW_VOL_BLOCK_DEVICE));
 
@@ -1481,12 +1469,8 @@ Returns:
   //
   // Allocate for scratch space, an intermediate buffer for FVB extention
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  MaxLbaSize,
-                  &mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL]
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL] = AllocateRuntimePool (MaxLbaSize);
+  ASSERT (mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL] != NULL);
 
   mFvbModuleGlobal->FvbScratchSpace[FVB_VIRTUAL] = mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL];
 

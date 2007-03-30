@@ -346,7 +346,7 @@ Returns:
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
 
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;
@@ -430,12 +430,8 @@ Returns:
 
   WinNtIo->WinNtThunk->SetErrorMode (SEM_FAILCRITICALERRORS);
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_BLOCK_IO_PRIVATE),
-                  &Private
-                  );
-  ASSERT_EFI_ERROR (Status);
+  Private = AllocatePool (sizeof (WIN_NT_BLOCK_IO_PRIVATE));
+  ASSERT (Private != NULL);
 
   EfiInitializeLock (&Private->Lock, EFI_TPL_NOTIFY);
 
@@ -518,7 +514,7 @@ Returns:
                     );
     if (EFI_ERROR (Status)) {
       FreeUnicodeStringTable (Private->ControllerNameTable);
-      gBS->FreePool (Private);
+      FreePool (Private);
     }
 
     DEBUG ((EFI_D_INIT, "BlockDevice added: %s\n", Filename));

@@ -1,15 +1,15 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name: 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
 
   DeviceManager.c
 
@@ -51,7 +51,7 @@ Routine Description:
 
   This is the function that is called to provide results data to the driver.  This data
   consists of a unique key which is used to identify what data is either being passed back
-  or being asked for. 
+  or being asked for.
 
 Arguments:
 
@@ -61,7 +61,7 @@ Arguments:
 
   Data -            A pointer to the data being sent to the original exporting driver.
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -103,7 +103,7 @@ Routine Description:
 
 Arguments:
   None
-            
+
 Returns:
 
 --*/
@@ -120,7 +120,7 @@ Returns:
 
   PackageList = PreparePackages (1, &gBdsStringPackGuid, DeviceManagerVfrBin);
   Status      = Hii->NewPack (Hii, PackageList, &FPCallbackInfo.DevMgrHiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   //
   // This example does not implement worker functions for the NV accessor functions.  Only a callback evaluator
@@ -157,7 +157,7 @@ Returns:
   //
   Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
 
-  gBS->FreePool (UpdateData);
+  FreePool (UpdateData);
   return Status;
 }
 
@@ -168,17 +168,17 @@ CallDeviceManager (
 /*++
 
 Routine Description:
-  
+
   Call the browser and display the device manager
 
 Arguments:
-  
+
   None
-  
+
 Returns:
   EFI_SUCCESS            - Operation is successful.
   EFI_INVALID_PARAMETER  - If the inputs to SendForm function is not valid.
-  
+
 --*/
 {
   EFI_STATUS          Status;
@@ -337,7 +337,7 @@ Returns:
           }
         }
 
-        gBS->FreePool (String);
+        FreePool (String);
 
         CreateGotoOpCode (
           0x1000,     // Device Manager Page
@@ -391,7 +391,7 @@ Returns:
       //
       // Reset Buffer pointer to original location
       //
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
     }
   }
   //
@@ -406,12 +406,12 @@ Returns:
     FPCallbackInfo.Data.VideoBIOS = 0;
   } else {
     FPCallbackInfo.Data.VideoBIOS = VideoOption[0];
-    gBS->FreePool (VideoOption);
+    FreePool (VideoOption);
   }
 
   ASSERT (FPCallbackInfo.Data.VideoBIOS <= 1);
 
-  Status = gBS->AllocatePool (EfiBootServicesData, 2 * sizeof (IFR_OPTION), &IfrOptionList);
+  IfrOptionList = AllocatePool (2 * sizeof (IFR_OPTION));
   if (IfrOptionList != NULL) {
     IfrOptionList[0].Flags        = EFI_IFR_FLAG_INTERACTIVE;
     IfrOptionList[0].Key          = SET_VIDEO_BIOS_TYPE_QUESTION_ID + 0x2000;
@@ -437,7 +437,7 @@ Returns:
 
     UpdateData->DataCount = 4;
     Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) EFI_VBIOS_CLASS, TRUE, UpdateData);
-    gBS->FreePool (IfrOptionList);
+    FreePool (IfrOptionList);
   }
 
   BootDeviceMngrMenuResetRequired = FALSE;
@@ -490,8 +490,8 @@ Returns:
     gCallbackKey = 4;
   }
 
-  gBS->FreePool (UpdateData);
-  gBS->FreePool (HiiHandles);
+  FreePool (UpdateData);
+  FreePool (HiiHandles);
 
   return Status;
 }

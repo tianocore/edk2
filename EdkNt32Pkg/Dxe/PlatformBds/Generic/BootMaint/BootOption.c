@@ -1,17 +1,17 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   BootOption.c
-  
+
 Abstract:
 
   Provide boot option support for Application "BootMaint"
@@ -19,7 +19,7 @@ Abstract:
   Include file system navigation, system handle selection
 
   Boot option manipulation
-  
+
 Revision History
 
 --*/
@@ -42,7 +42,7 @@ Arguments:
                       Menu type
 
 Returns:
-  NULL                Cannot allocate memory for current menu 
+  NULL                Cannot allocate memory for current menu
                       entry
   Others              A valid pointer pointing to the allocated
                       memory pool for current menu entry
@@ -195,11 +195,11 @@ BOpt_GetMenuEntry (
   )
 /*++
   Rountine Description :
-    Use this routine to get one particular menu entry in specified 
+    Use this routine to get one particular menu entry in specified
     menu
 
   Arguments :
-    MenuOption        The menu that we will search 
+    MenuOption        The menu that we will search
 
     MenuNumber        The menunubmer that we want
 
@@ -238,7 +238,7 @@ Routine Description
   protocol, Load File protocol.
 
   Building up the FileSystem Menu for user selection
-  All file system will be stored in FsOptionMenu 
+  All file system will be stored in FsOptionMenu
   for future use.
 
 Arguments:
@@ -303,7 +303,7 @@ Returns:
         //
         // If block IO exists check to see if it's remobable media
         //
-        RemovableMedia = BlkIo->Media->RemovableMedia; 
+        RemovableMedia = BlkIo->Media->RemovableMedia;
       }
 
       //
@@ -311,12 +311,12 @@ Returns:
       //
       MenuEntry = BOpt_CreateMenuEntry (BM_FILE_CONTEXT_SELECT);
       if (NULL == MenuEntry) {
-        SafeFreePool (SimpleFsHandle);    
+        SafeFreePool (SimpleFsHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
       FileContext = (BM_FILE_CONTEXT *) MenuEntry->VariableContext;
-            
+
       FileContext->Handle     = SimpleFsHandle[Index];
       MenuEntry->OptionNumber = Index;
       FileContext->FHandle    = EfiLibOpenRoot (FileContext->Handle);
@@ -364,7 +364,7 @@ Returns:
         TempStr
         );
       OptionNumber++;
-      InsertTailList (&FsOptionMenu.Head, &MenuEntry->Link);      
+      InsertTailList (&FsOptionMenu.Head, &MenuEntry->Link);
     }
   }
 
@@ -386,7 +386,7 @@ Returns:
     for (Index = 0; Index < NoLoadFileHandles; Index++) {
       MenuEntry = BOpt_CreateMenuEntry (BM_FILE_CONTEXT_SELECT);
       if (NULL == MenuEntry) {
-        SafeFreePool (LoadFileHandle);    
+        SafeFreePool (LoadFileHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -494,7 +494,7 @@ Arguments:
 
 Returns:
   VOID
-  
+
 --*/
 {
   BM_MENU_ENTRY *MenuEntry;
@@ -675,15 +675,15 @@ BOpt_GetLegacyOptions (
   )
 /*++
 Routine Description:
-  
+
   Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
-    
+
 Arguments:
   None
 
 Returns:
   The device info of legacy device.
-  
+
 --*/
 {
   BM_MENU_ENTRY             *NewMenuEntry;
@@ -832,16 +832,16 @@ BOpt_GetBootOptions (
 /*++
 
 Routine Description:
-  
+
   Build the BootOptionMenu according to BootOrder Variable.
-  This Routine will access the Boot#### to get EFI_LOAD_OPTION 
-  
+  This Routine will access the Boot#### to get EFI_LOAD_OPTION
+
 Arguments:
   None
 
 Returns:
   The number of the Var Boot####
-  
+
 --*/
 {
   UINTN                     Index;
@@ -1148,7 +1148,7 @@ BOpt_IsEfiImageName (
 /*++
 
 Routine Description
-  Check whether current FileName point to a valid 
+  Check whether current FileName point to a valid
   Efi Image File.
 
 Arguments:
@@ -1157,7 +1157,7 @@ Arguments:
 Returns:
   TRUE  -   Is Efi Image
   FALSE -   Not a valid Efi Image
-  
+
 --*/
 {
   //
@@ -1198,7 +1198,7 @@ IsEfiAppReadFromFile (
 {
   EFI_STATUS        Status;
   EFI_FILE_HANDLE   File;
-    
+
   File = (EFI_FILE_HANDLE)FileHandle;
   Status = File->SetPosition (File, FileOffset);
   if (EFI_ERROR (Status)) {
@@ -1219,15 +1219,15 @@ BOpt_IsEfiApp (
 
 Routine Description:
   Check whether current FileName point to a valid Efi Application
-  
+
 Arguments:
   Dir       -   Pointer to current Directory
   FileName  -   Pointer to current File name.
-  
+
 Returns:
   TRUE      -   Is a valid Efi Application
   FALSE     -   not a valid Efi Application
-  
+
 --*/
 {
   EFI_STATUS                            Status;
@@ -1268,7 +1268,7 @@ Routine Description
   in current system environment
   All valid handles in the system except those consume SimpleFs, LoadFile
   are stored in DriverMenu for future use.
-  
+
 Arguments:
   None
 
@@ -1363,13 +1363,13 @@ BOpt_GetBootOptionNumber (
 /*++
 
 Routine Description:
-  Get the Option Number that does not used 
-  
+  Get the Option Number that does not used
+
 Arguments:
 
 Returns:
   The Option Number
-  
+
 --*/
 {
   BM_MENU_ENTRY *NewMenuEntry;
@@ -1415,7 +1415,7 @@ Returns:
                 &gEfiGlobalVariableGuid,
                 &OptionSize
                 );
-      if (NULL == OptionBuffer) 
+      if (NULL == OptionBuffer)
         break;
       }
     }
@@ -1440,13 +1440,13 @@ BOpt_GetDriverOptionNumber (
 /*++
 
 Routine Description:
-  Get the Option Number that does not used 
-  
+  Get the Option Number that does not used
+
 Arguments:
 
 Returns:
   The Option Number
-  
+
 --*/
 {
   BM_MENU_ENTRY *NewMenuEntry;
@@ -1507,12 +1507,12 @@ BOpt_GetDriverOptions (
 
 Routine Description:
   Build up all DriverOptionMenu
-  
+
 Arguments:
 
 Returns:
   The Option Number
-  
+
 --*/
 {
   UINTN           Index;
@@ -1671,7 +1671,7 @@ SafeFreePool (
 Routine Description:
   Wrap original FreePool gBS call
   in order to decrease code length
-  
+
 Arguments:
 
 Returns:
@@ -1679,7 +1679,7 @@ Returns:
 --*/
 {
   if (Buffer != NULL) {
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     Buffer = NULL;
   }
 }

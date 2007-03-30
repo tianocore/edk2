@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -25,9 +25,9 @@ IsNvNeed (
   )
 {
   CHAR16 *Ptr;
-  
+
   Ptr = ConVarName;
-  
+
   //
   // If the variable includes "Dev" at last, we consider
   // it does not support NV attribute.
@@ -35,7 +35,7 @@ IsNvNeed (
   while (*Ptr) {
     Ptr++;
   }
-  
+
   if ((*(Ptr - 3) == 'D') && (*(Ptr - 2) == 'e') && (*(Ptr - 1) == 'v')) {
     return FALSE;
   } else {
@@ -53,7 +53,7 @@ BdsLibUpdateConsoleVariable (
 
 Routine Description:
 
-  This function update console variable based on ConVarName, it can 
+  This function update console variable based on ConVarName, it can
   add or remove one specific console device path from the variable
 
 Arguments:
@@ -71,8 +71,8 @@ Arguments:
 Returns:
 
   EFI_UNSUPPORTED         - Add or remove the same device path.
-  
-  EFI_SUCCESS             - Success add or remove the device path from 
+
+  EFI_SUCCESS             - Success add or remove the device path from
                             the console variable.
 
 --*/
@@ -103,12 +103,12 @@ Returns:
                 &gEfiGlobalVariableGuid,
                 &DevicePathSize
                 );
-                
+
   //
   // Initialize NewDevicePath
   //
   NewDevicePath  = VarConsole;
-  
+
   //
   // If ExclusiveDevicePath is even the part of the instance in VarConsole, delete it.
   // In the end, NewDevicePath is the final device path.
@@ -134,7 +134,7 @@ Returns:
       BdsLibSafeFreePool(TempNewDevicePath);
     }
   }
-  
+
   //
   // The attribute for ConInDev, ConOutDev and ErrOutDev does not include NV.
   //
@@ -149,7 +149,7 @@ Returns:
     //
     Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
-  
+
   //
   // Finally, Update the variable of the default console by NewDevicePath
   //
@@ -192,7 +192,7 @@ Arguments:
 Returns:
 
   EFI_NOT_FOUND           - There is not any console devices connected success
-  
+
   EFI_SUCCESS             - Success connect any one instance of the console
                             device path base on the variable ConVarName.
 
@@ -250,7 +250,7 @@ Returns:
     BdsLibSafeFreePool(Instance);
   } while (CopyOfDevicePath != NULL);
 
-  gBS->FreePool (StartDevicePath);
+  FreePool (StartDevicePath);
 
   if (DeviceExist == FALSE) {
     return EFI_NOT_FOUND;
@@ -346,7 +346,7 @@ BdsLibConnectAllDefaultConsoles (
 
 Routine Description:
 
-  This function will connect console device base on the console 
+  This function will connect console device base on the console
   device variable ConIn, ConOut and ErrOut.
 
 Arguments:
@@ -357,7 +357,7 @@ Returns:
 
   EFI_SUCCESS      - At least one of the ConIn and ConOut device have
                      been connected success.
-                     
+
   EFI_STATUS       - Return the status of BdsLibConnectConsoleVariable ().
 
 --*/
@@ -370,12 +370,12 @@ Returns:
 
   //
   // Because possibly the platform is legacy free, in such case,
-  // ConIn devices (Serial Port and PS2 Keyboard ) does not exist, 
+  // ConIn devices (Serial Port and PS2 Keyboard ) does not exist,
   // so we need not check the status.
-  //  
+  //
   BdsLibConnectConsoleVariable (L"ConIn");
 
-  // 
+  //
   // It seems impossible not to have any ConOut device on platform,
   // so we check the status here.
   //

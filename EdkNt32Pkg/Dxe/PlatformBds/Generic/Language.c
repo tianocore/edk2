@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,7 +16,7 @@ Module Name:
 Abstract:
 
  Language settings
-  
+
 Revision History
 
 --*/
@@ -311,7 +311,7 @@ Routine Description:
 
 Arguments:
   None
-            
+
 Returns:
 
 --*/
@@ -326,7 +326,7 @@ Returns:
   HiiHandle = 0;
   Hii->NewPack (Hii, PackageList, &HiiHandle);
 
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 }
 
 VOID
@@ -336,12 +336,12 @@ InitializeLanguage (
 /*++
 
 Routine Description:
-  Determine the current language that will be used 
+  Determine the current language that will be used
   based on language related EFI Variables
 
 Arguments:
   LangCodesSettingRequired - If required to set LangCode variable
-            
+
 Returns:
 
 --*/
@@ -421,11 +421,11 @@ Returns:
   }
 
   if (LangCodes) {
-    gBS->FreePool (LangCodes);
+    FreePool (LangCodes);
   }
 
   if (LanguageString != NULL) {
-    gBS->FreePool (LanguageString);
+    FreePool (LanguageString);
   }
 
 }

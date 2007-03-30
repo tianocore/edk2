@@ -1,18 +1,18 @@
-/*++ 
+/*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   BootMaint.c
-    
+
 Abstract:
 
   Boot Maintainence Main File
@@ -58,15 +58,15 @@ Routine Description:
 Arguments:
 
   HiiHandle       - Hii Handle of the package to be updated.
-  
+
   MenuOption      - The Menu whose string tokens need to be created
 
 Returns:
 
   EFI_SUCCESS     - string tokens created successfully
-  
+
   others          - contain some errors
-  
+
 --*/
 {
   BM_MENU_ENTRY *NewMenuEntry;
@@ -113,7 +113,7 @@ Routine Description:
 
 Arguments:
 
-  This            - File explorer callback protocol pointer.     
+  This            - File explorer callback protocol pointer.
   KeyValue        - Key value to identify the type of data to expect.
   Data            - A pointer to the data being sent to the original exporting driver.
   Packet          - A pointer to a packet of information which a driver passes back to the browser.
@@ -122,7 +122,7 @@ Returns:
 
   EFI_SUCCESS     - Callback ended successfully.
   Others          - Contain some errors.
-  
+
 --*/
 {
   BMM_CALLBACK_DATA *Private;
@@ -729,15 +729,15 @@ Routine Description:
 Arguments:
 
   ImageHandle     - caller provided handle
-  
+
   SystemTable     - caller provided system tables
 
 Returns:
 
   EFI_SUCCESS     - utility ended successfully
-  
+
   others          - contain some errors
-  
+
 --*/
 {
   EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
@@ -849,13 +849,13 @@ Returns:
   //
   PackageList = PreparePackages (1, &gBdsStringPackGuid, bmBin);
   Status      = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   BmmCallbackInfo->BmmHiiHandle = HiiHandle;
 
   PackageList                   = PreparePackages (1, &gBdsStringPackGuid, FEBin);
   Status                        = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   BmmCallbackInfo->FeHiiHandle = HiiHandle;
 
@@ -1036,7 +1036,7 @@ Arguments:
   None.
 
 Returns:
-  None.  
+  None.
 --*/
 {
   STRING_DEPOSITORY *StringDepository;

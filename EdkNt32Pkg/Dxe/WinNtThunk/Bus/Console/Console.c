@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Console based on Win32 APIs. 
+  Console based on Win32 APIs.
 
 --*/
 
@@ -164,12 +164,8 @@ Returns:
     return Status;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_SIMPLE_TEXT_PRIVATE_DATA),
-                  &Private
-                  );
-  if (EFI_ERROR (Status)) {
+  Private = AllocatePool (sizeof (WIN_NT_SIMPLE_TEXT_PRIVATE_DATA));
+  if (Private == NULL) {
     goto Done;
   }
 
@@ -214,7 +210,7 @@ Done:
       gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
     }
 
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;
@@ -300,7 +296,7 @@ Returns:
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
 
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;

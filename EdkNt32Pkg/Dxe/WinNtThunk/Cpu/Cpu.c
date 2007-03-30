@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -114,7 +114,7 @@ WinNtEnableInterrupt (
 Routine Description:
 
   This routine provides support for emulation of the interrupt enable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -148,7 +148,7 @@ WinNtDisableInterrupt (
 Routine Description:
 
   This routine provides support for emulation of the interrupt disable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -183,7 +183,7 @@ WinNtGetInterruptState (
 Routine Description:
 
   This routine provides support for emulation of the interrupt disable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -223,8 +223,8 @@ WinNtInit (
 
 Routine Description:
 
-  This routine would support generation of a CPU INIT.  At 
-  present, this code does not provide emulation.  
+  This routine would support generation of a CPU INIT.  At
+  present, this code does not provide emulation.
 
 Arguments:
 
@@ -258,8 +258,8 @@ WinNtRegisterInterruptHandler (
 
 Routine Description:
 
-  This routine would support registration of an interrupt handler.  At 
-  present, this code does not provide emulation.  
+  This routine would support registration of an interrupt handler.  At
+  present, this code does not provide emulation.
 
 Arguments:
 
@@ -305,8 +305,8 @@ WinNtGetTimerValue (
 
 Routine Description:
 
-  This routine would support querying of an on-CPU timer.  At present, 
-  this code does not provide timer emulation.  
+  This routine would support querying of an on-CPU timer.  At present,
+  this code does not provide timer emulation.
 
 Arguments:
 
@@ -325,7 +325,7 @@ Returns:
   if (TimerValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // No timer supported
   //
@@ -345,8 +345,8 @@ WinNtSetMemoryAttributes (
 
 Routine Description:
 
-  This routine would support querying of an on-CPU timer.  At present, 
-  this code does not provide timer emulation.  
+  This routine would support querying of an on-CPU timer.  At present,
+  this code does not provide timer emulation.
 
 Arguments:
 
@@ -405,7 +405,7 @@ Returns:
 
   Status
 
-  EFI_SUCCESS           - protocol instance can be published 
+  EFI_SUCCESS           - protocol instance can be published
   EFI_OUT_OF_RESOURCES  - cannot allocate protocol data structure
   EFI_DEVICE_ERROR      - cannot create the thread
 
@@ -417,12 +417,8 @@ Returns:
   CPU_ARCH_PROTOCOL_PRIVATE *Private;
   VOID                      *Registration;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (CPU_ARCH_PROTOCOL_PRIVATE),
-                  &Private
-                  );
-  ASSERT_EFI_ERROR (Status);
+  Private = AllocatePool (sizeof (CPU_ARCH_PROTOCOL_PRIVATE));
+  ASSERT (Private != NULL);
 
   Private->Signature                    = CPU_ARCH_PROT_PRIVATE_SIGNATURE;
   Private->Cpu.FlushDataCache           = WinNtFlushCpuDataCache;
@@ -479,7 +475,7 @@ Returns:
   DEBUG ((EFI_D_ERROR, "CPU Architectural Protocol Loaded\n"));
 
 
-  
+
   return Status;
 }
 
@@ -495,8 +491,8 @@ Routine Description:
 Arguments:
   String - Unicode string.
 
-Returns: 
-  UINTN of the number represented by String.  
+Returns:
+  UINTN of the number represented by String.
 
 --*/
 {
@@ -656,7 +652,7 @@ Returns:
       Status      = Hii->NewPack (Hii, PackageList, &StringHandle);
       ASSERT (!EFI_ERROR (Status));
 
-      gBS->FreePool (PackageList);
+      FreePool (PackageList);
 
       //
       // Store processor version data record to data hub
@@ -717,7 +713,7 @@ Returns:
                           TotalSize
                           );
 
-      gBS->FreePool (RecordBuffer.Raw);
+      FreePool (RecordBuffer.Raw);
     }
 
     gBS->CloseProtocol (

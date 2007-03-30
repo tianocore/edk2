@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   BmLib.c
-    
+
 AgBStract:
 
   Boot Maintainence Helper functions
@@ -30,13 +30,13 @@ EfiLibLocateProtocol (
 
 Routine Description:
 
-  Find the first instance of this Protocol 
+  Find the first instance of this Protocol
   in the system and return it's interface
 
 Arguments:
 
   ProtocolGuid    - Provides the protocol to search for
-  Interface       - On return, a pointer to the first interface 
+  Interface       - On return, a pointer to the first interface
                     that matches ProtocolGuid
 
 Returns:
@@ -72,7 +72,7 @@ Arguments:
   DeviceHandle         - A handle for a device
 
 Returns:
-  
+
   A valid file handle or NULL is returned
 
 --*/
@@ -118,7 +118,7 @@ EfiGrowBuffer (
 Routine Description:
 
     Helper function called as part of the code needed
-    to allocate the proper sized buffer for various 
+    to allocate the proper sized buffer for various
     EFI interfaces.
 
 Arguments:
@@ -128,10 +128,10 @@ Arguments:
     Buffer      - Current allocated buffer, or NULL
 
     BufferSize  - Current buffer size needed
-    
+
 Returns:
-    
-    TRUE - if the buffer was reallocated and the caller 
+
+    TRUE - if the buffer was reallocated and the caller
     should try the API again.
 
 --*/
@@ -182,7 +182,7 @@ Routine Description:
   Function returns the value of the specified variable.
 
 Arguments:
-  Name                - A Null-terminated Unicode string that is 
+  Name                - A Null-terminated Unicode string that is
                         the name of the vendor's variable.
 
   VendorGuid          - A unique identifier for the vendor.
@@ -209,7 +209,7 @@ Routine Description:
   Function deletes the variable specified by VarName and VarGuid.
 
 Arguments:
-  VarName              - A Null-terminated Unicode string that is 
+  VarName              - A Null-terminated Unicode string that is
                          the name of the vendor's variable.
 
   VendorGuid           - A unique identifier for the vendor.
@@ -252,7 +252,7 @@ EfiLibFileSystemVolumeLabelInfo (
 
 Routine Description:
 
-  Function gets the file system information from an open file descriptor, 
+  Function gets the file system information from an open file descriptor,
   and stores it in a buffer allocated from pool.
 
 Arguments:
@@ -260,7 +260,7 @@ Arguments:
   Fhand         - A file handle
 
 Returns:
-  
+
   A pointer to a buffer with file information or NULL is returned
 
 --*/
@@ -315,7 +315,7 @@ EfiLibFileInfo (
 
 Routine Description:
 
-  Function gets the file information from an open file descriptor, and stores it 
+  Function gets the file information from an open file descriptor, and stores it
   in a buffer allocated from pool.
 
 Arguments:
@@ -323,7 +323,7 @@ Arguments:
   Fhand         - A file handle
 
 Returns:
-  
+
   A pointer to a buffer with file information or NULL is returned
 
 --*/
@@ -360,7 +360,7 @@ EfiDevicePathInstanceCount (
 /*++
 
 Routine Description:
-  Function is used to determine the number of device path instances 
+  Function is used to determine the number of device path instances
   that exist in a device path.
 
 Arguments:
@@ -368,7 +368,7 @@ Arguments:
 
 Returns:
 
-  This function counts and returns the number of device path instances 
+  This function counts and returns the number of device path instances
   in DevicePath.
 
 --*/
@@ -437,15 +437,15 @@ EfiLibGetStringFromToken (
 /*++
 
 Routine Description:
-  
+
   Acquire the string associated with the ProducerGuid and return it.
 
 Arguments:
-  
+
   ProducerGuid - The Guid to search the HII database for
   Token        - The token value of the string to extract
   String       - The string that is extracted
-  
+
 Returns:
 
   EFI_SUCCESS           -  Buffer filled with the requested forms. BufferLength
@@ -469,7 +469,7 @@ Returns:
   //
   HandleBufferLength  = 0;
   HiiHandleBuffer     = NULL;
-  
+
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
@@ -484,7 +484,7 @@ Returns:
   //
   Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandleBuffer);
   ASSERT_EFI_ERROR (Status);
-  
+
   //
   // Get the Hii Handle that matches the StructureNode->ProducerName
   //
@@ -518,7 +518,7 @@ Returns:
                   *String
                   );
 
-  gBS->FreePool (HiiHandleBuffer);
+  FreePool (HiiHandleBuffer);
 
   return Status;
 }
@@ -541,7 +541,7 @@ Arguments:
 Returns:
   TRUE              The FirstTime is not later than the SecondTime.
   FALSE             The FirstTime is later than the SecondTime.
-  
+
 --*/
 {
   if (FirstTime->Year != SecondTime->Year) {

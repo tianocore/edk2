@@ -71,7 +71,7 @@ Returns:
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    gBS->FreePool (OldPool);
+    FreePool (OldPool);
   }
 
   return NewPool;
@@ -137,7 +137,7 @@ Returns:
     Str->len = strsize - sizeof (UINT16);
   }
 
-  gBS->FreePool (AppendStr);
+  FreePool (AppendStr);
   return Str->str;
 }
 
@@ -1059,7 +1059,7 @@ DevicePathToStr (
   //
   // Shrink pool used for string allocation
   //
-  gBS->FreePool (DevPath);
+  FreePool (DevPath);
 
 Done:
   NewSize = (Str.len + 1) * sizeof (CHAR16);

@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,8 +16,8 @@ Module Name:
 Abstract:
 
   Produce Simple File System abstractions for directories on your PC using Win32 APIs.
-  The configuration of what devices to mount or emulate comes from NT 
-  environment variables. The variables must be visible to the Microsoft* 
+  The configuration of what devices to mount or emulate comes from NT
+  environment variables. The variables must be visible to the Microsoft*
   Developer Studio for them to work.
 
   * Other names and brands may be claimed as the property of others.
@@ -142,7 +142,7 @@ Returns:
     for (Pointer = Str; *(Pointer + Count); Pointer++) {
       *Pointer = *(Pointer + Count);
     }
-    *Pointer = *(Pointer + Count);    
+    *Pointer = *(Pointer + Count);
   }
 }
 
@@ -284,12 +284,10 @@ Returns:
     goto Done;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE),
-                  &Private
-                  );
-  if (EFI_ERROR (Status)) {
+  Private = AllocatePool (sizeof (WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE));
+  if (Private == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+
     goto Done;
   }
 
@@ -298,14 +296,9 @@ Returns:
 
   Private->FilePath = WinNtIo->EnvString;
 
-  Private->VolumeLabel      = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (L"EFI_EMULATED"),
-                  &Private->VolumeLabel
-                  );
-
-  if (EFI_ERROR (Status)) {
+  Private->VolumeLabel = AllocatePool (StrSize (L"EFI_EMULATED"));
+  if (Private->VolumeLabel == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -339,7 +332,7 @@ Done:
 
       FreeUnicodeStringTable (Private->ControllerNameTable);
 
-      gBS->FreePool (Private);
+      FreePool (Private);
     }
 
     gBS->CloseProtocol (
@@ -431,7 +424,7 @@ Returns:
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
 
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;
@@ -489,33 +482,21 @@ Returns:
 
   Private     = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (This);
 
-  PrivateFile = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_EFI_FILE_PRIVATE),
-                  &PrivateFile
-                  );
-  if (EFI_ERROR (Status)) {
+  PrivateFile = AllocatePool (sizeof (WIN_NT_EFI_FILE_PRIVATE));
+  if (PrivateFile == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
-  PrivateFile->FileName = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (Private->FilePath),
-                  &PrivateFile->FileName
-                  );
-  if (EFI_ERROR (Status)) {
+  PrivateFile->FileName = AllocatePool (StrSize (Private->FilePath));
+  if (PrivateFile->FileName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
-  PrivateFile->FilePath = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (Private->FilePath),
-                  &PrivateFile->FilePath
-                  );
-  if (EFI_ERROR (Status)) {
+  PrivateFile->FilePath = AllocatePool (StrSize (Private->FilePath));
+  if (PrivateFile->FilePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -541,7 +522,7 @@ Returns:
   PrivateFile->LHandle              = INVALID_HANDLE_VALUE;
   PrivateFile->DirHandle            = INVALID_HANDLE_VALUE;
   PrivateFile->IsValidFindBuf       = FALSE;
-  
+
   *Root = &PrivateFile->EfiFile;
 
   Status = EFI_SUCCESS;
@@ -550,14 +531,14 @@ Done:
   if (EFI_ERROR (Status)) {
     if (PrivateFile) {
       if (PrivateFile->FileName) {
-        gBS->FreePool (PrivateFile->FileName);
+        FreePool (PrivateFile->FileName);
       }
 
       if (PrivateFile->FilePath) {
-        gBS->FreePool (PrivateFile->FilePath);
+        FreePool (PrivateFile->FilePath);
       }
 
-      gBS->FreePool (PrivateFile);
+      FreePool (PrivateFile);
     }
   }
 
@@ -675,13 +656,9 @@ Returns:
   //
   // Allocate buffer for FileName as the passed in FileName may be read only
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (FileName),
-                  &TempFileName
-                  );
-  if (EFI_ERROR (Status)) {
-    return  Status;
+  TempFileName = AllocatePool (StrSize (FileName));
+  if (TempFileName == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
   StrCpy (TempFileName, FileName);
   FileName = TempFileName;
@@ -705,7 +682,7 @@ OpenRoot:
   }
 
   //
-  // If file name does not equal to "." or "..", 
+  // If file name does not equal to "." or "..",
   // then we trim the leading/trailing blanks and trailing dots
   //
   if (StrCmp (FileName, L".") != 0 && StrCmp (FileName, L"..") != 0) {
@@ -722,7 +699,7 @@ OpenRoot:
     //
     // Trim trailing dots and blanks
     //
-    for (TempFileName = FileName + StrLen (FileName) - 1; 
+    for (TempFileName = FileName + StrLen (FileName) - 1;
       TempFileName >= FileName && (*TempFileName == L' ' || *TempFileName == L'.');
       TempFileName--) {
       ;
@@ -733,27 +710,17 @@ OpenRoot:
   //
   // Attempt to open the file
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_EFI_FILE_PRIVATE),
-                  &NewPrivateFile
-                  );
-
-  if (EFI_ERROR (Status)) {
+  NewPrivateFile = AllocatePool (sizeof (WIN_NT_EFI_FILE_PRIVATE));
+  if (NewPrivateFile == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
   CopyMem (NewPrivateFile, PrivateFile, sizeof (WIN_NT_EFI_FILE_PRIVATE));
 
-  NewPrivateFile->FilePath = NULL;
-
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (PrivateFile->FileName),
-                  &NewPrivateFile->FilePath
-                  );
-
-  if (EFI_ERROR (Status)) {
+  NewPrivateFile->FilePath = AllocatePool (StrSize (PrivateFile->FileName));
+  if (NewPrivateFile->FilePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -763,14 +730,9 @@ OpenRoot:
     StrCpy (NewPrivateFile->FilePath, PrivateFile->FilePath);
   }
 
-  NewPrivateFile->FileName = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (NewPrivateFile->FilePath) + StrSize (L"\\") + StrSize (FileName),
-                  &NewPrivateFile->FileName
-                  );
-
-  if (EFI_ERROR (Status)) {
+  NewPrivateFile->FileName = AllocatePool (StrSize (NewPrivateFile->FilePath) + StrSize (L"\\") + StrSize (FileName));
+  if (NewPrivateFile->FileName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -783,7 +745,7 @@ OpenRoot:
     if (StrCmp (FileName, L"") != 0) {
       //
       // In case the filename becomes empty, especially after trimming dots and blanks
-      //    
+      //
       StrCat (NewPrivateFile->FileName, L"\\");
       StrCat (NewPrivateFile->FileName, FileName);
     }
@@ -847,9 +809,9 @@ OpenRoot:
 
   if (StrCmp (NewPrivateFile->FileName, PrivateRoot->FilePath) == 0) {
     NewPrivateFile->IsRootDirectory = TRUE;
-    gBS->FreePool (NewPrivateFile->FilePath);
-    gBS->FreePool (NewPrivateFile->FileName);
-    gBS->FreePool (NewPrivateFile);
+    FreePool (NewPrivateFile->FilePath);
+    FreePool (NewPrivateFile->FileName);
+    FreePool (NewPrivateFile);
     goto OpenRoot;
   }
 
@@ -861,15 +823,11 @@ OpenRoot:
   TempChar            = *(RealFileName - 1);
   *(RealFileName - 1) = 0;
 
-  gBS->FreePool (NewPrivateFile->FilePath);
+  FreePool (NewPrivateFile->FilePath);
   NewPrivateFile->FilePath = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (NewPrivateFile->FileName),
-                  &NewPrivateFile->FilePath
-                  );
-
-  if (EFI_ERROR (Status)) {
+  NewPrivateFile->FilePath = AllocatePool (StrSize (NewPrivateFile->FileName));
+  if (NewPrivateFile->FilePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -923,13 +881,9 @@ OpenRoot:
   //
   if (NewPrivateFile->IsDirectoryPath) {
 
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (NewPrivateFile->FileName) + StrSize (L"\\*"),
-                    &TempFileName
-                    );
-
-    if (EFI_ERROR (Status)) {
+    TempFileName = AllocatePool (StrSize (NewPrivateFile->FileName) + StrSize (L"\\*"));
+    if (TempFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -943,7 +897,7 @@ OpenRoot:
 
         LastError = PrivateFile->WinNtThunk->GetLastError ();
         if (LastError != ERROR_ALREADY_EXISTS) {
-          gBS->FreePool (TempFileName);
+          FreePool (TempFileName);
           Status = EFI_ACCESS_DENIED;
           goto Done;
         }
@@ -1059,13 +1013,9 @@ OpenRoot:
       goto Done;
     }
 
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    InfoSize,
-                    &Info
-                    );
-
-    if (EFI_ERROR (Status)) {
+    Info = AllocatePool (InfoSize);
+    if (Info == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -1081,19 +1031,19 @@ OpenRoot:
   }
 
 Done: ;
-  gBS->FreePool (FileName);
+  FreePool (FileName);
 
   if (EFI_ERROR (Status)) {
     if (NewPrivateFile) {
       if (NewPrivateFile->FileName) {
-        gBS->FreePool (NewPrivateFile->FileName);
+        FreePool (NewPrivateFile->FileName);
       }
 
       if (NewPrivateFile->FilePath) {
-        gBS->FreePool (NewPrivateFile->FilePath);
+        FreePool (NewPrivateFile->FilePath);
       }
 
-      gBS->FreePool (NewPrivateFile);
+      FreePool (NewPrivateFile);
     }
   } else {
     *NewHandle = &NewPrivateFile->EfiFile;
@@ -1132,7 +1082,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle != INVALID_HANDLE_VALUE) {
@@ -1151,13 +1101,13 @@ Returns:
   }
 
   if (PrivateFile->FileName) {
-    gBS->FreePool (PrivateFile->FileName);
+    FreePool (PrivateFile->FileName);
   }
 
-  gBS->FreePool (PrivateFile);
+  FreePool (PrivateFile);
 
   gBS->RestoreTPL (OldTpl);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -1194,7 +1144,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status      = EFI_WARN_DELETE_FAILURE;
@@ -1223,8 +1173,8 @@ Returns:
     }
   }
 
-  gBS->FreePool (PrivateFile->FileName);
-  gBS->FreePool (PrivateFile);
+  FreePool (PrivateFile->FileName);
+  FreePool (PrivateFile);
 
   gBS->RestoreTPL (OldTpl);
 
@@ -1328,7 +1278,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
@@ -1344,11 +1294,7 @@ Returns:
     }
 
     FileInfoSize = SIZE_OF_EFI_FILE_SYSTEM_INFO;
-    gBS->AllocatePool (
-          EfiBootServicesData,
-          FileInfoSize,
-          &FileInfo
-          );
+    FileInfo = AllocatePool (FileInfoSize);
 
     Status = This->GetInfo (
                     This,
@@ -1358,12 +1304,8 @@ Returns:
                     );
 
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      gBS->FreePool (FileInfo);
-      gBS->AllocatePool (
-            EfiBootServicesData,
-            FileInfoSize,
-            &FileInfo
-            );
+      FreePool (FileInfo);
+      FileInfo = AllocatePool (FileInfoSize);
       Status = This->GetInfo (
                       This,
                       &gEfiFileInfoGuid,
@@ -1379,7 +1321,7 @@ Returns:
 
     FileSize = FileInfo->FileSize;
 
-    gBS->FreePool (FileInfo);
+    FreePool (FileInfo);
 
     if (Pos >= FileSize) {
       *BufferSize = 0;
@@ -1545,7 +1487,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
@@ -1619,7 +1561,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->IsDirectoryPath) {
@@ -1628,13 +1570,9 @@ Returns:
       goto Done;
     }
 
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (PrivateFile->FileName) + StrSize (L"\\*"),
-                    &FileName
-                    );
-
-    if (EFI_ERROR (Status)) {
+    FileName = AllocatePool (StrSize (PrivateFile->FileName) + StrSize (L"\\*"));
+    if (FileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -1653,7 +1591,7 @@ Returns:
       PrivateFile->IsValidFindBuf = TRUE;
     }
 
-    gBS->FreePool (FileName);
+    FreePool (FileName);
 
     Status = (PrivateFile->LHandle == INVALID_HANDLE_VALUE) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
   } else {
@@ -1956,14 +1894,10 @@ Returns:
     //
     // Try to get the drive name
     //
-    DriveName       = NULL;
     DriveNameFound  = FALSE;
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (PrivateFile->FilePath) + 1,
-                    &DriveName
-                    );
-    if (EFI_ERROR (Status)) {
+    DriveName = AllocatePool (StrSize (PrivateFile->FilePath) + 1);
+    if (DriveName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -2003,7 +1937,7 @@ Returns:
                                           &TotalClusters
                                           );
     if (DriveName) {
-      gBS->FreePool (DriveName);
+      FreePool (DriveName);
     }
 
     if (NtStatus) {
@@ -2161,16 +2095,10 @@ Returns:
 
     NewFileSystemInfo = (EFI_FILE_SYSTEM_INFO *) Buffer;
 
-    gBS->FreePool (PrivateRoot->VolumeLabel);
-
-    PrivateRoot->VolumeLabel = NULL;
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (NewFileSystemInfo->VolumeLabel),
-                    &PrivateRoot->VolumeLabel
-                    );
-
-    if (EFI_ERROR (Status)) {
+    FreePool (PrivateRoot->VolumeLabel);
+    PrivateRoot->VolumeLabel = AllocatePool (StrSize (NewFileSystemInfo->VolumeLabel));
+    if (PrivateRoot->VolumeLabel == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -2240,9 +2168,9 @@ Returns:
     goto Done;
   }
 
-  Status = gBS->AllocatePool (EfiBootServicesData, OldInfoSize, &OldFileInfo);
-
-  if (EFI_ERROR (Status)) {
+  OldFileInfo = AllocatePool (OldInfoSize);
+  if (OldFileInfo == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -2252,13 +2180,9 @@ Returns:
     goto Done;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  StrSize (PrivateFile->FileName),
-                  &OldFileName
-                  );
-
-  if (EFI_ERROR (Status)) {
+  OldFileName = AllocatePool (StrSize (PrivateFile->FileName));
+  if (OldFileName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -2268,13 +2192,9 @@ Returns:
   // Make full pathname from new filename and rootpath.
   //
   if (NewFileInfo->FileName[0] == '\\') {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (PrivateRoot->FilePath) + StrSize (L"\\") + StrSize (NewFileInfo->FileName),
-                    &NewFileName
-                    );
-
-    if (EFI_ERROR (Status)) {
+    NewFileName = AllocatePool (StrSize (PrivateRoot->FilePath) + StrSize (L"\\") + StrSize (NewFileInfo->FileName));
+    if (NewFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -2282,13 +2202,9 @@ Returns:
     StrCat (NewFileName, L"\\");
     StrCat (NewFileName, NewFileInfo->FileName + 1);
   } else {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    StrSize (PrivateFile->FilePath) + StrSize (L"\\") + StrSize (NewFileInfo->FileName),
-                    &NewFileName
-                    );
-
-    if (EFI_ERROR (Status)) {
+    NewFileName = AllocatePool (StrSize (PrivateFile->FilePath) + StrSize (L"\\") + StrSize (NewFileInfo->FileName));
+    if (NewFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -2394,30 +2310,22 @@ Returns:
       //
       // modify file name
       //
-      gBS->FreePool (PrivateFile->FileName);
+      FreePool (PrivateFile->FileName);
 
-      Status = gBS->AllocatePool (
-                      EfiBootServicesData,
-                      StrSize (NewFileName),
-                      &PrivateFile->FileName
-                      );
-
-      if (EFI_ERROR (Status)) {
+      PrivateFile->FileName = AllocatePool (StrSize (NewFileName));
+      if (PrivateFile->FileName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
 
       StrCpy (PrivateFile->FileName, NewFileName);
 
-      Status = gBS->AllocatePool (
-                      EfiBootServicesData,
-                      StrSize (NewFileName) + StrSize (L"\\*"),
-                      &TempFileName
-                      );
+      TempFileName = AllocatePool (StrSize (NewFileName) + StrSize (L"\\*"));
 
       StrCpy (TempFileName, NewFileName);
 
       if (!PrivateFile->IsDirectoryPath) {
-        PrivateFile->LHandle = PrivateFile->WinNtThunk->CreateFile (
+       PrivateFile->LHandle = PrivateFile->WinNtThunk->CreateFile (
                                                           TempFileName,
                                                           PrivateFile->IsOpenedByRead ? GENERIC_READ : GENERIC_READ | GENERIC_WRITE,
                                                           FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -2427,7 +2335,7 @@ Returns:
                                                           NULL
                                                           );
 
-        gBS->FreePool (TempFileName);
+        FreePool (TempFileName);
 
         //
         //  Flush buffers just in case
@@ -2450,7 +2358,7 @@ Returns:
         StrCat (TempFileName, L"\\*");
         PrivateFile->LHandle = PrivateFile->WinNtThunk->FindFirstFile (TempFileName, &FindBuf);
 
-        gBS->FreePool (TempFileName);
+        FreePool (TempFileName);
       }
     } else {
 Reopen: ;
@@ -2462,11 +2370,7 @@ Reopen: ;
         goto Done;
       }
 
-      Status = gBS->AllocatePool (
-                      EfiBootServicesData,
-                      StrSize (OldFileName) + StrSize (L"\\*"),
-                      &TempFileName
-                      );
+      TempFileName = AllocatePool (StrSize (OldFileName) + StrSize (L"\\*"));
 
       StrCpy (TempFileName, OldFileName);
 
@@ -2495,7 +2399,7 @@ Reopen: ;
         PrivateFile->LHandle = PrivateFile->WinNtThunk->FindFirstFile (TempFileName, &FindBuf);
       }
 
-      gBS->FreePool (TempFileName);
+      FreePool (TempFileName);
 
       goto Done;
 
@@ -2637,15 +2541,15 @@ Reopen: ;
 
 Done:
   if (OldFileInfo != NULL) {
-    gBS->FreePool (OldFileInfo);
+    FreePool (OldFileInfo);
   }
 
   if (OldFileName != NULL) {
-    gBS->FreePool (OldFileName);
+    FreePool (OldFileName);
   }
 
   if (NewFileName != NULL) {
-    gBS->FreePool (NewFileName);
+    FreePool (NewFileName);
   }
 
   gBS->RestoreTPL (OldTpl);
@@ -2696,7 +2600,7 @@ Returns:
   }
 
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {

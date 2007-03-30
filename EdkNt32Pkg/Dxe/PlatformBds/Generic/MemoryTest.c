@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -38,19 +38,19 @@ PlatformBdsShowProgress (
 /*++
 
 Routine Description:
-  
+
   Show progress bar with title above it. It only works in UGA mode.
 
 Arguments:
-  
+
   TitleForeground - Foreground color for Title.
   TitleBackground - Background color for Title.
   Title           - Title above progress bar.
   ProgressColor   - Progress bar color.
   Progress        - Progress (0-100)
 
-Returns: 
-  
+Returns:
+
   EFI_STATUS      - Success update the progress bar
 
 --*/
@@ -203,19 +203,19 @@ BdsMemoryTest (
 /*++
 
 Routine Description:
-  
-  Perform the memory test base on the memory test intensive level, 
+
+  Perform the memory test base on the memory test intensive level,
   and update the memory resource.
 
 Arguments:
-  
+
   Level  - The memory test intensive level.
 
-Returns: 
-  
+Returns:
+
   EFI_STATUS      - Success test all the system memory and update
                     the memory resource
-                    
+
 --*/
 {
   EFI_STATUS                        Status;
@@ -274,7 +274,7 @@ Returns:
                   &GenMemoryTest
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Pos);
+    FreePool (Pos);
     return EFI_SUCCESS;
   }
 
@@ -291,7 +291,7 @@ Returns:
     // do the test, and then the status of EFI_NO_MEDIA will be returned by
     // "MemoryTestInit". So it does not need to test memory again, just return.
     //
-    gBS->FreePool (Pos);
+    FreePool (Pos);
     return EFI_SUCCESS;
   }
 
@@ -300,7 +300,7 @@ Returns:
 
   if (TmpStr != NULL) {
     gST->ConOut->OutputString (gST->ConOut, TmpStr);
-    gBS->FreePool (TmpStr);
+    FreePool (TmpStr);
   }
 
   do {
@@ -317,7 +317,7 @@ Returns:
         PrintXY (10, 10, NULL, NULL, TmpStr);
         gST->ConOut->SetCursorPosition (gST->ConOut, 0, 4);
         gST->ConOut->OutputString (gST->ConOut, TmpStr);
-        gBS->FreePool (TmpStr);
+        FreePool (TmpStr);
       }
 
       ASSERT (0);
@@ -333,7 +333,7 @@ Returns:
       TmpStr = GetStringById (STRING_TOKEN (STR_MEMORY_TEST_PERCENT));
       if (TmpStr != NULL) {
         BdsLibOutputStrings (gST->ConOut, StrPercent, TmpStr, NULL);
-        gBS->FreePool (TmpStr);
+        FreePool (TmpStr);
       }
 
       TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
@@ -346,7 +346,7 @@ Returns:
           TestPercent,
           (UINTN) PreviousValue
           );
-        gBS->FreePool (TmpStr);
+        FreePool (TmpStr);
       }
     }
 
@@ -365,7 +365,7 @@ Returns:
             100,
             (UINTN) PreviousValue
             );
-          gBS->FreePool (TmpStr);
+          FreePool (TmpStr);
         }
 
         gST->ConOut->SetCursorPosition (gST->ConOut, 0, 0);
@@ -389,7 +389,7 @@ Done:
   TmpStr = GetStringById (STRING_TOKEN (STR_MEM_TEST_COMPLETED));
   if (TmpStr != NULL) {
     StrCat (StrTotalMemory, TmpStr);
-    gBS->FreePool (TmpStr);
+    FreePool (TmpStr);
   }
 
   gST->ConOut->ClearScreen (gST->ConOut);
@@ -405,7 +405,7 @@ Done:
     (UINTN) PreviousValue
     );
 
-  gBS->FreePool (Pos);
+  FreePool (Pos);
 
   DataSize = sizeof (Value);
   Status = gRT->GetVariable (
