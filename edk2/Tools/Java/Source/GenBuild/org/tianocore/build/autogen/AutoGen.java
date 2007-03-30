@@ -1960,6 +1960,7 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeDxeRuntimeDriver:
         case CommonDefinition.ModuleTypeDxeSalDriver:
         case CommonDefinition.ModuleTypeUefiDriver:
+        case CommonDefinition.ModuleTypeUefiApplication:
             //
             //  If moduleType is one of above, call setVirtualAddressToAutogenC,
             //  and setExitBootServiceToAutogenC.
