@@ -49,7 +49,11 @@ text SEGMENT
 ; Destroys no working registers.
 ;****************************************************************************
 ; VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-EbcLLCALLEXNative        PROC
+
+CopyMem  PROTO  Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
+
+
+EbcLLCALLEXNative        PROC    NEAR    PUBLIC
       push   rbp
       push   rbx
       mov    rbp, rsp
@@ -59,7 +63,12 @@ EbcLLCALLEXNative        PROC
       mov    rbx, rcx
 
       ; Set stack pointer to new value
-      mov    rsp, rdx      
+      sub    r8,  rdx
+      sub    rsp, r8
+      mov    rcx, rsp
+      sub    rsp, 20h
+      call   CopyMem      
+      add    rsp, 20h
       
       ; Considering the worst case, load 4 potiential arguments
       ; into registers.
@@ -92,7 +101,7 @@ EbcLLCALLEXNative    ENDP
 ; Returns:
 ;     The contents of the register in which the entry point is passed.
 ;
-EbcLLGetEbcEntryPoint        PROC
+EbcLLGetEbcEntryPoint        PROC    NEAR    PUBLIC
     ret
 EbcLLGetEbcEntryPoint    ENDP
 
@@ -115,7 +124,7 @@ EbcLLGetEbcEntryPoint    ENDP
 ;--*/
 
 ; UINTN EbcLLGetStackPointer()            
-EbcLLGetStackPointer        PROC
+EbcLLGetStackPointer        PROC    NEAR    PUBLIC
     mov    rax, rsp      ; get current stack pointer
     ; Stack adjusted by this much when we were called,
     ; For this function, it's 4.
@@ -136,7 +145,7 @@ EbcLLGetStackPointer    ENDP
 ; Returns:
 ;     The unmodified value returned by the native code.
 ;
-EbcLLGetReturnValue   PROC
+EbcLLGetReturnValue   PROC    NEAR    PUBLIC
     ret
 EbcLLGetReturnValue    ENDP
 

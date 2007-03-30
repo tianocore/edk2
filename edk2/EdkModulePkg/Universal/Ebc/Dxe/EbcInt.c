@@ -178,6 +178,10 @@ static EFI_PERIODIC_CALLBACK  mDebugPeriodicCallback                            
 static EFI_EXCEPTION_CALLBACK mDebugExceptionCallback[MAX_EBC_EXCEPTION + 1] = {NULL};
 static EFI_GUID               mEfiEbcVmTestProtocolGuid = EFI_EBC_VM_TEST_PROTOCOL_GUID;
 
+static VOID*      mStackBuffer[MAX_STACK_NUM];
+static EFI_HANDLE mStackBufferIndex[MAX_STACK_NUM];
+static UINTN      mStackNum = 0;
+
 //
 // Event for Periodic callback
 //
@@ -288,6 +292,12 @@ Returns:
       return Status;
     }
   }
+
+  Status = InitEBCStack();
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
   //
   // Allocate memory for our debug protocol. Then fill in the blanks.
   //
@@ -335,6 +345,7 @@ Returns:
   return EFI_SUCCESS;
 
 ErrorExit:
+  FreeEBCStack();
   HandleBuffer  = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -504,7 +515,7 @@ Routine Description:
 Arguments:
 
   This              - pointer to the caller's debug support protocol interface
-  PeriodicCallback  - pointer to the function to call periodically
+  ExceptionCallback - pointer to the function to the exception
 
 Returns:
 
@@ -867,6 +878,7 @@ Returns:
   // First go through our list of known image handles and see if we've already
   // created an image list element for this image handle.
   //
+  ReturnEBCStackByHandle(ImageHandle);
   PrevImageList = NULL;
   for (ImageList = mEbcImageList; ImageList != NULL; ImageList = ImageList->Next) {
     if (ImageList->ImageHandle == ImageHandle) {
@@ -1020,6 +1032,87 @@ EbcGetVersion (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+GetEBCStack(
+  EFI_HANDLE Handle,
+  VOID       **StackBuffer,
+  UINTN      *BufferIndex
+  )
+{
+  UINTN   Index;
+  EFI_TPL OldTpl;
+  OldTpl = gBS->RaiseTPL(EFI_TPL_HIGH_LEVEL);
+  for (Index = 0; Index < mStackNum; Index ++) {
+    if (mStackBufferIndex[Index] == NULL) {
+      mStackBufferIndex[Index] = Handle;
+      break;
+    }
+  }
+  gBS->RestoreTPL(OldTpl);
+  if (Index == mStackNum) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  *BufferIndex = Index;
+  *StackBuffer = mStackBuffer[Index];
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ReturnEBCStack(
+  UINTN Index
+  )
+{
+  mStackBufferIndex[Index] =NULL;
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ReturnEBCStackByHandle(
+  EFI_HANDLE Handle
+  )
+{
+  UINTN Index;
+  for (Index = 0; Index < mStackNum; Index ++) {
+    if (mStackBufferIndex[Index] == Handle) {
+      break;
+    }
+  }
+  if (Index == mStackNum) {
+    return EFI_NOT_FOUND;
+  }
+  mStackBufferIndex[Index] = NULL;
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+InitEBCStack (
+  VOID
+  )
+{
+  for (mStackNum = 0; mStackNum < MAX_STACK_NUM; mStackNum ++) {
+    mStackBuffer[mStackNum] = AllocatePool(STACK_POOL_SIZE);
+    mStackBufferIndex[mStackNum] = NULL;
+    if (mStackBuffer[mStackNum] == NULL) {
+      break;
+    }
+  }
+  if (mStackNum == 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+FreeEBCStack(
+  VOID
+  )
+{
+  UINTN Index;
+  for (Index = 0; Index < mStackNum; Index ++) {
+    FreePool(mStackBuffer[Index]);
+  }
+  return EFI_SUCCESS;
+}
 STATIC
 EFI_STATUS
 InitEbcVmTestProtocol (
