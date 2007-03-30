@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -20,7 +20,7 @@ Abstract:
 
   Handle(1) - WinNtIo - DevicePath(1)
 
-  If a serial port is added to the system this driver creates a new handle. 
+  If a serial port is added to the system this driver creates a new handle.
   The new handle is required, since the serial device must add an UART device
   pathnode.
 
@@ -32,15 +32,15 @@ Abstract:
 
   Handle(1) - WinNtIo - DevicePath(1) - WinNtSerialPort
 
-  If the driver is unloaded Handle(2) is removed from the system and 
+  If the driver is unloaded Handle(2) is removed from the system and
   gEfiWinNtSerialPortGuid is removed from Handle(1).
 
   Note: Handle(1) is any handle created by the Win NT Bus driver that is passed
   into the DriverBinding member functions of this driver. This driver requires
-  a Handle(1) to contain a WinNtIo protocol, a DevicePath protocol, and 
-  the TypeGuid in the WinNtIo must be gEfiWinNtSerialPortGuid. 
-  
-  If Handle(1) contains a gEfiWinNtSerialPortGuid protocol then the driver is 
+  a Handle(1) to contain a WinNtIo protocol, a DevicePath protocol, and
+  the TypeGuid in the WinNtIo must be gEfiWinNtSerialPortGuid.
+
+  If Handle(1) contains a gEfiWinNtSerialPortGuid protocol then the driver is
   loaded on the device.
 
 --*/
@@ -135,7 +135,7 @@ Returns:
     Status = EFI_UNSUPPORTED;
     goto Error;
   }
-  
+
   //
   // Check the GUID to see if this is a handle type the driver supports
   //
@@ -309,7 +309,7 @@ Returns:
       }
     }
 
-    gBS->FreePool (OpenInfoBuffer);
+    FreePool (OpenInfoBuffer);
     return Status;
   }
 
@@ -334,12 +334,8 @@ Returns:
   //
   // Construct Private data
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (WIN_NT_SERIAL_IO_PRIVATE_DATA),
-                  &Private
-                  );
-  if (EFI_ERROR (Status)) {
+  Private = AllocatePool (sizeof (WIN_NT_SERIAL_IO_PRIVATE_DATA));
+  if (Private == NULL) {
     goto Error;
   }
 
@@ -474,12 +470,12 @@ Error:
       }
 
       if (Private->DevicePath != NULL) {
-        gBS->FreePool (Private->DevicePath);
+        FreePool (Private->DevicePath);
       }
 
       FreeUnicodeStringTable (Private->ControllerNameTable);
 
-      gBS->FreePool (Private);
+      FreePool (Private);
     }
   }
 
@@ -592,11 +588,11 @@ Returns:
       } else {
         Private->WinNtThunk->CloseHandle (Private->NtHandle);
 
-        gBS->FreePool (Private->DevicePath);
+        FreePool (Private->DevicePath);
 
         FreeUnicodeStringTable (Private->ControllerNameTable);
 
-        gBS->FreePool (Private);
+        FreePool (Private);
       }
     }
 
@@ -683,7 +679,7 @@ Routine Description:
 
 Arguments:
 
-  This              - A pointer to the EFI_SERIAL_IO_PROTOCOL structrue.    
+  This              - A pointer to the EFI_SERIAL_IO_PROTOCOL structrue.
   BaudRate          - The Baud rate of the serial device.
   ReceiveFifoDepth  - The request depth of fifo on receive side.
   Timeout           - the request timeout for a single charact.
@@ -869,7 +865,7 @@ Returns:
   }
 
   if (Private->DevicePath != NULL) {
-    gBS->FreePool (Private->DevicePath);
+    FreePool (Private->DevicePath);
   }
 
   Private->DevicePath = NewDevicePath;
@@ -1029,7 +1025,7 @@ Returns:
   if (ModemStatus & MS_RLSD_ON) {
     Bits |= EFI_SERIAL_CARRIER_DETECT;
   }
-  
+
   //
   // Get ctrl status
   //
@@ -1059,7 +1055,7 @@ Returns:
   if (Private->HardwareLoopbackEnable) {
     Bits |= EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE;
   }
-  
+
   //
   //  Get input buffer status
   //
@@ -1145,7 +1141,7 @@ Returns:
         Control |= EFI_SERIAL_REQUEST_TO_SEND;
         WinNtSerialIoSetControl (&Private->SerialIo, Control);
       }
-      
+
       //
       //  Do the write
       //
@@ -1285,10 +1281,10 @@ IsaSerialFifoFull (
 
   Routine Description:
   Detect whether specific FIFO is full or not
-  
+
   Arguments:
   Fifo  SERIAL_DEV_FIFO *: A pointer to the Data Structure SERIAL_DEV_FIFO
-    
+
   Returns:
   TRUE:  the FIFO is full
   FALSE: the FIFO is not full
@@ -1310,10 +1306,10 @@ IsaSerialFifoEmpty (
 
   Routine Description:
   Detect whether specific FIFO is empty or not
-  
+
   Arguments:
     Fifo  SERIAL_DEV_FIFO *: A pointer to the Data Structure SERIAL_DEV_FIFO
-    
+
   Returns:
     TRUE:  the FIFO is empty
     FALSE: the FIFO is not empty
@@ -1336,14 +1332,14 @@ IsaSerialFifoAdd (
 
   Routine Description:
   Add data to specific FIFO
-  
+
   Arguments:
     Fifo  SERIAL_DEV_FIFO *: A pointer to the Data Structure SERIAL_DEV_FIFO
-    Data  UINT8: the data added to FIFO  
-  
+    Data  UINT8: the data added to FIFO
+
   Returns:
     EFI_SUCCESS:  Add data to specific FIFO successfully
-    EFI_OUT_RESOURCE: Failed to add data because FIFO is already full 
+    EFI_OUT_RESOURCE: Failed to add data because FIFO is already full
 
 --*/
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
@@ -1354,7 +1350,7 @@ IsaSerialFifoAdd (
   if (IsaSerialFifoFull (Fifo)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // FIFO is not full can add data
   //
@@ -1377,11 +1373,11 @@ IsaSerialFifoRemove (
 
   Routine Description:
   Remove data from specific FIFO
-  
+
   Arguments:
     Fifo  SERIAL_DEV_FIFO *: A pointer to the Data Structure SERIAL_DEV_FIFO
-    Data  UINT8*: the data removed from FIFO  
-  
+    Data  UINT8*: the data removed from FIFO
+
   Returns:
     EFI_SUCCESS:  Remove data from specific FIFO successfully
     EFI_OUT_RESOURCE: Failed to remove data because FIFO is empty
@@ -1395,7 +1391,7 @@ IsaSerialFifoRemove (
   if (IsaSerialFifoEmpty (Fifo)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // FIFO is not empty, can remove data
   //

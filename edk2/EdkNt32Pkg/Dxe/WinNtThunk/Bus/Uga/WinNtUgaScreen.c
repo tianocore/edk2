@@ -1,22 +1,22 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
     WinNtUgaScreen.c
 
 Abstract:
 
-  This file produces the graphics abstration of UGA. It is called by 
-  WinNtUgaDriver.c file which deals with the EFI 1.1 driver model. 
+  This file produces the graphics abstration of UGA. It is called by
+  WinNtUgaDriver.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
 --*/
@@ -72,7 +72,7 @@ WinNtUgaGetMode (
 
   Returns:
     EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode () 
+    EFI_NOT_STARTED - Video display is not initialized. Call SetMode ()
     EFI_INVALID_PARAMETER - One of the input args was NULL.
 
 --*/
@@ -123,7 +123,7 @@ WinNtUgaSetMode (
 
   Returns:
     EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode () 
+    EFI_NOT_STARTED - Video display is not initialized. Call SetMode ()
     EFI_INVALID_PARAMETER - One of the input args was NULL.
 
 --*/
@@ -224,17 +224,13 @@ WinNtUgaSetMode (
 
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_UGA_PIXEL) * HorizontalResolution,
-                  &NewFillLine
-                  );
-  if (EFI_ERROR (Status)) {
+  NewFillLine = AllocatePool (sizeof (EFI_UGA_PIXEL) * HorizontalResolution);
+  if (NewFillLine == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
   if (Private->FillLine != NULL) {
-    gBS->FreePool (Private->FillLine);
+    FreePool (Private->FillLine);
   }
 
   Private->FillLine             = NewFillLine;
@@ -281,19 +277,19 @@ WinNtUgaBlt (
   Routine Description:
     Blt pixels from the rectangle (Width X Height) formed by the BltBuffer
     onto the graphics screen starting a location (X, Y). (0, 0) is defined as
-    the upper left hand side of the screen. (X, Y) can be outside of the 
-    current screen geometry and the BltBuffer will be cliped when it is 
-    displayed. X and Y can be negative or positive. If Width or Height is 
+    the upper left hand side of the screen. (X, Y) can be outside of the
+    current screen geometry and the BltBuffer will be cliped when it is
+    displayed. X and Y can be negative or positive. If Width or Height is
     bigger than the current video screen the image will be clipped.
 
   Arguments:
     This          - Protocol instance pointer.
-    X             - X location on graphics screen. 
+    X             - X location on graphics screen.
     Y             - Y location on the graphics screen.
     Width         - Width of BltBuffer.
     Height        - Hight of BltBuffer
     BltOperation  - Operation to perform on BltBuffer and video memory
-    BltBuffer     - Buffer containing data to blt into video buffer. This 
+    BltBuffer     - Buffer containing data to blt into video buffer. This
                     buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
     SourceX       - If the BltOperation is a EfiCopyBlt this is the source
                     of the copy. For other BLT operations this argument is not
@@ -301,11 +297,11 @@ WinNtUgaBlt (
     SourceX       - If the BltOperation is a EfiCopyBlt this is the source
                     of the copy. For other BLT operations this argument is not
                     used.
-      
+
   Returns:
     EFI_SUCCESS           - The palette is updated with PaletteArray.
     EFI_INVALID_PARAMETER - BltOperation is not valid.
-    EFI_DEVICE_ERROR      - A hardware error occured writting to the video 
+    EFI_DEVICE_ERROR      - A hardware error occured writting to the video
                              buffer.
 
 --*/
@@ -445,7 +441,7 @@ WinNtUgaBlt (
     // we may miss some data for a short period of time this is no different than
     // a write combining on writes to a frame buffer.
     //
-  
+
     Private->WinNtThunk->UpdateWindow (Private->WindowHandle);
   }
 
@@ -501,7 +497,7 @@ WinNtUgaThreadWindowProc (
 /*++
 
 Routine Description:
-  Win32 Windows event handler. 
+  Win32 Windows event handler.
 
 Arguments:
   See Win32 Book
@@ -631,7 +627,7 @@ Returns:
     case VK_F8:   Key.ScanCode = SCAN_F8;   break;
     case VK_F9:   Key.ScanCode = SCAN_F9;   break;
     case VK_F11:  Key.ScanCode = SCAN_F11;  break;
-    case VK_F12:  Key.ScanCode = SCAN_F12;  break;    
+    case VK_F12:  Key.ScanCode = SCAN_F12;  break;
     }
 
     if (Key.ScanCode != 0) {
@@ -693,7 +689,7 @@ WinNtUgaThreadWinMain (
 Routine Description:
 
   This thread simulates the end of WinMain () aplication. Each Winow nededs
-  to process it's events. The messages are dispatched to 
+  to process it's events. The messages are dispatched to
   WinNtUgaThreadWindowProc ().
 
   Be very careful sine WinNtUgaThreadWinMain () and WinNtUgaThreadWindowProc ()
@@ -974,8 +970,8 @@ KillNtUgaThread (
 /*++
 
 Routine Description:
-  
-  This is the UGA screen's callback notification function for exit-boot-services. 
+
+  This is the UGA screen's callback notification function for exit-boot-services.
   All we do here is call WinNtUgaDestructor().
 
 Arguments:

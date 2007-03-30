@@ -47,6 +47,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DevicePathLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>WinNtSerialIo.h</Filename>

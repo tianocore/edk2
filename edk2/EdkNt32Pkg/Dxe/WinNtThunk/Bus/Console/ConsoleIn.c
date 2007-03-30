@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,15 +15,15 @@ Module Name:
 
 Abstract:
 
-  Console based on Win32 APIs. 
+  Console based on Win32 APIs.
 
   This file attaches a SimpleTextIn protocol to a previously open window.
-  
+
   The constructor for this protocol depends on an open window. Currently
   the SimpleTextOut protocol creates a window when it's constructor is called.
-  Thus this code must run after the constructor for the SimpleTextOut 
+  Thus this code must run after the constructor for the SimpleTextOut
   protocol
-  
+
 --*/
 
 #include "Console.h"
@@ -102,7 +102,7 @@ Returns:
   } else {
     return EFI_NOT_READY;
   }
-  
+
   //
   // Check to see if we should return a scan code in place of Unicode character.
   //
@@ -280,12 +280,8 @@ Returns:
     goto Done;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (INPUT_RECORD) * NtEventCount,
-                  &InputRecord
-                  );
-  if (EFI_ERROR (Status)) {
+  InputRecord = AllocatePool (sizeof (INPUT_RECORD) * NtEventCount);
+  if (InputRecord == NULL) {
     Status = EFI_NOT_READY;
     goto Done;
   }
@@ -315,7 +311,7 @@ Returns:
 
 Done:
   if (InputRecord != NULL) {
-    gBS->FreePool (InputRecord);
+    FreePool (InputRecord);
   }
 
   return Status;

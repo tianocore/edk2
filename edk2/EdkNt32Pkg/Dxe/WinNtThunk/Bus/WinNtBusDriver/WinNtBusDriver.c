@@ -136,18 +136,11 @@ AllocateMemory (
   IN  UINTN   Size
   )
 {
-  EFI_STATUS  Status;
   VOID        *Buffer;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  Size,
-                  (VOID *)&Buffer
-                  );
-  if (EFI_ERROR (Status)) {
-    ASSERT (FALSE);
-    return NULL;
-  }
+  Buffer = AllocatePool (Size);
+  ASSERT (Buffer != NULL);
+
   return Buffer;
 }
 
@@ -341,13 +334,9 @@ Returns:
   }
 
   if (Status != EFI_ALREADY_STARTED) {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (WIN_NT_BUS_DEVICE),
-                    (VOID *) &WinNtBusDevice
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
+    WinNtBusDevice = AllocatePool (sizeof (WIN_NT_BUS_DEVICE));
+    if (WinNtBusDevice == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
 
     WinNtBusDevice->Signature           = WIN_NT_BUS_DEVICE_SIGNATURE;
@@ -368,7 +357,7 @@ Returns:
                     );
     if (EFI_ERROR (Status)) {
       FreeUnicodeStringTable (WinNtBusDevice->ControllerNameTable);
-      gBS->FreePool (WinNtBusDevice);
+      FreePool (WinNtBusDevice);
       return Status;
     }
   }
@@ -464,7 +453,7 @@ Returns:
                                     Count
                                     );
         if (WinNtDevice->DevicePath == NULL) {
-          gBS->FreePool (WinNtDevice);
+          FreePool (WinNtDevice);
           return EFI_OUT_OF_RESOURCES;
         }
 
@@ -490,7 +479,7 @@ Returns:
                         );
         if (EFI_ERROR (Status)) {
           FreeUnicodeStringTable (WinNtDevice->ControllerNameTable);
-          gBS->FreePool (WinNtDevice);
+          FreePool (WinNtDevice);
         } else {
           //
           // Open For Child Device
@@ -516,7 +505,7 @@ Returns:
       StartString = SubString;
     }
 
-    gBS->FreePool (TempStr);
+    FreePool (TempStr);
   }
 
   return EFI_SUCCESS;
@@ -588,7 +577,7 @@ Returns:
 
     FreeUnicodeStringTable (WinNtBusDevice->ControllerNameTable);
 
-    gBS->FreePool (WinNtBusDevice);
+    FreePool (WinNtBusDevice);
 
     gBS->CloseProtocol (
           ControllerHandle,
@@ -652,7 +641,7 @@ Returns:
         // Close the child handle
         //
         FreeUnicodeStringTable (WinNtDevice->ControllerNameTable);
-        gBS->FreePool (WinNtDevice);
+        FreePool (WinNtDevice);
       }
     }
 

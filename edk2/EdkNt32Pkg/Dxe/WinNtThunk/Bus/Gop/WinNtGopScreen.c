@@ -85,7 +85,6 @@ WinNtGopQuerytMode (
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
 {
-  EFI_STATUS        Status;
   GOP_PRIVATE_DATA  *Private;
 
   Private = GOP_PRIVATE_DATA_FROM_THIS (This);
@@ -94,13 +93,9 @@ WinNtGopQuerytMode (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
-                  Info
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+  if (*Info == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
@@ -242,17 +237,13 @@ WinNtGopSetMode (
 
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->HorizontalResolution,
-                  &NewFillLine
-                  );
-  if (EFI_ERROR (Status)) {
+  NewFillLine = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->HorizontalResolution);
+  if (NewFillLine == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
   if (Private->FillLine != NULL) {
-    gBS->FreePool (Private->FillLine);
+    FreePool (Private->FillLine);
   }
 
   Private->FillLine             = NewFillLine;
@@ -637,7 +628,7 @@ WinNtGopThreadWindowProc (
     case VK_F8:   Key.ScanCode = SCAN_F8;   break;
     case VK_F9:   Key.ScanCode = SCAN_F9;   break;
     case VK_F11:  Key.ScanCode = SCAN_F11;  break;
-    case VK_F12:  Key.ScanCode = SCAN_F12;  break;    
+    case VK_F12:  Key.ScanCode = SCAN_F12;  break;
     }
 
     if (Key.ScanCode != 0) {
@@ -885,8 +876,6 @@ WinNtGopConstructor (
   GOP_PRIVATE_DATA    *Private
   )
 {
-  EFI_STATUS                             Status;
-
   Private->ModeData = mGopModeData;
 
   Private->GraphicsOutput.QueryMode = WinNtGopQuerytMode;
@@ -896,22 +885,15 @@ WinNtGopConstructor (
   //
   // Allocate buffer for Graphics Output Protocol mode information
   //
-  Status = gBS->AllocatePool (
-                EfiBootServicesData,
-                sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE),
-                (VOID **) &Private->GraphicsOutput.Mode
-                );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Private->GraphicsOutput.Mode = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE));
+  if (Private->GraphicsOutput.Mode == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
-  Status = gBS->AllocatePool (
-                EfiBootServicesData,
-                sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
-                (VOID **) &Private->GraphicsOutput.Mode->Info
-                );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Private->GraphicsOutput.Mode->Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+  if (Private->GraphicsOutput.Mode->Info == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
+
   Private->GraphicsOutput.Mode->MaxMode = sizeof(mGopModeData) / sizeof(GOP_MODE_DATA);
   //
   // Till now, we have no idea about the window size.
@@ -982,9 +964,9 @@ WinNtGopDestructor (
   //
   if (Private->GraphicsOutput.Mode != NULL) {
     if (Private->GraphicsOutput.Mode->Info != NULL) {
-        gBS->FreePool (Private->GraphicsOutput.Mode->Info);
+      FreePool (Private->GraphicsOutput.Mode->Info);
     }
-    gBS->FreePool (Private->GraphicsOutput.Mode);
+    FreePool (Private->GraphicsOutput.Mode);
   }
 
   return EFI_SUCCESS;

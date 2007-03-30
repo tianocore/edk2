@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -30,7 +30,7 @@ BdsLibDoLegacyBoot (
 /*++
 
 Routine Description:
- 
+
   Boot the legacy system with the boot option
 
 Arguments:
@@ -41,7 +41,7 @@ Returns:
 
   EFI_UNSUPPORTED  - There is no legacybios protocol, do not support
                      legacy boot.
-                         
+
   EFI_STATUS       - Return the status of LegacyBios->LegacyBoot ().
 
 --*/
@@ -89,15 +89,15 @@ BdsLibBootViaBootOption (
 
 Routine Description:
 
-  Process the boot option follow the EFI 1.1 specification and 
+  Process the boot option follow the EFI 1.1 specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
 
 Arguments:
 
   Option       - The boot option need to be processed
-  
-  DevicePath   - The device path which describe where to load 
-                 the boot image or the legcy BBS device path 
+
+  DevicePath   - The device path which describe where to load
+                 the boot image or the legcy BBS device path
                  to boot the legacy OS
 
   ExitDataSize - Returned directly from gBS->StartImage ()
@@ -167,7 +167,7 @@ Returns:
   // Signal the EFI_EVENT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot ();
-  
+
   //
   // Set Boot Current
   //
@@ -240,7 +240,7 @@ Returns:
                      BlkIo->Media->BlockSize,
                      Buffer
                      );
-            gBS->FreePool (Buffer);
+            FreePool (Buffer);
           }
         }
 
@@ -324,8 +324,8 @@ BdsBootByDiskSignatureAndPartition (
 Routine Description:
 
   Check to see if a hard ware device path was passed in. If it was then search
-  all the block IO devices for the passed in hard drive device path. 
-  
+  all the block IO devices for the passed in hard drive device path.
+
 Arguments:
 
   Option - The current processing boot option.
@@ -347,7 +347,7 @@ Returns:
 
   EFI_SUCCESS   - Status from gBS->StartImage (),
                   or BootByDiskSignatureAndPartition ()
-                  
+
   EFI_NOT_FOUND - If the Device Path is not found in the system
 
 --*/
@@ -406,7 +406,7 @@ Returns:
     // find HardDriver device path node
     //
     while (!IsDevicePathEnd (DevicePath)) {
-      if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) && 
+      if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
           (DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP)
           ) {
         BlockIoHdDevicePath = DevicePath;
@@ -460,7 +460,7 @@ Returns:
     }
   }
 
-  gBS->FreePool (BlockIoBuffer);
+  FreePool (BlockIoBuffer);
   return Status;
 }
 
@@ -532,7 +532,7 @@ Returns:
                       &BootOptionSize
                       );
     if (NULL == BootOptionVar) {
-      gBS->FreePool (BootOrder);
+      FreePool (BootOrder);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -549,11 +549,11 @@ Returns:
     if ((OptionDevicePathSize == DevicePathSize) &&
         (CompareMem (DevicePath, OptionDevicePath, DevicePathSize) == 0)) {
       BdsDeleteBootOption (BootOrder[Index], BootOrder, &BootOrderSize);
-      gBS->FreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       break;
     }
 
-    gBS->FreePool (BootOptionVar);
+    FreePool (BootOptionVar);
     Index++;
   }
 
@@ -565,7 +565,7 @@ Returns:
                   BootOrder
                   );
 
-  gBS->FreePool (BootOrder);
+  FreePool (BootOrder);
 
   return Status;
 }
@@ -636,7 +636,7 @@ Returns:
                       &BootOptionSize
                       );
     if (NULL == BootOptionVar) {
-      gBS->FreePool (BootOrder);
+      FreePool (BootOrder);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -652,7 +652,7 @@ Returns:
     //
     if ((DevicePathType (OptionDevicePath) == BBS_DEVICE_PATH) &&
         (DevicePathSubType (OptionDevicePath) == BBS_BBS_DP)) {
-      gBS->FreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       Index++;
       continue;
     }
@@ -664,7 +664,7 @@ Returns:
       TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
     }
     //
-    // Skip the boot option that point to a file, since the device path in 
+    // Skip the boot option that point to a file, since the device path in
     // removable media boot option doesn't contains a file name.
     //
     if (((DevicePathType (LastDeviceNode) == MEDIA_DEVICE_PATH) &&
@@ -673,7 +673,7 @@ Returns:
         // Skip boot option for internal Shell, it's always valid
         //
         (EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode) != NULL)) {
-      gBS->FreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       Index++;
       continue;
     }
@@ -721,7 +721,7 @@ Returns:
       BootOrder[Index] = 0xffff;
     }
 
-    gBS->FreePool (BootOptionVar);
+    FreePool (BootOptionVar);
     Index++;
   }
 
@@ -743,7 +743,7 @@ Returns:
                   BootOrder
                   );
 
-  gBS->FreePool (BootOrder);
+  FreePool (BootOrder);
 
   return Status;
 }
@@ -877,7 +877,7 @@ Returns:
   }
 
   if (NumberFileSystemHandles) {
-    gBS->FreePool (FileSystemHandles);
+    FreePool (FileSystemHandles);
   }
   //
   // Parse Network Boot Device
@@ -904,7 +904,7 @@ Returns:
   }
 
   if (NumberLoadFileHandles) {
-    gBS->FreePool (LoadFileHandles);
+    FreePool (LoadFileHandles);
   }
   //
   // Check if we have on flash shell
@@ -946,7 +946,7 @@ Returns:
   }
 
   if (FvHandleCount) {
-    gBS->FreePool (FvHandleBuffer);
+   FreePool (FvHandleBuffer);
   }
   //
   // Make sure every boot only have one time
@@ -966,13 +966,13 @@ BdsLibBuildOptionFromHandle (
 /*++
 
 Routine Description:
-  
+
   Build the boot option with the handle parsed in
-  
+
 Arguments:
 
   Handle - The handle which present the device path to create boot option
-  
+
   BdsBootOptionList - The header of the link list which indexed all current
                       boot options
 
@@ -1002,14 +1002,14 @@ BdsLibBuildOptionFromShell (
 /*++
 
 Routine Description:
-  
+
   Build the on flash shell boot option with the handle parsed in
-  
+
 Arguments:
 
   Handle - The handle which present the device path to create on flash shell
            boot option
-  
+
   BdsBootOptionList - The header of the link list which indexed all current
                       boot options
 
@@ -1044,13 +1044,13 @@ BdsLibBootNext (
 /*++
 
 Routine Description:
-  
+
   Boot from the EFI1.1 spec defined "BootNext" variable
-  
+
 Arguments:
 
   None
-  
+
 Returns:
 
   None

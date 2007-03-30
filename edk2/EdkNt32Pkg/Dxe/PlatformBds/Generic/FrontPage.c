@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,7 +16,7 @@ Module Name:
 Abstract:
 
   FrontPage routines to handle the callbacks and browser calls
-  
+
 --*/
 
 #include "Bds.h"
@@ -53,7 +53,7 @@ Routine Description:
 
   This is the function that is called to provide results data to the driver.  This data
   consists of a unique key which is used to identify what data is either being passed back
-  or being asked for. 
+  or being asked for.
 
 Arguments:
 
@@ -63,7 +63,7 @@ Arguments:
 
   Data -            A pointer to the data being sent to the original exporting driver.
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -136,7 +136,7 @@ Returns:
                     Lang
                     );
 
-    gBS->FreePool (LanguageString);
+    FreePool (LanguageString);
     gCallbackKey = 2;
     break;
 
@@ -179,7 +179,7 @@ Returns:
         (UINTN) (((EFI_IFR_DATA_ENTRY *) (DataArray+1))->Data),
         0
         );
-      gBS->FreePool (TmpStr);
+      FreePool (TmpStr);
     }
     break;
 
@@ -198,12 +198,12 @@ InitializeFrontPage (
 /*++
 
 Routine Description:
-  
+
   Initialize HII information for the FrontPage
 
 Arguments:
   None
-            
+
 Returns:
   EFI_SUCCESS       - The operation is successful.
   EFI_DEVICE_ERROR  - If the dynamic opcode creation failed.
@@ -254,7 +254,7 @@ Returns:
 
   Status        = Hii->NewPack (Hii, PackageList, &gFrontPageHandle);
 
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   //
   // There will be only one FormConfig in the system
@@ -364,11 +364,11 @@ ReInitStrings:
     OptionCount++;
   }
 
-  gBS->FreePool (LanguageString);
+  FreePool (LanguageString);
 
   if (ReInitializeStrings) {
-    gBS->FreePool (StringBuffer);
-    gBS->FreePool (OptionList);
+    FreePool (StringBuffer);
+    FreePool (OptionList);
     return EFI_SUCCESS;
   }
 
@@ -389,11 +389,11 @@ ReInitStrings:
 
   Hii->UpdateForm (Hii, gFrontPageHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
-  gBS->FreePool (UpdateData);
+  FreePool (UpdateData);
   //
-  // gBS->FreePool (OptionList);
+  // FreePool (OptionList);
   //
-  gBS->FreePool (StringBuffer);
+  FreePool (StringBuffer);
   return Status;
 }
 
@@ -404,13 +404,13 @@ CallFrontPage (
 /*++
 
 Routine Description:
-  
+
   Call the browser and display the front page
 
 Arguments:
-  
+
   None
-  
+
 Returns:
 
 --*/
@@ -442,7 +442,7 @@ Returns:
                       );
   //
   // Check whether user change any option setting which needs a reset to be effective
-  //                      
+  //
   if (FrontPageMenuResetRequired) {
     EnableResetRequired ();
   }
@@ -461,15 +461,15 @@ GetStringFromToken (
 /*++
 
 Routine Description:
-  
+
   Acquire the string associated with the ProducerGuid and return it.
 
 Arguments:
-  
+
   ProducerGuid - The Guid to search the HII database for
   Token - The token value of the string to extract
   String - The string that is extracted
-  
+
 Returns:
 
   EFI_SUCCESS - The function returns EFI_SUCCESS always.
@@ -529,11 +529,11 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (*String);
+    FreePool (*String);
     *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
   }
 
-  gBS->FreePool (HiiHandleBuffer);
+  FreePool (HiiHandleBuffer);
   return EFI_SUCCESS;
 }
 
@@ -545,14 +545,14 @@ ConvertProcessorToString (
 /*++
 
 Routine Description:
-  
+
   Convert Processor Frequency Data to a string
 
 Arguments:
-  
+
   ProcessorFrequency - The frequency data to process
   String - The string that is created
-  
+
 Returns:
 
 --*/
@@ -590,14 +590,14 @@ ConvertMemorySizeToString (
 /*++
 
 Routine Description:
-  
+
   Convert Memory Size to a string
 
 Arguments:
-  
+
   MemorySize - The size of the memory to process
   String - The string that is created
-  
+
 Returns:
 
 --*/
@@ -621,13 +621,13 @@ UpdateFrontPageStrings (
 /*++
 
 Routine Description:
-  
+
   Update the banner information for the Front Page based on DataHub information
 
 Arguments:
-  
+
   None
-  
+
 Returns:
 
 --*/
@@ -689,7 +689,7 @@ Returns:
         GetStringFromToken (&Record->ProducerName, BiosVendor->BiosVersion, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_BIOS_VERSION;
         Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
-        gBS->FreePool (NewString);
+        FreePool (NewString);
         Find[0] = TRUE;
       }
 
@@ -700,7 +700,7 @@ Returns:
         GetStringFromToken (&Record->ProducerName, SystemManufacturer->SystemProductName, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_COMPUTER_MODEL;
         Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
-        gBS->FreePool (NewString);
+        FreePool (NewString);
         Find[1] = TRUE;
       }
 
@@ -711,7 +711,7 @@ Returns:
         GetStringFromToken (&Record->ProducerName, *ProcessorVersion, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_CPU_MODEL;
         Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
-        gBS->FreePool (NewString);
+        FreePool (NewString);
         Find[2] = TRUE;
       }
 
@@ -722,7 +722,7 @@ Returns:
         ConvertProcessorToString (ProcessorFrequency, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_CPU_SPEED;
         Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
-        gBS->FreePool (NewString);
+        FreePool (NewString);
         Find[3] = TRUE;
       }
 
@@ -730,12 +730,12 @@ Returns:
           (DataHeader->RecordType == EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER)
           ) {
         MemoryArray = (EFI_MEMORY_ARRAY_START_ADDRESS_DATA *) (DataHeader + 1);
-        ConvertMemorySizeToString((UINT32)(RShiftU64((MemoryArray->MemoryArrayEndAddress - 
+        ConvertMemorySizeToString((UINT32)(RShiftU64((MemoryArray->MemoryArrayEndAddress -
                                   MemoryArray->MemoryArrayStartAddress + 1), 20)),
                                   &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_MEMORY_SIZE;
         Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
-        gBS->FreePool (NewString);
+        FreePool (NewString);
         Find[4] = TRUE;
       }
     }
@@ -753,15 +753,15 @@ PlatformBdsEnterFrontPage (
 
 Routine Description:
   This function is the main entry of the platform setup entry.
-  The function will present the main menu of the system setup, 
+  The function will present the main menu of the system setup,
   this is the platform reference part and can be customize.
-  
+
 Arguments:
   TimeoutDefault     - The fault time out value before the system
                        continue to boot.
   ConnectAllHappened - The indicater to check if the connect all have
                        already happended.
-  
+
 Returns:
   None
 
@@ -890,7 +890,7 @@ Returns:
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
   SetupResetReminder ();
-  
+
   //
   // Automatically load current entry
   // Note: The following lines of code only execute when Auto boot

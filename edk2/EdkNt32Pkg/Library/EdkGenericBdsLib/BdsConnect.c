@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -26,12 +26,12 @@ BdsLibConnectAll (
 /*++
 
 Routine Description:
-  
+
   This function will connect all the system driver to controller
   first, and then special connect the default console, this make
   sure all the system controller avialbe and the platform default
   console connected.
-  
+
 Arguments:
 
   None
@@ -66,12 +66,12 @@ BdsLibGenericConnectAll (
 /*++
 
 Routine Description:
-  
+
   This function will connect all the system drivers to all controllers
-  first, and then connect all the console devices the system current 
+  first, and then connect all the console devices the system current
   have. After this we should get all the device work and console avariable
   if the system have console device.
-  
+
 Arguments:
 
   None
@@ -100,7 +100,7 @@ Routine Description:
   path node. If the handle associate with one device path node can not
   be created success, then still give one chance to do the dispatch,
   which load the missing drivers if possible.
-  
+
 Arguments:
 
   DevicePathToConnect  - The device path which will be connected, it can
@@ -108,12 +108,12 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS          - All handles associate with every device path 
+  EFI_SUCCESS          - All handles associate with every device path
                          node have been created
-  
+
   EFI_OUT_OF_RESOURCES - There is no resource to create new handles
-  
-  EFI_NOT_FOUND        - Create the handle associate with one device 
+
+  EFI_NOT_FOUND        - Create the handle associate with one device
                          path node failed
 
 --*/
@@ -206,7 +206,7 @@ Returns:
   } while (DevicePath != NULL);
 
   if (CopyOfDevicePath != NULL) {
-    gBS->FreePool (CopyOfDevicePath);
+    FreePool (CopyOfDevicePath);
   }
   //
   // All handle with DevicePath exists in the handle database
@@ -224,7 +224,7 @@ Routine Description:
 
   This function will connect all current system handles recursively. The
   connection will finish until every handle's child handle created if it have.
-  
+
 Arguments:
 
   None
@@ -232,8 +232,8 @@ Arguments:
 Returns:
 
   EFI_SUCCESS          - All handles and it's child handle have been connected
-  
-  EFI_STATUS           - Return the status of gBS->LocateHandleBuffer(). 
+
+  EFI_STATUS           - Return the status of gBS->LocateHandleBuffer().
 
 --*/
 {
@@ -257,7 +257,7 @@ Returns:
     Status = gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
   }
 
-  gBS->FreePool (HandleBuffer);
+  FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
@@ -272,7 +272,7 @@ Routine Description:
 
   This function will disconnect all current system handles. The disconnection
   will finish until every handle have been disconnected.
-  
+
 Arguments:
 
   None
@@ -280,8 +280,8 @@ Arguments:
 Returns:
 
   EFI_SUCCESS          - All handles have been disconnected
-  
-  EFI_STATUS           - Return the status of gBS->LocateHandleBuffer(). 
+
+  EFI_STATUS           - Return the status of gBS->LocateHandleBuffer().
 
 --*/
 {
@@ -308,7 +308,7 @@ Returns:
     Status = gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
   }
 
-  gBS->FreePool (HandleBuffer);
+  FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
@@ -321,19 +321,19 @@ BdsLibConnectAllDriversToAllControllers (
 
 Routine Description:
 
-  Connects all drivers to all controllers. 
+  Connects all drivers to all controllers.
   This function make sure all the current system driver will manage
   the correspoinding controllers if have. And at the same time, make
-  sure all the system controllers have driver to manage it if have. 
-  
+  sure all the system controllers have driver to manage it if have.
+
 Arguments:
-  
+
   None
-  
+
 Returns:
-  
+
   None
-  
+
 --*/
 {
   EFI_STATUS  Status;

@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -19,9 +19,9 @@ Abstract:
 
   UGA is short hand for Universal Graphics Abstraction protocol.
 
-  This file is a verision of UgaIo the uses WinNtThunk system calls as an IO 
+  This file is a verision of UgaIo the uses WinNtThunk system calls as an IO
   abstraction. For a PCI device WinNtIo would be replaced with
-  a PCI IO abstraction that abstracted a specific PCI device. 
+  a PCI IO abstraction that abstracted a specific PCI device.
 
 --*/
 
@@ -137,13 +137,8 @@ Returns:
   //
   // Allocate Private context data for SGO inteface.
   //
-  Private = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (UGA_PRIVATE_DATA),
-                  &Private
-                  );
-  if (EFI_ERROR (Status)) {
+  Private = AllocatePool (sizeof (UGA_PRIVATE_DATA));
+  if (Private == NULL) {
     goto Done;
   }
   //
@@ -198,7 +193,7 @@ Done:
         FreeUnicodeStringTable (Private->ControllerNameTable);
       }
 
-      gBS->FreePool (Private);
+      FreePool (Private);
     }
   }
 
@@ -287,7 +282,7 @@ Returns:
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
 
-    gBS->FreePool (Private);
+    FreePool (Private);
 
   }
 
@@ -308,9 +303,9 @@ Arguments:
 
   String - Unicode string.
 
-Returns: 
+Returns:
 
-  UINTN of the number represented by String.  
+  UINTN of the number represented by String.
 
 --*/
 {

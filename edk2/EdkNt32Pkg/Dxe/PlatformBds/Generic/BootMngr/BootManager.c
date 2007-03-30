@@ -1,15 +1,15 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name: 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
 
   BootManager.c
 
@@ -47,7 +47,7 @@ Routine Description:
 
   This is the function that is called to provide results data to the driver.  This data
   consists of a unique key which is used to identify what data is either being passed back
-  or being asked for. 
+  or being asked for.
 
 Arguments:
 
@@ -57,7 +57,7 @@ Arguments:
 
   Data -            A pointer to the data being sent to the original exporting driver.
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -170,7 +170,7 @@ Returns:
   //
   PackageList = PreparePackages (2, &BmGuid, BootManagerVfrBin, BdsStrings);
   Status      = Hii->NewPack (Hii, PackageList, &gBootManagerHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   //
   // This example does not implement worker functions
@@ -296,20 +296,20 @@ Returns:
 
   Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
-  gBS->FreePool (UpdateData);
+  FreePool (UpdateData);
 
   ASSERT (gBrowser);
 
   BootMngrMenuResetRequired = FALSE;
   gBrowser->SendForm (
-              gBrowser, 
-              TRUE, 
-              &gBootManagerHandle, 
-              1, 
-              NULL, 
-              NULL, 
-              NULL, 
-              NULL, 
+              gBrowser,
+              TRUE,
+              &gBootManagerHandle,
+              1,
+              NULL,
+              NULL,
+              NULL,
+              NULL,
               &BootMngrMenuResetRequired
               );
 
@@ -322,12 +322,12 @@ Returns:
   if (gOption == NULL) {
     return ;
   }
-  
+
   //
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
   SetupResetReminder ();
-  
+
   //
   // BugBug: This code looks repeated from the BDS. Need to save code space.
   //

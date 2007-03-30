@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   UpdatePage.c
-    
+
 AgBStract:
 
   Dynamically Update the pages
@@ -179,7 +179,8 @@ BootThisFile (
   CHAR16            *ExitData;
   BDS_COMMON_OPTION *Option;
 
-  Status                  = gBS->AllocatePool (EfiBootServicesData, sizeof (BDS_COMMON_OPTION), &Option);
+  Option                  = AllocatePool (sizeof (BDS_COMMON_OPTION));
+
   Option->Description     = FileContext->FileName;
   Option->DevicePath      = FileContext->DevicePath;
   Option->LoadOptionsSize = 0;
@@ -218,7 +219,7 @@ UpdateConCOMPage (
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
- 
+
       CreateGotoOpCode (
         FORM_CON_COM_SETUP_ID,
         NewMenuEntry->DisplayStringToken,

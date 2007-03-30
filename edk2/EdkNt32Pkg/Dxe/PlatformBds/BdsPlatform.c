@@ -445,7 +445,7 @@ Returns:
   TmpStr = GetStringById (STRING_TOKEN (STR_BOOT_SUCCEEDED));
   if (TmpStr != NULL) {
     BdsLibOutputStrings (gST->ConOut, TmpStr, Option->Description, L"\n\r", NULL);
-    gBS->FreePool (TmpStr);
+    FreePool (TmpStr);
   }
 }
 
@@ -487,7 +487,7 @@ Returns:
   TmpStr = GetStringById (STRING_TOKEN (STR_BOOT_FAILED));
   if (TmpStr != NULL) {
     BdsLibOutputStrings (gST->ConOut, TmpStr, Option->Description, L"\n\r", NULL);
-    gBS->FreePool (TmpStr);
+    FreePool (TmpStr);
   }
 
 }
