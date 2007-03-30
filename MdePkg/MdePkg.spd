@@ -1880,7 +1880,7 @@
     </Entry>
     <Entry Name="Mtftp4">
       <C_Name>gEfiMtftp4ProtocolGuid</C_Name>
-      <GuidValue>3AD9DF29-4501-478D-B1F8-7F7FE70E50F3</GuidValue>
+      <GuidValue>78247C57-63DB-4708-99C2-A8B4A9A61F6B</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="Mtftp4ServiceBinding">
