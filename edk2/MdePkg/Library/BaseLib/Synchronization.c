@@ -16,6 +16,10 @@
 
 #include "BaseLibInternals.h"
 
+//
+// SPIN_LOCK_RELEASED & SPIN_LOCK_ACQUIRED should belong to type "SPIN_LOCK".
+// Here we use type-case "UINTN" to avoid "volatile" modifier on const integers.
+//
 #define SPIN_LOCK_RELEASED          ((UINTN) 1)
 #define SPIN_LOCK_ACQUIRED          ((UINTN) 2)
 
