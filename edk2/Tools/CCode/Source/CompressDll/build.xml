@@ -57,6 +57,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <linkerarg value="-mno-cygwin" if="cygwin"/>
       <linkerarg value="--add-stdcall-alias" if="cygwin"/>
     </cc>
+    <if>
+      <available file="${result}.manifest"/>
+      <then>
+        <exec executable="mt.exe">
+          <arg value="-manifest"/>
+          <arg value="${result}.manifest"/>
+          <arg value="-outputresource:${result};2"/>
+        </exec>
+      </then>
+    </if>
     <copy file="${result}" tofile="${BIN_DIR}/CompressDll.dll"/>
     <chmod file="${BIN_DIR}/CompressDll.dll" perm="ugo+x"/>
   </target>
