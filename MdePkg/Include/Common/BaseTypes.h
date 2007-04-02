@@ -3,7 +3,7 @@
 
   This file is stand alone self consistent set of definitions. 
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -194,6 +194,11 @@ typedef CHAR8 *VA_LIST;
 #define VA_END(ap)      (ap = (VA_LIST) 0)
 
 #endif
+
+//
+// Macro that returns the byte offset of a field in a data structure. 
+//
+#define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
 
 ///
 ///  CONTAINING_RECORD - returns a pointer to the structure
