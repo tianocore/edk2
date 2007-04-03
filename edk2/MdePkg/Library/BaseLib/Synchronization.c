@@ -1,7 +1,7 @@
 /** @file
   Implementation of synchronization functions.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -10,19 +10,14 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SynchronizationGcc.c
+  Module Name:  Synchronization.c
 
 **/
 
 #include "BaseLibInternals.h"
 
-//
-// GCC inline assembly for Read Write Barrier  
-//
-#define _ReadWriteBarrier() do { asm volatile ("": : : "memory"); } while(0)
-
-#define SPIN_LOCK_RELEASED          ((UINTN) 1)
-#define SPIN_LOCK_ACQUIRED          ((UINTN) 2)
+#define SPIN_LOCK_RELEASED          ((SPIN_LOCK)1)
+#define SPIN_LOCK_ACQUIRED          ((SPIN_LOCK)2)
 
 /**
   Retrieves the architecture specific spin lock alignment requirements for
@@ -73,11 +68,7 @@ InitializeSpinLock (
   )
 {
   ASSERT (SpinLock != NULL);
-
-  _ReadWriteBarrier();
   *SpinLock = SPIN_LOCK_RELEASED;
-  _ReadWriteBarrier();
-
   return SpinLock;
 }
 
@@ -160,23 +151,20 @@ AcquireSpinLockOrFail (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  SPIN_LOCK   LockValue;
-  VOID        *Result;
-  
+  SPIN_LOCK    LockValue;
+
   ASSERT (SpinLock != NULL);
 
   LockValue = *SpinLock;
   ASSERT (LockValue == SPIN_LOCK_ACQUIRED || LockValue == SPIN_LOCK_RELEASED);
 
-  _ReadWriteBarrier ();
-  Result = InterlockedCompareExchangePointer (
+  return (BOOLEAN)(
+           InterlockedCompareExchangePointer (
              (VOID**)SpinLock,
              (VOID*)SPIN_LOCK_RELEASED,
              (VOID*)SPIN_LOCK_ACQUIRED
+             ) == (VOID*)SPIN_LOCK_RELEASED
            );
-
-  _ReadWriteBarrier ();
-  return (BOOLEAN) (Result == (VOID*) SPIN_LOCK_RELEASED);
 }
 
 /**
@@ -206,10 +194,7 @@ ReleaseSpinLock (
   LockValue = *SpinLock;
   ASSERT (LockValue == SPIN_LOCK_ACQUIRED || LockValue == SPIN_LOCK_RELEASED);
 
-  _ReadWriteBarrier ();
   *SpinLock = SPIN_LOCK_RELEASED;
-  _ReadWriteBarrier ();
-
   return SpinLock;
 }
 
