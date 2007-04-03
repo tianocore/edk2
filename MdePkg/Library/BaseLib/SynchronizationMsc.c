@@ -162,10 +162,13 @@ AcquireSpinLockOrFail (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  VOID  *Result;
+  SPIN_LOCK   LockValue;
+  VOID        *Result;
   
   ASSERT (SpinLock != NULL);
-  ASSERT (*SpinLock == SPIN_LOCK_ACQUIRED || *SpinLock == SPIN_LOCK_RELEASED);
+
+  LockValue = *SpinLock;
+  ASSERT (LockValue == SPIN_LOCK_ACQUIRED || LockValue == SPIN_LOCK_RELEASED);
 
   _ReadWriteBarrier ();
   Result = InterlockedCompareExchangePointer (
@@ -198,8 +201,12 @@ ReleaseSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
+  SPIN_LOCK    LockValue;
+
   ASSERT (SpinLock != NULL);
-  ASSERT (*SpinLock == SPIN_LOCK_ACQUIRED || *SpinLock == SPIN_LOCK_RELEASED);
+
+  LockValue = *SpinLock;
+  ASSERT (LockValue == SPIN_LOCK_ACQUIRED || LockValue == SPIN_LOCK_RELEASED);
 
   _ReadWriteBarrier ();
   *SpinLock = SPIN_LOCK_RELEASED;
