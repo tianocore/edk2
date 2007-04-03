@@ -275,8 +275,13 @@ public class GenBuildTask extends Ant {
             //
             // Whether the module is built before
             //
-            if (moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) {
-                EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n");
+            if ((moduleId.isLibrary() == false || isSingleModuleBuild) && GlobalData.hasFpdModuleSA(fpdModuleId) == false) {
+                if (isSingleModuleBuild) {
+                    EdkLog.log(this, EdkLog.EDK_ERROR, "Error: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n");
+                    throw new BuildException("No platform containing this module!");
+                } else {
+                    EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n");
+                }
                 continue;
             } else if (GlobalData.isModuleBuilt(fpdModuleId)) {
                 break;
