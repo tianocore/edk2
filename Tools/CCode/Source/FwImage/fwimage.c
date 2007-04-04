@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -254,10 +254,14 @@ CheckElfHeader(
     return 0;
   if (Ehdr->e_version != EV_CURRENT)
     return 0;
-  
+
+  //
+  // Find the section header table
+  // 
   ShdrBase = (Elf_Shdr *)((UINT8 *)Ehdr + Ehdr->e_shoff);
 
   CoffSectionsOffset = (UINT32 *)malloc(Ehdr->e_shnum * sizeof (UINT32));
+
   memset(CoffSectionsOffset, 0, Ehdr->e_shnum * sizeof(UINT32));
   return 1;
 }
@@ -332,17 +336,21 @@ ScanSections(
   for (i = 0; i < Ehdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
     if (IsTextShdr(shdr)) {
+      //
+      // Align the coff offset
+      // 
+      CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
       /* Relocate entry.  */
-      if (Ehdr->e_entry >= shdr->sh_addr
-	  && Ehdr->e_entry < shdr->sh_addr + shdr->sh_size) {
-	CoffEntry = CoffOffset + Ehdr->e_entry - shdr->sh_addr;
+      if ((Ehdr->e_entry >= shdr->sh_addr) && 
+          (Ehdr->e_entry < shdr->sh_addr + shdr->sh_size)) {
+        CoffEntry = CoffOffset + Ehdr->e_entry - shdr->sh_addr;
       }
       CoffSectionsOffset[i] = CoffOffset;
       CoffOffset += shdr->sh_size;
     }
   }
   CoffOffset = CoffAlign(CoffOffset);
-		       
+
   //
   //  Then data sections.
   //
