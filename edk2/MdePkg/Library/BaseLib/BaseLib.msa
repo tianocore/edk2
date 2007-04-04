@@ -75,7 +75,7 @@
     <Filename>CheckSum.c</Filename>
     <Filename SupArchList="IA32 X64 IPF" ToolChainFamily="GCC">SynchronizationGcc.c</Filename>
     <Filename SupArchList="IA32 X64 IPF" ToolChainFamily="MSFT">SynchronizationMsc.c</Filename>
-    <Filename SupArchList="IA32 X64 IPF" ToolChainFamily="ICC">Synchronization.c</Filename>
+    <Filename SupArchList="IA32 X64 IPF" ToolChainFamily="INTEL">Synchronization.c</Filename>
 
     <Filename SupArchList="IA32">x86DisablePaging32.c</Filename>
     <Filename SupArchList="IA32">x86DisablePaging64.c</Filename>
