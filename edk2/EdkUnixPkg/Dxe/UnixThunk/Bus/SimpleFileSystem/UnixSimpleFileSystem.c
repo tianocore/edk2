@@ -495,10 +495,12 @@ Returns:
   EFI_STATUS                        Status;
   UNIX_SIMPLE_FILE_SYSTEM_PRIVATE *Private;
   UNIX_EFI_FILE_PRIVATE           *PrivateFile;
+  EFI_TPL                           OldTpl;
 
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   Private     = UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (This);
 
@@ -565,6 +567,8 @@ Done:
       gBS->FreePool (PrivateFile);
     }
   }
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -640,7 +644,6 @@ Returns:
   BOOLEAN                           LoopFinish;
   UINTN                             InfoSize;
   EFI_FILE_INFO                     *Info;
-  EFI_TPL                           OldTpl;
 
   TrailingDash = FALSE;
 
@@ -672,7 +675,6 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
 
   PrivateFile     = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot     = UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -953,8 +955,6 @@ Done: ;
     *NewHandle = &NewPrivateFile->EfiFile;
   }
 
-  gBS->RestoreTPL (OldTpl);
-
   return Status;
 }
 
@@ -1072,6 +1072,8 @@ Returns:
 
   gBS->FreePool (PrivateFile->FileName);
   gBS->FreePool (PrivateFile);
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -1273,31 +1275,37 @@ Returns:
   if (!PrivateFile->IsDirectoryPath) {
 
     if (PrivateFile->fd < 0) {
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
 
     Res = PrivateFile->UnixThunk->Read (
 					 PrivateFile->fd,
 					 Buffer,
 					 *BufferSize);
-    if (Res < 0)
-      return EFI_DEVICE_ERROR;
+    if (Res < 0) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
     *BufferSize = Res;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   //
   // Read on a directory.
   //
   if (PrivateFile->Dir == NULL) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   if (PrivateFile->Dirent == NULL) {
     PrivateFile->Dirent = PrivateFile->UnixThunk->ReadDir (PrivateFile->Dir);
     if (PrivateFile->Dirent == NULL) {
       *BufferSize = 0;
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Done;
     }
   }
 
@@ -1307,7 +1315,8 @@ Returns:
 
   if (*BufferSize < ResultSize) {
     *BufferSize = ResultSize;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto Done;
   }
   Status  = EFI_SUCCESS;
 
@@ -1320,7 +1329,7 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 		  
   AsciiStrCpy(FullFileName, PrivateFile->FileName);
@@ -1333,6 +1342,9 @@ Returns:
   gBS->FreePool (FullFileName);
 
   PrivateFile->Dirent = NULL;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -1389,6 +1401,8 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->fd < 0) {
@@ -1403,8 +1417,6 @@ Returns:
     return EFI_ACCESS_DENIED;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
   Res = PrivateFile->UnixThunk->Write (
 					PrivateFile->fd,
 					Buffer,
