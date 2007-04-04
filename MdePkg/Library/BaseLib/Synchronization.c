@@ -16,8 +16,8 @@
 
 #include "BaseLibInternals.h"
 
-#define SPIN_LOCK_RELEASED          ((SPIN_LOCK)1)
-#define SPIN_LOCK_ACQUIRED          ((SPIN_LOCK)2)
+#define SPIN_LOCK_RELEASED          ((UINTN) 1)
+#define SPIN_LOCK_ACQUIRED          ((UINTN) 2)
 
 /**
   Retrieves the architecture specific spin lock alignment requirements for
