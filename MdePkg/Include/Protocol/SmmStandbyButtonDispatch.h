@@ -40,8 +40,9 @@ typedef struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL  EFI_SMM_STANDBY_BUTTON
 //    - OS Install Phase
 //
 typedef enum {
-  StandbyButtonEntry,
-  StandbyButtonExit
+  EfiStandbyButtonEntry,
+  EfiStandbyButtonExit,
+  EfiStandbyButtonMax
 } EFI_STANDBY_BUTTON_PHASE;
 
 typedef struct {
