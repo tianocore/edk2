@@ -1960,7 +1960,7 @@
     </Entry>
     <Entry Name="IScsiInitiatorName">
       <C_Name>gEfiIScsiInitiatorNameProtocolGuid</C_Name>
-      <GuidValue>A6A72875-2962-4C18-9F46-8DA644CCFE00</GuidValue>
+      <GuidValue>59324945-EC44-4C0D-B1CD-9DB139DF070C</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="ScsiIoExt">
