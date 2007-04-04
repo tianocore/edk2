@@ -86,7 +86,7 @@ Returns:
     //
     Status = Fv->ReadSection (
                   Fv,
-                  &gEfiDefaultBmpLogoGuid,
+                  FileNameGuid,
                   EFI_SECTION_RAW,
                   0,
                   Image,

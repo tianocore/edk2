@@ -99,9 +99,6 @@
       <ProtocolCName>gEfiLegacyBiosProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiUgaSplashProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
@@ -194,6 +191,9 @@
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFileInfoGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiDefaultBmpLogoGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

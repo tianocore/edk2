@@ -254,7 +254,7 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    EnableQuietBoot (&gEfiUgaSplashProtocolGuid);
+    EnableQuietBoot (&gEfiDefaultBmpLogoGuid);
     //
     // Perform system diagnostic
     //
