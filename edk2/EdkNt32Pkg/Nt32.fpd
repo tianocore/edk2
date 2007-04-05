@@ -7007,7 +7007,7 @@
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>106</MaxDatumSize>
-          <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
+          <Value>L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
         </PcdData>
         <PcdData ItemType="DYNAMIC">
           <C_Name>PcdWinNtVirtualDisk</C_Name>
@@ -7949,7 +7949,7 @@
       <MaxDatumSize>106</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
+        <Value>L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
