@@ -2151,13 +2151,13 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
   OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
   
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
 
   if (PrivateFile->IsDirectoryPath) {
-    Status = EFI_SUCCESS;
     goto Done;
   }
 
