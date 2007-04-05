@@ -340,7 +340,9 @@ ScanSections(
       // Align the coff offset to meet with the alignment requirement of section
       // itself.
       // 
-      CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
+      if ((shdr->sh_addralign != 0) && (shdr->sh_addralign != 1)) {
+        CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
+      }
 
       /* Relocate entry.  */
       if ((Ehdr->e_entry >= shdr->sh_addr) && 
@@ -364,8 +366,10 @@ ScanSections(
       // Align the coff offset to meet with the alignment requirement of section
       // itself.
       // 
-      CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
-
+      if ((shdr->sh_addralign != 0) && (shdr->sh_addralign != 1)) {
+        CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
+      }
+     
       CoffSectionsOffset[i] = CoffOffset;
       CoffOffset += shdr->sh_size;
     }
