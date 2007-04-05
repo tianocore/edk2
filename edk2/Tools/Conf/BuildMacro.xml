@@ -220,9 +220,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <var name="FILE_PATH" value="@{FILEPATH}" />
       <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
+      <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"
+                TargetFile="${DEST_DIR_OUTPUT}/${BASE_NAME}.depex">
+        <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        <EXTRA.INC/>
+      </makedeps>
+
       <OnDependency>
         <sourcefiles>
-          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+          <!--file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/-->
+          <file ListFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/AutoGen.h.dep"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_OUTPUT}/${BASE_NAME}.depex"/>
