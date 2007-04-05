@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+	Header file for EFI Variable Services.
+	
+Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  EfiVariable.h
-  
-Abstract:
-  
-  Header file for EFI Variable Services
-
---*/
+**/
 
 #ifndef _EFI_VARIABLE_H_
 #define _EFI_VARIABLE_H_
@@ -33,6 +26,15 @@ Abstract:
 //
 #define VARIABLE_STORE_FORMATTED  0x5a
 #define VARIABLE_STORE_HEALTHY    0xfe
+
+//
+// The alignment of variable's start offset.
+//
+#if defined (MDE_CPU_IPF)
+#define ALIGNMENT  8
+#else
+#define ALIGNMENT  2
+#endif
 
 //
 // Variable Store Status
