@@ -337,9 +337,11 @@ ScanSections(
     Elf_Shdr *shdr = GetShdrByIndex(i);
     if (IsTextShdr(shdr)) {
       //
-      // Align the coff offset
+      // Align the coff offset to meet with the alignment requirement of section
+      // itself.
       // 
       CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
+
       /* Relocate entry.  */
       if ((Ehdr->e_entry >= shdr->sh_addr) && 
           (Ehdr->e_entry < shdr->sh_addr + shdr->sh_size)) {
@@ -358,6 +360,12 @@ ScanSections(
   for (i = 0; i < Ehdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
     if (IsDataShdr(shdr)) {
+      //
+      // Align the coff offset to meet with the alignment requirement of section
+      // itself.
+      // 
+      CoffOffset = (CoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
+
       CoffSectionsOffset[i] = CoffOffset;
       CoffOffset += shdr->sh_size;
     }
