@@ -29,13 +29,6 @@ Abstract:
 //
 #include <Common/Variable.h>
 
-#if defined (MDE_CPU_IPF)
-#define ALIGNMENT  8
-#else
-#define ALIGNMENT  1
-#endif
-
-
 #define VARIABLE_STORE_SIZE (64 * 1024)
 #define SCRATCH_SIZE        (4 * 1024)
 
