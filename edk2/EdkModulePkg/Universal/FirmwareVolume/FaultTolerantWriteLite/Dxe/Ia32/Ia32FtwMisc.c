@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -76,10 +76,12 @@ Returns:
   Status = PciRootBridgeIo->Pci.Read (
                                   PciRootBridgeIo,
                                   EfiPciWidthUint32,
-                                  EFI_PCI_ADDRESS (LPC_BUS_NUMBER,
-    LPC_DEVICE_NUMBER,
-    LPC_IF,
-    Offset),
+                                  EFI_PCI_ADDRESS (
+                                    LPC_BUS_NUMBER,
+                                    LPC_DEVICE_NUMBER,
+                                    LPC_IF,
+                                    Offset
+                                    ),
                                   1,
                                   &Value
                                   );
@@ -295,7 +297,7 @@ Notes:
   Status = GetSwapState (FtwLiteDevice, &TopSwap);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "FtwLite: Get Top Swapped status - %r\n", Status));
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     return EFI_ABORTED;
   }
 
@@ -305,7 +307,7 @@ Notes:
     //
     Status = GetFvbByAddress (FtwLiteDevice->SpareAreaAddress + FTW_BLOCK_SIZE, &BootFvb);
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
     //
@@ -323,7 +325,7 @@ Notes:
                           Ptr
                           );
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (Buffer);
+        FreePool (Buffer);
         return Status;
       }
 
@@ -345,7 +347,7 @@ Notes:
                                               Ptr
                                               );
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (Buffer);
+        FreePool (Buffer);
         return Status;
       }
 
@@ -363,7 +365,7 @@ Notes:
   //
   Status = FtwEraseSpareBlock (FtwLiteDevice);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     return EFI_ABORTED;
   }
   //
@@ -381,14 +383,14 @@ Notes:
                                             );
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Write boot block - %r\n", Status));
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
 
     Ptr += Count;
   }
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
   //
   // Clear TopSwap bit

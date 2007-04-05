@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -229,7 +229,7 @@ Returns:
     }
   }
 
-  gBS->FreePool (HandleBuffer);
+  FreePool (HandleBuffer);
   return Status;
 }
 
@@ -329,7 +329,7 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
 
@@ -340,7 +340,7 @@ Returns:
   //
   Status = FtwEraseBlock (FtwLiteDevice, FvBlock, Lba);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     return EFI_ABORTED;
   }
   //
@@ -352,14 +352,14 @@ Returns:
     Status  = FvBlock->Write (FvBlock, Lba + Index, 0, &Count, Ptr);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Write block - %r\n", Status));
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
 
     Ptr += Count;
   }
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
   return Status;
 }
@@ -433,7 +433,7 @@ Notes:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
 
@@ -463,7 +463,7 @@ Notes:
             WORKING_BLOCK_INVALID
             );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     return EFI_ABORTED;
   }
 
@@ -478,7 +478,7 @@ Notes:
             FtwLiteDevice->FtwWorkBlockLba
             );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Buffer);
+    FreePool (Buffer);
     return EFI_ABORTED;
   }
   //
@@ -496,7 +496,7 @@ Notes:
                                           );
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Write block - %r\n", Status));
-      gBS->FreePool (Buffer);
+      FreePool (Buffer);
       return Status;
     }
 
@@ -505,7 +505,7 @@ Notes:
   //
   // Since the memory buffer will not be used, free memory Buffer.
   //
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
   //
   // Update the VALID of the working block

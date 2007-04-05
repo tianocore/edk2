@@ -6,8 +6,9 @@
     <GuidValue>96B5C032-DF4C-4b6e-8232-438DCF448D0E</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for NullMemoryTest module.</Abstract>
-    <Description>This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to provide generic memory test functions.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to 
+      provide simple generic memory test functions.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +23,9 @@
     <OutputFileBasename>NullMemoryTest</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
@@ -32,13 +34,10 @@
       <Keyword>DxeServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
+      <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>MemoryAllocationLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>

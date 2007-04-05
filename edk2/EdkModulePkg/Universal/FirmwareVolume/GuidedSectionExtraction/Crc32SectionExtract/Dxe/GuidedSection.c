@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -20,17 +20,9 @@ Abstract:
   extraction protocol. GUID specific implementation of each
   GUIDed section extraction protocol can be found in other
   files under the same directory.
-  
-  Please refer to the Tiano File Image Format Specification, 
-  FV spec 0.3.6
-  
-  Acronyms used       Meaning
-
     
 --*/
 
-
-#include "Common/FirmwareFileSystem.h"
 #include "GuidedSection.h"
 
 EFI_STATUS
@@ -58,15 +50,8 @@ Returns:
 // TODO:    ExtractSection - add argument and description to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 {
-  EFI_STATUS  Status;
-
-  *GuidedSep = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL),
-                  (VOID **) GuidedSep
-                  );
-  if (EFI_ERROR (Status)) {
+  *GuidedSep = AllocatePool (sizeof (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL));
+  if (*GuidedSep == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -16,8 +16,7 @@ Module Name:
 Abstract:
 
   Header file for GuidedSection.c
-  Please refer to Tiano File Image Format specification 
-  FV spec 0.3.6
+  Please refer to the Framewokr Firmware Volume Specification 0.9.
   
 --*/
 

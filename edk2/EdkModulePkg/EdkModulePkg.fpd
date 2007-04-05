@@ -5804,186 +5804,6 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IPF" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
-      <Libraries>
-        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <!--Pkg: MdePkg Mod: UefiRuntimeServicesTableLib Path: MdePkg\Library\UefiRuntimeServicesTableLib\UefiRuntimeServicesTableLib.msa-->
-        <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <!--Pkg: MdePkg Mod: BaseTimerLibNullTemplate Path: MdePkg\Library\BaseTimerLibNullTemplate\BaseTimerLibNullTemplate.msa-->
-        <Instance ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-      </Libraries>
-      <PcdBuildDefinition>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeUseHardSerial</C_Name>
-          <Token>0x00010027</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeUseEfiSerial</C_Name>
-          <Token>0x00010026</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeUseRuntimeMemory</C_Name>
-          <Token>0x00010028</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeUseDataHub</C_Name>
-          <Token>0x00010029</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeUseOEM</C_Name>
-          <Token>0x00010024</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeReplayInSerial</C_Name>
-          <Token>0x0001002a</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeReplayInDataHub</C_Name>
-          <Token>0x0001002c</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeReplayInRuntimeMemory</C_Name>
-          <Token>0x0001002b</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FEATURE_FLAG">
-          <C_Name>PcdStatusCodeReplayInOEM</C_Name>
-          <Token>0x0001002d</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>BOOLEAN</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>FALSE</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
-          <Token>0x0001002e</Token>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT16</DatumType>
-          <MaxDatumSize>2</MaxDatumSize>
-          <Value>4</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdDebugPropertyMask</C_Name>
-          <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x0f</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdDebugClearMemoryValue</C_Name>
-          <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0xAF</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdDebugPrintErrorLevel</C_Name>
-          <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>0x80000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x06</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdUefiLibMaxPrintBufferSize</C_Name>
-          <Token>0x101</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>320</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
     <ModuleSA SupArchList="X64" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="80CF7257-87AB-47f9-A3FE-D50B76D89541">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -21298,6 +21118,646 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x06</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: Crc32SectionExtract Type: DXE_DRIVER Path: EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa-->
+    <ModuleSA ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="IA32">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: Crc32SectionExtract Type: DXE_DRIVER Path: EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa-->
+    <ModuleSA ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="X64">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: Crc32SectionExtract Type: DXE_DRIVER Path: EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa-->
+    <ModuleSA ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="IPF">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: Crc32SectionExtract Type: DXE_DRIVER Path: EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa-->
+    <ModuleSA ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="EBC">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: MonotonicCounter Type: DXE_RUNTIME_DRIVER Path: EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.msa-->
+    <ModuleSA ModuleGuid="AD608272-D07F-4964-801E-7BD3B7888652" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="EBC">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkUefiRuntimeLib Path: EdkModulePkg\Library\EdkUefiRuntimeLib\EdkUefiRuntimeLib.msa-->
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiRuntimeServicesTableLib Path: MdePkg\Library\UefiRuntimeServicesTableLib\UefiRuntimeServicesTableLib.msa-->
+        <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+      </PcdBuildDefinition>
+      <ModuleSaBuildOptions>
+        <FvBinding>NULL</FvBinding>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+      </ModuleSaBuildOptions>
+    </ModuleSA>
+    <!--Mod: DxeStatusCode Type: DXE_RUNTIME_DRIVER Path: EdkModulePkg\Universal\StatusCode\Dxe\DxeStatusCode.msa-->
+    <ModuleSA ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3" SupArchList="IPF">
+      <Libraries>
+        <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeHobLib Path: MdePkg\Library\DxeHobLib\DxeHobLib.msa-->
+        <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkUefiRuntimeLib Path: EdkModulePkg\Library\EdkUefiRuntimeLib\EdkUefiRuntimeLib.msa-->
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiLib Path: MdePkg\Library\UefiLib\UefiLib.msa-->
+        <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkDxeRuntimeSalLib Path: EdkModulePkg\Library\EdkDxeRuntimeSalLib\EdkDxeRuntimeSalLib.msa-->
+        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
+        <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeReportStatusCodeLib Path: MdePkg\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.msa-->
+        <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: UefiDriverEntryPoint Path: MdePkg\Library\UefiDriverEntryPoint\UefiDriverEntryPoint.msa-->
+        <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BasePrintLib Path: MdePkg\Library\BasePrintLib\BasePrintLib.msa-->
+        <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkOemHookStatusCodeLibNull Path: EdkModulePkg\Library\EdkOemHookStatusCodeLibNull\EdkOemHookStatusCodeLibNull.msa-->
+        <Instance ModuleGuid="54D2878F-25CD-4a2b-8420-EBD18E609C76" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: PeiDxeDebugLibReportStatusCode Path: MdePkg\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.msa-->
+        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: EdkModulePkg Mod: EdkSerialPortLibNull Path: EdkModulePkg\Library\EdkSerialPortLibNull\EdkSerialPortLibNull.msa-->
+        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: DxeMemoryLib Path: MdePkg\Library\DxeMemoryLib\DxeMemoryLib.msa-->
+        <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: MdePkg Mod: BaseTimerLibNullTemplate Path: MdePkg\Library\BaseTimerLibNullTemplate\BaseTimerLibNullTemplate.msa-->
+        <Instance ModuleGuid="f4731d79-537e-4505-bd52-c03f9b1f6b89" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+      </Libraries>
+      <PcdBuildDefinition>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseHardSerial</C_Name>
+          <Token>0x00010027</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseEfiSerial</C_Name>
+          <Token>0x00010026</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseRuntimeMemory</C_Name>
+          <Token>0x00010028</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseDataHub</C_Name>
+          <Token>0x00010029</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseOEM</C_Name>
+          <Token>0x00010024</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInSerial</C_Name>
+          <Token>0x0001002a</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInDataHub</C_Name>
+          <Token>0x0001002c</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInRuntimeMemory</C_Name>
+          <Token>0x0001002b</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInOEM</C_Name>
+          <Token>0x0001002d</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
+          <Token>0x0001002e</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT16</DatumType>
+          <MaxDatumSize>2</MaxDatumSize>
+          <Value>4</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdUefiLibMaxPrintBufferSize</C_Name>
+          <Token>0x101</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>320</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+          <Token>0x00000001</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumAsciiStringLength</C_Name>
+          <Token>0x00000002</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdMaximumLinkedListLength</C_Name>
+          <Token>0x00000003</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdSpinLockTimeout</C_Name>
+          <Token>0x00000004</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x06</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPropertyMask</C_Name>
+          <Token>0x00000005</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0f</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugClearMemoryValue</C_Name>
+          <Token>0x00000008</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdDebugPrintErrorLevel</C_Name>
+          <Token>0x00000006</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x80000000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
