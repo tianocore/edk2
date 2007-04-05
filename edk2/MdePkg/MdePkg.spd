@@ -1620,7 +1620,7 @@
     </Entry>
     <Entry Name="Hii">
       <C_Name>gEfiHiiProtocolGuid</C_Name>
-      <GuidValue>EA816D2C-CEE5-4F02-99B5-D3905CBBD077</GuidValue>
+      <GuidValue>D7AD636E-B997-459B-BF3F-8846897980E1</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="PcdProtocol">
