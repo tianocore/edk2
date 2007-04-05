@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -236,7 +236,7 @@ Returns:
                                             Ptr
                                             );
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (MyBuffer);
+        FreePool (MyBuffer);
         return EFI_ABORTED;
       }
 
@@ -256,7 +256,7 @@ Returns:
       MyLength  = FtwLiteDevice->SizeOfSpareBlock;
       Status    = Fvb->Read (Fvb, Lba + Index, 0, &MyLength, Ptr);
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (MyBuffer);
+        FreePool (MyBuffer);
         return EFI_ABORTED;
       }
 
@@ -276,7 +276,7 @@ Returns:
   SpareBufferSize = FtwLiteDevice->SpareAreaLength;
   SpareBuffer     = AllocatePool (SpareBufferSize);
   if (SpareBuffer == NULL) {
-    gBS->FreePool (MyBuffer);
+    FreePool (MyBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -291,8 +291,8 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (MyBuffer);
-      gBS->FreePool (SpareBuffer);
+      FreePool (MyBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
@@ -314,8 +314,8 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (MyBuffer);
-      gBS->FreePool (SpareBuffer);
+      FreePool (MyBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
@@ -324,7 +324,7 @@ Returns:
   //
   // Free MyBuffer
   //
-  gBS->FreePool (MyBuffer);
+  FreePool (MyBuffer);
 
   //
   // Set the SpareCompleteD in the FTW record,
@@ -337,7 +337,7 @@ Returns:
             SPARE_COMPLETED
             );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (SpareBuffer);
+    FreePool (SpareBuffer);
     return EFI_ABORTED;
   }
 
@@ -349,7 +349,7 @@ Returns:
   //
   Status = FtwWriteRecord (FtwLiteDevice, Fvb);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (SpareBuffer);
+    FreePool (SpareBuffer);
     return EFI_ABORTED;
   }
 
@@ -371,7 +371,7 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (SpareBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
@@ -380,7 +380,7 @@ Returns:
   //
   // All success.
   //
-  gBS->FreePool (SpareBuffer);
+  FreePool (SpareBuffer);
 
   DEBUG (
     (EFI_D_FTW_LITE,

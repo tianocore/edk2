@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -417,16 +417,10 @@ Returns:
   // Read all original data from working block to a memory buffer
   //
   TempBufferSize = FtwLiteDevice->SpareAreaLength;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  TempBufferSize,
-                  (VOID **) &TempBuffer
-                  );
-  if (EFI_ERROR (Status)) {
+  TempBuffer     = AllocateZeroPool (TempBufferSize);
+  if (TempBuffer != NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  ZeroMem (TempBuffer, TempBufferSize);
 
   Ptr = TempBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
@@ -439,7 +433,7 @@ Returns:
                                           Ptr
                                           );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (TempBuffer);
+      FreePool (TempBuffer);
       return EFI_ABORTED;
     }
 
@@ -450,8 +444,8 @@ Returns:
   //
   Ptr = TempBuffer +
     ((UINTN) (FtwLiteDevice->FtwWorkSpaceLba - FtwLiteDevice->FtwWorkBlockLba)) *
-    FtwLiteDevice->SizeOfSpareBlock +
-    FtwLiteDevice->FtwWorkSpaceBase;
+    FtwLiteDevice->SizeOfSpareBlock + FtwLiteDevice->FtwWorkSpaceBase;
+
   Status = CleanupWorkSpace (
             FtwLiteDevice,
             Ptr,
@@ -480,7 +474,7 @@ Returns:
   SpareBufferSize = FtwLiteDevice->SpareAreaLength;
   SpareBuffer     = AllocatePool (SpareBufferSize);
   if (SpareBuffer == NULL) {
-    gBS->FreePool (TempBuffer);
+    FreePool (TempBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -495,8 +489,8 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (TempBuffer);
-      gBS->FreePool (SpareBuffer);
+      FreePool (TempBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
@@ -517,8 +511,8 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (TempBuffer);
-      gBS->FreePool (SpareBuffer);
+      FreePool (TempBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
@@ -527,14 +521,14 @@ Returns:
   //
   // Free TempBuffer
   //
-  gBS->FreePool (TempBuffer);
+  FreePool (TempBuffer);
 
   //
   // Write the spare block to working block
   //
   Status = FlushSpareBlockToWorkingBlock (FtwLiteDevice);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (SpareBuffer);
+    FreePool (SpareBuffer);
     return Status;
   }
   //
@@ -552,14 +546,14 @@ Returns:
                                             Ptr
                                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (SpareBuffer);
+      FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
     Ptr += Length;
   }
 
-  gBS->FreePool (SpareBuffer);
+  FreePool (SpareBuffer);
 
   DEBUG ((EFI_D_FTW_LITE, "FtwLite: reclaim work space success\n"));
 

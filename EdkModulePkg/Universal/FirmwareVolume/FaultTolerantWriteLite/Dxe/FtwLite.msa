@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for FtwLite module.</Abstract>
     <Description>This driver provides fault tolerant write capability for block devices.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -24,21 +24,13 @@
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PcdLib</Keyword>
-    </LibraryClass>  
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>HobLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
@@ -69,7 +61,7 @@
     <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFaultTolerantWriteLiteProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="ALWAYS_CONSUMED" SupArchList="IA32 EBC">
       <ProtocolCName>gEfiPciRootBridgeIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
@@ -77,9 +69,6 @@
     </Protocol>
   </Protocols>
   <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
-    </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiSystemNvDataFvGuid</GuidCName>
     </GuidCNames>

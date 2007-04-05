@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -18,8 +18,7 @@ Abstract:
   Implements GUIDed section extraction protocol interface with 
   a specific GUID: CRC32.
 
-  Please refer to the Tiano File Image Format Specification, 
-  FV spec 0.3.6
+  Please refer to the Framewokr Firmware Volume Specification 0.9.
 
 --*/
 
@@ -68,7 +67,7 @@ Returns:
             );
   if (EFI_ERROR (Status)) {
     if (Crc32GuidedSep != NULL) {
-      gBS->FreePool (Crc32GuidedSep);
+      FreePool (Crc32GuidedSep);
     }
 
     return Status;
@@ -84,7 +83,7 @@ Returns:
                   Crc32GuidedSep
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Crc32GuidedSep);
+    FreePool (Crc32GuidedSep);
     return EFI_LOAD_ERROR;
   }
 
@@ -199,8 +198,8 @@ Crc32ExtractSection (
   Image = (UINT8 *) InputSection + (UINT32) (GuidedSectionHeader->DataOffset);
   *OutputSize = GetSectionLength ((EFI_COMMON_SECTION_HEADER *) InputSection) - (UINT32) GuidedSectionHeader->DataOffset;
 
-  Status = gBS->AllocatePool (EfiBootServicesData, *OutputSize, OutputBuffer);
-  if (EFI_ERROR (Status)) {
+  *OutputBuffer = AllocatePool (*OutputSize);
+  if (*OutputBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
