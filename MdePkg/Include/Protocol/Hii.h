@@ -3,7 +3,7 @@
   be used by resources which want to publish IFR/Font/String data and have it 
   collected by the Configuration engine.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -26,7 +26,7 @@
 
 #define EFI_HII_PROTOCOL_GUID \
   { \
-    0xea816d2c, 0xcee5, 0x4f02, {0x99, 0xb5, 0xd3, 0x90, 0x5c, 0xbb, 0xd0, 0x77 } \
+    0xd7ad636e, 0xb997, 0x459b, {0xbf, 0x3f, 0x88, 0x46, 0x89, 0x79, 0x80, 0xe1} \
   }
 
 // BugBug:
