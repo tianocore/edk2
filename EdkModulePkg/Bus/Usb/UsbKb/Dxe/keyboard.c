@@ -93,8 +93,8 @@ UINT8 KeyConvertionTable[USB_KEYCODE_MAX_MAKE][3] = {
   { SCAN_F8,        0x00,     0x00 },     // 0x41
   { SCAN_F9,        0x00,     0x00 },     // 0x42
   { SCAN_F10,       0x00,     0x00 },     // 0x43
-  { SCAN_NULL,      0x00,     0x00 },     // 0x44   F11
-  { SCAN_NULL,      0x00,     0x00 },     // 0x45   F12
+  { SCAN_F11,      0x00,     0x00 },     // 0x44   F11
+  { SCAN_F12,      0x00,     0x00 },     // 0x45   F12
   { SCAN_NULL,      0x00,     0x00 },     // 0x46   PrintScreen
   { SCAN_NULL,      0x00,     0x00 },     // 0x47   Scroll Lock
   { SCAN_NULL,      0x00,     0x00 },     // 0x48   Pause
@@ -289,6 +289,7 @@ InitUSBKeyboard (
   UsbKeyboardDevice->ShiftOn    = 0;
   UsbKeyboardDevice->NumLockOn  = 0;
   UsbKeyboardDevice->CapsOn     = 0;
+  UsbKeyboardDevice->ScrollOn   = 0;  
   ZeroMem (UsbKeyboardDevice->LastKeyCodeArray, sizeof (UINT8) * 8);
 
   //

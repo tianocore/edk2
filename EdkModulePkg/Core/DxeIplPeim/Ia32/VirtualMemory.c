@@ -57,7 +57,6 @@ Returns:
 
 --*/
 {  
-  UINT32                                        RegEax;
   UINT8                                         PhysicalAddressBits;
   EFI_PHYSICAL_ADDRESS                          PageAddress;
   UINTN                                         IndexOfPml4Entries;
@@ -71,16 +70,16 @@ Returns:
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         TotalPagesNum;
   UINTN                                         BigPageAddress;
+  VOID                                          *Hob;
 
   //
-  // Get physical address bits supported.
+  // Get physical address bits supported from CPU HOB.
   //
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= 0x80000008) {
-    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PhysicalAddressBits = (UINT8) RegEax;
-  } else {
-    PhysicalAddressBits = 36;
+  PhysicalAddressBits = 36;
+  
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (Hob != NULL) {
+    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;    
   }
 
   //
