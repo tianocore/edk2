@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -97,7 +97,7 @@ Notes:
   //
   mDebugTable = (EFI_SYSTEM_TABLE_POINTER *)(UINTN)Mem;
   mDebugTable->Signature = EFI_SYSTEM_TABLE_SIGNATURE;
-  mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gST;
+  mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
   mDebugTable->Crc32 = 0;
   Status = CoreInstallConfigurationTable (&gEfiDebugImageInfoTableGuid, &mDebugInfoTableHeader);
   ASSERT_EFI_ERROR (Status);
@@ -127,7 +127,7 @@ Returns:
 {
   ASSERT(mDebugTable != NULL);
   mDebugTable->Crc32 = 0;
-  gBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
+  gDxeCoreBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
 }
 
 VOID

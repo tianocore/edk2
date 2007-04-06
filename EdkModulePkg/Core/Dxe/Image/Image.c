@@ -132,7 +132,7 @@ Returns:
   Image->ImageBasePage      = DxeCoreImageBaseAddress;
   Image->NumberOfPages      = (UINTN)(EFI_SIZE_TO_PAGES((UINTN)(DxeCoreImageLength)));
   Image->Tpl                = gEfiCurrentTpl;
-  Image->Info.SystemTable   = gST;
+  Image->Info.SystemTable   = gDxeCoreST;
   Image->Info.ImageBase     = (VOID *)(UINTN)DxeCoreImageBaseAddress;
   Image->Info.ImageSize     = DxeCoreImageLength;
 
@@ -650,7 +650,7 @@ Returns:
   // Initialize the fields for an internal driver
   //
   Image->Signature         = LOADED_IMAGE_PRIVATE_DATA_SIGNATURE;
-  Image->Info.SystemTable  = gST;
+  Image->Info.SystemTable  = gDxeCoreST;
   Image->Info.DeviceHandle = DeviceHandle;
   Image->Info.Revision     = EFI_LOADED_IMAGE_INFORMATION_REVISION;
   Image->Info.FilePath     = CoreDuplicateDevicePath (FilePath);

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -455,7 +455,7 @@ Returns:
   Prot = NULL;
   Handle = NULL;
 
-  ASSERT (NULL != gBS);
+  ASSERT (NULL != gDxeCoreBS);
 
   if (*UserHandle != NULL_HANDLE) {
     Status = CoreHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);

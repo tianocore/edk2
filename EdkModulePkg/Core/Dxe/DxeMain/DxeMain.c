@@ -211,16 +211,16 @@ EFI_RUNTIME_ARCH_PROTOCOL *gRuntime = &gRuntimeTemplate;
 // DXE Core Global Variables for the EFI System Table, Boot Services Table,
 // DXE Services Table, and Runtime Services Table
 //
-EFI_BOOT_SERVICES     *gBS = &mBootServices;
-EFI_DXE_SERVICES      *gDS = &mDxeServices;
-EFI_SYSTEM_TABLE      *gST = NULL;
+EFI_BOOT_SERVICES     *gDxeCoreBS = &mBootServices;
+EFI_DXE_SERVICES      *gDxeCoreDS = &mDxeServices;
+EFI_SYSTEM_TABLE      *gDxeCoreST = NULL;
 
 //
-// For debug initialize gRT to template. gRT must be allocated from RT memory
-//  but gRT is used for ASSERT () and DEBUG () type macros so lets give it
+// For debug initialize gDxeCoreRT to template. gDxeCoreRT must be allocated from RT memory
+//  but gDxeCoreRT is used for ASSERT () and DEBUG () type macros so lets give it
 //  a value that will not cause debug infrastructure to crash early on.
 //
-EFI_RUNTIME_SERVICES  *gRT = &mEfiRuntimeServicesTableTemplate;
+EFI_RUNTIME_SERVICES  *gDxeCoreRT = &mEfiRuntimeServicesTableTemplate;
 EFI_HANDLE            gDxeCoreImageHandle = NULL;
 
 VOID  *mHobStart;
@@ -288,13 +288,13 @@ Returns:
   // Allocate the EFI System Table and EFI Runtime Service Table from EfiRuntimeServicesData
   // Use the templates to initialize the contents of the EFI System Table and EFI Runtime Services Table
   //
-  gST = CoreAllocateRuntimeCopyPool (sizeof (EFI_SYSTEM_TABLE), &mEfiSystemTableTemplate);
-  ASSERT (gST != NULL);
+  gDxeCoreST = CoreAllocateRuntimeCopyPool (sizeof (EFI_SYSTEM_TABLE), &mEfiSystemTableTemplate);
+  ASSERT (gDxeCoreST != NULL);
 
-  gRT = CoreAllocateRuntimeCopyPool (sizeof (EFI_RUNTIME_SERVICES), &mEfiRuntimeServicesTableTemplate);
-  ASSERT (gRT != NULL);
+  gDxeCoreRT = CoreAllocateRuntimeCopyPool (sizeof (EFI_RUNTIME_SERVICES), &mEfiRuntimeServicesTableTemplate);
+  ASSERT (gDxeCoreRT != NULL);
 
-  gST->RuntimeServices = gRT;
+  gDxeCoreST->RuntimeServices = gDxeCoreRT;
 
   //
   // Start the Image Services.
@@ -305,7 +305,7 @@ Returns:
   //
   // Call constructor for all libraries
   //
-  ProcessLibraryConstructorList (gDxeCoreImageHandle, gST);
+  ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
   PERF_END   (0,PEI_TOK, NULL, 0) ;
   PERF_START (0,DXE_TOK, NULL, 0) ;
 
@@ -318,7 +318,7 @@ Returns:
   //
   // Install the DXE Services Table into the EFI System Tables's Configuration Table
   //
-  Status = CoreInstallConfigurationTable (&gEfiDxeServicesTableGuid, gDS);
+  Status = CoreInstallConfigurationTable (&gEfiDxeServicesTableGuid, gDxeCoreDS);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -400,16 +400,16 @@ Returns:
   //
   // Produce Firmware Volume Protocols, one for each FV in the HOB list.
   //
-  Status = FwVolBlockDriverInit (gDxeCoreImageHandle, gST);
+  Status = FwVolBlockDriverInit (gDxeCoreImageHandle, gDxeCoreST);
   ASSERT_EFI_ERROR (Status);
 
-  Status = FwVolDriverInit (gDxeCoreImageHandle, gST);
+  Status = FwVolDriverInit (gDxeCoreImageHandle, gDxeCoreST);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Produce the Section Extraction Protocol
   //
-  Status = InitializeSectionExtraction (gDxeCoreImageHandle, gST);
+  Status = InitializeSectionExtraction (gDxeCoreImageHandle, gDxeCoreST);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -742,11 +742,11 @@ Returns:
   Hdr->CRC32 = 0;
 
   //
-  // If gBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
+  // If gDxeCoreBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
   //  Crc will come back as zero if we set it to zero here
   //
   Crc = 0;
-  gBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
+  gDxeCoreBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
   Hdr->CRC32 = Crc;
 }
 
@@ -812,24 +812,24 @@ Returns:
   //
   // Clear the non-runtime values of the EFI System Table
   //
-  gST->BootServices        = NULL;
-  gST->ConIn               = NULL;
-  gST->ConsoleInHandle     = NULL;
-  gST->ConOut              = NULL;
-  gST->ConsoleOutHandle    = NULL;
-  gST->StdErr              = NULL;
-  gST->StandardErrorHandle = NULL;
+  gDxeCoreST->BootServices        = NULL;
+  gDxeCoreST->ConIn               = NULL;
+  gDxeCoreST->ConsoleInHandle     = NULL;
+  gDxeCoreST->ConOut              = NULL;
+  gDxeCoreST->ConsoleOutHandle    = NULL;
+  gDxeCoreST->StdErr              = NULL;
+  gDxeCoreST->StandardErrorHandle = NULL;
 
   //
   // Recompute the 32-bit CRC of the EFI System Table
   //
-  CalculateEfiHdrCrc (&gST->Hdr);
+  CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
 
   //
   // Zero out the Boot Service Table
   //
-  SetMem (gBS, sizeof (EFI_BOOT_SERVICES), 0);
-  gBS = NULL;
+  SetMem (gDxeCoreBS, sizeof (EFI_BOOT_SERVICES), 0);
+  gDxeCoreBS = NULL;
 
   //
   // Update the AtRuntime field in Runtiem AP.

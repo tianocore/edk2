@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -116,10 +116,10 @@ typedef struct {
 //
 // DXE Core Global Variables
 //
-extern EFI_SYSTEM_TABLE                         *gST;
-extern EFI_BOOT_SERVICES                        *gBS;
-extern EFI_RUNTIME_SERVICES                     *gRT;
-extern EFI_DXE_SERVICES                         *gDS;
+extern EFI_SYSTEM_TABLE                         *gDxeCoreST;
+extern EFI_BOOT_SERVICES                        *gDxeCoreBS;
+extern EFI_RUNTIME_SERVICES                     *gDxeCoreRT;
+extern EFI_DXE_SERVICES                         *gDxeCoreDS;
 extern EFI_HANDLE                               gDxeCoreImageHandle;
 
 extern EFI_DECOMPRESS_PROTOCOL                  gEfiDecompress;
