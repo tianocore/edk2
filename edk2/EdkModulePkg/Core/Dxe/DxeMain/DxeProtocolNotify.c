@@ -181,10 +181,10 @@ Returns:
   // It's over kill to do them all every time, but it saves a lot of code.
   //
   if (Found) {
-    CalculateEfiHdrCrc (&gRT->Hdr);
-    CalculateEfiHdrCrc (&gBS->Hdr);
-    CalculateEfiHdrCrc (&gST->Hdr);
-    CalculateEfiHdrCrc (&gDS->Hdr);
+    CalculateEfiHdrCrc (&gDxeCoreRT->Hdr);
+    CalculateEfiHdrCrc (&gDxeCoreBS->Hdr);
+    CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
+    CalculateEfiHdrCrc (&gDxeCoreDS->Hdr);
   }
 }
 

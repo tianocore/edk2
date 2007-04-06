@@ -1,7 +1,7 @@
 /** @file
   UEFI Boot Services Table Library.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,9 +14,9 @@
 
 **/
 
-EFI_HANDLE         gImageHandle;
-EFI_SYSTEM_TABLE   *gST;
-EFI_BOOT_SERVICES  *gBS;
+EFI_HANDLE         gImageHandle = NULL;
+EFI_SYSTEM_TABLE   *gST         = NULL;
+EFI_BOOT_SERVICES  *gBS         = NULL;
 
 /**
   The constructor function caches the pointer of Boot Services Table.
@@ -43,6 +43,7 @@ UefiBootServicesTableLibConstructor (
   // Cache the Image Handle
   //
   gImageHandle = ImageHandle;
+  ASSERT (gImageHandle != NULL);
 
   //
   // Cache pointer to the EFI System Table

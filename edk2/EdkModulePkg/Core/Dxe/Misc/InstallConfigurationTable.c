@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -54,9 +54,9 @@ Returns:
 {
   UINTN Index;
 
-  for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (Guid, &(gST->ConfigurationTable[Index].VendorGuid))) {
-      *Table = gST->ConfigurationTable[Index].VendorTable;
+  for (Index = 0; Index < gDxeCoreST->NumberOfTableEntries; Index++) {
+    if (CompareGuid (Guid, &(gDxeCoreST->ConfigurationTable[Index].VendorGuid))) {
+      *Table = gDxeCoreST->ConfigurationTable[Index].VendorTable;
       return EFI_SUCCESS;
     }
   }
@@ -104,18 +104,18 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  EfiConfigurationTable = gST->ConfigurationTable;
+  EfiConfigurationTable = gDxeCoreST->ConfigurationTable;
 
   //
   // Search all the table for an entry that matches Guid
   //
-  for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (Guid, &(gST->ConfigurationTable[Index].VendorGuid))) {
+  for (Index = 0; Index < gDxeCoreST->NumberOfTableEntries; Index++) {
+    if (CompareGuid (Guid, &(gDxeCoreST->ConfigurationTable[Index].VendorGuid))) {
       break;
     }
   }
 
-  if (Index < gST->NumberOfTableEntries) {
+  if (Index < gDxeCoreST->NumberOfTableEntries) {
     //
     // A match was found, so this is either a modify or a delete operation
     //
@@ -124,22 +124,22 @@ Returns:
       // If Table is not NULL, then this is a modify operation.
       // Modify the table enty and return.
       //
-      gST->ConfigurationTable[Index].VendorTable = Table;
+      gDxeCoreST->ConfigurationTable[Index].VendorTable = Table;
       return EFI_SUCCESS;
     }
 
     //
     // A match was found and Table is NULL, so this is a delete operation.
     //
-    gST->NumberOfTableEntries--;
+    gDxeCoreST->NumberOfTableEntries--;
 
     //
     // Copy over deleted entry
     //
     CopyMem (
       &(EfiConfigurationTable[Index]),
-      &(gST->ConfigurationTable[Index + 1]),
-      (gST->NumberOfTableEntries - Index) * sizeof (EFI_CONFIGURATION_TABLE)
+      &(gDxeCoreST->ConfigurationTable[Index + 1]),
+      (gDxeCoreST->NumberOfTableEntries - Index) * sizeof (EFI_CONFIGURATION_TABLE)
       );
 
   } else {
@@ -156,7 +156,7 @@ Returns:
     }
 
     //
-    // Assume that Index == gST->NumberOfTableEntries
+    // Assume that Index == gDxeCoreST->NumberOfTableEntries
     //
     if ((Index * sizeof (EFI_CONFIGURATION_TABLE)) >= mSystemTableAllocateSize) {
       //
@@ -171,26 +171,26 @@ Returns:
         return EFI_OUT_OF_RESOURCES;
       }
 
-      if (gST->ConfigurationTable != NULL) {
+      if (gDxeCoreST->ConfigurationTable != NULL) {
         //
         // Copy the old table to the new table.
         //
         CopyMem (
           EfiConfigurationTable,
-          gST->ConfigurationTable,
+          gDxeCoreST->ConfigurationTable,
           Index * sizeof (EFI_CONFIGURATION_TABLE)
           );
 
         //
         // Free Old Table
         //
-        CoreFreePool (gST->ConfigurationTable);
+        CoreFreePool (gDxeCoreST->ConfigurationTable);
       }
 
       //
       // Update System Table
       //
-      gST->ConfigurationTable = EfiConfigurationTable;
+      gDxeCoreST->ConfigurationTable = EfiConfigurationTable;
     }
 
     //
@@ -202,13 +202,13 @@ Returns:
     //
     // This is an add operation, so increment the number of table entries
     //
-    gST->NumberOfTableEntries++;
+    gDxeCoreST->NumberOfTableEntries++;
   }
 
   //
   // Fix up the CRC-32 in the EFI System Table
   //
-  CalculateEfiHdrCrc (&gST->Hdr);
+  CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
 
   return EFI_SUCCESS;
 }
