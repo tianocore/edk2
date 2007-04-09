@@ -29,11 +29,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // The alignment of variable's start offset.
+// For IA32/X64 architecture, the alignment is set to 1, and 
+// 2 is for IPF archtecture.
 //
 #if defined (MDE_CPU_IPF)
 #define ALIGNMENT  8
 #else
-#define ALIGNMENT  2
+#define ALIGNMENT  1
 #endif
 
 //
