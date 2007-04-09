@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -164,7 +164,7 @@ PxeDhcp4Run (
     // No DHCP Acks.  Release DHCP Offer list storage.
     //
     if (offer_list != NULL) {
-      gBS->FreePool (offer_list);
+      FreePool (offer_list);
       offer_list = NULL;
     }
     //

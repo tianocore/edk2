@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -65,7 +65,7 @@ PxeDhcp4Release (
   // packet, just release storage and return.
   //
   if (This->Data->IsBootp || !This->Data->IsAck) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -96,7 +96,7 @@ PxeDhcp4Release (
                 );
 
   if (EFI_ERROR (efi_status)) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -107,7 +107,7 @@ PxeDhcp4Release (
   }
 
   if (op->len != 4) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -139,7 +139,7 @@ PxeDhcp4Release (
                 );
 
   if (EFI_ERROR (efi_status)) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -150,7 +150,7 @@ PxeDhcp4Release (
   }
 
   if (op->len != 4) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -181,7 +181,7 @@ PxeDhcp4Release (
   efi_status = start_udp (Private, &client_ip, &subnet_mask);
 
   if (EFI_ERROR (efi_status)) {
-    gBS->FreePool (This->Data);
+    FreePool (This->Data);
     This->Data = NULL;
 
     if (Private->StopPxeBc) {
@@ -233,7 +233,7 @@ PxeDhcp4Release (
   //
   stop_udp (Private);
 
-  gBS->FreePool (This->Data);
+  FreePool (This->Data);
   This->Data = NULL;
 
   if (Private->StopPxeBc) {

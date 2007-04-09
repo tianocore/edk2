@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2223,12 +2223,12 @@ FreeMem (
   )
 {
   if (Private->TransmitBuffer != NULL) {
-    gBS->FreePool (Private->TransmitBuffer);
+    FreePool (Private->TransmitBuffer);
     Private->TransmitBuffer = NULL;
   }
 
   if (Private->ReceiveBuffers != NULL) {
-    gBS->FreePool (Private->ReceiveBuffers);
+    FreePool (Private->ReceiveBuffers);
     Private->ReceiveBuffers = NULL;
   }
 }
@@ -2240,48 +2240,29 @@ GetMem (
   PXE_BASECODE_DEVICE *Private
   )
 {
-  EFI_STATUS  Status;
 
   if (Private->DhcpPacketBuffer == NULL) {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (DHCP_RECEIVE_BUFFER) * (PXE_BIS_INDEX + 1),
-                    &Private->DhcpPacketBuffer
-                    );
-
-    if (EFI_ERROR (Status) || Private->DhcpPacketBuffer == NULL) {
-      Private->DhcpPacketBuffer = NULL;
+    Private->DhcpPacketBuffer = AllocatePool (sizeof (DHCP_RECEIVE_BUFFER) * (PXE_BIS_INDEX + 1));
+    if (Private->DhcpPacketBuffer == NULL) {
       FreeMem (Private);
       return FALSE;
     }
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_PXE_BASE_CODE_PACKET),
-                  &Private->TransmitBuffer
-                  );
-
-  if (EFI_ERROR (Status) || Private->TransmitBuffer == NULL) {
-    gBS->FreePool (Private->DhcpPacketBuffer);
+  Private->TransmitBuffer = AllocatePool (sizeof (EFI_PXE_BASE_CODE_PACKET));
+  if (Private->TransmitBuffer == NULL) {
+    FreePool (Private->DhcpPacketBuffer);
     Private->DhcpPacketBuffer = NULL;
-    Private->TransmitBuffer   = NULL;
     FreeMem (Private);
     return FALSE;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (DHCP_RECEIVE_BUFFER) * (MAX_OFFERS),
-                  &Private->ReceiveBuffers
-                  );
-
-  if (EFI_ERROR (Status) || Private->ReceiveBuffers == NULL) {
-    gBS->FreePool (Private->TransmitBuffer);
-    gBS->FreePool (Private->DhcpPacketBuffer);
+  Private->ReceiveBuffers = AllocatePool (sizeof (DHCP_RECEIVE_BUFFER) * (MAX_OFFERS));
+  if (Private->ReceiveBuffers == NULL) {
+    FreePool (Private->TransmitBuffer);
+    FreePool (Private->DhcpPacketBuffer);
     Private->DhcpPacketBuffer = NULL;
     Private->TransmitBuffer   = NULL;
-    Private->ReceiveBuffers   = NULL;
     FreeMem (Private);
     return FALSE;
   }
@@ -2920,7 +2901,6 @@ Returns:
   PXE_SERVER_LISTS                DefaultSrvList;
   PXE_SERVER_LISTS                *ServerListPtr;
   PXE_SERVER_LISTS                *McastServerListPtr;
-  EFI_STATUS                      Status;
   UNION_PTR                       LocalPtr;
   UINTN                           Index;
   UINTN                           Index2;
@@ -3120,14 +3100,11 @@ Returns:
     }
 
     if (ServerListPtr == NULL) {
-      Status = gBS->AllocatePool (
-                      EfiBootServicesData,
-                      sizeof (PXEV4_SERVER_LIST) + (Index2 - 1) * sizeof (EFI_IPv4_ADDRESS),
-                      (VOID **) &ServerListPtr
+      ServerListPtr = AllocatePool (
+                        sizeof (PXEV4_SERVER_LIST) + (Index2 - 1) * sizeof (EFI_IPv4_ADDRESS)
                       );
 
-      if (EFI_ERROR (Status) || ServerListPtr == NULL) {
-        ServerListPtr = NULL;
+      if (ServerListPtr == NULL) {
         EfiReleaseLock (&Private->Lock);
         return EFI_OUT_OF_RESOURCES;
       }
@@ -3173,7 +3150,7 @@ Returns:
               );
 
   if (AcquiredSrvList) {
-    gBS->FreePool (ServerListPtr);
+    FreePool (ServerListPtr);
   }
 
   FreeMem (Private);
@@ -3219,7 +3196,6 @@ Returns:
 --*/
 {
   EFI_PXE_BASE_CODE_MODE  *PxebcMode;
-  EFI_STATUS              Status;
   PXE_BASECODE_DEVICE     *Private;
 
   //
@@ -3249,14 +3225,8 @@ Returns:
   PxebcMode = Private->EfiBc.Mode;
 
   if (Private->DhcpPacketBuffer == NULL) {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (DHCP_RECEIVE_BUFFER) * (PXE_BIS_INDEX + 1),
-                    &Private->DhcpPacketBuffer
-                    );
-
-    if (EFI_ERROR (Status) || Private->DhcpPacketBuffer == NULL) {
-      Private->DhcpPacketBuffer = NULL;
+    Private->DhcpPacketBuffer = AllocatePool (sizeof (DHCP_RECEIVE_BUFFER) * (PXE_BIS_INDEX + 1));
+    if (Private->DhcpPacketBuffer == NULL) {
       EfiReleaseLock (&Private->Lock);
       return EFI_OUT_OF_RESOURCES;
     }

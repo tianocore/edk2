@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -340,7 +340,6 @@ Returns:
   EFI_PXE_BASE_CODE_MODE  *PxeBcMode;
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   ARP_PACKET              *ArpPacket;
-  EFI_STATUS              Status;
   UINTN                   HardwareAddrLength;
   UINT8                   *SrcProtocolAddrPtr;
   UINT8                   *DestHardwareAddrptr;
@@ -357,14 +356,9 @@ Returns:
   // Allocate ARP buffer
   //
   if (Private->ArpBuffer == NULL) {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    SnpMode->MediaHeaderSize + sizeof (ARP_PACKET),
-                    (VOID **) &Private->ArpBuffer
-                    );
-
-    if (EFI_ERROR (Status)) {
-      return Status;
+    Private->ArpBuffer = AllocatePool (SnpMode->MediaHeaderSize + sizeof (ARP_PACKET));
+    if (Private->ArpBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
   }
 

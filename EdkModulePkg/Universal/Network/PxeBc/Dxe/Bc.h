@@ -411,14 +411,6 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
   )
 ;
 
-UINTN
-EFIAPI
-AsciiPrint (
-  IN CONST CHAR8 *Format,
-  ...
-  )
-;
-
 //
 // Define SMBIOS tables.
 //
