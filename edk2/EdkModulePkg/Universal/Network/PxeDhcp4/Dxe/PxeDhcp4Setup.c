@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -117,17 +117,7 @@ PxeDhcp4Setup (
   // Allocate data structure.  Return error
   // if there is not enough available memory.
   //
-  EfiStatus = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (EFI_PXE_DHCP4_DATA),
-                    (VOID **) &This->Data
-                    );
-
-  if (EFI_ERROR (EfiStatus)) {
-    This->Data = NULL;
-    return EfiStatus;
-  }
-
+  This->Data = AllocatePool (sizeof (EFI_PXE_DHCP4_DATA));
   if (This->Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -139,7 +129,7 @@ PxeDhcp4Setup (
 
   if (EFI_ERROR (EfiStatus)) {
     if (EfiStatus != EFI_ALREADY_STARTED) {
-      gBS->FreePool (This->Data);
+      FreePool (This->Data);
       This->Data = NULL;
       Private->PxeBc->Stop (Private->PxeBc);
       return EfiStatus;

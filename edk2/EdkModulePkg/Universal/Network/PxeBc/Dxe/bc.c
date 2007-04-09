@@ -822,7 +822,7 @@ Returns:
     return NULL;
   }
 
-  if (BisHandleCount != sizeof BisHandleBuffer) {
+  if (BisHandleCount != sizeof (BisHandleBuffer)) {
     //
     // This really should never happen, but I am paranoid.
     //
@@ -1186,7 +1186,6 @@ BcStart (
 {
   EFI_SIMPLE_NETWORK_PROTOCOL *SnpPtr;
   EFI_SIMPLE_NETWORK_MODE     *SnpModePtr;
-  EFI_STATUS                  Status;
   EFI_STATUS                  StatCode;
   PXE_BASECODE_DEVICE         *Private;
 
@@ -1364,54 +1363,34 @@ BcStart (
   //
   // Allocate Tx/Rx buffers
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  BUFFER_ALLOCATE_SIZE,
-                  (VOID **) &Private->TransmitBufferPtr
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (Private->TransmitBufferPtr, BUFFER_ALLOCATE_SIZE);
-  } else {
+  Private->TransmitBufferPtr = AllocateZeroPool (BUFFER_ALLOCATE_SIZE);
+  if (Private->TransmitBufferPtr == NULL) {
     DEBUG ((EFI_D_NET, "\nBcStart()  Could not alloc TxBuf.\n"));
     EfiReleaseLock (&Private->Lock);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  BUFFER_ALLOCATE_SIZE,
-                  (VOID **) &Private->ReceiveBufferPtr
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (Private->ReceiveBufferPtr, BUFFER_ALLOCATE_SIZE);
-  } else {
+  Private->ReceiveBufferPtr = AllocateZeroPool (BUFFER_ALLOCATE_SIZE);
+  if (Private->ReceiveBufferPtr == NULL) {
     DEBUG ((EFI_D_NET, "\nBcStart()  Could not alloc RxBuf.\n"));
-    gBS->FreePool (Private->TransmitBufferPtr);
+    FreePool (Private->TransmitBufferPtr);
     EfiReleaseLock (&Private->Lock);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  256,
-                  (VOID **) &Private->TftpErrorBuffer
-                  );
-
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (Private->ReceiveBufferPtr);
-    gBS->FreePool (Private->TransmitBufferPtr);
+  Private->TftpErrorBuffer = AllocatePool (256);
+  if (Private->TftpErrorBuffer == NULL) {
+    FreePool (Private->ReceiveBufferPtr);
+    FreePool (Private->TransmitBufferPtr);
     EfiReleaseLock (&Private->Lock);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (EfiBootServicesData, 256, (VOID **) &Private->TftpAckBuffer);
-
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (Private->TftpErrorBuffer);
-    gBS->FreePool (Private->ReceiveBufferPtr);
-    gBS->FreePool (Private->TransmitBufferPtr);
+  Private->TftpAckBuffer = AllocatePool (256);
+  if (Private->TftpAckBuffer == NULL) {
+    FreePool (Private->TftpErrorBuffer);
+    FreePool (Private->ReceiveBufferPtr);
+    FreePool (Private->TransmitBufferPtr);
     EfiReleaseLock (&Private->Lock);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1546,27 +1525,27 @@ BcStop (
   }
 
   if (Private->TransmitBufferPtr != NULL) {
-    gBS->FreePool (Private->TransmitBufferPtr);
+    FreePool (Private->TransmitBufferPtr);
     Private->TransmitBufferPtr = NULL;
   }
 
   if (Private->ReceiveBufferPtr != NULL) {
-    gBS->FreePool (Private->ReceiveBufferPtr);
+    FreePool (Private->ReceiveBufferPtr);
     Private->ReceiveBufferPtr = NULL;
   }
 
   if (Private->ArpBuffer != NULL) {
-    gBS->FreePool (Private->ArpBuffer);
+    FreePool (Private->ArpBuffer);
     Private->ArpBuffer = NULL;
   }
 
   if (Private->TftpErrorBuffer != NULL) {
-    gBS->FreePool (Private->TftpErrorBuffer);
+    FreePool (Private->TftpErrorBuffer);
     Private->TftpErrorBuffer = NULL;
   }
 
   if (Private->TftpAckBuffer != NULL) {
-    gBS->FreePool (Private->TftpAckBuffer);
+    FreePool (Private->TftpAckBuffer);
     Private->TftpAckBuffer = NULL;
   }
 
@@ -2118,46 +2097,26 @@ PxeBcDriverStart (
   //
   // Allocate structures needed by BaseCode and LoadFile protocols.
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (PXE_BASECODE_DEVICE),
-                  (VOID **) &Private
-                  );
+  Private = AllocateZeroPool (sizeof (PXE_BASECODE_DEVICE));
 
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (Private, sizeof (PXE_BASECODE_DEVICE));
-  } else {
+  if (Private == NULL ) {
     DEBUG ((EFI_D_NET, "\nBcNotifySnp()  Could not alloc PXE_BASECODE_DEVICE structure.\n"));
-    return Status;
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (LOADFILE_DEVICE),
-                  (VOID **) &pLF
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (pLF, sizeof (LOADFILE_DEVICE));
-  } else {
+  pLF = AllocateZeroPool (sizeof (LOADFILE_DEVICE));
+  if (pLF == NULL) {
     DEBUG ((EFI_D_NET, "\nBcNotifySnp()  Could not alloc LOADFILE_DEVICE structure.\n"));
-    gBS->FreePool (Private);
-    return Status;
+    FreePool (Private);
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_PXE_BASE_CODE_MODE),
-                  (VOID **) &Private->EfiBc.Mode
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (Private->EfiBc.Mode, sizeof (EFI_PXE_BASE_CODE_MODE));
-  } else {
+  Private->EfiBc.Mode = AllocateZeroPool (sizeof (EFI_PXE_BASE_CODE_MODE));
+  if (Private->EfiBc.Mode == NULL) {
     DEBUG ((EFI_D_NET, "\nBcNotifySnp()  Could not alloc Mode structure.\n"));
-    gBS->FreePool (Private);
-    gBS->FreePool (pLF);
-    return Status;
+    FreePool (Private);
+    FreePool (pLF);
+    return EFI_OUT_OF_RESOURCES;
   }
   //
   // Lock access, just in case
@@ -2298,9 +2257,9 @@ PxeBcDriverStart (
   return Status;
 
 PxeBcError: ;
-  gBS->FreePool (Private->EfiBc.Mode);
-  gBS->FreePool (Private);
-  gBS->FreePool (pLF);
+  FreePool (Private->EfiBc.Mode);
+  FreePool (Private);
+  FreePool (pLF);
   return Status;
 }
 
@@ -2370,9 +2329,9 @@ PxeBcDriverStop (
                     Controller
                     );
 
-    gBS->FreePool (LoadDevice->Private->EfiBc.Mode);
-    gBS->FreePool (LoadDevice->Private);
-    gBS->FreePool (LoadDevice);
+    FreePool (LoadDevice->Private->EfiBc.Mode);
+    FreePool (LoadDevice->Private);
+    FreePool (LoadDevice);
   }
 
   return Status;

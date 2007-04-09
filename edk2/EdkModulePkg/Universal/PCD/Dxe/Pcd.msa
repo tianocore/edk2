@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for PCD service DXE driver.</Abstract>
     <Description>This DXE driver implement and produce the PCD protocol.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -25,11 +25,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>HiiLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiLib</Keyword>
@@ -70,15 +68,12 @@
     <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gPcdProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
-    </Protocol>
   </Protocols>
-  <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gPcdDataBaseHobGuid</GuidCName>
-    </GuidCNames>
-  </Guids>
+  <Hobs>
+    <HobTypes Usage="ALWAYS_CONSUMED" HobGuidCName="gPcdDataBaseHobGuid">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
   <Externs>
     <PcdIsDriver>DXE_PCD_DRIVER</PcdIsDriver>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>

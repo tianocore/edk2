@@ -107,13 +107,8 @@ offer_verify (
   //
   // Good DHCP (or BOOTP) packet.  Cache it!
   //
-  EfiStatus = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    (Private->offers + 1) * sizeof (DHCP4_PACKET),
-                    (VOID **) &tmp
-                    );
-
-  if (EFI_ERROR (EfiStatus)) {
+  tmp = AllocatePool ((Private->offers + 1) * sizeof (DHCP4_PACKET));
+  if (tmp == NULL) {
     return -2;
   }
 
@@ -126,7 +121,7 @@ offer_verify (
       Private->offers * sizeof (DHCP4_PACKET)
       );
 
-    gBS->FreePool (Private->offer_list);
+    FreePool (Private->offer_list);
   }
 
   CopyMem (&tmp[Private->offers++], rx_pkt, sizeof (DHCP4_PACKET));
@@ -388,7 +383,7 @@ PxeDhcp4Init (
 
   if (EFI_ERROR (EfiStatus)) {
     if (Private->offer_list) {
-      gBS->FreePool (Private->offer_list);
+      FreePool (Private->offer_list);
     }
 
     Private->offers     = 0;

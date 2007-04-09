@@ -1963,7 +1963,6 @@ Returns:
 {
   EFI_PXE_BASE_CODE_IP_FILTER Filter;
   EFI_STATUS                  StatCode;
-  EFI_STATUS                  Status;
   UINT64                      BufferSizeLocal;
   UINTN                       PacketSize;
   UINT8                       *BufferPtrLocal;
@@ -2082,13 +2081,8 @@ Returns:
   }
 
   if (DontUseBuffer) {
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    BUFFER_ALLOCATE_SIZE,
-                    (VOID **) &BufferPtrLocal
-                    );
-
-    if (EFI_ERROR (Status) || BufferPtrLocal == NULL) {
+    BufferPtrLocal = AllocatePool (BUFFER_ALLOCATE_SIZE);
+    if (BufferPtrLocal == NULL) {
       DEBUG ((EFI_D_NET, "\nPxeBcMtftp()  Exit #4"));
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2267,7 +2261,7 @@ Returns:
   }
 
   if (DontUseBuffer) {
-    gBS->FreePool (BufferPtrLocal);
+    FreePool (BufferPtrLocal);
   }
 
   if (StatCode != EFI_SUCCESS) {

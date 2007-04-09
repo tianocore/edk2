@@ -6,8 +6,8 @@
     <GuidValue>9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Pcd Database PEIM module</Abstract>
-    <Description>This DXE driver implement and produce the PCD PPI.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Description>This PEIM driver implement and produce PCD PPI.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,9 @@
     <OutputFileBasename>PcdPeim</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeimEntryPoint</Keyword>
@@ -44,9 +45,6 @@
       <Keyword>PeiServicesTablePointerLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>MemoryAllocationLib</Keyword>
-    </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
@@ -60,6 +58,14 @@
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
     <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
+  <Hobs>
+    <HobTypes Usage="ALWAYS_PRODUCED" HobGuidCName="gPcdDataBaseHobGuid">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+    <HobTypes Usage="ALWAYS_PRODUCED" HobGuidCName="gPcdPeiCallbackFnTableHobGuid">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
   <PPIs>
     <Ppi Usage="ALWAYS_PRODUCED">
       <PpiCName>gPcdPpiGuid</PpiCName>
@@ -68,14 +74,6 @@
       <PpiCName>gEfiPeiReadOnlyVariablePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
-  <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gPcdDataBaseHobGuid</GuidCName>
-    </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gPcdPeiCallbackFnTableHobGuid</GuidCName>
-    </GuidCNames>
-  </Guids>
   <Externs>
     <PcdIsDriver>PEI_PCD_DRIVER</PcdIsDriver>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>

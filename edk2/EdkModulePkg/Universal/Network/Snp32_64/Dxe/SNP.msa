@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for SNP module.</Abstract>
     <Description>This module attachs the SNP interface to UNDI layer that it finds on the given handle!</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,9 @@
     <OutputFileBasename>SNP</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverModelLib</Keyword>
@@ -69,7 +70,6 @@
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="BY_START">
@@ -81,11 +81,12 @@
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
+    <Protocol Usage="TO_START">
       <ProtocolCName>gEfiNetworkInterfaceIdentifierProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiNetworkInterfaceIdentifierProtocolGuid_31</ProtocolCName>
+      <HelpText>This module first look for 3.1 undi, if it is not there then look for 3.0 undi.</HelpText>
     </Protocol>
   </Protocols>
   <Externs>

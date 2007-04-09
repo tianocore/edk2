@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1081,14 +1081,9 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (struct s_v2p),
-                  (VOID **) v2p
-                  );
-
-  if (Status != EFI_SUCCESS) {
-    return Status;
+  *v2p = AllocatePool (sizeof (struct s_v2p));
+  if (*v2p != NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Status = mPciIoFncs->Map (
@@ -1100,7 +1095,7 @@ Returns:
                         &(*v2p)->unmap
                         );
   if (Status != EFI_SUCCESS) {
-    gBS->FreePool (*v2p);
+    FreePool (*v2p);
     return Status;
   }
   (*v2p)->vaddr = vaddr;
@@ -1189,7 +1184,7 @@ Returns:
 
     Status  = mPciIoFncs->Unmap (mPciIoFncs, v->unmap);
 
-    gBS->FreePool (v);
+    FreePool (v);
 
     if (Status) {
       DEBUG ((EFI_D_ERROR, "Unmap failed with status = %x\n", Status));
@@ -1201,7 +1196,7 @@ Returns:
     if ((t = v->next)->vaddr == vaddr) {
       v->next = t->next;
       Status  = mPciIoFncs->Unmap (mPciIoFncs, t->unmap);
-      gBS->FreePool (t);
+      FreePool (t);
 
       if (Status) {
         DEBUG ((EFI_D_ERROR, "Unmap failed with status = %x\n", Status));

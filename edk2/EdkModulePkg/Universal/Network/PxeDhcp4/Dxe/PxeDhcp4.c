@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -155,19 +155,11 @@ PxeDhcp4DriverBindingStart (
   //
   // Initialize the PXE DHCP device instance.
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (PXE_DHCP4_PRIVATE_DATA),
-                  (VOID **) &Private
-                  );
-
-  if (EFI_ERROR (Status)) {
+  Private = AllocateZeroPool (sizeof (PXE_DHCP4_PRIVATE_DATA));
+  if (Private == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto error_exit;
   }
-  //
-  //
-  //
-  ZeroMem (Private, sizeof (PXE_DHCP4_PRIVATE_DATA));
 
   Private->Signature          = PXE_DHCP4_PRIVATE_DATA_SIGNATURE;
   Private->PxeBc              = PxeBc;
@@ -263,7 +255,7 @@ PxeDhcp4DriverBindingStop (
   // Release allocated resources
   //
   if (Private->PxeDhcp4.Data) {
-    gBS->FreePool (Private->PxeDhcp4.Data);
+    FreePool (Private->PxeDhcp4.Data);
     Private->PxeDhcp4.Data = NULL;
   }
   //
@@ -294,7 +286,7 @@ PxeDhcp4DriverBindingStop (
   //
   // Release our private data
   //
-  gBS->FreePool (Private);
+  FreePool (Private);
 
   return Status;
 }
