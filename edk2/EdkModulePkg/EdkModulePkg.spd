@@ -6,7 +6,7 @@
     <Version>0.3</Version>
     <Abstract>Edk Module Package Reference Implementations</Abstract>
     <Description>This Module provides standard reference information for EFI/Tiano implementations.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved.
       This program and the accompanying materials are licensed and made available 
       under the terms and conditions of the BSD License which accompanies this distribution.
@@ -387,7 +387,6 @@
     <Filename>Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.msa</Filename>
     <Filename>Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.msa</Filename>
     <Filename>Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.msa</Filename>
-    <Filename>Library/EdkDxeDebugLibReportStatusCode/EdkDxeDebugLibReportStatusCode.msa</Filename>
     <Filename>Library/EdkDxePeCoffLoaderFromHobLib/EdkDxePeCoffLoaderFromHobLib.msa</Filename>
     <Filename>Library/DxePerformanceLib/DxePerformanceLib.msa</Filename>
     <Filename>Library/EdkDxePrintLib/EdkDxePrintLib.msa</Filename>
@@ -400,8 +399,6 @@
     <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
     <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
     <Filename>Library/EdkScsiLib/EdkScsiLib.msa</Filename>
-    <Filename>Library/EdkUefiDebugLibConOut/EdkUefiDebugLibConOut.msa</Filename>
-    <Filename>Library/EdkUefiDebugLibStdErr/EdkUefiDebugLibStdErr.msa</Filename>
     <Filename>Library/EdkUsbLib/EdkUsbLib.msa</Filename>
     <Filename>Library/EdkSerialPortLibNull/EdkSerialPortLibNull.msa</Filename>
     <Filename>Library/EdkOemHookStatusCodeLibNull/EdkOemHookStatusCodeLibNull.msa</Filename>
