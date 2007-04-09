@@ -136,6 +136,7 @@ PeCoffLoaderGetPdbPointer (
   VOID                                  *CodeViewEntryPointer;
   INTN                                  TEImageAdjust;
   UINT32                                NumberOfRvaAndSizes;
+  UINT16                                Magic;
  
   ASSERT (Pe32Data   != NULL);
 
@@ -166,7 +167,33 @@ PeCoffLoaderGetPdbPointer (
                     TEImageAdjust);
     }
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    //
+    // NOTE: We use Machine field to identify PE32/PE32+, instead of Magic.
+    //       It is due to backward-compatibility, for some system might
+    //       generate PE32+ image with PE32 Magic.
+    //
+    switch (Hdr.Pe32->FileHeader.Machine) {
+    case EFI_IMAGE_MACHINE_IA32:
+      //
+      // Assume PE32 image with IA32 Machine field.
+      //
+      Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
+      break;
+    case EFI_IMAGE_MACHINE_X64:
+    case EFI_IMAGE_MACHINE_IPF:
+      //
+      // Assume PE32+ image with X64 or IPF Machine field
+      //
+      Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+      break;
+    default:
+      //
+      // For unknow Machine field, use Magic in optional Header
+      //
+      Magic = Hdr.Pe32->OptionalHeader.Magic;
+    }
+
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //     
       // Use PE32 offset get Debug Directory Entry
       //
