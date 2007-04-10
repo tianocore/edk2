@@ -21,8 +21,6 @@ Abstract:
 
 #include "CapsuleService.h"
 
-extern EFI_GUID gEfiCapsuleGuid;
-
 EFI_STATUS
 EFIAPI
 UpdateCapsule (
