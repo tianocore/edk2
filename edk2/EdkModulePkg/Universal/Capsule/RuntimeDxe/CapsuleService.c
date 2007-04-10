@@ -21,9 +21,7 @@ Abstract:
 
 #include "CapsuleService.h"
 
-
-STATIC EFI_GUID mEfiCapsuleHeaderGuid = EFI_CAPSULE_GUID;
-
+extern EFI_GUID gEfiCapsuleGuid;
 
 EFI_STATUS
 EFIAPI
@@ -78,7 +76,7 @@ Returns:
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
+    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }
@@ -206,7 +204,7 @@ Returns:
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &mEfiCapsuleHeaderGuid)) {
+    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }

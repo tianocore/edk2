@@ -58,10 +58,10 @@
     <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+    <Protocol Usage="ALWAYS_PRODUCED" SupArchList="IA32 X64">
       <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+    <Protocol Usage="ALWAYS_PRODUCED" SupArchList="IA32 X64">
       <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>

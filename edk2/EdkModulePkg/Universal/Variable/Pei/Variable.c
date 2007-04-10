@@ -1,13 +1,13 @@
 /*++
 
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
   Variable.c
@@ -34,7 +34,7 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
-EFI_GUID gEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
+EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 
 EFI_STATUS
 EFIAPI
@@ -265,9 +265,9 @@ Returns:
   //
   MaxIndex = 0;
 
-  GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
+  GuidHob = GetFirstGuidHob (&mEfiVariableIndexTableGuid);
   if (GuidHob == NULL) {
-    IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
+    IndexTable = BuildGuidHob (&mEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
     IndexTable->Length      = 0;
     IndexTable->StartPtr    = NULL;
     IndexTable->EndPtr      = NULL;

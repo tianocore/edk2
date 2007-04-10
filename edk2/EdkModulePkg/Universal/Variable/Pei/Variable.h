@@ -61,7 +61,6 @@ typedef struct {
   UINT16          Index[VARIABLE_INDEX_TABLE_VOLUME];
 } VARIABLE_INDEX_TABLE;
 
-extern EFI_GUID gEfiVariableIndexTableGuid;
 
 //
 // Functions
