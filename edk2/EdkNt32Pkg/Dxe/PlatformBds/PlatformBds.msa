@@ -154,34 +154,36 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiUgaDrawProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiBlockIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiSerialIoProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiGenericMemTestProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
+      <ProtocolCName>gEfiGraphicsOutputProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
+  <Hobs>
+    <HobTypes HobGuidCName="gEfiFlashMapHobGuid" Usage="ALWAYS_CONSUMED">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
   <DataHubs>
     <DataHubRecord Usage="SOMETIMES_CONSUMED">
       <DataHubCName>BiosVendor</DataHubCName>
@@ -198,12 +200,6 @@
     <DataHubRecord Usage="SOMETIMES_CONSUMED">
       <DataHubCName>MemoryArray</DataHubCName>
     </DataHubRecord>
-    <DataHubRecord Usage="SOMETIMES_CONSUMED">
-      <DataHubCName>SerialIoDevice</DataHubCName>
-    </DataHubRecord>
-    <DataHubRecord Usage="SOMETIMES_CONSUMED">
-      <DataHubCName>SerialIoPort</DataHubCName>
-    </DataHubRecord>
   </DataHubs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
@@ -216,15 +212,12 @@
       <GuidCName>gEfiGenericPlatformVariableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
-    </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFileSystemVolumeLabelInfoIdGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFileInfoGuid</GuidCName>
     </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiDefaultBmpLogoGuid</GuidCName>
     </GuidCNames>
   </Guids>

@@ -55,6 +55,11 @@
       <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
+  <Hobs>
+    <HobTypes HobGuidCName="gEfiFlashMapHobGuid" Usage="ALWAYS_CONSUMED">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
   <PPIs>
     <Ppi Usage="ALWAYS_PRODUCED">
       <PpiCName>gPeiFlashMapPpiGuid</PpiCName>
@@ -64,9 +69,6 @@
     </Ppi>
   </PPIs>
   <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
-    </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiFirmwareFileSystemGuid</GuidCName>
     </GuidCNames>
@@ -82,10 +84,10 @@
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdFlashNvStorageVariableBase</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>The driver sets the NV Storage FV base address defined by this PCD.  
+      <HelpText>The driver sets the NV Storage FV base address defined by this PCD.
         This base address point to an EFI_FIRMWARE_VOLUMN_HEADER struct. Variable PEIM
         will get the base address from this PCD. In NT emulator, this PCD is a DYNAMIC
-        type, as FD is mapped to process space by WinNT OS. On real platform, it is 
+        type, as FD is mapped to process space by WinNT OS. On real platform, it is
         normally a FIXED_AT_BUILD type as system memory map is fixed to BIOS.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
