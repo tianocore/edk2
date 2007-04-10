@@ -64,6 +64,9 @@
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiCapsuleGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiCapsuleVendorGuid</GuidCName>
     </GuidCNames>
   </Guids>

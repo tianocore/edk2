@@ -72,10 +72,10 @@
     <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiFaultTolerantWriteLiteProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
