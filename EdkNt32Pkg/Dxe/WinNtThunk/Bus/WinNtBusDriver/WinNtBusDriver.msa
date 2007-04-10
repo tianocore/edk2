@@ -19,7 +19,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>WinNtBusDriver</OutputFileBasename>
   </ModuleDefinitions>
@@ -71,8 +71,11 @@
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiWinNtThunkProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="TO_START">
+    <Protocol Usage="BY_START">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gWinNtBusDriverGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
@@ -105,9 +108,6 @@
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiWinNtCPUSpeedGuid</GuidCName>
-    </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gWinNtBusDriverGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

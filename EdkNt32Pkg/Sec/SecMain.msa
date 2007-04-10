@@ -17,7 +17,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>SecMain</OutputFileBasename>
   </ModuleDefinitions>
@@ -94,7 +94,7 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtBootMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the boot mode for simualtor. 
+      <HelpText>This PCD defines the boot mode for simualtor.
         The boot mode can be set as following value:
           0x0: Boot with full configuration.
           0x1: Boot with minimal configuration.
@@ -103,7 +103,7 @@
           0x4: Boot with default settings.
           0x5: Boot on S4 resume.
           0x6: Boot on S5 resume.
-          0x10: Boot on S2 resume. 
+          0x10: Boot on S2 resume.
           0x11: Boot on S3 resume.
           0x12: Boot on flash update.
           0x20: Boot in reovery mode.</HelpText>
