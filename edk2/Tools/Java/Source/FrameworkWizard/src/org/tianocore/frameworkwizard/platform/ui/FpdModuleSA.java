@@ -157,13 +157,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         classInstanceMap = null;
         classProduced = null;
         classConsumed = null;
-        jTabbedPane.setSelectedIndex(0);
+        int tabIndex = jTabbedPane.indexOfTab("FV Info");
+        jTabbedPane.setSelectedIndex(tabIndex);
         initPcdBuildDefinition(moduleKey);
         moduleId = WorkspaceProfile.getModuleId(moduleKey);
         if (moduleId == null) {
             return;
         }
-        int tabIndex = jTabbedPane.indexOfTab("Libraries");
+        tabIndex = jTabbedPane.indexOfTab("Libraries");
         if (moduleId.isLibrary()) {
             jTabbedPane.setEnabledAt(tabIndex, false);
         }
