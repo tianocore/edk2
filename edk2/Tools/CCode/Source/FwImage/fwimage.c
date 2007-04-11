@@ -25,7 +25,7 @@ Abstract:
 // List of OS and CPU which support ELF to PE conversion
 //
 #if defined(linux)
-#if defined(i386)
+#if defined (__i386__) || defined(__x86_64__)
 #define HAVE_ELF
 #endif
 #endif

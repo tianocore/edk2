@@ -45,7 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         excludes="*.xml *.inf"/>
 
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
+      <!-- <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/> -->
+      <!-- We can only convert IA32, not X64, ELF objects -->
+      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
     </cc>

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007 Intel Corporation.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -172,6 +172,9 @@ Returns:
   VOID                  *PeiCoreFile;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
+
+  setbuf(stdout, 0);
+  setbuf(stderr, 0);
 
   MemorySizeStr      = (CHAR16 *)PcdGetPtr (PcdUnixMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *)PcdGetPtr (PcdUnixFirmwareVolume);
