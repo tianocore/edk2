@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007 Intel Corporation.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -131,7 +131,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
          
           <shellscript shell="sh" tmpsuffix=".cmd" >
             set -v
-            gcc -Wl,--start-group ${LIBS} -Wl,--end-group -o ${BIN_DIR}/SecMain.exe -L/usr/X11R6/lib -lXext -lX11
+            gcc -m32 -Wl,--start-group ${LIBS} -Wl,--end-group -o ${BIN_DIR}/SecMain.exe -L/usr/X11R6/lib -lXext -lX11
           </shellscript>
         </sequential>
       </OnDependency>
