@@ -46,41 +46,32 @@ Returns:
 {
   UINT8       *StubCopy;
 
+  StubCopy = *Stub;
+
   //
-  // First, allocate a new buffer and copy the stub code into it
+  // Fixup the stub code for this vector
   //
-  *Stub = AllocatePool (StubSize);
-  if (*Stub != NULL) {
-    StubCopy = *Stub;
-    CopyMem (StubCopy, InterruptEntryStub, StubSize);
 
-    //
-    // Next fixup the stub code for this vector
-    //
+  // The stub code looks like this:
+  //
+  //    00000000  89 25 00000004 R  mov     AppEsp, esp             ; save stack top
+  //    00000006  BC 00008014 R     mov     esp, offset DbgStkBot   ; switch to debugger stack
+  //    0000000B  6A 00             push    0                       ; push vector number - will be modified before installed
+  //    0000000D  E9                db      0e9h                    ; jump rel32
+  //    0000000E  00000000          dd      0                       ; fixed up to relative address of CommonIdtEntry
+  //
 
-    // The stub code looks like this:
-    //
-    //    00000000  89 25 00000004 R  mov     AppEsp, esp             ; save stack top
-    //    00000006  BC 00008014 R     mov     esp, offset DbgStkBot   ; switch to debugger stack
-    //    0000000B  6A 00             push    0                       ; push vector number - will be modified before installed
-    //    0000000D  E9                db      0e9h                    ; jump rel32
-    //    0000000E  00000000          dd      0                       ; fixed up to relative address of CommonIdtEntry
-    //
+  //
+  // poke in the exception type so the second push pushes the exception type
+  //
+  StubCopy[0x0c] = (UINT8) ExceptionType;
 
-    //
-    // poke in the exception type so the second push pushes the exception type
-    //
-    StubCopy[0x0c] = (UINT8) ExceptionType;
+  //
+  // fixup the jump target to point to the common entry
+  //
+  *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
 
-    //
-    // fixup the jump target to point to the common entry
-    //
-    *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
-
-    return EFI_SUCCESS;
-  }
-
-  return EFI_OUT_OF_RESOURCES;
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -151,8 +142,6 @@ Returns:
 
   OldIntFlagState = WriteInterruptFlag (0);
   WriteIdt (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
-  FreePool ((VOID *) (UINTN) IdtEntryTable[ExceptionType].StubEntry);
-  ZeroMem (&IdtEntryTable[ExceptionType], sizeof (IDT_ENTRY));
   WriteInterruptFlag (OldIntFlagState);
 
   return EFI_SUCCESS;
@@ -362,16 +351,37 @@ Returns:
 
 --*/
 {
+  EFI_EXCEPTION_TYPE  ExceptionType;
+
   if (!FxStorSupport ()) {
     return EFI_UNSUPPORTED;
-  } else {
-    IdtEntryTable = AllocateZeroPool (sizeof (IDT_ENTRY) * NUM_IDT_ENTRIES);
-    if (IdtEntryTable != NULL) {
-      return EFI_SUCCESS;
-    } else {
-      return EFI_OUT_OF_RESOURCES;
+  }
+
+  IdtEntryTable = AllocateZeroPool (sizeof (IDT_ENTRY) * NUM_IDT_ENTRIES);
+  if (IdtEntryTable == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
+    IdtEntryTable[ExceptionType].StubEntry = (DEBUG_PROC) (UINTN) AllocatePool (StubSize);
+    if (IdtEntryTable[ExceptionType].StubEntry == NULL) {
+      goto ErrorCleanup;
+    }
+
+    CopyMem ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry, InterruptEntryStub, StubSize);
+  }
+  return EFI_SUCCESS;
+
+ErrorCleanup:
+
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
+    if (IdtEntryTable[ExceptionType].StubEntry != NULL) {
+      FreePool ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry);
     }
   }
+  FreePool (IdtEntryTable);
+
+  return EFI_OUT_OF_RESOURCES;
 }
 
 EFI_STATUS

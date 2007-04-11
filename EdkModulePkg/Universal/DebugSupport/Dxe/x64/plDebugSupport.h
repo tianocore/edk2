@@ -31,11 +31,18 @@ typedef struct {
   UINT64 High;
 } DESCRIPTOR;
 
+typedef
+VOID
+(*DEBUG_PROC) (
+  VOID
+  )
+;
+
 typedef struct {
   DESCRIPTOR  OrigDesc;
-  VOID (*OrigVector) (VOID);
+  DEBUG_PROC  OrigVector;
   DESCRIPTOR  NewDesc;
-  VOID (*StubEntry) (VOID);
+  DEBUG_PROC  StubEntry;
   VOID (*RegisteredCallback) ();
 } IDT_ENTRY;
 
