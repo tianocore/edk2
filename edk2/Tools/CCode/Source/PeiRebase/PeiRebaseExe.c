@@ -104,27 +104,22 @@ Returns:
   // Set utility name for error/warning reporting purposes.
   //
   SetUtilityName (UTILITY_NAME);
-  
-  if (argc == 1) {
-    Usage();
-    return STATUS_ERROR;
-  }
-    
+
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) ||
       (strcmp(argv[1], "-?") == 0) || (strcmp(argv[1], "/?") == 0)) {
     Usage();
     return STATUS_ERROR;
   }
-  
+
   if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
     Version();
     return STATUS_ERROR;
   }
- 
+
   //
   // Verify the correct number of arguments
   //
-  if (argc != MAX_ARGS) {
+  if (argc < MAX_ARGS) {
     Usage ();
     return STATUS_ERROR;
   }
@@ -147,7 +142,7 @@ Returns:
   //
   // Parse the command line arguments
   //
-  for (Index = 1; Index < MAX_ARGS; Index += 2) {
+  for (Index = 1; Index < argc; Index += 2) {
     //
     // Make sure argument pair begin with - or /
     //
@@ -293,7 +288,7 @@ Returns:
   // Open the log file
   //
   strcat (InputFileName, ".log");
-  LogFile = fopen (InputFileName, "a");
+  LogFile = fopen (InputFileName, "w");
   if (LogFile == NULL) {
     Error (NULL, 0, 0, InputFileName, "could not append to log file");
   }
@@ -552,7 +547,7 @@ Returns:
 --*/
 {
   Version();
-  
+
   printf (
     "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress [-F InputFvInfName]\n",
     UTILITY_NAME
@@ -612,7 +607,7 @@ Returns:
   EFI_FFS_FILE_TAIL                     TailValue;
   EFI_PHYSICAL_ADDRESS                  *BaseToUpdate;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY       *DebugEntry;
-  
+
 
   //
   // Verify input parameters
@@ -687,14 +682,14 @@ Returns:
     PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext.ImageAddress + ImageContext.PeCoffHeaderOffset);
     if (PeHdr->OptionalHeader.SectionAlignment != PeHdr->OptionalHeader.FileAlignment) {
       //
-      // Nor XIP module can be ignored. 
+      // Nor XIP module can be ignored.
       //
       if ((Flags & 1) == 0) {
         continue;
       }
       Error (NULL, 0, 0, "Section-Alignment and File-Alignment does not match", FileGuidString);
       return EFI_ABORTED;
-    } 
+    }
 
     //
     // Update CodeView and PdbPointer in ImageContext
@@ -703,8 +698,8 @@ Returns:
                     ImageContext.ImageAddress +
                     ImageContext.DebugDirectoryEntryRva
                     );
-    ImageContext.CodeView = (VOID *)(UINTN)( 
-                              ImageContext.ImageAddress + 
+    ImageContext.CodeView = (VOID *)(UINTN)(
+                              ImageContext.ImageAddress +
                               DebugEntry->RVA
                               );
     switch (*(UINT32 *) ImageContext.CodeView) {
@@ -803,10 +798,9 @@ Returns:
     //
     fprintf (
       LogFile,
-      "%s %016I64X %s\n",
+      "%s %016I64X\n",
       FileGuidString,
-      ImageContext.DestinationAddress,
-      ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
+      ImageContext.DestinationAddress
       );
     *BaseToUpdate += EFI_SIZE_TO_PAGES (ImageContext.ImageSize) * EFI_PAGE_SIZE;
 
@@ -855,7 +849,7 @@ Returns:
     //
     return EFI_SUCCESS;
   }
-  
+
   //
   // Now process TE sections
   //
@@ -921,7 +915,7 @@ Returns:
 
     //
     // Reloacate TeImage
-    // 
+    //
     ImageContext.DestinationAddress = XipBase + (UINTN) TEImageHeader + sizeof (EFI_TE_IMAGE_HEADER) \
                                       - TEImageHeader->StrippedSize - (UINTN) FfsFile;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
@@ -963,13 +957,12 @@ Returns:
 
     fprintf (
       LogFile,
-      "%s %016I64X %s\n",
+      "%s %016I64X\n",
       FileGuidString,
-      ImageContext.DestinationAddress,
-      ImageContext.PdbPointer == NULL ? "*" : ImageContext.PdbPointer
+      ImageContext.DestinationAddress
       );
   }
- 
+
   return EFI_SUCCESS;
 }
 

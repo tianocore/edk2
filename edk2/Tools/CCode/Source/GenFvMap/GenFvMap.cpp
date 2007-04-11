@@ -8,453 +8,640 @@
 //** from the company.
 //**
 //****************************************************************************
-#include "ProcessorBind.h"
+#include <cstdio>
 #include <iostream>
-#include <stdexcept>
-#include <list>
-#include <map>
-#include <vector>
-#include <iomanip>
 #include <fstream>
-#include <sstream>
+#include <iomanip>
+#include <stdexcept>
+#include <set>
 #include <string>
-#include <utility>
+#include <sstream>
+#include <vector>
+#include <map>
 #include <algorithm>
-#include <functional>
 using namespace std;
 
-typedef UINT64 ulonglong_t;
+#include "ProcessorBind.h"
 
-#ifdef __GNUC__
-#if __STDC_VERSION__ < 199901L
-#define __FUNCTION__ __FILE__
-#endif
-#endif
-
-template <class T>
-class CMemoryLeakChecker : public list<T*>
+class putUINT64
 {
 public:
-    static CMemoryLeakChecker<T>& GetInstance(void);
+    putUINT64(UINT64 ullVal) : m_ull(ullVal) {}
+    putUINT64(const putUINT64& r) : m_ull(r.m_ull) {}
+
+    template <class _E, class _Tr>
+    friend basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>&, putUINT64);
 
 private:
-    CMemoryLeakChecker(void)
+    UINT64 m_ull;
+};
+
+template <class _E, class _Tr>
+basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, putUINT64 ull)
+{
+    static const char cDigits[] = "0123456789abcdef";
+
+    UINT64 base = 10;
+    if (os.flags() & ios_base::hex)
+        base = 16;
+    else if (os.flags() & ios_base::oct)
+        base = 8;
+
+    ostringstream ostr;
+    UINT64 ullVal = ull.m_ull;
+    while (ullVal != 0)
     {
+        ostr << cDigits[ullVal % base];
+        ullVal /= base;
     }
 
-    ~CMemoryLeakChecker(void);
+    string s1(ostr.str());
+    string s2(s1.rbegin(), s1.rend());
+    return os << s2;
+}
+
+class getUINT64
+{
+public:
+    getUINT64(UINT64& ullVal) : m_ull(ullVal) {}
+    getUINT64(const getUINT64& r) : m_ull(r.m_ull) {}
+
+    template <class _E, class _Tr>
+    friend basic_istream<_E, _Tr>& operator >> (basic_istream<_E, _Tr>&, getUINT64);
+
+private:
+    UINT64& m_ull;
+
+private:
+    getUINT64& operator = (const getUINT64&);
+};
+
+template <class _E, class _Tr>
+basic_istream<_E, _Tr>& operator >> (basic_istream<_E, _Tr>& is, getUINT64 ull)
+{
+    string strBuf;
+    is >> strBuf;
+
+    UINT64 base = 10;
+    if (is.flags() & ios_base::hex)
+        base = 16;
+    else if (is.flags() & ios_base::oct)
+        base = 8;
+
+    UINT64 ullVal = 0;
+    for (string::iterator i = strBuf.begin(); i != strBuf.end(); i++)
+    {
+        if (*i <= '9' && *i >= '0')
+            *i -= '0';
+        else if (*i <= 'F' && *i >= 'A')
+            *i -= 'A' - '\x0a';
+        else if (*i <= 'f' && *i >= 'a')
+            *i -= 'a' - '\x0a';
+        else throw runtime_error("Invalid number format");
+
+        ullVal = ullVal * base + *i;
+    }
+    ull.m_ull = ullVal;
+    return is;
+}
+
+class EMemoryLeak : public logic_error
+{
+public:
+    EMemoryLeak() : logic_error("Memory leak detected") {}
+};
+
+class EInvalidGuidString : public invalid_argument
+{
+public:
+    EInvalidGuidString() : invalid_argument("Unexpected format of GUID string") {}
+};
+
+class ELogFileError : public logic_error
+{
+public:
+    ELogFileError(const string& strMsg) : logic_error(strMsg) {}
+};
+
+class EDuplicatedFfsFile : public ELogFileError
+{
+public:
+    EDuplicatedFfsFile() : ELogFileError("Duplicated FFS found in LOG file") {}
+};
+
+class EUnexpectedLogFileToken : public ELogFileError
+{
+public:
+    EUnexpectedLogFileToken() : ELogFileError("Unexpected LOG file token") {}
+};
+
+class EFileNotFound : public invalid_argument
+{
+public:
+    EFileNotFound(const string& strFName) : invalid_argument("File not found - " + strFName) {}
+};
+
+class EUnexpectedMapFile : public logic_error
+{
+public:
+    EUnexpectedMapFile(const string& strKeyWord) : logic_error("Unexpected map file format - " + strKeyWord) {}
+};
+
+class EUsage : public invalid_argument
+{
+public:
+    EUsage() : invalid_argument("Usage: GenFvMap <FV.LOG> <FV.INF> <FV.MAP>") {}
 };
 
 template <class T>
-CMemoryLeakChecker<T>& CMemoryLeakChecker<T>::GetInstance(void)
+class CMemoryLeakChecker : public set<T*>
 {
-    static CMemoryLeakChecker<T> s_memLeakChecker;
-    return s_memLeakChecker;
+protected:
+    CMemoryLeakChecker()
+    {
+    }
+
+public:
+    virtual ~CMemoryLeakChecker();
+    static CMemoryLeakChecker<T>& GetInstance();
+
+private:
+    CMemoryLeakChecker(const CMemoryLeakChecker<T>&);
+};
+
+template <class T>
+CMemoryLeakChecker<T>::~CMemoryLeakChecker()
+{
+    if (!CMemoryLeakChecker<T>::empty())
+        throw EMemoryLeak();
 }
 
 template <class T>
-CMemoryLeakChecker<T>::~CMemoryLeakChecker(void)
+CMemoryLeakChecker<T>& CMemoryLeakChecker<T>::GetInstance()
 {
-    if (!list<T*>::empty())
-        throw logic_error(__FUNCTION__ ": Memory leak detected!");
+    static CMemoryLeakChecker<T> s_instance;
+    return s_instance;
 }
 
 class CObjRoot
 {
 protected:
-    CObjRoot(void);
-    virtual ~CObjRoot(void);
+    CObjRoot()
+    {
+#ifdef _CHK_MEM_LEAK
+        CMemoryLeakChecker<CObjRoot>::GetInstance().insert(this);
+#endif
+    }
+
+public:
+    virtual ~CObjRoot()
+    {
+#ifdef _CHK_MEM_LEAK
+        CMemoryLeakChecker<CObjRoot>::GetInstance().erase(this);
+#endif
+    }
+
+private:
+    CObjRoot(const CObjRoot&);
 };
-
-CObjRoot::CObjRoot(void)
-{
-    CMemoryLeakChecker<CObjRoot>::GetInstance().push_back(this);
-}
-
-CObjRoot::~CObjRoot(void)
-{
-    CMemoryLeakChecker<CObjRoot>::GetInstance().remove(this);
-}
 
 class CIdentity : public CObjRoot
 {
 public:
-    CIdentity(void);
     CIdentity(const string&);
-    CIdentity(const CIdentity&);
+    operator string (void) const;
 
-    bool operator < (const CIdentity&) const;
-    friend istream& operator >> (istream&, CIdentity&);
-    friend ostream& operator << (ostream&, const CIdentity&);
+    bool operator < (const CIdentity& id) const
+    {
+        return memcmp(this, &id, sizeof(*this)) < 0;
+    }
 
-    static const string::size_type s_nIdStrLen;
+    CIdentity() : ulD1(0), wD2(0), wD3(0), wD4(0), ullD5(0)
+    {
+    }
 
-protected:
-    ulonglong_t m_ullId[2];
+    CIdentity(const CIdentity& r) : ulD1(r.ulD1), wD2(r.wD2), wD3(r.wD3), wD4(r.wD4), ullD5(r.ullD5)
+    {
+    }
+
+    template <class _E, class _Tr>
+    basic_istream<_E, _Tr>& ReadId(basic_istream<_E, _Tr>&);
+    template <class _E, class _Tr>
+    basic_ostream<_E, _Tr>& WriteId(basic_ostream<_E, _Tr>&);
+
+    template <class _E, class _Tr>
+    friend basic_istream<_E, _Tr>& operator >> (basic_istream<_E, _Tr>&, CIdentity&);
+    template <class _E, class _Tr>
+    friend basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>&, CIdentity);
+
+private:
+    UINT32 ulD1;
+    UINT16 wD2, wD3, wD4;
+    UINT64 ullD5;
 };
 
-const string::size_type CIdentity::s_nIdStrLen = 36;
-
-CIdentity::CIdentity(void)
+CIdentity::CIdentity(const string& strGuid)
 {
-    memset(m_ullId, 0, sizeof(m_ullId));
+    try
+    {
+        string str(strGuid);
+        str.erase(0, str.find_first_not_of(" {"));
+        str.resize(str.find_last_not_of(" }") + 1);
+        str[str.find('-')] = ' ';
+        str[str.find('-')] = ' ';
+        str[str.find('-')] = ' ';
+        str[str.find('-')] = ' ';
+
+        istringstream is(str);
+        is >> hex >> ulD1 >> wD2 >> wD3 >> wD4 >> getUINT64(ullD5);
+    }
+    catch (const exception&)
+    {
+        throw EInvalidGuidString();
+    }
 }
 
-CIdentity::CIdentity(const string& strId)
+CIdentity::operator string(void) const
 {
-    if (strId.length() != CIdentity::s_nIdStrLen ||
-        strId[8] != '-' ||
-        strId[13] != '-' ||
-        strId[18] != '-' ||
-        strId[23] != '-')
-        throw runtime_error(
-            __FUNCTION__ ": Error GUID format " + strId);
-
-    string strIdCopy(strId);
-    strIdCopy.erase(23, 1);
-    strIdCopy[18] = ' ';
-    strIdCopy.erase(13, 1);
-    strIdCopy.erase(8, 1);
-
-    istringstream is(strIdCopy);
-    is >> hex >> m_ullId[0] >> m_ullId[1];
-    if (!is)
-        throw runtime_error(
-            __FUNCTION__ ": GUID contains invalid characters" + strId);
+    ostringstream os;
+    os << hex << setfill('0')
+        << setw(8) << ulD1 << '-'
+        << setw(4) << wD2 << '-'
+        << setw(4) << wD3 << '-'
+        << setw(4) << wD4 << '-'
+        << setw(12) << putUINT64(ullD5);
+    return os.str();
 }
 
-CIdentity::CIdentity(const CIdentity& idRight)
+template <class _E, class _Tr>
+basic_istream<_E, _Tr>& CIdentity::ReadId(basic_istream<_E, _Tr>& is)
 {
-    memmove(m_ullId, idRight.m_ullId, sizeof(m_ullId));
-}
-
-bool CIdentity::operator < (const CIdentity& idRight) const
-{
-    return memcmp(m_ullId, idRight.m_ullId, sizeof(m_ullId)) < 0;
-}
-
-istream& operator >> (istream& is, CIdentity& idRight)
-{
-    string strId;
-    is >> strId;
-    if (!!is)
-        idRight = CIdentity(strId);
+    string str;
+    if (!!(is >> str))
+        *this = CIdentity(str);
     return is;
 }
 
-ostream& operator << (ostream& os, const CIdentity& idRight)
+template <class _E, class _Tr>
+basic_ostream<_E, _Tr>& CIdentity::WriteId(basic_ostream<_E, _Tr>& os)
 {
-    return os << hex << setfill('0')
-        << setw(8) << (unsigned long)(idRight.m_ullId[0] >> 32) << '-'
-        << setw(4) << (unsigned short)(idRight.m_ullId[0] >> 16) << '-'
-        << setw(4) << (unsigned short)idRight.m_ullId[0] << '-'
-        << setw(4) << (unsigned short)(idRight.m_ullId[1] >> 48) << '-'
-        << setw(12) <<  (idRight.m_ullId[1] & 0xffffffffffffULL);
+    return os << (string)(*this);
 }
 
-class CInputFile : public CObjRoot
+template <class _E, class _Tr>
+basic_istream<_E, _Tr>& operator >> (basic_istream<_E, _Tr>& is, CIdentity& id)
 {
-protected:
-    CInputFile(const string&);
-    CInputFile(istream&);
-    istream& GetLine(string&);
+    return id.ReadId(is);
+}
 
-private:
-    CInputFile(const CInputFile&);
-    CInputFile& operator = (const CInputFile&);
+template <class _E, class _Tr>
+basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, CIdentity id)
+{
+    return id.WriteId(os);
+}
 
-private:
-    auto_ptr<istream> m_pIs;
-
-protected:
-    istream& m_is;
+template <class T>
+class IVectorContainerByReference : virtual public CObjRoot, public vector<T*>
+{
 };
 
-CInputFile::CInputFile(const string& strFName)
-: m_pIs(new ifstream(strFName.c_str()))
-, m_is(*m_pIs)
+template <class T>
+class IMapContainer : virtual public CObjRoot, public map<CIdentity, T>
 {
-    if (!m_is)
-        throw runtime_error(__FUNCTION__ ": Error opening input file " + strFName);
-}
-
-CInputFile::CInputFile(istream& is)
-: m_is(is)
-{
-    if (!m_is)
-        throw runtime_error(__FUNCTION__ ": Error opening input stream");
-}
-
-istream& CInputFile::GetLine(string& strALine)
-{
-    if (!!m_is)
-        while (!!getline(m_is, strALine))
-        {
-            string::size_type pos = strALine.find_last_not_of(' ');
-            if (pos != string::npos)
-            {
-                strALine.erase(pos + 1);
-                strALine.erase(0, strALine.find_first_not_of(' '));
-                break;
-            }
-        }
-    return m_is;
-}
-
-class CIdAddressPathMap : public CInputFile, public map<CIdentity, pair<ulonglong_t, string> >
-{
-public:
-    CIdAddressPathMap(istream&);
 };
 
-CIdAddressPathMap::CIdAddressPathMap(istream& is)
-: CInputFile(is)
+struct ISymbol : virtual public CObjRoot
 {
-    key_type k;
-    mapped_type m;
-    while (!!(m_is >> hex >> k >> m.first) && !!GetLine(m.second))
-        if (!insert(value_type(k, m)).second)
-            throw runtime_error(__FUNCTION__ ": Duplicated files");
-}
+    string strAddress;
+    string strName;
+    string strFrom;
+    UINT64 ullRva;
+    bool bStatic;
+    bool bFunction;
+    virtual void Relocate(UINT64)=0;
+};
 
-class CSymbol : public CObjRoot
+class IModule : public IVectorContainerByReference<ISymbol>
 {
 public:
-    string m_strAddress;
-    string m_strName;
-    ulonglong_t m_ullRva;
-    string m_strFrom;
-    bool m_bStatic;
-    bool m_bFunction;
+    string strName;
+    CIdentity id;
+    virtual UINT64 BaseAddress(void) const=0;
+    virtual UINT64 BaseAddress(UINT64)=0;
+    virtual const ISymbol *EntryPoint(void) const=0;
+};
 
-    CSymbol()
+class IFirmwareVolume : public IVectorContainerByReference<IModule>
+{
+};
+
+class IMapFileSet : public IMapContainer<istream*>
+{
+};
+
+class IFfsSet : public IMapContainer<UINT64>
+{
+};
+
+class CFfsSetFromLogFile : public IFfsSet
+{
+public:
+    CFfsSetFromLogFile(const string&);
+};
+
+CFfsSetFromLogFile::CFfsSetFromLogFile(const string& strFName)
+{
+    ifstream ifs(strFName.c_str());
+    if (!ifs)
+        throw EFileNotFound(strFName);
+
+    CIdentity ffsId;
+    while (!!ffsId.ReadId(ifs))
     {
+        UINT64 ullBase;
+        if (!(ifs >> hex >> getUINT64(ullBase)))
+            throw EUnexpectedLogFileToken();
+        if (!insert(value_type(ffsId, ullBase)).second)
+            throw EDuplicatedFfsFile();
     }
-    CSymbol(const string&, bool = false);
-    friend ostream& operator << (ostream&, const CSymbol&);
-};
-
-CSymbol::CSymbol(const string& strALine, bool bStatic)
-: m_bStatic(bStatic)
-{
-    istringstream is(strALine);
-
-    is >> m_strAddress >> m_strName >> hex >> m_ullRva >> m_strFrom;
-    if (m_strFrom == "F" || m_strFrom == "f")
-    {
-        m_bFunction = true;
-        is >> m_strFrom;
-    } else m_bFunction = false;
 }
 
-ostream& operator << (ostream& os, const CSymbol& symbol)
-{
-    os << hex << setw(16) << setfill('0') << symbol.m_ullRva << setw(0);
-    os << ' ' << (symbol.m_bFunction ? 'F' : ' ')
-        << (symbol.m_bStatic ? 'S' : ' ') << ' ';
-    return os << symbol.m_strName;
-}
-
-class CMapFile : public CInputFile, public list<CSymbol>
+class CMapFileSetFromInfFile : public IMapFileSet
 {
 public:
-    CMapFile(const string&);
-
-    void SetLoadAddress(ulonglong_t);
-
-    string m_strModuleName;
-    ulonglong_t m_ullLoadAddr;
-    string m_strEntryPoint;
+    CMapFileSetFromInfFile(const string&);
+    ~CMapFileSetFromInfFile();
 };
 
-CMapFile::CMapFile(const string& strFName)
-: CInputFile(strFName)
+CMapFileSetFromInfFile::CMapFileSetFromInfFile(const string& strFName)
+{
+    static const char cszEfiFileName[] = "EFI_FILE_NAME";
+
+    ifstream ifs(strFName.c_str());
+    if (!ifs)
+        throw EFileNotFound(strFName);
+
+    string strFile;
+    getline(ifs, strFile, ifstream::traits_type::to_char_type(ifstream::traits_type::eof()));
+    strFile.erase(0, strFile.find("[files]"));
+
+    istringstream is(strFile);
+    string strTmp;
+    while (!!getline(is, strTmp))
+    {
+        string::size_type pos = strTmp.find(cszEfiFileName);
+        if (pos == string::npos)
+            continue;
+
+        strTmp.erase(0, strTmp.find_first_not_of(" =", pos + sizeof(cszEfiFileName) - 1));
+        pos = strTmp.find_last_of("\\/");
+        string strId(
+            strTmp.begin() + pos + 1,
+            strTmp.begin() + strTmp.find('-', strTmp.find('-', strTmp.find('-', strTmp.find('-', strTmp.find('-') + 1) + 1) + 1) + 1)
+            );
+        strTmp.erase(pos + 1, strId.length() + 1);
+        strTmp.replace(strTmp.rfind('.'), string::npos, ".map");
+
+        istream *ifmaps = new ifstream(strTmp.c_str());
+        if (ifmaps && !!*ifmaps &&
+            !insert(value_type(CIdentity(strId), ifmaps)).second)
+                throw EDuplicatedFfsFile();
+    }
+}
+
+CMapFileSetFromInfFile::~CMapFileSetFromInfFile()
+{
+    for (iterator i = begin(); i != end(); i++)
+        delete i->second;
+}
+
+class CSymbolFromString : public ISymbol
+{
+public:
+    CSymbolFromString(const string&, bool = false);
+    void Relocate(UINT64);
+};
+
+CSymbolFromString::CSymbolFromString(const string& strSymbol, bool b)
+{
+    bStatic = b;
+
+    istringstream is(strSymbol);
+    is >> strAddress >> strName >> getUINT64(ullRva) >> strFrom;
+    if (strFrom == "f")
+    {
+        bFunction = true;
+        is >> strFrom;
+    }
+    else bFunction = false;
+    if (!is)
+        throw EUnexpectedMapFile("Symbol line format");
+}
+
+void CSymbolFromString::Relocate(UINT64 ullDelta)
+{
+    if (ullRva > 0)
+        ullRva += ullDelta;
+}
+
+class CModuleFromMap : public IModule
+{
+public:
+    CModuleFromMap(istream&);
+    ~CModuleFromMap();
+
+    UINT64 BaseAddress() const;
+    UINT64 BaseAddress(UINT64);
+    const ISymbol *EntryPoint() const;
+
+private:
+    UINT64 m_ullLoadAddress;
+    iterator m_iEntryPoint;
+
+    static pair<string, string::size_type> FindToken(istream&, const string&);
+};
+
+pair<string, string::size_type> CModuleFromMap::FindToken(istream& is, const string& strToken)
+{
+    for (string strTmp; !!getline(is, strTmp);)
+    {
+        string::size_type pos = strTmp.find(strToken);
+        if (pos != string::npos)
+            return pair<string, string::size_type>(strTmp, pos);
+    }
+    throw EUnexpectedMapFile(strToken);
+}
+
+CModuleFromMap::CModuleFromMap(istream& imaps)
 {
     static const char cszLoadAddr[] = "Preferred load address is";
     static const char cszGlobal[] = "Address";
     static const char cszEntryPoint[] = "entry point at";
     static const char cszStatic[] = "Static symbols";
 
-    string strALine;
+    pair<string, string::size_type> pairTmp;
+    istringstream iss;
 
-    GetLine(m_strModuleName);
+    getline(imaps, strName);
+    strName.erase(0, strName.find_first_not_of(' '));
 
-    while (!!GetLine(strALine) && strALine.compare(0, sizeof(cszLoadAddr) - 1, cszLoadAddr));
-    if (!m_is)
-        throw runtime_error(__FUNCTION__ ": Load Address not listed in map file");
+    pairTmp = FindToken(imaps, cszLoadAddr);
+    iss.str(pairTmp.first.substr(pairTmp.second + sizeof(cszLoadAddr) - 1));
+    iss >> getUINT64(m_ullLoadAddress);
 
-    istringstream is(strALine.substr(sizeof(cszLoadAddr) - 1));
-    if (!(is >> hex >> m_ullLoadAddr))
-        throw runtime_error(__FUNCTION__ ": Unexpected Load Address format");
+    pairTmp = FindToken(imaps, cszGlobal);
+    while (!!getline(imaps, pairTmp.first) &&
+            pairTmp.first.find(cszEntryPoint) == string::npos)
+        if (pairTmp.first.find_first_not_of(' ') != string::npos)
+            push_back(new CSymbolFromString(pairTmp.first));
 
-    while (!!GetLine(strALine) && strALine.compare(0, sizeof(cszGlobal) - 1, cszGlobal));
-    if (!m_is)
-        throw runtime_error(__FUNCTION__ ": Global symbols not found in map file");
+    iss.str(pairTmp.first.substr(pairTmp.first.find(cszEntryPoint) + sizeof(cszEntryPoint) - 1));
+    iss.clear();
+    string strEntryPoint;
+    iss >> strEntryPoint;
 
-    while (!!GetLine(strALine) && strALine.compare(0, sizeof(cszEntryPoint) - 1, cszEntryPoint))
-        push_back(CSymbol(strALine));
-    if (!m_is)
-        throw runtime_error(__FUNCTION__ ": Entry Point not listed in map file");
+    pairTmp = FindToken(imaps, cszStatic);
+    if (pairTmp.second)
+        while (!!getline(imaps, pairTmp.first))
+            if (pairTmp.first.find_first_not_of(' ') != string::npos)
+                push_back(new CSymbolFromString(pairTmp.first, true));
 
-    is.str(strALine.substr(strALine.find_first_not_of(' ', sizeof(cszEntryPoint) - 1)));
-    is.clear();
-    if (!getline(is, m_strEntryPoint))
-        throw runtime_error(__FUNCTION__ ": Unexpected Entry Point format");
-
-    while (!!GetLine(strALine) && strALine.compare(0, sizeof(cszStatic) - 1, cszStatic));
-    while (!!GetLine(strALine))
-        push_back(CSymbol(strALine, true));
+    for (m_iEntryPoint = begin();
+         m_iEntryPoint != end() && (*m_iEntryPoint)->strAddress != strEntryPoint;
+         m_iEntryPoint++);
+    if (m_iEntryPoint == end())
+        throw EUnexpectedMapFile("Entry point not found");
 }
 
-void CMapFile::SetLoadAddress(ulonglong_t ullLoadAddr)
+CModuleFromMap::~CModuleFromMap()
 {
     for (iterator i = begin(); i != end(); i++)
-        if (i->m_ullRva >= m_ullLoadAddr)
-            i->m_ullRva += ullLoadAddr - m_ullLoadAddr;
-    m_ullLoadAddr = ullLoadAddr;
+        delete *i;
 }
 
-class COutputFile : public CObjRoot
+UINT64 CModuleFromMap::BaseAddress(void) const
 {
-protected:
-    COutputFile(ostream&);
-    ostream& m_os;
+    return m_ullLoadAddress;
+}
 
-private:
-    COutputFile(const COutputFile&);
-    COutputFile& operator = (const COutputFile&);
-};
+UINT64 CModuleFromMap::BaseAddress(UINT64 ullNewBase)
+{
+    ullNewBase -= m_ullLoadAddress;
+    for (iterator i = begin(); i != end(); i++)
+        (*i)->Relocate(ullNewBase);
+    m_ullLoadAddress += ullNewBase;
+    return m_ullLoadAddress - ullNewBase;
+}
 
-class CFvMapFile : public CObjRoot, public map<CIdentity, CMapFile*>
+const ISymbol *CModuleFromMap::EntryPoint(void) const
+{
+    return *m_iEntryPoint;
+}
+
+class CFvMap : public IFirmwareVolume
 {
 public:
-    CFvMapFile(const CIdAddressPathMap&);
-    ~CFvMapFile(void);
-
-    friend ostream& operator << (ostream&, const CFvMapFile&);
+    CFvMap(IFfsSet*, IMapFileSet*);
+    ~CFvMap();
 
 private:
-    void Cleanup(void);
+    CFvMap(const CFvMap&);
 };
 
-CFvMapFile::CFvMapFile(const CIdAddressPathMap& idAddrPath)
+CFvMap::CFvMap(IFfsSet *pFfsSet, IMapFileSet *pMapSet)
 {
-    for (CIdAddressPathMap::const_iterator i = idAddrPath.begin(); i != idAddrPath.end(); i++)
+    for (IFfsSet::iterator i = pFfsSet->begin(); i != pFfsSet->end(); i++)
     {
-        if (i->second.second == "*")
-            continue;
-
-        try
+        IMapFileSet::iterator j = pMapSet->find(i->first);
+        if (j != pMapSet->end())
         {
-            pair<iterator, bool> r = insert(value_type(i->first,
-              new CMapFile(i->second.second.substr(0, i->second.second.rfind('.')) + ".map")));
-            r.first->second->SetLoadAddress(i->second.first);
-        }
-        catch (const runtime_error& e)
-        {
+            IModule *pModule = new CModuleFromMap(*j->second);
+            pModule->id = i->first;
+            pModule->BaseAddress(i->second);
+            push_back(pModule);
         }
     }
 }
 
-CFvMapFile::~CFvMapFile(void)
-{
-    Cleanup();
-}
-
-void CFvMapFile::Cleanup(void)
+CFvMap::~CFvMap()
 {
     for (iterator i = begin(); i != end(); i++)
-        delete i->second;
+        delete *i;
 }
 
-static bool map_less(const CFvMapFile::const_iterator& l, const CFvMapFile::const_iterator& r)
+class CFvMapFormatter : public CObjRoot
 {
-    return l->second->m_ullLoadAddr < r->second->m_ullLoadAddr;
-}
+public:
+    CFvMapFormatter(const IFirmwareVolume *pFv) : m_pFv(pFv) {}
+    CFvMapFormatter(const CFvMapFormatter& r) : m_pFv(r.m_pFv) {}
 
-ostream& operator << (ostream& os, const CFvMapFile& fvMap)
+    template <class _E, class _Tr>
+    friend basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>&, CFvMapFormatter);
+
+private:
+    static bool Less(const IModule*, const IModule*);
+
+private:
+    const IFirmwareVolume *m_pFv;
+};
+
+template <class _E, class _Tr>
+basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, CFvMapFormatter fvMapFmt)
 {
-    vector<CFvMapFile::const_iterator> rgIter;
-    rgIter.reserve(fvMap.size());
-    for (CFvMapFile::const_iterator i = fvMap.begin(); i != fvMap.end(); i++)
-        rgIter.push_back(i);
-    sort(rgIter.begin(), rgIter.end(), map_less);
-
-    for (vector<CFvMapFile::const_iterator>::const_iterator i = rgIter.begin(); i != rgIter.end(); i++)
+    vector<IModule*> rgMods(fvMapFmt.m_pFv->begin(), fvMapFmt.m_pFv->end());
+    sort(rgMods.begin(), rgMods.end(), CFvMapFormatter::Less);
+    for (vector<IModule*>::iterator i = rgMods.begin(); i != rgMods.end(); i++)
     {
-        CMapFile::const_iterator j = (*i)->second->begin();
-        while (j != (*i)->second->end() && j->m_strAddress != (*i)->second->m_strEntryPoint) j++;
-        if (j == (*i)->second->end())
-            throw runtime_error(
-                __FUNCTION__ ":Entry point not found for module " +
-                (*i)->second->m_strModuleName);
+        os << (*i)->strName << hex << " (BaseAddress=" << putUINT64((*i)->BaseAddress());
+        os << ", EntryPoint=" << hex << putUINT64((*i)->EntryPoint()->ullRva);
+        os << ", GUID=";
+        (*i)->id.WriteId(os);
+        os << ")" << endl << endl;
 
-        os << hex
-            << (*i)->second->m_strModuleName
-            << " (EntryPoint=" << j->m_ullRva
-            << ", BaseAddress=" << (*i)->second->m_ullLoadAddr
-            << ", GUID=" << (*i)->first
-            << ")" << endl << endl;
-
-        for (j = (*i)->second->begin(); j != (*i)->second->end(); j++)
-            os << "  " << *j << endl;
+        for (IModule::iterator j = (*i)->begin(); j != (*i)->end(); j++)
+        {
+            os << hex << "  " << setw(16) << setfill('0') << putUINT64((*j)->ullRva);
+            os << ((*j)->bFunction ? " F" : "  ")
+                << ((*j)->bStatic ? "S " : "  ")
+                << (*j)->strName << endl;
+        }
 
         os << endl << endl;
     }
-
     return os;
 }
 
-class CGenFvMapUsage : public invalid_argument
+bool CFvMapFormatter::Less(const IModule *pModL, const IModule *pModR)
+{
+    return pModL->BaseAddress() < pModR->BaseAddress();
+}
+
+class CApplication : public CObjRoot
 {
 public:
-    CGenFvMapUsage(void) : invalid_argument(s_szUsage)
-    {
-    }
-
-private:
-    static const char s_szUsage[];
-};
-
-const char CGenFvMapUsage::s_szUsage[] = "Usage: GenFvMap <LOG> <MAP>";
-
-class CGenFvMapApp : public CObjRoot
-{
-public:
-    CGenFvMapApp(int, char *[]);
-    ~CGenFvMapApp(void);
-
+    CApplication(int, char**);
     int Run(void);
 
 private:
-    int m_cArgc;
-    char **m_ppszArgv;
+    char **m_ppszArg;
+private:
+    CApplication(const CApplication&);
 };
 
-CGenFvMapApp::CGenFvMapApp(int cArgc, char *ppszArgv[])
-: m_cArgc(cArgc)
-, m_ppszArgv(ppszArgv)
+CApplication::CApplication(int cArg, char *ppszArg[])
+: m_ppszArg(ppszArg)
 {
-    if (cArgc != 3)
-        throw CGenFvMapUsage();
+    if (cArg != 4)
+        throw EUsage();
 }
 
-CGenFvMapApp::~CGenFvMapApp(void)
+int CApplication::Run(void)
 {
-}
-
-int CGenFvMapApp::Run(void)
-{
-    ifstream isLog(m_ppszArgv[1]);
-    CIdAddressPathMap idAddrPath(isLog);
-    CFvMapFile fvMap(idAddrPath);
-
-    ofstream osMap(m_ppszArgv[2], ios_base::out | ios_base::trunc);
-    osMap << fvMap;
-
-    if (!osMap)
-        throw runtime_error(__FUNCTION__ ": Error writing output file");
-
+    CFfsSetFromLogFile ffsSet(m_ppszArg[1]);
+    CMapFileSetFromInfFile mapSet(m_ppszArg[2]);
+    ofstream ofs(m_ppszArg[3]);
+    CFvMap fvMap(&ffsSet, &mapSet);
+    ofs << CFvMapFormatter(&fvMap);
     return 0;
 }
 
@@ -462,7 +649,7 @@ int main(int argc, char *argv[])
 {
     try
     {
-        CGenFvMapApp app(argc, argv);
+        CApplication app(argc, argv);
         return app.Run();
     }
     catch (const exception& e)
@@ -471,3 +658,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 }
+
+#ifdef _DDK3790x1830_WORKAROUND
+extern "C" void __fastcall __security_check_cookie(int)
+{
+}
+#endif
