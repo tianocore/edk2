@@ -507,7 +507,9 @@ Error:
     // Free private data
     //
     if (Private != NULL) {
-      FreePool (Private->LineBuffer);
+      if (Private->LineBuffer != NULL) {
+        FreePool (Private->LineBuffer);
+      }
       FreePool (Private);
     }
   }
