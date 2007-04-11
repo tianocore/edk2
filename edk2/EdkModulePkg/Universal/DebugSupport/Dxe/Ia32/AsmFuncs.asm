@@ -164,7 +164,7 @@ WriteInterruptFlag  PROC C PUBLIC State:DWORD
                 and     eax, 200h
                 shr     eax, 9
                 mov     ecx, State
-                .IF     ecx == 0
+                .IF     cl == 0
                         cli
                 .ELSE
                         sti

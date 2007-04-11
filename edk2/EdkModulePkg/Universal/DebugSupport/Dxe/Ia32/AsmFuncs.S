@@ -55,7 +55,7 @@ ASM_PFX(WriteInterruptFlag):
         and    $0x200,%eax
         shr    $0x9,%eax
         mov    0x8(%ebp),%ecx
-        or     %ecx,%ecx
+        or     %cl,%cl
         jne    ASM_PFX(WriteInterruptFlag+0x17)
         cli    
         jmp    ASM_PFX(WriteInterruptFlag+0x18)
