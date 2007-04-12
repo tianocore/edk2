@@ -1,22 +1,22 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  PciLib.c 
-  
+  PciLib.c
+
 Abstract:
 
   PCI Bus Driver Lib file
-  It abstracts some functions that can be different 
+  It abstracts some functions that can be different
   between light PCI bus driver and full PCI bus driver
 
 Revision History
@@ -175,7 +175,7 @@ Returns:
   if (!gFullEnumeration) {
 
     Address = 0;
-    PciIoDevice->PciIo.Pci.Read (
+    PciIoRead (
                             &(PciIoDevice->PciIo),
                             EfiPciIoWidthUint32,
                             0x1c,
@@ -188,7 +188,7 @@ Returns:
     (PciIoDevice->PciBar)[P2C_MEM_1].BarType      = PciBarTypeMem32;
 
     Address = 0;
-    PciIoDevice->PciIo.Pci.Read (
+    PciIoRead (
                             &(PciIoDevice->PciIo),
                             EfiPciIoWidthUint32,
                             0x20,
@@ -200,7 +200,7 @@ Returns:
     (PciIoDevice->PciBar)[P2C_MEM_2].BarType      = PciBarTypePMem32;
 
     Address = 0;
-    PciIoDevice->PciIo.Pci.Read (
+    PciIoRead (
                             &(PciIoDevice->PciIo),
                             EfiPciIoWidthUint32,
                             0x2c,
@@ -212,7 +212,7 @@ Returns:
     (PciIoDevice->PciBar)[P2C_IO_1].BarType     = PciBarTypeIo16;
 
     Address = 0;
-    PciIoDevice->PciIo.Pci.Read (
+    PciIoRead (
                             &(PciIoDevice->PciIo),
                             EfiPciIoWidthUint32,
                             0x34,
@@ -276,19 +276,19 @@ Returns:
       // Skip rejection for all PPBs, while detect rejection for others
       //
       if (IsPciDeviceRejected (Temp)) {
-                
+
         //
         // For P2C, remove all devices on it
         //
-                
+
         if (!IsListEmpty (&Temp->ChildList)) {
           RemoveAllPciDeviceOnBridge (RootBridgeHandle, Temp);
         }
-        
+
         //
         // Finally remove itself
         //
-        
+
         LastLink = CurrentLink->BackLink;
         RemoveEntryList (CurrentLink);
         FreePciDevice (Temp);
@@ -316,7 +316,7 @@ PciHostBridgeResourceAllocator (
     return PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
              PciResAlloc
              );
-  }  
+  }
 }
 
 
@@ -366,7 +366,7 @@ Returns:
   //
   // Initialize resource pool
   //
-  
+
   InitializeResourcePool (&IoPool, PciBarTypeIo16);
   InitializeResourcePool (&Mem32Pool, PciBarTypeMem32);
   InitializeResourcePool (&PMem32Pool, PciBarTypePMem32);
@@ -479,7 +479,7 @@ Returns:
         Mem32Bridge->Alignment = MaxOptionRomSize - 1;
       }
     }
-    
+
     //
     // Based on the all the resource tree, contruct ACPI resource node to
     // submit the resource aperture to pci host bridge protocol
@@ -516,8 +516,8 @@ Returns:
     //
     // Free acpi resource node
     //
-    if (AcpiConfig) {
-      gBS->FreePool (AcpiConfig);
+    if (AcpiConfig != NULL) {
+      FreePool (AcpiConfig);
     }
 
     if (EFI_ERROR (Status)) {
@@ -575,7 +575,7 @@ Returns:
     if (RootBridgeDev == NULL) {
       return EFI_NOT_FOUND;
     }
-    
+
     //
     // Get acpi resource node for all the resource types
     //
@@ -671,7 +671,7 @@ Returns:
       );
 
     if (AcpiConfig != NULL) {
-      gBS->FreePool (AcpiConfig);
+      FreePool (AcpiConfig);
     }
   }
 
@@ -758,7 +758,7 @@ Returns:
 
     //
     // Initialize resource pool
-    //    
+    //
     InitializeResourcePool (&IoPool, PciBarTypeIo16);
     InitializeResourcePool (&Mem32Pool, PciBarTypeMem32);
     InitializeResourcePool (&PMem32Pool, PciBarTypePMem32);
@@ -871,8 +871,8 @@ Returns:
             Mem32Bridge->Alignment = MaxOptionRomSize - 1;
           }
         }
-      }    
-      
+      }
+
       //
       // Based on the all the resource tree, contruct ACPI resource node to
       // submit the resource aperture to pci host bridge protocol
@@ -911,7 +911,7 @@ Returns:
       // Free acpi resource node
       //
       if (AcpiConfig != NULL) {
-        gBS->FreePool (AcpiConfig);
+        FreePool (AcpiConfig);
       }
 
       if (EFI_ERROR (Status)) {
@@ -930,7 +930,7 @@ Returns:
     //
     // Notify pci bus driver starts to program the resource
     //
-   
+
     Status = NotifyPhase (PciResAlloc, EfiPciHostBridgeAllocateResources);
 
     if (!EFI_ERROR (Status)) {
@@ -939,11 +939,11 @@ Returns:
       //
       break;
     }
-      
+
     //
     // If the resource allocation is unsuccessful, free resources on bridge
     //
-            
+
     RootBridgeDev     = NULL;
     RootBridgeHandle  = 0;
 
@@ -961,7 +961,7 @@ Returns:
       if (RootBridgeDev == NULL) {
         return EFI_NOT_FOUND;
       }
- 
+
       //
       // Get host bridge handle for status report
       //
@@ -994,7 +994,7 @@ Returns:
           &Mem64ResStatus,
           &PMem64ResStatus
           );
-        gBS->FreePool (AcpiConfig);
+        FreePool (AcpiConfig);
       }
     }
     //
@@ -1081,7 +1081,7 @@ Returns:
     if (RootBridgeDev == NULL) {
       return EFI_NOT_FOUND;
     }
-    
+
     //
     // Get acpi resource node for all the resource types
     //
@@ -1209,16 +1209,16 @@ PciScanBus (
 {
   if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
     return PciScanBus_WithHotPlugDeviceSupport (
-      Bridge, 
-      StartBusNumber, 
-      SubBusNumber, 
+      Bridge,
+      StartBusNumber,
+      SubBusNumber,
       PaddedBusRange
       );
   } else {
     return PciScanBus_WithoutHotPlugDeviceSupport (
-      Bridge, 
-      StartBusNumber, 
-      SubBusNumber, 
+      Bridge,
+      StartBusNumber,
+      SubBusNumber,
       PaddedBusRange
       );
   }
@@ -1282,7 +1282,7 @@ Returns:
                 Func
                 );
 
-      if (!EFI_ERROR (Status)   && 
+      if (!EFI_ERROR (Status)   &&
           (IS_PCI_BRIDGE (&Pci) ||
           IS_CARDBUS_BRIDGE (&Pci))) {
 
@@ -1310,8 +1310,9 @@ Returns:
 
         Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint16,
                                         Address,
                                         1,
@@ -1322,8 +1323,9 @@ Returns:
         // Initialize SubBusNumber to SecondBus
         //
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -1339,8 +1341,9 @@ Returns:
           //
           Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
           Register  = 0xFF;
-          Status = PciRootBridgeIo->Pci.Write (
+          Status = PciRootBridgeIoWrite (
                                           PciRootBridgeIo,
+                                          &Pci,
                                           EfiPciWidthUint8,
                                           Address,
                                           1,
@@ -1373,8 +1376,9 @@ Returns:
 
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -1476,7 +1480,7 @@ Returns:
 
         continue;
       }
-      
+
       //
       // Get the PCI device information
       //
@@ -1507,7 +1511,7 @@ Returns:
             EfiPciBeforeChildBusEnumeration
             );
       }
-      
+
       //
       // For Pci Hotplug controller devcie only
       //
@@ -1530,14 +1534,14 @@ Returns:
                                         Event,
                                         &State
                                         );
-                                        
+
             PreprocessController (
               PciDevice,
               PciDevice->BusNumber,
               PciDevice->DeviceNumber,
               PciDevice->FunctionNumber,
               EfiPciBeforeChildBusEnumeration
-            );                                        
+            );
             continue;
           }
         }
@@ -1552,7 +1556,7 @@ Returns:
         if (gPciHotPlugInit != NULL) {
 
           if (IsRootPciHotPlugBus (PciDevice->DevicePath, &HpIndex)) {
-          
+
             //
             // If it is initialized, get the padded bus range
             //
@@ -1593,8 +1597,9 @@ Returns:
         Register  = (UINT16) ((SecondBus << 8) | (UINT16) StartBusNumber);
         Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint16,
                                         Address,
                                         1,
@@ -1606,14 +1611,15 @@ Returns:
         // If it is PPB, resursively search down this bridge
         //
         if (IS_PCI_BRIDGE (&Pci)) {
-          
+
           //
           // Initialize SubBusNumber to Maximum bus number
           //
           Register  = 0xFF;
           Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-          Status = PciRootBridgeIo->Pci.Write (
+          Status = PciRootBridgeIoWrite (
                                           PciRootBridgeIo,
+                                          &Pci,
                                           EfiPciWidthUint8,
                                           Address,
                                           1,
@@ -1661,8 +1667,9 @@ Returns:
         //
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -1691,7 +1698,7 @@ PciRootBridgeP2CProcess (
 /*++
 
 Routine Description:
-  
+
     Process Option Rom on this host bridge
 
 Arguments:
@@ -1719,7 +1726,7 @@ Returns:
     if (IS_CARDBUS_BRIDGE (&Temp->Pci)) {
 
       if (gPciHotPlugInit && Temp->Allocated) {
-        
+
         //
         // Raise the EFI_IOB_PCI_HPC_INIT status code
         //
@@ -1769,7 +1776,7 @@ PciHostBridgeP2CProcess (
 /*++
 
 Routine Description:
-  
+
 Arguments:
 
 Returns:
@@ -1821,7 +1828,7 @@ PciHostBridgeEnumerator (
 
 Routine Description:
 
-  This function is used to enumerate the entire host bridge 
+  This function is used to enumerate the entire host bridge
   in a given platform
 
 Arguments:
@@ -1887,12 +1894,12 @@ Returns:
 
   if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
 
-    //                                                            
+    //
     // Notify the bus allocation phase is finished for the first time
-    //                                                            
+    //
     NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
-      
-                    
+
+
     if (gPciHotPlugInit != NULL) {
       //
       // Wait for all HPC initialized
@@ -1907,7 +1914,7 @@ Returns:
       // Notify the bus allocation phase is about to start for the 2nd time
       //
       NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
-    
+
       RootBridgeHandle = NULL;
       while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 
@@ -1935,7 +1942,7 @@ Returns:
           return Status;
         }
       }
-        
+
       //
       // Notify the bus allocation phase is to end
       //
@@ -2017,4 +2024,874 @@ Returns:
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Read PCI device configuration register by specified address.
+
+  This function check the incompatiblilites on PCI device. Return the register
+  value.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  PciIo               A pointer to EFI_PCI_PROTOCOL.
+  @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+STATIC
+EFI_STATUS
+ReadConfigData (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
+  IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
+  IN       UINT64                                 Width,
+  IN       UINT64                                 Address,
+  IN OUT   VOID                                   *Buffer
+  )
+{
+  EFI_STATUS                    Status;
+  UINT64                        AccessWidth;
+  EFI_PCI_REGISTER_ACCESS_DATA  *PciRegisterAccessData;
+  UINT64                        AccessAddress;
+  UINTN                         Stride;
+  UINT64                        TempBuffer;
+  UINT8                         *Pointer;
+
+  ASSERT ((PciRootBridgeIo == NULL) ^ (PciIo == NULL));
+
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_ACCESS_WIDTH_SUPPORT) {
+    //
+    // check access compatibility at first time
+    //
+    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_READ, Address & 0xff, Width, &PciRegisterAccessData);
+
+    if (Status == EFI_SUCCESS) {
+      //
+      // there exist incompatibility on this operation
+      //
+      AccessWidth = Width;
+
+      if (PciRegisterAccessData->Width != VALUE_NOCARE) {
+        AccessWidth = PciRegisterAccessData->Width;
+      }
+
+      AccessAddress = Address & ~((1 << AccessWidth) - 1);
+
+      TempBuffer    = 0;
+      Stride        = 0;
+      Pointer       = (UINT8 *) &TempBuffer;
+
+      while (1) {
+
+        if (PciRootBridgeIo != NULL) {
+          Status = PciRootBridgeIo->Pci.Read (
+                         PciRootBridgeIo,
+                         (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
+                         AccessAddress,
+                         1,
+                         Pointer
+                         );
+        } else if (PciIo != NULL) {
+          Status = PciIo->Pci.Read (
+                         PciIo,
+                         (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
+                         (UINT32) AccessAddress,
+                         1,
+                         Pointer
+                         );
+        }
+
+        if (Status != EFI_SUCCESS) {
+          return Status;
+        }
+
+        Stride = 1 << AccessWidth;
+        AccessAddress += Stride;
+        if (AccessAddress >= (Address + (1 << Width))) {
+          //
+          // if all datas have been read, exist
+          //
+          break;
+        }
+
+        Pointer += Stride;
+
+        if ((AccessAddress & 0xff) < PciRegisterAccessData->EndOffset) {
+          //
+          // if current offset doesn't reach the end
+          //
+          continue;
+        }
+
+        FreePool (PciRegisterAccessData);
+
+        //
+        // continue checking access incompatibility
+        //
+        Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_READ, AccessAddress & 0xff, AccessWidth, &PciRegisterAccessData);
+        if (Status == EFI_SUCCESS) {
+          if (PciRegisterAccessData->Width != VALUE_NOCARE) {
+            AccessWidth = PciRegisterAccessData->Width;
+          }
+        }
+      }
+
+      FreePool (PciRegisterAccessData);
+
+      switch (Width) {
+      case EfiPciWidthUint8:
+        * (UINT8 *) Buffer = (UINT8) TempBuffer;
+        break;
+      case EfiPciWidthUint16:
+        * (UINT16 *) Buffer = (UINT16) TempBuffer;
+        break;
+      case EfiPciWidthUint32:
+        * (UINT32 *) Buffer = (UINT32) TempBuffer;
+        break;
+      default:
+        return EFI_UNSUPPORTED;
+      }
+
+      return Status;
+    }
+  }
+  //
+  // AccessWidth incompatible check not supportted
+  // or, there doesn't exist incompatibility on this operation
+  //
+  if (PciRootBridgeIo != NULL) {
+    Status = PciRootBridgeIo->Pci.Read (
+                     PciRootBridgeIo,
+                     (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                     Address,
+                     1,
+                     Buffer
+                     );
+
+  } else {
+    Status = PciIo->Pci.Read (
+                     PciIo,
+                     (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
+                     (UINT32) Address,
+                     1,
+                     Buffer
+                     );
+  }
+
+  return Status;
+}
+
+/**
+  Update register value by checking PCI device incompatibility.
+
+  This function check register value incompatibilites on PCI device. Return the register
+  value.
+
+  @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
+  @param  AccessType          Access type, READ or WRITE.
+  @Param  Address             The address within the PCI configuration space.
+  @param  Buffer              Store the register data.
+
+  @retval EFI_SUCCESS         The data has been updated.
+
+**/
+STATIC
+EFI_STATUS
+UpdateConfigData (
+  IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
+  IN       UINT64                                 AccessType,
+  IN       UINT64                                 Width,
+  IN       UINT64                                 Address,
+  IN OUT   VOID                                   *Buffer
+)
+{
+  EFI_STATUS                    Status;
+  EFI_PCI_REGISTER_VALUE_DATA   *PciRegisterData;
+  UINT64                        AndValue;
+  UINT64                        OrValue;
+  UINT32                        TempValue;
+
+  //
+  // check register value incompatibility
+  //
+  Status = PciRegisterUpdateCheck (PciDeviceInfo, AccessType, Address & 0xff, &PciRegisterData);
+
+  if (Status == EFI_SUCCESS) {
+
+    AndValue = (PciRegisterData->AndValue) >> ((Address & 0x3) * 8);
+    OrValue  = (PciRegisterData->OrValue)  >> ((Address & 0x3) * 8);
+
+    TempValue = * (UINT32 *) Buffer;
+
+    if (PciRegisterData->AndValue != VALUE_NOCARE) {
+      TempValue &= (UINT32) AndValue;
+    }
+    if (PciRegisterData->OrValue != VALUE_NOCARE) {
+      TempValue |= (UINT32) OrValue;
+    }
+
+    switch (Width) {
+    case EfiPciWidthUint8:
+      *(UINT32 *)Buffer = *(UINT32 *)Buffer & 0xffffff00 + (UINT8)TempValue;
+      break;
+
+    case EfiPciWidthUint16:
+      *(UINT32 *)Buffer = *(UINT32 *)Buffer & 0xffff0000 + (UINT16)TempValue;
+      break;
+    case EfiPciWidthUint32:
+      *(UINT32 *)Buffer = TempValue;
+      break;
+
+    default:
+      return EFI_UNSUPPORTED;
+    }
+
+    FreePool (PciRegisterData);
+  }
+
+  return Status;
+}
+
+/**
+  Write PCI device configuration register by specified address.
+
+  This function check the incompatiblilites on PCI device, and write date
+  into register.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  PciIo               A pointer to EFI_PCI_PROTOCOL.
+  @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+STATIC
+EFI_STATUS
+WriteConfigData (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
+  IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
+  IN       UINT64                                 Width,
+  IN       UINT64                                 Address,
+  IN       VOID                                   *Buffer
+  )
+{
+  EFI_STATUS                    Status;
+  UINT64                        AccessWidth;
+  EFI_PCI_REGISTER_ACCESS_DATA  *PciRegisterAccessData;
+  UINT64                        AccessAddress;
+  UINTN                         Stride;
+  UINT8                         *Pointer;
+  UINT64                        Data;
+  UINTN                         Shift;
+
+  ASSERT ((PciRootBridgeIo == NULL) ^ (PciIo == NULL));
+
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_ACCESS_WIDTH_SUPPORT) {
+    //
+    // check access compatibility at first time
+    //
+    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_WRITE, Address & 0xff, Width, &PciRegisterAccessData);
+
+    if (Status == EFI_SUCCESS) {
+      //
+      // there exist incompatibility on this operation
+      //
+      AccessWidth = Width;
+
+      if (PciRegisterAccessData->Width != VALUE_NOCARE) {
+        AccessWidth = PciRegisterAccessData->Width;
+      }
+
+      AccessAddress = Address & ~((1 << AccessWidth) - 1);
+
+      Stride        = 0;
+      Pointer       = (UINT8 *) &Buffer;
+      Data          = * (UINT64 *) Buffer;
+
+      while (1) {
+
+        if (AccessWidth > Width) {
+          //
+          // if actual access width is larger than orignal one, additional data need to be read back firstly
+          //
+          Status = ReadConfigData (PciRootBridgeIo, PciIo, PciDeviceInfo, AccessWidth, AccessAddress, &Data);
+          if (Status != EFI_SUCCESS) {
+            return Status;
+          }
+
+          //
+          // check data read incompatibility
+          //
+          UpdateConfigData (PciDeviceInfo, PCI_REGISTER_READ, AccessWidth, AccessAddress & 0xff, &Data);
+
+          Shift = (Address - AccessAddress) * 8;
+          switch (Width) {
+          case EfiPciWidthUint8:
+            Data = (* (UINT8 *) Buffer) << Shift | (Data & ~(0xff << Shift));
+            break;
+
+          case EfiPciWidthUint16:
+            Data = (* (UINT16 *) Buffer) << Shift | (Data & ~(0xffff << Shift));
+            break;
+          }
+
+          //
+          // check data write incompatibility
+          //
+          UpdateConfigData (PciDeviceInfo, PCI_REGISTER_WRITE, AccessWidth, AccessAddress * 0xff, &Data);
+        }
+
+        if (PciRootBridgeIo != NULL) {
+          Status = PciRootBridgeIo->Pci.Write (
+                         PciRootBridgeIo,
+                         (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
+                         AccessAddress,
+                         1,
+                         &Data
+                         );
+        } else {
+          Status = PciIo->Pci.Write (
+                         PciIo,
+                         (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
+                         (UINT32) AccessAddress,
+                         1,
+                         &Data
+                         );
+        }
+
+        if (Status != EFI_SUCCESS) {
+          return Status;
+        }
+
+        Data = Data >> ((1 << AccessWidth) * 8);
+
+        Stride = 1 << AccessWidth;
+        AccessAddress += Stride;
+        if (AccessAddress >= (Address + (1 << Width))) {
+          //
+          // if all datas have been written, exist
+          //
+          break;
+        }
+
+        Pointer += Stride;
+
+        if ((AccessAddress & 0xff) < PciRegisterAccessData->EndOffset) {
+          //
+          // if current offset doesn't reach the end
+          //
+          continue;
+        }
+
+        FreePool (PciRegisterAccessData);
+
+        //
+        // continue checking access incompatibility
+        //
+        Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_WRITE, AccessAddress & 0xff, AccessWidth, &PciRegisterAccessData);
+        if (Status == EFI_SUCCESS) {
+          if (PciRegisterAccessData->Width != VALUE_NOCARE) {
+            AccessWidth = PciRegisterAccessData->Width;
+          }
+        }
+      };
+
+      FreePool (PciRegisterAccessData);
+
+      return Status;
+    }
+
+  }
+  //
+  // AccessWidth incompatible check not supportted
+  // or, there doesn't exist incompatibility on this operation
+  //
+  if (PciRootBridgeIo != NULL) {
+    Status = PciRootBridgeIo->Pci.Write (
+                     PciRootBridgeIo,
+                     (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                     Address,
+                     1,
+                     Buffer
+                     );
+  } else {
+    Status = PciIo->Pci.Write (
+                   PciIo,
+                   (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
+                   (UINT32) Address,
+                   1,
+                   Buffer
+                   );
+  }
+
+  return Status;
+}
+
+/**
+  Abstract PCI device device information.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  PciIo               A pointer to EFI_PCI_PROTOCOL.
+  @param  Pci                 A pointer to PCI_TYPE00.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
+
+  @retval EFI_SUCCESS         Pci device device information has been abstracted.
+
+**/
+STATIC
+EFI_STATUS
+GetPciDeviceDeviceInfo (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
+  IN       PCI_TYPE00                             *Pci,              OPTIONAL
+  IN       UINT64                                 Address,           OPTIONAL
+  OUT      EFI_PCI_DEVICE_INFO                    *PciDeviceInfo
+)
+{
+  EFI_STATUS                    Status;
+  UINT64                        PciAddress;
+  UINT32                        PciConfigData;
+  PCI_IO_DEVICE                 *PciIoDevice;
+
+  ASSERT ((PciRootBridgeIo == NULL) ^ (PciIo == NULL));
+
+  if (PciIo != NULL) {
+    PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (PciIo);
+
+    //
+    // get pointer to PCI_TYPE00 from PciIoDevice
+    //
+    Pci = &PciIoDevice->Pci;
+  }
+
+  if (Pci == NULL) {
+    //
+    // while PCI_TYPE00 hasn't been gotten, read PCI device device information directly
+    //
+    PciAddress = Address & 0xffffffffffffff00ULL;
+    Status = PciRootBridgeIo->Pci.Read (
+                                    PciRootBridgeIo,
+                                    EfiPciWidthUint32,
+                                    PciAddress,
+                                    1,
+                                    &PciConfigData
+                                    );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((PciConfigData & 0xffff) == 0xffff) {
+      return EFI_NOT_FOUND;
+    }
+
+    PciDeviceInfo->VendorID = PciConfigData & 0xffff;
+    PciDeviceInfo->DeviceID = PciConfigData >> 16;
+
+    Status = PciRootBridgeIo->Pci.Read (
+                                    PciRootBridgeIo,
+                                    EfiPciWidthUint32,
+                                    PciAddress + 8,
+                                    1,
+                                    &PciConfigData
+                                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    PciDeviceInfo->RevisionID = PciConfigData & 0xf;
+
+    Status = PciRootBridgeIo->Pci.Read (
+                                    PciRootBridgeIo,
+                                    EfiPciWidthUint32,
+                                    PciAddress + 0x2c,
+                                    1,
+                                    &PciConfigData
+                                    );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    PciDeviceInfo->SubsystemVendorID = PciConfigData & 0xffff;
+    PciDeviceInfo->SubsystemID = PciConfigData >> 16;
+
+  } else {
+    PciDeviceInfo->VendorID          = Pci->Hdr.VendorId;
+    PciDeviceInfo->DeviceID          = Pci->Hdr.DeviceId;
+    PciDeviceInfo->RevisionID        = Pci->Hdr.RevisionID;
+    PciDeviceInfo->SubsystemVendorID = Pci->Device.SubsystemVendorID;
+    PciDeviceInfo->SubsystemID       = Pci->Device.SubsystemID;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Read PCI configuration space with incompatibility check.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  PciIo               A pointer to the EFI_PCI_IO_PROTOCOL.
+  @param  Pci                 A pointer to PCI_TYPE00.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+STATIC
+EFI_STATUS
+PciIncompatibilityCheckRead (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,   OPTIONAL
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,             OPTIONAL
+  IN       PCI_TYPE00                             *Pci,               OPTIONAL
+  IN       UINTN                                  Width,
+  IN       UINT64                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+)
+{
+  EFI_STATUS                    Status;
+  EFI_PCI_DEVICE_INFO           PciDeviceInfo;
+  UINT32                        Stride;
+
+  ASSERT ((PciRootBridgeIo == NULL) ^ (PciIo == NULL));
+
+  //
+  // get PCI device device information
+  //
+  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Address, &PciDeviceInfo);
+  if (Status != EFI_SUCCESS) {
+    return Status;
+  }
+
+  Stride = 1 << Width;
+
+  for (; Count > 0; Count--, Address += Stride, Buffer = (UINT8 *)Buffer + Stride) {
+
+    //
+    // read configuration register
+    //
+    Status = ReadConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, (UINT64) Width, Address, Buffer);
+
+    if (Status != EFI_SUCCESS) {
+      return Status;
+    }
+
+    //
+    // update the data read from configuration register
+    //
+    if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT) {
+      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_READ, Width, Address & 0xff, Buffer);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Write PCI configuration space with incompatibility check.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  PciIo               A pointer to the EFI_PCI_IO_PROTOCOL.
+  @param  Pci                 A pointer to PCI_TYPE00.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+STATIC
+EFI_STATUS
+PciIncompatibilityCheckWrite (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,   OPTIONAL
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,             OPTIONAL
+  IN       PCI_TYPE00                             *Pci,               OPTIONAL
+  IN       UINTN                                  Width,
+  IN       UINT64                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+)
+{
+  EFI_STATUS                    Status;
+  EFI_PCI_DEVICE_INFO           PciDeviceInfo;
+  UINT32                        Stride;
+  UINT64                        Data;
+
+  ASSERT ((PciRootBridgeIo == NULL) ^ (PciIo == NULL));
+
+  //
+  // get PCI device device information
+  //
+  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Address, &PciDeviceInfo);
+  if (Status != EFI_SUCCESS) {
+    return Status;
+  }
+
+  Stride = 1 << Width;
+
+  for (; Count > 0; Count--, Address += Stride, Buffer = (UINT8 *) Buffer + Stride) {
+
+    Data = 0;
+
+    switch (Width) {
+    case EfiPciWidthUint8:
+      Data = * (UINT8 *) Buffer;
+      break;
+    case EfiPciWidthUint16:
+      Data = * (UINT16 *) Buffer;
+      break;
+
+    case EfiPciWidthUint32:
+      Data = * (UINT32 *) Buffer;
+      break;
+
+    default:
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // update the data writen into configuration register
+    //
+    if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT) {
+      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_WRITE, Width, Address & 0xff, &Data);
+    }
+
+    //
+    // write configuration register
+    //
+    Status = WriteConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, Width, Address, &Data);
+
+    if (Status != EFI_SUCCESS) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Read PCI configuration space through EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  Pci                 A pointer to PCI_TYPE00.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+PciRootBridgeIoRead (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
+  IN       PCI_TYPE00                             *Pci,            OPTIONAL
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN       UINT64                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+  )
+{
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_READ_SUPPORT) {
+    //
+    // if PCI incompatibility check enabled
+    //
+    return PciIncompatibilityCheckRead (
+                   PciRootBridgeIo,
+                   NULL,
+                   Pci,
+                   (UINTN) Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  } else {
+    return PciRootBridgeIo->Pci.Read (
+                   PciRootBridgeIo,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  }
+}
+
+/**
+  Write PCI configuration space through EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+
+  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param  Pci                 A pointer to PCI_TYPE00.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+PciRootBridgeIoWrite (
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
+  IN       PCI_TYPE00                             *Pci,
+  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN       UINT64                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+  )
+{
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_WRITE_SUPPORT) {
+    //
+    // if PCI incompatibility check enabled
+    //
+    return  PciIncompatibilityCheckWrite (
+                   PciRootBridgeIo,
+                   NULL,
+                   Pci,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+
+  } else {
+    return  PciRootBridgeIo->Pci.Write (
+                   PciRootBridgeIo,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  }
+}
+
+/**
+  Read PCI configuration space through EFI_PCI_IO_PROTOCOL.
+
+  @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+PciIoRead (
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
+  IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
+  IN       UINT32                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+  )
+{
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_READ_SUPPORT) {
+    //
+    // if PCI incompatibility check enabled
+    //
+    return PciIncompatibilityCheckRead (
+                   NULL,
+                   PciIo,
+                   NULL,
+                   (UINTN) Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  } else {
+    return PciIo->Pci.Read (
+                   PciIo,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  }
+}
+
+/**
+  Write PCI configuration space through EFI_PCI_IO_PROTOCOL.
+
+  @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
+  @param  Width               Signifies the width of the memory operations.
+  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Buffer              For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+PciIoWrite (
+  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
+  IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
+  IN       UINT32                                 Address,
+  IN       UINTN                                  Count,
+  IN OUT   VOID                                   *Buffer
+  )
+{
+  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_WRITE_SUPPORT) {
+
+    //
+    // if PCI incompatibility check enabled
+    //
+    return  PciIncompatibilityCheckWrite (
+                   NULL,
+                   PciIo,
+                   NULL,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+
+  } else {
+    return PciIo->Pci.Write (
+                   PciIo,
+                   Width,
+                   Address,
+                   Count,
+                   Buffer
+                   );
+  }
 }
