@@ -1035,7 +1035,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <!-- Copy the efi file to BIN and OUTPUT directory -->
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />
-          <copy file="${DEST_DIR_DEBUG}/@{FILENAME}.map" tofile="${BIN_DIR}/@{FILENAME}.map" />
+          <if>
+            <available file="${DEST_DIR_DEBUG}/@{FILENAME}.map" />
+            <then>
+              <copy file="${DEST_DIR_DEBUG}/@{FILENAME}.map" tofile="${BIN_DIR}/@{FILENAME}.map" />
+            </then>
+          </if>
         </sequential>
       </OnDependency>
     </sequential>
