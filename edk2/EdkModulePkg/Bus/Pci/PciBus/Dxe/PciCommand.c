@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciCommand.c
-  
+
 Abstract:
 
   PCI Bus Driver
@@ -56,13 +56,13 @@ Returns:
   PciIo       = &PciIoDevice->PciIo;
 
   if (Operation != EFI_SET_REGISTER) {
-    Status = PciIo->Pci.Read (
-                          PciIo,
-                          EfiPciIoWidthUint16,
-                          Offset,
-                          1,
-                          &OldCommand
-                          );
+    Status = PciIoRead (
+                         PciIo,
+                         EfiPciIoWidthUint16,
+                         Offset,
+                         1,
+                         &OldCommand
+                        );
 
     if (Operation == EFI_GET_REGISTER) {
       *PtrCommand = OldCommand;
@@ -78,13 +78,13 @@ Returns:
     OldCommand = Command;
   }
 
-  return PciIo->Pci.Write (
+  return PciIoWrite (
                       PciIo,
                       EfiPciIoWidthUint16,
                       Offset,
                       1,
                       &OldCommand
-                      );
+                    );
 }
 
 BOOLEAN
@@ -98,7 +98,7 @@ Routine Description:
 Arguments:
 
 Returns:
-  
+
   None
 
 --*/
@@ -131,7 +131,7 @@ Arguments:
   NextRegBlock        - A pointer to the next block.
 
 Returns:
-  
+
   None
 
 --*/
@@ -157,22 +157,22 @@ Returns:
     CapabilityPtr = 0;
     if (IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
 
-      PciIoDevice->PciIo.Pci.Read (
-                              &PciIoDevice->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR,
-                              1,
-                              &CapabilityPtr
-                              );
+      PciIoRead (
+                  &PciIoDevice->PciIo,
+                  EfiPciIoWidthUint8,
+                  EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR,
+                  1,
+                  &CapabilityPtr
+                );
     } else {
 
-      PciIoDevice->PciIo.Pci.Read (
-                              &PciIoDevice->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_CAPABILITY_PTR,
-                              1,
-                              &CapabilityPtr
-                              );
+      PciIoRead (
+                  &PciIoDevice->PciIo,
+                  EfiPciIoWidthUint8,
+                  EFI_PCI_CAPABILITY_PTR,
+                  1,
+                  &CapabilityPtr
+                );
     }
   }
 
@@ -181,13 +181,13 @@ Returns:
     // Mask it to DWORD alignment per PCI spec
     //
     CapabilityPtr &= 0xFC;
-    PciIoDevice->PciIo.Pci.Read (
-                            &PciIoDevice->PciIo,
-                            EfiPciIoWidthUint16,
-                            CapabilityPtr,
-                            1,
-                            &CapabilityEntry
-                            );
+    PciIoRead (
+                &PciIoDevice->PciIo,
+                EfiPciIoWidthUint16,
+                CapabilityPtr,
+                1,
+                &CapabilityEntry
+              );
 
     CapabilityID = (UINT8) CapabilityEntry;
 

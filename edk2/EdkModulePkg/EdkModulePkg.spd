@@ -8,7 +8,7 @@
     <Description>This Module provides standard reference information for EFI/Tiano implementations.</Description>
     <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
     <License>All rights reserved.
-      This program and the accompanying materials are licensed and made available 
+      This program and the accompanying materials are licensed and made available
       under the terms and conditions of the BSD License which accompanies this distribution.
       The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
@@ -71,6 +71,10 @@
     <LibraryClass Name="EdkGenericPlatformBdsLib">
       <IncludeHeader>Include/Library/EdkGenericPlatformBdsLib.h</IncludeHeader>
       <HelpText>Generic Platform Bds library</HelpText>
+    </LibraryClass>
+    <LibraryClass Name="PciIncompatibleDeviceSupportLib">
+      <IncludeHeader>Include/Library/PciIncompatibleDeviceSupportLib.h</IncludeHeader>
+      <HelpText>This library includes the PCI incompatible devices list.</HelpText>
     </LibraryClass>
   </LibraryClassDeclarations>
   <IndustryStdIncludes>
@@ -404,6 +408,7 @@
     <Filename>Library/EdkOemHookStatusCodeLibNull/EdkOemHookStatusCodeLibNull.msa</Filename>
     <Filename>Library/EdkGenericBdsLib/EdkGenericBdsLib.msa</Filename>
     <Filename>Library/EdkGenericPlatformBdsLib/EdkGenericPlatformBdsLib.msa</Filename>
+    <Filename>Library/EdkPciIncompatibleDeviceSupportLib/EdkPciIncompatibleDeviceSupportLib.msa</Filename>
     <Filename>Universal/Console/ConSplitter/Dxe/ConSplitter.msa</Filename>
     <Filename>Universal/Console/GraphicsConsole/Dxe/GraphicsConsole.msa</Filename>
     <Filename>Universal/Console/Terminal/Dxe/Terminal.msa</Filename>
@@ -919,7 +924,7 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x08</DefaultValue>
-      <HelpText>The maximum number of callback function, which will be triggered when 
+      <HelpText>The maximum number of callback function, which will be triggered when
         a PCD entry is been set, can be registered for a single PCD entry in PEI phase.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -929,7 +934,7 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x0</DefaultValue>
-      <HelpText>The base address of the VPD (Vital Product Data) region. It is 
+      <HelpText>The base address of the VPD (Vital Product Data) region. It is
         normally a region reserved on flash.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -966,7 +971,7 @@
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>TRUE</DefaultValue>
-      <HelpText>This feature flag can be used to enable or disable the Pcd PEIM database 
+      <HelpText>This feature flag can be used to enable or disable the Pcd PEIM database
         traverse capability. Disable it can reduce the size of final image generated.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -976,7 +981,7 @@
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>TRUE</DefaultValue>
-      <HelpText>This feature flag can be used to enable or disable the Pcd DXE database 
+      <HelpText>This feature flag can be used to enable or disable the Pcd DXE database
         traverse capability. Disable it can reduce the size of final image generated.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1293,6 +1298,21 @@
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>If this PCD is set as TRUE, NT emulator will be endabled.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPciIncompatibleDeviceSupportMask</C_Name>
+      <Token>0x0001003f</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT8</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0</DefaultValue>
+      <HelpText>The PCD masks for PCI incompatible devices support.
+        Acpi_Resource_Update_Support   :1;
+        Register_Read_Support          :1;
+        Register_Write_Support         :1;
+        Register_Update_Support        :1;
+        Register_Access_Width_Support  :1;
+        Reserved                       :3;</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

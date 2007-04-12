@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -335,14 +335,13 @@ Returns:
   if (!EFI_ERROR (Status)) {
     PciIoDevice->IsPciExp = TRUE;
   }
-
+  
   //
   // Force Interrupt line to "Unknown" or "No Connection"
   //
   PciIo = &(PciIoDevice->PciIo);
   Data8 = PCI_INT_LINE_UNKNOWN;
-
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
+  PciIoWrite (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
 
   //
   // Process Platform OpRom

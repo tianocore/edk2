@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciResourceSupport.c
-  
+
 Abstract:
 
   PCI Bus Driver
@@ -1222,7 +1222,7 @@ Returns:
   case PciBarTypeMem32:
   case PciBarTypePMem32:
 
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 (Node->PciDev->PciBar[Node->Bar]).Offset,
@@ -1239,7 +1239,7 @@ Returns:
 
     Address32 = (UINT32) (Address & 0x00000000FFFFFFFF);
 
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 (Node->PciDev->PciBar[Node->Bar]).Offset,
@@ -1249,7 +1249,7 @@ Returns:
 
     Address32 = (UINT32) RShiftU64 (Address, 32);
 
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 (UINT8) ((Node->PciDev->PciBar[Node->Bar]).Offset + 4),
@@ -1317,7 +1317,7 @@ Returns:
 
   case PPB_BAR_0:
   case PPB_BAR_1:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 (Node->PciDev->PciBar[Node->Bar]).Offset,
@@ -1333,7 +1333,7 @@ Returns:
   case PPB_IO_RANGE:
 
     Address32 = ((UINT32) (Address)) >> 8;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint8,
                 0x1C,
@@ -1342,7 +1342,7 @@ Returns:
                 );
 
     Address32 >>= 8;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x30,
@@ -1352,7 +1352,7 @@ Returns:
 
     Address32 = (UINT32) (Address + Node->Length - 1);
     Address32 = ((UINT32) (Address32)) >> 8;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint8,
                 0x1D,
@@ -1361,7 +1361,7 @@ Returns:
                 );
 
     Address32 >>= 8;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x32,
@@ -1376,7 +1376,7 @@ Returns:
   case PPB_MEM32_RANGE:
 
     Address32 = ((UINT32) (Address)) >> 16;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x20,
@@ -1386,7 +1386,7 @@ Returns:
 
     Address32 = (UINT32) (Address + Node->Length - 1);
     Address32 = ((UINT32) (Address32)) >> 16;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x22,
@@ -1402,7 +1402,7 @@ Returns:
   case PPB_PMEM64_RANGE:
 
     Address32 = ((UINT32) (Address)) >> 16;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x24,
@@ -1412,7 +1412,7 @@ Returns:
 
     Address32 = (UINT32) (Address + Node->Length - 1);
     Address32 = ((UINT32) (Address32)) >> 16;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint16,
                 0x26,
@@ -1421,7 +1421,7 @@ Returns:
                 );
 
     Address32 = (UINT32) RShiftU64 (Address, 32);
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x28,
@@ -1430,7 +1430,7 @@ Returns:
                 );
 
     Address32 = (UINT32) RShiftU64 ((Address + Node->Length - 1), 32);
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x2C,
@@ -1915,7 +1915,7 @@ Returns:
   switch (Node->Bar) {
 
   case P2C_BAR_0:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 (Node->PciDev->PciBar[Node->Bar]).Offset,
@@ -1928,7 +1928,7 @@ Returns:
     break;
 
   case P2C_MEM_1:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x1c,
@@ -1937,7 +1937,7 @@ Returns:
                 );
 
     TempAddress = Address + Node->Length - 1;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x20,
@@ -1950,7 +1950,7 @@ Returns:
       //
       // Set non-prefetchable bit
       //
-      PciIo->Pci.Read (
+      PciIoRead (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -1959,7 +1959,7 @@ Returns:
                   );
 
       BridgeControl &= 0xfeff;
-      PciIo->Pci.Write (
+      PciIoWrite (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -1972,7 +1972,7 @@ Returns:
       //
       // Set pre-fetchable bit
       //
-      PciIo->Pci.Read (
+      PciIoRead (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -1981,7 +1981,7 @@ Returns:
                   );
 
       BridgeControl |= 0x0100;
-      PciIo->Pci.Write (
+      PciIoWrite (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -1997,7 +1997,7 @@ Returns:
     break;
 
   case P2C_MEM_2:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x24,
@@ -2007,7 +2007,7 @@ Returns:
 
     TempAddress = Address + Node->Length - 1;
 
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x28,
@@ -2020,7 +2020,7 @@ Returns:
       //
       // Set non-prefetchable bit
       //
-      PciIo->Pci.Read (
+      PciIoRead (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -2029,7 +2029,7 @@ Returns:
                   );
 
       BridgeControl &= 0xfdff;
-      PciIo->Pci.Write (
+      PciIoWrite (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -2041,7 +2041,7 @@ Returns:
       //
       // Set pre-fetchable bit
       //
-      PciIo->Pci.Read (
+      PciIoRead (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -2050,7 +2050,7 @@ Returns:
                   );
 
       BridgeControl |= 0x0200;
-      PciIo->Pci.Write (
+      PciIoWrite (
                   PciIo,
                   EfiPciIoWidthUint16,
                   0x3e,
@@ -2065,7 +2065,7 @@ Returns:
     break;
 
   case P2C_IO_1:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x2c,
@@ -2073,7 +2073,7 @@ Returns:
                 &Address
                 );
     TempAddress = Address + Node->Length - 1;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x30,
@@ -2088,7 +2088,7 @@ Returns:
     break;
 
   case P2C_IO_2:
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x34,
@@ -2097,7 +2097,7 @@ Returns:
                 );
 
     TempAddress = Address + Node->Length - 1;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 EfiPciIoWidthUint32,
                 0x38,

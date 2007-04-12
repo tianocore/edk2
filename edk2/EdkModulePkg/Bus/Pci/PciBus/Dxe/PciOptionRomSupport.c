@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciOptionRomSupport.c
-  
+
 Abstract:
 
   PCI Bus Driver
@@ -88,8 +88,9 @@ Returns:
   AllOnes = 0xfffffffe;
   Address = EFI_PCI_ADDRESS (Bus, Device, Function, RomBarIndex);
 
-  Status = PciRootBridgeIo->Pci.Write (
+  Status = PciRootBridgeIoWrite (
                                   PciRootBridgeIo,
+                                  &PciIoDevice->Pci,
                                   EfiPciWidthUint32,
                                   Address,
                                   1,
@@ -98,12 +99,13 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // read back
   //
-  Status = PciRootBridgeIo->Pci.Read (
+  Status = PciRootBridgeIoRead (
                                   PciRootBridgeIo,
+                                  &PciIoDevice->Pci,
                                   EfiPciWidthUint32,
                                   Address,
                                   1,
@@ -334,7 +336,7 @@ Returns:
     // Clear all bars
     //
     for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
+      PciIoWrite (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
     }
     
     //
@@ -342,7 +344,7 @@ Returns:
     // enable its decoder
     //
     Value32 = RomBar | 0x1;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
                 RomBarIndex,
@@ -376,7 +378,7 @@ Returns:
     // disable rom decode
     //
     Value32 = 0xFFFFFFFE;
-    PciIo->Pci.Write (
+    PciIoWrite (
                 PciIo,
                 (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
                 RomBarIndex,

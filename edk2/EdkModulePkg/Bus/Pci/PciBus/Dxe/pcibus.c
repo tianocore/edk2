@@ -1,24 +1,24 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciBus.c
-  
+
 Abstract:
 
   PCI Bus Driver
 
 Revision History
- 
+
 --*/
 
 #include "pcibus.h"
@@ -36,7 +36,6 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
   NULL
 };
 
-EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gEfiIncompatiblePciDeviceSupport = NULL;
 EFI_HANDLE                                    gPciHostBrigeHandles[PCI_MAX_HOST_BRIDGE_NUM];
 UINTN                                         gPciHostBridgeNumber;
 BOOLEAN                                       gFullEnumeration;
@@ -68,8 +67,8 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS 
-  EFI_DEVICE_ERROR 
+  EFI_SUCCESS
+  EFI_DEVICE_ERROR
 
 --*/
 // TODO:    ImageHandle - add argument and description to function comment
@@ -101,7 +100,7 @@ Routine Description:
   Check to see if pci bus driver supports the given controller
 
 Arguments:
-  
+
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
@@ -195,13 +194,13 @@ Routine Description:
   Start to management the controller passed in
 
 Arguments:
-  
+
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
 
 Returns:
- 
+
 
 --*/
 // TODO:    This - add argument and description to function comment
@@ -210,12 +209,6 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS  Status;
-
-  Status = gBS->LocateProtocol (
-                  &gEfiIncompatiblePciDeviceSupportProtocolGuid,
-                  NULL,
-                  (VOID **) &gEfiIncompatiblePciDeviceSupport
-                  );
 
   //
   // If PCI Platform protocol is available, get it now.
@@ -240,12 +233,12 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Enable PCI device specified by remaining device path. BDS or other driver can call the
   // start more than once.
   //
-  
+
   StartPciDevices (Controller, RemainingDevicePath);
 
   return EFI_SUCCESS;
@@ -267,7 +260,7 @@ Routine Description:
   if all the the children get closed, close the protocol
 
 Arguments:
-  
+
   IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
   IN  EFI_HANDLE                    Controller,
   IN  UINTN                         NumberOfChildren,
@@ -275,7 +268,7 @@ Arguments:
 
 Returns:
 
-  
+
 --*/
 // TODO:    This - add argument and description to function comment
 // TODO:    Controller - add argument and description to function comment

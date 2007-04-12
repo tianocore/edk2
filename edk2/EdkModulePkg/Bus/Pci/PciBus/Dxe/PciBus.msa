@@ -57,6 +57,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PcdLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PciIncompatibleDeviceSupportLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>pcibus.h</Filename>
@@ -173,6 +176,11 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DefaultValue>TRUE</DefaultValue>
       <HelpText>If TRUE, the PCI bus driver will support hot plug device. If not hot plug device is supported, this feature flag can be set to FALSE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdPciIncompatibleDeviceSupportMask</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The PCD masks for PCI incompatible devices support</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

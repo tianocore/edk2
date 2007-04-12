@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciEnumerator.c
-  
+
 Abstract:
 
   PCI Bus Driver
@@ -34,7 +34,7 @@ PciEnumerator (
 
 Routine Description:
 
-  This routine is used to enumerate entire pci bus system 
+  This routine is used to enumerate entire pci bus system
   in a given platform
 
 Arguments:
@@ -118,7 +118,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-      
+
   //
   // Submit the resource request
   //
@@ -127,7 +127,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Process P2C
   //
@@ -136,7 +136,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Process attributes for devices on this host bridge
   //
@@ -286,7 +286,7 @@ Returns:
   while (CurrentLink && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (!IsListEmpty (&Temp->ChildList)) {
-      
+
       //
       // Go further to process the option rom under this bridge
       //
@@ -294,7 +294,7 @@ Returns:
     }
 
     if (Temp->RomSize != 0 && Temp->RomSize <= MaxLength) {
-     
+
       //
       // Load and process the option rom
       //
@@ -382,8 +382,9 @@ Returns:
 
         Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint16,
                                         Address,
                                         1,
@@ -394,8 +395,9 @@ Returns:
         // Initialize SubBusNumber to SecondBus
         //
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -407,8 +409,9 @@ Returns:
         if (IS_PCI_BRIDGE (&Pci)) {
 
           Register8 = 0xFF;
-          Status = PciRootBridgeIo->Pci.Write (
+          Status = PciRootBridgeIoWrite (
                                           PciRootBridgeIo,
+                                          &Pci,
                                           EfiPciWidthUint8,
                                           Address,
                                           1,
@@ -432,8 +435,9 @@ Returns:
 
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
 
-        Status = PciRootBridgeIo->Pci.Write (
+        Status = PciRootBridgeIoWrite (
                                         PciRootBridgeIo,
+                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -503,7 +507,7 @@ Returns:
   // Here is the point where PCI bus driver calls HOST bridge allocation protocol
   // Currently we hardcoded for ea815
   //
-  
+
   if (Attributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) {
     RootBridgeDev->Decodes |= EFI_BRIDGE_PMEM_MEM_COMBINE_SUPPORTED;
   }
@@ -526,7 +530,7 @@ GetMaxOptionRomSize (
 /*++
 
 Routine Description:
-  
+
     Get Max Option Rom size on this bridge
 
 Arguments:
@@ -552,7 +556,7 @@ Returns:
   while (CurrentLink && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (!IsListEmpty (&Temp->ChildList)) {
-      
+
       //
       // Get max option rom size under this bridge
       //
@@ -567,13 +571,13 @@ Returns:
       }
 
     } else {
-      
+
       //
       // For devices get the rom size directly
       //
       TempOptionRomSize = Temp->RomSize;
     }
-    
+
     //
     // Get the largest rom size on this bridge
     //
@@ -594,7 +598,7 @@ PciHostBridgeDeviceAttribute (
 /*++
 
 Routine Description:
-  
+
     Process attributes of devices on this host bridge
 
 Arguments:
@@ -650,7 +654,7 @@ GetResourceAllocationStatus (
 /*++
 
 Routine Description:
-  
+
     Get resource allocation status from the ACPI pointer
 
 Arguments:
@@ -736,7 +740,7 @@ RejectPciDevice (
 /*++
 
 Routine Description:
-  
+
     Remove a PCI device from device pool and mark its bar
 
 Arguments:
@@ -789,7 +793,7 @@ Returns:
     //
     InitializeP2C (PciDevice);
   }
-    
+
   //
   // Remove the device
   //
@@ -817,7 +821,7 @@ IsRejectiveDevice (
 /*++
 
 Routine Description:
-  
+
     Determine whethter a PCI device can be rejected
 
 Arguments:
@@ -839,7 +843,7 @@ Returns:
   if (!Temp) {
     return FALSE;
   }
-    
+
   //
   // PPB and RB should go ahead
   //
@@ -853,7 +857,7 @@ Returns:
   if ((Temp->Parent) && (Temp->BusNumber == 0)) {
     return FALSE;
   }
-  
+
   //
   // Skip VGA
   //
@@ -872,7 +876,7 @@ GetLargerConsumerDevice (
 /*++
 
 Routine Description:
-  
+
     Get the larger resource consumer
 
 Arguments:
@@ -914,8 +918,8 @@ GetMaxResourceConsumerDevice (
 /*++
 
 Routine Description:
-  
-    Get the max resource consumer in the host resource pool 
+
+    Get the max resource consumer in the host resource pool
 
 Arguments:
 
@@ -974,7 +978,7 @@ PciHostBridgeAdjustAllocation (
 /*++
 
 Routine Description:
-  
+
     Adjust host bridge allocation so as to reduce resource requirement
 
 Arguments:
@@ -1039,7 +1043,7 @@ Returns:
       //
       return EFI_ABORTED;
     }
-    
+
     //
     // Hostbridge hasn't enough resource
     //
@@ -1047,7 +1051,7 @@ Returns:
     if (!PciResNode) {
       continue;
     }
-    
+
     //
     // Check if the device has been removed before
     //
@@ -1056,13 +1060,13 @@ Returns:
         continue;
       }
     }
-    
+
     //
     // Remove the device if it isn't in the array
     //
     Status = RejectPciDevice (PciResNode->PciDev);
     if (Status == EFI_SUCCESS) {
-      
+
       //
       // Raise the EFI_IOB_EC_RESOURCE_CONFLICT status code
       //
@@ -1399,7 +1403,7 @@ Returns:
       // Memory type aperture
       //
       case 0:
-  
+
         //
         // Check to see the granularity
         //
@@ -1471,7 +1475,7 @@ Returns:
   SubBusNumber    = 0;
   StartBusNumber  = 0;
   PciIo           = &(BridgeDev->PciIo);
-  Status          = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x19, 1, &StartBusNumber);
+  Status          = PciIoRead (PciIo, EfiPciIoWidthUint8, 0x19, 1, &StartBusNumber);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1896,7 +1900,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Get Root Brige Handle
   //
@@ -1965,7 +1969,7 @@ PciHotPlugRequestNotify (
 Routine Description:
 
   Hot plug request notify.
-  
+
 Arguments:
 
   This                 - A pointer to the hot plug request protocol.
@@ -2082,7 +2086,7 @@ SearchHostBridgeHandle (
 /*++
 
 Routine Description:
-  
+
 Arguments:
 
 Returns:
@@ -2130,7 +2134,7 @@ AddHostBridgeEnumerator (
 /*++
 
 Routine Description:
-  
+
 Arguments:
 
 Returns:
