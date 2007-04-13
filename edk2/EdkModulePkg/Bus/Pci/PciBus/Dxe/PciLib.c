@@ -2113,7 +2113,7 @@ ReadConfigData (
           return Status;
         }
 
-        Stride = 1 << AccessWidth;
+       Stride = 1 << AccessWidth;
         AccessAddress += Stride;
         if (AccessAddress >= (Address + (1 << Width))) {
           //
@@ -2215,9 +2215,7 @@ UpdateConfigData (
 {
   EFI_STATUS                    Status;
   EFI_PCI_REGISTER_VALUE_DATA   *PciRegisterData;
-  UINT64                        AndValue;
-  UINT64                        OrValue;
-  UINT32                        TempValue;
+  UINT64                        TempValue;
 
   //
   // check register value incompatibility
@@ -2226,28 +2224,17 @@ UpdateConfigData (
 
   if (Status == EFI_SUCCESS) {
 
-    AndValue = (PciRegisterData->AndValue) >> ((Address & 0x3) * 8);
-    OrValue  = (PciRegisterData->OrValue)  >> ((Address & 0x3) * 8);
-
     TempValue = * (UINT32 *) Buffer;
-
-    if (PciRegisterData->AndValue != VALUE_NOCARE) {
-      TempValue &= (UINT32) AndValue;
-    }
-    if (PciRegisterData->OrValue != VALUE_NOCARE) {
-      TempValue |= (UINT32) OrValue;
-    }
 
     switch (Width) {
     case EfiPciWidthUint8:
-      *(UINT32 *)Buffer = *(UINT32 *)Buffer & 0xffffff00 + (UINT8)TempValue;
+      * (UINT8 *) Buffer = (UINT8) TempValue;
       break;
-
     case EfiPciWidthUint16:
-      *(UINT32 *)Buffer = *(UINT32 *)Buffer & 0xffff0000 + (UINT16)TempValue;
+      * (UINT16 *) Buffer = (UINT16) TempValue;
       break;
     case EfiPciWidthUint32:
-      *(UINT32 *)Buffer = TempValue;
+      * (UINT32 *) Buffer = (UINT32) TempValue;
       break;
 
     default:
@@ -2340,7 +2327,7 @@ WriteConfigData (
           //
           UpdateConfigData (PciDeviceInfo, PCI_REGISTER_READ, AccessWidth, AccessAddress & 0xff, &Data);
 
-          Shift = (Address - AccessAddress) * 8;
+          Shift = (UINTN) ((Address - AccessAddress) * 8);
           switch (Width) {
           case EfiPciWidthUint8:
             Data = (* (UINT8 *) Buffer) << Shift | (Data & ~(0xff << Shift));
