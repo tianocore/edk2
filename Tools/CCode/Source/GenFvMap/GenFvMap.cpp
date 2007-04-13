@@ -427,7 +427,7 @@ CSymbolFromString::CSymbolFromString(const string& strSymbol, bool b)
     bStatic = b;
 
     istringstream is(strSymbol);
-    is >> strAddress >> strName >> getUINT64(ullRva) >> strFrom;
+    is >> strAddress >> strName >> hex >> getUINT64(ullRva) >> strFrom;
     if (strFrom == "f")
     {
         bFunction = true;
@@ -569,14 +569,14 @@ CFvMap::~CFvMap()
         delete *i;
 }
 
-class CFvMapFormatter : public CObjRoot
+class CFvMapGenerator : public CObjRoot
 {
 public:
-    CFvMapFormatter(const IFirmwareVolume *pFv) : m_pFv(pFv) {}
-    CFvMapFormatter(const CFvMapFormatter& r) : m_pFv(r.m_pFv) {}
+    CFvMapGenerator(const IFirmwareVolume *pFv) : m_pFv(pFv) {}
+    CFvMapGenerator(const CFvMapGenerator& r) : m_pFv(r.m_pFv) {}
 
     template <class _E, class _Tr>
-    friend basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>&, CFvMapFormatter);
+    friend basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>&, CFvMapGenerator);
 
 private:
     static bool Less(const IModule*, const IModule*);
@@ -586,10 +586,10 @@ private:
 };
 
 template <class _E, class _Tr>
-basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, CFvMapFormatter fvMapFmt)
+basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, CFvMapGenerator fvMapFmt)
 {
     vector<IModule*> rgMods(fvMapFmt.m_pFv->begin(), fvMapFmt.m_pFv->end());
-    sort(rgMods.begin(), rgMods.end(), CFvMapFormatter::Less);
+    sort(rgMods.begin(), rgMods.end(), CFvMapGenerator::Less);
     for (vector<IModule*>::iterator i = rgMods.begin(); i != rgMods.end(); i++)
     {
         os << (*i)->strName << hex << " (BaseAddress=" << putUINT64((*i)->BaseAddress());
@@ -611,7 +611,7 @@ basic_ostream<_E, _Tr>& operator << (basic_ostream<_E, _Tr>& os, CFvMapFormatter
     return os;
 }
 
-bool CFvMapFormatter::Less(const IModule *pModL, const IModule *pModR)
+bool CFvMapGenerator::Less(const IModule *pModL, const IModule *pModR)
 {
     return pModL->BaseAddress() < pModR->BaseAddress();
 }
@@ -641,7 +641,7 @@ int CApplication::Run(void)
     CMapFileSetFromInfFile mapSet(m_ppszArg[2]);
     ofstream ofs(m_ppszArg[3]);
     CFvMap fvMap(&ffsSet, &mapSet);
-    ofs << CFvMapFormatter(&fvMap);
+    ofs << CFvMapGenerator(&fvMap);
     return 0;
 }
 
