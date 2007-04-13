@@ -46,6 +46,7 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 #   WINDDK3790x1830  - Microsoft Windows DDK 3790.1830
 #   UINIXGCC         - UINIX GCC
 #   CYGWINGCC        - CygWin GCC
+#   UNIXPKGCYGWINGCC - CygWin GCC for Unix Package.
 #   ICC              - Intel C Compiler V9.1
 #   MYTOOLS          - Settings compatible with previous versions of tools_def.template
 #
@@ -342,7 +343,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_UNIXGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_UNIXGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
+*_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_UNIXGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
 *_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_UNIXGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -377,7 +378,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_CYGWINGCC_IA32_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_CYGWINGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
+*_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_CYGWINGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
 *_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_CYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -409,7 +410,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_ELFGCC_IA32_ASM_FLAGS    = -m32 -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=name
 *_ELFGCC_IA32_PP_FLAGS     = -m32 -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 
-*_ELFGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
+*_ELFGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT} -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_ELFGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=name
 *_ELFGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_ELFGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
@@ -434,7 +435,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXPKGCYGWINGCC_IA32_VFRPP_NAME   = gcc
 
 *_UNIXPKGCYGWINGCC_IA32_CC_FLAGS     = -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include ${DEST_DIR_DEBUG}/AutoGen.h -DSTRING_ARRAY_NAME=${BASE_NAME}Strings -IC:/cygwin/usr/X11R6/include
-*_UNIXPKGCYGWINGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
+*_UNIXPKGCYGWINGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT} -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_UNIXPKGCYGWINGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=_##name
 *_UNIXPKGCYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_UNIXPKGCYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
