@@ -407,7 +407,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_ELFGCC_IA32_VFRPP_NAME   = gcc
 
 *_ELFGCC_IA32_CC_FLAGS     = -m32 -g -fshort-wchar -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -DSTRING_ARRAY_NAME=${BASE_NAME}Strings
-*_ELFGCC_IA32_DLINK_FLAGS  = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
+*_ELFGCC_IA32_DLINK_FLAGS  = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT} -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_ELFGCC_IA32_ASM_FLAGS    = -m32 -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=name
 *_ELFGCC_IA32_PP_FLAGS     = -m32 -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 
@@ -464,7 +464,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_MIXED_X64_PP_NAME      = cl.exe
 
 *_MIXED_X64_CC_FLAGS     = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include ${DEST_DIR_DEBUG}/AutoGen.h -D_EFI_P64
-*_MIXED_*_DLINK_FLAGS    = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 
+*_MIXED_*_DLINK_FLAGS    = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _${ENTRYPOINT} --file-alignment 0x20 --section-alignment 0x20 -Map ${DEST_DIR_DEBUG}/${BASE_NAME}.map
 *_MIXED_X64_PP_FLAGS     = /nologo /P /TC /FI${DEST_DIR_DEBUG}/AutoGen.h 
 
 *_MIXED_X64_ASM_NAME     = ml64.exe
