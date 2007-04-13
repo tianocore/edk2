@@ -4537,6 +4537,8 @@
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="be490364-73d2-420d-950e-f6450ca75dfb" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: EdkModulePkg Mod: EdkPciIncompatibleDeviceSuppportLib Path: EdkModulePkg\Library\EdkPciIncompatibleDeviceSupportLib\EdkPciIncompatibleDeviceSupportLib.msa-->
+        <Instance ModuleGuid="1ca1c1f9-5baf-4204-b6e5-5e24109a4e4e" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -4650,6 +4652,14 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>320</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdPciIncompatibleDeviceSupportMask</C_Name>
+          <Token>0x0001003f</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x0</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
