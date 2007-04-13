@@ -44,7 +44,8 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 #   VS2005PRO        - Microsoft Visual Studio 2005 Professional Edition 
 #   VS2005TEAMSUITE  - Microsoft Visual Studio 2005 Team Suite Edition
 #   WINDDK3790x1830  - Microsoft Windows DDK 3790.1830
-#   UINIXGCC         - UINIX GCC
+#   UNIXGCC          - UNIX GCC
+#   ELFGCC           - GCC for Unix Package to produce elf binary.
 #   CYGWINGCC        - CygWin GCC
 #   UNIXPKGCYGWINGCC - CygWin GCC for Unix Package.
 #   ICC              - Intel C Compiler V9.1
