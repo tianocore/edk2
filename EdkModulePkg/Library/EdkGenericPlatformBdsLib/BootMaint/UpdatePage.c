@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
+/**@file
+  Dynamically Update the pages.
+  
+Copyright (c) 2006 - 2007 Intel Corporation.
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,21 +10,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  UpdatePage.c
-    
-AgBStract:
-
-  Dynamically Update the pages
-
---*/
+**/
 
 #include "Bds.h"
 #include "BootMaint.h"
 
 EFI_GUID gTerminalDriverGuid = {
-  0x10634d8e, 0x1c05, 0x46cb, {0xbb, 0xc, 0x5a, 0xfd, 0xc8, 0x29, 0xa8, 0xc8}
+  0x9E863906, 0xA40F, 0x4875, {0x97, 0x7F, 0x5B, 0x93, 0xFF, 0x23, 0x7F, 0xC6}
 };
 
 VOID
