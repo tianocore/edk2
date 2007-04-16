@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,9 +30,10 @@ Revision History
 //
 // timeout unit is in millisecond.
 //
-#define USBFLPTIMEOUT         1000
-#define STALL_1_MILLI_SECOND  1000
 
+#define STALL_1_MILLI_SECOND  1000
+#define USBFLPTIMEOUT         STALL_1_MILLI_SECOND
+#define USBDATATIMEOUT        2 * STALL_1_MILLI_SECOND
 //
 // ATAPI Packet Command
 //

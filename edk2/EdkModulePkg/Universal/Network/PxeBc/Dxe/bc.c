@@ -1950,11 +1950,14 @@ BcSetStationIP (
 --*/
 {
   EFI_PXE_BASE_CODE_MODE  *PxebcMode;
+  EFI_STATUS              StatCode;
   PXE_BASECODE_DEVICE     *Private;
+  UINT32                  SubnetMask;
 
   //
   // Lock the instance data and make sure started
   //
+  StatCode = EFI_SUCCESS;
 
   if (This == NULL) {
     DEBUG ((EFI_D_ERROR, "BC *This pointer == NULL"));
@@ -1972,26 +1975,61 @@ BcSetStationIP (
 
   if (This->Mode == NULL || !This->Mode->Started) {
     DEBUG ((EFI_D_ERROR, "BC was not started."));
-    EfiReleaseLock (&Private->Lock);
-    return EFI_NOT_STARTED;
+    StatCode = EFI_NOT_STARTED;
+    goto RELEASE_LOCK;
   }
 
   PxebcMode = Private->EfiBc.Mode;
 
-  if (StationIpPtr != NULL) {
-    CopyMem (&PxebcMode->StationIp, StationIpPtr, sizeof (EFI_IP_ADDRESS));
-    Private->GoodStationIp = TRUE;
+  if (!Private->GoodStationIp && ((StationIpPtr == NULL) || (SubnetMaskPtr == NULL))) {
+    //
+    // It's not allowed to only set one of the two addresses while there isn't a previous
+    // GOOD address configuration.
+    //
+    StatCode = EFI_INVALID_PARAMETER;
+    goto RELEASE_LOCK;
   }
 
   if (SubnetMaskPtr != NULL) {
-    CopyMem (&PxebcMode->SubnetMask, SubnetMaskPtr, sizeof (EFI_IP_ADDRESS));
+    SubnetMask = SubnetMaskPtr->Addr[0];
+
+    if (SubnetMask & (SubnetMask + 1)) {
+      //
+      // the subnet mask is valid if it's with leading continuous 1 bits.
+      //
+      StatCode = EFI_INVALID_PARAMETER;
+      goto RELEASE_LOCK;
+    }
+  } else {
+    SubnetMaskPtr = &PxebcMode->SubnetMask;
+    SubnetMask    = SubnetMaskPtr->Addr[0];
   }
+
+  if (StationIpPtr == NULL) {
+    StationIpPtr = &PxebcMode->StationIp;
+  }
+
+  if (!IS_INADDR_UNICAST (StationIpPtr) || 
+      ((StationIpPtr->Addr[0] | SubnetMask) == BROADCAST_IPv4)) {
+    //
+    // The station IP is not a unicast address.
+    //
+    StatCode = EFI_INVALID_PARAMETER;
+    goto RELEASE_LOCK;
+  }
+
+  CopyMem (&PxebcMode->StationIp, StationIpPtr, sizeof (EFI_IP_ADDRESS));
+  CopyMem (&PxebcMode->SubnetMask, SubnetMaskPtr, sizeof (EFI_IP_ADDRESS));
+
+  Private->GoodStationIp = TRUE;
+
+RELEASE_LOCK:
   //
   // Unlock the instance data
   //
   EfiReleaseLock (&Private->Lock);
 
-  return EFI_SUCCESS;
+  return StatCode;
 }
 
 EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
