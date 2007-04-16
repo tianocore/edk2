@@ -1607,14 +1607,19 @@ TryBINL (
   DhcpRxBuf = &RxBuf[OfferIx];
 
   //
-  // send DHCP request
-  // if fail return false
+  // use next server address first.
   //
-  CopyMem (
-    ((EFI_IPv4_ADDRESS *) &ServerIp),
-    &((DHCPV4_OP_SERVER_IP *) DhcpRxBuf->OpAdds.PktOptAdds[OP_DHCP_SERVER_IP_IX - 1])->Ip,
-    sizeof (EFI_IPv4_ADDRESS)
-    );
+  ServerIp.Addr[0] = DhcpRxBuf->u.Dhcpv4.siaddr;
+  if (ServerIp.Addr[0] == 0) {
+    //
+    // next server address is NULL, use option 54.
+    //
+    CopyMem (
+      ((EFI_IPv4_ADDRESS *) &ServerIp),
+      &((DHCPV4_OP_SERVER_IP *) DhcpRxBuf->OpAdds.PktOptAdds[OP_DHCP_SERVER_IP_IX - 1])->Ip,
+      sizeof (EFI_IPv4_ADDRESS)
+      );
+  }
 
   //
   // client IP address - filled in by client if it knows it
