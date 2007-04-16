@@ -571,7 +571,7 @@ Returns:
   //
   // build menu items array
   //
-  for (Longest = NumMenuItems = Index = 0; Index < MenuLth && NumMenuItems <= MAX_MENULIST;) {
+  for (Longest = NumMenuItems = Index = 0; Index < MenuLth && NumMenuItems < MAX_MENULIST;) {
     UINTN lth;
 
     lth = Ptr.CurrentMenuItemPtr->DataLen + sizeof (*Ptr.CurrentMenuItemPtr) - sizeof (Ptr.CurrentMenuItemPtr->Data);

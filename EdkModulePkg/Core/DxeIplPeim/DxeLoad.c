@@ -370,6 +370,11 @@ Returns:
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw)) != NULL) {
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (Hob.FirmwareVolume->BaseAddress);
+    //
+    // Make sure the FV HOB does not get corrupted.
+    //
+    ASSERT (FwVolHeader->Signature == EFI_FVH_SIGNATURE);
+
     Status = PeiServicesFfsFindNextFile (
                Type,
                FwVolHeader,
