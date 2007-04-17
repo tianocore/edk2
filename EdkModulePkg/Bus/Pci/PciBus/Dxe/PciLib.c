@@ -1892,13 +1892,12 @@ Returns:
     //
   }
 
+  //
+  // Notify the bus allocation phase is finished for the first time
+  //
+  NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
+
   if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
-
-    //
-    // Notify the bus allocation phase is finished for the first time
-    //
-    NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
-
 
     if (gPciHotPlugInit != NULL) {
       //
@@ -1944,15 +1943,10 @@ Returns:
       }
 
       //
-      // Notify the bus allocation phase is to end
+      // Notify the bus allocation phase is to end for the 2nd time
       //
       NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
     }
-  } else {
-    //
-    // Notify the bus allocation phase is to end
-    //
-    NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
   }
 
   //
@@ -2215,7 +2209,9 @@ UpdateConfigData (
 {
   EFI_STATUS                    Status;
   EFI_PCI_REGISTER_VALUE_DATA   *PciRegisterData;
-  UINT64                        TempValue;
+  UINT32                        AndValue;
+  UINT32                        OrValue;
+  UINT32                        TempValue;
 
   //
   // check register value incompatibility
@@ -2224,17 +2220,27 @@ UpdateConfigData (
 
   if (Status == EFI_SUCCESS) {
 
+    AndValue = ((UINT32) PciRegisterData->AndValue) >> (((UINT8) Address & 0x3) * 8);
+    OrValue  = ((UINT32) PciRegisterData->OrValue)  >> (((UINT8) Address & 0x3) * 8);
+
     TempValue = * (UINT32 *) Buffer;
+    if (PciRegisterData->AndValue != VALUE_NOCARE) {
+      TempValue &= AndValue;
+    }
+    if (PciRegisterData->OrValue != VALUE_NOCARE) {
+      TempValue |= OrValue;
+    }
 
     switch (Width) {
     case EfiPciWidthUint8:
-      * (UINT8 *) Buffer = (UINT8) TempValue;
+      *(UINT8 *)Buffer = (UINT8) TempValue;
       break;
+
     case EfiPciWidthUint16:
-      * (UINT16 *) Buffer = (UINT16) TempValue;
+      *(UINT16 *)Buffer = (UINT16) TempValue;
       break;
     case EfiPciWidthUint32:
-      * (UINT32 *) Buffer = (UINT32) TempValue;
+      *(UINT32 *)Buffer = TempValue;
       break;
 
     default:
@@ -2366,7 +2372,7 @@ WriteConfigData (
           return Status;
         }
 
-        Data = Data >> ((1 << AccessWidth) * 8);
+        Data = RShiftU64 (Data, ((1 << AccessWidth) * 8));
 
         Stride = 1 << AccessWidth;
         AccessAddress += Stride;
