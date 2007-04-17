@@ -1010,7 +1010,7 @@ Returns:
 
   //
   // If bridge doesn't support Prefetchable
-  // memory64, degrade it to Mem64
+  // memory64, degrade it to Prefetchable memory32
   //
   if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
     MergeResourceTree (
