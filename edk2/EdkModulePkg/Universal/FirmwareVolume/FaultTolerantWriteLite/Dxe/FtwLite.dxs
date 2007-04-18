@@ -19,7 +19,6 @@ Abstract:
   Dependency expression source file.
   
 --*/  
-#include <AutoGen.h>
 #include <DxeDepex.h>
 
 
