@@ -83,8 +83,12 @@ Returns:
 
 --*/
 {
-  EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
-  EfiConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
+	UINT64  PhysicalEntryPoint;
+
+	PhysicalEntryPoint = mPlabel.EntryPoint;
+
+	EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
+	mPlabel.GP += mPlabel.EntryPoint - PhysicalEntryPoint;
 
   SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 }
