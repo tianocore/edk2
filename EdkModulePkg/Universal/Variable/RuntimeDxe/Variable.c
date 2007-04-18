@@ -59,6 +59,39 @@ ReleaseLockOnlyAtBootTime (
   }
 }
 
+/**
+  A temparaty function that returns the size of a Null-terminated Unicode
+  string in bytes, including the Null terminator.
+
+  This function returns the size, in bytes, of the Null-terminated Unicode
+  string specified by String. It duplicates the functionality of StrSize()
+  in MDE library, but avoids using PCD, because IPF currently cannot convert
+  address of global variable for runtime.
+
+  If String is NULL, then ASSERT().
+  If String is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param  String  Pointer to a Null-terminated Unicode string.
+
+  @return The size of String.
+
+**/
+STATIC
+UINTN
+StrSizeOfVariableName (
+  IN      CONST CHAR16              *String
+  )
+{
+  UINTN                             Length;
+
+  ASSERT (String != NULL);
+  ASSERT (((UINTN) String & 0x01) == 0);
+
+  for (Length = 0; *String != L'\0'; String++, Length++);
+
+  return (Length + 1) * sizeof (*String);
+}
+
 STATIC
 BOOLEAN
 EFIAPI
@@ -835,7 +868,7 @@ Returns:
     //
     Status = EFI_WRITE_PROTECTED;
     goto Done;
-  } else if (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > MAX_VARIABLE_SIZE) {
+  } else if (sizeof (VARIABLE_HEADER) + StrSizeOfVariableName (VariableName) + DataSize > MAX_VARIABLE_SIZE) {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
     //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
@@ -944,7 +977,7 @@ Returns:
     //
     NextVariable->Reserved  = 0;
     VarNameOffset           = sizeof (VARIABLE_HEADER);
-    VarNameSize             = StrSize (VariableName);
+    VarNameSize             = StrSizeOfVariableName (VariableName);
     CopyMem (
       (UINT8 *) ((UINTN) NextVariable + VarNameOffset),
       VariableName,
