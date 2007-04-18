@@ -19,7 +19,6 @@ Abstract:
 
 --*/  
 
-#include <AutoGen.h>
 #include <PeimDepex.h>
 
 DEPENDENCY_START

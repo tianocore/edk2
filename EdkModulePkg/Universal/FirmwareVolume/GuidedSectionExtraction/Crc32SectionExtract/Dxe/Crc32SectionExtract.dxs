@@ -18,8 +18,6 @@ Abstract:
   Dependency expression file.
   
 --*/  
-
-#include <AutoGen.h>  
 #include "DxeDepex.h"
 
 DEPENDENCY_START

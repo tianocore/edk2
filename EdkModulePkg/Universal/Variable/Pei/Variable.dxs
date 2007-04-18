@@ -18,7 +18,6 @@ Abstract:
   Dependency expression file for Variable PEIM.
 
 --*/  
-#include <AutoGen.h>
 #include <PeimDepex.h>
 
 DEPENDENCY_START
