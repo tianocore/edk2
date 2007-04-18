@@ -83,12 +83,12 @@ Returns:
 
 --*/
 {
-	UINT64  PhysicalEntryPoint;
+  UINT64  PhysicalEntryPoint;
 
-	PhysicalEntryPoint = mPlabel.EntryPoint;
+  PhysicalEntryPoint = mPlabel.EntryPoint;
 
-	EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
-	mPlabel.GP += mPlabel.EntryPoint - PhysicalEntryPoint;
+  EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
+  mPlabel.GP += mPlabel.EntryPoint - PhysicalEntryPoint;
 
   SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 }
