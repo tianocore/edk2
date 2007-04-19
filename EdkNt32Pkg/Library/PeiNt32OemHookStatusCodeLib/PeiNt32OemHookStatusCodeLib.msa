@@ -57,7 +57,7 @@
     </Ppi>
   </PPIs>
   <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
     </GuidCNames>
   </Guids>
