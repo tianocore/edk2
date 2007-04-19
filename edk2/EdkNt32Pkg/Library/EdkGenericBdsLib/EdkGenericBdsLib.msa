@@ -86,19 +86,19 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiAcpiS3SaveProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiSimpleTextInProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiSimpleNetworkProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
@@ -113,16 +113,16 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiBlockIoProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiFormBrowserProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>

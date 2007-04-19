@@ -39,11 +39,11 @@
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
-  <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiWinNtThunkProtocolGuid</ProtocolCName>
-    </Protocol>
-  </Protocols>
+  <Hobs>
+    <HobTypes HobGuidCName="gEfiWinNtThunkProtocolGuid" Usage="ALWAYS_CONSUMED">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
