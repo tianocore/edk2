@@ -991,7 +991,7 @@ HiiGetDefaultImagePopulateMap (
     // Either Defaults/Manufacturing variable exists and appears to be valid. 
     // The map is read, exit w/ success now.
     //
-    gBS->FreePool (Name16);
+    FreePool (Name16);
     return;
   }
 
@@ -1149,7 +1149,7 @@ HiiGetDefaultImagePopulateMap (
     }
   }
 
-  gBS->FreePool (Name16);
+  FreePool (Name16);
 
 }
 
@@ -1570,7 +1570,7 @@ Returns:
   //
   // Free the old buffer, and assign into our database the latest buffer
   //
-  gBS->FreePool (HandleDatabase->Buffer);
+  FreePool (HandleDatabase->Buffer);
   HandleDatabase->Buffer = OrigTempBuffer;
 
   return EFI_SUCCESS;

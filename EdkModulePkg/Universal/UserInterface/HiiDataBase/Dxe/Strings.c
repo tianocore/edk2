@@ -349,7 +349,7 @@ Returns:
   // If the token value is not valid, error out
   //
   if ((*Reference >= TotalStringCount) && !ResetStrings) {
-    gBS->FreePool (NewBuffer);
+    FreePool (NewBuffer);
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -631,7 +631,7 @@ Returns:
       //
       // Free the previous buffer associated with this handle, and assign the new buffer to the handle
       //
-      gBS->FreePool (HandleDatabase->Buffer);
+      FreePool (HandleDatabase->Buffer);
       HandleDatabase->Buffer = NewBuffer;
       break;
     }
@@ -710,7 +710,7 @@ Returns:
                 );
     }
 
-    gBS->FreePool (LangCodes);
+    FreePool (LangCodes);
   }
 
   return Status;
@@ -764,7 +764,7 @@ Returns:
     ASSERT_EFI_ERROR (Status);
   }
 
-  gBS->FreePool (LangCodes);
+  FreePool (LangCodes);
   return EFI_SUCCESS;
 }
 
@@ -1240,7 +1240,7 @@ HiiCompareLanguage (
   // If the Language is the same return success
   //
   if (CompareMem (LanguageStringLocation, Language, 6) == 0) {
-    gBS->FreePool (InputString);
+    FreePool (InputString);
     return EFI_SUCCESS;
   }
   //
@@ -1258,14 +1258,14 @@ HiiCompareLanguage (
     // Getting in here means we have a secondary language
     //
     if (CompareMem (&InputString[Index], Language, 6) == 0) {
-      gBS->FreePool (InputString);
+      FreePool (InputString);
       return EFI_SUCCESS;
     }
   }
   //
   // If nothing was found, return the error
   //
-  gBS->FreePool (OriginalInputString);
+  FreePool (OriginalInputString);
   return EFI_NOT_FOUND;
 
 }

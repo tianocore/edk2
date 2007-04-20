@@ -80,6 +80,9 @@
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiSerialIoProtocolGuid</ProtocolCName>
     </Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiHotPlugDeviceGuid</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Variables>
     <Variable Usage="SOMETIMES_CONSUMED">
@@ -99,9 +102,6 @@
     </Variable>
   </Variables>
   <Guids>
-    <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>gEfiHotPlugDeviceGuid</GuidCName>
-    </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiGlobalVariableGuid</GuidCName>
     </GuidCNames>
