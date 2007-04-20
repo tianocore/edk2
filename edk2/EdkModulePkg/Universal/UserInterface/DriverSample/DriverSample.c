@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -61,7 +61,6 @@ Returns:
 {
   EFI_CALLBACK_INFO       *Private;
   EFI_HII_UPDATE_DATA     *UpdateData;
-  EFI_STATUS              Status;
   UINT8                   *Location;
   EFI_HII_CALLBACK_PACKET *DataPacket;
   UINT16                  Value;
@@ -159,8 +158,8 @@ Returns:
                     UpdateData
                     );
 
-    gBS->FreePool (UpdateData);
-    gBS->FreePool (OptionList);
+    FreePool (UpdateData);
+    FreePool (OptionList);
     break;
 
   case 0x0002:
@@ -235,8 +234,8 @@ Returns:
                     UpdateData
                     );
 
-    gBS->FreePool (UpdateData);
-    gBS->FreePool (OptionList);
+    FreePool (UpdateData);
+    FreePool (OptionList);
     break;
 
   case 0x1234:
@@ -244,14 +243,8 @@ Returns:
     // Allocate space for creation of Buffer
     //
     QuestionId = (UINT16) ((UINTN) (&NVStruc.DynamicCheck) - (UINTN) (&NVStruc));
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    0x1000,
-                    (VOID **) &UpdateData
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    ZeroMem (UpdateData, 0x1000);
+    UpdateData = AllocateZeroPool (0x1000);
+    ASSERT (UpdateData != NULL);
 
     Location                        = (UINT8 *) &UpdateData->Data;
 
@@ -290,7 +283,7 @@ Returns:
                     UpdateData
                     );
 
-    gBS->FreePool (UpdateData);
+    FreePool (UpdateData);
     QuestionId++;
     break;
 
@@ -298,14 +291,8 @@ Returns:
     //
     // Allocate space for creation of Buffer
     //
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    0x1000,
-                    (VOID **)&UpdateData
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    ZeroMem (UpdateData, 0x1000);
+    UpdateData = AllocateZeroPool (0x1000);
+    ASSERT (UpdateData != NULL);
 
     //
     // Initialize DataPacket with information intended to remove all
@@ -355,7 +342,7 @@ Returns:
                     UpdateData
                     );
 
-    gBS->FreePool (UpdateData);
+    FreePool (UpdateData);
     break;
 
   case 0x1236:
@@ -368,14 +355,8 @@ Returns:
     // an error and fill in the string parameter, otherwise, I will return information in the DataArray structure.
     // The browser will free this packet structure
     //
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (EFI_HII_CALLBACK_PACKET) + sizeof (SAMPLE_STRING) + 2,
-                    (VOID **) Packet
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    ZeroMem (*Packet, sizeof (EFI_HII_CALLBACK_PACKET) + sizeof (SAMPLE_STRING) + 2);
+    *Packet = AllocateZeroPool (sizeof (EFI_HII_CALLBACK_PACKET) + sizeof (SAMPLE_STRING) + 2);
+    ASSERT (*Packet != NULL);
 
     //
     // Assign the buffer address to DataPacket
@@ -387,14 +368,8 @@ Returns:
 
   case 0x1237:
 
-    Status = gBS->AllocatePool (
-                    EfiBootServicesData,
-                    sizeof (EFI_HII_CALLBACK_PACKET) + 2,
-                    (VOID **) Packet
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    ZeroMem (*Packet, sizeof (EFI_HII_CALLBACK_PACKET) + 2);
+    *Packet = AllocateZeroPool (sizeof (EFI_HII_CALLBACK_PACKET) + 2);
+    ASSERT (*Packet != NULL);
 
     //
     // Assign the buffer address to DataPacket
@@ -410,39 +385,39 @@ Returns:
     Value = 0x0001;
     UnicodeSPrint (VariableName, 0x80, (CHAR16 *) L"%d", VAR_EQ_TEST_NAME);
 
-    Status = gRT->SetVariable (
-                    VariableName,
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    2,
-                    (VOID *) &Value
-                    );
+    gRT->SetVariable (
+          VariableName,
+          &mFormSetGuid,
+          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          2,
+          (VOID *) &Value
+          );
     break;
 
   case 0x1556:
     Value = 0x1000;
     UnicodeSPrint (VariableName, 0x80, (CHAR16 *) L"%d", VAR_EQ_TEST_NAME);
 
-    Status = gRT->SetVariable (
-                    VariableName,
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    2,
-                    (VOID *) &Value
-                    );
+    gRT->SetVariable (
+          VariableName,
+          &mFormSetGuid,
+          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          2,
+          (VOID *) &Value
+          );
     break;
 
   case 0x1557:
     Value = 0x0000;
     UnicodeSPrint (VariableName, 0x80, (CHAR16 *) L"%d", VAR_EQ_TEST_NAME);
 
-    Status = gRT->SetVariable (
-                    VariableName,
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    2,
-                    (VOID *) &Value
-                    );
+    gRT->SetVariable (
+          VariableName,
+          &mFormSetGuid,
+          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          2,
+          (VOID *) &Value
+          );
     break;
 
   default:
@@ -497,26 +472,9 @@ DriverSampleInit (
     return Status;;
   }
 
-  /*
-  //
-  // There should only be one Form Configuration protocol
-  //
-  Status = gBS->LocateProtocol (
-                 &gEfiFormBrowserProtocolGuid, 
-                 NULL, 
-                 &FormConfig
-                 );
-  if (EFI_ERROR (Status)) {
-    return Status;;
-  }
-*/
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_CALLBACK_INFO),
-                  (VOID **) &CallbackInfo
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  CallbackInfo = AllocatePool (sizeof (EFI_CALLBACK_INFO));
+  if (CallbackInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   CallbackInfo->Signature = EFI_CALLBACK_INFO_SIGNATURE;
@@ -546,15 +504,15 @@ DriverSampleInit (
 
   PackageList                   = PreparePackages (1, &mStringPackGuid, DriverSampleStrings);
   Status                        = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   PackageList = PreparePackages (1, &mStringPackGuid, InventoryBin);
   Status      = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   PackageList = PreparePackages (1, &mStringPackGuid, VfrBin);
   Status      = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
 
   CallbackInfo->RegisteredHandle = HiiHandle;
 
@@ -589,14 +547,8 @@ DriverSampleInit (
   //
   // Allocate space for creation of Buffer
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  0x1000,
-                  (VOID **) &UpdateData
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  ZeroMem (UpdateData, 0x1000);
+  UpdateData = AllocateZeroPool (0x1000);
+  ASSERT (UpdateData != NULL);
 
   //
   // Flag update pending in FormSet
@@ -614,7 +566,7 @@ DriverSampleInit (
 
   Hii->UpdateForm (Hii, HiiHandle, (EFI_FORM_LABEL) 100, TRUE, UpdateData);
 
-  gBS->FreePool (UpdateData);
+  FreePool (UpdateData);
 
   //
   // Example of how to display only the item we sent to HII

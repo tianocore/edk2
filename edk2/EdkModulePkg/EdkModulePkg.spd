@@ -491,41 +491,6 @@
       <GuidValue>B091E7D2-05A0-4198-94F0-74B7B8C55459</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="StatusCodeDataTypeString">
-      <C_Name>gEfiStatusCodeDataTypeStringGuid</C_Name>
-      <GuidValue>92D11080-496F-4D95-BE7E-037488382B0A</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeDataTypeDebug">
-      <C_Name>gEfiStatusCodeDataTypeDebugGuid</C_Name>
-      <GuidValue>9A4E9246-D553-11D5-87E2-00062945C3B9</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeDataTypeAssert">
-      <C_Name>gEfiStatusCodeDataTypeAssertGuid</C_Name>
-      <GuidValue>DA571595-4D99-487C-827C-2622677D3307</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeDataTypeExceptionHandler">
-      <C_Name>gEfiStatusCodeDataTypeExceptionHandlerGuid</C_Name>
-      <GuidValue>3BC2BD12-AD2E-11D5-87DD-00062945C3B9</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeDataTypeError">
-      <C_Name>gEfiStatusCodeDataTypeErrorGuid</C_Name>
-      <GuidValue>AB359CE3-99B3-AE18-C89D-95D3B072E19B</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeDataTypeProgressCode">
-      <C_Name>gEfiStatusCodeDataTypeProgressCodeGuid</C_Name>
-      <GuidValue>A356AB39-35C4-35DA-B37A-F8EA9E8B36A3</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="StatusCodeSpecificData">
-      <C_Name>gEfiStatusCodeSpecificDataGuid</C_Name>
-      <GuidValue>335984BD-E805-409A-B8F8-D27ECE5FF7A6</GuidValue>
-      <HelpText/>
-    </Entry>
     <Entry Name="SystemNvDataHob">
       <C_Name>gEfiSystemNvDataHobGuid</C_Name>
       <GuidValue>D6E5092D-C7B2-4872-AF66-FDC0E6F95E78</GuidValue>

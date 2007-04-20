@@ -7,7 +7,7 @@
     <Version>1.0</Version>
     <Abstract>Component description file for HiiDatabase module.</Abstract>
     <Description>This module inits HII database and installs HII protocol.</Description>
-    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
@@ -25,8 +25,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
       <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
@@ -62,24 +63,20 @@
     <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiFormCallbackProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Variables>
-    <Variable Usage="ALWAYS_CONSUMED">
-      <VariableName>0x004C 0x0061 0x006E</VariableName>
-      <GuidC_Name>gLanGuid</GuidC_Name>
+    <Variable Usage="SOMETIMES_CONSUMED">
+      <VariableName>0x004C 0x0061 0x006E 0x0067</VariableName>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>L"Lang" global variable is used as system default language.</HelpText>
     </Variable>
   </Variables>
-  <Guids>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>gEfiGlobalVariableGuid</GuidCName>
-    </GuidCNames>
-  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
