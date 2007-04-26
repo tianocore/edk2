@@ -623,10 +623,12 @@ public class GenBuildTask extends Ant {
 
     private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws EdkException {
         //
-        // Call AutoGen to generate AutoGen.c and AutoGen.h
+        // Call AutoGen to generate AutoGen.c and AutoGen.h for non-binary module
         //
-        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch(), saq, parentId);
-        autogen.genAutogen();
+        if (!fpdModuleId.getModule().isBinary()) {
+            AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch(), saq, parentId);
+            autogen.genAutogen();
+        }
 
         //
         // Get compiler flags
