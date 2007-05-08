@@ -180,16 +180,6 @@
       <GuidValue>CC664EB8-3C24-4086-B6F6-34E856BCE36E</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="PcdHob">
-      <C_Name>gPcdHobGuid</C_Name>
-      <GuidValue>582E7CA1-68CD-4D44-B43B-F298ED587BA6</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="WinNtBusDriver">
-      <C_Name>gWinNtBusDriverGuid</C_Name>
-      <GuidValue>0419f582-0625-4531-8a33-85a9965c95bc</GuidValue>
-      <HelpText/>
-    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="WinNtIo">
@@ -200,6 +190,11 @@
     <Entry Name="WinNtThunk">
       <C_Name>gEfiWinNtThunkProtocolGuid</C_Name>
       <GuidValue>58C518B1-76F3-11D4-BCEA-0080C73C8881</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="WinNtBusDriver">
+      <C_Name>gWinNtBusDriverGuid</C_Name>
+      <GuidValue>0419f582-0625-4531-8a33-85a9965c95bc</GuidValue>
       <HelpText/>
     </Entry>
   </ProtocolDeclarations>
