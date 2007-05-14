@@ -3625,6 +3625,1236 @@ CpuDeadLoop (
   );
 
 
+#if defined (MDE_CPU_IPF)
+
+/**
+  Flush a range of  cache lines in the cache coherency domain of the calling
+  CPU.
+
+  Invalidates the  cache lines specified by Address and Length. If Address is
+  not aligned on a cache line boundary, then entire cache line containing
+  Address is invalidated. If Address + Length is not aligned on a cache line
+  boundary, then the entire instruction cache line containing Address + Length
+  -1 is invalidated. This function may choose to invalidate the entire
+  instruction cache if that is more efficient than invalidating the specified
+  range. If Length is 0, the no instruction cache lines are invalidated.
+  Address is returned.
+
+  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
+
+  @param  Address The base address of the instruction lines to invalidate. If
+                  the CPU is in a physical addressing mode, then Address is a
+                  physical address. If the CPU is in a virtual addressing mode,
+                  then Address is a virtual address.
+
+  @param  Length  The number of bytes to invalidate from the instruction cache.
+
+  @return Address
+
+**/
+VOID *
+EFIAPI
+IpfFlushCacheRange (
+  IN      VOID                      *Address,
+  IN      UINTN                     Length
+  );
+
+
+/**
+  Executes a FC instruction
+  Executes a FC instruction on the cache line specified by Address.
+  The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
+  An implementation may flush a larger region.  This function is only available on IPF.
+
+  @param Address  	The Address of cache line to be flushed.
+
+  @return The address of FC instruction executed.
+
+**/
+UINT64
+EFIAPI
+AsmFc (
+  IN  UINT64  Address
+  );
+
+
+/**
+  Executes a FC.I instruction.
+  Executes a FC.I instruction on the cache line specified by Address.
+  The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
+  An implementation may flush a larger region.  This function is only available on IPF.
+
+  @param Address  	The Address of cache line to be flushed.
+
+  @return The address of FC.I instruction executed.
+
+**/
+UINT64
+EFIAPI
+AsmFci (
+  IN  UINT64  Address
+  );
+
+
+/**
+  Reads the current value of a Processor Identifier Register (CPUID).
+  The Index of largest implemented CPUID (One less than the number of implemented CPUID
+  registers) is determined by CPUID [3] bits {7:0}.
+  No parameter checking is performed on Index.  If the Index value is beyond the
+  implemented CPUID register range, a Reserved Register/Field fault may occur.  The caller
+  must either guarantee that Index is valid, or the caller must set up fault handlers to
+  catch the faults.  This function is only available on IPF.
+
+  @param Index		The 8-bit Processor Identifier Register index to read.
+
+  @return The current value of Processor Identifier Register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadCpuid (
+  IN  UINT8   Index
+  );
+
+
+/**
+  Reads the current value of 64-bit Processor Status Register (PSR).
+  This function is only available on IPF.
+
+  @return The current value of PSR.
+
+**/
+UINT64
+EFIAPI
+AsmReadPsr (
+  VOID
+  );
+
+
+/**
+  Writes the current value of 64-bit Processor Status Register (PSR).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of PSR must be 0 or a Reserved Register/Field fault may occur.  The caller must either guarantee that Value is valid, or the caller must set up fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to PSR.
+
+  @return The 64-bit value written to the PSR.
+
+**/
+UINT64
+EFIAPI
+AsmWritePsr (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #0 (KR0).
+  This function is only available on IPF.
+
+  @return The current value of KR0.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr0 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #1 (KR1).
+  This function is only available on IPF.
+
+  @return The current value of KR1.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr1 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #2 (KR2).
+  This function is only available on IPF.
+
+  @return The current value of KR2.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr2 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #3 (KR3).
+  This function is only available on IPF.
+
+  @return The current value of KR3.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr3 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #4 (KR4).
+  This function is only available on IPF.
+
+  @return The current value of KR4.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr4 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #5 (KR5).
+  This function is only available on IPF.
+
+  @return The current value of KR5.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr5 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #6 (KR6).
+  This function is only available on IPF.
+
+  @return The current value of KR6.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr6 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of 64-bit Kernel Register #7 (KR7).
+  This function is only available on IPF.
+
+  @return The current value of KR7.
+
+**/
+UINT64
+EFIAPI
+AsmReadKr7 (
+  VOID
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #0 (KR0).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR0.
+
+  @return The 64-bit value written to the KR0.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr0 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #1 (KR1).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR1.
+
+  @return The 64-bit value written to the KR1.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr1 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #2 (KR2).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR2.
+
+  @return The 64-bit value written to the KR2.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr2 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #3 (KR3).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR3.
+
+  @return The 64-bit value written to the KR3.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr3 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #4 (KR4).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR4.
+
+  @return The 64-bit value written to the KR4.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr4 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #5 (KR5).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR5.
+
+  @return The 64-bit value written to the KR5.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr5 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #6 (KR6).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR6.
+
+  @return The 64-bit value written to the KR6.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr6 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Write the current value of 64-bit Kernel Register #7 (KR7).
+  This function is only available on IPF.
+
+  @param  Value 	The 64-bit value to write to KR7.
+
+  @return The 64-bit value written to the KR7.
+
+**/
+UINT64
+EFIAPI
+AsmWriteKr7 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of Interval Timer Counter Register (ITC).
+  This function is only available on IPF.
+
+  @return The current value of ITC.
+
+**/
+UINT64
+EFIAPI
+AsmReadItc (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Interval Timer Vector Register (ITV).
+  This function is only available on IPF.
+
+  @return The current value of ITV.
+
+**/
+UINT64
+EFIAPI
+AsmReadItv (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Interval Timer Match Register (ITM).
+  This function is only available on IPF.
+
+  @return The current value of ITM.
+**/
+UINT64
+EFIAPI
+AsmReadItm (
+  VOID
+  );
+
+
+/**
+  Writes the current value of 64-bit Interval Timer Counter Register (ITC).
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to ITC.
+
+  @return The 64-bit value written to the ITC.
+
+**/
+UINT64
+EFIAPI
+AsmWriteItc (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Interval Timer Match Register (ITM).
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to ITM.
+
+  @return The 64-bit value written to the ITM.
+
+**/
+UINT64
+EFIAPI
+AsmWriteItm (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Interval Timer Vector Register (ITV).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of ITV must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to ITV.
+
+  @return The 64-bit value written to the ITV.
+
+**/
+UINT64
+EFIAPI
+AsmWriteItv (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of Default Control Register (DCR).
+  This function is only available on IPF.
+
+  @return The current value of DCR.
+
+**/
+UINT64
+EFIAPI
+AsmReadDcr (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Interruption Vector Address Register (IVA).
+  This function is only available on IPF.
+
+  @return The current value of IVA.
+**/
+UINT64
+EFIAPI
+AsmReadIva (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Page Table Address Register (PTA).
+  This function is only available on IPF.
+
+  @return The current value of PTA.
+
+**/
+UINT64
+EFIAPI
+AsmReadPta (
+  VOID
+  );
+
+
+/**
+  Writes the current value of 64-bit Default Control Register (DCR).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to DCR.
+
+  @return The 64-bit value written to the DCR.
+
+**/
+UINT64
+EFIAPI
+AsmWriteDcr (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Interruption Vector Address Register (IVA).
+  The size of vector table is 32 K bytes and is 32 K bytes aligned
+  the low 15 bits of Value is ignored when written.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to IVA.
+
+  @return The 64-bit value written to the IVA.
+
+**/
+UINT64
+EFIAPI
+AsmWriteIva (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Page Table Address Register (PTA).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to PTA.
+
+  @return The 64-bit value written to the PTA.
+**/
+UINT64
+EFIAPI
+AsmWritePta (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of Local Interrupt ID Register (LID).
+  This function is only available on IPF.
+
+  @return The current value of LID.
+
+**/
+UINT64
+EFIAPI
+AsmReadLid (
+  VOID
+  );
+
+
+/**
+  Reads the current value of External Interrupt Vector Register (IVR).
+  This function is only available on IPF.
+
+  @return The current value of IVR.
+
+**/
+UINT64
+EFIAPI
+AsmReadIvr (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Task Priority Register (TPR).
+  This function is only available on IPF.
+
+  @return The current value of TPR.
+
+**/
+UINT64
+EFIAPI
+AsmReadTpr (
+  VOID
+  );
+
+
+/**
+  Reads the current value of External Interrupt Request Register #0 (IRR0).
+  This function is only available on IPF.
+
+  @return The current value of IRR0.
+
+**/
+UINT64
+EFIAPI
+AsmReadIrr0 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of External Interrupt Request Register #1 (IRR1).
+  This function is only available on IPF.
+
+  @return The current value of IRR1.
+
+**/
+UINT64
+EFIAPI
+AsmReadIrr1 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of External Interrupt Request Register #2 (IRR2).
+  This function is only available on IPF.
+
+  @return The current value of IRR2.
+
+**/
+UINT64
+EFIAPI
+AsmReadIrr2 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of External Interrupt Request Register #3 (IRR3).
+  This function is only available on IPF.
+
+  @return The current value of IRR3.
+
+**/
+UINT64
+EFIAPI
+AsmReadIrr3 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Performance Monitor Vector Register (PMV).
+  This function is only available on IPF.
+
+  @return The current value of PMV.
+
+**/
+UINT64
+EFIAPI
+AsmReadPmv (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Corrected Machine Check Vector Register (CMCV).
+  This function is only available on IPF.
+
+  @return The current value of CMCV.
+
+**/
+UINT64
+EFIAPI
+AsmReadCmcv (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Local Redirection Register #0 (LRR0).
+  This function is only available on IPF.
+
+  @return The current value of LRR0.
+
+**/
+UINT64
+EFIAPI
+AsmReadLrr0 (
+  VOID
+  );
+
+
+/**
+  Reads the current value of Local Redirection Register #1 (LRR1).
+  This function is only available on IPF.
+
+  @return The current value of LRR1.
+
+**/
+UINT64
+EFIAPI
+AsmReadLrr1 (
+  VOID
+  );
+
+
+/**
+  Writes the current value of 64-bit Page Local Interrupt ID Register (LID).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of LID must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to LID.
+
+  @return The 64-bit value written to the LID.
+
+**/
+UINT64
+EFIAPI
+AsmWriteLid (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Task Priority Register (TPR).
+  No parameter checking is performed on Value.  All bits of Value corresponding to
+  reserved fields of TPR must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to TPR.
+
+  @return The 64-bit value written to the TPR.
+
+**/
+UINT64
+EFIAPI
+AsmWriteTpr (
+  IN UINT64  Value
+  );
+
+
+/**
+  Performs a write operation on End OF External Interrupt Register (EOI).
+  Writes a value of 0 to the EOI Register.  This function is only available on IPF.
+
+**/
+VOID
+EFIAPI
+AsmWriteEoi (
+  VOID
+  );
+
+
+/**
+  Writes the current value of 64-bit Performance Monitor Vector Register (PMV).
+  No parameter checking is performed on Value.  All bits of Value corresponding
+  to reserved fields of PMV must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to PMV.
+
+  @return The 64-bit value written to the PMV.
+
+**/
+UINT64
+EFIAPI
+AsmWritePmv (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Corrected Machine Check Vector Register (CMCV).
+  No parameter checking is performed on Value.  All bits of Value corresponding
+  to reserved fields of CMCV must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to CMCV.
+
+  @return The 64-bit value written to the CMCV.
+
+**/
+UINT64
+EFIAPI
+AsmWriteCmcv (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Local Redirection Register #0 (LRR0).
+  No parameter checking is performed on Value.  All bits of Value corresponding
+  to reserved fields of LRR0 must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to LRR0.
+
+  @return The 64-bit value written to the LRR0.
+
+**/
+UINT64
+EFIAPI
+AsmWriteLrr0 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Local Redirection Register #1 (LRR1).
+  No parameter checking is performed on Value.  All bits of Value corresponding
+  to reserved fields of LRR1 must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must
+  set up fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Value		The 64-bit value to write to LRR1.
+
+  @return The 64-bit value written to the LRR1.
+
+**/
+UINT64
+EFIAPI
+AsmWriteLrr1 (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of Instruction Breakpoint Register (IBR).
+  
+  The Instruction Breakpoint Registers are used in pairs.  The even numbered
+  registers contain breakpoint addresses, and the odd numbered registers contain
+  breakpoint mask conditions.  At least 4 instruction registers pairs are implemented
+  on all processor models.   Implemented registers are contiguous starting with
+  register 0.  No parameter checking is performed on Index, and if the Index value
+  is beyond the implemented IBR register range, a Reserved Register/Field fault may
+  occur.  The caller must either guarantee that Index is valid, or the caller must
+  set up fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Instruction Breakpoint Register index to read.
+
+  @return The current value of Instruction Breakpoint Register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadIbr (
+  IN  UINT8   Index
+  );
+
+
+/**
+  Reads the current value of Data Breakpoint Register (DBR).
+
+  The Data Breakpoint Registers are used in pairs.  The even numbered registers
+  contain breakpoint addresses, and odd numbered registers contain breakpoint
+  mask conditions.  At least 4 data registers pairs are implemented on all processor
+  models.  Implemented registers are contiguous starting with register 0.
+  No parameter checking is performed on Index.  If the Index value is beyond
+  the implemented DBR register range, a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Index is valid, or the caller must set up
+  fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Data Breakpoint Register index to read.
+
+  @return The current value of Data Breakpoint Register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadDbr (
+  IN  UINT8   Index
+  );
+
+
+/**
+  Reads the current value of Performance Monitor Configuration Register (PMC).
+
+  All processor implementations provide at least 4 performance counters
+  (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow
+  status registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide
+  additional implementation-dependent PMC and PMD to increase the number of
+  ¡®generic¡¯ performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
+  register set is implementation dependent.  No parameter checking is performed
+  on Index.  If the Index value is beyond the implemented PMC register range,
+  zero value will be returned.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Performance Monitor Configuration Register index to read.
+
+  @return The current value of Performance Monitor Configuration Register
+  specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadPmc (
+  IN  UINT8   Index
+  );
+
+
+/**
+  Reads the current value of Performance Monitor Data Register (PMD).
+
+  All processor implementations provide at least 4 performance counters
+  (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter
+  overflow status registers (PMC [0]¡­ PMC [3]).  Processor implementations may
+  provide additional implementation-dependent PMC and PMD to increase the number
+  of ¡®generic¡¯ performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
+  register set is implementation dependent.  No parameter checking is performed
+  on Index.  If the Index value is beyond the implemented PMD register range,
+  zero value will be returned.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Performance Monitor Data Register index to read.
+
+  @return The current value of Performance Monitor Data Register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadPmd (
+  IN  UINT8   Index
+  );
+
+
+/**
+  Writes the current value of 64-bit Instruction Breakpoint Register (IBR).
+
+  Writes current value of Instruction Breakpoint Register specified by Index.
+  The Instruction Breakpoint Registers are used in pairs.  The even numbered
+  registers contain breakpoint addresses, and odd numbered registers contain
+  breakpoint mask conditions.  At least 4 instruction registers pairs are implemented
+  on all processor models.  Implemented registers are contiguous starting with
+  register 0.  No parameter checking is performed on Index.  If the Index value
+  is beyond the implemented IBR register range, a Reserved Register/Field fault may
+  occur.  The caller must either guarantee that Index is valid, or the caller must
+  set up fault handlers to catch the faults.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Instruction Breakpoint Register index to write.
+  @param Value		The 64-bit value to write to IBR.
+
+  @return The 64-bit value written to the IBR.
+
+**/
+UINT64
+EFIAPI
+AsmWriteIbr (
+  IN UINT8   Index,
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Data Breakpoint Register (DBR).
+
+  Writes current value of Data Breakpoint Register specified by Index.
+  The Data Breakpoint Registers are used in pairs.  The even numbered registers
+  contain breakpoint addresses, and odd numbered registers contain breakpoint
+  mask conditions.  At least 4 data registers pairs are implemented on all processor
+  models.  Implemented registers are contiguous starting with register 0.  No parameter
+  checking is performed on Index.  If the Index value is beyond the implemented
+  DBR register range, a Reserved Register/Field fault may occur.  The caller must
+  either guarantee that Index is valid, or the caller must set up fault handlers to
+  catch the faults.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Data Breakpoint Register index to write.
+  @param Value		The 64-bit value to write to DBR.
+
+  @return The 64-bit value written to the DBR.
+
+**/
+UINT64
+EFIAPI
+AsmWriteDbr (
+  IN UINT8   Index,
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Performance Monitor Configuration Register (PMC).
+
+  Writes current value of Performance Monitor Configuration Register specified by Index.
+  All processor implementations provide at least 4 performance counters
+  (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow status
+  registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide additional
+  implementation-dependent PMC and PMD to increase the number of ¡®generic¡¯ performance
+  counters (PMC/PMD pairs).  The remainder of PMC and PMD register set is implementation
+  dependent.  No parameter checking is performed on Index.  If the Index value is
+  beyond the implemented PMC register range, the write is ignored.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Performance Monitor Configuration Register index to write.
+  @param Value		The 64-bit value to write to PMC.
+
+  @return The 64-bit value written to the PMC.
+
+**/
+UINT64
+EFIAPI
+AsmWritePmc (
+  IN UINT8   Index,
+  IN UINT64  Value
+  );
+
+
+/**
+  Writes the current value of 64-bit Performance Monitor Data Register (PMD).
+
+  Writes current value of Performance Monitor Data Register specified by Index.
+  All processor implementations provide at least 4 performance counters
+  (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow
+  status registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide
+  additional implementation-dependent PMC and PMD to increase the number of ¡®generic¡¯
+  performance counters (PMC/PMD pairs).  The remainder of PMC and PMD register set
+  is implementation dependent.  No parameter checking is performed on Index.  If the
+  Index value is beyond the implemented PMD register range, the write is ignored.
+  This function is only available on IPF.
+
+  @param Index		The 8-bit Performance Monitor Data Register index to write.
+  @param Value		The 64-bit value to write to PMD.
+
+  @return The 64-bit value written to the PMD.
+
+**/
+UINT64
+EFIAPI
+AsmWritePmd (
+  IN UINT8   Index,
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of 64-bit Global Pointer (GP).
+
+  Reads and returns the current value of GP.
+  This function is only available on IPF.
+
+  @return The current value of GP.
+
+**/
+UINT64
+EFIAPI
+AsmReadGp (
+  VOID
+  );
+
+
+/**
+  Write the current value of 64-bit Global Pointer (GP).
+
+  Writes the current value of GP. The 64-bit value written to the GP is returned.
+  No parameter checking is performed on Value.
+  This function is only available on IPF.
+
+  @param Value  The 64-bit value to write to GP.
+
+  @return The 64-bit value written to the GP.
+
+**/
+UINT64
+EFIAPI
+AsmWriteGp (
+  IN UINT64  Value
+  );
+
+
+/**
+  Reads the current value of 64-bit Stack Pointer (SP).
+
+  Reads and returns the current value of SP.
+  This function is only available on IPF.
+
+  @return The current value of SP.
+
+**/
+UINT64
+EFIAPI
+AsmReadSp (
+  VOID
+  );
+
+
+/**
+  Determines if the CPU is currently executing in virtual, physical, or mixed mode.
+
+  Determines the current execution mode of the CPU.
+  If the CPU is in virtual mode(PSR.RT=1, PSR.DT=1, PSR.IT=1), then 1 is returned.
+  If the CPU is in physical mode(PSR.RT=0, PSR.DT=0, PSR.IT=0), then 0 is returned.
+  If the CPU is not in physical mode or virtual mode, then it is in mixed mode,
+  and -1 is returned.
+  This function is only available on IPF.
+
+  @return  1  The CPU is in virtual mode.
+  @return  0  The CPU is in physical mode.
+  @return -1  The CPU is in mixed mode.
+
+**/
+INT64
+EFIAPI
+AsmCpuVirtual (
+  VOID
+  );
+
+
+/**
+  Makes a PAL procedure call.
+
+  This is a wrapper function to make a PAL procedure call.  Based on the Index
+  value this API will make static or stacked PAL call.  The following table
+  describes the usage of PAL Procedure Index Assignment. Architected procedures
+  may be designated as required or optional.  If a PAL procedure is specified
+  as optional, a unique return code of 0xFFFFFFFFFFFFFFFF is returned in the
+  Status field of the PAL_CALL_RETURN structure.
+  This indicates that the procedure is not present in this PAL implementation.
+  It is the caller¡¯s responsibility to check for this return code after calling
+  any optional PAL procedure.
+  No parameter checking is performed on the 5 input parameters, but there are
+  some common rules that the caller should follow when making a PAL call.  Any
+  address passed to PAL as buffers for return parameters must be 8-byte aligned.
+  Unaligned addresses may cause undefined results.  For those parameters defined
+  as reserved or some fields defined as reserved must be zero filled or the invalid
+  argument return value may be returned or undefined result may occur during the
+  execution of the procedure.  If the PalEntryPoint  does not point to a valid
+  PAL entry point then the system behavior is undefined.  This function is only
+  available on IPF.
+
+  @param PalEntryPoint	The PAL procedure calls entry point.
+  @param Index			    The PAL procedure Index number.
+  @param Arg2			      The 2nd parameter for PAL procedure calls.
+  @param Arg3			      The 3rd parameter for PAL procedure calls.
+  @param Arg4			      The 4th parameter for PAL procedure calls.
+
+  @return structure returned from the PAL Call procedure, including the status and return value.
+
+**/
+PAL_CALL_RETURN
+EFIAPI
+AsmPalCall (
+  IN UINT64  PalEntryPoint,
+  IN UINT64  Index,
+  IN UINT64  Arg2,
+  IN UINT64  Arg3,
+  IN UINT64  Arg4
+  );
+
+
+/**
+  Transfers control to a function starting with a new stack.
+
+  Transfers control to the function specified by EntryPoint using the new stack
+  specified by NewStack and passing in the parameters specified by Context1 and
+  Context2. Context1 and Context2 are optional and may be NULL. The function
+  EntryPoint must never return.
+
+  If EntryPoint is NULL, then ASSERT().
+  If NewStack is NULL, then ASSERT().
+
+  @param  EntryPoint  A pointer to function to call with the new stack.
+  @param  Context1    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  Context2    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                      function.
+  @param  NewBsp      A pointer to the new memory location for RSE backing
+                      store.
+
+**/
+VOID
+EFIAPI
+AsmSwitchStackAndBackingStore (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *NewStack,
+  IN      VOID                      *NewBsp
+  );
+
+
+//
+// Bugbug: This call should be removed after
+//         the PalCall Instance issue has been fixed.
+//
+/**
+  Performs a PAL call using static calling convention.
+
+  An internal function to perform a PAL call using static calling convention.
+
+  @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
+                        would be used if this parameter were NULL on input.
+  @param  Arg1          The first argument of a PAL call.
+  @param  Arg1          The second argument of a PAL call.
+  @param  Arg1          The third argument of a PAL call.
+  @param  Arg1          The fourth argument of a PAL call.
+
+  @return The values returned in r8, r9, r10 and r11.
+
+**/
+PAL_CALL_RETURN
+PalCallStatic (
+  IN      CONST VOID                *PalEntryPoint,
+  IN      UINT64                    Arg1,
+  IN      UINT64                    Arg2,
+  IN      UINT64                    Arg3,
+  IN      UINT64                    Arg4
+  );
+
+
+#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 //
 // IA32 and X64 Specific Functions
 //
@@ -5900,91 +7130,9 @@ AsmPrepareAndThunk16 (
   IN OUT  THUNK_CONTEXT             *ThunkContext
   );
 
+#else
 
-typedef struct {
-  UINT64                            Status;
-  UINT64                            r9;
-  UINT64                            r10;
-  UINT64                            r11;
-} PAL_PROC_RETURN;
-
-//
-// IPF Specific functions
-//
-
-
-/**
-  Performs a PAL call using static calling convention.
-
-  An internal function to perform a PAL call using static calling convention.
-
-  @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
-                        would be used if this parameter were NULL on input.
-  @param  Arg1          The first argument of a PAL call.
-  @param  Arg1          The second argument of a PAL call.
-  @param  Arg1          The third argument of a PAL call.
-  @param  Arg1          The fourth argument of a PAL call.
-
-  @return The values returned in r8, r9, r10 and r11.
-
-**/
-PAL_PROC_RETURN
-PalCallStatic (
-  IN      CONST VOID                *PalEntryPoint,
-  IN      UINT64                    Arg1,
-  IN      UINT64                    Arg2,
-  IN      UINT64                    Arg3,
-  IN      UINT64                    Arg4
-  );
-
-
-/**
-  Returns the current value of ar.itc.
-
-  An internal function to return the current value of ar.itc, which is the
-  timer tick on IPF.
-
-  @return The currect value of ar.itc
-
-**/
-INT64
-IpfReadItc (
-  VOID
-  );
-
-
-/**
-  Flush a range of  cache lines in the cache coherency domain of the calling
-  CPU.
-
-  Invalidates the  cache lines specified by Address and Length. If Address is
-  not aligned on a cache line boundary, then entire cache line containing
-  Address is invalidated. If Address + Length is not aligned on a cache line
-  boundary, then the entire instruction cache line containing Address + Length
-  -1 is invalidated. This function may choose to invalidate the entire
-  instruction cache if that is more efficient than invalidating the specified
-  range. If Length is 0, the no instruction cache lines are invalidated.
-  Address is returned.
-
-  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
-
-  @param  Address The base address of the instruction lines to invalidate. If
-                  the CPU is in a physical addressing mode, then Address is a
-                  physical address. If the CPU is in a virtual addressing mode,
-                  then Address is a virtual address.
-
-  @param  Length  The number of bytes to invalidate from the instruction cache.
-
-  @return Address
-
-**/
-VOID *
-EFIAPI
-IpfFlushCacheRange (
-  IN      VOID                      *Address,
-  IN      UINTN                     Length
-  );
-
+#endif
 
 #endif
 

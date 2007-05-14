@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #if defined(MDE_CPU_IPF)
 #include <SalApi.h>
+#include <PalApi.h>
 #endif
 
 #endif
