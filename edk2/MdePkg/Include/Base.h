@@ -25,4 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Common/BaseTypes.h>
 #include <Common/EfiImage.h>
 
+#if defined(MDE_CPU_IPF)
+#include <PalApi.h>
+#endif
+
 #endif
