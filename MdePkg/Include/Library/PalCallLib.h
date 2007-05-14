@@ -24,8 +24,8 @@
 //
 
 /**
-
   Makes a PAL procedure call.
+
   This is a wrapper function to make a PAL procedure call.  Based on the Index value,
   this API will make static or stacked PAL call. Architected procedures may be designated
   as required or optional.  If a PAL procedure is specified as optional, a unique return
