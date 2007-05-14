@@ -504,8 +504,17 @@
     <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
     <Filename SupArchList="IPF">Ipf/InternalSwitchStack.c</Filename>
     <Filename SupArchList="IPF">Ipf/FlushCacheRange.s</Filename>
-    <Filename SupArchList="IPF">Ipf/ReadItc.s</Filename>
-
+    <Filename SupArchList="IPF">Ipf/AccessDbr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessEicr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessGcr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessKr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessPmr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessPsr.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AsmPalCall.s</Filename>
+    <Filename SupArchList="IPF">Ipf/ExecFc.s</Filename>
+    <Filename SupArchList="IPF">Ipf/ReadCpuid.s</Filename>
+    <Filename SupArchList="IPF">Ipf/AccessGp.s</Filename>
+ 
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>
     <Filename SupArchList="EBC">Ebc/SwitchStack.c</Filename>
