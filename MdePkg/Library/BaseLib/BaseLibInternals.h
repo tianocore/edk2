@@ -345,9 +345,236 @@ InternalSwitchStack (
   IN      VA_LIST                   Marker
   );
 
+
+/**
+  Worker function that locates the Node in the List
+
+  By searching the List, finds the location of the Node in List. At the same time,
+  verifies the validity of this list.
+
+  If List is NULL, then ASSERT().
+  If List->ForwardLink is NULL, then ASSERT().
+  If List->backLink is NULL, then ASSERT().
+  If Node is NULL, then ASSERT();
+  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  of nodes in ListHead, including the ListHead node, is greater than or
+  equal to PcdMaximumLinkedListLength, then ASSERT().
+
+  @param  List  A pointer to a node in a linked list.
+  @param  Node  A pointer to one nod.
+
+  @retval TRUE   Node is in List
+  @retval FALSE  Node isn't in List, or List is invalid
+
+**/
+BOOLEAN
+IsNodeInList (
+  IN      CONST LIST_ENTRY      *List,
+  IN      CONST LIST_ENTRY      *Node
+  );
+
+
+/**
+  Performs an atomic increment of an 32-bit unsigned integer.
+
+  Performs an atomic increment of the 32-bit unsigned integer specified by
+  Value and returns the incremented value. The increment operation must be
+  performed using MP safe mechanisms. The state of the return value is not
+  guaranteed to be MP safe.
+
+  @param  Value A pointer to the 32-bit value to increment.
+
+  @return The incremented value.
+
+**/
+UINT32
+EFIAPI
+InternalSyncIncrement (
+  IN      volatile UINT32           *Value
+  );
+
+
+/**
+  Performs an atomic decrement of an 32-bit unsigned integer.
+
+  Performs an atomic decrement of the 32-bit unsigned integer specified by
+  Value and returns the decrement value. The decrement operation must be
+  performed using MP safe mechanisms. The state of the return value is not
+  guaranteed to be MP safe.
+
+  @param  Value A pointer to the 32-bit value to decrement.
+
+  @return The decrement value.
+
+**/
+UINT32
+EFIAPI
+InternalSyncDecrement (
+  IN      volatile UINT32           *Value
+  );
+
+
+/**
+  Performs an atomic compare exchange operation on a 32-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 32-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using
+  MP safe mechanisms.
+
+  @param  Value         A pointer to the 32-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  32-bit value used in compare operation.
+  @param  ExchangeValue 32-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
+UINT32
+EFIAPI
+InternalSyncCompareExchange32 (
+  IN      volatile UINT32           *Value,
+  IN      UINT32                    CompareValue,
+  IN      UINT32                    ExchangeValue
+  );
+
+
+/**
+  Performs an atomic compare exchange operation on a 64-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 64-bit unsigned integer specified
+  by Value.  If Value is equal to CompareValue, then Value is set to ExchangeValue and
+  CompareValue is returned.  If Value is not equal to CompareValue, then Value is returned.
+  The compare exchange operation must be performed using MP safe mechanisms.
+
+  @param  Value         A pointer to the 64-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  64-bit value used in compare operation.
+  @param  ExchangeValue 64-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
+UINT64
+EFIAPI
+InternalSyncCompareExchange64 (
+  IN      volatile UINT64           *Value,
+  IN      UINT64                    CompareValue,
+  IN      UINT64                    ExchangeValue
+  );
+
+
+/**
+  Worker function that returns a bit field from Operand
+
+  Returns the bitfield specified by the StartBit and the EndBit from Operand.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+
+  @return The bit field read.
+
+**/
+unsigned int
+BitFieldReadUint (
+  IN      unsigned int              Operand,
+  IN      UINTN                     StartBit,
+  IN      UINTN                     EndBit
+  );
+
+
+/**
+  Worker function that reads a bit field from Operand, performs a bitwise OR,
+  and returns the result.
+
+  Performs a bitwise OR between the bit field specified by StartBit and EndBit
+  in Operand and the value specified by AndData. All other bits in Operand are
+  preserved. The new value is returned.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+  @param  OrData    The value to OR with the read value from the value
+
+  @return The new value.
+
+**/
+unsigned int
+BitFieldOrUint (
+  IN      unsigned int              Operand,
+  IN      UINTN                     StartBit,
+  IN      UINTN                     EndBit,
+  IN      unsigned int              OrData
+  );
+
+
+/**
+  Worker function that reads a bit field from Operand, performs a bitwise AND,
+  and returns the result.
+
+  Performs a bitwise AND between the bit field specified by StartBit and EndBit
+  in Operand and the value specified by AndData. All other bits in Operand are
+  preserved. The new value is returned.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+  @param  AndData    The value to And with the read value from the value
+
+  @return The new value.
+
+**/
+unsigned int
+BitFieldAndUint (
+  IN      unsigned int              Operand,
+  IN      UINTN                     StartBit,
+  IN      UINTN                     EndBit,
+  IN      unsigned int              AndData
+  );
+
+
+/**
+  Worker function that checks ASSERT condition for JumpBuffer
+
+  Checks ASSERT condition for JumpBuffer.
+
+  If JumpBuffer is NULL, then ASSERT().
+  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
+
+  @param  JumpBuffer    A pointer to CPU context buffer.
+
+**/
+VOID
+InternalAssertJumpBuffer (
+  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+  );
+
+
+/**
+  Restores the CPU context that was saved with SetJump().
+
+  Restores the CPU context from the buffer specified by JumpBuffer.
+  This function never returns to the caller.
+  Instead is resumes execution based on the state of JumpBuffer.
+
+  @param  JumpBuffer    A pointer to CPU context buffer.
+  @param  Value         The value to return when the SetJump() context is restored.
+
+**/
+VOID
+EFIAPI
+InternalLongJump (
+  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+  IN      UINTN                     Value
+  );
+
+
 //
 // Ia32 and x64 specific functions
 //
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 /**
   Reads the current Global Descriptor Table Register(GDTR) descriptor.
@@ -595,223 +822,9 @@ InternalX86DisablePaging64 (
   IN      UINT32                    NewStack
   );
 
-/**
-  Worker function that locates the Node in the List
 
-  By searching the List, finds the location of the Node in List. At the same time,
-  verifies the validity of this list.
-
-  If List is NULL, then ASSERT().
-  If List->ForwardLink is NULL, then ASSERT().
-  If List->backLink is NULL, then ASSERT().
-  If Node is NULL, then ASSERT();
-  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
-  of nodes in ListHead, including the ListHead node, is greater than or
-  equal to PcdMaximumLinkedListLength, then ASSERT().
-
-  @param  List  A pointer to a node in a linked list.
-  @param  Node  A pointer to one nod.
-
-  @retval TRUE   Node is in List
-  @retval FALSE  Node isn't in List, or List is invalid
-
-**/
-BOOLEAN
-IsNodeInList (
-  IN      CONST LIST_ENTRY      *List,
-  IN      CONST LIST_ENTRY      *Node
-  );
-
-/**
-  Performs an atomic increment of an 32-bit unsigned integer.
-
-  Performs an atomic increment of the 32-bit unsigned integer specified by
-  Value and returns the incremented value. The increment operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
-
-  @param  Value A pointer to the 32-bit value to increment.
-
-  @return The incremented value.
-
-**/
-UINT32
-EFIAPI
-InternalSyncIncrement (
-  IN      volatile UINT32           *Value
-  );
-
-/**
-  Performs an atomic decrement of an 32-bit unsigned integer.
-
-  Performs an atomic decrement of the 32-bit unsigned integer specified by
-  Value and returns the decrement value. The decrement operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
-
-  @param  Value A pointer to the 32-bit value to decrement.
-
-  @return The decrement value.
-
-**/
-UINT32
-EFIAPI
-InternalSyncDecrement (
-  IN      volatile UINT32           *Value
-  );
-
-/**
-  Performs an atomic compare exchange operation on a 32-bit unsigned integer.
-
-  Performs an atomic compare exchange operation on the 32-bit unsigned integer
-  specified by Value.  If Value is equal to CompareValue, then Value is set to
-  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
-  then Value is returned.  The compare exchange operation must be performed using
-  MP safe mechanisms.
-
-  @param  Value         A pointer to the 32-bit value for the compare exchange
-                        operation.
-  @param  CompareValue  32-bit value used in compare operation.
-  @param  ExchangeValue 32-bit value used in exchange operation.
-
-  @return The original *Value before exchange.
-
-**/
-UINT32
-EFIAPI
-InternalSyncCompareExchange32 (
-  IN      volatile UINT32           *Value,
-  IN      UINT32                    CompareValue,
-  IN      UINT32                    ExchangeValue
-  );
-
-/**
-  Performs an atomic compare exchange operation on a 64-bit unsigned integer.
-
-  Performs an atomic compare exchange operation on the 64-bit unsigned integer specified
-  by Value.  If Value is equal to CompareValue, then Value is set to ExchangeValue and
-  CompareValue is returned.  If Value is not equal to CompareValue, then Value is returned.
-  The compare exchange operation must be performed using MP safe mechanisms.
-
-  @param  Value         A pointer to the 64-bit value for the compare exchange
-                        operation.
-  @param  CompareValue  64-bit value used in compare operation.
-  @param  ExchangeValue 64-bit value used in exchange operation.
-
-  @return The original *Value before exchange.
-
-**/
-UINT64
-EFIAPI
-InternalSyncCompareExchange64 (
-  IN      volatile UINT64           *Value,
-  IN      UINT64                    CompareValue,
-  IN      UINT64                    ExchangeValue
-  );
-
-/**
-  Worker function that returns a bit field from Operand
-
-  Returns the bitfield specified by the StartBit and the EndBit from Operand.
-
-  @param  Operand   Operand on which to perform the bitfield operation.
-  @param  StartBit  The ordinal of the least significant bit in the bit field.
-  @param  EndBit    The ordinal of the most significant bit in the bit field.
-
-  @return The bit field read.
-
-**/
-unsigned int
-BitFieldReadUint (
-  IN      unsigned int              Operand,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit
-  );
-
-/**
-  Worker function that reads a bit field from Operand, performs a bitwise OR,
-  and returns the result.
-
-  Performs a bitwise OR between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData. All other bits in Operand are
-  preserved. The new value is returned.
-
-  @param  Operand   Operand on which to perform the bitfield operation.
-  @param  StartBit  The ordinal of the least significant bit in the bit field.
-  @param  EndBit    The ordinal of the most significant bit in the bit field.
-  @param  OrData    The value to OR with the read value from the value
-
-  @return The new value.
-
-**/
-unsigned int
-BitFieldOrUint (
-  IN      unsigned int              Operand,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      unsigned int              OrData
-  );
-
-/**
-  Worker function that reads a bit field from Operand, performs a bitwise AND,
-  and returns the result.
-
-  Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData. All other bits in Operand are
-  preserved. The new value is returned.
-
-  @param  Operand   Operand on which to perform the bitfield operation.
-  @param  StartBit  The ordinal of the least significant bit in the bit field.
-  @param  EndBit    The ordinal of the most significant bit in the bit field.
-  @param  AndData    The value to And with the read value from the value
-
-  @return The new value.
-
-**/
-unsigned int
-BitFieldAndUint (
-  IN      unsigned int              Operand,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      unsigned int              AndData
-  );
-
-/**
-  Worker function that checks ASSERT condition for JumpBuffer
-
-  Checks ASSERT condition for JumpBuffer.
-
-  If JumpBuffer is NULL, then ASSERT().
-  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
-
-  @param  JumpBuffer    A pointer to CPU context buffer.
-
-**/
-VOID
-InternalAssertJumpBuffer (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
-  );
-
-
-/**
-  Restores the CPU context that was saved with SetJump().
-
-  Restores the CPU context from the buffer specified by JumpBuffer.
-  This function never returns to the caller.
-  Instead is resumes execution based on the state of JumpBuffer.
-
-  @param  JumpBuffer    A pointer to CPU context buffer.
-  @param  Value         The value to return when the SetJump() context is restored.
-
-**/
-VOID
-EFIAPI
-InternalLongJump (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
-  IN      UINTN                     Value
-  );
-
-
+#elif defined (MDE_CPU_IPF)
+//
 //
 // IPF specific functions
 //
@@ -847,5 +860,8 @@ AsmSwitchStackAndBackingStore (
   IN      VOID                      *NewStack,
   IN      VOID                      *NewBsp
   );
+#else
+
+#endif
 
 #endif
