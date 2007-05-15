@@ -32,19 +32,19 @@ InternalIpfDelay (
   IN      INT64                     Delay
   )
 {
-  UINT64                             Ticks;
+  INT64                             Ticks;
 
   //
   // The target timer count is calculated here
   //
-  Ticks = AsmReadItc () + Delay;
+  Ticks = (INT64)AsmReadItc () + Delay;
 
   //
   // Wait until time out
   // Delay > 2^63 could not be handled by this function
   // Timer wrap-arounds are handled correctly by this function
   //
-  while (Ticks >= AsmReadItc());
+  while (Ticks - (INT64)AsmReadItc() >= 0);
 }
 
 /**
