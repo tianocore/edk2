@@ -113,7 +113,7 @@ RuntimeDriverLibConstruct (
 
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -136,13 +136,11 @@ RuntimeDriverLibDeconstruct (
   //
   // Close SetVirtualAddressMap () notify function
   //
-  if (_gDriverSetVirtualAddressMapEvent[0] != NULL) {
-    ASSERT (gBS != NULL);
-    Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  return EFI_SUCCESS;
+  ASSERT (gBS != NULL);
+  Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
+  ASSERT_EFI_ERROR (Status);
+  
+  return Status;
 }
 
 /**
