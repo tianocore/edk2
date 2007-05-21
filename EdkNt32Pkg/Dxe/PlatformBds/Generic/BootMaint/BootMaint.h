@@ -85,16 +85,14 @@ Revision History
 // Check to see if current build support option active feature of
 // some driver option
 //
-#ifndef LOAD_OPTION_ACTIVE
 #define LOAD_OPTION_ACTIVE  0x00000001
-#endif
+
 //
 // Check to see if current build support force reconnect feature of
 // some driver option
 //
-#ifndef LOAD_OPTION_FORCE_RECONNECT
 #define LOAD_OPTION_FORCE_RECONNECT 0x00000002
-#endif
+
 //
 // Below are the form ids for display, form id is used as callback key value,
 // some key value definitions are also defined here. By defining this enum type,

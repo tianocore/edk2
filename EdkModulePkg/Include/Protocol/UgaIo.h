@@ -63,7 +63,6 @@ typedef struct _UGA_DEVICE {
 }
 UGA_DEVICE, *PUGA_DEVICE;
 
-#ifndef UGA_IO_REQUEST_CODE
 //
 // Prevent conflicts with UGA typedefs.
 //
@@ -93,8 +92,6 @@ typedef enum {
   UgaIoBtPrivateInterface
 }
 UGA_IO_REQUEST_CODE, *PUGA_IO_REQUEST_CODE;
-
-#endif
 
 typedef struct {
   IN UGA_IO_REQUEST_CODE  ioRequestCode;
