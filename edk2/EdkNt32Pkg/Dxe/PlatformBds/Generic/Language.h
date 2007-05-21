@@ -24,9 +24,7 @@ Revision History
 #ifndef _LANGUAGE_H
 #define _LANGUAGE_H
 
-#ifndef ISO_639_2_ENTRY_SIZE
 #define ISO_639_2_ENTRY_SIZE  3
-#endif
 
 VOID
 InitializeLanguage (
