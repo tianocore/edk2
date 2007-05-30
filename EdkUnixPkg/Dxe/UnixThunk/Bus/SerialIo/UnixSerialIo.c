@@ -58,25 +58,6 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixSerialIoDriverBinding = {
 };
 
 STATIC
-VOID
-PrintSerialParameter(
-  UNIX_SERIAL_IO_PRIVATE_DATA *Private
-  )
-{
-  struct termios Options;
-
-  if (Private->UnixThunk->Tcgetattr (Private->UnixHandle, &Options) == 0) {
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Input mode: 0x%x\r\n", Private->UnixHandle, Options.c_iflag));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Output mode: 0x%x\r\n", Private->UnixHandle, Options.c_oflag));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Control flag: 0x%x\r\n", Private->UnixHandle, Options.c_cflag));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Local mode flag: 0x%x\r\n", Private->UnixHandle, Options.c_lflag));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Line discipline: 0x%x\r\n", Private->UnixHandle, Options.c_line));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Input Speed: 0x%x\r\n", Private->UnixHandle, Options.c_ispeed));
-    DEBUG ((EFI_D_INFO, "Serial[0x%x]:Output Speed: 0x%x\r\n", Private->UnixHandle, Options.c_ospeed));
-  }
-}
-
-STATIC
 UINTN
 ConvertBaud2Unix (
   UINT64 BaudRate
@@ -1134,7 +1115,6 @@ Returns:
   UNIX_SERIAL_IO_PRIVATE_DATA *Private;
   UINTN                       Result;
   UINTN                       Status;
-  struct termios              Options;
   UINT32                      Bits;
   EFI_TPL                     Tpl;
   UINTN                       Bytes;

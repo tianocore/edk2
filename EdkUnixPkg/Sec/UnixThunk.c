@@ -191,7 +191,6 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   tcflush,
   UgaCreate,
   perror,
-  printf,
   ioctl,
   fcntl,
   cfsetispeed,
