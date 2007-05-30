@@ -122,6 +122,7 @@ static UNIX_PCD_ENTRY  mPcdEnvironment[] = {
   {PcdToken(PcdUnixConsole),       &gEfiUnixConsoleGuid},
   {PcdToken(PcdUnixUga),           &gEfiUnixUgaGuid},
   {PcdToken(PcdUnixFileSystem),    &gEfiUnixFileSystemGuid},
+  {PcdToken(PcdUnixSerialPort),    &gEfiUnixSerialPortGuid},
   {PcdToken(PcdUnixVirtualDisk),   &gEfiUnixVirtualDisksGuid},
   {PcdToken(PcdUnixPhysicalDisk),  &gEfiUnixPhysicalDisksGuid},
   {PcdToken(PcdUnixCpuModel),      &gEfiUnixCPUModelGuid},
@@ -293,10 +294,10 @@ Returns:
 {
   EFI_STATUS                      Status;
   EFI_STATUS                      InstallStatus;
-  EFI_UNIX_THUNK_PROTOCOL       *UnixThunk;
+  EFI_UNIX_THUNK_PROTOCOL         *UnixThunk;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
-  UNIX_BUS_DEVICE               *UnixBusDevice;
-  UNIX_IO_DEVICE                *UnixDevice;
+  UNIX_BUS_DEVICE                 *UnixBusDevice;
+  UNIX_IO_DEVICE                  *UnixDevice;
   UINTN                           Index;
   CHAR16                          *StartString;
   CHAR16                          *SubString;
@@ -428,7 +429,6 @@ Returns:
       }
 
       if (CreateDevice) {
-
         //
         // Allocate instance structure, and fill in parent information.
         //
@@ -441,7 +441,7 @@ Returns:
         UnixDevice->ControllerHandle   = ControllerHandle;
         UnixDevice->ParentDevicePath   = ParentDevicePath;
 
-        UnixDevice->UnixIo.UnixThunk = UnixThunk;
+        UnixDevice->UnixIo.UnixThunk   = UnixThunk;
 
         //
         // Plus 2 to account for the NULL at the end of the Unicode string

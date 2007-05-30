@@ -1,15 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<PackageSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>EdkUnixPkg</PackageName>
     <GuidValue>f2805c44-8985-11db-9e98-0040d02b1835</GuidValue>
@@ -26,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </SpdHeader>
   <PackageDefinitions>
-    <ReadOnly>true</ReadOnly>
+    <ReadOnly>false</ReadOnly>
     <RePackage>false</RePackage>
   </PackageDefinitions>
   <LibraryClassDeclarations>
@@ -92,6 +82,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Dxe/UnixThunk/Bus/Console/UnixConsole.msa</Filename>
     <Filename>Dxe/UnixThunk/Bus/SimpleFileSystem/UnixSimpleFileSystem.msa</Filename>
     <Filename>Dxe/UnixThunk/Bus/Uga/UnixUga.msa</Filename>
+    <Filename>Dxe/UnixThunk/Bus/SerialIo/UnixSerialIo.msa</Filename>
     <Filename>Dxe/UnixThunk/Bus/UnixBusDriver/UnixBusDriver.msa</Filename>
     <Filename>Dxe/UnixThunk/Chipset/Metronome/Metronome.msa</Filename>
     <Filename>Dxe/UnixThunk/Chipset/RealTimeClock/RealTimeClock.msa</Filename>
@@ -170,6 +161,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Entry Name="PcdHob">
       <C_Name>gPcdHobGuid</C_Name>
       <GuidValue>f2de8f12-8985-11db-aabc-0040d02b1835</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="UnixSerialPort">
+      <C_Name>gEfiUnixSerialPortGuid</C_Name>
+      <GuidValue>6d3a727d-66c8-4d19-87e6-0215861490f3</GuidValue>
       <HelpText/>
     </Entry>
   </GuidDeclarations>
@@ -335,6 +331,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DefaultValue>L"64!64"</DefaultValue>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
         the size of PcdUnixMemorySizeForSecMain in host platform.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdUnixSerialPort</C_Name>
+      <Token>0x00001002</Token>
+      <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>VOID*</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>L"/dev/ttyS0"</DefaultValue>
+      <HelpText>Simulation serial IO port</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

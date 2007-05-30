@@ -28,6 +28,7 @@ Abstract:
 #ifndef _UNIX_THUNK_H_
 #define _UNIX_THUNK_H_
 
+#include <sys/termios.h>
 
 #define EFI_UNIX_THUNK_PROTOCOL_GUID \
   { \
@@ -138,6 +139,43 @@ EFI_STATUS
 (*UnixUgaCreate)(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo,
 		 CONST CHAR16 *Title);
 
+typedef
+int
+(*UnixTcflush) (int fildes, int queue_selector);
+
+typedef
+void
+(*UnixPerror) (__const char *__s);
+
+typedef
+void
+(*UnixPrintf) (const char* format, ...);
+
+typedef 
+int 
+(*UnixIoCtl) (int fd, unsigned long int __request, ...);
+
+typedef 
+int 
+(*UnixFcntl) (int __fd, int __cmd, ...);
+
+typedef
+int 
+(*UnixCfsetispeed) (struct termios *__termios_p, speed_t __speed);
+
+typedef 
+int 
+(*UnixCfsetospeed) (struct termios *__termios_p, speed_t __speed);
+
+typedef
+int 
+(*UnixTcgetattr) (int __fd, struct termios *__termios_p);
+
+typedef 
+int 
+(*UnixTcsetattr) (int __fd, int __optional_actions,
+		      __const struct termios *__termios_p);
+
 //
 //
 //
@@ -147,14 +185,14 @@ EFI_STATUS
 typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UINT64                              Signature;
 
-  UnixSleep                          Sleep;
+  UnixSleep                           Sleep;
   UnixExit                    	      Exit;
-  UnixSetTimer                       SetTimer;
-  UnixGetLocalTime		      GetLocalTime;
+  UnixSetTimer                        SetTimer;
+  UnixGetLocalTime		                GetLocalTime;
   UnixGmTime                          GmTime;
   UnixGetTimeZone                     GetTimeZone;
   UnixGetDayLight                     GetDayLight;
-  UnixPoll	                      Poll;
+  UnixPoll	                          Poll;
   UnixRead                           Read;
   UnixWrite                          Write;
   UnixGetenv                         Getenv;
@@ -177,9 +215,16 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixFSync                           FSync;
   UnixChmod                           Chmod;
   UnixUTime                           UTime;
-
-  UnixUgaCreate			      UgaCreate;
-
+  UnixTcflush                         Tcflush;
+  UnixUgaCreate			                  UgaCreate;
+  UnixPerror                          Perror;
+  UnixPrintf                          Printf;
+  UnixIoCtl                           IoCtl;
+  UnixFcntl                           Fcntl;
+  UnixCfsetispeed                     Cfsetispeed;
+  UnixCfsetospeed                     Cfsetospeed;
+  UnixTcgetattr                       Tcgetattr;
+  UnixTcsetattr                       Tcsetattr;
 } EFI_UNIX_THUNK_PROTOCOL;
 
 extern EFI_GUID gEfiUnixThunkProtocolGuid;

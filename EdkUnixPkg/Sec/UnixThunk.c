@@ -38,6 +38,7 @@ Abstract:
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+#include <termio.h>
 
 static int settimer_initialized;
 static struct timeval settimer_timeval;
@@ -187,8 +188,16 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   fsync,
   chmod,
   utime,
-
+  tcflush,
   UgaCreate,
+  perror,
+  printf,
+  ioctl,
+  fcntl,
+  cfsetispeed,
+  cfsetospeed,
+  tcgetattr,
+  tcsetattr
 };
 
 

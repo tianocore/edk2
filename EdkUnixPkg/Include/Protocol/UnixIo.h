@@ -70,6 +70,16 @@ extern EFI_GUID gEfiUnixPhysicalDisksGuid;
 extern EFI_GUID gEfiUnixFileSystemGuid;
 
 //
+// EFI_WIN_NT_SERIAL_PORT
+//
+#define EFI_UNIX_SERIAL_PORT_GUID \
+  { \
+    0x6d3a727d, 0x66c8, 0x4d19, {0x87, 0xe6, 0x2, 0x15, 0x86, 0x14, 0x90, 0xf3} \
+  }
+
+extern EFI_GUID gEfiUnixSerialPortGuid;
+
+//
 // EFI_UNIX_UGA
 //
 #define EFI_UNIX_UGA_GUID \
