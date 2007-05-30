@@ -147,10 +147,6 @@ typedef
 void
 (*UnixPerror) (__const char *__s);
 
-typedef
-void
-(*UnixPrintf) (const char* format, ...);
-
 typedef 
 int 
 (*UnixIoCtl) (int fd, unsigned long int __request, ...);
@@ -218,7 +214,6 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixTcflush                         Tcflush;
   UnixUgaCreate			                  UgaCreate;
   UnixPerror                          Perror;
-  UnixPrintf                          Printf;
   UnixIoCtl                           IoCtl;
   UnixFcntl                           Fcntl;
   UnixCfsetispeed                     Cfsetispeed;
