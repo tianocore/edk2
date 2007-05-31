@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1056,33 +1056,25 @@ Returns:
   CfgPtr = gST->ConfigurationTable;
 
   for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    Status = CompareGuid (
-              &CfgPtr->VendorGuid,
-              &gEfiNetworkInterfaceIdentifierProtocolGuid_31
-              );
-    if (Status != EFI_SUCCESS) {
+    if (CompareGuid (&CfgPtr->VendorGuid, &gEfiNetworkInterfaceIdentifierProtocolGuid_31)) {
+      TmpData = (NII_TABLE *) CfgPtr->VendorTable;
+      //
+      // go to the last link
+      //
+      while (TmpData->NextLink != NULL) {
+        TmpData = TmpData->NextLink;
+      }
+
+      TmpData->NextLink = UndiData;
+
+      //
+      // 1st one in chain
+      //
+      UndiData = (NII_TABLE *) CfgPtr->VendorTable;
       break;
     }
 
     CfgPtr++;
-  }
-
-  if (Index < gST->NumberOfTableEntries) {
-    TmpData = (NII_TABLE *) CfgPtr->VendorTable;
-
-    //
-    // go to the last link
-    //
-    while (TmpData->NextLink != NULL) {
-      TmpData = TmpData->NextLink;
-    }
-
-    TmpData->NextLink = UndiData;
-
-    //
-    // 1st one in chain
-    //
-    UndiData = (NII_TABLE *) CfgPtr->VendorTable;
   }
 
   //
