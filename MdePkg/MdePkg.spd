@@ -1974,7 +1974,7 @@
     </Entry>
     <Entry Name="ExtScsiPassThru">
       <C_Name>gEfiExtScsiPassThruProtocolGuid</C_Name>
-      <GuidValue>1D3DE7F0-0807-424F-AA69-11A54E19A46F</GuidValue>
+      <GuidValue>143B7632-B81B-4CB7-ABD3-B625A5B9BFFE</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="TapeIo">

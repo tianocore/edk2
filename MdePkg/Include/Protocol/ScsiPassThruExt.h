@@ -1,7 +1,7 @@
 /** @file
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL as defined in UEFI 2.0.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,7 +19,7 @@
 
 #define EFI_EXT_SCSI_PASS_THRU_PROTOCOL_GUID \
   { \
-    0x1d3de7f0, 0x0807, 0x424f, {0xaa, 0x69, 0x11, 0xa5, 0x4e, 0x19, 0xa4, 0x6f } \
+    0x143b7632, 0xb81b, 0x4cb7, {0xab, 0xd3, 0xb6, 0x25, 0xa5, 0xb9, 0xbf, 0xfe } \
   }
 
 typedef struct _EFI_EXT_SCSI_PASS_THRU_PROTOCOL EFI_EXT_SCSI_PASS_THRU_PROTOCOL;
