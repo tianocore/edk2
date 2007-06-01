@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>EdkNt32Pkg</PackageName>
@@ -120,65 +120,65 @@
     <IncludePkgHeader ModuleType="UEFI_DRIVER">Include/WinNtDxe.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
-    <Entry Name="EdkNt32PkgTokenSpace">
+    <Entry Name="EdkNt32PkgTokenSpace" GuidTypeList="TOKEN_SPACE_GUID">
       <C_Name>gEfiEdkNt32PkgTokenSpaceGuid</C_Name>
       <GuidValue>0D79A645-1D91-40a6-A81F-61E6982B32B4</GuidValue>
       <HelpText>All PCD define in EdkNt32Pkg is in this token space scope</HelpText>
     </Entry>
-    <Entry Name="WinNtVirtualDisks">
+    <Entry Name="WinNtVirtualDisks" GuidTypeList="GUID">
       <C_Name>gEfiWinNtVirtualDisksGuid</C_Name>
       <GuidValue>0C95A928-A006-11D4-BCFA-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual disk the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtPhysicalDisks">
+    <Entry Name="WinNtPhysicalDisks" GuidTypeList="GUID">
       <C_Name>gEfiWinNtPhysicalDisksGuid</C_Name>
       <GuidValue>0C95A92F-A006-11D4-BCFA-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines phisical disk emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtFileSystem">
+    <Entry Name="WinNtFileSystem" GuidTypeList="GUID">
       <C_Name>gEfiWinNtFileSystemGuid</C_Name>
       <GuidValue>0C95A935-A006-11D4-BCFA-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines file system the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtSerialPort">
+    <Entry Name="WinNtSerialPort" GuidTypeList="GUID">
       <C_Name>gEfiWinNtSerialPortGuid</C_Name>
       <GuidValue>0C95A93D-A006-11D4-BCFA-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual serial device the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtGop">
+    <Entry Name="WinNtGop" GuidTypeList="GUID">
       <C_Name>gEfiWinNtGopGuid</C_Name>
       <GuidValue>4e11e955-ccca-11d4-bd0d-0080c73c8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual GOP device the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtUga">
+    <Entry Name="WinNtUga" GuidTypeList="GUID">
       <C_Name>gEfiWinNtUgaGuid</C_Name>
       <GuidValue>AB248E99-ABE1-11D4-BD0D-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual VGA device the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtConsole">
+    <Entry Name="WinNtConsole" GuidTypeList="GUID">
       <C_Name>gEfiWinNtConsoleGuid</C_Name>
       <GuidValue>BA73672C-A5D3-11D4-BD00-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Console the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtMemory">
+    <Entry Name="WinNtMemory" GuidTypeList="GUID">
       <C_Name>gEfiWinNtMemoryGuid</C_Name>
       <GuidValue>99042912-122A-11D4-BD0D-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Memory the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtCPUModel">
+    <Entry Name="WinNtCPUModel" GuidTypeList="GUID">
       <C_Name>gEfiWinNtCPUModelGuid</C_Name>
       <GuidValue>BEE9B6CE-2F8A-11D4-BD0D-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines model of the CPU the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNtCPUSpeed">
+    <Entry Name="WinNtCPUSpeed" GuidTypeList="GUID">
       <C_Name>gEfiWinNtCPUSpeedGuid</C_Name>
       <GuidValue>D4F29055-E1FB-11D4-BD0D-0080C73C8881</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines speed of the CPU the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
-    <Entry Name="WinNPassThrough">
+    <Entry Name="WinNPassThrough" GuidTypeList="GUID">
       <C_Name>gEfiWinNtPassThroughGuid</C_Name>
       <GuidValue>CC664EB8-3C24-4086-B6F6-34E856BCE36E</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Pass Thru devicehardware the emulator/WinNtBusDriver will produce.</HelpText>
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
