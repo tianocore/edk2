@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <PlatformHeader>
-    <PlatformName>MdePkgAll</PlatformName>
+    <PlatformName>OriginalMdePkgAll</PlatformName>
     <GuidValue>0fe7dd3e-0969-48c3-8cd2-de9a190088e2</GuidValue>
     <Version>0.3</Version>
     <Abstract>EFI/Tiano MdePkg Package</Abstract>

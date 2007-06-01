@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
-    <PackageName>MdePkg</PackageName>
+    <PackageName>Original MdePkg</PackageName>
     <GuidValue>5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec</GuidValue>
     <Version>0.3</Version>
     <Abstract>Framework Module Development Environment Industry Standards</Abstract>
