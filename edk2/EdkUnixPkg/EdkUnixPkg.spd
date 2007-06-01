@@ -121,52 +121,47 @@
     <Entry Name="UnixVirtualDisks">
       <C_Name>gEfiUnixVirtualDisksGuid</C_Name>
       <GuidValue>f2ba331a-8985-11db-a406-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual disk the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixPhysicalDisks">
       <C_Name>gEfiUnixPhysicalDisksGuid</C_Name>
       <GuidValue>f2bdcc96-8985-11db-8719-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines phisical disk emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixFileSystem">
       <C_Name>gEfiUnixFileSystemGuid</C_Name>
       <GuidValue>f2c16b9e-8985-11db-92c8-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines file system the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixUga">
       <C_Name>gEfiUnixUgaGuid</C_Name>
       <GuidValue>f2c8b80e-8985-11db-93f1-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual VGA device the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixConsole">
       <C_Name>gEfiUnixConsoleGuid</C_Name>
       <GuidValue>f2cc5d06-8985-11db-bb19-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Console the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixMemory">
       <C_Name>gEfiUnixMemoryGuid</C_Name>
       <GuidValue>f2d006cc-8985-11db-a472-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Memory the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixCPUModel">
       <C_Name>gEfiUnixCPUModelGuid</C_Name>
       <GuidValue>f2d3b330-8985-11db-8aa3-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines model of the CPU the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixCPUSpeed">
       <C_Name>gEfiUnixCPUSpeedGuid</C_Name>
       <GuidValue>f2d74e5a-8985-11db-9705-0040d02b1835</GuidValue>
-      <HelpText/>
-    </Entry>
-    <Entry Name="PcdHob">
-      <C_Name>gPcdHobGuid</C_Name>
-      <GuidValue>f2de8f12-8985-11db-aabc-0040d02b1835</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines speed of the CPU the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
     <Entry Name="UnixSerialPort">
       <C_Name>gEfiUnixSerialPortGuid</C_Name>
       <GuidValue>6d3a727d-66c8-4d19-87e6-0215861490f3</GuidValue>
-      <HelpText/>
+      <HelpText>This variable defines virtual Pass Thru devicehardware the emulator/UnixBusDriver will produce.</HelpText>
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
