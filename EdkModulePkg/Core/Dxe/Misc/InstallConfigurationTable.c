@@ -125,6 +125,12 @@ Returns:
       // Modify the table enty and return.
       //
       gDxeCoreST->ConfigurationTable[Index].VendorTable = Table;
+
+      //
+      // Signal Configuration Table change
+      //
+      CoreNotifySignalList (Guid);
+
       return EFI_SUCCESS;
     }
 
@@ -209,6 +215,11 @@ Returns:
   // Fix up the CRC-32 in the EFI System Table
   //
   CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
+
+  //
+  // Signal Configuration Table change
+  //
+  CoreNotifySignalList (Guid);
 
   return EFI_SUCCESS;
 }

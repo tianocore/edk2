@@ -17,15 +17,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define VARIABLE_STORE_SIGNATURE  EFI_SIGNATURE_32 ('$', 'V', 'S', 'S')
 
-#define MAX_VARIABLE_SIZE         1024
+#define MAX_VARIABLE_SIZE                 1024
 
-#define VARIABLE_DATA             0x55AA
+//
+// Enlarges the hardware error record maximum variable size to 32K bytes
+//
+#define MAX_HARDWARE_ERROR_VARIABLE_SIZE  0x8000
+
+#define VARIABLE_DATA                     0x55AA
 
 //
 // Variable Store Header flags
 //
-#define VARIABLE_STORE_FORMATTED  0x5a
-#define VARIABLE_STORE_HEALTHY    0xfe
+#define VARIABLE_STORE_FORMATTED          0x5a
+#define VARIABLE_STORE_HEALTHY            0xfe
 
 //
 // The alignment of variable's start offset.

@@ -75,7 +75,16 @@ ConPlatformTextOutDriverBindingStart (
 
 EFI_STATUS
 EFIAPI
-ConPlatformDriverBindingStop (
+ConPlatformTextInDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Handle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
+  );
+
+EFI_STATUS
+EFIAPI
+ConPlatformTextOutDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  UINTN                        NumberOfChildren,

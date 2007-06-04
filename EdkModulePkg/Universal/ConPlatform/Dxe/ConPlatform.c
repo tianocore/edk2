@@ -22,7 +22,7 @@ Abstract:
 EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding = {
   ConPlatformTextInDriverBindingSupported,
   ConPlatformTextInDriverBindingStart,
-  ConPlatformDriverBindingStop,
+  ConPlatformTextInDriverBindingStop,
   0xa,
   NULL,
   NULL
@@ -31,7 +31,7 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding = {
 EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
   ConPlatformTextOutDriverBindingSupported,
   ConPlatformTextOutDriverBindingStart,
-  ConPlatformDriverBindingStop,
+  ConPlatformTextOutDriverBindingStop,
   0xa,
   NULL,
   NULL
@@ -287,7 +287,6 @@ Returns:
   EFI_STATUS                    Status;
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
   EFI_SIMPLE_TEXT_OUT_PROTOCOL  *TextOut;
-
   BOOLEAN                       NeedClose;
 
   NeedClose = TRUE;
@@ -360,6 +359,7 @@ Returns:
               DevicePath,
               CHECK
               );
+
     if (!EFI_ERROR (Status)) {
       NeedClose = FALSE;
       Status = gBS->InstallMultipleProtocolInterfaces (
@@ -403,7 +403,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-ConPlatformDriverBindingStop (
+ConPlatformTextInDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
   IN  UINTN                        NumberOfChildren,
@@ -443,13 +443,81 @@ Returns:
                     );
     if (!EFI_ERROR (Status)) {
       //
-      // Remove DevicePath from ConInDev, ConOutDev, and StdErrDev
+      // Remove DevicePath from ConInDev
       //
       ConPlatformUpdateDeviceVariable (
         VarConsoleInpDev,
         DevicePath,
         DELETE
         );
+    }
+  }
+  //
+  // Uninstall the Console Device GUIDs from Controller Handle
+  //
+  ConPlatformUnInstallProtocol (
+    This,
+    ControllerHandle,
+    &gEfiConsoleInDeviceGuid
+    );
+
+  //
+  // Close the Simple Input Protocol
+  //
+  gBS->CloseProtocol (
+        ControllerHandle,
+        &gEfiSimpleTextInProtocolGuid,
+        This->DriverBindingHandle,
+        ControllerHandle
+        );
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+ConPlatformTextOutDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+  (Standard DriverBinding Protocol Stop() function)
+
+Returns:
+
+  None
+
+--*/
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  //
+  // hot plug device is not included into the console associated variables,
+  // so no need to check variable for those hot plug devices.
+  //
+  if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
+    //
+    // Get the Device Path Protocol so the environment variables can be updated
+    //
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **) &DevicePath,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Remove DevicePath from ConOutDev, and StdErrDev
+      //
       ConPlatformUpdateDeviceVariable (
         VarConsoleOutDev,
         DevicePath,
@@ -468,12 +536,6 @@ Returns:
   ConPlatformUnInstallProtocol (
     This,
     ControllerHandle,
-    &gEfiConsoleInDeviceGuid
-    );
-
-  ConPlatformUnInstallProtocol (
-    This,
-    ControllerHandle,
     &gEfiConsoleOutDeviceGuid
     );
 
@@ -484,15 +546,8 @@ Returns:
     );
 
   //
-  // Close the Simple Input and Simple Text Output Protocols
+  // Close the Simple Text Output Protocol
   //
-  gBS->CloseProtocol (
-        ControllerHandle,
-        &gEfiSimpleTextInProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle
-        );
-
   gBS->CloseProtocol (
         ControllerHandle,
         &gEfiSimpleTextOutProtocolGuid,
@@ -502,6 +557,7 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
 
 VOID
 ConPlatformUnInstallProtocol (
