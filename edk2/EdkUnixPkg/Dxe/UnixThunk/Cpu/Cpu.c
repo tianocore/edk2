@@ -651,7 +651,7 @@ Returns:
       //
       // Initialize strings to HII database
       //
-      PackageList = PreparePackages (1, &gEfiProcessorProducerGuid, STRING_ARRAY_NAME);
+      PackageList = PreparePackages (1, &gEfiProcessorProducerGuid, CpuStrings);
 
       Status      = Hii->NewPack (Hii, PackageList, &StringHandle);
       ASSERT (!EFI_ERROR (Status));

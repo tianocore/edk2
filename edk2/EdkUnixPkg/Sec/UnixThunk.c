@@ -40,6 +40,8 @@ Abstract:
 #include <stdlib.h>
 #include <termio.h>
 
+extern ioctl (int fd, unsigned long int __request, ...);
+
 static int settimer_initialized;
 static struct timeval settimer_timeval;
 static void (*settimer_callback)(UINT64 delta);
