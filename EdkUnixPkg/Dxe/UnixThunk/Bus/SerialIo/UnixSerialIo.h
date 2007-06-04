@@ -133,6 +133,54 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gUnixSerialIoComponentName;
 #define SERIAL_PORT_MAX_BAUD_RATE 115400  
 
 //
+// Fix the differences issue of linux header files termios.h 
+// 
+#ifndef B460800
+#define B460800 0010004
+#endif
+#ifndef B500000
+#define   B500000 0010005
+#endif
+#ifndef B576000
+#define   B576000 0010006
+#endif
+#ifndef B921600
+#define   B921600 0010007
+#endif
+#ifndef B1000000
+#define  B1000000 0010010
+#endif
+#ifndef B1152000
+#define  B1152000 0010011
+#endif
+#ifndef B1500000
+#define  B1500000 0010012
+#endif
+#ifndef B2000000
+#define  B2000000 0010013
+#endif
+#ifndef B2500000
+#define  B2500000 0010014
+#endif
+#ifndef B3000000
+#define  B3000000 0010015
+#endif
+#ifndef B3500000
+#define  B3500000 0010016
+#endif
+#ifndef B4000000
+#define  B4000000 0010017
+#endif
+#ifndef __MAX_BAUD
+#define __MAX_BAUD B4000000
+#endif
+#ifndef CMSPAR
+#define CMSPAR	  010000000000		/* mark or space (stick) parity */
+#endif
+#ifndef FIONREAD
+#define FIONREAD	0x541B
+#endif
+//
 // Function Prototypes
 //
 EFI_STATUS
