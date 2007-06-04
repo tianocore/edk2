@@ -39,9 +39,9 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 #include <termio.h>
-
+#ifdef __INSIDE_CYGWIN__
 extern ioctl (int fd, unsigned long int __request, ...);
-
+#endif
 static int settimer_initialized;
 static struct timeval settimer_timeval;
 static void (*settimer_callback)(UINT64 delta);
