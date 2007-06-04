@@ -352,6 +352,10 @@
       <IncludeHeader>Include/Guid/EventGroup.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
+    <IndustryStdHeader Name="HardwareErrorVariable">
+      <IncludeHeader>Include/Guid/HardwareErrorVariable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
     <IndustryStdHeader Name="EventLegacyBios">
       <IncludeHeader>Include/Guid/EventLegacyBios.h</IncludeHeader>
       <HelpText/>
@@ -708,6 +712,10 @@
       <IncludeHeader>Include/Protocol/AcpiSupport.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
+    <IndustryStdHeader Name="AcpiTable">
+      <IncludeHeader>Include/Protocol/AcpiTable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
     <IndustryStdHeader Name="Arp">
       <IncludeHeader>Include/Protocol/Arp.h</IncludeHeader>
       <HelpText/>
@@ -734,6 +742,10 @@
     </IndustryStdHeader>
     <IndustryStdHeader Name="ComponentName">
       <IncludeHeader>Include/Protocol/ComponentName.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ComponentName2">
+      <IncludeHeader>Include/Protocol/ComponentName2.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="CpuIo">
@@ -1305,6 +1317,11 @@
       <GuidValue>1BA0062E-C779-4582-8566-336AE8F78F09</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="HardwareErrorVariable">
+      <C_Name>gEfiHardwareErrorVariableGuid</C_Name>
+      <GuidValue>414E6BDD-E47B-47CC-B244-BB61020CF516</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="HobList">
       <C_Name>gEfiHobListGuid</C_Name>
       <GuidValue>7739F24C-93D7-11D4-9A3A-0090273FC14D</GuidValue>
@@ -1657,6 +1674,11 @@
       <GuidValue>107A772C-D5E1-11D4-9A46-0090273FC14D</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="ComponentName2">
+      <C_Name>gEfiComponentName2ProtocolGuid</C_Name>
+      <GuidValue>6A7A5CFF-E8D9-4F70-BADA-75AB3025CE14</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="DebugPort">
       <C_Name>gEfiDebugPortProtocolGuid</C_Name>
       <GuidValue>EBA4E8D2-3858-41EC-A281-2647BA9660D0</GuidValue>
@@ -1995,6 +2017,11 @@
     <Entry Name="AcpiSupport">
       <C_Name>gEfiAcpiSupportProtocolGuid</C_Name>
       <GuidValue>DBFF9D55-89B7-46DA-BDDF-677D3DC0241D</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="AcpiSupport">
+      <C_Name>gEfiAcpiTableProtocolGuid</C_Name>
+      <GuidValue>FFE06BDD-6107-46A6-7BB2-5A9C7EC5275C</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="BootScriptSave">
