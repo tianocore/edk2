@@ -522,7 +522,6 @@
     <Filename SupArchList="EBC">Ebc/CpuBreakpoint.c</Filename>
     <Filename SupArchList="EBC">Ebc/Synchronization.c</Filename>
     <Filename SupArchList="EBC">Synchronization.c</Filename>
-    <Filename>CheckSum.c</Filename>
   </SourceFiles>
   <NonProcessedFiles>
     <Filename>Ia32/ARShiftU64.asm</Filename>
