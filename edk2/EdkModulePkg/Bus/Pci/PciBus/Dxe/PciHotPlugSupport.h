@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -24,10 +24,6 @@ Revision History
 #ifndef _EFI_PCI_HOT_PLUG_SUPPORT_H
 #define _EFI_PCI_HOT_PLUG_SUPPORT_H
 
-//
-// stall 1 ms
-//
-#define STALL_1_MILLI_SECOND  1000    
 
 //
 // stall 1 second
@@ -205,7 +201,7 @@ Returns:
 
 EFI_STATUS
 AllRootHPCInitialized (
-  IN  UINTN           TimeoutInMilliSeconds
+  IN  UINTN           TimeoutInMicroSeconds
   )
 /*++
 
@@ -214,12 +210,11 @@ Routine Description:
   TODO: Add function description
 
 Arguments:
-
-  TimeoutInMilliSeconds - TODO: add argument description
+  TimeoutInMicroSeconds - microseconds to wait for all root hpc's initialization
 
 Returns:
-
-  TODO: add return values
+  EFI_SUCCESS - All root hpc's initialization is finished before the timeout
+  EFI_TIMEOUT - Time out
 
 --*/
 ;
