@@ -156,7 +156,6 @@ Returns:
 {
   EFI_STATUS  Status;
 
-  EFI_DEADLOOP ();
   Status = VariableCommonInitialize (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
 
