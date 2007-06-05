@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "pcibus.h"
+#include "Pcibus.h"
 #include "PciHotPlugSupport.h"
 
 EFI_PCI_HOT_PLUG_INIT_PROTOCOL  *gPciHotPlugInit;
@@ -270,17 +270,18 @@ Returns:
 
 EFI_STATUS
 AllRootHPCInitialized (
-  IN  UINTN           TimeoutInMilliSeconds
+  IN  UINTN           TimeoutInMicroSeconds
   )
 /*++
 
 Routine Description:
 
 Arguments:
+  TimeoutInMicroSeconds - microseconds to wait for all root hpc's initialization
 
 Returns:
-
-  None
+  EFI_SUCCESS - All root hpc's initialization is finished before the timeout
+  EFI_TIMEOUT - Time out
 
 --*/
 // TODO:    TimeoutInMilliSeconds - add argument and description to function comment
@@ -290,7 +291,7 @@ Returns:
   UINT32  Delay;
   UINTN   Index;
 
-  Delay = (UINT32) (((TimeoutInMilliSeconds * STALL_1_MILLI_SECOND) / 30) + 1);
+  Delay = (UINT32) ((TimeoutInMicroSeconds / 30) + 1);
   do {
 
     for (Index = 0; Index < gPciRootHpcCount; Index++) {
