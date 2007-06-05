@@ -7034,7 +7034,7 @@
           <TokenSpaceGuidCName>gEfiEdkUnixPkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>20</MaxDatumSize>
-          <Value>L"/dev/ttyS0"</Value>
+          <Value>L"/dev/ttyS0!/dev/ttyS1"</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -7943,7 +7943,7 @@
       <MaxDatumSize>20</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>L"/dev/ttyS0"</Value>
+        <Value>L"/dev/ttyS0!/dev/ttyS1"</Value>
       </SkuInfo>
     </PcdBuildData>
   </DynamicPcdBuildDefinitions>
