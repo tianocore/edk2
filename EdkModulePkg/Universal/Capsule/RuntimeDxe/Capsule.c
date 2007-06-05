@@ -48,7 +48,6 @@ Returns:
   EFI_STATUS  Status;
   EFI_HANDLE  NewHandle;
 
-  EFI_DEADLOOP ();
   SystemTable->RuntimeServices->UpdateCapsule                    = UpdateCapsule;
   SystemTable->RuntimeServices->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
 
