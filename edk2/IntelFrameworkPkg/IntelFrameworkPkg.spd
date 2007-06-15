@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SpdHeader>
+    <PackageName>IntelFrameworkPkg</PackageName>
+    <GuidValue>2759ded5-bb57-4b06-af4f-c398fa552719</GuidValue>
+    <Version>1.0</Version>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </SpdHeader>
+  <PackageDefinitions>
+    <ReadOnly>false</ReadOnly>
+    <RePackage>false</RePackage>
+  </PackageDefinitions>
+  <MsaFiles>
+    <Filename>Library/DxeIoLibCpuIo/DxeIoLibCpuIo.msa</Filename>
+    <Filename>Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.msa</Filename>
+    <Filename>Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.msa</Filename>
+    <Filename>Library/UefiLibFramework/UefiLib.msa</Filename>
+  </MsaFiles>
+  <PackageHeaders>
+    <IncludePkgHeader ModuleType="BASE">Include/FrameworkBase.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="PEIM">Include/FrameworkPei.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_DRIVER">Include/FrameworkDxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_RUNTIME_DRIVER">Include/FrameworkDxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_SMM_DRIVER">Include/FrameworkSmm.h</IncludePkgHeader>
+  </PackageHeaders>
+</PackageSurfaceArea>
