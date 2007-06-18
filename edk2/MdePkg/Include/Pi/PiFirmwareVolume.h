@@ -23,16 +23,16 @@
 //
 // EFI_FV_FILE_ATTRIBUTES
 //
-typedef UINT32 	EFI_FV_FILE_ATTRIBUTES;
+typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 
 //
 // Value of EFI_FV_FILE_ATTRIBUTES.
 // 
-#define EFI_FV_FILE_ATTRIB_ALIGNMENT			0x0000001F
-#define EFI_FV_FILE_ATTRIB_FIXED 					0x00000100
-#define EFI_FV_FILE_ATTRIB_MEMORY_MAPPED 	0x00000200
+#define EFI_FV_FILE_ATTRIB_ALIGNMENT      0x0000001F
+#define EFI_FV_FILE_ATTRIB_FIXED          0x00000100
+#define EFI_FV_FILE_ATTRIB_MEMORY_MAPPED  0x00000200
 
-typedef UINT32 	EFI_FVB_ATTRIBUTES;
+typedef UINT32  EFI_FVB_ATTRIBUTES;
 
 // 
 // Attributes bit definitions
@@ -96,16 +96,16 @@ typedef struct {
 // Describes the features and layout of the firmware volume.
 //
 typedef struct {
-  UINT8     ZeroVector[16];
-  EFI_GUID  FileSystemGuid;
-  UINT64    FvLength;
-  UINT32    Signature;
-  EFI_FVB_ATTRIBUTES  Attributes;
-  UINT16    HeaderLength;
-  UINT16    Checksum;
-  UINT16    ExtHeaderOffset;
-  UINT8     Reserved[1];
-  UINT8     Revision;
+  UINT8                     ZeroVector[16];
+  EFI_GUID                  FileSystemGuid;
+  UINT64                    FvLength;
+  UINT32                    Signature;
+  EFI_FVB_ATTRIBUTES        Attributes;
+  UINT16                    HeaderLength;
+  UINT16                    Checksum;
+  UINT16                    ExtHeaderOffset;
+  UINT8                     Reserved[1];
+  UINT8                     Revision;
   EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
 } EFI_FIRMWARE_VOLUME_HEADER;
 

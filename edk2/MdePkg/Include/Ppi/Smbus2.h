@@ -24,7 +24,7 @@
 #include <IndustryStandard/SmBus.h>
 
 #define EFI_PEI_SMBUS2_PPI_GUID \
-	{ 0x9ca93627, 0xb65b, 0x4324, { 0xa2, 0x2, 0xc0, 0xb4, 0x61, 0x76, 0x45, 0x43 } }
+  { 0x9ca93627, 0xb65b, 0x4324, { 0xa2, 0x2, 0xc0, 0xb4, 0x61, 0x76, 0x45, 0x43 } }
 
 
 typedef struct _EFI_PEI_SMBUS2_PPI EFI_PEI_SMBUS2_PPI;
@@ -32,36 +32,36 @@ typedef struct _EFI_PEI_SMBUS2_PPI EFI_PEI_SMBUS2_PPI;
 //
 // EFI_SMBUS_DEVICE_COMMAND
 //
-typedef UINTN 	EFI_SMBUS_DEVICE_COMMAND;
+typedef UINTN   EFI_SMBUS_DEVICE_COMMAND;
 
 
 /*
   Executes an SMBus operation to an SMBus controller.
 
-  @param  This           	A pointer to the EFI_PEI_SMBUS2_PPI instance.
-  @param  SlaveAddress   	The SMBUS hardware address to which the SMBUS device is preassigned or
-													allocated.
-  @param  Command        	This command is transmitted by the SMBus host controller to the SMBus slave 
-													device and the interpretation is SMBus slave device specific. 
-													It can mean the offset to a list of functions inside 
-													an SMBus slave device. Not all operations or slave devices support
-													this command's registers.
+  @param  This            A pointer to the EFI_PEI_SMBUS2_PPI instance.
+  @param  SlaveAddress    The SMBUS hardware address to which the SMBUS device is preassigned or
+                          allocated.
+  @param  Command         This command is transmitted by the SMBus host controller to the SMBus slave 
+                          device and the interpretation is SMBus slave device specific. 
+                          It can mean the offset to a list of functions inside 
+                          an SMBus slave device. Not all operations or slave devices support
+                          this command's registers.
 
-  @param  Operation      	Signifies which particular SMBus hardware protocol instance that it 
-													will use to execute the SMBus transactions. 
-													This SMBus hardware protocol is defined by the System Management Bus (SMBus) 
-													Specification and is not related to UEFI.
+  @param  Operation       Signifies which particular SMBus hardware protocol instance that it 
+                          will use to execute the SMBus transactions. 
+                          This SMBus hardware protocol is defined by the System Management Bus (SMBus) 
+                          Specification and is not related to UEFI.
 
-  @param  PecCheck       	Defines if Packet Error Code (PEC) checking is required for this operation.
+  @param  PecCheck        Defines if Packet Error Code (PEC) checking is required for this operation.
 
-  @param  Length         	Signifies the number of bytes that this operation will do. 
-													The maximum number of bytes can be revision specific and operation specific.
-													This parameter will contain the actual number of bytes that are executed
-													for this operation. Not all operations require this argument.
+  @param  Length          Signifies the number of bytes that this operation will do. 
+                          The maximum number of bytes can be revision specific and operation specific.
+                          This parameter will contain the actual number of bytes that are executed
+                          for this operation. Not all operations require this argument.
 
-  @param  Buffer         	Contains the value of data to execute to the SMBus slave device. 
-													Not all operations require this argument. 
-													The length of this buffer is identified by Length.
+  @param  Buffer          Contains the value of data to execute to the SMBus slave device. 
+                          Not all operations require this argument. 
+                          The length of this buffer is identified by Length.
 
 
   @retval EFI_SUCCESS           The last data that was returned from the access
@@ -83,13 +83,13 @@ typedef UINTN 	EFI_SMBUS_DEVICE_COMMAND;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION) (
-	IN CONST 	EFI_PEI_SMBUS2_PPI 				*This,
-	IN CONST 	EFI_SMBUS_DEVICE_ADDRESS 	SlaveAddress,
-	IN CONST 	EFI_SMBUS_DEVICE_COMMAND 	Command,
-	IN CONST 	EFI_SMBUS_OPERATION 			Operation,
-	IN CONST 	BOOLEAN 									PecCheck,
-	IN OUT 		UINTN 										*Length,
-	IN OUT 		VOID 											*Buffer
+  IN CONST  EFI_PEI_SMBUS2_PPI        *This,
+  IN CONST  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN CONST  EFI_SMBUS_DEVICE_COMMAND  Command,
+  IN CONST  EFI_SMBUS_OPERATION       Operation,
+  IN CONST  BOOLEAN                   PecCheck,
+  IN OUT    UINTN                     *Length,
+  IN OUT    VOID                      *Buffer
 );
 
 
@@ -119,9 +119,9 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_NOTIFY2_FUNCTION) (
-	IN CONST 	EFI_PEI_SMBUS2_PPI 				*SmbusPpi,
-	IN CONST 	EFI_SMBUS_DEVICE_ADDRESS 	SlaveAddress,
-	IN CONST 	UINTN 										Data
+  IN CONST  EFI_PEI_SMBUS2_PPI        *SmbusPpi,
+  IN CONST  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN CONST  UINTN                     Data
 );
 /**
   The ArpDevice() function enumerates the entire bus or enumerates a specific 
@@ -149,10 +149,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS2_PPI_ARP_DEVICE) (
-	IN CONST	EFI_PEI_SMBUS2_PPI 				*This,
-	IN CONST  BOOLEAN 									ArpAll,
-	IN CONST 	EFI_SMBUS_UDID 						*SmbusUdid, OPTIONAL
-	IN OUT 		EFI_SMBUS_DEVICE_ADDRESS 	*SlaveAddress OPTIONAL
+  IN CONST  EFI_PEI_SMBUS2_PPI        *This,
+  IN CONST  BOOLEAN                   ArpAll,
+  IN CONST  EFI_SMBUS_UDID            *SmbusUdid, OPTIONAL
+  IN OUT    EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
 );
 
 
@@ -176,9 +176,9 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS2_PPI_GET_ARP_MAP) (
-	IN CONST	EFI_PEI_SMBUS2_PPI 		*This,
-	IN OUT 		UINTN 								*Length,
-	IN OUT 		EFI_SMBUS_DEVICE_MAP 	**SmbusDeviceMap
+  IN CONST  EFI_PEI_SMBUS2_PPI    *This,
+  IN OUT    UINTN                 *Length,
+  IN OUT    EFI_SMBUS_DEVICE_MAP  **SmbusDeviceMap
 );
 
 
@@ -201,10 +201,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS2_PPI_NOTIFY) (
-	IN CONST	EFI_PEI_SMBUS2_PPI 							*This,
-	IN CONST 	EFI_SMBUS_DEVICE_ADDRESS 				SlaveAddress,
-	IN CONST 	UINTN 													Data,
-	IN CONST 	EFI_PEI_SMBUS_NOTIFY2_FUNCTION 	NotifyFunction
+  IN CONST  EFI_PEI_SMBUS2_PPI              *This,
+  IN CONST  EFI_SMBUS_DEVICE_ADDRESS        SlaveAddress,
+  IN CONST  UINTN                           Data,
+  IN CONST  EFI_PEI_SMBUS_NOTIFY2_FUNCTION  NotifyFunction
 );
 
 /**
@@ -231,11 +231,11 @@ EFI_STATUS
 
 **/
 struct _EFI_PEI_SMBUS2_PPI {
-	EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION 	Execute;
-	EFI_PEI_SMBUS2_PPI_ARP_DEVICE 				ArpDevice;
-	EFI_PEI_SMBUS2_PPI_GET_ARP_MAP 				GetArpMap;
-	EFI_PEI_SMBUS2_PPI_NOTIFY 						Notify;
-	EFI_GUID 															Identifier;
+  EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION  Execute;
+  EFI_PEI_SMBUS2_PPI_ARP_DEVICE         ArpDevice;
+  EFI_PEI_SMBUS2_PPI_GET_ARP_MAP        GetArpMap;
+  EFI_PEI_SMBUS2_PPI_NOTIFY             Notify;
+  EFI_GUID                              Identifier;
 };
 
 extern EFI_GUID gEfiPeiSmbus2PpiGuid;

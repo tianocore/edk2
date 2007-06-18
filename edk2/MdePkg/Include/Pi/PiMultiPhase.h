@@ -32,14 +32,14 @@
 //
 // Status Code Type Definition
 //
-typedef UINT32 	EFI_STATUS_CODE_TYPE;
+typedef UINT32  EFI_STATUS_CODE_TYPE;
 
 //
 // A Status Code Type is made up of the code type and severity
 // All values masked by EFI_STATUS_CODE_RESERVED_MASK are
 // reserved for use by this specification.
 //
-#define EFI_STATUS_CODE_TYPE_MASK 		0x000000FF
+#define EFI_STATUS_CODE_TYPE_MASK     0x000000FF
 #define EFI_STATUS_CODE_SEVERITY_MASK 0xFF000000
 #define EFI_STATUS_CODE_RESERVED_MASK 0x00FFFF00
 
@@ -48,9 +48,9 @@ typedef UINT32 	EFI_STATUS_CODE_TYPE;
 // EFI_STATUS_CODE_TYPE_MASK are reserved for use by
 // this specification.
 //
-#define EFI_PROGRESS_CODE 						0x00000001
-#define EFI_ERROR_CODE 								0x00000002
-#define EFI_DEBUG_CODE 								0x00000003
+#define EFI_PROGRESS_CODE             0x00000001
+#define EFI_ERROR_CODE                0x00000002
+#define EFI_DEBUG_CODE                0x00000003
 
 //
 // Definitions of severities, all other values masked by
@@ -61,10 +61,10 @@ typedef UINT32 	EFI_STATUS_CODE_TYPE;
 // For example, if a memory error was not detected early enough,
 // the bad data could be consumed by other drivers.
 //
-#define EFI_ERROR_MINOR 							0x40000000
-#define EFI_ERROR_MAJOR 							0x80000000
-#define EFI_ERROR_UNRECOVERED 				0x90000000
-#define EFI_ERROR_UNCONTAINED 				0xa0000000
+#define EFI_ERROR_MINOR               0x40000000
+#define EFI_ERROR_MAJOR               0x80000000
+#define EFI_ERROR_UNRECOVERED         0x90000000
+#define EFI_ERROR_UNCONTAINED         0xa0000000
 
 //
 // Status Code Value Definition
@@ -74,18 +74,18 @@ typedef UINT32 EFI_STATUS_CODE_VALUE;
 // A Status Code Value is made up of the class, subclass, and
 // an operation.
 //
-#define EFI_STATUS_CODE_CLASS_MASK 			0xFF000000
-#define EFI_STATUS_CODE_SUBCLASS_MASK 	0x00FF0000
-#define EFI_STATUS_CODE_OPERATION_MASK 	0x0000FFFF
+#define EFI_STATUS_CODE_CLASS_MASK      0xFF000000
+#define EFI_STATUS_CODE_SUBCLASS_MASK   0x00FF0000
+#define EFI_STATUS_CODE_OPERATION_MASK  0x0000FFFF
 //
 // Definition of Status Code extended data header.
 // The data will follow HeaderSize bytes from the beginning of
 // the structure and is Size bytes long.
 //
 typedef struct {
-	UINT16 		HeaderSize;
-	UINT16 		Size;
-	EFI_GUID 	Type;
+  UINT16    HeaderSize;
+  UINT16    Size;
+  EFI_GUID  Type;
 } EFI_STATUS_CODE_DATA;
 
 #endif

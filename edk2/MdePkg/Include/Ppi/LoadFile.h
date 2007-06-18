@@ -21,32 +21,32 @@
 #define __FV_FILE_LOADER_PPI_H__
 
 #define EFI_PEI_LOAD_FILE_PPI_GUID \
-	{ 0xb9e0abfe, 0x5979, 0x4914, { 0x97, 0x7f, 0x6d, 0xee, 0x78, 0xc2, 0x78, 0xa6 } }
+  { 0xb9e0abfe, 0x5979, 0x4914, { 0x97, 0x7f, 0x6d, 0xee, 0x78, 0xc2, 0x78, 0xa6 } }
 
 
-typedef struct _EFI_PEI_LOAD_FILE_PPI	EFI_PEI_LOAD_FILE_PPI;
+typedef struct _EFI_PEI_LOAD_FILE_PPI EFI_PEI_LOAD_FILE_PPI;
 
 /**
   This service is the single member function of EFI_LOAD_FILE_PPI. This service separates
   image loading and relocating from the PEI Foundation.
   
-  @param This   							Interface pointer that implements
+  @param This                 Interface pointer that implements
                               the Load File PPI instance.
 
-  @param FileHandle						File handle of the file to load.
-															Type EFI_PEI_FILE_HANDLE is defined in
-															FfsFindNextFile().
+  @param FileHandle           File handle of the file to load.
+                              Type EFI_PEI_FILE_HANDLE is defined in
+                              FfsFindNextFile().
 
-  @param ImageAddress 				Pointer to the address of the
-															loaded image.
+  @param ImageAddress         Pointer to the address of the
+                              loaded image.
 
-  @param ImageSize 						Pointer to the size of the loaded
+  @param ImageSize            Pointer to the size of the loaded
                               image.
 
-  @param EntryPoint 					Pointer to the entry point of the
+  @param EntryPoint           Pointer to the entry point of the
                               image.
 
-  @param AuthenticationState 	On exit, points to the attestation
+  @param AuthenticationState  On exit, points to the attestation
                               authentication state of the image
                               or 0 if no attestation was
                               performed. The format of
@@ -54,29 +54,29 @@ typedef struct _EFI_PEI_LOAD_FILE_PPI	EFI_PEI_LOAD_FILE_PPI;
                               EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI.ExtractSection()
 
 
-  @retval EFI_SUCCESS 				The image was loaded successfully.
+  @retval EFI_SUCCESS         The image was loaded successfully.
 
-  @retval EFI_OUT_OF_RESOURCES 	There was not enough memory.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory.
 
-  @retval EFI_LOAD_ERROR 			There was no supported image in
+  @retval EFI_LOAD_ERROR      There was no supported image in
                               the file EFI_INVALID_PARAMETER
                               FileHandle was not a valid
                               firmware file handle.
-  @retval EFI_INVALID_PARAMETER 	EntryPoint was NULL.
+  @retval EFI_INVALID_PARAMETER   EntryPoint was NULL.
 
-  @retval EFI_NOT_SUPPORTED 	An image requires relocations or
-															is not memory mapped.
+  @retval EFI_NOT_SUPPORTED   An image requires relocations or
+                              is not memory mapped.
    
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_LOAD_FILE) (
-	IN CONST 	EFI_PEI_LOAD_FILE_PPI 	*This,
-	IN CONST 	EFI_PEI_FILE_HANDLE 		FileHandle,
-	OUT 			EFI_PHYSICAL_ADDRESS 		*ImageAddress,
-	OUT 			UINT64 									*ImageSize,
-	OUT 			EFI_PHYSICAL_ADDRESS 		*EntryPoint,
-	OUT 			UINT32 									*AuthenticationState
+  IN CONST  EFI_PEI_LOAD_FILE_PPI   *This,
+  IN CONST  EFI_PEI_FILE_HANDLE     FileHandle,
+  OUT       EFI_PHYSICAL_ADDRESS    *ImageAddress,
+  OUT       UINT64                  *ImageSize,
+  OUT       EFI_PHYSICAL_ADDRESS    *EntryPoint,
+  OUT       UINT32                  *AuthenticationState
 );
 
 
@@ -92,7 +92,7 @@ EFI_STATUS
   
 **/
 struct _EFI_PEI_LOAD_FILE_PPI {
-	EFI_PEI_LOAD_FILE LoadFile;
+  EFI_PEI_LOAD_FILE LoadFile;
 };
 
 

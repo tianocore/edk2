@@ -22,23 +22,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Basical data type definitions introduced in UEFI.
 // 
-typedef GUID          						EFI_GUID;
-typedef RETURN_STATUS 						EFI_STATUS;
-typedef VOID											*EFI_HANDLE;
+typedef GUID                      EFI_GUID;
+typedef RETURN_STATUS             EFI_STATUS;
+typedef VOID                      *EFI_HANDLE;
 
-typedef VOID  										*EFI_EVENT;
+typedef VOID                      *EFI_EVENT;
 
-typedef UINTN 										EFI_TPL;
-
-
-typedef UINT64    								EFI_LBA;
+typedef UINTN                     EFI_TPL;
 
 
-typedef UINT16  									EFI_HII_HANDLE;
-typedef UINT16  									STRING_REF;
+typedef UINT64                    EFI_LBA;
 
-typedef UINT64  									EFI_PHYSICAL_ADDRESS;
-typedef UINT64  									EFI_VIRTUAL_ADDRESS;
+
+typedef UINT16                    EFI_HII_HANDLE;
+typedef UINT16                    STRING_REF;
+
+typedef UINT64                    EFI_PHYSICAL_ADDRESS;
+typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
 //
 // EFI Time Abstraction:
@@ -105,12 +105,12 @@ typedef struct {
 #define EFI_WARN_BUFFER_TOO_SMALL RETURN_WARN_BUFFER_TOO_SMALL
 
 
-#define NULL_HANDLE 							((VOID *) 0)
+#define NULL_HANDLE               ((VOID *) 0)
 
 //
 // Define macro to encode the status code.
 // 
-#define EFIERR(_a)    						ENCODE_ERROR(_a)
+#define EFIERR(_a)                ENCODE_ERROR(_a)
 
 #define EFI_ERROR(A)              RETURN_ERROR(A)
 
@@ -133,9 +133,9 @@ typedef struct {
 // 4K. This should in no way be confused with the page size of the processor.
 // An EFI_PAGE is just the quanta of memory in EFI.
 //
-#define EFI_PAGE_SIZE							0x1000
-#define EFI_PAGE_MASK         		0xFFF
-#define EFI_PAGE_SHIFT        		12
+#define EFI_PAGE_SIZE             0x1000
+#define EFI_PAGE_MASK             0xFFF
+#define EFI_PAGE_SHIFT            12
 
 
 #endif
