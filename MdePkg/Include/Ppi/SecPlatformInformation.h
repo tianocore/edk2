@@ -66,14 +66,14 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SEC_PLATFORM_INFORMATION) (
-	IN CONST 	EFI_PEI_SERVICES 										**PeiServices,
-	IN OUT 		UINT64 															*StructureSize,
-	OUT 			EFI_SEC_PLATFORM_INFORMATION_RECORD	*PlatformInformationRecord
+  IN CONST  EFI_PEI_SERVICES                    **PeiServices,
+  IN OUT    UINT64                              *StructureSize,
+  OUT       EFI_SEC_PLATFORM_INFORMATION_RECORD *PlatformInformationRecord
 );
 
 
 /**
-	Ppi Description:
+  Ppi Description:
 
   @param Name
 

@@ -119,9 +119,9 @@ typedef EFI_COMMON_SECTION_HEADER EFI_COMPATIBILITY16_SECTION;
 // section data is compressed.
 // 
 typedef struct {
-  EFI_COMMON_SECTION_HEADER CommonHeader;
-  UINT32  UncompressedLength;
-  UINT8   CompressionType;
+  EFI_COMMON_SECTION_HEADER   CommonHeader;
+  UINT32                      UncompressedLength;
+  UINT8                       CompressionType;
 } EFI_COMPRESSION_SECTION;
 
 //
@@ -138,8 +138,8 @@ typedef EFI_COMMON_SECTION_HEADER EFI_FIRMWARE_VOLUME_IMAGE_SECTION;
 // Leaf section which contains a single GUID.
 // 
 typedef struct {
-  EFI_COMMON_SECTION_HEADER CommonHeader;
-  EFI_GUID  SubTypeGuid;
+  EFI_COMMON_SECTION_HEADER   CommonHeader;
+  EFI_GUID                    SubTypeGuid;
 } EFI_FREEFORM_SUBTYPE_GUID_SECTION;
 
 //
@@ -151,10 +151,10 @@ typedef struct {
 // Leaf section which is encapsulation defined by specific GUID
 // 
 typedef struct {
-  EFI_COMMON_SECTION_HEADER CommonHeader;
-  EFI_GUID  SectionDefinitionGuid;
-  UINT16    DataOffset;
-  UINT16    Attributes;
+  EFI_COMMON_SECTION_HEADER   CommonHeader;
+  EFI_GUID                    SectionDefinitionGuid;
+  UINT16                      DataOffset;
+  UINT16                      Attributes;
 } EFI_GUID_DEFINED_SECTION;
 
 //
@@ -183,12 +183,12 @@ typedef EFI_COMMON_SECTION_HEADER EFI_RAW_SECTION;
 // is human readable file name.
 // 
 typedef struct {
-  EFI_COMMON_SECTION_HEADER CommonHeader;
+  EFI_COMMON_SECTION_HEADER   CommonHeader;
 
   //
   // Array of unicode string.
   // 
-  CHAR16 FileNameString[1];
+  CHAR16                      FileNameString[1];
 } EFI_USER_INTERFACE_SECTION;
 
 
@@ -197,9 +197,9 @@ typedef struct {
 // an optional unicode string that represent the file revision. 
 // 
 typedef struct {
-  EFI_COMMON_SECTION_HEADER CommonHeader;
-  UINT16  BuildNumber;
-  CHAR16  VersionString[1];
+  EFI_COMMON_SECTION_HEADER   CommonHeader;
+  UINT16                      BuildNumber;
+  CHAR16                      VersionString[1];
 } EFI_VERSION_SECTION;
 
 #endif

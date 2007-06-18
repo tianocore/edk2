@@ -28,8 +28,8 @@
 //
 // Handles of EFI FV/FFS.
 // 
-typedef VOID 		*EFI_PEI_FV_HANDLE;
-typedef VOID 		*EFI_PEI_FILE_HANDLE;
+typedef VOID    *EFI_PEI_FV_HANDLE;
+typedef VOID    *EFI_PEI_FILE_HANDLE;
 
 //
 // Declare forward referenced data structures
@@ -54,7 +54,7 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEIM_ENTRY_POINT)(
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -104,10 +104,10 @@ struct _EFI_PEI_NOTIFY_DESCRIPTOR {
 // this HOB is produced and consumed during the HOB producer phase.
 // 
 typedef struct _EFI_HOB_LOAD_PEIM {
-	EFI_HOB_GENERIC_HEADER            Header;
-	EFI_PEI_FILE_HANDLE               FileHandle;
-	EFI_PEIM_ENTRY_POINT              EntryPoint;
-	EFI_PEIM_ENTRY_POINT              InMemEntryPoint;
+  EFI_HOB_GENERIC_HEADER            Header;
+  EFI_PEI_FILE_HANDLE               FileHandle;
+  EFI_PEIM_ENTRY_POINT              EntryPoint;
+  EFI_PEIM_ENTRY_POINT              InMemEntryPoint;
 } EFI_HOB_LOAD_PEIM;
 
 
@@ -499,69 +499,69 @@ EFI_STATUS
 
 /**
    
-	This service searches for files with a specific name, within
-	either the specified firmware volume or all firmware volumes.
-	The service returns a file handle of type EFI_PEI_FILE_HANDLE,
+  This service searches for files with a specific name, within
+  either the specified firmware volume or all firmware volumes.
+  The service returns a file handle of type EFI_PEI_FILE_HANDLE,
   which must be unique within the system.
 
-  @param FileName 			A pointer to the name of the file to
-												find within the firmware volume.
+  @param FileName       A pointer to the name of the file to
+                        find within the firmware volume.
 
-  @param VolumeHandle 	The firmware volume to search FileHandle
+  @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
 
-  @retval EFI_SUCCESS 						File was found.
+  @retval EFI_SUCCESS             File was found.
 
-  @retval EFI_NOT_FOUND 					File was not found.
+  @retval EFI_NOT_FOUND           File was not found.
 
-  @retval EFI_INVALID_PARAMETER 	VolumeHandle or FileHandle or
-																	FileName was NULL.
+  @retval EFI_INVALID_PARAMETER   VolumeHandle or FileHandle or
+                                  FileName was NULL.
 
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_BY_NAME) (
-	IN CONST 	EFI_GUID 						*FileName,
-	IN CONST	EFI_PEI_FV_HANDLE 	VolumeHandle,
-	OUT 			EFI_PEI_FILE_HANDLE *FileHandle
-);
+  IN CONST  EFI_GUID            *FileName,
+  IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
+  OUT       EFI_PEI_FILE_HANDLE *FileHandle
+  );
 
 
 /**
    
-  @param FileName 	Name of the file.
+  @param FileName   Name of the file.
 
-  @param FileType 	File type. See EFI_FV_FILETYPE, which is
+  @param FileType   File type. See EFI_FV_FILETYPE, which is
                     defined in the Platform Initialization
                     Firmware Storage Specification.
 
-  @param FileAttributes 	Attributes of the file. Type
+  @param FileAttributes   Attributes of the file. Type
                           EFI_FV_FILE_ATTRIBUTES is defined in
                           the Platform Initialization Firmware
                           Storage Specification.
 
-  @param Buffer 	Points to the file's data (not the header).
+  @param Buffer   Points to the file's data (not the header).
                   Not valid if EFI_FV_FILE_ATTRIB_MEMORY_MAPPED
                   is zero.
 
-  @param BufferSize 	Size of the file's data.
+  @param BufferSize   Size of the file's data.
 
 **/
 typedef struct {
-	EFI_GUID 								FileName;
-	EFI_FV_FILETYPE 				FileType;
-	EFI_FV_FILE_ATTRIBUTES 	FileAttributes;
-	VOID 										*Buffer;
-	UINT32 									BufferSize;
+  EFI_GUID                FileName;
+  EFI_FV_FILETYPE         FileType;
+  EFI_FV_FILE_ATTRIBUTES  FileAttributes;
+  VOID                    *Buffer;
+  UINT32                  BufferSize;
 } EFI_FV_FILE_INFO;
 
 /**
    
-	This function returns information about a specific file,
-	including its file name, type, attributes, starting address and
-	size. If the firmware volume is not memory mapped then the
+  This function returns information about a specific file,
+  including its file name, type, attributes, starting address and
+  size. If the firmware volume is not memory mapped then the
   Buffer member will be NULL.
 
   @param FileHandle   Handle of the file.
@@ -569,58 +569,58 @@ typedef struct {
   @param FileInfo     Upon exit, points to the file¡¯s
                       information.
 
-  @retval EFI_SUCCESS 						File information returned.
+  @retval EFI_SUCCESS             File information returned.
   
-  @retval EFI_INVALID_PARAMETER 	If FileHandle does not
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
   
-  @retval EFI_INVALID_PARAMETER 	If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
   
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_FILE_INFO) (
-	IN CONST	EFI_PEI_FILE_HANDLE 	FileHandle,
-	OUT 			EFI_FV_FILE_INFO 			*FileInfo
-);
+  IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
+  OUT       EFI_FV_FILE_INFO      *FileInfo
+  );
 
 
 /**
    
-  @param FvAttributes 	Attributes of the firmware volume. Type
+  @param FvAttributes   Attributes of the firmware volume. Type
                         EFI_FVB_ATTRIBUTES is defined in the
                         Platform Initialization Firmware Storage
                         Specficiation.
 
-  @param FvFormat 			Format of the firmware volume. For PI
+  @param FvFormat       Format of the firmware volume. For PI
                         Architecture Firmware Volumes, this can
                         be copied from FileSystemGuid in
                         EFI_FIRMWARE_VOLUME_HEADER.
 
-  @param FvName 				Name of the firmware volume. For PI
+  @param FvName         Name of the firmware volume. For PI
                         Architecture Firmware Volumes, this can
                         be copied from VolumeName in the
                         extended header of
                         EFI_FIRMWARE_VOLUME_HEADER.
 
-  @param FvStart 				Points to the first byte of the firmware
+  @param FvStart        Points to the first byte of the firmware
                         volume, if bit EFI_FVB_MEMORY_MAPPED is
                         set in FvAttributes. FvSize Size of the
                         firmware volume.
 
 **/
 typedef struct {
-	EFI_FVB_ATTRIBUTES 	FvAttributes;
-	EFI_GUID 						FvFormat;
-	EFI_GUID 						FvName;
-	VOID								*FvStart;
-	UINT64 							FvSize;
+  EFI_FVB_ATTRIBUTES  FvAttributes;
+  EFI_GUID            FvFormat;
+  EFI_GUID            FvName;
+  VOID                *FvStart;
+  UINT64              FvSize;
 } EFI_FV_INFO;
 
 /**
    
-	This function returns information about a specific firmware
-	volume, including its name, type, attributes, starting address
+  This function returns information about a specific firmware
+  volume, including its name, type, attributes, starting address
   and size.
 
   @param VolumeHandle   Handle of the volume.
@@ -628,51 +628,51 @@ typedef struct {
   @param VolumeInfo     Upon exit, points to the volume¡¯s
                         information.
 
-	@retval EFI_SUCCESS 						File information returned.
+  @retval EFI_SUCCESS             File information returned.
   
-  @retval EFI_INVALID_PARAMETER 	If FileHandle does not
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
   
-  @retval EFI_INVALID_PARAMETER 	If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_VOLUME_INFO) (
-	IN CONST	EFI_PEI_FV_HANDLE	*VolumeHandle,
-	OUT 			EFI_FV_INFO 			*VolumeInfo
-);
+  IN CONST  EFI_PEI_FV_HANDLE *VolumeHandle,
+  OUT       EFI_FV_INFO       *VolumeInfo
+  );
 
 /**
    
-	This service registers a file handle so that after memory is
-	available, the PEIM will be re-loaded into permanent memory and
-	re-initialized. The PEIM registered this way will always be
-	initialized twice. The first time, this function call will
-	return EFI_SUCCESS. The second time, this function call will
-	return EFI_ALREADY_STARTED. Depending on the order in which
-	PEIMs are dispatched, the PEIM making this call may be
-	initialized after permanent memory is installed, even the first
+  This service registers a file handle so that after memory is
+  available, the PEIM will be re-loaded into permanent memory and
+  re-initialized. The PEIM registered this way will always be
+  initialized twice. The first time, this function call will
+  return EFI_SUCCESS. The second time, this function call will
+  return EFI_ALREADY_STARTED. Depending on the order in which
+  PEIMs are dispatched, the PEIM making this call may be
+  initialized after permanent memory is installed, even the first
   time.
 
-  @param FileHandle 	PEIM¡¯s file handle. Must be the currently
+  @param FileHandle   PEIM¡¯s file handle. Must be the currently
                       xecuting PEIM.
   
-  @retval EFI_SUCCESS 	The PEIM was successfully registered for
+  @retval EFI_SUCCESS   The PEIM was successfully registered for
                         shadowing.
 
-  @retval EFI_ALREADY_STARTED 	The PEIM was previously
+  @retval EFI_ALREADY_STARTED   The PEIM was previously
                                 registered for shadowing.
 
-  @retval EFI_NOT_FOUND 	The FileHandle does not refer to a
-													valid file handle.
+  @retval EFI_NOT_FOUND   The FileHandle does not refer to a
+                          valid file handle.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_REGISTER_FOR_SHADOW) (
-	IN CONST 	EFI_PEI_FILE_HANDLE FileHandle
-);
+  IN CONST  EFI_PEI_FILE_HANDLE FileHandle
+  );
 
 
 //
@@ -684,63 +684,63 @@ EFI_STATUS
 //
 // PEI Services Table
 //
-#define PEI_SERVICES_SIGNATURE 	0x5652455320494550
-#define PEI_SERVICES_REVISION 	(PEI_SPECIFICATION_MAJOR_REVISION<<16) | (PEI_SPECIFICATION_MINOR_REVISION)
+#define PEI_SERVICES_SIGNATURE  0x5652455320494550
+#define PEI_SERVICES_REVISION   (PEI_SPECIFICATION_MAJOR_REVISION<<16) | (PEI_SPECIFICATION_MINOR_REVISION)
 
 struct EFI_PEI_SERVICES {
-	EFI_TABLE_HEADER 						Hdr;
-	//
-	// PPI Functions
-	//
-	EFI_PEI_INSTALL_PPI 				InstallPpi;
-	EFI_PEI_REINSTALL_PPI 			ReInstallPpi;
-	EFI_PEI_LOCATE_PPI 					LocatePpi;
-	EFI_PEI_NOTIFY_PPI					NotifyPpi;
-	//
-	// Boot Mode Functions
-	//
-	EFI_PEI_GET_BOOT_MODE 			GetBootMode;
-	EFI_PEI_SET_BOOT_MODE 			SetBootMode;
-	//
-	// HOB Functions
-	//
-	EFI_PEI_GET_HOB_LIST 				GetHobList;
-	EFI_PEI_CREATE_HOB 					CreateHob;
-	//
-	// Firmware Volume Functions
-	//
-	EFI_PEI_FFS_FIND_NEXT_VOLUME2 	FfsFindNextVolume;
-	EFI_PEI_FFS_FIND_NEXT_FILE2 		FfsFindNextFile;
-	EFI_PEI_FFS_FIND_SECTION_DATA2 	FfsFindSectionData;
-	//
-	// PEI Memory Functions
-	//
-	EFI_PEI_INSTALL_PEI_MEMORY 	InstallPeiMemory;
-	EFI_PEI_ALLOCATE_PAGES 			AllocatePages;
-	EFI_PEI_ALLOCATE_POOL 			AllocatePool;
-	EFI_PEI_COPY_MEM 						CopyMem;
-	EFI_PEI_SET_MEM 						SetMem;
-	//
-	// Status Code
-	EFI_PEI_REPORT_STATUS_CODE 	ReportStatusCode;
-	//
-	// Reset
-	//
-	EFI_PEI_RESET_SYSTEM 				ResetSystem;
-	//
-	// (the following interfaces are installed by publishing PEIM)
-	//
-	// I/O Abstractions
-	//
-	EFI_PEI_CPU_IO_PPI 					*CpuIo;
-	EFI_PEI_PCI_CFG2_PPI 				*PciCfg;
-	//
-	// Future Installed Services
-	EFI_PEI_FFS_FIND_BY_NAME 		FfsFindFileByName;
-	EFI_PEI_FFS_GET_FILE_INFO 	FfsGetFileInfo;
-	EFI_PEI_FFS_GET_VOLUME_INFO FfsGetVolumeInfo;
-	EFI_PEI_REGISTER_FOR_SHADOW RegisterForShadow;
-} ;
+  EFI_TABLE_HEADER            Hdr;
+  //
+  // PPI Functions
+  //
+  EFI_PEI_INSTALL_PPI         InstallPpi;
+  EFI_PEI_REINSTALL_PPI       ReInstallPpi;
+  EFI_PEI_LOCATE_PPI          LocatePpi;
+  EFI_PEI_NOTIFY_PPI          NotifyPpi;
+  //
+  // Boot Mode Functions
+  //
+  EFI_PEI_GET_BOOT_MODE       GetBootMode;
+  EFI_PEI_SET_BOOT_MODE       SetBootMode;
+  //
+  // HOB Functions
+  //
+  EFI_PEI_GET_HOB_LIST        GetHobList;
+  EFI_PEI_CREATE_HOB          CreateHob;
+  //
+  // Firmware Volume Functions
+  //
+  EFI_PEI_FFS_FIND_NEXT_VOLUME2   FfsFindNextVolume;
+  EFI_PEI_FFS_FIND_NEXT_FILE2     FfsFindNextFile;
+  EFI_PEI_FFS_FIND_SECTION_DATA2  FfsFindSectionData;
+  //
+  // PEI Memory Functions
+  //
+  EFI_PEI_INSTALL_PEI_MEMORY  InstallPeiMemory;
+  EFI_PEI_ALLOCATE_PAGES      AllocatePages;
+  EFI_PEI_ALLOCATE_POOL       AllocatePool;
+  EFI_PEI_COPY_MEM            CopyMem;
+  EFI_PEI_SET_MEM             SetMem;
+  //
+  // Status Code
+  EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
+  //
+  // Reset
+  //
+  EFI_PEI_RESET_SYSTEM        ResetSystem;
+  //
+  // (the following interfaces are installed by publishing PEIM)
+  //
+  // I/O Abstractions
+  //
+  EFI_PEI_CPU_IO_PPI          *CpuIo;
+  EFI_PEI_PCI_CFG2_PPI        *PciCfg;
+  //
+  // Future Installed Services
+  EFI_PEI_FFS_FIND_BY_NAME    FfsFindFileByName;
+  EFI_PEI_FFS_GET_FILE_INFO   FfsGetFileInfo;
+  EFI_PEI_FFS_GET_VOLUME_INFO FfsGetVolumeInfo;
+  EFI_PEI_REGISTER_FOR_SHADOW RegisterForShadow;
+};
 
 
 typedef struct _EFI_SEC_PEI_HAND_OFF {

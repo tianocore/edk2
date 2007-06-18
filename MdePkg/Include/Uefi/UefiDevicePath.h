@@ -180,12 +180,12 @@ typedef struct {
     UINT8                         Lun;
 } DEVICE_LOGICAL_UNIT_DEVICE_PATH;
 
-#define MSG_SATA_DP								0x12
+#define MSG_SATA_DP               0x12
 typedef struct {
-	EFI_DEVICE_PATH_PROTOCOL      	Header;
-	UINT16													HbaPortNumber;
-	UINT16                          PortMultiplierPort;
-	UINT16                          LogicalUnitNumber;
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  UINT16                          HbaPortNumber;
+  UINT16                          PortMultiplierPort;
+  UINT16                          LogicalUnitNumber;
 } SATA_DEVICE_PATH;
 
 #define MSG_I2O_DP                0x06
@@ -253,7 +253,7 @@ typedef struct {
 // Use VENDOR_DEVICE_PATH struct
 //
 #define MSG_VENDOR_DP             0x0a
-typedef VENDOR_DEVICE_PATH 				VENDOR_DEFINED_DEVICE_PATH;
+typedef VENDOR_DEVICE_PATH        VENDOR_DEFINED_DEVICE_PATH;
 
 #define DEVICE_PATH_MESSAGING_PC_ANSI     EFI_PC_ANSI_GUID
 #define DEVICE_PATH_MESSAGING_VT_100      EFI_VT_100_GUID
@@ -350,11 +350,11 @@ typedef struct {
 } MEDIA_PROTOCOL_DEVICE_PATH;
 
 
-#define MEDIA_PIWG_FW_VOL_DP			0x6
+#define MEDIA_PIWG_FW_VOL_DP      0x6
 typedef MEDIA_PROTOCOL_DEVICE_PATH MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
 
-#define MEDIA_PIWG_FW_FILE_DP			0x7
+#define MEDIA_PIWG_FW_FILE_DP     0x7
 typedef MEDIA_PROTOCOL_DEVICE_PATH MEDIA_FW_VOL_DEVICE_PATH;
 
 //

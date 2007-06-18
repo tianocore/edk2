@@ -72,9 +72,9 @@ typedef enum {
 //
 // physical memory protection on range
 //
-#define EFI_MEMORY_WP 	0x0000000000001000ULL
-#define EFI_MEMORY_RP 	0x0000000000002000ULL
-#define EFI_MEMORY_XP 	0x0000000000004000ULL
+#define EFI_MEMORY_WP   0x0000000000001000ULL
+#define EFI_MEMORY_RP   0x0000000000002000ULL
+#define EFI_MEMORY_XP   0x0000000000004000ULL
 
 //
 // range requires a runtime mapping
@@ -83,11 +83,11 @@ typedef enum {
 
 #define EFI_MEMORY_DESCRIPTOR_VERSION 1
 typedef struct {
-	UINT32 								Type;
-	EFI_PHYSICAL_ADDRESS 	PhysicalStart;
-	EFI_VIRTUAL_ADDRESS 	VirtualStart;
-	UINT64 								NumberOfPages;
-	UINT64 								Attribute;
+  UINT32                Type;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  EFI_VIRTUAL_ADDRESS   VirtualStart;
+  UINT64                NumberOfPages;
+  UINT64                Attribute;
 } EFI_MEMORY_DESCRIPTOR;
 
 //
@@ -336,13 +336,13 @@ EFI_STATUS
 // EVT_TIMER might be ¡°Ored¡± with EVT_NOTIFY_WAIT or
 // EVT_NOTIFY_SIGNAL.
 //
-#define EVT_TIMER 												0x80000000
-#define EVT_RUNTIME 											0x40000000
+#define EVT_TIMER                         0x80000000
+#define EVT_RUNTIME                       0x40000000
 
-#define EVT_NOTIFY_WAIT										0x00000100
-#define EVT_NOTIFY_SIGNAL									0x00000200
-#define EVT_SIGNAL_EXIT_BOOT_SERVICES			0x00000201
-#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE	0x60000202
+#define EVT_NOTIFY_WAIT                   0x00000100
+#define EVT_NOTIFY_SIGNAL                 0x00000200
+#define EVT_SIGNAL_EXIT_BOOT_SERVICES     0x00000201
+#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE 0x60000202
 
 
 //
@@ -638,9 +638,9 @@ EFI_STATUS
 // real time clock device as exposed through the EFI interfaces.
 // 
 typedef struct {
-	UINT32 		Resolution;
-	UINT32 		Accuracy;
-	BOOLEAN 	SetsToZero;
+  UINT32    Resolution;
+  UINT32    Accuracy;
+  BOOLEAN   SetsToZero;
 } EFI_TIME_CAPABILITIES;
 
 /**
@@ -1542,153 +1542,153 @@ EFI_STATUS
 //
 // EFI Runtime Services Table
 //
-#define EFI_SYSTEM_TABLE_SIGNATURE 			0x5453595320494249
-#define EFI_SYSTEM_TABLE_REVISION 			((2<<16) | (10))
-#define EFI_2_10_SYSTEM_TABLE_REVISION 	((2<<16) | (10))
-#define EFI_2_00_SYSTEM_TABLE_REVISION 	((2<<16) | (00))
-#define EFI_1_10_SYSTEM_TABLE_REVISION 	((1<<16) | (10))
-#define EFI_1_02_SYSTEM_TABLE_REVISION 	((1<<16) | (02))
+#define EFI_SYSTEM_TABLE_SIGNATURE      0x5453595320494249
+#define EFI_SYSTEM_TABLE_REVISION       ((2<<16) | (10))
+#define EFI_2_10_SYSTEM_TABLE_REVISION  ((2<<16) | (10))
+#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2<<16) | (00))
+#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1<<16) | (10))
+#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1<<16) | (02))
 
-#define EFI_RUNTIME_SERVICES_SIGNATURE 	0x56524553544e5552
-#define EFI_RUNTIME_SERVICES_REVISION 	EFI_2_00_SYSTEM_TABLE_REVISION
+#define EFI_RUNTIME_SERVICES_SIGNATURE  0x56524553544e5552
+#define EFI_RUNTIME_SERVICES_REVISION   EFI_2_00_SYSTEM_TABLE_REVISION
 
 typedef struct {
-	EFI_TABLE_HEADER Hdr;
+  EFI_TABLE_HEADER Hdr;
 
-	//
-	// Time Services
-	//
-	EFI_GET_TIME 										GetTime;
-	EFI_SET_TIME 										SetTime;
-	EFI_GET_WAKEUP_TIME 						GetWakeupTime;
-	EFI_SET_WAKEUP_TIME 						SetWakeupTime;
+  //
+  // Time Services
+  //
+  EFI_GET_TIME                    GetTime;
+  EFI_SET_TIME                    SetTime;
+  EFI_GET_WAKEUP_TIME             GetWakeupTime;
+  EFI_SET_WAKEUP_TIME             SetWakeupTime;
 
-	//
-	// Virtual Memory Services
-	//
-	EFI_SET_VIRTUAL_ADDRESS_MAP			SetVirtualAddressMap;
-	EFI_CONVERT_POINTER 						ConvertPointer;
+  //
+  // Virtual Memory Services
+  //
+  EFI_SET_VIRTUAL_ADDRESS_MAP     SetVirtualAddressMap;
+  EFI_CONVERT_POINTER             ConvertPointer;
 
-	//
-	// Variable Services
-	//
-	EFI_GET_VARIABLE 								GetVariable;
-	EFI_GET_NEXT_VARIABLE_NAME 			GetNextVariableName;
-	EFI_SET_VARIABLE 								SetVariable;
+  //
+  // Variable Services
+  //
+  EFI_GET_VARIABLE                GetVariable;
+  EFI_GET_NEXT_VARIABLE_NAME      GetNextVariableName;
+  EFI_SET_VARIABLE                SetVariable;
 
-	//
-	// Miscellaneous Services
-	//
-	EFI_GET_NEXT_HIGH_MONO_COUNT 		GetNextHighMonotonicCount;
-	EFI_RESET_SYSTEM 								ResetSystem;
+  //
+  // Miscellaneous Services
+  //
+  EFI_GET_NEXT_HIGH_MONO_COUNT    GetNextHighMonotonicCount;
+  EFI_RESET_SYSTEM                ResetSystem;
 
-	//
-	// UEFI 2.0 Capsule Services
-	//
-	EFI_UPDATE_CAPSULE 							UpdateCapsule;
-	EFI_QUERY_CAPSULE_CAPABILITIES 	QueryCapsuleCapabilities;
+  //
+  // UEFI 2.0 Capsule Services
+  //
+  EFI_UPDATE_CAPSULE              UpdateCapsule;
+  EFI_QUERY_CAPSULE_CAPABILITIES  QueryCapsuleCapabilities;
 
-	//
-	// Miscellaneous UEFI 2.0 Service
-	//
-	EFI_QUERY_VARIABLE_INFO 				QueryVariableInfo;
+  //
+  // Miscellaneous UEFI 2.0 Service
+  //
+  EFI_QUERY_VARIABLE_INFO         QueryVariableInfo;
 } EFI_RUNTIME_SERVICES;
 
 
-#define EFI_BOOT_SERVICES_SIGNATURE 	0x56524553544f4f42
-#define EFI_BOOT_SERVICES_REVISION 		((2<<16) | (00))
+#define EFI_BOOT_SERVICES_SIGNATURE   0x56524553544f4f42
+#define EFI_BOOT_SERVICES_REVISION    ((2<<16) | (00))
 
 typedef struct {
-	EFI_TABLE_HEADER 	Hdr;
-	
-	//
-	// Task Priority Services
-	//
-	EFI_RAISE_TPL 									RaiseTPL;
-	EFI_RESTORE_TPL 								RestoreTPL;
+  EFI_TABLE_HEADER  Hdr;
+  
+  //
+  // Task Priority Services
+  //
+  EFI_RAISE_TPL                   RaiseTPL;
+  EFI_RESTORE_TPL                 RestoreTPL;
 
-	//
-	// Memory Services
-	//
-	EFI_ALLOCATE_PAGES 							AllocatePages;
-	EFI_FREE_PAGES 									FreePages;
-	EFI_GET_MEMORY_MAP 							GetMemoryMap;
-	EFI_ALLOCATE_POOL 							AllocatePool;
-	EFI_FREE_POOL 									FreePool;
+  //
+  // Memory Services
+  //
+  EFI_ALLOCATE_PAGES              AllocatePages;
+  EFI_FREE_PAGES                  FreePages;
+  EFI_GET_MEMORY_MAP              GetMemoryMap;
+  EFI_ALLOCATE_POOL               AllocatePool;
+  EFI_FREE_POOL                   FreePool;
 
-	//
-	// Event & Timer Services
-	//
-	EFI_CREATE_EVENT 									CreateEvent;
-	EFI_SET_TIMER 										SetTimer;
-	EFI_WAIT_FOR_EVENT 								WaitForEvent;
-	EFI_SIGNAL_EVENT 									SignalEvent;
-	EFI_CLOSE_EVENT 									CloseEvent;
-	EFI_CHECK_EVENT 									CheckEvent;
+  //
+  // Event & Timer Services
+  //
+  EFI_CREATE_EVENT                  CreateEvent;
+  EFI_SET_TIMER                     SetTimer;
+  EFI_WAIT_FOR_EVENT                WaitForEvent;
+  EFI_SIGNAL_EVENT                  SignalEvent;
+  EFI_CLOSE_EVENT                   CloseEvent;
+  EFI_CHECK_EVENT                   CheckEvent;
 
-	//
-	// Protocol Handler Services
-	//
-	EFI_INSTALL_PROTOCOL_INTERFACE 		InstallProtocolInterface;
-	EFI_REINSTALL_PROTOCOL_INTERFACE 	ReinstallProtocolInterface;
-	EFI_UNINSTALL_PROTOCOL_INTERFACE 	UninstallProtocolInterface;
-	EFI_HANDLE_PROTOCOL 							HandleProtocol;
-	VOID															*Reserved;
-	EFI_REGISTER_PROTOCOL_NOTIFY 			RegisterProtocolNotify;
-	EFI_LOCATE_HANDLE 								LocateHandle;
-	EFI_LOCATE_DEVICE_PATH 						LocateDevicePath;
-	EFI_INSTALL_CONFIGURATION_TABLE 	InstallConfigurationTable;
+  //
+  // Protocol Handler Services
+  //
+  EFI_INSTALL_PROTOCOL_INTERFACE    InstallProtocolInterface;
+  EFI_REINSTALL_PROTOCOL_INTERFACE  ReinstallProtocolInterface;
+  EFI_UNINSTALL_PROTOCOL_INTERFACE  UninstallProtocolInterface;
+  EFI_HANDLE_PROTOCOL               HandleProtocol;
+  VOID                              *Reserved;
+  EFI_REGISTER_PROTOCOL_NOTIFY      RegisterProtocolNotify;
+  EFI_LOCATE_HANDLE                 LocateHandle;
+  EFI_LOCATE_DEVICE_PATH            LocateDevicePath;
+  EFI_INSTALL_CONFIGURATION_TABLE   InstallConfigurationTable;
 
-	//
-	// Image Services
-	//
-	EFI_IMAGE_LOAD 										LoadImage;
-	EFI_IMAGE_START 									StartImage;
-	EFI_EXIT 													Exit;
-	EFI_IMAGE_UNLOAD 									UnloadImage;
-	EFI_EXIT_BOOT_SERVICES 						ExitBootServices;
+  //
+  // Image Services
+  //
+  EFI_IMAGE_LOAD                    LoadImage;
+  EFI_IMAGE_START                   StartImage;
+  EFI_EXIT                          Exit;
+  EFI_IMAGE_UNLOAD                  UnloadImage;
+  EFI_EXIT_BOOT_SERVICES            ExitBootServices;
 
-	//
-	// Miscellaneous Services
-	//
-	EFI_GET_NEXT_MONOTONIC_COUNT 			GetNextMonotonicCount;
-	EFI_STALL 												Stall;
-	EFI_SET_WATCHDOG_TIMER 						SetWatchdogTimer;
+  //
+  // Miscellaneous Services
+  //
+  EFI_GET_NEXT_MONOTONIC_COUNT      GetNextMonotonicCount;
+  EFI_STALL                         Stall;
+  EFI_SET_WATCHDOG_TIMER            SetWatchdogTimer;
 
-	//
-	// DriverSupport Services
-	//
-	EFI_CONNECT_CONTROLLER 						ConnectController;
-	EFI_DISCONNECT_CONTROLLER 				DisconnectController;
+  //
+  // DriverSupport Services
+  //
+  EFI_CONNECT_CONTROLLER            ConnectController;
+  EFI_DISCONNECT_CONTROLLER         DisconnectController;
 
-	//
-	// Open and Close Protocol Services
-	//
-	EFI_OPEN_PROTOCOL 								OpenProtocol;
-	EFI_CLOSE_PROTOCOL 								CloseProtocol;
-	EFI_OPEN_PROTOCOL_INFORMATION 		OpenProtocolInformation;
+  //
+  // Open and Close Protocol Services
+  //
+  EFI_OPEN_PROTOCOL                 OpenProtocol;
+  EFI_CLOSE_PROTOCOL                CloseProtocol;
+  EFI_OPEN_PROTOCOL_INFORMATION     OpenProtocolInformation;
 
-	//
-	// Library Services
-	//
-	EFI_PROTOCOLS_PER_HANDLE 					ProtocolsPerHandle;
-	EFI_LOCATE_HANDLE_BUFFER 					LocateHandleBuffer;
-	EFI_LOCATE_PROTOCOL 							LocateProtocol;
-	EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES 		InstallMultipleProtocolInterfaces;
-	EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES 	UninstallMultipleProtocolInterfaces;
+  //
+  // Library Services
+  //
+  EFI_PROTOCOLS_PER_HANDLE          ProtocolsPerHandle;
+  EFI_LOCATE_HANDLE_BUFFER          LocateHandleBuffer;
+  EFI_LOCATE_PROTOCOL               LocateProtocol;
+  EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES    InstallMultipleProtocolInterfaces;
+  EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES  UninstallMultipleProtocolInterfaces;
 
-	//
-	// 32-bit CRC Services
-	//
-	EFI_CALCULATE_CRC32 							CalculateCrc32;
+  //
+  // 32-bit CRC Services
+  //
+  EFI_CALCULATE_CRC32               CalculateCrc32;
 
-	//
-	// Miscellaneous Services
-	//
-	EFI_COPY_MEM 											CopyMem;
-	EFI_SET_MEM 											SetMem;
+  //
+  // Miscellaneous Services
+  //
+  EFI_COPY_MEM                      CopyMem;
+  EFI_SET_MEM                       SetMem;
 
-	EFI_CREATE_EVENT_EX 							CreateEventEx;
+  EFI_CREATE_EVENT_EX               CreateEventEx;
 } EFI_BOOT_SERVICES;
 
 //
@@ -1696,24 +1696,24 @@ typedef struct {
 // EFI System Table.
 // 
 typedef struct{
-	EFI_GUID 													VendorGuid;
-	VOID 															*VendorTable;
+  EFI_GUID                          VendorGuid;
+  VOID                              *VendorTable;
 } EFI_CONFIGURATION_TABLE;
 
 struct _EFI_SYSTEM_TABLE {
-	EFI_TABLE_HEADER 	Hdr;
-	CHAR16 														*FirmwareVendor;
-	UINT32 														FirmwareRevision;
-	EFI_HANDLE 												ConsoleInHandle;
-	EFI_SIMPLE_TEXT_INPUT_PROTOCOL 		*ConIn;
-	EFI_HANDLE 												ConsoleOutHandle;
-	EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 	*ConOut;
-	EFI_HANDLE 												StandardErrorHandle;
-	EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 	*StdErr;
-	EFI_RUNTIME_SERVICES 							*RuntimeServices;
-	EFI_BOOT_SERVICES 								*BootServices;
-	UINTN 														NumberOfTableEntries;
-	EFI_CONFIGURATION_TABLE 					*ConfigurationTable;
+  EFI_TABLE_HEADER  Hdr;
+  CHAR16                            *FirmwareVendor;
+  UINT32                            FirmwareRevision;
+  EFI_HANDLE                        ConsoleInHandle;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *ConIn;
+  EFI_HANDLE                        ConsoleOutHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut;
+  EFI_HANDLE                        StandardErrorHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *StdErr;
+  EFI_RUNTIME_SERVICES              *RuntimeServices;
+  EFI_BOOT_SERVICES                 *BootServices;
+  UINTN                             NumberOfTableEntries;
+  EFI_CONFIGURATION_TABLE           *ConfigurationTable;
 };
 
 //

@@ -83,10 +83,10 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_PCI_CFG_PPI_IO) (
-  IN CONST 	EFI_PEI_SERVICES          **PeiServices,
-  IN CONST 	EFI_PEI_PCI_CFG2_PPI      *This,
-  IN CONST 	EFI_PEI_PCI_CFG_PPI_WIDTH Width,
-  IN CONST 	UINT64                    Address,
+  IN CONST  EFI_PEI_SERVICES          **PeiServices,
+  IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
+  IN CONST  EFI_PEI_PCI_CFG_PPI_WIDTH Width,
+  IN CONST  UINT64                    Address,
   IN OUT    VOID                      *Buffer
 );
 
