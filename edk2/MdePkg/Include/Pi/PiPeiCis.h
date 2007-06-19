@@ -41,6 +41,7 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 #include <Ppi/CpuIo.h>
 #include <Ppi/PciCfg2.h>
 
+
 /**
   The PEI Dispatcher will invoke each PEIM one time.  During this pass, the PEI 
   Dispatcher will pass control to the PEIM at the AddressOfEntryPoint in the PE Header. 
@@ -801,5 +802,49 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
   // 
   UINTN   StackSize;
 } EFI_SEC_PEI_HAND_OFF;
+
+
+/**
+
+  This function is the entry point for the PEI Foundation, which
+  allows the SEC phase to pass information about the stack,
+  temporary RAM and the Boot Firmware Volume. In addition, it also
+  allows the SEC phase to pass services and data forward for use
+  during the PEI phase in the form of one or more PPIs. There is
+  no limit to the number of additional PPIs that can be passed
+  from SEC into the PEI Foundation. As part of its initialization
+  phase, the PEI Foundation will add these SEC-hosted PPIs to its
+  PPI database such that both the PEI Foundation and any modules
+  can leverage the associated service calls and/or code in these
+  early PPIs.
+
+  @param SecCoreData    Points to a data structure containing
+                        information about the PEI core's
+                        operating environment, such as the size
+                        and location of temporary RAM, the stack
+                        location and the BFV location. The type
+                        EFI_SEC_PEI_HAND_OFF is
+
+  @param PpiList        Points to a list of one or more PPI
+                        descriptors to be installed initially by
+                        the PEI core. An empty PPI list consists
+                        of a single descriptor with the end-tag
+                        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
+                        As part of its initialization phase, the
+                        PEI Foundation will add these SEC-hosted
+                        PPIs to its PPI database such that both
+                        the PEI Foundation and any modules can
+                        leverage the associated service calls
+                        and/or code in these early PPIs.
+
+
+**/
+typedef
+VOID
+EFIAPI
+(*EFI_PEI_CORE_ENTRY_POINT)(
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
+);
 
 #endif
