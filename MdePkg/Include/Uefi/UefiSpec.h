@@ -28,28 +28,6 @@
 #include <Protocol/SimpleTextOut.h>
 
 //
-// Networking Definitions
-//
-typedef struct {
-  UINT8 Addr[4];
-} EFI_IPv4_ADDRESS;
-
-typedef struct {
-  UINT8 Addr[16];
-} EFI_IPv6_ADDRESS;
-
-typedef struct {
-  UINT8 Addr[32];
-} EFI_MAC_ADDRESS;
-
-typedef union {
-  UINT32            Addr[4];
-  EFI_IPv4_ADDRESS  v4;
-  EFI_IPv6_ADDRESS  v6;
-} EFI_IP_ADDRESS;
-
-
-//
 // Enumeration of memory allocation.
 // 
 typedef enum {
@@ -1550,7 +1528,7 @@ EFI_STATUS
 #define EFI_1_02_SYSTEM_TABLE_REVISION  ((1<<16) | (02))
 
 #define EFI_RUNTIME_SERVICES_SIGNATURE  0x56524553544e5552
-#define EFI_RUNTIME_SERVICES_REVISION   EFI_2_00_SYSTEM_TABLE_REVISION
+#define EFI_RUNTIME_SERVICES_REVISION   EFI_2_10_SYSTEM_TABLE_REVISION
 
 typedef struct {
   EFI_TABLE_HEADER Hdr;
@@ -1596,7 +1574,7 @@ typedef struct {
 
 
 #define EFI_BOOT_SERVICES_SIGNATURE   0x56524553544f4f42
-#define EFI_BOOT_SERVICES_REVISION    ((2<<16) | (00))
+#define EFI_BOOT_SERVICES_REVISION    EFI_2_10_SYSTEM_TABLE_REVISION
 
 typedef struct {
   EFI_TABLE_HEADER  Hdr;
