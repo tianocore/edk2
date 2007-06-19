@@ -27,7 +27,19 @@
 // The following types are currently defined:
 //
 typedef UINT32  RELOFST;
+
 typedef CHAR16  *EFI_STRING;
+typedef UINT16  EFI_IMAGE_ID;
+typedef UINT16  EFI_QUESTION_ID;
+typedef UINT16  EFI_STRING_ID;
+typedef UINT16  EFI_FORM_ID;
+typedef UINT16  EFI_VARSTORE_ID;
+
+//
+// BugBug in UEFI2.1 
+// 
+typedef VOID    *EFI_FONT_HANDLE;
+
 
 //
 // IFR Op codes

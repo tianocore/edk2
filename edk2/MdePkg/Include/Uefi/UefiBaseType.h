@@ -65,6 +65,29 @@ typedef struct {
   UINT8   Pad2;
 } EFI_TIME;
 
+
+//
+// Networking Definitions
+//
+typedef struct {
+  UINT8 Addr[4];
+} EFI_IPv4_ADDRESS;
+
+typedef struct {
+  UINT8 Addr[16];
+} EFI_IPv6_ADDRESS;
+
+typedef struct {
+  UINT8 Addr[32];
+} EFI_MAC_ADDRESS;
+
+typedef union {
+  UINT32            Addr[4];
+  EFI_IPv4_ADDRESS  v4;
+  EFI_IPv6_ADDRESS  v6;
+} EFI_IP_ADDRESS;
+
+
 //
 // Enumeration of EFI_STATUS.
 // 
