@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://www.TianoCore.org/2007/Edk2.1" targetNamespace="http://www.TianoCore.org/2007/Edk2.1">
+  <!--
+    Filename: FrameworkDataTypes.xsd
+    
+    Copyright (c) 2007, Intel Corp.
+    All rights reserved. This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which may be found at http://opensource.org/licenses/bsd-license.php
+    
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    
+  -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en">This schema defines EFI and Framework Data Types. Only simpleType are specified in this file. </xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="NamingConvention.xsd"/>
+  <xs:simpleType name="PrimaryArchListType">
+    <xs:list itemType="SupportedArchitectures"/>
+  </xs:simpleType>
+  <xs:simpleType name="ArchListType">
+    <xs:restriction base="PrimaryArchListType">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BinFileType">
+    <xs:restriction base="xs:NCName">
+      <xs:enumeration value="LIB"/>
+      <xs:enumeration value="UNI_UI"/>
+      <xs:enumeration value="UNI_VER"/>
+      <xs:enumeration value="PE32"/>
+      <xs:enumeration value="FW"/>
+      <xs:enumeration value="GUID"/>
+      <xs:enumeration value="FREEFORM"/>
+      <xs:enumeration value="UEFI_APP"/>
+      <xs:enumeration value="PIC"/>
+      <xs:enumeration value="PEI_DEPEX"/>
+      <xs:enumeration value="DXE_DEPEX"/>
+      <xs:enumeration value="TE"/>
+      <xs:enumeration value="VER"/>
+      <xs:enumeration value="UI"/>
+      <xs:enumeration value="BIN"/>
+      <xs:enumeration value="FV"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BlockNameType">
+    <xs:restriction base="UCNameType">
+      <xs:pattern value="\s*BLOCK[A-F0-9]{2}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BootModeNames">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="FULL"/>
+      <xs:enumeration value="MINIMAL"/>
+      <xs:enumeration value="NO_CHANGE"/>
+      <xs:enumeration value="DIAGNOSTICS"/>
+      <xs:enumeration value="DEFAULT"/>
+      <xs:enumeration value="S2_RESUME"/>
+      <xs:enumeration value="S3_RESUME"/>
+      <xs:enumeration value="S4_RESUME"/>
+      <xs:enumeration value="S5_RESUME"/>
+      <xs:enumeration value="FLASH_UPDATE"/>
+      <xs:enumeration value="RECOVERY_FULL"/>
+      <xs:enumeration value="RECOVERY_MINIMAL"/>
+      <xs:enumeration value="RECOVERY_NO_CHANGE"/>
+      <xs:enumeration value="RECOVERY_DIAGNOSTICS"/>
+      <xs:enumeration value="RECOVERY_DEFAULT"/>
+      <xs:enumeration value="RECOVERY_S2_RESUME"/>
+      <xs:enumeration value="RECOVERY_S3_RESUME"/>
+      <xs:enumeration value="RECOVERY_S4_RESUME"/>
+      <xs:enumeration value="RECOVERY_S5_RESUME"/>
+      <xs:enumeration value="RECOVERY_FLASH_UPDATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BootModeUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BuildTargetList">
+    <xs:restriction base="BuildTargetUList">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BuildTargetUList">
+    <xs:list itemType="BrUType"/>
+  </xs:simpleType>
+  <xs:simpleType name="BrUType">
+    <xs:union memberTypes="BrType UCNameType"/>
+  </xs:simpleType>
+  <xs:simpleType name="BrType">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="DEBUG"/>
+      <xs:enumeration value="RELEASE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ComponentExecutionPhase">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="MDE"/>
+      <xs:enumeration value="SEC"/>
+      <xs:enumeration value="PEI_CORE"/>
+      <xs:enumeration value="PEIM"/>
+      <xs:enumeration value="DXE_CORE"/>
+      <xs:enumeration value="DXE_DRIVER"/>
+      <xs:enumeration value="DXE_RUNTIME_DRIVER"/>
+      <xs:enumeration value="DXE_SAL_DRIVER"/>
+      <xs:enumeration value="DXE_SMM_DRIVER"/>
+      <xs:enumeration value="UEFI"/>
+      <xs:enumeration value="UEFI_APPLICATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataHubUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DatumSizeLimitation">
+    <xs:restriction base="xs:nonNegativeInteger">
+      <xs:maxExclusive value="13777216"/>
+      <xs:pattern value="(\s)*[1-9][0-9]*(\s)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DefaultValueType">
+    <xs:union memberTypes="xs:normalizedString Hex64BitDataType UnicodeString HexByteArrayType"/>
+  </xs:simpleType>
+  <xs:simpleType name="EfiSectionType">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="EFI_SECTION_FREEFORM_SUBTYPE_GUID"/>
+      <xs:enumeration value="EFI_SECTION_VERSION"/>
+      <xs:enumeration value="EFI_SECTION_USER_INTERFACE"/>
+      <xs:enumeration value="EFI_SECTION_DXE_DEPEX"/>
+      <xs:enumeration value="EFI_SECTION_PEI_DEPEX"/>
+      <xs:enumeration value="EFI_SECTION_PE32"/>
+      <xs:enumeration value="EFI_SECTION_PIC"/>
+      <xs:enumeration value="EFI_SECTION_TE"/>
+      <xs:enumeration value="EFI_SECTION_RAW"/>
+      <xs:enumeration value="EFI_SECTION_COMPRESSION"/>
+      <xs:enumeration value="EFI_SECTION_GUID_DEFINED"/>
+      <xs:enumeration value="EFI_SECTION_COMPATIBILITY16"/>
+      <xs:enumeration value="EFI_SECTION_FIRMWARE_VOLUME_IMAGE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EventTypes">
+    <xs:restriction base="UCNameType">
+       <xs:enumeration value="EVENT_GROUP_GUID"/>
+      <xs:enumeration value="EVENT_TYPE_PERIODIC_TIMER"/>
+      <xs:enumeration value="EVENT_TYPE_RELATIVE_TIMER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EventUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ExecutionType">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="REL" id="Relocatable"/>
+      <xs:enumeration value="NREL" id="Non-Relocatable"/>
+      <xs:enumeration value="XIP" id="Execute_In_Place"/>
+      <xs:enumeration value="PIC" id="Position_Independent_Code"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ExternType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="1"/>
+      <!--<xs:pattern value="((\w)+(\W)*(\s)*)+"/>-->
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ExternUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileNameUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FeatureFlagExpressionType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FrameworkComponentListType">
+    <xs:list itemType="FrameworkComponentTypes"/>
+  </xs:simpleType>
+  <xs:simpleType name="FrameworkComponentTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="APRIORI"/>
+      <xs:enumeration value="SEC"/>
+      <xs:enumeration value="LIBRARY"/>
+      <xs:enumeration value="FV_IMAGE_FILE"/>
+      <xs:enumeration value="BS_DRIVER"/>
+      <xs:enumeration value="RT_DRIVER"/>
+      <xs:enumeration value="SAL_RT_DRIVER"/>
+      <xs:enumeration value="PE32_PEIM"/>
+      <xs:enumeration value="PIC_PEIM"/>
+      <xs:enumeration value="COMBINED_PEIM_DRIVER"/>
+      <xs:enumeration value="PEI_CORE"/>
+      <xs:enumeration value="DXE_CORE"/>
+      <xs:enumeration value="BS_DRIVER_EFI"/>
+      <xs:enumeration value="SHELLAPP"/>
+      <xs:enumeration value="BINARY"/>
+      <xs:enumeration value="LOGO"/>
+      <xs:enumeration value="USER_DEFINED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FrameworkModuleTypes">
+    <xs:restriction base="ModuleTypeDef">
+      <xs:enumeration value="BASE"/>
+      <xs:enumeration value="SEC"/>
+      <xs:enumeration value="PEI_CORE"/>
+      <xs:enumeration value="PEIM"/>
+      <xs:enumeration value="DXE_CORE"/>
+      <xs:enumeration value="DXE_DRIVER"/>
+      <xs:enumeration value="DXE_RUNTIME_DRIVER"/>
+      <xs:enumeration value="DXE_SAL_DRIVER"/>
+      <xs:enumeration value="DXE_SMM_DRIVER"/>
+      <xs:enumeration value="UEFI_DRIVER"/>
+      <xs:enumeration value="UEFI_APPLICATION"/>
+      <xs:enumeration value="USER_DEFINED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FvRegionTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="FV_MAIN"/>
+      <xs:enumeration value="FV_MAIN_COMPACT"/>
+      <xs:enumeration value="NV_STORAGE"/>
+      <xs:enumeration value="FV_RECOVERY"/>
+      <xs:enumeration value="FV_RECOVERY_FLOPPY"/>
+      <xs:enumeration value="FV_FILE"/>
+      <xs:enumeration value="CAPSULE_CARGO"/>
+      <xs:enumeration value="NULL"/>
+      <xs:enumeration value="USER_DEFINED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PrimaryGuidListType">
+    <xs:list itemType="GuidTypes"/>
+  </xs:simpleType>
+  <xs:simpleType name="GuidListType">
+    <xs:restriction base="PrimaryGuidListType">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="DATA_HUB_RECORD"/>
+      <xs:enumeration value="EFI_EVENT"/>
+      <xs:enumeration value="EFI_SYSTEM_CONFIGURATION_TABLE"/>
+      <xs:enumeration value="EFI_VARIABLE"/>
+      <xs:enumeration value="GUID"/>
+      <xs:enumeration value="HII_PACKAGE_LIST"/>
+      <xs:enumeration value="HOB"/>
+      <xs:enumeration value="TOKEN_SPACE_GUID"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexByteArrayListType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="4"/>
+      <xs:pattern value="\s*((( )?0x[a-fA-F0-9]{2})(,)?)+( )?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexByteArrayType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="4"/>
+      <xs:pattern value="((\s)*0x([a-fA-F0-9]){2}(,)?(\s)*)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexWordArrayType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="6"/>
+      <xs:pattern value="((\s)*0x([a-fA-F0-9]){4}(,)?(\s)*)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HiiPackageUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HobTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="PHIT"/>
+      <xs:enumeration value="MEMORY_ALLOCATION"/>
+      <xs:enumeration value="RESOURCE_DESCRIPTOR"/>
+      <xs:enumeration value="GUID_EXTENSION"/>
+      <xs:enumeration value="FIRMWARE_VOLUME"/>
+      <xs:enumeration value="CPU"/>
+      <xs:enumeration value="POOL"/>
+      <xs:enumeration value="CAPSULE_VOLUME"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HobUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="IntermediateOutputType">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="MODULE"/>
+      <xs:enumeration value="UNIFIED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LibraryUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ModuleTypeDef">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="BASE"/>
+      <xs:enumeration value="SEC"/>
+      <xs:enumeration value="PEI_CORE"/>
+      <xs:enumeration value="PEIM"/>
+      <xs:enumeration value="DXE_CORE"/>
+      <xs:enumeration value="DXE_DRIVER"/>
+      <xs:enumeration value="DXE_RUNTIME_DRIVER"/>
+      <xs:enumeration value="DXE_SAL_DRIVER"/>
+      <xs:enumeration value="DXE_SMM_DRIVER"/>
+      <xs:enumeration value="TOOL"/>
+      <xs:enumeration value="UEFI_DRIVER"/>
+      <xs:enumeration value="UEFI_APPLICATION"/>
+      <xs:enumeration value="USER_DEFINED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Md5sumType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="\s*[a-fA-F0-9]{32}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PrimaryModuleListType">
+    <xs:list itemType="FrameworkModuleTypes"/>
+  </xs:simpleType>
+  <xs:simpleType name="ModuleListType">
+    <xs:restriction base="PrimaryModuleListType">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PackageType">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="SOURCE"/>
+      <xs:enumeration value="BINARY"/>
+      <xs:enumeration value="MIXED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PackageUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdListType">
+    <xs:restriction base="PrimaryPcdListType">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PrimaryPcdListType">
+    <xs:list itemType="PcdItemTypes"/>
+  </xs:simpleType>
+  <xs:simpleType name="PcdTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="FIXED_AT_BUILD"/>
+      <xs:enumeration value="FEATURE_FLAG"/>
+      <xs:enumeration value="PATCHABLE_IN_MODULE"/>
+      <xs:enumeration value="DYNAMIC"/>
+      <xs:enumeration value="DYNAMIC_EX"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdDriverTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="PEI_PCD_DRIVER"/>
+      <xs:enumeration value="DXE_PCD_DRIVER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdDataTypes">
+    <xs:restriction base="xs:normalizedString">
+      <xs:enumeration value="UINT8"/>
+      <xs:enumeration value="UINT16"/>
+      <xs:enumeration value="UINT32"/>
+      <xs:enumeration value="UINT64"/>
+      <xs:enumeration value="VOID*"/>
+      <xs:enumeration value="BOOLEAN"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdFeatureFlagUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdItemTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="FEATURE_FLAG"/>
+      <xs:enumeration value="FIXED_AT_BUILD"/>
+      <xs:enumeration value="PATCHABLE_IN_MODULE"/>
+      <xs:enumeration value="DYNAMIC"/>
+      <xs:enumeration value="DYNAMIC_EX"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PcdUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PpiNotifyUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PpiUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ProtocolNotifyUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ProtocolUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="TO_START"/>
+      <xs:enumeration value="BY_START"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SkuListType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="1"/>
+      <xs:pattern value="\s*(\d)+((,)?(\s)*(\d)+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SupportedArchitectures">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="EBC"/>
+      <xs:enumeration value="IA32"/>
+      <xs:enumeration value="X64"/>
+      <xs:enumeration value="IPF"/>
+      <xs:enumeration value="ARM"/>
+      <xs:enumeration value="PPC"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SystemTableUsage">
+    <xs:restriction base="UsageTypes">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TokenDataType">
+    <xs:union memberTypes="HexDoubleWordDataType  xs:nonNegativeInteger"/>
+  </xs:simpleType>
+  <xs:simpleType name="ToolChains">
+    <xs:restriction base="UCNameType">
+      <xs:minLength value="2"/>
+      <xs:enumeration value="MSFT"/>
+      <xs:enumeration value="INTEL"/>
+      <xs:enumeration value="GCC"/>
+      <xs:enumeration value="CYGWIN"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UiNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:pattern value="[^ ].*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UnicodeString">
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="3"/>
+      <xs:pattern value="(\s)*L(\:)?&quot;[^&quot;]*&quot;(\s)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UsageListType">
+    <xs:restriction base="PrimaryUsageList">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PrimaryUsageList">
+    <xs:list itemType="UsageTypes"/>
+  </xs:simpleType>
+  <!-- UsageTypes describes all of the Usage Attributes that are defined in the Module Surface Area Specification -->
+  <xs:simpleType name="UsageTypes">
+    <xs:restriction base="UCNameType">
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <xs:enumeration value="TO_START"/>
+      <xs:enumeration value="BY_START"/>
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VariableOffsetValues">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:pattern value="\s*\d+(:)?\d*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VariableUsage">
+    <xs:restriction base="UsageTypes">
+      <!-- Module requires the variable entry to be set -->
+      <xs:enumeration value="ALWAYS_CONSUMED"/>
+      <!-- Module will use the variable entry if it's set -->
+      <xs:enumeration value="SOMETIMES_CONSUMED"/>
+      <!-- Module Always will write the variable -->
+      <xs:enumeration value="ALWAYS_PRODUCED"/>
+      <!-- Module sometimes writes the variable -->
+      <xs:enumeration value="SOMETIMES_PRODUCED"/>
+      <!-- Variable is produced and consumed only by this module -->
+      <xs:enumeration value="PRIVATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- Complex Data Types -->
+  <xs:complexType name="DbPathAndFilename">
+    <xs:simpleContent>
+      <xs:extension base="PathAndFilename">
+        <xs:attribute name="FarGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="Md5sum" type="Md5sumType"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ArgsType">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Arg" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ToolType">
+    <xs:sequence>
+      <xs:element name="ToolName" type="xs:string"/>
+      <xs:element name="ToolArgs" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
