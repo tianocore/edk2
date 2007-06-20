@@ -51,6 +51,7 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 
 
 #include <Ppi/CpuIo.h>
+#include <Ppi/PciCfg2.h>
 #include <Ppi/PciCfg.h>
 
 //

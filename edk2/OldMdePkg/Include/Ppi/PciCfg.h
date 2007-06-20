@@ -32,22 +32,6 @@ typedef struct _EFI_PEI_PCI_CFG_PPI   EFI_PEI_PCI_CFG_PPI;
       (UINT64) ((((UINTN) bus) << 24) + (((UINTN) dev) << 16) + (((UINTN) func) << 8) + ((UINTN) reg)) \
     ) & 0x00000000ffffffff
 
-typedef enum {
-  EfiPeiPciCfgWidthUint8   = 0,
-  EfiPeiPciCfgWidthUint16  = 1,
-  EfiPeiPciCfgWidthUint32  = 2,
-  EfiPeiPciCfgWidthUint64  = 3,
-  EfiPeiPciCfgWidthMaximum
-} EFI_PEI_PCI_CFG_PPI_WIDTH;
-
-typedef struct {
-  UINT8 Register;
-  UINT8 Function;
-  UINT8 Device;
-  UINT8 Bus;
-  UINT8 Reserved[4];
-} EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS;
-
 /**
   PCI read and write operation.
 
