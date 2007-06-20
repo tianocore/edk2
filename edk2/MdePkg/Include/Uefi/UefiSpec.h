@@ -1714,7 +1714,6 @@ struct _EFI_SYSTEM_TABLE {
   #error Unknown Processor Type
 #endif
 
-#include <Uefi/UefiDevicePath.h>
 #include <Uefi/UefiPxe.h>
 #include <Uefi/UefiGpt.h>
 #include <Uefi/UefiInternalFormRepresentation.h>
