@@ -160,5 +160,8 @@ typedef union {
 #define EFI_PAGE_MASK             0xFFF
 #define EFI_PAGE_SHIFT            12
 
+#define EFI_SIZE_TO_PAGES(a)  (((a) >> EFI_PAGE_SHIFT) + (((a) & EFI_PAGE_MASK) ? 1 : 0))
+
+#define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
 #endif
