@@ -28,6 +28,10 @@
       <IncludeHeader>Include/Library/EdkDxeSalLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
+    <LibraryClass Name="ExtendedSalLib">
+      <IncludeHeader>Include/Library/ExtendedSalLib.h</IncludeHeader>
+      <HelpText/>
+    </LibraryClass>
     <LibraryClass Name="EdkFvbServiceLib">
       <IncludeHeader>Include/Library/EdkFvbServiceLib.h</IncludeHeader>
       <HelpText/>
@@ -200,6 +204,10 @@
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkDxeSalLib">
       <IncludeHeader>Include/Library/EdkDxeSalLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ExtendedSalLib">
+      <IncludeHeader>Include/Library/ExtendedSalLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkFvbServiceLib">
