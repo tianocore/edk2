@@ -71,6 +71,17 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  <xs:element name="Depex">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This section is used to describe the DXE or PEI Dependency code</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Define" type="xs:normalizedString"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Expression" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Description" type="Paragraph">
     <xs:annotation>
       <xs:documentation xml:lang="en">This section is required for new modules and libraries and must contain more information than the Abstract.</xs:documentation>
