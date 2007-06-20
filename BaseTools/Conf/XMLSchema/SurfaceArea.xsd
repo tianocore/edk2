@@ -53,6 +53,7 @@
         <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="PcdCoded"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Depex"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="ModuleBuildOptions"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
       </xs:sequence>
