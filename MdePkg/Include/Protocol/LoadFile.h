@@ -23,17 +23,22 @@
 #ifndef __EFI_LOAD_FILE_PROTOCOL_H__
 #define __EFI_LOAD_FILE_PROTOCOL_H__
 
-#define LOAD_FILE_PROTOCOL_GUID \
+#define EFI_LOAD_FILE_PROTOCOL_GUID \
   { \
     0x56EC3091, 0x954C, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B } \
   }
 
 //
-// Protocol Guid Name defined by UEFI 2.0 spec.
+// Protocol Guid defined by EFI1.1.
 //
-#define EFI_LOAD_FILE_PROTOCOL_GUID LOAD_FILE_PROTOCOL_GUID
+#define LOAD_FILE_PROTOCOL EFI_LOAD_FILE_PROTOCOL_GUID
 
 typedef struct _EFI_LOAD_FILE_PROTOCOL EFI_LOAD_FILE_PROTOCOL;
+
+//
+// Backward-compatible with EFI1.1
+// 
+typedef EFI_LOAD_FILE_PROTOCOL  EFI_LOAD_FILE_INTERFACE;
 
 /**
   Causes the driver to load a specified file.

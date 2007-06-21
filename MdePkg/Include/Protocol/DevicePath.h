@@ -30,8 +30,13 @@
   }
 
 //
+// Protocol GUID defined in EFI1.1.
+// 
+
+//
 // Device Path information
 //
+#define DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH_PROTOCOL_GUID
 
 #pragma pack(1)
 
@@ -40,6 +45,11 @@ typedef struct {
   UINT8 SubType;
   UINT8 Length[2];
 } EFI_DEVICE_PATH_PROTOCOL;
+
+//
+// For backward-compatible with EFI1.1.
+// 
+typedef EFI_DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH;
 
 //
 // Hardware Device Paths

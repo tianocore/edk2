@@ -22,7 +22,18 @@
     0x1d85cd7f, 0xf43d, 0x11d2, {0x9a, 0xc, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
   }
 
-typedef struct _EFI_UNICODE_COLLATION_PROTOCOL   EFI_UNICODE_COLLATION_PROTOCOL;
+typedef struct _EFI_UNICODE_COLLATION_PROTOCOL  EFI_UNICODE_COLLATION_PROTOCOL;
+
+
+//
+// Protocol GUID name defined in EFI1.1.
+// 
+#define UNICODE_COLLATION_PROTOCOL              EFI_UNICODE_COLLATION_PROTOCOL_GUID
+
+//
+// Protocol defined in EFI1.1.
+// 
+typedef EFI_UNICODE_COLLATION_PROTOCOL          UNICODE_COLLATION_INTERFACE;
 
 //
 // Protocol data structures and defines

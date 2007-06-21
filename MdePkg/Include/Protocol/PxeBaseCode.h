@@ -24,7 +24,12 @@
     0x03c4e603, 0xac28, 0x11d3, {0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
   }
 
-typedef struct _EFI_PXE_BASE_CODE_PROTOCOL EFI_PXE_BASE_CODE_PROTOCOL;
+typedef struct _EFI_PXE_BASE_CODE_PROTOCOL  EFI_PXE_BASE_CODE_PROTOCOL;
+
+//
+// Protocol defined in EFI1.1.
+// 
+typedef EFI_PXE_BASE_CODE_PROTOCOL  EFI_PXE_BASE_CODE;
 
 //
 // Default IP TTL and ToS.
@@ -597,8 +602,12 @@ EFI_STATUS
 //
 // PXE Base Code Protocol structure
 //
-#define EFI_PXE_BASE_CODE_INTERFACE_REVISION  0x00010000
-#define EFI_PXE_BASE_CODE_PROTOCOL_REVISION   EFI_PXE_BASE_CODE_INTERFACE_REVISION
+#define EFI_PXE_BASE_CODE_PROTOCOL_REVISION   0x00010000
+
+//
+// Revision defined in EFI1.1
+// 
+#define EFI_PXE_BASE_CODE_INTERFACE_REVISION  EFI_PXE_BASE_CODE_PROTOCOL_REVISION
 
 struct _EFI_PXE_BASE_CODE_PROTOCOL {
   UINT64                            Revision;

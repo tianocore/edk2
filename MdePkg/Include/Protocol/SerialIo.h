@@ -25,7 +25,18 @@
     0xBB25CF6F, 0xF1D4, 0x11D2, {0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD } \
   }
 
+//
+// Protocol GUID defined in EFI1.1.
+// 
+#define SERIAL_IO_PROTOCOL  EFI_SERIAL_IO_PROTOCOL_GUID
+
 typedef struct _EFI_SERIAL_IO_PROTOCOL EFI_SERIAL_IO_PROTOCOL;
+
+
+//
+// Backward-compatible with EFI1.1.
+// 
+typedef EFI_SERIAL_IO_PROTOCOL  SERIAL_IO_INTERFACE;
 
 //
 // Serial IO Data structures
@@ -246,8 +257,8 @@ typedef struct {
   UINT32  StopBits;
 } EFI_SERIAL_IO_MODE;
 
-#define SERIAL_IO_INTERFACE_REVISION    0x00010000
-#define EFI_SERIAL_IO_PROTOCOL_REVISION SERIAL_IO_INTERFACE_REVISION
+#define EFI_SERIAL_IO_PROTOCOL_REVISION    0x00010000
+#define SERIAL_IO_INTERFACE_REVISION  EFI_SERIAL_IO_PROTOCOL_REVISION
 
 struct _EFI_SERIAL_IO_PROTOCOL {
   UINT32                      Revision;

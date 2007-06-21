@@ -25,10 +25,17 @@
     0x964e5b21, 0x6459, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-//
-// Forward reference for pure ANSI compatability
-//
 typedef struct _EFI_BLOCK_IO_PROTOCOL  EFI_BLOCK_IO_PROTOCOL;
+
+//
+// Protocol GUID name defined in EFI1.1.
+// 
+#define BLOCK_IO_PROTOCOL       EFI_BLOCK_IO_PROTOCOL_GUID
+
+//
+// Protocol defined in EFI1.1.
+// 
+typedef EFI_BLOCK_IO_PROTOCOL   EFI_BLOCK_IO;
 
 /**
   Reset the Block Device.
@@ -155,6 +162,10 @@ typedef struct {
 } EFI_BLOCK_IO_MEDIA;
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
+//
+// Revision defined in EFI1.1.
+// 
+#define EFI_BLOCK_IO_INTERFACE_REVISION   EFI_BLOCK_IO_PROTOCOL_REVISION
 
 struct _EFI_BLOCK_IO_PROTOCOL {
   UINT64              Revision;

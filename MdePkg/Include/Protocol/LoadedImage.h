@@ -28,10 +28,20 @@
   }
 
 //
+// Protocol GUID defined in EFI1.1.
+// 
+#define LOADED_IMAGE_PROTOCOL   EFI_LOADED_IMAGE_PROTOCOL_GUID
+
+//
 // EFI_SYSTEM_TABLE & EFI_IMAGE_UNLOAD are defined in EfiApi.h
 //
-#define EFI_LOADED_IMAGE_INFORMATION_REVISION 0x1000
-#define EFI_LOADED_IMAGE_PROTOCOL_REVISION    EFI_LOADED_IMAGE_INFORMATION_REVISION
+#define EFI_LOADED_IMAGE_PROTOCOL_REVISION  0x1000
+
+//
+// Revision defined in EFI1.1.
+// 
+#define EFI_LOADED_IMAGE_INFORMATION_REVISION    EFI_LOADED_IMAGE_PROTOCOL_REVISION
+
 
 typedef struct {
   UINT32                    Revision;
@@ -65,6 +75,11 @@ typedef struct {
   EFI_IMAGE_UNLOAD          Unload;
 
 } EFI_LOADED_IMAGE_PROTOCOL;
+
+//
+// For backward-compatible with EFI1.1.
+// 
+typedef EFI_LOADED_IMAGE_PROTOCOL EFI_LOADED_IMAGE;
 
 extern EFI_GUID gEfiLoadedImageProtocolGuid;
 
