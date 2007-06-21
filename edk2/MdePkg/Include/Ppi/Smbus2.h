@@ -92,18 +92,6 @@ EFI_STATUS
   IN OUT    VOID                      *Buffer
 );
 
-
-typedef struct {
-  UINT32  VendorSpecificId;
-  UINT16  SubsystemDeviceId;
-  UINT16  SubsystemVendorId;
-  UINT16  Interface;
-  UINT16  DeviceId;
-  UINT16  VendorId;
-  UINT8   VendorRevision;
-  UINT8   DeviceCapabilities;
-} EFI_SMBUS_UDID;
-
 /**
   CallBack function can be registered in EFI_PEI_SMBUS_PPI_NOTIFY.
 
