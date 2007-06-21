@@ -62,6 +62,6 @@ typedef struct {
   TEMPORARY_RAM_MIGRATION   TemporaryRamMigration;
 } TEMPORARY_RAM_SUPPORT_PPI;
 
-extern EFI_GUID gEfiPeiTemporaryRamSupportPpiGuid;
+extern EFI_GUID gEfiTemporaryRamSupportPpiGuid;
 
 #endif

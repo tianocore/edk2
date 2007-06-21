@@ -25,7 +25,7 @@
   { 0xdcd0be23, 0x9586, 0x40f4, { 0xb6, 0x43, 0x6, 0x52, 0x2c, 0xed, 0x4e, 0xde } }
 
 
-typedef _EFI_PEI_SECURITY2_PPI  EFI_PEI_SECURITY2_PPI;
+typedef struct _EFI_PEI_SECURITY2_PPI  EFI_PEI_SECURITY2_PPI;
 
 /**
    
