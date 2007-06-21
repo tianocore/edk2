@@ -50,7 +50,7 @@ TARGET_ARCH           = IA32
 #  TOOL_DEFINITION_FILE  Filename  Optional   Specify the name of the filename to use for specifying 
 #                                             the tools to use for the build.  If not specified, 
 #                                             tools_def.txt will be used for the build.  This file 
-#                                             MUST be located in the WORKSPACE/Tools/Conf directory.
+#                                             MUST be located in the WORKSPACE/Conf directory.
 TOOL_CHAIN_CONF       = Conf/tools_def.txt
 
 #  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.  
