@@ -6,7 +6,7 @@
     <Version>0.3</Version>
     <Abstract>The Framework Module Development Packaging System Database</Abstract>
     <Description>
-      This Database tracks all packages and platforms installed in this workspace.
+      This Database tracks all packages and archives installed in this workspace.
     </Description>
     <Copyright>Copyright (c) 2007,  Intel Corporation    All rights reserved.</Copyright>
     <License>
