@@ -618,10 +618,10 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_ELFGCC_IA32_PP_NAME      = gcc
 *_ELFGCC_IA32_VFRPP_NAME   = gcc
 
-*_ELFGCC_IA32_CC_FLAGS     = -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include ${DEST_DIR_DEBUG}/AutoGen.h -DSTRING_ARRAY_NAME=${BASE_NAME}Strings
-*_ELFGCC_*_DLINK_FLAGS     = -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
-*_ELFGCC_*_ASM_FLAGS       = -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=name
-*_ELFGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
+*_ELFGCC_IA32_CC_FLAGS     = -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include ${DEST_DIR_DEBUG}/AutoGen.h -DSTRING_ARRAY_NAME=${BASE_NAME}Strings
+*_ELFGCC_*_DLINK_FLAGS     = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry ${ENTRYPOINT} -u ${ENTRYPOINT}
+*_ELFGCC_*_ASM_FLAGS       = -m32 -c -imacros ${DEST_DIR_DEBUG}/AutoGen.h -DASM_PFX(name)=name
+*_ELFGCC_*_PP_FLAGS        = -m32 -E -x assembler-with-cpp -include ${DEST_DIR_DEBUG}/AutoGen.h
 *_ELFGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
 *_ELFGCC_*_ASM_EXT         = .S
 
