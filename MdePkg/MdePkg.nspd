@@ -204,7 +204,6 @@
     <Filename>Library/BaseMemoryLibMmx/BaseMemoryLibMmx.msa</Filename>
     <Filename>Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.msa</Filename>
     <Filename>Library/BaseMemoryLibSse2/BaseMemoryLibSse2.msa</Filename>
-    <Filename>Library/BasePcdLibNull/BasePcdLibNull.msa</Filename>
     <Filename>Library/BasePciCf8Lib/BasePciCf8Lib.msa</Filename>
     <Filename>Library/BasePciExpressLib/BasePciExpressLib.msa</Filename>
     <Filename>Library/BasePciLibCf8/BasePciLibCf8.msa</Filename>
@@ -215,35 +214,26 @@
     <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
     <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
     <Filename>Library/BasePrintLib/BasePrintLib.msa</Filename>
-    <Filename>Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.msa</Filename>
+    <Filename>Library/BaseTimerLibNull/BaseTimerLibNull.msa</Filename>
     <Filename>Library/BaseUefiDecompressLib/BaseUefiDecompressLib.msa</Filename>
     <Filename>Library/DxeCoreEntryPoint/DxeCoreEntryPoint.msa</Filename>
     <Filename>Library/DxeCoreHobLib/DxeCoreHobLib.msa</Filename>
     <Filename>Library/DxeHobLib/DxeHobLib.msa</Filename>
-    <Filename>Library/DxeIoLibCpuIo/DxeIoLibCpuIo.msa</Filename>
     <Filename>Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.msa</Filename>
-    <Filename>Library/DxeMemoryLib/DxeMemoryLib.msa</Filename>
     <Filename>Library/DxePcdLib/DxePcdLib.msa</Filename>
-    <Filename>Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.msa</Filename>
     <Filename>Library/DxeServicesTableLib/DxeServicesTableLib.msa</Filename>
     <Filename>Library/DxeSmbusLib/DxeSmbusLib.msa</Filename>
-    <Filename>Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.msa</Filename>
     <Filename>Library/HiiLib/HiiLib.msa</Filename>
     <Filename>Library/PeiCoreEntryPoint/PeiCoreEntryPoint.msa</Filename>
     <Filename>Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.msa</Filename>
     <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
     <Filename>Library/PeiHobLib/PeiHobLib.msa</Filename>
-    <Filename>Library/PeiIoLibCpuIo/PeiIoLibCpuIo.msa</Filename>
     <Filename>Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.msa</Filename>
-    <Filename>Library/PeiMemoryLib/PeiMemoryLib.msa</Filename>
     <Filename>Library/PeimEntryPoint/PeimEntryPoint.msa</Filename>
     <Filename>Library/PeiPcdLib/PeiPcdLib.msa</Filename>
-    <Filename>Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.msa</Filename>
     <Filename>Library/PeiResourcePublicationLib/PeiResourcePublicationLib.msa</Filename>
     <Filename>Library/PeiServicesLib/PeiServicesLib.msa</Filename>
     <Filename>Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.msa</Filename>
-    <Filename>Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.msa</Filename>
-    <Filename>Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.msa</Filename>
     <Filename>Library/PeiSmbusLib/PeiSmbusLib.msa</Filename>
     <Filename>Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.msa</Filename>
     <Filename>Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.msa</Filename>
@@ -253,7 +243,6 @@
     <Filename>Library/UefiDevicePathLib/UefiDevicePathLib.msa</Filename>
     <Filename>Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.msa</Filename>
     <Filename>Library/UefiDriverEntryPoint/UefiDriverEntryPoint.msa</Filename>
-    <Filename>Library/UefiDriverModelLib/UefiDriverModelLib.msa</Filename>
     <Filename>Library/UefiLib/UefiLib.msa</Filename>
     <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
   </MsaFiles>
