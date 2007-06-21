@@ -22,15 +22,22 @@
 #ifndef __SIMPLE_TEXT_OUT_H__
 #define __SIMPLE_TEXT_OUT_H__
 
-#define EFI_SIMPLE_TEXT_OUT_PROTOCOL_GUID \
+#define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID \
   { \
     0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-#define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID  EFI_SIMPLE_TEXT_OUT_PROTOCOL_GUID
+//
+// Protocol GUID defined in EFI1.1.
+// 
+#define SIMPLE_TEXT_OUTPUT_PROTOCOL   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID
 
-typedef struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL EFI_SIMPLE_TEXT_OUT_PROTOCOL;
-typedef struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+
+//
+// Backward-compatible with EFI1.1.
+// 
+typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 
 //
 // Define's for required EFI Unicode Box Draw characters
@@ -155,7 +162,7 @@ typedef struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_RESET) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL           *This,
   IN BOOLEAN                                ExtendedVerification
   )
 ;
@@ -181,7 +188,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_STRING) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
   )
 ;
@@ -203,7 +210,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_TEST_STRING) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
   )
 ;
@@ -227,7 +234,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_QUERY_MODE) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  ModeNumber,
   OUT UINTN                                 *Columns,
   OUT UINTN                                 *Rows
@@ -248,7 +255,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_SET_MODE) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  ModeNumber
   )
 ;
@@ -270,7 +277,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_SET_ATTRIBUTE) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Attribute
   )
 ;
@@ -289,7 +296,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_CLEAR_SCREEN) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL   *This
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *This
   )
 ;
 
@@ -313,7 +320,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_SET_CURSOR_POSITION) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Column,
   IN UINTN                                  Row
   )
@@ -336,7 +343,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_ENABLE_CURSOR) (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN BOOLEAN                                Visible
   )
 ;
@@ -365,7 +372,7 @@ typedef struct {
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
-struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL {
+struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_TEXT_RESET                Reset;
 
   EFI_TEXT_STRING               OutputString;
@@ -385,6 +392,6 @@ struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL {
   EFI_SIMPLE_TEXT_OUTPUT_MODE   *Mode;
 };
 
-extern EFI_GUID gEfiSimpleTextOutProtocolGuid;
+extern EFI_GUID gEfiSimpleTextOutputProtocolGuid;
 
 #endif

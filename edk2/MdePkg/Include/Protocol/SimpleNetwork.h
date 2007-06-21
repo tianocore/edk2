@@ -31,6 +31,12 @@
 
 typedef struct _EFI_SIMPLE_NETWORK_PROTOCOL  EFI_SIMPLE_NETWORK_PROTOCOL;
 
+
+//
+// Protocol defined in EFI1.1.
+// 
+typedef EFI_SIMPLE_NETWORK_PROTOCOL   EFI_SIMPLE_NETWORK;
+
 //
 // Simple Network Protocol data structures
 //
@@ -555,6 +561,11 @@ EFI_STATUS
 ;
 
 #define EFI_SIMPLE_NETWORK_PROTOCOL_REVISION  0x00010000
+
+//
+// Revision defined in EFI1.1
+// 
+#define EFI_SIMPLE_NETWORK_INTERFACE_REVISION   EFI_SIMPLE_NETWORK_PROTOCOL_REVISION
 
 struct _EFI_SIMPLE_NETWORK_PROTOCOL {
   UINT64                              Revision;
