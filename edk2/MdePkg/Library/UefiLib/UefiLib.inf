@@ -2,8 +2,8 @@
 # Component description file for the entry point to a EFIDXE Drivers
 #
 # Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
-# 
-#  Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the oldconflicts with library functions and supporting implementations of the old 
+#
+#  Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the oldconflicts with library functions and supporting implementations of the old
 #  (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as it contains DXE enum extensions for EFI event services.
 # Copyright (c) 2007, Intel Corporation.
 #
@@ -28,7 +28,7 @@
   FILE_GUID                      = 3a004ba5-efe0-4a61-9f1a-267a46ae5ba9
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = UefiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -98,7 +98,6 @@
 ################################################################################
 
 [Guids]
-  gEfiFrameworkDevicePathGuid                   # ALWAYS_CONSUMED
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
 

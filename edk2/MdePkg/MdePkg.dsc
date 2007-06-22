@@ -32,6 +32,10 @@
 
 
 ################################################################################
+#
+# Pcd Section - list of all EDK II PCD Entries defined by this Platform
+#
+################################################################################
 
 [PcdsFeatureFlag.common]
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
