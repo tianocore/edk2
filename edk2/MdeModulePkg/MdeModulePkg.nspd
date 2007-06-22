@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SpdHeader>
+    <PackageName>MdeModulePkg</PackageName>
+    <GuidValue>BA0D78D6-2CAF-414b-BD4D-B6762A894288</GuidValue>
+    <Version>0.1</Version>
+    <Abstract>Mde Module Package Reference Implementations</Abstract>
+    <Description>This module provides headers and libraries that conform to EFI/PI Industry standards.</Description>
+    <Copyright>Copyright (c) 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved.
+      This program and the accompanying materials are licensed and made available under
+      the terms and conditions of the BSD License which accompanies this distribution.
+      The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </SpdHeader>
+  <PackageDefinitions>
+    <ReadOnly>false</ReadOnly>
+    <RePackage>false</RePackage>
+  </PackageDefinitions>
+  <MsaFiles>
+    <Filename>Application/HelloWorld/HelloWorld.msa</Filename>
+  </MsaFiles>
+</PackageSurfaceArea>
