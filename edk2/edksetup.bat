@@ -26,6 +26,14 @@
 @echo off
 
 @REM
+@REM Set the WORKSPACE to the current working directory
+@REM
+set WORKSPACE=%CD%
+
+@if /I "%1"=="NewBuild" goto NewBuild
+
+:AntBuild
+@REM
 @REM Check the required system environment variables
 @REM
 
@@ -59,11 +67,6 @@ if not exist %ANT_HOME%\lib\ant-contrib.jar goto no_antcontrib
 :check_xmlbeans
 if "%XMLBEANS_HOME%"=="" goto no_xmlbeans
 if not exist %XMLBEANS_HOME%\lib\saxon8.jar goto no_saxon8
-
-@REM
-@REM Set the WORKSPACE to the current working directory
-@REM
-set WORKSPACE=%CD%
 
 set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
 
@@ -271,6 +274,12 @@ echo  Note that target.template, tools_def.template, FrameworkDatabase.template 
 echo  only copied to target.txt, tools_def.txt, FrameworkDatabase.db respectively if they
 echo  are not existed. Using option [Reconfig] to do the force copy. 
 echo.
+
+:NewBuild
+@IF NOT EXIST "BaseTools\toolsetup.bat" goto AntBuild
+@set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+@call BaseTools\toolsetup.bat
+@goto end
 
 :end
 @echo on
