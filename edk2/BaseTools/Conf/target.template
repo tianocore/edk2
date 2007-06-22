@@ -23,7 +23,7 @@
 #                                               of the platform FPD file that will be used for the build
 #                                               This line is required if and only if the current working
 #                                               directory does not contain one or more FPD files.
-ACTIVE_PLATFORM       = Nt32Pkg/Nt32.dsc
+ACTIVE_PLATFORM       = MdePkg/MdePkg.dsc
 
 #  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE, 
 #                                               UserDefined; separated by a space character.  

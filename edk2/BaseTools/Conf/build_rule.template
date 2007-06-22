@@ -1,0 +1,165 @@
+# file extention   :   file type
+FileTypeMapping = {
+    ".c"    :   "C-Code",
+    ".C"    :   "C-Code",
+    ".cpp"  :   "C-Code",
+    ".Cpp"  :   "C-Code",
+    ".CPP"  :   "C-Code",
+    ".h"    :   "C-Header",
+    ".H"    :   "C-Header",
+    ".asm"  :   "Masm-Code",
+    ".Asm"  :   "Masm-Code",
+    ".ASM"  :   "Masm-Code",
+    ".s"    :   "Iasm-Code",    # IPF assembly code
+    ".S"    :   "Gasm-Code",    # GNU assembly code
+    ".uni"  :   "Unicode-Text",
+    ".Uni"  :   "Unicode-Text",
+    ".UNI"  :   "Unicode-Text",
+    ".vfr"  :   "Visual-Form-Representation",
+    ".Vfr"  :   "Visual-Form-Representation",
+    ".VFR"  :   "Visual-Form-Representation",
+    ".dxs"  :   "Dependency-Expression",
+    ".Dxs"  :   "Dependency-Expression",
+    ".DXS"  :   "Dependency-Expression",
+    ".fv"   :   "FirmwareVolume",
+    ".Fv"   :   "FirmwareVolume",
+    ".FV"   :   "FirmwareVolume",
+    ".efi"  :   "Efi-Image",
+    ".Efi"  :   "Efi-Image",
+    ".EFI"  :   "Efi-Image",
+    ".SEC"  :   "Firmware-File-System",
+    ".PEI"  :   "Firmware-File-System",
+    ".DXE"  :   "Firmware-File-System",
+    ".APP"  :   "Firmware-File-System",
+    ".FYI"  :   "Firmware-File-System",
+    ".FFS"  :   "Firmware-File-System",
+    ".bmp"  :   "Bmp-Image",
+    ".i"    :   "Preprocessed-Code",
+    ".asl"  :   "Acpi-Source-Language",
+    ".Asl"  :   "Acpi-Source-Language",
+    ".ASL"  :   "Acpi-Source-Language",
+    ".obj"  :   "Object",
+    ".o"    :   "Object",
+    ".lib"  :   "Static-Library",
+    ".a"    :   "Static-Library",
+    ".dll"  :   "Dynamic-Library",
+    ".so"   :   "Dynamic-Library",
+}
+
+DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL", "VFRC", "AUTOGEN"]
+
+ToolCodeMapping = {
+    "C-Code"                        :   "CC",
+    "C-Header"                      :   "PCH",
+    "Masm-Code"                     :   "ASM",
+    "Iasm-Code"                     :   "ASM",          # IPF assembly code
+    "Gasm-Code"                     :   "ASM",          # GNU assembly code
+    "Unicode-Text"                  :   "AUTOGEN",
+    "Visual-Form-Representation"    :   "VFRC",
+    "Preprocessed-Code"             :   "CC",
+    "Acpi-Source-Language"          :   "ASL",
+    "Object"                        :   "SLINK",
+    "Static-Library"                :   "DLINK",
+	"Dependency-Expression"			:	"PP",
+}
+
+ToolChainFamilyMapping = {
+    "C-Code"                        :   ["MSFT", "INTEL", "GCC"],
+    "C-Header"                      :   ["MSFT", "INTEL", "GCC"],
+    "Masm-Code"                     :   ["MSFT", "INTEL"],
+    "Iasm-Code"                     :   ["MSFT", "INTEL"],          # IPF assembly code
+    "Gasm-Code"                     :   ["GCC"],                    # GNU assembly code
+    "Unicode-Text"                  :   ["MSFT", "INTEL", "GCC"],
+    "Visual-Form-Representation"    :   ["MSFT", "INTEL", "GCC"],
+    "Dependency-Expression"         :   ["MSFT", "INTEL", "GCC"],
+    "FirmwareVolume"                :   ["MSFT", "INTEL", "GCC"],
+    "Efi-Image"                     :   ["MSFT", "INTEL", "GCC"],
+    "Firmware-File-System"          :   ["MSFT", "INTEL", "GCC"],
+    "Bmp-Image"                     :   ["MSFT", "INTEL", "GCC"],
+    "Preprocessed-Code"             :   ["MSFT", "INTEL"],
+    "Acpi-Source-Language"          :   ["MSFT", "INTEL"],
+}
+
+## Build rules for makefile
+# Placeholders for string substitution
+# 	${fdir}		File relative directory within a module
+#   ${fname}	File full name without path
+#   ${fbase}	File name without extension and path
+#   ${fext}     File extension
+#   ${dep}      Dependency file
+#   ${sep}      Directory separator
+#
+Makefile = {
+"nmake"	: {
+"C-Code"    : '''\
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(MODULE_DIR)${sep}${fdir}${sep}${fname}
+''',
+
+"AutoGen-Code"    : '''\
+${BEGIN}$(OUTPUT_DIR)${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fname}
+''',
+
+"Masm-Code" : '''\
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${END}	"$(PP)" $(PP_FLAGS) $(INC) $(MODULE_DIR)${sep}${fdir}${sep}${fname} > $(@D)${sep}${fbase}.i
+	Trim -CONVERT $(@D)${sep}${fbase}.i
+	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.iii
+''',
+
+"Iasm-Code" : '''\
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${END}	"$(APP)" $(APP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)${sep}${fbase}.i
+	"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)${sep}${fbase}.i
+''',
+
+"Visual-Form-Representation" : 
+'$(OUTPUT_DIR)\\%(fdir)s\\%(fbase)s.obj : $(MODULE_DIR)\\%(fdir)s\\%(fname)s $(DEP_FILES)\n'\
+    '\t"$(PP)" $(PP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)\\%(fbase)s.i\n'\
+    '\t"$(VFRC)" $(VFRC_FLAGS) $(INC) $(VFRC_OUTPUT)$(DEBUG_DIR)\\%(fdir)s\\%(fbase)s.c $(@D)\\%(fbase)s.i\n'\
+    '\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $(DEBUG_DIR)\\%(fdir)s\\%(fbase)s.c\n',
+},
+
+"gmake" : {
+"C-Code"    : 
+'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
+\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $<''',
+
+"Masm-Code" : 
+'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
+\t"$(PP)" $(PP_FLAGS) $(INC) $? $(PP_OUTPUT)$(@D)/%(fbase)s.i
+\tTrim -CONVERT $(@D)/%(fbase)s.i
+\t"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)/%(fbase)s.iii''',
+    
+"Gasm-Code" : 
+'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
+\t"$(ASM)" $(ASM_FLAGS) $(INC) $(ASM_OUTPUT)$@ $<''',
+
+"Iasm-Code" : 
+'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
+\t"$(APP)" $(APP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)/%(fbase)s.i
+\t"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)/%(fbase)s.i''',
+
+"Visual-Form-Representation" : 
+'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
+\t"$(PP)" $(PP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)/%(fbase)s.i
+\t"$(VFRC)" $(VFRC_FLAGS) $(INC) $(VFRC_OUTPUT)$(DEBUG_DIR)/%(fdir)s/%(fbase)s.c $(@D)/%(fbase)s.i
+\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $(DEBUG_DIR)/%(fdir)s/%(fbase)s.c''',
+}
+}
+
+# This acts like the main() function for the script, unless it is 'import'ed into another
+# script.
+if __name__ == '__main__':
+    for ext in FileTypeMapping:
+        print ext,":",FileTypeMapping[ext]
+
+    for type in Makefile["nmake"]:
+        print "[",type,"]\n",Makefile["nmake"][type]
+        print
+
+    for type in Makefile["gmake"]:
+        print "[",type,"]\n",Makefile["gmake"][type]
+        print
+
