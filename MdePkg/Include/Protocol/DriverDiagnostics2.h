@@ -10,29 +10,21 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  DriverDiagnostics.h
+  Module Name:  DriverDiagnostics2.h
 
 **/
 
-#ifndef __EFI_DRIVER_DIAGNOSTICS_H__
-#define __EFI_DRIVER_DIAGNOSTICS_H__
+#ifndef __EFI_DRIVER_DIAGNOSTICS2_H__
+#define __EFI_DRIVER_DIAGNOSTICS2_H__
 
-//
-// Global ID for the Driver Diagnostics Protocol as defined in EFI 1.10.
-//
-#define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID \
+#include <Protocol/DriverDiagnostics.h>
+
+#define EFI_DRIVER_DIAGNOSTICS2_PROTOCOL_GUID \
   { \
-    0x0784924f, 0xe296, 0x11d4, {0x9a, 0x49, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+    0x4d330321, 0x025f, 0x4aac, {0x90, 0xd8, 0x5e, 0xd9, 0x00, 0x17, 0x3b, 0x63 } \
   }
-
-typedef struct _EFI_DRIVER_DIAGNOSTICS_PROTOCOL  EFI_DRIVER_DIAGNOSTICS_PROTOCOL;
-
-typedef enum {
-  EfiDriverDiagnosticTypeStandard     = 0,
-  EfiDriverDiagnosticTypeExtended     = 1,
-  EfiDriverDiagnosticTypeManufacturing= 2,
-  EfiDriverDiagnosticTypeMaximum
-} EFI_DRIVER_DIAGNOSTIC_TYPE;
+  
+typedef struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL  EFI_DRIVER_DIAGNOSTICS2_PROTOCOL;
 
 /**
   Runs diagnostics on a controller.
@@ -88,8 +80,8 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS) (
-  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL                        *This,
+(EFIAPI *EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS) (
+  IN EFI_DRIVER_DIAGNOSTICS2_PROTOCOL                       *This,
   IN  EFI_HANDLE                                            ControllerHandle,
   IN  EFI_HANDLE                                            ChildHandle  OPTIONAL,
   IN  EFI_DRIVER_DIAGNOSTIC_TYPE                            DiagnosticType,
@@ -110,16 +102,18 @@ EFI_STATUS
   Used to perform diagnostics on a controller that an EFI Driver is managing.
 
   @param RunDiagnostics      Runs diagnostics on a controller.
-  @param SupportedLanguages  A Null-terminated ASCII string that contains one or more
-                             ISO 639-2 language codes.  This is the list of language 
-                             codes that this protocol supports.
+  @param SupportedLanguages  A Null-terminated ASCII string that
+                             contains one or more RFC 3066
+                             language codes.  This is the list
+                             of language codes that this
+                             protocol supports.
 
 **/
-struct _EFI_DRIVER_DIAGNOSTICS_PROTOCOL {
-  EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS  RunDiagnostics;
+struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
+  EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS RunDiagnostics;
   CHAR8                                   *SupportedLanguages;
 };
 
-extern EFI_GUID gEfiDriverDiagnosticsProtocolGuid;
+extern EFI_GUID gEfiDriverDiagnostics2ProtocolGuid;
 
 #endif
