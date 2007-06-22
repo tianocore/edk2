@@ -14,13 +14,20 @@
 
 **/
 
-
-
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
-#include <Include/IndustryStandard/PeImage.h>
+#include <Base.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/DebugLib.h>
+
+#include <IndustryStandard/PeImage.h>
 
 /**
   Retrieves and returns a pointer to the entry point to a PE/COFF image that has been loaded

@@ -14,9 +14,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiPei.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/PeimEntryPoint.h>
+#include <Library/DebugLib.h>
 
 /**
   Image entry point of Peim.

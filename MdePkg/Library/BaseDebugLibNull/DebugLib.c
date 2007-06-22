@@ -13,9 +13,14 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Base.h>
+
+//
+// The Library classes this module produced
+//
+#include <Library/DebugLib.h>
 
 /**
 

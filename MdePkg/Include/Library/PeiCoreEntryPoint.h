@@ -16,19 +16,35 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __MODULE_ENTRY_POINT_H__
 
 /**
+
   Enrty point to PEI core.
 
-  @param  PeiStartupDescriptor Pointer of start up information.
- 
-  @return Status returned by entry points of core and drivers. 
+  @param SecCoreData    Points to a data structure containing
+                        information about the PEI core's
+                        operating environment, such as the size
+                        and location of temporary RAM, the stack
+                        location and the BFV location. The type
+                        EFI_SEC_PEI_HAND_OFF is
+
+  @param PpiList        Points to a list of one or more PPI
+                        descriptors to be installed initially by
+                        the PEI core. An empty PPI list consists
+                        of a single descriptor with the end-tag
+                        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
+                        As part of its initialization phase, the
+                        PEI Foundation will add these SEC-hosted
+                        PPIs to its PPI database such that both
+                        the PEI Foundation and any modules can
+                        leverage the associated service calls
+                        and/or code in these early PPIs.
 
 **/
-EFI_STATUS
-EFIAPI
-_ModuleEntryPoint (
+VOID
+EFIAPI 
+_ModuleEntryPoint(
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
-  );
+);
 
 /**
   Wrapper of enrty point to PEI core.
@@ -38,7 +54,7 @@ _ModuleEntryPoint (
   @return Status returned by entry points of core and drivers. 
 
 **/
-EFI_STATUS
+VOID
 EFIAPI
 EfiMain (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
@@ -69,7 +85,7 @@ ProcessLibraryConstructorList (
   @return Status returned by entry points of drivers.  
  
 **/
-EFI_STATUS
+VOID
 EFIAPI
 ProcessModuleEntryPointList (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,

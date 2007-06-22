@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _USB_DXE_LIB_H
 #define _USB_DXE_LIB_H
 
+#include <Protocol/UsbIo.h>
 //
 // define the timeout time as 3ms
 //

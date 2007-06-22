@@ -1102,8 +1102,26 @@
       <HelpText>If this value is set TRUE, autogen will replace Compoent Name Protocol instance with NULL.</HelpText>
     </PcdEntry>
     <PcdEntry>
-      <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+      <C_Name>PcdDriverDiagnostics2Disable</C_Name>
       <Token>0x0000000e</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdComponentName2Disable</C_Name>
+      <Token>0x0000000f</Token>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this value is set TRUE, autogen will replace Compoent Name Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDriverDiagnostics2Disable</C_Name>
+      <Token>0x00000010</Token>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>

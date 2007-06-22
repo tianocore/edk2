@@ -48,6 +48,7 @@
 [Sources.common]
   UefiLibPrint.c
   UefiNotTiano.c
+  UefiDriverModel.c
   Console.c
   UefiLib.c
   CommonHeader.h
@@ -116,6 +117,10 @@
 
 [PcdsFixedAtBuild.common]
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid
+
+[PcdsFeatureFlag.common]
   PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid
+  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid
+  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid
 

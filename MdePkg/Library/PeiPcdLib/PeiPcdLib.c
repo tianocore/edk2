@@ -18,9 +18,20 @@ Module Name: PeiPcdLib.c
 
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiPei.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Ppi/Pcd.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/PcdLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
+#include <Library/BaseMemoryLib.h>
 
 /**
   The constructor function retrieve the PCD_PPI pointer.

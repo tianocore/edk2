@@ -15,9 +15,17 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Base.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/PciLib.h>
+#include <Library/PciCf8Lib.h>
 
 /**
   Reads an 8-bit PCI configuration register.

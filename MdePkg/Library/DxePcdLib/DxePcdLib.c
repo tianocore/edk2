@@ -16,9 +16,20 @@ Module Name: DxePcdLib.c
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/Pcd.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/PcdLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
 
 static PCD_PROTOCOL  *mPcd;
 

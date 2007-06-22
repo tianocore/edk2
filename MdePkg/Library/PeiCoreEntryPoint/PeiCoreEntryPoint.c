@@ -1,7 +1,7 @@
 /** @file
   Entry point to a the PEI Core.
 
-Copyright (c) 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,11 +13,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiPei.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module produced
+//
+#include <Library/PeiCoreEntryPoint.h>
 
 /**
+
   Enrty point to PEI core.
 
   @param SecCoreData    Points to a data structure containing
@@ -40,23 +48,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                         and/or code in these early PPIs.
 
 **/
-EFI_STATUS
-EFIAPI
-_ModuleEntryPoint (
-  IN CONST EFI_SEC_PEI_HAND_OFF    *SecCoreData,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
-  )
+VOID
+EFIAPI 
+_ModuleEntryPoint(
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
+)
 {
-  //
-  // Call the PEI Core entry point
-  //
-  return ProcessModuleEntryPointList (SecCoreData, PpiList, NULL);
+  ProcessModuleEntryPointList (SecCoreData, PpiList, NULL);
 }
 
 
 /**
+  
   Wrapper of enrty point to PEI core.
-
+  
   @param SecCoreData    Points to a data structure containing
                         information about the PEI core's
                         operating environment, such as the size
@@ -77,11 +83,12 @@ _ModuleEntryPoint (
                         and/or code in these early PPIs.
 
 **/
-EFI_STATUS
+VOID
+EFIAPI
 EfiMain (
-  IN CONST EFI_SEC_PEI_HAND_OFF    *SecCoreData,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 {
-  return _ModuleEntryPoint (SecCoreData, PpiList);
+  _ModuleEntryPoint (SecCoreData, PpiList);
 }

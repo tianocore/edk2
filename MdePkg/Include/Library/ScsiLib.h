@@ -24,6 +24,8 @@ Module Name:
 #ifndef _SCSI_LIB_H
 #define _SCSI_LIB_H
 
+#include <Protocol/ScsiIo.h>
+
 //
 // the time unit is 100ns, since the SCSI I/O defines timeout in 100ns unit.
 //

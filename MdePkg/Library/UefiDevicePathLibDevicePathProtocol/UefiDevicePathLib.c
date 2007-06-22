@@ -15,9 +15,23 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Uefi.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/DevicePathUtilities.h>
+#include <Protocol/DevicePath.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DevicePathLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 STATIC EFI_DEVICE_PATH_UTILITIES_PROTOCOL          *mDevicePathUtilities = NULL;
 

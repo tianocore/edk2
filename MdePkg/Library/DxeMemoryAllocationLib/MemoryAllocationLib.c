@@ -15,9 +15,19 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 
 #include "MemoryAllocationLibInternals.h"
 

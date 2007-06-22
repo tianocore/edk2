@@ -15,9 +15,18 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Base.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/PerformanceLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 /**
   Creates a record for the beginning of a performance measurement. 
