@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>SecPeiDxeTimerLibCpu</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>b5a05743-9b71-489b-a0ed-a0eb3950d23b</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Timer Library implementation for Boot Timer moudles that require timer services.</Abstract>
+    <Description>Timer Library that uses CPU resources to provide calibrated
+      delays on IA-32 and x64, and uses ITC on IPF. Note: Because CpuLocalApci
+      and ITC could be programmed by OS, it cannot be used by SMM drivers
+      and runtime drivers, ACPI timer is recommended for SMM drivers and RUNTIME
+      drivers.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>SecPeiDxeTimerLibCpu</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="BASE DXE_CORE DXE_DRIVER DXE_SAL_DRIVER PEIM PEI_CORE SEC UEFI_APPLICATION UEFI_DRIVER">
+      <Keyword>TimerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+      <Keyword>IoLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename SupArchList="IA32">x86TimerLib.c</Filename>
+    <Filename SupArchList="X64">x86TimerLib.c</Filename>
+    <Filename SupArchList="IPF">IpfTimerLib.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
+      <C_Name>PcdFSBClock</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This value is FSB Clock frequency. Its unit is Hz and its default value is 200000000, that means FSB frequency is 200Mhz.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>

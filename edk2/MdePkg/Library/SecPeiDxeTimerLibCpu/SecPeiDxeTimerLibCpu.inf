@@ -1,0 +1,116 @@
+#/** @file
+# Timer Library implementation for Boot Timer moudles that require timer services.
+#
+# Timer Library that uses CPU resources to provide calibrated
+#  delays on IA-32 and x64, and uses ITC on IPF. Note: Because CpuLocalApci
+#  and ITC could be programmed by OS, it cannot be used by SMM drivers
+#  and runtime drivers, ACPI timer is recommended for SMM drivers and RUNTIME
+#  drivers.
+# Copyright (c) 2007 - 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecPeiDxeTimerLibCpu
+  FILE_GUID                      = b5a05743-9b71-489b-a0ed-a0eb3950d23b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|BASE DXE_CORE DXE_DRIVER DXE_SAL_DRIVER PEIM PEI_CORE SEC UEFI_APPLICATION UEFI_DRIVER 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  CommonHeader.h
+
+[Sources.Ia32]
+  x86TimerLib.c
+
+[Sources.X64]
+  x86TimerLib.c
+
+[Sources.IPF]
+  IpfTimerLib.c
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg\Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+
+[LibraryClasses.IA32]
+  PcdLib
+  IoLib
+
+[LibraryClasses.X64]
+  PcdLib
+  IoLib
+
+[LibraryClasses.IPF]
+  DebugLib
+
+
+################################################################################
+#
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsDynamic.IA32]
+  PcdFSBClock|gEfiMdePkgTokenSpaceGuid
+
+[PcdsDynamic.X64]
+  PcdFSBClock|gEfiMdePkgTokenSpaceGuid
+
