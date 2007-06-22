@@ -82,14 +82,3 @@
   DebugLib
 
 
-################################################################################
-#
-# Build Options - list of custom build options for this module.
-#
-################################################################################
-
-[BuildOptions]
-  *_MYTOOLS_*_CC_FLAGS           = /WX-
-  *_VS2005PRO_*_CC_FLAGS         = /WX-
-  *_WINDDK3790x1830_*_CC_FLAGS   = /WX-
-  *_ICC_*_CC_FLAGS               = /WX-
