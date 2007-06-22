@@ -12,10 +12,11 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Uefi.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiApplicationEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 EFI_STATUS
 EFIAPI
