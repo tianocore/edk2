@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BasePostCodeLibDebug</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>19e3bbba-beb1-43e8-b32d-9acbb22c7639</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Debug Base Post Code Library.</Abstract>
+    <Description>Post Code Library that layers on top of a Debug Library instance.</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BasePostCodeLibDebug</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>PostCodeLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PostCode.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPostCodePropertyMask</C_Name>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The bitmask of flags that specify the enable/disable of Post
+                Code, Post Code Description.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>

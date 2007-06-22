@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BasePciExpressLib</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>287e50f4-a188-4699-b907-3e4080ca5688</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Base PCI Express Library.</Abstract>
+    <Description>PCI Express Library that uses the 256 MB PCI Express MMIO window to perform
+      PCI Configuration cycles.  Layers on top of an I/O Library instance.</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BasePciExpressLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>PciExpressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>IoLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>    
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PciLib.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdPciExpressBaseAddress</C_Name>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The base address of PCI Express MMIO window.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>

@@ -1,0 +1,83 @@
+#/** @file
+# Timer library NULL template implementaton
+#
+# A non-functional instance of the Timer Library that can be used as a template
+#  for the implementation of a functional timer library instance. This library instance can
+#  also be used to test build DXE, Runtime, DXE SAL, and DXE SMM modules that require timer
+#  services as well as EBC modules that require timer services
+# Copyright (c) 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseTimerLibNullTemplate
+  FILE_GUID                      = f4731d79-537e-4505-bd52-c03f9b1f6b89
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  TimerLibNull.c
+  CommonHeader.h
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg\Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  DebugLib
+

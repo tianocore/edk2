@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BasePciCf8Lib</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>472ab06d-9810-4c00-bb7f-dad1828fc1ab</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Base PCI Cf8 Library.</Abstract>
+    <Description>PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+      Layers on top of an I/O Library instance.</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BasePciCf8Lib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>PciCf8Lib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>IoLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PciLib.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+</ModuleSurfaceArea>

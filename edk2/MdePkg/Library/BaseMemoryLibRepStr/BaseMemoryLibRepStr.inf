@@ -1,0 +1,143 @@
+#/** @file
+# Component description file for RepStr Base Memory Library
+#
+# Base Memory Library that uses REP string instructions for
+#  high performance and small size. Optimized for use in PEI.
+# Copyright (c) 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseMemoryLibRepStr
+  FILE_GUID                      = e7884bf4-51a1-485b-982a-ff89129983bc
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseMemoryLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  MemLibInternals.h
+  CommonHeader.h
+
+[Sources.Ia32]
+  Ia32/ScanMem64.S
+  Ia32/ScanMem32.S
+  Ia32/ScanMem16.S
+  Ia32/ScanMem8.S
+  Ia32/CompareMem.S
+  Ia32/ZeroMem.S
+  Ia32/SetMem64.S
+  Ia32/SetMem32.S
+  Ia32/SetMem16.S
+  Ia32/SetMem.S
+  Ia32/CopyMem.S
+  Ia32/ScanMem64.asm
+  Ia32/ScanMem32.asm
+  Ia32/ScanMem16.asm
+  Ia32/ScanMem8.asm
+  Ia32/CompareMem.asm
+  Ia32/ZeroMem.asm
+  Ia32/SetMem64.asm
+  Ia32/SetMem32.asm
+  Ia32/SetMem16.asm
+  Ia32/SetMem.asm
+  Ia32/CopyMem.asm
+  ScanMem64Wrapper.c
+  ScanMem32Wrapper.c
+  ScanMem16Wrapper.c
+  ScanMem8Wrapper.c
+  ZeroMemWrapper.c
+  CompareMemWrapper.c
+  SetMem64Wrapper.c
+  SetMem32Wrapper.c
+  SetMem16Wrapper.c
+  SetMemWrapper.c
+  CopyMemWrapper.c
+  MemLibGuid.c
+
+[Sources.X64]
+  x64/ScanMem64.asm
+  x64/ScanMem32.asm
+  x64/ScanMem16.asm
+  x64/ScanMem8.asm
+  x64/CompareMem.asm
+  x64/ZeroMem.asm
+  x64/SetMem64.asm
+  x64/SetMem32.asm
+  x64/SetMem16.asm
+  x64/SetMem.asm
+  x64/CopyMem.asm
+  ScanMem64Wrapper.c
+  ScanMem32Wrapper.c
+  ScanMem16Wrapper.c
+  ScanMem8Wrapper.c
+  ZeroMemWrapper.c
+  CompareMemWrapper.c
+  SetMem64Wrapper.c
+  SetMem32Wrapper.c
+  SetMem16Wrapper.c
+  SetMemWrapper.c
+  CopyMemWrapper.c
+  MemLibGuid.c
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg\Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+
