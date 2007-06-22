@@ -365,7 +365,7 @@ typedef struct {
   CHAR16                          PathName[1];
 } FILEPATH_DEVICE_PATH;
 
-#define SIZE_OF_FILEPATH_DEVICE_PATH EFI_FIELD_OFFSET(FILEPATH_DEVICE_PATH,PathName)
+#define SIZE_OF_FILEPATH_DEVICE_PATH  EFI_FIELD_OFFSET(FILEPATH_DEVICE_PATH,PathName)
 
 #define MEDIA_PROTOCOL_DP         0x05
 typedef struct {
@@ -375,11 +375,17 @@ typedef struct {
 
 
 #define MEDIA_PIWG_FW_VOL_DP      0x6
-typedef MEDIA_PROTOCOL_DEVICE_PATH MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  EFI_GUID                        FvName;
+} MEDIA_FW_VOL_DEVICE_PATH;
 
 
 #define MEDIA_PIWG_FW_FILE_DP     0x7
-typedef MEDIA_PROTOCOL_DEVICE_PATH MEDIA_FW_VOL_DEVICE_PATH;
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  EFI_GUID                        FvFileName;
+} MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
 //
 // BBS Device Path
