@@ -17,11 +17,6 @@
 #ifndef __PEI_MEMORY_ALLOCATION_LIB_INTERNALS_H__
 #define __PEI_MEMORY_ALLOCATION_LIB_INTERNALS_H__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 /**
   Allocates one or more 4KB pages of a certain memory type.
 

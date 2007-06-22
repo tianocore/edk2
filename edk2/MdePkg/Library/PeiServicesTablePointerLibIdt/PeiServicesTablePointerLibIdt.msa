@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>PeiServicesTablePointerLibIdt</ModuleName>
+    <ModuleType>PEIM</ModuleType>
+    <GuidValue>DED3F743-CE2C-4ba6-92A2-FFCE2A6D72D9</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for IPF KR1 Pei Services Table Pointer Library</Abstract>
+    <Description>PEI Services Table Library implementation that retrieves a pointer to the PEI
+      Services Table from the KR1 register on IPF.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>PeiServicesTablePointerLibIdt</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="PEIM PEI_CORE">
+      <Keyword>PeiServicesTablePointerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename SupArchList="IA32 X64">PeiServicesTablePointer.c</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="GCC">Ia32/AsmPeiSevicesTablePointer.S</Filename>
+    <Filename SupArchList="IA32" ToolChainFamily="MSFT">Ia32/AsmPeiSevicesTablePointer.c</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="GCC">x64/AsmPeiSevicesTablePointer.S</Filename>
+    <Filename SupArchList="X64" ToolChainFamily="MSFT">x64/AsmPeiSevicesTablePointer.asm</Filename>
+  </SourceFiles>
+  <NonProcessedFiles>
+    <Filename>Ia32/AsmPeiSevicesTablePointer.Asm</Filename>
+  </NonProcessedFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+</ModuleSurfaceArea>

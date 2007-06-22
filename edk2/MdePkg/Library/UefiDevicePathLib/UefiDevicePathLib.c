@@ -22,9 +22,22 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Uefi.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/DevicePath.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DevicePathLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseLib.h>
 
 /**
   Returns the size of a device path in bytes.

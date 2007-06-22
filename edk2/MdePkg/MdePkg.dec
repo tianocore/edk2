@@ -270,6 +270,8 @@
 [PcdsFeatureFlag.common]
   PcdComponentNameDisable|0x0000000d|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdDriverDiagnosticsDisable|0x0000000e|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdComponentName2Disable|0x0000ffff|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDriverDiagnostics2Disable|0x0000fffe|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
 
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|0x00000001|gEfiMdePkgTokenSpaceGuid|UINT32|1000000

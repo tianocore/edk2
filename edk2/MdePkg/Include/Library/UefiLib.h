@@ -15,6 +15,13 @@
 #ifndef __UEFI_LIB_H__
 #define __UEFI_LIB_H__
 
+#include <Protocol/DriverBinding.h>
+#include <Protocol/DriverConfiguration.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/ComponentName2.h>
+#include <Protocol/DriverDiagnostics.h>
+#include <Protocol/DriverDiagnostics2.h>
+
 //
 // Unicode String Table
 //
@@ -707,5 +714,126 @@ AsciiErrorPrint (
   IN CONST CHAR8  *Format,
   ...
   );
+
+/**
+  Intialize a driver by installing the Driver Binding Protocol onto the
+  driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols.  This function also initializes the EFI Driver
+  Library that initializes the global variables gST, gBS, gRT.
+
+  @param  ImageHandle          The image handle of the driver
+  @param  SystemTable          The EFI System Table that was passed to the driver's entry point
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing
+  @param  DriverBindingHandle  The handle that DriverBinding is to be installe onto.  If this
+                               parameter is NULL, then a new handle is created.
+
+  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
+  @retval Other                Status from gBS->InstallProtocolInterface()
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibInstallDriverBinding (
+  IN CONST EFI_HANDLE             ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE       *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding,
+  IN EFI_HANDLE                   DriverBindingHandle
+  );
+
+/**
+  Intialize a driver by installing the Driver Binding Protocol onto the
+  driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols.  This function also initializes the EFI Driver
+  Library that initializes the global variables gST, gBS, gRT.
+
+  @ImageHandle                 The image handle of the driver
+  @SystemTable                 The EFI System Table that was passed to the driver's entry point
+  @DriverBinding               A Driver Binding Protocol instance that this driver is producing
+  @DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+                               parameter is NULL, then a new handle is created.
+  @ComponentName               A Component Name Protocol instance that this driver is producing
+  @DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing
+  @DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing
+
+  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
+  @retval Other                Status from gBS->InstallProtocolInterface()
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibInstallAllDriverProtocols (
+  IN CONST EFI_HANDLE                         ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
+  IN EFI_HANDLE                               DriverBindingHandle,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
+  );
+
+
+/**
+  Intialize a driver by installing the Driver Binding Protocol
+  onto the driver's DriverBindingHandle.  This is typically the
+  same as the driver's ImageHandle, but it can be different if
+  the driver produces multiple DriverBinding Protocols.  This
+  function also initializes the EFI Driver Library that
+  initializes the global variables gST, gBS, gRT.
+
+  @ImageHandle                  The image handle of the driver
+  
+  @SystemTable                  The EFI System Table that was
+                                passed to the driver's entry
+                                point
+  
+  @DriverBinding                A Driver Binding Protocol
+                                instance that this driver is
+                                producing
+  
+  @DriverBindingHandle          The handle that DriverBinding is
+                                to be installe onto.  If this
+                                parameter is NULL, then a new
+                                handle is created.
+  
+  @ComponentName                A Component Name Protocol
+                                instance that this driver is
+                                producing
+  
+  @ComponentName2               A Component Name 2 Protocol
+                                instance that this driver is
+                                producing
+  
+  @DriverConfiguration          A Driver Configuration Protocol
+                                instance that this driver is
+                                producing
+  
+  @DriverDiagnostics            A Driver Diagnostics Protocol
+                                instance that this driver is
+                                producing
+  
+  @DriverDiagnostics2           A Driver Diagnostics 2 Protocol
+                                instance that this driver is
+                                producing
+
+  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
+  @retval Other                Status from gBS->InstallProtocolInterface()
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibInstallAllDriverProtocols2 (
+  IN CONST EFI_HANDLE                         ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
+  IN EFI_HANDLE                               DriverBindingHandle,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,      OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,   OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2   OPTIONAL
+  );
+
 
 #endif

@@ -25,8 +25,10 @@
 //
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName.h>
+#include <Protocol/ComponentName2.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverDiagnostics.h>
+#include <Protocol/DriverDiagnostics2.h>
 
 
 #include <Guid/EventGroup.h>

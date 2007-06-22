@@ -15,9 +15,17 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Base.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/TimerLib.h>
+#include <Library/DebugLib.h>
 
 /**
   Stalls the CPU for at least the given number of microseconds.

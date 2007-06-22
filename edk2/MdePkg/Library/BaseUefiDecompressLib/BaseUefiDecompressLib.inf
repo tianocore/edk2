@@ -45,7 +45,6 @@
 [Sources.common]
   BaseUefiDecompressLibInternals.h
   BaseUefiDecompressLib.c
-  CommonHeader.h
 
 
 ################################################################################

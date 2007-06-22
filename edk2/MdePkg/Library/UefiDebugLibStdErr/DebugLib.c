@@ -13,9 +13,21 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Uefi.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 
 //
 // Define the maximum debug and assert message length that this library supports 

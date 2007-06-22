@@ -14,12 +14,22 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
-#include "HobLib.h"
+//
+// The package level header files this module uses
+//
+#include <PiDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/HobLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+
+#include "InternalHobLib.h""
 
 /**
   Returns the pointer to the HOB list.

@@ -15,9 +15,17 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiPei.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/PeiServicesLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
 
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation.

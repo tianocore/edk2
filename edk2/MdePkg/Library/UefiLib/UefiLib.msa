@@ -55,6 +55,7 @@
     <Filename>Console.c</Filename>
     <Filename>UefiNotTiano.c</Filename>
     <Filename>UefiLibPrint.c</Filename>
+    <Filename>UefiDriverModel.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -76,6 +77,26 @@
       <C_Name>PcdUefiLibMaxPrintBufferSize</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD is used by UefiLib APIs, which are Print, ErrorPrint, AsciiPrint, AsciiErrorPrint. If the length of the formatted Unicode or ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then only the first (PcdUefiLibMaxPrintBufferSize / Sizeof(CHAR16)) Unicode characters or PcdUefiLibMaxPrintBufferSize Ascii characters are sent to the respective console.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDriverDiagnosticsDisable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDriverDiagnostics2Disable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Driver Diagnostics2 Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdComponentNameDisable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Component Name Protocol instance with NULL.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdComponentName2Disable</C_Name>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>If this value is set TRUE, autogen will replace Component Name2 Protocol instance with NULL.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

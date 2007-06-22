@@ -14,9 +14,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Uefi.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/LoadedImage.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 
 /**
@@ -49,7 +59,6 @@ _DriverUnloadHandler (
   // unloaded, and the library destructors should not be called
   //
   if (!EFI_ERROR (Status)) {
-
     ProcessLibraryDestructorList (ImageHandle, gST);
   }
 
@@ -59,31 +68,6 @@ _DriverUnloadHandler (
   return Status;
 }
 
-
-/**
-  Notification Entry of ExitBootService event. In the entry, all notifications in _gDriverExitBootServicesEvent[]
-  would be invoked.
-
-  @param Event   The Event that is being processed.
-  @param Context Event Context.
-
-**/
-STATIC
-VOID
-EFIAPI
-_DriverExitBootServices (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
-  UINTN             Index;
-
-  for (Index = 0; _gDriverExitBootServicesEvent[Index] != NULL; Index++) {
-    ChildNotifyEventHandler = _gDriverExitBootServicesEvent[Index];
-    ChildNotifyEventHandler (Event, NULL);
-  }
-}
 
 /**
   Enrty point to DXE Driver.
@@ -115,6 +99,11 @@ _ModuleEntryPoint (
   }
 
   //
+  // Call constructor for all libraries
+  //
+  ProcessLibraryConstructorList (ImageHandle, SystemTable);
+
+  //
   //  Install unload handler...
   //
   if (_gDriverUnloadImageCount != 0) {
@@ -126,11 +115,6 @@ _ModuleEntryPoint (
     ASSERT_EFI_ERROR (Status);
     LoadedImage->Unload = _DriverUnloadHandler;
   }
-
-  //
-  // Call constructor for all libraries
-  //
-  ProcessLibraryConstructorList (ImageHandle, SystemTable);
 
   //
   // Call the driver entry point

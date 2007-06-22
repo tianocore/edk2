@@ -21,8 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PI_UEFI_H__
 #define __PI_UEFI_H__
 
-#include <UefiBaseType.h>
-#include <UefiSpec.h>
+#include <Uefi/UefiBaseType.h>
+#include <Uefi/UefiSpec.h>
 
 #endif
 

@@ -15,6 +15,8 @@
 #ifndef __REPORT_STATUS_CODE_LIB_H__
 #define __REPORT_STATUS_CODE_LIB_H__
 
+#include <Protocol/DevicePath.h>
+
 //
 // Declare bits for PcdReportStatusCodePropertyMask
 //
@@ -25,150 +27,6 @@
 //
 // Extended Data structure definitions with EFI_STATUS_CODE_DATA headers removed
 //
-
-///
-/// Voltage Extended Error Data
-///
-typedef struct {
-  EFI_EXP_BASE10_DATA   Voltage;
-  EFI_EXP_BASE10_DATA   Threshold;
-} REPORT_STATUS_CODE_LIBRARY_COMPUTING_UNIT_VOLTAGE_ERROR_DATA;
-
-///
-/// Microcode Update Extended Error Data
-///
-typedef struct {
-  UINT32                Version;
-} REPORT_STATUS_CODE_LIBRARY_COMPUTING_UNIT_MICROCODE_UPDATE_ERROR_DATA;
-
-///
-/// Asynchronous Timer Extended Error Data
-///
-typedef struct {
-  EFI_EXP_BASE10_DATA   TimerLimit;
-} REPORT_STATUS_CODE_LIBRARY_COMPUTING_UNIT_TIMER_EXPIRED_ERROR_DATA;
-
-///
-/// Host Processor Mismatch Extended Error Data
-///
-typedef struct {
-  UINT32                Instance;
-  UINT16                Attributes;
-} REPORT_STATUS_CODE_LIBRARY_HOST_PROCESSOR_MISMATCH_ERROR_DATA;
-
-///
-/// Thermal Extended Error Data
-///
-typedef struct {
-  EFI_EXP_BASE10_DATA   Temperature;
-  EFI_EXP_BASE10_DATA   Threshold;
-} REPORT_STATUS_CODE_LIBRARY_COMPUTING_UNIT_THERMAL_ERROR_DATA;
-
-///
-/// Processor Disabled Extended Error Data
-///
-typedef struct {
-  UINT32                Cause;
-  BOOLEAN               SoftwareDisabled;
-} REPORT_STATUS_CODE_LIBRARY_COMPUTING_UNIT_CPU_DISABLED_ERROR_DATA;
-
-///
-/// Embedded cache init extended data
-///
-typedef struct {
-  UINT32                Level;
-  EFI_INIT_CACHE_TYPE   Type;
-} REPORT_STATUS_CODE_LIBRARY_CACHE_INIT_DATA;
-
-///
-/// Memory Extended Error Data
-///
-typedef struct {
-  EFI_MEMORY_ERROR_GRANULARITY  Granularity;
-  EFI_MEMORY_ERROR_OPERATION    Operation;
-  UINTN                         Syndrome;
-  EFI_PHYSICAL_ADDRESS          Address;
-  UINTN                         Resolution;
-} REPORT_STATUS_CODE_LIBRARY_MEMORY_EXTENDED_ERROR_DATA;
-
-///
-/// DIMM number
-///
-typedef struct {
-  UINT16                Array;
-  UINT16                Device;
-} REPORT_STATUS_CODE_LIBRARY_STATUS_CODE_DIMM_NUMBER;
-
-///
-/// Memory Module Mismatch Extended Error Data
-///
-typedef struct {
-  EFI_STATUS_CODE_DIMM_NUMBER Instance;
-} REPORT_STATUS_CODE_LIBRARY_MEMORY_MODULE_MISMATCH_ERROR_DATA;
-
-///
-/// Memory Range Extended Data
-///
-typedef struct {
-  EFI_PHYSICAL_ADDRESS  Start;
-  EFI_PHYSICAL_ADDRESS  Length;
-} REPORT_STATUS_CODE_LIBRARY_MEMORY_RANGE_EXTENDED_DATA;
-
-///
-/// Device handle Extended Data. Used for many
-/// errors and progress codes to point to the device.
-///
-typedef struct {
-  EFI_HANDLE            Handle;
-} REPORT_STATUS_CODE_LIBRARY_DEVICE_HANDLE_EXTENDED_DATA;
-
-typedef struct {
-  UINT8                                *DevicePath;
-} REPORT_STATUS_CODE_LIBRARY_DEVICE_PATH_EXTENDED_DATA;
-
-typedef struct {
-  EFI_HANDLE                     ControllerHandle;
-  EFI_HANDLE                     DriverBindingHandle;
-  UINT16                         DevicePathSize;
-  UINT8                          *RemainingDevicePath;
-} REPORT_STATUS_CODE_LIBRARY_STATUS_CODE_START_EXTENDED_DATA;
-
-///
-/// Resource Allocation Failure Extended Error Data
-///
-typedef struct {
-  UINT32                             Bar;
-  UINT16                             DevicePathSize;
-  UINT16                             ReqResSize;
-  UINT16                             AllocResSize;
-  UINT8                              *DevicePath;
-  UINT8                              *ReqRes;
-  UINT8                              *AllocRes;
-} REPORT_STATUS_CODE_LIBRARY_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
-
-///
-/// Extended Error Data for Assert
-///
-typedef struct {
-  UINT32                      LineNumber;
-  UINT32                      FileNameSize;
-  EFI_STATUS_CODE_STRING_DATA *FileName;
-} REPORT_STATUS_CODE_LIBRARY_DEBUG_ASSERT_DATA;
-
-///
-/// System Context Data EBC/IA32/IPF
-///
-typedef struct {
-  EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT  Context;
-} REPORT_STATUS_CODE_LIBRARY_STATUS_CODE_EXCEP_EXTENDED_DATA;
-
-///
-/// Legacy Oprom extended data
-///
-typedef struct {
-  EFI_HANDLE            DeviceHandle;
-  EFI_PHYSICAL_ADDRESS  RomImageBase;
-} REPORT_STATUS_CODE_LIBRARY_LEGACY_OPROM_EXTENDED_DATA;
 
 //
 // Extern for the modules Caller ID GUID

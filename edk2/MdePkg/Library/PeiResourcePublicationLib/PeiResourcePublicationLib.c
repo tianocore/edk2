@@ -16,9 +16,19 @@
 
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiPei.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/ResourcePublicationLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/DebugLib.h>
+
 
 /**
   

@@ -103,7 +103,10 @@ EfiCreateEventLegacyBootEx (
 
   ASSERT (LegacyBootEvent != NULL);
 
-  if (gST->Hdr.Revision < 0x00020000) {
+  if (gST->Hdr.Revision < EFI_2_00_SYSTEM_TABLE_REVISION) {
+    DEBUG ((EFI_D_ERROR, "EFI1.1 can't support LegacyBootEvent!"));
+    ASSERT (FALSE);
+
     return EFI_UNSUPPORTED;
   } else {
     //
@@ -145,7 +148,7 @@ EfiCreateEventReadyToBoot (
   )
 {
   return EfiCreateEventReadyToBootEx (
-           TPL_CALLBACK ,
+           TPL_CALLBACK,
            InternalEmptyFuntion,
            NULL,
            ReadyToBootEvent
@@ -184,7 +187,10 @@ EfiCreateEventReadyToBootEx (
 
   ASSERT (ReadyToBootEvent != NULL);
 
-  if (gST->Hdr.Revision < 0x00020000) {
+  if (gST->Hdr.Revision < EFI_2_00_SYSTEM_TABLE_REVISION) {
+    DEBUG ((EFI_D_ERROR, "EFI1.1 can't support ReadyToBootEvent!"));
+    ASSERT (FALSE);
+
     return EFI_UNSUPPORTED;
   } else {
     //
@@ -269,16 +275,20 @@ EfiSignalEventLegacyBoot (
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
 
 **/
-EFI_GUID *
+EFI_GUID*
 EFIAPI
 EfiGetNameGuidFromFwVolDevicePathNode (
-  IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
+  IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFileDevicePathNode
   )
 {
-  ASSERT (FvDevicePathNode != NULL);
-  //
-  //  bugbug:Need to implement ...
-  //
+  ASSERT (FvFileDevicePathNode != NULL);
+
+  if (FvFileDevicePathNode->Header.Type == MEDIA_DEVICE_PATH &&
+      FvFileDevicePathNode->Header.SubType == MEDIA_PIWG_FW_FILE_DP
+     ) {
+    return (EFI_GUID *) &FvFileDevicePathNode->FvFileName;
+  }
+
   return NULL;
 }
 
@@ -300,14 +310,20 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 VOID
 EFIAPI
 EfiInitializeFwVolDevicepathNode (
-  IN OUT MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode,
-  IN CONST EFI_GUID                         *NameGuid
+  IN OUT    MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFileDevicePathNode,
+  IN CONST  EFI_GUID                          *NameGuid
   )
 {
-  ASSERT (FvDevicePathNode  != NULL);
+  ASSERT (FvFileDevicePathNode  != NULL);
   ASSERT (NameGuid          != NULL);
+
   //
-  //  bugbug:Need to implement ...
+  // Use the new Device path that does not conflict with the UEFI
   //
+  FvFileDevicePathNode->Header.Type     = MEDIA_DEVICE_PATH;
+  FvFileDevicePathNode->Header.SubType  = MEDIA_PIWG_FW_FILE_DP;
+  SetDevicePathNodeLength (&FvFileDevicePathNode->Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
+
+  CopyGuid (&FvFileDevicePathNode->FvFileName, NameGuid);
 }
 

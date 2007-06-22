@@ -32,15 +32,12 @@
   The allocated and initialized packages.
 
 **/
-EFI_HII_PACKAGE_LIST_HEADER*
+EFI_HII_PACKAGE_LIST_HEADER *
 EFIAPI
 PreparePackages (
-  IN UINTN           NumberOfPackages,
-  IN CONST EFI_GUID  *Guid OPTIONAL,
+  IN CONST  UINTN     NumberOfPackages,
+  IN CONST  EFI_GUID  *Guid OPTIONAL,
   ...
-  )
-;
-
-
+  );
 
 #endif

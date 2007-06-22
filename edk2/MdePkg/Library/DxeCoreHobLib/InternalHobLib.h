@@ -17,11 +17,6 @@
 #ifndef __DXE_ENTRY_POINT_HOB_LIB_H__
 #define __DXE_ENTRY_POINT_HOB_LIB_H__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 extern VOID *gHobList;
 
 #endif
