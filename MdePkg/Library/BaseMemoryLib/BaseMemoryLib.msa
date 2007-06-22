@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BaseMemoryLib</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>fd44e603-002a-4b29-9f5f-529e815b6165</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Base Memory Library</Abstract>
+    <Description>Base Memory Library implementation – no ASM.</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BaseMemoryLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>MemLibInternals.h</Filename>
+    <Filename>CopyMem.c</Filename>
+    <Filename>MemLibGuid.c</Filename>
+    <Filename>MemLibGeneric.c</Filename>
+    <Filename>CopyMemWrapper.c</Filename>
+    <Filename>SetMemWrapper.c</Filename>
+    <Filename>SetMem16Wrapper.c</Filename>
+    <Filename>SetMem32Wrapper.c</Filename>
+    <Filename>SetMem64Wrapper.c</Filename>
+    <Filename>CompareMemWrapper.c</Filename>
+    <Filename>ZeroMemWrapper.c</Filename>
+    <Filename>ScanMem8Wrapper.c</Filename>
+    <Filename>ScanMem16Wrapper.c</Filename>
+    <Filename>ScanMem32Wrapper.c</Filename>
+    <Filename>ScanMem64Wrapper.c</Filename>
+    <Filename>SetMem.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+</ModuleSurfaceArea>
