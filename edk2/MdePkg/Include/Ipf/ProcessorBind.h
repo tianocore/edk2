@@ -215,7 +215,5 @@ typedef struct {
   UINT64  GP;
 } EFI_PLABEL;
 
-#include <IpfDefines.h>
-
 #endif
 
