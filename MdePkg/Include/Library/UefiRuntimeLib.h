@@ -221,9 +221,6 @@ EfiGetNextHighMonotonicCount (
   @param  ResetData   Pointer to data buffer that includes 
                       Null-Terminated Unicode string.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
-
 **/
 VOID
 EfiResetSystem (
