@@ -1,14 +1,14 @@
 /** @file
   Data Hub status code worker in DXE.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-                                                                                            
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  DataHubStatusCodeWorker.c
 
@@ -33,9 +33,9 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 /**
   Return one DATAHUB_STATUSCODE_RECORD space.
-  The size of free record pool would be extend, if the pool is empty. 
+  The size of free record pool would be extend, if the pool is empty.
 
- 
+
   @retval  NULL   Can not allocate free memeory for record.
   @retval  !NULL  Point to buffer of record.
 
@@ -51,7 +51,7 @@ AcquireRecordBuffer (
   LIST_ENTRY                *Node;
   UINT32                    Index;
 
-  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   if (!IsListEmpty (&mRecordsBuffer)) {
     Node = GetFirstNode (&mRecordsBuffer);
@@ -59,7 +59,7 @@ AcquireRecordBuffer (
 
     Record = _CR (Node, DATAHUB_STATUSCODE_RECORD, Node);
   } else {
-    if (CurrentTpl > EFI_TPL_NOTIFY) {
+    if (CurrentTpl > TPL_NOTIFY) {
       gBS->RestoreTPL (CurrentTpl);
       return NULL;
     }
@@ -70,7 +70,7 @@ AcquireRecordBuffer (
       return NULL;
     }
 
-    CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     for (Index = 1; Index < 16; Index++) {
       InsertTailList (&mRecordsBuffer, &Record[Index].Node);
     }
@@ -86,12 +86,12 @@ AcquireRecordBuffer (
 
 
 /**
-  Retrieve one record from Records FIFO. The record would be removed from FIFO and 
+  Retrieve one record from Records FIFO. The record would be removed from FIFO and
   release to free record buffer.
 
   @return   !NULL   Point to record, which is ready to be logged.
   @return   NULL    the FIFO of record is empty.
- 
+
 **/
 STATIC
 DATAHUB_STATUSCODE_RECORD *
@@ -103,7 +103,7 @@ RetrieveRecord (
   LIST_ENTRY                  *Node;
   EFI_TPL                     CurrentTpl;
 
-  CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   if (!IsListEmpty (&mRecordsFifo)) {
     Node = GetFirstNode (&mRecordsFifo);
@@ -122,29 +122,29 @@ RetrieveRecord (
 
 /**
   Report status code into DataHub.
- 
+
   @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
- 
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This included information about the class and subclass that is used to classify the entity 
-                        as well as an operation.  For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
+
+  @param  Value         Describes the current status of a hardware or software entity.
+                        This included information about the class and subclass that is used to classify the entity
+                        as well as an operation.  For progress codes, the operation is the current activity.
+                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
- 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass pairing. 
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
+
+  @param  Instance      The enumeration of a hardware or software entity within the system.
+                        A system may contain multiple entities that match a class/subclass pairing.
+                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable,
                         not meaningful, or not relevant.  Valid instance numbers start with 1.
 
 
-  @param  CallerId      This optional parameter may be used to identify the caller. 
-                        This parameter allows the status code driver to apply different rules to different callers. 
+  @param  CallerId      This optional parameter may be used to identify the caller.
+                        This parameter allows the status code driver to apply different rules to different callers.
                         Type EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification.
 
 
   @param  Data          This optional parameter may be used to pass additional data
- 
+
   @retval EFI_OUT_OF_RESOURCES   Can not acquire record buffer.
   @retval EFI_DEVICE_ERROR       EFI serial device can not work after ExitBootService() is called .
   @retval EFI_SUCCESS            Success to cache status code and signal log data event.
@@ -212,7 +212,7 @@ DataHubStatusCodeReportWorker (
 
       if (Data->Size > EFI_STATUS_CODE_DATA_MAX_SIZE) {
         Record->Data.Size = EFI_STATUS_CODE_DATA_MAX_SIZE;
-      } 
+      }
       CopyMem (Record->ExtendData, Data + 1, Record->Data.Size);
     }
   }
@@ -276,7 +276,7 @@ LogDataHubEventCallBack (
     //
     // Log DataRecord in Data Hub
     //
-    
+
     mDataHubProtocol->LogData (
                         mDataHubProtocol,
                         &gEfiStatusCodeGuid,
@@ -293,7 +293,7 @@ LogDataHubEventCallBack (
 /**
   Initialize data hubstatus code.
   Create a data hub listener.
- 
+
   @return  The function always return EFI_SUCCESS
 
 **/
@@ -315,8 +315,8 @@ DataHubStatusCodeInitializeWorker (
   // Create a Notify Event to log data in Data Hub
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   LogDataHubEventCallBack,
                   NULL,
                   &mLogDataHubEvent

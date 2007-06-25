@@ -679,7 +679,7 @@ Returns:
                   );
   ASSERT_EFI_ERROR (Status);
 
-  EfiInitializeLock (&Private->Lock, EFI_TPL_NOTIFY);
+  EfiInitializeLock (&Private->Lock, TPL_NOTIFY);
 
   Private->UnixThunk = UnixIo->UnixThunk;
 
@@ -1066,7 +1066,7 @@ UnixBlockIoReadBlocks (
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1133,7 +1133,7 @@ UnixBlockIoWriteBlocks (
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1211,7 +1211,7 @@ UnixBlockIoResetBlock (
   UNIX_BLOCK_IO_PRIVATE *Private;
   EFI_TPL               OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   Private = UNIX_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 

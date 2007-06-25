@@ -352,7 +352,7 @@ USBFloppyReset (
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   UsbFloppyDevice   = USB_FLOPPY_DEV_FROM_THIS (This);
 
@@ -426,7 +426,7 @@ USBFloppyReadBlocks (
     return EFI_SUCCESS;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   UsbFloppyTestUnitReady (UsbFloppyDevice);
 
@@ -572,7 +572,7 @@ USBFloppyWriteBlocks (
     return EFI_SUCCESS;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   UsbFloppyTestUnitReady (UsbFloppyDevice);
 

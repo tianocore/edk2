@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -41,16 +41,16 @@ CoreReportProgressCodeSpecific (
 
 Routine Description:
 
-  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiDxeServicesTableGuid, 
+  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiDxeServicesTableGuid,
   with a handle as additional information.
-    
+
 Arguments:
 
-  Value    - Describes the class/subclass/operation of the hardware or software entity 
-             that the Status Code relates to. 
-             
+  Value    - Describes the class/subclass/operation of the hardware or software entity
+             that the Status Code relates to.
+
   Handle   - Additional information.
-   
+
 Returns:
 
   None
@@ -80,12 +80,12 @@ CoreReportProgressCode (
 Routine Description:
 
   Report status code of type EFI_PROGRESS_CODE by caller ID gEfiDxeServicesTableGuid.
-    
+
 Arguments:
 
-  Value    - Describes the class/subclass/operation of the hardware or software entity 
-             that the Status Code relates to. 
-   
+  Value    - Describes the class/subclass/operation of the hardware or software entity
+             that the Status Code relates to.
+
 Returns:
 
   None
@@ -113,11 +113,11 @@ CoreAllocateBootServicesPool (
 Routine Description:
 
   Allocate pool of type EfiBootServicesData, the size is specified with AllocationSize.
-    
+
 Arguments:
 
   AllocationSize    - Size to allocate.
-   
+
 Returns:
 
   Pointer of the allocated pool.
@@ -140,11 +140,11 @@ CoreAllocateZeroBootServicesPool (
 Routine Description:
 
   Allocate pool of type EfiBootServicesData and zero it, the size is specified with AllocationSize.
-    
+
 Arguments:
 
   AllocationSize    - Size to allocate.
-   
+
 Returns:
 
   Pointer of the allocated pool.
@@ -169,13 +169,13 @@ CoreAllocateCopyPool (
 Routine Description:
 
   Allocate pool of specified size with EfiBootServicesData type, and copy specified buffer to this pool.
-    
+
 Arguments:
 
   AllocationSize    - Size to allocate.
-  
+
   Buffer            - Specified buffer that will be copy to the allocated pool
-   
+
 Returns:
 
   Pointer of the allocated pool.
@@ -186,11 +186,11 @@ Returns:
 
   Memory = CoreAllocateBootServicesPool (AllocationSize);
   CopyMem (Memory, Buffer, (Memory == NULL) ? 0 : AllocationSize);
-  
+
   return Memory;
 }
 
- 
+
 
 VOID *
 CoreAllocateRuntimePool (
@@ -201,11 +201,11 @@ CoreAllocateRuntimePool (
 Routine Description:
 
   Allocate pool of type EfiRuntimeServicesData, the size is specified with AllocationSize.
-    
+
 Arguments:
 
   AllocationSize    - Size to allocate.
-   
+
 Returns:
 
   Pointer of the allocated pool.
@@ -228,13 +228,13 @@ CoreAllocateRuntimeCopyPool (
 Routine Description:
 
   Allocate pool of specified size with EfiRuntimeServicesData type, and copy specified buffer to this pool.
-    
+
 Arguments:
 
   AllocationSize    - Size to allocate.
-  
+
   Buffer            - Specified buffer that will be copy to the allocated pool
-   
+
 Returns:
 
   Pointer of the allocated pool.
@@ -246,7 +246,7 @@ Returns:
 
   Memory = CoreAllocateRuntimePool (AllocationSize);
   CopyMem (Memory, Buffer, (Memory == NULL) ? 0 : AllocationSize);
-  
+
   return Memory;
 }
 
@@ -271,11 +271,11 @@ Routine Description:
   level.  Since there is no-premption (at any TPL) or
   multiprocessor support, acquiring the lock only consists
   of raising to the locks TPL.
-    
+
 Arguments:
 
   Lock        - The EFI_LOCK structure to initialize
-   
+
 Returns:
 
   EFI_SUCCESS       - Lock Owned.
@@ -310,11 +310,11 @@ Routine Description:
 
   Raising to the task priority level of the mutual exclusion
   lock, and then acquires ownership of the lock.
-    
+
 Arguments:
 
   Lock - The lock to acquire
-    
+
 Returns:
 
   Lock owned
@@ -339,11 +339,11 @@ Routine Description:
 
     Releases ownership of the mutual exclusion lock, and
     restores the previous task priority level.
-    
+
 Arguments:
 
     Lock - The lock to release
-    
+
 Returns:
 
     Lock unowned
@@ -356,7 +356,7 @@ Returns:
   ASSERT (Lock->Lock == EfiLockAcquired);
 
   Tpl = Lock->OwnerTpl;
-  
+
   Lock->Lock = EfiLockReleased;
 
   CoreRestoreTpl (Tpl);
@@ -371,12 +371,12 @@ CoreDevicePathSize (
 
 Routine Description:
 
-  Calculate the size of a whole device path.    
-    
+  Calculate the size of a whole device path.
+
 Arguments:
 
   DevicePath - The pointer to the device path data.
-    
+
 Returns:
 
   Size of device path data structure..
@@ -513,7 +513,7 @@ Returns:
   if (Src1 == NULL && Src2 == NULL) {
     return NULL;
   }
-  
+
   //
   // Allocate space for the combined device path. It only has one end node of
   // length EFI_DEVICE_PATH_PROTOCOL
@@ -564,7 +564,7 @@ Arguments:
 
   Registration    - Registration key returned from RegisterProtocolNotify().
 
-  SignalFlag      -  Boolean value to decide whether kick the event after register or not. 
+  SignalFlag      -  Boolean value to decide whether kick the event after register or not.
 
 Returns:
 
@@ -581,11 +581,11 @@ Returns:
   //
 
   Status = CoreCreateEvent (
-            EFI_EVENT_NOTIFY_SIGNAL,
+            EVT_NOTIFY_SIGNAL,
             NotifyTpl,
             NotifyFunction,
             NotifyContext,
-            &Event
+           &Event
             );
   ASSERT_EFI_ERROR (Status);
 

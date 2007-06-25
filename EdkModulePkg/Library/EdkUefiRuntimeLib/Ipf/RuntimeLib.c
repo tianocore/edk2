@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -38,10 +38,10 @@ Routine Description:
 Arguments:
 
   Event   - The Event that is being processed
-  
+
   Context - Event Context
 
-Returns: 
+Returns:
 
   None
 
@@ -64,16 +64,16 @@ RuntimeLibVirtualNotifyEvent (
 Routine Description:
 
   Fixup internal data so that EFI can be call in virtual mode.
-  Call the passed in Child Notify event and convert any pointers in 
+  Call the passed in Child Notify event and convert any pointers in
   lib to virtual mode.
 
 Arguments:
 
   Event   - The Event that is being processed
-  
+
   Context - Event Context
 
-Returns: 
+Returns:
 
   None
 
@@ -103,12 +103,12 @@ RuntimeDriverLibConstruct (
 
 Routine Description:
 
-  Intialize runtime Driver Lib if it has not yet been initialized. 
+  Intialize runtime Driver Lib if it has not yet been initialized.
 
 Arguments:
 
   ImageHandle     - The firmware allocated handle for the EFI image.
-  
+
   SystemTable     - A pointer to the EFI System Table.
 
   GoVirtualChildEvent - Caller can register a virtual notification event.
@@ -128,8 +128,8 @@ Returns:
   //
   if (_gDriverSetVirtualAddressMapEvent[0] != NULL) {
     Status = gBS->CreateEvent (
-                    EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
-                    EFI_TPL_NOTIFY,
+                    EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+                    TPL_NOTIFY,
                     RuntimeLibVirtualNotifyEvent,
                     NULL,
                     &mEfiVirtualNotifyEvent
@@ -151,14 +151,14 @@ RuntimeDriverLibDeconstruct (
 Routine Description:
 
   This routine will free some resources which have been allocated in
-  EfiInitializeRuntimeDriverLib(). If a runtime driver exits with an error, 
+  EfiInitializeRuntimeDriverLib(). If a runtime driver exits with an error,
   it must call this routine to free the allocated resource before the exiting.
 
 Arguments:
 
   None
 
-Returns: 
+Returns:
 
   EFI_SUCCESS     - Shotdown the Runtime Driver Lib successfully
   EFI_UNSUPPORTED - Runtime Driver lib was not initialized at all
@@ -191,7 +191,7 @@ Routine Description:
 Arguments:
   NONE
 
-Returns: 
+Returns:
   TRUE - If ExitBootService () has been called
 
 --*/
@@ -220,7 +220,7 @@ Routine Description:
 Arguments:
   NONE
 
-Returns: 
+Returns:
   TRUE - If SetVirtualAddressMap () has been called
 
 --*/

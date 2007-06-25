@@ -1,19 +1,19 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
     Terminal.c
-    
-Abstract: 
+
+Abstract:
 
 Revision History:
 
@@ -289,10 +289,10 @@ TerminalDriverBindingStart (
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
-    
+
     CopyMem (&DefaultNode->Guid, &gEfiPcAnsiGuid, sizeof (EFI_GUID));
     RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL*) DefaultNode;
-  }  
+  }
   //
   // Use the RemainingDevicePath to determine the terminal type
   //
@@ -341,8 +341,8 @@ TerminalDriverBindingStart (
   TerminalDevice->SimpleInput.ReadKeyStroke = TerminalConInReadKeyStroke;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   TerminalConInWaitForKey,
                   &TerminalDevice->SimpleInput,
                   &TerminalDevice->SimpleInput.WaitForKey
@@ -465,8 +465,8 @@ TerminalDriverBindingStart (
   TerminalDevice->ResetState  = RESET_STATE_DEFAULT;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
-                  EFI_TPL_CALLBACK,
+                  EVT_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &TerminalDevice->TwoSecondTimeOut
@@ -568,7 +568,7 @@ TerminalDriverBindingStart (
   if (DefaultNode != NULL) {
     FreePool (DefaultNode);
   }
-  
+
   return EFI_SUCCESS;
 
 ReportError:
@@ -614,7 +614,7 @@ Error:
   if (DefaultNode != NULL) {
     FreePool (DefaultNode);
   }
-  
+
   This->Stop (This, Controller, 0, NULL);
 
   return Status;
@@ -883,9 +883,9 @@ TerminalRemoveConsoleDevVariable (
 /*++
 
   Routine Description:
-  
+
     Remove console device variable.
-    
+
   Arguments:
 
     VariableName     - A pointer to the variable name.
@@ -1022,7 +1022,7 @@ Returns:
   Caller is repsoncible freeing the buffer.
 
   NULL - Variable was not read
-  
+
 --*/
 {
   EFI_STATUS  Status;

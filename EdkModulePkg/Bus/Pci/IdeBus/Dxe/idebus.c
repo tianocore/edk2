@@ -1,12 +1,12 @@
 /** @file
   Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This module is modified from DXE\IDE module for Ide Contriller Init support
@@ -89,7 +89,7 @@ IDEBusDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
- 
+
   //
   // Close protocol, don't use device path protocol in the .Support() function
   //
@@ -140,7 +140,7 @@ IDEBusDriverBindingSupported (
 // ***********************************************************************************
 //
 /**
-  Start this driver on Controller by detecting all disks and installing 
+  Start this driver on Controller by detecting all disks and installing
   BlockIo protocol on them.
 
   @param  This Protocol instance pointer.
@@ -210,7 +210,7 @@ IDEBusDriverBindingStart (
   if ((EFI_ERROR (Status)) && (Status != EFI_ALREADY_STARTED)) {
     return Status;
   }
-  
+
   //
   // Now open the IDE_CONTROLLER_INIT protocol. Step7.1
   //
@@ -429,7 +429,7 @@ IDEBusDriverBindingStart (
       if (!(ConfigurationOptions & (1 << (IdeChannel * 2 + IdeDevice)))) {
         continue;
       }
-      
+
       //
       // The device has been scanned in another Start(), No need to scan it again
       // for perf optimization.
@@ -437,7 +437,7 @@ IDEBusDriverBindingStart (
       if (IdeBusDriverPrivateData->HaveScannedDevice[IdeChannel * 2 + IdeDevice]) {
         continue;
       }
-      
+
       //
       // create child handle for the detected device.
       //
@@ -664,7 +664,7 @@ IDEBusDriverBindingStart (
       if ((IdeBlkIoDevicePtr->Type == IdeHardDisk) || (IdeBlkIoDevicePtr->Type == Ide48bitAddressingHardDisk)) {
         Status = SetDriveParameters (IdeBlkIoDevicePtr, &DriveParameters);
       }
-      
+
       //
       // Record PIO mode used in private data
       //
@@ -715,13 +715,13 @@ IDEBusDriverBindingStart (
         (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_ENABLE),
         IdeBlkIoDevicePtr->DevicePath
         );
-      
+
       //
       // Create event to clear pending IDE interrupt
       //
       Status = gBS->CreateEvent (
-                      EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                      EFI_TPL_NOTIFY,
+                      EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                      TPL_NOTIFY,
                       ClearInterrupt,
                       IdeBlkIoDevicePtr,
                       &IdeBlkIoDevicePtr->ExitBootServiceEvent
@@ -735,7 +735,7 @@ IDEBusDriverBindingStart (
     // end of 2nd outer loop ==========
     //
   }
-  
+
   //
   // All configurations done! Notify IdeController to do post initialization
   // work such as saving IDE controller PCI settings for S3 resume
@@ -808,7 +808,7 @@ ErrorExit:
 // ***********************************************************************************
 //
 /**
-  Stop this driver on Controller Handle. 
+  Stop this driver on Controller Handle.
 
   @param  This Protocol instance pointer.
   @param  DeviceHandle Handle of device to stop driver on
@@ -1003,7 +1003,7 @@ DeRegisterIdeDevice (
           );
     return Status;
   }
-  
+
   //
   // Release allocated resources
   //
@@ -1037,7 +1037,7 @@ IDEBlkIoReset (
   EFI_STATUS      Status;
   EFI_TPL         OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
   //
@@ -1058,7 +1058,7 @@ IDEBlkIoReset (
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
-  
+
   //
   // for ATAPI device, using ATAPI reset method
   //
@@ -1099,7 +1099,7 @@ IDEBlkIoReadBlocks (
   EFI_STATUS      Status;
   EFI_TPL         OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
 
@@ -1127,7 +1127,7 @@ IDEBlkIoReadBlocks (
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
-  
+
   //
   // for ATAPI device, using ATAPI read block's mechanism
   //
@@ -1172,8 +1172,8 @@ IDEBlkIoWriteBlocks (
   EFI_STATUS      Status;
   EFI_TPL         OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
-  
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (This);
   //
   // Requery IDE IO resources in case of the switch of native and legacy modes
@@ -1184,7 +1184,7 @@ IDEBlkIoWriteBlocks (
   // for ATA device, using ATA write block's mechanism
   //
   if (IdeBlkIoDevice->Type == IdeHardDisk ||
-      IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {        
+      IdeBlkIoDevice->Type == Ide48bitAddressingHardDisk) {
 
     Status = AtaBlkIoWriteBlocks (
             IdeBlkIoDevice,
@@ -1200,7 +1200,7 @@ IDEBlkIoWriteBlocks (
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
-  
+
   //
   // for ATAPI device, using ATAPI write block's mechanism
   //
@@ -1211,7 +1211,7 @@ IDEBlkIoWriteBlocks (
           BufferSize,
           Buffer
           );
-  
+
 Done:
   gBS->RestoreTPL (OldTpl);
   return Status;

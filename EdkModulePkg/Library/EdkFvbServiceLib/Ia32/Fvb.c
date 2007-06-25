@@ -2,21 +2,21 @@
 
   Firmware Volume Block Protocol Runtime Abstraction
 
-  mFvbEntry is an array of Handle Fvb pairs. The Fvb Lib Instance matches the 
+  mFvbEntry is an array of Handle Fvb pairs. The Fvb Lib Instance matches the
   index in the mFvbEntry array. This should be the same sequence as the FVB's
-  were described in the HOB. We have to remember the handle so we can tell if 
+  were described in the HOB. We have to remember the handle so we can tell if
   the protocol has been reinstalled and it needs updateing.
 
   If you are using any of these lib functions.you must first call FvbInitialize ().
-  
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -32,9 +32,9 @@ STATIC UINTN              mFvbCount;
 
 /**
   Check whether an address is runtime memory or not.
- 
+
   @param    Address   The Address being checked.
-  
+
   @retval   TRUE      The address is runtime memory.
   @retval   FALSE     The address is not runtime memory.
 **/
@@ -124,10 +124,10 @@ IsRuntimeMemory (
 /**
   Update mFvbEntry. Add new entry, or update existing entry if Fvb protocol is
   reinstalled.
- 
+
   @param Event      The Event that is being processed
   @param Context    Event Context
-  
+
 **/
 STATIC
 VOID
@@ -190,15 +190,15 @@ FvbNotificationEvent (
     //  Get the interface pointer and if it's ours, skip it
     //
     Status = gBS->HandleProtocol (
-                    Handle, 
-                    &gEfiFirmwareVolumeBlockProtocolGuid, 
+                    Handle,
+                    &gEfiFirmwareVolumeBlockProtocolGuid,
                     (VOID **) &mFvbEntry[UpdateIndex].Fvb
                     );
     ASSERT_EFI_ERROR (Status);
 
     Status = gBS->HandleProtocol (
-                    Handle, 
-                    &gEfiFvbExtensionProtocolGuid, 
+                    Handle,
+                    &gEfiFvbExtensionProtocolGuid,
                     (VOID **) &mFvbEntry[UpdateIndex].FvbExtension
                     );
     if (Status != EFI_SUCCESS) {
@@ -209,14 +209,14 @@ FvbNotificationEvent (
     // Check the FVB can be accessed in RUNTIME, The FVBs in FVB handle list comes
     // from two way:
     // 1) Dxe Core. (FVB information is transferred from FV HOB).
-    // 2) FVB driver. 
+    // 2) FVB driver.
     // The FVB produced Dxe core is used for discoverying DXE driver and dispatch. These
-    // FVBs can only be accessed in boot time. 
+    // FVBs can only be accessed in boot time.
     // FVB driver will discovery all FV in FLASH and these FVBs can be accessed in runtime.
-    // The FVB itself produced by FVB driver is allocated in runtime memory. So we can 
+    // The FVB itself produced by FVB driver is allocated in runtime memory. So we can
     // determine the what FVB can be accessed in RUNTIME by judging whether FVB itself is allocated
     // in RUNTIME memory.
-    // 
+    //
     mFvbEntry[UpdateIndex].IsRuntimeAccess = IsRuntimeMemory (mFvbEntry[UpdateIndex].Fvb);
   }
 }
@@ -226,7 +226,7 @@ FvbNotificationEvent (
 
   @param Event      The Event that is being processed
   @param Context    Event Context
-  
+
 **/
 VOID
 EFIAPI
@@ -265,10 +265,10 @@ FvbVirtualAddressChangeNotifyEvent (
 
 /**
   Library constructor function entry.
- 
+
   @param ImageHandle    The handle of image who call this libary.
   @param SystemTable    The point of System Table.
-  
+
   @retval EFI_SUCESS    Sucess construct this library.
   @retval Others        Fail to contruct this libary.
 **/
@@ -296,7 +296,7 @@ FvbLibInitialize (
 
   EfiCreateProtocolNotifyEvent (
     &gEfiFirmwareVolumeBlockProtocolGuid,
-    EFI_TPL_CALLBACK,
+    TPL_CALLBACK,
     FvbNotificationEvent,
     NULL,
     &mFvbRegistration
@@ -306,8 +306,8 @@ FvbLibInitialize (
   // Register SetVirtualAddressMap () notify function
   //
   //  Status = gBS->CreateEvent (
-  //                EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
-  //                EFI_TPL_NOTIFY,
+  //                EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+  //                TPL_NOTIFY,
   //                EfiRuntimeLibFvbVirtualNotifyEvent,
   //                NULL,
   //                &mEfiFvbVirtualNotifyEvent
@@ -326,7 +326,7 @@ FvbLibInitialize (
   return EFI_SUCCESS;
 }
 
-// 
+//
 // =============================================================================
 // The following functions wrap Fvb protocol in the Runtime Lib functions.
 // The Instance translates into Fvb instance. The Fvb order defined by HOBs and
@@ -335,7 +335,7 @@ FvbLibInitialize (
 // EfiFvbInitialize () must be called before any of the following functions
 // must be called.
 // =============================================================================
-// 
+//
 
 /**
   Reads specified number of bytes into a buffer from the specified block
@@ -348,7 +348,7 @@ FvbLibInitialize (
                       of bytes read
   @param Buffer       Pointer to a caller allocated buffer that will be
                       used to hold the data read
-  
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to Read block
   @retval Others                 Fail to read block
@@ -375,7 +375,7 @@ EfiFvbReadBlock (
 
 /**
    Writes specified number of bytes from the input buffer to the block
- 
+
   @param Instance         The FV instance to be written to
   @param Lba              The starting logical block index to write to
   @param Offset           Offset into the block at which to begin writing
@@ -384,7 +384,7 @@ EfiFvbReadBlock (
                           of bytes actually written
   @param Buffer           Pointer to a caller allocated buffer that contains
                           the source for the write
-  
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to write block
   @retval Others                 Fail to write block
@@ -414,7 +414,7 @@ EfiFvbWriteBlock (
 
    @param Instance      The FV instance to be erased
    @param Lba           The logical block index to be erased
-   
+
    @retval EFI_INVALID_PARAMETER  Invalid parameter
    @retval EFI_SUCESS             Sucess to erase block
    @retval Others                 Fail to erase block
@@ -439,10 +439,10 @@ EfiFvbEraseBlock (
 /**
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter
- 
+
   @param Instance       The FV instance whose attributes is going to be returned
   @param Attributes     Output buffer which contains attributes
-  
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to get Fv attribute
   @retval Others                 Fail to get Fv attribute
@@ -465,16 +465,16 @@ EfiFvbGetVolumeAttributes (
 }
 
 /**
-   Modifies the current settings of the firmware volume according to the 
+   Modifies the current settings of the firmware volume according to the
    input parameter, and returns the new setting of the volume
 
-   @param Instance        The FV instance whose attributes is going to be 
+   @param Instance        The FV instance whose attributes is going to be
                           modified
-   @param Attributes      On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+   @param Attributes      On input, it is a pointer to EFI_FVB_ATTRIBUTES
                           containing the desired firmware volume settings.
                           On successful return, it contains the new settings
                           of the firmware volume
-   
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to set Fv attribute
   @retval Others                 Fail to set Fv attribute
@@ -501,10 +501,10 @@ EfiFvbSetVolumeAttributes (
 
    @param Instance      The FV instance whose base address is going to be
                         returned
-   @param BaseAddress   Pointer to a caller allocated EFI_PHYSICAL_ADDRESS 
+   @param BaseAddress   Pointer to a caller allocated EFI_PHYSICAL_ADDRESS
                         that on successful return, contains the base address
                         of the firmware volume.
-   
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to get physical address
   @retval Others                 Fail to get physical address
@@ -538,7 +538,7 @@ EfiFvbGetPhysicalAddress (
                               number of consecutive blocks starting with Lba is
                               returned. All blocks in this range have a size of
                               BlockSize
-   
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to get block size
   @retval Others                 Fail to get block size
@@ -567,11 +567,11 @@ EfiFvbGetBlockSize (
 
    @param Instance          The FV instance to be erased
    @param StartLba          The starting logical block index to be erased
-   @param OffsetStartLba    Offset into the starting block at which to 
+   @param OffsetStartLba    Offset into the starting block at which to
                             begin erasing
    @param LastLba           The last logical block index to be erased
    @param OffsetLastLba     Offset into the last block at which to end erasing
-   
+
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCESS             Sucess to erase custom block range
   @retval Others                 Fail to erase custom block range

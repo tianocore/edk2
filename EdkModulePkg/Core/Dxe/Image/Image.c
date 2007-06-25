@@ -576,7 +576,7 @@ Returns:
 
   SecurityStatus = EFI_SUCCESS;
 
-  ASSERT (gEfiCurrentTpl < EFI_TPL_NOTIFY);
+  ASSERT (gEfiCurrentTpl < TPL_NOTIFY);
   ParentImage = NULL;
 
   //
@@ -1224,7 +1224,7 @@ Returns:
   // Prevent possible reentrance to this function
   // for the same ImageHandle
   // 
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY); 
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY); 
  
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL_HANDLE) {
@@ -1317,7 +1317,7 @@ Returns:
   // Prevent possible reentrance to this function
   // for the same ImageHandle
   // 
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
  
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL ) {

@@ -536,7 +536,7 @@ Returns:
 {
   gEfiFwVolBlockEvent = CoreCreateProtocolNotifyEvent (
                           &gEfiFirmwareVolumeBlockProtocolGuid,
-                          EFI_TPL_CALLBACK,
+                          TPL_CALLBACK,
                           NotifyFwVolBlock,
                           NULL,
                           &gEfiFwVolBlockNotifyReg,

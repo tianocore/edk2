@@ -366,8 +366,8 @@ Returns:
   // Create Event to support locking StdIn Device
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   ConSpliterConsoleControlLockStdInEvent,
                   NULL,
                   &ConInPrivate->LockEvent
@@ -375,8 +375,8 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   ConSplitterTextInWaitForKey,
                   ConInPrivate,
                   &ConInPrivate->TextIn.WaitForKey
@@ -395,8 +395,8 @@ Returns:
   }
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   ConSplitterSimplePointerWaitForInput,
                   ConInPrivate,
                   &ConInPrivate->SimplePointer.WaitForInput

@@ -117,8 +117,8 @@ Returns:
   //
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
-                  EFI_TPL_CALLBACK,
+                  EVT_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &TimeoutEvent

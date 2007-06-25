@@ -34,7 +34,7 @@ Revision History
 //
 static LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
 LIST_ENTRY             gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_NOTIFY);
+EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 UINT64                 gHandleDatabaseKey    = 0;
 
 
@@ -632,7 +632,7 @@ Returns:
   //
   // Syncronize with notifcations. 
   // 
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
   OldHandle = *Handle;
 
   //

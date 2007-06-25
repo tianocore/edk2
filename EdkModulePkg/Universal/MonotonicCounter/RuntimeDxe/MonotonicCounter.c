@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -84,7 +84,7 @@ Returns:
   //
   // Update the monotonic counter with a lock
   //
-  OldTpl  = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  OldTpl  = gBS->RaiseTPL (TPL_HIGH_LEVEL);
   *Count  = mEfiMtc;
   mEfiMtc++;
   gBS->RestoreTPL (OldTpl);
@@ -104,22 +104,22 @@ Returns:
 /**
   Returns the next high 32 bits of the platform's monotonic counter.
 
-  The GetNextHighMonotonicCount() function returns the next high 32 bits 
-  of the platform's monotonic counter. The platform's monotonic counter is 
-  comprised of two 32 bit quantities:  the high 32 bits and the low 32 bits.  
-  During boot service time the low 32 bit value is volatile:  it is reset to 
+  The GetNextHighMonotonicCount() function returns the next high 32 bits
+  of the platform's monotonic counter. The platform's monotonic counter is
+  comprised of two 32 bit quantities:  the high 32 bits and the low 32 bits.
+  During boot service time the low 32 bit value is volatile:  it is reset to
   zero on every system reset and is increased by 1 on every call to GetNextMonotonicCount().
-  The high 32 bit value is non-volatile and is increased by 1 whenever the system resets 
+  The high 32 bit value is non-volatile and is increased by 1 whenever the system resets
   or whenever the low 32 bit count [returned by GetNextMonoticCount()] overflows.
-  The GetNextMonotonicCount() function is only available at boot services time.  
-  If the operating system wishes to extend the platform monotonic counter to runtime, 
-  it may do so by utilizing GetNextHighMonotonicCount().  To do this, before calling 
-  ExitBootServices() the operating system would call GetNextMonotonicCount() to obtain 
-  the current platform monotonic count.  The operating system would then provide an 
-  interface that returns the next count by:  
+  The GetNextMonotonicCount() function is only available at boot services time.
+  If the operating system wishes to extend the platform monotonic counter to runtime,
+  it may do so by utilizing GetNextHighMonotonicCount().  To do this, before calling
+  ExitBootServices() the operating system would call GetNextMonotonicCount() to obtain
+  the current platform monotonic count.  The operating system would then provide an
+  interface that returns the next count by:
     Adding 1 to the last count.
-    Before the lower 32 bits of the count overflows, call GetNextHighMonotonicCount().  
-    This will increase the high 32 bits of the platform's non-volatile portion of the monotonic 
+    Before the lower 32 bits of the count overflows, call GetNextHighMonotonicCount().
+    This will increase the high 32 bits of the platform's non-volatile portion of the monotonic
     count by 1.
 
   This function may only be called at Runtime.
@@ -128,7 +128,7 @@ Returns:
 
   @retval EFI_INVALID_PARAMETER If HighCount is NULL.
   @retval EFI_SUCCESS           Operation is successful.
-  @retval EFI_OUT_OF_RESOURCES  If variable service reports that not enough storage 
+  @retval EFI_OUT_OF_RESOURCES  If variable service reports that not enough storage
                                 is available to hold the variable and its data.
   @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
@@ -162,7 +162,7 @@ Returns:
     //
     // Use a lock if called before ExitBootServices()
     //
-    OldTpl      = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    OldTpl      = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     *HighCount  = (UINT32) RShiftU64 (mEfiMtc, 32) + 1;
     mEfiMtc     = LShiftU64 (*HighCount, 32);
     gBS->RestoreTPL (OldTpl);
@@ -203,7 +203,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS       The event has been handled properly 
+  EFI_SUCCESS       The event has been handled properly
   EFI_NOT_FOUND     An error occurred updating the variable.
 
 --*/
@@ -243,8 +243,8 @@ Returns:
   // Initialize event to handle overflows
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   EfiMtcEventHandler,
                   NULL,
                   &mEfiMtcEvent

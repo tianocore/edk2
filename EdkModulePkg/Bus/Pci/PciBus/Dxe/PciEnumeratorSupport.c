@@ -693,7 +693,7 @@ Returns:
   //
   // Raise TPL to high level to disable timer interrupt while the BAR is probed
   //
-  OldTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   PciIoWrite (PciIo, EfiPciIoWidthUint32, (UINT8) Offset, 1, &gAllOne);
   PciIoRead (PciIo, EfiPciIoWidthUint32, (UINT8) Offset, 1, &Value);
@@ -759,7 +759,7 @@ Returns:
   //
   // Raise TPL to high level to disable timer interrupt while the BAR is probed
   //
-  OldTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   PciSetCommandRegister (PciIoDevice, *Command);
   PciReadCommandRegister (PciIoDevice, Command);
@@ -784,7 +784,7 @@ Returns:
     //
     // Raise TPL to high level to disable timer interrupt while the BAR is probed
     //
-    OldTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
     PciSetBridgeControlRegister (PciIoDevice, *BridgeControl);
     PciReadBridgeControlRegister (PciIoDevice, BridgeControl);

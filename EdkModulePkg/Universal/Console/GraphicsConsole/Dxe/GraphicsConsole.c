@@ -727,7 +727,7 @@ GraphicsConsoleConOutOutputString (
 
   Status = EFI_SUCCESS;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   //
   // Current mode
   //
@@ -1078,7 +1078,7 @@ GraphicsConsoleConOutQueryMode (
     return EFI_UNSUPPORTED;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   Status = EFI_SUCCESS;
   
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
@@ -1141,7 +1141,7 @@ GraphicsConsoleConOutSetMode (
   UINT32                          RefreshRate;
   EFI_TPL                         OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GraphicsOutput = Private->GraphicsOutput;
@@ -1343,7 +1343,7 @@ GraphicsConsoleConOutSetAttribute (
     return EFI_SUCCESS;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   EraseCursor (This);
 
@@ -1395,7 +1395,7 @@ GraphicsConsoleConOutClearScreen (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_TPL                       OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GraphicsOutput = Private->GraphicsOutput;
@@ -1482,7 +1482,7 @@ GraphicsConsoleConOutSetCursorPosition (
 
   Status = EFI_SUCCESS;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   ModeData  = &(Private->ModeData[This->Mode->Mode]);
@@ -1541,7 +1541,7 @@ GraphicsConsoleConOutEnableCursor (
 {
   EFI_TPL               OldTpl;
   
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     
   EraseCursor (This);
 

@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,13 +15,13 @@ Module Name:
 
 Abstract:
 
-  This file produces the Simple Text In for an Uga window. 
+  This file produces the Simple Text In for an Uga window.
 
   This stuff is linked at the hip to the Window, since the window
   processing is done in a thread kicked off in WinNtUgaImplementation.c
 
   Since the window information is processed in an other thread we need
-  a keyboard Queue to pass data about. The Simple Text In code just 
+  a keyboard Queue to pass data about. The Simple Text In code just
   takes data off the Queue. The WinProc message loop takes keyboard input
   and places it in the Queue.
 
@@ -222,7 +222,7 @@ Returns:
   //
   // Enter critical section
   //
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
   // A reset is draining the Queue
@@ -270,7 +270,7 @@ Returns:
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
 
   Status  = UgaPrivateCheckQ (Private);
   if (!EFI_ERROR (Status)) {
@@ -321,7 +321,7 @@ Returns:
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
 
   Status  = UgaPrivateCheckQ (Private);
   if (!EFI_ERROR (Status)) {
@@ -376,8 +376,8 @@ Returns:
   Private->SimpleTextIn.ReadKeyStroke = WinNtUgaSimpleTextInReadKeyStroke;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   WinNtUgaSimpleTextInWaitForKey,
                   Private,
                   &Private->SimpleTextIn.WaitForKey

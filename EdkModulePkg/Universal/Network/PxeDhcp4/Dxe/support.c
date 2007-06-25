@@ -558,8 +558,8 @@ Returns:
   // Setup timeout event and start timer.
   //
   efi_status = gBS->CreateEvent (
-                      EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                      EFI_TPL_NOTIFY,
+                      EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                      TPL_NOTIFY,
                       &timeout_notify,
                       Private,
                       &Private->TimeoutEvent
@@ -588,8 +588,8 @@ Returns:
   // Setup periodic event for callbacks
   //
   efi_status = gBS->CreateEvent (
-                      EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                      EFI_TPL_NOTIFY,
+                      EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                      TPL_NOTIFY,
                       &periodic_notify,
                       Private,
                       &Private->PeriodicEvent

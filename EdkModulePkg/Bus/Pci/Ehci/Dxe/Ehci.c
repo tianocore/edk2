@@ -2138,7 +2138,7 @@ EhciAsyncInterruptTransfer (
   //
   if (!IsNewTransfer) {
 
-    OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
     Status = DeleteAsyncRequestTransfer (
                HcDev,

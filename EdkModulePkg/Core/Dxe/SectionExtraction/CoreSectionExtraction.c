@@ -383,7 +383,7 @@ Returns:
   UINTN                                                 SectionSize;
   
 
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
   Instance = SectionInstance + 1;
   
   //
@@ -484,7 +484,7 @@ Returns:
   LIST_ENTRY                                    *Link;
   CORE_SECTION_CHILD_NODE                       *ChildNode;
   
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
   
   //
   // Locate target stream
@@ -1025,7 +1025,7 @@ Returns:
  
   Context->Event = CoreCreateProtocolNotifyEvent (
                     Context->ChildNode->EncapsulationGuid,
-                    EFI_TPL_NOTIFY,
+                    TPL_NOTIFY,
                     NotifyGuidedExtraction,
                     Context,
                     &Context->Registration,
@@ -1234,7 +1234,7 @@ OpenSectionStreamEx (
   //
   // Add new stream to stream list
   //
-  OldTpl = CoreRaiseTpl (EFI_TPL_NOTIFY);
+  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
   InsertTailList (&mStreamRoot, &NewStream->Link);
   CoreRestoreTpl (OldTpl);
 

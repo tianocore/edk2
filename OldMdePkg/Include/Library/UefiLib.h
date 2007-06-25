@@ -180,7 +180,7 @@ EfiInitializeLock (
 
 **/
 #define EFI_INITIALIZE_LOCK_VARIABLE(Priority) \
-  {Priority, EFI_TPL_APPLICATION, EfiLockReleased }
+  {Priority, TPL_APPLICATION, EfiLockReleased }
 
 
 /**

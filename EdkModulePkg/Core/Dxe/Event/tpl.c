@@ -118,7 +118,7 @@ Returns:
   //
   // If raising to high level, disable interrupts
   //
-  if (NewTpl >= EFI_TPL_HIGH_LEVEL  &&  OldTpl < EFI_TPL_HIGH_LEVEL) {
+  if (NewTpl >= TPL_HIGH_LEVEL  &&  OldTpl < TPL_HIGH_LEVEL) {
     CoreSetInterruptState (FALSE);
   }
 
@@ -165,8 +165,8 @@ Returns:
   // interrupts are enabled
   //
 
-  if (OldTpl >= EFI_TPL_HIGH_LEVEL  &&  NewTpl < EFI_TPL_HIGH_LEVEL) {
-    gEfiCurrentTpl = EFI_TPL_HIGH_LEVEL;  
+  if (OldTpl >= TPL_HIGH_LEVEL  &&  NewTpl < TPL_HIGH_LEVEL) {
+    gEfiCurrentTpl = TPL_HIGH_LEVEL;  
   }
 
   //
@@ -175,7 +175,7 @@ Returns:
 
   while ((-2 << NewTpl) & gEventPending) {
     gEfiCurrentTpl = CoreHighestSetBit (gEventPending);
-    if (gEfiCurrentTpl < EFI_TPL_HIGH_LEVEL) {
+    if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
       CoreSetInterruptState (TRUE);
     }
     CoreDispatchEventNotifies (gEfiCurrentTpl);
@@ -191,7 +191,7 @@ Returns:
   // If lowering below HIGH_LEVEL, make sure
   // interrupts are enabled
   //
-  if (gEfiCurrentTpl < EFI_TPL_HIGH_LEVEL) {
+  if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
     CoreSetInterruptState (TRUE);
   }
 

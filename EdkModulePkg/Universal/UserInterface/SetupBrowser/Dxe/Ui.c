@@ -291,7 +291,7 @@ Returns:
     //
     // Create a timer event
     //
-    Status = gBS->CreateEvent (EFI_EVENT_TIMER, 0, NULL, NULL, &TimerEvent);
+    Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
     if (!EFI_ERROR (Status)) {
       //
       // Set the timer event
@@ -324,7 +324,7 @@ Returns:
     Timeout = ONE_SECOND;
 
     do {
-      Status = gBS->CreateEvent (EFI_EVENT_TIMER, 0, NULL, NULL, &TimerEvent);
+      Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
 
       //
       // Set the timer event

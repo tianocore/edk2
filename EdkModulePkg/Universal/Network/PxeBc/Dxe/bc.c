@@ -417,8 +417,8 @@ WaitForReceive (
   // Create callback event and set timer
   //
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &CallbackEvent
@@ -622,8 +622,8 @@ SendPacket (
   // headersize should be zero if not filled in
   //
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TimeoutEvent
@@ -695,8 +695,8 @@ SendPacket (
   // immediately
   //
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TimeoutEvent
@@ -2009,7 +2009,7 @@ BcSetStationIP (
     StationIpPtr = &PxebcMode->StationIp;
   }
 
-  if (!IS_INADDR_UNICAST (StationIpPtr) || 
+  if (!IS_INADDR_UNICAST (StationIpPtr) ||
       ((StationIpPtr->Addr[0] | SubnetMask) == BROADCAST_IPv4)) {
     //
     // The station IP is not a unicast address.
@@ -2159,10 +2159,10 @@ PxeBcDriverStart (
   //
   // Lock access, just in case
   //
-  EfiInitializeLock (&Private->Lock, EFI_TPL_CALLBACK);
+  EfiInitializeLock (&Private->Lock, TPL_CALLBACK);
   EfiAcquireLock (&Private->Lock);
 
-  EfiInitializeLock (&pLF->Lock, EFI_TPL_CALLBACK);
+  EfiInitializeLock (&pLF->Lock, TPL_CALLBACK);
   EfiAcquireLock (&pLF->Lock);
 
   //

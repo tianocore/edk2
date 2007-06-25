@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -66,15 +66,15 @@ WatchdogTimerDriverExpires (
 
   Routine Description:
 
-    Notification function that is called if the watchdog timer is fired.  If a 
+    Notification function that is called if the watchdog timer is fired.  If a
     handler has been registered with the Watchdog Timer Architectural Protocol,
     then that handler is called passing in the time period that has passed that
-    cause the watchdog timer to fire.  Then, a call to the Runtime Service 
+    cause the watchdog timer to fire.  Then, a call to the Runtime Service
     ResetSystem() is made to reset the platform.
-    
+
   Arguments:
 
-    Timer   - The one-shot timer event that was signaled when the watchdog timer 
+    Timer   - The one-shot timer event that was signaled when the watchdog timer
               expired.
 
     Context - The context that was registered when the event Timer was created.
@@ -115,15 +115,15 @@ WatchdogTimerDriverRegisterHandler (
 
 Routine Description:
 
-  This function registers a handler that is to be invoked when the watchdog 
-  timer fires.  By default, the EFI_WATCHDOG_TIMER protocol will call the 
-  Runtime Service ResetSystem() when the watchdog timer fires.  If a 
-  NotifyFunction is registered, then the NotifyFunction will be called before 
-  the Runtime Service ResetSystem() is called.  If NotifyFunction is NULL, then 
-  the watchdog handler is unregistered.  If a watchdog handler is registered, 
-  then EFI_SUCCESS is returned.  If an attempt is made to register a handler 
-  when a handler is already registered, then EFI_ALREADY_STARTED is returned.  
-  If an attempt is made to uninstall a handler when a handler is not installed, 
+  This function registers a handler that is to be invoked when the watchdog
+  timer fires.  By default, the EFI_WATCHDOG_TIMER protocol will call the
+  Runtime Service ResetSystem() when the watchdog timer fires.  If a
+  NotifyFunction is registered, then the NotifyFunction will be called before
+  the Runtime Service ResetSystem() is called.  If NotifyFunction is NULL, then
+  the watchdog handler is unregistered.  If a watchdog handler is registered,
+  then EFI_SUCCESS is returned.  If an attempt is made to register a handler
+  when a handler is already registered, then EFI_ALREADY_STARTED is returned.
+  If an attempt is made to uninstall a handler when a handler is not installed,
   then return EFI_INVALID_PARAMETER.
 
 Arguments:
@@ -133,15 +133,15 @@ Arguments:
   NotifyFunction - The function to call when the watchdog timer fires.  If this
                    is NULL, then the handler will be unregistered.
 
-Returns: 
+Returns:
 
-  EFI_SUCCESS           - The watchdog timer handler was registered or 
+  EFI_SUCCESS           - The watchdog timer handler was registered or
                           unregistered.
 
-  EFI_ALREADY_STARTED   - NotifyFunction is not NULL, and a handler is already 
+  EFI_ALREADY_STARTED   - NotifyFunction is not NULL, and a handler is already
                           registered.
 
-  EFI_INVALID_PARAMETER - NotifyFunction is NULL, and a handler was not 
+  EFI_INVALID_PARAMETER - NotifyFunction is NULL, and a handler was not
                           previously registered.
 
 --*/
@@ -169,24 +169,24 @@ WatchdogTimerDriverSetTimerPeriod (
 
 Routine Description:
 
-  This function sets the amount of time to wait before firing the watchdog 
-  timer to TimerPeriod 100 nS units.  If TimerPeriod is 0, then the watchdog 
+  This function sets the amount of time to wait before firing the watchdog
+  timer to TimerPeriod 100 nS units.  If TimerPeriod is 0, then the watchdog
   timer is disabled.
 
 Arguments:
 
   This        - The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
 
-  TimerPeriod - The amount of time in 100 nS units to wait before the watchdog 
-                timer is fired.  If TimerPeriod is zero, then the watchdog 
+  TimerPeriod - The amount of time in 100 nS units to wait before the watchdog
+                timer is fired.  If TimerPeriod is zero, then the watchdog
                 timer is disabled.
-  
-Returns: 
 
-  EFI_SUCCESS      - The watchdog timer has been programmed to fire in Time 
+Returns:
+
+  EFI_SUCCESS      - The watchdog timer has been programmed to fire in Time
                      100 nS units.
 
-  EFI_DEVICE_ERROR - A watchdog timer could not be programmed due to a device 
+  EFI_DEVICE_ERROR - A watchdog timer could not be programmed due to a device
                      error.
 
 --*/
@@ -210,21 +210,21 @@ WatchdogTimerDriverGetTimerPeriod (
 
 Routine Description:
 
-  This function retrieves the amount of time the system will wait before firing 
-  the watchdog timer.  This period is returned in TimerPeriod, and EFI_SUCCESS 
+  This function retrieves the amount of time the system will wait before firing
+  the watchdog timer.  This period is returned in TimerPeriod, and EFI_SUCCESS
   is returned.  If TimerPeriod is NULL, then EFI_INVALID_PARAMETER is returned.
 
 Arguments:
 
   This        - The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
 
-  TimerPeriod - A pointer to the amount of time in 100 nS units that the system 
+  TimerPeriod - A pointer to the amount of time in 100 nS units that the system
                 will wait before the watchdog timer is fired.  If TimerPeriod of
                 zero is returned, then the watchdog timer is disabled.
-  
-Returns: 
 
-  EFI_SUCCESS           - The amount of time that the system will wait before 
+Returns:
+
+  EFI_SUCCESS           - The amount of time that the system will wait before
                           firing the watchdog timer was returned in TimerPeriod.
 
   EFI_INVALID_PARAMETER - TimerPeriod is NULL.
@@ -263,7 +263,7 @@ Returns:
   EFI_SUCCESS           - Timer Architectural Protocol created
 
   EFI_OUT_OF_RESOURCES  - Not enough resources available to initialize driver.
-  
+
   EFI_DEVICE_ERROR      - A device error occured attempting to initialize the driver.
 
 --*/
@@ -283,8 +283,8 @@ Returns:
   // Create the timer event used to implement a simple watchdog timer
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_NOTIFY,
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
                   WatchdogTimerDriverExpires,
                   NULL,
                   &mWatchdogTimerEvent

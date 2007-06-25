@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,15 +15,15 @@ Module Name:
 
 Abstract:
 
-  Console based on Posix APIs. 
+  Console based on Posix APIs.
 
   This file attaches a SimpleTextIn protocol to a previously open window.
-  
+
   The constructor for this protocol depends on an open window. Currently
   the SimpleTextOut protocol creates a window when it's constructor is called.
-  Thus this code must run after the constructor for the SimpleTextOut 
+  Thus this code must run after the constructor for the SimpleTextOut
   protocol
-  
+
 --*/
 
 #include "Console.h"
@@ -234,8 +234,8 @@ Returns:
   Private->SimpleTextIn.ReadKeyStroke = UnixSimpleTextInReadKeyStroke;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   UnixSimpleTextInWaitForKey,
                   Private,
                   &Private->SimpleTextIn.WaitForKey

@@ -64,7 +64,7 @@ _DriverUnloadHandler (
 
 
 /**
-  Notification Entry of ExitBootService event. In the entry, all notifications in _gDriverExitBootServicesEvent[] 
+  Notification Entry of ExitBootService event. In the entry, all notifications in _gDriverExitBootServicesEvent[]
   would be invoked.
 
   @param Event   The Event that is being processed.
@@ -127,8 +127,8 @@ _ModuleEntryPoint (
   //
   if (_gDriverExitBootServicesEvent[0] != NULL) {
     Status = gBS->CreateEvent (
-                    EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                    EFI_TPL_NOTIFY,
+                    EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                    TPL_NOTIFY,
                     _DriverExitBootServices,
                     NULL,
                     &_mDriverExitBootServicesNotifyEvent
