@@ -1,0 +1,51 @@
+Intel(R) Platform Innovation Framework for EFI
+EFI Development Kit II Prime (EDK II Prime)
+Root Package 1.00
+2007-06-25
+
+Intel is a trademark or registered trademark of Intel Corporation or its
+subsidiaries in the United States and other countries.
+* Other names and brands may be claimed as the property of others.
+Copyright (c) 2007, Intel Corporation
+
+EDK II Prime packages are in the development phase. They consist of:
+
+  BuildNotes2.txt    - The build notes for this package
+  MdePkg             - Industry-standard headers and libraries
+  BaseTools          - Build -specific tools that are designed to help the
+                       developer create and modify drivers and libraries
+  IntelFrameworkPkg  - Framework headers and libraries
+  MdeModulePkg       - Reference drivers
+
+Currently, only module build supported, and only IA32 architecture supported.
+
+
+-------------------------------------------------------------------------------
+Quick Start
+-----------
+
+NOTE: Please confirm you have already installed Python on your machine.
+
+In a command window, change to the top-level directory of the EDK II source.
+
+First, set up your workspace
+    c:\MyWork\edk2\> edksetup newbuild
+
+Second, go to the module directory (For example, MdeModulePkg\Application\HelloWorld),
+and then begin to build
+    c:\MyWork\edk2\> cd MdeModulePkg\Application\HelloWorld
+    c:\MyWork\edk2\> build
+
+If you want to build the modules in other packages
+(For example, MdePkg\Library\BaseLib\BaseLib.inf), please edit open the BaseTools\Conf\Target.txt firstly,
+
+change the following line
+    ACTIVE_PLATFORM       = MdeModulePkg/MdeModulePkg.dsc
+to
+    ACTIVE_PLATFORM       = MdePkg/MdePkg.dsc
+
+and then go to MdePkg\Library\BaseLib directory and build
+    c:\MyWork\edk2\> cd MdePkg\Library\BaseLib
+    c:\MyWork\edk2\> build
+
+
