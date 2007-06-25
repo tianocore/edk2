@@ -182,6 +182,10 @@
       <IncludeHeader>Include/Library/UefiApplicationEntryPoint.h</IncludeHeader>
       <HelpText>Library to abstract entry point to a EFI Application.</HelpText>
     </LibraryClass>
+    <LibraryClass Name="SalLib" SupArchList="IPF">
+      <IncludeHeader>Include/Library/SalLib.h</IncludeHeader>
+      <HelpText>Implement the SAL call</HelpText>
+    </LibraryClass>
   </LibraryClassDeclarations>
   <IndustryStdIncludes>
     <IndustryStdHeader Name="BaseTypes">

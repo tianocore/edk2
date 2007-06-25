@@ -266,13 +266,15 @@ typedef enum {
   CurrentProcInfo,
   NumProcessors,
   SetMinState,
-  GetMinState
+  GetMinState,
+  EsalPhysicalIdInfo
 } EFI_EXTENDED_SAL_MP_SERVICES_FUNC_ID;
 
 typedef enum {
   PalProc,
   SetNewPalEntry,
-  GetNewPalEntry
+  GetNewPalEntry,
+  EsalUpdatePal
 } EFI_EXTENDED_SAL_PAL_SERVICES_FUNC_ID;
 
 typedef enum {
@@ -283,7 +285,8 @@ typedef enum {
   EsalMcGetParams,
   EsalMcGetMcParams,
   EsalGetMcCheckinFlags,
-  EsalGetPlatformBaseFreq
+  EsalGetPlatformBaseFreq,
+  EsalRegisterPhysicalAddrFunctionId
 } EFI_EXTENDED_SAL_BASE_SERVICES_FUNC_ID;
 
 typedef enum {
