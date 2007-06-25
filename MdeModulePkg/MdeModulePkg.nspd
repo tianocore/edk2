@@ -23,5 +23,8 @@
   </PackageDefinitions>
   <MsaFiles>
     <Filename>Application/HelloWorld/HelloWorld.msa</Filename>
+    <Filename>Universal/Disk/DiskIo/Dxe/DiskIo.msa</Filename>
+    <Filename>Universal/Disk/Partition/Dxe/Partition.msa</Filename>
+    <Filename>Universal/Security/SecurityStub/SecurityStub.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
