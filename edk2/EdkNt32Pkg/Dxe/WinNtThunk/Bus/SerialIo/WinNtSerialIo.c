@@ -637,7 +637,7 @@ Returns:
   WIN_NT_SERIAL_IO_PRIVATE_DATA *Private;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -709,7 +709,7 @@ Returns:
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -906,7 +906,7 @@ Returns:
   DCB                           Dcb;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -996,7 +996,7 @@ Returns:
   DCB                           Dcb;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1114,7 +1114,7 @@ Returns:
   UINT32                        Control;
   EFI_TPL                       Tpl;
 
-  Tpl               = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl               = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private           = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1216,7 +1216,7 @@ Returns:
   UINT32                        Control;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 

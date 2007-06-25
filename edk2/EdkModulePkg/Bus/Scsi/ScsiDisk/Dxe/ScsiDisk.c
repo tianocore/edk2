@@ -334,7 +334,7 @@ Returns:
   EFI_STATUS    Status;
   EFI_TPL       OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   ScsiDiskDevice  = SCSI_DISK_DEV_FROM_THIS (This);
 
@@ -405,7 +405,7 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
@@ -529,7 +529,7 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 

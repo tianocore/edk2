@@ -28,19 +28,19 @@ Revision History
 //
 // gTpl - Task priority level
 //
-EFI_TPL  gEfiCurrentTpl = EFI_TPL_APPLICATION;
+EFI_TPL  gEfiCurrentTpl = TPL_APPLICATION;
 
 
 //
 // gEventQueueLock - Protects the event queus
 //
-EFI_LOCK gEventQueueLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_HIGH_LEVEL);
+EFI_LOCK gEventQueueLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
 
 //
 // gEventQueue - A list of event's to notify for each priority level
 // gEventPending - A bitmask of the EventQueues that are pending
 //
-LIST_ENTRY      gEventQueue[EFI_TPL_HIGH_LEVEL + 1];
+LIST_ENTRY      gEventQueue[TPL_HIGH_LEVEL + 1];
 UINTN           gEventPending = 0;
 
 

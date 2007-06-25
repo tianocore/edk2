@@ -632,7 +632,7 @@ Returns:
   InitializeListHead (&mPrivateData.DataListHead);
   InitializeListHead (&mPrivateData.FilterDriverListHead);
 
-  EfiInitializeLock (&mPrivateData.DataLock, EFI_TPL_NOTIFY);
+  EfiInitializeLock (&mPrivateData.DataLock, TPL_NOTIFY);
 
   //
   // Make sure we get a bigger MTC number on every boot!

@@ -66,7 +66,7 @@ LIST_ENTRY  mFvHandleList = INITIALIZE_LIST_HEAD_VARIABLE (mFvHandleList);      
 //
 // Lock for mDiscoveredList, mScheduledQueue, gDispatcherRunning.
 //
-EFI_LOCK  mDispatcherLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_HIGH_LEVEL);
+EFI_LOCK  mDispatcherLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
 
 
 //
@@ -1126,7 +1126,7 @@ Returns:
 {
   mFwVolEvent = CoreCreateProtocolNotifyEvent (
                   &gEfiFirmwareVolumeProtocolGuid, 
-                  EFI_TPL_CALLBACK,
+                  TPL_CALLBACK,
                   CoreFwVolEventProtocolNotify,
                   NULL,
                   &mFwVolEventRegistration,

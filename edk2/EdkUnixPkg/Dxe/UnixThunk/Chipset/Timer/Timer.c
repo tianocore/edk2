@@ -77,9 +77,9 @@ Returns:
   EFI_TIMER_NOTIFY  CallbackFunction;
 
 
-  OriginalTPL = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-  if (OriginalTPL < EFI_TPL_HIGH_LEVEL) {
+  if (OriginalTPL < TPL_HIGH_LEVEL) {
     CallbackFunction = mTimerNotifyFunction;
 
     //

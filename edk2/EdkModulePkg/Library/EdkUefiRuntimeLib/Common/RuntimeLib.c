@@ -1,14 +1,14 @@
 /**@file
   Library utility functions for Runtime driver.
-  
+
 Copyright (c) 2006 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -25,7 +25,7 @@ EFI_RUNTIME_SERVICES          *mRT;
 
 /**
   Set AtRuntime flag as TRUE after ExitBootServices
-  
+
   @param[in]  Event   The Event that is being processed
   @param[in]  Context Event Context
 **/
@@ -46,9 +46,9 @@ RuntimeDriverExitBootServices (
 
 /**
   Fixup internal data so that EFI can be call in virtual mode.
-  Call the passed in Child Notify event and convert any pointers in 
+  Call the passed in Child Notify event and convert any pointers in
   lib to virtual mode.
-  
+
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
@@ -63,7 +63,7 @@ RuntimeLibVirtualNotifyEvent (
   UINTN Index;
   EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
 
-  for (Index = 0; 
+  for (Index = 0;
        _gDriverSetVirtualAddressMapEvent[Index] != NULL;
        Index++) {
     ChildNotifyEventHandler = _gDriverSetVirtualAddressMapEvent[Index];
@@ -79,11 +79,11 @@ RuntimeLibVirtualNotifyEvent (
 }
 
 /**
-  Intialize runtime Driver Lib if it has not yet been initialized. 
-  
+  Intialize runtime Driver Lib if it has not yet been initialized.
+
   @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
   @param[in]  SystemTable   A pointer to the EFI System Table.
-  
+
   @return     EFI_STATUS    always returns EFI_SUCCESS except EFI_ALREADY_STARTED if already started.
 **/
 EFI_STATUS
@@ -101,11 +101,11 @@ RuntimeDriverLibConstruct (
   
   //
   // Register SetVirtualAddressMap () notify function
-  // 
+  //
   ASSERT (gBS != NULL);
   Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
-                  EFI_TPL_NOTIFY,
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+                  TPL_NOTIFY,
                   RuntimeLibVirtualNotifyEvent,
                   NULL,
                   &mEfiVirtualNotifyEvent
@@ -118,7 +118,7 @@ RuntimeDriverLibConstruct (
 
 /**
   This routine will free some resources which have been allocated in
-  EfiInitializeRuntimeDriverLib(). If a runtime driver exits with an error, 
+  EfiInitializeRuntimeDriverLib(). If a runtime driver exits with an error,
   it must call this routine to free the allocated resource before the exiting.
 
   @retval     EFI_SUCCESS       Shutdown the Runtime Driver Lib successfully
@@ -139,13 +139,13 @@ RuntimeDriverLibDeconstruct (
   ASSERT (gBS != NULL);
   Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
   ASSERT_EFI_ERROR (Status);
-  
+
   return Status;
 }
 
 /**
   Return TRUE if ExitBootServices () has been called
-  
+
   @retval TRUE If ExitBootServices () has been called
 **/
 BOOLEAN
@@ -159,7 +159,7 @@ EfiAtRuntime (
 
 /**
   Return TRUE if SetVirtualAddressMap () has been called
-  
+
   @retval TRUE  If SetVirtualAddressMap () has been called
 **/
 BOOLEAN

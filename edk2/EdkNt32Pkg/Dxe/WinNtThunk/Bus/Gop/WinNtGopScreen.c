@@ -835,7 +835,7 @@ WinNtGopStartWindow (
   // Register to be notified on exit boot services so we can destroy the window.
   //
   Status = gBS->CreateEvent (
-                  EVENT_SIGNAL_EXIT_BOOT_SERVICES,
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_CALLBACK,
                   KillNtGopThread,
                   Private,

@@ -1,22 +1,22 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
     UnixUgaScreen.c
 
 Abstract:
 
-  This file produces the graphics abstration of UGA. It is called by 
-  UnixUgaDriver.c file which deals with the EFI 1.1 driver model. 
+  This file produces the graphics abstration of UGA. It is called by
+  UnixUgaDriver.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
 --*/
@@ -71,7 +71,7 @@ UnixUgaGetMode (
 
   Returns:
     EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode () 
+    EFI_NOT_STARTED - Video display is not initialized. Call SetMode ()
     EFI_INVALID_PARAMETER - One of the input args was NULL.
 
 --*/
@@ -122,7 +122,7 @@ UnixUgaSetMode (
 
   Returns:
     EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode () 
+    EFI_NOT_STARTED - Video display is not initialized. Call SetMode ()
     EFI_INVALID_PARAMETER - One of the input args was NULL.
 
 --*/
@@ -196,19 +196,19 @@ UnixUgaBlt (
   Routine Description:
     Blt pixels from the rectangle (Width X Height) formed by the BltBuffer
     onto the graphics screen starting a location (X, Y). (0, 0) is defined as
-    the upper left hand side of the screen. (X, Y) can be outside of the 
-    current screen geometry and the BltBuffer will be cliped when it is 
-    displayed. X and Y can be negative or positive. If Width or Height is 
+    the upper left hand side of the screen. (X, Y) can be outside of the
+    current screen geometry and the BltBuffer will be cliped when it is
+    displayed. X and Y can be negative or positive. If Width or Height is
     bigger than the current video screen the image will be clipped.
 
   Arguments:
     This          - Protocol instance pointer.
-    X             - X location on graphics screen. 
+    X             - X location on graphics screen.
     Y             - Y location on the graphics screen.
     Width         - Width of BltBuffer.
     Height        - Hight of BltBuffer
     BltOperation  - Operation to perform on BltBuffer and video memory
-    BltBuffer     - Buffer containing data to blt into video buffer. This 
+    BltBuffer     - Buffer containing data to blt into video buffer. This
                     buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
     SourceX       - If the BltOperation is a EfiCopyBlt this is the source
                     of the copy. For other BLT operations this argument is not
@@ -216,11 +216,11 @@ UnixUgaBlt (
     SourceX       - If the BltOperation is a EfiCopyBlt this is the source
                     of the copy. For other BLT operations this argument is not
                     used.
-      
+
   Returns:
     EFI_SUCCESS           - The palette is updated with PaletteArray.
     EFI_INVALID_PARAMETER - BltOperation is not valid.
-    EFI_DEVICE_ERROR      - A hardware error occured writting to the video 
+    EFI_DEVICE_ERROR      - A hardware error occured writting to the video
                              buffer.
 
 --*/
@@ -256,7 +256,7 @@ UnixUgaBlt (
   // We would not want a timer based event (Cursor, ...) to come in while we are
   // doing this operation.
   //
-  OriginalTPL = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
   Status = Private->UgaIo->UgaBlt (Private->UgaIo,
 				   BltBuffer,
@@ -348,8 +348,8 @@ Returns:
   // Register to be notified on exit boot services so we can destroy the window.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                  EFI_TPL_CALLBACK,
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
                   KillNtUgaThread,
                   Private,
                   &mUgaScreenExitBootServicesEvent
@@ -426,8 +426,8 @@ KillNtUgaThread (
 /*++
 
 Routine Description:
-  
-  This is the UGA screen's callback notification function for exit-boot-services. 
+
+  This is the UGA screen's callback notification function for exit-boot-services.
   All we do here is call UnixUgaDestructor().
 
 Arguments:

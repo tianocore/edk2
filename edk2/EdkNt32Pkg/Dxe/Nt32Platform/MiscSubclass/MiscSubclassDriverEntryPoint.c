@@ -321,8 +321,8 @@ Returns:
   // Install notify function to fetch memory data through WinNtIo protocol and store to data hub.
   //
   EfiStatus = gBS->CreateEvent (
-                    EFI_EVENT_NOTIFY_SIGNAL,
-                    EFI_TPL_CALLBACK,
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
                     WinNtIoProtocolNotifyFunction,
                     ImageHandle,
                     &Event

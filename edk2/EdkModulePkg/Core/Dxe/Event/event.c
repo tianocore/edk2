@@ -30,30 +30,30 @@ UINT32 mEventTable[] = {
   // 0x80000200       Timer event with a notification function that is
   // queue when the event is signaled with SignalEvent()
   //
-  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
+  EVT_TIMER | EVT_NOTIFY_SIGNAL,
   //
   // 0x80000000       Timer event without a notification function. It can be
   // signaled with SignalEvent() and checked with CheckEvent() or WaitForEvent().
   //
-  EFI_EVENT_TIMER,
+  EVT_TIMER,
   //
   // 0x00000100       Generic event with a notification function that
   // can be waited on with CheckEvent() or WaitForEvent()
   //
-  EFI_EVENT_NOTIFY_WAIT,
+  EVT_NOTIFY_WAIT,
   //
   // 0x00000200       Generic event with a notification function that
   // is queue when the event is signaled with SignalEvent()
   //
-  EFI_EVENT_NOTIFY_SIGNAL,
+  EVT_NOTIFY_SIGNAL,
   //
   // 0x00000201       ExitBootServicesEvent.
   //
-  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
+  EVT_SIGNAL_EXIT_BOOT_SERVICES,
   //
   // 0x60000202       SetVirtualAddressMapEvent.
   //
-  EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
 
   //
   // 0x00000000       Generic event without a notification function.
@@ -65,7 +65,7 @@ UINT32 mEventTable[] = {
   // 0x80000100       Timer event with a notification function that can be
   // waited on with CheckEvent() or WaitForEvent()
   //
-  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_WAIT,
+  EVT_TIMER | EVT_NOTIFY_WAIT,
 };
 
 STATIC
@@ -139,7 +139,7 @@ Returns:
 {
   UINTN        Index;
 
-  for (Index=0; Index <= EFI_TPL_HIGH_LEVEL; Index++) {
+  for (Index=0; Index <= TPL_HIGH_LEVEL; Index++) {
     InitializeListHead (&gEventQueue[Index]);
   }
 
@@ -190,7 +190,7 @@ Returns:
     // Only clear the SIGNAL status if it is a SIGNAL type event.
     // WAIT type events are only cleared in CheckEvent()
     //
-    if (Event->Type & EFI_EVENT_NOTIFY_SIGNAL) {
+    if (Event->Type & EVT_NOTIFY_SIGNAL) {
       Event->SignalCount = 0;
     }
 
@@ -332,9 +332,9 @@ Returns:
   //
   // Convert EFI 1.10 Events to thier UEFI 2.0 CreateEventEx mapping
   //
-  if (Type == EVENT_SIGNAL_EXIT_BOOT_SERVICES) {
+  if (Type == EVT_SIGNAL_EXIT_BOOT_SERVICES) {
     GuidPtr = &gEfiEventExitBootServicesGuid;
-  } else if (Type == EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
+  } else if (Type == EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
     GuidPtr = &gEfiEventVirtualAddressChangeGuid;
   }
 
@@ -378,7 +378,7 @@ Returns:
   INTN            Index;
 
 
-  if ((Event == NULL) || (NotifyTpl == EFI_TPL_APPLICATION)) {
+  if ((Event == NULL) || (NotifyTpl == TPL_APPLICATION)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -399,13 +399,13 @@ Returns:
   //
   // If it's a notify type of event, check its parameters
   //
-  if ((Type & (EFI_EVENT_NOTIFY_WAIT | EFI_EVENT_NOTIFY_SIGNAL))) {
+  if ((Type & (EVT_NOTIFY_WAIT | EVT_NOTIFY_SIGNAL))) {
     //
     // Check for an invalid NotifyFunction or NotifyTpl
     //
     if ((NotifyFunction == NULL) ||
-        (NotifyTpl < EFI_TPL_APPLICATION) ||
-       (NotifyTpl >= EFI_TPL_HIGH_LEVEL)) {
+        (NotifyTpl < TPL_APPLICATION) ||
+       (NotifyTpl >= TPL_HIGH_LEVEL)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -422,7 +422,7 @@ Returns:
   // Allcoate and initialize a new event structure.
   //
   Status = CoreAllocatePool (
-             (Type & EFI_EVENT_RUNTIME) ? EfiRuntimeServicesData: EfiBootServicesData,
+             (Type & EVT_RUNTIME) ? EfiRuntimeServicesData: EfiBootServicesData,
              sizeof (IEVENT),
              (VOID **)&IEvent
              );
@@ -445,7 +445,7 @@ Returns:
 
   *Event = IEvent;
 
-  if (Type & EFI_EVENT_RUNTIME) {
+  if (Type & EVT_RUNTIME) {
     //
     // Keep a list of all RT events so we can tell the RT AP.
     //
@@ -459,7 +459,7 @@ Returns:
 
   CoreAcquireEventLock ();
 
-  if ((Type & EFI_EVENT_NOTIFY_SIGNAL) != 0x00000000) {
+  if ((Type & EVT_NOTIFY_SIGNAL) != 0x00000000) {
     //
     // The Event's NotifyFunction must be queued whenever the event is signaled
     //
@@ -523,7 +523,7 @@ Returns:
     //
     // If signalling type is a notify function, queue it
     //
-    if (Event->Type & EFI_EVENT_NOTIFY_SIGNAL) {
+    if (Event->Type & EVT_NOTIFY_SIGNAL) {
       if (Event->ExFlag) {
         //
         // The CreateEventEx() style requires all members of the Event Group
@@ -580,13 +580,13 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Event->Type & EFI_EVENT_NOTIFY_SIGNAL) {
+  if (Event->Type & EVT_NOTIFY_SIGNAL) {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_NOT_READY;
 
-  if (!Event->SignalCount && (Event->Type & EFI_EVENT_NOTIFY_WAIT)) {
+  if (!Event->SignalCount && (Event->Type & EVT_NOTIFY_WAIT)) {
 
     //
     // Queue the wait notify function
@@ -654,7 +654,7 @@ Returns:
   //
   // Can only WaitForEvent at TPL_APPLICATION
   //
-  if (gEfiCurrentTpl != EFI_TPL_APPLICATION) {
+  if (gEfiCurrentTpl != TPL_APPLICATION) {
     return EFI_UNSUPPORTED;
   }
 
@@ -721,7 +721,7 @@ Returns:
   //
   // If it's a timer event, make sure it's not pending
   //
-  if (Event->Type & EFI_EVENT_TIMER) {
+  if (Event->Type & EVT_TIMER) {
     CoreSetTimer (Event, TimerCancel, 0);
   }
 

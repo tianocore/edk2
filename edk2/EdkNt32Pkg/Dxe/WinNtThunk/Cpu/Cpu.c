@@ -454,8 +454,8 @@ Returns:
   // Install notify function to store processor data to HII database and data hub.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   WinNtIoProtocolNotifyFunction,
                   ImageHandle,
                   &Event

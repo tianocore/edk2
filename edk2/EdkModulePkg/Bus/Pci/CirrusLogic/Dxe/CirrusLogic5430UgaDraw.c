@@ -321,7 +321,7 @@ CirrusLogic5430UgaDrawBlt (
   // We would not want a timer based event (Cursor, ...) to come in while we are
   // doing this operation.
   //
-  OriginalTPL = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
   switch (BltOperation) {
   case EfiUgaVideoToBltBuffer:

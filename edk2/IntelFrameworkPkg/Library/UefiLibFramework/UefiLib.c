@@ -113,7 +113,7 @@ EfiCreateProtocolNotifyEvent(
   //
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   NotifyTpl,
                   NotifyFunction,
                   NotifyContext,
@@ -175,7 +175,7 @@ EfiNamedEventListen (
   // Create event
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   NotifyTpl,
                   NotifyFunction,
                   (VOID *) NotifyContext,
@@ -267,7 +267,7 @@ EfiGetCurrentTpl (
 {
   EFI_TPL Tpl;
 
-  Tpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
   gBS->RestoreTPL (Tpl);
 
   return Tpl;
@@ -294,10 +294,10 @@ EfiInitializeLock (
   )
 {
   ASSERT (Lock != NULL);
-  ASSERT (Priority <= EFI_TPL_HIGH_LEVEL);
+  ASSERT (Priority <= TPL_HIGH_LEVEL);
 
   Lock->Tpl       = Priority;
-  Lock->OwnerTpl  = EFI_TPL_APPLICATION;
+  Lock->OwnerTpl  = TPL_APPLICATION;
   Lock->Lock      = EfiLockReleased ;
   return Lock;
 }

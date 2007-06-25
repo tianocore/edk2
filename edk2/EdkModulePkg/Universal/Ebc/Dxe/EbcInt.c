@@ -1,24 +1,24 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name:  
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
 
   EbcInt.c
-  
+
 Abstract:
 
   Top level module for the EBC virtual machine implementation.
   Provides auxilliary support routines for the VM. That is, routines
   that are not particularly related to VM execution of EBC instructions.
-  
+
 --*/
 
 #include "EbcInt.h"
@@ -196,17 +196,17 @@ InitializeEbcDriver (
   )
 /*++
 
-Routine Description: 
+Routine Description:
 
-  Initializes the VM EFI interface.  Allocates memory for the VM interface 
+  Initializes the VM EFI interface.  Allocates memory for the VM interface
   and registers the VM protocol.
 
-Arguments:  
+Arguments:
 
   ImageHandle - EFI image handle.
   SystemTable - Pointer to the EFI system table.
 
-Returns:  
+Returns:
   Standard EFI status code.
 
 --*/
@@ -396,9 +396,9 @@ EbcCreateThunk (
 /*++
 
 Routine Description:
-  
+
   This is the top-level routine plugged into the EBC protocol. Since thunks
-  are very processor-specific, from here we dispatch directly to the very 
+  are very processor-specific, from here we dispatch directly to the very
   processor-specific routine EbcCreateThunks().
 
 Arguments:
@@ -438,7 +438,7 @@ EbcDebugGetMaximumProcessorIndex (
 /*++
 
 Routine Description:
-  
+
   This EBC debugger protocol service is called by the debug agent
 
 Arguments:
@@ -446,7 +446,7 @@ Arguments:
   This              - pointer to the caller's debug support protocol interface
   MaxProcessorIndex - pointer to a caller allocated UINTN in which the maximum
                       processor index is returned.
-                                               
+
 Returns:
 
   Standard EFI_STATUS
@@ -468,10 +468,10 @@ EbcDebugRegisterPeriodicCallback (
 /*++
 
 Routine Description:
-  
+
   This protocol service is called by the debug agent to register a function
   for us to call on a periodic basis.
-  
+
 
 Arguments:
 
@@ -490,7 +490,7 @@ Returns:
   if ((mDebugPeriodicCallback != NULL) && (PeriodicCallback != NULL)) {
     return EFI_ALREADY_STARTED;
   }
-	
+
   mDebugPeriodicCallback = PeriodicCallback;
   return EFI_SUCCESS;
 }
@@ -507,10 +507,10 @@ EbcDebugRegisterExceptionCallback (
 /*++
 
 Routine Description:
-  
+
   This protocol service is called by the debug agent to register a function
   for us to call when we detect an exception.
-  
+
 
 Arguments:
 
@@ -548,12 +548,12 @@ EbcDebugInvalidateInstructionCache (
 /*++
 
 Routine Description:
-  
+
   This EBC debugger protocol service is called by the debug agent.  Required
   for DebugSupport compliance but is only stubbed out for EBC.
 
 Arguments:
-                                               
+
 Returns:
 
   EFI_SUCCESS
@@ -574,7 +574,7 @@ EbcDebugSignalException (
 Routine Description:
 
   The VM interpreter calls this function when an exception is detected.
-  
+
 Arguments:
 
   VmPtr - pointer to a VM context for passing info to the EFI debugger.
@@ -582,7 +582,7 @@ Arguments:
 Returns:
 
   EFI_SUCCESS if it returns at all
-  
+
 --*/
 {
   EFI_SYSTEM_CONTEXT_EBC  EbcContext;
@@ -641,7 +641,7 @@ Returns:
     VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
     VmPtr->Flags = EbcContext.Flags;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -655,7 +655,7 @@ InitializeEbcCallback (
 Routine Description:
 
   To install default Callback function for the VM interpreter.
-  
+
 Arguments:
 
   This - pointer to the instance of DebugSupport protocol
@@ -663,7 +663,7 @@ Arguments:
 Returns:
 
   None
-  
+
 --*/
 {
   INTN       Index;
@@ -685,8 +685,8 @@ Returns:
   // For PeriodicCallback
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_NOTIFY,
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
                   EbcPeriodicNotifyFunction,
                   &mVmPtr,
                   &mEbcPeriodicEvent
@@ -720,7 +720,7 @@ Routine Description:
   The default Exception Callback for the VM interpreter.
   In this function, we report status code, and print debug information
   about EBC_CONTEXT, then dead loop.
-  
+
 Arguments:
 
   InterruptType - Interrupt type.
@@ -729,7 +729,7 @@ Arguments:
 Returns:
 
   None
-  
+
 --*/
 {
   //
@@ -753,7 +753,7 @@ Routine Description:
 
   The periodic callback function for EBC VM interpreter, which is used
   to support the EFI debug support protocol.
-  
+
 Arguments:
 
   Event   - The Periodic Callback Event.
@@ -762,7 +762,7 @@ Arguments:
 Returns:
 
   None.
-  
+
 --*/
 {
   VM_CONTEXT *VmPtr;
@@ -787,7 +787,7 @@ Routine Description:
 
   The VM interpreter calls this function on a periodic basis to support
   the EFI debug support protocol.
-  
+
 Arguments:
 
   VmPtr - pointer to a VM context for passing info to the debugger.
@@ -795,12 +795,12 @@ Arguments:
 Returns:
 
   Standard EFI status.
-  
+
 --*/
 {
   EFI_SYSTEM_CONTEXT_EBC   EbcContext;
   EFI_SYSTEM_CONTEXT       SystemContext;
-  
+
   //
   // If someone's registered for periodic callbacks, then call them.
   //
@@ -838,7 +838,7 @@ Returns:
     VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
     VmPtr->Flags = EbcContext.Flags;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -852,8 +852,8 @@ EbcUnloadImage (
 /*++
 
 Routine Description:
-  
-  This routine is called by the core when an image is being unloaded from 
+
+  This routine is called by the core when an image is being unloaded from
   memory. Basically we now have the opportunity to do any necessary cleanup.
   Typically this will include freeing any memory allocated for thunk-creation.
 
@@ -931,8 +931,8 @@ EbcAddImageThunk (
 /*++
 
 Routine Description:
-  
-  Add a thunk to our list of thunks for a given image handle. 
+
+  Add a thunk to our list of thunks for a given image handle.
   Also flush the instruction cache since we've written thunk code
   to memory that will be executed eventually.
 
@@ -943,7 +943,7 @@ Arguments:
   ThunkSize    - the size of the thunk memory allocated
 
 Returns:
- 
+
   EFI_OUT_OF_RESOURCES    - memory allocation failed
   EFI_SUCCESS             - successful completion
 
@@ -1041,7 +1041,7 @@ GetEBCStack(
 {
   UINTN   Index;
   EFI_TPL OldTpl;
-  OldTpl = gBS->RaiseTPL(EFI_TPL_HIGH_LEVEL);
+  OldTpl = gBS->RaiseTPL(TPL_HIGH_LEVEL);
   for (Index = 0; Index < mStackNum; Index ++) {
     if (mStackBufferIndex[Index] == NULL) {
       mStackBufferIndex[Index] = Handle;
@@ -1121,7 +1121,7 @@ InitEbcVmTestProtocol (
 /*++
 
 Routine Description:
-  
+
   Produce an EBC VM test protocol that can be used for regression tests.
 
 Arguments:

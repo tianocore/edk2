@@ -239,7 +239,7 @@ Returns:
   MemoryHeader  = HcDev->MemoryHeader;
   ASSERT (MemoryHeader != NULL);
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY + 1);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY + 1);
 
   //
   // allocate unit is 32 bytes (align on 32 byte)
@@ -297,7 +297,7 @@ Returns:
     return Status;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY + 1);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY + 1);
   	
   //
   // Link the new Memory Block to the Memory Header list
@@ -353,7 +353,7 @@ Returns:
   UINTN                 RealAllocSize;
   EFI_TPL               OldTpl;
 
-  OldTpl        = gBS->RaiseTPL (EFI_TPL_NOTIFY + 1);
+  OldTpl        = gBS->RaiseTPL (TPL_NOTIFY + 1);
 
   MemoryHeader  = HcDev->MemoryHeader;
 
@@ -419,7 +419,7 @@ Returns:
       //
       gBS->RestoreTPL (OldTpl);
       FreeMemoryHeader (HcDev, TempHeaderPtr);
-      OldTpl = gBS->RaiseTPL (EFI_TPL_NOTIFY + 1);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY + 1);
       //
       // reset the TempHeaderPtr, continue search for
       // another empty memory block.

@@ -453,7 +453,7 @@ Arguments:
 
   snp->Signature  = SNP_DRIVER_SIGNATURE;
 
-  EfiInitializeLock (&snp->lock, EFI_TPL_NOTIFY);
+  EfiInitializeLock (&snp->lock, TPL_NOTIFY);
 
   snp->snp.Revision       = EFI_SIMPLE_NETWORK_PROTOCOL_REVISION;
   snp->snp.Start          = snp_undi32_start;

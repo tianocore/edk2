@@ -500,7 +500,7 @@ Returns:
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private     = UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (This);
 
@@ -989,7 +989,7 @@ Returns:
 
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (PrivateFile->fd >= 0) {
     PrivateFile->UnixThunk->Close (PrivateFile->fd);
@@ -1044,7 +1044,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1268,7 +1268,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1401,7 +1401,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1473,7 +1473,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1539,7 +1539,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   PrivateFile   = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1609,7 +1609,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
     
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot = UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -1741,7 +1741,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   //
   // Initialise locals.
@@ -2152,7 +2152,7 @@ Returns:
   }
 
   Status = EFI_SUCCESS;
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   
   PrivateFile = UNIX_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 

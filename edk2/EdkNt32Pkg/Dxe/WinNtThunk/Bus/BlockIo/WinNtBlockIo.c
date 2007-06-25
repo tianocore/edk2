@@ -433,7 +433,7 @@ Returns:
   Private = AllocatePool (sizeof (WIN_NT_BLOCK_IO_PRIVATE));
   ASSERT (Private != NULL);
 
-  EfiInitializeLock (&Private->Lock, EFI_TPL_NOTIFY);
+  EfiInitializeLock (&Private->Lock, TPL_NOTIFY);
 
   Private->WinNtThunk = WinNtIo->WinNtThunk;
 
@@ -849,7 +849,7 @@ WinNtBlockIoReadBlocks (
   DWORD                   BytesRead;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -917,7 +917,7 @@ WinNtBlockIoWriteBlocks (
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -996,7 +996,7 @@ WinNtBlockIoResetBlock (
   WIN_NT_BLOCK_IO_PRIVATE *Private;
   EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 

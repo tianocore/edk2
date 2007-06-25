@@ -1,16 +1,16 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
   timer.c
 
 Abstract:
@@ -52,10 +52,10 @@ CoreInsertEventTimer (
 //
 
 static LIST_ENTRY       mEfiTimerList = INITIALIZE_LIST_HEAD_VARIABLE (mEfiTimerList);
-static EFI_LOCK         mEfiTimerLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_HIGH_LEVEL - 1);
+static EFI_LOCK         mEfiTimerLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL - 1);
 static EFI_EVENT        mEfiCheckTimerEvent;
 
-static EFI_LOCK         mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_HIGH_LEVEL);
+static EFI_LOCK         mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
 static UINT64           mEfiSystemTime = 0;
 
 //
@@ -75,7 +75,7 @@ Routine Description:
 Arguments:
 
   None
-    
+
 Returns:
 
   None
@@ -85,8 +85,8 @@ Returns:
   EFI_STATUS  Status;
 
   Status = CoreCreateEvent (
-              EFI_EVENT_NOTIFY_SIGNAL,
-              EFI_TPL_HIGH_LEVEL - 1,
+              EVT_NOTIFY_SIGNAL,
+              TPL_HIGH_LEVEL - 1,
               CoreCheckTimers,
               NULL,
               &mEfiCheckTimerEvent
@@ -108,7 +108,7 @@ Routine Description:
 Arguments:
 
   None
-    
+
 Returns:
 
   Returns the current system time
@@ -137,7 +137,7 @@ Routine Description:
 Arguments:
 
   Duration    - The number of 100ns elasped since the last call to TimerTick
-    
+
 Returns:
 
   None
@@ -331,16 +331,16 @@ Arguments:
   UserEvent   - The timer event that is to be signaled at the specified time
   Type        - The type of time that is specified in TriggerTime
   TriggerTime - The number of 100ns units until the timer expires
-  
+
 Returns:
 
   EFI_SUCCESS           - The event has been set to be signaled at the requested time
   EFI_INVALID_PARAMETER - Event or Type is not valid
 
---*/  
+--*/
 {
   IEVENT      *Event;
-  
+
   Event = UserEvent;
 
   if (Event == NULL) {
@@ -351,10 +351,10 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Type < 0 || Type > TimerRelative  || !(Event->Type & EFI_EVENT_TIMER)) {
+  if (Type < 0 || Type > TimerRelative  || !(Event->Type & EVT_TIMER)) {
     return EFI_INVALID_PARAMETER;
   }
- 
+
   CoreAcquireLock (&mEfiTimerLock);
 
   //

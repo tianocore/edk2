@@ -48,8 +48,8 @@ Abstract:
 //
 // Module Variables
 //
-EFI_LOCK           mGcdMemorySpaceLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_NOTIFY);
-EFI_LOCK           mGcdIoSpaceLock     = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_NOTIFY);
+EFI_LOCK           mGcdMemorySpaceLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+EFI_LOCK           mGcdIoSpaceLock     = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 LIST_ENTRY         mGcdMemorySpaceMap  = INITIALIZE_LIST_HEAD_VARIABLE (mGcdMemorySpaceMap);
 LIST_ENTRY         mGcdIoSpaceMap      = INITIALIZE_LIST_HEAD_VARIABLE (mGcdIoSpaceMap);
 

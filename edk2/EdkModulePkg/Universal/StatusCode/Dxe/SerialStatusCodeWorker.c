@@ -99,10 +99,10 @@ SerialStatusCodeReportWorker (
     if (EfiAtRuntime ()) {
       return EFI_DEVICE_ERROR;
     }
-    CurrentTpl = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+    CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     gBS->RestoreTPL (CurrentTpl);
 
-    if (CurrentTpl > EFI_TPL_CALLBACK ) {
+    if (CurrentTpl > TPL_CALLBACK ) {
       return EFI_DEVICE_ERROR;
     }
   }

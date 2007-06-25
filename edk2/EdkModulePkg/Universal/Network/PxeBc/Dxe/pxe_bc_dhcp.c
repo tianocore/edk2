@@ -587,8 +587,8 @@ SetStationIP (
   }
 
   EfiStatus = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &Private->Igmpv1TimeoutEvent
@@ -1283,8 +1283,8 @@ GetOffers (
   //
   Private->GotProxy[DHCP_ONLY_IX] = 1;
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TimeoutEvent
@@ -1522,8 +1522,8 @@ GetBINLAck (
   //
   //
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TimeoutEvent
@@ -1770,8 +1770,8 @@ TryFinishDORA (
   //
   //
   StatCode = gBS->CreateEvent (
-                    EFI_EVENT_TIMER,
-                    EFI_TPL_CALLBACK,
+                    EVT_TIMER,
+                    TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TimeoutEvent
@@ -2599,8 +2599,8 @@ Returns:
     //
     //
     StatCode = gBS->CreateEvent (
-                      EFI_EVENT_TIMER,
-                      EFI_TPL_CALLBACK,
+                      EVT_TIMER,
+                      TPL_CALLBACK,
                       NULL,
                       NULL,
                       &TimeoutEvent

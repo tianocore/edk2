@@ -167,7 +167,7 @@ Returns:
     //
     if (Delta < 1000) {
 
-      OriginalTPL = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+      OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
       //
       //  Inform the firmware of an "timer interrupt".  The time

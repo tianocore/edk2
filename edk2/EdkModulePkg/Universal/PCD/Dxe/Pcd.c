@@ -17,7 +17,7 @@ Module Name: Pcd.c
 
 #include "Service.h"
 
-EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(EFI_TPL_CALLBACK);
+EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_CALLBACK);
 
 PCD_PROTOCOL mPcdInstance = {
   DxePcdSetSku,

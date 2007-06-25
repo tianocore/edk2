@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Data Hub filter driver that takes DEBUG () info from Data Hub and writes it 
+  Data Hub filter driver that takes DEBUG () info from Data Hub and writes it
   to StdErr if it exists.
 
 --*/
@@ -42,7 +42,7 @@ Routine Description:
 Arguments:
   Event    - The event that occured, not used
   Context  - DataHub Protocol Pointer
-  
+
 Returns:
   None.
 
@@ -119,9 +119,9 @@ Arguments:
 Returns:
 
   EFI_SUCCESS             - The event handler was registered.
-  EFI_OUT_OF_RESOURCES    - The event hadler was not registered due to lack of 
+  EFI_OUT_OF_RESOURCES    - The event hadler was not registered due to lack of
                             system resources.
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -137,8 +137,8 @@ Returns:
   // Create an event and register it with the filter driver
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   DataHubStdErrEventHandler,
                   mDataHub,
                   &mDataHubStdErrEvent
@@ -151,7 +151,7 @@ Returns:
   Status = mDataHub->RegisterFilterDriver (
                       mDataHub,
                       mDataHubStdErrEvent,
-                      EFI_TPL_CALLBACK,
+                      TPL_CALLBACK,
                       DataClass,
                       NULL
                       );

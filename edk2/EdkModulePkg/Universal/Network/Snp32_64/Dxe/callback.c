@@ -112,7 +112,7 @@ Returns:
   // created at a lower level (TPL_CALLBACK) it gives an assert!
   //
   if (mInitializeLock) {
-    EfiInitializeLock (&mLock, EFI_TPL_NOTIFY);
+    EfiInitializeLock (&mLock, TPL_NOTIFY);
     mInitializeLock = FALSE;
   }
 

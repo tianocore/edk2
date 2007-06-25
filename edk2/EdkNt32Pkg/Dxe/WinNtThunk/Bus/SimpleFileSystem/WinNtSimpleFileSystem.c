@@ -478,7 +478,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private     = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1081,7 +1081,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1143,7 +1143,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1277,7 +1277,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1486,7 +1486,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1560,7 +1560,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1648,7 +1648,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   PrivateFile   = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   PositionHigh  = 0;
@@ -1913,7 +1913,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot = WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -2115,7 +2115,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Initialise locals.
@@ -2643,7 +2643,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = gBS->RaiseTPL (EFI_TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   PrivateFile = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 

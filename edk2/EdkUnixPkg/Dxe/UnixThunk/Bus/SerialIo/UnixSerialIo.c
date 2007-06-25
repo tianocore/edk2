@@ -770,7 +770,7 @@ Returns:
   EFI_TPL                      Tpl;
   UINTN                        UnixStatus;
 
-  Tpl         = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl         = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private     = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -844,7 +844,7 @@ Returns:
   EFI_TPL                       Tpl;
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
   Private = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
   //
@@ -1037,7 +1037,7 @@ Returns:
   struct termios              Options;
   EFI_TPL                     Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1119,7 +1119,7 @@ Returns:
   EFI_TPL                     Tpl;
   UINTN                       Bytes;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
   Result  = Private->UnixThunk->IoCtl (Private->UnixHandle, TIOCMGET, &Status);
@@ -1218,7 +1218,7 @@ Returns:
   UINT32                        Control;
   EFI_TPL                       Tpl;
 
-  Tpl               = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl               = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private           = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This); 
 
@@ -1309,7 +1309,7 @@ Returns:
   UINT32                        Control;
   EFI_TPL                       Tpl;
 
-  Tpl     = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+  Tpl     = gBS->RaiseTPL (TPL_NOTIFY);
 
   Private = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
 

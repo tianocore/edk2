@@ -342,7 +342,7 @@ Returns:
   //
   for (Link = mRuntime.EventHead.ForwardLink; Link != &mRuntime.EventHead; Link = Link->ForwardLink) {
     RuntimeEvent = _CR (Link, EFI_RUNTIME_EVENT_ENTRY, Link);
-    if ((RuntimeEvent->Type & EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) == EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
+    if ((RuntimeEvent->Type & EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) == EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
       RuntimeEvent->NotifyFunction (
                       RuntimeEvent->Event,
                       RuntimeEvent->NotifyContext

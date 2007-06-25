@@ -60,7 +60,7 @@ EfiCreateEventLegacyBoot (
   )
 {
   return EfiCreateEventLegacyBootEx (
-           EFI_TPL_CALLBACK,
+           TPL_CALLBACK,
            InternalEmptyFuntion,
            NULL,
            LegacyBootEvent
@@ -104,7 +104,7 @@ EfiCreateEventLegacyBootEx (
     // prior to UEFI 2.0 use Tiano extension to EFI
     //
     Status = gBS->CreateEvent (
-                    EFI_EVENT_SIGNAL_LEGACY_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL,
+                    EFI_EVENT_SIGNAL_LEGACY_BOOT | EVT_NOTIFY_SIGNAL,
                     NotifyTpl,
                     NotifyFunction,
                     NotifyContext,
@@ -115,7 +115,7 @@ EfiCreateEventLegacyBootEx (
     // For UEFI 2.0 and the future use an Event Group
     //
     Status = gBS->CreateEventEx (
-                    EVENT_NOTIFY_SIGNAL,
+                    EVT_NOTIFY_SIGNAL,
                     NotifyTpl,
                     NotifyFunction,
                     NotifyContext,
@@ -150,7 +150,7 @@ EfiCreateEventReadyToBoot (
   )
 {
   return EfiCreateEventReadyToBootEx (
-           EFI_TPL_CALLBACK,
+           TPL_CALLBACK,
            InternalEmptyFuntion,
            NULL,
            ReadyToBootEvent
@@ -205,7 +205,7 @@ EfiCreateEventReadyToBootEx (
     // For UEFI 2.0 and the future use an Event Group
     //
     Status = gBS->CreateEventEx (
-                    EVENT_NOTIFY_SIGNAL,
+                    EVT_NOTIFY_SIGNAL,
                     NotifyTpl,
                     NotifyFunction,
                     NotifyContext,

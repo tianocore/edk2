@@ -22,7 +22,7 @@ Abstract:
 #ifndef _EXEC_H_
 #define _EXEC_H_
 
-#define VALID_TPL(a)            ((a) <= EFI_TPL_HIGH_LEVEL)
+#define VALID_TPL(a)            ((a) <= TPL_HIGH_LEVEL)
 
 //
 // EFI_EVENT

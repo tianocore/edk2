@@ -253,7 +253,7 @@ Returns:
   //
   if (HcDev->Is64BitCapable != 0) {
   	HcDev->High32BitAddr = (UINT32) GET_32B_TO_63B (FrameBuffer);
-	
+
   	Status = SetCtrlDataStructSeg (HcDev);
     if (EFI_ERROR (Status)) {
       DEBUG ((gEHCErrorLevel, "EHCI: SetCtrlDataStructSeg Failed\n"));
@@ -347,8 +347,8 @@ Returns:
 --*/
 {
   return gBS->CreateEvent (
-                EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                EFI_TPL_NOTIFY,
+                EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                TPL_NOTIFY,
                 NotifyFunction,
                 HcDev,
                 &HcDev->AsyncRequestEvent
@@ -1868,7 +1868,7 @@ Returns:
   QhPtr->Qh.HeadReclamationFlag = FALSE;
 
   if (QhPtr->TransferType == ASYNC_INTERRUPT_TRANSFER) {
-  	
+
     //
     // AsyncInterruptTransfer Qh
     //
@@ -2596,7 +2596,7 @@ Returns:
     break;
 
   default:
-  	
+
     Status = EFI_INVALID_PARAMETER;
   }
 

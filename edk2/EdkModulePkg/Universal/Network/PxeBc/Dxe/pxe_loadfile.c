@@ -1,17 +1,17 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   pxe_loadfile.c
-  
+
 Abstract:
   An implementation of the load file protocol for network devices.
 
@@ -65,9 +65,9 @@ Arguments:
 
 Returns:
 
-  EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE - 
+  EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE -
   EFI_PXE_BASE_CODE_CALLBACK_STATUS_ABORT -
-  
+
 --*/
 {
   STATIC UINTN  Propeller;
@@ -173,7 +173,7 @@ Arguments:
 Returns:
 
   None
-  
+
 --*/
 {
   if (Ptr != NULL) {
@@ -199,7 +199,7 @@ Arguments:
 Returns:
 
   None
-  
+
 --*/
 {
   EFI_PXE_BASE_CODE_MODE  *PxeBcMode;
@@ -276,11 +276,11 @@ Arguments:
 
 Returns:
 
-  AUTO_SELECT - 
+  AUTO_SELECT -
   DO_MENU -
-  NO_MENU - 
-  LOCAL_BOOT - 
-  
+  NO_MENU -
+  LOCAL_BOOT -
+
 --*/
 {
   EFI_STATUS  Status;
@@ -307,8 +307,8 @@ Returns:
   //
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
-                  EFI_TPL_CALLBACK,
+                  EVT_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &TimeoutEvent
@@ -332,8 +332,8 @@ Returns:
   //
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
-                  EFI_TPL_CALLBACK,
+                  EVT_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &SecondsEvent
@@ -375,7 +375,7 @@ Returns:
 
   gST->ConOut->SetCursorPosition (gST->ConOut, SecColumn, SecRow);
   AsciiPrint ("(%d) ", SecsLeft);
-  
+
   //
   // set the default action to be AUTO_SELECT
   //
@@ -507,9 +507,9 @@ Arguments:
 
 Returns:
 
-  NO_MENU - 
-  LOCAL_BOOT - 
-  
+  NO_MENU -
+  LOCAL_BOOT -
+
 --*/
 {
   PXE_OP_DISCOVERY_CONTROL  *DiscoveryControlPtr;
@@ -804,7 +804,7 @@ Arguments:
 Returns:
 
   Value from DHCP option
-  
+
 --*/
 {
   if (OpPtr->Header.Length == 1) {
@@ -836,7 +836,7 @@ Arguments:
 Returns:
 
   Pointer to opcode, may be NULL
-  
+
 --*/
 {
   if (BufferPtr == NULL) {
@@ -889,7 +889,7 @@ Arguments:
 Returns:
 
   Pointer to option in packet
-  
+
 --*/
 {
   UINTN PacketLen;
@@ -1234,9 +1234,9 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS - 
-  EFI_NOT_READY - 
-  
+  EFI_SUCCESS -
+  EFI_NOT_READY -
+
 --*/
 {
   EFI_PXE_BASE_CODE_MODE      *PxeBcMode;
@@ -1363,7 +1363,7 @@ Arguments:
   This -  Pointer to Loadfile interface
   FilePath - Not used and not checked
   BootPolicy - Must be TRUE
-  BufferSize - Pointer to buffer size 
+  BufferSize - Pointer to buffer size
   Buffer - Pointer to download buffer or NULL
 
 Returns:

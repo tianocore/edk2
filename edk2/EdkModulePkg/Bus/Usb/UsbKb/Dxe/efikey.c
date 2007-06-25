@@ -1,18 +1,18 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   EfiKey.c
-    
+
 Abstract:
 
   USB Keyboard Driver
@@ -80,18 +80,18 @@ USBKeyboardDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 /*++
-  
+
   Routine Description:
     Supported.
-    
+
   Arguments:
     This          - EFI_DRIVER_BINDING_PROTOCOL
     Controller    - Controller handle
-    RemainingDevicePath - EFI_DEVICE_PATH_PROTOCOL 
+    RemainingDevicePath - EFI_DEVICE_PATH_PROTOCOL
   Returns:
     EFI_STATUS
-  
---*/ 
+
+--*/
 {
   EFI_STATUS          OpenStatus;
   EFI_USB_IO_PROTOCOL *UsbIo;
@@ -111,7 +111,7 @@ USBKeyboardDriverBindingSupported (
   if (EFI_ERROR (OpenStatus)) {
     return OpenStatus;
   }
-   
+
   //
   // Use the USB I/O protocol interface to check whether the Controller is
   // the Keyboard controller that can be managed by this driver.
@@ -140,10 +140,10 @@ USBKeyboardDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 /*++
-  
+
   Routine Description:
     Start.
-  
+
   Arguments:
     This       - EFI_DRIVER_BINDING_PROTOCOL
     Controller - Controller handle
@@ -152,8 +152,8 @@ USBKeyboardDriverBindingStart (
     EFI_SUCCESS          - Success
     EFI_OUT_OF_RESOURCES - Can't allocate memory
     EFI_UNSUPPORTED      - The Start routine fail
---*/       
-{ 
+--*/
+{
   EFI_STATUS                    Status;
   EFI_USB_IO_PROTOCOL           *UsbIo;
   USB_KB_DEV                    *UsbKeyboardDevice;
@@ -164,7 +164,7 @@ USBKeyboardDriverBindingStart (
   UINT8                         PollingInterval;
   UINT8                         PacketSize;
   BOOLEAN                       Found;
-  
+
   UsbKeyboardDevice = NULL;
   Found             = FALSE;
 
@@ -283,8 +283,8 @@ USBKeyboardDriverBindingStart (
   UsbKeyboardDevice->SimpleInput.Reset          = USBKeyboardReset;
   UsbKeyboardDevice->SimpleInput.ReadKeyStroke  = USBKeyboardReadKeyStroke;
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   USBKeyboardWaitForKey,
                   UsbKeyboardDevice,
                   &(UsbKeyboardDevice->SimpleInput.WaitForKey)
@@ -300,7 +300,7 @@ USBKeyboardDriverBindingStart (
           );
     return Status;
   }
-       
+
   //
   // Install simple txt in protocol interface
   // for the usb keyboard device.
@@ -328,7 +328,7 @@ USBKeyboardDriverBindingStart (
           );
     return Status;
   }
-    
+
   //
   // Reset USB Keyboard Device
   //
@@ -414,19 +414,19 @@ USBKeyboardDriverBindingStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
 /*++
-  
+
   Routine Description:
     Stop.
-  
+
   Arguments:
     This              - EFI_DRIVER_BINDING_PROTOCOL
     Controller        - Controller handle
     NumberOfChildren  - Child handle number
-    ChildHandleBuffer - Child handle buffer 
+    ChildHandleBuffer - Child handle buffer
   Returns:
     EFI_SUCCESS       - Success
-    EFI_UNSUPPORTED   - Can't support 
---*/       
+    EFI_UNSUPPORTED   - Can't support
+--*/
 {
   EFI_STATUS                  Status;
   EFI_SIMPLE_TEXT_IN_PROTOCOL *SimpleInput;
@@ -443,7 +443,7 @@ USBKeyboardDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Get USB_KB_DEV instance.
   //
@@ -522,17 +522,17 @@ USBKeyboardReset (
 
   Routine Description:
     Implements EFI_SIMPLE_TEXT_IN_PROTOCOL.Reset() function.
-  
+
   Arguments:
     This      The EFI_SIMPLE_TEXT_IN_PROTOCOL instance.
     ExtendedVerification
               Indicates that the driver may perform a more exhaustive
-              verification operation of the device during reset.              
-    
-  Returns:  
+              verification operation of the device during reset.
+
+  Returns:
     EFI_SUCCESS      - Success
     EFI_DEVICE_ERROR - Hardware Error
---*/      
+--*/
 {
   EFI_STATUS          Status;
   USB_KB_DEV          *UsbKeyboardDevice;
@@ -563,7 +563,7 @@ USBKeyboardReset (
     UsbKeyboardDevice->CurKeyChar = 0;
     return EFI_SUCCESS;
   }
-  
+
   //
   // Exhaustive reset
   //
@@ -587,15 +587,15 @@ USBKeyboardReadKeyStroke (
 
   Routine Description:
     Implements EFI_SIMPLE_TEXT_IN_PROTOCOL.ReadKeyStroke() function.
-  
+
   Arguments:
     This     The EFI_SIMPLE_TEXT_IN_PROTOCOL instance.
     Key      A pointer to a buffer that is filled in with the keystroke
              information for the key that was pressed.
-    
-  Returns:  
+
+  Returns:
     EFI_SUCCESS - Success
---*/       
+--*/
 {
   USB_KB_DEV  *UsbKeyboardDevice;
   EFI_STATUS  Status;
@@ -640,15 +640,15 @@ USBKeyboardWaitForKey (
 /*++
 
   Routine Description:
-    Handler function for WaitForKey event.    
-  
+    Handler function for WaitForKey event.
+
   Arguments:
     Event        Event to be signaled when a key is pressed.
     Context      Points to USB_KB_DEV instance.
-    
-  Returns:  
+
+  Returns:
     VOID
---*/       
+--*/
 {
   USB_KB_DEV  *UsbKeyboardDevice;
 
@@ -676,13 +676,13 @@ USBKeyboardCheckForKey (
 
   Routine Description:
     Check whether there is key pending.
-  
+
   Arguments:
     UsbKeyboardDevice    The USB_KB_DEV instance.
-    
-  Returns:  
+
+  Returns:
     EFI_SUCCESS  - Success
---*/       
+--*/
 {
   EFI_STATUS  Status;
   UINT8       KeyChar;

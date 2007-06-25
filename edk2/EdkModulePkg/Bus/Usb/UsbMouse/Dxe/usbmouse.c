@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:
 
@@ -127,7 +127,7 @@ USBMouseDriverBindingSupported (
   if (OpenStatus == EFI_ALREADY_STARTED) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   //
   // Use the USB I/O protocol interface to see the Controller is
   // the Mouse controller that can be managed by this driver.
@@ -283,8 +283,8 @@ USBMouseDriverBindingStart (
   UsbMouseDevice->SimplePointerProtocol.Mode      = &UsbMouseDevice->Mode;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   UsbMouseWaitForInput,
                   UsbMouseDevice,
                   &((UsbMouseDevice->SimplePointerProtocol).WaitForInput)
@@ -304,13 +304,13 @@ USBMouseDriverBindingStart (
     Status = EFI_DEVICE_ERROR;
     goto ErrorExit;
   }
-  
+
   //
   // After Enabling Async Interrupt Transfer on this mouse Device
   // we will be able to get key data from it. Thus this is deemed as
   // the enable action of the mouse
   //
-  
+
   MouseReportStatusCode (
     UsbMouseDevice->DevicePath,
     EFI_PROGRESS_CODE,
@@ -677,8 +677,8 @@ InitializeUsbMouseDevice (
   }
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_NOTIFY,
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
                   USBMouseRecoveryHandler,
                   UsbMouseDev,
                   &UsbMouseDev->DelayedRecoveryEvent
@@ -805,11 +805,11 @@ GetMouseState (
 
   Routine Description:
     Get the mouse state, see SIMPLE POINTER PROTOCOL.
-    
+
   Arguments:
     This              - Protocol instance pointer.
     MouseState        - Current mouse state
-    
+
   Returns:
     EFI_SUCCESS
     EFI_DEVICE_ERROR
@@ -858,11 +858,11 @@ UsbMouseReset (
 
   Routine Description:
     Reset the mouse device, see SIMPLE POINTER PROTOCOL.
-    
+
   Arguments:
     This                  - Protocol instance pointer.
     ExtendedVerification  - Ignored here/
-    
+
   Returns:
     EFI_SUCCESS
 
@@ -928,17 +928,17 @@ USBMouseRecoveryHandler (
   IN    VOID         *Context
   )
 /*++
-  
+
   Routine Description:
     Timer handler for Delayed Recovery timer.
-    
+
   Arguments:
     Event   -  The Delayed Recovery event.
     Context -  Points to the USB_KB_DEV instance.
-    
+
   Returns:
-  
---*/    
+
+--*/
 {
   USB_MOUSE_DEV       *UsbMouseDev;
   EFI_USB_IO_PROTOCOL *UsbIo;

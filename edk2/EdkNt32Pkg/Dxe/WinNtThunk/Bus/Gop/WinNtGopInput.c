@@ -323,7 +323,7 @@ WinNtGopInitializeSimpleTextInForWindow (
   Private->SimpleTextIn.ReadKeyStroke = WinNtGopSimpleTextInReadKeyStroke;
 
   Status = gBS->CreateEvent (
-                  EVENT_NOTIFY_WAIT,
+                  EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
                   WinNtGopSimpleTextInWaitForKey,
                   Private,

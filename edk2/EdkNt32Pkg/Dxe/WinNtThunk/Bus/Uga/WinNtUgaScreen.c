@@ -362,7 +362,7 @@ WinNtUgaBlt (
     // We would not want a timer based event (Cursor, ...) to come in while we are
     // doing this operation.
     //
-    OriginalTPL = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+    OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
     for (SrcY = SourceY, DstY = DestinationY; DstY < (Height + DestinationY); SrcY++, DstY++) {
       Blt = (EFI_UGA_PIXEL *) ((UINT8 *) BltBuffer + (DstY * Delta) + DestinationX * sizeof (EFI_UGA_PIXEL));
@@ -386,7 +386,7 @@ WinNtUgaBlt (
     // We would not want a timer based event (Cursor, ...) to come in while we are
     // doing this operation.
     //
-    OriginalTPL = gBS->RaiseTPL (EFI_TPL_NOTIFY);
+    OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
     if (BltOperation == EfiUgaVideoFill) {
       FillPixel = BltBuffer;
@@ -851,8 +851,8 @@ Returns:
   // Register to be notified on exit boot services so we can destroy the window.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                  EFI_TPL_CALLBACK,
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
                   KillNtUgaThread,
                   Private,
                   &mUgaScreenExitBootServicesEvent

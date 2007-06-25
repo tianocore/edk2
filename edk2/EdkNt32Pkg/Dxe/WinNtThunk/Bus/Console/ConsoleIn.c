@@ -345,8 +345,8 @@ Returns:
   Private->SimpleTextIn.ReadKeyStroke = WinNtSimpleTextInReadKeyStroke;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_WAIT,
-                  EFI_TPL_NOTIFY,
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
                   WinNtSimpleTextInWaitForKey,
                   Private,
                   &Private->SimpleTextIn.WaitForKey

@@ -285,7 +285,7 @@ Returns:
       //
       // else remove the previously installed handler
       //
-      OldTpl          = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+      OldTpl          = gBS->RaiseTPL (TPL_HIGH_LEVEL);
       InterruptFlags  = ProgramInterruptFlags (DISABLE_INTERRUPTS);
       if (ExceptionType == EXCEPT_IPF_EXTERNAL_INTERRUPT) {
         UnchainExternalInterrupt ();
@@ -305,7 +305,7 @@ Returns:
     // no user handler installed on this vector
     //
     if (NewCallback != NULL) {
-      OldTpl          = gBS->RaiseTPL (EFI_TPL_HIGH_LEVEL);
+      OldTpl          = gBS->RaiseTPL (TPL_HIGH_LEVEL);
       InterruptFlags  = ProgramInterruptFlags (DISABLE_INTERRUPTS);
       if (ExceptionType == EXCEPT_IPF_EXTERNAL_INTERRUPT) {
         ChainExternalInterrupt (NewCallback);

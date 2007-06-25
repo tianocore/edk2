@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -114,7 +114,7 @@ UnixEnableInterrupt (
 Routine Description:
 
   This routine provides support for emulation of the interrupt enable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -148,7 +148,7 @@ UnixDisableInterrupt (
 Routine Description:
 
   This routine provides support for emulation of the interrupt disable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -183,7 +183,7 @@ UnixGetInterruptState (
 Routine Description:
 
   This routine provides support for emulation of the interrupt disable of the
-  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer 
+  the system.  For our purposes, CPU enable is just a BOOLEAN that the Timer
   Architectural Protocol observes in order to defer behaviour while in its
   emulated interrupt, or timer tick.
 
@@ -223,8 +223,8 @@ UnixInit (
 
 Routine Description:
 
-  This routine would support generation of a CPU INIT.  At 
-  present, this code does not provide emulation.  
+  This routine would support generation of a CPU INIT.  At
+  present, this code does not provide emulation.
 
 Arguments:
 
@@ -258,8 +258,8 @@ UnixRegisterInterruptHandler (
 
 Routine Description:
 
-  This routine would support registration of an interrupt handler.  At 
-  present, this code does not provide emulation.  
+  This routine would support registration of an interrupt handler.  At
+  present, this code does not provide emulation.
 
 Arguments:
 
@@ -305,8 +305,8 @@ UnixGetTimerValue (
 
 Routine Description:
 
-  This routine would support querying of an on-CPU timer.  At present, 
-  this code does not provide timer emulation.  
+  This routine would support querying of an on-CPU timer.  At present,
+  this code does not provide timer emulation.
 
 Arguments:
 
@@ -325,7 +325,7 @@ Returns:
   if (TimerValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // No timer supported
   //
@@ -345,8 +345,8 @@ UnixSetMemoryAttributes (
 
 Routine Description:
 
-  This routine would support querying of an on-CPU timer.  At present, 
-  this code does not provide timer emulation.  
+  This routine would support querying of an on-CPU timer.  At present,
+  this code does not provide timer emulation.
 
 Arguments:
 
@@ -405,7 +405,7 @@ Returns:
 
   Status
 
-  EFI_SUCCESS           - protocol instance can be published 
+  EFI_SUCCESS           - protocol instance can be published
   EFI_OUT_OF_RESOURCES  - cannot allocate protocol data structure
   EFI_DEVICE_ERROR      - cannot create the thread
 
@@ -458,8 +458,8 @@ Returns:
   // Install notify function to store processor data to HII database and data hub.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
                   UnixIoProtocolNotifyFunction,
                   ImageHandle,
                   &Event
@@ -479,7 +479,7 @@ Returns:
   DEBUG ((EFI_D_ERROR, "CPU Architectural Protocol Loaded\n"));
 
 
-  
+
   return Status;
 }
 
@@ -495,8 +495,8 @@ Routine Description:
 Arguments:
   String - Unicode string.
 
-Returns: 
-  UINTN of the number represented by String.  
+Returns:
+  UINTN of the number represented by String.
 
 --*/
 {

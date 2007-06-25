@@ -216,8 +216,8 @@ Returns:
     // Create the event
     //
     Status = CoreCreateEvent (
-              EFI_EVENT_NOTIFY_SIGNAL,
-              EFI_TPL_CALLBACK,
+              EVT_NOTIFY_SIGNAL,
+              TPL_CALLBACK,
               GenericArchProtocolNotify,
               NULL,
               &Entry->Event

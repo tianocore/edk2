@@ -28,7 +28,7 @@ Revision History
 //
 // MemoryLock - synchronizes access to the memory map and pool lists
 //
-EFI_LOCK          gMemoryLock = EFI_INITIALIZE_LOCK_VARIABLE (EFI_TPL_NOTIFY);
+EFI_LOCK          gMemoryLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 //
 // MemoryMap - the current memory map
