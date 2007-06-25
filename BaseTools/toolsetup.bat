@@ -78,24 +78,24 @@ echo EDK_TOOLS_PATH = %EDK_TOOLS_PATH%
 echo.
 
 REM
-REM copy *.template to %EDK_TOOLS_PATH%\Conf
+REM copy *.template to %WORKSPACE%\Conf
 REM
-if NOT exist %EDK_TOOLS_PATH%\Conf mkdir %EDK_TOOLS_PATH%\Conf
-if NOT exist %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.db (
-  echo copying ... FrameworkDatabase.template to %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.db
-  copy %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.db > nul
+if NOT exist %WORKSPACE%\Conf mkdir %WORKSPACE%\Conf
+if NOT exist %WORKSPACE%\Conf\FrameworkDatabase.db (
+  echo copying ... FrameworkDatabase.template to %WORKSPACE%\Conf\FrameworkDatabase.db
+  copy %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %WORKSPACE%\Conf\FrameworkDatabase.db > nul
 )
-if NOT exist %EDK_TOOLS_PATH%\Conf\target.txt (
-  echo copying ... target.template to %EDK_TOOLS_PATH%\Conf\target.txt
-  copy %EDK_TOOLS_PATH%\Conf\target.template %EDK_TOOLS_PATH%\Conf\target.txt > nul
+if NOT exist %WORKSPACE%\Conf\target.txt (
+  echo copying ... target.template to %WORKSPACE%\Conf\target.txt
+  copy %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
 )
-if NOT exist %EDK_TOOLS_PATH%\Conf\tools_def.txt (
-  echo copying ... tools_def.template to %EDK_TOOLS_PATH%\Conf\tools_def.txt
-  copy %EDK_TOOLS_PATH%\Conf\tools_def.template %EDK_TOOLS_PATH%\Conf\tools_def.txt > nul
+if NOT exist %WORKSPACE%\Conf\tools_def.txt (
+  echo copying ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
+  copy %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
 )
-if NOT exist %EDK_TOOLS_PATH%\Conf\build_rule.txt (
-  echo copying ... build_rule.template to %EDK_TOOLS_PATH%\Conf\build_rule.txt
-  copy %EDK_TOOLS_PATH%\Conf\build_rule.template %EDK_TOOLS_PATH%\Conf\build_rule.txt > nul
+if NOT exist %WORKSPACE%\Conf\build_rule.txt (
+  echo copying ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
+  copy %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
 )
 
 REM

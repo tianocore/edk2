@@ -92,24 +92,24 @@ ToolChainFamilyMapping = {
 Makefile = {
 "nmake"	: {
 "C-Code"    : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
 ${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(MODULE_DIR)${sep}${fdir}${sep}${fname}
 ''',
 
 "AutoGen-Code"    : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${BEGIN}$(OUTPUT_DIR)${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
 ${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fname}
 ''',
 
 "Masm-Code" : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
 ${END}	"$(PP)" $(PP_FLAGS) $(INC) $(MODULE_DIR)${sep}${fdir}${sep}${fname} > $(@D)${sep}${fbase}.i
 	Trim -CONVERT $(@D)${sep}${fbase}.i
 	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.iii
 ''',
 
 "Iasm-Code" : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE_DIR)${sep}${dep}
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
 ${END}	"$(APP)" $(APP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)${sep}${fbase}.i
 	"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)${sep}${fbase}.i
 ''',
