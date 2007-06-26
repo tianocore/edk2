@@ -22,7 +22,7 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
-  PACKAGE_NAME                   = EdkModulePkg
+  PACKAGE_NAME                   = MdeModulePkg
   PACKAGE_GUID                   = BA0D78D6-2CAF-414b-BD4D-B6762A894288
   PACKAGE_VERSION                = 0.1
 
