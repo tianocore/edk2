@@ -23,11 +23,14 @@ Abstract:
 #define _SECURITY_STUB_ARCH_PROTOCOL_H
 
 
-
 //
-// Include common header file for this module.
+// Common header files for this module.
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Protocol/Security.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiDriverEntryPoint.h>
 
 //
 // Function prototypes

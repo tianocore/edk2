@@ -1,39 +1,24 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  DiskIo.c
-
-Abstract:
-
+/** @file
   DiskIo driver that layers it's self on every Block IO protocol in the system.
   DiskIo converts a block oriented device to a byte oriented device.
 
   ReadDisk may have to do reads that are not aligned on sector boundaries.
   There are three cases:
-
     UnderRun - The first byte is not on a sector boundary or the read request is
                less than a sector in length.
-
     Aligned  - A read of N contiguous sectors.
-
     OverRun  - The last byte is not on a sector boundary.
 
---*/
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include "DiskIo.h"
 
@@ -56,6 +41,20 @@ DISK_IO_PRIVATE_DATA        gDiskIoPrivateDataTemplate = {
   NULL
 };
 
+
+/**
+  Test to see if this driver supports ControllerHandle. 
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingSupported (
@@ -63,23 +62,6 @@ DiskIoDriverBindingSupported (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
-/*++
-
-  Routine Description:
-    Test to see if this driver supports ControllerHandle. Any ControllerHandle
-    than contains a BlockIo protocol can be supported.
-
-  Arguments:
-    This                - Protocol instance pointer.
-    ControllerHandle    - Handle of device to test.
-    RemainingDevicePath - Not used.
-
-  Returns:
-    EFI_SUCCESS         - This driver supports this device.
-    EFI_ALREADY_STARTED - This driver is already running on this device.
-    other               - This driver does not support this device.
-
---*/
 {
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
@@ -98,6 +80,7 @@ DiskIoDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Close the I/O Abstraction(s) used to perform the supported test.
   //
@@ -110,6 +93,21 @@ DiskIoDriverBindingSupported (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Start this driver on ControllerHandle by opening a Block IO protocol and
+  installing a Disk IO protocol on ControllerHandle.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStart (
@@ -117,23 +115,6 @@ DiskIoDriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
-/*++
-
-  Routine Description:
-    Start this driver on ControllerHandle by opening a Block IO protocol and
-    installing a Disk IO protocol on ControllerHandle.
-
-  Arguments:
-    This                - Protocol instance pointer.
-    ControllerHandle    - Handle of device to bind driver to.
-    RemainingDevicePath - Not used, always produce all possible children.
-
-  Returns:
-    EFI_SUCCESS         - This driver is added to ControllerHandle.
-    EFI_ALREADY_STARTED - This driver is already running on ControllerHandle.
-    other               - This driver does not support this device.
-
---*/
 {
   EFI_STATUS            Status;
   DISK_IO_PRIVATE_DATA  *Private;
@@ -154,6 +135,7 @@ DiskIoDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
   //
   // Initialize the Disk IO device instance.
   //
@@ -162,6 +144,7 @@ DiskIoDriverBindingStart (
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
+  
   //
   // Install protocol interfaces for the Disk IO device.
   //
@@ -190,6 +173,21 @@ ErrorExit:
   return Status;
 }
 
+
+/**
+  Stop this driver on ControllerHandle by removing Disk IO protocol and closing
+  the Block IO protocol on ControllerHandle.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStop (
@@ -198,24 +196,6 @@ DiskIoDriverBindingStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-    Stop this driver on ControllerHandle by removing Disk IO protocol and closing
-    the Block IO protocol on ControllerHandle.
-
-  Arguments:
-    This              - Protocol instance pointer.
-    ControllerHandle  - Handle of device to stop driver on.
-    NumberOfChildren  - Not used.
-    ChildHandleBuffer - Not used.
-
-  Returns:
-    EFI_SUCCESS         - This driver is removed ControllerHandle.
-    other               - This driver was not removed from this device.
-    EFI_UNSUPPORTED
-
---*/
 {
   EFI_STATUS            Status;
   EFI_DISK_IO_PROTOCOL  *DiskIo;
@@ -260,6 +240,31 @@ DiskIoDriverBindingStop (
   return Status;
 }
 
+
+
+/**
+  Read BufferSize bytes from Offset into Buffer.
+  Reads may support reads that are not aligned on
+  sector boundaries. There are three cases:
+    UnderRun - The first byte is not on a sector boundary or the read request is
+               less than a sector in length.
+    Aligned  - A read of N contiguous sectors.
+    OverRun  - The last byte is not on a sector boundary.
+
+  @param  This                  Protocol instance pointer.
+  @param  MediaId               Id of the media, changes every time the media is replaced.
+  @param  Offset                The starting byte offset to read from
+  @param  BufferSize            Size of Buffer
+  @param  Buffer                Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_INVALID_PARAMETER The read request contains device addresses that are not
+                                valid for the device.
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoReadDisk (
@@ -269,39 +274,6 @@ DiskIoReadDisk (
   IN UINTN                 BufferSize,
   OUT VOID                 *Buffer
   )
-/*++
-
-  Routine Description:
-    Read BufferSize bytes from Offset into Buffer.
-
-    Reads may support reads that are not aligned on
-    sector boundaries. There are three cases:
-
-      UnderRun - The first byte is not on a sector boundary or the read request is
-                 less than a sector in length.
-
-      Aligned  - A read of N contiguous sectors.
-
-      OverRun  - The last byte is not on a sector boundary.
-
-
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Offset     - The starting byte offset to read from.
-    BufferSize - Size of Buffer.
-    Buffer     - Buffer containing read data.
-
-  Returns:
-    EFI_SUCCESS           - The data was read correctly from the device.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the read.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHNAGED     - The MediaId does not matched the current device.
-    EFI_INVALID_PARAMETER - The read request contains device addresses that are not
-                            valid for the device.
-    EFI_OUT_OF_RESOURCES
-
---*/
 {
   EFI_STATUS            Status;
   DISK_IO_PRIVATE_DATA  *Private;
@@ -485,6 +457,32 @@ Done:
   return Status;
 }
 
+
+/**
+  Read BufferSize bytes from Offset into Buffer.
+  Writes may require a read modify write to support writes that are not
+  aligned on sector boundaries. There are three cases:
+    UnderRun - The first byte is not on a sector boundary or the write request
+               is less than a sector in length. Read modify write is required.
+    Aligned  - A write of N contiguous sectors.
+    OverRun  - The last byte is not on a sector boundary. Read modified write
+               required.
+
+  @param  This       Protocol instance pointer.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Offset     The starting byte offset to read from
+  @param  BufferSize Size of Buffer
+  @param  Buffer     Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_INVALID_PARAMETER The write request contains device addresses that are not
+                                 valid for the device.
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoWriteDisk (
@@ -494,40 +492,6 @@ DiskIoWriteDisk (
   IN UINTN                 BufferSize,
   IN VOID                  *Buffer
   )
-/*++
-
-  Routine Description:
-    Read BufferSize bytes from Offset into Buffer.
-
-    Writes may require a read modify write to support writes that are not
-    aligned on sector boundaries. There are three cases:
-
-      UnderRun - The first byte is not on a sector boundary or the write request
-                 is less than a sector in length. Read modify write is required.
-
-      Aligned  - A write of N contiguous sectors.
-
-      OverRun  - The last byte is not on a sector boundary. Read modified write
-                 required.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Offset     - The starting byte offset to read from.
-    BufferSize - Size of Buffer.
-    Buffer     - Buffer containing read data.
-
-  Returns:
-    EFI_SUCCESS           - The data was written correctly to the device.
-    EFI_WRITE_PROTECTED   - The device can not be written to.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the write.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHNAGED     - The MediaId does not matched the current device.
-    EFI_INVALID_PARAMETER - The write request contains device addresses that are not
-                            valid for the device.
-    EFI_OUT_OF_RESOURCES
-
---*/
 {
   EFI_STATUS            Status;
   DISK_IO_PRIVATE_DATA  *Private;
@@ -732,3 +696,42 @@ Done:
 
   return Status;
 }
+
+
+/**
+  The user Entry Point for module DiskIo. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeDiskIo (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallAllDriverProtocols (
+             ImageHandle,
+             SystemTable,
+             &gDiskIoDriverBinding,
+             ImageHandle,
+             &gDiskIoComponentName,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+
+  return Status;
+}
+

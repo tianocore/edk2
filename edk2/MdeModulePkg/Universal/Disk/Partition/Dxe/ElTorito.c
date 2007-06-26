@@ -1,33 +1,36 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  ElTorito.c
-
-Abstract:
-
+/** @file
   Decode an El Torito formatted CD-ROM
 
-Revision History
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
---*/
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+**/
+
 
 #include "Partition.h"
 
+
+/**
+  Install child handles if the Handle supports El Torito format.
+
+  @param[in]  This        Calling context.
+  @param[in]  Handle      Parent Handle
+  @param[in]  DiskIo      Parent DiskIo interface
+  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  DevicePath  Parent Device Path
+
+
+  @retval EFI_SUCCESS         Child handle(s) was added
+  @retval EFI_MEDIA_CHANGED   Media changed Detected
+  @retval other               no child handle was added
+
+**/
 EFI_STATUS
 PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -36,24 +39,6 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
-/*++
-
-Routine Description:
-  Install child handles if the Handle supports El Torito format.
-
-Arguments:
-  This       - Calling context.
-  Handle     - Parent Handle
-  DiskIo     - Parent DiskIo interface
-  BlockIo    - Parent BlockIo interface
-  DevicePath - Parent Device Path
-
-Returns:
-  EFI_SUCCESS       - some child handle(s) was added
-  EFI_MEDIA_CHANGED - Media changed Detected
-  !EFI_SUCCESS      - no child handle was added
-
---*/
 {
   EFI_STATUS              Status;
   UINT32                  VolDescriptorLba;

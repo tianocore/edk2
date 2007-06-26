@@ -1,31 +1,20 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Partition.c
-
-Abstract:
-
+/** @file
   Partition driver that produces logical BlockIo devices from a physical
   BlockIo device. The logical BlockIo devices are based on the format
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy
   MBR, and GPT partition schemes are supported.
 
---*/
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
+
 
 #include "Partition.h"
 
@@ -50,6 +39,21 @@ PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
 };
 
 
+
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a BlockIo and DiskIo protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingSupported (
@@ -57,23 +61,6 @@ PartitionDriverBindingSupported (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-    Test to see if this driver supports ControllerHandle. Any ControllerHandle
-    than contains a BlockIo and DiskIo protocol can be supported.
-
-  Arguments:
-    This                - Protocol instance pointer.
-    ControllerHandle    - Handle of device to test
-    RemainingDevicePath - Not used
-
-  Returns:
-    EFI_SUCCESS         - This driver supports this device
-    EFI_ALREADY_STARTED - This driver is already running on this device
-    EFI_UNSUPPORTED     - This driver does not support this device
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
@@ -160,6 +147,22 @@ PartitionDriverBindingSupported (
   return Status;
 }
 
+
+/**
+  Start this driver on ControllerHandle by opening a Block IO and Disk IO
+  protocol, reading Device Path, and creating a child handle with a
+  Disk IO and device path protocol.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingStart (
@@ -167,24 +170,6 @@ PartitionDriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-    Start this driver on ControllerHandle by opening a Block IO and Disk IO
-    protocol, reading Device Path, and creating a child handle with a
-    Disk IO and device path protocol.
-
-  Arguments:
-    This                - Protocol instance pointer.
-    ControllerHandle    - Handle of device to bind driver to
-    RemainingDevicePath - Not used
-
-  Returns:
-    EFI_SUCCESS         - This driver is added to DeviceHandle
-    EFI_ALREADY_STARTED - This driver is already running on DeviceHandle
-    other               - This driver does not support this device
-
---*/
 {
   EFI_STATUS                Status;
   EFI_STATUS                OpenStatus;
@@ -289,6 +274,21 @@ PartitionDriverBindingStart (
   return Status;
 }
 
+
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingStop (
@@ -297,23 +297,6 @@ PartitionDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-    Stop this driver on ControllerHandle. Support stoping any child handles
-    created by this driver.
-
-  Arguments:
-    This              - Protocol instance pointer.
-    ControllerHandle  - Handle of device to stop driver on
-    NumberOfChildren  - Number of Children in the ChildHandleBuffer
-    ChildHandleBuffer - List of handles for the children we need to stop.
-
-  Returns:
-    EFI_SUCCESS         - This driver is removed DeviceHandle
-    EFI_DEVICE_ERROR    - This driver was not removed from this device
-
---*/
 {
   EFI_STATUS              Status;
   UINTN                   Index;
@@ -407,6 +390,18 @@ PartitionDriverBindingStop (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Reset the Block Device.
+
+  @param  This                 Protocol instance pointer.
+  @param  ExtendedVerification Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -414,21 +409,6 @@ PartitionReset (
   IN EFI_BLOCK_IO_PROTOCOL  *This,
   IN BOOLEAN                ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the parent Block Device.
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could
-                            not be reset.
-
---*/
 {
   PARTITION_PRIVATE_DATA  *Private;
 
@@ -440,6 +420,26 @@ PartitionReset (
                                   );
 }
 
+
+/**
+  Read by using the Disk IO protocol on the parent device. Lba addresses
+  must be converted to byte offsets.
+
+  @param  This       Protocol instance pointer.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Lba        The starting Logical Block Address to read from
+  @param  BufferSize Size of Buffer, must be a multiple of device block size.
+  @param  Buffer     Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains device addresses that are not
+                                valid for the device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -450,30 +450,6 @@ PartitionReadBlocks (
   IN UINTN                  BufferSize,
   OUT VOID                  *Buffer
   )
-/*++
-
-  Routine Description:
-    Read by using the Disk IO protocol on the parent device. Lba addresses
-    must be converted to byte offsets.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Lba        - The starting Logical Block Address to read from
-    BufferSize - Size of Buffer, must be a multiple of device block size.
-    Buffer     - Buffer containing read data
-
-  Returns:
-    EFI_SUCCESS           - The data was read correctly from the device.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the read.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHANGED     - The MediaId does not matched the current device.
-    EFI_BAD_BUFFER_SIZE   - The Buffer was not a multiple of the block size of the
-                            device.
-    EFI_INVALID_PARAMETER - The read request contains device addresses that are not
-                            valid for the device.
-
---*/
 {
   PARTITION_PRIVATE_DATA  *Private;
   UINT64                  Offset;
@@ -496,6 +472,26 @@ PartitionReadBlocks (
   return Private->DiskIo->ReadDisk (Private->DiskIo, MediaId, Offset, BufferSize, Buffer);
 }
 
+/**
+  Write by using the Disk IO protocol on the parent device. Lba addresses
+  must be converted to byte offsets.
+
+  @param  This       Protocol instance pointer.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Lba        The starting Logical Block Address to read from
+  @param  BufferSize Size of Buffer, must be a multiple of device block size.
+  @param  Buffer     Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains a LBA that is not
+                                valid for the device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -506,31 +502,6 @@ PartitionWriteBlocks (
   IN UINTN                  BufferSize,
   OUT VOID                  *Buffer
   )
-/*++
-
-  Routine Description:
-    Write by using the Disk IO protocol on the parent device. Lba addresses
-    must be converted to byte offsets.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Lba        - The starting Logical Block Address to read from
-    BufferSize - Size of Buffer, must be a multiple of device block size.
-    Buffer     - Buffer containing read data
-
-  Returns:
-    EFI_SUCCESS           - The data was written correctly to the device.
-    EFI_WRITE_PROTECTED   - The device can not be written to.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the write.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHNAGED     - The MediaId does not matched the current device.
-    EFI_BAD_BUFFER_SIZE   - The Buffer was not a multiple of the block size of the
-                            device.
-    EFI_INVALID_PARAMETER - The write request contains a LBA that is not
-                            valid for the device.
-
---*/
 {
   PARTITION_PRIVATE_DATA  *Private;
   UINT64                  Offset;
@@ -553,26 +524,23 @@ PartitionWriteBlocks (
   return Private->DiskIo->WriteDisk (Private->DiskIo, MediaId, Offset, BufferSize, Buffer);
 }
 
+
+/**
+  Flush the parent Block Device.
+
+  @param  This              Protocol instance pointer.
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device
+  @retval EFI_DEVICE_ERROR  The device reported an error while writting back the data
+  @retval EFI_NO_MEDIA      There is no media in the device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
 PartitionFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   )
-/*++
-
-  Routine Description:
-    Flush the parent Block Device.
-
-  Arguments:
-    This             - Protocol instance pointer.
-
-  Returns:
-    EFI_SUCCESS      - All outstanding data was written to the device
-    EFI_DEVICE_ERROR - The device reported an error while writing back the data
-    EFI_NO_MEDIA     - There is no media in the device.
-
---*/
 {
   PARTITION_PRIVATE_DATA  *Private;
 
@@ -581,6 +549,28 @@ PartitionFlushBlocks (
   return Private->ParentBlockIo->FlushBlocks (Private->ParentBlockIo);
 }
 
+
+
+/**
+  Create a child handle for a logical block device that represents the
+  bytes Start to End of the Parent Block IO device.
+
+  @param[in]  This              Protocol instance pointer.
+  @param[in]  This              Calling context.
+  @param[in]  ParentHandle      Parent Handle for new child
+  @param[in]  ParentDiskIo      Parent DiskIo interface
+  @param[in]  ParentBlockIo     Parent BlockIo interface
+  @param[in]  ParentDevicePath  Parent Device Path
+  @param[in]  DevicePathNode    Child Device Path node
+  @param[in]  Start             Start Block
+  @param[in]  End               End Block
+  @param[in]  BlockSize         Child block size
+  @param[in]  InstallEspGuid    Flag to install EFI System Partition GUID on handle
+
+  @retval EFI_SUCCESS       A child handle was added
+  @retval other             A child handle was not added
+
+**/
 EFI_STATUS
 PartitionInstallChildHandle (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -594,29 +584,6 @@ PartitionInstallChildHandle (
   IN  UINT32                       BlockSize,
   IN  BOOLEAN                      InstallEspGuid
   )
-/*++
-
-Routine Description:
-  Create a child handle for a logical block device that represents the
-  bytes Start to End of the Parent Block IO device.
-
-Arguments:
-  This             - Calling context.
-  ParentHandle     - Parent Handle for new child
-  ParentDiskIo     - Parent DiskIo interface
-  ParentBlockIo    - Parent BlockIo interface
-  ParentDevicePath - Parent Device Path
-  DevicePathNode   - Child Device Path node
-  Start            - Start Block
-  End              - End Block
-  BlockSize        - Child block size
-  InstallEspGuid   - Flag to install EFI System Partition GUID on handle
-
-Returns:
-  EFI_SUCCESS - If a child handle was added
-  EFI_OUT_OF_RESOURCES  - A child handle was not added
-
---*/
 {
   EFI_STATUS              Status;
   PARTITION_PRIVATE_DATA  *Private;
@@ -704,3 +671,42 @@ Returns:
 
   return Status;
 }
+
+
+/**
+  The user Entry Point for module Partition. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializePartition (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallAllDriverProtocols (
+             ImageHandle,
+             SystemTable,
+             &gPartitionDriverBinding,
+             ImageHandle,
+             &gPartitionComponentName,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+
+  return Status;
+}
+

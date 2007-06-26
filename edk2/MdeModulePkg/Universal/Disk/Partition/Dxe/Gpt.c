@@ -1,33 +1,22 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Gpt.c
-
-Abstract:
-
+/** @file
   Decode a hard disk partitioned with the GPT scheme in the EFI 1.0
   specification.
 
---*/
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
+
 
 #include "Partition.h"
 
-STATIC
+
 BOOLEAN
 PartitionValidGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -36,7 +25,7 @@ PartitionValidGptTable (
   OUT EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
-STATIC
+
 BOOLEAN
 PartitionCheckGptEntryArrayCRC (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -44,7 +33,7 @@ PartitionCheckGptEntryArrayCRC (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
-STATIC
+
 BOOLEAN
 PartitionRestoreGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -52,7 +41,7 @@ PartitionRestoreGptTable (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
 
-STATIC
+
 VOID
 PartitionCheckGptEntry (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
@@ -60,7 +49,7 @@ PartitionCheckGptEntry (
   OUT EFI_PARTITION_ENTRY_STATUS  *PEntryStatus
   );
 
-STATIC
+
 BOOLEAN
 PartitionCheckCrcAltSize (
   IN UINTN                 MaxSize,
@@ -68,26 +57,40 @@ PartitionCheckCrcAltSize (
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
-STATIC
+
 BOOLEAN
 PartitionCheckCrc (
   IN UINTN                 MaxSize,
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
-STATIC
+
 VOID
 PartitionSetCrcAltSize (
   IN UINTN                 Size,
   IN OUT EFI_TABLE_HEADER  *Hdr
   );
 
-STATIC
+
 VOID
 PartitionSetCrc (
   IN OUT EFI_TABLE_HEADER *Hdr
   );
 
+/**
+  Install child handles if the Handle supports GPT partition structure.
+
+  @param[in]  This       - Calling context.
+  @param[in]  Handle     - Parent Handle
+  @param[in]  DiskIo     - Parent DiskIo interface
+  @param[in]  BlockIo    - Parent BlockIo interface
+  @param[in]  DevicePath - Parent Device Path
+
+  @retval EFI_SUCCESS         Valid GPT disk
+  @retval EFI_MEDIA_CHANGED   Media changed Detected
+  @retval other               Not a valid GPT disk
+
+**/
 EFI_STATUS
 PartitionInstallGptChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -96,24 +99,6 @@ PartitionInstallGptChildHandles (
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
-/*++
-
-Routine Description:
-  Install child handles if the Handle supports GPT partition structure.
-
-Arguments:
-  This       - Calling context.
-  Handle     - Parent Handle
-  DiskIo     - Parent DiskIo interface
-  BlockIo    - Parent BlockIo interface
-  DevicePath - Parent Device Path
-
-Returns:
-  EFI_SUCCESS  - Valid GPT disk
-  EFI_MEDIA_CHANGED - Media changed Detected
-  !EFI_SUCCESS - Not a valid GPT disk
-
---*/
 {
   EFI_STATUS                  Status;
   UINT32                      BlockSize;
@@ -333,7 +318,19 @@ Done:
   return GptValid;
 }
 
-STATIC
+
+/**
+  Install child handles if the Handle supports GPT partition structure.
+
+  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  DiskIo      Disk Io protocol.
+  @param[in]  Lba         The starting Lba of the Partition Table
+  @param[in]  PartHeader  Stores the partition table that is read
+
+  @retval TRUE      The partition table is valid
+  @retval FALSE     The partition table is not valid
+
+**/
 BOOLEAN
 PartitionValidGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
@@ -341,22 +338,6 @@ PartitionValidGptTable (
   IN  EFI_LBA                     Lba,
   OUT EFI_PARTITION_TABLE_HEADER  *PartHeader
   )
-/*++
-
-Routine Description:
-  Check if the GPT partition table is valid
-
-Arguments:
-  BlockIo   - Parent BlockIo interface
-  DiskIo    - Disk Io protocol.
-  Lba       - The starting Lba of the Partition Table
-  PartHeader   - Stores the partition table that is read
-
-Returns:
-  TRUE       - The partition table is valid
-  FALSE      - The partition table is not valid
-
---*/
 {
   EFI_STATUS                  Status;
   UINT32                      BlockSize;
@@ -405,32 +386,25 @@ Returns:
   return TRUE;
 }
 
-STATIC
+
+/**
+  Check if the CRC field in the Partition table header is valid
+  for Partition entry array.
+
+  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  DiskIo      Disk Io Protocol.
+  @param[in]  PartHeader  Partition table header structure
+
+  @retval TRUE      the CRC is valid
+  @retval FALSE     the CRC is invalid
+
+**/
 BOOLEAN
 PartitionCheckGptEntryArrayCRC (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
   IN  EFI_DISK_IO_PROTOCOL        *DiskIo,
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   )
-/*++
-
-Routine Description:
-
-  Check if the CRC field in the Partition table header is valid
-  for Partition entry array
-
-Arguments:
-
-  BlockIo   - parent BlockIo interface
-  DiskIo    - Disk Io Protocol.
-  PartHeader   - Partition table header structure
-
-Returns:
-
-  TRUE      - the CRC is valid
-  FALSE     - the CRC is invalid
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       *Ptr;
@@ -472,32 +446,25 @@ Returns:
   return (BOOLEAN) (PartHeader->PartitionEntryArrayCRC32 == Crc);
 }
 
-STATIC
+
+/**
+  Restore Partition Table to its alternate place
+  (Primary -> Backup or Backup -> Primary)
+
+  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  DiskIo      Disk Io Protocol.
+  @param[in]  PartHeader  Partition table header structure
+
+  @retval TRUE      Restoring succeeds
+  @retval FALSE     Restoring failed
+
+**/
 BOOLEAN
 PartitionRestoreGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
   IN  EFI_DISK_IO_PROTOCOL        *DiskIo,
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   )
-/*++
-
-Routine Description:
-
-  Restore Partition Table to its alternate place
-  (Primary -> Backup or Backup -> Primary)
-
-Arguments:
-
-  BlockIo   - parent BlockIo interface
-  DiskIo    - Disk Io Protocol.
-  PartHeader   - the source Partition table header structure
-
-Returns:
-
-  TRUE      - Restoring succeeds
-  FALSE     - Restoring failed
-
---*/
 {
   EFI_STATUS                  Status;
   UINTN                       BlockSize;
@@ -570,30 +537,22 @@ Done:
   return TRUE;
 }
 
-STATIC
+
+/**
+  Restore Partition Table to its alternate place
+  (Primary -> Backup or Backup -> Primary)
+
+  @param[in]    PartHeader    Partition table header structure
+  @param[in]    PartEntry     The partition entry array
+  @param[out]   PEntryStatus  the partition entry status array 
+                              recording the status of each partition
+**/
 VOID
 PartitionCheckGptEntry (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
   IN  EFI_PARTITION_ENTRY         *PartEntry,
   OUT EFI_PARTITION_ENTRY_STATUS  *PEntryStatus
   )
-/*++
-
-Routine Description:
-
-  Check each partition entry for its range
-
-Arguments:
-
-  PartHeader       - the partition table header
-  PartEntry        - the partition entry array
-  PEntryStatus  - the partition entry status array recording the status of
-                  each partition
-
-Returns:
-  VOID
-
---*/
 {
   EFI_LBA StartingLBA;
   EFI_LBA EndingLBA;
@@ -639,52 +598,35 @@ Returns:
   DEBUG ((EFI_D_INFO, " End check partition entries\n"));
 }
 
-STATIC
+
+/**
+  Updates the CRC32 value in the table header
+
+  @param[in,out]  Hdr    Table to update
+
+**/
 VOID
 PartitionSetCrc (
   IN OUT EFI_TABLE_HEADER *Hdr
   )
-/*++
-
-Routine Description:
-
-  Updates the CRC32 value in the table header
-
-Arguments:
-
-  Hdr     - The table to update
-
-Returns:
-
-  None
-
---*/
 {
   PartitionSetCrcAltSize (Hdr->HeaderSize, Hdr);
 }
 
-STATIC
+
+/**
+  Updates the CRC32 value in the table header
+
+  @param[in]      Size   The size of the table
+  @param[in,out]  Hdr    Table to update
+
+**/
 VOID
 PartitionSetCrcAltSize (
   IN UINTN                 Size,
   IN OUT EFI_TABLE_HEADER  *Hdr
   )
-/*++
 
-Routine Description:
-
-  Updates the CRC32 value in the table header
-
-Arguments:
-
-  Size    - The size of the table
-  Hdr     - The table to update
-
-Returns:
-
-  None
-
---*/
 {
   UINT32  Crc;
 
@@ -693,56 +635,44 @@ Returns:
   Hdr->CRC32 = Crc;
 }
 
-STATIC
+
+/**
+  Checks the CRC32 value in the table header
+
+  @param[in]      MaxSize   Max Size limit
+  @param[in,out]  Hdr       Table to check
+
+  @return TRUE    CRC Valid
+  @return FALSE   CRC Invalid
+
+**/
 BOOLEAN
 PartitionCheckCrc (
   IN UINTN                 MaxSize,
   IN OUT EFI_TABLE_HEADER  *Hdr
   )
-/*++
-
-Routine Description:
-
-  Checks the CRC32 value in the table header
-
-Arguments:
-
-  MaxSize - Max Size limit
-  Hdr     - The table to check
-
-Returns:
-
-  TRUE if the CRC is OK in the table
-
---*/
 {
   return PartitionCheckCrcAltSize (MaxSize, Hdr->HeaderSize, Hdr);
 }
 
-STATIC
+
+/**
+  Checks the CRC32 value in the table header
+
+  @param[in]      MaxSize   Max Size limit
+  @param[in]      Size      The size of the table
+  @param[in,out]  Hdr       Table to check
+
+  @return TRUE    CRC Valid
+  @return FALSE   CRC Invalid
+
+**/
 BOOLEAN
 PartitionCheckCrcAltSize (
   IN UINTN                 MaxSize,
   IN UINTN                 Size,
   IN OUT EFI_TABLE_HEADER  *Hdr
   )
-/*++
-
-Routine Description:
-
-  Checks the CRC32 value in the table header
-
-Arguments:
-
-  MaxSize - Max Size Limit
-  Size    - The size of the table
-  Hdr     - The table to check
-
-Returns:
-
-  TRUE if the CRC is OK in the table
-
---*/
 {
   UINT32      Crc;
   UINT32      OrgCrc;
