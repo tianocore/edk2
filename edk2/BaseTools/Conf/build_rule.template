@@ -82,36 +82,35 @@ ToolChainFamilyMapping = {
 
 ## Build rules for makefile
 # Placeholders for string substitution
-# 	${fdir}		File relative directory within a module
+#   ${fpath}  File path relative to $(WORKSPACE)
+#   ${fdir}  	File relative directory within a module
 #   ${fname}	File full name without path
 #   ${fbase}	File name without extension and path
-#   ${fext}     File extension
-#   ${dep}      Dependency file
-#   ${sep}      Directory separator
+#   ${fext}   File extension
+#   ${fdep}   File dependencies
+#   ${sep}    Directory separator
 #
 Makefile = {
 "nmake"	: {
 "C-Code"    : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
-${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(MODULE_DIR)${sep}${fdir}${sep}${fname}
-''',
-
-"AutoGen-Code"    : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
-${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fname}
+$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
+${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(WORKSPACE)${sep}${fpath}
 ''',
 
 "Masm-Code" : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
-${END}	"$(PP)" $(PP_FLAGS) $(INC) $(MODULE_DIR)${sep}${fdir}${sep}${fname} > $(@D)${sep}${fbase}.i
+$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
+${END}	"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
 	Trim -CONVERT $(@D)${sep}${fbase}.i
 	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.iii
 ''',
 
 "Iasm-Code" : '''\
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${dep}
-${END}	"$(APP)" $(APP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)${sep}${fbase}.i
-	"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)${sep}${fbase}.i
+$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
+${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
+	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.i
 ''',
 
 "Visual-Form-Representation" : 
