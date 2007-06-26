@@ -10,7 +10,7 @@
     </Description>
     <Copyright>Copyright (c) 2007,  Intel Corporation    All rights reserved.</Copyright>
     <License>
-      This program and the accompanying materials are licensed and made available 
+      This program and the accompanying materials are licensed and made available
       under the terms and conditions of the BSD License which accompanies this
       distribution.  The full text of the license may be found at:
         http://opensource.org/licenses/bsd-license.php
@@ -20,8 +20,8 @@
     <Specification>FRAMEWORK_PACKAGING_SPECIFICATION 0x00090000</Specification>
   </FdbHeader>
   <PackageList>
-    <Filename>MdePkg/MdePkg.spd</Filename>
-    <Filename>MdeModulePkg/MdeModulePkg.spd</Filename>
-    <Filename>ShellBinPkg/ShellBinPkg.spd</Filename>
+    <Filename>MdePkg/MdePkg.nspd</Filename>
+    <Filename>MdeModulePkg/MdeModulePkg.nspd</Filename>
+    <Filename>ShellBinPkg/ShellBinPkg.nspd</Filename>
   </PackageList>
 </FrameworkDatabase>
