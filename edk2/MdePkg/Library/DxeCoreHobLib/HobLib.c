@@ -29,7 +29,7 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 
-#include "InternalHobLib.h""
+#include "InternalHobLib.h"
 
 /**
   Returns the pointer to the HOB list.
@@ -51,7 +51,7 @@ GetHobList (
 /**
   Returns the next instance of a HOB type from the starting HOB.
 
-  This function searches the first instance of a HOB type from the starting HOB pointer. 
+  This function searches the first instance of a HOB type from the starting HOB pointer.
   If there does not exist such HOB type from the starting HOB pointer, it will return NULL.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
@@ -74,7 +74,7 @@ GetNextHob (
   EFI_PEI_HOB_POINTERS  Hob;
 
   ASSERT (HobStart != NULL);
-   
+
   Hob.Raw = (UINT8 *) HobStart;
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -91,8 +91,8 @@ GetNextHob (
 /**
   Returns the first instance of a HOB type among the whole HOB list.
 
-  This function searches the first instance of a HOB type among the whole HOB list. 
-  If there does not exist such HOB type in the HOB list, it will return NULL. 
+  This function searches the first instance of a HOB type among the whole HOB list.
+  If there does not exist such HOB type in the HOB list, it will return NULL.
 
   @param  Type          The HOB type to return.
 
@@ -112,10 +112,10 @@ GetFirstHob (
 }
 
 /**
-  This function searches the first instance of a HOB from the starting HOB pointer. 
-  Such HOB should satisfy two conditions: 
-  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
-  If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
   to extract the data section and its size info respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
@@ -150,7 +150,7 @@ GetNextGuidHob (
 }
 
 /**
-  This function searches the first instance of a HOB among the whole HOB list. 
+  This function searches the first instance of a HOB among the whole HOB list.
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
@@ -178,7 +178,7 @@ GetFirstGuidHob (
 /**
   Get the Boot Mode from the HOB list.
 
-  This function returns the system boot mode information from the 
+  This function returns the system boot mode information from the
   PHIT HOB in HOB list.
 
   @param  VOID
@@ -260,8 +260,8 @@ BuildResourceDescriptorHob (
 /**
   Builds a GUID HOB with a certain data length.
 
-  This function builds a customized HOB tagged with a GUID for identification 
-  and returns the start address of GUID HOB data so that caller can fill the customized data. 
+  This function builds a customized HOB tagged with a GUID for identification
+  and returns the start address of GUID HOB data so that caller can fill the customized data.
   The HOB Header and Name field is already stripped.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
