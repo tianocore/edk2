@@ -13,6 +13,9 @@
 
 **/
 
+#ifndef _DISK_IO_H_
+#define _DISK_IO_H_
+
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/ComponentName.h>
@@ -118,3 +121,4 @@ DiskIoComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
+#endif
