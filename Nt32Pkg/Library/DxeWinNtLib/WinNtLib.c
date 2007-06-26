@@ -11,18 +11,43 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  WinNtLib.h
+  WinNtLib.c
 
 Abstract:
 
-  Public include file for the WinNt Library
+  WinNt Library 
 
 --*/
 
-#ifndef __WIN_NT_LIB_H__
-#define __WIN_NT_LIB_H__
 
-#include <WinNtThunk.h>
-extern EFI_WIN_NT_THUNK_PROTOCOL  *gWinNt;
 
-#endif
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
+EFI_WIN_NT_THUNK_PROTOCOL *gWinNt;
+
+EFI_STATUS
+WinNtLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+Returns:
+
+--*/
+{
+  EFI_HOB_GUID_TYPE        *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gEfiWinNtThunkProtocolGuid);
+  ASSERT (GuidHob != NULL);
+  gWinNt = (EFI_WIN_NT_THUNK_PROTOCOL *)(*(UINTN *)(GET_GUID_HOB_DATA (GuidHob)));
+  ASSERT (gWinNt != NULL);
+  return EFI_SUCCESS;
+}

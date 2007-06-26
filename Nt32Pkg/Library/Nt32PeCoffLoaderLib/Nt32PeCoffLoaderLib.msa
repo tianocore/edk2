@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>Nt32PeCoffLoaderLib</ModuleName>
+    <ModuleType>PEIM</ModuleType>
+    <GuidValue>3c5702f2-9b17-4273-b60c-b96e6cd13066</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for the Nt32PeCoffLoaderLib library.</Abstract>
+    <Description>EdkPeCoffLoaderLib library class for NT32 instance implemented by PeiPeCoffLoader PPI.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>Nt32PeCoffLoaderLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED" SupModuleList="DXE_CORE PEIM">
+      <Keyword>EdkPeCoffLoaderLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Nt32PeCoffLoader.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <PPIs>
+    <Ppi Usage="ALWAYS_CONSUMED">
+      <PpiCName>gEfiPeiPeCoffLoaderGuid</PpiCName>
+    </Ppi>
+  </PPIs>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <Constructor>PeCoffLoaderConstructor</Constructor>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

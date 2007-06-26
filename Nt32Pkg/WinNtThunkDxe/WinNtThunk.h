@@ -11,18 +11,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  WinNtLib.h
+  WinNtThunk.h
 
 Abstract:
 
-  Public include file for the WinNt Library
-
 --*/
 
-#ifndef __WIN_NT_LIB_H__
-#define __WIN_NT_LIB_H__
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+#ifndef _WIN_NT_THUNK_H_
+#define _WIN_NT_THUNK_H_
 
-#include <WinNtThunk.h>
-extern EFI_WIN_NT_THUNK_PROTOCOL  *gWinNt;
+// TODO: add protective #ifndef
+
+
+//
+// WinNtThunk Device Path Protocol Instance Type
+//
+typedef struct {
+  VENDOR_DEVICE_PATH        Vendor;
+  EFI_DEVICE_PATH_PROTOCOL  EndDevicePath;
+} WIN_NT_THUNK_DEVICE_PATH;
 
 #endif
