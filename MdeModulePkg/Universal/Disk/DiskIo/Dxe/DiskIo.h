@@ -26,13 +26,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-//
-// Driver Binding Externs
-//
-extern EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gDiskIoComponentName;
-
-
 
 #define DISK_IO_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('d', 's', 'k', 'I')
 
