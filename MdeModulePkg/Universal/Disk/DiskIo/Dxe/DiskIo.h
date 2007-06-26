@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _DISK_IO_H_
-#define _DISK_IO_H_
+#ifndef _DISK_IO_H
+#define _DISK_IO_H
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
