@@ -11,18 +11,50 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  WinNtLib.h
+  Performance.h
 
 Abstract:
 
-  Public include file for the WinNt Library
+  This file included the performance relete function header and 
+  definition.
 
 --*/
 
-#ifndef __WIN_NT_LIB_H__
-#define __WIN_NT_LIB_H__
+#ifndef _PERF_H_
+#define _PERF_H_
 
-#include <WinNtThunk.h>
-extern EFI_WIN_NT_THUNK_PROTOCOL  *gWinNt;
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
+#define PERF_TOKEN_LENGTH       28
+#define PERF_PEI_ENTRY_MAX_NUM  50
+
+typedef struct {
+  CHAR8   Token[PERF_TOKEN_LENGTH];
+  UINT32  Duration;
+} PERF_DATA;
+
+typedef struct {
+  UINT64        BootToOs;
+  UINT64        S3Resume;
+  UINT32        S3EntryNum;
+  PERF_DATA     S3Entry[PERF_PEI_ENTRY_MAX_NUM];
+  UINT64        CpuFreq;
+  UINT64        BDSRaw;
+  UINT32        Count;
+  UINT32        Signiture;
+} PERF_HEADER;
+
+VOID
+WriteBootToOsPerformanceData (
+  VOID
+  );
+
+VOID
+ClearDebugRegisters (
+  VOID
+  );
 
 #endif

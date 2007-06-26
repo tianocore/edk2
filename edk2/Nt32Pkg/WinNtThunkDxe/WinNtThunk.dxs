@@ -11,18 +11,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  WinNtLib.h
+  WinNtThunk.dxs
 
 Abstract:
 
-  Public include file for the WinNt Library
+  Dependency expression source file.
+  
+--*/  
 
---*/
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
 
-#ifndef __WIN_NT_LIB_H__
-#define __WIN_NT_LIB_H__
+#include <DxeDepex.h>
 
-#include <WinNtThunk.h>
-extern EFI_WIN_NT_THUNK_PROTOCOL  *gWinNt;
-
-#endif
+DEPENDENCY_START
+  TRUE
+DEPENDENCY_END

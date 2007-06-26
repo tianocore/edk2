@@ -51,66 +51,66 @@
 #
 ################################################################################
 
-[LibraryClass.IA32.DXE_CORE]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.DXE_CORE]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   EdkPeCoffLoaderLib|$(WORKSPACE)\Nt32Pkg\Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
 
-[LibraryClass.IA32]
+[LibraryClasses.IA32]
   IoLib|$(WORKSPACE)\MdePkg\Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
-[LibraryClass.IA32.DXE_SAL_DRIVER]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.DXE_SAL_DRIVER]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
-[LibraryClass.IA32.DXE_SMM_DRIVER]
+[LibraryClasses.IA32.DXE_SMM_DRIVER]
   WinNtLib|$(WORKSPACE)\Nt32Pkg\Library/DxeWinNtLib/DxeWinNtLib.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
-[LibraryClass.IA32.PEIM]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.PEIM]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   EdkPeCoffLoaderLib|$(WORKSPACE)\Nt32Pkg\Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/PeiNt32OemHookStatusCodeLib/PeiNt32OemHookStatusCodeLib.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)\Nt32Pkg\Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
 
-[LibraryClass.IA32.PEI_CORE]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.PEI_CORE]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)\Nt32Pkg\Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
 
-[LibraryClass.IA32.DXE_RUNTIME_DRIVER]
+[LibraryClasses.IA32.DXE_RUNTIME_DRIVER]
   WinNtLib|$(WORKSPACE)\Nt32Pkg\Library/DxeWinNtLib/DxeWinNtLib.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
-[LibraryClass.IA32.BASE]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.BASE]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
-[LibraryClass.IA32.SEC]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.SEC]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
-[LibraryClass.IA32.UEFI_DRIVER]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.UEFI_DRIVER]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   WinNtLib|$(WORKSPACE)\Nt32Pkg\Library/DxeWinNtLib/DxeWinNtLib.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
-[LibraryClass.IA32.DXE_DRIVER]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.DXE_DRIVER]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   WinNtLib|$(WORKSPACE)\Nt32Pkg\Library/DxeWinNtLib/DxeWinNtLib.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
   EdkGenericBdsLib|$(WORKSPACE)\Nt32Pkg\Library/EdkGenericBdsLib/EdkGenericBdsLib.inf
 
-[LibraryClass.IA32.UEFI_APPLICATION]
-  TimerLib|$(WORKSPACE)\MdePkg\Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+[LibraryClasses.IA32.UEFI_APPLICATION]
+  TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   WinNtLib|$(WORKSPACE)\Nt32Pkg\Library/DxeWinNtLib/DxeWinNtLib.inf
   EdkFvbServiceLib|$(WORKSPACE)\MdeModulePkg\Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
-[LibraryClass.common.DXE_CORE]
+[LibraryClasses.common.DXE_CORE]
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
@@ -124,7 +124,7 @@
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   TianoDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
 
-[LibraryClass.common]
+[LibraryClasses.common]
   TimerLib|$(WORKSPACE)\MdePkg\Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/BaseUefiTianoDecompressLib/BaseUefiTianoDecompressLib.inf
@@ -140,7 +140,7 @@
   PciIncompatibleDeviceSupportLib|$(WORKSPACE)\MdeModulePkg\Library/EdkPciIncompatibleDeviceSupportLib/EdkPciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|$(WORKSPACE)\MdePkg\Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
-[LibraryClass.common.DXE_SAL_DRIVER]
+[LibraryClasses.common.DXE_SAL_DRIVER]
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
@@ -164,7 +164,7 @@
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
 
-[LibraryClass.common.DXE_SMM_DRIVER]
+[LibraryClasses.common.DXE_SMM_DRIVER]
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
@@ -186,7 +186,7 @@
   TianoDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-[LibraryClass.common.PEIM]
+[LibraryClasses.common.PEIM]
   HobLib|$(WORKSPACE)\MdePkg\Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PcdLib|$(WORKSPACE)\MdePkg\Library/PeiPcdLib/PeiPcdLib.inf
@@ -198,7 +198,7 @@
   MemoryAllocationLib|$(WORKSPACE)\MdePkg\Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
-[LibraryClass.common.PEI_CORE]
+[LibraryClasses.common.PEI_CORE]
   HobLib|$(WORKSPACE)\MdePkg\Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PcdLib|$(WORKSPACE)\MdePkg\Library/PeiPcdLib/PeiPcdLib.inf
@@ -209,7 +209,7 @@
   PeiCoreEntryPoint|$(WORKSPACE)\MdePkg\Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
-[LibraryClass.common.DXE_RUNTIME_DRIVER]
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
@@ -234,7 +234,7 @@
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)\MdePkg\Library/UefiDriverModelLib/UefiDriverModelLib.inf
 
-[LibraryClass.common.UEFI_DRIVER]
+[LibraryClasses.common.UEFI_DRIVER]
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
@@ -258,8 +258,8 @@
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)\MdePkg\Library/UefiDriverModelLib/UefiDriverModelLib.inf
 
-[LibraryClass.common.DXE_DRIVER]
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+[LibraryClasses.common.DXE_DRIVER]
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
   EdkIfrSupportLib|$(WORKSPACE)\MdeModulePkg\Library/EdkIfrSupportLib/EdkIfrSupportLib.inf
@@ -270,19 +270,19 @@
   UefiDriverEntryPoint|$(WORKSPACE)\MdePkg\Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   EdkGraphicsLib|$(WORKSPACE)\MdeModulePkg\Library/EdkGraphicsLib/EdkGraphicsLib.inf
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-  PrintLib|$(WORKSPACE)\MdeModulePkg\Library/EdkDxePrintLib/EdkDxePrintLib.inf
+  PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
   HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/DxeMemoryLib/DxeMemoryLib.inf
+  BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
   TianoDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)\MdePkg\Library/UefiDriverModelLib/UefiDriverModelLib.inf
 
-[LibraryClass.common.UEFI_APPLICATION]
+[LibraryClasses.common.UEFI_APPLICATION]
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
@@ -311,11 +311,11 @@
 #
 ################################################################################
 
-[PcdPatchableInModule.IA32]
+[PcdsPatchableInModule.IA32]
   PcdStatusCodeMemorySize|gEfiMdeModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiMdeModulePkgTokenSpaceGuid|128
 
-[PcdFixedAtBuild.IA32]
+[PcdsFixedAtBuild.IA32]
   PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|VOID*|10
   PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid|L"..\\Fv\\Fv_Recovery.fd"|VOID*|52
   PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1
@@ -323,7 +323,6 @@
   PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
@@ -334,637 +333,9 @@
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
   PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaxSizePopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaxSizeNonPopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdPciIncompatibleDeviceSupportMask|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1F
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
 
-[PcdFeatureFlag.IA32]
+
+[PcdsFeatureFlag.IA32]
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseExEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
@@ -992,74 +363,12 @@
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdPciIsaEnable|gEfiGenericPlatformTokenSpaceGuid|FALSE
-  PcdPciVgaEnable|gEfiGenericPlatformTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdPciBusHotplugDeviceSupport|gEfiGenericPlatformTokenSpaceGuid|TRUE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-
+  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
+  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
 
 ################################################################################
 #
@@ -1067,7 +376,7 @@
 #
 ################################################################################
 
-[PcdDynamic.DEFAULT]
+[PcdsDynamic.DEFAULT]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
@@ -1092,3 +401,4 @@
 ################################################################################
 
 [Components.IA32]
+  $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
