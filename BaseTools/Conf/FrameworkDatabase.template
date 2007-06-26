@@ -22,6 +22,7 @@
   <PackageList>
     <Filename>MdePkg/MdePkg.nspd</Filename>
     <Filename>MdeModulePkg/MdeModulePkg.nspd</Filename>
+    <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.nspd</Filename>
     <Filename>ShellBinPkg/ShellBinPkg.nspd</Filename>
   </PackageList>
 </FrameworkDatabase>
