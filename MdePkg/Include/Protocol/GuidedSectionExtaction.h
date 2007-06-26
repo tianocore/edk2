@@ -59,8 +59,8 @@ typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL EFI_GUIDED_SECTION_EXTRAC
   OutputBuffer. In this case, the
   EFI_AUTH_STATUS_PLATFORM_OVERRIDE bit AuthenticationStatus
   must be set on return. ExtractSection() is callable only from
-  EFI_TPL_NOTIFY and below. Behavior of ExtractSection() at any
-  EFI_TPL above EFI_TPL_NOTIFY is undefined. Type EFI_TPL is
+  TPL_NOTIFY and below. Behavior of ExtractSection() at any
+  EFI_TPL above TPL_NOTIFY is undefined. Type EFI_TPL is
   defined in RaiseTPL() in the UEFI 2.0 specification.
 
   

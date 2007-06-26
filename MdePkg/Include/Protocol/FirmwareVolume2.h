@@ -94,8 +94,8 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
   architecture. These constraints and the current state of the
   firmware volume are exposed to the caller using the
   GetVolumeAttributes() function. GetVolumeAttributes() is
-  callable only from EFI_TPL_NOTIFY and below. Behavior of
-  GetVolumeAttributes() at any EFI_TPL above EFI_TPL_NOTIFY is
+  callable only from TPL_NOTIFY and below. Behavior of
+  GetVolumeAttributes() at any EFI_TPL above TPL_NOTIFY is
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
   2.0 specification.
   
@@ -132,9 +132,9 @@ EFI_STATUS
   does not affect the ability to read or write the firmware
   volume. Rather, once the EFI_FV_LOCK_STATUS bit is set, it
   prevents further modification to all the attribute bits.
-  SetVolumeAttributes() is callable only from EFI_TPL_NOTIFY and
+  SetVolumeAttributes() is callable only from TPL_NOTIFY and
   below. Behavior of SetVolumeAttributes() at any EFI_TPL above
-  EFI_TPL_NOTIFY is undefined. Type EFI_TPL is defined in
+  TPL_NOTIFY is undefined. Type EFI_TPL is defined in
   RaiseTPL() in the UEFI 2.0 specification.
 
 
@@ -251,8 +251,8 @@ EFI_STATUS
   boot services pool memory, which will be returned in Buffer.
   The size of the new buffer is returned in BufferSize and all
   other output parameters are returned with valid values.
-  ReadFile() is callable only from EFI_TPL_NOTIFY and below.
-  Behavior of ReadFile() at any EFI_TPL above EFI_TPL_NOTIFY is
+  ReadFile() is callable only from TPL_NOTIFY and below.
+  Behavior of ReadFile() at any EFI_TPL above TPL_NOTIFY is
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
   2.0 specification.
   
@@ -343,8 +343,8 @@ EFI_STATUS
   pool memory, which will be returned in *Buffer. The size of
   the new buffer is returned in *BufferSize and all other output
   parameters are returned with valid values. ReadSection() is
-  callable only from EFI_TPL_NOTIFY and below. Behavior of
-  ReadSection() at any EFI_TPL above EFI_TPL_NOTIFY is
+  callable only from TPL_NOTIFY and below. Behavior of
+  ReadSection() at any EFI_TPL above TPL_NOTIFY is
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
   2.0 specification.
 
@@ -462,8 +462,8 @@ typedef struct {
   Deleting a file as part of a multiple file write is not allowed.
   Platform Initialization Specification VOLUME 3 Shared
   Architectural Elements 84 August 21, 2006 Version 1.0
-  WriteFile() is callable only from EFI_TPL_NOTIFY and below.
-  Behavior of WriteFile() at any EFI_TPL above EFI_TPL_NOTIFY is
+  WriteFile() is callable only from TPL_NOTIFY and below.
+  Behavior of WriteFile() at any EFI_TPL above TPL_NOTIFY is
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
   specification.
 
@@ -536,8 +536,8 @@ EFI_STATUS
   GetNextFile() must maintain the value of *Key returned by the
   immediately previous call. The actual contents of *Key are
   implementation specific and no semantic content is implied.
-  GetNextFile() is callable only from EFI_TPL_NOTIFY and below.
-  Behavior of GetNextFile() at any EFI_TPL above EFI_TPL_NOTIFY is
+  GetNextFile() is callable only from TPL_NOTIFY and below.
+  Behavior of GetNextFile() at any EFI_TPL above TPL_NOTIFY is
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
   specification. Status Codes Returned
 
