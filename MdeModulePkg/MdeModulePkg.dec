@@ -1,15 +1,17 @@
 #/** @file
 # Mde Module Package Reference Implementations
 #
-# This Module provides standard reference information for EFI/PI implementations.
+# This module provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007, Intel Corporation.
 #
 # All rights reserved.
-#    This program and the accompanying materials are licensed and made available
-#    under the terms and conditions of the BSD License which accompanies this distribution.
-#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
-#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#    This program and the accompanying materials are licensed and made available under
+#    the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+# 
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #**/
 
@@ -30,34 +32,35 @@
 
 ################################################################################
 #
-# Include Section - list of Include Paths that are provided by this package.
-#                   Comments are used for Keywords and Module Types.
-#
-# Supported Module Types:
-#  SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
-#
-################################################################################
-[Includes.common]
-
-
-
-################################################################################
-#
-# Library Class Header section - list of Library Class header files that are
-#                                provided by this package.
-#
-################################################################################
-[LibraryClasses.common]
-
-
-
-################################################################################
-#
 # Global Guid Definition section - list of Global Guid C Name Data Structures
 #                                  that are provided by this package.
 #
 ################################################################################
 [Guids.common]
+  gEfiGenericPlatformVariableGuid = { 0x59d1c24f, 0x50f1, 0x401a, { 0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43 }}
+  gPeiPerformanceHobGuid         = { 0xEC4DF5AF, 0x4395, 0x4CC9, { 0x94, 0xDE, 0x77, 0x50, 0x6D, 0x12, 0xC7, 0xB8 }}
+  gEfiCapsuleVendorGuid          = { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 }}
+  gEfiPciHotplugDeviceGuid       = { 0x0B280816, 0x52E7, 0x4E51, { 0xAA, 0x57, 0x11, 0xBD, 0x41, 0xCB, 0xEF, 0xC3 }}
+  gEfiBootStateGuid              = { 0x60B5E939, 0x0FCF, 0x4227, { 0xBA, 0x83, 0x6B, 0xBE, 0xD4, 0x5B, 0xC0, 0xE3 }}
+  gEfiDefaultBmpLogoGuid         = { 0x7BB28B99, 0x61BB, 0x11D5, { 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
+  gEfiPrimaryConsoleOutDeviceGuid = { 0x62BDF38A, 0xE3D5, 0x492C, { 0x95, 0x0C, 0x23, 0xA7, 0xF6, 0x6E, 0x67, 0x2E }}
+  gEfiPrimaryConsoleInDeviceGuid = { 0xE451DCBE, 0x96A1, 0x4729, { 0xA5, 0xCF, 0x6B, 0x9C, 0x2C, 0xFF, 0x47, 0xFD }}
+  gEfiPrimaryStandardErrorDeviceGuid = { 0x5A68191B, 0x9B97, 0x4752, { 0x99, 0x46, 0xE3, 0x6A, 0x5D, 0xA9, 0x42, 0xB1 }}
+  gEfiHotPlugDeviceGuid          = { 0x220AC432, 0x1D43, 0x49E5, { 0xA7, 0x4F, 0x4C, 0x9D, 0xA6, 0x7A, 0xD2, 0x3B }}
+  gEfiStandardErrorDeviceGuid    = { 0xD3B36F2D, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
+  gEfiConsoleOutDeviceGuid       = { 0xD3B36F2C, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
+  gEfiConsoleInDeviceGuid        = { 0xD3B36F2B, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
+  gEfiAlternateFvBlockGuid       = { 0xF496922D, 0x172F, 0x4BBC, { 0xA1, 0xEB, 0x0E, 0xEB, 0x94, 0x9C, 0x34, 0x86 }}
+  gEfiDiskInfoUsbInterfaceGuid   = { 0xCB871572, 0xC11A, 0x47B5, { 0xB4, 0x92, 0x67, 0x5E, 0xAF, 0xA7, 0x77, 0x27 }}
+  gEfiDiskInfoScsiInterfaceGuid  = { 0x08F74BAA, 0xEA36, 0x41D9, { 0x95, 0x21, 0x21, 0xA7, 0x0F, 0x87, 0x80, 0xBC }}
+  gEfiDiskInfoIdeInterfaceGuid   = { 0x5E948FE3, 0x26D3, 0x42B5, { 0xAF, 0x17, 0x61, 0x02, 0x87, 0x18, 0x8D, 0xEC }}
+  gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
+  gEfiSystemNvDataHobGuid        = { 0xD6E5092D, 0xC7B2, 0x4872, { 0xAF, 0x66, 0xFD, 0xC0, 0xE6, 0xF9, 0x5E, 0x78 }}
+  gPcdPeiCallbackFnTableHobGuid  = { 0xC625F4B2, 0xEA09, 0x4675, { 0x82, 0xD7, 0xBA, 0x36, 0x82, 0x15, 0x7A, 0x14 }}
+  gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
+  gEfiMdePkgTokenSpaceGuid       = { 0xA1AFF049, 0xFDEB, 0x442a, { 0xB3, 0x20, 0x13, 0xAB, 0x4C, 0xB7, 0x2B, 0xBC }}
+
+
 
 
 ################################################################################
@@ -67,6 +70,32 @@
 #
 ################################################################################
 [Protocols.common]
+  gEfiScsiIoProtocolGuid         = { 0x403CD195, 0xF233, 0x48EC, { 0x84, 0x55, 0xB2, 0xE5, 0x2F, 0x1D, 0x9E, 0x02 }}
+  gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
+  gEfiUsbAtapiProtocolGuid       = { 0x2B2F68DA, 0x0CD2, 0x44CF, { 0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75 }}
+  gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
+  gEfiConsoleControlProtocolGuid = { 0xF42F7782, 0x012E, 0x4C12, { 0x99, 0x56, 0x49, 0xF9, 0x43, 0x04, 0xF7, 0x21 }}
+  gEfiFaultTolerantWriteLiteProtocolGuid = { 0x3F557189, 0x8DAE, 0x45AE, { 0xA0, 0xB3, 0x2B, 0x99, 0xCA, 0x7A, 0xA7, 0xA0 }}
+  gEfiFvbExtensionProtocolGuid   = { 0x53A4C71B, 0xB581, 0x4170, { 0x91, 0xB3, 0x8D, 0xB8, 0x7A, 0x4B, 0x5C, 0x46 }}
+  gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
+  gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
+  gEfiPrintProtocolGuid          = { 0xDF2D868E, 0x32FC, 0x4CF0, { 0x8E, 0x6B, 0xFF, 0xD9, 0x5D, 0x13, 0x43, 0xD0 }}
+  gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
+  gEfiCapsuleArchProtocolGuid    = { 0x5053697E, 0x2EBC, 0x4819, { 0x90, 0xD9, 0x05, 0x80, 0xDE, 0xEE, 0x57, 0x54 }}
+
+
+
+
+################################################################################
+#
+# Global Ppis Definition section - list of Global Ppis C Name Data Structures
+#                                  that are provided by this package.
+#
+################################################################################
+[Ppis.common]
+  gPeiBaseMemoryTestPpiGuid      = { 0xB6EC423C, 0x21D2, 0x490D, { 0x85, 0xC6, 0xDD, 0x58, 0x64, 0xEA, 0xA6, 0x74 }}
+
+
 
 
 ################################################################################
@@ -77,5 +106,54 @@
 #
 ################################################################################
 
-[PcdsFeatureFlag.common]
+[PcdFeatureFlag.common]
+  PcdSupportUpdateCapsuleRest|0x0001001d|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPeiPcdDatabaseTraverseEnabled|0x00010020|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxePcdDatabaseTraverseEnabled|0x00010021|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseSetEnabled|0x00010030|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseGetSizeEnabled|0x00010031|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseCallbackOnSetEnabled|0x00010032|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseExEnabled|0x00010033|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportEfiDecompress|0x00010034|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportTianoDecompress|0x00010035|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportCustomDecompress|0x00010036|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDevicePathSupportDevicePathToText|0x00010037|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDevicePathSupportDevicePathFromText|0x00010038|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDxeIplBuildShareCodeHobs|0x0001003c|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdNtEmulatorEnable|0x0001003e|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+
+[PcdFixedAtBuild.common]
+  PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x0001000f|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x08
+  PcdVpdBaseAddress|0x00010010|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxSizePopulateCapsule|0x0001001e|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxSizeNonPopulateCapsule|0x0001001f|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiEdkModulePkgTokenSpaceGuid|UINT8|28
+  PcdFlashNvStorageVariableBase|0x30000001|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageVariableSize|0x30000002|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareSize|0x30000014|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+
+[PcdDynamic.common]
+  PcdFlashNvStorageVariableBase|0x30000001|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageVariableSize|0x30000002|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareSize|0x30000014|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+
+[PcdPatchableInModule.common]
+  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiEdkModulePkgTokenSpaceGuid|UINT8|28
+  PcdFlashNvStorageVariableBase|0x30000001|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageVariableSize|0x30000002|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwSpareSize|0x30000014|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+  PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
+
+
+[PcdFeatureFlag.IA32]
+  PcdDxeIplSwitchToLongMode|0x0001003b|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+
 
