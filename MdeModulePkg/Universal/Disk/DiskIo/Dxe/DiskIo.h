@@ -1,32 +1,38 @@
-/*++
+/** @file
+  DiskIo driver that layers it's self on every Block IO protocol in the system.
+  DiskIo converts a block oriented device to a byte oriented device.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Module Name:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  DiskIo.h
-  
-Abstract:
-  Private Data definition for Disk IO driver
+**/
 
---*/
-
-#ifndef _DISK_IO_H
-#define _DISK_IO_H
-
-
+#include <Uefi.h>
+#include <Protocol/BlockIo.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/DiskIo.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 //
-// Include common header file for this module.
+// Driver Binding Externs
 //
-#include "CommonHeader.h"
+extern EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gDiskIoComponentName;
+
+
 
 #define DISK_IO_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('d', 's', 'k', 'I')
 
@@ -119,4 +125,3 @@ DiskIoComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
-#endif

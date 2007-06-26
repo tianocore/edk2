@@ -1,36 +1,42 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Partition.h
-  
-Abstract:
-
+/** @file
   Partition driver that produces logical BlockIo devices from a physical 
   BlockIo device. The logical BlockIo devices are based on the format
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy 
   MBR, and GPT partition schemes are supported.
 
-Revision History
+  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
---*/
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-#ifndef __PARTITION_H__
-#define __PARTITION_H__
+**/
+
+
+#include <Uefi.h>
+#include <Protocol/BlockIo.h>
+#include <Guid/Gpt.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/DiskIo.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 //
-// Include common header file for this module.
+// Driver Binding Externs
 //
-#include "CommonHeader.h"
+extern EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gPartitionComponentName;
 
 #include <IndustryStandard/Mbr.h>
 #include <IndustryStandard/ElTorito.h>
@@ -186,4 +192,3 @@ EFI_STATUS
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
-#endif
