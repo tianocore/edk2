@@ -1,0 +1,109 @@
+#/** @file
+# Intel Framework Module Package Reference Implementations
+#
+# This Module provides standard reference information for EFI/Tiano implementations.
+# Copyright (c) 2007, Intel Corporation.
+#
+# All rights reserved.
+#    This program and the accompanying materials are licensed and made available
+#    under the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = IntelFrameworkModulePkg
+  PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
+  PACKAGE_VERSION                = 0.1
+
+
+################################################################################
+#
+# Library Class Header section - list of Library Class header files that are
+#                                provided by this package.
+#
+################################################################################
+[LibraryClass.common]
+  PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
+  OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
+
+
+
+################################################################################
+#
+# Global Guid Definition section - list of Global Guid C Name Data Structures
+#                                  that are provided by this package.
+#
+################################################################################
+[Guids.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
+  gEfiPciHotplugDeviceGuid       = { 0x0B280816, 0x52E7, 0x4E51, { 0xAA, 0x57, 0x11, 0xBD, 0x41, 0xCB, 0xEF, 0xC3 }}
+  gEfiPciOptionRomTableGuid      = { 0x7462660F, 0x1CBD, 0x48DA, { 0xAD, 0x11, 0x91, 0x71, 0x79, 0x13, 0x83, 0x1C }}
+  gEfiStatusCodeGuid             = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
+  gMemoryStatusCodeRecordGuid    = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
+
+
+
+
+################################################################################
+#
+# Global Protocols Definition section - list of Global Protocols C Name Data
+#                                  Structures that are provided by this package.
+#
+################################################################################
+[Protocols.common]
+  gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
+  gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
+  gEfiPciHotPlugInitProtocolGuid = { 0xAA0E8BC1, 0xDABC, 0x46B0, { 0xA8, 0x44, 0x37, 0xB8, 0x16, 0x9B, 0x2B, 0xEA }}
+  gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
+
+
+
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+
+[PcdDynamic.common]
+  PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
+  PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
+
+[PcdFeatureFlag.common]
+  PcdStatusCodeUseSerial|0x00010022|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseMemory|0x00010023|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseOEM|0x00010024|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseEfiSerial|0x00010026|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseHardSerial|0x00010027|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseRuntimeMemory|0x00010028|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeUseDataHub|0x00010029|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeReplayInSerial|0x0001002a|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeReplayInRuntimeMemory|0x0001002b|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeReplayInDataHub|0x0001002c|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdStatusCodeReplayInOEM|0x0001002d|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPciIsaEnable|0x00010039|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPciVgaEnable|0x0001003a|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPciBusHotplugDeviceSupport|0x0001003d|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+
+[PcdFixedAtBuild.common]
+  PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
+  PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
+
+[PcdPatchableInModule.common]
+  PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
+  PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
+
+
