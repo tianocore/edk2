@@ -15,6 +15,8 @@
 
 **/
 
+#ifndef _PARTITION_H 
+#define _PARTITION_H 
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
@@ -31,12 +33,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-
-//
-// Driver Binding Externs
-//
-extern EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gPartitionComponentName;
 
 #include <IndustryStandard/Mbr.h>
 #include <IndustryStandard/ElTorito.h>
@@ -192,3 +188,4 @@ EFI_STATUS
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
+#endif
