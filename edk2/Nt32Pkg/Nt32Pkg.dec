@@ -1,0 +1,119 @@
+#/** @file
+# EFI/PI Reference Module Package for All Architectures
+#
+# This FPD file is used for Package Level build.
+#
+# Copyright (c) 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#    are licensed and made available under the terms and conditions of the BSD License
+#    which accompanies this distribution. The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = Nt32Pkg
+  PACKAGE_GUID                   = 0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3
+  PACKAGE_VERSION                = 0.1
+  
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
+#
+################################################################################
+[Includes.common]
+  Include                        # FlashLayout WinNtDxe WinNtPeim
+  Include/Library                # EdkGenericBdsLib WinNtLib
+  Include/Ppi                    # NtAutoscan NtFwh NtPeiLoadFile NtThunk
+  Include/Common                 # WinNTInclude
+  Include/Protocol               # WinNtIo WinNtThunk
+
+
+################################################################################
+#
+# Library Class Header section - list of Library Class header files that are
+#                                provided by this package.
+#
+################################################################################
+[LibraryClasses.common]
+  WinNtLib|Include/Library/WinNtLib.h
+  EdkGenericBdsLib|Include/Library/EdkGenericBdsLib.h
+
+
+################################################################################
+#
+# Global Guid Definition section - list of Global Guid C Name Data Structures
+#                                  that are provided by this package.
+#
+################################################################################
+[Guids.common]
+  gEfiWinNtPassThroughGuid       = { 0xCC664EB8, 0x3C24, 0x4086, { 0xB6, 0xF6, 0x34, 0xE8, 0x56, 0xBC, 0xE3, 0x6E }}
+  gEfiWinNtCPUSpeedGuid          = { 0xD4F29055, 0xE1FB, 0x11D4, { 0xBD, 0x0D, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtCPUModelGuid          = { 0xBEE9B6CE, 0x2F8A, 0x11D4, { 0xBD, 0x0D, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtMemoryGuid            = { 0x99042912, 0x122A, 0x11D4, { 0xBD, 0x0D, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtConsoleGuid           = { 0xBA73672C, 0xA5D3, 0x11D4, { 0xBD, 0x00, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtUgaGuid               = { 0xAB248E99, 0xABE1, 0x11D4, { 0xBD, 0x0D, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtGopGuid               = { 0x4e11e955, 0xccca, 0x11d4, { 0xbd, 0x0d, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81 }}
+  gEfiWinNtSerialPortGuid        = { 0x0C95A93D, 0xA006, 0x11D4, { 0xBC, 0xFA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtFileSystemGuid        = { 0x0C95A935, 0xA006, 0x11D4, { 0xBC, 0xFA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtPhysicalDisksGuid     = { 0x0C95A92F, 0xA006, 0x11D4, { 0xBC, 0xFA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtVirtualDisksGuid      = { 0x0C95A928, 0xA006, 0x11D4, { 0xBC, 0xFA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiEdkNt32PkgTokenSpaceGuid   = { 0x0D79A645, 0x1D91, 0x40a6, { 0xA8, 0x1F, 0x61, 0xE6, 0x98, 0x2B, 0x32, 0xB4 }}
+
+
+################################################################################
+#
+# Global Protocols Definition section - list of Global Protocols C Name Data
+#                                  Structures that are provided by this package.
+#
+################################################################################
+[Protocols.common]
+  gWinNtBusDriverGuid            = { 0x0419f582, 0x0625, 0x4531, { 0x8a, 0x33, 0x85, 0xa9, 0x96, 0x5c, 0x95, 0xbc }}
+  gEfiWinNtThunkProtocolGuid     = { 0x58C518B1, 0x76F3, 0x11D4, { 0xBC, 0xEA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+  gEfiWinNtIoProtocolGuid        = { 0x96EB4AD6, 0xA32A, 0x11D4, { 0xBC, 0xFD, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
+
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+
+[PcdFixedAtBuild.common]
+  PcdWinNtBootMode|0x00001006|gEfiEdkNt32PkgTokenSpaceGuid|UINT32|1
+  PcdWinNtFirmwareVolume|0x00001009|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
+  PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"64!64"
+
+[PcdDynamic.common]
+  PcdWinNtPhysicalDisk|0x00001000|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"
+  PcdWinNtVirtualDisk|0x00001001|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"FW;40960;512"
+  PcdWinNtSerialPort|0x00001002|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"COM1!COM2"
+  PcdWinNtUga|0x00001003|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"UGA Window 1!UGA Window 2"
+  PcdWinNtFileSystem|0x00001004|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"
+  PcdWinNtMemorySize|0x00001005|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"64!64"
+  PcdWinNtCpuModel|0x00001007|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"Intel(R) Processor Model"
+  PcdWinNtCpuSpeed|0x00001008|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"3000"
+  PcdWinNtConsole|0x0000100a|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"Bus Driver Console Window"
+  PcdWinNtGop|0x0000100d|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"UGA Window 1!UGA Window 2"
+
+[PcdPatchableInModule.common]
+  PcdWinNtBootMode|0x00001006|gEfiEdkNt32PkgTokenSpaceGuid|UINT32|1
+  PcdWinNtFirmwareVolume|0x00001009|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
+  PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiEdkNt32PkgTokenSpaceGuid|VOID*|L"64!64"
