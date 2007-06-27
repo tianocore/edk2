@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 
 STATIC EFI_EVENT              mEfiVirtualNotifyEvent;
+STATIC EFI_EVENT              mEfiExitBootServicesEvent;
 STATIC BOOLEAN                mEfiGoneVirtual         = FALSE;
 STATIC BOOLEAN                mEfiAtRuntime           = FALSE;
 EFI_RUNTIME_SERVICES          *mRT;
@@ -29,9 +30,10 @@ EFI_RUNTIME_SERVICES          *mRT;
   @param[in]  Event   The Event that is being processed
   @param[in]  Context Event Context
 **/
+STATIC
 VOID
 EFIAPI
-RuntimeDriverExitBootServices (
+RuntimeLibExitBootServicesEvent (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   )
@@ -60,16 +62,6 @@ RuntimeLibVirtualNotifyEvent (
   IN VOID             *Context
   )
 {
-  UINTN Index;
-  EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
-
-  for (Index = 0;
-       _gDriverSetVirtualAddressMapEvent[Index] != NULL;
-       Index++) {
-    ChildNotifyEventHandler = _gDriverSetVirtualAddressMapEvent[Index];
-    ChildNotifyEventHandler (Event, NULL);
-  }
-
   //
   // Update global for Runtime Services Table and IO
   //
@@ -113,6 +105,16 @@ RuntimeDriverLibConstruct (
 
   ASSERT_EFI_ERROR (Status);
 
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_NOTIFY,
+                  RuntimeLibExitBootServicesEvent,
+                  NULL,
+                  &mEfiExitBootServicesEvent
+                  );
+
+  ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
 
@@ -138,6 +140,9 @@ RuntimeDriverLibDeconstruct (
   //
   ASSERT (gBS != NULL);
   Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CloseEvent (mEfiExitBootServicesEvent);
   ASSERT_EFI_ERROR (Status);
 
   return Status;
