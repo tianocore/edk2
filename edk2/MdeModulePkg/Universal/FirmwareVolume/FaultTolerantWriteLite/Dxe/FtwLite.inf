@@ -1,7 +1,7 @@
 #/** @file
-# Component description file for Capsule module.
+# Component description file for FtwLite module.
 #
-# CapsuleRuntime module provides capsule runtime services
+# This driver provides fault tolerant write capability for block devices.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,14 +21,14 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = CapsuleRuntime
-  FILE_GUID                      = 42857F0A-13F2-4B21-8A23-53D3F714B840
-  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  BASE_NAME                      = FtwLite
+  FILE_GUID                      = 4C862FC6-0E54-4e36-8C8F-FF6F3167951F
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = CapsuleServiceInitialize
+  ENTRY_POINT                    = InitializeFtwLite
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -43,10 +43,23 @@
 ################################################################################
 
 [Sources.common]
-  Capsule.dxs
-  CapsuleService.h
-  CapsuleService.c
-  Capsule.c
+  FtwLite.dxs
+  FtwWorkSpace.c
+  FtwMisc.c
+  FtwLite.c
+  FtwLite.h
+ 
+[Sources.Ia32]
+  Ia32/Ia32FtwMisc.c
+
+[Sources.X64]
+  x64/x64FtwMisc.c
+
+[Sources.IPF]
+  Ipf/IpfFtwMisc.c
+
+[Sources.EBC]
+  Ia32/Ia32FtwMisc.c
 
 
 ################################################################################
@@ -58,7 +71,9 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
 
 ################################################################################
 #
@@ -71,11 +86,9 @@
   UefiBootServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
-  PcdLib
-  DebugLib
-  UefiRuntimeLib
-  DxeServicesTableLib
   UefiDriverEntryPoint
+  DebugLib
+  PcdLib
 
 
 ################################################################################
@@ -85,8 +98,8 @@
 ################################################################################
 
 [Guids]
-  gEfiCapsuleVendorGuid                         # SOMETIMES_CONSUMED
-  gEfiCapsuleGuid                               
+  gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
+
 
 ################################################################################
 #
@@ -96,26 +109,25 @@
 ################################################################################
 
 [Protocols]
-  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
+  gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
+
+[Protocols.IA32]
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+
+[Protocols.EBC]
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 
 ################################################################################
 #
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
 #
 ################################################################################
 
-[PcdsFeatureFlag.common]
-  PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid
-
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
-
-[PcdsFixedAtBuild.common]
-  PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
-  PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
+[PcdsDynamic.common]
+  PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid
 
