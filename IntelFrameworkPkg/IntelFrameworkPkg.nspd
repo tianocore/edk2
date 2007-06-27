@@ -20,8 +20,8 @@
     <RePackage>false</RePackage>
   </PackageDefinitions>
   <LibraryClassDeclarations>
-    <LibraryClass Name="HiiLib">
-      <IncludeHeader>Include/Library/HiiLib.h</IncludeHeader>
+    <LibraryClass Name="FrameworkHiiLib">
+      <IncludeHeader>Include/Library/FrameworkHiiLib.h</IncludeHeader>
       <HelpText>This library provide the service function for package manipulations based on Intel Framework HII specification.</HelpText>
     </LibraryClass>
   </LibraryClassDeclarations>
