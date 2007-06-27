@@ -138,11 +138,26 @@
       <GuidValue>59d1c24f-50f1-401a-b101-f33e0daed443</GuidValue>
       <HelpText>The variable space Guid to pair with a Unicode string name to tag an EFI variable</HelpText>
     </Entry>
+    <Entry Name="PeiPeCoffLoader">
+      <C_Name>gEfiPeiPeCoffLoaderGuid</C_Name>
+      <GuidValue>D8117CFF-94A6-11D4-9A3A-0090273FC14D</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="Capsule">
       <C_Name>gEfiCapsuleArchProtocolGuid</C_Name>
       <GuidValue>5053697E-2EBC-4819-90D9-0580DEEE5754</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="CustomizedDecompress">
+      <C_Name>gEfiCustomizedDecompressProtocolGuid</C_Name>
+      <GuidValue>9A44198E-A4A2-44E6-8A1F-39BEFDAC896F</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="TianoDecompress">
+      <C_Name>gEfiTianoDecompressProtocolGuid</C_Name>
+      <GuidValue>E84CF29C-191F-4EAE-96E1-F46AECEAEA0B</GuidValue>
       <HelpText/>
     </Entry>
     <Entry Name="LoadPeImage">
@@ -198,6 +213,11 @@
     <Entry Name="ScsiIo">
       <C_Name>gEfiScsiIoProtocolGuid</C_Name>
       <GuidValue>403CD195-F233-48EC-8455-B2E52F1D9E02</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="FindFv">
+      <C_Name>gEfiFindFvPpiGuid</C_Name>
+      <GuidValue>36164812-A023-44E5-BD85-05BF3C7700AA</GuidValue>
       <HelpText/>
     </Entry>
   </ProtocolDeclarations>

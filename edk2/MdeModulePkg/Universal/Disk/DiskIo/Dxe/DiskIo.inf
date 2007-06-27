@@ -1,12 +1,13 @@
 #/** @file
-#  Component description file for DiskIo module.
+# Component description file for DiskIo module.
 #
-#  Copyright (c) 2006 - 2007, Intel Corporation
+# DiskIo driver that layers it's self on every Block IO protocol in the system.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -34,8 +35,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gDiskIoDriverBinding
-#  COMPONENT_NAME                =  gDiskIoComponentName
+#  DRIVER_BINDING                =  gDiskIoDriverBinding                         
+#  COMPONENT_NAME                =  gDiskIoComponentName                         
 #
 
 ################################################################################
@@ -48,6 +49,8 @@
   ComponentName.c
   DiskIo.h
   diskio.c
+  CommonHeader.h
+  EntryPoint.c
 
 
 ################################################################################
@@ -59,18 +62,6 @@
 
 [Includes]
   $(WORKSPACE)/MdePkg/Include/Library
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
-[Packages]
-  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
-  $(WORKSPACE)/MdePkg/MdePkg.dec
-
 
 ################################################################################
 #

@@ -18,6 +18,11 @@
 #ifndef _PARTITION_H 
 #define _PARTITION_H 
 
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
 #include <Guid/Gpt.h>

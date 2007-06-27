@@ -16,6 +16,11 @@
 #ifndef _DISK_IO_H
 #define _DISK_IO_H
 
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/ComponentName.h>
