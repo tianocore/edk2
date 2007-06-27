@@ -99,12 +99,12 @@
 #
 ################################################################################
 
-[PcdFixedAtBuild.common]
+[PcdsFixedAtBuild.common]
   PcdWinNtBootMode|0x00001006|gEfiNt32PkgTokenSpaceGuid|UINT32|1
   PcdWinNtFirmwareVolume|0x00001009|gEfiNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
   PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"
 
-[PcdDynamic.common]
+[PcdsDynamic.common]
   PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"
   PcdWinNtVirtualDisk|0x00001001|gEfiNt32PkgTokenSpaceGuid|VOID*|L"FW;40960;512"
   PcdWinNtSerialPort|0x00001002|gEfiNt32PkgTokenSpaceGuid|VOID*|L"COM1!COM2"
@@ -116,7 +116,7 @@
   PcdWinNtConsole|0x0000100a|gEfiNt32PkgTokenSpaceGuid|VOID*|L"Bus Driver Console Window"
   PcdWinNtGop|0x0000100d|gEfiNt32PkgTokenSpaceGuid|VOID*|L"UGA Window 1!UGA Window 2"
 
-[PcdPatchableInModule.common]
+[PcdsPatchableInModule.common]
   PcdWinNtBootMode|0x00001006|gEfiNt32PkgTokenSpaceGuid|UINT32|1
   PcdWinNtFirmwareVolume|0x00001009|gEfiNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
   PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"

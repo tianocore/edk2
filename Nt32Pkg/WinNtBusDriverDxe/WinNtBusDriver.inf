@@ -1,0 +1,146 @@
+#/** @file
+# Win NT Bus driver
+#
+# This following section documents the envirnoment variables for the Win NT
+#  build. These variables are used to define the (virtual) hardware
+#  configuration of the NT environment
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = WinNtBusDriver
+  FILE_GUID                      = BD7E9A27-D6C5-416a-B245-5F507D95B2BD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeWinNtBusDriver
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+#  DRIVER_BINDING                =  gWinNtBusDriverBinding                       
+#  COMPONENT_NAME                =  gWinNtBusDriverComponentName                 
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  ComponentName.c
+  WinNtBusDriver.c
+  WinNtBusDriver.h
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg/Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  Nt32Pkg/Nt32Pkg.dec
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  MemoryAllocationLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiWinNtCPUSpeedGuid                         # ALWAYS_CONSUMED
+  gEfiWinNtCPUModelGuid                         # ALWAYS_CONSUMED
+  gEfiWinNtMemoryGuid                           # ALWAYS_CONSUMED
+  gEfiWinNtConsoleGuid                          # ALWAYS_CONSUMED
+  gEfiWinNtGopGuid                              # ALWAYS_CONSUMED
+  gEfiWinNtSerialPortGuid                       # ALWAYS_CONSUMED
+  gEfiWinNtFileSystemGuid                       # ALWAYS_CONSUMED
+  gEfiWinNtPhysicalDisksGuid                    # ALWAYS_CONSUMED
+  gEfiWinNtVirtualDisksGuid                     # ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gWinNtBusDriverGuid                           # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
+  gEfiWinNtThunkProtocolGuid                    # PROTOCOL TO_START
+  gEfiWinNtIoProtocolGuid                       # PROTOCOL BY_START
+
+
+################################################################################
+#
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsDynamic.common]
+  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtVirtualDisk|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFileSystem|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtSerialPort|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtGop|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtConsole|gEfiNt32PkgTokenSpaceGuid
+

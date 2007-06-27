@@ -376,7 +376,7 @@
 #
 ################################################################################
 
-[PcdsDynamic.DEFAULT]
+[PcdsDynamic.common]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
@@ -405,3 +405,4 @@
   $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPeim\WinNtThunkPPIToProtocolPeim.inf
   $(WORKSPACE)\Nt32Pkg\WinNtAutoScanPeim\WinNtAutoScan.inf
   $(WORKSPACE)\Nt32Pkg\WinNtBlockIoDxe\WinNtBlockIo.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtBusDriverDxe\WinNtBusDriver.inf
