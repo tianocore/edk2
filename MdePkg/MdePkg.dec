@@ -110,7 +110,7 @@
   CacheMaintenanceLib|Include/Library/CacheMaintenanceLib.h
   BaseMemoryLib|Include/Library/BaseMemoryLib.h
   BaseLib|Include/Library/BaseLib.h
-
+  CustomDecompressLib|Include/Library/CustomDecompressLib.h
 
 ################################################################################
 #

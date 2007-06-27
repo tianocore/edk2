@@ -194,6 +194,10 @@
       <IncludeHeader>Include/Library/UsbLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
+    <LibraryClass Name="CustomDecompressLib">
+      <IncludeHeader>Include/Library/CustomDecompressLib.h</IncludeHeader>
+      <HelpText/>
+    </LibraryClass>
   </LibraryClassDeclarations>
   <MsaFiles>
     <Filename>Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.msa</Filename>
