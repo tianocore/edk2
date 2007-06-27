@@ -403,3 +403,4 @@
 [Components.IA32]
   $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
   $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPeim\WinNtThunkPPIToProtocolPeim.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtAutoScanPeim\WinNtAutoScan.inf
