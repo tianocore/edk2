@@ -29,6 +29,12 @@
       <HelpText>This library includes the PCI incompatible devices list.</HelpText>
     </LibraryClass>
   </LibraryClassDeclarations>
+  <MsaFiles>
+    <Filename>Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.msa</Filename>
+    <Filename>Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.msa</Filename>
+    <Filename>Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.msa</Filename>
+    <Filename>Bus/Pci/PciBus/Dxe/PciBus.msa</Filename>
+  </MsaFiles>
   <GuidDeclarations>
     <Entry Name="MemoryStatusCodeRecord" GuidTypeList="HOB">
       <C_Name>gMemoryStatusCodeRecordGuid</C_Name>
@@ -222,6 +228,15 @@
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>TRUE</DefaultValue>
       <HelpText>If TRUE, the PCI bus driver will support hot plug device. If not hot plug device is supported, this feature flag can be set to FALSE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPciIncompatibleDeviceSupportMask</C_Name>
+      <Token>0x0001003f</Token>
+      <TokenSpaceGuidCName>gEfiIntelFrameworkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT8</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0</DefaultValue>
+      <HelpText>The PCD masks for PCI incompatible devices support.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
