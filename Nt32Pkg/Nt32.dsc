@@ -155,7 +155,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -171,7 +171,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -224,7 +224,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -249,7 +249,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -273,7 +273,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -289,7 +289,7 @@
   PrintLib|$(WORKSPACE)\MdePkg\Library/BasePrintLib/BasePrintLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
-  HiiLib|$(WORKSPACE)\MdePkg\Library/HiiLib/HiiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)\IntelFrameworkPkg\Library/HiiLib/FrameworkHiiLib.inf
   UefiApplicationEntryPoint|$(WORKSPACE)\MdePkg\Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
@@ -401,6 +401,9 @@
 ################################################################################
 
 [Components.IA32]
+  ${WORKSPACE}/Nt32Pkg/BootModePei/BootMode.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
+  ${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
   $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
   $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPeim\WinNtThunkPPIToProtocolPeim.inf
   $(WORKSPACE)\Nt32Pkg\WinNtAutoScanPeim\WinNtAutoScan.inf

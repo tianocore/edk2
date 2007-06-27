@@ -28,7 +28,6 @@ Abstract:
 //
 #pragma warning(disable : 4115)
 #pragma warning(disable : 4201)
-#pragma warning(disable : 4214)
 #pragma warning(disable : 4028)
 #pragma warning(disable : 4133)
 
@@ -65,7 +64,6 @@ Abstract:
 //
 #pragma warning(default : 4115)
 #pragma warning(default : 4201)
-#pragma warning(default : 4214)
 
 
 #endif
