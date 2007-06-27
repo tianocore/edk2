@@ -117,6 +117,7 @@
   ${WORKSPACE}\MdePkg\Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   ${WORKSPACE}\MdePkg\Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ${WORKSPACE}\MdePkg\Library/UefiLib/UefiLib.inf
+  ${WORKSPACE}\MdePkg\Library/UefiRuntimeLib/UefiRuntimeLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
 
