@@ -10,12 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  pci30.h
-
 **/
 
-#ifndef _PCI30_H
-#define _PCI30_H
+#ifndef __PCI30_H__
+#define __PCI30_H__
 
 //#include "pci23.h"
 

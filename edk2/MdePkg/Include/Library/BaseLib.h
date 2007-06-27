@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  BaseLib.h
-
 **/
 
 #ifndef __BASE_LIB__
@@ -43,6 +41,7 @@ typedef struct {
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
 
 #elif defined (MDE_CPU_IPF)
+
 //
 // IPF context buffer used by SetJump() and LongJump()
 //
@@ -3626,8 +3625,6 @@ CpuDeadLoop (
 
 
 #if defined (MDE_CPU_IPF)
-
-#include <IndustryStandard/Pal.h>
 
 /**
   Flush a range of  cache lines in the cache coherency domain of the calling

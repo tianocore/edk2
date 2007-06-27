@@ -12,8 +12,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
   
-  Module name: EfiPxe.h
-  
   @par Revision Reference:
   32/64-bit PXE specification:
   alpha-4, 99-Dec-17
