@@ -37,9 +37,8 @@
 #  BASE PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
 #
 ################################################################################
-[Include.common]
+[Includes.common]
   Include                        # BASE
-
 
 
 ################################################################################
@@ -49,7 +48,7 @@
 #
 ################################################################################
 [LibraryClass.common]
-  HiiLib|Include/Library/HiiLib.h
+  FrameworkHiiLib|Include/Library/FrameworkHiiLib.h
 
 
 
@@ -115,6 +114,7 @@
   gEfiSmmSwDispatchProtocolGuid  = { 0xe541b773, 0xdd11, 0x420c, { 0xb0, 0x26, 0xdf, 0x99, 0x36, 0x53, 0xf8, 0xbf }}
   gEfiSmmUsbDispatchProtocolGuid = { 0xa05b6ffd, 0x87af, 0x4e42, { 0x95, 0xc9, 0x62, 0x28, 0xb6, 0x3c, 0xf3, 0xf3 }}
   gEfiSmmSxDispatchProtocolGuid  = { 0x14fc52be, 0x01dc, 0x426c, { 0x91, 0xae, 0xa2, 0x3c, 0x3e, 0x22, 0x0a, 0xe8 }}
+  gEfiDataHubProtocolGuid = { 0xae80d021, 0x618e, 0x11d4, {0xbc, 0xd7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 }}
 
 
 
