@@ -95,6 +95,7 @@
   DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
+  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -108,6 +109,7 @@
   UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -121,6 +123,7 @@
   UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 
 [LibraryClasses.common.DXE_SAL_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -249,6 +252,15 @@
 [LibraryClasses.IPF.UEFI_APPLICATION]
   TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
+[LibraryClasses.IA32.DXE_RUNTIME_DRIVER]
+  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+
+[LibraryClasses.X64.DXE_RUNTIME_DRIVER]
+  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+
+[LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
+  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
@@ -259,6 +271,7 @@
   PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
+  PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid|FALSE
 
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -274,6 +287,8 @@
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
   PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+  PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
+  PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
@@ -293,5 +308,5 @@
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
-
-
+  ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
+  ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
