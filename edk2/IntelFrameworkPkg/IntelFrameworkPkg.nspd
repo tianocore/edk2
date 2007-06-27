@@ -96,6 +96,11 @@
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
+    <Entry Name="DataHub">
+      <C_Name>gEfiDataHubProtocolGuid</C_Name>
+      <GuidValue>AE80D021-618E-11D4-BCD7-0080C73C8881</GuidValue>
+      <HelpText>Data Hub Protocol Guid</HelpText>
+    </Entry>
     <Entry Name="SmmSxDispatch">
       <C_Name>gEfiSmmSxDispatchProtocolGuid</C_Name>
       <GuidValue>14fc52be-01dc-426c-91ae-a23c3e220ae8</GuidValue>

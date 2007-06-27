@@ -12,15 +12,21 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  Hii.h
+  Module Name:  FrameworkHii.h
 
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
 
 **/
 
-#ifndef _HII_H_
-#define _HII_H_
+#ifndef _FRAMEWORK_HII_H_
+#define _FRAMEWORK_HII_H_
+
+//
+// To get EFI_GRAPHICS_OUTPUT_BLT_PIXEL,
+// is defined in MdePkg/Protocol/GraphicsOutput.h
+//
+#include <Protocol/GraphicsOutput.h>
 
 #define EFI_HII_PROTOCOL_GUID \
   { \
