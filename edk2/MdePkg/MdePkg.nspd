@@ -82,10 +82,6 @@
       <IncludeHeader>Include/Library/MemoryAllocationLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="PalCallLib" SupArchList="IPF">
-      <IncludeHeader>Include/Library/PalCallLib.h</IncludeHeader>
-      <HelpText>Implement the PAL call</HelpText>
-    </LibraryClass>
     <LibraryClass Name="PcdLib">
       <IncludeHeader>Include/Library/PcdLib.h</IncludeHeader>
       <HelpText/>
