@@ -17,8 +17,6 @@ EDK II Prime packages are in the development phase. They consist of:
   IntelFrameworkPkg  - Framework headers and libraries
   MdeModulePkg       - Reference drivers
 
-Currently, only module build supported, and only IA32 architecture supported.
-
 
 -------------------------------------------------------------------------------
 Quick Start
@@ -28,7 +26,9 @@ NOTE: Please confirm you have already installed Python on your machine.
 
 In a command window, change to the top-level directory of the EDK II source.
 
-First, set up your workspace
+First, set up your workspace. If you have had a setup, please make sure that
+you don't have newer *.template in WORKSPACE\BaseTools\Conf. Otherwise remove
+*.txt files in WORKSPACE\Conf in advance.
     c:\MyWork\edk2\> edksetup newbuild
 
 Second, go to the module directory (For example, MdeModulePkg\Application\HelloWorld),
@@ -48,4 +48,45 @@ and then go to MdePkg\Library\BaseLib directory and build
     c:\MyWork\edk2\> cd MdePkg\Library\BaseLib
     c:\MyWork\edk2\> build
 
+If you want build a platform, please set ACTIVE_PLATFORM  to your desired platform dsc file,
+go to directory which must be not a module's directory, and run "build" command.
+
+-------------------------------------------------------------------------------
+Tools in Python
+---------------
+
+* Run buld tool written in Python from source
+  The build tool written in Python can be executed from its source directly as long as you
+have the Python interpreter (version 2.5) installed. The source of Python code is locating at
+
+		https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python
+
+	where:
+
+		MyBuild.py	- The temporary "build" tool from which the "build.exe" is coming
+		AutoGen.py  - Generate AutoGen.c/.h and makefile only
+
+	"MyBuild.py" steps:
+		1. Run "edksetup.bat newbuild"
+		2. Set ACTIVE_PLATFORM in WORKSPACE\Conf
+		3. Go to platform or module directory
+		4. Run "<python_interpreter.exe> <python_source_dir>\MyBuild.py" or "<python_source_dir>\MyBuild.py"
+		   directly.
+
+	"AutoGen.py" steps:
+		1. Run "edksetup.bat newbuild"
+		2. Set ACTIVE_PLATFORM in WORKSPACE\Conf
+		4. Run "<python_interpreter.exe> <python_source_dir>\AutoGen.py" or "<python_source_dir>\AutoGen.py"
+
+* Convert Python source to exe file
+  The tools written in Python can be coverted into executable program which can be executed
+without Python interpreter. One of the convertion tools is called cx_Freeze at 
+
+		http://sourceforge.net/projects/cx-freeze/
+
+	Suppose you have installed cx_Freeze at c:\cx_Freeze-3.0.3. Use following command line to convert MyBuild.py
+
+  	c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk --install-dir=.\mybuild MyBuild.py
+
+	The generated .exe files are put in "mybuild" subdirectory.
 
