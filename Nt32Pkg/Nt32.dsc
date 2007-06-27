@@ -411,3 +411,4 @@
   $(WORKSPACE)\Nt32Pkg\WinNtBusDriverDxe\WinNtBusDriver.inf
   $(WORKSPACE)\Nt32Pkg\WinNtConsoleDxe\WinNtConsole.inf
   $(WORKSPACE)\Nt32Pkg\WinNtSimpleFileSystemDxe\WinNtSimpleFileSystem.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtGopDxe\WinNtGop.inf
