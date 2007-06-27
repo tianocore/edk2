@@ -78,11 +78,11 @@
 #
 ################################################################################
 
-[PcdDynamic.common]
+[PcdsDynamic.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
   PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
 
-[PcdFeatureFlag.common]
+[PcdsFeatureFlag.common]
   PcdStatusCodeUseSerial|0x00010022|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdStatusCodeUseMemory|0x00010023|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdStatusCodeUseOEM|0x00010024|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
@@ -98,11 +98,12 @@
   PcdPciVgaEnable|0x0001003a|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdPciBusHotplugDeviceSupport|0x0001003d|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
 
-[PcdFixedAtBuild.common]
+[PcdsFixedAtBuild.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
   PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
+  PcdPciIncompatibleDeviceSupportMask|0x0001003f|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT8|0
 
-[PcdPatchableInModule.common]
+[PcdsPatchableInModule.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
   PcdStatusCodeRuntimeMemorySize|0x0001002e|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|4
 
