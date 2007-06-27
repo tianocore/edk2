@@ -109,7 +109,12 @@ typedef struct {
   EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
 } EFI_FIRMWARE_VOLUME_HEADER;
 
+#define EFI_FVH_SIGNATURE EFI_SIGNATURE_32 ('_', 'F', 'V', 'H')
 
+///
+/// Firmware Volume Header Revision definition
+///
+#define EFI_FVH_REVISION  0x01
 
 //
 // Extension header pointed by ExtHeaderOffset of volume header.

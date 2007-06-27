@@ -20,6 +20,11 @@ Abstract:
 #ifndef __RUNTIMELIBINTERNAL_H__
 #define __RUNTIMELIBINTERNAL_H__
 
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
 extern EFI_RUNTIME_SERVICES   *mRT;
 
 #endif //__RUNTIMELIBINTERNAL_H__
