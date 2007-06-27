@@ -406,3 +406,4 @@
   $(WORKSPACE)\Nt32Pkg\WinNtAutoScanPeim\WinNtAutoScan.inf
   $(WORKSPACE)\Nt32Pkg\WinNtBlockIoDxe\WinNtBlockIo.inf
   $(WORKSPACE)\Nt32Pkg\WinNtBusDriverDxe\WinNtBusDriver.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtConsoleDxe\WinNtConsole.inf
