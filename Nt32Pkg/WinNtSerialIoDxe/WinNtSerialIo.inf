@@ -1,0 +1,115 @@
+#/** @file
+# Serial I/O driver
+#
+# Our DriverBinding member functions operate on the handles
+#  created by the NT Bus drive
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = WinNtSerialIo
+  FILE_GUID                      = 6B41B553-A649-11d4-BD02-0080C73C8881
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeWinNtSerialIo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+#  DRIVER_BINDING                =  gWinNtSerialIoDriverBinding                  
+#  COMPONENT_NAME                =  gWinNtSerialIoComponentName                  
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  ComponentName.c
+  WinNtSerialIo.c
+  WinNtSerialIo.h
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg/Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  Nt32Pkg/Nt32Pkg.dec
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  MemoryAllocationLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiWinNtSerialPortGuid                       # ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiSerialIoProtocolGuid                      # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiWinNtIoProtocolGuid                       # PROTOCOL TO_START
+
