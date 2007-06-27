@@ -17,11 +17,6 @@
 
 
 //
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
-//
 // Common header files for this module.
 //
 #include <PiDxe.h>
