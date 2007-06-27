@@ -39,6 +39,11 @@
     <IncludePkgHeader ModuleType="DXE_SMM_DRIVER">Include/FrameworkSmm.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
+    <Entry Name="Capsule">
+      <C_Name>gEfiCapsuleGuid</C_Name>
+      <GuidValue>3B6686BD-0D76-4030-B70E-B5519E2FC5A0</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="SmramMemoryReserve" GuidTypeList="HOB">
       <C_Name>gEfiSmmPeiSmramMemoryReserveGuid</C_Name>
       <GuidValue>6dadf1d1-d4cc-4910-bb6e-82b1fd80ff3d</GuidValue>
@@ -236,6 +241,26 @@
       <GuidValue>dbff9d55-89b7-46da-bddf-677d3dc0241d</GuidValue>
       <HelpText>ACPI Support protocol</HelpText>
     </Entry>
+    <Entry Name="AcpiS3Save">
+      <C_Name>gEfiAcpiS3SaveProtocolGuid</C_Name>
+      <GuidValue>125F2DE1-FB85-440C-A54C-4D99358A8D38</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="FirmwareVolumeDispatch">
+      <C_Name>gEfiFirmwareVolumeDispatchProtocolGuid</C_Name>
+      <GuidValue>7AA35A69-506C-444F-A7AF-694BF56F71C8</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="FormCallback">
+      <C_Name>gEfiFormCallbackProtocolGuid</C_Name>
+      <GuidValue>F3E4543D-CF35-6CEF-35C4-4FE6344DFC54</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="Crc32GuidedSectionExtraction">
+      <C_Name>gEfiCrc32GuidedSectionExtractionProtocolGuid</C_Name>
+      <GuidValue>FC1BCDB0-7D31-49AA-936A-A4600D9DD083</GuidValue>
+      <HelpText/>
+    </Entry>
   </ProtocolDeclarations>
   <PpiDeclarations>
     <Entry Name="Smbus">
@@ -272,6 +297,21 @@
       <C_Name>gEfiPeiVirtualBlockIoPpiGuid</C_Name>
       <GuidValue>695d8aa1-42ee-4c46-805c-6ea6bce799e3</GuidValue>
       <HelpText>Virtual Block I/O PPI</HelpText>
+    </Entry>
+    <Entry Name="Security">
+      <C_Name>gEfiPeiSecurityPpiGuid</C_Name>
+      <GuidValue>1388066E-3A57-4EFA-98F3-C12F3A958A29</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="SectionExtraction">
+      <C_Name>gEfiPeiSectionExtractionPpiGuid</C_Name>
+      <GuidValue>4F89E208-E144-4804-9EC8-0F894F7E36D7</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ReadOnlyVariable">
+      <C_Name>gEfiPeiReadOnlyVariablePpiGuid</C_Name>
+      <GuidValue>3CDC90C6-13FB-4A75-9E79-59E9DD78B9FA</GuidValue>
+      <HelpText/>
     </Entry>
   </PpiDeclarations>
 </PackageSurfaceArea>
