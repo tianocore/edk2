@@ -1,15 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>IntelFrameworkPkg</PackageName>
     <GuidValue>2759ded5-bb57-4b06-af4f-c398fa552719</GuidValue>
     <Version>1.0</Version>
+    <Abstract>Intel Framework Package Reference Implementations</Abstract>
+    <Description>This package provides definitions and libraries that comply to Intel Framework Specifications.</Description>
+    <Copyright>Copyright (c) 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved.
+      This program and the accompanying materials are licensed and made available
+      under the terms and conditions of the BSD License which accompanies this distribution.
+      The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+      OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </SpdHeader>
   <PackageDefinitions>
     <ReadOnly>false</ReadOnly>
     <RePackage>false</RePackage>
   </PackageDefinitions>
+  <LibraryClassDeclarations>
+    <LibraryClass Name="HiiLib">
+      <IncludeHeader>Include/Library/HiiLib.h</IncludeHeader>
+      <HelpText>This library provide the service function for package manipulations based on Intel Framework HII specification.</HelpText>
+    </LibraryClass>
+  </LibraryClassDeclarations>
   <MsaFiles>
     <Filename>Library/DxeIoLibCpuIo/DxeIoLibCpuIo.msa</Filename>
     <Filename>Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.msa</Filename>
