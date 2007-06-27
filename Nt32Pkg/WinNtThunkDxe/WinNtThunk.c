@@ -27,9 +27,22 @@ Abstract:
 --*/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <WinNtDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/WinNtThunk.h>
+#include <Protocol/DevicePath.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/WinNtLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include "WinNtThunk.h"
 

@@ -17,10 +17,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 #ifndef _WIN_NT_THUNK_H_
 #define _WIN_NT_THUNK_H_
 

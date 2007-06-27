@@ -46,8 +46,6 @@
   WinNtThunk.dxs
   WinNtThunk.c
   WinNtThunk.h
-  CommonHeader.h
-
 
 ################################################################################
 #
