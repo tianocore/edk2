@@ -23,6 +23,7 @@
     <Filename>MdePkg/MdePkg.nspd</Filename>
     <Filename>MdeModulePkg/MdeModulePkg.nspd</Filename>
     <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.nspd</Filename>
+    <Filename>Nt32Pkg/Nt32Pkg.spd</Filename>
     <Filename>ShellBinPkg/ShellBinPkg.nspd</Filename>
   </PackageList>
 </FrameworkDatabase>
