@@ -20,7 +20,13 @@
 //
 // IPF Specific Functions
 //
-
+#ifdef _MSC_VER
+//
+// Disabling bitfield type checking warnings.
+//
+#pragma warning ( disable : 4214 )
+#endif
+  
 typedef struct {
   UINT64                    Status;
   UINT64                    r9;
@@ -140,6 +146,7 @@ typedef struct {
 	UINT64	AliasBoundary:8;
 	UINT64	TagLsBits:8;
 	UINT64	TagMsBits:8;
+	UINT64	Reserve:8;
 } PAL_CACHE_INFO_RETURN2;
 
 /**
