@@ -20,6 +20,8 @@ Abstract:
 #ifndef __WIN_NT_IO_H__
 #define __WIN_NT_IO_H__
 
+#include <Protocol/WinNtThunk.h>
+
 #define EFI_WIN_NT_IO_PROTOCOL_GUID \
   { 0x96eb4ad6, 0xa32a, 0x11d4, { 0xbc, 0xfd, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
