@@ -14,8 +14,8 @@
 
 **/
 
-#ifndef __EFI_DRIVER_CONFIGURATION_H__
-#define __EFI_DRIVER_CONFIGURATION_H__
+#ifndef __EFI_DRIVER_CONFIGURATION2_H__
+#define __EFI_DRIVER_CONFIGURATION2_H__
 
 //
 // Global ID for the Driver Configuration Protocol defined in UEFI 2.0
@@ -150,8 +150,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS) (
-  IN EFI_DRIVER_CONFIGURATION_PROTOCOL                        *This,
+(EFIAPI *EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS) (
+  IN EFI_DRIVER_CONFIGURATION2_PROTOCOL                        *This,
   IN  EFI_HANDLE                                              ControllerHandle,
   IN  EFI_HANDLE                                              ChildHandle  OPTIONAL,
   IN  UINT32                                                  DefaultType,
@@ -162,10 +162,10 @@ EFI_STATUS
 //
 //
 struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
-  EFI_DRIVER_CONFIGURATION2_SET_OPTIONS   SetOptions;
-  EFI_DRIVER_CONFIGURATION_OPTIONS_VALID  OptionsValid;
-  EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS ForceDefaults;
-  CHAR8                                   *SupportedLanguages;
+  EFI_DRIVER_CONFIGURATION2_SET_OPTIONS     SetOptions;
+  EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID   OptionsValid;
+  EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS  ForceDefaults;
+  CHAR8                                     *SupportedLanguages;
 };
 
 /**
