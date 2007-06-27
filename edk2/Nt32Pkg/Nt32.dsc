@@ -111,7 +111,7 @@
   OemHookStatusCodeLib|$(WORKSPACE)\Nt32Pkg\Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_CORE]
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -141,7 +141,7 @@
   CacheMaintenanceLib|$(WORKSPACE)\MdePkg\Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
 [LibraryClasses.common.DXE_SAL_DRIVER]
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
   EdkIfrSupportLib|$(WORKSPACE)\MdeModulePkg\Library/EdkIfrSupportLib/EdkIfrSupportLib.inf
@@ -166,7 +166,7 @@
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PrintLib|$(WORKSPACE)\MdeModulePkg\Library/EdkDxePrintLib/EdkDxePrintLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
@@ -191,10 +191,10 @@
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PcdLib|$(WORKSPACE)\MdePkg\Library/PeiPcdLib/PeiPcdLib.inf
   IoLib|$(WORKSPACE)\MdePkg\Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeimEntryPoint|$(WORKSPACE)\MdePkg\Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|$(WORKSPACE)\MdePkg\Library/PeiServicesLib/PeiServicesLib.inf
-  BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/PeiMemoryLib/PeiMemoryLib.inf
+  BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
   MemoryAllocationLib|$(WORKSPACE)\MdePkg\Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
@@ -203,14 +203,14 @@
   PeiServicesTablePointerLib|$(WORKSPACE)\MdePkg\Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PcdLib|$(WORKSPACE)\MdePkg\Library/PeiPcdLib/PeiPcdLib.inf
   IoLib|$(WORKSPACE)\MdePkg\Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeiServicesLib|$(WORKSPACE)\MdePkg\Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib|$(WORKSPACE)\MdePkg\Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiCoreEntryPoint|$(WORKSPACE)\MdePkg\Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   ReportStatusCodeLib|$(WORKSPACE)\MdePkg\Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
   EdkIfrSupportLib|$(WORKSPACE)\MdeModulePkg\Library/EdkIfrSupportLib/EdkIfrSupportLib.inf
@@ -235,7 +235,7 @@
   UefiDriverModelLib|$(WORKSPACE)\MdePkg\Library/UefiDriverModelLib/UefiDriverModelLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)\MdePkg\Library/DxeHobLib/DxeHobLib.inf
   EdkIfrSupportLib|$(WORKSPACE)\MdeModulePkg\Library/EdkIfrSupportLib/EdkIfrSupportLib.inf
@@ -284,7 +284,7 @@
 
 [LibraryClasses.common.UEFI_APPLICATION]
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
-  DebugLib|$(WORKSPACE)\MdePkg\Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|$(WORKSPACE)\MdePkg\Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DxeServicesTableLib|$(WORKSPACE)\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PrintLib|$(WORKSPACE)\MdeModulePkg\Library/EdkDxePrintLib/EdkDxePrintLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
@@ -402,3 +402,4 @@
 
 [Components.IA32]
   $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
+  $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPeim\WinNtThunkPPIToProtocolPeim.inf

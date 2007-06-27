@@ -94,6 +94,7 @@
   ${WORKSPACE}\MdePkg\Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   ${WORKSPACE}\MdePkg\Library/DxeCoreHobLib/DxeCoreHobLib.inf
   ${WORKSPACE}\MdePkg\Library/DxeHobLib/DxeHobLib.inf
+  ${WORKSPACE}\MdePkg\Library/PeiHobLib/PeiHobLib.inf
   ${WORKSPACE}\MdePkg\Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   ${WORKSPACE}\MdePkg\Library/DxePcdLib/DxePcdLib.inf
   ${WORKSPACE}\MdePkg\Library/DxeServicesTableLib/DxeServicesTableLib.inf

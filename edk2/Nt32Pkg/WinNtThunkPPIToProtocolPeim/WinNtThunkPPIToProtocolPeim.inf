@@ -1,0 +1,104 @@
+#/** @file
+# Stuff driver
+#
+# Tiano PEIM to abstract construction of firmware volume in a Windows NT environment.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = WinNtThunkPPIToProtocolPeim
+  FILE_GUID                      = D3AAD8DC-3A48-46ac-B1C7-28A9D3CF6755
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = PeimInitializeWinNtThunkPPIToProtocolPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  WinNtThunkPPIToProtocolPeim.dxs
+  WinNtThunkPPIToProtocolPeim.c
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/OldMdePkg/Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  Nt32Pkg/Nt32Pkg.dec
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  HobLib
+  PeimEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiWinNtThunkProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# PPI C Name Section - list of PPI and PPI Notify C Names that this module
+#                      uses or produces.
+#
+################################################################################
+
+[Ppis]
+  gPeiNtThunkPpiGuid                            # PPI ALWAYS_CONSUMED
+
