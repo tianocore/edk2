@@ -115,7 +115,7 @@
 #
 ################################################################################
 
-[PcdFeatureFlag.common]
+[PcdsFeatureFlag.common]
   PcdSupportUpdateCapsuleRest|0x0001001d|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdPeiPcdDatabaseTraverseEnabled|0x00010020|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdDxePcdDatabaseTraverseEnabled|0x00010021|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
@@ -131,7 +131,7 @@
   PcdDxeIplBuildShareCodeHobs|0x0001003c|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdNtEmulatorEnable|0x0001003e|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
 
-[PcdFixedAtBuild.common]
+[PcdsFixedAtBuild.common]
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x0001000f|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x08
   PcdVpdBaseAddress|0x00010010|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
   PcdMaxSizePopulateCapsule|0x0001001e|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
@@ -144,7 +144,7 @@
   PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
 
-[PcdDynamic.common]
+[PcdsDynamic.common]
   PcdFlashNvStorageVariableBase|0x30000001|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageVariableSize|0x30000002|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
@@ -152,7 +152,7 @@
   PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
 
-[PcdPatchableInModule.common]
+[PcdsPatchableInModule.common]
   PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiEdkModulePkgTokenSpaceGuid|UINT8|28
   PcdFlashNvStorageVariableBase|0x30000001|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageVariableSize|0x30000002|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
@@ -162,7 +162,7 @@
   PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiGenericPlatformTokenSpaceGuid|UINT32|0x0
 
 
-[PcdFeatureFlag.IA32]
+[PcdsFeatureFlag.IA32]
   PcdDxeIplSwitchToLongMode|0x0001003b|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
 
 
