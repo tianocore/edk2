@@ -146,7 +146,6 @@ typedef struct {
 	UINT64	AliasBoundary:8;
 	UINT64	TagLsBits:8;
 	UINT64	TagMsBits:8;
-	UINT64	Reserve:8;
 } PAL_CACHE_INFO_RETURN2;
 
 /**
