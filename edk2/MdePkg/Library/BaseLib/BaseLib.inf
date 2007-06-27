@@ -290,9 +290,9 @@
   x86EnablePaging32.c
   x86DisablePaging64.c
   x86DisablePaging32.c
-  Synchronization.c
-  SynchronizationMsc.c
-  SynchronizationGcc.c
+#  SynchronizationMsc.c  #|| INTC
+  SynchronizationMsc.c  #|| MSFT
+#  SynchronizationGcc.c  || GCC
 
 [Sources.X64]
   X64/Thunk16.asm

@@ -49,14 +49,14 @@
 
 [Sources.Ia32]
   IoHighLevel.c
-  IoLibGcc.c
-  IoLibMsc.c
+#  IoLibGcc.c    || GCC   
+  IoLibMsc.c    #|| MSFT
   IoLib.c
 
 [Sources.X64]
   IoHighLevel.c
-  IoLibGcc.c
-  IoLibMsc.c
+#  IoLibGcc.c    || GCC   
+  IoLibMsc.c    #|| MSFT
   IoLib.c
 
 [Sources.IPF]
