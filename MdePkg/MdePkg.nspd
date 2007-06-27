@@ -721,6 +721,11 @@
       <GuidValue>982C298B-F4FA-41CB-B838-77AA688FB839</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="UgaIo">
+      <C_Name>gEfiUgaIoProtocolGuid</C_Name>
+      <GuidValue>61A4D49E-6F68-4F1B-B922-A86EED0B07A2</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="UnicodeCollation">
       <C_Name>gEfiUnicodeCollationProtocolGuid</C_Name>
       <GuidValue>1D85CD7F-F43D-11D2-9A0C-0090273FC14D</GuidValue>
