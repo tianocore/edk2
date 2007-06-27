@@ -159,7 +159,7 @@
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
-  UefiRuntimeLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUefiRuntimeLib/EdkUefiRuntimeLib.inf
+  UefiRuntimeLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeLib/UefiRuntimeLib.inf
   TianoDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
@@ -228,7 +228,7 @@
   UefiBootServicesTableLib|$(WORKSPACE)\MdePkg\Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|$(WORKSPACE)\MdePkg\Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseMemoryLib|$(WORKSPACE)\MdePkg\Library/BaseMemoryLib/BaseMemoryLib.inf
-  UefiRuntimeLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUefiRuntimeLib/EdkUefiRuntimeLib.inf
+  UefiRuntimeLib|$(WORKSPACE)\MdePkg\Library/UefiRuntimeLib/UefiRuntimeLib.inf
   TianoDecompressLib|$(WORKSPACE)\MdeModulePkg\Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)\MdeModulePkg\Library/EdkUsbLib/EdkUsbLib.inf
   EdkScsiLib|$(WORKSPACE)\MdeModulePkg\Library/EdkScsiLib/EdkScsiLib.inf
@@ -413,3 +413,4 @@
   $(WORKSPACE)\Nt32Pkg\WinNtSimpleFileSystemDxe\WinNtSimpleFileSystem.inf
   $(WORKSPACE)\Nt32Pkg\WinNtGopDxe\WinNtGop.inf
   $(WORKSPACE)\Nt32Pkg\WinNtSerialIoDxe\WinNtSerialIo.inf
+  $(WORKSPACE)\Nt32Pkg\FvbServicesRuntimeDxe\Nt32Fwh.inf
