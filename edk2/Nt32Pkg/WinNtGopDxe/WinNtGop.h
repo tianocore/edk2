@@ -23,11 +23,6 @@ Abstract:
 #ifndef _WIN_NT_GOP_H_
 #define _WIN_NT_GOP_H_
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 //@MT:#include "EfiWinNT.h"
 //@MT:#include "Tiano.h"
 //@MT:#include "EfiDriverLib.h"
