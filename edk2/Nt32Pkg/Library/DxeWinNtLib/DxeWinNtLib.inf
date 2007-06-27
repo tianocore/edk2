@@ -83,3 +83,6 @@
   HobLib
   DebugLib
 
+[Protocols]
+  gEfiWinNtThunkProtocolGuid      # Used as HOB in the code.
+  
