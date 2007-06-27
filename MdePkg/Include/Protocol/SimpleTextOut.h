@@ -392,6 +392,6 @@ struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_SIMPLE_TEXT_OUTPUT_MODE   *Mode;
 };
 
-extern EFI_GUID gEfiSimpleTextOutputProtocolGuid;
+extern EFI_GUID gEfiSimpleTextOutProtocolGuid;
 
 #endif
