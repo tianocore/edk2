@@ -17,8 +17,6 @@
 #ifndef __BASE_LIB__
 #define __BASE_LIB__
 
-#include <IndustryStandard/Pal.h>
-
 //
 // Definitions for architecture specific types
 // These include SPIN_LOCK and BASE_LIBRARY_JUMP_BUFFER
@@ -3628,6 +3626,8 @@ CpuDeadLoop (
 
 
 #if defined (MDE_CPU_IPF)
+
+#include <IndustryStandard/Pal.h>
 
 /**
   Flush a range of  cache lines in the cache coherency domain of the calling
