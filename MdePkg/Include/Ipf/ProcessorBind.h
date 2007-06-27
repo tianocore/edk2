@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  ProcessorBind.h
-
 **/
 
 #ifndef __PROCESSOR_BIND_H__
@@ -214,6 +212,13 @@ typedef struct {
   UINT64  EntryPoint;
   UINT64  GP;
 } EFI_PLABEL;
+
+typedef struct {
+  UINT64                    Status;
+  UINT64                    r9;
+  UINT64                    r10;
+  UINT64                    r11;
+} PAL_CALL_RETURN;
 
 #endif
 

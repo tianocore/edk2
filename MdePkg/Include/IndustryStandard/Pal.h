@@ -10,30 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  PalApi.h
-
 **/
 
 #ifndef __PAL_API_H__
 #define __PAL_API_H__
-
-//
-// IPF Specific Functions
-//
-#ifdef _MSC_VER
-//
-// Disabling bitfield type checking warnings.
-//
-#pragma warning ( disable : 4214 )
-#endif
-  
-typedef struct {
-  UINT64                    Status;
-  UINT64                    r9;
-  UINT64                    r10;
-  UINT64                    r11;
-} PAL_CALL_RETURN;
-
 
 
 //

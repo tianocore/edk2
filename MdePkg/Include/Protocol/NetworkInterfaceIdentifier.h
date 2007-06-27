@@ -1,5 +1,5 @@
 /** @file
-  Revision history:
+  EFI Network Interface Identifier Protocol
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -10,9 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module name:
-
-  EfiNetworkInterfaceIdentifier.h
 
 **/
 

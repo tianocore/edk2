@@ -12,8 +12,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  EventLegacyBios.h
-
   @par Revision Reference:
   GUIDs defined in DXE CIS 0.91b.
 

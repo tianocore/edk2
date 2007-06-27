@@ -1,7 +1,15 @@
 /** @file
   Declaration of internal functions for Base Memory Library.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  The following BaseMemoryLib instances share the same version of this file:
+    BaseMemoryLib
+    BaseMemoryLibMmx
+    BaseMemoryLibSse2
+    BaseMemoryLibRepStr
+    PeiMemoryLib
+    DxeMemoryLib
+
+  <BR>Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -9,17 +17,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  MemLibInternals.h
-
-  The following BaseMemoryLib instances share the same version of this file:
-
-    BaseMemoryLib
-    BaseMemoryLibMmx
-    BaseMemoryLibSse2
-    BaseMemoryLibRepStr
-    PeiMemoryLib
-    DxeMemoryLib
 
 **/
 

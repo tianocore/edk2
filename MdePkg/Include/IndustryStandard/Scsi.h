@@ -10,12 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  scsi.h
-
 **/
 
-#ifndef _SCSI_H
-#define _SCSI_H
+#ifndef __SCSI_H__
+#define __SCSI_H__
 
 //
 // SCSI command OP Code

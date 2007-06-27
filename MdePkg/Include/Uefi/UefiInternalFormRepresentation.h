@@ -13,8 +13,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  UefiInternalFormRepresentation.h
-
   @par Revision Reference:
   These definitions are from UEFI2.1.
 
