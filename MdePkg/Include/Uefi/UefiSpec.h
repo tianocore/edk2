@@ -37,6 +37,16 @@ typedef enum {
   MaxAllocateType
 } EFI_ALLOCATE_TYPE;
 
+//
+// Bit definitions for EFI_TIME.Daylight
+//
+#define EFI_TIME_ADJUST_DAYLIGHT  0x01
+#define EFI_TIME_IN_DAYLIGHT      0x02
+
+//
+// Value definition for EFI_TIME.TimeZone
+//
+#define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
 //
 // possible caching types for the memory range
