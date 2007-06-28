@@ -66,6 +66,20 @@ typedef struct {
 #define EFI_EVENT_SIGNAL_READY_TO_BOOT  0x00000203
 #define EFI_EVENT_SIGNAL_LEGACY_BOOT    0x00000204
 
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  EFI_GUID                  TianoSpecificDevicePath;
+  UINT32                    Type;
+} TIANO_DEVICE_PATH;
+
+#define TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE         0x01
+typedef struct {
+  TIANO_DEVICE_PATH     Tiano;
+  EFI_GUID              NameGuid;
+} FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
+
+
 //
 // Function prototype for invoking a function on an Application Processor
 // Used by both the SMM infrastructure and the MP Services Protocol

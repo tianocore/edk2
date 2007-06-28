@@ -26,6 +26,7 @@
 
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
 
+#include <Protocol/DevicePath.h>
 
 #pragma pack(1)
 
