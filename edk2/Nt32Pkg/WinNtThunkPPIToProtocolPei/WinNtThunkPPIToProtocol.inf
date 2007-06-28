@@ -43,8 +43,8 @@
 ################################################################################
 
 [Sources.common]
-  WinNtThunkPPIToProtocolPeim.dxs
-  WinNtThunkPPIToProtocolPeim.c
+  WinNtThunkPPIToProtocol.dxs
+  WinNtThunkPPIToProtocol.c
 
 ################################################################################
 #
@@ -54,7 +54,7 @@
 ################################################################################
 
 [Includes]
-  $(WORKSPACE)/OldMdePkg/Include/Library
+  $(WORKSPACE)/MdePkg/Include/Library
 
 ################################################################################
 #
