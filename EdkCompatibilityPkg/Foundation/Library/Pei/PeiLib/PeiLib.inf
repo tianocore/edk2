@@ -1,0 +1,104 @@
+#/*++
+#
+# Copyright (c) 2004 - 2006, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+# 
+#  Module Name:
+#
+#    PeiLib.inf
+#
+#  Abstract:
+#
+#    Component description file for the PEI library.
+#
+#--*/
+
+[defines]
+BASE_NAME         = PeiLib
+COMPONENT_TYPE    = LIBRARY
+
+[sources.common]
+  PeiLib.c
+  PeCoffLoader.c
+  Decompress.c
+  Debug.c
+  Hob\Hob.c
+  perf.c
+  print\print.c
+  print\print.h
+  FindFv.c
+
+[sources.ia32]
+#  ia32\Math.c
+  ia32\PeCoffLoaderEx.c
+  ia32\PeCoffLoaderEx.h
+  ia32\PerformancePrimitives.c
+  ia32\Processor.c
+  ia32\ProcessorAsms.Asm
+  ia32\SupportItpDebug.asm
+  ia32\efijump.h
+  ia32\ReadIdt.asm
+  ia32\WriteIdt.asm
+  ia32\PeiServicePointer.c
+
+[sources.x64]
+  x64\PeCoffLoaderEx.c
+  x64\PeCoffLoaderEx.h
+  x64\PerformancePrimitives.c
+  x64\Processor.c
+  x64\ProcessorAsms.Asm
+  x64\SupportItpDebug.asm
+  x64\efijump.h
+  x64\PeiServicePointer.c
+
+[sources.ipf]
+#  ipf\Math.c
+  ipf\PeCoffLoaderEx.c
+  ipf\PeCoffLoaderEx.h
+  ipf\PerformancePrimitives.s
+  ipf\Processor.c
+  ipf\EfiJump.h
+  ipf\SetJmp.s
+  ipf\Asm.h
+  ipf\PioFlush.s
+  ipf\SwitchStack.s
+  ipf\Ia_64Gen.h
+  ipf\HwAccess.s
+  ipf\PeiServicePointer.c
+  
+  
+[libraries.common]
+  EdkGuidLib
+  EfiCommonLib
+
+[libraries.ia32]
+  CpuIA32Lib
+
+[libraries.x64]
+  CpuIA32Lib
+
+[includes.common]
+  $(EDK_SOURCE)\Foundation
+  $(EDK_SOURCE)\Foundation\Framework
+  $(EDK_SOURCE)\Foundation\Efi
+  .
+  $(EDK_SOURCE)\Foundation\Core\Dxe
+  $(EDK_SOURCE)\Foundation\Include
+  $(EDK_SOURCE)\Foundation\Efi\Include
+  $(EDK_SOURCE)\Foundation\Framework\Include
+  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
+  $(EDK_SOURCE)\Foundation\Include\Pei
+  $(EDK_SOURCE)\Foundation\Library\Pei\Include
+  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
+  $(EDK_SOURCE)\Foundation\Cpu\Pentium\Include
+
+[includes.ia32.Nt32]
+  $(EDK_SOURCE)\Sample\Platform\Nt32
+
+[nmake.common]
