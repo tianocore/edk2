@@ -48,7 +48,7 @@
   PciLib|${WORKSPACE}/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PeCoffGetEntryPoint|${WORKSPACE}/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffLib|${WORKSPACE}/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  PeformanceLib|${WORKSPACE}/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  PerformanceLib|${WORKSPACE}/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
   PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
   PrintLib|${WORKSPACE}/MdePkg/Library/BasePrintLib/BasePrintLib.inf
@@ -336,7 +336,7 @@
   ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
-  #${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
