@@ -1,0 +1,172 @@
+#/** @file
+# Component description file for PciBus module.
+#
+# PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
+#  space for these devices. Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
+#  support hot plug.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciBus
+  FILE_GUID                      = 93B80004-9FB3-11d4-9A3A-0090273FC14D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = PciBusEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gPciBusDriverBinding                         
+#  COMPONENT_NAME                =  gPciBusComponentName                         
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  PciLib.c
+  PciIo.c
+  pcibus.c
+  PciDeviceSupport.c
+  ComponentName.c
+  ComponentName.h
+  PciCommand.c
+  PciResourceSupport.c
+  PciEnumeratorSupport.c
+  PciEnumerator.c
+  PciOptionRomSupport.c
+  PciDriverOverride.c
+  PciPowerManagement.c
+  PciPowerManagement.h
+  PciDriverOverride.h
+  PciRomTable.c
+  PciHotPlugSupport.c
+  PciLib.h
+  PciHotPlugSupport.h
+  PciRomTable.h
+  PciOptionRomSupport.h
+  PciEnumeratorSupport.h
+  PciEnumerator.h
+  PciResourceSupport.h
+  PciDeviceSupport.h
+  PciCommand.h
+  PciIo.h
+  pcibus.h
+
+[Includes]
+  IntelFrameworkModulePkg/Include
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  PciIncompatibleDeviceSupportLib
+  PcdLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
+  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED  System Table
+  gEfiPciHotplugDeviceGuid                      # PRIVATE
+  gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL BY_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL BY_START
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL TO_START
+  gEfiDecompressProtocolGuid                    # PROTOCOL TO_START
+  gEfiPciHotPlugInitProtocolGuid                # PROTOCOL TO_START
+  gEfiPciHostBridgeResourceAllocationProtocolGuid # PROTOCOL TO_START
+  gEfiPciPlatformProtocolGuid                   # PROTOCOL TO_START
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
+
+################################################################################
+#
+# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFeatureFlag.common]
+  PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+
+
+################################################################################
+#
+# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFixedAtBuild.common]
+  PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+
