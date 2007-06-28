@@ -45,7 +45,6 @@
 ################################################################################
 
 [Sources.common]
-  Variable.dxs
   InitVariable.c
   reclaim.c
   reclaim.h
@@ -120,4 +119,16 @@
 [PcdsDynamic.common]
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid
   PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
+
+
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid AND gEfiFaultTolerantWriteLiteProtocolGuid
+
 

@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  Capsule.dxs
   CapsuleService.h
   CapsuleService.c
   Capsule.c
@@ -119,3 +118,12 @@
   PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
   PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiVariableArchProtocolGuid
