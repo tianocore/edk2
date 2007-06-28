@@ -32,6 +32,7 @@ Abstract:
 //
 #include <Protocol/SecurityPolicy.h>
 #include <Protocol/GuidedSectionExtaction.h>
+#include <Protocol/Crc32GuidedSectionExtraction.h>
 //
 // The Library classes this module consumes
 //
