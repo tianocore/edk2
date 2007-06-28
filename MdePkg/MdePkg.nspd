@@ -547,11 +547,6 @@
       <GuidValue>11B34006-D85B-4D0A-A290-D5A571310EF7</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="SectionExtraction">
-      <C_Name>gEfiSectionExtractionProtocolGuid</C_Name>
-      <GuidValue>448F5DA4-6DD7-4FE1-9307-69224192215D</GuidValue>
-      <HelpText/>
-    </Entry>
     <Entry Name="Bis">
       <C_Name>gEfiBisProtocolGuid</C_Name>
       <GuidValue>0B64AAB0-5429-11D4-9816-00A0C91FADCF</GuidValue>
