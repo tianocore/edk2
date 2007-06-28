@@ -1,12 +1,13 @@
 #/** @file
-#  Component description file for DiskIo module.
+# Component description file for Variable module.
 #
-#  Copyright (c) 2006 - 2007, Intel Corporation
+# This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -20,22 +21,21 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DiskIo
-  FILE_GUID                      = 6B38F7B4-AD98-40e9-9093-ACA2B5A253C4
-  MODULE_TYPE                    = UEFI_DRIVER
+  BASE_NAME                      = Variable
+  FILE_GUID                      = CBD2E4D5-7068-4FF5-B462-9822B4AD8D60
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = InitializeDiskIo
+  ENTRY_POINT                    = VariableServiceInitialize
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64
 #
-#  DRIVER_BINDING                =  gDiskIoDriverBinding
-#  COMPONENT_NAME                =  gDiskIoComponentName
+#  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VariableClassAddressChangeEvent
 #
 
 ################################################################################
@@ -45,9 +45,13 @@
 ################################################################################
 
 [Sources.common]
-  ComponentName.c
-  DiskIo.h
-  DiskIo.c
+  Variable.dxs
+  InitVariable.c
+  reclaim.c
+  reclaim.h
+  Variable.c
+  Variable.h
+  CommonHeader.h
 
 
 ################################################################################
@@ -68,9 +72,9 @@
 ################################################################################
 
 [Packages]
-  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
+  $(WORKSPACE)/IntelFrameworkPkg/IntelFrameworkPkg.dec
   $(WORKSPACE)/MdePkg/MdePkg.dec
-
+  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
 
 ################################################################################
 #
@@ -80,13 +84,17 @@
 ################################################################################
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   MemoryAllocationLib
-  BaseMemoryLib
   BaseLib
   UefiLib
-  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  FvbServiceLib
+  BaseMemoryLib
   DebugLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+  PcdLib
 
 
 ################################################################################
@@ -97,6 +105,19 @@
 ################################################################################
 
 [Protocols]
-  gEfiDiskIoProtocolGuid                        # PROTOCOL BY_START
-  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
+  gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL SOMETIMES_CONSUMED
+  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+
+
+################################################################################
+#
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsDynamic.common]
+  PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
 

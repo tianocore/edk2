@@ -1,12 +1,13 @@
 #/** @file
-#  Component description file for DiskIo module.
+# FvbService Library for UEFI drivers
 #
-#  Copyright (c) 2006 - 2007, Intel Corporation
+# This library instance provide sevice functions to access Firmware Volume Block protocol.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -20,22 +21,22 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DiskIo
-  FILE_GUID                      = 6B38F7B4-AD98-40e9-9093-ACA2B5A253C4
-  MODULE_TYPE                    = UEFI_DRIVER
+  BASE_NAME                      = EdkFvbServiceLib
+  FILE_GUID                      = bd4d540e-04b0-4b10-8fd5-4a7bb533cf67
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EdkFvbServiceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = InitializeDiskIo
+  CONSTRUCTOR                    = FvbLibInitialize
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
-#  DRIVER_BINDING                =  gDiskIoDriverBinding
-#  COMPONENT_NAME                =  gDiskIoComponentName
+#  VIRTUAL_ADDRESS_MAP_CALLBACK  =  FvbVirtualAddressChangeNotifyEvent
 #
 
 ################################################################################
@@ -45,9 +46,16 @@
 ################################################################################
 
 [Sources.common]
-  ComponentName.c
-  DiskIo.h
-  DiskIo.c
+  Fvb.h
+
+[Sources.Ia32]
+  Ia32/Fvb.c
+
+[Sources.X64]
+  x64/Fvb.c
+
+[Sources.IPF]
+  Ipf/Fvb.c
 
 
 ################################################################################
@@ -68,9 +76,8 @@
 ################################################################################
 
 [Packages]
-  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
-  $(WORKSPACE)/MdePkg/MdePkg.dec
-
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 ################################################################################
 #
@@ -79,14 +86,21 @@
 #
 ################################################################################
 
-[LibraryClasses]
+[LibraryClasses.IA32]
   UefiBootServicesTableLib
-  MemoryAllocationLib
+  UefiRuntimeLib
   BaseMemoryLib
+  DebugLib
   BaseLib
   UefiLib
-  UefiDriverEntryPoint
+
+[LibraryClasses.X64]
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+  BaseMemoryLib
   DebugLib
+  BaseLib
+  UefiLib
 
 
 ################################################################################
@@ -97,6 +111,13 @@
 ################################################################################
 
 [Protocols]
-  gEfiDiskIoProtocolGuid                        # PROTOCOL BY_START
-  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
+
+[Protocols.IA32]
+  gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
+
+[Protocols.X64]
+  gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
 

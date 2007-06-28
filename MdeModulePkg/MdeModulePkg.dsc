@@ -96,6 +96,7 @@
   DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -110,6 +111,8 @@
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -124,6 +127,8 @@
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_SAL_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -138,6 +143,9 @@
   UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -151,6 +159,9 @@
   DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+
 
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -165,6 +176,9 @@
   UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+
 
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -178,6 +192,8 @@
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
 
 
 [LibraryClasses.IA32.BASE]
@@ -273,6 +289,8 @@
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid|FALSE
 
+#  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -293,6 +311,8 @@
   PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageFtwWorkingBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid|0x0
+  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid|0x0
+  PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
@@ -317,6 +337,7 @@
   ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
   #${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Variable/RuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
