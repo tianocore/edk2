@@ -1,14 +1,14 @@
 /** @file
   This file declares Section Extraction PPI.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  SectionExtraction.h
 
@@ -20,6 +20,8 @@
 
 #ifndef __SECTION_EXTRACTION_PPI_H__
 #define __SECTION_EXTRACTION_PPI_H__
+
+#include <PiPei.h>
 
 #define EFI_PEI_SECTION_EXTRACTION_PPI_GUID \
   { \
@@ -46,7 +48,7 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
   @param  SectionType    Pointer to an EFI_SECTION_TYPE. If SectionType == NULL,
                          the contents of the entire section are returned in Buffer. If SectionType
                          is not NULL, only the requested section is returned.
-  @param  SectionDefinitionGuid 
+  @param  SectionDefinitionGuid
                          Pointer to an EFI_GUID.
                          If SectionType == EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid
                          indicates for which section GUID to search.
@@ -59,7 +61,7 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
   @param  BufferSize     A pointer to a caller-allocated UINT32.On input, *BufferSize
                          indicates the size in bytes of the memory region pointed to by Buffer.On output,
                          *BufferSize contains the number of bytes required to read the section.
-  @param  AuthenticationStatus 
+  @param  AuthenticationStatus
                          A pointer to a caller-allocated UINT32 in
                          which any metadata from encapsulating GUID-defined sections is returned.
 
@@ -92,7 +94,7 @@ EFI_STATUS
 
 /**
   @par Ppi Description:
-  This PPI supports encapsulating sections, such as GUIDed sections used to 
+  This PPI supports encapsulating sections, such as GUIDed sections used to
   authenticate the file encapsulation of other domain-specific wrapping.
 
   @param GetSection

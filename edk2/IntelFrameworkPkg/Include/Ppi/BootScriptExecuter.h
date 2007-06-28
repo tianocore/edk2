@@ -21,6 +21,8 @@
 #ifndef _PEI_BOOT_SCRIPT_EXECUTER_PPI_H
 #define _PEI_BOOT_SCRIPT_EXECUTER_PPI_H
 
+#include <PiPei.h>
+
 #define EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI_GUID \
   { \
     0xabd42895, 0x78cf, 0x4872, {0x84, 0x44, 0x1b, 0x5c, 0x18, 0x0b, 0xfb, 0xff } \

@@ -1,18 +1,18 @@
 /** @file
-  The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to custom 
-  NV storage devices as well as communication of user selections in a more 
-  interactive environment.  This protocol should be published by hardware 
-  specific drivers which want to export access to custom hardware storage or 
+  The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to custom
+  NV storage devices as well as communication of user selections in a more
+  interactive environment.  This protocol should be published by hardware
+  specific drivers which want to export access to custom hardware storage or
   publish IFR which has a requirement to call back the original driver.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  FormCallback.h
 
@@ -24,6 +24,7 @@
 #ifndef __FORM_CALLBACK_H__
 #define __FORM_CALLBACK_H__
 
+#include <PiDxe.h>
 
 #define EFI_FORM_CALLBACK_PROTOCOL_GUID \
   { \
@@ -86,7 +87,7 @@ typedef struct {
 // The following types are currently defined:
 //
 /**
-  Returns the value of a variable. 
+  Returns the value of a variable.
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  VariableName          A NULL-terminated Unicode string that is the
@@ -118,7 +119,7 @@ EFI_STATUS
   );
 
 /**
-  Sets the value of a variable. 
+  Sets the value of a variable.
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  VariableName          A NULL-terminated Unicode string that is the
@@ -155,7 +156,7 @@ EFI_STATUS
   );
 
 /**
-  This function is called to provide results data to the driver. 
+  This function is called to provide results data to the driver.
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  KeyValue              A unique value which is sent to the original exporting
@@ -179,10 +180,10 @@ EFI_STATUS
 
 /**
   @par Protocol Description:
-  The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to 
-  custom NVS devices as well as communication of user selections in a more 
-  interactive environment. This protocol should be published by hardware-specific 
-  drivers that want to export access to custom hardware storage or publish IFR 
+  The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to
+  custom NVS devices as well as communication of user selections in a more
+  interactive environment. This protocol should be published by hardware-specific
+  drivers that want to export access to custom hardware storage or publish IFR
   that has a requirement to call back the original driver.
 
   @param NvRead
@@ -192,7 +193,7 @@ EFI_STATUS
   The write operation to access the NV data serviced by a hardware-specific driver.
 
   @param Callback
-  The function that is called from the configuration browser to communicate key value pairs. 
+  The function that is called from the configuration browser to communicate key value pairs.
 
 **/
 struct _EFI_FORM_CALLBACK_PROTOCOL {

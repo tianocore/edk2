@@ -22,6 +22,8 @@
 #ifndef _EFI_LEGACY_8259_H_
 #define _EFI_LEGACY_8259_H_
 
+#include <PiDxe.h>
+
 #define EFI_LEGACY_8259_PROTOCOL_GUID \
   { \
     0x38321dba, 0x4fe0, 0x4e17, {0x8a, 0xec, 0x41, 0x30, 0x55, 0xea, 0xed, 0xc1 } \

@@ -21,6 +21,8 @@
 #ifndef _SMM_CONTROL_H_
 #define _SMM_CONTROL_H_
 
+#include <PiDxe.h>
+
 typedef struct _EFI_SMM_CONTROL_PROTOCOL              EFI_SMM_CONTROL_PROTOCOL;
 
 #define EFI_SMM_CONTROL_PROTOCOL_GUID \

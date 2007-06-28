@@ -20,6 +20,8 @@
 #ifndef _BOOT_SCRIPT_SAVE_PROTOCOL_H
 #define _BOOT_SCRIPT_SAVE_PROTOCOL_H
 
+#include <PiDxe.h>
+
 //
 // S3 Save Protocol GUID
 //

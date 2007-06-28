@@ -21,6 +21,8 @@
 #ifndef _EFI_SMM_SW_DISPATCH_H_
 #define _EFI_SMM_SW_DISPATCH_H_
 
+#include <PiDxe.h>
+
 //
 // Global ID for the SW SMI Protocol
 //

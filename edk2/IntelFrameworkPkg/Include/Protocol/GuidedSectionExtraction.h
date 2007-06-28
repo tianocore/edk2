@@ -1,19 +1,19 @@
 /** @file
   This file declares GUIDed section extraction protocol.
 
-  This interface provides a means of decoding a GUID defined encapsulation 
+  This interface provides a means of decoding a GUID defined encapsulation
   section. There may be multiple different GUIDs associated with the GUIDed
   section extraction protocol. That is, all instances of the GUIDed section
   extraction protocol must have the same interface structure.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  GuidedSectionExtraction.h
 
@@ -26,6 +26,7 @@
 #ifndef __GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
 #define __GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
 
+#include <PiDxe.h>
 
 //
 // Protocol GUID definition. Each GUIDed section extraction protocol has the
@@ -46,7 +47,7 @@ typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  EFI_GUIDED_SECTION_EXTRA
 // Protocol member functions
 //
 /**
-  Processes the input section and returns the data contained therein along 
+  Processes the input section and returns the data contained therein along
   with the authentication status.
 
   @param  This                  Indicates the EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
@@ -57,7 +58,7 @@ typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  EFI_GUIDED_SECTION_EXTRA
                                 of *OutputBuffer allocation is stored.
   @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that
                                 indicates the authentication status of the output buffer.
-                                
+
   @retval EFI_SUCCESS           The InputSection was successfully processed and the
                                 section contents were returned.
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to
@@ -82,12 +83,12 @@ EFI_STATUS
 //
 /**
   @par Protocol Description:
-  If a GUID-defined section is encountered when doing section extraction, 
-  the section extraction driver calls the appropriate instance of the GUIDed 
+  If a GUID-defined section is encountered when doing section extraction,
+  the section extraction driver calls the appropriate instance of the GUIDed
   Section Extraction Protocol to extract the section stream contained therein.
 
   @param ExtractSection
-  Takes the GUIDed section as input and produces the section stream data. 
+  Takes the GUIDed section as input and produces the section stream data.
 
 **/
 struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {

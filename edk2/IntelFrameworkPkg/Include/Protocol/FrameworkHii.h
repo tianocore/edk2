@@ -22,6 +22,8 @@
 #ifndef _FRAMEWORK_HII_H_
 #define _FRAMEWORK_HII_H_
 
+#include <PiDxe.h>
+
 //
 // To get EFI_GRAPHICS_OUTPUT_BLT_PIXEL,
 // is defined in MdePkg/Protocol/GraphicsOutput.h

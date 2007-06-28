@@ -21,6 +21,8 @@
 #ifndef __PEI_S3_RESUME_PPI_H__
 #define __PEI_S3_RESUME_PPI_H__
 
+#include <PiPei.h>
+
 #define EFI_PEI_S3_RESUME_PPI_GUID \
   { \
     0x4426CCB2, 0xE684, 0x4a8a, {0xAE, 0x40, 0x20, 0xD4, 0xB0, 0x25, 0xB7, 0x10 } \

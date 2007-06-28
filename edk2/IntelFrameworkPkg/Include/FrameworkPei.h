@@ -20,14 +20,11 @@
 #ifndef _FRAMEWORK_PEI_H_
 #define _FRAMEWORK_PEI_H_
 
-#include <FrameworkBase.h>
 #include <PiPei.h>
-
 #include <Common/FrameworkFirmwareFileSystem.h>
 #include <Common/FrameworkHob.h>
 #include <Common/FrameworkLegacy16.h>
 #include <Common/DataHubRecords.h>
-
 #include <Common/FrameworkStatusCode.h>
 #include <Common/FrameworkStatusCodeDataTypeId.h>
 

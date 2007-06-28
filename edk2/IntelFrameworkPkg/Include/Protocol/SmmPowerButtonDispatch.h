@@ -21,6 +21,8 @@
 #ifndef _EFI_SMM_POWER_BUTTON_DISPATCH_H_
 #define _EFI_SMM_POWER_BUTTON_DISPATCH_H_
 
+#include <PiDxe.h>
+
 //
 // Global ID for the Power Button SMI Protocol
 //

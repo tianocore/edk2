@@ -21,6 +21,8 @@
 #ifndef _EFI_PCI_HOT_PLUG_INIT_H_
 #define _EFI_PCI_HOT_PLUG_INIT_H_
 
+#include <PiDxe.h>
+
 //
 // Global ID for the PCI Hot Plug Protocol
 //

@@ -24,6 +24,8 @@
 #ifndef _EFI_LEGACY_BIOS_PLATFORM_H_
 #define _EFI_LEGACY_BIOS_PLATFORM_H_
 
+#include <FrameworkDxe.h>
+
 #define EFI_LEGACY_BIOS_PLATFORM_PROTOCOL_GUID \
   { \
     0x783658a3, 0x4172, 0x4421, {0xa2, 0x99, 0xe0, 0x9, 0x7, 0x9c, 0xc, 0xb4 } \

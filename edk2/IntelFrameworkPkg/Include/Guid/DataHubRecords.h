@@ -20,6 +20,8 @@
 #ifndef _DATAHUB_RECORDS_GUID_H_
 #define _DATAHUB_RECORDS_GUID_H_
 
+#include <PiPei.h>
+
 #define EFI_PROCESSOR_PRODUCER_GUID \
   { 0x1bf06aea, 0x5bec, 0x4a8d, {0x95, 0x76, 0x74, 0x9b, 0x09, 0x56, 0x2d, 0x30 } }
 

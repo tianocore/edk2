@@ -20,7 +20,7 @@
 #ifndef _FRAMEWORK_SMM_CIS_H_
 #define _FRAMEWORK_SMM_CIS_H_
 
-#include <PiDxe.h>
+#include <Common/FrameworkDxeCis.h>
 
 #define EFI_SMM_CPU_IO_GUID \
   { \

@@ -22,6 +22,8 @@
 #ifndef _ACPI_TABLE_STORAGE_H_
 #define _ACPI_TABLE_STORAGE_H_
 
+#include <PiPei.h>
+
 #define EFI_ACPI_TABLE_STORAGE_GUID \
   { 0x7e374e25, 0x8e01, 0x4fee, {0x87, 0xf2, 0x39, 0xc, 0x23, 0xc6, 0x6, 0xcd } }
 
