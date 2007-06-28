@@ -289,16 +289,19 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
   )
 {
+  FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FrameworkFvDevicePathNode;
+
   ASSERT (FvDevicePathNode != NULL);
 
+  FrameworkFvDevicePathNode = (FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *) FvDevicePathNode;
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  if (FvDevicePathNode->Tiano.Header.Type == MEDIA_DEVICE_PATH ||
-      FvDevicePathNode->Tiano.Header.SubType == MEDIA_VENDOR_DP) {
-    if (CompareGuid (&gEfiFrameworkDevicePathGuid, &FvDevicePathNode->Tiano.TianoSpecificDevicePath)) {
-      if (FvDevicePathNode->Tiano.Type == TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
-        return (EFI_GUID *) &FvDevicePathNode->NameGuid;
+  if (FrameworkFvDevicePathNode->Tiano.Header.Type == MEDIA_DEVICE_PATH ||
+      FrameworkFvDevicePathNode->Tiano.Header.SubType == MEDIA_VENDOR_DP) {
+    if (CompareGuid (&gEfiFrameworkDevicePathGuid, &FrameworkFvDevicePathNode->Tiano.TianoSpecificDevicePath)) {
+      if (FrameworkFvDevicePathNode->Tiano.Type == TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
+        return (EFI_GUID *) &FrameworkFvDevicePathNode->NameGuid;
       }
     }
   }
@@ -325,29 +328,33 @@ VOID
 EFIAPI
 EfiInitializeFwVolDevicepathNode (
   IN OUT MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode,
-  IN CONST EFI_GUID                         *NameGuid
+  IN CONST EFI_GUID                                   *NameGuid
   )
 {
+  FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FrameworkFvDevicePathNode;
+
   ASSERT (FvDevicePathNode  != NULL);
   ASSERT (NameGuid          != NULL);
+
+  FrameworkFvDevicePathNode = (FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *) FvDevicePathNode;
 
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  FvDevicePathNode->Tiano.Header.Type     = MEDIA_DEVICE_PATH;
-  FvDevicePathNode->Tiano.Header.SubType  = MEDIA_VENDOR_DP;
-  SetDevicePathNodeLength (&FvDevicePathNode->Tiano.Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
+  FrameworkFvDevicePathNode->Tiano.Header.Type     = MEDIA_DEVICE_PATH;
+  FrameworkFvDevicePathNode->Tiano.Header.SubType  = MEDIA_VENDOR_DP;
+  SetDevicePathNodeLength (&FrameworkFvDevicePathNode->Tiano.Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
 
   //
   // Add the GUID for generic Tiano device paths
   //
-  CopyGuid (&FvDevicePathNode->Tiano.TianoSpecificDevicePath, &gEfiFrameworkDevicePathGuid);
+  CopyGuid (&FrameworkFvDevicePathNode->Tiano.TianoSpecificDevicePath, &gEfiFrameworkDevicePathGuid);
 
   //
   // Add in the FW Vol File Path Tiano defined information
   //
-  FvDevicePathNode->Tiano.Type = TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE;
+  FrameworkFvDevicePathNode->Tiano.Type = TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE;
 
-  CopyGuid (&FvDevicePathNode->NameGuid, NameGuid);
+  CopyGuid (&FrameworkFvDevicePathNode->NameGuid, NameGuid);
 }
 

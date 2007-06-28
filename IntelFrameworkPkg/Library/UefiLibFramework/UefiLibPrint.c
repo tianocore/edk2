@@ -36,9 +36,9 @@
 STATIC
 UINTN
 InternalPrint (
-  IN  CONST CHAR16                  *Format,
-  IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *Console,
-  IN  VA_LIST                       Marker
+  IN  CONST CHAR16                     *Format,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Console,
+  IN  VA_LIST                          Marker
   )
 {
   UINTN   Return;
@@ -159,9 +159,9 @@ ErrorPrint (
 STATIC
 UINTN
 AsciiInternalPrint (
-  IN  CONST CHAR8                   *Format,
-  IN  EFI_SIMPLE_TEXT_OUT_PROTOCOL  *Console,
-  IN  VA_LIST                       Marker
+  IN  CONST CHAR8                      *Format,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Console,
+  IN  VA_LIST                          Marker
   )
 {
   UINTN   Return;

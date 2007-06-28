@@ -61,9 +61,9 @@
 
 
 [Components.Ia32]
-#  ${WORKSPACE}/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  ${WORKSPACE}/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
-#  ${WORKSPACE}/IntelFrameworkPkg/Library/UefiLibFramework/UefiLib.inf
+  ${WORKSPACE}/IntelFrameworkPkg/Library/UefiLibFramework/UefiLib.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
