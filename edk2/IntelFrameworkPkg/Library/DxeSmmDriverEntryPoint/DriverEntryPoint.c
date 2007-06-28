@@ -13,17 +13,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
-
-#include <FrameworkDxe.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/DebugLib.h>
-#include <Library/DxeSmmDriverEntryPoint.h>
-
+#include <FrameworkSmm.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SmmBase.h>
+#include <Protocol/DevicePath.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DxeSmmDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DebugLib.h>
+
 
 EFI_BOOT_SERVICES  *mBS;
 
