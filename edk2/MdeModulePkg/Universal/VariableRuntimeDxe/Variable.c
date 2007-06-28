@@ -134,15 +134,15 @@ Returns:
   UINTN                       BlockIndex2;
   UINTN                       LinearOffset;
   UINTN                       CurrWriteSize;
-  UINTN                                 CurrWritePtr;
-  UINT8                                 *CurrBuffer;
-  EFI_LBA                               LbaNumber;
-  UINTN                                 Size;
-  FRAMEWORK_EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
-  VARIABLE_STORE_HEADER                 *VolatileBase;
-  EFI_PHYSICAL_ADDRESS                  FvVolHdr;
-  EFI_PHYSICAL_ADDRESS                  DataPtr;
-  EFI_STATUS                            Status;
+  UINTN                       CurrWritePtr;
+  UINT8                       *CurrBuffer;
+  EFI_LBA                     LbaNumber;
+  UINTN                       Size;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  VARIABLE_STORE_HEADER       *VolatileBase;
+  EFI_PHYSICAL_ADDRESS        FvVolHdr;
+  EFI_PHYSICAL_ADDRESS        DataPtr;
+  EFI_STATUS                  Status;
 
   FwVolHeader = NULL;
   DataPtr     = DataPtrIndex;
@@ -152,7 +152,7 @@ Returns:
   //
   if (!Volatile) {
     EfiFvbGetPhysicalAddress (Instance, &FvVolHdr);
-    FwVolHeader = (FRAMEWORK_EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
+    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
     //
     // Data Pointer should point to the actual Address where data is to be
     // written
@@ -198,7 +198,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  for (PtrBlockMapEntry = FwVolHeader->FvBlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
+  for (PtrBlockMapEntry = FwVolHeader->BlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
     for (BlockIndex2 = 0; BlockIndex2 < PtrBlockMapEntry->NumBlocks; BlockIndex2++) {
       //
       // Check to see if the Variable Writes are spanning through multiple

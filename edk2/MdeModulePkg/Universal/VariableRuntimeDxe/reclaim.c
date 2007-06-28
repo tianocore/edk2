@@ -95,13 +95,13 @@ GetLbaAndOffsetByAddress (
   OUT UINTN                  *Offset
   )
 {
-  EFI_STATUS                            Status;
-  EFI_HANDLE                            FvbHandle;
-  EFI_PHYSICAL_ADDRESS                  FvbBaseAddress;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
-  FRAMEWORK_EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
-  EFI_FV_BLOCK_MAP_ENTRY                *FvbMapEntry;
-  UINT32                                LbaIndex;
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          FvbHandle;
+  EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
+  UINT32                              LbaIndex;
 
   *Lba    = (EFI_LBA) (-1);
   *Offset = 0;
@@ -130,7 +130,7 @@ GetLbaAndOffsetByAddress (
     return Status;
   }
 
-  FwVolHeader = (FRAMEWORK_EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
 
   //
   // Get the (LBA, Offset) of Address
@@ -140,7 +140,7 @@ GetLbaAndOffsetByAddress (
       //
       // BUGBUG: Assume one FV has one type of BlockLength
       //
-      FvbMapEntry = &FwVolHeader->FvBlockMap[0];
+      FvbMapEntry = &FwVolHeader->BlockMap[0];
       for (LbaIndex = 1; LbaIndex <= FvbMapEntry->NumBlocks; LbaIndex += 1) {
         if (Address < (FvbBaseAddress + FvbMapEntry->Length * LbaIndex)) {
           //
@@ -149,7 +149,7 @@ GetLbaAndOffsetByAddress (
           *Lba    = LbaIndex - 1;
           *Offset = (UINTN) (Address - (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)));
           return EFI_SUCCESS;
-        }
+       }
       }
     }
   }
