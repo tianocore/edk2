@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  WinNtThunk.dxs
   WinNtThunk.c
   WinNtThunk.h
 
@@ -94,3 +93,5 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
   gEfiWinNtThunkProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
 
+[depex]
+  TRUE
