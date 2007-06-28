@@ -28,7 +28,8 @@
   PACKAGE_GUID                   = BA0D78D6-2CAF-414b-BD4D-B6762A894288
   PACKAGE_VERSION                = 0.1
 
-
+[Includes.common]
+  Include                        
 
 ################################################################################
 #
@@ -61,13 +62,6 @@
   gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
   gEfiMdePkgTokenSpaceGuid       = { 0xA1AFF049, 0xFDEB, 0x442a, { 0xB3, 0x20, 0x13, 0xAB, 0x4C, 0xB7, 0x2B, 0xBC }}
 
-
-[Includes.common]
-  Include                        
-  Include/Library                
-  Include/Ppi                    
-  Include/Common                 
-  Include/Protocol               
 
 ################################################################################
 #

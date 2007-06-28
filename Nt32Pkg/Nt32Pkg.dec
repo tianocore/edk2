@@ -37,11 +37,7 @@
 #
 ################################################################################
 [Includes.common]
-  Include                        # FlashLayout WinNtDxe WinNtPeim
-  Include/Library                # EdkGenericBdsLib WinNtLib
-  Include/Ppi                    # NtAutoscan NtFwh NtPeiLoadFile NtThunk
-  Include/Common                 # WinNTInclude
-  Include/Protocol               # WinNtIo WinNtThunk
+  Include                        # Root include for the package
 
 
 ################################################################################
