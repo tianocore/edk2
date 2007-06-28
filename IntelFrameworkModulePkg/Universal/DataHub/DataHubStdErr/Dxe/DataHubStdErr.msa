@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>DataHubStdErr</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>CA515306-00CE-4032-874E-11B755FF6866</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Data Hub filter driver.</Abstract>
+    <Description>This driver takes DEBUG () info from Data Hub and writes it to StdErr if it exists.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DataHubStdErr</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DataHubStdErr.c</Filename>
+    <Filename>DataHubStdErr.dxs</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="1E73767F-8F52-4603-AEB4-F29B510B6766"/>
+    <Package PackageGuid="2759ded5-bb57-4b06-af4f-c398fa552719"/>
+    <Package PackageGuid="88894582-7553-4822-B484-624E24B6DECF"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <DataHubs>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">
+      <DataHubCName>DATA_HUB_STATUS_CODE_DATA_RECORD</DataHubCName>
+      <HelpText>DEBUG() data that is recorded in status code data hub will be sent to Standard Error.</HelpText>
+    </DataHubRecord>
+  </DataHubs>
+  <Guids>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>gEfiStatusCodeGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>gEfiStatusCodeDataTypeDebugGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>DataHubStdErrInitialize</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

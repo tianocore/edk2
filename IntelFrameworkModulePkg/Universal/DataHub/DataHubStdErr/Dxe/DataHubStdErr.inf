@@ -1,0 +1,111 @@
+#/** @file
+# Component description file for Data Hub filter driver.
+#
+# This driver takes DEBUG () info from Data Hub and writes it to StdErr if it exists.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DataHubStdErr
+  FILE_GUID                      = CA515306-00CE-4032-874E-11B755FF6866
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = DataHubStdErrInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  DataHubStdErr.c
+
+[Includes]
+  IntelFrameworkModulePkg/Include
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiStatusCodeDataTypeDebugGuid               # SOMETIMES_CONSUMED
+  gEfiStatusCodeGuid                            # SOMETIMES_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiDataHubProtocolGuid
+
