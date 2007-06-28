@@ -30,6 +30,38 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
+[LibraryClasses.common]
+  CacheMaintenanceLib|${WORKSPACE}/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  DebugLib|${WORKSPACE}/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  BaseLib|${WORKSPACE}/MdePkg/Library/BaseLib/BaseLib.inf
+  BaseMemoryLib|${WORKSPACE}/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  PciCf8Lib|${WORKSPACE}/MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+  PciExpressLib|${WORKSPACE}/MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
+  PciLib|${WORKSPACE}/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PeCoffGetEntryPoint|${WORKSPACE}/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  PeCoffLib|${WORKSPACE}/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  PerformanceLib|${WORKSPACE}/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
+  PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
+  PrintLib|${WORKSPACE}/MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  TimerLib|${WORKSPACE}/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
 
 ################################################################################
 #
@@ -88,4 +120,6 @@
   $(WORKSPACE)\IntelFrameworkModulePkg\Library\OemHookStatusCodeLibNull\OemHookStatusCodeLibNull.inf
   $(WORKSPACE)\IntelFrameworkModulePkg\Library\PciIncompatibleDeviceSupportLib\PciIncompatibleDeviceSupportLib.inf
   #$(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.inf
-  #$(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\IdeBus\Dxe\IdeBus.inf
+  $(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\IdeBus\Dxe\IdeBus.inf
+  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.inf
+  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.inf
