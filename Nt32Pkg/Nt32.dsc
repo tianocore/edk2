@@ -405,7 +405,7 @@
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
   ${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPeim/WinNtThunkPPIToProtocolPeim.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPeim/WinNtAutoScan.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
