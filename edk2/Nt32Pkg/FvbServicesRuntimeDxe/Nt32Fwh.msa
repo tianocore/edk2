@@ -76,9 +76,6 @@
     <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFvbExtensionProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>gEfiAlternateFvBlockGuid</ProtocolCName>
-    </Protocol>
   </Protocols>
   <Events>
     <CreateEvents>
@@ -88,7 +85,7 @@
     </CreateEvents>
   </Events>
   <Guids>
-    <GuidCNames Usage="ALWAYS_PRODUCED">
+    <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiAlternateFvBlockGuid</GuidCName>
     </GuidCNames>
   </Guids>
