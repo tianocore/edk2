@@ -73,6 +73,15 @@
 
 [Includes]
   $(WORKSPACE)/MdePkg/Include/Library
+
+[Includes.IA32]
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Ia32
+[Includes.X64]
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/x64
+[Includes.IPF]
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/IPF
+[Includes.EBC]
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/EBC
   
 ################################################################################
 #
