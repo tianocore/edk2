@@ -22,6 +22,7 @@
 #define _FRAMEWORK_DXE_CIS_H_
 
 #include <PiDxe.h>
+#include <Protocol/StatusCode.h>
 
 typedef struct {
   EFI_TABLE_HEADER              Hdr;
@@ -64,5 +65,15 @@ typedef struct {
 #define EFI_EVENT_NOTIFY_SIGNAL_ALL     0x00000400
 #define EFI_EVENT_SIGNAL_READY_TO_BOOT  0x00000203
 #define EFI_EVENT_SIGNAL_LEGACY_BOOT    0x00000204
+
+//
+// Function prototype for invoking a function on an Application Processor
+// Used by both the SMM infrastructure and the MP Services Protocol
+//
+typedef
+VOID
+(EFIAPI *EFI_AP_PROCEDURE) (
+  IN  VOID                              *Buffer
+  );
 
 #endif
