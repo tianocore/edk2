@@ -416,10 +416,10 @@
   $(WORKSPACE)\Nt32Pkg\WinNtSimpleFileSystemDxe\WinNtSimpleFileSystem.inf
   $(WORKSPACE)\Nt32Pkg\WinNtGopDxe\WinNtGop.inf
   $(WORKSPACE)\Nt32Pkg\WinNtSerialIoDxe\WinNtSerialIo.inf
-#  $(WORKSPACE)\Nt32Pkg\TimerDxe\Timer.inf
-#  $(WORKSPACE)\Nt32Pkg\ResetRuntimeDxe\Reset.inf
-#  $(WORKSPACE)\Nt32Pkg\RealTimeClockRuntimeDxe\RealTimeClock.inf
-#  $(WORKSPACE)\Nt32Pkg\MonotonicCounterRuntimeDxe\Metronome.inf
+  $(WORKSPACE)\Nt32Pkg\TimerDxe\Timer.inf
+  $(WORKSPACE)\Nt32Pkg\ResetRuntimeDxe\Reset.inf
+  $(WORKSPACE)\Nt32Pkg\RealTimeClockRuntimeDxe\RealTimeClock.inf
+  $(WORKSPACE)\Nt32Pkg\MonotonicCounterRuntimeDxe\Metronome.inf
 #  $(WORKSPACE)\Nt32Pkg\CpuRuntimeDxe\Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
