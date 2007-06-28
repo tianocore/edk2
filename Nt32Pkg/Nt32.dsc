@@ -333,6 +333,8 @@
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
   PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
+  PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
+  PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
 
 
 [PcdsFeatureFlag.IA32]
@@ -369,6 +371,7 @@
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
+  PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid|FALSE
 
 ################################################################################
 #
@@ -403,7 +406,7 @@
 [Components.IA32]
   ${WORKSPACE}/Nt32Pkg/BootModePei/BootMode.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-  ${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
+  #${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
@@ -414,3 +417,10 @@
   $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf
   $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
+  #${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
+  ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
