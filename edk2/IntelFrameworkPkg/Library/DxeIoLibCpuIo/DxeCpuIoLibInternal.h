@@ -17,14 +17,25 @@
 #ifndef _DXE_CPUIO_LIB_INTERNAL_H_
 #define _DXE_CPUIO_LIB_INTERNAL_H_
 
+//
+// The package level header files this module uses
+//
 #include <FrameworkDxe.h>
+
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/CpuIo.h>
+#include <Protocol/PciRootBridgeIo.h>
+
+//
+// The Library classes this module consumes
+//
 #include <Library/IoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 
-#include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/CpuIo.h>
 
 /**
   Reads registers in the EFI CPU I/O space.

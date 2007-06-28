@@ -25,7 +25,7 @@
   FILE_GUID                      = 1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -44,7 +44,6 @@
 
 [Sources.common]
   HiiLib.c
-  CommonHeader.h
 
 
 ################################################################################
@@ -56,7 +55,7 @@
 
 [Includes]
   $(WORKSPACE)/MdePkg/Include/Library
-  
+
 ################################################################################
 #
 # Package Dependency Section - list of Package files that are required for
