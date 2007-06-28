@@ -406,7 +406,6 @@
 [Components.IA32]
   ${WORKSPACE}/Nt32Pkg/BootModePei/BootMode.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-<<<<<<< .mine
 # ${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
   $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
   $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPei\WinNtThunkPPIToProtocol.inf
