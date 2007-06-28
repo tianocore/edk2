@@ -407,20 +407,20 @@
   ${WORKSPACE}/Nt32Pkg/BootModePei/BootMode.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 # ${WORKSPACE}/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtThunkPPIToProtocolPei\WinNtThunkPPIToProtocol.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtAutoScanPei\WinNtAutoScan.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtBlockIoDxe\WinNtBlockIo.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtBusDriverDxe\WinNtBusDriver.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtConsoleDxe\WinNtConsole.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtSimpleFileSystemDxe\WinNtSimpleFileSystem.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtGopDxe\WinNtGop.inf
-  $(WORKSPACE)\Nt32Pkg\WinNtSerialIoDxe\WinNtSerialIo.inf
-  $(WORKSPACE)\Nt32Pkg\TimerDxe\Timer.inf
-  $(WORKSPACE)\Nt32Pkg\ResetRuntimeDxe\Reset.inf
-  $(WORKSPACE)\Nt32Pkg\RealTimeClockRuntimeDxe\RealTimeClock.inf
-  $(WORKSPACE)\Nt32Pkg\MonotonicCounterRuntimeDxe\Metronome.inf
-#  $(WORKSPACE)\Nt32Pkg\CpuRuntimeDxe\Cpu.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
+  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
+  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
+  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
+  $(WORKSPACE)/Nt32Pkg/MonotonicCounterRuntimeDxe/Metronome.inf
+#  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
@@ -431,3 +431,6 @@
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
