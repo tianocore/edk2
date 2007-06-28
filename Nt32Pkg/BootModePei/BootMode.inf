@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  BootMode.dxs
   BootMode.c
   CommonHeader.h
 
@@ -92,3 +91,5 @@
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
 
+[depex]
+  TRUE

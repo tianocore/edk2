@@ -85,3 +85,5 @@
 [Protocols]
   gEfiMetronomeArchProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
 
+[depex]
+  TRUE

@@ -47,7 +47,6 @@
   FvbInfo.c
   FwBlockService.h
   FWBlockService.c
-  Nt32Fwh.dxs
 
 
 ################################################################################
@@ -116,3 +115,5 @@
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
+[depex]
+  TRUE

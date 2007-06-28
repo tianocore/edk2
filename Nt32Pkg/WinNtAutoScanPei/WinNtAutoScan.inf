@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  WinNtAutoscan.dxs
   WinntAutoscan.c
 
 ################################################################################
@@ -93,3 +92,5 @@
   gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_CONSUMED
   gPeiNtAutoScanPpiGuid                         # PPI ALWAYS_CONSUMED
 
+[depex]
+  gPeiNtAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid AND gPeiBaseMemoryTestPpiGuid

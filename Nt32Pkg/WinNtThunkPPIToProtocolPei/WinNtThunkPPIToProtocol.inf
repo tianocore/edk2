@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  WinNtThunkPPIToProtocol.dxs
   WinNtThunkPPIToProtocol.c
 
 ################################################################################
@@ -102,3 +101,5 @@
 [Ppis]
   gPeiNtThunkPpiGuid                            # PPI ALWAYS_CONSUMED
 
+[depex]
+  gPeiNtThunkPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
