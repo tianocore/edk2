@@ -84,7 +84,7 @@
   ${WORKSPACE}\MdePkg\Library/BasePciLibCf8/BasePciLibCf8.inf
   ${WORKSPACE}\MdePkg\Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   ${WORKSPACE}\MdePkg\Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-#  ${WORKSPACE}\MdePkg\Library/BasePeCoffLib/BasePeCoffLib.inf
+  ${WORKSPACE}\MdePkg\Library/BasePeCoffLib/BasePeCoffLib.inf
   ${WORKSPACE}\MdePkg\Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   ${WORKSPACE}\MdePkg\Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
   ${WORKSPACE}\MdePkg\Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
