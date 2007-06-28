@@ -40,26 +40,19 @@
 #
 ################################################################################
 [Includes.common]
-  Include                        # Base PiPei PiDxe Uefi
-  Include/Guid                   # GUIDs that are declared by the MDE Package
-  Include/Library                # All Mde Libraries
-  Include/IndustryStandard       # Acpi Pci22 Scsi Usb SmBus
-  Include/Protocol               # The summary of protocols introduced by UEFI2.0/UEFI2.1/EFI1.1/PI1.0
-  Include/Ppi                    # All PPIs defined in PI1.0
-  Include/Pi                     # PI definitions
-  Include/Uefi                   # UEFI definitions
+  Include                        # Root include for the package
 
 [Includes.Ia32]
-  Include/Ia32                   # ProcessorBind
+  Include/Ia32                   # Processor specific include path for pacakge
 
 [Includes.X64]
-  Include/x64                    # ProcessorBind
+  Include/x64                    # Processor specific include path for pacakge
 
 [Includes.IPF]
-  Include/Ipf                    # IpfDefines IpfMacro ProcessorBind SalApi
+  Include/Ipf                    # Processor specific include path for pacakge
 
 [Includes.EBC]
-  Include/Ebc                    # ProcessorBind
+  Include/Ebc                    # Processor specific include path for pacakge
 
 ################################################################################
 #
