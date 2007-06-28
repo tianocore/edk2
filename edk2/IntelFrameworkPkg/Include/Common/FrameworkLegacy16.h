@@ -109,6 +109,9 @@ typedef struct {
 // EFI_TO_COMPATIBILITY16_BOOT_TABLE
 ///////////////////////////////////////////////////////////////////////////////
 
+typedef UINT8 SERIAL_MODE;
+typedef UINT8 PARALLEL_MODE;
+
 //
 // DEVICE_PRODUCER_SERIAL & its modes
 //
