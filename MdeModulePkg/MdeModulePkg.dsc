@@ -337,7 +337,7 @@
   ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
   #${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Variable/RuntimeDxe/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
+#  ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
