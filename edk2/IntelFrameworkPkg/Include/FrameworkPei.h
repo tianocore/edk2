@@ -22,6 +22,13 @@
 
 #include <FrameworkBase.h>
 #include <PiPei.h>
+
+#include <Common/FrameworkFirmwareFileSystem.h>
+#include <Common/FrameworkHob.h>
+#include <Common/FrameworkLegacy16.h>
+#include <Common/DataHubRecords.h>
+
 #include <Common/FrameworkStatusCode.h>
+#include <Common/FrameworkStatusCodeDataTypeId.h>
 
 #endif

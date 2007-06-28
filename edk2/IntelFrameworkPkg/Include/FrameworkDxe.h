@@ -21,7 +21,15 @@
 #define _FRAMEWORK_DXE_H_
 
 #include <FrameworkBase.h>
+
 #include <Common/FrameworkDxeCis.h>
+
+#include <Common/FrameworkFirmwareFileSystem.h>
+#include <Common/FrameworkHob.h>
+#include <Common/FrameworkLegacy16.h>
+#include <Common/DataHubRecords.h>
+
 #include <Common/FrameworkStatusCode.h>
+#include <Common/FrameworkStatusCodeDataTypeId.h>
 
 #endif
