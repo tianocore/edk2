@@ -331,6 +331,7 @@
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
