@@ -1,0 +1,361 @@
+#/*++
+#
+# Copyright (c) 2004 - 2006, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.              
+# 
+#  Module Name:
+#
+#   BaseLib.inf
+#
+#  Abstract:
+#
+#    Component description file for BaseLib.
+#
+#--*/
+
+[defines]
+BASE_NAME       = EdkIIGlueBaseLib
+COMPONENT_TYPE  = LIBRARY
+
+[sources.common]
+  String.c
+  LinkedList.c
+  Synchronization.c
+  Cpu.c
+  CpuDeadLoop.c
+  BitField.c
+  ARShiftU64.c
+  DivS64x64Remainder.c
+  DivU64x32.c
+  DivU64x32Remainder.c
+  DivU64x64Remainder.c
+  GetPowerOfTwo32.c
+  GetPowerOfTwo64.c
+  HighBitSet32.c
+  HighBitSet64.c
+  LowBitSet32.c
+  LowBitSet64.c
+  LRotU32.c
+  LRotU64.c
+  LShiftU64.c
+  ModU64x32.c
+  MultS64x64.c
+  MultU64x32.c
+  MultU64x64.c
+  RRotU32.c
+  RRotU64.c
+  RShiftU64.c
+  SetJump.c
+  LongJump.c
+  SwapBytes16.c
+  SwapBytes32.c
+  SwapBytes64.c
+  SwitchStack.c
+
+[sources.ia32]
+  x86DisablePaging32.c
+  x86DisablePaging64.c
+  x86EnablePaging32.c
+  x86EnablePaging64.c
+  x86FxRestore.c
+  x86FxSave.c
+  x86GetInterruptState.c
+  x86MemoryFence.c
+  x86Msr.c
+  x86ReadGdtr.c
+  x86ReadIdtr.c
+  x86Thunk.c
+  x86WriteGdtr.c
+  x86WriteIdtr.c
+  Unaligned.c
+  Ia32\Non-existing.c
+  Ia32\InternalSwitchStack.c
+  Ia32\DivS64x64Remainder.c
+  Ia32\ARShiftU64.asm
+  Ia32\CpuBreakpoint.asm
+  Ia32\CpuFlushTlb.asm
+  Ia32\CpuSleep.asm
+  Ia32\CpuId.asm
+  Ia32\CpuIdEx.asm
+  Ia32\CpuPause.asm
+  Ia32\DisableInterrupts.asm
+  Ia32\DisablePaging32.asm
+  Ia32\DivU64x32.asm
+  Ia32\DivU64x32Remainder.asm
+  Ia32\DivU64x64Remainder.asm
+  Ia32\EnableDisableInterrupts.asm
+  Ia32\EnableInterrupts.asm
+  Ia32\EnablePaging32.asm
+  Ia32\EnablePaging64.asm
+  Ia32\FlushCacheLine.asm
+  Ia32\FxSave.asm
+  Ia32\FxRestore.asm
+  Ia32\InterlockedIncrement.asm
+  Ia32\InterlockedDecrement.asm
+  Ia32\InterlockedCompareExchange32.asm
+  Ia32\InterlockedCompareExchange64.asm
+  Ia32\Invd.asm
+  Ia32\LongJump.asm
+  Ia32\LRotU64.asm
+  Ia32\LShiftU64.asm
+  Ia32\MultU64x32.asm
+  Ia32\MultU64x64.asm
+  Ia32\ModU64x32.asm
+  Ia32\Monitor.asm
+  Ia32\Mwait.asm
+  Ia32\ReadCr0.asm
+  Ia32\ReadCr2.asm
+  Ia32\ReadCr3.asm
+  Ia32\ReadCr4.asm
+  Ia32\ReadDr0.asm
+  Ia32\ReadDr1.asm
+  Ia32\ReadDr2.asm
+  Ia32\ReadDr3.asm
+  Ia32\ReadDr4.asm
+  Ia32\ReadDr5.asm
+  Ia32\ReadDr6.asm
+  Ia32\ReadDr7.asm
+  Ia32\ReadEflags.asm
+  Ia32\ReadMm0.asm
+  Ia32\ReadMm1.asm
+  Ia32\ReadMm2.asm
+  Ia32\ReadMm3.asm
+  Ia32\ReadMm4.asm
+  Ia32\ReadMm5.asm
+  Ia32\ReadMm6.asm
+  Ia32\ReadMm7.asm
+  Ia32\ReadMsr64.asm
+  Ia32\ReadCs.asm
+  Ia32\ReadDs.asm
+  Ia32\ReadEs.asm
+  Ia32\ReadFs.asm
+  Ia32\ReadGs.asm
+  Ia32\ReadSs.asm
+  Ia32\ReadTr.asm
+  Ia32\ReadGdtr.asm
+  Ia32\ReadIdtr.asm
+  Ia32\ReadLdtr.asm
+  Ia32\ReadTsc.asm
+  Ia32\ReadPmc.asm
+  Ia32\RShiftU64.asm
+  Ia32\RRotU64.asm
+  Ia32\SetJump.asm
+  Ia32\SwapBytes64.asm
+  Ia32\Thunk16.asm
+  Ia32\WriteMsr64.asm
+  Ia32\WriteCr0.asm
+  Ia32\WriteCr2.asm
+  Ia32\WriteCr3.asm
+  Ia32\WriteCr4.asm
+  Ia32\WriteDr0.asm
+  Ia32\WriteDr1.asm
+  Ia32\WriteDr2.asm
+  Ia32\WriteDr3.asm
+  Ia32\WriteDr4.asm
+  Ia32\WriteDr5.asm
+  Ia32\WriteDr6.asm
+  Ia32\WriteDr7.asm
+  Ia32\WriteGdtr.asm
+  Ia32\WriteIdtr.asm
+  Ia32\WriteLdtr.asm
+  Ia32\WriteMm0.asm
+  Ia32\WriteMm1.asm
+  Ia32\WriteMm2.asm
+  Ia32\WriteMm3.asm
+  Ia32\WriteMm4.asm
+  Ia32\WriteMm5.asm
+  Ia32\WriteMm6.asm
+  Ia32\WriteMm7.asm
+  Ia32\Wbinvd.asm
+  
+[sources.x64]
+  x86DisablePaging32.c
+  x86DisablePaging64.c
+  x86EnablePaging32.c
+  x86EnablePaging64.c
+  x86FxRestore.c
+  x86FxSave.c
+  x86GetInterruptState.c
+  x86MemoryFence.c
+  x86Msr.c
+  x86ReadGdtr.c
+  x86ReadIdtr.c
+  x86Thunk.c
+  x86WriteGdtr.c
+  x86WriteIdtr.c
+  Unaligned.c
+  Math64.c
+  X64\Non-existing.c
+  X64\SwitchStack.asm
+  X64\SetJump.asm
+  X64\LongJump.asm
+  X64\CpuId.asm
+  X64\CpuIdEx.asm
+  X64\ReadEflags.asm
+  X64\ReadMsr64.asm
+  X64\WriteMsr64.asm
+  X64\ReadCr0.asm
+  X64\ReadCr2.asm
+  X64\ReadCr3.asm
+  X64\ReadCr4.asm
+  X64\WriteCr0.asm
+  X64\WriteCr2.asm
+  X64\WriteCr3.asm
+  X64\WriteCr4.asm
+  X64\ReadDr0.asm
+  X64\ReadDr1.asm
+  X64\ReadDr2.asm
+  X64\ReadDr3.asm
+  X64\ReadDr4.asm
+  X64\ReadDr5.asm
+  X64\ReadDr6.asm
+  X64\ReadDr7.asm
+  X64\WriteDr0.asm
+  X64\WriteDr1.asm
+  X64\WriteDr2.asm
+  X64\WriteDr3.asm
+  X64\WriteDr4.asm
+  X64\WriteDr5.asm
+  X64\WriteDr6.asm
+  X64\WriteDr7.asm
+  X64\ReadCs.asm
+  X64\ReadDs.asm
+  X64\ReadEs.asm
+  X64\ReadFs.asm
+  X64\ReadGs.asm
+  X64\ReadSs.asm
+  X64\ReadTr.asm
+  X64\ReadGdtr.asm
+  X64\WriteGdtr.asm
+  X64\ReadIdtr.asm
+  X64\WriteIdtr.asm
+  X64\ReadLdtr.asm
+  X64\WriteLdtr.asm
+  X64\FxSave.asm
+  X64\FxRestore.asm
+  X64\ReadMm0.asm
+  X64\ReadMm1.asm
+  X64\ReadMm2.asm
+  X64\ReadMm3.asm
+  X64\ReadMm4.asm
+  X64\ReadMm5.asm
+  X64\ReadMm6.asm
+  X64\ReadMm7.asm
+  X64\WriteMm0.asm
+  X64\WriteMm1.asm
+  X64\WriteMm2.asm
+  X64\WriteMm3.asm
+  X64\WriteMm4.asm
+  X64\WriteMm5.asm
+  X64\WriteMm6.asm
+  X64\WriteMm7.asm
+  X64\ReadTsc.asm
+  X64\ReadPmc.asm
+  X64\Monitor.asm
+  X64\Mwait.asm
+  X64\EnablePaging64.asm
+  X64\DisablePaging64.asm
+  X64\Wbinvd.asm
+  X64\Invd.asm
+  X64\FlushCacheLine.asm
+  X64\InterlockedIncrement.asm
+  X64\InterlockedDecrement.asm
+  X64\InterlockedCompareExchange32.asm
+  X64\InterlockedCompareExchange64.asm
+  X64\EnableInterrupts.asm
+  X64\DisableInterrupts.asm
+  X64\EnableDisableInterrupts.asm
+  X64\CpuSleep.asm
+  X64\CpuPause.asm
+  X64\CpuBreakpoint.asm
+  X64\CpuFlushTlb.asm
+  X64\Thunk16.asm
+
+[sources.ipf]
+  Math64.c
+  Ipf\asm.h
+  Ipf\ia_64gen.h
+  Ipf\PalCallStatic.s
+  Ipf\setjmp.s
+  Ipf\longjmp.s
+  Ipf\SwitchStack.s
+  Ipf\Unaligned.c
+  Ipf\CpuBreakpoint.c
+  Ipf\InterlockedCompareExchange32.s
+  Ipf\InterlockedCompareExchange64.s
+  Ipf\Synchronization.c
+  Ipf\CpuPause.s
+  Ipf\CpuFlushTlb.s
+  Ipf\GetInterruptState.s
+  Ipf\Non-existing.c
+  Ipf\FlushCacheRange.s
+  Ipf\ReadItc.s
+    
+[sources.ebc]
+  Math64.c
+  Unaligned.c
+  Ebc\SwitchStack.c
+  Ebc\SetJumpLongJump.c
+  Ebc\CpuBreakpoint.c
+  Ebc\Synchronization.c
+
+[includes.common]
+  .
+  ..\..\Include
+  ..\..\Include\Library
+  $(EDK_SOURCE)\Foundation
+  $(EDK_SOURCE)\Foundation\Framework
+  $(EDK_SOURCE)\Foundation\Efi
+  $(EDK_SOURCE)\Foundation\Include
+  $(EDK_SOURCE)\Foundation\Efi\Include
+  $(EDK_SOURCE)\Foundation\Framework\Include
+  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
+  $(EDK_SOURCE)\Foundation\Core\Dxe
+  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
+  $(EDK_SOURCE)\Foundation\Cpu\Pentium\Include
+
+[includes.IA32]
+  ..\..\Include\Ia32
+
+[includes.X64]
+  ..\..\Include\x64
+
+
+[libraries.common]
+#
+# Actually, BaesLib may refer
+#	BaseTimerLibLocalApic::GetPerformanceCounter()in AcquireSpinLock()
+#	BaseMemoryLib::ZeroMem() in StrnCpy()
+#
+
+
+[libraries.ia32]
+  
+
+[libraries.x64]
+  
+
+[nmake.common]
+  C_FLAGS = $(C_FLAGS) /D EDKII_GLUE_LIBRARY_IMPLEMENTATION
+  LIB_STD_FLAGS = $(LIB_STD_FLAGS) /IGNORE:4006
+
+[nmake.ia32]
+  C_FLAGS = $(C_FLAGS) /D MDE_CPU_IA32
+
+[nmake.x64]
+  C_FLAGS = $(C_FLAGS) /D MDE_CPU_X64
+
+[nmake.ipf]
+  C_FLAGS = $(C_FLAGS) /D MDE_CPU_IPF
+
+[nmake.ebc]
+  EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /D EDKII_GLUE_LIBRARY_IMPLEMENTATION
+  EBC_LIB_STD_FLAGS = $(EBC_LIB_STD_FLAGS)  /IGNORE:4006
+  EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /D MDE_CPU_EBC
+  

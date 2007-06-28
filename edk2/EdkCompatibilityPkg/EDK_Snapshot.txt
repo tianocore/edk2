@@ -1,0 +1,6 @@
+Notes:
+  This EDK Compatibility Package is based on the EDK 1.03 release found at http://edk.tianocore.org.
+  It is compatibile with EDK 1.01 with the following exception:
+  
+  
+  
