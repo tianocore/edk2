@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  FtwLite.dxs
   FtwWorkSpace.c
   FtwMisc.c
   FtwLite.c
@@ -131,3 +130,12 @@
   PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid

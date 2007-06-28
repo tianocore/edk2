@@ -44,7 +44,6 @@
 ################################################################################
 
 [Sources.common]
-  Ebc.dxs
   EbcExecute.h
   EbcExecute.c
   EbcInt.h
@@ -106,3 +105,12 @@
   gEfiDebugSupportProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiEbcProtocolGuid                           # PROTOCOL ALWAYS_PRODUCED
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  TRUE
