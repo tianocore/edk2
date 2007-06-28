@@ -75,7 +75,6 @@
 
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
-  EdkModulePkg/EdkModulePkg.dec
   MdePkg/MdePkg.dec
 
 
