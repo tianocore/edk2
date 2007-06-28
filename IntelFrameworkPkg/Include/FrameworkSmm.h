@@ -20,6 +20,8 @@
 #ifndef _FRAMEWORK_SMM_H_
 #define _FRAMEWORK_SMM_H_
 
+#include <FrameworkBase.h>
+
 #include <FrameworkDxe.h>
 #include <Common/FrameworkSmmCis.h>
 

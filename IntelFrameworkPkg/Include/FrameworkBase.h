@@ -21,9 +21,4 @@
 #ifndef _FRAMEWORK_BASE_H_
 #define _FRAMEWORK_BASE_H_
 
-#include <Common/FrameworkFirmwareFileSystem.h>
-#include <Common/FrameworkHob.h>
-#include <Common/FrameworkLegacy16.h>
-#include <Common/DataHubRecords.h>
-
 #endif
