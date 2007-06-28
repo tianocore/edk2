@@ -23,8 +23,8 @@
 
 **/
 
-#ifndef _DATA_HUB_H_
-#define _DATA_HUB_H_
+#ifndef __DATA_HUB_H__
+#define __DATA_HUB_H__
 
 #include <PiDxe.h>
 
