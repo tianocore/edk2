@@ -14,6 +14,11 @@
 
 **/
 
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
 #include "DxeCpuIoLibInternal.h"
 
 //
@@ -146,7 +151,7 @@ MmioReadWorker (
   UINT64                            Data;
 
   if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo.Mem.Read (mPciRootBridgeIo, Width, Address, 1, &Data);
+    Status = mPciRootBridgeIo->Mem.Read (mPciRootBridgeIo, Width, Address, 1, &Data);
   } else {
     Status = mCpuIo->Mem.Read (mCpuIo, Width, Address, 1, &Data);
   }

@@ -20,7 +20,7 @@
 #ifndef _FRAMEWORK_FIRMWARE_FILE_SYSTEM_H_
 #define _FRAMEWORK_FIRMWARE_FILE_SYSTEM_H_
 
-#include <PiFirmwareFileSystem.h>
+#include <PiFirmwareFile.h>
 
 typedef UINT16                      EFI_FFS_FILE_TAIL;
 

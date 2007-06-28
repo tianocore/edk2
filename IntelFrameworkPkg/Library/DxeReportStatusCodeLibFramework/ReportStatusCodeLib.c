@@ -12,16 +12,26 @@
 
 **/
 
-#include <Common/FrameworkDxeCis.h>
+//
+// The package level header files this module uses
+//
+#include <FrameworkDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Guid/StatusCodeDataTypeId.h>
+#include <Protocol/StatusCode.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
-#include <Library/ReportStatusCodeLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Protocol/StatusCode.h>
 
 /**
   Internal worker function that reports a status code through the Status Code Protocol

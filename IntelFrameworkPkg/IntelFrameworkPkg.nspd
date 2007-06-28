@@ -94,6 +94,11 @@
       <GuidValue>62512c92-63c4-4d80-82b1-c1a4dc4480e5</GuidValue>
       <HelpText>Misc Producer DataHub Record</HelpText>
     </Entry>
+    <Entry Name="StatusCodeDataTypeDebug">
+      <C_Name>gEfiStatusCodeDataTypeDebugGuid</C_Name>
+      <GuidValue>9A4E9246-D553-11D5-87E2-00062945C3B9</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="DataHub">
