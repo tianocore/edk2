@@ -81,9 +81,9 @@
 [LibraryClasses.common.PEIM]
   HobLib|${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  PeimEntryPointLib|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PeimEntryPoint|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PcdLib|${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  PeiServiceLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   SmBusLib|${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
 
@@ -340,4 +340,4 @@
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-#  ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
