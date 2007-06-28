@@ -22,7 +22,18 @@
 #define _FRAMEWORK_DXE_CIS_H_
 
 #include <PiDxe.h>
+#include <Common/FrameworkStatusCode.h>
 #include <Protocol/StatusCode.h>
+
+//
+// Function prototype for invoking a function on an Application Processor
+// Used by both the SMM infrastructure and the MP Services Protocol
+//
+typedef
+VOID
+(EFIAPI *EFI_AP_PROCEDURE) (
+  IN  VOID                              *Buffer
+  );
 
 typedef struct {
   EFI_TABLE_HEADER              Hdr;

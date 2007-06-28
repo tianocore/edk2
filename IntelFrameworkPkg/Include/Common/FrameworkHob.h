@@ -20,7 +20,7 @@
 #ifndef _FRAMEWORK_HOB_H_
 #define _FRAMEWORK_HOB_H_
 
-#include <PiHob.h>
+#include <PiPei.h>
 
 //
 // Capsule volume HOB -- identical to a firmware volume

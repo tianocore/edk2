@@ -21,6 +21,8 @@
 #ifndef _EFI_LEGACY_INTERRUPT_H_
 #define _EFI_LEGACY_INTERRUPT_H_
 
+#include <PiDxe.h>
+
 #define EFI_LEGACY_INTERRUPT_PROTOCOL_GUID \
   { \
     0x31ce593d, 0x108a, 0x485d, {0xad, 0xb2, 0x78, 0xf2, 0x1f, 0x29, 0x66, 0xbe } \

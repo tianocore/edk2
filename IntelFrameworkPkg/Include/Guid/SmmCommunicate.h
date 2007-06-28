@@ -21,6 +21,8 @@
 #ifndef _SMM_COMMUNICATE_GUID_H_
 #define _SMM_COMMUNICATE_GUID_H_
 
+#include <PiPei.h>
+
 //******************************************************
 // EFI_SMM_COMMUNICATE_HEADER
 //******************************************************

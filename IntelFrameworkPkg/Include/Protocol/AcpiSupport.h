@@ -20,6 +20,8 @@
 #ifndef _ACPI_SUPPORT_PROTOCOL_H_
 #define _ACPI_SUPPORT_PROTOCOL_H_
 
+#include <PiDxe.h>
+
 typedef struct _EFI_ACPI_SUPPORT_PROTOCOL EFI_ACPI_SUPPORT_PROTOCOL;
 
 //

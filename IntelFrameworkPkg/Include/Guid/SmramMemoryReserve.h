@@ -20,6 +20,8 @@
 #ifndef _EFI_SMM_PEI_SMRAM_MEMORY_RESERVE_H_
 #define _EFI_SMM_PEI_SMRAM_MEMORY_RESERVE_H_
 
+#include <PiPei.h>
+
 #define EFI_SMM_PEI_SMRAM_MEMORY_RESERVE \
   { \
     0x6dadf1d1, 0xd4cc, 0x4910, {0xbb, 0x6e, 0x82, 0xb1, 0xfd, 0x80, 0xff, 0x3d } \

@@ -24,6 +24,9 @@
 #ifndef _DATAHUB_RECORDS_H_
 #define _DATAHUB_RECORDS_H_
 
+#include <PiPei.h>
+#include <Protocol/DevicePath.h>
+
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
 
 #include <Protocol/DevicePath.h>

@@ -21,6 +21,9 @@
 #ifndef _PCI_PLATFORM_H_
 #define _PCI_PLATFORM_H_
 
+#include <PiDxe.h>
+#include <Protocol/PciHostBridgeResourceAllocation.h>
+
 //
 // Protocol for GUID.
 //

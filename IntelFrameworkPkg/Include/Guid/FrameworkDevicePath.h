@@ -21,6 +21,8 @@
 #ifndef _FRAMEWORK_DEVICE_PATH_GUID_H_
 #define _FRAMEWORK_DEVICE_PATH_GUID_H_
 
+#include <PiPei.h>
+
 #define EFI_FRAMEWORK_DEVICE_PATH_GUID  \
   { 0xb7084e63, 0x46b7, 0x4d1a, { 0x86, 0x77, 0xe3, 0x0b, 0x53, 0xdb, 0xf0, 0x50 } }
 

@@ -30,6 +30,9 @@
 //
 #pragma pack(1)
 
+typedef UINT8 SERIAL_MODE;
+typedef UINT8 PARALLEL_MODE;
+
 ///////////////////////////////////////////////////////////////////////////////
 // EFI_COMPATIBILITY16_TABLE is located at a 16-byte boundary starting with the
 // signature "$EFI"

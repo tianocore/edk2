@@ -1,14 +1,14 @@
 /** @file
   This file declares Read-only Variable Service PPI
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  ReadOnlyVariable.h
 
@@ -20,6 +20,8 @@
 
 #ifndef __PEI_READ_ONLY_VARIABLE_PPI_H__
 #define __PEI_READ_ONLY_VARIABLE_PPI_H__
+
+#include <PiPei.h>
 
 #define EFI_PEI_READ_ONLY_VARIABLE_ACCESS_PPI_GUID \
   { \
@@ -67,10 +69,10 @@ EFI_STATUS
   );
 
 /**
-  This function can be called multiple times to retrieve the VariableName 
-  and VendorGuid of all variables currently available in the system. On each call 
-  to GetNextVariableName() the previous results are passed into the interface, 
-  and on output the interface returns the next variable name data.  When the 
+  This function can be called multiple times to retrieve the VariableName
+  and VendorGuid of all variables currently available in the system. On each call
+  to GetNextVariableName() the previous results are passed into the interface,
+  and on output the interface returns the next variable name data.  When the
   entire variable list has been returned, the error EFI_NOT_FOUND is returned.
 
   @param  PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
@@ -100,8 +102,8 @@ EFI_STATUS
 
 /**
   @par Ppi Description:
-  This PPI provides a lightweight, read-only variant of the full EFI 
-  variable services. 
+  This PPI provides a lightweight, read-only variant of the full EFI
+  variable services.
 
   @param GetVariable
   A service to ascertain a given variable name.

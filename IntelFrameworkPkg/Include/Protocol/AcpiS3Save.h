@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,11 +15,13 @@ Module Name:
 
 Abstract:
 
-  
+
 --*/
 
 #ifndef _ACPI_S3_SAVE_PROTOCOL_H
 #define _ACPI_S3_SAVE_PROTOCOL_H
+
+#include <PiDxe.h>
 
 //
 // Forward reference for pure ANSI compatability
@@ -41,11 +43,11 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_ACPI_S3_SAVE) (
   IN EFI_ACPI_S3_SAVE_PROTOCOL      * This,
-  IN VOID                           * LegacyMemoryAddress 
+  IN VOID                           * LegacyMemoryAddress
   );
 
-typedef 
-EFI_STATUS  
+typedef
+EFI_STATUS
 (EFIAPI *EFI_ACPI_GET_LEGACY_MEMORY_SIZE) (
   IN  EFI_ACPI_S3_SAVE_PROTOCOL     * This,
   OUT UINTN                         * Size

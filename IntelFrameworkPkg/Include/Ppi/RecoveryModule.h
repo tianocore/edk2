@@ -21,6 +21,8 @@
 #ifndef __PEI_RECOVERY_MODULE_PPI_H__
 #define __PEI_RECOVERY_MODULE_PPI_H__
 
+#include <PiPei.h>
+
 #define EFI_PEI_RECOVERY_MODULE_PPI_GUID \
   { \
     0xFB6D9542, 0x612D, 0x4f45, {0x87, 0x2F, 0x5C, 0xFF, 0x52, 0xE9, 0x3D, 0xCF } \

@@ -24,6 +24,7 @@
 #ifndef _FIRMWARE_VOLUME_BLOCK_H_
 #define _FIRMWARE_VOLUME_BLOCK_H_
 
+#include <PiDxe.h>
 
 #define EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID \
   { \

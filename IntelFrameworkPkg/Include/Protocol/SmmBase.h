@@ -22,6 +22,8 @@
 #ifndef _SMM_BASE_H_
 #define _SMM_BASE_H_
 
+#include <FrameworkSmm.h>
+
 #define EFI_SMM_BASE_PROTOCOL_GUID \
   { \
     0x1390954D, 0xda95, 0x4227, {0x93, 0x28, 0x72, 0x82, 0xc2, 0x17, 0xda, 0xa8 } \

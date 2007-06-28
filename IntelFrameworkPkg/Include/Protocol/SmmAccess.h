@@ -20,7 +20,8 @@
 #ifndef _SMM_ACCESS_H_
 #define _SMM_ACCESS_H_
 
-#include <SmramMemoryReserve.h>
+#include <PiDxe.h>
+#include <Guid/SmramMemoryReserve.h>
 
 typedef struct _EFI_SMM_ACCESS_PROTOCOL  EFI_SMM_ACCESS_PROTOCOL;
 
