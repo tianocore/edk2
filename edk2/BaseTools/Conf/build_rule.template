@@ -60,7 +60,7 @@ ToolCodeMapping = {
     "Acpi-Source-Language"          :   "ASL",
     "Object"                        :   "SLINK",
     "Static-Library"                :   "DLINK",
-	"Dependency-Expression"			:	"PP",
+		"Dependency-Expression"         :   "PP",
 }
 
 ToolChainFamilyMapping = {
