@@ -65,7 +65,6 @@
 ################################################################################
 
 [Packages]
-  EdkModulePkg/EdkModulePkg.dec
   MdePkg/MdePkg.dec
 
 
