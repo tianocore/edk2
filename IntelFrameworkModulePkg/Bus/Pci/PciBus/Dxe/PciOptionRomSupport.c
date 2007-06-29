@@ -24,6 +24,7 @@ Revision History
 #include "pcibus.h"
 #include "PciResourceSupport.h"
 
+#include <IndustryStandard/Pci23.h>
 //
 // Min Max
 //
