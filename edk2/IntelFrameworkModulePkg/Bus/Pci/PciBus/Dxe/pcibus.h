@@ -29,6 +29,7 @@ Revision History
 //
 #include <PiDxe.h>
 #include <Common/FrameworkStatusCode.h>
+#include <Common/FrameworkStatusCodeDataTypeId.h>
 //
 // The protocols, PPI and GUID defintions for this module
 //

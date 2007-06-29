@@ -361,7 +361,7 @@ Returns:
   PCI_RESOURCE_NODE               PMem32Pool;
   PCI_RESOURCE_NODE               Mem64Pool;
   PCI_RESOURCE_NODE               PMem64Pool;
-  REPORT_STATUS_CODE_LIBRARY_DEVICE_HANDLE_EXTENDED_DATA  ExtendedData;
+  EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD  ExtendedData;
 
   //
   // Initialize resource pool
@@ -743,8 +743,8 @@ Returns:
   PCI_RESOURCE_NODE                     Mem64Pool;
   PCI_RESOURCE_NODE                     PMem64Pool;
   BOOLEAN                               ReAllocate;
-  REPORT_STATUS_CODE_LIBRARY_DEVICE_HANDLE_EXTENDED_DATA        HandleExtendedData;
-  REPORT_STATUS_CODE_LIBRARY_RESOURCE_ALLOC_FAILURE_ERROR_DATA  AllocFailExtendedData;
+  EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD        HandleExtendedData;
+  EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD  AllocFailExtendedData;
 
   //
   // Reallocate flag
