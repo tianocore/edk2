@@ -16,6 +16,8 @@
 #ifndef __HII_DATABASE_H__
 #define __HII_DATABASE_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+
 #define EFI_HII_DATABASE_PROTOCOL_GUID \
   { 0xef9fc172, 0xa1b2, 0x4693, { 0xb3, 0x27, 0x6d, 0x32, 0xfc, 0x41, 0x60, 0x42 } }
 

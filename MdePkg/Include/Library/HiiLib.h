@@ -15,6 +15,8 @@
 #ifndef __HII_LIB_H__
 #define __HII_LIB_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+
 #include <Protocol/HiiDatabase.h>
 
 /**

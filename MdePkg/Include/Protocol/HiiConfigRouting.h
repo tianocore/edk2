@@ -19,6 +19,8 @@
 #ifndef __HII_CONFIG_ROUTING_H__
 #define __HII_CONFIG_ROUTING_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+
 #define EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID \
   { 0x587e72d7, 0xcc50, 0x4f79, { 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f } }
 

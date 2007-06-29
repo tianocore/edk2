@@ -15,6 +15,8 @@
 #ifndef __IFRSUPPORTLIBRARY_H__
 #define __IFRSUPPORTLIBRARY_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+
 #define DEFAULT_FORM_BUFFER_SIZE    0xFFFF
 #define DEFAULT_STRING_BUFFER_SIZE  0xFFFF
 

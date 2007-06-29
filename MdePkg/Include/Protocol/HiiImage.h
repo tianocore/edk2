@@ -15,6 +15,7 @@
 #ifndef __HII_IMAGE_H__
 #define __HII_IMAGE_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
 
 #define EFI_HII_IMAGE_PROTOCOL_GUID \
   { 0x31a6406a, 0x6bdf, 0x4e46, { 0xb2, 0xa2, 0xeb, 0xaa, 0x89, 0xc4, 0x9, 0x20 } }
