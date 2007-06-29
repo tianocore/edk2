@@ -21,11 +21,11 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = MdeModuleAll
+  PLATFORM_NAME                  = IntelFramework
   PLATFORM_GUID                  = E76EB141-6EDB-43f3-A455-EF24A79673DD
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/MdeModule
+  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/IntelFramework
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -67,3 +67,4 @@
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  ${WORKSPACE}/IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf

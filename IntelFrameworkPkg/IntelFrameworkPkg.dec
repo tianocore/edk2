@@ -48,6 +48,7 @@
 ################################################################################
 [LibraryClass.common]
   FrameworkHiiLib|Include/Library/FrameworkHiiLib.h
+  FrameworkIfrSupportLib|Include/Library/FrameworkIfrSupportLib.h
 
 
 
