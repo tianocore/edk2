@@ -26,7 +26,6 @@ Abstract:
 // BugBug: We need relcate the head file.
 //
 #include <Common/Variable.h>
-#include <VarMachine.h>
 
 //
 // Define GET_PAD_SIZE to optimize compiler

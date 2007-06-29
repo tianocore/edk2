@@ -47,19 +47,15 @@
   Variable.h
 
 [Sources.Ia32]
-  Ia32/VarMachine.h
   VariableWorker.c
 
 [Sources.X64]
-  x64/VarMachine.h
   VariableWorker.c
 
 [Sources.IPF]
-  Ipf/VarMachine.h
   Ipf/VariableWorker.c
 
 [Sources.EBC]
-  Ebc/VarMachine.h
   VariableWorker.c
 
 
