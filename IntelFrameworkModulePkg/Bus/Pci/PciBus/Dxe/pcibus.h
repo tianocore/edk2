@@ -66,28 +66,6 @@ Revision History
 #include <IndustryStandard/Acpi.h>
 #include "ComponentName.h"
 
-///
-/// Device handle Extended Data. Used for many
-/// errors and progress codes to point to the device.
-///
-typedef struct {
-  EFI_HANDLE            Handle;
-} REPORT_STATUS_CODE_LIBRARY_DEVICE_HANDLE_EXTENDED_DATA;
-
-///
-/// Resource Allocation Failure Extended Error Data
-///
-typedef struct {
-  UINT32                             Bar;
-  UINT16                             DevicePathSize;
-  UINT16                             ReqResSize;
-  UINT16                             AllocResSize;
-  UINT8                              *DevicePath;
-  UINT8                              *ReqRes;
-  UINT8                              *AllocRes;
-} REPORT_STATUS_CODE_LIBRARY_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
-
-
 //
 // Driver Produced Protocol Prototypes
 //
