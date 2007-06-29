@@ -60,6 +60,26 @@
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiComponentName2ProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiComponentNameProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDriverConfigurationProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDriverDiagnosticsProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDriverDiagnostics2ProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiEventLegacyBootGuid</GuidCName>
