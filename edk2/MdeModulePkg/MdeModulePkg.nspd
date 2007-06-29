@@ -143,6 +143,21 @@
       <GuidValue>D8117CFF-94A6-11D4-9A3A-0090273FC14D</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="FlashMapHob">
+      <C_Name>gEfiFlashMapHobGuid</C_Name>
+      <GuidValue>B091E7D2-05A0-4198-94F0-74B7B8C55459</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="MemoryTypeInformation">
+      <C_Name>gEfiMemoryTypeInformationGuid</C_Name>
+      <GuidValue>4C19049F-4137-4DD3-9C10-8B97A83FFDFA</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="ShellFile">
+      <C_Name>gEfiShellFileGuid</C_Name>
+      <GuidValue>C57AD6B7-0515-40A8-9D21-551652854E37</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="Capsule">
