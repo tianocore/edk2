@@ -144,7 +144,7 @@
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  EdkScsiLib|$(WORKSPACE)/MdeModulePkg/Library/EdkScsiLib/EdkScsiLib.inf
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   UefiDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
   FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -208,7 +208,7 @@
   UefiRuntimeLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   TianoDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)/MdeModulePkg/Library/EdkUsbLib/EdkUsbLib.inf
-  EdkScsiLib|$(WORKSPACE)/MdeModulePkg/Library/EdkScsiLib/EdkScsiLib.inf
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)/MdePkg/Library/UefiDriverModelLib/UefiDriverModelLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
 
@@ -234,7 +234,7 @@
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   TianoDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)/MdeModulePkg/Library/EdkUsbLib/EdkUsbLib.inf
-  EdkScsiLib|$(WORKSPACE)/MdeModulePkg/Library/EdkScsiLib/EdkScsiLib.inf
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)/MdePkg/Library/UefiDriverModelLib/UefiDriverModelLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
 
@@ -260,7 +260,7 @@
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   TianoDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/DxeCoreTianoDecompressLibFromHob/DxeCoreTianoDecompressLibFromHob.inf
   EdkUsbLib|$(WORKSPACE)/MdeModulePkg/Library/EdkUsbLib/EdkUsbLib.inf
-  EdkScsiLib|$(WORKSPACE)/MdeModulePkg/Library/EdkScsiLib/EdkScsiLib.inf
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   UefiDriverModelLib|$(WORKSPACE)/MdePkg/Library/UefiDriverModelLib/UefiDriverModelLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
 
@@ -270,7 +270,7 @@
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  EdkScsiLib|$(WORKSPACE)/MdeModulePkg/Library/EdkScsiLib/EdkScsiLib.inf
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   UefiDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/DxeCoreUefiDecompressLibFromHob/DxeCoreUefiDecompressLibFromHob.inf
   FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiApplicationEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -425,3 +425,4 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
+  ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf

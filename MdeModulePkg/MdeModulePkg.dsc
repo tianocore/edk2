@@ -113,7 +113,8 @@
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
@@ -129,7 +130,8 @@
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  
 [LibraryClasses.common.DXE_SAL_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
@@ -145,7 +147,7 @@
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -161,7 +163,7 @@
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -178,7 +180,7 @@
   UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -194,7 +196,7 @@
   DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-
+  ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.IA32.BASE]
   TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
@@ -342,3 +344,4 @@
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
