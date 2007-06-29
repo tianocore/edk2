@@ -25,6 +25,7 @@
     <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.nspd</Filename>
     <Filename>IntelFrameworkPkg/IntelFrameworkPkg.nspd</Filename>
     <Filename>Nt32Pkg/Nt32Pkg.nspd</Filename>
+    <Filename>FatBinPkg/FatBinPkg.nspd</Filename>
     <Filename>ShellBinPkg/ShellBinPkg.nspd</Filename>
   </PackageList>
 </FrameworkDatabase>
