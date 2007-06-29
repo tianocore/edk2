@@ -65,6 +65,6 @@
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/UefiLibFramework/UefiLib.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
-  ${WORKSPACE}/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
+  ${WORKSPACE}/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   ${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  ${WORKSPACE}/IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
+  ${WORKSPACE}/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
