@@ -48,7 +48,7 @@ and then go to MdePkg\Library\BaseLib directory and build
     c:\MyWork\edk2\> cd MdePkg\Library\BaseLib
     c:\MyWork\edk2\> build
 
-If you want build a platform, please set ACTIVE_PLATFORM  to your desired platform dsc file,
+If you want build a platform, ACTIVE_PLATFORM must be set to your desired platform dsc file,
 go to directory which must be not a module's directory, and run "build" command.
 
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ without Python interpreter. One of the convertion tools is called cx_Freeze at
 
 	Suppose you have installed cx_Freeze at c:\cx_Freeze-3.0.3. Use following command line to convert MyBuild.py
 
-  	c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk --install-dir=.\mybuild MyBuild.py
+  	c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8 --install-dir=.\mybuild MyBuild.py
 
 	The generated .exe files are put in "mybuild" subdirectory.
 
