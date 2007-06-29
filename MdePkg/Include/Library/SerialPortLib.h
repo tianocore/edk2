@@ -25,7 +25,7 @@
   @return  Status of Serial Port Device initialization.
 
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 SerialPortInitialize (
   VOID
@@ -49,7 +49,7 @@ EFIAPI
 SerialPortWrite (
   IN UINT8 	   *Buffer,
   IN UINTN 	   NumberOfBytes
-);
+  );
 
 
 /**
@@ -70,7 +70,7 @@ EFIAPI
 SerialPortRead (
   OUT UINT8 	*Buffer,
   IN  UINTN 	NumberOfBytes
-);
+  );
 
 
 #endif
