@@ -19,7 +19,9 @@
 //
 // The package level header files this module uses
 //
-#include <FrameworkDxe.h>
+#include <PiDxe.h>
+
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
