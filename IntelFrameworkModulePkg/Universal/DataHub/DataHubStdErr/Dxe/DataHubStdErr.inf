@@ -45,9 +45,6 @@
 [Sources.common]
   DataHubStdErr.c
 
-[Includes]
-  IntelFrameworkModulePkg/Include
-
 ################################################################################
 #
 # Package Dependency Section - list of Package files that are required for

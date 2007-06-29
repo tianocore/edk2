@@ -48,25 +48,14 @@
 
 ################################################################################
 #
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-  $(WORKSPACE)/IntelFrameworkPkg/Include
-
-################################################################################
-#
 # Package Dependency Section - list of Package files that are required for
 #                              this module.
 #
 ################################################################################
 
 [Packages]
-  $(WORKSPACE)/MdePkg/MdePkg.dec
-  $(WORKSPACE)/IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 ################################################################################
 #

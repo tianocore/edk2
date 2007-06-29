@@ -77,9 +77,6 @@
   PciIo.h
   pcibus.h
 
-[Includes]
-  IntelFrameworkModulePkg/Include
-
 ################################################################################
 #
 # Package Dependency Section - list of Package files that are required for
