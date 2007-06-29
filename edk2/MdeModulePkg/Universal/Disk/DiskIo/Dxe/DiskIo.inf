@@ -58,8 +58,8 @@
 ################################################################################
 
 [Packages]
-  $(WORKSPACE)/MdePkg/MdePkg.dec
-  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 
 ################################################################################

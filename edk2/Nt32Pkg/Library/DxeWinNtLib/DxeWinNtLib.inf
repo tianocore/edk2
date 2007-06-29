@@ -52,24 +52,14 @@
 
 ################################################################################
 #
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-
-################################################################################
-#
 # Package Dependency Section - list of Package files that are required for
 #                              this module.
 #
 ################################################################################
 
 [Packages]
-  Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
+  Nt32Pkg/Nt32Pkg.dec
 
 
 ################################################################################

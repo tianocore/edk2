@@ -61,9 +61,9 @@
 ################################################################################
 
 [Packages]
-  $(WORKSPACE)/MdePkg/MdePkg.dec
-  $(WORKSPACE)/MdeModulePkg/MdeModulePkg.dec
-  $(WORKSPACE)/IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 ################################################################################
 #
