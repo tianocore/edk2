@@ -45,8 +45,6 @@
 [Sources.common]
   IncompatiblePciDeviceList.h
   PciIncompatibleDeviceSupportLib.c
-  CommonHeader.h
-
 
 ################################################################################
 #

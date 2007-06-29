@@ -18,9 +18,16 @@
 #define __BASE_UEFI_TIANO_CUSTOM_DECOMPRESS_LIB_INTERNALS_H__
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <Base.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/UefiDecompressLib.h>
+#include <Library/CustomDecompressLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
 
 //
 // Decompression algorithm begins here
