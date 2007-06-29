@@ -106,8 +106,11 @@
 [Protocols]
   gEfiDriverBindingProtocolGuid                 # ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # SOMETIMES_CONSUMED
+  gEfiComponentName2ProtocolGuid                 # SOMETIMES_CONSUMED
   gEfiDriverConfigurationProtocolGuid           # SOMETIMES_CONSUMED
   gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
+  gEfiDriverDiagnostics2ProtocolGuid             # SOMETIMES_CONSUMED
+
 
 ################################################################################
 #
