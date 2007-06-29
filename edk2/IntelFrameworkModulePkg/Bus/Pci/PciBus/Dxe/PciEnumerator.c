@@ -1011,7 +1011,7 @@ Returns:
   UINTN                                 DevIndex;
   UINTN                                 ResType;
   EFI_STATUS                            Status;
-  REPORT_STATUS_CODE_LIBRARY_RESOURCE_ALLOC_FAILURE_ERROR_DATA AllocFailExtendedData;
+  EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD AllocFailExtendedData;
 
   PciResNode = NULL;
   ZeroMem (RemovedPciDev, 5 * sizeof (PCI_IO_DEVICE *));
