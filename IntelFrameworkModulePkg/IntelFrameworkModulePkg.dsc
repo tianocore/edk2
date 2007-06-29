@@ -48,6 +48,7 @@
   UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   OemHookStatusCodeLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|${WORKSPACE}/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
+  GraphicsLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -150,6 +151,7 @@
   $(WORKSPACE)\IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   $(WORKSPACE)\IntelFrameworkModulePkg\Library\OemHookStatusCodeLibNull\OemHookStatusCodeLibNull.inf
   $(WORKSPACE)\IntelFrameworkModulePkg\Library\PciIncompatibleDeviceSupportLib\PciIncompatibleDeviceSupportLib.inf
+  $(WORKSPACE)\IntelFrameworkModulePkg\Library\GraphicsLib\GraphicsLib.inf
   #$(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.inf
   $(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\IdeBus\Dxe\IdeBus.inf
   $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.inf

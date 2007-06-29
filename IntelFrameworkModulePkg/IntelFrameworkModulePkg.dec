@@ -26,6 +26,17 @@
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
   PACKAGE_VERSION                = 0.1
 
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
 
 ################################################################################
 #
@@ -36,6 +47,7 @@
 [LibraryClass.common]
   PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
+  GraphicsLib|Include/Library/GraphicsLib.h
 
 
 
