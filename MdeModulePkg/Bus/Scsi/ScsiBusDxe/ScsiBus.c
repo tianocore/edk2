@@ -635,10 +635,10 @@ Returns:
   ScsiIoDevice->Lun                       = Lun;
 
   ScsiIoDevice->ScsiIo.GetDeviceType      = ScsiGetDeviceType;
-  ScsiIoDevice->ScsiIo.GetDeviceLocation  = ScsiGetDeviceLocation;
+ // ScsiIoDevice->ScsiIo.GetDeviceLocation  = ScsiGetDeviceLocation;
   ScsiIoDevice->ScsiIo.ResetBus           = ScsiResetBus;
   ScsiIoDevice->ScsiIo.ResetDevice        = ScsiResetDevice;
-  ScsiIoDevice->ScsiIo.ExecuteSCSICommand = ScsiExecuteSCSICommand;
+  ScsiIoDevice->ScsiIo.ExecuteScsiCommand = ScsiExecuteSCSICommand;
 
   if (!DiscoverScsiDevice (ScsiIoDevice)) {
     gBS->FreePool (ScsiIoDevice);
