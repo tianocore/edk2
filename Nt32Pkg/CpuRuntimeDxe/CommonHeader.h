@@ -35,7 +35,7 @@
 // The Library classes this module consumes
 //
 #include <Library/DebugLib.h>
-#include <Library/FrameworkHiiLib.h>
+#include <Library/HiiLibFramework.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>

@@ -75,7 +75,7 @@
   MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
-  FrameworkHiiLib
+  HiiLibFramework
   DebugLib
 
 
