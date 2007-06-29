@@ -17,7 +17,7 @@
 //
 // The package level header files this module uses
 //
-#include <FrameworkPei.h>
+#include <Base.h>
 //
 // The protocols, PPI and GUID defintions for this module
 //
@@ -33,13 +33,13 @@
   @return    Always return EFI_UNSUPPORTED.
 
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 SerialPortInitialize (
   VOID
   )
 {
-  return EFI_UNSUPPORTED;
+  return RETURN_UNSUPPORTED;
 }
 
 /**
