@@ -277,4 +277,9 @@ typedef struct {
 //
 #define EFI_SCSI_ASCQ_IN_PROGRESS (0x01)
 
+//
+// Max bytes needed to represent ID of a SCSI device
+//
+#define EFI_SCSI_TARGET_MAX_BYTES (0x10)
+
 #endif

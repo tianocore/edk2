@@ -222,7 +222,7 @@ struct _EFI_SCSI_IO_PROTOCOL {
   EFI_SCSI_IO_PROTOCOL_GET_DEVICE_LOCATION  GetDeviceLocation;
   EFI_SCSI_IO_PROTOCOL_RESET_BUS            ResetBus;
   EFI_SCSI_IO_PROTOCOL_RESET_DEVICE         ResetDevice;
-  EFI_SCSI_IO_PROTOCOL_EXEC_SCSI_COMMAND    ExecuteSCSICommand;    
+  EFI_SCSI_IO_PROTOCOL_EXEC_SCSI_COMMAND    ExecuteScsiCommand;    
   UINT32                                    IoAlign;
 };
 
