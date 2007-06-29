@@ -15,10 +15,13 @@
 #ifndef __BASE_LIB_INTERNALS__
 #define __BASE_LIB_INTERNALS__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
+
 
 #define QUIENT_MAX_UINTN_DIVIDED_BY_10      ((UINTN) -1 / 10)
 #define REMINDER_MAX_UINTN_DIVIDED_BY_10    ((UINTN) -1 % 10)

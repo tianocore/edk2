@@ -14,20 +14,12 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
 #include <Guid/DxeServices.h>
-//
-// The Library classes this module consumes
-//
 #include <Library/DxeServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
+
 
 //
 // Cache copy of the DXE Services Table

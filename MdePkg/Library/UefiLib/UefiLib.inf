@@ -51,7 +51,7 @@
   UefiDriverModel.c
   Console.c
   UefiLib.c
-  CommonHeader.h
+  UefiLibInternal.h
 
 
 ################################################################################

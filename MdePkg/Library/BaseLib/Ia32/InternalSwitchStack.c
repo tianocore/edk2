@@ -17,7 +17,8 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
 
 /**
   Transfers control to a function starting with a new stack.

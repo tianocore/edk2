@@ -77,7 +77,6 @@
   LinkedList.c
   String.c
   BaseLibInternals.h
-  CommonHeader.h
 
 [Sources.Ia32]
   Ia32/Wbinvd.c

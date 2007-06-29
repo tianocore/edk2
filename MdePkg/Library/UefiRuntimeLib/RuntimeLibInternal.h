@@ -15,10 +15,10 @@
 #ifndef __RUNTIMELIBINTERNAL_H__
 #define __RUNTIMELIBINTERNAL_H__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Library/UefiRuntimeLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 extern EFI_RUNTIME_SERVICES   *mRT;
 

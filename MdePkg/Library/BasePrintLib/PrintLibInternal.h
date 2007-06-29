@@ -15,10 +15,11 @@
 #ifndef __PRINT_LIB_INTERNAL_H
 #define __PRINT_LIB_INTERNAL_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/PrintLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+
 
 //
 // Print primitives

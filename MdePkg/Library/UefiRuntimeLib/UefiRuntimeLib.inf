@@ -47,7 +47,6 @@
 
 [Sources.common]
   RuntimeLibInternal.h
-  CommonHeader.h
 
 [Sources.Ia32]
   RuntimeService.c

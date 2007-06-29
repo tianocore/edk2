@@ -16,7 +16,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "UefiLibInternal.h"
 
 /**
   Internal function which prints a formatted Unicode string to the console output device

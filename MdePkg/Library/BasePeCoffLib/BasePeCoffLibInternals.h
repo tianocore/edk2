@@ -17,10 +17,13 @@
 #ifndef __BASE_PECOFF_LIB_INTERNALS__
 #define __BASE_PECOFF_LIB_INTERNALS__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/PeCoffLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <IndustryStandard/PeImage.h>
+
+
 
 /**
   Performs an Itanium-based specific relocation fixup and is a no-op on other

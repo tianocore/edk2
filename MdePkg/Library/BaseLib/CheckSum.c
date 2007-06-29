@@ -18,7 +18,8 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
 
 /**
   Calculate the sum of all elements in a buffer in unit of UINT8. 

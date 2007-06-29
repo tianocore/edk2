@@ -14,13 +14,13 @@
 
 **/
 
+#include <Base.h>
+#include <Library/TimerLib.h>
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
-
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 /**
   Performs a delay measured as number of ticks.

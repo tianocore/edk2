@@ -17,7 +17,9 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 
 //
 // This size must be at or below the smallest cache size possible among all

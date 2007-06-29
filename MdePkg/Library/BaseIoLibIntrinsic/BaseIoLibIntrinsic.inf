@@ -45,7 +45,7 @@
 
 [Sources.common]
   IoLibMmioBuffer.c
-  CommonHeader.h
+  BaseIoLibIntrinsicInternal.h
 
 [Sources.Ia32]
   IoHighLevel.c

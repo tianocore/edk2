@@ -17,7 +17,8 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
 
 /**
   Returns the lower 32-bits of a Machine Specific Register(MSR).

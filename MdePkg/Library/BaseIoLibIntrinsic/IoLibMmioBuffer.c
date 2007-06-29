@@ -15,7 +15,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "BaseIoLibIntrinsicInternal.h"
 
 /**
   Copy data from MMIO region to system memory by using 8-bit access.

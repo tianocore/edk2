@@ -17,7 +17,8 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
 
 /**
   Retrieves the current CPU interrupt state.
