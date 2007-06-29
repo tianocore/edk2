@@ -1,0 +1,57 @@
+#/** @file
+# Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.
+#
+# This is the FAT 32 EFI/Tiano Driver
+# Copyright 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to generate a binary image.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Fat
+  FILE_GUID                      = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  BINARY_MODULE                  = true
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Binaries Section - list of binary files that are required for the build
+# to succeed.
+#
+################################################################################
+
+[Binaries.Ia32]
+  FV|RELEASE|Ia32/Fat.efi
+
+[Binaries.X64]
+  FV|RELEASE|X64/Fat.efi
+
+[Binaries.IPF]
+  FV|RELEASE|Ipf/Fat.efi
+
+[Binaries.EBC]
+  FV|RELEASE|Ebc/Fat.efi
+
