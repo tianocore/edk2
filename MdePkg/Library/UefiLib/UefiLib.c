@@ -513,32 +513,51 @@ EfiTestChildHandle (
 }
 
 /**
-  This function looks up a Unicode string in UnicodeStringTable.  If Language is
-  a member of SupportedLanguages and a Unicode string is found in UnicodeStringTable
-  that matches the language code specified by Language, then it is returned in
+  This function looks up a Unicode string in UnicodeStringTable.
+  If Language is a member of SupportedLanguages and a Unicode
+  string is found in UnicodeStringTable that matches the
+  language code specified by Language, then it is returned in
   UnicodeString.
 
-  @param  Language                A pointer to the ISO 639-2 language code for the
-                                  Unicode string to look up and return.
-  @param  SupportedLanguages      A pointer to the set of ISO 639-2 language codes
-                                  that the Unicode string table supports.  Language
-                                  must be a member of this set.
-  @param  UnicodeStringTable      A pointer to the table of Unicode strings.
-  @param  UnicodeString           A pointer to the Unicode string from UnicodeStringTable
-                                  that matches the language specified by Language.
+  @param  Language                A pointer to the ISO 639-2
+                                  language code for the Unicode
+                                  string to look up and return.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2language
+                                  codes that the Unicode string
+                                  table supports. Language must
+                                  be a member of this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string from UnicodeStringTable
+                                  that matches the language
+                                  specified by Language.
 
-  @retval  EFI_SUCCESS            The Unicode string that matches the language
-                                  specified by Language was found
-                                  in the table of Unicoide strings UnicodeStringTable,
-                                  and it was returned in UnicodeString.
+  @retval  EFI_SUCCESS            The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicoide strings
+                                  UnicodeStringTable, and it was
+                                  returned in UnicodeString.
+  
   @retval  EFI_INVALID_PARAMETER  Language is NULL.
+  
   @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
   @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
+  
   @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
-  @retval  EFI_UNSUPPORTED        The language specified by Language is not a
-                                  member of SupportedLanguages.
-  @retval  EFI_UNSUPPORTED        The language specified by Language is not
-                                  supported by UnicodeStringTable.
+  
+  @retval  EFI_UNSUPPORTED        The language specified by
+                                  Language is not a member
+                                  ofSupportedLanguages.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not supported by
+                                  UnicodeStringTable.
 
 **/
 EFI_STATUS
@@ -596,36 +615,195 @@ LookupUnicodeString (
   return EFI_UNSUPPORTED;
 }
 
+
+
 /**
+  This function looks up a Unicode string in UnicodeStringTable.
+  If Language is a member of SupportedLanguages and a Unicode
+  string is found in UnicodeStringTable that matches the
+  language code specified by Language, then it is returned in
+  UnicodeString.
+
+  @param  Language                A pointer to the ISO 639-2 or
+                                  RFC 3066 language code for the
+                                  Unicode string to look up and
+                                  return.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2 or RFC 3066 language
+                                  codes that the Unicode string
+                                  table supports. Language must
+                                  be a member of this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string from UnicodeStringTable
+                                  that matches the language
+                                  specified by Language.
+
+  @param  Iso639Language          Specify the language code
+                                  format supported. If true,
+                                  then the format follow ISO
+                                  639-2. If false, then it
+                                  follows RFC3066.
+
+  @retval  EFI_SUCCESS            The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicoide strings
+                                  UnicodeStringTable, and it was
+                                  returned in UnicodeString.
+  
+  @retval  EFI_INVALID_PARAMETER  Language is NULL.
+  
+  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
+  
+  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
+  
+  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
+  
+  @retval  EFI_UNSUPPORTED        The language specified by
+                                  Language is not a member
+                                  ofSupportedLanguages.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not supported by
+                                  UnicodeStringTable.
+
+**/
+EFI_STATUS
+EFIAPI
+LookupUnicodeString2 (
+  IN CONST CHAR8                     *Language,
+  IN CONST CHAR8                     *SupportedLanguages,
+  IN CONST EFI_UNICODE_STRING_TABLE  *UnicodeStringTable,
+  OUT CHAR16                         **UnicodeString,
+  IN BOOLEAN                         Iso639Language
+  )
+{
+  BOOLEAN   Found;
+  UINTN     Index;
+  CHAR8     *LanguageString;
+
+  //
+  // Make sure the parameters are valid
+  //
+  if (Language == NULL || UnicodeString == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If there are no supported languages, or the Unicode String Table is empty, then the
+  // Unicode String specified by Language is not supported by this Unicode String Table
+  //
+  if (SupportedLanguages == NULL || UnicodeStringTable == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure Language is in the set of Supported Languages
+  //
+  Found = FALSE;
+  while (*SupportedLanguages != 0) {
+    if (Iso639Language) {
+      if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += 3;
+    } else {
+      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
+      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += Index;
+      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
+    }
+  }
+
+  //
+  // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
+  //
+  if (!Found) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Search the Unicode String Table for the matching Language specifier
+  //
+  while (UnicodeStringTable->Language != NULL) {
+    LanguageString = UnicodeStringTable->Language;
+    while (0 != *LanguageString) {
+      for (Index = 0 ;LanguageString[Index] != 0 && LanguageString[Index] != ';'; Index++);
+      if (AsciiStrnCmp(LanguageString, Language, Index) == 0) {
+        *UnicodeString = UnicodeStringTable->UnicodeString;
+        return EFI_SUCCESS;
+      }
+      LanguageString += Index;
+      for (Index = 0 ;LanguageString[Index] != 0 && LanguageString[Index] == ';'; Index++);
+    }
+    UnicodeStringTable++;
+  }
+
+  return EFI_UNSUPPORTED;
+}
+
+
+/**
+  
   This function adds a Unicode string to UnicodeStringTable.
-  If Language is a member of SupportedLanguages then UnicodeString is added to
-  UnicodeStringTable.  New buffers are allocated for both Language and
-  UnicodeString.  The contents of Language and UnicodeString are copied into
-  these new buffers.  These buffers are automatically freed when
+  If Language is a member of SupportedLanguages then
+  UnicodeString is added to UnicodeStringTable.  New buffers are
+  allocated for both Language and UnicodeString.  The contents
+  of Language and UnicodeString are copied into these new
+  buffers.  These buffers are automatically freed when
   FreeUnicodeStringTable() is called.
 
-  @param  Language                A pointer to the ISO 639-2 language code for the Unicode
+  @param  Language                A pointer to the ISO 639-2
+                                  language code for the Unicode
                                   string to add.
-  @param  SupportedLanguages      A pointer to the set of ISO 639-2 language codes
-                                  that the Unicode string table supports.
-                                  Language must be a member of this set.
-  @param  UnicodeStringTable      A pointer to the table of Unicode strings.
-  @param  UnicodeString           A pointer to the Unicode string to add.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2 language codes that the
+                                  Unicode string table supports.
+                                  Language must be a member of
+                                  this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string to add.
 
-  @retval EFI_SUCCESS             The Unicode string that matches the language
-                                  specified by Language was found in the table of
-                                  Unicode strings UnicodeStringTable, and it was
+  @retval EFI_SUCCESS             The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicode strings
+                                  UnicodeStringTable, and it was
                                   returned in UnicodeString.
+  
   @retval EFI_INVALID_PARAMETER   Language is NULL.
+  
   @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
+  
   @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
+  
   @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
-  @retval EFI_ALREADY_STARTED     A Unicode string with language Language is
-                                  already present in UnicodeStringTable.
-  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to add another
-                                  Unicode string to UnicodeStringTable.
-  @retval EFI_UNSUPPORTED         The language specified by Language is not a
-                                  member of SupportedLanguages.
+  
+  @retval EFI_ALREADY_STARTED     A Unicode string with language
+                                  Language is already present in
+                                  UnicodeStringTable.
+  
+  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
+                                  add another Unicode string to
+                                  UnicodeStringTable.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not a member of
+                                  SupportedLanguages.
 
 **/
 EFI_STATUS
@@ -762,10 +940,229 @@ AddUnicodeString (
   return EFI_UNSUPPORTED;
 }
 
+
+/**
+  
+  This function adds a Unicode string to UnicodeStringTable.
+  If Language is a member of SupportedLanguages then
+  UnicodeString is added to UnicodeStringTable.  New buffers are
+  allocated for both Language and UnicodeString.  The contents
+  of Language and UnicodeString are copied into these new
+  buffers.  These buffers are automatically freed when
+  FreeUnicodeStringTable() is called.
+
+  @param  Language                A pointer to the ISO 639-2 or
+                                  RFC 3066 language code for the
+                                  Unicode string to add.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2 or RFC 3.66 language
+                                  codes that the Unicode string
+                                  table supports. Language must
+                                  be a member of this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string to add.
+  
+  @param  Iso639Language          Specify the language code
+                                  format supported. If true,
+                                  then the format follow ISO
+                                  639-2. If false, then it
+                                  follows RFC3066.
+
+  @retval EFI_SUCCESS             The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicode strings
+                                  UnicodeStringTable, and it was
+                                  returned in UnicodeString.
+  
+  @retval EFI_INVALID_PARAMETER   Language is NULL.
+  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
+  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
+  
+  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
+  
+  @retval EFI_ALREADY_STARTED     A Unicode string with language
+                                  Language is already present in
+                                  UnicodeStringTable.
+  
+  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
+                                  add another Unicode string to
+                                  UnicodeStringTable.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not a member of
+                                  SupportedLanguages.
+
+**/
+EFI_STATUS
+EFIAPI
+AddUnicodeString2 (
+  IN CONST CHAR8               *Language,
+  IN CONST CHAR8               *SupportedLanguages,
+  IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
+  IN CONST CHAR16              *UnicodeString,
+  IN BOOLEAN                   Iso639Language
+  )
+{
+  UINTN                     NumberOfEntries;
+  EFI_UNICODE_STRING_TABLE  *OldUnicodeStringTable;
+  EFI_UNICODE_STRING_TABLE  *NewUnicodeStringTable;
+  UINTN                     UnicodeStringLength;
+  BOOLEAN                   Found;
+  UINTN                     Index;
+  CHAR8                     *LanguageString;
+
+  //
+  // Make sure the parameter are valid
+  //
+  if (Language == NULL || UnicodeString == NULL || UnicodeStringTable == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If there are no supported languages, then a Unicode String can not be added
+  //
+  if (SupportedLanguages == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // If the Unicode String is empty, then a Unicode String can not be added
+  //
+  if (UnicodeString[0] == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Make sure Language is a member of SupportedLanguages
+  //
+  Found = FALSE;
+  while (*SupportedLanguages != 0) {
+    if (Iso639Language) {
+      if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += 3;
+    } else {
+      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
+      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += Index;
+      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
+    }
+  }
+
+  //
+  // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
+  //
+  if (!Found) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Determine the size of the Unicode String Table by looking for a NULL Language entry
+  //
+  NumberOfEntries = 0;
+  if (*UnicodeStringTable != NULL) {
+    OldUnicodeStringTable = *UnicodeStringTable;
+    while (OldUnicodeStringTable->Language != NULL) {
+      LanguageString = OldUnicodeStringTable->Language;
+
+      while (*LanguageString) {
+        for (Index = 0; LanguageString[Index] != 0 && LanguageString[Index] != ';'; Index++);
+
+        if (AsciiStrnCmp (Language, LanguageString, Index) == 0) { 
+          return EFI_ALREADY_STARTED;
+        }
+        LanguageString += Index;
+        for (; *LanguageString != 0 && *LanguageString == ';'; LanguageString++);
+      }
+      OldUnicodeStringTable++;
+      NumberOfEntries++;
+    }
+  }
+
+  //
+  // Allocate space for a new Unicode String Table.  It must hold the current number of
+  // entries, plus 1 entry for the new Unicode String, plus 1 entry for the end of table
+  // marker
+  //
+  NewUnicodeStringTable = AllocatePool ((NumberOfEntries + 2) * sizeof (EFI_UNICODE_STRING_TABLE));
+  if (NewUnicodeStringTable == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // If the current Unicode String Table contains any entries, then copy them to the
+  // newly allocated Unicode String Table.
+  //
+  if (*UnicodeStringTable != NULL) {
+    CopyMem (
+      NewUnicodeStringTable,
+      *UnicodeStringTable,
+      NumberOfEntries * sizeof (EFI_UNICODE_STRING_TABLE)
+      );
+  }
+
+  //
+  // Allocate space for a copy of the Language specifier
+  //
+  NewUnicodeStringTable[NumberOfEntries].Language = AllocateCopyPool (AsciiStrSize(Language), Language);
+  if (NewUnicodeStringTable[NumberOfEntries].Language == NULL) {
+    gBS->FreePool (NewUnicodeStringTable);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Compute the length of the Unicode String
+  //
+  for (UnicodeStringLength = 0; UnicodeString[UnicodeStringLength] != 0; UnicodeStringLength++);
+
+  //
+  // Allocate space for a copy of the Unicode String
+  //
+  NewUnicodeStringTable[NumberOfEntries].UnicodeString = AllocateCopyPool (StrSize (UnicodeString), UnicodeString);
+  if (NewUnicodeStringTable[NumberOfEntries].UnicodeString == NULL) {
+    gBS->FreePool (NewUnicodeStringTable[NumberOfEntries].Language);
+    gBS->FreePool (NewUnicodeStringTable);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Mark the end of the Unicode String Table
+  //
+  NewUnicodeStringTable[NumberOfEntries + 1].Language       = NULL;
+  NewUnicodeStringTable[NumberOfEntries + 1].UnicodeString  = NULL;
+
+  //
+  // Free the old Unicode String Table
+  //
+  if (*UnicodeStringTable != NULL) {
+    gBS->FreePool (*UnicodeStringTable);
+  }
+
+  //
+  // Point UnicodeStringTable at the newly allocated Unicode String Table
+  //
+  *UnicodeStringTable = NewUnicodeStringTable;
+
+  return EFI_SUCCESS;
+}
+
 /**
   This function frees the table of Unicode strings in UnicodeStringTable.
   If UnicodeStringTable is NULL, then EFI_SUCCESS is returned.
-  Otherwise, each language code, and each Unicode string in the Unicode string
+  Otherwise, each language code, and each Unicode string in the Unicode string 
   table are freed, and EFI_SUCCESS is returned.
 
   @param  UnicodeStringTable  A pointer to the table of Unicode strings.
@@ -810,76 +1207,6 @@ FreeUnicodeStringTable (
   // Free the Unicode String Table itself
   //
   gBS->FreePool (UnicodeStringTable);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Intialize a driver by installing the Driver Binding Protocol onto the
-  driver's DriverBindingHandle.  This is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple
-  DriverBinding Protocols.  This function also initializes the EFI Driver
-  Library that initializes the global variables gST, gBS, gRT.
-
-  @param  ImageHandle          The image handle of the driver
-  @param  SystemTable          The EFI System Table that was passed to the driver's entry point
-  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing
-  @param  DriverBindingHandle  The handle that DriverBinding is to be installe onto.  If this
-                               parameter is NULL, then a new handle is created.
-
-  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
-  @retval Other                Status from gBS->InstallProtocolInterface()
-
-**/
-EFI_STATUS
-EfiLibInstallDriverBinding (
-  IN const EFI_HANDLE             ImageHandle,
-  IN const EFI_SYSTEM_TABLE       *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding,
-  IN EFI_HANDLE                   DriverBindingHandle
-  )
-{
-  //
-  //  bugbug:Need to implement ...
-  //
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Intialize a driver by installing the Driver Binding Protocol onto the
-  driver's DriverBindingHandle.  This is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple
-  DriverBinding Protocols.  This function also initializes the EFI Driver
-  Library that initializes the global variables gST, gBS, gRT.
-
-  @ImageHandle                 The image handle of the driver
-  @SystemTable                 The EFI System Table that was passed to the driver's entry point
-  @DriverBinding               A Driver Binding Protocol instance that this driver is producing
-  @DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
-                               parameter is NULL, then a new handle is created.
-  @ComponentName               A Component Name Protocol instance that this driver is producing
-  @DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing
-  @DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing
-
-  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
-  @retval Other                Status from gBS->InstallProtocolInterface()
-
-**/
-EFI_STATUS
-EfiLibInstallAllDriverProtocols (
-  IN const EFI_HANDLE                         ImageHandle,
-  IN const EFI_SYSTEM_TABLE                   *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN EFI_HANDLE                               DriverBindingHandle,
-  IN const EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN const EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
-  IN const EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
-  )
-{
-  //
-  //  bugbug:Need to implement ...
-  //
 
   return EFI_SUCCESS;
 }
