@@ -51,16 +51,6 @@
   ScsiBus.h
 
 
-################################################################################
-#
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-  $(WORKSPACE)/MdeModulePkg/Include/Library
 
 ################################################################################
 #
@@ -70,8 +60,8 @@
 ################################################################################
 
 [Packages]
-  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 
 ################################################################################

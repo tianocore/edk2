@@ -45,15 +45,6 @@
 [Sources.common]
   UefiScsiLib.c
 
-################################################################################
-#
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
 
 ################################################################################
 #
