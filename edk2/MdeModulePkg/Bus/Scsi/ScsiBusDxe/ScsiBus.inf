@@ -1,0 +1,105 @@
+#/** @file
+# Component description file for Scsi Bus module.
+#
+# SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ScsiBus
+  FILE_GUID                      = 0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00010010
+
+  ENTRY_POINT                    = InitializeScsiBus
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gSCSIBusDriverBinding                        
+#  COMPONENT_NAME                =  gScsiBusComponentName                        
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  ComponentName.c
+  ScsiBus.c
+  ScsiBus.h
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg/Include/Library
+  $(WORKSPACE)/MdeModulePkg/Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  ScsiLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiScsiIoProtocolGuid                        # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiScsiPassThruProtocolGuid                  # PROTOCOL TO_START
+
