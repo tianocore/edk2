@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EdkPciIncompatibleDeviceSupportLib
+  BASE_NAME                      = PciIncompatibleDeviceSupportLib
   FILE_GUID                      = 1ca1c1f9-5baf-4204-b6e5-5e24109a4e4e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
