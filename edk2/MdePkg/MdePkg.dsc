@@ -119,7 +119,7 @@
   ${WORKSPACE}\MdePkg\Library/UefiLib/UefiLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiRuntimeLib/UefiRuntimeLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-
+  ${WORKSPACE}\MdePkg\Library/UefiScsiLib/UefiScsiLib.inf
 
 [Components.IA32]
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
