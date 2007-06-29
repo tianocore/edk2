@@ -24,7 +24,7 @@
 //
 // The Library classes this module consumes
 //
-#include <Library/FrameworkHiiLib.h>
+#include <Library/HiiLibFramework.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 

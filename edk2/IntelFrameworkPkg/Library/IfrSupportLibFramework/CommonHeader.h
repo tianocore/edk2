@@ -28,7 +28,7 @@
 //
 // The Library classes this module consumes
 //
-#include <Library/FrameworkIfrSupportLib.h>
+#include <Library/IfrSupportLibFramework.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
