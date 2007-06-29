@@ -30,7 +30,7 @@
 //
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/FrameworkHiiLib.h>
+#include <Library/HiiLibFramework.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
