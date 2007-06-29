@@ -16,9 +16,15 @@ Intel Corporation.
 #define _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/PciIncompatibleDeviceSupportLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
 
 #include <IndustryStandard/pci22.h>
 #include <IndustryStandard/Acpi.h>
