@@ -47,7 +47,7 @@
   TimerLib|${WORKSPACE}/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   OemHookStatusCodeLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  SerialPortLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/EdkSerialPortLibNull/EdkSerialPortLibNull.inf
+  SerialPortLib|${WORKSPACE}/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
