@@ -90,6 +90,11 @@ typedef struct {
   EFI_EXP_BASE10_DATA   Threshold;
 } EFI_COMPUTING_UNIT_VOLTAGE_ERROR_DATA;
 
+typedef struct {
+  EFI_EXP_BASE10_DATA   Voltage;
+  EFI_EXP_BASE10_DATA   Threshold;
+} EFI_COMPUTING_UNIT_VOLTAGE_ERROR_DATA_PAYLOAD;
+
 ///
 /// Microcode Update Extended Error Data
 ///
@@ -97,6 +102,10 @@ typedef struct {
   EFI_STATUS_CODE_DATA  DataHeader;
   UINT32                Version;
 } EFI_COMPUTING_UNIT_MICROCODE_UPDATE_ERROR_DATA;
+
+typedef struct {
+  UINT32                Version;
+} EFI_COMPUTING_UNIT_MICROCODE_UPDATE_ERROR_DATA_PAYLOAD;
 
 ///
 /// Asynchronous Timer Extended Error Data
@@ -106,6 +115,10 @@ typedef struct {
   EFI_EXP_BASE10_DATA   TimerLimit;
 } EFI_COMPUTING_UNIT_TIMER_EXPIRED_ERROR_DATA;
 
+typedef struct {
+  EFI_EXP_BASE10_DATA   TimerLimit;
+} EFI_COMPUTING_UNIT_TIMER_EXPIRED_ERROR_DATA_PAYLOAD;
+
 ///
 /// Host Processor Mismatch Extended Error Data
 ///
@@ -114,6 +127,11 @@ typedef struct {
   UINT32                Instance;
   UINT16                Attributes;
 } EFI_HOST_PROCESSOR_MISMATCH_ERROR_DATA;
+
+typedef struct {
+  UINT32                Instance;
+  UINT16                Attributes;
+} EFI_HOST_PROCESSOR_MISMATCH_ERROR_DATA_PAYLOAD;
 
 //
 // EFI_COMPUTING_UNIT_MISMATCH_ATTRIBUTES
@@ -140,6 +158,11 @@ typedef struct {
   EFI_EXP_BASE10_DATA   Threshold;
 } EFI_COMPUTING_UNIT_THERMAL_ERROR_DATA;
 
+typedef struct {
+  EFI_EXP_BASE10_DATA   Temperature;
+  EFI_EXP_BASE10_DATA   Threshold;
+} EFI_COMPUTING_UNIT_THERMAL_ERROR_DATA_PAYLOAD;
+
 ///
 /// Processor Disabled Extended Error Data
 ///
@@ -148,6 +171,11 @@ typedef struct {
   UINT32                Cause;
   BOOLEAN               SoftwareDisabled;
 } EFI_COMPUTING_UNIT_CPU_DISABLED_ERROR_DATA;
+
+typedef struct {
+  UINT32                Cause;
+  BOOLEAN               SoftwareDisabled;
+} EFI_COMPUTING_UNIT_CPU_DISABLED_ERROR_DATA_PAYLOAD;
 
 typedef enum {
   EfiInitCacheDataOnly,
@@ -164,6 +192,11 @@ typedef struct {
   UINT32                Level;
   EFI_INIT_CACHE_TYPE   Type;
 } EFI_CACHE_INIT_DATA;
+
+typedef struct {
+  UINT32                Level;
+  EFI_INIT_CACHE_TYPE   Type;
+} EFI_CACHE_INIT_DATA_PAYLOAD;
 
 //
 // Memory Extended Error Data
@@ -187,6 +220,14 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS          Address;
   UINTN                         Resolution;
 } EFI_MEMORY_EXTENDED_ERROR_DATA;
+
+typedef struct {
+  EFI_MEMORY_ERROR_GRANULARITY  Granularity;
+  EFI_MEMORY_ERROR_OPERATION    Operation;
+  UINTN                         Syndrome;
+  EFI_PHYSICAL_ADDRESS          Address;
+  UINTN                         Resolution;
+} EFI_MEMORY_EXTENDED_ERROR_DATA_PAYLOAD;
 
 //
 // Memory Error Granularities
@@ -236,6 +277,11 @@ typedef struct {
   UINT16                Array;
   UINT16                Device;
 } EFI_STATUS_CODE_DIMM_NUMBER;
+
+typedef struct {
+  UINT16                Array;
+  UINT16                Device;
+} EFI_STATUS_CODE_DIMM_NUMBER_PAYLOAD;
 #pragma pack()
 
 ///
@@ -246,6 +292,10 @@ typedef struct {
   EFI_STATUS_CODE_DIMM_NUMBER Instance;
 } EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA;
 
+typedef struct {
+  EFI_STATUS_CODE_DIMM_NUMBER Instance;
+} EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA_PAYLOAD;
+
 ///
 /// Memory Range Extended Data
 ///
@@ -254,6 +304,11 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  Start;
   EFI_PHYSICAL_ADDRESS  Length;
 } EFI_MEMORY_RANGE_EXTENDED_DATA;
+
+typedef struct {
+  EFI_PHYSICAL_ADDRESS  Start;
+  EFI_PHYSICAL_ADDRESS  Length;
+} EFI_MEMORY_RANGE_EXTENDED_DATA_PAYLOAD;
 
 ///
 /// Device handle Extended Data. Used for many
@@ -276,6 +331,21 @@ typedef struct {
   UINT16                         DevicePathSize;
   UINT8                          *RemainingDevicePath;
 } EFI_STATUS_CODE_START_EXTENDED_DATA;
+
+typedef struct {
+  EFI_HANDLE            Handle;
+} EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD;
+
+typedef struct {
+  UINT8                                *DevicePath;
+} EFI_DEVICE_PATH_EXTENDED_DATA_PAYLOAD;
+
+typedef struct {
+  EFI_HANDLE                     ControllerHandle;
+  EFI_HANDLE                     DriverBindingHandle;
+  UINT16                         DevicePathSize;
+  UINT8                          *RemainingDevicePath;
+} EFI_STATUS_CODE_START_EXTENDED_DATA_PAYLOAD;
 
 ///
 /// Resource Allocation Failure Extended Error Data
@@ -301,6 +371,16 @@ typedef struct {
   UINT8                              *AllocRes;
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
 
+typedef struct {
+  UINT32                             Bar;
+  UINT16                             DevicePathSize;
+  UINT16                             ReqResSize;
+  UINT16                             AllocResSize;
+  UINT8                              *DevicePath;
+  UINT8                              *ReqRes;
+  UINT8                              *AllocRes;
+} EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD;
+
 ///
 /// Extended Error Data for Assert
 ///
@@ -310,6 +390,12 @@ typedef struct {
   UINT32                      FileNameSize;
   EFI_STATUS_CODE_STRING_DATA *FileName;
 } EFI_DEBUG_ASSERT_DATA;
+
+typedef struct {
+  UINT32                      LineNumber;
+  UINT32                      FileNameSize;
+  EFI_STATUS_CODE_STRING_DATA *FileName;
+} EFI_DEBUG_ASSERT_DATA_PAYLOAD;
 
 ///
 /// System Context Data EBC/IA32/IPF
@@ -325,6 +411,10 @@ typedef struct {
   EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT  Context;
 } EFI_STATUS_CODE_EXCEP_EXTENDED_DATA;
 
+typedef struct {
+  EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT  Context;
+} EFI_STATUS_CODE_EXCEP_EXTENDED_DATA_PAYLOAD;
+
 ///
 /// Legacy Oprom extended data
 ///
@@ -333,5 +423,10 @@ typedef struct {
   EFI_HANDLE            DeviceHandle;
   EFI_PHYSICAL_ADDRESS  RomImageBase;
 } EFI_LEGACY_OPROM_EXTENDED_DATA;
+
+typedef struct {
+  EFI_HANDLE            DeviceHandle;
+  EFI_PHYSICAL_ADDRESS  RomImageBase;
+} EFI_LEGACY_OPROM_EXTENDED_DATA_PAYLOAD;
 
 #endif
