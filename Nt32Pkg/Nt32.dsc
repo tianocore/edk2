@@ -405,7 +405,7 @@
   $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
   $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
   $(WORKSPACE)/Nt32Pkg/MonotonicCounterRuntimeDxe/Metronome.inf
-  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
+  #$(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
   #$(WORKSPACE)/Nt32Pkg\PlatformBdsDxe\PlatformBds.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
