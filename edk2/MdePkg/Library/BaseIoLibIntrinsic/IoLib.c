@@ -17,7 +17,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "BaseIoLibIntrinsicInternal.h"
 
 /**
   Reads a 64-bit I/O port.

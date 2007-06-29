@@ -12,18 +12,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// The package level header files this module uses
-//
 #include <Uefi.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-//
-// The Library classes this module consumes
-//
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
+
 
 /**
   Enrty point to UEFI application.

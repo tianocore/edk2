@@ -23,10 +23,11 @@
 #ifndef __MEM_LIB_INTERNALS__
 #define __MEM_LIB_INTERNALS__
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+
 
 /**
   Copy Length bytes from Source to Destination.

@@ -17,7 +17,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "UefiLibInternal.h"
 
 /**
   Compare whether two names of languages are identical.

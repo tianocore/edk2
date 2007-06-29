@@ -17,7 +17,8 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
 
 //
 // Byte packed structure for a segment descriptor in a GDT/LDT

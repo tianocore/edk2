@@ -16,7 +16,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "UefiLibInternal.h"
 
 /**
   Intialize a driver by installing the Driver Binding Protocol onto the

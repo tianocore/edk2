@@ -14,10 +14,13 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/TimerLib.h>
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+
 
 //
 // The following array is used in calculating the frequency of local APIC

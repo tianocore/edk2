@@ -15,6 +15,13 @@
 #ifndef __DXE_MEMORY_ALLOCATION_LIB_INTERNALS_H__
 #define __DXE_MEMORY_ALLOCATION_LIB_INTERNALS_H__
 
+#include <PiDxe.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+
+
 /**
   Allocates one or more 4KB pages of a certain memory type.
 

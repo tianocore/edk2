@@ -45,7 +45,6 @@
 [Sources.common]
   BasePeCoffLibInternals.h
   BasePeCoff.c
-  CommonHeader.h
 
 [Sources.Ia32]
   Ia32/PeCoffLoaderEx.c

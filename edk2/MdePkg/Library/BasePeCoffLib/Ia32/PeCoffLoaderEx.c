@@ -14,14 +14,8 @@
 
 **/
 
+#include "BasePeCoffLibInternals.h"
 
-
-
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 /**
   Performs an IA-32 specific relocation fixup.

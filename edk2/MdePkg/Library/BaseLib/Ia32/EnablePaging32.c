@@ -15,7 +15,9 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <BaseLibInternals.h>
+
+#if _MSC_EXTENSIONS
 
 __declspec (naked)
 VOID
@@ -49,3 +51,4 @@ InternalX86EnablePaging32 (
   }
 }
 
+#endif

@@ -17,7 +17,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "BaseIoLibIntrinsicInternal.h"
 
 #define MAP_PORT_BASE_TO_MEM(_Port) \
     ((((_Port) & 0xfffc) << 10) | ((_Port) & 0x0fff))
