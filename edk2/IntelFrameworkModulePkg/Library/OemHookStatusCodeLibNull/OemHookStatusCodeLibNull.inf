@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EdkOemHookStatusCodeLibNull
+  BASE_NAME                      = OemHookStatusCodeLibNull
   FILE_GUID                      = 54D2878F-25CD-4a2b-8420-EBD18E609C76
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
