@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FrameworkHiiLib
+  BASE_NAME                      = HiiLibFramework
   FILE_GUID                      = 1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
