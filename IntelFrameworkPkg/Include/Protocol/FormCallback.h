@@ -26,6 +26,8 @@
 
 #include <PiDxe.h>
 
+#include <Protocol/FrameworkHii.h>
+
 #define EFI_FORM_CALLBACK_PROTOCOL_GUID \
   { \
     0xf3e4543d, 0xcf35, 0x6cef, {0x35, 0xc4, 0x4f, 0xe6, 0x34, 0x4d, 0xfc, 0x54 } \
@@ -66,6 +68,7 @@ typedef struct {
   // EFI_IFR_DATA_ENTRY  Data[1];    // The in-line Data entries.
   //
 } EFI_IFR_DATA_ARRAY;
+
 
 typedef union {
   EFI_IFR_DATA_ARRAY  DataArray;  // Primarily used by those who call back to their drivers and use HII as a repository
