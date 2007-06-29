@@ -1,0 +1,170 @@
+#/** @file
+# DXE status code driver.
+#
+# Status Code Architectural Protocol implementation as defined in Tiano
+#  Architecture Specification. This driver has limited functionality
+#  at runtime and will not log to Data Hub at runtime.
+# Copyright (c) 2006, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeStatusCode
+  FILE_GUID                      = FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeDxeStatusCode
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VirtualAddressChangeCallBack
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  SerialStatusCodeWorker.c
+  RtMemoryStatusCodeWorker.c
+  DataHubStatusCodeWorker.c
+  DxeStatusCode.c
+  DxeStatusCode.h
+  CommonHeader.h
+  EntryPoint.c
+
+[Sources.Ia32]
+  Common/StatusCode.dxs
+  Common/DxeStatusCodeCommon.c
+
+[Sources.X64]
+  Common/StatusCode.dxs
+  Common/DxeStatusCodeCommon.c
+
+[Sources.EBC]
+  Common/StatusCode.dxs
+  Common/DxeStatusCodeCommon.c
+
+
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
+
+[Includes]
+  $(WORKSPACE)/MdePkg/Include/Library
+  $(WORKSPACE)/IntelFrameworkModulePkg/Include
+  $(WORKSPACE)/IntelFrameworkModulePkg/Include/Library
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  OemHookStatusCodeLib
+  SerialPortLib
+  UefiRuntimeLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  HobLib
+  PcdLib
+  PrintLib
+  ReportStatusCodeLib
+  DebugLib
+  BaseMemoryLib
+  BaseLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiStatusCodeGuid                            # SOMETIMES_CONSUMED
+  gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
+  gEfiStatusCodeDataTypeStringGuid              # SOMETIMES_CONSUMED
+  gEfiStatusCodeSpecificDataGuid                # SOMETIMES_CONSUMED
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFeatureFlag.common]
+  PcdStatusCodeReplayInOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeReplayInRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeReplayInDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeReplayInSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeUseDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeUseRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeUseEfiSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+
+
+################################################################################
+#
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsDynamic.common]
+  PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+
