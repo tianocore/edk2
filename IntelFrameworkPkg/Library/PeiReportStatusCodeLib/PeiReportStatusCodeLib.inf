@@ -1,7 +1,7 @@
 #/** @file
-# DXE report status code library
+# Report status code library
 #
-# Retrieve status code and report status code in DXE phase
+# ReportStatusCodeLib for PEIM which depends upon Pei Services table
 # Copyright (c) 2006 - 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,11 +21,11 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeReportStatusCodeLib
-  FILE_GUID                      = 3ddc3b12-99ea-4364-b315-6310a2050be5
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = PeiReportStatusCodeLib
+  FILE_GUID                      = 8c690838-7a22-45c4-aa58-a33e3e515cd4
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ReportStatusCodeLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = ReportStatusCodeLib|PEIM PEI_CORE
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -48,16 +48,6 @@
 
 ################################################################################
 #
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-
-
-################################################################################
-#
 # Package Dependency Section - list of Package files that are required for
 #                              this module.
 #
@@ -65,7 +55,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
 ################################################################################
@@ -77,11 +66,10 @@
 
 [LibraryClasses]
   PcdLib
+  PeiServicesTablePointerLib
   BaseMemoryLib
   BaseLib
-  UefiBootServicesTableLib
   DebugLib
-  UefiRuntimeServicesTableLib
 
 
 ################################################################################
@@ -93,17 +81,6 @@
 [Guids]
   gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
   gEfiStatusCodeDataTypeDebugGuid               # ALWAYS_CONSUMED
-
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
-[Protocols]
-  gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 
 ################################################################################

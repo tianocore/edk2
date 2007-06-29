@@ -103,6 +103,11 @@
       <GuidValue>335984BD-E805-409A-B8F8-D27ECE5FF7A6</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="StatusCodeDataTypeString">
+      <C_Name>gEfiStatusCodeDataTypeStringGuid</C_Name>
+      <GuidValue>92D11080-496F-4D95-BE7E-037488382B0A</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="DataHub">
