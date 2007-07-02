@@ -1,8 +1,3 @@
-//
-// Include common header file for this module.
-//
-
-
 ;------------------------------------------------------------------------------
 ;
 ; Copyright (c) 2006, Intel Corporation

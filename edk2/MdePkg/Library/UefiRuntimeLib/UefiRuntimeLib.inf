@@ -1,7 +1,7 @@
 #/** @file
 # Runtime driver library
 #
-# Instance of runtime driver library, Hook VitualAddressChange and 
+# Instance of runtime driver library, Hook VitualAddressChange and
 #  BooterviceExit event and provide runtime service.
 # Copyright (c) 2006 - 2007, Intel Corporation.
 #
@@ -22,11 +22,11 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EdkUefiRuntimeLib
+  BASE_NAME                      = UefiRuntimeLib
   FILE_GUID                      = b1ee6c28-54aa-4d17-b705-3e28ccb27b2e
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER 
+  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -36,7 +36,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 ################################################################################
