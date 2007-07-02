@@ -110,7 +110,7 @@ ${END}	"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbas
 $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
 ${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
-	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.i
+	"$(ASM)" $(ASM_FLAGS) -o$@ $(@D)${sep}${fbase}.i
 ''',
 
 "Visual-Form-Representation" : '''\
