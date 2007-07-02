@@ -15,18 +15,34 @@
 **/
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <FrameWorkDxe.h>
+#include <WinNtDxe.h>
 
 //
-// Cache of WinNtThunk protocol 
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/WinNtThunk.h>
+#include <Guid/StatusCodeDataTypeId.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/OemHookStatusCodeLib.h>
+#include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+#include <Library/PrintLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/ReportStatusCodeLib.h>
+
+//
+// Cache of WinNtThunk protocol
 //
 STATIC
 EFI_WIN_NT_THUNK_PROTOCOL   *mWinNt;
 
 //
-// Cache of standard output handle . 
+// Cache of standard output handle .
 //
 STATIC
 HANDLE                      mStdOut;
@@ -64,29 +80,29 @@ OemHookStatusCodeInitialize (
 
 /**
   Report status code to OEM device.
- 
+
   @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
- 
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This included information about the class and subclass that is used to classify the entity 
-                        as well as an operation.  For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
+
+  @param  Value         Describes the current status of a hardware or software entity.
+                        This included information about the class and subclass that is used to classify the entity
+                        as well as an operation.  For progress codes, the operation is the current activity.
+                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
- 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass pairing. 
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
+
+  @param  Instance      The enumeration of a hardware or software entity within the system.
+                        A system may contain multiple entities that match a class/subclass pairing.
+                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable,
                         not meaningful, or not relevant.  Valid instance numbers start with 1.
 
 
-  @param  CallerId      This optional parameter may be used to identify the caller. 
-                        This parameter allows the status code driver to apply different rules to different callers. 
+  @param  CallerId      This optional parameter may be used to identify the caller.
+                        This parameter allows the status code driver to apply different rules to different callers.
                         Type EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification.
 
 
   @param  Data          This optional parameter may be used to pass additional data
- 
+
   @return               The function always return EFI_SUCCESS.
 
 **/
@@ -145,12 +161,12 @@ OemHookStatusCodeReport (
     // Print DEBUG() information into output buffer.
     //
     CharCount = AsciiVSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  Format, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  Format,
                   Marker
                   );
-  } else if (Data != NULL && 
+  } else if (Data != NULL &&
              CompareGuid (&Data->Type, &gEfiStatusCodeSpecificDataGuid) &&
              (CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE) {
     //
@@ -166,18 +182,18 @@ OemHookStatusCodeReport (
     // Print ERROR information into output buffer.
     //
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "ERROR: C%x:V%x I%x", 
-                  CodeType, 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "ERROR: C%x:V%x I%x",
+                  CodeType,
+                  Value,
                   Instance
                   );
 
     //
     // Make sure we don't try to print values that weren't intended to be printed, especially NULL GUID pointers.
     //
-    
+
     if (CallerId != NULL) {
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
@@ -203,19 +219,19 @@ OemHookStatusCodeReport (
                    );
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "PROGRESS CODE: V%x I%x\n\r", 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "PROGRESS CODE: V%x I%x\n\r",
+                  Value,
                   Instance
                   );
   } else {
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "Undefined: C%x:V%x I%x\n\r", 
-                  CodeType, 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "Undefined: C%x:V%x I%x\n\r",
+                  CodeType,
+                  Value,
                   Instance
                   );
   }

@@ -129,7 +129,7 @@
   PcdLib|$(WORKSPACE)/MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)/MdePkg/Library/GetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  SerialPortLib|$(WORKSPACE)/MdeModulePkg/Library/EdkSerialPortLibNull/EdkSerialPortLibNull.inf
+  SerialPortLib|$(WORKSPACE)/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
   CustomDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
@@ -174,7 +174,7 @@
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  ReportStatusCodeLib|$(WORKSPACE)/MdePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -185,7 +185,7 @@
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  ReportStatusCodeLib|$(WORKSPACE)/MdePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -298,8 +298,8 @@
 ################################################################################
 
 [PcdsPatchableInModule.IA32]
-  PcdStatusCodeMemorySize|gEfiMdeModulePkgTokenSpaceGuid|1
-  PcdStatusCodeRuntimeMemorySize|gEfiMdeModulePkgTokenSpaceGuid|128
+  PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
+  PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|128
 
 [PcdsFixedAtBuild.IA32]
   PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|VOID*|10
@@ -329,24 +329,24 @@
   PcdPeiPcdDatabaseExEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseGetSizeEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseSetEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdStatusCodeUseSerial|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseMemory|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseOEM|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdStatusCodeUseSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxePcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdStatusCodeUseHardSerial|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseEfiSerial|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseRuntimeMemory|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseDataHub|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseOEM|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdStatusCodeReplayInSerial|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInDataHub|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInRuntimeMemory|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInOEM|gEfiMdeModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseEfiSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
+  PcdStatusCodeReplayInSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeReplayInDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeReplayInRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdStatusCodeReplayInOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
@@ -430,5 +430,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
+  #$(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Dxe\DxeStatusCode.inf
+  #$(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Pei\PeiStatusCode.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
