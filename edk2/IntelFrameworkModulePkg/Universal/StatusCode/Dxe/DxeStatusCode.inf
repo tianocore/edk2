@@ -157,3 +157,12 @@
 [PcdsDynamic.common]
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiDataHubProtocolGuid AND gEfiCpuIoProtocolGuid

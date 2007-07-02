@@ -107,3 +107,12 @@
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid

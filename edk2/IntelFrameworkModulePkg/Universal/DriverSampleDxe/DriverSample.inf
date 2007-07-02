@@ -98,3 +98,12 @@
   gEfiFormCallbackProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiSimpleTextOutProtocolGuid
