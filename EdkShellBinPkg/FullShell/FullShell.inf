@@ -1,0 +1,56 @@
+#/** @file
+# Component description file for EFI Shell module.
+#
+# This is a binary module containing multiple binary shell applications.
+#  All .efi file tagged with "ToolCode="DUMMY"" in following file list are raw EFI application
+#  file, and they are can be run in shell environment.
+# Copyright (c) 2006, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to generate a binary image.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FullShell
+  FILE_GUID                      = c57ad6b7-0515-40a8-9d21-551652854e37
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.1
+  BINARY_MODULE                  = true
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+################################################################################
+#
+# Binaries Section - list of binary files that are required for the build
+# to succeed.
+#
+################################################################################
+
+[Binaries.Ia32]
+  UEFI_APP|RELEASE|ia32/Shell_Full.efi
+
+[Binaries.X64]
+  UEFI_APP|RELEASE|x64/Shell_full.efi
+
+[Binaries.IPF]
+  UEFI_APP|RELEASE|ipf/Shell_Full.efi
+
