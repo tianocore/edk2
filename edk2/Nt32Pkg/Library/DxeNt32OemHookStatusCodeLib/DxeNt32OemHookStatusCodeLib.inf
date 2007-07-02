@@ -58,7 +58,6 @@
 ################################################################################
 
 [Packages]
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
