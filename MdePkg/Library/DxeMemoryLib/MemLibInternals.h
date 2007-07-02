@@ -26,6 +26,21 @@
 #ifndef __MEM_LIB_INTERNALS__
 #define __MEM_LIB_INTERNALS__
 
+//
+// The package level header files this module uses
+//
+#include <Uefi.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+//
+// The Library classes this module consumes
+//
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseLib.h>
+
 /**
   Copy Length bytes from Source to Destination.
 

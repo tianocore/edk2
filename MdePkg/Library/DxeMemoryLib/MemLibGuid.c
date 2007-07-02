@@ -23,6 +23,8 @@
 
 **/
 
+#include "MemLibInternals.h"
+
 /**
   Copies a source GUID to a destination GUID.
 
