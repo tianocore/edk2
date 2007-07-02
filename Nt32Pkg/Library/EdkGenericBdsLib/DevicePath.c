@@ -834,7 +834,7 @@ DevPathFvFilePath (
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFilePath;
 
   FvFilePath = DevPath;
-  CatPrint (Str, L"%g", &FvFilePath->NameGuid);
+  CatPrint (Str, L"%g", &FvFilePath->FvFileName);
 }
 
 VOID
