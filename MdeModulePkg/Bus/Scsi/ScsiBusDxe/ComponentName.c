@@ -26,6 +26,7 @@ Abstract:
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Protocol/ScsiPassThru.h>
+#include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiIo.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
