@@ -119,6 +119,7 @@
   ${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   ${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiScsiLib/UefiScsiLib.inf
+  ${WORKSPACE}/MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
 
 
 [Components.IA32]
