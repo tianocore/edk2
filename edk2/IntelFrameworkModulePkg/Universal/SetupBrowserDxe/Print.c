@@ -44,7 +44,7 @@ UINTN
 _IPrint (
   IN UINTN                            Column,
   IN UINTN                            Row,
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL     *Out,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Out,
   IN CHAR16                           *fmt,
   IN VA_LIST                          args
   )

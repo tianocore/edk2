@@ -81,8 +81,8 @@
 ################################################################################
 
 [LibraryClasses]
-  EdkGraphicsLib
-  FrameworkHiiLib
+  GraphicsLib
+  HiiLibFramework
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
   PrintLib
