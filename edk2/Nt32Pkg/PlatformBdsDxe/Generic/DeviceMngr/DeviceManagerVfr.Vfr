@@ -1,0 +1,80 @@
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
+// *++
+//
+// Copyright (c) 2006, Intel Corporation                                                         
+// All rights reserved. This program and the accompanying materials                          
+// are licensed and made available under the terms and conditions of the BSD License         
+// which accompanies this distribution.  The full text of the license may be found at        
+// http://opensource.org/licenses/bsd-license.php                                            
+//                                                                                           
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+// 
+// Module Name:
+//
+//   DeviceManagerVfr.vfr 
+// 
+// Abstract:
+// 
+//   Device Manager formset.
+// 
+// Revision History: 
+// 
+// --*/
+
+#include "BdsStrDefs.h"
+
+#define FORMSET_GUID  { 0x3ebfa8e6, 0x511d, 0x4b5b, { 0xa9, 0x5f, 0xfb, 0x38, 0x26, 0xf, 0x1c, 0x27 } }
+
+#define EFI_DISK_DEVICE_CLASS              0x01
+#define EFI_VIDEO_DEVICE_CLASS             0x02
+#define EFI_NETWORK_DEVICE_CLASS           0x04
+#define EFI_INPUT_DEVICE_CLASS             0x08
+#define EFI_ON_BOARD_DEVICE_CLASS          0x10
+#define EFI_OTHER_DEVICE_CLASS             0x20
+#define EFI_VBIOS_CLASS                    0x40
+
+#define DEVICE_MANAGER_CLASS               0x0000
+#define FRONT_PAGE_SUBCLASS		             0x0003
+
+formset 
+  guid     = FORMSET_GUID,
+  title    = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE),  
+  help     = STRING_TOKEN(STR_EMPTY_STRING),
+  class    = DEVICE_MANAGER_CLASS,      
+  subclass = FRONT_PAGE_SUBCLASS,
+
+  form formid = 0x1000,
+       title  = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE);
+
+    //
+    // This is where devices get added to the device manager hierarchy
+    //
+    subtitle text = STRING_TOKEN(STR_DISK_DEVICE);
+    label EFI_DISK_DEVICE_CLASS;
+
+    subtitle text = STRING_TOKEN(STR_VIDEO_DEVICE);
+    label EFI_VIDEO_DEVICE_CLASS;
+
+    subtitle text = STRING_TOKEN(STR_NETWORK_DEVICE);
+    label EFI_NETWORK_DEVICE_CLASS;
+
+    subtitle text = STRING_TOKEN(STR_INPUT_DEVICE);
+    label EFI_INPUT_DEVICE_CLASS;
+
+    subtitle text = STRING_TOKEN(STR_ON_BOARD_DEVICE);
+    label EFI_ON_BOARD_DEVICE_CLASS;
+
+    subtitle text = STRING_TOKEN(STR_OTHER_DEVICE);
+    label EFI_OTHER_DEVICE_CLASS;
+    
+    subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
+    label EFI_VBIOS_CLASS;
+    
+  endform;
+endformset;
+
