@@ -10,13 +10,19 @@ Copyright (c) 2007, Intel Corporation
 
 EDK II Prime packages are in the development phase. They consist of:
 
-  BuildNotes2.txt    - The build notes for this package
-  MdePkg             - Industry-standard headers and libraries
-  BaseTools          - Build -specific tools that are designed to help the
-                       developer create and modify drivers and libraries
-  IntelFrameworkPkg  - Framework headers and libraries
-  MdeModulePkg       - Reference drivers
+  BuildNotes2.txt         - The build notes for this package
+  MdePkg                  - Industry-standard headers and libraries
+  BaseTools               - Build -specific tools that are designed to help the
+                            developer create and modify drivers and libraries
+  IntelFrameworkPkg       - Tiano/Framework Includes and Libraries
+  MdeModulePkg            - UEFI 2.1/PI 1.0 compliant modules
+  IntelFrameworkModulePKg - Tiano/Framework Includes and Libraries
+  Nt32Pkg                 - UEFI 2.1/PI 1.0 emulation environment for Windows
+  FatBinPkg               - Binaries built from the FatPkg 
+  EdkShellBinPkg          - Binaries of full shell, minimum shell and commonds(to be added)
 
+Note:
+  EdkShellBinPkg is supported to support both EDK II build and EDKII Prime build by having several module description files.
 
 -------------------------------------------------------------------------------
 Quick Start
