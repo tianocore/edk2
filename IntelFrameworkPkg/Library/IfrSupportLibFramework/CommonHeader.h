@@ -24,7 +24,7 @@
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Guid/GlobalVariable.h>
-#include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiFramework.h>
 //
 // The Library classes this module consumes
 //
