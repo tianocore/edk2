@@ -60,7 +60,7 @@ ToolCodeMapping = {
     "Acpi-Source-Language"          :   "ASL",
     "Object"                        :   "SLINK",
     "Static-Library"                :   "DLINK",
-		"Dependency-Expression"         :   "PP",
+    "Dependency-Expression"         :   "PP",
 }
 
 ToolChainFamilyMapping = {
@@ -113,11 +113,14 @@ ${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fb
 	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.i
 ''',
 
-"Visual-Form-Representation" : 
-'$(OUTPUT_DIR)\\%(fdir)s\\%(fbase)s.obj : $(MODULE_DIR)\\%(fdir)s\\%(fname)s $(DEP_FILES)\n'\
-    '\t"$(PP)" $(PP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)\\%(fbase)s.i\n'\
-    '\t"$(VFRC)" $(VFRC_FLAGS) $(INC) $(VFRC_OUTPUT)$(DEBUG_DIR)\\%(fdir)s\\%(fbase)s.c $(@D)\\%(fbase)s.i\n'\
-    '\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $(DEBUG_DIR)\\%(fdir)s\\%(fbase)s.c\n',
+"Visual-Form-Representation" : '''\
+$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
+${END}\t"$(VFRPP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
+\tTrim -VFR $(@D)${sep}${fbase}.i
+\t"$(VFRC)" $(VFRC_FLAGS) -od $(DEBUG_DIR)${sep}${fdir} $(@D)${sep}${fbase}.iii
+\t"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fdir}${sep}${fbase}.c
+''',
 },
 
 "gmake" : {
