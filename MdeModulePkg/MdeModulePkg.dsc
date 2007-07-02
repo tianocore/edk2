@@ -86,6 +86,7 @@
   PeiServicesLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   SmBusLib|${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -334,13 +335,15 @@
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
