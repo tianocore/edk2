@@ -59,8 +59,6 @@
   MdePkg/MdePkg.dec
   Nt32Pkg/Nt32Pkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
 
 ################################################################################
 #

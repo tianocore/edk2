@@ -331,6 +331,7 @@
 
 
 [Components.Ia32]
+  ${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
@@ -347,5 +348,6 @@
   ${WORKSPACE}/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf

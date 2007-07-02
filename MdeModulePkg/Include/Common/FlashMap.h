@@ -24,7 +24,7 @@ Abstract:
 #ifndef __COMMON_FLASHMAP_H__
 #define __COMMON_FLASHMAP_H__
 
-#include <Common/FrameworkHob.h>
+//#include <Common/FrameworkHob.h>
 //
 // Definition for flash map GUIDed HOBs
 //

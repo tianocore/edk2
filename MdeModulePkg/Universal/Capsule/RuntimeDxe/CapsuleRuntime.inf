@@ -85,7 +85,7 @@
 
 [Guids]
   gEfiCapsuleVendorGuid                         # SOMETIMES_CONSUMED
-  gEfiCapsuleGuid                               
+  gEfiCapsuleGuid
 
 ################################################################################
 #
