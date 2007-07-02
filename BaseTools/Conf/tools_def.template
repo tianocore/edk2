@@ -769,7 +769,9 @@ RELEASE_ICC_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGN
 *_MYTOOLS_*_APP_NAME             = cl.exe
 *_MYTOOLS_*_ASM_NAME             = ml.exe
 
-*_MYTOOLS_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE
+*_MYTOOLS_*_VFRC_NAME            = VfrCompile.exe
+*_MYTOOLS_IA32_VFRC_PATH         = 
+*_MYTOOLS_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 ##################
 # IA32 definitions
 ##################
