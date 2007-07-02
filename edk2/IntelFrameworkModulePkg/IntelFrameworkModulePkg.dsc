@@ -77,6 +77,7 @@
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  BootScriptLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeBootScriptLibNull/DxeBootScriptLibNull.inf
   HiiLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   IfrSupportLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   PciIncompatibleDeviceSupportLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
@@ -121,6 +122,9 @@
   PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
+  PcdIsaBusSupportDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
+  PcdIsaBusOnlySupportSlaveDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+  PcdIsaBusSupportIsaMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
 
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -160,6 +164,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Library\GraphicsLib\GraphicsLib.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus\Pci\PciBus\Dxe\PciBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus\Pci\IdeBus\Dxe\IdeBus.inf
+  $(WORKSPACE)\IntelFrameworkModulePkg\Bus\Isa\IsaBusDxe\IsaBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>DxeBootScriptLibNull</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>9A6DC1AC-94C0-43b1-8714-4C70FD58A815</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>BootScriptLib instance that always produces NOP operation.</Abstract>
+    <Description>This library is primarily used by platform that does not support ACPI S3 resume.
+      All the library interfaces simply return EFI_SUCCESS without performing any operation.</Description>
+    <Copyright>Copyright (c) 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved.
+      This software and associated documentation (if any) is furnished
+      under a license and may only be used or copied in accordance
+      with the terms of the license. Except as permitted by such
+      license, no part of this software or documentation may be
+      reproduced, stored in a retrieval system, or transmitted in any
+      form or by any means without the express written consent of
+      Intel Corporation.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DxeBootScriptLibNull</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>BootScriptLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>BootScriptLib.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+    <Package PackageGuid="bea835f9-fd62-464a-81ff-f3a806360c6b"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+</ModuleSurfaceArea>
