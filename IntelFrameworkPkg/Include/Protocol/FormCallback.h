@@ -27,6 +27,7 @@
 #include <PiDxe.h>
 
 #include <Protocol/FrameworkHii.h>
+#include <Protocol/FrameworkFormBrowser.h>
 
 #define EFI_FORM_CALLBACK_PROTOCOL_GUID \
   { \

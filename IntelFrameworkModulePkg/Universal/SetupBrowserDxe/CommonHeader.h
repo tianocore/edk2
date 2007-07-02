@@ -24,7 +24,7 @@
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Protocol/FormCallback.h>
-#include <Protocol/FormBrowser.h>
+#include <Protocol/FrameworkFormBrowser.h>
 #include <Protocol/FrameworkHii.h>
 #include <Protocol/Print.h>
 //

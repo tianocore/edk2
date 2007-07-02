@@ -414,17 +414,6 @@ typedef struct _EFI_HII_VARIABLE_PACK_LIST {
   EFI_HII_VARIABLE_PACK                *VariablePack;
 } EFI_HII_VARIABLE_PACK_LIST;
 
-typedef struct {
-  EFI_HII_IFR_PACK    *IfrData;
-  EFI_HII_STRING_PACK *StringData;
-} EFI_IFR_PACKET;
-
-typedef struct {
-  UINTN LeftColumn;
-  UINTN RightColumn;
-  UINTN TopRow;
-  UINTN BottomRow;
-} EFI_SCREEN_DESCRIPTOR;
 
 #pragma pack()
 

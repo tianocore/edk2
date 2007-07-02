@@ -411,7 +411,7 @@
   $(WORKSPACE)/Nt32Pkg/MonotonicCounterRuntimeDxe/Metronome.inf
   $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
-  #$(WORKSPACE)/Nt32Pkg\PlatformBdsDxe\PlatformBds.inf
+  #$(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Security/SecurityStub/Dxe/SecurityStub.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
@@ -430,7 +430,10 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-  #$(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Dxe\DxeStatusCode.inf
-  #$(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Pei\PeiStatusCode.inf
+  #$(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  #$(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition

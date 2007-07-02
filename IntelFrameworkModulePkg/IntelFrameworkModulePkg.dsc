@@ -154,17 +154,17 @@
 ################################################################################
 
 [Components.common]
-  $(WORKSPACE)\IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Library\OemHookStatusCodeLibNull\OemHookStatusCodeLibNull.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Library\PciIncompatibleDeviceSupportLib\PciIncompatibleDeviceSupportLib.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Library\GraphicsLib\GraphicsLib.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Bus\Pci\IdeBus\Dxe\IdeBus.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Dxe\DxeStatusCode.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\StatusCode\Pei\PeiStatusCode.inf
-  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\HiiDataBaseDxe\HiiDatabase.inf
- # $(WORKSPACE)\IntelFrameworkModulePkg\Universal\UserInterface\SetupBrowser\Dxe\SetupBrowser.inf
-#  $(WORKSPACE)\IntelFrameworkModulePkg\Universal\DriverSampleDxe\DriverSample.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Library\OemHookStatusCodeLibNull\OemHookStatusCodeLibNull.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Library\PciIncompatibleDeviceSupportLib\PciIncompatibleDeviceSupportLib.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Library\GraphicsLib\GraphicsLib.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus\Pci\PciBus\Dxe\PciBus.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus\Pci\IdeBus\Dxe\IdeBus.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
 

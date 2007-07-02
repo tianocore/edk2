@@ -1,34 +1,28 @@
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 // *++
 //
-// Copyright (c) 2006, Intel Corporation                                                         
-// All rights reserved. This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
+// Copyright (c) 2006, Intel Corporation
+// All rights reserved. This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
 // Module Name:
 //
-//   Vfr.vfr 
-// 
+//   Vfr.vfr
+//
 // Abstract:
-// 
+//
 //   Sample Setup formset
-// 
-// Revision History: 
-// 
+//
+// Revision History:
+//
 // --*/
 
 
-#include "DriverSampleStrDefs.h" 
- 
+
 #include "NVDataStruc.h"
 
 
@@ -44,73 +38,74 @@ typedef struct {
   UINT8         OrderedList[3];
 } MyIfrNVData3;
 
-#define MY_TEXT_KEY                 0x100 
+#define MY_TEXT_KEY                 0x100
 
 #define LABEL_1_VALUE               0x01
 #define LABEL_2_VALUE               0x1000
 #define LABEL_UPDATE_BBS            0x2222
 #define LABEL_END_UPDATE_BBS        0x2223
 
-formset 
+formset
   guid     = FORMSET_GUID,
-  title    = STRING_TOKEN(STR_FORM_SET_TITLE),  
-  help     = STRING_TOKEN(STR_FORM_SET_TITLE_HELP), 
-  class    = 0x10,      
+  title    = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help     = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  class    = 0x10,
   subclass = 0,
 
   varstore MyIfrNVData2, key = 0x1234, name = MY_DATA2, guid = FORMSET_GUID;
 
+  varstore MyIfrNVData, key = 0x1324, name = MY_DATA1, guid = FORMSET_GUID;
 
   varstore MyIfrNVData3, key = 0x4321, name = MY_DATA3, guid = FORMSET_GUID;
 
   form formid = 1,
        title  = STRING_TOKEN(STR_FORM1_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
-  
+
     subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT);
 
     subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
 
-    banner 
+    banner
       title = STRING_TOKEN(STR_BANNER_TITLE),
       line  1,
       align center;
-    
-    banner 
+
+    banner
       title = STRING_TOKEN(STR_BANNER_TITLE),
       line  2,
       align left;
 
-    banner 
+    banner
       title = STRING_TOKEN(STR_BANNER_TITLE),
       line  2,
       align right;
 
-  	text 
-      help   = STRING_TOKEN(STR_TEXT_HELP),  
+  	text
+      help   = STRING_TOKEN(STR_TEXT_HELP),
       text   = STRING_TOKEN(STR_CPU_STRING),
 	    text   = STRING_TOKEN(STR_CPU_STRING2),
       flags  = 0,
       key    = 0;
 
-  	text 
-      help   = STRING_TOKEN(STR_EXIT_TEXT),  
-      text   = STRING_TOKEN(STR_EXIT_TEXT), 
+  	text
+      help   = STRING_TOKEN(STR_EXIT_TEXT),
+      text   = STRING_TOKEN(STR_EXIT_TEXT),
 	    text   = STRING_TOKEN(STR_EXIT_TEXT),
       flags  = INTERACTIVE,
       key    = 0x1237;
 
     oneof varid  = MyIfrNVData.SuppressGrayOutSomething,
       prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
-      help        = STRING_TOKEN(STR_ONE_OF_HELP),  
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT4), value = 0x0, flags = 0; 
+      help        = STRING_TOKEN(STR_ONE_OF_HELP),
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT4), value = 0x0, flags = 0;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT5), value = 0x1, flags = 0;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT6), value = 0x2, flags = DEFAULT;
     endoneof;
 
     oneof varid  = MyIfrNVData.BootOrderLarge,
       prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
-      help        = STRING_TOKEN(STR_ONE_OF_HELP),  
-      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0x0, flags = INTERACTIVE, key = 1; 
+      help        = STRING_TOKEN(STR_ONE_OF_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0x0, flags = INTERACTIVE, key = 1;
       option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 0x1, flags = INTERACTIVE | DEFAULT, key = 2;
     endoneof;
 
@@ -119,7 +114,7 @@ formset
       label 0;
       checkbox varid    = MyIfrNVData.ChooseToActivateNuclearWeaponry,
               prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
-              help     = STRING_TOKEN(STR_CHECK_BOX_HELP),  
+              help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
               flags    = 1,                  // Flags behavior for checkbox is overloaded so that it equals a DEFAULT value.  1 = ON, 0 = off
               key      = 0,
       endcheckbox;
@@ -127,7 +122,7 @@ formset
 
 
     //
-    // Ordered list: 
+    // Ordered list:
     //   sizeof(MyIfrNVData) storage must be UINT8 array, and
     //   size written for the variable must be size of the entire
     //   variable.
@@ -143,36 +138,36 @@ formset
                 option text = STRING_TOKEN(STR_BOOT_OPTION1), value = 1, flags = RESET_REQUIRED;
                 option text = STRING_TOKEN(STR_BOOT_OPTION3), value = 3, flags = RESET_REQUIRED;
                 option text = STRING_TOKEN(STR_BOOT_OPTION4), value = 4, flags = RESET_REQUIRED;
-      endlist;      
+      endlist;
       label LABEL_END_UPDATE_BBS;
     endif;
- 
+
     suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2;
-      orderedlist    
+      orderedlist
         varid       = MyIfrNVData.OrderedList,
         prompt      = STRING_TOKEN(STR_TEST_OPCODE),
-        help        = STRING_TOKEN(STR_TEXT_HELP),  
+        help        = STRING_TOKEN(STR_TEXT_HELP),
         option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 4, flags = RESET_REQUIRED;
         option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 3, flags = RESET_REQUIRED;
         option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 2, flags = RESET_REQUIRED;
         option text = STRING_TOKEN(STR_TEXT_HELP),    value = 1, flags = RESET_REQUIRED;
       endlist;
     endif;
-     
+
     label 100;
 
-    goto 0x1234, 
-      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC), 
+    goto 0x1234,
+      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC),
       help    = STRING_TOKEN(STR_GOTO_HELP),
-      flags   = INTERACTIVE, 
+      flags   = INTERACTIVE,
       key     = 0x1234;
 
-    goto 0x1234, 
-      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC2), 
+    goto 0x1234,
+      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC2),
       help    = STRING_TOKEN(STR_GOTO_HELP),
-      flags   = INTERACTIVE, 
+      flags   = INTERACTIVE,
       key     = 0x1235;
-    
+
     //
     // VARSTORE tests
     //
@@ -198,14 +193,14 @@ formset
 
     oneof varid  = MyIfrNVData.TestLateCheck,
       prompt      = STRING_TOKEN(STR_TEST_OPCODE),
-      help        = STRING_TOKEN(STR_ONE_OF_HELP),  
+      help        = STRING_TOKEN(STR_ONE_OF_HELP),
       option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = LATE_CHECK | RESET_REQUIRED;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = LATE_CHECK | DEFAULT | RESET_REQUIRED;
     endoneof;
 
     oneof varid  = MyIfrNVData.TestLateCheck2,
       prompt      = STRING_TOKEN(STR_TEST_OPCODE2),
-      help        = STRING_TOKEN(STR_ONE_OF_HELP),  
+      help        = STRING_TOKEN(STR_ONE_OF_HELP),
       option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = LATE_CHECK | DEFAULT | RESET_REQUIRED;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = LATE_CHECK | RESET_REQUIRED;
 
@@ -213,7 +208,7 @@ formset
 
     oneof varid  = MyIfrNVData.QuestionAboutTreeHugging,
       prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
-      help        = STRING_TOKEN(STR_ONE_OF_HELP),  
+      help        = STRING_TOKEN(STR_ONE_OF_HELP),
       option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = RESET_REQUIRED;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT | RESET_REQUIRED;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 0x03, flags = RESET_REQUIRED;
@@ -227,42 +222,42 @@ formset
               key      = 0x1234,
               minsize  = 6,
               maxsize  = 0x14,
-    endstring; 
+    endstring;
 
-  	text 
-      help   = STRING_TOKEN(STR_GRAYOUT_TEST),  
+  	text
+      help   = STRING_TOKEN(STR_GRAYOUT_TEST),
       text   = STRING_TOKEN(STR_GRAYOUT_TEST),
 	    text   = STRING_TOKEN(STR_GRAYOUT_TEST),
       flags  = INTERACTIVE,
       key    = 0x1555;
 
-  	text 
-      help   = STRING_TOKEN(STR_SUPPRESS_TEST),  
+  	text
+      help   = STRING_TOKEN(STR_SUPPRESS_TEST),
       text   = STRING_TOKEN(STR_SUPPRESS_TEST),
 	    text   = STRING_TOKEN(STR_SUPPRESS_TEST),
       flags  = INTERACTIVE,
       key    = 0x1556;
 
-  	text 
-      help   = STRING_TOKEN(STR_CLEAR_TEST),  
+  	text
+      help   = STRING_TOKEN(STR_CLEAR_TEST),
       text   = STRING_TOKEN(STR_CLEAR_TEST),
 	    text   = STRING_TOKEN(STR_CLEAR_TEST),
       flags  = INTERACTIVE,
       key    = 0x1557;
 
     grayoutif  vareqval var(VAR_EQ_TEST_NAME) == 0x1;
-    suppressif vareqval var(VAR_EQ_TEST_NAME) == 0x1000; 
+    suppressif vareqval var(VAR_EQ_TEST_NAME) == 0x1000;
       label 30;
       checkbox varid    = MyIfrNVData.ChooseToActivateNuclearWeaponry,
               prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
-              help     = STRING_TOKEN(STR_CHECK_BOX_HELP),  
+              help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
               flags    = 1,
               key      = 0,
       endcheckbox;
     endif;
 
 
-    numeric varid   = MyIfrNVData.HowOldAreYouInYearsManual, 
+    numeric varid   = MyIfrNVData.HowOldAreYouInYearsManual,
             prompt  = STRING_TOKEN(STR_NUMERIC_MANUAL_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP0),
             minimum = 0,
@@ -270,11 +265,11 @@ formset
             step    = 0,         // Stepping of 0 equates to a manual entering
                                  // of a value, otherwise it will auto-increment
                                  // with a left/right arrow
-            default = 21, 
+            default = 21,
 
     endnumeric;
 
-    numeric varid   = MyIfrNVData.HowTallAreYouManual, 
+    numeric varid   = MyIfrNVData.HowTallAreYouManual,
             prompt  = STRING_TOKEN(STR_TALL_MANUAL_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP1),
             minimum = 0,
@@ -282,7 +277,7 @@ formset
             step    = 0,         // Stepping of 0 equates to a manual entering
                                  // of a value, otherwise it will auto-increment
                                  // with a left/right arrow
-            default = 175, 
+            default = 175,
 
     endnumeric;
 
@@ -291,7 +286,7 @@ formset
       text    = STRING_TOKEN(STR_INVENTORY_TEXT1),
       text    = STRING_TOKEN(STR_INVENTORY_TEXT2);
 
-      
+
     restore defaults,
       formid  = 4,
       prompt  = STRING_TOKEN(STR_RESTORE_DEFAULTS_PROMPT),
@@ -306,7 +301,7 @@ formset
       flags   = 0,
       key     = 0;
 
-    // 
+    //
     // Case with no flags or key
     //
     save defaults,
@@ -333,7 +328,7 @@ formset
     label LABEL_2_VALUE;
 
     grayoutif  ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1;
-    numeric varid   = MyIfrNVData.HowOldAreYouInYears,   
+    numeric varid   = MyIfrNVData.HowOldAreYouInYears,
             prompt  = STRING_TOKEN(STR_NUMERIC_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP2),
             minimum = 0,
@@ -348,7 +343,7 @@ formset
     //
     // Numeric with no step or default specified
     //
-    numeric varid   = MyIfrNVData.HowTallAreYou, 
+    numeric varid   = MyIfrNVData.HowTallAreYou,
             prompt  = STRING_TOKEN(STR_NUMERIC_PROMPT1),
             help    = STRING_TOKEN(STR_NUMERIC_HELP3),
             minimum = 0,
@@ -363,22 +358,22 @@ formset
               help     = STRING_TOKEN(STR_MY_STRING_HELP),
               minsize  = 6,
               maxsize  = 0x14,
-    endstring; 
-        
+    endstring;
+
     password  varid    = MyIfrNVData.WhatIsThePassword,
               prompt   = STRING_TOKEN(STR_PASSWORD_PROMPT),
               help     = STRING_TOKEN(STR_PASSWORD_HELP),
               minsize  = 6,
-              maxsize  = 20, // new opcode 
+              maxsize  = 20, // new opcode
               encoding = 1,
-    endpassword; 
+    endpassword;
     password  varid    = MyIfrNVData.WhatIsThePassword2,
               prompt   = STRING_TOKEN(STR_PASSWORD_PROMPT),
               help     = STRING_TOKEN(STR_PASSWORD_HELP),
               minsize  = 6,
-              maxsize  = 20, // new opcode 
+              maxsize  = 20, // new opcode
               encoding = 1,
-    endpassword; 
+    endpassword;
     //
     // Test with flags and key fields
     //
@@ -388,21 +383,21 @@ formset
               flags    = INTERACTIVE,
               key      = 0x2000,
               minsize  = 6,
-              maxsize  = 20, // new opcode 
+              maxsize  = 20, // new opcode
               encoding = 1,
     endpassword;
 
-    goto 2, 
+    goto 2,
       prompt = STRING_TOKEN(STR_GOTO_FORM2), //SecondSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
-    goto 3, 
+    goto 3,
       prompt = STRING_TOKEN(STR_GOTO_FORM3), //ThirdSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
   endform;
 
-  form formid = 2,               // SecondSetupPage, 
+  form formid = 2,               // SecondSetupPage,
        title = STRING_TOKEN(STR_FORM2_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
 
@@ -510,11 +505,11 @@ formset
 
     endtime;
 
-    grayoutif 
+    grayoutif
       ideqval Date.Day == 21
       AND
       ideqval Date.Month == 8;
-    
+
     hidden  value = 32, key = 0x7777;
 
     endif; // grayoutif
@@ -522,8 +517,8 @@ formset
     suppressif
       ideqval Date.Day == 8
       AND
-      ideqval Date.Month == 21; 
-    
+      ideqval Date.Month == 21;
+
     hidden  value = 32, key = 0x7777;
 
     endif; // suppressif
@@ -534,7 +529,7 @@ formset
     inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
       ideqval MyIfrNVData.HowOldAreYouInYearsManual == 4
     endif;
-     
+
     inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
       ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 2 3 4
     endif;
@@ -543,12 +538,12 @@ formset
       ideqid MyIfrNVData.HowOldAreYouInYearsManual == MyIfrNVData.MyFavoriteNumber
     endif;
 
-//    grayoutif 
+//    grayoutif
 //
 // If the day is 31 AND months is any of the following 2, 4, 6, 9, 11
 //
     inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
-      ideqval Date.Day == 31 
+      ideqval Date.Day == 31
       AND
       ideqvallist Date.Month == 2 4 6 9 11
     endif;
@@ -568,7 +563,7 @@ formset
     inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
       ideqval Date.Day == 0x1D
       AND
-      ideqval Date.Month == 2 
+      ideqval Date.Month == 2
       AND
       NOT
       ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036
@@ -576,23 +571,23 @@ formset
 
     checkbox varid    = MyIfrNVData.ChooseToActivateNuclearWeaponry,
             prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
-            help     = STRING_TOKEN(STR_CHECK_BOX_HELP),  
+            help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
             flags    = 1,
             key      = 0,
     endcheckbox;
 
-    text  
-      help = STRING_TOKEN(STR_TEXT_HELP),  
+    text
+      help = STRING_TOKEN(STR_TEXT_HELP),
       text = STRING_TOKEN(STR_TEXT_TEXT_1);
-    
-    text 
-      help   = STRING_TOKEN(STR_TEXT_HELP),  
+
+    text
+      help   = STRING_TOKEN(STR_TEXT_HELP),
       text   = STRING_TOKEN(STR_TEXT_TEXT_1),
       text   = STRING_TOKEN(STR_TEXT_TEXT_2),
       flags  = 0,
       key    = MY_TEXT_KEY;
-         
-    goto 1, 
+
+    goto 1,
       prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
@@ -601,23 +596,23 @@ formset
   form formid = 3, title = STRING_TOKEN(STR_FORM3_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
     grayoutif  ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1;
-      text  
-        help = STRING_TOKEN(STR_TEXT_HELP),  
+      text
+        help = STRING_TOKEN(STR_TEXT_HELP),
         text = STRING_TOKEN(STR_TEXT_TEXT_1);
-        
+
     endif; //end grayoutif
-    
-    text  
-      help = STRING_TOKEN(STR_TEXT_HELP),  
+
+    text
+      help = STRING_TOKEN(STR_TEXT_HELP),
       text = STRING_TOKEN(STR_TEXT_TEXT_1);
-    
+
   endform;
-  
+
   form formid = 4, title = STRING_TOKEN(STR_FORM3_TITLE);
 
   endform;
 
-  form formid = 0x1234,            // Dynamically created page, 
+  form formid = 0x1234,            // Dynamically created page,
        title = STRING_TOKEN(STR_DYNAMIC_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
     label 0x1234;
