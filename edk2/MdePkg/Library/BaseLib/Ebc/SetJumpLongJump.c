@@ -13,6 +13,10 @@
   Module Name:  SetJumpLongJump.c
 
 **/
+//
+// Include common header file for this module.
+//
+#include <BaseLibInternals.h>
 
 /**
   Worker function that checks ASSERT condition for JumpBuffer
@@ -33,15 +37,15 @@ InternalAssertJumpBuffer (
 /**
   Saves the current CPU context that can be restored with a call to LongJump() and returns 0.
 
-  Saves the current CPU context in the buffer specified by JumpBuffer and returns 0.  The initial 
-  call to SetJump() must always return 0.  Subsequent calls to LongJump() cause a non-zero 
-  value to be returned by SetJump(). 
+  Saves the current CPU context in the buffer specified by JumpBuffer and returns 0.  The initial
+  call to SetJump() must always return 0.  Subsequent calls to LongJump() cause a non-zero
+  value to be returned by SetJump().
 
   If JumpBuffer is NULL, then ASSERT().
   For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
 
   @param  JumpBuffer    A pointer to CPU context buffer.
- 
+
 **/
 UINTN
 EFIAPI
