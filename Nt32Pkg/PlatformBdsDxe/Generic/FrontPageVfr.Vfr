@@ -1,0 +1,164 @@
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
+// *++
+//
+// Copyright (c) 2006, Intel Corporation                                                         
+// All rights reserved. This program and the accompanying materials                          
+// are licensed and made available under the terms and conditions of the BSD License         
+// which accompanies this distribution.  The full text of the license may be found at        
+// http://opensource.org/licenses/bsd-license.php                                            
+//                                                                                           
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+// 
+// Module Name:
+//
+//   FrontPageVfr.vfr 
+// 
+// Abstract:
+// 
+//   Browser formset.
+// 
+// Revision History: 
+// 
+// --*/
+
+#include "BdsStrDefs.h"
+
+#define FORMSET_GUID  { 0x9e0c30bc, 0x3f06, 0x4ba6, { 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe } }
+
+#define FRONT_PAGE_ITEM_ONE    0x0001
+#define FRONT_PAGE_ITEM_TWO    0x0002
+#define FRONT_PAGE_ITEM_THREE  0x0003
+#define FRONT_PAGE_ITEM_FOUR   0x0004
+#define FRONT_PAGE_ITEM_FIVE   0x0005
+
+#define FRONT_PAGE_TIMEOUT     0xFFFF
+#define FRONT_PAGE_CLASS       0x0000
+#define FRONT_PAGE_SUBCLASS    0x0002
+
+formset 
+  guid     = FORMSET_GUID,
+  title    = STRING_TOKEN(STR_FRONT_PAGE_TITLE),  
+  help     = STRING_TOKEN(STR_NULL_STRING),
+  class    = FRONT_PAGE_CLASS,      
+  subclass = FRONT_PAGE_SUBCLASS,
+
+  form formid = 0x1000,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);
+
+    banner 
+      title = STRING_TOKEN(STR_FRONT_PAGE_COMPUTER_MODEL),
+      line  0,
+      align left;
+    
+    banner 
+      title = STRING_TOKEN(STR_FRONT_PAGE_CPU_MODEL),
+      line  1,
+      align left;
+    
+    banner 
+      title = STRING_TOKEN(STR_FRONT_PAGE_CPU_SPEED),
+      line  1,
+      align right;
+    
+    banner 
+      title = STRING_TOKEN(STR_FRONT_PAGE_BIOS_VERSION),
+      line  2,
+      align left;
+    
+    banner 
+      title = STRING_TOKEN(STR_FRONT_PAGE_MEMORY_SIZE),
+      line  2,
+      align right;
+
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_0_LEFT),
+//      line  0,
+//      align left;
+    
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_0_RIGHT),
+//      line  0,
+//      align right;
+    
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_1_LEFT),
+//      line  1,
+//      align left;
+    
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_1_RIGHT),
+//      line  1,
+//      align right;
+    
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_2_LEFT),
+//      line  2,
+//      align left;
+    
+//    banner 
+//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_3_LEFT),
+//      line  3,
+//      align left;
+
+    goto FRONT_PAGE_ITEM_ONE, 
+      prompt  = STRING_TOKEN(STR_CONTINUE_PROMPT), 
+      help    = STRING_TOKEN(STR_CONTINUE_HELP),
+      flags   = INTERACTIVE | NV_ACCESS, 
+      key     = 0x0001;
+
+    label FRONT_PAGE_ITEM_TWO;
+    //
+    // This is where we will dynamically add a OneOf type op-code to select Languages from the
+    // currently available choices
+    //
+
+    goto FRONT_PAGE_ITEM_THREE, 
+      prompt  = STRING_TOKEN(STR_BOOT_MANAGER), 
+      help    = STRING_TOKEN(STR_BOOT_MANAGER_HELP),
+      flags   = INTERACTIVE | NV_ACCESS, 
+      key     = 0x1064;
+
+    goto FRONT_PAGE_ITEM_FOUR, 
+      prompt  = STRING_TOKEN(STR_DEVICE_MANAGER), 
+      help    = STRING_TOKEN(STR_DEVICE_MANAGER_HELP),
+      flags   = INTERACTIVE | NV_ACCESS, 
+      key     = 0x8567;
+
+    goto FRONT_PAGE_ITEM_FIVE, 
+      prompt  = STRING_TOKEN(STR_BOOT_MAINT_MANAGER), 
+      help    = STRING_TOKEN(STR_BOOT_MAINT_MANAGER_HELP),
+      flags   = INTERACTIVE | NV_ACCESS, 
+      key     = 0x9876;
+
+    label FRONT_PAGE_TIMEOUT;
+//  If one wanted to hard-code a value one could do it below, but our implementation follows EFI architecture
+//  and honors the TimeOut NV variable
+//
+//    banner
+//      title = STRING_TOKEN(STR_TIME_OUT_PROMPT),
+//      timeout = 0x000A;
+    
+  endform;
+
+  form formid = FRONT_PAGE_ITEM_ONE,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);  
+  endform;
+
+  form formid = FRONT_PAGE_ITEM_THREE,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);  
+  endform;
+
+  form formid = FRONT_PAGE_ITEM_FOUR,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);  
+  endform;
+
+  form formid = FRONT_PAGE_ITEM_FIVE,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);  
+  endform;
+
+endformset;

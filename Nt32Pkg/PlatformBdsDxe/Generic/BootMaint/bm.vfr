@@ -1,0 +1,500 @@
+//
+// Include common header file for this module.
+//
+#include "CommonHeader.h"
+
+// *++
+//
+// Copyright (c) 2006, Intel Corporation                                                         
+// All rights reserved. This program and the accompanying materials                          
+// are licensed and made available under the terms and conditions of the BSD License         
+// which accompanies this distribution.  The full text of the license may be found at        
+// http://opensource.org/licenses/bsd-license.php                                            
+//                                                                                           
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+// 
+// Module Name:
+//
+//   bm.vfr 
+// 
+// Abstract:
+// 
+//   Boot Maintenance Utility Formset
+// 
+// Revision History: 
+// 
+// --*/
+
+#include "BdsStrDefs.h" 
+#include "formguid.h"
+
+#pragma pack(1)
+
+//
+// This is the structure that will be used to store the 
+// question's current value. Use it at initialize time to 
+// set default value for each question. When using at run
+// time, this map is returned by the callback function,
+// so dynamically changing the question's value will be
+// possible through this mechanism
+//
+typedef struct {
+
+//
+// Three questions displayed at the main page
+// for Timeout, BootNext Variables respectively
+//
+  UINT16                    BootTimeOut;
+  UINT16                    BootNext;
+
+//
+// This is the COM1 Attributes value storage
+//
+  UINT8                     COM1BaudRate;
+  UINT8                     COM1DataRate;
+  UINT8                     COM1StopBits;
+  UINT8                     COM1Parity;
+  UINT8                     COM1TerminalType;
+  
+//
+// This is the COM2 Attributes value storage
+//
+  UINT8                     COM2BaudRate;
+  UINT8                     COM2DataRate;
+  UINT8                     COM2StopBits;
+  UINT8                     COM2Parity;
+  UINT8                     COM2TerminalType;
+
+// 
+// Driver Option Add Handle page storage
+//
+  UINT16                    DriverAddHandleDesc[100];
+  UINT16                    DriverAddHandleOptionalData[100];
+  UINT8                     DriverAddActive;
+  UINT8                     DriverAddForceReconnect;
+  
+//
+// Console Input/Output/Errorout using COM port check storage
+//
+  UINT8                     ConsoleInputCOM1;
+  UINT8                     ConsoleInputCOM2;
+  UINT8                     ConsoleOutputCOM1;
+  UINT8                     ConsoleOutputCOM2;
+  UINT8                     ConsoleErrorCOM1;
+  UINT8                     ConsoleErrorCOM2;
+
+//
+// At most 100 input/output/errorout device for console storage
+//
+  UINT8                     ConsoleCheck[100];
+
+//
+// Boot or Driver Option Order storage
+//
+  UINT8                     OptionOrder[100];
+  UINT8                     DriverOptionToBeDeleted[100];
+
+//
+// Boot Option Delete storage
+// 
+  UINT8                     BootOptionDel[100];
+  UINT8                     DriverOptionDel[100];
+  
+//
+// This is the Terminal Attributes value storage
+//
+  UINT8                     COMBaudRate;
+  UINT8                     COMDataRate;
+  UINT8                     COMStopBits;
+  UINT8                     COMParity;
+  UINT8                     COMTerminalType;
+  
+//
+// Legacy Device Order Selection Storage
+//
+  UINT8                     LegacyFD[100];
+  UINT8                     LegacyHD[100];
+  UINT8                     LegacyCD[100];
+  UINT8                     LegacyNET[100];
+  UINT8                     LegacyBEV[100];
+} BMM_FAKE_NV_DATA;
+#pragma pack()
+
+
+#define FORM_MAIN_ID                         0x0001
+#define FORM_BOOT_ADD_ID                     0x0002
+#define FORM_BOOT_DEL_ID                     0x0003
+#define FORM_BOOT_CHG_ID                     0x0004
+#define FORM_DRV_ADD_ID                      0x0005
+#define FORM_DRV_DEL_ID                      0x0006
+#define FORM_DRV_CHG_ID                      0x0007
+#define FORM_CON_MAIN_ID                     0x0008
+#define FORM_CON_IN_ID                       0x0009
+#define FORM_CON_OUT_ID                      0x000A
+#define FORM_CON_ERR_ID                      0x000B
+#define FORM_FILE_SEEK_ID                    0x000C
+#define FORM_FILE_NEW_SEEK_ID                0x000D
+#define FORM_DRV_ADD_FILE_ID                 0x000E
+#define FORM_DRV_ADD_HANDLE_ID               0x000F
+#define FORM_DRV_ADD_HANDLE_DESC_ID          0x0010
+#define FORM_BOOT_NEXT_ID                    0x0011
+#define FORM_TIME_OUT_ID                     0x0012
+#define FORM_RESET                           0x0013
+#define FORM_BOOT_SETUP_ID                   0x0014
+#define FORM_DRIVER_SETUP_ID                 0x0015
+#define FORM_BOOT_LEGACY_DEVICE_ID           0x0016
+#define FORM_CON_COM_ID                      0x0017
+#define FORM_CON_COM_SETUP_ID                0x0018
+#define FORM_SET_FD_ORDER_ID                 0x0019
+#define FORM_SET_HD_ORDER_ID                 0x001A
+#define FORM_SET_CD_ORDER_ID                 0x001B
+#define FORM_SET_NET_ORDER_ID                0x001C
+#define FORM_SET_BEV_ORDER_ID                0x001D
+									
+#define KEY_VALUE_BOOT_FROM_FILE             0x0092
+
+formset 
+  guid = MAIN_FORMSET_GUID,
+  title = STRING_TOKEN(STR_FORM_MAIN_TITLE),  // uint8 opcode, uint8 length, guid Handle, uint16 Title
+  help = STRING_TOKEN(STR_NULL_STRING),
+  class = 0,      
+  subclass = 0,
+
+  form formid = FORM_MAIN_ID,
+       title = STRING_TOKEN(STR_FORM_MAIN_TITLE);
+
+    goto FORM_BOOT_SETUP_ID,
+         prompt = STRING_TOKEN(STR_FORM_BOOT_SETUP_TITLE),
+         help = STRING_TOKEN(STR_FORM_BOOT_SETUP_HELP),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_BOOT_SETUP_ID;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORM_DRIVER_SETUP_ID,
+         prompt = STRING_TOKEN(STR_FORM_DRIVER_SETUP_TITLE),
+         help = STRING_TOKEN(STR_FORM_DRIVER_SETUP_HELP),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_DRIVER_SETUP_ID;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORM_CON_MAIN_ID,
+         prompt = STRING_TOKEN(STR_FORM_CON_MAIN_TITLE),
+         help = STRING_TOKEN(STR_FORM_CON_MAIN_HELP),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_CON_MAIN_ID;
+   
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text 
+         help   = STRING_TOKEN(STR_BOOT_FROM_FILE_HELP),  
+         text   = STRING_TOKEN(STR_BOOT_FROM_FILE),
+         text   = STRING_TOKEN(STR_NULL_STRING),
+         flags  = INTERACTIVE | NV_ACCESS,
+         key    = KEY_VALUE_BOOT_FROM_FILE;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+//    label FORM_MAIN_ID;
+
+    goto FORM_BOOT_NEXT_ID,
+         prompt = STRING_TOKEN(STR_FORM_BOOT_NEXT_TITLE),
+         help = STRING_TOKEN(STR_FORM_BOOT_NEXT_HELP),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_BOOT_NEXT_ID;            
+
+    goto FORM_TIME_OUT_ID,
+         prompt = STRING_TOKEN(STR_FORM_TIME_OUT_TITLE),
+         help = STRING_TOKEN(STR_FORM_TIME_OUT_HELP),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_TIME_OUT_ID;
+         
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORM_MAIN_ID,
+         prompt = STRING_TOKEN(STR_RESET),
+         help = STRING_TOKEN(STR_RESET),
+         flags = INTERACTIVE | NV_ACCESS,
+         key = FORM_RESET;
+         
+  endform;       
+
+  form formid = FORM_BOOT_SETUP_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_SETUP_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_MAIN_ID;
+
+       goto FORM_BOOT_ADD_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE),
+            help = STRING_TOKEN(STR_FORM_BOOT_ADD_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_BOOT_ADD_ID;
+      
+       goto FORM_BOOT_DEL_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_DEL_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_BOOT_DEL_ID;
+       
+       goto FORM_BOOT_CHG_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_BOOT_CHG_ID;
+
+       subtitle text = STRING_TOKEN(STR_NULL_STRING);
+       //
+	   // We will add "Select Legacy Boot Floppy Drive" and "Select Legacy Boot Hard Drive" 
+	   // here dynamically
+	   //
+       label FORM_BOOT_LEGACY_DEVICE_ID;
+
+  endform;       
+
+  form formid = FORM_DRIVER_SETUP_ID,
+       title = STRING_TOKEN(STR_FORM_DRIVER_SETUP_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_MAIN_ID;
+
+       goto FORM_DRV_ADD_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_ADD_TITLE),
+            help = STRING_TOKEN(STR_FORM_DRV_ADD_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_DRV_ADD_ID;
+     
+       goto FORM_DRV_DEL_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_DEL_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_DRV_DEL_ID;
+       
+       goto FORM_DRV_CHG_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_DRV_CHG_ID;
+  endform;       
+
+  form formid = FORM_BOOT_ADD_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
+
+       label FORM_BOOT_ADD_ID;
+  endform;
+
+  form formid = FORM_BOOT_DEL_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_DEL_TITLE);
+
+       label FORM_BOOT_DEL_ID;
+  endform;
+
+  form formid = FORM_BOOT_CHG_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE);
+
+       label FORM_BOOT_CHG_ID;
+       
+       //
+       // This tag is added for bypassing issue of setup browser
+       // setup browser could not support dynamic form very well.
+       //
+       checkbox varid    = BMM_FAKE_NV_DATA.OptionOrder[0],
+           prompt   = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE),
+           help     = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE),  
+           flags    = 1,
+           key      = 0,
+       endcheckbox;
+      
+  endform;
+
+  form formid = FORM_BOOT_NEXT_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_NEXT_TITLE);
+
+       label FORM_BOOT_NEXT_ID;
+  endform;
+  
+  form formid = FORM_TIME_OUT_ID,
+       title = STRING_TOKEN(STR_FORM_TIME_OUT_TITLE);
+       
+       label FORM_TIME_OUT_ID;
+  endform;
+  
+  form formid = FORM_DRV_ADD_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_MAIN_ID;
+              
+       goto FORM_DRV_ADD_FILE_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE),
+            help = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE),
+            flags = INTERACTIVE | NV_ACCESS,
+            key = FORM_DRV_ADD_FILE_ID;
+
+  endform;
+
+  form formid = FORM_DRV_DEL_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_DEL_TITLE);
+
+       label FORM_DRV_DEL_ID;
+
+  endform;
+
+  form formid = FORM_DRV_CHG_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE);
+
+       label FORM_DRV_CHG_ID;
+      
+       //
+       // This tag is added for bypassing issue of setup browser
+       // setup browser could not support dynamic form very well.
+       //
+       checkbox varid    = BMM_FAKE_NV_DATA.OptionOrder[0],
+           prompt   = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE),
+           help     = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE),  
+           flags    = 1,
+           key      = 0,
+       endcheckbox;
+       
+  endform;
+
+  form formid = FORM_CON_MAIN_ID,
+       title = STRING_TOKEN(STR_FORM_CON_MAIN_TITLE);
+
+       goto FORM_MAIN_ID,
+       prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+       help = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+       flags = INTERACTIVE | NV_ACCESS,
+       key = FORM_MAIN_ID;
+
+       goto FORM_CON_IN_ID,
+       prompt = STRING_TOKEN(STR_FORM_CON_IN_TITLE),
+       help = STRING_TOKEN(STR_FORM_CON_IN_HELP),
+       flags = INTERACTIVE | NV_ACCESS,
+       key = FORM_CON_IN_ID;
+
+       goto FORM_CON_OUT_ID,
+       prompt = STRING_TOKEN(STR_FORM_CON_OUT_TITLE),
+       help = STRING_TOKEN(STR_FORM_CON_OUT_HELP),
+       flags = INTERACTIVE | NV_ACCESS,
+       key = FORM_CON_OUT_ID;
+  
+       goto FORM_CON_ERR_ID,
+       prompt = STRING_TOKEN(STR_FORM_STD_ERR_TITLE),
+       help = STRING_TOKEN(STR_FORM_STD_ERR_HELP),
+       flags = INTERACTIVE | NV_ACCESS,
+       key = FORM_CON_ERR_ID;
+
+       goto FORM_CON_COM_ID,
+       prompt = STRING_TOKEN(STR_FORM_COM_TITLE),
+       help = STRING_TOKEN(STR_FORM_COM_HELP),
+       flags = INTERACTIVE | NV_ACCESS,
+       key = FORM_CON_COM_ID;
+  endform;
+
+  form formid = FORM_CON_COM_ID,
+       title = STRING_TOKEN(STR_FORM_COM_TITLE);
+
+       label FORM_CON_COM_ID;
+  endform;
+
+  form formid = FORM_CON_COM_SETUP_ID,
+       title = STRING_TOKEN(STR_CON_COM_SETUP);
+
+       label FORM_CON_COM_SETUP_ID;
+  endform;
+
+  form formid = FORM_FILE_SEEK_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
+
+       label FORM_FILE_SEEK_ID;
+  endform;
+
+  form formid = FORM_FILE_NEW_SEEK_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
+
+       label FORM_FILE_NEW_SEEK_ID;
+  endform;
+
+  form formid = FORM_DRV_ADD_FILE_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE);
+
+       label FORM_DRV_ADD_FILE_ID;
+  endform;
+
+  form formid = FORM_DRV_ADD_HANDLE_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_HANDLE_TITLE);
+
+       label FORM_DRV_ADD_HANDLE_ID;
+  endform;     
+
+  form formid = FORM_DRV_ADD_HANDLE_DESC_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_DESC_TITLE);
+
+       label FORM_DRV_ADD_HANDLE_DESC_ID;
+
+  endform;
+
+  form formid = FORM_CON_IN_ID,
+       title = STRING_TOKEN(STR_FORM_CON_IN_TITLE);
+
+       label FORM_CON_IN_ID;
+
+  endform;
+
+  form formid = FORM_CON_OUT_ID,
+       title = STRING_TOKEN(STR_FORM_CON_OUT_TITLE);
+
+       label FORM_CON_OUT_ID;
+
+  endform;
+
+  form formid = FORM_CON_ERR_ID,
+       title = STRING_TOKEN(STR_FORM_STD_ERR_TITLE);
+
+       label FORM_CON_ERR_ID;
+
+  endform;
+
+  form formid = FORM_SET_FD_ORDER_ID,
+       title = STRING_TOKEN(STR_FORM_SET_FD_ORDER_TITLE);
+
+       label FORM_SET_FD_ORDER_ID;
+  endform;
+  
+  form formid = FORM_SET_HD_ORDER_ID,
+       title = STRING_TOKEN(STR_FORM_SET_HD_ORDER_TITLE);
+
+       label FORM_SET_HD_ORDER_ID;
+  endform;
+
+  form formid = FORM_SET_CD_ORDER_ID,
+       title = STRING_TOKEN(STR_FORM_SET_CD_ORDER_TITLE);
+
+       label FORM_SET_CD_ORDER_ID;
+  endform;
+
+  form formid = FORM_SET_NET_ORDER_ID,
+       title = STRING_TOKEN(STR_FORM_SET_NET_ORDER_TITLE);
+
+       label FORM_SET_NET_ORDER_ID;
+  endform;
+
+  form formid = FORM_SET_BEV_ORDER_ID,
+       title = STRING_TOKEN(STR_FORM_SET_BEV_ORDER_TITLE);
+
+       label FORM_SET_BEV_ORDER_ID;
+  endform;
+
+endformset;
