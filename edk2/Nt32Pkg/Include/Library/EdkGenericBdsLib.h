@@ -165,7 +165,7 @@ BdsLibGetVariableAndSize (
 
 EFI_STATUS
 BdsLibOutputStrings (
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID   *ConOut,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut,
   ...
   );
 
