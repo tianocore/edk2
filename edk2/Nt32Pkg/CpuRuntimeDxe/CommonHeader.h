@@ -26,7 +26,7 @@
 //
 #include <Protocol/Cpu.h>
 #include <Protocol/DataHub.h>
-#include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiFramework.h>
 #include <Common/DataHubRecords.h>
 #include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo.h>

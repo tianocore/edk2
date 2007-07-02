@@ -22,6 +22,9 @@ Abstract:
 #ifndef _BDS_LIB_H_
 #define _BDS_LIB_H_
 
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/HiiFramework.h>
+
 extern EFI_HANDLE mBdsImageHandle;
 
 //
@@ -162,7 +165,7 @@ BdsLibGetVariableAndSize (
 
 EFI_STATUS
 BdsLibOutputStrings (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL   *ConOut,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID   *ConOut,
   ...
   );
 

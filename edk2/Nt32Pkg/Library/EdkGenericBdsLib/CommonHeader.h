@@ -19,8 +19,7 @@
 //
 // The package level header files this module uses
 //
-#include <Dxe.h>
-#include <EdkDxe.h>
+#include <PiDxe.h>
 #include <WinNtDxe.h>
 //
 // The protocols, PPI and GUID defintions for this module
