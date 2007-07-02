@@ -351,3 +351,12 @@
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
+
+[Components.X64]
+  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+[Components.IPF]
+  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+[Components.EBC]
+  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
