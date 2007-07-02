@@ -65,8 +65,6 @@
   gMemoryStatusCodeRecordGuid    = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
 
 
-
-
 ################################################################################
 #
 # Global Protocols Definition section - list of Global Protocols C Name Data
@@ -78,8 +76,7 @@
   gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
   gEfiPciHotPlugInitProtocolGuid = { 0xAA0E8BC1, 0xDABC, 0x46B0, { 0xA8, 0x44, 0x37, 0xB8, 0x16, 0x9B, 0x2B, 0xEA }}
   gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
-
-
+  gEfiIsaIoProtocolGuid          = { 0x7ee2bd44, 0x3da0, 0x11d4, { 0x9a, 0x38, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
 
 
 ################################################################################
@@ -109,6 +106,9 @@
   PcdPciIsaEnable|0x00010039|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdPciVgaEnable|0x0001003a|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdPciBusHotplugDeviceSupport|0x0001003d|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdIsaBusSupportDma|0x00010040|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdIsaBusOnlySupportSlaveDma|0x00010041|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdIsaBusSupportIsaMemory|0x00010042|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
 
 [PcdsFixedAtBuild.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
