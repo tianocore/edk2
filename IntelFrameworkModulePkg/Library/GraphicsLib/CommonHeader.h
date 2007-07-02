@@ -29,7 +29,7 @@
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/FirmwareVolume.h>
 #include <Protocol/UgaDraw.h>
-#include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiFramework.h>
 
 #include <Guid/Bmp.h>
 //
