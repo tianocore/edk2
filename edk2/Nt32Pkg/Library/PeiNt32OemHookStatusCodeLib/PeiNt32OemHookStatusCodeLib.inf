@@ -27,7 +27,7 @@
   FILE_GUID                      = 0C2070F9-02A7-4e8e-B584-84EA922363FB
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = OemHookStatusCodeLib|PEIM 
+  LIBRARY_CLASS                  = OemHookStatusCodeLib|PEIM
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -46,7 +46,6 @@
 
 [Sources.common]
   Nt32OemHookStatusCodeLib.c
-  CommonHeader.h
 
 
 ################################################################################
@@ -59,6 +58,8 @@
 [Packages]
   MdePkg/MdePkg.dec
   Nt32Pkg/Nt32Pkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 
 ################################################################################

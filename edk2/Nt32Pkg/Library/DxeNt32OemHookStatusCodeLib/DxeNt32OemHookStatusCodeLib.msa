@@ -51,11 +51,12 @@
     <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
-  <Hobs>
-    <HobTypes HobGuidCName="gEfiWinNtThunkProtocolGuid" Usage="ALWAYS_CONSUMED">
-      <HobType>GUID_EXTENSION</HobType>
-    </HobTypes>
-  </Hobs>
+  <Protocols>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiWinNtThunkProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
