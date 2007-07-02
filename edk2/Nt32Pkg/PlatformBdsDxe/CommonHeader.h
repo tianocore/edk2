@@ -23,7 +23,7 @@
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Protocol/FormCallback.h>
+#include <Protocol/FormCallbackFramework.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Protocol/DevicePath.h>
 #include <Guid/BootState.h>
@@ -32,7 +32,7 @@
 #include <Guid/FileInfo.h>
 #include <Protocol/Bds.h>
 #include <Protocol/DataHub.h>
-#include <Protocol/FormBrowser.h>
+#include <Protocol/FormBrowserFramework.h>
 #include <Guid/Bmp.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/BlockIo.h>
@@ -41,7 +41,7 @@
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/SimpleFileSystem.h>
-#include <Protocol/Hii.h>
+#include <Protocol/HiiFramework.h>
 #include <Guid/GenericPlatformVariable.h>
 #include <Guid/FlashMapHob.h>
 #include <Protocol/SerialIo.h>
@@ -53,7 +53,7 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
-#include <Library/EdkGraphicsLib.h>
+#include <Library/GraphicsLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
@@ -66,7 +66,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/HiiLib.h>
+#include <Library/HiiLibFramework.h>
 #include <Library/PeCoffLib.h>
 
 #endif
