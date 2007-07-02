@@ -6,11 +6,9 @@
     <GuidValue>FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F</GuidValue>
     <Version>1.0</Version>
     <Abstract>DXE status code driver.</Abstract>
-    <Description>
-      Status Code Architectural Protocol implementation as defined in Tiano
+    <Description>Status Code Architectural Protocol implementation as defined in Tiano
       Architecture Specification. This driver has limited functionality 
-      at runtime and will not log to Data Hub at runtime.
-    </Description>
+      at runtime and will not log to Data Hub at runtime.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -68,8 +66,8 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>OemHookStatusCodeLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
-      <Keyword>EdkDxeSalLib</Keyword>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>ExtendedSalLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
@@ -105,7 +103,7 @@
       <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
-  <Guids> 
+  <Guids>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gMemoryStatusCodeRecordGuid</GuidCName>
     </GuidCNames>

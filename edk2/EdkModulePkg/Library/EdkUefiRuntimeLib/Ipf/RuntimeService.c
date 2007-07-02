@@ -50,7 +50,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RESET_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RESET_SERVICES_PROTOCOL_GUID_HI;
 
-  EfiCallEsalService (
+  EsalCall (
     &Guid,
     ResetSystem,
     (UINT64) ResetType,
@@ -99,7 +99,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (&Guid, GetTime, (UINT64) Time, (UINT64) Capabilities, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetTime, (UINT64) Time, (UINT64) Capabilities, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -130,7 +130,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (&Guid, SetTime, (UINT64) Time, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, SetTime, (UINT64) Time, 0, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -165,7 +165,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (&Guid, GetWakeupTime, (UINT64) Enabled, (UINT64) Pending, (UINT64) Time, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetWakeupTime, (UINT64) Enabled, (UINT64) Pending, (UINT64) Time, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -199,7 +199,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (&Guid, SetWakeupTime, (UINT64) Enable, (UINT64) Time, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, SetWakeupTime, (UINT64) Enable, (UINT64) Time, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -241,7 +241,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (
+  ReturnReg = EsalCall (
                 &Guid,
                 EsalGetVariable,
                 (UINT64) VariableName,
@@ -291,7 +291,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (
+  ReturnReg = EsalCall (
                 &Guid,
                 EsalGetNextVariableName,
                 (UINT64) VariableNameSize,
@@ -341,7 +341,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (
+  ReturnReg = EsalCall (
                 &Guid,
                 EsalSetVariable,
                 (UINT64) VariableName,
@@ -382,7 +382,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (&Guid, GetNextHighMonotonicCount, (UINT64) HighCount, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetNextHighMonotonicCount, (UINT64) HighCount, 0, 0, 0, 0, 0, 0);
   return (EFI_STATUS) ReturnReg.Status;
 }
 
@@ -499,7 +499,7 @@ EfiSetVirtualAddressMap (
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EfiCallEsalService (
+  ReturnReg = EsalCall (
                 &Guid,
                 SetVirtualAddress,
                 (UINT64) MemoryMapSize,
