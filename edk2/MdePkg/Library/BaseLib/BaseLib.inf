@@ -479,9 +479,9 @@
   X64/CpuIdEx.S
   X64/CpuFlushTlb.S
   X64/CpuBreakpoint.S
-#  SynchronizationMsc.c  #|| INTC
-  SynchronizationMsc.c  #|| MSFT
-#  SynchronizationGcc.c  || GCC
+  Synchronization.c     || INTEL |||
+  SynchronizationMsc.c  || MSFT |||
+  SynchronizationGcc.c  || GCC |||
 
 [Sources.IPF]
   Ipf/AccessGp.s
@@ -511,9 +511,9 @@
   Ipf/ia_64gen.h
   Ipf/asm.h
   Math64.c
-#  SynchronizationMsc.c  #|| INTC
-  SynchronizationMsc.c  #|| MSFT
-#  SynchronizationGcc.c  || GCC
+  Synchronization.c     || INTEL |||
+  SynchronizationMsc.c  || MSFT |||
+  SynchronizationGcc.c  || GCC |||
 
 [Sources.EBC]
   Synchronization.c
