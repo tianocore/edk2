@@ -100,7 +100,7 @@
   ${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 #  ${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-#  ${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  ${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -108,7 +108,6 @@
   ${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 #  ${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
-  ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   ${WORKSPACE}/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   ${WORKSPACE}/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -118,7 +117,6 @@
   ${WORKSPACE}/MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   ${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  ${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   ${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiScsiLib/UefiScsiLib.inf
 
@@ -126,9 +124,14 @@
 [Components.IA32]
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  ${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [Components.X64]
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  ${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
-
+[Components.IPF]
+  ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
