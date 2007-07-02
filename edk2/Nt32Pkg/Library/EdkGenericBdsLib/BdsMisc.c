@@ -778,7 +778,7 @@ Returns:
 
 EFI_STATUS
 BdsLibOutputStrings (
-  IN EFI_SIMPLE_TEXT_OUT_PROTOCOL   *ConOut,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut,
   ...
   )
 /*++

@@ -24,6 +24,7 @@
 //
 // The protocols, PPI and GUID defintions for this module
 //
+#include <Protocol/Cpu.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/LoadedImage.h>
@@ -34,12 +35,16 @@
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/AcpiS3Save.h>
 #include <Guid/GlobalVariable.h>
-#include <Protocol/FormBrowser.h>
+#include <Protocol/FormBrowserFramework.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/FirmwareVolume.h>
+#include <Protocol/Performance.h>
+#include <Protocol/WinNtIo.h>
+#include <Guid/PcAnsi.h>
+
 //
 // The Library classes this module consumes
 //
