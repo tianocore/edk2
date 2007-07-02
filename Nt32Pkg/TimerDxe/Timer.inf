@@ -87,3 +87,13 @@
 [Protocols]
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiCpuArchProtocolGuid

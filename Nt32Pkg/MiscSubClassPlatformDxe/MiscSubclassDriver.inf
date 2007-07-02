@@ -132,3 +132,12 @@
   gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid
