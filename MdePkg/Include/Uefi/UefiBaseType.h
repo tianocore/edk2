@@ -164,4 +164,8 @@ typedef union {
 
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
+
+#define EFI_MAX_BIT               MAX_BIT
+#define EFI_MAX_ADDRESS           MAX_ADDRESS
+
 #endif
