@@ -17,6 +17,8 @@
 #ifndef __EFI_FORM_BROWSER_H__
 #define __EFI_FORM_BROWSER_H__
 
+#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+
 
 #define EFI_FORM_BROWSER_PROTOCOL_GUID \
   { 0xe5a1333e, 0xe1b4, 0x4e55, { 0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43 } }
