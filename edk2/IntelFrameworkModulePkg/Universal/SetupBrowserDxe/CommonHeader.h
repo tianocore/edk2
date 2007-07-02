@@ -25,7 +25,7 @@
 //
 #include <Protocol/FormCallback.h>
 #include <Protocol/FrameworkFormBrowser.h>
-#include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiFramework.h>
 #include <Protocol/Print.h>
 //
 // The Library classes this module consumes
