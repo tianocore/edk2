@@ -44,7 +44,6 @@
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/HiiFramework.h>
 #include <Guid/GenericPlatformVariable.h>
-#include <Guid/FlashMapHob.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/LegacyBios.h>
 #include <Common/MaxBbsEntries.h>
