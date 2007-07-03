@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  Metronome.dxs
   Metronome.h
   Metronome.c
   CommonHeader.h
