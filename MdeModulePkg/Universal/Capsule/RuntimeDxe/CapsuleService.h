@@ -50,7 +50,7 @@ extern EFI_GUID gEfiCapsuleGuid;
 EFI_STATUS
 EFIAPI
 UpdateCapsule(
-  IN UEFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN EFI_CAPSULE_HEADER      **CapsuleHeaderArray,
   IN UINTN                   CapsuleCount,
   IN EFI_PHYSICAL_ADDRESS    ScatterGatherList OPTIONAL
   );
@@ -58,7 +58,7 @@ UpdateCapsule(
 EFI_STATUS
 EFIAPI
 QueryCapsuleCapabilities(
-  IN  UEFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN  EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
   IN  UINTN                CapsuleCount,
   OUT UINT64               *MaxiumCapsuleSize,
   OUT EFI_RESET_TYPE       *ResetType
