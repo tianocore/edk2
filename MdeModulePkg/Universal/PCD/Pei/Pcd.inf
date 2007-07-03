@@ -25,7 +25,7 @@
   FILE_GUID                      = 9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  PCD_DRIVER                     = PEI_PCD_DRIVER
+  PCD_IS_DRIVER                  = PEI_PCD_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -60,6 +60,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
 ################################################################################

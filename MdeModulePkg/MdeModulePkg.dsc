@@ -291,6 +291,12 @@
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDxePcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdPeiPcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdPeiPcdDatabaseSetEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdPeiPcdDatabaseGetSizeEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdPeiPcdDatabaseExEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
 
 #  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
 
@@ -317,6 +323,8 @@
   PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdMaxPeiPerformanceLogEntries|gEfiEdkModulePkgTokenSpaceGuid|28
+  PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid|0x0
+  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiEdkModulePkgTokenSpaceGuid|0x08
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
@@ -356,6 +364,8 @@
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 
 [Components.X64]
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
