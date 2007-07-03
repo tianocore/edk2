@@ -212,8 +212,8 @@
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|128
 
 [PcdsFixedAtBuild.IA32]
-  PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|VOID*|10
-  PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid|L"..\\Fv\\Fv_Recovery.fd"|VOID*|52
+  PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
+  PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid|L"..\\Fv\\Fv_Recovery.fd"|52
   PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -351,3 +351,4 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
+  $(WORKSPACE)/Nt32Pkg/Sec/SecMain.inf
