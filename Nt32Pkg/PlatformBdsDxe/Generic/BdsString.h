@@ -9,47 +9,45 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name: 
+Module Name:
 
-  BootManager.h
+  BdsString.h
 
 Abstract:
-
-  The platform boot manager reference implement
+  
+  String support
 
 Revision History
 
 --*/
 
-#ifndef _EFI_BOOT_MANAGER_H
-#define _EFI_BOOT_MANAGER_H
+#ifndef _PLATFORMBDS_STRING_H_
+#define _PLATFORMBDS_STRING_H_
 
 //
-// Include common header file for this module.
+// String Definition Guid for BDS Platform
 //
-#include "CommonHeader.h"
-
-#include "Generic/Bds.h"
-#include "BdsPlatform.h"
-#include "Generic/BdsString.h"
-
-EFI_STATUS
-EFIAPI
-BootManagerCallbackRoutine (
-  IN EFI_FORM_CALLBACK_PROTOCOL       *This,
-  IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
-  OUT EFI_HII_CALLBACK_PACKET         **Packet
-  );
-
-VOID
-CallBootManager (
-  VOID
-);
-
-#define BOOT_MANAGER_GUID \
+#define EFI_BDS_PLATFORM_GUID \
   { \
-    0x847bc3fe, 0xb974, 0x446d, {0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b } \
+    0x7777E939, 0xD57E, 0x4DCB, {0xA0, 0x8E, 0x64, 0xD7, 0x98, 0x57, 0x1E, 0x0F } \
   }
 
-#endif
+EFI_HII_HANDLE    gStringPackHandle;
+EFI_HII_PROTOCOL  *Hii;
+
+CHAR16            *
+GetStringById (
+  IN  STRING_REF   Id
+  );
+
+EFI_STATUS
+InitializeStringSupport (
+  VOID
+  );
+
+EFI_STATUS
+CallFrontPage (
+  VOID
+  );
+
+#endif // _STRING_H_

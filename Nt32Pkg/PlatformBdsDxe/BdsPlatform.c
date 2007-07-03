@@ -27,7 +27,7 @@ Abstract:
 
 #include "Generic/Bds.h"
 #include "BdsPlatform.h"
-#include "Generic/String.h"
+#include "Generic/BdsString.h"
 #include "Generic/Language.h"
 #include "Generic/FrontPage.h"
 

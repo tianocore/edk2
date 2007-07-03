@@ -27,7 +27,7 @@ Abstract:
 #include "Bds.h"
 #include "BdsPlatform.h"
 #include "FrontPage.h"
-#include "String.h"
+#include "BdsString.h"
 
 EFI_GUID                    mProcessorSubClass  = EFI_PROCESSOR_SUBCLASS_GUID;
 EFI_GUID                    mMemorySubClass     = EFI_MEMORY_SUBCLASS_GUID;

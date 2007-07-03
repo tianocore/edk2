@@ -94,7 +94,7 @@
     <Filename>Generic/FrontPageVfr.Vfr</Filename>
     <Filename>Generic/Language.h</Filename>
     <Filename>Generic/Language.c</Filename>
-    <Filename>Generic/String.h</Filename>
+    <Filename>Generic/BdsString.h</Filename>
     <Filename>Generic/String.c</Filename>
     <Filename>Generic/Strings.uni</Filename>
     <Filename>Generic/Capsules.c</Filename>
