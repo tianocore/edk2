@@ -1461,7 +1461,7 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_UPDATE_CAPSULE) (
-  IN UEFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN EFI_CAPSULE_HEADER     **CapsuleHeaderArray,
   IN UINTN                  CapsuleCount,
   IN EFI_PHYSICAL_ADDRESS   ScatterGatherList   OPTIONAL
   );
@@ -1487,7 +1487,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_QUERY_CAPSULE_CAPABILITIES) (
-  IN  UEFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN  EFI_CAPSULE_HEADER     **CapsuleHeaderArray,
   IN  UINTN                  CapsuleCount,
   OUT UINT64                 *MaximumCapsuleSize,
   OUT EFI_RESET_TYPE         *ResetType
