@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>PcdDxe</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>80CF7257-87AB-47f9-A3FE-D50B76D89541</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for PCD service DXE driver.</Abstract>
+    <Description>This DXE driver implement and produce the PCD protocol.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>PcdDxe</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
+      <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiRuntimeServicesTableLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Service.h</Filename>
+    <Filename>Service.c</Filename>
+    <Filename>Pcd.c</Filename>
+    <Filename>Pcd.dxs</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gPcdProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <Hobs>
+    <HobTypes Usage="ALWAYS_CONSUMED" HobGuidCName="gPcdDataBaseHobGuid">
+      <HobType>GUID_EXTENSION</HobType>
+    </HobTypes>
+  </Hobs>
+  <Externs>
+    <PcdIsDriver>DXE_PCD_DRIVER</PcdIsDriver>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>PcdDxeInit</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdVpdBaseAddress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The base address of the VPD (Vital Product Data) region. It is 
+        normally a region reserved on flash.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG">
+      <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This feature flag can be used to enable or disable the Pcd DXE database 
+        traverse capability. Disable it can reduce the size of final image generated.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>
