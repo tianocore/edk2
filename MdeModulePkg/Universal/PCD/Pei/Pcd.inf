@@ -1,0 +1,140 @@
+#/** @file
+# Component description file for Pcd Database PEIM module
+#
+# This PEIM driver implement and produce PCD PPI.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PcdPeim
+  FILE_GUID                      = 9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  PCD_DRIVER                     = PEI_PCD_DRIVER
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = PcdPeimInit
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  Service.c
+  Service.h
+  Pcd.c
+  CommonHeader.h
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseMemoryLib
+  PeiServicesTablePointerLib
+  PcdLib
+  PeiServicesLib
+  HobLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gPcdPeiCallbackFnTableHobGuid                 # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
+  gPcdDataBaseHobGuid                           # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
+
+
+################################################################################
+#
+# PPI C Name Section - list of PPI and PPI Notify C Names that this module
+#                      uses or produces.
+#
+################################################################################
+
+[Ppis]
+  gEfiPeiReadOnlyVariablePpiGuid                # PPI ALWAYS_CONSUMED
+  gPcdPpiGuid                                   # PPI ALWAYS_PRODUCED
+
+
+################################################################################
+#
+# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFeatureFlag.common]
+  PcdPeiPcdDatabaseSetEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseGetSizeEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseExEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid
+
+
+################################################################################
+#
+# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFixedAtBuild.common]
+  PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid
+  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiEdkModulePkgTokenSpaceGuid
+
+
+################################################################################
+#
+# Dependency Expression Section - list of Dependency expressions that are required for
+#                              this module.
+#
+################################################################################
+
+[Depex]
+  TRUE
+
