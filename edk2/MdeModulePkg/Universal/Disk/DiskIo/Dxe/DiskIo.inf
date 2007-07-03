@@ -48,7 +48,11 @@
   ComponentName.c
   DiskIo.h
   DiskIo.c
-
+  Inventory.vfr
+  InventoryStrings.uni
+  NVDataStruc.h
+  Vfr.vfr
+  VfrStrings.uni
 
 ################################################################################
 #
