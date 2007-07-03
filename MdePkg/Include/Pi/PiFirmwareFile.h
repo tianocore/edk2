@@ -33,6 +33,26 @@ typedef UINT8 EFI_FV_FILETYPE;
 typedef UINT8 EFI_FFS_FILE_ATTRIBUTES;
 typedef UINT8 EFI_FFS_FILE_STATE;
 
+//
+// File Types Definitions
+// 
+#define EFI_FV_FILETYPE_RAW                   0x01
+#define EFI_FV_FILETYPE_FREEFORM              0x02
+#define EFI_FV_FILETYPE_SECURITY_CORE         0x03
+#define EFI_FV_FILETYPE_PEI_CORE              0x04
+#define EFI_FV_FILETYPE_DXE_CORE              0x05
+#define EFI_FV_FILETYPE_PEIM                  0x06
+#define EFI_FV_FILETYPE_DRIVER                0x07
+#define EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER  0x08
+#define EFI_FV_FILETYPE_APPLICATION           0x09
+#define EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 0x0B
+#define EFI_FV_FILETYPE_OEM_MIN               0xc0
+#define EFI_FV_FILETYPE_OEM_MAX               0xdf
+#define EFI_FV_FILETYPE_DEBUG_MIN             0xe0
+#define EFI_FV_FILETYPE_DEBUG_MAX             0xef
+#define EFI_FV_FILETYPE_FFS_MIN               0xf0
+#define EFI_FV_FILETYPE_FFS_MAX               0xff
+#define EFI_FV_FILETYPE_FFS_PAD               0xf0
 // 
 // FFS File Attributes.
 // 
