@@ -245,6 +245,9 @@
     <Filename>Library/UefiDriverEntryPoint/UefiDriverEntryPoint.msa</Filename>
     <Filename>Library/UefiLib/UefiLib.msa</Filename>
     <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
+    <Filename>Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.msa</Filename>
+    <Filename>Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.msa</Filename>
+    <Filename>Library/UefiUsbLib/UefiUsbLib.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="BASE">Include/Base.h</IncludePkgHeader>
