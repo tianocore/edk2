@@ -29,12 +29,12 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupModuleList="PEIM">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeiServicesTablePointer.c</Filename>
-    <Filename>PeiServicesTablePointerLibInternals.h</Filename>
-    <Filename SupArchList="IPF">Ipf/ReadKr1.s</Filename>
-    <Filename SupArchList="IPF">Ipf/WriteKr1.s</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
