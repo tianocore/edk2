@@ -39,40 +39,6 @@ BdsLockFv (
   IN EFI_FLASH_SUBAREA_ENTRY      *FlashEntry
   )
 {
-  EFI_FV_BLOCK_MAP_ENTRY      *BlockMap;
-  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
-  UINT64                      BaseAddress;
-  UINT8                       Data;
-  UINT32                      BlockLength;
-  UINTN                       Index;
-
-  BaseAddress = FlashEntry->Base - 0x400000 + 2;
-  FvHeader    = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) (FlashEntry->Base));
-  BlockMap    = &(FvHeader->BlockMap[0]);
-
-  while ((BlockMap->NumBlocks != 0) && (BlockMap->Length != 0)) {
-    BlockLength = BlockMap->Length;
-    for (Index = 0; Index < BlockMap->NumBlocks; Index++) {
-      CpuIo->Mem.Read (
-                  CpuIo,
-                  EfiCpuIoWidthUint8,
-                  BaseAddress,
-                  1,
-                  &Data
-                  );
-      Data = (UINT8) (Data | 0x3);
-      CpuIo->Mem.Write (
-                  CpuIo,
-                  EfiCpuIoWidthUint8,
-                  BaseAddress,
-                  1,
-                  &Data
-                  );
-      BaseAddress += BlockLength;
-    }
-
-    BlockMap++;
-  }
 }
 
 VOID
@@ -80,30 +46,6 @@ BdsLockNonUpdatableFlash (
   VOID
   )
 {
-  EFI_FLASH_MAP_ENTRY_DATA  *FlashMapEntryData;
-  EFI_PEI_HOB_POINTERS      GuidHob;
-  EFI_STATUS                Status;
-  EFI_CPU_IO_PROTOCOL       *CpuIo;
-
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, &CpuIo);
-  ASSERT_EFI_ERROR (Status);
-  
-  GuidHob.Raw = GetHobList ();
-  while ((GuidHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, GuidHob.Raw)) != NULL) {
-    FlashMapEntryData = (EFI_FLASH_MAP_ENTRY_DATA *) GET_GUID_HOB_DATA (GuidHob.Guid);
-
-    //
-    // Get the variable store area
-    //
-    if ((FlashMapEntryData->AreaType == EFI_FLASH_AREA_RECOVERY_BIOS) ||
-        (FlashMapEntryData->AreaType == EFI_FLASH_AREA_MAIN_BIOS)
-        ) {
-      BdsLockFv (CpuIo, &(FlashMapEntryData->Entries[0]));
-    }
-    GuidHob.Raw = GET_NEXT_HOB (GuidHob);
-  }
-
-  return ;
 }
 
 EFI_STATUS
