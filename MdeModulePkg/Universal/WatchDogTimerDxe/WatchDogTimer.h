@@ -24,6 +24,20 @@ Revision History
 #ifndef _WATCHDOG_TIMER_H_
 #define _WATCHDOG_TIMER_H_
 
+
+//
+// The package level header files this module uses
+//
+#include <PiDxe.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/PcdLib.h>
+#include <Protocol/WatchDogTimer.h>
+
+
 //
 // Function Prototypes
 //
@@ -32,31 +46,27 @@ EFIAPI
 WatchdogTimerDriverRegisterHandler (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN EFI_WATCHDOG_TIMER_NOTIFY         NotifyFunction
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverSetTimerPeriod (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                            TimerPeriod
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverGetTimerPeriod (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                            *TimerPeriod
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-;
+  );
 
 #endif

@@ -69,7 +69,7 @@ EFI_STATUS
   OUT       UINT32                          *Attributes,
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
-);
+  );
 
 
 /**
@@ -112,7 +112,7 @@ EFI_STATUS
   IN OUT    UINTN                           *VariableNameSize,
   IN OUT    CHAR16                          *VariableName,
   IN OUT    EFI_GUID                        *VariableGuid
-);
+  );
 
 /**
   This PPI provides a lightweight, read-only variant of the full EFI 

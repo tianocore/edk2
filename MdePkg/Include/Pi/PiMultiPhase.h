@@ -86,4 +86,13 @@ typedef struct {
   EFI_GUID  Type;
 } EFI_STATUS_CODE_DATA;
 
+
+//
+// Bit values for AuthenticationStatus
+//
+#define EFI_AUTH_STATUS_PLATFORM_OVERRIDE   0x01
+#define EFI_AUTH_STATUS_IMAGE_SIGNED        0x02
+#define EFI_AUTH_STATUS_NOT_TESTED          0x04
+#define EFI_AUTH_STATUS_TEST_FAILED         0x08
+
 #endif

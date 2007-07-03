@@ -23,8 +23,43 @@ Abstract:
 --*/
 
 
-#include <GuidedSection.h>
 #include <Crc32SectionExtract.h>
+
+EFI_STATUS
+GuidedSectionExtractionProtocolConstructor (
+  OUT EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL      **GuidedSep,
+  IN  EFI_EXTRACT_GUIDED_SECTION                  ExtractSection
+  )
+/*++
+
+Routine Description:
+
+  Constructor for the GUIDed section extraction protocol.  Initializes
+  instance data.
+
+Arguments:
+
+  This      Instance to construct
+
+Returns:
+
+  EFI_SUCCESS:  Instance initialized.
+
+--*/
+// TODO:    GuidedSep - add argument and description to function comment
+// TODO:    ExtractSection - add argument and description to function comment
+// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
+{
+  *GuidedSep = AllocatePool (sizeof (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL));
+  if (*GuidedSep == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  (*GuidedSep)->ExtractSection = ExtractSection;
+
+  return EFI_SUCCESS;
+}
+
 
 EFI_STATUS
 EFIAPI
@@ -206,21 +241,21 @@ Crc32ExtractSection (
   // Implictly CRC32 GUIDed section should have STATUS_VALID bit set
   //
   ASSERT (GuidedSectionHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID);
-  *AuthenticationStatus = EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_AGGREGATE_AUTH_STATUS_IMAGE_SIGNED;
+  *AuthenticationStatus = EFI_AUTH_STATUS_IMAGE_SIGNED;
 
   //
   // Check whether there exists EFI_SECURITY_POLICY_PROTOCOL_GUID.
   //
   Status = gBS->LocateProtocol (&gEfiSecurityPolicyProtocolGuid, NULL, &DummyInterface);
   if (!EFI_ERROR (Status)) {
-    *AuthenticationStatus |= EFI_LOCAL_AUTH_STATUS_PLATFORM_OVERRIDE | EFI_AGGREGATE_AUTH_STATUS_PLATFORM_OVERRIDE;
+    *AuthenticationStatus |= EFI_AUTH_STATUS_PLATFORM_OVERRIDE;
   } else {
     //
     // Calculate CRC32 Checksum of Image
     //
     gBS->CalculateCrc32 (Image, *OutputSize, &Crc32Checksum);
     if (Crc32Checksum != Crc32SectionHeader->CRC32Checksum) {
-      *AuthenticationStatus |= EFI_LOCAL_AUTH_STATUS_TEST_FAILED | EFI_AGGREGATE_AUTH_STATUS_TEST_FAILED;
+      *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     }
   }
 

@@ -22,6 +22,16 @@ Abstract:
 #ifndef _PEI_VARIABLE_H
 #define _PEI_VARIABLE_H
 
+#include <PiPei.h>
+#include <Ppi/ReadOnlyVariable2.h>
+#include <Library/DebugLib.h>
+#include <Library/PeimEntryPoint.h>
+#include <Library/HobLib.h>
+#include <Library/PcdLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
+
+
 //
 // BugBug: We need relcate the head file.
 //
@@ -91,12 +101,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiGetVariable (
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     * VendorGuid,
-  OUT UINT32                      *Attributes OPTIONAL,
-  IN OUT UINTN                    *DataSize,
-  OUT VOID                        *Data
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
+  IN CONST  CHAR16                          *VariableName,
+  IN CONST  EFI_GUID                        *VariableGuid,
+  OUT       UINT32                          *Attributes,
+  IN OUT    UINTN                           *DataSize,
+  OUT       VOID                            *Data
   )
 /*++
 
@@ -123,10 +133,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiGetNextVariableName (
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN OUT UINTN                    *VariableNameSize,
-  IN OUT CHAR16                   *VariableName,
-  IN OUT EFI_GUID                 *VendorGuid
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
+  IN OUT UINTN                              *VariableNameSize,
+  IN OUT CHAR16                             *VariableName,
+  IN OUT EFI_GUID                           *VariableGuid
   )
 /*++
 

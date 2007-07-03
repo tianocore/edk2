@@ -22,6 +22,14 @@ Abstract:
 #ifndef _PEI_BASE_MEMORY_TEST_H_
 #define _PEI_BASE_MEMORY_TEST_H_
 
+#include <PiPei.h>
+#include <Ppi/BaseMemoryTest.h>
+#include <Library/DebugLib.h>
+#include <Library/PeimEntryPoint.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/PcdLib.h>
+
+
 //
 // Some global define
 //

@@ -18,38 +18,20 @@ Abstract:
 
 --*/
 
-//
-// The package level header files this module uses
-//
-#include <PiPei.h>
 
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Ppi/ReadOnlyVariable.h>
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/PeimEntryPoint.h>
-#include <Library/HobLib.h>
-#include <Library/PcdLib.h>
-#include <Library/BaseMemoryLib.h>
-
-
-#include <Variable.h>
+#include "Variable.h"
 
 //
 // Module globals
 //
-static EFI_PEI_READ_ONLY_VARIABLE_PPI mVariablePpi = {
+static EFI_PEI_READ_ONLY_VARIABLE2_PPI mVariablePpi = {
   PeiGetVariable,
   PeiGetNextVariableName
 };
 
 static EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiReadOnlyVariablePpiGuid,
+  &gEfiPeiReadOnlyVariable2PpiGuid,
   &mVariablePpi
 };
 
@@ -187,10 +169,10 @@ Returns:
 STATIC
 EFI_STATUS
 CompareWithValidVariable (
-  IN  VARIABLE_HEADER         *Variable,
-  IN  CHAR16                  *VariableName,
-  IN  EFI_GUID                *VendorGuid,
-  OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  IN  VARIABLE_HEADER               *Variable,
+  IN  CONST CHAR16                  *VariableName,
+  IN  CONST EFI_GUID                *VendorGuid,
+  OUT VARIABLE_POINTER_TRACK        *PtrTrack
   )
 /*++
 
@@ -242,8 +224,8 @@ EFI_STATUS
 EFIAPI
 FindVariable (
   IN EFI_PEI_SERVICES         **PeiServices,
-  IN  CHAR16                  *VariableName,
-  IN  EFI_GUID                *VendorGuid,
+  IN CONST  CHAR16            *VariableName,
+  IN CONST  EFI_GUID          *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack
   )
 /*++
@@ -380,12 +362,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiGetVariable (
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     * VendorGuid,
-  OUT UINT32                      *Attributes OPTIONAL,
-  IN OUT UINTN                    *DataSize,
-  OUT VOID                        *Data
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
+  IN CONST  CHAR16                          *VariableName,
+  IN CONST  EFI_GUID                        *VariableGuid,
+  OUT       UINT32                          *Attributes,
+  IN OUT    UINTN                           *DataSize,
+  OUT       VOID                            *Data
   )
 /*++
 
@@ -420,15 +402,16 @@ Returns:
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
   EFI_STATUS              Status;
+  EFI_PEI_SERVICES        **PeiServices;
 
-  if (VariableName == NULL || VendorGuid == NULL) {
+  PeiServices = GetPeiServicesTablePointer ();
+  if (VariableName == NULL || VariableGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   //
   // Find existing variable
   //
-  Status = FindVariable (PeiServices, VariableName, VendorGuid, &Variable);
-
+  Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
     return Status;
   }
@@ -454,10 +437,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiGetNextVariableName (
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN OUT UINTN                    *VariableNameSize,
-  IN OUT CHAR16                   *VariableName,
-  IN OUT EFI_GUID                 *VendorGuid
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
+  IN OUT UINTN                              *VariableNameSize,
+  IN OUT CHAR16                             *VariableName,
+  IN OUT EFI_GUID                           *VariableGuid
   )
 /*++
 
@@ -470,7 +453,7 @@ Arguments:
   PeiServices        - General purpose services available to every PEIM.
   VariabvleNameSize  - The variable name's size.
   VariableName       - A pointer to the variable's name.
-  VendorGuid         - A pointer to the EFI_GUID structure.
+  VariableGuid       - A pointer to the EFI_GUID structure.
 
   VariableNameSize - Size of the variable name
 
@@ -489,13 +472,14 @@ Returns:
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
+  EFI_PEI_SERVICES        **PeiServices;
 
+  PeiServices = GetPeiServicesTablePointer ();
   if (VariableName == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FindVariable (PeiServices, VariableName, VendorGuid, &Variable);
-
+  Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
     return Status;
   }
@@ -514,7 +498,7 @@ Returns:
         if (VarNameSize <= *VariableNameSize) {
           (*PeiServices)->CopyMem (VariableName, GET_VARIABLE_NAME_PTR (Variable.CurrPtr), VarNameSize);
 
-          (*PeiServices)->CopyMem (VendorGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
+          (*PeiServices)->CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
 
           Status = EFI_SUCCESS;
         } else {

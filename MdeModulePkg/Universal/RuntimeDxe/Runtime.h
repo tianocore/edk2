@@ -24,6 +24,22 @@ Abstract:
 #ifndef _RUNTIME_H_
 #define _RUNTIME_H_
 
+#include <PiDxe.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/Runtime.h>
+#include <Protocol/UgaIo.h>
+#include <Library/BaseLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/DebugLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/CacheMaintenanceLib.h>
+#include <Library/PeCoffLib.h>
+#include <Library/PcdLib.h>
+
+
 //
 // Function Prototypes
 //

@@ -18,24 +18,6 @@ Abstract:
   Framework PEIM to provide the Variable functionality
 
 --*/
-//
-// The package level header files this module uses
-//
-#include <PiPei.h>
-
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Ppi/ReadOnlyVariable.h>
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/PeimEntryPoint.h>
-#include <Library/HobLib.h>
-#include <Library/PcdLib.h>
-#include <Library/BaseMemoryLib.h>
-
 
 #include <Variable.h>
 
