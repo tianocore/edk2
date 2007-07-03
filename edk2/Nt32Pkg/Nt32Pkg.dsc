@@ -228,7 +228,7 @@
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
-  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
+  PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid|0x0
   PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
   PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid|0x0
   PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid|0
@@ -340,6 +340,8 @@
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
+#  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+#  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
