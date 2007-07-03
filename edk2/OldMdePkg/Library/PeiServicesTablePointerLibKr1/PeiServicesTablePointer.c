@@ -20,8 +20,6 @@ Abstract:
   
 --*/
 
-#include "PeiServicesTablePointerLibInternals.h"
-
 /**
   The function returns the pointer to PeiServices.
 
