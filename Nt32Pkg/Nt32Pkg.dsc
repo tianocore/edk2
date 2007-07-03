@@ -30,6 +30,7 @@
   SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
+  FLASH_DEFINITION               = $(WORKSPACE)/Nt32Pkg/Nt32Pkg.fdf
 
   DEBUG_ICC_IA32_DLINK_FLAGS                  = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
   DEBUG_VS2003_IA32_DLINK_FLAGS               = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
@@ -396,7 +397,6 @@
   $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 # $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
