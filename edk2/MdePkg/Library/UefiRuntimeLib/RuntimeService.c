@@ -408,9 +408,9 @@ EfiSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
-  IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
-  IN UINTN				    CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS	ScatterGatherList	OPTIONAL
+  IN EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
+  IN UINTN                CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS ScatterGatherList OPTIONAL
   )
 {
   return mRT->UpdateCapsule (
@@ -423,10 +423,10 @@ EfiUpdateCapsule (
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
-  IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
-  IN UINTN				    CapsuleCount,
-  OUT	UINT64			    *MaximumCapsuleSize,
-  OUT EFI_RESET_TYPE		*ResetType
+  IN EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
+  IN UINTN                CapsuleCount,
+  OUT UINT64              *MaximumCapsuleSize,
+  OUT EFI_RESET_TYPE      *ResetType
   )
 {
   return mRT->QueryCapsuleCapabilities (
@@ -441,10 +441,10 @@ EfiQueryCapsuleCapabilities (
 EFI_STATUS
 EFIAPI
 EfiQueryVariableInfo (
-  IN UINT32			  Attributes,
-  OUT UINT64			*MaximumVariableStorageSize,
-  OUT	 UINT64			*RemainingVariableStorageSize,
-  OUT UINT64			*MaximumVariableSize
+  IN  UINT32      Attributes,
+  OUT UINT64      *MaximumVariableStorageSize,
+  OUT UINT64      *RemainingVariableStorageSize,
+  OUT UINT64      *MaximumVariableSize
   )
 {
   return mRT->QueryVariableInfo (

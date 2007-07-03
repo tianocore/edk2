@@ -24,7 +24,7 @@ Abstract:
 EFI_STATUS
 EFIAPI
 UpdateCapsule (
-  IN UEFI_CAPSULE_HEADER     **CapsuleHeaderArray,
+  IN EFI_CAPSULE_HEADER      **CapsuleHeaderArray,
   IN UINTN                   CapsuleCount,
   IN EFI_PHYSICAL_ADDRESS    ScatterGatherList OPTIONAL
   )
@@ -56,7 +56,7 @@ Returns:
   VOID                      *BufferPtr;
   EFI_STATUS                Status;
   EFI_HANDLE                FvHandle;
-  UEFI_CAPSULE_HEADER       *CapsuleHeader;
+  EFI_CAPSULE_HEADER        *CapsuleHeader;
 
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
@@ -152,7 +152,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 QueryCapsuleCapabilities (
-  IN  UEFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN  EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
   IN  UINTN                CapsuleCount,
   OUT UINT64               *MaxiumCapsuleSize,
   OUT EFI_RESET_TYPE       *ResetType
@@ -181,7 +181,7 @@ Returns:
 --*/
 {
   UINTN                     ArrayNumber;
-  UEFI_CAPSULE_HEADER       *CapsuleHeader;
+  EFI_CAPSULE_HEADER        *CapsuleHeader;
 
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
