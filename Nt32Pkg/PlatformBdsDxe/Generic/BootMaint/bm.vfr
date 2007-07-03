@@ -21,7 +21,6 @@
 // 
 // --*/
 
-#include "BdsStrDefs.h" 
 #include "formguid.h"
 
 #pragma pack(1)

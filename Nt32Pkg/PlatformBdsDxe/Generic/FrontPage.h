@@ -37,7 +37,6 @@ Revision History
 // This is the VFR compiler generated header file which defines the
 // string identifiers.
 //
-#include "BdsStrDefs.h"
 #define EFI_DISK_DEVICE_CLASS           0x01
 #define EFI_VIDEO_DEVICE_CLASS          0x02
 #define EFI_NETWORK_DEVICE_CLASS        0x04
