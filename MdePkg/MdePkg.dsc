@@ -120,7 +120,9 @@
   ${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   ${WORKSPACE}\MdePkg\Library/UefiScsiLib/UefiScsiLib.inf
   ${WORKSPACE}/MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
-
+  ${WORKSPACE}/MdePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
+  ${WORKSPACE}/MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
+  ${WORKSPACE}/MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
 [Components.IA32]
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf

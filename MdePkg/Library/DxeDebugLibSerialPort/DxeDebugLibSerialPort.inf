@@ -1,0 +1,95 @@
+#/** @file
+# Debug Library for Dxe drivers
+#
+# Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
+# Copyright (c) 2006 - 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeDebugLibSerialPort
+  FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  DebugLib.c
+  CommonHeader.h
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  SerialPortLib
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+  BaseLib
+
+
+################################################################################
+#
+# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFixedAtBuild.common]
+  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid
+  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid
+
+
+################################################################################
+#
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsDynamic.common]
+  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid
+
