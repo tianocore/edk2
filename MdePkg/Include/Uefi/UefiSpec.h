@@ -1424,14 +1424,14 @@ typedef struct {
     EFI_PHYSICAL_ADDRESS  DataBlock;
     EFI_PHYSICAL_ADDRESS  ContinuationPointer;
   } Union;
-} UEFI_CAPSULE_BLOCK_DESCRIPTOR;
+} EFI_CAPSULE_BLOCK_DESCRIPTOR;
 
 typedef struct {
   EFI_GUID          CapsuleGuid;
   UINT32            HeaderSize;
   UINT32            Flags;
   UINT32            CapsuleImageSize;
-} UEFI_CAPSULE_HEADER;
+} EFI_CAPSULE_HEADER;
 
 #define CAPSULE_FLAGS_PERSIST_ACROSS_RESET          0x00010000
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE         0x00020000
