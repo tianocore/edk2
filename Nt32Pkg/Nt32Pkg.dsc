@@ -137,7 +137,7 @@
   PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|$(WORKSPACE)/MdeModulePkg/Library/EdkPciIncompatibleDeviceSupportLib/EdkPciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|$(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  IfrSupportLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf\
+  IfrSupportLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   GraphicsLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
@@ -408,7 +408,7 @@
   $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
   $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
   $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
-  $(WORKSPACE)/Nt32Pkg/MonotonicCounterRuntimeDxe/Metronome.inf
+  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
   $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
   #$(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
