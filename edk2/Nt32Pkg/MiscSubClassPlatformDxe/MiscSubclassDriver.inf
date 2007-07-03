@@ -46,7 +46,6 @@
 ################################################################################
 
 [Sources.common]
-  MiscSubclassDriver.dxs
   MiscPortInternalConnectorDesignatorFunction.c
   MiscSystemSlotDesignationData.c
   MiscSystemOptionStringData.c
