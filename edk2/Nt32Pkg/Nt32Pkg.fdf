@@ -1,13 +1,40 @@
 # This is NT32 FDF file
-# $(BUILD_NUMBER) The number may be specified in the platform description (DSC) file¡¯s [Defines] section, BUILD_NUMBER element. 
 
+################################################################################
+#
+# FD Section
+# The [FD] Section is made up of the definition statements and a 
+# description of what goes into  the Flash Device Image.  Each FD section 
+# defines one flash ¡°device¡± image.  A flash device image may be one of 
+# the following: Removable media bootable image (like a boot floppy 
+# image,) an Option ROM image (that would be ¡°flashed¡± into an add-in 
+# card,) a System ¡°Flash¡±  image (that would be burned into a system¡¯s 
+# flash) or an Update (¡°Capsule¡±) image that will be used to update and 
+# existing system flash.
+#
+################################################################################
 [FD.Fv_Recovery]
-BaseAddress   = 0x0|PcdFdBaseAddress
-Size          = 0x002a0000
+BaseAddress   = 0x0|PcdFdBaseAddress  #The base address of the FLASH Device.
+Size          = 0x002a0000            #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0x2a
 
+################################################################################
+#
+# Following are lists of FD Region layout which correspond to the locations of different 
+# images within the flash device. 
+# 
+# Regions must be defined in ascending order and may not overlap.
+#
+# A Layout Region start with a eight digit hex offset (leading ¡°0x¡± required) followed by 
+# the pipe ¡°|¡± character, followed by the size of the region, also in hex with the leading 
+# ¡°0x¡± characters. Like: 
+# Offset|Size
+# PcdOffsetCName|PcdSizeCName
+# RegionType <FV, DATA, or FILE>
+#
+################################################################################
 0x00000000|0x00280000
 PcdFlashFvRecoveryBase|PcdFlashFvRecoverySize
 FV = FvRecovery
@@ -43,10 +70,18 @@ DATA = {
 0x00290000|0x00010000
 PcdFlashNvStorageFtwSpareBase|PcdFlashNvStorageFtwSpareBase
 
+################################################################################
+#
+# FV Section
+#
+# [FV] section is used to define what components or modules are placed within a flash
+# device file.  This section also defines order the components and modules are positioned
+# within the image.  The [FV] section consists of define statements, set statements and
+# module statements.
+#
+################################################################################
 [FV.FvRecovery]
-BlockSize     = 0x10000
-NumBlocks     = 0x28
-FvAlignment        = 16
+FvAlignment        = 16         #FV alignment and FV attributes setting.    
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -63,6 +98,17 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
+################################################################################
+#
+# The INF statements point to EDK component and EDK II module INF files, which will be placed into this FV image.
+# Parsing tools will scan the INF file to determine the type of component or module.
+# The component or module type is used to reference the standard rules 
+# defined elsewhere in the FDF file.
+#
+# The format for INF statements is:
+# INF $(PathAndInfFileName)
+#
+################################################################################
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 #INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
@@ -77,7 +123,7 @@ INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
 INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
 INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
 INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
-INF  $(WORKSPACE)/Nt32Pkg/MonotonicCounterRuntimeDxe/Metronome.inf
+INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
 INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
 INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
 #INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
@@ -94,7 +140,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
-INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.inf
+INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
@@ -111,6 +157,15 @@ INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser
 #INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
+
+################################################################################
+#
+# FILE statements are provided so that a platform integrator can include 
+# complete EFI FFS files, as well as a method for constructing FFS files 
+# using curly "{}" brace scoping. The following three FILEs are 
+# for binary shell, binary fat and logo module.
+#
+################################################################################
 FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED { 
@@ -133,6 +188,15 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
     } 
   } 
 
+
+################################################################################
+#
+# Rules are use with the [FV] section¡¯s module INF type to define 
+# how an FFS file is created for a given INF file. The following Rule are the default
+# rules for the different module type. User can add the customized rules to define the
+# content of the FFS file.
+#
+################################################################################
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) CheckSum {
     PE32                $(INF_OUTPUT)/$(MODULE_NAME).efi
