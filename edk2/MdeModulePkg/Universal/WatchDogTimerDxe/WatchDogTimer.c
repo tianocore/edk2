@@ -21,24 +21,6 @@ Revision History
 
 --*/
 
-//
-// The package level header files this module uses
-//
-#include <PiDxe.h>
-#include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/ReportStatusCodeLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Protocol/WatchDogTimer.h>
-
 #include "WatchDogTimer.h"
 
 //
@@ -103,13 +85,7 @@ WatchdogTimerDriverExpires (
 
 --*/
 {
-  //
-  // Report error code before exiting
-  //
-  REPORT_STATUS_CODE (
-        EFI_ERROR_CODE | EFI_ERROR_MINOR,
-        (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED)
-        );
+  REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, PcdGet32 (PcdStatusCodeValueEfiWatchDogTimerExpired));
 
   //
   // If a notification function has been registered, then call it
@@ -122,6 +98,7 @@ WatchdogTimerDriverExpires (
   //
   gRT->ResetSystem (EfiResetCold, EFI_TIMEOUT, 0, NULL);
 }
+
 
 EFI_STATUS
 EFIAPI
@@ -288,10 +265,6 @@ Returns:
 {
   EFI_STATUS  Status;
 
-  REPORT_STATUS_CODE (
-        EFI_PROGRESS_CODE,
-        (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_SW_PC_INIT_BEGIN)
-        );
   //
   // Make sure the Watchdog Timer Architectural Protocol is not already installed in the system
   //
@@ -319,11 +292,6 @@ Returns:
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-
-  REPORT_STATUS_CODE (
-        EFI_PROGRESS_CODE,
-        (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_SW_PC_INIT_END)
-        );
 
   return Status;
 }

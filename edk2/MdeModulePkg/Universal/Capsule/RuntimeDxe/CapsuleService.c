@@ -65,19 +65,13 @@ Returns:
   BufferPtr       = NULL;
   CapsuleHeader   = NULL;
 
-  //
-  //Compare GUIDs with EFI_CAPSULE_GUID, if capsule header contains CAPSULE_FLAGS_PERSIST_ACROSS_RESET
-  //and CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flags,whatever the GUID is ,the service supports.
-  //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
-      if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-        return EFI_UNSUPPORTED;
-      }
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+      return EFI_UNSUPPORTED;
     }
   }
 
@@ -193,19 +187,13 @@ Returns:
 
   CapsuleHeader = NULL;
 
-  //
-  //Compare GUIDs with EFI_CAPSULE_GUID, if capsule header contains CAPSULE_FLAGS_PERSIST_ACROSS_RESET
-  //and CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flags,whatever the GUID is ,the service supports.
-  //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
-      if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-        return EFI_UNSUPPORTED;
-      }
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+      return EFI_UNSUPPORTED;
     }
   }
 
@@ -229,3 +217,48 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+EFI_STATUS
+EFIAPI
+CapsuleServiceInitialize (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+/*++
+
+Routine Description:
+
+  This code is capsule runtime service initialization.
+
+Arguments:
+
+  ImageHandle          The image handle
+  SystemTable          The system table.
+
+Returns:
+
+  EFI STATUS
+
+--*/
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  NewHandle;
+
+  SystemTable->RuntimeServices->UpdateCapsule                    = UpdateCapsule;
+  SystemTable->RuntimeServices->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
+
+  //
+  // Now install the Capsule Architectural Protocol on a new handle
+  //
+  NewHandle = NULL;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &NewHandle,
+                  &gEfiCapsuleArchProtocolGuid,
+                  NULL,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}

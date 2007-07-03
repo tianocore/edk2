@@ -19,22 +19,6 @@ Abstract:
 
 --*/
 
-//
-// The package level header files this module uses
-//
-#include <PiPei.h>
-#include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Ppi/BaseMemoryTest.h>
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/PeimEntryPoint.h>
-#include <Library/ReportStatusCodeLib.h>
-
 #include <BaseMemoryTest.h>
 
 static PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
@@ -109,10 +93,7 @@ Returns:
   EFI_PHYSICAL_ADDRESS  TempAddress;
   UINT32                SpanSize;
 
-  REPORT_STATUS_CODE (
-    EFI_PROGRESS_CODE,
-    EFI_COMPUTING_UNIT_MEMORY + EFI_CU_MEMORY_PC_TEST
-    );
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE,  PcdGet32 (PcdStatusCodeValueMemoryTestStarted));
 
   TestPattern = TEST_PATTERN;
   SpanSize    = 0;
@@ -151,10 +132,7 @@ Returns:
   while (TempAddress < BeginAddress + MemoryLength) {
     if ((*(UINT32 *) (UINTN) TempAddress) != TestPattern) {
       *ErrorAddress = TempAddress;
-      REPORT_STATUS_CODE (
-        EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED,
-        EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
-        );
+      REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED, PcdGet32 (PcdStatusCodeValueUncorrectableMemoryError));
 
       return EFI_DEVICE_ERROR;
     }

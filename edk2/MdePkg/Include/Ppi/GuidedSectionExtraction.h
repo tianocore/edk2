@@ -37,13 +37,6 @@
 
 typedef struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI   EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI;
 
-//
-// Bit values for AuthenticationStatus
-//
-#define EFI_AUTH_STATUS_PLATFORM_OVERRIDE   0x01
-#define EFI_AUTH_STATUS_IMAGE_SIGNED        0x02
-#define EFI_AUTH_STATUS_NOT_TESTED          0x04
-#define EFI_AUTH_STATUS_TEST_FAILED         0x08
 
 /**
   The ExtractSection() function processes the input section and

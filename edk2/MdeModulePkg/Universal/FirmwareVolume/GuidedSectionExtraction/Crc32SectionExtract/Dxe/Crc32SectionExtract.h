@@ -23,25 +23,16 @@ Abstract:
 #ifndef _CRC32_GUIDED_SECTION_EXTRACTION_H
 #define _CRC32_GUIDED_SECTION_EXTRACTION_H
 
-//
-// The package level header files this module uses
-//
 #include <PiDxe.h>
-#include <Common/FrameworkFirmwareVolumeImageFormat.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
 #include <Protocol/SecurityPolicy.h>
-#include <Protocol/GuidedSectionExtaction.h>
 #include <Protocol/Crc32GuidedSectionExtraction.h>
-//
-// The Library classes this module consumes
-//
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+
+
 
 typedef struct {
   EFI_GUID_DEFINED_SECTION  GuidedSectionHeader;

@@ -315,6 +315,10 @@
   PcdPciExpressBaseAddress|0x0000000a|gEfiMdePkgTokenSpaceGuid|UINT64|0xE0000000
   PcdFSBClock|0x0000000c|gEfiMdePkgTokenSpaceGuid|UINT32|200000000
   PcdUefiLibMaxPrintBufferSize|0x101|gEfiMdePkgTokenSpaceGuid|UINT32|320
+  PcdStatusCodeValueEfiWatchDogTimerExpired|0x0000000d|gEfiMdePkgTokenSpaceGuid|UINT32|0x00011003   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
+  PcdStatusCodeValueSetVirtualAddressMap|0x0000000e|gEfiMdePkgTokenSpaceGuid|UINT32|0x03101004      # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
+  PcdStatusCodeValueMemoryTestStarted|0x0000000f|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051006         # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
+  PcdStatusCodeValueUncorrectableMemoryError|0x00000010|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051003  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|0x00000006|gEfiMdePkgTokenSpaceGuid|UINT32|0x80000000

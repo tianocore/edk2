@@ -62,15 +62,6 @@
 
 ################################################################################
 #
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
-[Includes]
-
-################################################################################
-#
 # Package Dependency Section - list of Package files that are required for
 #                              this module.
 #
@@ -78,8 +69,8 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 

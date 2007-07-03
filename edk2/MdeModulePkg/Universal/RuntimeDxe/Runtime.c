@@ -51,31 +51,6 @@ Revision History:
 
 --*/
 
-//
-// The package level header files this module uses
-//
-#include <PiDxe.h>
-#include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Protocol/LoadedImage.h>
-#include <Protocol/Runtime.h>
-#include <Protocol/UgaIo.h>
-
-//
-// The Library classes this module consumes
-//
-#include <Library/BaseLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/DebugLib.h>
-#include <Library/ReportStatusCodeLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/CacheMaintenanceLib.h>
-#include <Library/PeCoffLib.h>
-
 #include "Runtime.h"
 
 //
@@ -333,10 +308,7 @@ Returns:
   // check whether in Runtime or not (this is judged by looking at
   // mEfiAtRuntime global So this ReportStatusCode will work
   //
-  REPORT_STATUS_CODE (
-          EFI_PROGRESS_CODE,
-          (EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP)
-          );
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdStatusCodeValueSetVirtualAddressMap));
 
   //
   // Signal all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE events.

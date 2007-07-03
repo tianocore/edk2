@@ -45,26 +45,9 @@
 [Sources.common]
   CapsuleService.h
   CapsuleService.c
-  Capsule.c
-
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -76,54 +59,18 @@
   DxeServicesTableLib
   UefiDriverEntryPoint
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiCapsuleVendorGuid                         # SOMETIMES_CONSUMED
-  gEfiCapsuleGuid
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFeatureFlag.common]
   PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid
-
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFixedAtBuild.common]
   PcdMaxSizeNonPopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
   PcdMaxSizePopulateCapsule|gEfiEdkModulePkgTokenSpaceGuid
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   gEfiVariableArchProtocolGuid
