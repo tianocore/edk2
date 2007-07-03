@@ -297,6 +297,7 @@
   PcdPeiPcdDatabaseGetSizeEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseExEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdNtEmulatorEnable|gEfiEdkModulePkgTokenSpaceGuid|FALSE
 
 #  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
 
@@ -362,6 +363,8 @@
   ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
