@@ -105,7 +105,7 @@
   BaseMemoryLib
   UefiDriverEntryPoint
   UefiLib
-  HiiLib
+  HiiLibFramework
   DebugLib
   BaseLib
 
@@ -118,7 +118,11 @@
 
 [Guids]
   gEfiWinNtMemoryGuid                           # SOMETIMES_CONSUMED
-
+  gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
+  gEfiMiscSubClassGuid                          # SOMETIMES_CONSUMED
+  gEfiMemoryProducerGuid                        # SOMETIMES_CONSUMED
+  gEfiMemorySubClassGuid                        # SOMETIMES_CONSUMED
+  gEfiWinNtMemoryGuid                           # SOMETIMES_CONSUMED
 
 ################################################################################
 #
