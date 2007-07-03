@@ -320,7 +320,7 @@
   $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
   $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
-  #$(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
+  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
