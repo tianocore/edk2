@@ -20,6 +20,7 @@
 // The package level header files this module uses
 //
 #include <PiDxe.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
@@ -46,6 +47,11 @@
 #include <Guid/FlashMapHob.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/LegacyBios.h>
+#include <Common/MaxBbsEntries.h>
+#include <Guid/PcAnsi.h>
+#include <Guid/DataHubRecords.h>
+#include <Protocol/Performance.h>
+
 //
 // The Library classes this module consumes
 //
@@ -68,5 +74,12 @@
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLibFramework.h>
 #include <Library/PeCoffLib.h>
+
+//
+// The rest of the includes
+//
+#include <Common/FirmwareRevision.h>
+
+extern UINT8 PlatformBdsStrings[];
 
 #endif

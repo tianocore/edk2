@@ -35,7 +35,6 @@ EFI_GUID                          gBmGuid = BOOT_MANAGER_GUID;
 
 extern EFI_FORM_BROWSER_PROTOCOL  *gBrowser;
 extern UINT8                      BootManagerVfrBin[];
-extern UINT8                      BdsStrings[];
 extern BOOLEAN                    gConnectAllHappened;
 
 EFI_STATUS
@@ -173,7 +172,7 @@ Returns:
   //
   // Post our VFR to the HII database
   //
-  PackageList = PreparePackages (2, &BmGuid, BootManagerVfrBin, BdsStrings);
+  PackageList = PreparePackages (2, &BmGuid, BootManagerVfrBin, PlatformBdsStrings);
   Status      = Hii->NewPack (Hii, PackageList, &gBootManagerHandle);
   FreePool (PackageList);
 

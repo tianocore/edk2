@@ -66,7 +66,7 @@ Returns:
                           );
   ASSERT (gST->FirmwareVendor != NULL);
 
-  gST->FirmwareRevision = EFI_FIRMWARE_REVISION;
+  gST->FirmwareRevision = FIRMWARE_REVISION;
 
   //
   // Fixup Tasble CRC after we updated Firmware Vendor and Revision
