@@ -30,12 +30,6 @@ Revision History
 #include "CommonHeader.h"
 
 //
-// This is the VFR compiler generated header file which defines the
-// string identifiers.
-//
-#include "BdsStrDefs.h"
-
-//
 // String Definition Guid for BDS Platform
 //
 #define EFI_BDS_PLATFORM_GUID \

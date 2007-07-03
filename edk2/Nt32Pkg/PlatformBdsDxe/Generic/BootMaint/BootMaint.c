@@ -26,7 +26,6 @@ Abstract:
 
 #include "Generic/Bds.h"
 #include "BootMaint.h"
-#include "BdsStrDefs.h"
 #include "formguid.h"
 
 //

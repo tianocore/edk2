@@ -27,7 +27,6 @@ Revision History
 //
 #include "CommonHeader.h"
 
-#include "BdsStrDefs.h"
 #include "Generic/BootMaint/BBSsupport.h"
 
 //
