@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>SecMain</ModuleName>
+    <ModuleType>SEC</ModuleType>
+    <GuidValue>4b837b03-6587-4d19-b82b-edfad836c0a0</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Entry Point of NT32 Emulator</Abstract>
+    <Description>Main executable file of NT32 Emulator that loads PEI core after initialization finished.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>SecMain</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeCoffLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PrintLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename ToolCode="DUMMY">SecMain_build.xml</Filename>
+    <Filename>SecMain.c</Filename>
+    <Filename>FwVol.c</Filename>
+    <Filename>WinNtThunk.c</Filename>
+    <Filename>SecMain.h</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+    <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
+  </PackageDependencies>
+  <PPIs>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>gPeiNtThunkPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>gPeiNtAutoScanPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>gNtFwhPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>gEfiPeiStatusCodePpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>gNtPeiLoadFilePpiGuid</PpiCName>
+    </Ppi>
+  </PPIs>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_PRODUCED">
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
+        the size of PcdWinNtMemorySizeForSecMain in windows platform.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdWinNtFirmwareVolume</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtBootMode</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>This PCD defines the boot mode for simualtor.
+        The boot mode can be set as following value:
+          0x0: Boot with full configuration.
+          0x1: Boot with minimal configuration.
+          0x2: Boot assume no configuration changes.
+          0x3: Boot with full configuration plus diagnostics.
+          0x4: Boot with default settings.
+          0x5: Boot on S4 resume.
+          0x6: Boot on S5 resume.
+          0x10: Boot on S2 resume.
+          0x11: Boot on S3 resume.
+          0x12: Boot on flash update.
+          0x20: Boot in reovery mode.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>
