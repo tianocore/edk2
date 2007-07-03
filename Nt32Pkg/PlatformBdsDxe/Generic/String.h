@@ -21,13 +21,8 @@ Revision History
 
 --*/
 
-#ifndef _STRING_H_
-#define _STRING_H_
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#ifndef _PLATFORMBDS_STRING_H_
+#define _PLATFORMBDS_STRING_H_
 
 //
 // String Definition Guid for BDS Platform

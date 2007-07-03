@@ -48,10 +48,10 @@ BdsLockFv (
 
   BaseAddress = FlashEntry->Base - 0x400000 + 2;
   FvHeader    = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) (FlashEntry->Base));
-  BlockMap    = &(FvHeader->FvBlockMap[0]);
+  BlockMap    = &(FvHeader->BlockMap[0]);
 
-  while ((BlockMap->NumBlocks != 0) && (BlockMap->BlockLength != 0)) {
-    BlockLength = BlockMap->BlockLength;
+  while ((BlockMap->NumBlocks != 0) && (BlockMap->Length != 0)) {
+    BlockLength = BlockMap->Length;
     for (Index = 0; Index < BlockMap->NumBlocks; Index++) {
       CpuIo->Mem.Read (
                   CpuIo,

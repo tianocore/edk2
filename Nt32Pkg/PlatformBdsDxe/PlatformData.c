@@ -27,6 +27,8 @@ Abstract:
 
 #include "Generic/Bds.h"
 #include "BdsPlatform.h"
+#include <Protocol/WinNtThunk.h>
+#include <Protocol/WinNtIo.h>
 
 //
 // Predefined platform default time out value
