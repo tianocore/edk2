@@ -40,6 +40,7 @@ Abstract:
 #undef UNALIGNED
 #undef CONST
 #undef VOID
+#undef DEBUG_EVENT
 
 #include "windows.h"
 
