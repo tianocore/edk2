@@ -316,6 +316,7 @@
   PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
+  PcdMaxPeiPerformanceLogEntries|gEfiEdkModulePkgTokenSpaceGuid|28
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
@@ -332,6 +333,10 @@
 
 [Components.Ia32]
   ${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ${WORKSPACE}/MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  ${WORKSPACE}/MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  ${WORKSPACE}/MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+  ${WORKSPACE}/MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
