@@ -30,6 +30,8 @@ Abstract:
 #ifndef __WIN_NT_THUNK_H__
 #define __WIN_NT_THUNK_H__
 
+#include <Common/WinNtInclude.h>
+
 #define EFI_WIN_NT_THUNK_PROTOCOL_GUID \
   { 0x58c518b1, 0x76f3, 0x11d4, { 0xbc, 0xea, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
