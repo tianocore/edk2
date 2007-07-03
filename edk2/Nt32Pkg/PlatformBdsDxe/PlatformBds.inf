@@ -71,7 +71,7 @@
   Generic/Capsules.c
   Generic/Strings.uni
   Generic/String.c
-  Generic/String.h
+  Generic/BdsString.h
   Generic/Language.c
   Generic/Language.h
   Generic/FrontPageVfr.Vfr

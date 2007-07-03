@@ -26,7 +26,7 @@ Abstract:
 
 #include "bds.h"
 #include "BdsPlatform.h"
-#include "String.h"
+#include "BdsString.h"
 
 //
 // BDS Platform Functions

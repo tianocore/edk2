@@ -27,7 +27,7 @@ Revision History
 #include "CommonHeader.h"
 
 #include "Bds.h"
-#include "String.h"
+#include "BdsString.h"
 #include "Language.h"
 
 EFI_GUID      gBdsStringPackGuid = { 0x7bac95d3, 0xddf, 0x42f3, 0x9e, 0x24, 0x7c, 0x64, 0x49, 0x40, 0x37, 0x9a };

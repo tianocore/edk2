@@ -26,7 +26,7 @@ Revision History
 //
 #include "CommonHeader.h"
 
-#include "String.h"
+#include "BdsString.h"
 #include "Language.h"
 
 #define NARROW_GLYPH_NUMBER 8
