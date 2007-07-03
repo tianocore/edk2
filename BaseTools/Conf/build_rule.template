@@ -118,6 +118,7 @@ $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
 ${END}\t"$(VFRPP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
 \tTrim -VFR $(@D)${sep}${fbase}.i
+\t-mkdir $(DEBUG_DIR)${sep}${fdir} > NUL 2>&1
 \t"$(VFRC)" $(VFRC_FLAGS) -od $(DEBUG_DIR)${sep}${fdir} $(@D)${sep}${fbase}.iii
 \t"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fdir}${sep}${fbase}.c
 ''',
