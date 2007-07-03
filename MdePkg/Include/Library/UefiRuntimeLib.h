@@ -1,14 +1,14 @@
 /** @file
   Library to abstract runtime services
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -32,7 +32,7 @@ extern const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[];
 BOOLEAN
 EFIAPI
 EfiAtRuntime (
-  VOID 
+  VOID
   );
 
 /**
@@ -45,17 +45,17 @@ EfiAtRuntime (
 BOOLEAN
 EFIAPI
 EfiGoneVirtual (
-  VOID 
+  VOID
   );
 
 /**
-  Return current time and date information, and time-keeping 
+  Return current time and date information, and time-keeping
   capabilities of hardware platform.
 
   @param  Time         A pointer to storage to receive a snapshot of the current time.
   @param  Capabilities An optional pointer to a buffer to receive the real time clock device's
                        capabilities.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to e3xecute the function.
 
@@ -71,7 +71,7 @@ EfiGetTime (
   Set current time and date information.
 
   @param  Time         A pointer to cache of time setting.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to execute the function.
 
@@ -88,7 +88,7 @@ EfiSetTime (
   @param  Enabled Indicate if the alarm clock is enabled or disabled.
   @param  Pending Indicate if the alarm signal is pending and requires acknowledgement.
   @param  Time    Current alarm clock setting.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to e3xecute the function.
 
@@ -106,7 +106,7 @@ EfiGetWakeupTime (
 
   @param  Enable Enable or disable current alarm clock..
   @param  Time   Point to alarm clock setting.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to e3xecute the function.
 
@@ -121,15 +121,15 @@ EfiSetWakeupTime (
 /**
   Return value of variable.
 
-  @param  VariableName the name of the vendor's variable, it's a 
+  @param  VariableName the name of the vendor's variable, it's a
                        Null-Terminated Unicode String
   @param  VendorGuid   Unify identifier for vendor.
-  @param  Attributes   Point to memory location to return the attributes of variable. If the point 
+  @param  Attributes   Point to memory location to return the attributes of variable. If the point
                        is NULL, the parameter would be ignored.
   @param  DataSize     As input, point to the maxinum size of return Data-Buffer.
                        As output, point to the actual size of the returned Data-Buffer.
   @param  Data         Point to return Data-Buffer.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to e3xecute the function.
 
@@ -150,14 +150,14 @@ EfiGetVariable (
 
   @param  VariableNameSize As input, point to maxinum size of variable name.
                            As output, point to actual size of varaible name.
-  @param  VariableName     As input, supplies the last VariableName that was returned by 
+  @param  VariableName     As input, supplies the last VariableName that was returned by
                            GetNextVariableName().
-                           As output, returns the name of variable. The name 
+                           As output, returns the name of variable. The name
                            string is Null-Terminated Unicode string.
-  @param  VendorGuid       As input, supplies the last VendorGuid that was returned by 
+  @param  VendorGuid       As input, supplies the last VendorGuid that was returned by
                            GetNextVriableName().
                            As output, returns the VendorGuid of the current variable.
- 
+
   @retval  EFI_SUCCESS  Success to execute the function.
   @retval  !EFI_SUCCESS Failed to e3xecute the function.
 
@@ -173,10 +173,10 @@ EfiGetNextVariableName (
 /**
   Sets value of variable.
 
-  @param  VariableName the name of the vendor's variable, it's a 
+  @param  VariableName the name of the vendor's variable, it's a
                        Null-Terminated Unicode String
   @param  VendorGuid   Unify identifier for vendor.
-  @param  Attributes   Point to memory location to return the attributes of variable. If the point 
+  @param  Attributes   Point to memory location to return the attributes of variable. If the point
                        is NULL, the parameter would be ignored.
   @param  DataSize     The size in bytes of Data-Buffer.
   @param  Data         Point to the content of the variable.
@@ -216,7 +216,7 @@ EfiGetNextHighMonotonicCount (
   @param  ResetType   The type of reset to perform.
   @param  ResetStatus The status code for reset.
   @param  DataSize    The size in bytes of reset data.
-  @param  ResetData   Pointer to data buffer that includes 
+  @param  ResetData   Pointer to data buffer that includes
                       Null-Terminated Unicode string.
 
 **/
@@ -232,8 +232,8 @@ EfiResetSystem (
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
   @param  DebugDisposition   Supplies type information for the pointer being converted.
-  @param  Address            The pointer to a pointer that is to be fixed to be the 
-                             value needed for the new virtual address mapping being 
+  @param  Address            The pointer to a pointer that is to be fixed to be the
+                             value needed for the new virtual address mapping being
                              applied.
 
   @retval  EFI_SUCCESS  Success to execute the function.
@@ -297,14 +297,14 @@ EfiConvertList (
   );
 
 /**
- 
-  Passes capsules to the firmware with both virtual and physical mapping. 
+
+  Passes capsules to the firmware with both virtual and physical mapping.
   Depending on the intended consumption, the firmware may
   process the capsule immediately. If the payload should persist across a
   system reset, the reset value returned from EFI_QueryCapsuleCapabilities must
-  be passed into ResetSystem() and will cause the capsule to be processed by 
+  be passed into ResetSystem() and will cause the capsule to be processed by
   the firmware as part of the reset process.
-  
+
   @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
                                 being passed into update capsule. Each capsules is assumed to
                                 stored in contiguous virtual memory. The capsules in the
@@ -332,14 +332,14 @@ EfiConvertList (
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
-  IN UEFI_CAPSULE_HEADER      **CapsuleHeaderArray,
+  IN EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
   IN UINTN                    CapsuleCount,
   IN EFI_PHYSICAL_ADDRESS     ScatterGatherList
   );
 
 
 /**
- 
+
   The QueryCapsuleCapabilities() function allows a caller to test to see if a capsule or
   capsules can be updated via UpdateCapsule(). The Flags values in the capsule header and
   size of the entire capsule is checked.
@@ -352,7 +352,7 @@ EfiUpdateCapsule (
   CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag set in EFI_CAPSULE_HEADER. The
   firmware sets the policy for what capsules are supported that do not have the
   CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag set.
-  
+
   @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
                                 being passed into update capsule. The capsules are assumed to
                                 stored in contiguous virtual memory.
@@ -373,15 +373,15 @@ EfiUpdateCapsule (
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
-  IN UEFI_CAPSULE_HEADER       **CapsuleHeaderArray,
-  IN UINTN                     CapsuleCount,
+  IN  EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
+  IN  UINTN                    CapsuleCount,
   OUT UINT64                   *MaximumCapsuleSize,
   OUT EFI_RESET_TYPE           *ResetType
   );
 
 
 /**
- 
+
   The QueryVariableInfo() function allows a caller to obtain the information about the
   maximum size of the storage space available for the EFI variables, the remaining size of the storage
   space available for the EFI variables and the maximum size of each individual EFI variable,
@@ -390,15 +390,15 @@ EfiQueryCapsuleCapabilities (
   MaximumVariableSize information may change immediately after the call based on other
   runtime activities including asynchronous error events. Also, these values associated with different
   attributes are not additive in nature.
-  
+
   @param  Attributes            Attributes bitmask to specify the type of variables on
                                 which to return information. Refer to the
                                 GetVariable() function description.
-  @param  MaximumVariableStorageSize  
+  @param  MaximumVariableStorageSize
                                 On output the maximum size of the storage space
                                 available for the EFI variables associated with the
                                 attributes specified.
-  @param  RemainingVariableStorageSize 
+  @param  RemainingVariableStorageSize
                                 Returns the remaining size of the storage space
                                 available for the EFI variables associated with the
                                 attributes specified..
