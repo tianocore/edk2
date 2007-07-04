@@ -236,5 +236,10 @@ typedef struct {
   CHAR16                      VersionString[1];
 } EFI_VERSION_SECTION;
 
+
+#define SECTION_SIZE(SectionHeaderPtr) \
+    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) SectionHeaderPtr)->Size) & 0x00ffffff))
+
+
 #endif
 
