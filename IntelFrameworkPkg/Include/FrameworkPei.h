@@ -22,12 +22,13 @@
 
 #include <PiPei.h>
 
+#include <Framework/Capsule.h>
+#include <Framework/DataHubRecords.h>
 #include <Framework/FirmwareFileSystem.h>
 #include <Framework/FirmwareVolumeImageFormat.h>
 #include <Framework/FirmwareVolumeHeader.h>
 #include <Framework/Hob.h>
 #include <Framework/Legacy16.h>
-#include <Framework/DataHubRecords.h>
 #include <Framework/StatusCode.h>
 #include <Framework/StatusCodeDataTypeId.h>
 
