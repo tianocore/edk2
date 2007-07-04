@@ -21,8 +21,6 @@
 
 #include <Pi/PiMultiPhase.h>
 
-#define EFI_NOT_AVAILABLE_YET   EFIERR (28)
-
 //
 // Handles of EFI FV/FFS.
 // 

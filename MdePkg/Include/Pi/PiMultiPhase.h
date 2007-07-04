@@ -27,6 +27,9 @@
 #include <Pi/PiHob.h>
 #include <Pi/PiDependency.h>
 
+
+#define EFI_NOT_AVAILABLE_YET   EFIERR (32)
+
 //
 // Status Code Type Definition
 //
