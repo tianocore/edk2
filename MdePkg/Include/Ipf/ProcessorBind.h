@@ -1,14 +1,14 @@
 /** @file
   Processor or Compiler specific defines and types for Intel Itanium(TM).
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -28,11 +28,11 @@
 #pragma pack()
 
 
-#if _MSC_EXTENSIONS 
-    
+#if _MSC_EXTENSIONS
+
 //
 // Disable warning that make it impossible to compile at /W4
-// This only works for Microsoft tools. Copied from the 
+// This only works for Microsoft tools. Copied from the
 // IA-32 version of efibind.h
 //
 
@@ -63,7 +63,7 @@
 #pragma warning ( disable : 4127 )
 
 //
-// Can not cast a function pointer to a data pointer. We need to do this on 
+// Can not cast a function pointer to a data pointer. We need to do this on
 // IPF to get access to the PLABEL.
 //
 #pragma warning ( disable : 4514 )
@@ -85,12 +85,12 @@
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
- 
-  #if _MSC_EXTENSIONS 
-    
+
+  #if _MSC_EXTENSIONS
+
 
     //
-    // use Microsoft C complier dependent interger width types 
+    // use Microsoft C complier dependent interger width types
     //
     typedef unsigned __int64    UINT64;
     typedef __int64             INT64;
@@ -104,9 +104,9 @@
     typedef char                CHAR8;
     typedef char                INT8;
   #else
-    #ifdef _EFI_P64 
+    #ifdef _EFI_P64
       //
-      // P64 - is Intel Itanium(TM) speak for pointers being 64-bit and longs and ints 
+      // P64 - is Intel Itanium(TM) speak for pointers being 64-bit and longs and ints
       //  are 32-bits
       //
       typedef unsigned long long  UINT64;
@@ -185,18 +185,18 @@ typedef INT64   INTN;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify thier member functions with EFIAPI.
 //
-#if _MSC_EXTENSIONS 
+#if _MSC_EXTENSIONS
   //
   // Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
-  // 
-  #define EFIAPI __cdecl  
+  //
+  #define EFIAPI __cdecl
 #else
-  #define EFIAPI       
+  #define EFIAPI
 #endif
 
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
-//  if the /OPT:REF linker option is used. We defined a macro as this is a 
+//  if the /OPT:REF linker option is used. We defined a macro as this is a
 //  a non standard extension
 //
 #if _MSC_EXTENSIONS
@@ -204,6 +204,12 @@ typedef INT64   INTN;
 #else
   #define GLOBAL_REMOVE_IF_UNREFERENCED
 #endif
+
+//
+// For IPF boot mode
+//
+#define RECOVERY_CHECK_CALL 0x3
+#define NORMAL_BOOT_CALL    0x0
 
 //
 // A pointer to a function in IPF points to a plabel.
