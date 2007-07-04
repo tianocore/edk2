@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>EdkFvbServiceLib</ModuleName>
@@ -43,7 +43,7 @@
     <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IA32 X64">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
+    <LibraryClass Usage="ALWAYS_CONSUMED" SupArchList="IPF">
       <Keyword>ExtendedSalLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
