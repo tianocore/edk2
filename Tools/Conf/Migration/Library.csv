@@ -2,8 +2,8 @@ R8.5LibClass,R8.5Lib,R9Lib,R9LibClass,Package
 EfiDriverLib,EfiCopyMem,CopyMem,BaseMemoryLib,MdePkg
 EfiDriverLib,EfiSetMem,SetMem,BaseMemoryLib,MdePkg
 EfiDriverLib,EfiZeroMem,ZeroMem,BaseMemoryLib,MdePkg
-EfiDriverLib,EfiLibInstallDriverBinding,R8_EfiLibInstallDriverBinding,%,MdePkg
-EfiDriverLib,EfiLibInstallAllDriverProtocols,R8_EfiLibInstallAllDriverProtocols,%,MdePkg
+EfiDriverLib,EfiLibInstallDriverBinding,EfiLibInstallDriverBinding,UefiLib,MdePkg
+EfiDriverLib,EfiLibInstallAllDriverProtocols,EfiLibInstallAllDriverProtocols,UefiLib,MdePkg
 EfiDriverLib,EfiLibCompareLanguage,R8_EfiLibCompareLanguage,%,MdePkg
 EfiDriverLib,EfiDevicePathSize,GetDevicePathSize,DevicePathLib,MdePkg
 EfiDriverLib,EfiDuplicateDevicePath,DuplicateDevicePath,DevicePathLib,MdePkg
@@ -124,25 +124,25 @@ EfiCommonLib,DEBUG_SET_MEMORY,DEBUG_CLEAR_MEMORY,DebugLib,MdePkg
 EfiCommonLib,EfiDebugAssert,DebugAssert,DebugLib,MdePkg
 EfiCommonLib,EfiDebugPrint,DebugPrint,DebugLib,MdePkg
 EfiCommonLib,EfiDebugVPrint,DebugVPrint,DebugLib,MdePkg
-EfiCommonLib,EFI_D_INIT,EFI_D_INIT,DebugLib,MdePkg
-EfiCommonLib,EFI_D_WARN,EFI_D_WARN,DebugLib,MdePkg
-EfiCommonLib,EFI_D_LOAD,EFI_D_LOAD,DebugLib,MdePkg
-EfiCommonLib,EFI_D_FS,EFI_D_FS,DebugLib,MdePkg
-EfiCommonLib,EFI_D_POOL,EFI_D_POOL,DebugLib,MdePkg
-EfiCommonLib,EFI_D_PAGE,EFI_D_PAGE,DebugLib,MdePkg
-EfiCommonLib,EFI_D_INFO,EFI_D_INFO,DebugLib,MdePkg
-EfiCommonLib,EFI_D_VARIABLE,EFI_D_VARIABLE,DebugLib,MdePkg
-EfiCommonLib,EFI_D_BM,EFI_D_BM,DebugLib,MdePkg
-EfiCommonLib,EFI_D_BLKIO,EFI_D_BLKIO,DebugLib,MdePkg
-EfiCommonLib,EFI_D_NET,EFI_D_NET ,DebugLib,MdePkg
-EfiCommonLib,EFI_D_UNDI,EFI_D_UNDI,DebugLib,MdePkg
-EfiCommonLib,EFI_D_LOADFILE,EFI_D_LOADFILE,DebugLib,MdePkg
-EfiCommonLib,EFI_D_EVENT,EFI_D_EVENT,DebugLib,MdePkg
-EfiCommonLib,EFI_D_ERROR,EFI_D_ERROR,DebugLib,MdePkg
-EfiCommonLib,EFI_D_GENERIC,(EFI_D_ERROR | EFI_D_INIT | EFI_D_WARN | EFI_D_INFO | EFI_D_BLKIO | EFI_D_NET | EFI_D_UNDI),DebugLib,MdePkg
-EfiCommonLib,EFI_D_INTRINSIC,(EFI_D_EVENT | EFI_D_POOL | EFI_D_PAGE | EFI_D_LOAD | EFI_D_BM | EFI_D_VARIABLE),DebugLib,MdePkg
-EfiCommonLib,EFI_D_RESERVED,((EFI_D_ERROR | EFI_D_INIT | EFI_D_WARN | EFI_D_INFO | EFI_D_BLKIO | EFI_D_NET | EFI_D_UNDI) | (EFI_D_EVENT | EFI_D_POOL | EFI_D_PAGE | EFI_D_LOAD | EFI_D_BM | EFI_D_VARIABLE)),DebugLib,MdePkg
-EfiCommonLib,EFI_DBUG_MASK,EFI_D_ERROR,DebugLib,MdePkg
+EfiCommonLib,EFI_D_INIT,DEBUG_INIT,DebugLib,MdePkg
+EfiCommonLib,EFI_D_WARN,DEBUG_WARN,DebugLib,MdePkg
+EfiCommonLib,EFI_D_LOAD,DEBUG_LOAD,DebugLib,MdePkg
+EfiCommonLib,EFI_D_FS,DEBUG_FS,DebugLib,MdePkg
+EfiCommonLib,EFI_D_POOL,DEBUG_POOL,DebugLib,MdePkg
+EfiCommonLib,EFI_D_PAGE,DEBUG_PAGE,DebugLib,MdePkg
+EfiCommonLib,EFI_D_INFO,DEBUG_INFO,DebugLib,MdePkg
+EfiCommonLib,EFI_D_VARIABLE,DEBUG_VARIABLE,DebugLib,MdePkg
+EfiCommonLib,EFI_D_BM,DEBUG_BM,DebugLib,MdePkg
+EfiCommonLib,EFI_D_BLKIO,DEBUG_BLKIO,DebugLib,MdePkg
+EfiCommonLib,EFI_D_NET,DEBUG_NET,DebugLib,MdePkg
+EfiCommonLib,EFI_D_UNDI,DEBUG_UNDI,DebugLib,MdePkg
+EfiCommonLib,EFI_D_LOADFILE,DEBUG_LOADFILE,DebugLib,MdePkg
+EfiCommonLib,EFI_D_EVENT,DEBUG_EVENT,DebugLib,MdePkg
+EfiCommonLib,EFI_D_ERROR,DEBUG_ERROR,DebugLib,MdePkg
+EfiCommonLib,EFI_D_GENERIC,(DEBUG_ERROR | DEBUG_INIT | DEBUG_WARN | DEBUG_INFO | DEBUG_BLKIO | DEBUG_NET | DEBUG_UNDI),DebugLib,MdePkg
+EfiCommonLib,EFI_D_INTRINSIC,(DEBUG_EVENT | DEBUG_POOL | DEBUG_PAGE | DEBUG_LOAD | DEBUG_BM | DEBUG_VARIABLE),DebugLib,MdePkg
+EfiCommonLib,EFI_D_RESERVED,((DEBUG_ERROR | DEBUG_INIT | DEBUG_WARN | DEBUG_INFO | DEBUG_BLKIO | DEBUG_NET | DEBUG_UNDI) | (DEBUG_EVENT | DEBUG_POOL | DEBUG_PAGE | DEBUG_LOAD | DEBUG_BM | DEBUG_VARIABLE)),DebugLib,MdePkg
+EfiCommonLib,EFI_DBUG_MASK,DEBUG_ERROR,DebugLib,MdePkg
 PeiLib,ASPrint,AsciiSPrint,PrintLib,MdePkg
 PeiLib,AvSPrint,AsciiVSPrint,PrintLib,MdePkg
 PeiLib,CompareGuid,CompareGuid,BaseMemoryLib,MdePkg
