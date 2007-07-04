@@ -19,15 +19,15 @@
 //
 // The package level header files this module uses
 //
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 #include <WinNtDxe.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Protocol/Cpu.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/HiiFramework.h>
-#include <Common/DataHubRecords.h>
 #include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo.h>
 #include <Protocol/WinNtIo.h>

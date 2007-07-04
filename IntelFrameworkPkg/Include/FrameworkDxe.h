@@ -21,7 +21,7 @@
 #define _FRAMEWORK_DXE_H_
 
 #include <FrameworkPei.h>
-#include <PiDxe.h>
-#include <Common/FrameworkDxeCis.h>
+
+#include <Framework/DxeCis.h>
 
 #endif

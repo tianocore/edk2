@@ -1,14 +1,14 @@
 /** @file
   This file declares FindFv PPI used to locate FVs that contain PEIMs in PEI
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2007, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  FindFv.h
 
@@ -18,8 +18,10 @@
 
 **/
 
-#ifndef __FIND_FV_H__
-#define __FIND_FV_H__
+#ifndef _FIND_FV_H_
+#define _FIND_FV_H_
+
+#include <FrameworkPei.h>
 
 #define EFI_PEI_FIND_FV_PPI_GUID \
   { \
@@ -29,8 +31,8 @@
 typedef struct _EFI_PEI_FIND_FV_PPI EFI_PEI_FIND_FV_PPI;
 
 /**
-  This interface returns the base address of the firmware volume whose index 
-  was passed in FvNumber.Once this function reports a firmware volume 
+  This interface returns the base address of the firmware volume whose index
+  was passed in FvNumber.Once this function reports a firmware volume
   index/base address pair, that index/address pairing must continue throughout PEI.
 
   @param  PeiServices    Pointer to the PEI Services Table.
@@ -55,7 +57,7 @@ EFI_STATUS
 /**
   @par Ppi Description:
   Hardware mechanisms for locating FVs in a platform vary widely.
-  EFI_PEI_FIND_FV_PPI serves to abstract this variation so that the 
+  EFI_PEI_FIND_FV_PPI serves to abstract this variation so that the
   PEI Foundation can remain standard across a wide variety of platforms.
 
   @param FindFv
