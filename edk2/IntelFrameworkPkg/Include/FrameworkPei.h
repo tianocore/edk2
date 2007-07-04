@@ -23,6 +23,8 @@
 #include <PiPei.h>
 
 #include <Common/FrameworkFirmwareFileSystem.h>
+#include <Common/FrameworkFirmwareVolumeImageFormat.h>
+#include <Common/FrameworkFirmwareVolumeHeader.h>
 #include <Common/FrameworkHob.h>
 #include <Common/FrameworkLegacy16.h>
 #include <Common/DataHubRecords.h>
