@@ -410,7 +410,7 @@ EFI_STATUS
 // DXE Services Table
 //
 #define DXE_SERVICES_SIGNATURE  0x565245535f455844
-#define DXE_SERVICES_REVISION   ((1<<16) | (00)
+#define DXE_SERVICES_REVISION   ((1<<16) | (00))
 
 typedef struct {
   EFI_TABLE_HEADER                Hdr;
