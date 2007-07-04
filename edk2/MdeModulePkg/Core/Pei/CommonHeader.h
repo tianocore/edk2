@@ -15,21 +15,30 @@
 #ifndef __COMMON_HEADER_H_
 #define __COMMON_HEADER_H_
 
-
-//
-// The package level header files this module uses
-//
 #include <PiPei.h>
-#include <IndustryStandard/PeImage.h>
-#include <WinNtPeim.h>
+#include <FrameworkPei.h>
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Ppi/NtPeiLoadFile.h>
+#include <Ppi/DxeIpl.h>
+#include <Ppi/MemoryDiscovered.h>
+#include <Ppi/FindFv.h>
+#include <Ppi/StatusCode.h>
+#include <Ppi/Security.h>
+#include <Ppi/Reset.h>
+#include <Ppi/LoadFile.h>
 //
 // The Library classes this module consumes
 //
-#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PeiCoreEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/HobLib.h>
+#include <Library/PerformanceLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/TimerLib.h>
 
 #endif

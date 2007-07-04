@@ -77,7 +77,10 @@
   PcdLib|${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   PeiServiceLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeCoffGetEntryPointLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  
 [LibraryClasses.common.PEIM]
   HobLib|${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
@@ -373,6 +376,7 @@
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 
 [Components.X64]
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf

@@ -368,3 +368,5 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
   $(WORKSPACE)/Nt32Pkg/Sec/SecMain.inf
+  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
+  

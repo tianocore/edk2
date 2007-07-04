@@ -25,6 +25,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Pi/PiPeiCis.h>
 #include <Uefi/UefiMultiPhase.h>
 
+//
+// BUGBUG: The EFI_PEI_STARTUP_DESCRIPTOR definition does not follows PI specification.
+//         After enabling PI for Nt32Pkg and tools generate correct autogen for PEI_CORE,
+//         the following structure should be removed at once.
+//
+typedef struct {
+  UINTN                   BootFirmwareVolume;
+  UINTN                   SizeOfCacheAsRam;
+  EFI_PEI_PPI_DESCRIPTOR  *DispatchTable;
+} EFI_PEI_STARTUP_DESCRIPTOR;
 
 #endif
 
