@@ -101,6 +101,7 @@
   UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
   DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  PeCoffLoaderLib|${WORKSPACE}/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -376,6 +377,7 @@
   ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 
 [Components.X64]
