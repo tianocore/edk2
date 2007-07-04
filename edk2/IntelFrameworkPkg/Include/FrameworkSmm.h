@@ -21,6 +21,7 @@
 #define _FRAMEWORK_SMM_H_
 
 #include <FrameworkDxe.h>
-#include <Common/FrameworkSmmCis.h>
+
+#include <Framework/SmmCis.h>
 
 #endif

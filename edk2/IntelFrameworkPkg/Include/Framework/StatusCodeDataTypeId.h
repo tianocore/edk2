@@ -21,7 +21,7 @@
 #ifndef __FRAMEWORK_STATUS_CODE_DATA_TYPE_ID_H__
 #define __FRAMEWORK_STATUS_CODE_DATA_TYPE_ID_H__
 
-#include <Common/DataHubRecords.h>
+#include <Framework/DataHubRecords.h>
 #include <Protocol/DebugSupport.h>
 
 ///

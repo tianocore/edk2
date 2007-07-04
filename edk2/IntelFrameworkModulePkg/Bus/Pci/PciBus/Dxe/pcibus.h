@@ -27,9 +27,8 @@ Revision History
 //
 // The package level header files this module uses
 //
-#include <PiDxe.h>
-#include <Common/FrameworkStatusCode.h>
-#include <Common/FrameworkStatusCodeDataTypeId.h>
+#include <FrameworkDxe.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //

@@ -22,7 +22,7 @@
 #define _FRAMEWORK_DXE_CIS_H_
 
 #include <PiDxe.h>
-#include <Common/FrameworkStatusCode.h>
+#include <Framework/StatusCode.h>
 #include <Protocol/StatusCode.h>
 
 //
