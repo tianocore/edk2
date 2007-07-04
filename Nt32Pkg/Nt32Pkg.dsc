@@ -45,6 +45,14 @@
   RELEASE_VS2005PRO_IA32_DLINK_FLAGS          = /ALIGN:4096
   RELEASE_MIXED_IA32_DLINK_FLAGS              = /ALIGN:4096
 
+################################################################################
+#
+# SKU Identification section - list of all SKU IDs supported by this
+#                              Platform.
+#
+################################################################################
+[SkuIds]
+  0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
 ################################################################################
 #
@@ -284,7 +292,7 @@
 #
 ################################################################################
 
-[PcdsDynamic.common]
+[PcdsDynamic.common.DEFAULT]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
