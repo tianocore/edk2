@@ -37,4 +37,7 @@
 #define EFI_LOCAL_AUTH_STATUS_TEST_FAILED           0x080000
 #define EFI_LOCAL_AUTH_STATUS_ALL                   0x0f0000
 
+
+#define EFI_FV_FILETYPE_ALL                         0x00
+
 #endif
