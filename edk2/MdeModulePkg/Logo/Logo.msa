@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>Logo</ModuleName>
+    <ModuleType>BASE</ModuleType>
+    <GuidValue>7BB28B99-61BB-11D5-9A5D-0090273FC14D</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for creating a Logo file.</Abstract>
+    <Description>
+      This module provides the default logo bitmap picture 
+      shown on setup screen, which is correspondig to gEfiDefaultBmpLogoGuid.
+    </Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>true</BinaryModule>
+    <OutputFileBasename>Logo</OutputFileBasename>
+  </ModuleDefinitions>
+  <SourceFiles>
+    <Filename>Logo.bmp</Filename>
+  </SourceFiles>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+  </Externs>
+</ModuleSurfaceArea>
