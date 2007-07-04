@@ -1,0 +1,175 @@
+#/** @file
+# Component description file for DxeMain module.
+#
+# This module provide an DXE CIS compliant implementation of DXE Core.
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeMain
+  FILE_GUID                      = D6A2CB7F-6A18-4e2f-B43B-9920A733700A
+  MODULE_TYPE                    = DXE_CORE
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = DxeMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  Library.h
+  imem.h
+  Image.h
+  hand.h
+  gcd.h
+  FwVolDriver.h
+  FwVolBlock.h
+  Exec.h
+  DxeMain.h
+  DebugImageInfo.h
+  SectionExtraction/CoreSectionExtraction.c
+  Image/ImageFile.c
+  Image/Image.c
+  Misc/DebugImageInfo.c
+  Misc/Stall.c
+  Misc/SetWatchdogTimer.c
+  Misc/InstallConfigurationTable.c
+  Library/Library.c
+  Hand/DriverSupport.c
+  Hand/Notify.c
+  Hand/locate.c
+  Hand/handle.c
+  Gcd/gcd.c
+  Mem/pool.c
+  Mem/Page.c
+  Mem/memdata.c
+  FwVolBlock/FwVolBlock.c
+  FwVol/FwVolWrite.c
+  FwVol/FwVolRead.c
+  FwVol/FwVolAttrib.c
+  FwVol/Ffs.c
+  FwVol/FwVol.c
+  Event/tpl.c
+  Event/timer.c
+  Event/event.c
+  Event/execdata.c
+  Dispatcher/dependency.c
+  Dispatcher/Dispatcher.c
+  DxeMain/DxeProtocolNotify.c
+  DxeMain/DxeMain.c
+  CommonHeader.h
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseMemoryLib
+  CacheMaintenanceLib
+  PeCoffLoaderLib
+  UefiDecompressLib
+  PerformanceLib
+  HobLib
+  BaseLib
+  UefiLib
+  DebugLib
+  DxeCoreEntryPoint
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
+  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
+  gEfiEventMemoryMapChangeGuid                  # ALWAYS_CONSUMED
+  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
+  gEfiEventExitBootServicesGuid                 # ALWAYS_CONSUMED
+  gEfiHobMemoryAllocModuleGuid                  # ALWAYS_CONSUMED
+  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
+  gEfiFirmwareFileSystemGuid                    # ALWAYS_CONSUMED
+  gAprioriGuid                                  # ALWAYS_CONSUMED
+  gEfiDebugImageInfoTableGuid                   # ALWAYS_CONSUMED
+  gEfiHobListGuid                               # ALWAYS_CONSUMED
+  gEfiDxeServicesTableGuid                      # ALWAYS_CONSUMED
+  gEfiMemoryTypeInformationGuid                 # ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL SOMETIMES_CONSUMED
+  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiTianoDecompressProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiCustomizedDecompressProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
+  gEfiDecompressProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadPeImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
+  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiResetArchProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiWatchdogTimerArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiSecurityArchProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiMonotonicCounterArchProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
+  gEfiMetronomeArchProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
+  gEfiPlatformDriverOverrideProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
+  gEfiDriverBindingProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
+  gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
+  gEfiFirmwareVolumeProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
+  gEfiEbcProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSectionExtractionProtocolGuid             # PROTOCOL ALWAYS_PRODUCED

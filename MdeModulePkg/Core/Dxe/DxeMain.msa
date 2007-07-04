@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>DxeMain</ModuleName>
+    <ModuleType>DXE_CORE</ModuleType>
+    <GuidValue>D6A2CB7F-6A18-4e2f-B43B-9920A733700A</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for DxeMain module.</Abstract>
+    <Description>This module provide an DXE CIS compliant implementation of DXE Core.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DxeMain</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DxeCoreEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PerformanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>TianoDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CustomDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>EdkPeCoffLoaderLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CacheMaintenanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DxeMain/DxeMain.c</Filename>
+    <Filename>DxeMain/DxeProtocolNotify.c</Filename>
+    <Filename>Dispatcher/Dispatcher.c</Filename>
+    <Filename>Dispatcher/dependency.c</Filename>
+    <Filename>Event/execdata.c</Filename>
+    <Filename>Event/event.c</Filename>
+    <Filename>Event/timer.c</Filename>
+    <Filename>Event/tpl.c</Filename>
+    <Filename>FwVol/FwVol.c</Filename>
+    <Filename>FwVol/Ffs.c</Filename>
+    <Filename>FwVol/FwVolAttrib.c</Filename>
+    <Filename>FwVol/FwVolRead.c</Filename>
+    <Filename>FwVol/FwVolWrite.c</Filename>
+    <Filename>FwVolBlock/FwVolBlock.c</Filename>
+    <Filename>Mem/memdata.c</Filename>
+    <Filename>Mem/Page.c</Filename>
+    <Filename>Mem/pool.c</Filename>
+    <Filename>Gcd/gcd.c</Filename>
+    <Filename>Hand/handle.c</Filename>
+    <Filename>Hand/locate.c</Filename>
+    <Filename>Hand/Notify.c</Filename>
+    <Filename>Hand/DriverSupport.c</Filename>
+    <Filename>Library/Library.c</Filename>
+    <Filename>Misc/InstallConfigurationTable.c</Filename>
+    <Filename>Misc/SetWatchdogTimer.c</Filename>
+    <Filename>Misc/Stall.c</Filename>
+    <Filename>Misc/DebugImageInfo.c</Filename>
+    <Filename>Image/Image.c</Filename>
+    <Filename>Image/ImageFile.c</Filename>
+    <Filename>SectionExtraction/CoreSectionExtraction.c</Filename>
+    <Filename>DebugImageInfo.h</Filename>
+    <Filename>DxeMain.h</Filename>
+    <Filename>Exec.h</Filename>
+    <Filename>FwVolBlock.h</Filename>
+    <Filename>FwVolDriver.h</Filename>
+    <Filename>gcd.h</Filename>
+    <Filename>hand.h</Filename>
+    <Filename>Image.h</Filename>
+    <Filename>imem.h</Filename>
+    <Filename>Library.h</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiEbcProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiFirmwareVolumeDispatchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiSectionExtractionProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiPlatformDriverOverrideProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiBusSpecificDriverOverrideProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiTimerArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiMetronomeArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiMonotonicCounterArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiBdsArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiSecurityArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiWatchdogTimerArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiRuntimeArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiRealTimeClockArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiResetArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiLoadPeImageProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiCustomizedDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiTianoDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiCapsuleArchProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiMemoryTypeInformationGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiDxeServicesTableGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiHobListGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiDebugImageInfoTableGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gAprioriGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiFirmwareFileSystemGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiFileInfoGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiHobMemoryAllocModuleGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventExitBootServicesGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventVirtualAddressChangeGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventMemoryMapChangeGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventReadyToBootGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiEventLegacyBootGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>DxeMain</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>
