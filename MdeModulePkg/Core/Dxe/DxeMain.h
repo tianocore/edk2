@@ -43,7 +43,7 @@ Revision History
 #include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/Variable.h>
 #include <Guid/MemoryTypeInformation.h>
-#include <Guid/FirmwareFileSystem2.h>
+#include <Guid/FirmwareFileSystem.h>
 #include <Guid/HobList.h>
 #include <Protocol/Timer.h>
 #include <Protocol/SimpleFileSystem.h>
