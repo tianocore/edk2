@@ -112,7 +112,7 @@ typedef struct {
 ///
 /// Firmware Volume Header Revision definition
 ///
-#define EFI_FVH_REVISION  0x01
+#define EFI_FVH_REVISION  0x02
 
 //
 // Extension header pointed by ExtHeaderOffset of volume header.
