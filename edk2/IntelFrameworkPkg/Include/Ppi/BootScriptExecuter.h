@@ -21,7 +21,7 @@
 #ifndef _PEI_BOOT_SCRIPT_EXECUTER_PPI_H_
 #define _PEI_BOOT_SCRIPT_EXECUTER_PPI_H_
 
-#include <FrameworkPei.h>
+#include <PiPei.h>
 
 #define EFI_ACPI_S3_RESUME_SCRIPT_TABLE               0x00
 
