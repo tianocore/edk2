@@ -22,12 +22,6 @@
 
 #include <PiPei.h>
 
-typedef struct {
-  UINTN                   BootFirmwareVolume;
-  UINTN                   SizeOfCacheAsRam;
-  EFI_PEI_PPI_DESCRIPTOR  *DispatchTable;
-} EFI_PEI_STARTUP_DESCRIPTOR;
-
 #include <Common/FrameworkFirmwareFileSystem.h>
 #include <Common/FrameworkHob.h>
 #include <Common/FrameworkLegacy16.h>
