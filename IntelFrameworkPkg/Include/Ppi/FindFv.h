@@ -21,7 +21,7 @@
 #ifndef _FIND_FV_H_
 #define _FIND_FV_H_
 
-#include <FrameworkPei.h>
+#include <PiPei.h>
 
 #define EFI_PEI_FIND_FV_PPI_GUID \
   { \
