@@ -23,7 +23,7 @@ Abstract:
 #ifndef __PE_COFF_LOADER_LIB_H_
 #define __PE_COFF_LOADER_LIB_H_
 
-#include <Protocol/PeiPeCoffLoader.h>
+#include <Guid/PeiPeCoffLoader.h>
 
 EFI_PEI_PE_COFF_LOADER_PROTOCOL*
 EFIAPI
