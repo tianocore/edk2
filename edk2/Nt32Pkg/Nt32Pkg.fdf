@@ -110,6 +110,7 @@ READ_LOCK_STATUS   = TRUE
 #
 ################################################################################
 INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
+INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 #INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
@@ -160,6 +161,8 @@ INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
 INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
 
 ################################################################################
 #

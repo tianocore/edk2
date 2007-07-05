@@ -1,7 +1,7 @@
 #/** @file
-# Component description file for DxeIpl module
+# Component description file for FlashMap PEI module
 #
-# The responsibility of this module is to load the DXE Core from a Firmware Volume. This implementation i used to load a 32-bit DXE Core.
+# This module installs FlashMap PPI which is used to get flash layout information.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,14 +21,14 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeIpl
-  FILE_GUID                      = 86D70125-BAA3-4296-A62F-602BEBBB9081
+  BASE_NAME                      = PeiFlashMap
+  FILE_GUID                      = 681F3771-6F1D-42DE-9AA2-F82BBCDBC5F9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = PeimInitializeDxeIpl
+  ENTRY_POINT                    = PeimInitializeFlashMap
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -43,28 +43,18 @@
 ################################################################################
 
 [Sources.common]
-  DxeIpl.h
-  DxeLoad.c
-  CommonHeader.h
+  FlashMap.c
 
-[Sources.Ia32]
-  Ia32/VirtualMemory.h
-  Ia32/VirtualMemory.c
-  Ia32/DxeLoadFunc.c
-  Ia32/ImageRead.c
 
-[Sources.X64]
-  X64/DxeLoadFunc.c
-  Ia32/ImageRead.c
+################################################################################
+#
+# Includes Section - list of Include locations that are required for
+#                    this module.
+#
+################################################################################
 
-[Sources.IPF]
-  Ipf/DxeLoadFunc.c
-  Ipf/ImageRead.c
-
-[Sources.EBC]
-  X64/DxeLoadFunc.c
-  Ia32/ImageRead.c
-
+[Includes]
+  $(WORKSPACE)/MdePkg/Include/Library
 
 ################################################################################
 #
@@ -74,9 +64,9 @@
 ################################################################################
 
 [Packages]
-  MdePkg/MdePkg.dec  
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  Nt32Pkg/Nt32Pkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 
 ################################################################################
@@ -87,20 +77,10 @@
 ################################################################################
 
 [LibraryClasses]
-  PeCoffLib
   PcdLib
-  MemoryAllocationLib
   BaseMemoryLib
-  PeiServicesTablePointerLib
-  CustomDecompressLib
-  TianoDecompressLib
-  UefiDecompressLib
-  PeCoffLoaderLib
-  CacheMaintenanceLib
-  ReportStatusCodeLib
   PeiServicesLib
   HobLib
-  BaseLib
   PeimEntryPoint
   DebugLib
 
@@ -111,6 +91,10 @@
 #
 ################################################################################
 
+[Guids]
+  gEfiFlashMapHobGuid                           # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
+  gEfiFirmwareFileSystem2Guid                    # ALWAYS_CONSUMED
+
 
 ################################################################################
 #
@@ -120,9 +104,7 @@
 ################################################################################
 
 [Protocols]
-  gEfiCustomizedDecompressProtocolGuid          # PROTOCOL SOMETIMES_PRODUCED
-  gEfiTianoDecompressProtocolGuid               # PROTOCOL SOMETIMES_PRODUCED
-  gEfiDecompressProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
 
 
 ################################################################################
@@ -133,39 +115,21 @@
 ################################################################################
 
 [Ppis]
-  gEfiPeiSecurityPpiGuid                        # PPI SOMETIMES_CONSUMED
-  gEfiPeiSectionExtractionPpiGuid               # PPI SOMETIMES_CONSUMED
-  gEfiPeiS3ResumePpiGuid                        # PPI SOMETIMES_CONSUMED
-  gEfiPeiRecoveryModulePpiGuid                  # PPI SOMETIMES_CONSUMED
-  gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
-  gEfiPeiFvFileLoaderPpiGuid                    # PPI SOMETIMES_PRODUCED
-  gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
-  gEfiPeiPeCoffLoaderGuid                       
+  gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
+  gPeiFlashMapPpiGuid                           # PPI ALWAYS_PRODUCED
 
 
 ################################################################################
 #
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
+# Pcd DYNAMIC - list of PCDs that this module is coded for.
 #
 ################################################################################
 
-[PcdsFeatureFlag.common]
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid
-
-[PcdsFeatureFlag.IA32]
-  PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid
-
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
-
-[Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
+[PcdsDynamic.common]
+  PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
 
