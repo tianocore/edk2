@@ -63,7 +63,7 @@
 [LibraryClasses.common]
   TimerLib|$(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   SerialPortLib|$(WORKSPACE)/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
@@ -88,9 +88,9 @@
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  EdkPeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
   PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
@@ -118,7 +118,7 @@
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  EdkPeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)/Nt32Pkg/Library/PeiNt32OemHookStatusCodeLib/PeiNt32OemHookStatusCodeLib.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
@@ -243,7 +243,7 @@
   PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
   PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
+  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000040
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
   PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid|0x0
@@ -379,9 +379,12 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
   $(WORKSPACE)/Nt32Pkg/Sec/SecMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
-  ${WORKSPACE}/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
+  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
+  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
