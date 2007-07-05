@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>PeiSmbusLib</ModuleName>
     <ModuleType>PEIM</ModuleType>
-    <GuidValue>51C4C059-67F0-4e3c-9A55-FF42A8291C8C</GuidValue>
+    <GuidValue>2A1E1C92-AABA-4d62-AC40-F3A4C3387356</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Pei Smbus Library.</Abstract>
     <Description>SMBUS library that layers on top of the SMBUS PPI.</Description>
@@ -45,7 +45,7 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>gEfiPeiSmbusPpiGuid</PpiCName>
+      <PpiCName>gEfiPeiSmbusPpi2Guid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

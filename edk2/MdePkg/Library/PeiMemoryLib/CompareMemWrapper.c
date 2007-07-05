@@ -34,8 +34,8 @@
   mismatched byte in DestinationBuffer.
   If Length > 0 and DestinationBuffer is NULL and Length > 0, then ASSERT().
   If Length > 0 and SourceBuffer is NULL and Length > 0, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT(). 
-  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
+  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
 
   @param  DestinationBuffer Pointer to the destination buffer to compare.
