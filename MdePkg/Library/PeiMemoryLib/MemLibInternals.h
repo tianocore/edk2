@@ -26,6 +26,18 @@
 #ifndef __MEM_LIB_INTERNALS__
 #define __MEM_LIB_INTERNALS__
 
+//
+// The package level header files this module uses
+//
+#include <PiPei.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/BaseMemoryLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+
 /**
   Copy Length bytes from Source to Destination.
 

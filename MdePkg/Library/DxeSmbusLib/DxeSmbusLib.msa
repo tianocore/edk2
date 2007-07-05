@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>DxeSmbusLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <GuidValue>07720769-A7D0-4a8d-BE41-71CC18EB3338</GuidValue>
+    <GuidValue>4F369FB1-31A7-423c-960E-B3EFD337894F</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Dxe Smbus Library.</Abstract>
     <Description>SMBUS Library that layers on top of the SMBUS Protocol.</Description>
@@ -45,7 +45,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiSmbusProtocolGuid</ProtocolCName>
+      <ProtocolCName>gEfiSmbusHcProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

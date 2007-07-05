@@ -98,16 +98,19 @@
   ${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   ${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   ${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-#  ${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  ${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  #${WORKSPACE}/MdePkg/Library/HiiLib/HiiLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  ${WORKSPACE}/MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   ${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  ${WORKSPACE}/MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
   ${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-#  ${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
+  ${WORKSPACE}/MdePkg/Library/PeiSmbusLibSmbus2/PeiSmbusLib.inf
   ${WORKSPACE}/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   ${WORKSPACE}/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf

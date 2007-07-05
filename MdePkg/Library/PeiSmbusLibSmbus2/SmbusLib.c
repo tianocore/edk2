@@ -2,20 +2,19 @@
 Implementation of SmBusLib class library for PEI phase.
 
 Copyright (c) 2006, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 Module Name: SmbusLib.c
 
 **/
 
-#include <Ppi/Smbus2.h>
 #include "InternalSmbusLib.h"
 
 /**
@@ -190,7 +189,7 @@ SmBusReadDataByte (
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusReadByte, SmBusAddress, 1, &Byte, Status);
-  
+
   return Byte;
 }
 
@@ -229,7 +228,7 @@ SmBusWriteDataByte (
 
   Byte = Value;
   InternalSmBusExec (EfiSmbusWriteByte, SmBusAddress, 1, &Byte, Status);
-  
+
   return Value;
 }
 
@@ -242,7 +241,7 @@ SmBusWriteDataByte (
   If Status is not NULL, then the status of the executed command is returned in Status.
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
-  
+
   @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status          Return status for the executed command.
@@ -264,7 +263,7 @@ SmBusReadDataWord (
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusReadWord, SmBusAddress, 2, &Word, Status);
-  
+
   return Word;
 }
 
@@ -339,7 +338,7 @@ SmBusProcessCall (
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusProcessCall, SmBusAddress, 2, &Value, Status);
-  
+
   return Value;
 }
 
@@ -388,7 +387,7 @@ SmBusReadBlock (
   The SMBUS slave address, SMBUS command, and SMBUS length fields of SmBusAddress are required.
   Bytes are written to the SMBUS from Buffer.
   The number of bytes written is returned, and will never return a value larger than 32-bytes.
-  If Status is not NULL, then the status of the executed command is returned in Status.  
+  If Status is not NULL, then the status of the executed command is returned in Status.
   If Length in SmBusAddress is zero or greater than 32, then ASSERT().
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
