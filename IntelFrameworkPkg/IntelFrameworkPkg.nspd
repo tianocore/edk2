@@ -337,5 +337,10 @@
       <GuidValue>0DE2CE25-446A-45A7-BFC9-37DA26344B37</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="PciCfg">
+      <C_Name>gEfiPciCfgPpiInServiceTableGuid</C_Name>
+      <GuidValue>E1F2EBA0-F7B9-4A26-8620-131221642A90</GuidValue>
+      <HelpText/>
+    </Entry>
   </PpiDeclarations>
 </PackageSurfaceArea>
