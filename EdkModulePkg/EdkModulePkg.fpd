@@ -11754,8 +11754,8 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="556f5d10-7309-4af4-b80a-8196bd60946f" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="36270801-b4db-45ac-a36f-53e674cf0612" PackageGuid="9082e5e9-5651-4a50-8b5d-7f50b387ce7f"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -11840,7 +11840,7 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="36270801-b4db-45ac-a36f-53e674cf0612" PackageGuid="9082e5e9-5651-4a50-8b5d-7f50b387ce7f"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -20409,14 +20409,14 @@
         <Instance ModuleGuid="40096a3a-5c2a-4fbc-aef7-5475dd7ab334" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: UefiLib Path: MdePkg\Library\UefiLib\UefiLib.msa-->
         <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <!--Pkg: EdkModulePkg Mod: EdkDxeSalLib Path: EdkModulePkg\Library\EdkDxeSalLib\EdkDxeSalLib.msa-->
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: BasePrintLib Path: MdePkg\Library\BasePrintLib\BasePrintLib.msa-->
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <!--Pkg: ItaniumPlatformPkg Mod: DxeRuntimeExtendedSalLib Path: R9\ItaniumPlatformPkg\DxeRuntimeExtendedSalLib\DxeRuntimeExtendedSalLib.msa-->
+        <Instance ModuleGuid="36270801-b4db-45ac-a36f-53e674cf0612" PackageGuid="9082e5e9-5651-4a50-8b5d-7f50b387ce7f"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -20620,8 +20620,8 @@
       <Libraries>
         <!--Pkg: EdkModulePkg Mod: EdkUefiRuntimeLib Path: EdkModulePkg\Library\EdkUefiRuntimeLib\EdkUefiRuntimeLib.msa-->
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
-        <!--Pkg: EdkModulePkg Mod: EdkDxeRuntimeSalLib Path: EdkModulePkg\Library\EdkDxeRuntimeSalLib\EdkDxeRuntimeSalLib.msa-->
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: ItaniumPlatformPkg Mod: DxeRuntimeExtendedSalLib Path: R9\ItaniumPlatformPkg\DxeRuntimeExtendedSalLib\DxeRuntimeExtendedSalLib.msa-->
+        <Instance ModuleGuid="36270801-b4db-45ac-a36f-53e674cf0612" PackageGuid="9082e5e9-5651-4a50-8b5d-7f50b387ce7f"/>
         <!--Pkg: MdePkg Mod: UefiBootServicesTableLib Path: MdePkg\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.msa-->
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: UefiDriverModelLib Path: MdePkg\Library\UefiDriverModelLib\UefiDriverModelLib.msa-->
@@ -21626,8 +21626,8 @@
         <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: UefiLib Path: MdePkg\Library\UefiLib\UefiLib.msa-->
         <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <!--Pkg: EdkModulePkg Mod: EdkDxeRuntimeSalLib Path: EdkModulePkg\Library\EdkDxeRuntimeSalLib\EdkDxeRuntimeSalLib.msa-->
-        <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
+        <!--Pkg: ItaniumPlatformPkg Mod: DxeRuntimeExtendedSalLib Path: R9\ItaniumPlatformPkg\DxeRuntimeExtendedSalLib\DxeRuntimeExtendedSalLib.msa-->
+        <Instance ModuleGuid="36270801-b4db-45ac-a36f-53e674cf0612" PackageGuid="9082e5e9-5651-4a50-8b5d-7f50b387ce7f"/>
         <!--Pkg: MdePkg Mod: DxeMemoryAllocationLib Path: MdePkg\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.msa-->
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <!--Pkg: MdePkg Mod: BaseLib Path: MdePkg\Library\BaseLib\BaseLib.msa-->
