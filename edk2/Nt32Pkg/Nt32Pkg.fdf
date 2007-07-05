@@ -109,6 +109,7 @@ READ_LOCK_STATUS   = TRUE
 # INF $(PathAndInfFileName)
 #
 ################################################################################
+INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 #INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
