@@ -82,6 +82,7 @@
   PeiServicesLib|Include/Library/PeiServicesLib.h
   PeimEntryPoint|Include/Library/PeimEntryPoint.h
   PeiCoreEntryPoint|Include/Library/PeiCoreEntryPoint.h
+  OldPeiCoreEntryPoint|Include/Library/OldPeiCoreEntryPoint.h
   PeCoffLib|Include/Library/PeCoffLib.h
   PeCoffGetEntryPointLib|Include/Library/PeCoffGetEntryPointLib.h
   PciSegmentLib|Include/Library/PciSegmentLib.h
@@ -105,7 +106,7 @@
   BaseMemoryLib|Include/Library/BaseMemoryLib.h
   BaseLib|Include/Library/BaseLib.h
   BasePeCoffLib|Include/Library/PeCoffLib.h
-
+  
 ################################################################################
 #
 # Global Guid Definition section - list of Global Guid C Name Data Structures

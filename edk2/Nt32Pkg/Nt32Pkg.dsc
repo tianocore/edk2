@@ -130,6 +130,7 @@
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  OldPeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/OldPeiCoreEntryPoint/OldPeiCoreEntryPoint.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/EdkNt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
  PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -301,7 +302,7 @@
 #
 ################################################################################
 
-[PcdsDynamicDefault.common.DEFAULT]
+[PcdsDynamic.common.DEFAULT]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
@@ -365,7 +366,7 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
 #  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 #  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
+#  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
