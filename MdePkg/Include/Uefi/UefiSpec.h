@@ -318,18 +318,27 @@ EFI_STATUS
 
 
 //
-// These types can be ¡°ORed¡± together as needed ¨C for example,
-// EVT_TIMER might be ¡°Ored¡± with EVT_NOTIFY_WAIT or
+// These types can be ORed together as needed ¨C for example,
+// EVT_TIMER might be Ored with EVT_NOTIFY_WAIT or
 // EVT_NOTIFY_SIGNAL.
 //
 #define EVT_TIMER                         0x80000000
+#define EFI_EVENT_TIMER                   EVT_TIMER
+
 #define EVT_RUNTIME                       0x40000000
+#define EFI_EVENT_RUNTIME                 EVT_RUNTIME
 
 #define EVT_NOTIFY_WAIT                   0x00000100
-#define EVT_NOTIFY_SIGNAL                 0x00000200
-#define EVT_SIGNAL_EXIT_BOOT_SERVICES     0x00000201
-#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE 0x60000202
+#define EFI_EVENT_NOTIFY_WAIT             EVT_NOTIFY_WAIT
 
+#define EVT_NOTIFY_SIGNAL                 0x00000200
+#define EFI_EVENT_NOTIFY_SIGNAL           EVT_NOTIFY_SIGNAL
+
+#define EVT_SIGNAL_EXIT_BOOT_SERVICES     0x00000201
+#define EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES         EVT_SIGNAL_EXIT_BOOT_SERVICES
+
+#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE 0x60000202
+#define EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE     EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
 
 //
 // The event¡¯s NotifyContext pointer points to a runtime memory
