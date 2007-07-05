@@ -147,7 +147,7 @@
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
   PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
 
-[PcdsDynamic.common]
+[PcdsDynamicDefault.common]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
 
