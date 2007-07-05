@@ -1,14 +1,14 @@
 /** @file
   This file declares PciCfg PPI used to access PCI configuration space in PEI
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2007, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is defined in PI
@@ -61,10 +61,10 @@ typedef struct {
 
   @param  This            Pointer to local data for the interface.
 
-  @param  Width           The width of the access. Enumerated in bytes. 
+  @param  Width           The width of the access. Enumerated in bytes.
                           See EFI_PEI_PCI_CFG_PPI_WIDTH above.
 
-  @param  Address         The physical address of the access. The format of 
+  @param  Address         The physical address of the access. The format of
                           the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
 
   @param  Buffer          A pointer to the buffer of data..
@@ -80,7 +80,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG_PPI_IO) (
+(EFIAPI *EFI_PEI_PCI_CFG2_PPI_IO) (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
   IN CONST  EFI_PEI_PCI_CFG_PPI_WIDTH Width,
@@ -92,7 +92,7 @@ EFI_STATUS
 /**
   PCI read-modify-write operation.
 
-  @param  PeiServices     An indirect pointer to the PEI Services Table 
+  @param  PeiServices     An indirect pointer to the PEI Services Table
                           published by the PEI Foundation.
 
   @param  This            Pointer to local data for the interface.
@@ -102,11 +102,11 @@ EFI_STATUS
 
   @param  Address         The physical address of the access.
 
-  @param  SetBits         Points to value to bitwise-OR with the read configuration value. 
+  @param  SetBits         Points to value to bitwise-OR with the read configuration value.
 
                           The size of the value is determined by Width.
 
-  @param  ClearBits       Points to the value to negate and bitwise-AND with the read configuration value. 
+  @param  ClearBits       Points to the value to negate and bitwise-AND with the read configuration value.
                           The size of the value is determined by Width.
 
 
@@ -114,13 +114,13 @@ EFI_STATUS
 
   @retval EFI_DEVICE_ERROR      There was a problem with the transaction.
 
-  @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting 
+  @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting
                                 the operation at this time.
 
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG_PPI_RW) (
+(EFIAPI *EFI_PEI_PCI_CFG2_PPI_RW) (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
   IN CONST  EFI_PEI_PCI_CFG_PPI_WIDTH Width,
@@ -131,7 +131,7 @@ EFI_STATUS
 
 /**
   @par Ppi Description:
-  The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI 
+  The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI
   controllers behind a PCI root bridge controller.
 
   @param Read     PCI read services.  See the Read() function description.
@@ -144,9 +144,9 @@ EFI_STATUS
 
 **/
 struct _EFI_PEI_PCI_CFG2_PPI {
-  EFI_PEI_PCI_CFG_PPI_IO  Read;
-  EFI_PEI_PCI_CFG_PPI_IO  Write;
-  EFI_PEI_PCI_CFG_PPI_RW  Modify;
+  EFI_PEI_PCI_CFG2_PPI_IO  Read;
+  EFI_PEI_PCI_CFG2_PPI_IO  Write;
+  EFI_PEI_PCI_CFG2_PPI_RW  Modify;
   UINT16                  Segment;
 };
 
