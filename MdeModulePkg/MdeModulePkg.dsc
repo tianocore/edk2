@@ -89,13 +89,14 @@
   
 [LibraryClasses.common.PEIM]
   HobLib|${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  PeimEntryPoint|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PcdLib|${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  PeimEntryPoint|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   SmBusLib|${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
