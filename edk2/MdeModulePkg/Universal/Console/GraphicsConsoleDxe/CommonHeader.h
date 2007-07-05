@@ -19,14 +19,29 @@
 //
 // The package level header files this module uses
 //
-#include <PiPei.h>
+#include <PiDxe.h>
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/PeiPeCoffLoader.h>
+#include <Protocol/FrameworkHii.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/DevicePath.h>
 //
 // The Library classes this module consumes
 //
-#include <Library/PeCoffLoaderLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/HiiLibFramework.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+//
+// Driver Binding Externs
+//
+extern EFI_DRIVER_BINDING_PROTOCOL gGraphicsConsoleDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gGraphicsConsoleComponentName;
 
 #endif

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>GraphicsConsole</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>CCCB0C28-4B24-11d5-9A5A-0090273FC14D</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for GraphicsConsole module</Abstract>
+    <Description>This is the main routine for initializing the Graphics Console support routines.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>GraphicsConsole</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
+      <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverModelLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HiiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>GraphicsConsole.h</Filename>
+    <Filename>GraphicsConsole.c</Filename>
+    <Filename>LaffStd.c</Filename>
+    <Filename>ComponentName.h</Filename>
+    <Filename>ComponentName.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiUgaDrawProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiGraphicsOutputProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <HiiPackages>
+    <HiiPackage Usage="ALWAYS_PRODUCED">
+      <HiiCName>FontPack</HiiCName>
+      <HelpText>Register UsStdNarrow Fonts into the global database.</HelpText>
+    </HiiPackage>
+  </HiiPackages>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <DriverBinding>gGraphicsConsoleDriverBinding</DriverBinding>
+      <ComponentName>gGraphicsConsoleComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

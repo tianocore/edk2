@@ -63,12 +63,10 @@
 [LibraryClasses.common]
   TimerLib|$(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  UefiDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/BaseUefiTianoDecompressLib/BaseUefiTianoDecompressLib.inf
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   SerialPortLib|$(WORKSPACE)/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
-  CustomDecompressLib|$(WORKSPACE)/MdeModulePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
   PerformanceLib|$(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
@@ -77,6 +75,8 @@
   GraphicsLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  CustomDecompressLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf   
+  HiiLib|${WORKSPACE}/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -214,6 +214,15 @@
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
+
+[PcdsFeatureFlag.common]
+  PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid|FALSE  
+  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE  
 
 [PcdsPatchableInModule.IA32]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
@@ -369,4 +378,9 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
   $(WORKSPACE)/Nt32Pkg/Sec/SecMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
-  
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+  ${WORKSPACE}/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
