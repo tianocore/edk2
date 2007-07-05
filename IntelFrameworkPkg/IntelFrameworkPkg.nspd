@@ -332,5 +332,10 @@
       <GuidValue>3CDC90C6-13FB-4A75-9E79-59E9DD78B9FA</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="DeviceRecoveryModule">
+      <C_Name>gEfiPeiDeviceRecoveryModulePpiGuid</C_Name>
+      <GuidValue>0DE2CE25-446A-45A7-BFC9-37DA26344B37</GuidValue>
+      <HelpText/>
+    </Entry>
   </PpiDeclarations>
 </PackageSurfaceArea>
