@@ -27,7 +27,7 @@ LIBS = $(LIB_DIR)\BaseDebugLibNull.lib      \
 MSVS_LINK_LIBPATHS =  /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib"
 LINK_FLAGS_EXE = /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG \
                  Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
-CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /Od /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Fp${DEST_DIR_OUTPUT}/AutoGen.h.gch /Yu$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Gm
+CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /Od /DSTRING_ARRAY_NAME=SecMainStrings /FI${DEST_DIR_DEBUG}/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 COMMON_DEPS = $(DEBUG_DIR)\AutoGen.h
 
 all : $(BIN_DIR)\SecMain.exe
