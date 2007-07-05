@@ -361,11 +361,32 @@ public final class ModuleReader implements Common.ForDoAll {
 								.group(1))) {
 					templine = mtrinclude.group();
 				} else {
-					templine = MigrationTool.MIGRATIONCOMMENT
-							+ mtrinclude.group();
-				}
-				mtrinclude.appendReplacement(wholebuffer, templine);
-			}
+                    String line = mtrinclude.group().toLowerCase();
+                    if (line.contains("pal.h")) {
+                        templine = "#include <IndustryStandard/Pal.h>\n";
+                    } else if (line.contains("sal.h")) {
+                        templine = "#include <IndustryStandard/Sal.h>\n";
+                    } else if (line.contains("pci22.h")) {
+                        templine = "#include <IndustryStandard/Pci22.h>\n";
+                    } else if (line.contains("pci23.h")) {
+                        templine = "#include <IndustryStandard/Pci23.h>\n";
+                    } else if (line.contains("pci30.h")) {
+                        templine = "#include <IndustryStandard/Pci30.h>\n";
+                    } else if (line.contains("pci.h")) {
+                        templine = "#include <IndustryStandard/Pci.h>\n";
+                    } else if (line.contains("acpi.h")) {
+                        templine = "#include <IndustryStandard/Acpi.h>\n";
+                    } else if (line.contains("scsi.h")) {
+                        templine = "#include <IndustryStandard/Scsi.h>\n";
+                    } else if (line.contains("usb.h")) {
+                        templine = "#include <IndustryStandard/Usb.h>\n";
+                    } else {
+                        templine = MigrationTool.MIGRATIONCOMMENT
+                                + mtrinclude.group();
+                    }
+                }
+                mtrinclude.appendReplacement(wholebuffer, templine);
+            }
 			mtrinclude.appendTail(wholebuffer);
 			return wholebuffer.toString();
 		}
