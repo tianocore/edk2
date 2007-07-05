@@ -114,7 +114,7 @@
   PerformanceLib
   HobLib
   BaseLib
-  PeiCoreEntryPoint
+  OldPeiCoreEntryPoint
   DebugLib
 
 
