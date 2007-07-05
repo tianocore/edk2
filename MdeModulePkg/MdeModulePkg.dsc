@@ -54,6 +54,11 @@
   PrintLib|${WORKSPACE}/MdePkg/Library/BasePrintLib/BasePrintLib.inf
   TimerLib|${WORKSPACE}/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  EdkPeCoffLoaderLib|${WORKSPACE}/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
+  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  CustomDecompressLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf 
+  HiiLib|${WORKSPACE}/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  
 
 [LibraryClasses.IA32]
   IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -119,6 +124,7 @@
   FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -302,8 +308,18 @@
   PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseExEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
   PcdNtEmulatorEnable|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid|FALSE  
+  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE 
 
 #  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
+
+[PcdsFeatureFlag.IA32]
+  PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid|TRUE
 
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -379,6 +395,13 @@
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+  ${WORKSPACE}/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
 
 [Components.X64]
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf

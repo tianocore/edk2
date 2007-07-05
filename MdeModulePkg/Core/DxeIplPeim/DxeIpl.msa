@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>DxeIpl</ModuleName>
+    <ModuleType>PEIM</ModuleType>
+    <GuidValue>86D70125-BAA3-4296-A62F-602BEBBB9081</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for DxeIpl module</Abstract>
+    <Description>The responsibility of this module is to load the DXE Core from a Firmware Volume.  This implementation i used to load a 32-bit DXE Core.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DxeIpl</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeimEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>ReportStatusCodeLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CacheMaintenanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>EdkPeCoffLoaderLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>TianoDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CustomDecompressLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesTablePointerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeCoffLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DxeLoad.c</Filename>
+    <Filename>DxeIpl.h</Filename>
+    <Filename>DxeIpl.dxs</Filename>
+    <Filename SupArchList="IA32 X64 EBC">Ia32/ImageRead.c</Filename>
+    <Filename SupArchList="IA32">Ia32/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="IA32">Ia32/VirtualMemory.c</Filename>
+    <Filename SupArchList="IA32">Ia32/VirtualMemory.h</Filename>
+    <Filename SupArchList="X64 EBC">X64/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="IPF">Ipf/ImageRead.c</Filename>
+    <Filename SupArchList="IPF">Ipf/DxeLoadFunc.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="SOMETIMES_PRODUCED">
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_PRODUCED">
+      <ProtocolCName>gEfiTianoDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_PRODUCED">
+      <ProtocolCName>gEfiCustomizedDecompressProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <PPIs>
+    <Ppi Usage="SOMETIMES_PRODUCED">
+      <PpiCName>gEfiDxeIplPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_PRODUCED">
+      <PpiCName>gEfiPeiFvFileLoaderPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_PRODUCED">
+      <PpiCName>gEfiEndOfPeiSignalPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">
+      <PpiCName>gEfiPeiRecoveryModulePpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">
+      <PpiCName>gEfiPeiS3ResumePpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">
+      <PpiCName>gEfiPeiSectionExtractionPpiGuid</PpiCName>
+    </Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">
+      <PpiCName>gEfiPeiSecurityPpiGuid</PpiCName>
+    </Ppi>
+  </PPIs>
+  <Guids>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>PeimInitializeDxeIpl</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED" SupArchList="IA32">
+      <C_Name>PcdDxeIplSwitchToLongMode</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL will load a 64-bit DxeCore.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplBuildShareCodeHobs</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If this feature is enabled, DXE IPL will build a series of HOBs to share code with DXE Core.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the EFI Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportTianoDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Tiano Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdDxeIplSupportCustomDecompress</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Custom Compression algorithm</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>

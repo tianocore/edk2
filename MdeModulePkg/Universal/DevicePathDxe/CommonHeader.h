@@ -19,14 +19,26 @@
 //
 // The package level header files this module uses
 //
-#include <PiPei.h>
+#include <PiDxe.h>
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/PeiPeCoffLoader.h>
+#include <Protocol/DevicePathUtilities.h>
+#include <Protocol/DebugPort.h>
+#include <Protocol/DevicePathToText.h>
+#include <Protocol/DevicePathFromText.h>
+#include <Guid/PcAnsi.h>
 //
 // The Library classes this module consumes
 //
-#include <Library/PeCoffLoaderLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PrintLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
 #endif

@@ -1,0 +1,117 @@
+#/** @file
+# Component description file for Terminal module.
+#
+# This driver installs Simple Text In/Out protocol for terminal devices (serial devices or hotplug devices).
+# Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Terminal
+  FILE_GUID                      = 9E863906-A40F-4875-977F-5B93FF237FC6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeTerminal
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gTerminalDriverBinding                       
+#  COMPONENT_NAME                =  gTerminalComponentName                       
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  ComponentName.c
+  vtutf8.c
+  ansi.c
+  TerminalConOut.c
+  TerminalConIn.c
+  Terminal.c
+  Terminal.h
+  CommonHeader.h
+  EntryPoint.c
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec 
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  DevicePathLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  ReportStatusCodeLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiGlobalVariableGuid                        # SOMETIMES_CONSUMED L"ErrOutDev"
+  gEfiVTUTF8Guid                                # SOMETIMES_CONSUMED
+  gEfiVT100Guid                                 # SOMETIMES_CONSUMED
+  gEfiVT100PlusGuid                             # SOMETIMES_CONSUMED
+  gEfiPcAnsiGuid                                # SOMETIMES_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiHotPlugDeviceGuid                         # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSerialIoProtocolGuid                      # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
+
