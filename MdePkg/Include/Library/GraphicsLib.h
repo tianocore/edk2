@@ -18,8 +18,10 @@ Abstract:
  
 --*/
 
-#ifndef _EFI_GRAPHICS_LIB_H_
-#define _EFI_GRAPHICS_LIB_H_
+#ifndef __EFI_GRAPHICS_LIB_H__
+#define __EFI_GRAPHICS_LIB_H__
+
+#include <Protocol/GraphicsOutput.h>
 
 EFI_STATUS
 GetGraphicsBitMapFromFV (
