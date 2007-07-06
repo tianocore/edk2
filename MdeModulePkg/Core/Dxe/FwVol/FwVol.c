@@ -461,7 +461,7 @@ Returns:
     // Check to see that the file system is indeed formatted in a way we can
     // understand it...
     //
-    if (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystemGuid)) {
+    if (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) {
       continue;
     }
 

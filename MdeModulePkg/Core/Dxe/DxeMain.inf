@@ -127,7 +127,7 @@
   gEfiEventExitBootServicesGuid                 # ALWAYS_CONSUMED
   gEfiHobMemoryAllocModuleGuid                  # ALWAYS_CONSUMED
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
-  gEfiFirmwareFileSystemGuid                    # ALWAYS_CONSUMED
+  gEfiFirmwareFileSystem2Guid                   # ALWAYS_CONSUMED
   gAprioriGuid                                  # ALWAYS_CONSUMED
   gEfiDebugImageInfoTableGuid                   # ALWAYS_CONSUMED
   gEfiHobListGuid                               # ALWAYS_CONSUMED
