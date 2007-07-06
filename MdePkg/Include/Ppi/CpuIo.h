@@ -465,6 +465,6 @@ struct _EFI_PEI_CPU_IO_PPI {
   EFI_PEI_CPU_IO_PPI_MEM_WRITE64  MemWrite64;
 };
 
-extern EFI_GUID gEfiPeiCpuIoPpiInServiceTableGuid;
+extern EFI_GUID gEfiPeiCpuIoPpiInstalledGuid;
 
 #endif
