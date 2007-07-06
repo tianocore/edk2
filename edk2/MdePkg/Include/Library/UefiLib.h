@@ -357,6 +357,73 @@ LookupUnicodeString (
   );
 
 /**
+  This function looks up a Unicode string in UnicodeStringTable.
+  If Language is a member of SupportedLanguages and a Unicode
+  string is found in UnicodeStringTable that matches the
+  language code specified by Language, then it is returned in
+  UnicodeString.
+
+  @param  Language                A pointer to the ISO 639-2 or
+                                  RFC 3066 language code for the
+                                  Unicode string to look up and
+                                  return.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2 or RFC 3066 language
+                                  codes that the Unicode string
+                                  table supports. Language must
+                                  be a member of this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string from UnicodeStringTable
+                                  that matches the language
+                                  specified by Language.
+
+  @param  Iso639Language          Specify the language code
+                                  format supported. If true,
+                                  then the format follow ISO
+                                  639-2. If false, then it
+                                  follows RFC3066.
+
+  @retval  EFI_SUCCESS            The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicoide strings
+                                  UnicodeStringTable, and it was
+                                  returned in UnicodeString.
+  
+  @retval  EFI_INVALID_PARAMETER  Language is NULL.
+  
+  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
+  
+  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
+  
+  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
+  
+  @retval  EFI_UNSUPPORTED        The language specified by
+                                  Language is not a member
+                                  ofSupportedLanguages.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not supported by
+                                  UnicodeStringTable.
+
+**/
+EFI_STATUS
+EFIAPI
+LookupUnicodeString2 (
+  IN CONST CHAR8                     *Language,
+  IN CONST CHAR8                     *SupportedLanguages,
+  IN CONST EFI_UNICODE_STRING_TABLE  *UnicodeStringTable,
+  OUT CHAR16                         **UnicodeString,
+  IN BOOLEAN                         Iso639Language
+  )
+;
+
+/**
   This function adds a Unicode string to UnicodeStringTable.
   If Language is a member of SupportedLanguages then UnicodeString is added to 
   UnicodeStringTable.  New buffers are allocated for both Language and 
@@ -396,6 +463,77 @@ AddUnicodeString (
   IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
   IN CONST CHAR16              *UnicodeString
   );
+
+/**
+  
+  This function adds a Unicode string to UnicodeStringTable.
+  If Language is a member of SupportedLanguages then
+  UnicodeString is added to UnicodeStringTable.  New buffers are
+  allocated for both Language and UnicodeString.  The contents
+  of Language and UnicodeString are copied into these new
+  buffers.  These buffers are automatically freed when
+  FreeUnicodeStringTable() is called.
+
+  @param  Language                A pointer to the ISO 639-2 or
+                                  RFC 3066 language code for the
+                                  Unicode string to add.
+  
+  @param  SupportedLanguages      A pointer to the set of ISO
+                                  639-2 or RFC 3.66 language
+                                  codes that the Unicode string
+                                  table supports. Language must
+                                  be a member of this set.
+  
+  @param  UnicodeStringTable      A pointer to the table of
+                                  Unicode strings.
+  
+  @param  UnicodeString           A pointer to the Unicode
+                                  string to add.
+  
+  @param  Iso639Language          Specify the language code
+                                  format supported. If true,
+                                  then the format follow ISO
+                                  639-2. If false, then it
+                                  follows RFC3066.
+
+  @retval EFI_SUCCESS             The Unicode string that
+                                  matches the language specified
+                                  by Language was found in the
+                                  table of Unicode strings
+                                  UnicodeStringTable, and it was
+                                  returned in UnicodeString.
+  
+  @retval EFI_INVALID_PARAMETER   Language is NULL.
+  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
+  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
+  
+  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
+  
+  @retval EFI_ALREADY_STARTED     A Unicode string with language
+                                  Language is already present in
+                                  UnicodeStringTable.
+  
+  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
+                                  add another Unicode string to
+                                  UnicodeStringTable.
+  
+  @retval EFI_UNSUPPORTED         The language specified by
+                                  Language is not a member of
+                                  SupportedLanguages.
+
+**/
+EFI_STATUS
+EFIAPI
+AddUnicodeString2 (
+  IN CONST CHAR8               *Language,
+  IN CONST CHAR8               *SupportedLanguages,
+  IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
+  IN CONST CHAR16              *UnicodeString,
+  IN BOOLEAN                   Iso639Language
+  )
+;
 
 /**
   This function frees the table of Unicode strings in UnicodeStringTable.

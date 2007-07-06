@@ -1,5 +1,5 @@
 /** @file
-  PEI Services Table Pointer Library.
+  Internal Header file for PEI Services Table Pointer Library.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,37 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  PeiServicesTablePointer.c
-
 **/
 
-#include <PiPei.h>
-#include <Library/PeiServicesTablePointerLib.h>
-#include <Library/DebugLib.h>
-
-#include "PeiServicesTablePointerInternal.h"
-
-static EFI_PEI_SERVICES  **gPeiServices;
-
-/**
-  The function returns the pointer to PEI services.
-
-  The function returns the pointer to PEI services.
-  It will ASSERT() if the pointer to PEI services is NULL.
-
-  @retval  The pointer to PeiServices.
-
-**/
-EFI_PEI_SERVICES **
-GetPeiServicesTablePointer (
-  VOID
-  )
-{
-  ASSERT (gPeiServices != NULL);
-  return gPeiServices;
-}
-
-
+#ifndef _PEI_SERVICE_TABLE_POINTER_INTERNAL_H_
+#define _PEI_SERVICE_TABLE_POINTER_INTERNAL_H_
 /**
   The constructor function caches the pointer to PEI services.
   
@@ -59,7 +32,5 @@ PeiServicesTablePointerLibConstructor (
   IN EFI_FFS_FILE_HEADER  *FfsHeader,
   IN EFI_PEI_SERVICES     **PeiServices
   )
-{
-  gPeiServices = PeiServices;
-  return EFI_SUCCESS;
-}
+;
+#endif

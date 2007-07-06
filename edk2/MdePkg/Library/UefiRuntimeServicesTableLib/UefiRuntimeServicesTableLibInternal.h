@@ -1,5 +1,5 @@
 /** @file
-  UEFI Runtime Services Table Library.
+  Internal Header file for UEFI Runtime Services Table Library.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,27 +10,11 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  UefiRuntimeServicesTableLib.c
-
 **/
 
-//
-// The package level header files this module uses
-//
-#include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-//
-// The Library classes this module consumes
-//
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DebugLib.h>
 
-#include "UefiRuntimeServicesTableLibInternal.h"
-
-EFI_RUNTIME_SERVICES  *gRT = NULL;
-
+#ifndef _UEFI_RUNTIME_SERVICES_TABLE_LIB_INTERNAL_H_
+#define _UEFI_RUNTIME_SERVICES_TABLE_LIB_INTERNAL_H_
 /**
   The constructor function caches the pointer of Runtime Services Table.
 
@@ -50,11 +34,6 @@ UefiRuntimeServicesTableLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-{
-  //
-  // Cache pointer to the EFI Runtime Services Table
-  //
-  gRT = SystemTable->RuntimeServices;
-  ASSERT (gRT != NULL);
-  return EFI_SUCCESS;
-}
+;
+#endif
+
