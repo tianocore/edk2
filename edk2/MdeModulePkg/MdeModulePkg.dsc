@@ -347,7 +347,7 @@
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdMaxPeiPerformanceLogEntries|gEfiEdkModulePkgTokenSpaceGuid|28
   PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid|0x0
-  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiEdkModulePkgTokenSpaceGuid|0x08
+  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
   PcdStatusCodeValueEfiWatchDogTimerExpired|gEfiMdePkgTokenSpaceGuid|0x00011003   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
   PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid|0x00051006         # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004      # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
