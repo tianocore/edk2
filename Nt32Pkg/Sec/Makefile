@@ -74,13 +74,18 @@ $(OUTPUT_DIR)\.\SecMain.obj : $(MODULE_DIR)\SecMain.c
 	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(MODULE_DIR)\SecMain.c
 	
 clean:
-  - @if exist $(DEBUG_DIR)\AutoGen.c del $(DEBUG_DIR)\AutoGen.c > NUL
-  del $(DEBUG_DIR)\AutoGen.h > NUL
-  del $(OUTPUT_DIR)\.\*.obj > NUL
-  del $(MODULE_BUILD_DIR)\makefile > NUL
-  del $(MODULE_BUILD_DIR)\*.idb > NUL
-  del $(MODULE_BUILD_DIR)\*.pdb > NUL
-  del $(BIN_DIR)\SecMain.exe > NUL
-  del $(BIN_DIR)\SecMain.pdb > NUL
+#  - @if exist $(DEBUG_DIR)\AutoGen.c del $(DEBUG_DIR)\AutoGen.c > NUL
+#  - @if exist $(DEBUG_DIR)\AutoGen.h del $(DEBUG_DIR)\AutoGen.h > NUL
+#  - @if exist $(OUTPUT_DIR)\.\*.obj del $(OUTPUT_DIR)\.\*.obj > NUL
+#  - @if exist $(MODULE_BUILD_DIR)\makefile del $(MODULE_BUILD_DIR)\makefile > NUL
+#  - @if exist $(MODULE_BUILD_DIR)\*.idb del $(MODULE_BUILD_DIR)\*.idb > NUL
+#  - @if exist $(MODULE_BUILD_DIR)\*.pdb del $(MODULE_BUILD_DIR)\*.pdb > NUL
+#  - @if exist $(BIN_DIR)\SecMain.exe del $(BIN_DIR)\SecMain.exe > NUL
+#  - @if exist $(BIN_DIR)\SecMain.pdb del $(BIN_DIR)\SecMain.pdb > NUL
+  - @rmdir /s /q $(OUTPUT_DIR) > NUL 2>&1
+  
+cleanall:
+  - @rmdir /s /q $(OUTPUT_DIR) $(DEBUG_DIR) > NUL 2>&1
+	- @del /f /q *.pdb *.idb > NUL 2>&1
   
   
