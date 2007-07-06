@@ -83,6 +83,11 @@
       <GuidValue>64a892dc-5561-4536-92c7-799bfc183355</GuidValue>
       <HelpText>Provide interface to manage the ISA device resource.</HelpText>
     </Entry>
+    <Entry Name="Ps2Policy">
+      <C_Name>gEfiPs2PolicyProtocolGuid</C_Name>
+      <GuidValue>4DF19259-DC71-4D46-BEF1-357BB578C418</GuidValue>
+      <HelpText/>
+    </Entry>
   </ProtocolDeclarations>
   <PcdDeclarations>
     <PcdEntry>
