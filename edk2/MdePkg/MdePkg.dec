@@ -107,6 +107,9 @@
   BaseLib|Include/Library/BaseLib.h
   BasePeCoffLib|Include/Library/PeCoffLib.h
   
+[LibraryClasses.IPF]
+  SalLib|Include/Library/SalLib.h
+
 ################################################################################
 #
 # Global Guid Definition section - list of Global Guid C Name Data Structures
