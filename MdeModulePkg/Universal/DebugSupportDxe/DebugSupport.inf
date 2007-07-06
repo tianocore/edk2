@@ -118,7 +118,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.IA32]
-  PcdNtEmulatorEnable|gEfiEdkModulePkgTokenSpaceGuid
+  PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################

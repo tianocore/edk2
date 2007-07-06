@@ -110,7 +110,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdDxePcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdDxePcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################
@@ -120,7 +120,7 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid
+  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################

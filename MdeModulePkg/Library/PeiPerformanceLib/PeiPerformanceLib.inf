@@ -101,5 +101,5 @@
 ################################################################################
 
 [PcdsDynamic.common]
-  PcdMaxPeiPerformanceLogEntries|gEfiEdkModulePkgTokenSpaceGuid
+  PcdMaxPeiPerformanceLogEntries|gEfiMdeModulePkgTokenSpaceGuid
 
