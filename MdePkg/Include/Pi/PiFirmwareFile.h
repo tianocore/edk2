@@ -18,6 +18,7 @@
 #ifndef __PI_FIRMWARE_FILE_H__
 #define __PI_FIRMWARE_FILE_H__
 
+#pragma pack(1)
 //
 // Used to verify the integrity of the file.
 // 
@@ -224,6 +225,7 @@ typedef struct {
 #define SECTION_SIZE(SectionHeaderPtr) \
     ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) SectionHeaderPtr)->Size) & 0x00ffffff))
 
+#pragma pack()
 
 #endif
 
