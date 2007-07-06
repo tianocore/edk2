@@ -125,12 +125,12 @@
   PcdPeiPcdDatabaseGetSizeEnabled|0x00010031|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdPeiPcdDatabaseCallbackOnSetEnabled|0x00010032|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdPeiPcdDatabaseExEnabled|0x00010033|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdDxeIplSupportEfiDecompress|0x00010034|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdDxeIplSupportTianoDecompress|0x00010035|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdDxeIplSupportCustomDecompress|0x00010036|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportEfiDecompress|0x00010034|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportTianoDecompress|0x00010035|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxeIplSupportCustomDecompress|0x00010036|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdDevicePathSupportDevicePathToText|0x00010037|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdDevicePathSupportDevicePathFromText|0x00010038|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdDxeIplBuildShareCodeHobs|0x0001003c|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDxeIplBuildShareCodeHobs|0x0001003c|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdNtEmulatorEnable|0x0001003e|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
 
 [PcdsFixedAtBuild.common]

@@ -93,7 +93,7 @@
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  PeCoffLoaderLib|$(WORKSPACE)/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/MdeModulePkg/Library/DxePeCoffLoaderFromHobLib/DxePeCoffLoaderFromHobLib.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
@@ -231,11 +231,11 @@
 [PcdsFeatureFlag.common]
   PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
   PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid|FALSE  
-  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE  
+  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|TRUE  
+  PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE  
 
 [PcdsPatchableInModule.IA32]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
@@ -276,7 +276,7 @@
   PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|TRUE  
   PcdDxePcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid|TRUE
   PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdStatusCodeUseEfiSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE

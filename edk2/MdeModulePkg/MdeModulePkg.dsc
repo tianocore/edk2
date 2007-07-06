@@ -312,11 +312,11 @@
   PcdNtEmulatorEnable|gEfiEdkModulePkgTokenSpaceGuid|FALSE
   PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
   PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid|FALSE  
-  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid|TRUE 
+  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|FALSE  
+  PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE 
 
 #  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
 
