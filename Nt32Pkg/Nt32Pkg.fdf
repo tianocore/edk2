@@ -111,6 +111,7 @@ READ_LOCK_STATUS   = TRUE
 ################################################################################
 INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 #INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
@@ -137,7 +138,6 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf

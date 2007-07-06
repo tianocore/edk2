@@ -43,6 +43,8 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
-
+#include <Library/HobLib.h>
+#include <Common/FlashMap.h>
+#include <Guid/FlashMapHob.h>
 
 #endif

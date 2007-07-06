@@ -82,7 +82,10 @@
   DxeServicesTableLib
   UefiDriverEntryPoint
   PcdLib
+  HobLib
 
+[Guids]
+  gEfiFlashMapHobGuid
 
 ################################################################################
 #
