@@ -146,7 +146,6 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
@@ -184,7 +183,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
 #FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
 #    SECTION COMPRESS PI_STD {
 #      SECTION GUIDED {
-#        SECTION PE32 = FatBinPkg/Fat/Ia32/Fat.efi
+#        SECTION PE32 = EdkFatBinPkg/Ia32/Fat.efi
 #      }
 #    }
 #  }
