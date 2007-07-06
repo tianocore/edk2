@@ -2328,7 +2328,7 @@ WriteConfigData (
           //
           UpdateConfigData (PciDeviceInfo, PCI_REGISTER_READ, AccessWidth, AccessAddress & 0xff, &Data);
 
-          Shift = (UINTN) ((Address - AccessAddress) * 8);
+          Shift = (UINTN)(Address - AccessAddress) * 8;
           switch (Width) {
           case EfiPciWidthUint8:
             Data = (* (UINT8 *) Buffer) << Shift | (Data & ~(0xff << Shift));
@@ -2342,7 +2342,7 @@ WriteConfigData (
           //
           // check data write incompatibility
           //
-          UpdateConfigData (PciDeviceInfo, PCI_REGISTER_WRITE, AccessWidth, AccessAddress * 0xff, &Data);
+          UpdateConfigData (PciDeviceInfo, PCI_REGISTER_WRITE, AccessWidth, MultU64x32 (AccessAddress, 0xff), &Data);
         }
 
         if (PciRootBridgeIo != NULL) {
