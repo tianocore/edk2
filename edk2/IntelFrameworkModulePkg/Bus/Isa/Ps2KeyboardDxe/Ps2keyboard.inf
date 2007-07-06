@@ -1,0 +1,108 @@
+#/** @file
+# Ps2 Keyboard Driver
+#
+# This dirver directly uses IsaIo protocol service to support KeyBoard work.
+# Copyright (c) 2006 - 2007, Intel Corporation.
+#
+#  All rights reserved.
+#  This software and associated documentation (if any) is furnished
+#  under a license and may only be used or copied in accordance
+#  with the terms of the license. Except as permitted by such
+#  license, no part of this software or documentation may be
+#  reproduced, stored in a retrieval system, or transmitted in any
+#  form or by any means without the express written consent of
+#  Intel Corporation.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ps2Keyboard
+  FILE_GUID                      = 3DC82376-637B-40a6-A8FC-A565417F2C38
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializePs2Keyboard
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gKeyboardControllerDriver
+#  COMPONENT_NAME                =  gPs2KeyboardComponentName
+#  Create Event Guid C Name:  Event Type: EVENT_TYPE_RELATIVE_TIMER
+#  Create Event Guid C Name:  Event Type: EVENT_TYPE_PERIODIC_TIMER
+#
+#  Signal Event Guid C Name:  Event Type: EVENT_TYPE_PERIODIC_TIMER
+#
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  ComponentName.c
+  Ps2Keyboard.h
+  Ps2KbdCtrller.c
+  Ps2KbdTextIn.c
+  Ps2Keyboard.c
+  CommonHeader.h
+  EntryPoint.c
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiPs2PolicyProtocolGuid                     # PROTOCOL TO_START
+  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
