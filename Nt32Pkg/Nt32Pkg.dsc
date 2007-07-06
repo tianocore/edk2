@@ -68,14 +68,14 @@
   BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
   PerformanceLib|$(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  PciIncompatibleDeviceSupportLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
+  PciIncompatibleDeviceSupportLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|$(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   IfrSupportLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   GraphicsLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  CustomDecompressLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf   
-  HiiLib|${WORKSPACE}/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  CustomDecompressLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf   
+  HiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   
 [LibraryClasses.common.BASE]
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -85,7 +85,7 @@
 
 [LibraryClasses.common.DXE_CORE]
   DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  UefiDecompressLib|$(WORKSPACE)/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   DxeCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
@@ -386,7 +386,7 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
+  #$(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
@@ -407,7 +407,8 @@
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
-
+  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
+  
 [BuildOptions]
 	MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
 	MSFT:RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
