@@ -349,6 +349,7 @@
 [Components.IA32]
   $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
@@ -373,7 +374,6 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
