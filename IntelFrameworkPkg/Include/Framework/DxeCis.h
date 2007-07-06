@@ -91,14 +91,4 @@ typedef struct {
 } FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
 
-//
-// Function prototype for invoking a function on an Application Processor
-// Used by both the SMM infrastructure and the MP Services Protocol
-//
-typedef
-VOID
-(EFIAPI *EFI_AP_PROCEDURE) (
-  IN  VOID                              *Buffer
-  );
-
 #endif
