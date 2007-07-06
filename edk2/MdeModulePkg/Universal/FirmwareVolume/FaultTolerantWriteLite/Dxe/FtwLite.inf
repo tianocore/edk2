@@ -88,7 +88,7 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
-
+  HobLib
 
 ################################################################################
 #
@@ -98,7 +98,7 @@
 
 [Guids]
   gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
-
+  gEfiFlashMapHobGuid
 
 ################################################################################
 #
@@ -125,10 +125,10 @@
 ################################################################################
 
 [PcdsDynamic.common]
-  PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwWorkingBase|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
 
 ################################################################################
 #

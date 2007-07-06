@@ -138,22 +138,44 @@ EFI_DRIVER_BINDING_PROTOCOL           gWinNtBusDriverBinding = {
   NULL
 };
 
-#define NT_PCD_ARRAY_SIZE (sizeof(mPcdEnvironment)/sizeof(NT_PCD_ENTRY))
+#define NT_PCD_ARRAY_SIZE (sizeof(mPcdEnvironment)/sizeof(NT_ENVIRONMENT_VARIABLE_ENTRY))
+
+//
+// BUGBUG: Because currently the new build tools does not support dynamic PCD 
+//         following dynamic PCd will be hard code. After tools ready, we should
+//         use dynmanic PCD AQAP.
+//
 
 //
 // Table to map NT Environment variable to the GUID that should be in
 // device path.
 //
-static NT_PCD_ENTRY  mPcdEnvironment[] = {
-  PcdToken(PcdWinNtConsole),       &gEfiWinNtConsoleGuid,
-  PcdToken(PcdWinNtGop),           &gEfiWinNtGopGuid,
-  PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,
-  PcdToken(PcdWinNtFileSystem),    &gEfiWinNtFileSystemGuid,
-  PcdToken(PcdWinNtVirtualDisk),   &gEfiWinNtVirtualDisksGuid,
-  PcdToken(PcdWinNtPhysicalDisk),  &gEfiWinNtPhysicalDisksGuid,
-  PcdToken(PcdWinNtCpuModel),      &gEfiWinNtCPUModelGuid,
-  PcdToken(PcdWinNtCpuSpeed),      &gEfiWinNtCPUSpeedGuid,
-  PcdToken(PcdWinNtMemorySize),    &gEfiWinNtMemoryGuid
+//static NT_PCD_ENTRY  mPcdEnvironment[] = {
+//  PcdToken(PcdWinNtConsole),       &gEfiWinNtConsoleGuid,
+//  PcdToken(PcdWinNtGop),           &gEfiWinNtGopGuid,
+//  PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,
+//  PcdToken(PcdWinNtFileSystem),    &gEfiWinNtFileSystemGuid,
+//  PcdToken(PcdWinNtVirtualDisk),   &gEfiWinNtVirtualDisksGuid,
+//  PcdToken(PcdWinNtPhysicalDisk),  &gEfiWinNtPhysicalDisksGuid,
+//  PcdToken(PcdWinNtCpuModel),      &gEfiWinNtCPUModelGuid,
+//  PcdToken(PcdWinNtCpuSpeed),      &gEfiWinNtCPUSpeedGuid,
+//  PcdToken(PcdWinNtMemorySize),    &gEfiWinNtMemoryGuid
+//};
+typedef struct {
+  CHAR16    *Variable;
+  EFI_GUID  *DevicePathGuid;
+} NT_ENVIRONMENT_VARIABLE_ENTRY;
+
+static NT_ENVIRONMENT_VARIABLE_ENTRY  mPcdEnvironment[] = {
+  L"Bus Driver Console Window",         &gEfiWinNtConsoleGuid,
+  L"UGA Window 1!UGA Window 2",         &gEfiWinNtGopGuid,
+  L"COM1!COM2",      			&gEfiWinNtSerialPortGuid,
+  L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps",      &gEfiWinNtFileSystemGuid,
+  L"FW;40960;512",    			&gEfiWinNtVirtualDisksGuid,
+  L"E:RW;245760;512",   		&gEfiWinNtPhysicalDisksGuid,
+  L"Intel(R) Processor Model",        	&gEfiWinNtCPUModelGuid,
+  L"3000",        			&gEfiWinNtCPUSpeedGuid,
+  L"64!64",                             &gEfiWinNtMemoryGuid
 };
 
 /**
@@ -430,7 +452,8 @@ Returns:
   //
   InstallStatus   = EFI_NOT_FOUND;
   for (Index = 0; Index < NT_PCD_ARRAY_SIZE; Index++) {
-    PcdTempStr = (VOID *)LibPcdGetPtr (mPcdEnvironment[Index].Token);
+    //PcdTempStr = (VOID *)LibPcdGetPtr (mPcdEnvironment[Index].Token);
+    PcdTempStr = mPcdEnvironment[Index].Variable;
     ASSERT (PcdTempStr != NULL);
 
     TempStrSize = StrLen (PcdTempStr);
