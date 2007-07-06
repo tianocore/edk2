@@ -36,6 +36,20 @@
 // IA-32 version of efibind.h
 //
 
+#if __INTEL_COMPILER
+//
+// Disable ICC's error #1418: external function definition with no prior declaration
+//
+#pragma warning ( disable : 1418 )
+
+
+//
+// Disable ICC's error #1419: external declaration in primary source file
+//
+#pragma warning ( disable : 1419 )
+
+#endif
+
 //
 // Disabling bitfield type checking warnings.
 //
