@@ -173,3 +173,5 @@
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
+[depex]
+  gEfiHiiProtocolGuid
