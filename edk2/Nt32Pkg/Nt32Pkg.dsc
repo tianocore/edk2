@@ -237,8 +237,8 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
-  PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid|FALSE
+  PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|TRUE  
   PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
@@ -311,7 +311,7 @@
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
-  PcdSupportUpdateCapsuleRest|gEfiEdkModulePkgTokenSpaceGuid|FALSE
+  PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
