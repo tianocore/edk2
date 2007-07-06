@@ -28,27 +28,28 @@
 #pragma pack()
 
 
-#if _MSC_EXTENSIONS
-
-//
-// Disable warning that make it impossible to compile at /W4
-// This only works for Microsoft tools. Copied from the
-// IA-32 version of efibind.h
-//
-
 #if __INTEL_COMPILER
 //
-// Disable ICC's error #1418: external function definition with no prior declaration
+// Disable ICC's remark #1418: external function definition with no prior declaration.
+// This is legal ANSI C code so we disable the remark that is turned on with /W4
 //
 #pragma warning ( disable : 1418 )
 
 
 //
-// Disable ICC's error #1419: external declaration in primary source file
+// Disable ICC's remark #1419: external declaration in primary source file
+// This is legal ANSI C code so we disable the remark that is turned on with /W4
 //
 #pragma warning ( disable : 1419 )
 
 #endif
+
+
+#if _MSC_EXTENSIONS
+//
+// Disable warning that make it impossible to compile at /W4
+// This only works for Microsoft tools. 
+//
 
 //
 // Disabling bitfield type checking warnings.
