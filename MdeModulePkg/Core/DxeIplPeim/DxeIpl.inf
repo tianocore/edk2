@@ -150,10 +150,10 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdDxeIplSupportCustomDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplSupportTianoDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplSupportEfiDecompress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDxeIplBuildShareCodeHobs|gEfiEdkModulePkgTokenSpaceGuid
+  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid
+  PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid
+  PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid
+  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid
 
 [PcdsFeatureFlag.IA32]
   PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid
