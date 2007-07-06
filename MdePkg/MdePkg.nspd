@@ -194,6 +194,10 @@
       <IncludeHeader>Include/Library/CustomDecompressLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
+    <LibraryClass Name="SalLib" SupArchList="IPF">
+      <IncludeHeader>Include/Library/SalLib.h</IncludeHeader>
+      <HelpText>Implement the SAL call</HelpText>
+    </LibraryClass>
   </LibraryClassDeclarations>
   <MsaFiles>
     <Filename>Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.msa</Filename>
