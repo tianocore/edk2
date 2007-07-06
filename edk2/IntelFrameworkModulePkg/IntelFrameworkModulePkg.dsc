@@ -30,6 +30,15 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
+################################################################################
+#
+# SKU Identification section - list of all SKU IDs supported by this
+#                              Platform.
+#
+################################################################################
+[SkuIds]
+  0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
+
 [LibraryClasses.common]
   CacheMaintenanceLib|${WORKSPACE}/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   DebugLib|${WORKSPACE}/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -147,7 +156,7 @@
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
   PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
 
-[PcdsDynamicDefault.common]
+[PcdsDynamicDefault.common.DEFAULT]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
 
