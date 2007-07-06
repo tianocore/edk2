@@ -137,11 +137,11 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf

@@ -105,8 +105,8 @@
 ################################################################################
 
 [PcdsDynamic.common]
-  PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################

@@ -126,10 +126,10 @@
 ################################################################################
 
 [PcdsDynamic.common]
-  PcdFlashNvStorageFtwWorkingSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwWorkingBase|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid
-  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
 

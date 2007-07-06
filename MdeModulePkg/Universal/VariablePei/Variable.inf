@@ -63,7 +63,7 @@
   gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_CONSUMED
 
 [PcdsDynamic.common]
-  PcdFlashNvStorageVariableBase|gEfiGenericPlatformTokenSpaceGuid
+  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
 
 [Depex]
   TRUE
