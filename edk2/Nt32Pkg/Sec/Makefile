@@ -30,7 +30,7 @@ LINK_FLAGS_EXE = /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT
 CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /Od /DSTRING_ARRAY_NAME=SecMainStrings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 COMMON_DEPS = $(DEBUG_DIR)\AutoGen.h
 
-all : $(BIN_DIR)\SecMain.exe
+all : gen_libs $(BIN_DIR)\SecMain.exe
 
 $(BIN_DIR)\SecMain.exe : $(OBJECTS)
   "$(DLINK)"                        \
@@ -41,6 +41,18 @@ $(BIN_DIR)\SecMain.exe : $(OBJECTS)
     /base:0x10000000                \
     /out:"$(BIN_DIR)\SecMain.exe"   \
     /pdb:"$(BIN_DIR)\SecMain.pdb"
+    
+gen_libs:
+	cd $(BUILD_DIR)\$(ARCH)\MdePkg\Library\BaseDebugLibNull\BaseDebugLibNull
+	$(MAKE) $(MAKE_FLAGS)
+	cd $(BUILD_DIR)\$(ARCH)\MdePkg\Library\BasePrintLib\BasePrintLib
+	$(MAKE) $(MAKE_FLAGS)
+	cd $(BUILD_DIR)\$(ARCH)\MdePkg\Library\BaseMemoryLib\BaseMemoryLib
+	$(MAKE) $(MAKE_FLAGS)
+	cd $(BUILD_DIR)\$(ARCH)\MdePkg\Library\BaseLib\BaseLib
+	$(MAKE) $(MAKE_FLAGS)
+	cd $(BUILD_DIR)\$(ARCH)\MdePkg\Library\BasePeCoffLib\BasePeCoffLib
+	$(MAKE) $(MAKE_FLAGS)
   
 #
 # Individual Object Build Targets
