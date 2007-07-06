@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>MdeModulePkg</PackageName>
@@ -160,6 +160,11 @@
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
+    <Entry Name="ExtendedSalVariableServices">
+      <C_Name>gEfiExtendedSalVariableServicesProtocolGuid</C_Name>
+      <GuidValue>4ECB6C53-C641-4370-8CB2-3B0E496E8378</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="Capsule">
       <C_Name>gEfiCapsuleArchProtocolGuid</C_Name>
       <GuidValue>5053697E-2EBC-4819-90D9-0580DEEE5754</GuidValue>

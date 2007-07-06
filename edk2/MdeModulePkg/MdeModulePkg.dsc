@@ -384,6 +384,7 @@
   ${WORKSPACE}/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
   ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  ${WORKSPACE}/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
   ${WORKSPACE}/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
@@ -411,6 +412,7 @@
 
 [Components.IPF]
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  #${WORKSPACE}/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableIpf.inf
 
 [Components.EBC]
   ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
