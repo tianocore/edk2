@@ -93,8 +93,7 @@
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  PeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
-  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
@@ -253,7 +252,7 @@
   PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
   PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
+  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
   PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000040
