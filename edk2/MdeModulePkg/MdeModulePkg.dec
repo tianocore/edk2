@@ -119,27 +119,27 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdSupportUpdateCapsuleRest|0x0001001d|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdPeiPcdDatabaseTraverseEnabled|0x00010020|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdDxePcdDatabaseTraverseEnabled|0x00010021|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdPeiPcdDatabaseSetEnabled|0x00010030|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdPeiPcdDatabaseGetSizeEnabled|0x00010031|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdPeiPcdDatabaseCallbackOnSetEnabled|0x00010032|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdPeiPcdDatabaseExEnabled|0x00010033|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdSupportUpdateCapsuleRest|0x0001001d|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPeiPcdDatabaseTraverseEnabled|0x00010020|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdDxePcdDatabaseTraverseEnabled|0x00010021|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseSetEnabled|0x00010030|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseGetSizeEnabled|0x00010031|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseCallbackOnSetEnabled|0x00010032|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPeiPcdDatabaseExEnabled|0x00010033|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdDxeIplSupportEfiDecompress|0x00010034|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdDxeIplSupportTianoDecompress|0x00010035|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdDxeIplSupportCustomDecompress|0x00010036|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|TRUE
-  PcdDevicePathSupportDevicePathToText|0x00010037|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdDevicePathSupportDevicePathFromText|0x00010038|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDevicePathSupportDevicePathToText|0x00010037|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdDevicePathSupportDevicePathFromText|0x00010038|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdDxeIplBuildShareCodeHobs|0x0001003c|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdNtEmulatorEnable|0x0001003e|gEfiEdkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdNtEmulatorEnable|0x0001003e|gEfiMdeModulePkgTokenSpaceGuid|BOOLEAN|FALSE
 
 [PcdsFixedAtBuild.common]
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x0001000f|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x08
-  PcdVpdBaseAddress|0x00010010|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
-  PcdMaxSizePopulateCapsule|0x0001001e|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
-  PcdMaxSizeNonPopulateCapsule|0x0001001f|gEfiEdkModulePkgTokenSpaceGuid|UINT32|0x0
-  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiEdkModulePkgTokenSpaceGuid|UINT8|28
+  PcdVpdBaseAddress|0x00010010|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxSizePopulateCapsule|0x0001001e|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxSizeNonPopulateCapsule|0x0001001f|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiMdeModulePkgTokenSpaceGuid|UINT8|28
   PcdFlashNvStorageVariableBase|0x30000001|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageVariableSize|0x30000002|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
@@ -156,7 +156,7 @@
   PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
 
 [PcdsPatchableInModule.common]
-  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiEdkModulePkgTokenSpaceGuid|UINT8|28
+  PcdMaxPeiPerformanceLogEntries|0x0001002f|gEfiMdeModulePkgTokenSpaceGuid|UINT8|28
   PcdFlashNvStorageVariableBase|0x30000001|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageVariableSize|0x30000002|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwSpareBase|0x30000013|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0

@@ -117,6 +117,6 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdDevicePathSupportDevicePathFromText|gEfiEdkModulePkgTokenSpaceGuid
-  PcdDevicePathSupportDevicePathToText|gEfiEdkModulePkgTokenSpaceGuid
+  PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid
+  PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid
 

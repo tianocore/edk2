@@ -111,11 +111,11 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  PcdPeiPcdDatabaseSetEnabled|gEfiEdkModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseGetSizeEnabled|gEfiEdkModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseExEnabled|gEfiEdkModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiEdkModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseTraverseEnabled|gEfiEdkModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseGetSizeEnabled|gEfiMdeModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseExEnabled|gEfiMdeModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
+  PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################
@@ -125,7 +125,7 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid
+  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid
 
 
