@@ -114,7 +114,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-#INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
+INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
@@ -164,6 +164,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
 
 ################################################################################
 #
@@ -173,27 +174,27 @@ INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED { 
-        SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
-      }
-    }
-  }
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION PE32 = FatBinPkg/Fat/Ia32/Fat.efi
-      }
-    }
-  }
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
-    SECTION COMPRESS PI_STD { 
-      SECTION GUIDED {
-        SECTION RAW = EdkNt32Pkg/Logo/Logo.bmp
-      }
-    } 
-  } 
+#FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
+#    SECTION COMPRESS PI_STD {
+#      SECTION GUIDED { 
+#        SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
+#      }
+#    }
+#  }
+#FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
+#    SECTION COMPRESS PI_STD {
+#      SECTION GUIDED {
+#        SECTION PE32 = FatBinPkg/Fat/Ia32/Fat.efi
+#      }
+#    }
+#  }
+#FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
+#    SECTION COMPRESS PI_STD { 
+#      SECTION GUIDED {
+#        SECTION RAW = EdkNt32Pkg/Logo/Logo.bmp
+#      }
+#    } 
+#  } 
 
 
 ################################################################################
