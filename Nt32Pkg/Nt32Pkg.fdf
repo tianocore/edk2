@@ -109,61 +109,73 @@ READ_LOCK_STATUS   = TRUE
 # INF $(PathAndInfFileName)
 #
 ################################################################################
+  ##
+  #  PEI Phase modules
+  ##
 INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
-INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf  
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf    
+INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
-INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
-INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
-INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
+INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf  
+  
+  ##
+  #  DXE Phase modules
+  ##
+INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  
 INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
-INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
-INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
-INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
-INF  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
+INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf  
+INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf    
+INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf  
 INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf    
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
-INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
-INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf  
+INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf        
+INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf        
+INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf      
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
+INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf  
+INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf  
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf    
+INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf              
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf    
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
+INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf  
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
-INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
-INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
+INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
+INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf  
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
+INF  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
 ################################################################################
 #
@@ -173,13 +185,13 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-#FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
-#    SECTION COMPRESS PI_STD {
-#      SECTION GUIDED { 
-#        SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
-#      }
-#    }
-#  }
+FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
+    SECTION COMPRESS PI_STD {
+      SECTION GUIDED { 
+        SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
+      }
+    }
+  }
 #FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
 #    SECTION COMPRESS PI_STD {
 #      SECTION GUIDED {
@@ -187,13 +199,13 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
 #      }
 #    }
 #  }
-#FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
-#    SECTION COMPRESS PI_STD { 
-#      SECTION GUIDED {
-#        SECTION RAW = EdkNt32Pkg/Logo/Logo.bmp
-#      }
-#    } 
-#  } 
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
+    SECTION COMPRESS PI_STD { 
+      SECTION GUIDED {
+        SECTION RAW = EdkNt32Pkg/Logo/Logo.bmp
+      }
+    } 
+  } 
 
 
 ################################################################################
