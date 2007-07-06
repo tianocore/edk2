@@ -18,7 +18,6 @@
 #ifndef __PAL_CALL_LIB_H__
 #define __PAL_CALL_LIB_H__
 
-typedef  int PAL_CALL_RETURN;
 //
 // CacheType of PAL_CACHE_FLUSH.
 //
