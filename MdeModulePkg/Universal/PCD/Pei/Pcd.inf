@@ -126,7 +126,7 @@
 
 [PcdsFixedAtBuild.common]
   PcdVpdBaseAddress|gEfiEdkModulePkgTokenSpaceGuid
-  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiEdkModulePkgTokenSpaceGuid
+  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid
 
 
 ################################################################################
