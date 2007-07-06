@@ -30,6 +30,7 @@
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include "HobLibInternal.h"
 
 STATIC VOID  *mHobList = NULL;
 

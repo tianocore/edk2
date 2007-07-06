@@ -1,5 +1,5 @@
 /** @file
-  DXE Library.
+  Internal Header file for Dxe Services Table Library Instance.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,22 +10,11 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  DxeServicesTableLib.c
-
 **/
 
-#include <PiDxe.h>
-#include <Guid/DxeServices.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiLib.h>
+#ifndef _DXE_SERVICE_TABLE_LIB_INTERNAL_H
+#define _DXE_SERVICE_TABLE_LIB_INTERNAL_H
 
-#include "DxeServicesTableLibInternal.h"
-
-//
-// Cache copy of the DXE Services Table
-//
-EFI_DXE_SERVICES  *gDS      = NULL;
 
 /**
   The constructor function caches the pointer of DXE Services Table.
@@ -47,15 +36,5 @@ DxeServicesTableLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-{
-  EFI_STATUS  Status;
-
-  //
-  // Cache copy of the DXE Services Table
-  //
-  Status = EfiGetSystemConfigurationTable (&gEfiDxeServicesTableGuid, (VOID **) &gDS);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (gDS != NULL);
-
-  return Status;
-}
+;
+#endif

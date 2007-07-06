@@ -17,6 +17,7 @@
 // Include common header file for this module.
 //
 #include <Base.h>
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 

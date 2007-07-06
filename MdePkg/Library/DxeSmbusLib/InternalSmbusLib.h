@@ -73,4 +73,24 @@ InternalSmBusExec (
      OUT RETURN_STATUS              *Status        OPTIONAL
   );
 
+/**
+  The constructor function caches the pointer to Smbus protocol.
+
+  The constructor function locates Smbus protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+SmbusLibConstructor (
+  IN EFI_HANDLE                ImageHandle,
+  IN EFI_SYSTEM_TABLE          *SystemTable
+  )
+;
+
 #endif

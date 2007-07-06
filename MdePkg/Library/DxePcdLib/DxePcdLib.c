@@ -31,6 +31,8 @@ Module Name: DxePcdLib.c
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
+#include "DxePcdLibInternal.h"
+
 static PCD_PROTOCOL  *mPcd;
 
 /**
