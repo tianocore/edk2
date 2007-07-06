@@ -16,6 +16,8 @@
 // Include common header file for this module.
 //
 
+#include <Base.h>
+#include <Library\BaseLib.h>
 
 /**
   Executes an infinite loop.
