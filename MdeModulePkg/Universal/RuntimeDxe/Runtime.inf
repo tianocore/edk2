@@ -110,3 +110,5 @@
 [PcdsFixedAtBuild.common]
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid
   
+[depex]
+  TRUE  
