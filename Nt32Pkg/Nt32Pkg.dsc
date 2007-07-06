@@ -314,7 +314,7 @@
 #
 ################################################################################
 
-[PcdsDynamicDefault.common]
+[PcdsDynamicDefault.common.DEFAULT]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
@@ -376,9 +376,9 @@
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
-#  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-#  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-#  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
@@ -399,4 +399,7 @@
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf  
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
+
+[BuildOptions]
+	MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+	MSFT:RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
