@@ -315,7 +315,7 @@
 #
 ################################################################################
 
-[PcdsDynamic.common.DEFAULT]
+[PcdsDynamicDefault.common]
   PcdFlashNvStorageFtwSpareBase|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdFlashNvStorageVariableSize|gEfiGenericPlatformTokenSpaceGuid|0x0
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
