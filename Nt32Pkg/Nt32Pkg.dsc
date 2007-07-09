@@ -130,7 +130,7 @@
   PeCoffLoaderLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeCoffLoaderLib/Nt32PeCoffLoaderLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)/Nt32Pkg/Library/PeiNt32OemHookStatusCodeLib/PeiNt32OemHookStatusCodeLib.inf
-  PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
+  PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/Nt32PeiPeCoffGetEntryPointLib.inf
   DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
 [LibraryClasses.common.PEI_CORE]
@@ -142,7 +142,7 @@
   PeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   OldPeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/OldPeiCoreEntryPoint/OldPeiCoreEntryPoint.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/EdkNt32PeiPeCoffGetEntryPointLib.inf
+  PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/Nt32PeiPeCoffGetEntryPointLib.inf
   # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
   #PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
