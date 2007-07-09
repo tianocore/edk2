@@ -1,0 +1,2 @@
+FAT Binary Package does not provide any debug infrastructure. The PCD value of PcdDebugPropertyMask is set to 0 to disable Assert, Debug Print, Debug Code, Clear Memory, Assert Breakpoint and Assert Dead Loop.
+It also has no patchable-in-module PCD settings. So it only contains UEFI image files.
