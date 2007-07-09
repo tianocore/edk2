@@ -153,10 +153,6 @@ typedef struct _WIN_CERTIFICATE_UEFI_GUID {
 } WIN_CERTIFICATE_UEFI_GUID;
 
 
-
-
-
-
 /**
    
   Certificate which encapsulates the RSASSA_PKCS1-v1_5 digital

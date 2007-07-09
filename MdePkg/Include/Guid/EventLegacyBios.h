@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  GUIDs defined in DXE CIS 0.91b.
+  GUIDs defined in PI 1.0.
 
 **/
 

@@ -894,6 +894,7 @@ typedef enum {
   EfiResetCold,
   EfiResetWarm,
   EfiResetShutdown,
+  EfiResetUpdate
 } EFI_RESET_TYPE;
 
 /**
