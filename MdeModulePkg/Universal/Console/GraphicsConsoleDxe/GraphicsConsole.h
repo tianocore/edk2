@@ -23,13 +23,43 @@ Revision History
 #ifndef _GRAPHICS_CONSOLE_H
 #define _GRAPHICS_CONSOLE_H
 
+#include <PiDxe.h>
+#include <Protocol/FrameworkHii.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/DevicePath.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/HiiLibFramework.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+
+extern EFI_COMPONENT_NAME_PROTOCOL  gGraphicsConsoleComponentName;
 
 //
-// Include common header file for this module.
+// EFI Component Name Functions
 //
-#include "CommonHeader.h"
+EFI_STATUS
+EFIAPI
+GraphicsConsoleComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
 
-#include "ComponentName.h"
+EFI_STATUS
+EFIAPI
+GraphicsConsoleComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
 
 //
 // Glyph database

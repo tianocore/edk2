@@ -15,10 +15,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _CON_SPLITTER_H_
 #define _CON_SPLITTER_H_
 
+#include <PiDxe.h>
+#include <Guid/PrimaryStandardErrorDevice.h>
+#include <Guid/PrimaryConsoleOutDevice.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Guid/PrimaryConsoleInDevice.h>
+#include <Protocol/SimplePointer.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Guid/ConsoleInDevice.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/ConsoleControl.h>
+#include <Guid/StandardErrorDevice.h>
+#include <Guid/ConsoleOutDevice.h>
+#include <Protocol/UgaDraw.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
 //
-// Include common header file for this module.
+// Driver Binding Externs
 //
-#include "CommonHeader.h"
+extern EFI_DRIVER_BINDING_PROTOCOL gConSplitterConInDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConSplitterConInComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL gConSplitterSimplePointerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConSplitterSimplePointerComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL gConSplitterConOutDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConSplitterConOutComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL gConSplitterStdErrDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConSplitterStdErrComponentName;
+
+// These definitions were in the old Hii protocol, but are not in the new UEFI
+// version. So they are defined locally.
+#define UNICODE_NARROW_CHAR   0xFFF0
+#define UNICODE_WIDE_CHAR     0xFFF1 
+
 
 //
 // Private Data Structures

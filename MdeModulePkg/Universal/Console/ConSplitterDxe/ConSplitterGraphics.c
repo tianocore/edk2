@@ -22,15 +22,8 @@ Abstract:
 
 --*/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "ConSplitter.h"
 
-#include <Protocol/FrameworkHii.h>
 
 static CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
@@ -839,8 +832,8 @@ DevNullTextOutOutputString (
           break;
         }
 
-        if (*WString == WIDE_CHAR || *WString == NARROW_CHAR) {
-          CurrentWidth = (*WString == WIDE_CHAR) ? 2 : 1;
+        if (*WString == UNICODE_WIDE_CHAR || *WString == UNICODE_NARROW_CHAR) {
+          CurrentWidth = (*WString == UNICODE_WIDE_CHAR) ? 2 : 1;
           WString++;
           continue;
         }

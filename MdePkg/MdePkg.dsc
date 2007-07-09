@@ -21,11 +21,11 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = MdePkgAll
+  PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = $(WORKSPACE)\Build/Mde
+  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/Mde
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT

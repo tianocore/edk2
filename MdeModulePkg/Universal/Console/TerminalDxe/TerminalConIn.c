@@ -12,14 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Terminal.h"
 
-#include "FrameworkDxe.h"
 
 EFI_STATUS
 EFIAPI
@@ -60,7 +54,7 @@ TerminalConInReset (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET,
+    PcdGet32 (PcdStatusCodeValueRemoteConsoleReset),
     TerminalDevice->DevicePath
     );
 
@@ -76,7 +70,7 @@ TerminalConInReset (
   if (EFI_ERROR (Status)) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      EFI_PERIPHERAL_LOCAL_CONSOLE | EFI_P_EC_CONTROLLER_ERROR,
+      PcdGet32 (PcdStatusCodeValueRemoteConsoleError),
       TerminalDevice->DevicePath
       );
   }
@@ -313,7 +307,7 @@ TerminalConInCheckForKey (
       if (Status == EFI_DEVICE_ERROR) {
         REPORT_STATUS_CODE_WITH_DEVICE_PATH (
           EFI_ERROR_CODE | EFI_ERROR_MINOR,
-          EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR,
+          PcdGet32 (PcdStatusCodeValueRemoteConsoleInputError),
           TerminalDevice->DevicePath
           );
       }

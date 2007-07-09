@@ -196,7 +196,6 @@
 #
 ################################################################################
 [Protocols.common]
-
   gEfiBdsArchProtocolGuid        = { 0x665E3FF6, 0x46CC, 0x11D4, { 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   gEfiCpuArchProtocolGuid        = { 0x26BACCB1, 0x6F42, 0x11D4, { 0xBC, 0xE7, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
   gEfiMetronomeArchProtocolGuid  = { 0x26BACCB2, 0x6F42, 0x11D4, { 0xBC, 0xE7, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
@@ -325,12 +324,15 @@
   PcdStatusCodeValueSetVirtualAddressMap|0x0000000e|gEfiMdePkgTokenSpaceGuid|UINT32|0x03101004      # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
   PcdStatusCodeValueMemoryTestStarted|0x0000000f|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051006         # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
   PcdStatusCodeValueUncorrectableMemoryError|0x00000010|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051003  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
+  PcdStatusCodeValueRemoteConsoleError|0x00000011|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  PcdStatusCodeValueRemoteConsoleReset|0x00000012|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  PcdStatusCodeValueRemoteConsoleInputError|0x00000013|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  PcdStatusCodeValueRemoteConsoleOutputError|0x00000014|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|0x00000006|gEfiMdePkgTokenSpaceGuid|UINT32|0x80000000
   PcdPciExpressBaseAddress|0x0000000a|gEfiMdePkgTokenSpaceGuid|UINT64|0xE0000000
   PcdFSBClock|0x0000000c|gEfiMdePkgTokenSpaceGuid|UINT32|200000000
-
 
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|0x0000000c|gEfiMdePkgTokenSpaceGuid|UINT64|0x0ffffc000000

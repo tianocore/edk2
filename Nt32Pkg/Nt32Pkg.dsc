@@ -26,7 +26,7 @@
   PLATFORM_GUID                  = EB216561-961F-47EE-9EF9-CA426EF547C2
   PLATFORM_VERSION               = 0.3
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/Nt32Platform
+  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/NT32
   SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
@@ -276,6 +276,11 @@
   PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid|0x2000
   PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0x280000
   PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid|0x00c000
+  PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x0005100   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE3
+  PcdStatusCodeValueRemoteConsoleError|gEfiMdePkgTokenSpaceGuid|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  PcdStatusCodeValueRemoteConsoleReset|gEfiMdePkgTokenSpaceGuid|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
 [PcdsFeatureFlag.IA32]
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE

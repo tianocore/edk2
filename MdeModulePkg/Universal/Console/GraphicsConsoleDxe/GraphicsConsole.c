@@ -17,11 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "GraphicsConsole.h"
 
 STATIC
@@ -1824,3 +1819,41 @@ EraseCursor (
 
   return EFI_SUCCESS;
 }
+
+/**
+  The user Entry Point for module GraphicsConsole. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeGraphicsConsole (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallAllDriverProtocols (
+             ImageHandle,
+             SystemTable,
+             &gGraphicsConsoleDriverBinding,
+             ImageHandle,
+             &gGraphicsConsoleComponentName,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+
+  return Status;
+}
+

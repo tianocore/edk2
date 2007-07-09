@@ -23,10 +23,27 @@ Revision History
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+
+#include <PiDxe.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/SerialIo.h>
+#include <Guid/GlobalVariable.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Guid/HotPlugDevice.h>
+#include <Guid/PcAnsi.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
+
+
 
 #define RAW_FIFO_MAX_NUMBER 256
 #define FIFO_MAX_NUMBER     128

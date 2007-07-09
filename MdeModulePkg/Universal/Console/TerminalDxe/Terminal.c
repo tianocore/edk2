@@ -20,14 +20,8 @@ Revision History:
 --*/
 
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "Terminal.h"
-
-#include "FrameworkDxe.h"
 
 //
 // Globals
@@ -195,15 +189,6 @@ TerminalDriverBindingStart (
   if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     return Status;
   }
-  //
-  // Report that the remote terminal is being enabled
-  //
-  DevicePath = ParentDevicePath;
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-    EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_ENABLE,
-    DevicePath
-    );
 
   //
   // Open the Serial I/O Protocol BY_DRIVER.  It might already be started.
@@ -584,7 +569,7 @@ ReportError:
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_ERROR_CODE | EFI_ERROR_MINOR,
-    EFI_PERIPHERAL_LOCAL_CONSOLE | EFI_P_EC_CONTROLLER_ERROR,
+    PcdGet32 (PcdStatusCodeValueRemoteConsoleError),
     DevicePath
     );
 
@@ -672,14 +657,6 @@ TerminalDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Report that the remote terminal is being disabled
-  //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-    EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_DISABLE,
-    DevicePath
-    );
 
   //
   // Complete all outstanding transactions to Controller.
@@ -1191,4 +1168,42 @@ InitializeEfiKeyFiFo (
   // Make the efi key fifo empty
   //
   TerminalDevice->EfiKeyFiFo.Head = TerminalDevice->EfiKeyFiFo.Tail;
+}
+
+
+/**
+  The user Entry Point for module Terminal. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeTerminal(
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallAllDriverProtocols (
+             ImageHandle,
+             SystemTable,
+             &gTerminalDriverBinding,
+             ImageHandle,
+             &gTerminalComponentName,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+
+  return Status;
 }

@@ -14,10 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name: Service.c
 
 **/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "Service.h"
 
@@ -171,28 +167,28 @@ GetHiiVariable (
   UINTN      Size;
   EFI_STATUS Status;
   VOID       *Buffer;
-  EFI_PEI_READ_ONLY_VARIABLE_PPI *VariablePpi;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI *VariablePpi;
 
-  Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariablePpiGuid, 0, NULL, (VOID **) &VariablePpi);
+  Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **) &VariablePpi);
   ASSERT_EFI_ERROR (Status);
 
   Size = 0;
-  Status = VariablePpi->PeiGetVariable (
-                          GetPeiServicesTablePointer (),
+  Status = VariablePpi->GetVariable (
+                          VariablePpi,
                           VariableName,
                           (EFI_GUID *) VariableGuid,
                           NULL,
                           &Size,
                           NULL
-                            );
+                          );
   if (Status == EFI_BUFFER_TOO_SMALL) {
 
 
     Status = PeiServicesAllocatePool (Size, &Buffer);
     ASSERT_EFI_ERROR (Status);
 
-    Status = VariablePpi->PeiGetVariable (
-                              GetPeiServicesTablePointer (),
+    Status = VariablePpi->GetVariable (
+                              VariablePpi,
                               (UINT16 *) VariableName,
                               (EFI_GUID *) VariableGuid,
                               NULL,
