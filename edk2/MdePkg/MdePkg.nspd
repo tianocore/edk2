@@ -912,7 +912,7 @@
       <HelpText/>
     </Entry>
     <Entry Name="CpuIo">
-      <C_Name>gEfiPeiCpuIoPpiInServiceTableGuid</C_Name>
+      <C_Name>gEfiPeiCpuIoPpiInstalledGuid</C_Name>
       <GuidValue>E6AF1F7B-FC3F-46DA-A828-A3B457A44282</GuidValue>
       <HelpText/>
     </Entry>
