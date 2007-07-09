@@ -513,9 +513,9 @@ typedef
 EFI_STATUS 
 (EFIAPI * EFI_FV_WRITE_FILE) (
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
-  IN CONST  UINT32                        NumberOfFiles,
-  IN CONST  EFI_FV_WRITE_POLICY           WritePolicy,
-  IN CONST  EFI_FV_WRITE_FILE_DATA        *FileData
+  IN        UINT32                        NumberOfFiles,
+  IN        EFI_FV_WRITE_POLICY           WritePolicy,
+  IN        EFI_FV_WRITE_FILE_DATA        *FileData
 );
 
 
