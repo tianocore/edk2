@@ -21,6 +21,10 @@
 #define _BOOT_SCRIPT_SAVE_PROTOCOL_H
 
 #include <PiDxe.h>
+//
+// To get the multiple phase definitions defined in Boot Script Specification
+//
+#include <Ppi/BootScriptExecuter.h>
 
 //
 // S3 Save Protocol GUID
