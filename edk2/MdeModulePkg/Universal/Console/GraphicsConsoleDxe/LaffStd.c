@@ -20,11 +20,6 @@ Revision History
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "GraphicsConsole.h"
 
 EFI_NARROW_GLYPH  UsStdNarrowGlyphData[] = {

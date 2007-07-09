@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = GraphicsConsole
@@ -39,40 +34,16 @@
 #  COMPONENT_NAME                =  gGraphicsConsoleComponentName                
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   ComponentName.c
-  ComponentName.h
   LaffStd.c
   GraphicsConsole.c
   GraphicsConsole.h
-  CommonHeader.h
-  EntryPoint.c
-
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec  
-
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
+  # currently use Hii for glyph lookup, need to change to UEFI scheme
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -82,24 +53,6 @@
   UefiDriverEntryPoint
   DebugLib
   HiiLib  
-
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
-[Guids]
-  
-
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

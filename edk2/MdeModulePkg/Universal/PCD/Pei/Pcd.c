@@ -14,11 +14,6 @@ Module Name: Pcd.c
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Service.h"
 
 

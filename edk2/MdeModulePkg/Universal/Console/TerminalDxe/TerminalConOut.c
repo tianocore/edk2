@@ -19,14 +19,7 @@ Abstract:
 Revision History
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Terminal.h"
-
-#include "FrameworkDxe.h"
 
 //
 // This list is used to define the valid extend chars.
@@ -145,7 +138,7 @@ TerminalConOutReset (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_PROGRESS_CODE,
-      EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET,
+      PcdGet32 (PcdStatusCodeValueRemoteConsoleReset),
       TerminalDevice->DevicePath
       );
 
@@ -156,7 +149,7 @@ TerminalConOutReset (
       //
       REPORT_STATUS_CODE_WITH_DEVICE_PATH (
         EFI_ERROR_CODE | EFI_ERROR_MINOR,
-        EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR,
+        PcdGet32 (PcdStatusCodeValueRemoteConsoleError),
         TerminalDevice->DevicePath
         );
 
@@ -360,7 +353,7 @@ TerminalConOutOutputString (
 OutputError:
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_ERROR_CODE | EFI_ERROR_MINOR,
-    EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR,
+    PcdGet32 (PcdStatusCodeValueRemoteConsoleOutputError),
     TerminalDevice->DevicePath
     );
 

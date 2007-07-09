@@ -18,10 +18,18 @@ Module Name: Service.h
 #ifndef _SERVICE_H
 #define _SERVICE_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiPei.h>
+#include <Ppi/ReadOnlyVariable2.h>
+#include <Ppi/Pcd.h>
+#include <Library/DebugLib.h>
+#include <Library/PeimEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/HobLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/PcdLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
+#include <Library/BaseMemoryLib.h>
+
 
 //
 // Please make sure the PCD Serivce PEIM Version is consistent with

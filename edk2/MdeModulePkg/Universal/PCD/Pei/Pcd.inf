@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PcdPeim
@@ -37,38 +32,15 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   Service.c
   Service.h
   Pcd.c
   CommonHeader.h
 
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   BaseMemoryLib
@@ -80,35 +52,14 @@
   PeimEntryPoint
   DebugLib
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gPcdPeiCallbackFnTableHobGuid                 # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
   gPcdDataBaseHobGuid                           # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
 
 
-################################################################################
-#
-# PPI C Name Section - list of PPI and PPI Notify C Names that this module
-#                      uses or produces.
-#
-################################################################################
-
 [Ppis]
-  gEfiPeiReadOnlyVariablePpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gPcdPpiGuid                                   # PPI ALWAYS_PRODUCED
-
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFeatureFlag.common]
   PcdPeiPcdDatabaseSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
@@ -117,24 +68,9 @@
   PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFixedAtBuild.common]
   PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid
-
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   TRUE

@@ -21,7 +21,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = MdeModuleAll
+  PLATFORM_NAME                  = MdeModule
   PLATFORM_GUID                  = 587CE499-6CBE-43cd-94E2-186218569478
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
@@ -351,6 +351,10 @@
   PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid|0x00051006         # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004      # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
   PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x0005100   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE3
+  PcdStatusCodeValueRemoteConsoleError|gEfiMdePkgTokenSpaceGuid|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  PcdStatusCodeValueRemoteConsoleReset|gEfiMdePkgTokenSpaceGuid|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
