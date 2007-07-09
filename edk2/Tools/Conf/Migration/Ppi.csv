@@ -1,6 +1,6 @@
 Name,R8.5 Cname,R9 Cname,Guid Value,Package
-BootInRecoveryMode,gEfiPeiBootInRecoveryModePpiGuid,gEfiPeiBootInRecoveryModePpiGuid,17EE496A-D8E4-4B9A-94D1-CE8272300850,MdePkg
-CpuIo,gEfiPeiCpuIoPpiInServiceTableGuid,gEfiPeiCpuIoPpiInServiceTableGuid,E6AF1F7B-FC3F-46DA-A828-A3B457A44282,MdePkg
+BootInRecoveryMode,gPeiBootInRecoveryModePpiGuid,gEfiPeiBootInRecoveryModePpiGuid,17EE496A-D8E4-4B9A-94D1-CE8272300850,MdePkg
+CpuIo,gEfiPeiCpuIoPpiInServiceTableGuid,gEfiPeiCpuIoPpiInstalledGuid,E6AF1F7B-FC3F-46DA-A828-A3B457A44282,MdePkg
 DxeIpl,gEfiDxeIplPpiGuid,gEfiDxeIplPpiGuid,0AE8CE5D-E448-4437-A8D7-EBF5F194F731,MdePkg
 EndOfPeiSignal,gEfiEndOfPeiSignalPpiGuid,gEfiEndOfPeiSignalPpiGuid,605EA650-C65C-42E1-BA80-91A52AB618C6,MdePkg
 FindFv,gEfiFindFvPpiGuid,gEfiFindFvPpiGuid,36164812-A023-44E5-BD85-05BF3C7700AA,MdePkg
