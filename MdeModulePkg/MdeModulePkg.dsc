@@ -39,258 +39,258 @@
 ################################################################################
 
 [LibraryClasses.common]
-  CacheMaintenanceLib|${WORKSPACE}/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  BaseLib|${WORKSPACE}/MdePkg/Library/BaseLib/BaseLib.inf
-  BaseMemoryLib|${WORKSPACE}/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  PciCf8Lib|${WORKSPACE}/MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
-  PciExpressLib|${WORKSPACE}/MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
-  PciLib|${WORKSPACE}/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
-  PeCoffGetEntryPoint|${WORKSPACE}/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  PeCoffLib|${WORKSPACE}/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  PerformanceLib|${WORKSPACE}/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
-  PostCodeLib|${WORKSPACE}/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
-  PrintLib|${WORKSPACE}/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  TimerLib|${WORKSPACE}/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-  UefiDecompressLib|${WORKSPACE}/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  PeCoffLoaderLib|${WORKSPACE}/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  CustomDecompressLib|${WORKSPACE}/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf 
-  HiiLib|${WORKSPACE}/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  CacheMaintenanceLib|$(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
+  BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  PciCf8Lib|$(WORKSPACE)/MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+  PciExpressLib|$(WORKSPACE)/MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
+  PciLib|$(WORKSPACE)/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PeCoffGetEntryPoint|$(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  PerformanceLib|$(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  PostCodeLib|$(WORKSPACE)/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
+  PostCodeLib|$(WORKSPACE)/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
+  PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  UefiDecompressLib|$(WORKSPACE)/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  CustomDecompressLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf 
+  HiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   
 
 [LibraryClasses.IA32]
-  IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  BaseMemoryLib|${WORKSPACE}/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
 
 [LibraryClasses.X64]
-  IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  BaseMemoryLib|${WORKSPACE}/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
 
 [LibraryClasses.IPF]
-  IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 [LibraryClasses.EBC]
 
 
 [LibraryClasses.common.PEI_CORE]
-  PeiCoreEntryPoint|${WORKSPACE}/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  HobLib|${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  PeimEntryPointLib|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  PeiServiceLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  PeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  PeimEntryPointLib|$(WORKSPACE)/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  PeiServiceLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   OldPeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/OldPeiCoreEntryPoint/OldPeiCoreEntryPoint.inf
   
 [LibraryClasses.common.PEIM]
-  HobLib|${WORKSPACE}/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  PeimEntryPoint|${WORKSPACE}/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-  PeiServicesLib|${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  PeimEntryPoint|$(WORKSPACE)/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  PeiServicesTablePointerLib|${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  SmBusLib|${WORKSPACE}/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
+  PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  SmBusLib|$(WORKSPACE)/MdePkg/Library/PeiSmbusLib/PeiSmbusLib.inf
 
 [LibraryClasses.common.DXE_CORE]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-  DxeCoreEntryPoint|${WORKSPACE}/MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  PeCoffLoaderLib|${WORKSPACE}/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
+  DxeCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  PeCoffLoaderLib|$(WORKSPACE)/MdeModulePkg/Library/PeiDxePeCoffLoaderLib/PeCoffLoaderLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  DxeServicesTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.DXE_SAL_DRIVER]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  HiiLib|${WORKSPACE}/MdePkg/Library/HiiLib/HiiLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  HiiLib|$(WORKSPACE)/MdePkg/Library/HiiLib/HiiLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  HiiLib|${WORKSPACE}/MdePkg/Library/HiiLib/HiiLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  HiiLib|$(WORKSPACE)/MdePkg/Library/HiiLib/HiiLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  SmbusLib|${WORKSPACE}/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  HiiLib|${WORKSPACE}/MdePkg/Library/HiiLib/HiiLib.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiDriverEntryPoint|${WORKSPACE}/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  HiiLib|$(WORKSPACE)/MdePkg/Library/HiiLib/HiiLib.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
-  HobLib|${WORKSPACE}/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|${WORKSPACE}/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  PcdLib|${WORKSPACE}/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  DxeServiceTableLib|${WORKSPACE}/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  HiiLib|${WORKSPACE}/MdePkg/Library/HiiLib/HiiLib.inf
-  UefiApplicationEntryPoint|${WORKSPACE}/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-  UefiBootServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DevicePathLib|${WORKSPACE}/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiLib|${WORKSPACE}/MdePkg/Library/UefiLib/UefiLib.inf
-  UefiRuntimeServicesTableLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  DebugLib|${WORKSPACE}/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
-  FvbServiceLib|${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ReportStatusCodeLib|${WORKSPACE}/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  HiiLib|$(WORKSPACE)/MdePkg/Library/HiiLib/HiiLib.inf
+  UefiApplicationEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+  UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.IA32.BASE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.SEC]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.PEI_CORE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.PEIM]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.DXE_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.DXE_SAL_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.UEFI_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.UEFI_APPLICATION]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.BASE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.SEC]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.PEI_CORE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.PEIM]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.DXE_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.DXE_SAL_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.UEFI_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.UEFI_APPLICATION]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.BASE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.SEC]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.PEI_CORE]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.PEIM]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.DXE_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.DXE_SAL_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.UEFI_DRIVER]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IPF.UEFI_APPLICATION]
-  TimerLib|${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|$(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.DXE_RUNTIME_DRIVER]
-  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiRuntimeLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
-  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiRuntimeLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 [LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
-  UefiRuntimeLib|${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiRuntimeLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 ################################################################################
 #
@@ -367,52 +367,52 @@
 
 
 [Components.Ia32]
-  ${WORKSPACE}/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  ${WORKSPACE}/MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
-  ${WORKSPACE}/MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  ${WORKSPACE}/MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  ${WORKSPACE}/MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
-  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
+  $(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
+  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/VariablePei/Variable.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
-  ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
-  ${WORKSPACE}/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
-  ${WORKSPACE}/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
-  ${WORKSPACE}/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 
 [Components.X64]
-  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
 [Components.IPF]
-  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-  #${WORKSPACE}/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableIpf.inf
+  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  #$(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableIpf.inf
 
 [Components.EBC]
-  ${WORKSPACE}/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
