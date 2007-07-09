@@ -342,5 +342,10 @@
       <GuidValue>E1F2EBA0-F7B9-4A26-8620-131221642A90</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="FvLoadFile">
+      <C_Name>gEfiPeiFvFileLoaderPpiGuid</C_Name>
+      <GuidValue>7e1f0d85-04ff-4bb2-866a-31a2996a48a8</GuidValue>
+      <HelpText>FV Load File PPI</HelpText>
+    </Entry>
   </PpiDeclarations>
 </PackageSurfaceArea>
