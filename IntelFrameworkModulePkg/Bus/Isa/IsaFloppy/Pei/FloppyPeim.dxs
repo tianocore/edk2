@@ -1,0 +1,34 @@
+/*++
+
+Copyright (c) 2006, Intel Corporation. All rights reserved. 
+This software and associated documentation (if any) is furnished
+under a license and may only be used or copied in accordance
+with the terms of the license. Except as permitted by such
+license, no part of this software or documentation may be
+reproduced, stored in a retrieval system, or transmitted in any
+form or by any means without the express written consent of
+Intel Corporation.
+
+
+Module Name:
+  
+    floppypeim.dxs
+
+Abstract:
+
+  Dependency expression file for Status Code PEIM.
+  
+--*/  
+
+#include <PeimDepex.h>
+
+DEPENDENCY_START
+ EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI_GUID AND
+ EFI_PEI_FV_FILE_LOADER_GUID AND
+ EFI_PEI_BOOT_IN_RECOVERY_MODE_PEIM_PPI
+DEPENDENCY_END
+
+
+
+
+
