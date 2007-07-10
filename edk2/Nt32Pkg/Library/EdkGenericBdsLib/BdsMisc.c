@@ -19,10 +19,8 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <EdkGenericBdsLibInternal.h>
+
 
 #define MAX_STRING_LEN        200
 static BOOLEAN   mFeaturerSwitch = TRUE;

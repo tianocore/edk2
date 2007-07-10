@@ -19,10 +19,7 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <EdkGenericBdsLibInternal.h>
 
 BOOLEAN
 IsNvNeed (

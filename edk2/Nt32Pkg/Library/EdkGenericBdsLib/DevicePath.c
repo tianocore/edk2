@@ -20,10 +20,7 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <EdkGenericBdsLibInternal.h>
 
 EFI_GUID  mEfiWinNtThunkProtocolGuid  = EFI_WIN_NT_THUNK_PROTOCOL_GUID;
 EFI_GUID  mEfiWinNtUgaGuid            = EFI_WIN_NT_UGA_GUID;

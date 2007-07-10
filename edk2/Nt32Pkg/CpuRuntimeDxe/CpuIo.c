@@ -23,11 +23,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include <CpuDriver.h>
 
 #define IA32_MAX_IO_ADDRESS   0xFFFF

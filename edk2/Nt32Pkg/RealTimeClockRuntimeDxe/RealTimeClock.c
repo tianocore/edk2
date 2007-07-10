@@ -19,12 +19,14 @@ Abstract:
 
 --*/
 
+#include <PiDxe.h>
+#include <WinNtDxe.h>
+#include <Protocol/RealTimeClock.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/WinNtLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 BOOLEAN
 DayValid (

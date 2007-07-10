@@ -21,11 +21,13 @@ Revision History
 
 --*/
 
+#include <PiPei.h>
+#include <IndustryStandard/PeImage.h>
+#include <WinNtPeim.h>
+#include <Ppi/NtPeiLoadFile.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/PeiServicesLib.h>
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 RETURN_STATUS
 EFIAPI

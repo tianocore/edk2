@@ -25,12 +25,15 @@ Abstract:
 #define _TIMER_H_
 
 
+#include <PiDxe.h>
+#include <WinNtDxe.h>
+#include <Protocol/Timer.h>
+#include <Protocol/Cpu.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/WinNtLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 //
 // Legal timer value range in 100 ns units

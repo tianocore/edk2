@@ -19,12 +19,12 @@ Abstract:
 
 --*/
 
+#include <PiDxe.h>
+#include <WinNtDxe.h>
+#include <Library/WinNtLib.h>
+#include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 EFI_WIN_NT_THUNK_PROTOCOL *gWinNt;
 

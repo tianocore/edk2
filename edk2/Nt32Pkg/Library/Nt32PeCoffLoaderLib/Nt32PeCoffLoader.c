@@ -20,12 +20,10 @@ Abstract:
 
 --*/
 
+#include <PiPei.h>
+#include <Guid/PeiPeCoffLoader.h>
+#include <Library/PeCoffLoaderLib.h>
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
 
