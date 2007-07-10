@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>Ps2Mouse</ModuleName>
@@ -8,14 +8,12 @@
     <Abstract>Ps2 Mouse Driver</Abstract>
     <Description>This dirver directly uses IsaIo protocol service to support Ps2 mouse work.</Description>
     <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
-    <License>All rights reserved.
-      This software and associated documentation (if any) is furnished
-      under a license and may only be used or copied in accordance
-      with the terms of the license. Except as permitted by such
-      license, no part of this software or documentation may be
-      reproduced, stored in a retrieval system, or transmitted in any
-      form or by any means without the express written consent of
-      Intel Corporation.</License>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
