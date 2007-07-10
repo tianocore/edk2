@@ -38,7 +38,6 @@ Abstract:
 //
 #include <Protocol/PciRootBridgeIo.h>
 #include <Guid/SystemNvDataGuid.h>
-#include <Guid/FlashMapHob.h>
 #include <Protocol/FaultTolerantWriteLite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 //
@@ -50,10 +49,8 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/HobLib.h>
 
 #include <Common/WorkingBlockHeader.h>
-#include <Common/FlashMap.h>
 
 #define EFI_D_FTW_LITE  EFI_D_ERROR
 #define EFI_D_FTW_INFO  EFI_D_INFO

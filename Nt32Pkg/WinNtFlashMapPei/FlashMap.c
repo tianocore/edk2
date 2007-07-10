@@ -216,21 +216,18 @@ Returns:
     // PCD entry will get the information.
     //
     if (FlashHobData.AreaType == EFI_FLASH_AREA_EFI_VARIABLES) {
-      // BUGBUG: Tool team does not enable dynamic PCD so comment out following code
-      //PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32) FlashHobData.SubAreaData.Base);
-      //PcdSet32 (PcdFlashNvStorageVariableSize, (UINT32) FlashHobData.SubAreaData.Length);
+      PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageVariableSize, (UINT32) FlashHobData.SubAreaData.Length);
     }
 
     if (FlashHobData.AreaType == EFI_FLASH_AREA_FTW_STATE) {
-      // BUGBUG: Tool team does not enable dynamic PCD so comment out following code
-      //PcdSet32 (PcdFlashNvStorageFtwWorkingBase, (UINT32) FlashHobData.SubAreaData.Base);
-      //PcdSet32 (PcdFlashNvStorageFtwWorkingSize, (UINT32) FlashHobData.SubAreaData.Length);
+      PcdSet32 (PcdFlashNvStorageFtwWorkingBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageFtwWorkingSize, (UINT32) FlashHobData.SubAreaData.Length);
     }
 
     if (FlashHobData.AreaType == EFI_FLASH_AREA_FTW_BACKUP) {
-      // BUGBUG: Tool team does not enable dynamic PCD so comment out following code
-      //PcdSet32 (PcdFlashNvStorageFtwSpareBase, (UINT32) FlashHobData.SubAreaData.Base);
-      //PcdSet32 (PcdFlashNvStorageFtwSpareSize, (UINT32) FlashHobData.SubAreaData.Length);
+      PcdSet32 (PcdFlashNvStorageFtwSpareBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageFtwSpareSize, (UINT32) FlashHobData.SubAreaData.Length);
     }
 
     switch (FlashHobData.AreaType) {
@@ -265,11 +262,11 @@ Returns:
       break;
     }
 
-    BuildGuidDataHob (
-      &gEfiFlashMapHobGuid,
-      &FlashHobData,
-      sizeof (EFI_FLASH_AREA_HOB_DATA)
-      );
+    //BuildGuidDataHob (
+    //  &gEfiFlashMapHobGuid,
+    //  &FlashHobData,
+    //  sizeof (EFI_FLASH_AREA_HOB_DATA)
+    //  );
   }
 
   return EFI_SUCCESS;

@@ -634,8 +634,7 @@ InitializeFtwLite (
   UINTN                               Offset;
   EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
   UINT32                              LbaIndex;
-  EFI_PEI_HOB_POINTERS                FvHob;
-  EFI_FLASH_MAP_ENTRY_DATA            *FlashMapEntry;
+
   //
   // Allocate Private data of this driver,
   // INCLUDING THE FtwWorkSpace[FTW_WORK_SPACE_SIZE].
@@ -666,34 +665,12 @@ InitializeFtwLite (
   FtwLiteDevice->FtwWorkSpaceHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) FtwLiteDevice->FtwWorkSpace;
 
   FtwLiteDevice->FtwLastRecord      = NULL;
-        
-  //
-  // BUGBUG: Here should use Pcd after build tool support dynamic PCD
-  //        
-  FtwLiteDevice->SpareAreaLength  = 0;
-  FtwLiteDevice->WorkSpaceLength  = 0;
-  FvHob.Raw = GetHobList ();
-  while ((FvHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, FvHob.Raw)) != NULL) {
 
-    FlashMapEntry = (EFI_FLASH_MAP_ENTRY_DATA *) GET_GUID_HOB_DATA (FvHob.Guid);
-      
-    //
-    // Get the FTW work space Flash Map SUB area
-    //
-    if ((FlashMapEntry->AreaType == EFI_FLASH_AREA_FTW_STATE) && (FlashMapEntry->NumEntries == 1)) {
-      FtwLiteDevice->WorkSpaceAddress = FlashMapEntry->Entries[0].Base;
-      FtwLiteDevice->WorkSpaceLength  = (UINTN) FlashMapEntry->Entries[0].Length;
-    }
-    //
-    // Get the FTW backup SUB area
-    //
-    if ((FlashMapEntry->AreaType == EFI_FLASH_AREA_FTW_BACKUP) && (FlashMapEntry->NumEntries == 1)) {
-      FtwLiteDevice->SpareAreaAddress = FlashMapEntry->Entries[0].Base;
-      FtwLiteDevice->SpareAreaLength  = (UINTN) FlashMapEntry->Entries[0].Length;
-    }
-    
-    FvHob.Raw = GET_NEXT_HOB (FvHob);
-  }
+  FtwLiteDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
+  FtwLiteDevice->WorkSpaceLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+
+  FtwLiteDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwSpareBase);
+  FtwLiteDevice->SpareAreaLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
   ASSERT ((FtwLiteDevice->WorkSpaceLength != 0) && (FtwLiteDevice->SpareAreaLength != 0));
 
