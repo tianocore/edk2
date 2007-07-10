@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  Generic/Bds.dxs
   Generic/DeviceMngr/DeviceManagerVfr.Vfr
   Generic/DeviceMngr/DeviceManagerStrings.uni
   Generic/DeviceMngr/DeviceManager.c
