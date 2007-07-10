@@ -1299,15 +1299,13 @@ Returns:
   EFI_PHYSICAL_ADDRESS            FvVolHdr;
 
   UINT64                          TempVariableStoreHeader;
-  UINT64                          TempVariableStoreLen;
+
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
   EFI_FLASH_SUBAREA_ENTRY         VariableStoreEntry;
   UINT64                          BaseAddress;
   UINT64                          Length;
   UINTN                           Index;
   UINT8                           Data;
-  EFI_PEI_HOB_POINTERS            FvHob;
-  EFI_FLASH_MAP_ENTRY_DATA        *FlashMapEntry;
 
   mVariableModuleGlobal = AllocateRuntimePool (sizeof (ESAL_VARIABLE_GLOBAL));
   if (mVariableModuleGlobal == NULL) {
@@ -1343,29 +1341,11 @@ Returns:
   //
   // Get non volatile varaible store
   //
-  // BUGBUG: Here should use dynamic PCD to get NvStorageVariableBase when build tools is ready.
-  TempVariableStoreHeader = 0;
-  TempVariableStoreLen    = 0;
-  FvHob.Raw = GetHobList ();
-  while ((FvHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, FvHob.Raw)) != NULL) {
 
-    FlashMapEntry = (EFI_FLASH_MAP_ENTRY_DATA *) GET_GUID_HOB_DATA (FvHob.Guid);
-      
-    //
-    // Get the FTW work space Flash Map SUB area
-    //
-    if ((FlashMapEntry->AreaType == EFI_FLASH_AREA_EFI_VARIABLES) && (FlashMapEntry->NumEntries == 1)) {
-      TempVariableStoreHeader = FlashMapEntry->Entries[0].Base;
-	    TempVariableStoreLen    = FlashMapEntry->Entries[0].Length;
-    }
-    FvHob.Raw = GET_NEXT_HOB (FvHob);
-  }
-  ASSERT ((TempVariableStoreHeader != 0) && (TempVariableStoreLen != 0));
-
-  //TempVariableStoreHeader = (UINT64) PcdGet32 (PcdFlashNvStorageVariableBase);
+  TempVariableStoreHeader = (UINT64) PcdGet32 (PcdFlashNvStorageVariableBase);
   VariableStoreEntry.Base = TempVariableStoreHeader + \
                               (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
-  VariableStoreEntry.Length = TempVariableStoreLen - \
+  VariableStoreEntry.Length = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
                                 (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
   //
   // Mark the variable storage region of the FLASH as RUNTIME
