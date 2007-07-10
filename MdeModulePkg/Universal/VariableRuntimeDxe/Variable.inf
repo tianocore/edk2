@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Variable
@@ -38,37 +33,14 @@
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VariableClassAddressChangeEvent
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   InitVariable.c
   reclaim.c
-  reclaim.h
   Variable.c
   Variable.h
-  CommonHeader.h
-
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdePkg/MdePkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -87,39 +59,16 @@
 [Guids]
   gEfiFlashMapHobGuid
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
   gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL SOMETIMES_CONSUMED
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
 
-
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsDynamic.common]
   PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
   PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
-
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid AND gEfiFaultTolerantWriteLiteProtocolGuid
-
 

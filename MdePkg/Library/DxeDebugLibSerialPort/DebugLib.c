@@ -12,10 +12,14 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/SerialPortLib.h>
+
 
 //
 // Define the maximum debug and assert message length that this library supports 

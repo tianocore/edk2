@@ -21,11 +21,6 @@ Revision History
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include <PeiMain.h>
 
 EFI_STATUS

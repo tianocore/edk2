@@ -17,40 +17,8 @@ Abstract:
 
 --*/
 
-#include <Uefi.h>
+#include <ConPlatform.h>
 
-#include "ConPlatform.h"
-
-
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Protocol/SimpleTextOut.h>
-#include <Guid/GlobalVariable.h>
-#include <Guid/ConsoleInDevice.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/SimpleTextIn.h>
-#include <Guid/HotPlugDevice.h>
-#include <Guid/StandardErrorDevice.h>
-#include <Guid/ConsoleOutDevice.h>
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/MemoryAllocationLib.h>
-//
-// Driver Binding Externs
-//
-extern EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
-extern EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
 
 EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding = {
   ConPlatformTextInDriverBindingSupported,

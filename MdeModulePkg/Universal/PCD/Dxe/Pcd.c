@@ -15,11 +15,6 @@ Module Name: Pcd.c
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Service.h"
 
 EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_CALLBACK);

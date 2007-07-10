@@ -17,7 +17,7 @@
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include <PeiMain.h>
 
 /**
   Transfers control to a function starting with a new stack.

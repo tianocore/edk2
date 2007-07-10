@@ -19,10 +19,9 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <Base.h>
+#include <Library/CustomDecompressLib.h>
+
 
 RETURN_STATUS
 EFIAPI

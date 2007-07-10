@@ -32,12 +32,9 @@ Abstract:
   
 --*/  
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
+#include "DxeIpl.h"
 #include "VirtualMemory.h"
+
 
 UINTN
 CreateIdentityMappingPageTables (

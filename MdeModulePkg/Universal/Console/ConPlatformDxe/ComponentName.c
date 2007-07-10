@@ -22,8 +22,7 @@ Abstract:
 //
 
 
-#include "ConPlatform.h"
-#include "ComponentName.h"
+#include <ConPlatform.h>
 
 //
 // EFI Component Name Protocol

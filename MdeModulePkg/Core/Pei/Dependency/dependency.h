@@ -23,10 +23,6 @@ Abstract:
 #ifndef _PEI_DEPENDENCY_H_
 #define _PEI_DEPENDENCY_H_
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #define MAX_GRAMMAR_SIZE  256
 

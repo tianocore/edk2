@@ -18,10 +18,18 @@ Module Name: Service.h
 #ifndef _SERVICE_H
 #define _SERVICE_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Protocol/Pcd.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/PcdLib.h>
+#include <Library/HobLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 //
 // Please make sure the PCD Serivce PEIM Version is consistent with

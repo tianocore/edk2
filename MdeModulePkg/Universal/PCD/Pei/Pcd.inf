@@ -36,7 +36,6 @@
   Service.c
   Service.h
   Pcd.c
-  CommonHeader.h
 
 [Packages]
   MdePkg/MdePkg.dec
