@@ -40,6 +40,44 @@ EFI_DRIVER_BINDING_PROTOCOL gIsaBusControllerDriver = {
   NULL
 };
 
+/**
+  The user Entry Point for module IsaBus. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeIsaBus(
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallAllDriverProtocols (
+             ImageHandle,
+             SystemTable,
+             &gIsaBusControllerDriver,
+             ImageHandle,
+             &gIsaBusComponentName,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+
+  return Status;
+}
+
+
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverSupported (
@@ -180,11 +218,6 @@ IsaBusControllerDriverStart (
   //
   EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA AllocFailExtendedData;
   EFI_DEVICE_PATH_PROTOCOL              *DevicePathData;
-
-  BootScriptSaveInformationAsciiString (
-    EFI_ACPI_S3_RESUME_SCRIPT_TABLE,
-    "IsaBusBindingStartBegin"
-    );
 
   //
   // Initialize status code structure
@@ -377,11 +410,6 @@ IsaBusControllerDriverStart (
     IsaAcpi->EnableDevice (IsaAcpi, IsaDevice, TRUE);
 
   } while (TRUE);
-
-  BootScriptSaveInformationAsciiString (
-    EFI_ACPI_S3_RESUME_SCRIPT_TABLE,
-    "IsaBusBindingStartEnd"
-    );
 
   return EFI_SUCCESS;
 }

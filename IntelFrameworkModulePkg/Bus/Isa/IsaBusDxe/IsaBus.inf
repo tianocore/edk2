@@ -56,8 +56,6 @@
   IsaBus.h
   IsaAcpi.h
   ComponentName.h
-  CommonHeader.h
-  EntryPoint.c
 
 
 ################################################################################

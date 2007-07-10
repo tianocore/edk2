@@ -22,11 +22,6 @@ Abstract:
 #ifndef _EFI_ISA_IO_LOCAL_H
 #define _EFI_ISA_IO_LOCAL_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "InternalIsaBus.h"
 
 //
