@@ -75,12 +75,11 @@
   UefiBootServicesTableLib
   MemoryAllocationLib
   HobLib
-  PcdLib
   UefiDriverEntryPoint
   UefiLib
   DebugLib
   BaseLib
-
+  PcdLib
 
 ################################################################################
 #
