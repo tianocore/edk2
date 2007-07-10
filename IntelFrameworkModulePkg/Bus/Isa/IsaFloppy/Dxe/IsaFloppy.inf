@@ -64,7 +64,6 @@
   IsaFloppyBlock.c
   IsaFloppy.c
   IsaFloppy.h
-  EntryPoint.c
 
 ################################################################################
 #

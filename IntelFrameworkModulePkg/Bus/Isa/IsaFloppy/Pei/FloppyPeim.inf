@@ -99,5 +99,5 @@
 ################################################################################
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiFvFileLoaderPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
