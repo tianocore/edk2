@@ -25,9 +25,33 @@ Revision History:
 #define _EFI_ISA_BUS_H
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <FrameworkDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/PciIo.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/IsaIo.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/IsaAcpi.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/GenericMemoryTest.h>
+#include <Guid/StatusCodeDataTypeId.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/PcdLib.h>
 
 #include "ComponentName.h"
 

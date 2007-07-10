@@ -26,7 +26,7 @@ Revision History:
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "InternalIsaBus.h"
 
 extern EFI_COMPONENT_NAME_PROTOCOL  gIsaBusComponentName;
 
