@@ -23,11 +23,20 @@ Abstract:
 #define _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
 
 
+#include <FrameworkDxe.h>
+#include <Protocol/Cpu.h>
+#include <Protocol/DataHub.h>
+#include <Protocol/HiiFramework.h>
+#include <Guid/DataHubRecords.h>
+#include <Protocol/CpuIo.h>
+#include <Protocol/WinNtIo.h>
+#include <Library/DebugLib.h>
+#include <Library/HiiLibFramework.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 extern UINT8  CpuStrings[];
 

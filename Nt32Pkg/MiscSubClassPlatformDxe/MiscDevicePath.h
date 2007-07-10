@@ -24,11 +24,6 @@ Abstract:
 #define _MISC_DEVICE_PATH_H
 
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #pragma pack(1)
 //
 // USB

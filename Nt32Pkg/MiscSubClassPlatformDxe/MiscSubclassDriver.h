@@ -22,14 +22,22 @@ Abstract:
 #ifndef _MISC_SUBCLASS_DRIVER_H
 #define _MISC_SUBCLASS_DRIVER_H
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <FrameworkDxe.h>
+#include <WinNtDxe.h>
+#include <Guid/DataHubRecords.h>
+#include <Protocol/DataHub.h>
+#include <Protocol/WinNtIo.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/HiiLibFramework.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 #include <MiscDevicePath.h>
-
 
 //
 // Data table entry update function.

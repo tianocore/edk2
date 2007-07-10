@@ -22,12 +22,15 @@ Abstract:
 #ifndef _NT_THUNK_METRONOME_H_
 #define _NT_THUNK_METRONOME_H_
 
+#include <PiDxe.h>
+#include <WinNtDxe.h>
+#include <Protocol/Metronome.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/WinNtLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 //
 // Period of on tick in 100 nanosecond units

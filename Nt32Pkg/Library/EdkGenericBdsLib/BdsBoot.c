@@ -19,12 +19,8 @@ Abstract:
   option.
 
 --*/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
-#include "Performance.h"
+#include <EdkGenericBdsLibInternal.h>
 
 BOOLEAN mEnumBootDevice = FALSE;
 

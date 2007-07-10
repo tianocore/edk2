@@ -17,11 +17,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EdkGenericBdsLib
@@ -39,43 +34,20 @@
 #  VALID_ARCHITECTURES           = IA32
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   BdsMisc.c
   Performance.c
-  Performance.h
   DevicePath.c
   BdsConnect.c
   BdsConsole.c
   BdsBoot.c
-  CommonHeader.h
-
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
+  EdkGenericBdsLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   Nt32Pkg/Nt32Pkg.dec
-
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PeCoffLib
@@ -92,25 +64,10 @@
   UefiLib
   BaseLib
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
   gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
   gEfiShellFileGuid                             # ALWAYS_CONSUMED
-
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL SOMETIMES_CONSUMED
