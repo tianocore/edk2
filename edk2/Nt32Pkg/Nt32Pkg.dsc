@@ -106,22 +106,19 @@
   UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   WinNtLib|$(WORKSPACE)/Nt32Pkg/Library/DxeWinNtLib/DxeWinNtLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)/Nt32Pkg/Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   IoLib|$(WORKSPACE)/MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
   PeimEntryPoint|$(WORKSPACE)/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
@@ -143,15 +140,13 @@
   OldPeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/OldPeiCoreEntryPoint/OldPeiCoreEntryPoint.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   PeCoffGetEntryPointLib|$(WORKSPACE)/Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/Nt32PeiPeCoffGetEntryPointLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   DebugLib|$(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -171,8 +166,7 @@
 [LibraryClasses.common.UEFI_DRIVER]
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -191,8 +185,7 @@
 [LibraryClasses.common.DXE_DRIVER]
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -219,8 +212,7 @@
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   EdkIfrSupportLib|$(WORKSPACE)/MdeModulePkg/Library/EdkIfrSupportLib/EdkIfrSupportLib.inf
-  # After tools enable the dynamic PCD, please uncomment follows library instances mapping.
-  #PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  PcdLib|$(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -376,7 +368,10 @@
   #  DXE Phase modules
   ##
   $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf  
-  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
+    <LibraryClass>
+      PcdLib|$(WORKSPACE)/MdeModulePkg/Library/PcdDriverPcdLibNull/PcdLib.inf
+  }
   $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
   $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf  
   $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
