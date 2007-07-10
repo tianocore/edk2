@@ -83,7 +83,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED" SupArchList="IA32">
       <C_Name>PcdNtEmulatorEnable</C_Name>
-      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdeModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>If this PCD is set as TRUE, NT emulator will be endabled.</HelpText>
     </PcdEntry>
   </PcdCoded>
