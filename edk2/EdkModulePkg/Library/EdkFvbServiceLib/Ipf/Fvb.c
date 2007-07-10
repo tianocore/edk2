@@ -87,7 +87,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, Read, Instance, Lba, Offset, (UINT64) NumBytes, (UINT64) Buffer, 0, 0).Status;
+  return EsalCall (&Guid, ReadFunctionId, Instance, Lba, Offset, (UINT64) NumBytes, (UINT64) Buffer, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -123,7 +123,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, Write, Instance, Lba, Offset, (UINT64) NumBytes, (UINT64) Buffer, 0, 0).Status;
+  return EsalCall (&Guid, WriteFunctionId, Instance, Lba, Offset, (UINT64) NumBytes, (UINT64) Buffer, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -150,7 +150,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, EraseBlock, Instance, Lba, 0, 0, 0, 0, 0).Status;
+  return EsalCall (&Guid, EraseBlockFunctionId, Instance, Lba, 0, 0, 0, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -179,7 +179,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, SetVolumeAttributes, Instance, (UINT64) Attributes, 0, 0, 0, 0, 0).Status;
+  return EsalCall (&Guid, SetVolumeAttributesFunctionId, Instance, (UINT64) Attributes, 0, 0, 0, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -211,7 +211,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, SetVolumeAttributes, Instance, (UINT64) Attributes, 0, 0, 0, 0, 0).Status;
+  return EsalCall (&Guid, SetVolumeAttributesFunctionId, Instance, (UINT64) Attributes, 0, 0, 0, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -241,7 +241,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI;
 
-  return EsalCall (&Guid, GetPhysicalAddress, Instance, (UINT64) BaseAddress, 0, 0, 0, 0, 0).Status;
+  return EsalCall (&Guid, GetPhysicalAddressFunctionId, Instance, (UINT64) BaseAddress, 0, 0, 0, 0, 0).Status;
 }
 
 EFI_STATUS
@@ -280,7 +280,7 @@ Returns:
 
   return EsalCall (
           &Guid,
-          GetBlockSize,
+          GetBlockSizeFunctionId,
           Instance,
           Lba,
           (UINT64) BlockSize,
@@ -324,7 +324,7 @@ Returns:
 
   return EsalCall (
           &Guid,
-          EraseCustomBlockRange,
+          EraseCustomBlockRangeFunctionId,
           Instance,
           StartLba,
           OffsetStartLba,

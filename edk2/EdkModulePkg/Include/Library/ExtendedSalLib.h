@@ -146,7 +146,7 @@ EsalGetNewPalEntry (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalGetStateBufferLeon (
+EsalGetStateBuffer (
   IN  UINT64  McaType,
   OUT UINT8   **McaBuffer,
   OUT UINTN   *BufferSize
@@ -164,7 +164,7 @@ EsalGetStateBufferLeon (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalSaveStateBufferLeon (
+EsalSaveStateBuffer (
   IN  UINT64  McaType
   )
 ;
@@ -181,7 +181,7 @@ EsalSaveStateBufferLeon (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalGetVectorsLeon (
+EsalGetVectors (
   IN  UINT64  VectorType
   )
 ;
@@ -200,7 +200,7 @@ EsalGetVectorsLeon (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalMcGetParamsLeon (
+EsalMcGetParams (
   IN  UINT64  ParamInfoType
   )
 ;
@@ -214,7 +214,7 @@ EsalMcGetParamsLeon (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalMcGetMcParamsLeon (
+EsalMcGetMcParams (
   VOID
   )
 ;
@@ -230,7 +230,7 @@ EsalMcGetMcParamsLeon (
 **/
 SAL_RETURN_REGS
 EFIAPI
-EsalGetMcCheckinFlagsLeon (
+EsalGetMcCheckinFlags (
   IN  UINT64  CpuIndex
   )
 ;
