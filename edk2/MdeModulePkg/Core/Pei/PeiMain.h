@@ -24,10 +24,26 @@ Revision History
 #ifndef _PEI_MAIN_H_
 #define _PEI_MAIN_H_
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiPei.h>
+#include <FrameworkPei.h>
+#include <Ppi/DxeIpl.h>
+#include <Ppi/MemoryDiscovered.h>
+#include <Ppi/FindFv.h>
+#include <Ppi/StatusCode.h>
+#include <Ppi/Security.h>
+#include <Ppi/Reset.h>
+#include <Ppi/LoadFile.h>
+#include <Library/DebugLib.h>
+#include <Library/PeiCoreEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/HobLib.h>
+#include <Library/PerformanceLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/TimerLib.h>
+
 
 extern EFI_GUID gEfiPeiCorePrivateGuid;
 

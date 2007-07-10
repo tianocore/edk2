@@ -23,7 +23,7 @@ Revision History
 --*/
 
 
-#include "reclaim.h"
+#include <Variable.h>
 #include "Common/Variable.h"
 
 EFI_STATUS

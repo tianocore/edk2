@@ -20,11 +20,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "DevicePath.h"
 
 EFI_HANDLE  mDevicePathHandle = NULL;

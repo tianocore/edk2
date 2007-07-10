@@ -20,14 +20,25 @@ Abstract:
 #ifndef _VARIABLE_H
 #define _VARIABLE_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
-//
-// Statements that include other header files
-//
+#include <PiDxe.h>
+#include <Protocol/VariableWrite.h>
+#include <Protocol/FaultTolerantWriteLite.h>
+#include <Protocol/FirmwareVolumeBlock.h>
+#include <Protocol/Variable.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/DxeServicesTableLib.h>
+#include <Library/UefiRuntimeLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/FvbServiceLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/HobLib.h>
+#include <Common/FlashMap.h>
+#include <Guid/FlashMapHob.h>
 
 //
 // BugBug: We need relcate the head file.
@@ -85,24 +96,21 @@ EFIAPI
 VariableCommonInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 VariableServiceInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
   IN EFI_EVENT        Event,
   IN VOID             *Context
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -114,8 +122,7 @@ GetVariable (
   OUT     VOID              *Data,
   IN      VARIABLE_GLOBAL   * Global,
   IN      UINT32            Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -125,8 +132,7 @@ GetNextVariableName (
   IN OUT  EFI_GUID          *VendorGuid,
   IN      VARIABLE_GLOBAL   *Global,
   IN      UINT32            Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -140,8 +146,7 @@ SetVariable (
   IN UINTN                   *VolatileOffset,
   IN UINTN                   *NonVolatileOffset,
   IN UINT32                  Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -152,7 +157,19 @@ QueryVariableInfo (
   OUT UINT64                 *MaximumVariableSize,
   IN  VARIABLE_GLOBAL        *Global,
   IN  UINT32                 Instance
-  )
-;
+  );
+
+EFI_STATUS
+GetFvbHandleByAddress (
+  IN  EFI_PHYSICAL_ADDRESS   VariableStoreBase,
+  OUT EFI_HANDLE             *FvbHandle
+  );
+
+EFI_STATUS
+FtwVariableSpace (
+  IN EFI_PHYSICAL_ADDRESS   VariableBaseAddress,
+  IN UINT8                  *Buffer,
+  IN UINTN                  BufferSize
+  );
 
 #endif

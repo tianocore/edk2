@@ -20,10 +20,31 @@ Abstract:
 #ifndef CON_MANAGE_H_
 #define CON_MANAGE_H_
 
+#include <Uefi.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Guid/GlobalVariable.h>
+#include <Guid/ConsoleInDevice.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Guid/HotPlugDevice.h>
+#include <Guid/StandardErrorDevice.h>
+#include <Guid/ConsoleOutDevice.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/MemoryAllocationLib.h>
+
 //
-// Include common header file for this module.
+// Driver Binding Externs
 //
-#include "CommonHeader.h"
+extern EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextInDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
 
 #define VarConsoleInpDev  L"ConInDev"
 #define VarConsoleInp     L"ConIn"
@@ -127,6 +148,27 @@ BOOLEAN
 IsHotPlugDevice (
   EFI_HANDLE    DriverBindingHandle,
   EFI_HANDLE    ControllerHandle
+  );
+
+//
+// EFI Component Name Functions
+//
+EFI_STATUS
+EFIAPI
+ConPlatformComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+ConPlatformComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
   );
 
 #endif

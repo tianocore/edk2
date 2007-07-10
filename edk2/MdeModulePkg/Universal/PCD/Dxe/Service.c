@@ -14,10 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name: Service.c
 
 **/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "Service.h"
 

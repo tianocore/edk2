@@ -21,10 +21,21 @@ Abstract:
 #ifndef _DEVICE_PATH_DRIVER_H
 #define _DEVICE_PATH_DRIVER_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Protocol/DevicePathUtilities.h>
+#include <Protocol/DebugPort.h>
+#include <Protocol/DevicePathToText.h>
+#include <Protocol/DevicePathFromText.h>
+#include <Guid/PcAnsi.h>
+#include <Library/DebugLib.h>
+#include <Library/PrintLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
 extern const EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;
 extern const EFI_GUID mEfiDevicePathMessagingSASGuid;
