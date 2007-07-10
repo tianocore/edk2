@@ -866,6 +866,11 @@
       <GuidValue>403CD195-F233-48EC-8455-B2E52F1D9E02</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="ExtendedSalErrorEventInformation">
+      <C_Name>gEfiExtendedSalErrorEventInfoProtocolGuid</C_Name>
+      <GuidValue>D0D7913F-1114-4543-B568-C30C737AFF96</GuidValue>
+      <HelpText>error event information-produced by Mca Handler</HelpText>
+    </Entry>
   </ProtocolDeclarations>
   <PpiDeclarations>
     <Entry Name="PeiInMemory">

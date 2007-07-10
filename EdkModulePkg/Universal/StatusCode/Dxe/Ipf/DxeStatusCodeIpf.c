@@ -206,7 +206,7 @@ ReportEsalServiceEntry (
 
   switch (FunctionId) {
 
-  case ReportStatusCodeService:
+  case ReportStatusCodeServiceFunctionId:
 
     DxeStatusCode = (DXE_STATUS_CODE_CONTROLLER *) Global;
 
@@ -315,7 +315,7 @@ DxeStatusCodeDriverEntry (
              &gEfiExtendedSalStatusCodeServicesProtocolGuid,
             &gDxeStatusCode,
              ReportEsalServiceEntry,
-             StatusCode,
+             StatusCodeFunctionId,
              NULL
              );
   ASSERT_EFI_ERROR (Status);

@@ -53,7 +53,7 @@ Returns:
   SAL_RETURN_REGS ReturnVal;
 
   switch (FunctionId) {
-  case EsalGetVariable:
+  case EsalGetVariableFunctionId:
     ReturnVal.Status = GetVariable (
                         (CHAR16 *) Arg2,
                         (EFI_GUID *) Arg3,
@@ -65,7 +65,7 @@ Returns:
                         );
     return ReturnVal;
 
-  case EsalGetNextVariableName:
+  case EsalGetNextVariableNameFunctionId:
     ReturnVal.Status = GetNextVariableName (
                         (UINTN *) Arg2,
                         (CHAR16 *) Arg3,
@@ -75,7 +75,7 @@ Returns:
                         );
     return ReturnVal;
 
-  case EsalSetVariable:
+  case EsalSetVariableFunctionId:
     ReturnVal.Status = SetVariable (
                         (CHAR16 *) Arg2,
                         (EFI_GUID *) Arg3,
@@ -89,7 +89,7 @@ Returns:
                         );
     return ReturnVal;
 
-  case EsalQueryVariableInfo:
+  case EsalQueryVariableInfoFunctionId:
     ReturnVal.Status = QueryVariableInfo (
                         (UINT32) Arg2,
                         (UINT64 *) Arg3,
@@ -166,13 +166,13 @@ Returns:
     &gEfiExtendedSalVariableServicesProtocolGuid,
     mVariableModuleGlobal,
     EsalVariableCommonEntry,
-    EsalGetVariable,
+    EsalGetVariableFunctionId,
     EsalVariableCommonEntry,
-    EsalGetNextVariableName,
+    EsalGetNextVariableNameFunctionId,
     EsalVariableCommonEntry,
-    EsalSetVariable,
+    EsalSetVariableFunctionId,
     EsalVariableCommonEntry,
-    EsalQueryVariableInfo,
+    EsalQueryVariableInfoFunctionId,
     NULL
     );
 

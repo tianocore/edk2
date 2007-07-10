@@ -202,7 +202,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, IsEfiRuntime, 0, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, IsEfiRuntimeFunctionId, 0, 0, 0, 0, 0, 0, 0);
 
   return (BOOLEAN) (ReturnReg.r9 == 1);
 }
@@ -231,7 +231,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, IsVirtual, 0, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, IsVirtualFunctionId, 0, 0, 0, 0, 0, 0, 0);
 
   return (BOOLEAN) (ReturnReg.r9 == 1);
 }

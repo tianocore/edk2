@@ -168,6 +168,11 @@ Abstract:
   { 0x38802700, 0x868a, 0x4b4e, {0x81, 0xd4, 0x4f, 0x1b, 0xdc, 0xcf, 0xb4, 0x6f } }
 //  GUID_STRUCTURE(EFI_EXTENDED_SAL_SST_GUID_LO, EFI_EXTENDED_SAL_SST_GUID_HI)
 
+#define EFI_ERROR_EVENT_INFORMATION_PROTOCOL_GUID_LO 0x45431114D0D7913F
+#define EFI_ERROR_EVENT_INFORMATION_PROTOCOL_GUID_HI 0x96FF7A730CC368B5
+#define EFI_ERROR_EVENT_INFORMATION_PROTOCOL_GUID \
+  { 0xD0D7913F, 0x1114, 0x4543, {0xB5, 0x68, 0xC3, 0x0C, 0x73, 0x7A, 0xFF, 0x96 } }
+
 //
 // Extended Sal Proc Function IDs.
 //
@@ -179,21 +184,21 @@ Abstract:
 //
 
 typedef enum {
-  IoRead,
-  IoWrite,
-  MemRead,
-  MemWrite
+  IoReadFunctionId,
+  IoWriteFunctionId,
+  MemReadFunctionId,
+  MemWriteFunctionId
 } EFI_EXTENDED_SAL_BASE_IO_SERVICES_FUNC_ID;
 
 typedef enum {
-  Stall
+  StallFunctionId
 } EFI_EXTENDED_SAL_STALL_FUNC_ID;
 
 
 typedef enum {
-  InitializeLockService,
-  AcquireLockService,
-  ReleaseLockService,
+  InitializeLockServiceFunctionId,
+  AcquireLockServiceFunctionId,
+  ReleaseLockServiceFunctionId,
   MaxLockServiceFunctionId
 } EFI_EXTENDED_SAL_LOCK_SERVICES_FUNC_ID;
 
@@ -202,139 +207,153 @@ typedef enum {
 // and move SalRegisterPhysicalAddress to SAL BASE Class
 //
 typedef enum {
-  SetVirtualAddress,
-  IsVirtual,
-  IsEfiRuntime,
-  SalRegisterPhysicalAddress
+  SetVirtualAddressFunctionId,
+  IsVirtualFunctionId,
+  IsEfiRuntimeFunctionId,
+  SalRegisterPhysicalAddressFunctionId
 } EFI_EXTENDED_SAL_VIRTUAL_SERVICES_FUNC_ID;
 
 typedef enum {
-  GetTime,
-  SetTime,
-  GetWakeupTime,
-  SetWakeupTime,
-  GetRtcFreq,
-  InitializeThreshold,
-  BumpThresholdCount,
-  GetThresholdCount
+  GetTimeFunctionId,
+  SetTimeFunctionId,
+  GetWakeupTimeFunctionId,
+  SetWakeupTimeFunctionId,
+  GetRtcFreqFunctionId,
+  InitializeThresholdFunctionId,
+  BumpThresholdCountFunctionId,
+  GetThresholdCountFunctionId
 } EFI_EXTENDED_SAL_RTC_SERVICES_FUNC_ID;
 
 typedef enum {
-  EsalGetVariable,
-  EsalGetNextVariableName,
-  EsalSetVariable
+  EsalGetVariableFunctionId,
+  EsalGetNextVariableNameFunctionId,
+  EsalSetVariableFunctionId
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   ,
-  EsalQueryVariableInfo
+  EsalQueryVariableInfoFunctionId
 #endif
 } EFI_EXTENDED_SAL_VARIABLE_SERVICES_FUNC_ID;
 
 typedef enum {
-  GetNextHighMonotonicCount
+  GetNextHighMonotonicCountFunctionId
 } EFI_EXTENDED_SAL_MTC_SERVICES_FUNC_ID;
 
 typedef enum {
-  ResetSystem
+  ResetSystemFunctionId
 } EFI_EXTENDED_SAL_RESET_SERVICES_FUNC_ID;
 
 typedef enum {
-  StatusCode
+  StatusCodeFunctionId
 } EFI_EXTENDED_SAL_STATUS_CODE_FUNC_ID;
 
 typedef enum {
-  ReportStatusCodeService
+  ReportStatusCodeServiceFunctionId
 } EFI_EXTENDED_SAL_STATUS_CODE_SERVICES_FUNC_ID;
 
 typedef enum {
-  Read,
-  Write,
-  EraseBlock,
-  GetVolumeAttributes,
-  SetVolumeAttributes,
-  GetPhysicalAddress,
-  GetBlockSize,
-  EraseCustomBlockRange,
+  ReadFunctionId,
+  WriteFunctionId,
+  EraseBlockFunctionId,
+  GetVolumeAttributesFunctionId,
+  SetVolumeAttributesFunctionId,
+  GetPhysicalAddressFunctionId,
+  GetBlockSizeFunctionId,
+  EraseCustomBlockRangeFunctionId
 } EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_FUNC_ID;
 
 typedef enum {
-  AddCpuData,
-  RemoveCpuData,
-  ModifyCpuData,
-  GetCpuDataByID,
-  GetCpuDataByIndex,
-  SendIpi,
-  CurrentProcInfo,
-  NumProcessors,
-  SetMinState,
-  GetMinState,
-  EsalPhysicalIdInfo
+  AddCpuDataFunctionId,
+  RemoveCpuDataFunctionId,
+  ModifyCpuDataFunctionId,
+  GetCpuDataByIDFunctionId,
+  GetCpuDataByIndexFunctionId,
+  SendIpiFunctionId,
+  CurrentProcInfoFunctionId,
+  NumProcessorsFunctionId,
+  SetMinStateFunctionId,
+  GetMinStateFunctionId,
+  EsalPhysicalIdInfoFunctionId
 } EFI_EXTENDED_SAL_MP_SERVICES_FUNC_ID;
 
 typedef enum {
-  PalProc,
-  SetNewPalEntry,
-  GetNewPalEntry,
-  EsalUpdatePal
+  PalProcFunctionId,
+  SetNewPalEntryFunctionId,
+  GetNewPalEntryFunctionId,
+  EsalUpdatePalFunctionId
 } EFI_EXTENDED_SAL_PAL_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalSetVectors,
-  SalMcRendez,
-  SalMcSetParams,
-  EsalGetVectors,
-  EsalMcGetParams,
-  EsalMcGetMcParams,
-  EsalGetMcCheckinFlags,
-  EsalGetPlatformBaseFreq,
+  McaVector,
+  BspInitVector,
+  BootRendezVector,
+  ApInitVector
+} ESAL_GET_VECTOR_TYPE;
+
+typedef enum {
+  SalSetVectorsFunctionId,
+  SalMcRendezFunctionId,
+  SalMcSetParamsFunctionId,
+  EsalGetVectorsFunctionId,
+  EsalMcGetParamsFunctionId,
+  EsalMcGetMcParamsFunctionId,
+  EsalGetMcCheckinFlagsFunctionId,
+  EsalGetPlatformBaseFreqFunctionId,
   EsalRegisterPhysicalAddrFunctionId
 } EFI_EXTENDED_SAL_BASE_SERVICES_FUNC_ID;
 
 typedef enum {
-  McaGetStateInfo,
-  McaRegisterCpu
+  McaGetStateInfoFunctionId,
+  McaRegisterCpuFunctionId
 } EFI_EXTENDED_SAL_MCA_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalPciConfigRead,
-  SalPciConfigWrite
+  SalPciConfigReadFunctionId,
+  SalPciConfigWriteFunctionId
 } EFI_EXTENDED_SAL_PCI_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalCacheInit,
-  SalCacheFlush
+  SalCacheInitFunctionId,
+  SalCacheFlushFunctionId
 } EFI_EXTENDED_SAL_CACHE_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalGetStateInfo,
-  SalGetStateInfoSize,
-  SalClearStateInfo,
-  EsalGetStateBuffer,
-  EsalSaveStateBuffer
+  SalGetStateInfoFunctionId,
+  SalGetStateInfoSizeFunctionId,
+  SalClearStateInfoFunctionId,
+  EsalGetStateBufferFunctionId,
+  EsalSaveStateBufferFunctionId
 } EFI_EXTENDED_SAL_MCA_LOG_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalSetEventLogData,
-  SalGetEventLogData,
-  SalEraseEventLogData,
-  SalActivateEventLogData
+  SalSetEventLogDataFunctionId,
+  SalGetEventLogDataFunctionId,
+  SalEraseEventLogDataFunctionId,
+  SalActivateEventLogDataFunctionId
 } EFI_EXTENDED_SAL_ELOG_SERVICES_FUNC_ID;
 
 typedef enum {
-  EsalGetComControllerInfo,
-  EsalSendComData,
-  EsalReceiveComData 
+  EsalGetComControllerInfoFunctionId,
+  EsalSendComDataFunctionId,
+  EsalReceiveComDataFunctionId 
 } EFI_EXTENDED_SAL_SM_COM_LAYER_SERVICES_FUNC_ID;
 
 typedef enum {
-  SalUpdatePal
+  SalUpdatePalFunctionId
 } EFI_EXTENDED_SAL_UPDATE_PAL_SERVICES_FUNC_ID;
 
 typedef enum {
-  EsalReadSensorInfo,   
-  EsalReadSensorStatus,
-  EsalRearmSensor,
-  EsalReadSensorData  
+  EsalReadSensorInfoFunctionId,   
+  EsalReadSensorStatusFunctionId,
+  EsalRearmSensorFunctionId,
+  EsalReadSensorDataFunctionId
 } EFI_EXTENDED_SAL_SENSOR_SERVICES_FUNC_ID;
+
+typedef enum {
+  EsalGetProcessorErrorEventInfoFunctionId,
+  EsalGetPlatformErrorEventInfoFunctionId,
+  EsalClearProcessorErrorEventInfoFunctionId,
+  EsalClearPlatformErrorEventInfoFunctionId
+} EFI_EXTENDED_SAL_ERROR_EVENT_INFO_FUNC_ID;
 
 typedef struct {
   UINT64      ProtoData;       
@@ -361,6 +380,7 @@ extern EFI_GUID gEfiExtendedSalElogServicesProtocolGuid;
 extern EFI_GUID gEfiExtendedSalSensorServicesProtocolGuid;
 extern EFI_GUID gEfiExtendedSalSmComLayerServicesProtocolGuid;
 extern EFI_GUID gEfiExtendedSalSstGuid;
+extern EFI_GUID gEfiExtendedSalErrorEventInfoProtocolGuid;
 
 
 #endif

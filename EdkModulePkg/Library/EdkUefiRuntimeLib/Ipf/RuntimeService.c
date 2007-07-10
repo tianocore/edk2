@@ -52,7 +52,7 @@ Returns:
 
   EsalCall (
     &Guid,
-    ResetSystem,
+    ResetSystemFunctionId,
     (UINT64) ResetType,
     (UINT64) ResetStatus,
     (UINT64) DataSize,
@@ -99,7 +99,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, GetTime, (UINT64) Time, (UINT64) Capabilities, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetTimeFunctionId, (UINT64) Time, (UINT64) Capabilities, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -130,7 +130,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, SetTime, (UINT64) Time, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, SetTimeFunctionId, (UINT64) Time, 0, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -165,7 +165,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, GetWakeupTime, (UINT64) Enabled, (UINT64) Pending, (UINT64) Time, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetWakeupTimeFunctionId, (UINT64) Enabled, (UINT64) Pending, (UINT64) Time, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -199,7 +199,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, SetWakeupTime, (UINT64) Enable, (UINT64) Time, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, SetWakeupTimeFunctionId, (UINT64) Enable, (UINT64) Time, 0, 0, 0, 0, 0);
   return ReturnReg.Status;
 }
 
@@ -243,7 +243,7 @@ Returns:
 
   ReturnReg = EsalCall (
                 &Guid,
-                EsalGetVariable,
+                EsalGetVariableFunctionId,
                 (UINT64) VariableName,
                 (UINT64) VendorGuid,
                 (UINT64) Attributes,
@@ -293,7 +293,7 @@ Returns:
 
   ReturnReg = EsalCall (
                 &Guid,
-                EsalGetNextVariableName,
+                EsalGetNextVariableNameFunctionId,
                 (UINT64) VariableNameSize,
                 (UINT64) VariableName,
                 (UINT64) VendorGuid,
@@ -343,7 +343,7 @@ Returns:
 
   ReturnReg = EsalCall (
                 &Guid,
-                EsalSetVariable,
+                EsalSetVariableFunctionId,
                 (UINT64) VariableName,
                 (UINT64) VendorGuid,
                 (UINT64) Attributes,
@@ -382,7 +382,7 @@ Returns:
   *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID_LO;
   *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_MTC_SERVICES_PROTOCOL_GUID_HI;
 
-  ReturnReg = EsalCall (&Guid, GetNextHighMonotonicCount, (UINT64) HighCount, 0, 0, 0, 0, 0, 0);
+  ReturnReg = EsalCall (&Guid, GetNextHighMonotonicCountFunctionId, (UINT64) HighCount, 0, 0, 0, 0, 0, 0);
   return (EFI_STATUS) ReturnReg.Status;
 }
 
@@ -501,7 +501,7 @@ EfiSetVirtualAddressMap (
 
   ReturnReg = EsalCall (
                 &Guid,
-                SetVirtualAddress,
+                SetVirtualAddressFunctionId,
                 (UINT64) MemoryMapSize,
                 (UINT64) DescriptorSize,
                 (UINT64) DescriptorVersion,
