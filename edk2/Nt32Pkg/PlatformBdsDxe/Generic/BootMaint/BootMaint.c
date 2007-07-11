@@ -33,7 +33,6 @@ Abstract:
 //
 extern UINT8    bmBin[];
 extern UINT8    FEBin[];
-extern EFI_GUID gBdsStringPackGuid;
 extern BOOLEAN  gConnectAllHappened;
 
 EFI_GUID        EfiLegacyDevOrderGuid = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
@@ -851,13 +850,13 @@ Returns:
   //
   // Post our VFR to the HII database.
   //
-  PackageList = PreparePackages (1, &gBdsStringPackGuid, bmBin);
+  PackageList = PreparePackages (1, &gEfiCallerIdGuid, bmBin);
   Status      = Hii->NewPack (Hii, PackageList, &HiiHandle);
   FreePool (PackageList);
 
   BmmCallbackInfo->BmmHiiHandle = HiiHandle;
 
-  PackageList                   = PreparePackages (1, &gBdsStringPackGuid, FEBin);
+  PackageList                   = PreparePackages (1, &gEfiCallerIdGuid, FEBin);
   Status                        = Hii->NewPack (Hii, PackageList, &HiiHandle);
   FreePool (PackageList);
 

@@ -42,7 +42,6 @@ UINTN                       gCallbackKey;
 BOOLEAN                     gConnectAllHappened = FALSE;
 
 extern EFI_HII_HANDLE       gFrontPageHandle;
-extern EFI_GUID             gBdsStringPackGuid;
 
 EFI_STATUS
 EFIAPI
@@ -106,7 +105,7 @@ Returns:
     //
     // Collect the languages from what our current Language support is based on our VFR
     //
-    Hii->GetPrimaryLanguages (Hii, gFrontPageHandle, &LanguageString);
+    gHii->GetPrimaryLanguages (gHii, gFrontPageHandle, &LanguageString);
 
     //
     // Based on the DataArray->Data->Data value, we can determine
@@ -255,9 +254,9 @@ Returns:
 
   gCallbackKey  = 0;
 
-  PackageList   = PreparePackages (1, &gBdsStringPackGuid, FrontPageVfrBin);
+  PackageList   = PreparePackages (1, &gEfiCallerIdGuid, FrontPageVfrBin);
 
-  Status        = Hii->NewPack (Hii, PackageList, &gFrontPageHandle);
+  Status        = gHii->NewPack (gHii, PackageList, &gFrontPageHandle);
 
   FreePool (PackageList);
 
@@ -335,7 +334,7 @@ ReInitStrings:
   //
   // Collect the languages from what our current Language support is based on our VFR
   //
-  Hii->GetPrimaryLanguages (Hii, gFrontPageHandle, &LanguageString);
+  gHii->GetPrimaryLanguages (gHii, gFrontPageHandle, &LanguageString);
 
   OptionCount = 0;
 
@@ -359,8 +358,8 @@ ReInitStrings:
       mLastSelection = (UINT16) OptionCount;
     }
 
-    Status = Hii->GetString (Hii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, StringBuffer);
-    Hii->NewString (Hii, NULL, gStringPackHandle, &Token, StringBuffer);
+    Status = gHii->GetString (gHii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, StringBuffer);
+    gHii->NewString (gHii, NULL, gStringPackHandle, &Token, StringBuffer);
     CopyMem (&OptionList[OptionCount].StringToken, &Token, sizeof (UINT16));
     CopyMem (&OptionList[OptionCount].Value, &OptionCount, sizeof (UINT16));
     Key = 0x1234;
@@ -392,7 +391,7 @@ ReInitStrings:
   //
   UpdateData->DataCount = (UINT8) (OptionCount + 2);
 
-  Hii->UpdateForm (Hii, gFrontPageHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gFrontPageHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
   FreePool (UpdateData);
   //
@@ -452,7 +451,7 @@ Returns:
     EnableResetRequired ();
   }
 
-  Hii->ResetStrings (Hii, gFrontPageHandle);
+  gHii->ResetStrings (gHii, gFrontPageHandle);
 
   return Status;
 }
@@ -499,11 +498,11 @@ Returns:
   //
   // Get all the Hii handles
   //
-  Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandleBuffer);
+  Status = BdsLibGetHiiHandles (gHii, &HandleBufferLength, &HiiHandleBuffer);
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get the Hii Handle that matches the StructureNode->ProducerName
+  // Get the gHii Handle that matches the StructureNode->ProducerName
   //
   NumberOfHiiHandles = HandleBufferLength / sizeof (EFI_HII_HANDLE);
   for (Index = 0; Index < NumberOfHiiHandles; Index++) {
@@ -523,8 +522,8 @@ Returns:
   //
   StringBufferLength  = 0x100;
   *String             = AllocateZeroPool (0x100);
-  Status = Hii->GetString (
-                  Hii,
+  Status = gHii->GetString (
+                  gHii,
                   HiiHandleBuffer[Index],
                   Token,
                   FALSE,
@@ -693,7 +692,7 @@ Returns:
         BiosVendor = (EFI_MISC_BIOS_VENDOR_DATA *) (DataHeader + 1);
         GetStringFromToken (&Record->ProducerName, BiosVendor->BiosVersion, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_BIOS_VERSION;
-        Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
+        gHii->NewString (gHii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
         FreePool (NewString);
         Find[0] = TRUE;
       }
@@ -704,7 +703,7 @@ Returns:
         SystemManufacturer = (EFI_MISC_SYSTEM_MANUFACTURER_DATA *) (DataHeader + 1);
         GetStringFromToken (&Record->ProducerName, SystemManufacturer->SystemProductName, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_COMPUTER_MODEL;
-        Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
+        gHii->NewString (gHii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
         FreePool (NewString);
         Find[1] = TRUE;
       }
@@ -715,7 +714,7 @@ Returns:
         ProcessorVersion = (EFI_PROCESSOR_VERSION_DATA *) (DataHeader + 1);
         GetStringFromToken (&Record->ProducerName, *ProcessorVersion, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_CPU_MODEL;
-        Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
+        gHii->NewString (gHii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
         FreePool (NewString);
         Find[2] = TRUE;
       }
@@ -726,7 +725,7 @@ Returns:
         ProcessorFrequency = (EFI_PROCESSOR_CORE_FREQUENCY_DATA *) (DataHeader + 1);
         ConvertProcessorToString (ProcessorFrequency, &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_CPU_SPEED;
-        Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
+        gHii->NewString (gHii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
         FreePool (NewString);
         Find[3] = TRUE;
       }
@@ -739,7 +738,7 @@ Returns:
                                   MemoryArray->MemoryArrayStartAddress + 1), 20)),
                                   &NewString);
         TokenToUpdate = (STRING_REF) STR_FRONT_PAGE_MEMORY_SIZE;
-        Hii->NewString (Hii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
+        gHii->NewString (gHii, Lang, gFrontPageHandle, &TokenToUpdate, NewString);
         FreePool (NewString);
         Find[4] = TRUE;
       }
@@ -797,7 +796,7 @@ Returns:
   //
   // Remove Banner Op-code if any at this label
   //
-  Hii->UpdateForm (Hii, gFrontPageHandle, (EFI_FORM_LABEL) 0xFFFF, FALSE, UpdateData);
+  gHii->UpdateForm (gHii, gFrontPageHandle, (EFI_FORM_LABEL) 0xFFFF, FALSE, UpdateData);
 
   //
   // Create Banner Op-code which reflects correct timeout value
@@ -812,7 +811,7 @@ Returns:
   //
   // Add Banner Op-code at this label
   //
-  Hii->UpdateForm (Hii, gFrontPageHandle, (EFI_FORM_LABEL) 0xFFFF, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gFrontPageHandle, (EFI_FORM_LABEL) 0xFFFF, TRUE, UpdateData);
 
   do {
 
