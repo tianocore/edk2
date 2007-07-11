@@ -28,7 +28,6 @@ STATIC UINT16                     mTokenCount;
 EFI_FRONTPAGE_CALLBACK_INFO       FPCallbackInfo;
 extern UINTN                      gCallbackKey;
 extern EFI_FORM_BROWSER_PROTOCOL  *gBrowser;
-extern EFI_GUID                   gBdsStringPackGuid;
 extern BOOLEAN                    gConnectAllHappened;
 
 STRING_REF                        gStringTokenTable[] = {
@@ -122,8 +121,8 @@ Returns:
   UpdateData = AllocateZeroPool (0x1000);
   ASSERT (UpdateData != NULL);
 
-  PackageList = PreparePackages (1, &gBdsStringPackGuid, DeviceManagerVfrBin);
-  Status      = Hii->NewPack (Hii, PackageList, &FPCallbackInfo.DevMgrHiiHandle);
+  PackageList = PreparePackages (1, &gEfiCallerIdGuid, DeviceManagerVfrBin);
+  Status      = gHii->NewPack (gHii, PackageList, &FPCallbackInfo.DevMgrHiiHandle);
   FreePool (PackageList);
 
   //
@@ -159,7 +158,7 @@ Returns:
   //
   // Simply registering the callback handle
   //
-  Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
 
   FreePool (UpdateData);
   return Status;
@@ -226,7 +225,7 @@ Returns:
   FormSetData   = NULL;
   gCallbackKey  = 0;
   if (mTokenCount == 0) {
-    Hii->NewString (Hii, NULL, FPCallbackInfo.DevMgrHiiHandle, &mTokenCount, L" ");
+    gHii->NewString (gHii, NULL, FPCallbackInfo.DevMgrHiiHandle, &mTokenCount, L" ");
   }
 
   Token     = mTokenCount;
@@ -244,7 +243,7 @@ Returns:
     //
     // Erase entries on this label
     //
-    Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, FALSE, UpdateData);
+    gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, FALSE, UpdateData);
 
     //
     // Did we reach the end of the Token Table?
@@ -262,21 +261,21 @@ Returns:
     //
     // Add default title for this label
     //
-    Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
+    gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
   }
   //
   // Add a space and an exit string.  Remember since we add things at the label and push other things beyond the
   // label down, we add this in reverse order
   //
   CreateSubTitleOpCode (STRING_TOKEN (STR_EXIT_STRING), &UpdateData->Data);
-  Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
   CreateSubTitleOpCode (STR_EMPTY_STRING, &UpdateData->Data);
-  Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) Count, TRUE, UpdateData);
 
   //
-  // Get all the Hii handles
+  // Get all the gHii handles
   //
-  Status = BdsLibGetHiiHandles (Hii, &HandleBufferLength, &HiiHandles);
+  Status = BdsLibGetHiiHandles (gHii, &HandleBufferLength, &HiiHandles);
   ASSERT_EFI_ERROR (Status);
 
   for (Index = 1, BufferSize = 0; Index < HandleBufferLength; Index++) {
@@ -284,7 +283,7 @@ Returns:
     // Am not initializing Buffer since the first thing checked is the size
     // this way I can get the real buffersize in the smallest code size
     //
-    Status = Hii->GetForms (Hii, Index, 0, &BufferSize, Buffer);
+    Status = gHii->GetForms (gHii, Index, 0, &BufferSize, Buffer);
 
     if (Status != EFI_NOT_FOUND) {
       //
@@ -297,7 +296,7 @@ Returns:
       // Am not initializing Buffer since the first thing checked is the size
       // this way I can get the real buffersize in the smallest code size
       //
-      Status = Hii->GetForms (Hii, Index, 0, &BufferSize, Buffer);
+      Status = gHii->GetForms (gHii, Index, 0, &BufferSize, Buffer);
 
       //
       // Skip EFI_HII_PACK_HEADER, advance to EFI_IFR_FORM_SET data.
@@ -313,8 +312,8 @@ Returns:
         String        = AllocateZeroPool (StringLength);
         ASSERT (String != NULL);
 
-        Status  = Hii->GetString (Hii, Index, FormSetData->FormSetTitle, TRUE, NULL, &StringLength, String);
-        Status  = Hii->NewString (Hii, NULL, FPCallbackInfo.DevMgrHiiHandle, &Token, String);
+        Status  = gHii->GetString (gHii, Index, FormSetData->FormSetTitle, TRUE, NULL, &StringLength, String);
+        Status  = gHii->NewString (gHii, NULL, FPCallbackInfo.DevMgrHiiHandle, &Token, String);
 
         //
         // If token value exceeded real token value - we need to add a new token values
@@ -322,21 +321,21 @@ Returns:
         if (Status == EFI_INVALID_PARAMETER) {
           Token     = 0;
           TokenHelp = 0;
-          Status    = Hii->NewString (Hii, NULL, FPCallbackInfo.DevMgrHiiHandle, &Token, String);
+          Status    = gHii->NewString (gHii, NULL, FPCallbackInfo.DevMgrHiiHandle, &Token, String);
         }
 
         StringLength = 0x1000;
         if (FormSetData->Help == 0) {
           TokenHelp = 0;
         } else {
-          Status = Hii->GetString (Hii, Index, FormSetData->Help, TRUE, NULL, &StringLength, String);
+          Status = gHii->GetString (gHii, Index, FormSetData->Help, TRUE, NULL, &StringLength, String);
           if (StringLength == 0x02) {
             TokenHelp = 0;
           } else {
-            Status = Hii->NewString (Hii, NULL, FPCallbackInfo.DevMgrHiiHandle, &TokenHelp, String);
+            Status = gHii->NewString (gHii, NULL, FPCallbackInfo.DevMgrHiiHandle, &TokenHelp, String);
             if (Status == EFI_INVALID_PARAMETER) {
               TokenHelp = 0;
-              Status    = Hii->NewString (Hii, NULL, FPCallbackInfo.DevMgrHiiHandle, &TokenHelp, String);
+              Status    = gHii->NewString (gHii, NULL, FPCallbackInfo.DevMgrHiiHandle, &TokenHelp, String);
             }
           }
         }
@@ -380,8 +379,8 @@ Returns:
           // This is an active bit, so update the form
           //
           if (FormSetData->Class & Count) {
-            Hii->UpdateForm (
-                  Hii,
+            gHii->UpdateForm (
+                  gHii,
                   FPCallbackInfo.DevMgrHiiHandle,
                   (EFI_FORM_LABEL) (FormSetData->Class & Count),
                   TRUE,
@@ -440,7 +439,7 @@ Returns:
       );
 
     UpdateData->DataCount = 4;
-    Hii->UpdateForm (Hii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) EFI_VBIOS_CLASS, TRUE, UpdateData);
+    gHii->UpdateForm (gHii, FPCallbackInfo.DevMgrHiiHandle, (EFI_FORM_LABEL) EFI_VBIOS_CLASS, TRUE, UpdateData);
     FreePool (IfrOptionList);
   }
 
@@ -461,7 +460,7 @@ Returns:
     EnableResetRequired ();
   }
 
-  Hii->ResetStrings (Hii, FPCallbackInfo.DevMgrHiiHandle);
+  gHii->ResetStrings (gHii, FPCallbackInfo.DevMgrHiiHandle);
 
   //
   // We will have returned from processing a callback - user either hit ESC to exit, or selected

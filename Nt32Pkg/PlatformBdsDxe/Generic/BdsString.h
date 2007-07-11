@@ -33,7 +33,7 @@ Revision History
   }
 
 EFI_HII_HANDLE    gStringPackHandle;
-EFI_HII_PROTOCOL  *Hii;
+EFI_HII_PROTOCOL  *gHii;
 
 CHAR16            *
 GetStringById (

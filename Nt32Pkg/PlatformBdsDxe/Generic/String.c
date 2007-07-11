@@ -30,9 +30,6 @@ Revision History
 #include "BdsString.h"
 #include "Language.h"
 
-EFI_GUID      gBdsStringPackGuid = { 0x7bac95d3, 0xddf, 0x42f3, 0x9e, 0x24, 0x7c, 0x64, 0x49, 0x40, 0x37, 0x9a };
-extern        UINT8 PlatformBdsStrings[];
-
 EFI_STATUS
 InitializeStringSupport (
   VOID
@@ -40,7 +37,7 @@ InitializeStringSupport (
 /*++
 
 Routine Description:
-
+ reset
   Initialize HII global accessor for string support
 
 Arguments:
@@ -59,11 +56,11 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
-                  &Hii
+                  &gHii
                   );
   if (!EFI_ERROR (Status)) {
-    PackageList = PreparePackages (1, &gBdsStringPackGuid, PlatformBdsStrings);
-    Status      = Hii->NewPack (Hii, PackageList, &gStringPackHandle);
+    PackageList = PreparePackages (1, &gEfiCallerIdGuid, PlatformBdsStrings);
+    Status      = gHii->NewPack (gHii, PackageList, &gStringPackHandle);
     FreePool (PackageList);
   }
 
@@ -110,7 +107,7 @@ Returns:
   //
   // Get the current string for the current Language
   //
-  Status = Hii->GetString (Hii, gStringPackHandle, Id, FALSE, NULL, &StringLength, String);
+  Status = gHii->GetString (gHii, gStringPackHandle, Id, FALSE, NULL, &StringLength, String);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_BUFFER_TOO_SMALL) {
       //
@@ -124,7 +121,7 @@ Returns:
       String = AllocatePool (StringLength);
       ASSERT (String != NULL);
 
-      Status = Hii->GetString (Hii, gStringPackHandle, Id, FALSE, NULL, &StringLength, String);
+      Status = gHii->GetString (gHii, gStringPackHandle, Id, FALSE, NULL, &StringLength, String);
       if (!EFI_ERROR (Status)) {
         return String;
       }

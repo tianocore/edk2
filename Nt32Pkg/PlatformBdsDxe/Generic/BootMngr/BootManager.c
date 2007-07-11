@@ -173,7 +173,7 @@ Returns:
   // Post our VFR to the HII database
   //
   PackageList = PreparePackages (2, &BmGuid, BootManagerVfrBin, PlatformBdsStrings);
-  Status      = Hii->NewPack (Hii, PackageList, &gBootManagerHandle);
+  Status      = gHii->NewPack (gHii, PackageList, &gBootManagerHandle);
   FreePool (PackageList);
 
   //
@@ -197,7 +197,7 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   LastToken = 0;
-  Hii->NewString (Hii, NULL, gBootManagerHandle, &LastToken, L" ");
+  gHii->NewString (gHii, NULL, gBootManagerHandle, &LastToken, L" ");
 
   //
   // Allocate space for creation of UpdateData Buffer
@@ -227,7 +227,7 @@ Returns:
             &UpdateData->Data // Buffer containing created op-code
             );
 
-  Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
 
   //
   // Create "Boot Option Menu" title
@@ -237,7 +237,7 @@ Returns:
             &UpdateData->Data                       // Buffer containing created op-code
             );
 
-  Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0000, TRUE, UpdateData);
 
   Token                 = LastToken;
   mKeyInput             = 0;
@@ -254,7 +254,7 @@ Returns:
     mKeyInput++;
     Token++;
 
-    Status = Hii->NewString (Hii, NULL, gBootManagerHandle, &Token, Option->Description);
+    Status = gHii->NewString (gHii, NULL, gBootManagerHandle, &Token, Option->Description);
 
     //
     // If we got an error it is almost certainly due to the token value being invalid.
@@ -262,7 +262,7 @@ Returns:
     //
     if (EFI_ERROR (Status)) {
       Token   = 0;
-      Status  = Hii->NewString (Hii, NULL, gBootManagerHandle, &Token, Option->Description);
+      Status  = gHii->NewString (gHii, NULL, gBootManagerHandle, &Token, Option->Description);
     }
 
     Status = CreateGotoOpCode (
@@ -279,7 +279,7 @@ Returns:
 
   }
 
-  Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0001, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0001, TRUE, UpdateData);
 
   UpdateData->DataCount = 1;
 
@@ -291,14 +291,14 @@ Returns:
             &UpdateData->Data               // Buffer containing created op-code
             );
 
-  Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
   Status = CreateSubTitleOpCode (
             LastToken,                      // Token Value for the string
             &UpdateData->Data               // Buffer containing created op-code
             );
 
-  Hii->UpdateForm (Hii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
+  gHii->UpdateForm (gHii, gBootManagerHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
   FreePool (UpdateData);
 
@@ -321,7 +321,7 @@ Returns:
     EnableResetRequired ();
   }
 
-  Hii->ResetStrings (Hii, gBootManagerHandle);
+  gHii->ResetStrings (gHii, gBootManagerHandle);
 
   if (gOption == NULL) {
     return ;
