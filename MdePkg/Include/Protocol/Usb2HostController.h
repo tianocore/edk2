@@ -1,14 +1,14 @@
 /** @file
   EFI_USB2_HC_PROTOCOL as defined in UEFI 2.0.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -66,6 +66,10 @@ EFI_STATUS
   )
 ;
 
+#define EFI_USB_HC_RESET_GLOBAL             0x0001
+#define EFI_USB_HC_RESET_HOST_CONTROLLER    0x0002
+#define EFI_USB_HC_RESET_GLOBAL_WITH_DEBUG  0x0004
+#define EFI_USB_HC_RESET_HOST_WITH_DEBUG    0x0008
 /**
   Provides software reset for the USB host controller.
 
@@ -93,7 +97,7 @@ EFI_STATUS
 ;
 
 /**
-   
+
   @param EfiUsbHcStateHalt  The host controller is in halt
                             state. No USB transactions can occur
                             while in this state. The host
@@ -103,8 +107,8 @@ EFI_STATUS
                             Explicitly set by software. 3)
                             Triggered by a fatal error such as
                             consistency check failure.
-  
-  
+
+
   @param EfiUsbHcStateOperational   The host controller is in an
                                     operational state. When in
                                     this state, the host
@@ -112,8 +116,8 @@ EFI_STATUS
                                     traffic. This state must be
                                     explicitly set to enable the
                                     USB bus traffic.
-  
-  
+
+
   @param EfiUsbHcStateSuspend   The host controller is in the
                                 suspend state. No USB
                                 transactions can occur while in
@@ -123,7 +127,7 @@ EFI_STATUS
                                 set by software. 2) Triggered
                                 when there is no bus traffic for
                                 3 microseconds.
-  
+
 **/
 typedef enum {
   EfiUsbHcStateHalt,
@@ -151,7 +155,7 @@ EFI_STATUS
   IN CONST  EFI_USB2_HC_PROTOCOL    *This,
   OUT       EFI_USB_HC_STATE        *State
 )
-;  
+;
 
 /**
   Sets the USB host controller to a specific state.
@@ -217,7 +221,7 @@ EFI_STATUS
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator,
   OUT    UINT32                             *TransferResult
   )
-;  
+;
 
 #define EFI_USB_MAX_BULK_BUFFER_NUM 10
 
@@ -271,7 +275,7 @@ EFI_STATUS
 /**
   Submits an asynchronous interrupt transfer to an interrupt endpoint of a USB device.
   Translator parameter doesn't exist in UEFI2.0 spec, but it will be updated in the following specification version.
-  
+
   @param  This                A pointer to the EFI_USB2_HC_PROTOCOL instance.
   @param  DeviceAddress       Represents the address of the target device on the USB.
   @param  EndPointAddress     The combination of an endpoint number and an endpoint direction of the
@@ -475,7 +479,7 @@ EFI_STATUS
   IN CONST  UINT8                   PortNumber,
   OUT       EFI_USB_PORT_STATUS     *PortStatus
   )
-;  
+;
 
 /**
   Sets a feature for the specified root hub port.
@@ -497,7 +501,7 @@ EFI_STATUS
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature
   )
-;  
+;
 
 /**
   Clears a feature for the specified root hub port.
@@ -519,7 +523,7 @@ EFI_STATUS
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature
   )
-;  
+;
 
 struct _EFI_USB2_HC_PROTOCOL {
   EFI_USB2_HC_PROTOCOL_GET_CAPABILITY              GetCapability;
