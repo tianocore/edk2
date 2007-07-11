@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  HiiDatabase.dxs
   Keyboard.c
   Fonts.c
   Package.c
