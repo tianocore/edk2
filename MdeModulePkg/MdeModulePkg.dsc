@@ -356,11 +356,13 @@
   PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
+[PcdsFixedAtBuild.IPF]
+  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+  
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
   PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-
 
 ################################################################################
 #
@@ -368,9 +370,9 @@
 #
 ################################################################################
 
-
-[Components.Ia32]
-  $(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+[Components.common]
+  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
+  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
   $(WORKSPACE)/MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
   $(WORKSPACE)/MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   $(WORKSPACE)/MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
@@ -379,34 +381,24 @@
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
-
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
+
   $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
+
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -415,14 +407,26 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf  
+  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf  
+
+[Components.Ia32]
+  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 
 [Components.X64]
-  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf  
 
 [Components.IPF]
-  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-  #$(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableIpf.inf
 
 [Components.EBC]
-  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+

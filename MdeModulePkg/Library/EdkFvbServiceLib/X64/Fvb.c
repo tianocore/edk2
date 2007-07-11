@@ -250,8 +250,8 @@ FvbVirtualAddressChangeNotifyEvent (
       if (NULL != mFvbEntry[Index].Fvb) {
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetBlockSize);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetPhysicalAddress);
-        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetVolumeAttributes);
-        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->SetVolumeAttributes);
+        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetAttributes);
+        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->SetAttributes);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->Read);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->Write);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->EraseBlocks);
@@ -459,7 +459,7 @@ EfiFvbGetVolumeAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  return mFvbEntry[Instance].Fvb->GetVolumeAttributes (mFvbEntry[Instance].Fvb, Attributes);
+  return mFvbEntry[Instance].Fvb->GetAttributes (mFvbEntry[Instance].Fvb, Attributes);
 }
 
 /**
@@ -491,7 +491,7 @@ EfiFvbSetVolumeAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  return mFvbEntry[Instance].Fvb->SetVolumeAttributes (mFvbEntry[Instance].Fvb, &Attributes);
+  return mFvbEntry[Instance].Fvb->SetAttributes (mFvbEntry[Instance].Fvb, &Attributes);
 }
 
 /**

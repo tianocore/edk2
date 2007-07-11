@@ -78,7 +78,7 @@ InternalReportStatusCode (
     if (gBS == NULL) {
       return EFI_UNSUPPORTED;
     }
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, &StatusCode);
+    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCode);
     if (!EFI_ERROR (Status) && StatusCode != NULL) {
       ReportStatusCode = StatusCode->ReportStatusCode;
     } else if (gRT->Hdr.Revision < 0x20000) {
