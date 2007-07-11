@@ -25,6 +25,7 @@ Revision History
 #define _IPF_PEI_MAIN_H_
 
 #include <PeiMain.h>
+#include <IndustryStandard/Sal.h>
 
 SAL_RETURN_REGS
 GetHandOffStatus (

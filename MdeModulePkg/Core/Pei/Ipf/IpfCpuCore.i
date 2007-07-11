@@ -20,11 +20,6 @@
 #ifndef _IPF_CPU_CORE_
 #define _IPF_CPU_CORE_
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #define  PEI_BSP_STORE_SIZE                     0x4000
 #define  ResetFn                                0x00
 #define  MachineCheckFn                         0x01
