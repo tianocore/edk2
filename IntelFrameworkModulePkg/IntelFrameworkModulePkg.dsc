@@ -178,7 +178,6 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaFloppy/Dxe/IsaFloppy.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaFloppy/Pei/FloppyPeim.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerial.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboard.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2Mouse.inf
