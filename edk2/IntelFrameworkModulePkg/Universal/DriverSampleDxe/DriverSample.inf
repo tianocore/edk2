@@ -43,7 +43,6 @@
 ################################################################################
 
 [Sources.common]
-  DriverSample.dxs
   DriverSample.h
   NVDataStruc.h
   DriverSample.c
