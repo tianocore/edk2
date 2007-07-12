@@ -626,7 +626,12 @@ UsbBootDetectMedia (
   EFI_STATUS                Status;
 
   Media    = &UsbMass->BlockIoMedia;
-  OldMedia = UsbMass->BlockIoMedia;
+
+  CopyMem (
+    &OldMedia,
+    &(UsbMass->BlockIoMedia),
+    sizeof (EFI_BLOCK_IO_MEDIA)
+    );
 
   //
   // First test whether the device is ready and get status

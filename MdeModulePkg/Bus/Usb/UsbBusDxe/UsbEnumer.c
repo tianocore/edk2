@@ -120,7 +120,12 @@ UsbCreateInterface (
   UsbIf->Device     = Device;
   UsbIf->IfDesc     = IfDesc;
   UsbIf->IfSetting  = IfDesc->Settings[IfDesc->ActiveIndex];
-  UsbIf->UsbIo      = mUsbIoProtocol;
+
+  CopyMem (
+    &(UsbIf->UsbIo),
+    &mUsbIoProtocol,
+    sizeof (EFI_USB_IO_PROTOCOL)
+    );
 
   //
   // Install protocols for USBIO and device path
