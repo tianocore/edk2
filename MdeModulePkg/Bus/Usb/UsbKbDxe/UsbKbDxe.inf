@@ -1,0 +1,121 @@
+#/** @file
+# Component name for module UsbKb
+#
+# FIX ME!
+# Copyright (c) 2006, Intel Corporation. All right reserved.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbKbDxe
+  FILE_GUID                      = 2D2E62CF-9ECF-43b7-8219-94E7FC713DFE
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = USBKeyboardDriverBindingEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources.common]
+  efikey.c
+  efikey.h
+  keyboard.c
+  ComponentName.c
+  keyboard.h
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  ReportStatusCodeLib
+  DebugLib
+  PcdLib
+  UsbLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiHotPlugDeviceGuid                         # ALWAYS_CONSUMED
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+
+################################################################################
+#
+# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFixedAtBuild]
+  PcdStatusCodeValueKeyboardEnable|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardPresenceDetect|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardDisable|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardReset|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardClearBuffer|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardSelfTest|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardInterfaceError|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueKeyboardInputError|gEfiMdePkgTokenSpaceGuid

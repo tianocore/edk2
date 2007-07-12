@@ -9,7 +9,7 @@
 #    the terms and conditions of the BSD License which accompanies this distribution.
 #    The full text of the license may be found at
 #    http://opensource.org/licenses/bsd-license.php
-# 
+#
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -29,7 +29,7 @@
   PACKAGE_VERSION                = 0.1
 
 [Includes.common]
-  Include                        
+  Include
 
 ################################################################################
 #
@@ -68,7 +68,7 @@
   gEfiPeiPeCoffLoaderGuid        = { 0xd8117cff, 0x94a6, 0x11d4, {0x9a, 0x3a, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } }
   gEfiPeiCorePrivateGuid         = { 0xd641a0f5, 0xcb7c, 0x4846, { 0xa3, 0x80, 0x1d, 0x01, 0xb4, 0xd9, 0xe3, 0xb9 }}
   gEfiExtendedSalVariableServicesProtocolGuid = {0x4ecb6c53, 0xc641, 0x4370, {0x8c, 0xb2, 0x3b, 0x0e, 0x49, 0x6e, 0x83, 0x78 }}
-  
+
 ################################################################################
 #
 # Global Protocols Definition section - list of Global Protocols C Name Data
@@ -92,7 +92,7 @@
   gEfiCustomizedDecompressProtocolGuid = { 0x9A44198E, 0xA4A2, 0x44E6, { 0x8A, 0x1F, 0x39, 0xBE, 0xFD, 0xAC, 0x89, 0x6F }}
   gEfiCapsuleArchProtocolGuid    = { 0x5053697E, 0x2EBC, 0x4819, { 0x90, 0xD9, 0x05, 0x80, 0xDE, 0xEE, 0x57, 0x54 }}
   gEfiCrc32GuidedSectionExtractionProtocolGuid = { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
- 
+
 
 
 
@@ -104,7 +104,7 @@
 ################################################################################
 [Ppis.common]
   gPeiBaseMemoryTestPpiGuid      = { 0xB6EC423C, 0x21D2, 0x490D, { 0x85, 0xC6, 0xDD, 0x58, 0x64, 0xEA, 0xA6, 0x74 }}
-  gEfiPeiFvFileLoaderPpiGuid     = { 0x7e1f0d85, 0x04ff, 0x4bb2, { 0x86, 0x6a, 0x31, 0xa2, 0x99, 0x6a, 0x48, 0xa8 }} 
+  gEfiPeiFvFileLoaderPpiGuid     = { 0x7e1f0d85, 0x04ff, 0x4bb2, { 0x86, 0x6a, 0x31, 0xa2, 0x99, 0x6a, 0x48, 0xa8 }}
   ##gPeiFlashMapPpiGuid will be removed in future
   gPeiFlashMapPpiGuid            = { 0xf34c2fa0, 0xde88, 0x4270, {0x84, 0x14, 0x96, 0x12, 0x22, 0xf4, 0x52, 0x1c } }
 
@@ -144,6 +144,19 @@
   PcdFlashNvStorageFtwSpareSize|0x30000014|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwWorkingBase|0x30000010|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
   PcdFlashNvStorageFtwWorkingSize|0x30000011|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0
+  PcdStatusCodeValueMouseInterfaceError|0x30001000|gEfiMdePkgTokenSpaceGuid|UINT32|0x01020005
+  PcdStatusCodeValueMouseEnable|0x30001001|gEfiMdePkgTokenSpaceGuid|UINT32|0x01020004
+  PcdStatusCodeValueMouseDisable|0x3001002|gEfiMdePkgTokenSpaceGuid|UINT32|0x01020002
+  PcdStatusCodeValueKeyboardEnable|0x3001003|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010004
+  PcdStatusCodeValueKeyboardDisable|0x3001004|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010002
+  PcdStatusCodeValueKeyboardPresenceDetect|0x30001005|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010003
+  PcdStatusCodeValueKeyboardReset|0x30001006|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010001
+  PcdStatusCodeValueKeyboardClearBuffer|0x30001007|gEfiMdePkgTokenSpaceGuid|UINT32|0x01011000
+  PcdStatusCodeValueKeyboardSelfTest|0x30001008|gEfiMdePkgTokenSpaceGuid|UINT32|0x01011001
+  PcdStatusCodeValueKeyboardInterfaceError|0x30001009|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010005
+  PcdStatusCodeValueKeyboardInputError|0x3000100a|gEfiMdePkgTokenSpaceGuid|UINT32|0x01010007
+  PcdStatusCodeValueMouseInputError|0x30001000b|gEfiMdePkgTokenSpaceGuid|UINT32|0x01020007
+  PcdStatusCodeValueMouseReset|0x30001000c|gEfiMdePkgTokenSpaceGuid|UINT32|0x01020001
 
 [PcdsDynamic.common]
   PcdFlashNvStorageVariableBase|0x30000001|gEfiMdeModulePkgTokenSpaceGuid|UINT32|0x0

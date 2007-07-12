@@ -30,6 +30,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>hid.h</Filename>
     <Filename>UsbDxeLib.c</Filename>
     <Filename>hid.c</Filename>
   </SourceFiles>

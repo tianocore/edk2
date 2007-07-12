@@ -1,6 +1,5 @@
 /** @file
-   Common Dxe Libarary  for USB
-   Add Constants & structure definitions for Usb HID
+  Common Dxe Libarary  for USB
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -18,6 +17,50 @@
 #define __USB_DXE_LIB_H__
 
 #include <Protocol/UsbIo.h>
+
+//
+// Standard device request and request type
+// By [Spec-USB20/Chapter-9.4]
+//
+#define USB_DEV_GET_STATUS                  0x00
+#define USB_DEV_GET_STATUS_REQ_TYPE_D       0x80 // Receiver : Device
+#define USB_DEV_GET_STATUS_REQ_TYPE_I       0x81 // Receiver : Interface
+#define USB_DEV_GET_STATUS_REQ_TYPE_E       0x82 // Receiver : Endpoint
+
+#define USB_DEV_CLEAR_FEATURE               0x01
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_D    0x00 // Receiver : Device
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_I    0x01 // Receiver : Interface
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_E    0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_FEATURE                 0x03
+#define USB_DEV_SET_FEATURE_REQ_TYPE_D      0x00 // Receiver : Device
+#define USB_DEV_SET_FEATURE_REQ_TYPE_I      0x01 // Receiver : Interface
+#define USB_DEV_SET_FEATURE_REQ_TYPE_E      0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_ADDRESS                 0x05
+#define USB_DEV_SET_ADDRESS_REQ_TYPE        0x00
+
+#define USB_DEV_GET_DESCRIPTOR              0x06
+#define USB_DEV_GET_DESCRIPTOR_REQ_TYPE     0x80
+
+#define USB_DEV_SET_DESCRIPTOR              0x07
+#define USB_DEV_SET_DESCRIPTOR_REQ_TYPE     0x00
+
+#define USB_DEV_GET_CONFIGURATION           0x08
+#define USB_DEV_GET_CONFIGURATION_REQ_TYPE  0x80
+
+#define USB_DEV_SET_CONFIGURATION           0x09
+#define USB_DEV_SET_CONFIGURATION_REQ_TYPE  0x00
+
+#define USB_DEV_GET_INTERFACE               0x0A
+#define USB_DEV_GET_INTERFACE_REQ_TYPE      0x81
+
+#define USB_DEV_SET_INTERFACE               0x0B
+#define USB_DEV_SET_INTERFACE_REQ_TYPE      0x01
+
+#define USB_DEV_SYNCH_FRAME                 0x0C
+#define USB_DEV_SYNCH_FRAME_REQ_TYPE        0x82
+
 //
 // define the timeout time as 3ms
 //
@@ -233,9 +276,11 @@ UsbGetReportRequest (
   IN UINT8                   *Report
   );
 
-//
-// Get Device Descriptor
-//
+typedef enum {
+  EfiUsbEndpointHalt,
+  EfiUsbDeviceRemoteWakeup
+} EFI_USB_STANDARD_FEATURE_SELECTOR;
+
 EFI_STATUS
 UsbGetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
@@ -246,9 +291,6 @@ UsbGetDescriptor (
   OUT UINT32                  *Status
   );
 
-//
-// Set Device Descriptor
-//
 EFI_STATUS
 UsbSetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
@@ -259,97 +301,70 @@ UsbSetDescriptor (
   OUT UINT32                  *Status
   );
 
-//
-// Get device Interface
-//
 EFI_STATUS
-UsbGetDeviceInterface (
+UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Index,
   OUT UINT8                   *AltSetting,
   OUT UINT32                  *Status
   );
 
-//
-// Set device interface
-//
 EFI_STATUS
-UsbSetDeviceInterface (
+UsbSetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  InterfaceNo,
   IN  UINT16                  AltSetting,
   OUT UINT32                  *Status
   );
 
-//
-// Get device configuration
-//
 EFI_STATUS
-UsbGetDeviceConfiguration (
+UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   OUT UINT8                   *ConfigValue,
   OUT UINT32                  *Status
   );
 
-//
-// Set device configuration
-//
 EFI_STATUS
-UsbSetDeviceConfiguration (
+UsbSetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
   OUT UINT32                  *Status
   );
 
-//
-//  Set Device Feature
-//
 EFI_STATUS
-UsbSetDeviceFeature (
+UsbSetFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  EFI_USB_RECIPIENT       Recipient,
+  IN  UINTN                   Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
   );
 
-//
-// Clear Device Feature
-//
 EFI_STATUS
-UsbClearDeviceFeature (
+UsbClearFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  EFI_USB_RECIPIENT       Recipient,
+  IN  UINTN                   Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
   );
 
-//
-//  Get Device Status
-//
 EFI_STATUS
-UsbGetDeviceStatus (
+UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  EFI_USB_RECIPIENT       Recipient,
+  IN  UINTN                   Recipient,
   IN  UINT16                  Target,
   OUT UINT16                  *DevStatus,
   OUT UINT32                  *Status
   );
 
-//
-// The following APIs are not basic library, but they are common used.
-//
-//
-// Usb Get String
-//
 EFI_STATUS
-UsbGetString (
+UsbGetHubDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  LangID,
-  IN  UINT8                   Index,
-  IN  VOID                    *Buf,
-  IN  UINTN                   BufSize,
+  IN  UINT16                  Value,
+  IN  UINT16                  Index,
+  IN  UINT16                  DescriptorLength,
+  OUT VOID                    *Descriptor,
   OUT UINT32                  *Status
   );
 
