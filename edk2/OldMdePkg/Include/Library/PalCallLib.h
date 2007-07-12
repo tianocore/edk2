@@ -18,6 +18,8 @@
 #ifndef __PAL_CALL_LIB_H__
 #define __PAL_CALL_LIB_H__
 
+#define PAL_SUCCESS             0x0
+
 //
 // CacheType of PAL_CACHE_FLUSH.
 //
