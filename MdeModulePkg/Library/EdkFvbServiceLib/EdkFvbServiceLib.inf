@@ -34,7 +34,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  FvbVirtualAddressChangeNotifyEvent
 #
@@ -53,10 +53,6 @@
 
 [Sources.X64]
   x64/Fvb.c
-
-[Sources.IPF]
-  Ipf/Fvb.c
-
 
 ################################################################################
 #
