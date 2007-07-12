@@ -30,8 +30,10 @@
 //
 // Bitmask of Opearation of PAL_CACHE_FLUSH.
 // 
-#define PAL_CACHE_FLUSH_INVIDED_LINES     BIT0
-#define PAL_CACHE_FLUSH_PROBE_INTERRUPT   BIT1
+#define PAL_CACHE_FLUSH_INVALIDATE_LINES     BIT0
+#define PAL_CACHE_FLUSH_NO_INVALIDATE_LINES  0
+#define PAL_CACHE_FLUSH_POLL_INTERRUPT       BIT1
+#define PAL_CACHE_FLUSH_NO_INTERRUPT       0
 
 /**
   
@@ -185,6 +187,13 @@ typedef struct {
 // Level of PAL_CACHE_INIT.
 // 
 #define PAL_CACHE_INIT_ALL  0xffffffffffffffffULL
+
+//
+// CacheType 
+//
+#define PAL_CACHE_INIT_TYPE_INSTRUCTION                 0x1
+#define PAL_CACHE_INIT_TYPE_DATA                        0x2
+#define PAL_CACHE_INIT_TYPE_INSTRUCTION_AND_DATA        0x3
 
 //
 // Restrict of PAL_CACHE_INIT.
