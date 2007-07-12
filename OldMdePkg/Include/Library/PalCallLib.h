@@ -1329,8 +1329,8 @@ typedef struct {
 **/
 #define PAL_PERF_MON_INFO 15
 
-#define PAL_PLATFORM_ADDR_INTERRUPT_BLOCK_TOKEN                       0x0
-#define PAL_PLATFORM_ADDR_IO_BLOCK_TOKEN                              0x1
+#define PAL_INTERRUPT_BLOCK_TOKEN                       0x0
+#define PAL_IO_BLOCK_TOKEN                              0x1
 
 /**
   
