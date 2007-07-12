@@ -13,8 +13,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  IoHighLevel.c
-
   The following IoLib instances share the same version of this file:
 
     BaseIoLibIntrinsic

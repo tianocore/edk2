@@ -9,26 +9,11 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
- Module Name:
-
-    UsbDxeLib.c
-
- Abstract:
-
    Common Dxe Libarary  for USB
-
- Revision History
-
 
 **/
 
-//
-// The package level header files this module uses
-//
 #include <PiDxe.h>
-//
-// The Library classes this module consumes
-//
 #include <Library/BaseMemoryLib.h>
 #include <Library/UsbLib.h>
 
