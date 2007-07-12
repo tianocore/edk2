@@ -1,13 +1,14 @@
 #/** @file
-# Component description file for UefiUsb library.
+# Component name for module UsbMouse
 #
-# This library provides supports for common USB functions.
-# Copyright (c) 2006, Intel Corporation.
+# FIX ME!
+# Copyright (c) 2006, Intel Corporation. All right reserved.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -21,14 +22,14 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = UefiUsbLib
-  FILE_GUID                      = 87eb5df9-722a-4241-ad7f-370d0b3a56d7
-  MODULE_TYPE                    = UEFI_DRIVER
+  BASE_NAME                      = UsbMouseDxe
+  FILE_GUID                      = 2D2E62AA-9ECF-43b7-8219-94E7FC713DFE
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UsbLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
+  ENTRY_POINT                    = USBMouseDriverBindingEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -43,8 +44,13 @@
 ################################################################################
 
 [Sources.common]
-  hid.c
-  UsbDxeLib.c
+  mousehid.h
+  ComponentName.c
+  usbmouse.c
+  mousehid.c
+  usbmouse.h
+  CommonHeader.h
+
 
 ################################################################################
 #
@@ -55,6 +61,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 
 ################################################################################
@@ -65,5 +72,39 @@
 ################################################################################
 
 [LibraryClasses]
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
   BaseMemoryLib
+  ReportStatusCodeLib
+  PcdLib
+  UsbLib
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Protocols]
+  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimplePointerProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+
+################################################################################
+#
+# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
+#
+################################################################################
+
+[PcdsFixedAtBuild]
+  PcdStatusCodeValueMouseInterfaceError|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueMouseEnable|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueMouseDisable|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueMouseInputError|gEfiMdePkgTokenSpaceGuid
+  PcdStatusCodeValueMouseReset|gEfiMdePkgTokenSpaceGuid
+
 

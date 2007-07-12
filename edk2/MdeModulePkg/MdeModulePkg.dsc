@@ -126,6 +126,7 @@
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
+  UsbLib|$(WORKSPACE)/MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -356,9 +357,23 @@
   PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
+  PcdStatusCodeValueMouseInterfaceError|gEfiMdePkgTokenSpaceGuid|0x01020005       # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR
+  PcdStatusCodeValueMouseEnable|gEfiMdePkgTokenSpaceGuid|0x01020004               # EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE
+  PcdStatusCodeValueMouseDisable|gEfiMdePkgTokenSpaceGuid|0x01020002              # EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE
+  PcdStatusCodeValueKeyboardEnable|gEfiMdePkgTokenSpaceGuid|0x01010004            # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
+  PcdStatusCodeValueKeyboardPresenceDetect|gEfiMdePkgTokenSpaceGuid|0x01010003    # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
+  PcdStatusCodeValueKeyboardDisable|gEfiMdePkgTokenSpaceGuid|0x01010002           # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE
+  PcdStatusCodeValueKeyboardReset|gEfiMdePkgTokenSpaceGuid|0x01010001             # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
+  PcdStatusCodeValueKeyboardClearBuffer|gEfiMdePkgTokenSpaceGuid|0x01011000       # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
+  PcdStatusCodeValueKeyboardSelfTest|gEfiMdePkgTokenSpaceGuid|0x01011001          # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
+  PcdStatusCodeValueKeyboardInterfaceError|gEfiMdePkgTokenSpaceGuid|0x01010005    # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR
+  PcdStatusCodeValueKeyboardInputError|gEfiMdePkgTokenSpaceGuid|0x01010007        # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
+  PcdStatusCodeValueMouseInputError|gEfiMdePkgTokenSpaceGuid|0x01020007           # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
+  PcdStatusCodeValueMouseReset|gEfiMdePkgTokenSpaceGuid|0x01020001                # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
+
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
-  
+
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
@@ -407,24 +422,26 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf  
+  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 
 [Components.Ia32]
-  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 
 [Components.X64]
-  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 
 [Components.IPF]
 
