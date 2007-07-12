@@ -9,13 +9,6 @@ reproduced, stored in a retrieval system, or transmitted in any
 form or by any means without the express written consent of
 Intel Corporation.
 
-
-Module Name:
-
-  PeiServicesTablePointer.c
-
-Abstract:
-
   PEI Services Table Pointer Library.
   
 --*/

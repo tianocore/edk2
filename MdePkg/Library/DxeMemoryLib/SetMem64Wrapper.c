@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SetMem64Wrapper.c
-
   The following BaseMemoryLib instances share the same version of this file:
 
     BaseMemoryLib
