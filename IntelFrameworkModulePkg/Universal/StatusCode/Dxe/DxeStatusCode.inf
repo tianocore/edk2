@@ -52,20 +52,19 @@
   DataHubStatusCodeWorker.c
   DxeStatusCode.c
   DxeStatusCode.h
-  CommonHeader.h
   EntryPoint.c
 
 [Sources.Ia32]
-  Common/StatusCode.dxs
-  Common/DxeStatusCodeCommon.c
+  StatusCode.dxs
+  DxeStatusCodeCommon.c
 
 [Sources.X64]
-  Common/StatusCode.dxs
-  Common/DxeStatusCodeCommon.c
+  StatusCode.dxs
+  DxeStatusCodeCommon.c
 
 [Sources.EBC]
-  Common/StatusCode.dxs
-  Common/DxeStatusCodeCommon.c
+  StatusCode.dxs
+  DxeStatusCodeCommon.c
 
 
 
@@ -114,8 +113,8 @@
 [Guids]
   gEfiStatusCodeGuid                            # SOMETIMES_CONSUMED
   gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
-  gEfiStatusCodeDataTypeStringGuid              # SOMETIMES_CONSUMED
   gEfiStatusCodeSpecificDataGuid                # SOMETIMES_CONSUMED
+  gEfiStatusCodeDataTypeDebugGuid               # PROTOCOL ALWAYS_CONSUMED
 
 ################################################################################
 #

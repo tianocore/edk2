@@ -108,7 +108,7 @@
       <GuidCName>gMemoryStatusCodeRecordGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>gEfiStatusCodeDataTypeStringGuid</GuidCName>
+      <GuidCName>gEfiStatusCodeDataTypeDebugGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>

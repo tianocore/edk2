@@ -13,10 +13,6 @@
   Module Name:  DataHubStatusCodeWorker.c
 
 **/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "DxeStatusCode.h"
 
@@ -46,7 +42,7 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 **/
 STATIC
-DATAHUB_STATUSCODE_RECORD *
+DATA_HUB_STATUS_CODE_DATA_RECORD *
 AcquireRecordBuffer (
   VOID
   )
@@ -86,7 +82,7 @@ AcquireRecordBuffer (
 
   gBS->RestoreTPL (CurrentTpl);
 
-  return Record;
+  return (DATA_HUB_STATUS_CODE_DATA_RECORD *) (Record->Data);
 }
 
 
@@ -99,14 +95,15 @@ AcquireRecordBuffer (
 
 **/
 STATIC
-DATAHUB_STATUSCODE_RECORD *
+DATA_HUB_STATUS_CODE_DATA_RECORD *
 RetrieveRecord (
   VOID
   )
 {
-  DATAHUB_STATUSCODE_RECORD   *Record = NULL;
-  LIST_ENTRY                  *Node;
-  EFI_TPL                     CurrentTpl;
+  DATA_HUB_STATUS_CODE_DATA_RECORD  *RecordData = NULL;
+  DATAHUB_STATUSCODE_RECORD         *Record;
+  LIST_ENTRY                        *Node;
+  EFI_TPL                           CurrentTpl;
 
   CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -117,11 +114,12 @@ RetrieveRecord (
     RemoveEntryList (&Record->Node);
     InsertTailList (&mRecordsBuffer, &Record->Node);
     Record->Signature = 0;
+    RecordData = (DATA_HUB_STATUS_CODE_DATA_RECORD *) Record->Data;
   }
 
   gBS->RestoreTPL (CurrentTpl);
 
-  return Record;
+  return RecordData;
 }
 
 
@@ -164,11 +162,11 @@ DataHubStatusCodeReportWorker (
   IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
   )
 {
-  DATAHUB_STATUSCODE_RECORD  *Record;
-  UINT32                     ErrorLevel;
-  VA_LIST                    Marker;
-  CHAR8                      *Format;
-  UINTN                      CharCount;
+  DATA_HUB_STATUS_CODE_DATA_RECORD  *Record;
+  UINT32                            ErrorLevel;
+  VA_LIST                           Marker;
+  CHAR8                             *Format;
+  UINTN                             CharCount;
 
   //
   // See whether in runtime phase or not.
@@ -184,6 +182,7 @@ DataHubStatusCodeReportWorker (
     //
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Construct Data Hub Extended Data
   //
@@ -198,7 +197,7 @@ DataHubStatusCodeReportWorker (
   if (Data != NULL) {
     if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
       CharCount = UnicodeVSPrintAsciiFormat (
-                    (CHAR16 *) Record->ExtendData,
+                    (CHAR16 *) (Record + 1),
                     EFI_STATUS_CODE_DATA_MAX_SIZE,
                     Format,
                     Marker
@@ -206,7 +205,7 @@ DataHubStatusCodeReportWorker (
       //
       // Change record data type from DebugType to String Type.
       //
-      CopyGuid (&Record->Data.Type, &gEfiStatusCodeDataTypeStringGuid);
+      CopyGuid (&Record->Data.Type, &gEfiStatusCodeDataTypeDebugGuid);
       Record->Data.HeaderSize = Data->HeaderSize;
       Record->Data.Size = (UINT16) ((CharCount + 1) * sizeof (CHAR16));
     } else {
@@ -218,7 +217,7 @@ DataHubStatusCodeReportWorker (
       if (Data->Size > EFI_STATUS_CODE_DATA_MAX_SIZE) {
         Record->Data.Size = EFI_STATUS_CODE_DATA_MAX_SIZE;
       }
-      CopyMem (Record->ExtendData, Data + 1, Record->Data.Size);
+      CopyMem ((VOID *) (Record + 1), Data + 1, Record->Data.Size);
     }
   }
 
@@ -244,7 +243,7 @@ LogDataHubEventCallBack (
   IN  VOID          *Context
   )
 {
-  DATAHUB_STATUSCODE_RECORD         *Record;
+  DATA_HUB_STATUS_CODE_DATA_RECORD  *Record;
   UINT32                            Size;
   UINT64                            DataRecordClass;
 
@@ -260,7 +259,7 @@ LogDataHubEventCallBack (
     //
     // Add in the size of the header we added.
     //
-    Size = sizeof (DATAHUB_STATUSCODE_RECORD) + (UINT32) Record->Data.Size;
+    Size = sizeof (DATA_HUB_STATUS_CODE_DATA_RECORD) + (UINT32) Record->Data.Size;
 
     if ((Record->CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
       DataRecordClass = EFI_DATA_RECORD_CLASS_PROGRESS_CODE;
