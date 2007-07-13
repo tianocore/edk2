@@ -188,6 +188,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
 
 [Components.IA32]  
   $(WORKSPACE)/IntelFrameworkModulePkg/PcatCompatible/RealTimeClockRuntimeDxe/PcRtc.inf
