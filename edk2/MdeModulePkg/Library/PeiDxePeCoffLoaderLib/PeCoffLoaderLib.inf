@@ -25,7 +25,7 @@
   FILE_GUID                      = 858bbbc9-474f-4556-a361-0ae52a44ffa5
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeiDxeCorePeCoffLoaderLib|DXE_CORE PEIM 
+  LIBRARY_CLASS                  = PeCoffLoaderLib|DXE_CORE PEIM 
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
