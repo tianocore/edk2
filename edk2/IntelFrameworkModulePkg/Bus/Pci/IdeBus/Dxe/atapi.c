@@ -91,11 +91,11 @@ LS120GetMediaStatus (
   //
   StatusValue = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
 
-  if (StatusValue & bit1) {
+  if (StatusValue & BIT1) {
     return EFI_NO_MEDIA;
   }
 
-  if (StatusValue & bit6) {
+  if (StatusValue & BIT6) {
     return EFI_WRITE_PROTECTED;
   } else {
     return EFI_SUCCESS;
@@ -248,7 +248,7 @@ ATAPIIdentify (
             IdeDev,
             (VOID *) AtapiIdentifyPointer,
             sizeof (EFI_IDENTIFY_DATA),
-            ATAPI_IDENTIFY_DEVICE_CMD,
+            ATA_CMD_IDENTIFY_DEVICE,
             DeviceSelect,
             0,
             0,
@@ -355,7 +355,7 @@ ATAPIIdentify (
   //
   IdeDev->SenseDataNumber = 20;
 
-  IdeDev->SenseData = AllocatePool (IdeDev->SenseDataNumber * sizeof (REQUEST_SENSE_DATA));
+  IdeDev->SenseData = AllocatePool (IdeDev->SenseDataNumber * sizeof (ATAPI_REQUEST_SENSE_DATA));
   if (IdeDev->SenseData == NULL) {
     gBS->FreePool (IdeDev->pIdData);
     gBS->FreePool (IdeDev->pInquiryData);
@@ -395,17 +395,17 @@ AtapiInquiry (
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
-  INQUIRY_DATA          *InquiryData;
+  ATAPI_INQUIRY_DATA          *InquiryData;
 
   //
   // prepare command packet for the ATAPI Inquiry Packet Command.
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.Inquiry.opcode             = INQUIRY;
+  Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
   Packet.Inquiry.page_code          = 0;
-  Packet.Inquiry.allocation_length  = sizeof (INQUIRY_DATA);
+  Packet.Inquiry.allocation_length  = sizeof (ATAPI_INQUIRY_DATA);
 
-  InquiryData                       = AllocatePool (sizeof (INQUIRY_DATA));
+  InquiryData                       = AllocatePool (sizeof (ATAPI_INQUIRY_DATA));
   if (InquiryData == NULL) {
     return EFI_DEVICE_ERROR;
   }
@@ -417,7 +417,7 @@ AtapiInquiry (
             IdeDev,
             &Packet,
             (UINT16 *) InquiryData,
-            sizeof (INQUIRY_DATA),
+            sizeof (ATAPI_INQUIRY_DATA),
             ATAPITIMEOUT
             );
   if (EFI_ERROR (Status)) {
@@ -488,7 +488,7 @@ AtapiPacketCommandIn (
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->Head,
-    (UINT8) ((IdeDev->Device << 4) | DEFAULT_CMD)  // DEFAULT_CMD: 0xa0 (1010,0000)
+    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)  // DEFAULT_CMD: 0xa0 (1010,0000)
     );
 
   //
@@ -497,31 +497,31 @@ AtapiPacketCommandIn (
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
 
   //
-  // set the transfersize to MAX_ATAPI_BYTE_COUNT to let the device
+  // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
   // determine how many data should be transferred.
   //
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->CylinderLsb,
-    (UINT8) (MAX_ATAPI_BYTE_COUNT & 0x00ff)
+    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
     );
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->CylinderMsb,
-    (UINT8) (MAX_ATAPI_BYTE_COUNT >> 8)
+    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
     );
 
   //
-  //  DEFAULT_CTL:0x0a (0000,1010)
+  //  ATA_DEFAULT_CTL:0x0a (0000,1010)
   //  Disable interrupt
   //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DEFAULT_CTL);
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
 
   //
   // Send Packet command to inform device
   // that the following data bytes are command packet.
   //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, PACKET_CMD);
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
 
   Status = DRQReady (IdeDev, ATAPITIMEOUT);
   if (EFI_ERROR (Status)) {
@@ -603,7 +603,7 @@ AtapiPacketCommandOut (
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->Head,
-    (UINT8) ((IdeDev->Device << 4) | DEFAULT_CMD)   // DEFAULT_CMD: 0xa0 (1010,0000)
+    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)   // ATA_DEFAULT_CMD: 0xa0 (1010,0000)
     );
 
   //
@@ -612,31 +612,31 @@ AtapiPacketCommandOut (
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
 
   //
-  // set the transfersize to MAX_ATAPI_BYTE_COUNT to
+  // set the transfersize to ATAPI_MAX_BYTE_COUNT to
   // let the device determine how many data should be transferred.
   //
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->CylinderLsb,
-    (UINT8) (MAX_ATAPI_BYTE_COUNT & 0x00ff)
+    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
     );
   IDEWritePortB (
     IdeDev->PciIo,
     IdeDev->IoPort->CylinderMsb,
-    (UINT8) (MAX_ATAPI_BYTE_COUNT >> 8)
+    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
     );
 
   //
   //  DEFAULT_CTL:0x0a (0000,1010)
   //  Disable interrupt
   //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DEFAULT_CTL);
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
 
   //
   // Send Packet command to inform device
   // that the following data bytes are command packet.
   //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, PACKET_CMD);
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
 
   Status = DRQReady2 (IdeDev, ATAPITIMEOUT);
   if (EFI_ERROR (Status)) {
@@ -826,7 +826,7 @@ AtapiTestUnitReady (
   // fill command packet
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.TestUnitReady.opcode = TEST_UNIT_READY;
+  Packet.TestUnitReady.opcode = ATA_CMD_TEST_UNIT_READY;
 
   //
   // send command packet
@@ -879,20 +879,20 @@ AtapiRequestSense (
   )
 {
   EFI_STATUS            Status;
-  REQUEST_SENSE_DATA    *Sense;
+  ATAPI_REQUEST_SENSE_DATA    *Sense;
   UINT16                *Ptr;
   BOOLEAN               FetchSenseData;
   ATAPI_PACKET_COMMAND  Packet;
 
   *SenseCounts = 0;
 
-  ZeroMem (IdeDev->SenseData, sizeof (REQUEST_SENSE_DATA) * (IdeDev->SenseDataNumber));
+  ZeroMem (IdeDev->SenseData, sizeof (ATAPI_REQUEST_SENSE_DATA) * (IdeDev->SenseDataNumber));
   //
   // fill command packet for Request Sense Packet Command
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.RequestSence.opcode            = REQUEST_SENSE;
-  Packet.RequestSence.allocation_length = sizeof (REQUEST_SENSE_DATA);
+  Packet.RequestSence.opcode            = ATA_CMD_REQUEST_SENSE;
+  Packet.RequestSence.allocation_length = sizeof (ATAPI_REQUEST_SENSE_DATA);
 
   //
   // initialize pointer
@@ -904,7 +904,7 @@ AtapiRequestSense (
   //
   for (FetchSenseData = TRUE; FetchSenseData;) {
 
-    Sense = (REQUEST_SENSE_DATA *) Ptr;
+    Sense = (ATAPI_REQUEST_SENSE_DATA *) Ptr;
 
     //
     // send out Request Sense Packet Command and get one Sense data form device
@@ -913,7 +913,7 @@ AtapiRequestSense (
               IdeDev,
               &Packet,
               Ptr,
-              sizeof (REQUEST_SENSE_DATA),
+              sizeof (ATAPI_REQUEST_SENSE_DATA),
               ATAPITIMEOUT
               );
     //
@@ -934,11 +934,11 @@ AtapiRequestSense (
     // In this case, dead loop occurs if we don't have a gatekeeper. 20 is
     // supposed to be large enough for any ATAPI device.
     //
-    if ((Sense->sense_key != SK_NO_SENSE) && ((*SenseCounts) < 20)) {
+    if ((Sense->sense_key != ATA_SK_NO_SENSE) && ((*SenseCounts) < 20)) {
       //
       // Ptr is word-based pointer
       //
-      Ptr += (sizeof (REQUEST_SENSE_DATA) + 1) >> 1;
+      Ptr += (sizeof (ATAPI_REQUEST_SENSE_DATA) + 1) >> 1;
 
     } else {
       //
@@ -989,8 +989,8 @@ AtapiReadCapacity (
   //
   // used for capacity data returned from ATAPI device
   //
-  READ_CAPACITY_DATA        Data;
-  READ_FORMAT_CAPACITY_DATA FormatData;
+  ATAPI_READ_CAPACITY_DATA        Data;
+  ATAPI_READ_FORMAT_CAPACITY_DATA FormatData;
 
   *SenseCount = 0;
 
@@ -1000,12 +1000,12 @@ AtapiReadCapacity (
   if (IdeDev->Type == IdeCdRom) {
 
     ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-    Packet.Inquiry.opcode = READ_CAPACITY;
+    Packet.Inquiry.opcode = ATA_CMD_READ_CAPACITY;
     Status = AtapiPacketCommandIn (
                IdeDev,
                &Packet,
                (UINT16 *) &Data,
-               sizeof (READ_CAPACITY_DATA),
+               sizeof (ATAPI_READ_CAPACITY_DATA),
                ATAPITIMEOUT
                );
 
@@ -1014,13 +1014,13 @@ AtapiReadCapacity (
     // Type == IdeMagnetic
     //
     ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-    Packet.ReadFormatCapacity.opcode                = READ_FORMAT_CAPACITY;
+    Packet.ReadFormatCapacity.opcode                = ATA_CMD_READ_FORMAT_CAPACITY;
     Packet.ReadFormatCapacity.allocation_length_lo  = 12;
     Status = AtapiPacketCommandIn (
                IdeDev,
                &Packet,
                (UINT16 *) &FormatData,
-               sizeof (READ_FORMAT_CAPACITY_DATA),
+               sizeof (ATAPI_READ_FORMAT_CAPACITY_DATA),
                ATAPITIMEOUT
                );
   }
@@ -1408,7 +1408,7 @@ AtapiReadSectors (
 {
 
   ATAPI_PACKET_COMMAND  Packet;
-  READ10_CMD            *Read10Packet;
+  ATAPI_READ10_CMD            *Read10Packet;
   EFI_STATUS            Status;
   UINTN                 BlocksRemaining;
   UINT32                Lba32;
@@ -1451,7 +1451,7 @@ AtapiReadSectors (
     // fill the Packet data structure
     //
 
-    Read10Packet->opcode = READ_10;
+    Read10Packet->opcode = ATA_CMD_READ_10;
 
     //
     // Lba0 ~ Lba3 specify the start logical block address of the data transfer.
@@ -1533,7 +1533,7 @@ AtapiWriteSectors (
 {
 
   ATAPI_PACKET_COMMAND  Packet;
-  READ10_CMD            *Read10Packet;
+  ATAPI_READ10_CMD            *Read10Packet;
 
   EFI_STATUS            Status;
   UINTN                 BlocksRemaining;
@@ -1578,7 +1578,7 @@ AtapiWriteSectors (
     //
     // Command code is WRITE_10.
     //
-    Read10Packet->opcode = WRITE_10;
+    Read10Packet->opcode = ATA_CMD_WRITE_10;
 
     //
     // Lba0 ~ Lba3 specify the start logical block address of the data transfer.
@@ -1653,10 +1653,10 @@ AtapiSoftReset (
   // for ATAPI device, no need to wait DRDY ready after device selecting.
   // (bit7 and bit5 are both set to 1 for backward compatibility)
   //
-  DeviceSelect = (UINT8) (((bit7 | bit5) | (IdeDev->Device << 4)));
+  DeviceSelect = (UINT8) (((BIT7 | BIT5) | (IdeDev->Device << 4)));
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, DeviceSelect);
 
-  Command = ATAPI_SOFT_RESET_CMD;
+  Command = ATA_CMD_SOFT_RESET;
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, Command);
 
   //
@@ -1998,7 +1998,7 @@ ParseSenseData (
   OUT SENSE_RESULT      *Result
   )
 {
-  REQUEST_SENSE_DATA      *SenseData;
+  ATAPI_REQUEST_SENSE_DATA      *SenseData;
 
   if (SenseCount == 0) {
     return EFI_INVALID_PARAMETER;
@@ -2011,19 +2011,19 @@ ParseSenseData (
   *Result   = SenseOtherSense;
 
   switch (SenseData->sense_key) {
-  case SK_NO_SENSE:
+  case ATA_SK_NO_SENSE:
     *Result = SenseNoSenseKey;
     break;
-  case SK_NOT_READY:
+  case ATA_SK_NOT_READY:
     switch (SenseData->addnl_sense_code) {
-    case ASC_NO_MEDIA:
+    case ATA_ASC_NO_MEDIA:
       *Result = SenseNoMedia;
       break;
-    case ASC_MEDIA_UPSIDE_DOWN:
+    case ATA_ASC_MEDIA_UPSIDE_DOWN:
       *Result = SenseMediaError;
       break;
-    case ASC_NOT_READY:
-      if (SenseData->addnl_sense_code_qualifier == ASCQ_IN_PROGRESS) {
+    case ATA_ASC_NOT_READY:
+      if (SenseData->addnl_sense_code_qualifier == ATA_ASCQ_IN_PROGRESS) {
         *Result = SenseDeviceNotReadyNeedRetry;
       } else {
         *Result = SenseDeviceNotReadyNoRetry;
@@ -2031,17 +2031,17 @@ ParseSenseData (
       break;
     }
     break;
-  case SK_UNIT_ATTENTION:
-    if (SenseData->addnl_sense_code == ASC_MEDIA_CHANGE) {
+  case ATA_SK_UNIT_ATTENTION:
+    if (SenseData->addnl_sense_code == ATA_ASC_MEDIA_CHANGE) {
       *Result = SenseMediaChange;
     }
     break;
-  case SK_MEDIUM_ERROR:
+  case ATA_SK_MEDIUM_ERROR:
     switch (SenseData->addnl_sense_code) {
-    case ASC_MEDIA_ERR1:
-    case ASC_MEDIA_ERR2:
-    case ASC_MEDIA_ERR3:
-    case ASC_MEDIA_ERR4:
+    case ATA_ASC_MEDIA_ERR1:
+    case ATA_ASC_MEDIA_ERR2:
+    case ATA_ASC_MEDIA_ERR3:
+    case ATA_ASC_MEDIA_ERR4:
       *Result = SenseMediaError;
       break;
     }
@@ -2071,12 +2071,12 @@ AtapiReadPendingData (
   UINT16    TempWordBuffer;
 
   AltRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.AltStatus);
-  if ((AltRegister & BSY) == BSY) {
+  if ((AltRegister & ATA_STSREG_BSY) == ATA_STSREG_BSY) {
     return EFI_NOT_READY;
   }
-  if ((AltRegister & (BSY | DRQ)) == DRQ) {
+  if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
     TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
-    while ((TempWordBuffer & (BSY | DRQ)) == DRQ) {
+    while ((TempWordBuffer & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
       IDEReadPortWMultiple (
         IdeDev->PciIo,
         IdeDev->IoPort->Data, 

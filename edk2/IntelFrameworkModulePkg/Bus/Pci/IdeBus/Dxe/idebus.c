@@ -1264,8 +1264,8 @@ IDEDiskInfoInquiry (
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_DISK_INFO_THIS (This);
 
-  if (*InquiryDataSize < sizeof (INQUIRY_DATA)) {
-    *InquiryDataSize = sizeof (INQUIRY_DATA);
+  if (*InquiryDataSize < sizeof (ATAPI_INQUIRY_DATA)) {
+    *InquiryDataSize = sizeof (ATAPI_INQUIRY_DATA);
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -1273,8 +1273,8 @@ IDEDiskInfoInquiry (
     return EFI_NOT_FOUND;
   }
 
-  gBS->CopyMem (InquiryData, IdeBlkIoDevice->pInquiryData, sizeof (INQUIRY_DATA));
-  *InquiryDataSize = sizeof (INQUIRY_DATA);
+  gBS->CopyMem (InquiryData, IdeBlkIoDevice->pInquiryData, sizeof (ATAPI_INQUIRY_DATA));
+  *InquiryDataSize = sizeof (ATAPI_INQUIRY_DATA);
 
   return EFI_SUCCESS;
 }
