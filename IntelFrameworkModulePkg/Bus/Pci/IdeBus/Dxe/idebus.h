@@ -89,12 +89,12 @@ typedef struct {
   IDE_BASE_REGISTERS          *IoPort;
   UINT16                      AtapiError;
 
-  INQUIRY_DATA                *pInquiryData;
+  ATAPI_INQUIRY_DATA                *pInquiryData;
   EFI_IDENTIFY_DATA           *pIdData;
   ATA_PIO_MODE                PioMode;
   EFI_ATA_MODE                UdmaMode;
   CHAR8                       ModelName[41];
-  REQUEST_SENSE_DATA          *SenseData;
+  ATAPI_REQUEST_SENSE_DATA          *SenseData;
   UINT8                       SenseDataNumber;
   UINT8                       *Cache;
 

@@ -315,8 +315,8 @@ GetIdeRegistersBaseAddr (
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[0] & bit0) == 0 ||
-        (PciData.Device.Bar[1] & bit0) == 0) {
+    if ((PciData.Device.Bar[0] & BIT0) == 0 ||
+        (PciData.Device.Bar[1] & BIT0) == 0) {
       return EFI_UNSUPPORTED;
     }
 
@@ -337,8 +337,8 @@ GetIdeRegistersBaseAddr (
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[2] & bit0) == 0 ||
-        (PciData.Device.Bar[3] & bit0) == 0) {
+    if ((PciData.Device.Bar[2] & BIT0) == 0 ||
+        (PciData.Device.Bar[3] & BIT0) == 0) {
       return EFI_UNSUPPORTED;
     }
 
@@ -709,8 +709,8 @@ DetectIDEController (
   // NOTE: This workaround doesn't apply to ATAPI.
   //
   if (MasterDeviceExist && SlaveDeviceExist &&
-      (StatusReg & DRDY) == 0               &&
-      (InitStatusReg & DRDY) == 0           &&
+      (StatusReg & ATA_STSREG_DRDY) == 0               &&
+      (InitStatusReg & ATA_STSREG_DRDY) == 0           &&
       MasterDeviceType == SlaveDeviceType   &&
       SlaveDeviceType != ATAPI_DEVICE_TYPE) {
     SlaveDeviceExist = FALSE;
@@ -768,14 +768,14 @@ DRQClear (
     //
     // wait for BSY == 0 and DRQ == 0
     //
-    if ((StatusRegister & (DRQ | BSY)) == 0) {
+    if ((StatusRegister & (ATA_STSREG_DRQ | ATA_STSREG_BSY)) == 0) {
       break;
     }
 
-    if ((StatusRegister & (BSY | ERR)) == ERR) {
+    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -842,14 +842,14 @@ DRQClear2 (
     //
     //  wait for BSY == 0 and DRQ == 0
     //
-    if ((AltRegister & (DRQ | BSY)) == 0) {
+    if ((AltRegister & (ATA_STSREG_DRQ | ATA_STSREG_BSY)) == 0) {
       break;
     }
 
-    if ((AltRegister & (BSY | ERR)) == ERR) {
+    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -921,14 +921,14 @@ DRQReady (
     //
     //  BSY==0,DRQ==1
     //
-    if ((StatusRegister & (BSY | DRQ)) == DRQ) {
+    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
       break;
     }
 
-    if ((StatusRegister & (BSY | ERR)) == ERR) {
+    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -998,14 +998,14 @@ DRQReady2 (
     //
     // BSY == 0 , DRQ == 1
     //
-    if ((AltRegister & (BSY | DRQ)) == DRQ) {
+    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
       break;
     }
 
-    if ((AltRegister & (BSY | ERR)) == ERR) {
+    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -1064,7 +1064,7 @@ WaitForBSYClear (
   do {
 
     StatusRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
-    if ((StatusRegister & BSY) == 0x00) {
+    if ((StatusRegister & ATA_STSREG_BSY) == 0x00) {
       break;
     }
 
@@ -1124,7 +1124,7 @@ WaitForBSYClear2 (
   Delay = (UINT32) (((TimeoutInMilliSeconds * STALL_1_MILLI_SECOND) / 30) + 1);
   do {
     AltRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.AltStatus);
-    if ((AltRegister & BSY) == 0x00) {
+    if ((AltRegister & ATA_STSREG_BSY) == 0x00) {
       break;
     }
 
@@ -1188,14 +1188,14 @@ DRDYReady (
     //
     //  BSY == 0 , DRDY == 1
     //
-    if ((StatusRegister & (DRDY | BSY)) == DRDY) {
+    if ((StatusRegister & (ATA_STSREG_DRDY | ATA_STSREG_BSY)) == ATA_STSREG_DRDY) {
       break;
     }
 
-    if ((StatusRegister & (BSY | ERR)) == ERR) {
+    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -1259,14 +1259,14 @@ DRDYReady2 (
     //
     //  BSY == 0 , DRDY == 1
     //
-    if ((AltRegister & (DRDY | BSY)) == DRDY) {
+    if ((AltRegister & (ATA_STSREG_DRDY | ATA_STSREG_BSY)) == ATA_STSREG_DRDY) {
       break;
     }
 
-    if ((AltRegister & (BSY | ERR)) == ERR) {
+    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
 
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
-      if ((ErrorRegister & ABRT_ERR) == ABRT_ERR) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
         return EFI_ABORTED;
       }
     }
@@ -1293,7 +1293,7 @@ DRDYReady2 (
   name by sending ATA command called ATA Identify Command or ATAPI
   Identify Command to the specified IDE device. The module name returned
   is a string of ASCII characters: the first character is bit8--bit15
-  of the first word, the second character is bit0--bit7 of the first word
+  of the first word, the second character is BIT0--bit7 of the first word
   and so on. Thus the string can not be print directly before it is
   preprocessed by this func to change the order of characters in
   each word in the string.
@@ -1424,7 +1424,7 @@ SetDeviceTransferMode (
   //
   Status = AtaNonDataCommandIn (
             IdeDev,
-            SET_FEATURES_CMD,
+            ATA_CMD_SET_FEATURES,
             DeviceSelect,
             0x03,
             SectorCount,
@@ -1507,10 +1507,10 @@ AtaNonDataCommandIn (
 
   //
   // Wait for command completion
-  // For ATA_SMART_CMD, we may need more timeout to let device
+  // For ATAPI_SMART_CMD, we may need more timeout to let device
   // adjust internal states.
   //
-  if (AtaCommand == ATA_SMART_CMD) {
+  if (AtaCommand == ATA_CMD_SMART) {
     Status = WaitForBSYClear (IdeDev, ATASMARTTIMEOUT);
   } else {
     Status = WaitForBSYClear (IdeDev, ATATIMEOUT);
@@ -1520,7 +1520,7 @@ AtaNonDataCommandIn (
   }
 
   StatusRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
-  if ((StatusRegister & ERR) == ERR) {
+  if ((StatusRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
     //
     // Failed to execute command, abort operation
     //
@@ -1639,7 +1639,7 @@ AtaNonDataCommandInExt (
   }
 
   StatusRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
-  if ((StatusRegister & ERR) == ERR) {
+  if ((StatusRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
     //
     // Failed to execute command, abort operation
     //
@@ -1678,7 +1678,7 @@ SetDriveParameters (
   //
   Status = AtaNonDataCommandIn (
             IdeDev,
-            INIT_DRIVE_PARAM_CMD,
+            ATA_CMD_INIT_DRIVE_PARAM,
             (UINT8) (DeviceSelect + DriveParameters->Heads),
             0,
             DriveParameters->Sector,
@@ -1692,7 +1692,7 @@ SetDriveParameters (
   //
   Status = AtaNonDataCommandIn (
             IdeDev,
-            SET_MULTIPLE_MODE_CMD,
+            ATA_CMD_SET_MULTIPLE_MODE,
             DeviceSelect,
             0,
             DriveParameters->MultipleSector,

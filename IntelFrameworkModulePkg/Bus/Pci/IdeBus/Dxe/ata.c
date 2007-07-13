@@ -72,7 +72,7 @@ ATAIdentify (
             IdeDev,
             (VOID *) AtaIdentifyPointer,
             sizeof (EFI_IDENTIFY_DATA),
-            IDENTIFY_DRIVE_CMD,
+            ATA_CMD_IDENTIFY_DRIVE,
             DeviceSelect,
             0,
             0,
@@ -191,7 +191,7 @@ AtaAtapi6Identify (
 
   Atapi6IdentifyStruct = IdeDev->pIdData;
 
-  if ((Atapi6IdentifyStruct->AtapiData.cmd_set_support_83 & bit10) == 0) {
+  if ((Atapi6IdentifyStruct->AtapiData.cmd_set_support_83 & BIT10) == 0) {
     //
     // The device dosn't support 48 bit addressing
     //
@@ -347,7 +347,7 @@ AtaPioDataIn (
     return EFI_DEVICE_ERROR;
   }
 
-  if (AtaCommand == SET_FEATURES_CMD) {
+  if (AtaCommand == ATA_CMD_SET_FEATURES) {
     IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x03);
   }
 
@@ -599,7 +599,7 @@ CheckErrorStatus (
 
   DEBUG_CODE_BEGIN ();
 
-    if (StatusRegister & DWF) {
+    if (StatusRegister & ATA_STSREG_DWF) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Write Fault\n",
@@ -607,7 +607,7 @@ CheckErrorStatus (
         );
     }
 
-    if (StatusRegister & CORR) {
+    if (StatusRegister & ATA_STSREG_CORR) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Corrected Data\n",
@@ -615,10 +615,10 @@ CheckErrorStatus (
         );
     }
 
-    if (StatusRegister & ERR) {
+    if (StatusRegister & ATA_STSREG_ERR) {
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
 
-      if (ErrorRegister & BBK_ERR) {
+      if (ErrorRegister & ATA_ERRREG_BBK) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Bad Block Detected\n",
@@ -626,7 +626,7 @@ CheckErrorStatus (
         );
       }
 
-      if (ErrorRegister & UNC_ERR) {
+      if (ErrorRegister & ATA_ERRREG_UNC) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Uncorrectable Data\n",
@@ -634,7 +634,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & MC_ERR) {
+      if (ErrorRegister & ATA_ERRREG_MC) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Media Change\n",
@@ -642,7 +642,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & ABRT_ERR) {
+      if (ErrorRegister & ATA_ERRREG_ABRT) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Abort\n",
@@ -650,7 +650,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & TK0NF_ERR) {
+      if (ErrorRegister & ATA_ERRREG_TK0NF) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Track 0 Not Found\n",
@@ -658,7 +658,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & AMNF_ERR) {
+      if (ErrorRegister & ATA_ERRREG_AMNF) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Address Mark Not Found\n",
@@ -669,7 +669,7 @@ CheckErrorStatus (
 
   DEBUG_CODE_END ();
 
-  if ((StatusRegister & (ERR | DWF | CORR)) == 0) {
+  if ((StatusRegister & (ATA_STSREG_ERR | ATA_STSREG_DWF | ATA_STSREG_CORR)) == 0) {
     return EFI_SUCCESS;
   }
 
@@ -725,7 +725,7 @@ AtaReadSectors (
   //
   // Using ATA Read Sector(s) command (opcode=0x20) with PIO DATA IN protocol
   //
-  AtaCommand      = READ_SECTORS_CMD;
+  AtaCommand      = ATA_CMD_READ_SECTORS;
 
 
   BlocksRemaining = NumberOfBlocks;
@@ -843,7 +843,7 @@ AtaWriteSectors (
   //
   // Using Write Sector(s) command (opcode=0x30) with PIO DATA OUT protocol
   //
-  AtaCommand      = WRITE_SECTORS_CMD;
+  AtaCommand      = ATA_CMD_WRITE_SECTORS;
 
   BlocksRemaining = NumberOfBlocks;
 
@@ -936,12 +936,12 @@ AtaSoftReset (
   //
   // set SRST bit to initiate soft reset
   //
-  DeviceControl |= SRST;
+  DeviceControl |= ATA_CTLREG_SRST;
 
   //
   // disable Interrupt
   //
-  DeviceControl |= bit1;
+  DeviceControl |= BIT1;
 
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
@@ -1259,7 +1259,7 @@ AtaReadSectorsExt (
   //
   // Using ATA "Read Sectors Ext" command(opcode=0x24) with PIO DATA IN protocol
   //
-  AtaCommand      = READ_SECTORS_EXT_CMD;
+  AtaCommand      = ATA_CMD_READ_SECTORS_EXT;
   Buffer          = DataBuffer;
   BlocksRemaining = NumberOfBlocks;
   Lba64           = StartLba;
@@ -1347,7 +1347,7 @@ AtaWriteSectorsExt (
   //
   // Using ATA "Write Sectors Ext" cmd(opcode=0x24) with PIO DATA OUT protocol
   //
-  AtaCommand      = WRITE_SECTORS_EXT_CMD;
+  AtaCommand      = ATA_CMD_WRITE_SECTORS_EXT;
   Lba64           = StartLba;
   Buffer          = DataBuffer;
   BlocksRemaining = NumberOfBlocks;
@@ -1471,7 +1471,7 @@ AtaPioDataInExt (
   //
   // Fill feature register if needed
   //
-  if (AtaCommand == SET_FEATURES_CMD) {
+  if (AtaCommand == ATA_CMD_SET_FEATURES) {
     IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x03);
   }
 
@@ -1633,7 +1633,7 @@ AtaPioDataOutExt (
   //
   // Fill feature register if needed
   //
-  if (AtaCommand == SET_FEATURES_CMD) {
+  if (AtaCommand == ATA_CMD_SET_FEATURES) {
     IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x03);
   }
 
@@ -1781,7 +1781,7 @@ AtaSMARTSupport (
     Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
     Status = AtaNonDataCommandIn (
               IdeDev,
-              ATA_SMART_CMD,
+              ATA_CMD_SMART,
               Device,
               ATA_SMART_ENABLE_OPERATION,
               0,
@@ -1799,7 +1799,7 @@ AtaSMARTSupport (
               IdeDev,
               (VOID *) TmpAtaIdentifyPointer,
               sizeof (EFI_IDENTIFY_DATA),
-              IDENTIFY_DRIVE_CMD,
+              ATA_CMD_IDENTIFY_DRIVE,
               DeviceSelect,
               0,
               0,
@@ -1820,7 +1820,7 @@ AtaSMARTSupport (
       //
       AtaNonDataCommandIn (
         IdeDev,
-        ATA_SMART_CMD,
+        ATA_CMD_SMART,
         Device,
         ATA_SMART_RETURN_STATUS,
         0,
@@ -2273,24 +2273,24 @@ DoAtaUdma (
 
   switch (UdmaOp) {
   case AtaUdmaReadOp:
-    MaxDmaCommandSectors = MAX_DMA_COMMAND_SECTORS;
+    MaxDmaCommandSectors = ATAPI_MAX_DMA_CMD_SECTORS;
     PciIoProtocolOp      = EfiPciIoOperationBusMasterWrite;
-    AtaCommand           = READ_DMA_CMD;
+    AtaCommand           = ATA_CMD_READ_DMA;
     break;
   case AtaUdmaReadExtOp:
-    MaxDmaCommandSectors = MAX_DMA_EXT_COMMAND_SECTORS;
+    MaxDmaCommandSectors = ATAPI_MAX_DMA_EXT_CMD_SECTORS;
     PciIoProtocolOp      = EfiPciIoOperationBusMasterWrite;
-    AtaCommand           = READ_DMA_EXT_CMD;
+    AtaCommand           = ATA_CMD_READ_DMA_EXT;
     break;
   case AtaUdmaWriteOp:
-    MaxDmaCommandSectors = MAX_DMA_COMMAND_SECTORS;
+    MaxDmaCommandSectors = ATAPI_MAX_DMA_CMD_SECTORS;
     PciIoProtocolOp      = EfiPciIoOperationBusMasterRead;
-    AtaCommand           = WRITE_DMA_CMD;
+    AtaCommand           = ATA_CMD_WRITE_DMA;
     break;
   case AtaUdmaWriteExtOp:
-    MaxDmaCommandSectors = MAX_DMA_EXT_COMMAND_SECTORS;
+    MaxDmaCommandSectors = ATAPI_MAX_DMA_EXT_CMD_SECTORS;
     PciIoProtocolOp      = EfiPciIoOperationBusMasterRead;
-    AtaCommand           = WRITE_DMA_EXT_CMD;
+    AtaCommand           = ATA_CMD_WRITE_DMA_EXT;
     break;
   default:
     return EFI_UNSUPPORTED;
@@ -2617,7 +2617,7 @@ DoAtaUdma (
   // Disable interrupt of Select device
   //
   IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl);
-  DeviceControl |= IEN_L;
+  DeviceControl |= ATA_CTLREG_IEN_L;
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
   return EFI_SUCCESS;
