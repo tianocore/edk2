@@ -9,14 +9,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  DxeStatusCode.h
-
-Abstract:
-
-  Header file of EFI DXE/RT Status Code.
-
 --*/
 
 #ifndef __DXE_STATUS_CODE_H__
