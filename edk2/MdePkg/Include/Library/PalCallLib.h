@@ -16,6 +16,8 @@
 #ifndef __PAL_CALL_LIB_H__
 #define __PAL_CALL_LIB_H__
 
+#define PAL_SUCCESS             0x0
+
 //
 // CacheType of PAL_CACHE_FLUSH.
 //
@@ -28,8 +30,10 @@
 //
 // Bitmask of Opearation of PAL_CACHE_FLUSH.
 // 
-#define PAL_CACHE_FLUSH_INVIDED_LINES     BIT0
-#define PAL_CACHE_FLUSH_PROBE_INTERRUPT   BIT1
+#define PAL_CACHE_FLUSH_INVALIDATE_LINES     BIT0
+#define PAL_CACHE_FLUSH_NO_INVALIDATE_LINES  0
+#define PAL_CACHE_FLUSH_POLL_INTERRUPT       BIT1
+#define PAL_CACHE_FLUSH_NO_INTERRUPT       0
 
 /**
   
@@ -183,6 +187,13 @@ typedef struct {
 // Level of PAL_CACHE_INIT.
 // 
 #define PAL_CACHE_INIT_ALL  0xffffffffffffffffULL
+
+//
+// CacheType 
+//
+#define PAL_CACHE_INIT_TYPE_INSTRUCTION                 0x1
+#define PAL_CACHE_INIT_TYPE_DATA                        0x2
+#define PAL_CACHE_INIT_TYPE_INSTRUCTION_AND_DATA        0x3
 
 //
 // Restrict of PAL_CACHE_INIT.
@@ -1315,6 +1326,9 @@ typedef struct {
    
 **/
 #define PAL_PERF_MON_INFO 15
+
+#define PAL_PLATFORM_ADDR_INTERRUPT_BLOCK_TOKEN                       0x0
+#define PAL_PLATFORM_ADDR_IO_BLOCK_TOKEN                              0x1
 
 /**
   
