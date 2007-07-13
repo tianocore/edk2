@@ -23,9 +23,35 @@ Abstract:
 #define __DXE_STATUS_CODE_H__
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <FrameworkDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Guid/StatusCode.h>
+#include <Protocol/DataHub.h>
+#include <Protocol/SerialIo.h>
+#include <Guid/MemoryStatusCodeRecord.h>
+#include <Protocol/StatusCode.h>
+#include <Guid/StatusCodeDataTypeId.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
+#include <Library/HobLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiRuntimeLib.h>
+#include <Library/SerialPortLib.h>
+#include <Library/OemHookStatusCodeLib.h>
 
 //
 // Data hub worker definition 
@@ -46,14 +72,10 @@ typedef enum {
 } PROCESSOR_MODE;
 
 typedef struct {
-  UINTN                     Signature;
-  LIST_ENTRY                Node;
-  EFI_STATUS_CODE_TYPE      CodeType;
-  EFI_STATUS_CODE_VALUE     Value;
-  UINT32                    Instance;
-  EFI_GUID                  CallerId;
-  EFI_STATUS_CODE_DATA      Data;
-  UINT8                     ExtendData[EFI_STATUS_CODE_DATA_MAX_SIZE];
+  UINTN       Signature;
+  LIST_ENTRY  Node;
+
+  UINT8       Data[sizeof (DATA_HUB_STATUS_CODE_DATA_RECORD) + EFI_STATUS_CODE_DATA_MAX_SIZE];
 } DATAHUB_STATUSCODE_RECORD;
 
 
@@ -235,6 +257,27 @@ DataHubStatusCodeReportWorker (
   IN UINT32                   Instance,
   IN EFI_GUID                 *CallerId,
   IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  );
+
+
+//
+// Declaration for callback Event.
+//
+VOID
+EFIAPI
+VirtualAddressChangeCallBack (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+//
+// Declaration for original Entry Point.
+//
+EFI_STATUS
+EFIAPI
+DxeStatusCodeDriverEntry (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
   );
 
 //

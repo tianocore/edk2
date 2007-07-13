@@ -22,6 +22,8 @@ Abstract:
 #ifndef __DXE_STATUS_CODE_H__
 #define __DXE_STATUS_CODE_H__
 
+#include <Common/StatusCode.h>
+
 //
 // Data hub worker definition 
 //
@@ -41,14 +43,10 @@ typedef enum {
 } PROCESSOR_MODE;
 
 typedef struct {
-  UINTN                     Signature;
-  LIST_ENTRY                Node;
-  EFI_STATUS_CODE_TYPE      CodeType;
-  EFI_STATUS_CODE_VALUE     Value;
-  UINT32                    Instance;
-  EFI_GUID                  CallerId;
-  EFI_STATUS_CODE_DATA      Data;
-  UINT8                     ExtendData[EFI_STATUS_CODE_DATA_MAX_SIZE];
+  UINTN       Signature;
+  LIST_ENTRY  Node;
+
+  UINT8       Data[sizeof (DATA_HUB_STATUS_CODE_DATA_RECORD) + EFI_STATUS_CODE_DATA_MAX_SIZE];
 } DATAHUB_STATUSCODE_RECORD;
 
 
