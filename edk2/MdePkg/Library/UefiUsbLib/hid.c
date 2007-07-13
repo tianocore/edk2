@@ -11,12 +11,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 **/
-#include <PiDxe.h>
-#include <Library/UsbLib.h>
 
-//
-// Function to get HID descriptor
-//
+#include <UefiUsbLibInternal.h>
+
 
 /**
   Get Hid Descriptor
