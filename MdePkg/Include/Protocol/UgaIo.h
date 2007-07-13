@@ -94,49 +94,51 @@ typedef struct {
   OUT VOID                *pvOutBuffer;
   IN UINT64               ui64OutBufferSize;
   OUT UINT64              ui64BytesReturned;
-}
-UGA_IO_REQUEST, *PUGA_IO_REQUEST;
+} UGA_IO_REQUEST, *PUGA_IO_REQUEST;
 
+
+/**
+  Dynamically allocate storage for a child UGA_DEVICE .
+
+  @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is 
+                                 defined in Section 10.7.
+  @param[in]     ParentDevice    ParentDevice specifies a pointer to the parent device of Device.
+  @param[in]     DeviceData      A pointer to UGA_DEVICE_DATA returned from a call to DispatchService()
+                                 with a UGA_DEVICE of Parent and an IoRequest of type UgaIoGetChildDevice.      
+  @param[in]     RunTimeContext  Context to associate with Device.  
+  @param[out]    Device          The Device returns a dynamically allocated child UGA_DEVICE object
+                                 for ParentDevice. The caller is responsible for deleting Device.
+
+                                 
+  @retval  EFI_SUCCESS           Device was returned.
+  @retval  EFI_INVALID_PARAMETER One of the arguments was not valid.
+  @retval  EFI_DEVICE_ERROR      The device had an error and could not complete the request.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_UGA_IO_PROTOCOL_CREATE_DEVICE) (
-  IN  EFI_UGA_IO_PROTOCOL  * This,
-  IN  UGA_DEVICE           * ParentDevice,
-  IN  UGA_DEVICE_DATA      * DeviceData,
+  IN  EFI_UGA_IO_PROTOCOL  *This,
+  IN  UGA_DEVICE           *ParentDevice,
+  IN  UGA_DEVICE_DATA      *DeviceData,
   IN  VOID                 *RunTimeContext,
   OUT UGA_DEVICE           **Device
   );
 
-/*++
 
-  Routine Description:
+/**
+  Delete a dynamically allocated child UGA_DEVICE object that was allocated via CreateDevice() .
 
-    Dynamically allocate storage for a child UGA_DEVICE .
+  @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is 
+                                 defined in Section 10.7.
+  @param[in]     Device          The Device points to a UGA_DEVICE object that was dynamically
+                                 allocated via a CreateDevice() call.
 
-  Arguments:
+                                 
+  @retval  EFI_SUCCESS           Device was returned.
+  @retval  EFI_INVALID_PARAMETER The Device was not allocated via CreateDevice().
 
-    This           - The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is 
-                     defined in Section 10.7.
-
-    ParentDevice   - ParentDevice specifies a pointer to the parent device of Device.
-
-    DeviceData     - A pointer to UGA_DEVICE_DATA returned from a call to DispatchService()
-                     with a UGA_DEVICE of Parent and an IoRequest of type UgaIoGetChildDevice.
-
-    RuntimeContext - Context to associate with Device.
-
-    Device         - The Device returns a dynamically allocated child UGA_DEVICE object
-                     for ParentDevice. The caller is responsible for deleting Device.
-      
-  Returns:
-
-    EFI_SUCCESS           - Device was returned.
-
-    EFI_INVALID_PARAMETER - One of the arguments was not valid.
-
-    EFI_DEVICE_ERROR      - The device had an error and could not complete the request.
-
---*/
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_UGA_IO_PROTOCOL_DELETE_DEVICE) (
@@ -144,31 +146,10 @@ EFI_STATUS
   IN UGA_DEVICE           * Device
   );
 
-/*++
 
-  Routine Description:
-
-    Delete a dynamically allocated child UGA_DEVICE object that was allocated via
-    CreateDevice() .
-
-  Arguments:
-
-    This   - The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is defined 
-             in Section 10.7.
-
-    Device - The Device points to a UGA_DEVICE object that was dynamically
-             allocated via a CreateDevice() call.
-
-  Returns:
-
-    EFI_SUCCESS           - Device was deleted.
-
-    EFI_INVALID_PARAMETER - The Device was not allocated via CreateDevice()
-
---*/
 typedef UGA_STATUS (EFIAPI *PUGA_FW_SERVICE_DISPATCH) (IN PUGA_DEVICE pDevice, IN OUT PUGA_IO_REQUEST pIoRequest);
 
-/*++
+/**
 
   Routine Description:
 
@@ -190,7 +171,7 @@ typedef UGA_STATUS (EFIAPI *PUGA_FW_SERVICE_DISPATCH) (IN PUGA_DEVICE pDevice, I
 
   Varies depending on pIoRequest.
 
---*/
+**/
 struct _EFI_UGA_IO_PROTOCOL {
   EFI_UGA_IO_PROTOCOL_CREATE_DEVICE CreateDevice;
   EFI_UGA_IO_PROTOCOL_DELETE_DEVICE DeleteDevice;

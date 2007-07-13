@@ -142,8 +142,7 @@ EfiGetVariable (
   OUT     UINT32                   *Attributes,
   IN OUT  UINTN                    *DataSize,
   OUT     VOID                     *Data
-  )
-;
+  );
 
 /**
   Enumerates variable's name.
@@ -280,7 +279,7 @@ EfiSetVirtualAddressMap (
 
 
 /**
-  Conver the standard Lib double linked list to a virtual mapping.
+  Convert the standard Lib double linked list to a virtual mapping.
 
   @param  DebugDisposition   Supplies type information for the pointer being converted.
   @param  ListHead           Head of linked list to convert.
@@ -297,7 +296,6 @@ EfiConvertList (
   );
 
 /**
-
   Passes capsules to the firmware with both virtual and physical mapping.
   Depending on the intended consumption, the firmware may
   process the capsule immediately. If the payload should persist across a
@@ -339,7 +337,6 @@ EfiUpdateCapsule (
 
 
 /**
-
   The QueryCapsuleCapabilities() function allows a caller to test to see if a capsule or
   capsules can be updated via UpdateCapsule(). The Flags values in the capsule header and
   size of the entire capsule is checked.
@@ -381,7 +378,6 @@ EfiQueryCapsuleCapabilities (
 
 
 /**
-
   The QueryVariableInfo() function allows a caller to obtain the information about the
   maximum size of the storage space available for the EFI variables, the remaining size of the storage
   space available for the EFI variables and the maximum size of each individual EFI variable,

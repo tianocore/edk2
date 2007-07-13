@@ -1,19 +1,19 @@
-/*++
+/** @file
+  PEI Services Table Pointer Library for IA-32 and X64.
 
-Copyright (c) 2006 Intel Corporation. All rights reserved
-This software and associated documentation (if any) is furnished
-under a license and may only be used or copied in accordance
-with the terms of the license. Except as permitted by such
-license, no part of this software or documentation may be
-reproduced, stored in a retrieval system, or transmitted in any
-form or by any means without the express written consent of
-Intel Corporation.
+  Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-  PEI Services Table Pointer Library.
-  
---*/
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include "InternalPeiServicesTablePointer.h"
+
 
 /**
   
@@ -23,8 +23,7 @@ Intel Corporation.
   For IA32, the four-bytes field immediately prior to new IDT
   base addres is used to save the EFI_PEI_SERVICES**.
   For x64, the eight-bytes field immediately prior to new IDT
-  base addres is used to save the EFI_PEI_SERVICES**.
-
+  base addres is used to save the EFI_PEI_SERVICES**
   @retval  The pointer to PeiServices.
 
 **/
