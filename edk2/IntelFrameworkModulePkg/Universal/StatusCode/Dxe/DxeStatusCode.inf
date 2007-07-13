@@ -55,15 +55,12 @@
   EntryPoint.c
 
 [Sources.Ia32]
-  StatusCode.dxs
   DxeStatusCodeCommon.c
 
 [Sources.X64]
-  StatusCode.dxs
   DxeStatusCodeCommon.c
 
 [Sources.EBC]
-  StatusCode.dxs
   DxeStatusCodeCommon.c
 
 
