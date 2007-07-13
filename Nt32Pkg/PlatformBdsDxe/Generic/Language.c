@@ -29,11 +29,6 @@ Revision History
 #include "BdsString.h"
 #include "Language.h"
 
-//
-// Default language code, currently is English
-//
-CHAR8 *mDefaultLangCode = "eng";
-
 
 VOID
 InitializeLanguage (
@@ -53,83 +48,107 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
-  UINTN       Index;
   UINTN       Size;
+  CHAR8       *Lang;
   CHAR8       LangCode[ISO_639_2_ENTRY_SIZE];
   CHAR8       *LangCodes;
-  CHAR16      *LanguageString;
+  CHAR8       *PlatformLang;
+  CHAR8       *PlatformLangCodes;
+  UINTN       Index;
+  BOOLEAN     Invalid;
 
-  LanguageString  = NULL;
-  LangCodes       = NULL;
 
-  //
-  // Collect the languages from what our current Language support is based on our VFR
-  //
-  gHii->GetPrimaryLanguages (gHii, gStringPackHandle, &LanguageString);
-
-  LangCodes = AllocatePool (StrLen (LanguageString));
-  ASSERT (LangCodes);
-
-  //
-  // Convert LanguageString from Unicode to EFI defined ASCII LangCodes
-  //
-  for (Index = 0; LanguageString[Index] != 0x0000; Index++) {
-    LangCodes[Index] = (CHAR8) LanguageString[Index];
-  }
-
-  LangCodes[Index] = 0;
-
+  LangCodes = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLangCodes);
   if (LangCodesSettingRequired) {
+    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+      //
+      // UEFI 2.1 depricated this variable so we support turning it off
+      //
+      Status = gRT->SetVariable (
+                      L"LangCodes",
+                      &gEfiGlobalVariableGuid,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                      AsciiStrLen (LangCodes),
+                      LangCodes
+                      );
+    }
+
+
+    PlatformLangCodes = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes);
     Status = gRT->SetVariable (
-                    L"LangCodes",
+                    L"PlatformLangCodes",
                     &gEfiGlobalVariableGuid,
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    AsciiStrLen (LangCodes),
-                    LangCodes
+                    AsciiStrSize (PlatformLangCodes),
+                    PlatformLangCodes
                     );
   }
-  //
-  // Find current LangCode from Lang NV Variable
-  //
-  Size = ISO_639_2_ENTRY_SIZE;
-  Status = gRT->GetVariable (
-                  L"Lang",
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &Size,
-                  &LangCode
-                  );
 
-  if (!EFI_ERROR (Status)) {
-    Status = EFI_NOT_FOUND;
-    for (Index = 0; LangCodes[Index] != 0; Index += ISO_639_2_ENTRY_SIZE) {
-      if (CompareMem (&LangCodes[Index], LangCode, ISO_639_2_ENTRY_SIZE) == 0) {
-        Status = EFI_SUCCESS;
-        break;
-      }
-    }
-  }
-  //
-  // If we cannot get language code from Lang variable,
-  // or LangCode cannot be found from language table,
-  // set the mDefaultLangCode to Lang variable.
-  //
-  if (EFI_ERROR (Status)) {
-    Status = gRT->SetVariable (
+  if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+    //
+    // UEFI 2.1 depricated this variable so we support turning it off
+    //
+
+    //
+    // Find current LangCode from Lang NV Variable
+    //
+    Size = ISO_639_2_ENTRY_SIZE;
+    Status = gRT->GetVariable (
                     L"Lang",
                     &gEfiGlobalVariableGuid,
+                    NULL,
+                    &Size,
+                    &LangCode
+                    );
+    if (!EFI_ERROR (Status)) {
+      Status = EFI_NOT_FOUND;
+      for (Index = 0; LangCodes[Index] != 0; Index += ISO_639_2_ENTRY_SIZE) {
+        if (CompareMem (&LangCodes[Index], LangCode, ISO_639_2_ENTRY_SIZE) == 0) {
+          Status = EFI_SUCCESS;
+          break;
+        }
+      }
+    }
+
+    //
+    // If we cannot get language code from Lang variable,
+    // or LangCode cannot be found from language table,
+    // set the mDefaultLangCode to Lang variable.
+    //
+    if (EFI_ERROR (Status)) {
+      Lang = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLang);
+      Status = gRT->SetVariable (
+                      L"Lang",
+                      &gEfiGlobalVariableGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                      ISO_639_2_ENTRY_SIZE,
+                      Lang
+                      );
+    }
+  }
+
+  Invalid = FALSE;
+  PlatformLang = BdsLibGetVariableAndSize (L"PlatformLang", &gEfiGlobalVariableGuid, &Size);
+  if (PlatformLang != NULL) {
+    //
+    // Check Current PlatformLang value against PlatformLangCode. Need a library that is TBD
+    // Set Invalid based on state of PlatformLang.
+    //
+
+    FreePool (PlatformLang);
+  } else {
+    // No valid variable is set
+    Invalid = TRUE;
+  }
+
+  if (Invalid) {
+    PlatformLang = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLang);
+    Status = gRT->SetVariable (
+                    L"PlatformLang",
+                    &gEfiGlobalVariableGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    ISO_639_2_ENTRY_SIZE,
-                    mDefaultLangCode
+                    AsciiStrSize (PlatformLang),
+                    PlatformLang
                     );
   }
-
-  if (LangCodes) {
-    FreePool (LangCodes);
-  }
-
-  if (LanguageString != NULL) {
-    FreePool (LanguageString);
-  }
-
 }

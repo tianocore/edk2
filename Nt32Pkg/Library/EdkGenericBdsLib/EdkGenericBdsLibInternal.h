@@ -21,20 +21,14 @@
 //
 #include <PiDxe.h>
 #include <WinNtDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
 #include <Protocol/Cpu.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/LoadedImage.h>
-#include <Guid/GenericPlatformVariable.h>
-#include <Guid/ShellFile.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/AcpiS3Save.h>
-#include <Guid/GlobalVariable.h>
 #include <Protocol/FormBrowserFramework.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/DriverBinding.h>
@@ -44,10 +38,9 @@
 #include <Protocol/Performance.h>
 #include <Protocol/WinNtIo.h>
 #include <Guid/PcAnsi.h>
-
-//
-// The Library classes this module consumes
-//
+#include <Guid/GlobalVariable.h>
+#include <Guid/GenericPlatformVariable.h>
+#include <Guid/ShellFile.h>
 #include <Library/EdkGenericBdsLib.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
@@ -62,6 +55,8 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/PcdLib.h>
+
 
 #define PERF_TOKEN_LENGTH       28
 #define PERF_PEI_ENTRY_MAX_NUM  50

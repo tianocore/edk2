@@ -63,6 +63,7 @@
   DxeServicesTableLib
   UefiLib
   BaseLib
+  PcdLib
 
 [Guids]
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
@@ -85,3 +86,5 @@
   gEfiFirmwareVolumeProtocolGuid                # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 
+[PcdsFixedAtBuild.common]
+  PcdUefiVariableDefaultTimeout|gEfiMdePkgTokenSpaceGuid

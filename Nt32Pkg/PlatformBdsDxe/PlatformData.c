@@ -30,10 +30,6 @@ Abstract:
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
 
-//
-// Predefined platform default time out value
-//
-UINT16                      gPlatformBootTimeOutDefault = 10;
 
 //
 // Platform specific keyboard device path

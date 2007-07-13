@@ -236,13 +236,14 @@
   PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE  
+  PcdUefiVariableDefaultLangDepricate|gEfiMdePkgTokenSpaceGuid|FALSE
 
 [PcdsPatchableInModule.IA32]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|128
 
 [PcdsFixedAtBuild.IA32]
-  PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
+  PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|12
   PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid|L"..\\Fv\\Fv_Recovery.fd"|52
   PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1
   PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
@@ -267,6 +268,11 @@
   PcdStatusCodeValueRemoteConsoleReset|gEfiMdePkgTokenSpaceGuid|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  PcdUefiVariableDefaultTimeout|gEfiMdePkgTokenSpaceGuid|0x0008
+  PcdUefiVariableDefaultLangCodes|gEfiMdePkgTokenSpaceGuid|"engfra"|7
+  PcdUefiVariableDefaultLang|gEfiMdePkgTokenSpaceGuid|"eng"|4
+  PcdUefiVariableDefaultPlatformLangCodes|gEfiMdePkgTokenSpaceGuid|"en;fr"|6
+  PcdUefiVariableDefaultPlatformLang|gEfiMdePkgTokenSpaceGuid|"en"|2
 
 [PcdsFeatureFlag.IA32]
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
