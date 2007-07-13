@@ -305,6 +305,7 @@
   PcdDriverDiagnosticsDisable|0x0000000e|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdComponentName2Disable|0x0000000f|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdDriverDiagnostics2Disable|0x00000010|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdUefiVariableDefaultLangDepricate|0x0000001a|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
 
 [PcdsFixedAtBuild.common]
   PcdMaximumUnicodeStringLength|0x00000001|gEfiMdePkgTokenSpaceGuid|UINT32|1000000
@@ -328,6 +329,11 @@
   PcdStatusCodeValueRemoteConsoleReset|0x00000012|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   PcdStatusCodeValueRemoteConsoleInputError|0x00000013|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueRemoteConsoleOutputError|0x00000014|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  PcdUefiVariableDefaultTimeout|0x00000015|gEfiMdePkgTokenSpaceGuid|UINT16|0x0008
+  PcdUefiVariableDefaultLangCodes|0x00000016|gEfiMdePkgTokenSpaceGuid|VOID*|"engfra"
+  PcdUefiVariableDefaultLang|0x00000017|gEfiMdePkgTokenSpaceGuid|VOID*|"eng"
+  PcdUefiVariableDefaultPlatformLangCodes|0x00000018|gEfiMdePkgTokenSpaceGuid|VOID*|"en"
+  PcdUefiVariableDefaultPlatformLang|0x00000019|gEfiMdePkgTokenSpaceGuid|VOID*|"en;fr"
 
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|0x00000006|gEfiMdePkgTokenSpaceGuid|UINT32|0x80000000

@@ -172,6 +172,15 @@
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
+[PcdsFeatureFlag.common]
+  PcdUefiVariableDefaultLangDepricate|gEfiMdePkgTokenSpaceGuid|
+
+[PcdsFixedAtBuild.common]
+  PcdUefiVariableDefaultLangCodes|gEfiMdePkgTokenSpaceGuid
+  PcdUefiVariableDefaultLang|gEfiMdePkgTokenSpaceGuid
+  PcdUefiVariableDefaultPlatformLangCodes|gEfiMdePkgTokenSpaceGuid
+  PcdUefiVariableDefaultPlatformLang|gEfiMdePkgTokenSpaceGuid
+
 [depex]
   gEfiHiiProtocolGuid
   

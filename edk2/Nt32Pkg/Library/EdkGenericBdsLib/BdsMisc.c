@@ -25,7 +25,7 @@ Abstract:
 #define MAX_STRING_LEN        200
 static BOOLEAN   mFeaturerSwitch = TRUE;
 static BOOLEAN   mResetRequired  = FALSE;
-extern UINT16 gPlatformBootTimeOutDefault;
+
 
 UINT16
 BdsLibGetTimeout (
@@ -66,7 +66,7 @@ Returns:
   // present.
   // This code should be removed later.
   //
-  Timeout = gPlatformBootTimeOutDefault;
+  Timeout = PcdGet16 (PcdUefiVariableDefaultTimeout);
 
   //
   // Notes: Platform should set default variable if non exists on all error cases!!!
