@@ -15,10 +15,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PS2KEYBOARD_H
 #define _PS2KEYBOARD_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Framework/StatusCode.h>
+
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/IsaIo.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/Ps2Policy.h>
+
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 //
 // Driver Private Data

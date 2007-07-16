@@ -58,7 +58,6 @@
   Ps2KbdCtrller.c
   Ps2KbdTextIn.c
   Ps2Keyboard.c
-  CommonHeader.h
   EntryPoint.c
 
 
