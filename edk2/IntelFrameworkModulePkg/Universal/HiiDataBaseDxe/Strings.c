@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+        
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -19,11 +19,6 @@ Abstract:
 
 --*/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "HiiDatabase.h"
 
@@ -56,10 +51,10 @@ HiiTestString (
 
 Routine Description:
   Test if all of the characters in a string have corresponding font characters.
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -75,7 +70,7 @@ Returns:
   HiiData     = EFI_HII_DATA_FROM_THIS (This);
   GlobalData  = HiiData->GlobalData;
 
-  
+
   //
   // Rewind through the string looking for a glyph width identifier
   // If no width identifier exists, we assume string has narrow width identifier
@@ -155,18 +150,18 @@ Routine Description:
   We will make a buffer the size of the package + EfiStrSize of the new string.  We will
   copy the string package that first gets changed and the following language packages until
   we encounter the NULL string package.  All this time we will ensure that the offsets have
-  been adjusted.  
+  been adjusted.
 
 Arguments:
-  
+
   This         -  Pointer to the HII protocol.
   Language     -  Pointer to buffer which contains the language code of this NewString.
   Handle       -  Handle of the package instance to be processed.
   Reference    -  The token number for the string. If 0, new string token to be returned through this parameter.
-  NewString    -  Buffer pointer for the new string. 
+  NewString    -  Buffer pointer for the new string.
   ResetStrings -  Indicate if we are resetting a string.
-  
-Returns: 
+
+Returns:
 
   EFI_SUCCESS            - The string has been added or reset to Hii database.
   EFI_INVALID_PARAMETER  - Some parameter passed in is invalid.
@@ -661,11 +656,11 @@ Routine Description:
   We will make a buffer the size of the package + StrSize of the new string.  We will
   copy the string package that first gets changed and the following language packages until
   we encounter the NULL string package.  All this time we will ensure that the offsets have
-  been adjusted.  
+  been adjusted.
 
 Arguments:
-  
-Returns: 
+
+Returns:
 
 --*/
 {
@@ -730,12 +725,12 @@ HiiResetStrings (
 /*++
 
 Routine Description:
-  
+
     This function removes any new strings that were added after the initial string export for this handle.
 
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -787,7 +782,7 @@ HiiGetString (
 /*++
 
 Routine Description:
-  
+
   This function extracts a string from a package already registered with the EFI HII database.
 
 Arguments:
@@ -795,7 +790,7 @@ Arguments:
   Handle          - The HII handle on which the string resides.
   Token           - The string token assigned to the string.
   Raw             - If TRUE, the string is returned unedited in the internal storage format described
-                    above. If false, the string returned is edited by replacing <cr> with <space> 
+                    above. If false, the string returned is edited by replacing <cr> with <space>
                     and by removing special characters such as the <wide> prefix.
   LanguageString  - Pointer to a NULL-terminated string containing a single ISO 639-2 language
                     identifier, indicating the language to print. If the LanguageString is empty (starts
@@ -805,11 +800,11 @@ Arguments:
   StringBuffer    - The buffer designed to receive the characters in the string. Type EFI_STRING is
                     defined in String.
 
-Returns: 
+Returns:
   EFI_INVALID_PARAMETER - If input parameter is invalid.
   EFI_BUFFER_TOO_SMALL  - If the *BufferLength is too small.
   EFI_SUCCESS           - Operation is successful.
-  
+
 --*/
 {
   EFI_HII_PACKAGE_INSTANCE  *PackageInstance;
@@ -930,11 +925,11 @@ LangNotFound:
     //
     // Back to the start of package.
     //
-    StringPack = (VOID*)(((UINT8*)StringPack) - Length); 
+    StringPack = (VOID*)(((UINT8*)StringPack) - Length);
     //
     // Terminating zero sub-pack.
     //
-    Length += sizeof (EFI_HII_STRING_PACK); 
+    Length += sizeof (EFI_HII_STRING_PACK);
 
     //
     // If trying to get the entire string package and have insufficient space.  Return error.
@@ -1009,11 +1004,11 @@ LangNotFound:
           // Skip "Narraw, Wide, NoBreak"
           //
           if (CompareMem (Local, &Narrow,  2) &&
-              CompareMem (Local, &Wide,    2) && 
-              CompareMem (Local, &NoBreak, 2)) {          
-            CopyMem (&StringBuffer[Count++], Local, 2);          
-          }        
-        } 
+              CompareMem (Local, &Wide,    2) &&
+              CompareMem (Local, &NoBreak, 2)) {
+            CopyMem (&StringBuffer[Count++], Local, 2);
+          }
+        }
         //
         // Add "NULL" at the end.
         //
@@ -1051,13 +1046,13 @@ HiiGetLine (
 
 Routine Description:
 
-  This function allows a program to extract a part of a string of not more than a given width.  
-  With repeated calls, this allows a calling program to extract "lines" of text that fit inside 
+  This function allows a program to extract a part of a string of not more than a given width.
+  With repeated calls, this allows a calling program to extract "lines" of text that fit inside
   columns.  The effort of measuring the fit of strings inside columns is localized to this call.
 
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {

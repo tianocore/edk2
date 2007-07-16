@@ -24,9 +24,30 @@ Revision History
 #define _SETUP_H
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/FormCallbackFramework.h>
+#include <Protocol/FormBrowserFramework.h>
+#include <Protocol/HiiFramework.h>
+#include <Protocol/Print.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/PrintLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/HiiLibFramework.h>
+#include <Library/GraphicsLib.h>
+
 
 //
 // This is the generated header file which includes whatever needs to be exported (strings + IFR)

@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+        
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -18,11 +18,6 @@ Abstract:
   This file contains the entry code to the HII database.
 
 --*/
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "HiiDatabase.h"
 
@@ -36,11 +31,11 @@ InitializeHiiDatabase (
 
 Routine Description:
   Initialize HII Database
-  
+
 Arguments:
   (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
 
-Returns: 
+Returns:
   EFI_SUCCESS - Setup loaded.
   other       - Setup Error
 
@@ -152,10 +147,10 @@ HiiFindHandles (
 
 Routine Description:
   Determines the handles that are currently active in the database.
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -221,12 +216,12 @@ HiiGetPrimaryLanguages (
 /*++
 
 Routine Description:
-  
+
   This function allows a program to determine what the primary languages that are supported on a given handle.
 
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -319,13 +314,13 @@ HiiGetSecondaryLanguages (
 /*++
 
 Routine Description:
-  
-  This function allows a program to determine which secondary languages are supported 
+
+  This function allows a program to determine which secondary languages are supported
   on a given handle for a given primary language.
 
   Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {

@@ -1,22 +1,17 @@
 /**@file
   This file contains the form processing code to the HII database.
-  
+
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "HiiDatabase.h"
 
@@ -27,24 +22,24 @@ Ascii2Unicode (
   IN  CHAR8          *AsciiStr
   )
 /*++
-  
+
   Routine Description:
 
     This function converts ASCII string to Unicode string.
-  
+
   Arguments:
 
     UnicodeStr     - NULL terminated Unicode output string.
     AsciieStr      - NULL terminated ASCII input string.
- 
-  Returns: 
+
+  Returns:
 
     Start of the Unicode ouput string.
-    
+
 --*/
 
 {
-  CHAR16      *Str = UnicodeStr;  
+  CHAR16      *Str = UnicodeStr;
   while (TRUE) {
     *(UnicodeStr++) = (CHAR16) *AsciiStr;
     if (*(AsciiStr++) == '\0') {
@@ -60,24 +55,24 @@ Unicode2Ascii (
   IN  CHAR16         *UnicodeStr
   )
 /*++
-  
+
   Routine Description:
 
     This function converts Unicode string to ASCII string.
-  
+
   Arguments:
 
     AsciieStr      - NULL terminated ASCII output string.
     UnicodeStr     - NULL terminated Unicode input string.
- 
-  Returns: 
+
+  Returns:
 
     Start of the ASCII ouput string.
-    
+
 --*/
 
 {
-  CHAR8      *Str = AsciiStr;  
+  CHAR8      *Str = AsciiStr;
   while (TRUE) {
     *(AsciiStr++) = (CHAR8) *UnicodeStr;
     if (*(UnicodeStr++) == '\0') {
@@ -96,10 +91,10 @@ ExtractDevicePathData (
 /*++
 
 Routine Description:
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -141,22 +136,22 @@ ExtractVariableData (
 
 Routine Description:
 
-  This function extract the EFI_HII_VARIABLE_PACK portion from the 
+  This function extract the EFI_HII_VARIABLE_PACK portion from the
   each of the EFI_HII_PACKAGE_INSTANCE in HII handle database.
-  
+
 Arguments:
 
   DataTable       - On input, this parameter point to the EFI_HII_DATA_TABLE structure
                     of the final data buffer for the EFI_HII_EXPORT interface. This function
                     update the NumberOfVariableData attribute.
   IfrData         - It points to a staring address of a EFI_HII_IFR_PACK structure.
-  ExportBufferPtr - On input, it points the starting address of the data buffer to 
+  ExportBufferPtr - On input, it points the starting address of the data buffer to
                     host the variable pack. On output, it is the starting address
                     of data buffer for the next extraction operation.
-Returns: 
+Returns:
 
   VOID
-  
+
 --*/
 {
   EFI_HII_VARIABLE_PACK       *VariableContents;
@@ -356,13 +351,13 @@ HiiExportDatabase (
 /*++
 
 Routine Description:
-  
-  This function allows a program to extract a form or form package that has 
+
+  This function allows a program to extract a form or form package that has
   previously been registered with the EFI HII database.
 
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -414,7 +409,7 @@ Returns:
     //
     // Extract Size of Export Package
     //
-    SizeNeeded = SizeNeeded + PackageInstance->IfrSize 
+    SizeNeeded = SizeNeeded + PackageInstance->IfrSize
                             + PackageInstance->StringSize
                             + sizeof (EFI_HII_DATA_TABLE)
                             + sizeof (EFI_HII_DEVICE_PATH_PACK);
@@ -696,35 +691,35 @@ HiiGetForms (
 /*++
 
 Routine Description:
-  
-  This function allows a program to extract a form or form package that has 
+
+  This function allows a program to extract a form or form package that has
   previously been registered with the EFI HII database.
 
 Arguments:
   This         - A pointer to the EFI_HII_PROTOCOL instance.
-  
-  Handle       - Handle on which the form resides. Type EFI_HII_HANDLE is defined in 
+
+  Handle       - Handle on which the form resides. Type EFI_HII_HANDLE is defined in
                  EFI_HII_PROTOCOL.NewPack() in the Packages section.
-            
+
   FormId       - The ID of the form to return. If the ID is zero, the entire form package is returned.
                  Type EFI_FORM_ID is defined in "Related Definitions" below.
-            
+
   BufferLength - On input, the length of the Buffer. On output, the length of the returned buffer, if
                  the length was sufficient and, if it was not, the length that is required to fit the
                  requested form(s).
-                  
+
   Buffer       - The buffer designed to receive the form(s).
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           -  Buffer filled with the requested forms. BufferLength
                            was updated.
-                           
+
   EFI_INVALID_PARAMETER -  The handle is unknown.
-  
+
   EFI_NOT_FOUND         -  A form on the requested handle cannot be found with the
                            requested FormId.
-                           
+
   EFI_BUFFER_TOO_SMALL  - The buffer provided was not large enough to allow the form to be stored.
 
 --*/
@@ -824,7 +819,7 @@ Returns:
             *BufferLengthTemp = FormLength;
             return EFI_BUFFER_TOO_SMALL;
           }
-          
+
           //
           // Rewind to start offset of the found Form
           //
@@ -857,21 +852,21 @@ HiiGetDefaultImageInitPack (
   IN     EFI_IFR_VARSTORE            *VarStore
   )
 /*++
-    
+
   Routine Description:
 
     Initialize the EFI_HII_VARIABLE_PACK_LIST structure and
     prepare it ready to be used by HiiGetDefaultImagePopulateMap ().
-      
+
   Arguments:
 
     VariablePackItem     - Variable Package List.
     VarStore             - IFR variable storage.
-   
-  Returns: 
+
+  Returns:
 
     Return the pointer to the Map space.
-      
+
 --*/
 {
   CHAR16                *Name16;
@@ -900,7 +895,7 @@ HiiGetDefaultImageInitPack (
   VariablePack->VariableId         = VarStore->VarId;
   CopyMem (&VariablePack->VariableGuid, &VarStore->Guid, sizeof (EFI_GUID));
   VariablePack->VariableNameLength = (UINT32) ((StrLen (Name16) + 1) * 2);
-  VariablePack->Header.Length      = sizeof (*VariablePack) 
+  VariablePack->Header.Length      = sizeof (*VariablePack)
                                               + VariablePack->VariableNameLength
                                               + VarStore->Size;
   //
@@ -914,28 +909,28 @@ HiiGetDefaultImageInitPack (
 STATIC
 VOID
 HiiGetDefaultImagePopulateMap (
-  IN OUT UINT8                        *Map,  
+  IN OUT UINT8                        *Map,
   IN     EFI_IFR_OP_HEADER            *FormSet,
   IN     EFI_IFR_VARSTORE             *VarStore,
   IN     UINTN                        DefaultMask
   )
 /*++
-    
+
   Routine Description:
 
    Fill the Map with all the default values either from NV or Hii database.
-      
+
   Arguments:
 
    Map         - Memory pointer to hold the default values.
    FormSet     - The starting EFI_IFR_OP_HEADER to begin retriving default values.
    VarStore    - IFR variable storage.
    DefaultMask - The mask used to get the default variable.
-   
-  Returns: 
+
+  Returns:
 
    VOID
-      
+
 --*/
 {
   EFI_STATUS                     Status;
@@ -950,7 +945,7 @@ HiiGetDefaultImagePopulateMap (
   EFI_IFR_NV_DATA                *IfrNvData;
   EFI_GUID                       Guid;
   CHAR16                         *Name16;
-  CHAR8                          *Name8;  
+  CHAR8                          *Name8;
   EFI_HANDLE                      CallbackHandle;
   EFI_FORM_CALLBACK_PROTOCOL     *FormCallbackProt;
 
@@ -993,7 +988,7 @@ HiiGetDefaultImagePopulateMap (
   }
   if (!EFI_ERROR (Status)) {
     //
-    // Either Defaults/Manufacturing variable exists and appears to be valid. 
+    // Either Defaults/Manufacturing variable exists and appears to be valid.
     // The map is read, exit w/ success now.
     //
     FreePool (Name16);
@@ -1002,10 +997,10 @@ HiiGetDefaultImagePopulateMap (
 
   //
   // First, prime the map with what already is in the NV.
-  // This is needed to cover a situation where the IFR does not contain all the 
+  // This is needed to cover a situation where the IFR does not contain all the
   // defaults; either deliberately not having appropriate IFR, or in case of IFR_STRING, there is no default.
-  // Ignore status. Either it gets read or not. 
-  //  
+  // Ignore status. Either it gets read or not.
+  //
   FormCallbackProt = NULL;
   CopyMem (&CallbackHandle, &((EFI_IFR_FORM_SET*) FormSet)->CallbackHandle, sizeof (CallbackHandle));
   if (CallbackHandle != NULL) {
@@ -1042,7 +1037,7 @@ HiiGetDefaultImagePopulateMap (
     }
   } else {
     //
-    // No callback available for this formset, read straight from NV. Deliberately ignore the Status. 
+    // No callback available for this formset, read straight from NV. Deliberately ignore the Status.
     // The buffer will only be written if variable exists nd has correct size.
     //
     Status = EfiLibHiiVariableRetrieveFromNv (
@@ -1056,8 +1051,8 @@ HiiGetDefaultImagePopulateMap (
   //
   // Iterate all IFR statements and for applicable, retrieve the default into the Map.
   //
-  for (IfrItem = FormSet, VarId = 0; 
-       IfrItem->OpCode != EFI_IFR_END_FORM_SET_OP; 
+  for (IfrItem = FormSet, VarId = 0;
+       IfrItem->OpCode != EFI_IFR_END_FORM_SET_OP;
        IfrItem = (EFI_IFR_OP_HEADER *) ((UINT8*) IfrItem + IfrItem->Length)
       ) {
 
@@ -1073,11 +1068,11 @@ HiiGetDefaultImagePopulateMap (
 
     //
     // Skip opcodes that reference other VarStore than that specific to current map.
-    // 
+    //
     if (VarId != VarStore->VarId) {
       continue;
     }
-    
+
     //
     // Extract the default value from this opcode if applicable, and apply it to the map.
     //
@@ -1089,7 +1084,7 @@ HiiGetDefaultImagePopulateMap (
         //
         // Get to the first EFI_IFR_ONE_OF_OPTION_OP
         //
-        IfrItem = (EFI_IFR_OP_HEADER *) ((UINT8*) IfrItem + IfrItem->Length); 
+        IfrItem = (EFI_IFR_OP_HEADER *) ((UINT8*) IfrItem + IfrItem->Length);
         ASSERT (EFI_IFR_ONE_OF_OPTION_OP == IfrItem->OpCode);
 
         OneOfOpt = (EFI_IFR_ONE_OF_OPTION *)IfrItem;
@@ -1126,7 +1121,7 @@ HiiGetDefaultImagePopulateMap (
 
       case EFI_IFR_CHECKBOX_OP:
         ASSERT (IfrNvData->QuestionId + IfrNvData->StorageWidth <= VarStore->Size);
-        CheckBox = (EFI_IFR_CHECK_BOX *)IfrItem;        
+        CheckBox = (EFI_IFR_CHECK_BOX *)IfrItem;
         if (DefaultMask == EFI_IFR_FLAG_MANUFACTURING) {
           if (0 != (CheckBox->Flags & EFI_IFR_FLAG_MANUFACTURING)) {
             *(UINT8 *) (Map + IfrNvData->QuestionId) = TRUE;
@@ -1168,25 +1163,25 @@ HiiGetDefaultImage (
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
   )
 /*++
-    
+
   Routine Description:
 
-  This function allows a program to extract the NV Image 
+  This function allows a program to extract the NV Image
   that represents the default storage image
-      
+
   Arguments:
     This             - A pointer to the EFI_HII_PROTOCOL instance.
     Handle           - The HII handle from which will have default data retrieved.
     UINTN            - Mask used to retrieve the default image.
-    VariablePackList - Callee allocated, tightly-packed, link list data 
+    VariablePackList - Callee allocated, tightly-packed, link list data
                          structure that contain all default varaible packs
                          from the Hii Database.
-    
-  Returns: 
+
+  Returns:
     EFI_NOT_FOUND         - If Hii database does not contain any default images.
     EFI_INVALID_PARAMETER - Invalid input parameter.
     EFI_SUCCESS           - Operation successful.
-      
+
 --*/
 {
   EFI_HII_HANDLE_DATABASE        *HandleDatabase;
@@ -1198,7 +1193,7 @@ HiiGetDefaultImage (
   UINTN                          SetupMapNameSize;
   UINTN                          SizeOfMaps;
   EFI_HII_VARIABLE_PACK_LIST     *PackList;
-  EFI_HII_VARIABLE_PACK_LIST     *PackListNext;  
+  EFI_HII_VARIABLE_PACK_LIST     *PackListNext;
   EFI_HII_VARIABLE_PACK_LIST     *PackListLast;
   UINT8                          *Map;
 
@@ -1232,26 +1227,26 @@ HiiGetDefaultImage (
       //
       // Size of the map
       //
-      SizeOfMaps += VarStore->Size; 
+      SizeOfMaps += VarStore->Size;
       //
       // add the size of the string, in Unicode
       //
-      SizeOfMaps += (VarStore->Header.Length - sizeof (*VarStore)) * 2; 
+      SizeOfMaps += (VarStore->Header.Length - sizeof (*VarStore)) * 2;
       //
       // Space for node
       //
-      SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK);      
+      SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK);
       //
-      // Space for linked list node 
+      // Space for linked list node
       //
-      SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK_LIST); 
+      SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK_LIST);
     }
 
     IfrItem = (EFI_IFR_OP_HEADER *) ((UINT8 *) IfrItem + IfrItem->Length);
   }
 
   //
-  // If the FormSet OpCode has a non-zero NvDataSize. There is a default 
+  // If the FormSet OpCode has a non-zero NvDataSize. There is a default
   // NvMap with ID=0, GUID that of the formset itself and "Setup" as name.
   //
   SetupMapNameSize = StrLen (SETUP_MAP_NAME) + 1;
@@ -1269,33 +1264,33 @@ HiiGetDefaultImage (
     //
     // Size of the map
     //
-    SizeOfMaps += VarStoreDefault->Size; 
+    SizeOfMaps += VarStoreDefault->Size;
     //
     // add the size of the string
     //
-    SizeOfMaps += sizeof (SETUP_MAP_NAME); 
+    SizeOfMaps += sizeof (SETUP_MAP_NAME);
     //
     // Space for node
     //
-    SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK);      
+    SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK);
     //
-    // Space for linked list node 
+    // Space for linked list node
     //
-    SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK_LIST); 
+    SizeOfMaps += sizeof (EFI_HII_VARIABLE_PACK_LIST);
   }
 
   if (0 == SizeOfMaps) {
     //
     // The IFR does not have any explicit or default map(s).
     //
-    return EFI_NOT_FOUND; 
+    return EFI_NOT_FOUND;
   }
 
   //
   // Allocate the return buffer
   //
   PackList = AllocateZeroPool (SizeOfMaps);
-  ASSERT (NULL != PackList); 
+  ASSERT (NULL != PackList);
 
   PackListNext = PackList;
   PackListLast = PackList;
@@ -1337,7 +1332,7 @@ HiiGetDefaultImage (
 
   PackListLast->NextVariablePack = NULL;
   *VariablePackList = PackList;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -1354,7 +1349,7 @@ HiiUpdateForm (
 /*++
 
 Routine Description:
-  This function allows the caller to update a form that has 
+  This function allows the caller to update a form that has
   previously been registered with the EFI HII database.
 
 Arguments:
@@ -1363,7 +1358,7 @@ Arguments:
   AddData    - If TRUE, add data.  If FALSE, remove data
   Data       - If adding data, this is the pointer to the data to add
 
-Returns: 
+Returns:
   EFI_SUCCESS - Update success.
   Other       - Update fail.
 

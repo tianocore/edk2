@@ -1,27 +1,22 @@
 /*++
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   DriverSample.c
 
 Abstract:
 
-  This is an example of how a driver might export data to the HII protocol to be 
+  This is an example of how a driver might export data to the HII protocol to be
   later utilized by the Setup Protocol
 
 --*/
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "DriverSample.h"
 
@@ -33,7 +28,7 @@ Abstract:
   }
 
 EFI_GUID  mFormSetGuid    = FORMSET_GUID;
-EFI_GUID  mStringPackGuid = STRING_PACK_GUID; 
+EFI_GUID  mStringPackGuid = STRING_PACK_GUID;
 
 STATIC
 EFI_STATUS
@@ -50,7 +45,7 @@ Routine Description:
 
   This is the function that is called to provide results data to the driver.  This data
   consists of a unique key which is used to identify what data is either being passed back
-  or being asked for. 
+  or being asked for.
 
 Arguments:
 
@@ -60,7 +55,7 @@ Arguments:
 
   Data -            A pointer to the data being sent to the original exporting driver.
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -507,7 +502,7 @@ DriverSampleInit (
 
   CallbackInfo->CallbackHandle  = Handle;
 
-  PackageList                   = PreparePackages (1, &mStringPackGuid, DriverSampleStrings);
+  PackageList                   = PreparePackages (1, &mStringPackGuid, DriverSampleDxeStrings);
   Status                        = Hii->NewPack (Hii, PackageList, &HiiHandle);
   FreePool (PackageList);
 

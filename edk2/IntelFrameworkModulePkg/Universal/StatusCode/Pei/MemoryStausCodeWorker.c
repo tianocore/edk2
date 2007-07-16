@@ -1,32 +1,27 @@
 /** @file
   Memory status code worker in PEI.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-                                                                                            
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  MemoryStatusCodeWorker.c
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "PeiStatusCode.h"
 
 /**
-  Create one memory status code GUID'ed HOB, use PacketIndex 
+  Create one memory status code GUID'ed HOB, use PacketIndex
   to identify the packet.
 
-  @param   PacketIndex    Index of records packet. 
- 
+  @param   PacketIndex    Index of records packet.
+
   @return                 Always return pointer of memory status code packet.
 
 **/
@@ -43,8 +38,8 @@ CreateMemoryStatusCodePacket (
   //
   PacketHeader =
     (MEMORY_STATUSCODE_PACKET_HEADER *) BuildGuidHob (
-                                          &gMemoryStatusCodeRecordGuid, 
-                                          PcdGet16 (PcdStatusCodeMemorySize) * 
+                                          &gMemoryStatusCodeRecordGuid,
+                                          PcdGet16 (PcdStatusCodeMemorySize) *
                                           1024 +
                                           sizeof (MEMORY_STATUSCODE_PACKET_HEADER)
                                           );
@@ -61,9 +56,9 @@ CreateMemoryStatusCodePacket (
 
 /**
   Initialize memory status code.
-  Create one GUID'ed HOB with PCD defined size. If create required size 
+  Create one GUID'ed HOB with PCD defined size. If create required size
   GUID'ed HOB failed, then ASSERT().
- 
+
   @return           The function always return EFI_SUCCESS
 
 **/
@@ -83,21 +78,21 @@ MemoryStatusCodeInitializeWorker (
 
 /**
   Report status code into GUID'ed HOB..
- 
+
   @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
- 
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This included information about the class and subclass that is used to classify the entity 
-                        as well as an operation.  For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
+
+  @param  Value         Describes the current status of a hardware or software entity.
+                        This included information about the class and subclass that is used to classify the entity
+                        as well as an operation.  For progress codes, the operation is the current activity.
+                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
+                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
                         Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
- 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass pairing. 
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
+
+  @param  Instance      The enumeration of a hardware or software entity within the system.
+                        A system may contain multiple entities that match a class/subclass pairing.
+                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable,
                         not meaningful, or not relevant.  Valid instance numbers start with 1.
- 
+
   @return               The function always return EFI_SUCCESS.
 
 **/
@@ -140,11 +135,11 @@ MemoryStatusCodeReportWorker (
 
   if (NULL == Record) {
     //
-    // In order to save status code , create new packet. 
+    // In order to save status code , create new packet.
     //
     PacketHeader = CreateMemoryStatusCodePacket (PacketIndex);
 
-    Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1); 
+    Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
     Record = &Record[PacketHeader->RecordIndex++];
   }
 

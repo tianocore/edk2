@@ -50,7 +50,6 @@
   Forms.c
   HiiDatabase.h
   HiiDatabase.c
-  CommonHeader.h
 
 
 ################################################################################

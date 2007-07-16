@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+        
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -19,11 +19,6 @@ Abstract:
 
 --*/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "HiiDatabase.h"
 
@@ -37,10 +32,10 @@ GetPackSize (
 
 Routine Description:
   Determines the passed in Pack's size and returns the value.
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -111,10 +106,10 @@ ValidatePack (
 
 Routine Description:
   Verifies that the package instance is using the correct handle for string operations.
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -227,14 +222,14 @@ HiiNewPack (
 Routine Description:
 
   Extracts the various packs from a package list.
-  
+
 Arguments:
 
   This      - Pointer of HII protocol.
   Packages  - Pointer of HII packages.
   Handle    - Handle value to be returned.
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           - Pacakges has added to HII database successfully.
   EFI_INVALID_PARAMETER - Invalid parameter.
@@ -610,10 +605,10 @@ HiiRemovePack (
 
 Routine Description:
   Removes the various packs from a Handle
-  
+
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {

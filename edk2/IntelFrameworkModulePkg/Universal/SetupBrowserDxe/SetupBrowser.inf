@@ -57,8 +57,6 @@
   Setup.h
   Setup.c
   SetupBrowserStr.uni
-  CommonHeader.h
-
 
 ################################################################################
 #
@@ -68,10 +66,9 @@
 ################################################################################
 
 [Packages]
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 ################################################################################
 #
