@@ -49,8 +49,6 @@
   usbmouse.c
   mousehid.c
   usbmouse.h
-  CommonHeader.h
-
 
 ################################################################################
 #
@@ -61,8 +59,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
-
 
 ################################################################################
 #
