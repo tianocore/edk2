@@ -361,7 +361,7 @@
   $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
-  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
+  $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
@@ -378,9 +378,9 @@
     <LibraryClass>
       PcdLib|$(WORKSPACE)/MdeModulePkg/Library/PcdDriverPcdLibNull/PcdLib.inf
   }
-  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
-  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
-  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
+  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
+  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf  
+  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
@@ -389,13 +389,13 @@
   $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
-  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf  
+  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf        
+  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf        
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf      
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
-  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
+  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
+  $(WORKSPACE)/Nt32Pkg/TimerDxe/TimerDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
