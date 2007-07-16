@@ -413,7 +413,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf

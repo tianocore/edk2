@@ -364,7 +364,7 @@
   $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
