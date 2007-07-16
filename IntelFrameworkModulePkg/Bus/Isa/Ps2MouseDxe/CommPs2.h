@@ -26,11 +26,6 @@ Revision History
 #ifndef _COMMPS2_H_
 #define _COMMPS2_H_
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #define PS2_PACKET_LENGTH       3
 #define PS2_SYNC_MASK           0xc
 #define PS2_SYNC_BYTE           0x8

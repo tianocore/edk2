@@ -24,10 +24,20 @@ Revision History
 #ifndef _PS2MOUSE_H
 #define _PS2MOUSE_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+#include <PiDxe.h>
+#include <Framework/StatusCode.h>
+
+#include <Protocol/SimplePointer.h>
+#include <Protocol/IsaIo.h>
+#include <Protocol/DevicePath.h>
+
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 //
 // PS/2 mouse sample rate
