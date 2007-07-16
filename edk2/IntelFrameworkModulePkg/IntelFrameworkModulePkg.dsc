@@ -162,6 +162,9 @@
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
 
+[PcdsFixedAtBuild.IPF]
+  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -178,7 +181,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBus.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppy.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerial.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboard.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2Mouse.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
