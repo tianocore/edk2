@@ -22,7 +22,11 @@ if /I "%1"=="/h" goto usage
 if /I "%1"=="/?" goto usage
 if /I "%1"=="/help" goto usage
 
-if NOT "%1"=="" set EDK_TOOLS_PATH=%1
+if /I "%1"=="Reconfig" (
+  if NOT "%2"=="" set EDK_TOOLS_PATH=%2
+) else (
+  if NOT "%1"=="" set EDK_TOOLS_PATH=%1
+)
 
 REM
 REM Check the required system environment variables
@@ -45,7 +49,7 @@ REM
 if not defined EDK_TOOLS_PATH goto no_tools_path
 if exist %EDK_TOOLS_PATH% goto set_path
 echo.
-echo !!!WARNING!!! %EDK_TOOLS_PATH% doesn't exist. %WORKSPACE%\Tools will be used !!!
+echo !!!WARNING!!! %EDK_TOOLS_PATH% doesn't exist. %WORKSPACE%\BaseTools will be used !!!
 echo.
 
 :no_tools_path
@@ -80,22 +84,39 @@ echo.
 REM
 REM copy *.template to %WORKSPACE%\Conf
 REM
-if NOT exist %WORKSPACE%\Conf mkdir %WORKSPACE%\Conf
+if NOT exist %WORKSPACE%\Conf (
+  mkdir %WORKSPACE%\Conf
+) else (
+  if /I "%1"=="Reconfig" (
+    echo.
+    echo  Over-writing the files in the WORKSPACE\Conf directory
+    echo  using the default template files
+    echo.
+  )
+)
 if NOT exist %WORKSPACE%\Conf\FrameworkDatabase.db (
   echo copying ... FrameworkDatabase.template to %WORKSPACE%\Conf\FrameworkDatabase.db
   copy %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %WORKSPACE%\Conf\FrameworkDatabase.db > nul
+) else (
+  if /I "%1"=="Reconfig" copy /Y %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %WORKSPACE%\Conf\FrameworkDatabase.db > nul
 )
 if NOT exist %WORKSPACE%\Conf\target.txt (
   echo copying ... target.template to %WORKSPACE%\Conf\target.txt
   copy %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
+) else (
+  if /I "%1"=="Reconfig" copy /Y %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
 )
 if NOT exist %WORKSPACE%\Conf\tools_def.txt (
   echo copying ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
   copy %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
+) else (
+  if /I "%1"=="Reconfig" copy /Y %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
 )
 if NOT exist %WORKSPACE%\Conf\build_rule.txt (
   echo copying ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
   copy %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
+) else (
+  if /I "%1"=="Reconfig" copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
 )
 
 REM
@@ -111,7 +132,7 @@ goto end
 
 :usage
 echo.
-echo  "Usage: %0 [/? | /h | /help | -h | -help | --help] [tools_path]"
+echo  "Usage: %0 [/? | /h | /help | -h | -help | --help] [Reconfig] [tools_path]"
 echo.
 echo                      tools_path       Tools' path. EDK_TOOLS_PATH will be set to this path.
 echo.
