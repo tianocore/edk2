@@ -115,7 +115,7 @@ READ_LOCK_STATUS   = TRUE
 INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
-INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
+INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
@@ -129,9 +129,9 @@ INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   ##
 INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
-INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
-INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
+INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
+INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
@@ -141,12 +141,12 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.in
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
-INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
-INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
+INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
+INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
-INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
+INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
+INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/TimerDxe.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
