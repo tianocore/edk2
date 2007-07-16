@@ -365,7 +365,7 @@
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
@@ -416,7 +416,7 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
   $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
   $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf
