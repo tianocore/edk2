@@ -30,7 +30,7 @@
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = InitializeDxeStatusCode
+  ENTRY_POINT                    = DxeStatusCodeDriverEntry
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -52,7 +52,6 @@
   DataHubStatusCodeWorker.c
   DxeStatusCode.c
   DxeStatusCode.h
-  EntryPoint.c
 
 [Sources.Ia32]
   DxeStatusCodeCommon.c

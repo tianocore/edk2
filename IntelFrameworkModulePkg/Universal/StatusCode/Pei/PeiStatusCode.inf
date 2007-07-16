@@ -47,7 +47,6 @@
   MemoryStausCodeWorker.c
   SerialStatusCodeWorker.c
   PeiStatusCode.h
-  CommonHeader.h
 
 
 ################################################################################

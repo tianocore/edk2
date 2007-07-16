@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>DriverSample</ModuleName>
+    <ModuleName>DriverSampleDxe</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>FE3542FE-C1D3-4EF8-657C-8048606FF670</GuidValue>
     <Version>1.0</Version>
@@ -19,7 +19,7 @@
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>DriverSample</OutputFileBasename>
+    <OutputFileBasename>DriverSampleDxe</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">

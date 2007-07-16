@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DriverSample
+  BASE_NAME                      = DriverSampleDxe
   FILE_GUID                      = FE3542FE-C1D3-4EF8-657C-8048606FF670
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -50,8 +50,6 @@
   VfrStrings.uni
   Inventory.vfr
   InventoryStrings.uni
-  CommonHeader.h
-
 
 ################################################################################
 #

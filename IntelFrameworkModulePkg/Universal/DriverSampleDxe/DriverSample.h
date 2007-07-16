@@ -25,9 +25,27 @@ Revision History
 
 
 //
-// Include common header file for this module.
+// The package level header files this module uses
 //
-#include "CommonHeader.h"
+#include <PiDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/FormCallbackFramework.h>
+#include <Protocol/HiiFramework.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/PrintLib.h>
+#include <Library/IfrSupportLibFramework.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/HiiLibFramework.h>
 
 #include "NVDataStruc.h"
 
@@ -43,7 +61,7 @@ extern UINT8  InventoryBin[];
 //
 // extern UINT8 InventoryStringsStr[];
 //
-extern UINT8  DriverSampleStrings[];
+extern UINT8  DriverSampleDxeStrings[];
 
 #define SAMPLE_STRING               L"This is an error!"
 

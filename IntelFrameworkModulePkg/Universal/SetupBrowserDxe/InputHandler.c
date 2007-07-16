@@ -21,11 +21,6 @@ Revision History
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Setup.h"
 #include "Ui.h"
 #include "Colors.h"

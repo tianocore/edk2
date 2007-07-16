@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+        
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -19,11 +19,6 @@ Abstract:
 
 --*/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "HiiDatabase.h"
 
@@ -85,7 +80,7 @@ HiiGetGlyph (
 /*++
 
 Routine Description:
-  Translates a Unicode character into the corresponding font glyph.  
+  Translates a Unicode character into the corresponding font glyph.
   If the Source was pointing to a non-spacing character, the next Source[*Index]
   character will be parsed and OR'd to the GlyphBuffer until a spacing character
   is found in the Source.  Since non-spacing characters are considered to be the
@@ -98,7 +93,7 @@ Routine Description:
 
 Arguments:
 
-Returns: 
+Returns:
 
 --*/
 {
@@ -222,7 +217,7 @@ Returns:
       Attributes = GlobalData->NarrowGlyphs[Character].Attributes & EFI_GLYPH_NON_SPACING;
     } else {
       for (Value = 0; Value != Count; Value++) {
-        *GlyphBuffer[Location + Value] = (UINT8) (*GlyphBuffer[Location + Value] | 
+        *GlyphBuffer[Location + Value] = (UINT8) (*GlyphBuffer[Location + Value] |
                                                   GlobalData->WideGlyphs[Character].GlyphCol1[Value]);
         *GlyphBuffer[Location + Value + Count] = (UINT8) (*GlyphBuffer[Location + Value + Count] |
                                                           GlobalData->WideGlyphs[Character].GlyphCol2[Value]);
