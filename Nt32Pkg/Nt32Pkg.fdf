@@ -3,13 +3,13 @@
 ################################################################################
 #
 # FD Section
-# The [FD] Section is made up of the definition statements and a 
-# description of what goes into  the Flash Device Image.  Each FD section 
-# defines one flash ¡°device¡± image.  A flash device image may be one of 
-# the following: Removable media bootable image (like a boot floppy 
-# image,) an Option ROM image (that would be ¡°flashed¡± into an add-in 
-# card,) a System ¡°Flash¡±  image (that would be burned into a system¡¯s 
-# flash) or an Update (¡°Capsule¡±) image that will be used to update and 
+# The [FD] Section is made up of the definition statements and a
+# description of what goes into  the Flash Device Image.  Each FD section
+# defines one flash ¡°device¡± image.  A flash device image may be one of
+# the following: Removable media bootable image (like a boot floppy
+# image,) an Option ROM image (that would be ¡°flashed¡± into an add-in
+# card,) a System ¡°Flash¡±  image (that would be burned into a system¡¯s
+# flash) or an Update (¡°Capsule¡±) image that will be used to update and
 # existing system flash.
 #
 ################################################################################
@@ -22,14 +22,14 @@ NumBlocks     = 0x2a
 
 ################################################################################
 #
-# Following are lists of FD Region layout which correspond to the locations of different 
-# images within the flash device. 
-# 
+# Following are lists of FD Region layout which correspond to the locations of different
+# images within the flash device.
+#
 # Regions must be defined in ascending order and may not overlap.
 #
-# A Layout Region start with a eight digit hex offset (leading ¡°0x¡± required) followed by 
-# the pipe ¡°|¡± character, followed by the size of the region, also in hex with the leading 
-# ¡°0x¡± characters. Like: 
+# A Layout Region start with a eight digit hex offset (leading ¡°0x¡± required) followed by
+# the pipe ¡°|¡± character, followed by the size of the region, also in hex with the leading
+# ¡°0x¡± characters. Like:
 # Offset|Size
 # PcdOffsetCName|PcdSizeCName
 # RegionType <FV, DATA, or FILE>
@@ -42,16 +42,16 @@ FV = FvRecovery
 0x00280000|0x0000c000
 PcdFlashNvStorageBase|PcdFlashNvStorageSize
 DATA = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-  0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c, 
-  0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50, 
-  0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 
-  0x5f, 0x46, 0x56, 0x48, 0xff, 0x8c, 0xff, 0xff, 
-  0x48, 0x00, 0x3b, 0x7c, 0x00, 0x00, 0x00, 0x01, 
-  0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-  0x24, 0x56, 0x53, 0x53, 0xb8, 0xbf, 0x00, 0x00, 
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c,
+  0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50,
+  0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x5f, 0x46, 0x56, 0x48, 0xff, 0x8c, 0xff, 0xff,
+  0x48, 0x00, 0x3b, 0x7c, 0x00, 0x00, 0x00, 0x01,
+  0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x24, 0x56, 0x53, 0x53, 0xb8, 0xbf, 0x00, 0x00,
   0x5a, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
@@ -60,11 +60,11 @@ PcdFlashNvStorageEventLogBase|PcdFlashNvStorageEventLogSize
 
 0x0028e000|0x00002000
 PcdFlashNvStorageFtwWorkingBase|PcdFlashNvStorageFtwWorkingSize
-DATA = { 
-  0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c, 
-  0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50, 
-  0xd2, 0x5f, 0x05, 0x9e, 0xfe, 0xff, 0xff, 0xff, 
-  0xff, 0xff, 0xff, 0xff, 0xe0, 0x1f, 0x00, 0x00 
+DATA = {
+  0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c,
+  0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50,
+  0xd2, 0x5f, 0x05, 0x9e, 0xfe, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xe0, 0x1f, 0x00, 0x00
 }
 
 0x00290000|0x00010000
@@ -81,7 +81,7 @@ PcdFlashNvStorageFtwSpareBase|PcdFlashNvStorageFtwSpareBase
 #
 ################################################################################
 [FV.FvRecovery]
-FvAlignment        = 16         #FV alignment and FV attributes setting.    
+FvAlignment        = 16         #FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -102,7 +102,7 @@ READ_LOCK_STATUS   = TRUE
 #
 # The INF statements point to EDK component and EDK II module INF files, which will be placed into this FV image.
 # Parsing tools will scan the INF file to determine the type of component or module.
-# The component or module type is used to reference the standard rules 
+# The component or module type is used to reference the standard rules
 # defined elsewhere in the FDF file.
 #
 # The format for INF statements is:
@@ -114,80 +114,80 @@ READ_LOCK_STATUS   = TRUE
   ##
 INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf  
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootMode.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf    
-INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/Variable.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScan.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
-INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf  
-  
+INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
   ##
   #  DXE Phase modules
   ##
-INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf  
-INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Core/Dxe/DxeMain.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/Metronome.inf
-INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf  
+INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
 INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/Reset.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf    
-INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
+INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf    
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf  
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf  
-INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf        
-INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf        
-INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf      
+INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf
+INF  $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/Cpu.inf
+INF  $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBds.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf  
-INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf  
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf  
-INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf    
+INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubclassDriver.inf
+INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/Timer.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf              
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf    
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
-INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf  
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
 INF  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf  
+INF  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf  
-INF  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf  
-INF  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf  
-INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSample.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGop.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf
+INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
 ################################################################################
 #
-# FILE statements are provided so that a platform integrator can include 
-# complete EFI FFS files, as well as a method for constructing FFS files 
-# using curly "{}" brace scoping. The following three FILEs are 
+# FILE statements are provided so that a platform integrator can include
+# complete EFI FFS files, as well as a method for constructing FFS files
+# using curly "{}" brace scoping. The following three FILEs are
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
 FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
     SECTION COMPRESS PI_STD {
-      SECTION GUIDED { 
+      SECTION GUIDED {
         SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
       }
     }
@@ -200,17 +200,17 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
     }
   }
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
-    SECTION COMPRESS PI_STD { 
+    SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION RAW = EdkNt32Pkg/Logo/Logo.bmp
       }
-    } 
-  } 
+    }
+  }
 
 
 ################################################################################
 #
-# Rules are use with the [FV] section¡¯s module INF type to define 
+# Rules are use with the [FV] section¡¯s module INF type to define
 # how an FFS file is created for a given INF file. The following Rule are the default
 # rules for the different module type. User can add the customized rules to define the
 # content of the FFS file.
@@ -226,18 +226,18 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) CheckSum {
      PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).Depex
-     PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi     
+     PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI Optional               $(MODULE_NAME)
      VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
-  } 
+  }
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) CheckSum {
     COMPRESS PI_STD {
-      PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi     
+      PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
       UI Optional               $(MODULE_NAME)
       VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
-    }    
+    }
   }
 
 [Rule.Common.UEFI_DRIVER]
@@ -245,45 +245,44 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi 
+        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
         UI Optional            $(MODULE_NAME)
         VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
       }
     }
-  } 
+  }
 
 [Rule.Common.DXE_DRIVER]
   FILE DRIVER = $(NAMED_GUID) CheckSum {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi 
+        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
         UI Optional            $(MODULE_NAME)
         VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
       }
     }
-  } 
+  }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) CheckSum {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi 
+        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
         UI Optional            $(MODULE_NAME)
         VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
       }
     }
-  } 
+  }
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) CheckSum {
     COMPRESS PI_STD {
       GUIDED {
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi 
+        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
         UI Optional            $(MODULE_NAME)
         VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
       }
     }
-  } 
-  
+  }
