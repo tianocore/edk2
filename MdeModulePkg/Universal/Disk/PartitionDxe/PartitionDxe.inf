@@ -1,9 +1,12 @@
 #/** @file
-# Component name for module Ehci
+# Component description file for Partition module.
 #
-# FIX ME!
-# Copyright (c) 2006, Intel Corporation. All right reserved.
+# Partition driver produces the logical BlockIo device
+#  that represents the bytes Start to End of the Parent Block IO
+#  device (one partition of physical BlockIo device,
+#  which can be one of GPT, MBR, ElTorito partition).
 #
+#  Copyright (c) 2006 - 2007, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -22,19 +25,22 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EhciDxe
-  FILE_GUID                      = BDFE430E-8F2A-4db0-9991-6F856594777E
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = PartitionDxe
+  FILE_GUID                      = 1FA1F39E-FEFF-4aae-BD7B-38A070A3B609
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = EhcDriverEntryPoint
+  ENTRY_POINT                    = InitializePartition
 
 #
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gPartitionDriverBinding
+#  COMPONENT_NAME                =  gPartitionComponentName
 #
 
 ################################################################################
@@ -44,19 +50,13 @@
 ################################################################################
 
 [Sources.common]
-  UsbHcMem.h
-  EhciUrb.c
-  EhciReg.h
-  UsbHcMem.c
-  EhciSched.c
-  EhciDebug.c
-  EhciReg.c
-  EhciDebug.h
   ComponentName.c
-  EhciUrb.h
-  Ehci.h
-  EhciSched.h
-  Ehci.c
+  Mbr.c
+  Gpt.c
+  ElTorito.c
+  Partition.c
+  Partition.h
+
 
 ################################################################################
 #
@@ -77,13 +77,25 @@
 ################################################################################
 
 [LibraryClasses]
-  MemoryAllocationLib
-  BaseLib
-  UefiLib
+  DevicePathLib
   UefiBootServicesTableLib
-  UefiDriverEntryPoint
+  MemoryAllocationLib
   BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
   DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiPartTypeUnusedGuid                        # SOMETIMES_CONSUMED
+  gEfiPartTypeSystemPartGuid                    # SOMETIMES_CONSUMED
 
 
 ################################################################################
@@ -94,6 +106,9 @@
 ################################################################################
 
 [Protocols]
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsb2HcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiDiskIoProtocolGuid                        # PROTOCOL TO_START
+  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
 

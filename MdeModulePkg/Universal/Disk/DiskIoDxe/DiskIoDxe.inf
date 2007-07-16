@@ -1,9 +1,7 @@
 #/** @file
-# Component name for module Ehci
+#  Component description file for DiskIo module.
 #
-# FIX ME!
-# Copyright (c) 2006, Intel Corporation. All right reserved.
-#
+#  Copyright (c) 2006 - 2007, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -22,19 +20,22 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EhciDxe
-  FILE_GUID                      = BDFE430E-8F2A-4db0-9991-6F856594777E
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = DiskIoDxe
+  FILE_GUID                      = 6B38F7B4-AD98-40e9-9093-ACA2B5A253C4
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = EhcDriverEntryPoint
+  ENTRY_POINT                    = InitializeDiskIo
 
 #
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gDiskIoDriverBinding
+#  COMPONENT_NAME                =  gDiskIoComponentName
 #
 
 ################################################################################
@@ -44,19 +45,10 @@
 ################################################################################
 
 [Sources.common]
-  UsbHcMem.h
-  EhciUrb.c
-  EhciReg.h
-  UsbHcMem.c
-  EhciSched.c
-  EhciDebug.c
-  EhciReg.c
-  EhciDebug.h
   ComponentName.c
-  EhciUrb.h
-  Ehci.h
-  EhciSched.h
-  Ehci.c
+  DiskIo.h
+  DiskIo.c
+
 
 ################################################################################
 #
@@ -77,12 +69,12 @@
 ################################################################################
 
 [LibraryClasses]
+  UefiBootServicesTableLib
   MemoryAllocationLib
+  BaseMemoryLib
   BaseLib
   UefiLib
-  UefiBootServicesTableLib
   UefiDriverEntryPoint
-  BaseMemoryLib
   DebugLib
 
 
@@ -94,6 +86,6 @@
 ################################################################################
 
 [Protocols]
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsb2HcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEfiDiskIoProtocolGuid                        # PROTOCOL BY_START
+  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
 

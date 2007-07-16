@@ -400,9 +400,9 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
 
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIo/Dxe/DiskIo.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Disk/Partition/Dxe/Partition.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/English/Dxe/English.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 
   $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
