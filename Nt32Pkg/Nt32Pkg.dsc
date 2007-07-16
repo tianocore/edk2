@@ -412,11 +412,9 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf     ##This driver follows UEFI specification definition
-  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf    ##This driver follows UEFI specification definition
+  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
+  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBus.inf
-  $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIo.inf
   $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsole.inf
