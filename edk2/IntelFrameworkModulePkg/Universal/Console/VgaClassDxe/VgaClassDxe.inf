@@ -65,7 +65,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  R9/TianoModulePkg/TianoModulePkg.dec
 
 
 ################################################################################
