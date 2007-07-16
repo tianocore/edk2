@@ -20,11 +20,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Ps2Mouse.h"
 #include "CommPs2.h"
 
