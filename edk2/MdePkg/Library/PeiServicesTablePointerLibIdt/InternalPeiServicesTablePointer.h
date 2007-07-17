@@ -16,6 +16,14 @@
 #ifndef __INTERNAL_PEI_SERVICES_TABLE_POINTER_H__
 #define __INTERNAL_PEI_SERVICES_TABLE_POINTER_H__
 
+
+#include <PiPei.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/PeiServicesTablePointerLib.h>
+#include <Library/DebugLib.h>
+
 extern 
 EFI_PEI_SERVICES **
 EFIAPI

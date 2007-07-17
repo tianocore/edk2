@@ -132,12 +132,14 @@
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   ${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  ${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
 [Components.X64]
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   ${WORKSPACE}\MdePkg\Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   ${WORKSPACE}/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  ${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
 [Components.IPF]
   ${WORKSPACE}/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
