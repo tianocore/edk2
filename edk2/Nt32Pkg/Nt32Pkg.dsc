@@ -388,7 +388,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunk.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf  
   $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf        
   $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf        
