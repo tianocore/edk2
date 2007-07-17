@@ -24,7 +24,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtGop
+  BASE_NAME                      = WinNtGopDxe
   FILE_GUID                      = 29b3c4c6-e5aa-49e4-8ce0-2772f782ddc2
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
