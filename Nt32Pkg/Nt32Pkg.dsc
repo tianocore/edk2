@@ -397,7 +397,7 @@
   $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
   $(WORKSPACE)/Nt32Pkg/TimerDxe/TimerDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/VariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
