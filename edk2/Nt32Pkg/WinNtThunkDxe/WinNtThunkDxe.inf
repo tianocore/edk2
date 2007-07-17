@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtThunk
+  BASE_NAME                      = WinNtThunkDxe
   FILE_GUID                      = 0C95A916-A006-11d4-BCFA-0080C73C8881
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
