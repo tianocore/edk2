@@ -155,7 +155,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/Terminal.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf

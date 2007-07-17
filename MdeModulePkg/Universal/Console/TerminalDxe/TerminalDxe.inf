@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Terminal
+  BASE_NAME                      = TerminalDxe
   FILE_GUID                      = 9E863906-A40F-4875-977F-5B93FF237FC6
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
