@@ -9,16 +9,6 @@
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
-; Module Name:
-;
-;   AsmPeiSevicesTablePointer.Asm
-;
-; Abstract:
-;
-;   AsmPeiSevicesTablePointer function
-;
-; Notes:
-;
 ;------------------------------------------------------------------------------
 
     .386
