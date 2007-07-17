@@ -15,6 +15,48 @@
 #ifndef __USB_H__
 #define __USB_H__
 
+//
+// Standard device request and request type
+// By [Spec-USB20/Chapter-9.4]
+//
+#define USB_DEV_GET_STATUS                  0x00
+#define USB_DEV_GET_STATUS_REQ_TYPE_D       0x80 // Receiver : Device
+#define USB_DEV_GET_STATUS_REQ_TYPE_I       0x81 // Receiver : Interface
+#define USB_DEV_GET_STATUS_REQ_TYPE_E       0x82 // Receiver : Endpoint
+
+#define USB_DEV_CLEAR_FEATURE               0x01
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_D    0x00 // Receiver : Device
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_I    0x01 // Receiver : Interface
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_E    0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_FEATURE                 0x03
+#define USB_DEV_SET_FEATURE_REQ_TYPE_D      0x00 // Receiver : Device
+#define USB_DEV_SET_FEATURE_REQ_TYPE_I      0x01 // Receiver : Interface
+#define USB_DEV_SET_FEATURE_REQ_TYPE_E      0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_ADDRESS                 0x05
+#define USB_DEV_SET_ADDRESS_REQ_TYPE        0x00
+
+#define USB_DEV_GET_DESCRIPTOR              0x06
+#define USB_DEV_GET_DESCRIPTOR_REQ_TYPE     0x80
+
+#define USB_DEV_SET_DESCRIPTOR              0x07
+#define USB_DEV_SET_DESCRIPTOR_REQ_TYPE     0x00
+
+#define USB_DEV_GET_CONFIGURATION           0x08
+#define USB_DEV_GET_CONFIGURATION_REQ_TYPE  0x80
+
+#define USB_DEV_SET_CONFIGURATION           0x09
+#define USB_DEV_SET_CONFIGURATION_REQ_TYPE  0x00
+
+#define USB_DEV_GET_INTERFACE               0x0A
+#define USB_DEV_GET_INTERFACE_REQ_TYPE      0x81
+
+#define USB_DEV_SET_INTERFACE               0x0B
+#define USB_DEV_SET_INTERFACE_REQ_TYPE      0x01
+
+#define USB_DEV_SYNCH_FRAME                 0x0C
+#define USB_DEV_SYNCH_FRAME_REQ_TYPE        0x82
 
 //
 // Definitions defined in UEFI spec
@@ -221,4 +263,125 @@ enum {
   //
   EFI_USB_INTERRUPT_DELAY = 2000000,
 };
+
+
+//
+// HID constants definition, see HID rev1.0
+//
+
+//
+// HID report item format
+//
+#define HID_ITEM_FORMAT_SHORT 0
+#define HID_ITEM_FORMAT_LONG  1
+
+//
+// Special tag indicating long items
+//
+#define HID_ITEM_TAG_LONG 15
+
+//
+// HID report descriptor item type (prefix bit 2,3)
+//
+#define HID_ITEM_TYPE_MAIN      0
+#define HID_ITEM_TYPE_GLOBAL    1
+#define HID_ITEM_TYPE_LOCAL     2
+#define HID_ITEM_TYPE_RESERVED  3
+
+//
+// HID report descriptor main item tags
+//
+#define HID_MAIN_ITEM_TAG_INPUT             8
+#define HID_MAIN_ITEM_TAG_OUTPUT            9
+#define HID_MAIN_ITEM_TAG_FEATURE           11
+#define HID_MAIN_ITEM_TAG_BEGIN_COLLECTION  10
+#define HID_MAIN_ITEM_TAG_END_COLLECTION    12
+
+//
+// HID report descriptor main item contents
+//
+#define HID_MAIN_ITEM_CONSTANT      0x001
+#define HID_MAIN_ITEM_VARIABLE      0x002
+#define HID_MAIN_ITEM_RELATIVE      0x004
+#define HID_MAIN_ITEM_WRAP          0x008
+#define HID_MAIN_ITEM_NONLINEAR     0x010
+#define HID_MAIN_ITEM_NO_PREFERRED  0x020
+#define HID_MAIN_ITEM_NULL_STATE    0x040
+#define HID_MAIN_ITEM_VOLATILE      0x080
+#define HID_MAIN_ITEM_BUFFERED_BYTE 0x100
+
+//
+// HID report descriptor collection item types
+//
+#define HID_COLLECTION_PHYSICAL     0
+#define HID_COLLECTION_APPLICATION  1
+#define HID_COLLECTION_LOGICAL      2
+
+//
+// HID report descriptor global item tags
+//
+#define HID_GLOBAL_ITEM_TAG_USAGE_PAGE        0
+#define HID_GLOBAL_ITEM_TAG_LOGICAL_MINIMUM   1
+#define HID_GLOBAL_ITEM_TAG_LOGICAL_MAXIMUM   2
+#define HID_GLOBAL_ITEM_TAG_PHYSICAL_MINIMUM  3
+#define HID_GLOBAL_ITEM_TAG_PHYSICAL_MAXIMUM  4
+#define HID_GLOBAL_ITEM_TAG_UNIT_EXPONENT     5
+#define HID_GLOBAL_ITEM_TAG_UNIT              6
+#define HID_GLOBAL_ITEM_TAG_REPORT_SIZE       7
+#define HID_GLOBAL_ITEM_TAG_REPORT_ID         8
+#define HID_GLOBAL_ITEM_TAG_REPORT_COUNT      9
+#define HID_GLOBAL_ITEM_TAG_PUSH              10
+#define HID_GLOBAL_ITEM_TAG_POP               11
+
+//
+// HID report descriptor local item tags
+//
+#define HID_LOCAL_ITEM_TAG_USAGE              0
+#define HID_LOCAL_ITEM_TAG_USAGE_MINIMUM      1
+#define HID_LOCAL_ITEM_TAG_USAGE_MAXIMUM      2
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_INDEX   3
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_MINIMUM 4
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_MAXIMUM 5
+#define HID_LOCAL_ITEM_TAG_STRING_INDEX       7
+#define HID_LOCAL_ITEM_TAG_STRING_MINIMUM     8
+#define HID_LOCAL_ITEM_TAG_STRING_MAXIMUM     9
+#define HID_LOCAL_ITEM_TAG_DELIMITER          10
+
+//
+// HID report types
+//
+#define HID_INPUT_REPORT    1
+#define HID_OUTPUT_REPORT   2
+#define HID_FEATURE_REPORT  3
+
+//
+// HID class protocol request
+//
+#define EFI_USB_GET_REPORT_REQUEST    0x01
+#define EFI_USB_GET_IDLE_REQUEST      0x02
+#define EFI_USB_GET_PROTOCOL_REQUEST  0x03
+#define EFI_USB_SET_REPORT_REQUEST    0x09
+#define EFI_USB_SET_IDLE_REQUEST      0x0a
+#define EFI_USB_SET_PROTOCOL_REQUEST  0x0b
+
+#pragma pack(1)
+//
+// Descriptor header for Report/Physical Descriptors
+//
+typedef struct hid_class_descriptor {
+  UINT8   DescriptorType;
+  UINT16  DescriptorLength;
+} EFI_USB_HID_CLASS_DESCRIPTOR;
+
+typedef struct hid_descriptor {
+  UINT8                         Length;
+  UINT8                         DescriptorType;
+  UINT16                        BcdHID;
+  UINT8                         CountryCode;
+  UINT8                         NumDescriptors;
+  EFI_USB_HID_CLASS_DESCRIPTOR  HidClassDesc[1];
+} EFI_USB_HID_DESCRIPTOR;
+
+#pragma pack()
+
 #endif
