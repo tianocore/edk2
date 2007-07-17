@@ -88,19 +88,19 @@ typedef struct {
 typedef struct _UHCI_TD_SW  UHCI_TD_SW;
 typedef struct _UHCI_QH_SW  UHCI_QH_SW;
 
-typedef struct _UHCI_QH_SW {
+struct _UHCI_QH_SW {
   UHCI_QH_HW        QhHw;
   UHCI_QH_SW        *NextQh;
   UHCI_TD_SW        *TDs;
   UINTN             Interval;
-} UHCI_QH_SW;
+};
 
-typedef struct _UHCI_TD_SW {
+struct _UHCI_TD_SW {
   UHCI_TD_HW        TdHw;
   UHCI_TD_SW        *NextTd;
   UINT8             *Data;
   UINT16            DataLen;
-} UHCI_TD_SW;
+};
 
 
 /**

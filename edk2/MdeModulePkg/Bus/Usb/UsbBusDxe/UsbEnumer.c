@@ -888,7 +888,7 @@ UsbEnumeratePort (
     // If overcurrent condition is cleared, enable the port again
     //
     if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_OVERCURRENT)) {
-      HubApi->SetPortFeature (HubIf, Port, USB_HUB_PORT_POWER);
+      HubApi->SetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
     }
 
   } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_CONNECTION)) {

@@ -37,7 +37,7 @@ enum {
   //
   // Usb Cbi transfer timeout
   //
-  USB_CBI_RESET_TIMEOUT         = 1 * USB_MASS_STALL_1_S,
+  USB_CBI_RESET_TIMEOUT         = 1 * USB_MASS_STALL_1_S
 };
 
 //

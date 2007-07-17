@@ -93,7 +93,7 @@ enum {
   //
   EHC_PCI_CLASSC          = 0x09,
   EHC_PCI_CLASSC_PI       = 0x20,
-  EHC_BAR_INDEX           = 0, /* how many bytes away from USB_BASE to 0x10 */
+  EHC_BAR_INDEX           = 0 /* how many bytes away from USB_BASE to 0x10 */
 };
 
 #define EHC_LINK_TERMINATED(Link) (((Link) & 0x01) != 0)

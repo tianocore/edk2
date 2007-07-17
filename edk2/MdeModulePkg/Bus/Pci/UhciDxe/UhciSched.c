@@ -498,7 +498,7 @@ UhciCheckTdStatus (
       // next to the last known-good TD's data toggle if
       // any TD is executed OK
       //
-      QhResult->NextToggle = 1 - (UINT8)TdHw->DataToggle;
+      QhResult->NextToggle = (UINT8) (1 - (UINT8)TdHw->DataToggle);
 
       //
       // This TD is finished OK or met short packet read. Update the

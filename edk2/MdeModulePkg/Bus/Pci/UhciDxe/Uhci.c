@@ -1538,7 +1538,7 @@ Uhci2ControlTransfer (
   BOOLEAN             IsSlow;
 
   Uhc     = UHC_FROM_USB2_HC_PROTO (This);
-  IsSlow  = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+  IsSlow  = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
 
   return UhciControlTransfer (
            &Uhc->UsbHc,
@@ -1668,7 +1668,7 @@ Uhci2AsyncInterruptTransfer (
   BOOLEAN             IsSlow;
 
   Uhc     = UHC_FROM_USB2_HC_PROTO (This);
-  IsSlow  = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+  IsSlow  = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
 
   return UhciAsyncInterruptTransfer (
            &Uhc->UsbHc,
@@ -1736,7 +1736,7 @@ Uhci2SyncInterruptTransfer (
   }
 
   Uhc     = UHC_FROM_USB2_HC_PROTO (This);
-  IsSlow  = (EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE;
+  IsSlow  = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
 
   return UhciSyncInterruptTransfer (
            &Uhc->UsbHc,
@@ -1897,7 +1897,7 @@ UhciDriverBindingSupported (
   OpenStatus = gBS->OpenProtocol (
                       Controller,
                       &gEfiPciIoProtocolGuid,
-                      &PciIo,
+                      (VOID **) &PciIo,
                       This->DriverBindingHandle,
                       Controller,
                       EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -2148,7 +2148,7 @@ UhciDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  &PciIo,
+                  (VOID **) &PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -2277,7 +2277,7 @@ UhciDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbHcProtocolGuid,
-                  &UsbHc,
+                  (VOID **) &UsbHc,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -2294,7 +2294,7 @@ UhciDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsb2HcProtocolGuid,
-                  &Usb2Hc,
+                  (VOID **) &Usb2Hc,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

@@ -33,10 +33,10 @@ typedef struct _USB_MASS_DEVICE USB_MASS_DEVICE;
 #include "UsbMassBoot.h"
 
 enum {
-  USB_MASS_SIGNATURE= EFI_SIGNATURE_32 ('U', 's', 'b', 'K'),
+  USB_MASS_SIGNATURE= EFI_SIGNATURE_32 ('U', 's', 'b', 'K')
 };
 
-typedef struct _USB_MASS_DEVICE {
+struct _USB_MASS_DEVICE {
   UINT32                Signature;
   EFI_HANDLE            Controller;
   EFI_USB_IO_PROTOCOL   *UsbIo;

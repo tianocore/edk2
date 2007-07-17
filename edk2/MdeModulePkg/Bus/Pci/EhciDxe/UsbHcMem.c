@@ -520,7 +520,7 @@ UsbHcFreeMem (
       for (Count = 0; Count < (AllocSize / USBHC_MEM_UNIT); Count++) {
         ASSERT (USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-        Block->Bits[Byte] ^= (UINT8) USB_HC_BIT (Bit);
+        Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] ^ USB_HC_BIT (Bit));
         NEXT_BIT (Byte, Bit);
       }
 

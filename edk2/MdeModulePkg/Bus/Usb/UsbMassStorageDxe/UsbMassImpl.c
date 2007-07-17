@@ -344,7 +344,7 @@ USBMassDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -421,7 +421,7 @@ USBMassDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -547,7 +547,7 @@ USBMassDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiBlockIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

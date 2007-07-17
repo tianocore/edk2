@@ -83,7 +83,7 @@ enum {
   USB_BUS_TPL               = TPL_NOTIFY,
 
   USB_INTERFACE_SIGNATURE   = EFI_SIGNATURE_32 ('U', 'S', 'B', 'I'),
-  USB_BUS_SIGNATURE         = EFI_SIGNATURE_32 ('U', 'S', 'B', 'B'),
+  USB_BUS_SIGNATURE         = EFI_SIGNATURE_32 ('U', 'S', 'B', 'B')
 };
 
 #define USB_BIT(a)                  ((UINTN)(1 << (a)))
@@ -110,7 +110,7 @@ typedef struct _EFI_USB_BUS_PROTOCOL {
 // Stands for the real USB device. Each device may
 // has several seperately working interfaces.
 //
-typedef struct _USB_DEVICE {
+struct _USB_DEVICE {
   USB_BUS                   *Bus;
 
   //
@@ -140,12 +140,12 @@ typedef struct _USB_DEVICE {
   UINT8                     ParentAddr;
   USB_INTERFACE             *ParentIf;
   UINT8                     ParentPort;       // Start at 0
-} USB_DEVICE;
+};
 
 //
 // Stands for different functions of USB device
 //
-typedef struct _USB_INTERFACE {
+struct _USB_INTERFACE {
   UINTN                     Signature;
   USB_DEVICE                *Device;
   USB_INTERFACE_DESC        *IfDesc;
@@ -179,12 +179,12 @@ typedef struct _USB_INTERFACE {
   // connected to EHCI.
   //
   UINT8                     MaxSpeed;
-} USB_INTERFACE;
+};
 
 //
 // Stands for the current USB Bus
 //
-typedef struct _USB_BUS {
+struct _USB_BUS {
   UINTN                     Signature;
   EFI_USB_BUS_PROTOCOL      BusId;
 
@@ -201,7 +201,7 @@ typedef struct _USB_BUS {
   // for root hub. Device with address i is at Devices[i].
   //
   USB_DEVICE                *Devices[USB_MAX_DEVICES];
-} USB_BUS;
+};
 
 extern EFI_USB_IO_PROTOCOL           mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL   mUsbBusDriverBinding;

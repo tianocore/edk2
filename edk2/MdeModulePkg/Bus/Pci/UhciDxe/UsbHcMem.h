@@ -36,7 +36,7 @@ Revision History
 
 typedef struct _USBHC_MEM_BLOCK   USBHC_MEM_BLOCK;
 
-typedef struct _USBHC_MEM_BLOCK {
+struct _USBHC_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
   UINTN                   BitsLen;
   UINT8                   *Buf;
@@ -44,7 +44,7 @@ typedef struct _USBHC_MEM_BLOCK {
   UINTN                   BufLen;   // Memory size in bytes
   VOID                    *Mapping;
   USBHC_MEM_BLOCK         *Next;
-} USBHC_MEM_BLOCK;
+};
 
 //
 // USBHC_MEM_POOL is used to manage the memory used by USB
@@ -62,7 +62,7 @@ enum {
   USBHC_MEM_UNIT           = 64,     // Memory allocation unit, must be 2^n, n>4
 
   USBHC_MEM_UNIT_MASK      = USBHC_MEM_UNIT - 1,
-  USBHC_MEM_DEFAULT_PAGES  = 16,
+  USBHC_MEM_DEFAULT_PAGES  = 16
 };
 
 #define USBHC_MEM_ROUND(Len)  (((Len) + USBHC_MEM_UNIT_MASK) & (~USBHC_MEM_UNIT_MASK))

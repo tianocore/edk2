@@ -89,7 +89,7 @@ UsbBootPutUint16 (
   IN UINT16                  Data16
   )
 {
-  Data16 = USB_BOOT_SWAP16 (Data16);
+  Data16 = (UINT16) (USB_BOOT_SWAP16 (Data16));
   CopyMem (Buf, &Data16, sizeof (UINT16));
 }
 
@@ -125,7 +125,7 @@ UsbBootRequestSense (
   ZeroMem (&SenseData, sizeof (USB_BOOT_REQUEST_SENSE_DATA));
 
   SenseCmd.OpCode   = USB_BOOT_REQUEST_SENSE_OPCODE;
-  SenseCmd.Lun      = USB_BOOT_LUN (UsbMass->Lun);
+  SenseCmd.Lun      = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
   SenseCmd.AllocLen = sizeof (USB_BOOT_REQUEST_SENSE_DATA);
 
   Status = Transport->ExecCommand (
@@ -364,7 +364,7 @@ UsbBootIsUnitReady (
   ZeroMem (&TestCmd, sizeof (USB_BOOT_TEST_UNIT_READY_CMD));
 
   TestCmd.OpCode  = USB_BOOT_TEST_UNIT_READY_OPCODE;
-  TestCmd.Lun     = USB_BOOT_LUN (UsbMass->Lun);
+  TestCmd.Lun     = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
 
   return UsbBootExecCmdWithRetry (
            UsbMass,
@@ -407,7 +407,7 @@ UsbBootInquiry (
   ZeroMem (&InquiryData, sizeof (USB_BOOT_INQUIRY_DATA));
 
   InquiryCmd.OpCode   = USB_BOOT_INQUIRY_OPCODE;
-  InquiryCmd.Lun      = USB_BOOT_LUN (UsbMass->Lun);
+  InquiryCmd.Lun      = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
   InquiryCmd.AllocLen = sizeof (InquiryData);
 
   Status = UsbBootExecCmdWithRetry (
@@ -423,8 +423,8 @@ UsbBootInquiry (
     return Status;
   }
 
-  UsbMass->Pdt          = USB_BOOT_PDT (InquiryData.Pdt);
-  Media->RemovableMedia = USB_BOOT_REMOVABLE (InquiryData.Removable);
+  UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (InquiryData.Pdt));
+  Media->RemovableMedia = (BOOLEAN) (USB_BOOT_REMOVABLE (InquiryData.Removable));
   //
   // Default value 512 Bytes, in case no media present at first time
   //
@@ -466,7 +466,7 @@ UsbBootReadCapacity (
   ZeroMem (&CapacityData, sizeof (USB_BOOT_READ_CAPACITY_DATA));
 
   CapacityCmd.OpCode = USB_BOOT_READ_CAPACITY_OPCODE;
-  CapacityCmd.Lun    = USB_BOOT_LUN (UsbMass->Lun);
+  CapacityCmd.Lun    = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
 
   Status = UsbBootExecCmdWithRetry (
              UsbMass,
@@ -742,7 +742,7 @@ UsbBootReadBlocks (
     ZeroMem (&ReadCmd, sizeof (USB_BOOT_READ10_CMD));
 
     ReadCmd.OpCode  = USB_BOOT_READ10_OPCODE;
-    ReadCmd.Lun     = USB_BOOT_LUN (UsbMass->Lun);
+    ReadCmd.Lun     = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
     UsbBootPutUint32 (ReadCmd.Lba, Lba);
     UsbBootPutUint16 (ReadCmd.TransferLen, Count);
 
@@ -822,7 +822,7 @@ UsbBootWriteBlocks (
     ZeroMem (&WriteCmd, sizeof (USB_BOOT_WRITE10_CMD));
 
     WriteCmd.OpCode = USB_BOOT_WRITE10_OPCODE;
-    WriteCmd.Lun    = USB_BOOT_LUN (UsbMass->Lun);
+    WriteCmd.Lun    = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
     UsbBootPutUint32 (WriteCmd.Lba, Lba);
     UsbBootPutUint16 (WriteCmd.TransferLen, Count);
 

@@ -38,7 +38,7 @@ enum {
   USB_ERR_FAIL_MASK = EFI_USB_ERR_STALL   | EFI_USB_ERR_BUFFER |
                       EFI_USB_ERR_BABBLE  | EFI_USB_ERR_CRC    |
                       EFI_USB_ERR_TIMEOUT | EFI_USB_ERR_BITSTUFF |
-                      EFI_USB_ERR_SYSTEM,
+                      EFI_USB_ERR_SYSTEM
 
 };
 
@@ -59,7 +59,7 @@ typedef struct _UHCI_ASYNC_REQUEST  UHCI_ASYNC_REQUEST;
 //
 // Structure used to manager the asynchronous interrupt transfers.
 //
-typedef struct _UHCI_ASYNC_REQUEST{
+struct _UHCI_ASYNC_REQUEST{
   UINTN                           Signature;
   LIST_ENTRY                      Link;
   UHCI_ASYNC_REQUEST              *Recycle;
@@ -86,7 +86,7 @@ typedef struct _UHCI_ASYNC_REQUEST{
   //
   EFI_ASYNC_USB_TRANSFER_CALLBACK Callback;
   VOID                            *Context;
-} UHCI_ASYNC_REQUEST;
+};
 
 #define UHCI_ASYNC_INT_FROM_LINK(a) \
           CR (a, UHCI_ASYNC_REQUEST, Link, UHCI_ASYNC_INT_SIGNATURE)

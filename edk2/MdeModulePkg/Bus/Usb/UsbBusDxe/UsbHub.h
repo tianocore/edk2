@@ -25,6 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _USB_HUB_H_
 #define _USB_HUB_H_
 
+#include <IndustryStandard/Usb.h>
+
 #define USB_ENDPOINT_ADDR(EpAddr) ((EpAddr) & 0x7F)
 #define USB_ENDPOINT_TYPE(Desc)   ((Desc)->Attributes & USB_ENDPOINT_TYPE_MASK)
 
@@ -89,7 +91,7 @@ enum {
   USB_HUB_SUBCLASS_CODE       = 0x00,
 
 
-  USB_HUB_LOOP                = 50,
+  USB_HUB_LOOP                = 50
 };
 
 #pragma pack(1)
@@ -110,7 +112,7 @@ typedef struct {
 
 typedef struct {
   UINT16                ChangedBit;
-  EFI_USB_PORT_FEATURE  Feature;
+  UINT8                 Feature;
 } USB_CHANGE_FEATURE_MAP;
 
 
