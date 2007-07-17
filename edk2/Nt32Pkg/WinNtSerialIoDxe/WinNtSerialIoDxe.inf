@@ -22,7 +22,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtSerialIo
+  BASE_NAME                      = WinNtSerialIoDxe
   FILE_GUID                      = 6B41B553-A649-11d4-BD02-0080C73C8881
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0

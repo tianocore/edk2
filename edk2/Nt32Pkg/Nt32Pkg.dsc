@@ -418,7 +418,7 @@
   $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsoleDxe.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
