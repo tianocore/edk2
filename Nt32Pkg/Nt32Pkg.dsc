@@ -367,7 +367,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocol.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
   $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   ##
