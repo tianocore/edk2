@@ -24,7 +24,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtSimpleFileSystem
+  BASE_NAME                      = WinNtSimpleFileSystemDxe
   FILE_GUID                      = 9C25E18B-76BA-43da-A132-DBB0997CEFEF
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
