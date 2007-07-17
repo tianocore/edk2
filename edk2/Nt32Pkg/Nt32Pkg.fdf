@@ -120,7 +120,7 @@ INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFwh.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
 INF  $(WORKSPACE)/MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
@@ -133,7 +133,7 @@ INF  $(WORKSPACE)/Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
-INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/Nt32Fwh.inf
+INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
