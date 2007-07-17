@@ -27,28 +27,6 @@
 #define EFI_ACPI_2_0_REVISION 0x02
 
 //
-// BUGBUG: OEM values need to be moved somewhere else, probably read from data hub
-// and produced by a platform specific driver.
-//
-//
-// ACPI OEM ID
-//
-#define EFI_ACPI_2_0_OEM_ID       "INTEL "
-#define EFI_ACPI_2_0_OEM_TABLE_ID 0x5034303738543245  // "E2T8704P"
-//
-// ACPI OEM Revision
-//
-#define EFI_ACPI_2_0_OEM_REVISION 0x00000002
-
-//
-// ACPI table creator ID
-//
-#define EFI_ACPI_2_0_CREATOR_ID 0x5446534D  // TBD "MSFT"
-//
-// ACPI table creator revision
-//
-#define EFI_ACPI_2_0_CREATOR_REVISION 0x01000013  // TBD
-//
 // ACPI 2.0 Generic Address Space definition
 //
 typedef struct {
