@@ -1,0 +1,65 @@
+#/** @file
+# Component description file for IPF KR1 Pei Services Table Pointer Library
+#
+# PEI Services Table Library implementation that retrieves a pointer to the PEI
+#  Services Table from the KR1 register on IPF.
+# Copyright (c) 2006 - 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiServicesTablePointerLibIdt
+  FILE_GUID                      = DED3F743-CE2C-4ba6-92A2-FFCE2A6D72D9
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+[Sources.Ia32]
+  Ia32/AsmPeiSevicesTablePointer.c||MSFT|||
+  Ia32/AsmPeiSevicesTablePointer.S||GCC|||
+  PeiServicesTablePointer.c
+
+[Sources.X64]
+  x64/AsmPeiSevicesTablePointer.asm||MSFT|||
+  x64/AsmPeiSevicesTablePointer.S||GCC|||
+  PeiServicesTablePointer.c
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  DebugLib
+

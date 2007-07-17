@@ -14,7 +14,6 @@
 
 #include "InternalPeiServicesTablePointer.h"
 
-
 /**
   
   The function returns the pointer to PeiServicee following

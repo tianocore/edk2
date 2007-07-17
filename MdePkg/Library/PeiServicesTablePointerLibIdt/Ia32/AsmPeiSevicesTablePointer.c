@@ -12,6 +12,11 @@
 
 **/
 
+//
+// Include common header file for this module.
+//
+#include "InternalPeiServicesTablePointer.h"
+
 EFI_PEI_SERVICES **
 EFIAPI
 AsmPeiSevicesTablePointer (
