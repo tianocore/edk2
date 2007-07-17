@@ -24,11 +24,8 @@
 //
 // ACPI Specification Revision
 //
-#define EFI_ACPI_3_0_REVISION 0x03  // BUGBUG: Not in spec yet.
-//
-// BUGBUG: OEM values need to be moved somewhere else, probably read from data hub
-// and produced by a platform specific driver.
-//
+#define EFI_ACPI_3_0_REVISION 0x03
+
 //
 // ACPI 3.0 Generic Address Space definition
 //
