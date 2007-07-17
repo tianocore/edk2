@@ -148,7 +148,7 @@ INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/Da
 INF  $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/TimerDxe/TimerDxe.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/VariableRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
