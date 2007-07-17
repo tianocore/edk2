@@ -1,8 +1,6 @@
 #/** @file
-# Component description file for IPF KR1 Pei Services Table Pointer Library
 #
 # PEI Services Table Library implementation that retrieves a pointer to the PEI
-#  Services Table from the KR1 register on IPF.
 # Copyright (c) 2006 - 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
