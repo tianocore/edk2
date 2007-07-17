@@ -22,7 +22,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtFwh
+  BASE_NAME                      = WinNtFirmwareVolumePei
   FILE_GUID                      = F0384FFD-8633-452f-9010-F6B7D2EAE2F1
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
