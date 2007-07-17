@@ -405,7 +405,6 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 
-  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
   $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
@@ -414,7 +413,6 @@
 
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugPortDxe/DebugPort.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
@@ -436,14 +434,20 @@
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/VariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
 
 [Components.X64]
   $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
 
 [Components.IPF]
+  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
 
 [Components.EBC]
 
