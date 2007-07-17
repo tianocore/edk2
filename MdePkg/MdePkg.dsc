@@ -110,7 +110,7 @@
   ${WORKSPACE}/MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   ${WORKSPACE}/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  ${WORKSPACE}/MdePkg/Library/PeiSmbusLibSmbus2/PeiSmbusLib.inf
+  ${WORKSPACE}/MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLib.inf
   ${WORKSPACE}/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   ${WORKSPACE}/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   ${WORKSPACE}/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
