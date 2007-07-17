@@ -185,7 +185,6 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
@@ -195,7 +194,11 @@
 
 [Components.IA32]
   $(WORKSPACE)/IntelFrameworkModulePkg/PcatCompatible/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 
 [Components.X64]
   $(WORKSPACE)/IntelFrameworkModulePkg/PcatCompatible/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 
+[Components.IA32]
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
