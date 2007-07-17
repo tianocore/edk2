@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WinNtThunkPPIToProtocolPeim
+  BASE_NAME                      = WinNtThunkPPIToProtocolPei
   FILE_GUID                      = D3AAD8DC-3A48-46ac-B1C7-28A9D3CF6755
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
