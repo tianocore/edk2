@@ -116,7 +116,7 @@ ${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fb
 "Visual-Form-Representation" : '''\
 $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}\t"$(VFRPP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
+${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
 \tTrim -VFR $(@D)${sep}${fbase}.i
 \t-mkdir $(DEBUG_DIR)${sep}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${sep}${fdir} $(@D)${sep}${fbase}.iii
