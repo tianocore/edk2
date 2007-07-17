@@ -116,7 +116,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Core/Pei/PeiMain.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
