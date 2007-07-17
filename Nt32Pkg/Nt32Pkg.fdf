@@ -169,7 +169,7 @@ INF  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriver.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsoleDxe.inf
-INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIo.inf
+INF  $(WORKSPACE)/Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystem.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
