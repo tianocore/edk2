@@ -17,7 +17,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DevicePath
+  BASE_NAME                      = DevicePathDxe
   FILE_GUID                      = 9B680FCE-AD6B-4F3A-B60B-F59899003443
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
