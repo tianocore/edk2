@@ -420,7 +420,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf

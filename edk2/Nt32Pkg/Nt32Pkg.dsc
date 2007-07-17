@@ -405,7 +405,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePath.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
