@@ -518,7 +518,7 @@ UsbHcSyncInterruptTransfer (
                                UsbResult
                                );
   } else {
-    IsSlowDevice = (EFI_USB_SPEED_LOW == DevSpeed) ? TRUE : FALSE;
+    IsSlowDevice = (BOOLEAN) ((EFI_USB_SPEED_LOW == DevSpeed) ? TRUE : FALSE);
     Status = UsbBus->UsbHc->SyncInterruptTransfer (
                               UsbBus->UsbHc,
                               DevAddr,
@@ -634,7 +634,7 @@ UsbOpenHostProtoByChild (
     Status = gBS->OpenProtocol (
                     Bus->HostHandle,
                     &gEfiUsb2HcProtocolGuid,
-                    &Usb2Hc,
+                    (VOID **) &Usb2Hc,
                     mUsbBusDriverBinding.DriverBindingHandle,
                     Child,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -644,7 +644,7 @@ UsbOpenHostProtoByChild (
     Status = gBS->OpenProtocol (
                     Bus->HostHandle,
                     &gEfiUsbHcProtocolGuid,
-                    &UsbHc,
+                    (VOID **) &UsbHc,
                     mUsbBusDriverBinding.DriverBindingHandle,
                     Child,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER

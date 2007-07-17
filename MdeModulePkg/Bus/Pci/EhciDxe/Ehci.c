@@ -351,7 +351,7 @@ EhcGetRootHubPortStatus (
 
   for (Index = 0; Index < MapSize; Index++) {
     if (EHC_BIT_IS_SET (State, mUsbPortStateMap[Index].HwState)) {
-      PortStatus->PortStatus |= mUsbPortStateMap[Index].UefiState;
+      PortStatus->PortStatus = (UINT16) (PortStatus->PortStatus | mUsbPortStateMap[Index].UefiState);
     }
   }
 
@@ -359,7 +359,7 @@ EhcGetRootHubPortStatus (
 
   for (Index = 0; Index < MapSize; Index++) {
     if (EHC_BIT_IS_SET (State, mUsbPortChangeMap[Index].HwState)) {
-      PortStatus->PortChangeStatus |= mUsbPortChangeMap[Index].UefiState;
+      PortStatus->PortChangeStatus = (UINT16) (PortStatus->PortChangeStatus | mUsbPortChangeMap[Index].UefiState);
     }
   }
 
@@ -707,7 +707,7 @@ EhcControlTransfer (
   // endpoint is bidirectional. EhcCreateUrb expects this
   // combination of Ep addr and its direction.
   //
-  Endpoint = 0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0);
+  Endpoint = (UINT8) (0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0));
   Urb = EhcCreateUrb (
           Ehc,
           DeviceAddress,
@@ -1340,7 +1340,7 @@ EhcDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  &PciIo,
+                  (VOID **) &PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1491,7 +1491,7 @@ EhcDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  &PciIo,
+                  (VOID **) &PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1636,7 +1636,7 @@ EhcDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsb2HcProtocolGuid,
-                  &Usb2Hc,
+                  (VOID **) &Usb2Hc,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

@@ -101,7 +101,7 @@ enum {
   USB_PDT_DIRECT_ACCESS           = 0x00,       // Direct access device
   USB_PDT_CDROM                   = 0x05,       // CDROM
   USB_PDT_OPTICAL                 = 0x07,       // Non-CD optical disks
-  USB_PDT_SIMPLE_DIRECT           = 0x0E,       // Simplified direct access device
+  USB_PDT_SIMPLE_DIRECT           = 0x0E        // Simplified direct access device
 };
 
 //

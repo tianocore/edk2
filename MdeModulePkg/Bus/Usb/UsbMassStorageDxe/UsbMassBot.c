@@ -182,7 +182,7 @@ UsbBotSendCommand (
   Cbw.Signature = USB_BOT_CBW_SIGNATURE;
   Cbw.Tag       = UsbBot->CbwTag;
   Cbw.DataLen   = TransLen;
-  Cbw.Flag      = ((DataDir == EfiUsbDataIn) ? 0x80 : 0);
+  Cbw.Flag      = (UINT8) ((DataDir == EfiUsbDataIn) ? 0x80 : 0);
   Cbw.Lun       = 0;
   Cbw.CmdLen    = CmdLen;
 

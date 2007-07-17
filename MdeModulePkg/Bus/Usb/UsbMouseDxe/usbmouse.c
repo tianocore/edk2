@@ -208,7 +208,7 @@ USBMouseDriverBindingSupported (
   OpenStatus = gBS->OpenProtocol (
                       Controller,
                       &gEfiUsbIoProtocolGuid,
-                      &UsbIo,
+                      (VOID **) &UsbIo,
                       This->DriverBindingHandle,
                       Controller,
                       EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -279,7 +279,7 @@ USBMouseDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -513,7 +513,7 @@ USBMouseDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiSimplePointerProtocolGuid,
-                  &SimplePointerProtocol,
+                  (VOID **) &SimplePointerProtocol,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -944,11 +944,8 @@ UsbMouseReset (
   )
 {
   USB_MOUSE_DEV       *UsbMouseDevice;
-  EFI_USB_IO_PROTOCOL *UsbIo;
 
   UsbMouseDevice  = USB_MOUSE_DEV_FROM_MOUSE_PROTOCOL (This);
-
-  UsbIo           = UsbMouseDevice->UsbIo;
 
   MouseReportStatusCode (
     UsbMouseDevice->DevicePath,

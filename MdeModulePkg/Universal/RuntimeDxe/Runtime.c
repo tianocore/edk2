@@ -150,7 +150,6 @@ Returns:
 --*/
 {
   UINTN                 Address;
-  VOID                  *PlabelConvertAddress;
   UINT64                VirtEndOfRange;
   EFI_MEMORY_DESCRIPTOR *VirtEntry;
   UINTN                 Index;
@@ -177,7 +176,6 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  PlabelConvertAddress  = NULL;
   VirtEntry             = mVirtualMap;
   for (Index = 0; Index < mVirtualMapMaxIndex; Index++) {
     //
@@ -368,9 +366,9 @@ Returns:
   RuntimeDriverCalculateEfiHdrCrc (&gRT->Hdr);
 
   //
-  // BugBug: PI requires System Configuration Tables Conversion. 
+  // BugBug: PI requires System Configuration Tables Conversion.
   // Currently, we do not implement it.
-  // 
+  //
 
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32

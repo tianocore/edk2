@@ -486,7 +486,7 @@ EhcCreateQtds (
     // Switch the Toggle bit if odd number of packets are included in the QTD.
     //
     if (((Qtd->DataLen + Ep->MaxPacket - 1) / Ep->MaxPacket) % 2) {
-      Toggle = 1 - Toggle;
+      Toggle = (UINT8) (1 - Toggle);
     }
 
     Len += Qtd->DataLen;
@@ -588,7 +588,7 @@ EhcCreateUrb (
 
   Ep              = &Urb->Ep;
   Ep->DevAddr     = DevAddr;
-  Ep->EpAddr      = EpAddr & 0x0F;
+  Ep->EpAddr      = (UINT8) (EpAddr & 0x0F);
   Ep->Direction   = ((EpAddr & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
   Ep->DevSpeed    = DevSpeed;
   Ep->MaxPacket   = MaxPacket;

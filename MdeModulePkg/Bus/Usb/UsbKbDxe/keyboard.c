@@ -206,9 +206,6 @@ InitUSBKeyboard (
   UINT8               Duration;
   EFI_STATUS          Status;
   UINT32              TransferResult;
-  EFI_USB_IO_PROTOCOL *UsbIo;
-
-  UsbIo = UsbKeyboardDevice->UsbIo;
 
   KbdReportStatusCode (
     UsbKeyboardDevice->DevicePath,
@@ -361,19 +358,16 @@ KeyboardHandler (
   UINT8               Index;
   UINT8               Index2;
   BOOLEAN             Down;
-  EFI_STATUS          Status;
   BOOLEAN             KeyRelease;
   BOOLEAN             KeyPress;
   UINT8               SavedTail;
   USB_KEY             UsbKey;
   UINT8               NewRepeatKey;
   UINT32              UsbStatus;
-  UINT8               *DataPtr;
 
   ASSERT (Context);
 
   NewRepeatKey      = 0;
-  DataPtr           = (UINT8 *) Data;
   UsbKeyboardDevice = (USB_KB_DEV *) Context;
   UsbIo             = UsbKeyboardDevice->UsbIo;
 
@@ -413,7 +407,7 @@ KeyboardHandler (
     // Delete & Submit this interrupt again
     //
 
-    Status = UsbIo->UsbAsyncInterruptTransfer (
+    UsbIo->UsbAsyncInterruptTransfer (
                       UsbIo,
                       UsbKeyboardDevice->IntEndpointDescriptor.EndpointAddress,
                       FALSE,

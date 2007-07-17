@@ -98,7 +98,7 @@ enum {
   USBTD_BABBLE          = BIT(4),  // Babble condition
   USBTD_NAK             = BIT(3),  // NAK is received
   USBTD_CRC             = BIT(2),  // CRC/Time out error
-  USBTD_BITSTUFF        = BIT(1),  // Bit stuff error
+  USBTD_BITSTUFF        = BIT(1)  // Bit stuff error
 };
 
 

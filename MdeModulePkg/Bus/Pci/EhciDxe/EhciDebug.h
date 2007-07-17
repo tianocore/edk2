@@ -30,7 +30,7 @@ enum {
 
   EHC_DEBUG_QH            = (UINTN)(1 << 8),
   EHC_DEBUG_QTD           = (UINTN)(1 << 9),
-  EHC_DEBUG_BUF           = (UINTN)(1 << 10),
+  EHC_DEBUG_BUF           = (UINTN)(1 << 10)
 };
 
 

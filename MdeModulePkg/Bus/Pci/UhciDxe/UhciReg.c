@@ -116,7 +116,7 @@ UhciSetRegBit (
   UINT16  Data;
 
   Data = UhciReadReg (PciIo, Offset);
-  Data |= Bit;
+  Data = (UINT16) (Data |Bit);
   UhciWriteReg (PciIo, Offset, Data);
 }
 
@@ -141,7 +141,7 @@ UhciClearRegBit (
   UINT16  Data;
 
   Data = UhciReadReg (PciIo, Offset);
-  Data &= ~Bit;
+  Data = (UINT16) (Data & ~Bit);
   UhciWriteReg (PciIo, Offset, Data);
 }
 

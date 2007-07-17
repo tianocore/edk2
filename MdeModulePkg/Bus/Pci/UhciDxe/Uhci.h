@@ -75,7 +75,7 @@ enum {
   //
   UHCI_TPL                 = TPL_NOTIFY,
 
-  USB_HC_DEV_SIGNATURE     = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i'),
+  USB_HC_DEV_SIGNATURE     = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
 };
 
 #pragma pack(1)
@@ -100,7 +100,7 @@ typedef struct {
 // or bulk transfer can reclaim the unused bandwidth. Some USB
 // device requires this bandwidth reclamation capability.
 //
-typedef struct _USB_HC_DEV {
+struct _USB_HC_DEV {
   UINT32                    Signature;
   EFI_USB_HC_PROTOCOL       UsbHc;
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
@@ -132,7 +132,7 @@ typedef struct _USB_HC_DEV {
   USBHC_MEM_POOL            *MemPool;
   EFI_UNICODE_STRING_TABLE  *CtrlNameTable;
   VOID                      *FrameMapping;
-} USB_HC_DEV;
+};
 
 extern EFI_DRIVER_BINDING_PROTOCOL  gUhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gUhciComponentName;

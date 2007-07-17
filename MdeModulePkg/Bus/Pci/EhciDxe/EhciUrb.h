@@ -83,7 +83,7 @@ enum {
   QH_MICROFRAME_6         = 0x40,
   QH_MICROFRAME_7         = 0x80,
 
-  USB_ERR_SHORT_PACKET    = 0x200,
+  USB_ERR_SHORT_PACKET    = 0x200
 };
 
 //
@@ -180,13 +180,13 @@ typedef struct _USB_ENDPOINT {
 // Software QTD strcture, this is used to manage all the
 // QTD generated from a URB. Don't add fields before QtdHw.
 //
-typedef struct _EHC_QTD {
+struct _EHC_QTD {
   QTD_HW                  QtdHw;
   UINT32                  Signature;
   LIST_ENTRY              QtdList;   // The list of QTDs to one end point
   UINT8                   *Data;     // Buffer of the original data
   UINTN                   DataLen;   // Original amount of data in this QTD
-} EHC_QTD;
+};
 
 //
 // Software QH structure. All three different transaction types
@@ -203,19 +203,19 @@ typedef struct _EHC_QTD {
 // transfer is supported. A dummy QH is linked to EHCI AsyncListAddr
 // as the reclamation header. New transfer is inserted after this QH.
 //
-typedef struct _EHC_QH {
+struct _EHC_QH {
   QH_HW                   QhHw;
   UINT32                  Signature;
   EHC_QH                  *NextQh;    // The queue head pointed to by horizontal link
   LIST_ENTRY              Qtds;       // The list of QTDs to this queue head
   UINTN                   Interval;
-} EHC_QH;
+};
 
 //
 // URB (Usb Request Block) contains information for all kinds of
 // usb requests.
 //
-typedef struct _URB {
+struct _URB {
   UINT32                          Signature;
   LIST_ENTRY                      UrbList;
 
@@ -244,7 +244,7 @@ typedef struct _URB {
   UINT32                          Result;
   UINTN                           Completed;    // completed data length
   UINT8                           DataToggle;
-} URB;
+};
 
 
 

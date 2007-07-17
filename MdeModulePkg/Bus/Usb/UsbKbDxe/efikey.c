@@ -174,7 +174,7 @@ USBKeyboardDriverBindingSupported (
   OpenStatus = gBS->OpenProtocol (
                       Controller,
                       &gEfiUsbIoProtocolGuid,
-                      &UsbIo,
+                      (VOID **) &UsbIo,
                       This->DriverBindingHandle,
                       Controller,
                       EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -244,7 +244,7 @@ USBKeyboardDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -500,12 +500,11 @@ USBKeyboardDriverBindingStop (
   EFI_STATUS                  Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL *SimpleInput;
   USB_KB_DEV                  *UsbKeyboardDevice;
-  EFI_USB_IO_PROTOCOL         *UsbIo;
 
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiSimpleTextInProtocolGuid,
-                  &SimpleInput,
+                  (VOID **) &SimpleInput,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -526,7 +525,6 @@ USBKeyboardDriverBindingStop (
         Controller
         );
 
-  UsbIo = UsbKeyboardDevice->UsbIo;
   //
   // Uninstall the Asyn Interrupt Transfer from this device
   // will disable the key data input from this device
@@ -605,11 +603,8 @@ USBKeyboardReset (
 {
   EFI_STATUS          Status;
   USB_KB_DEV          *UsbKeyboardDevice;
-  EFI_USB_IO_PROTOCOL *UsbIo;
 
   UsbKeyboardDevice = USB_KB_DEV_FROM_THIS (This);
-
-  UsbIo             = UsbKeyboardDevice->UsbIo;
 
   KbdReportStatusCode (
     UsbKeyboardDevice->DevicePath,

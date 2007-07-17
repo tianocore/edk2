@@ -98,7 +98,7 @@ UsbHubCtrlClearPortFeature (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_CLEAR_FEATURE,
              Feature,
-             Port + 1,
+             (UINT16) (Port + 1),
              NULL,
              0
              );
@@ -140,8 +140,8 @@ UsbHubCtrlClearTTBuffer (
   //
   // Check USB2.0 spec page 424 for wValue's encoding
   //
-  Value = (EpNum & 0x0F) | (DevAddr << 4) |
-          ((EpType & 0x03) << 11) | ((EpNum & 0x80) << 15);
+  Value = (UINT16) ((EpNum & 0x0F) | (DevAddr << 4) |
+          ((EpType & 0x03) << 11) | ((EpNum & 0x80) << 15));
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -150,7 +150,7 @@ UsbHubCtrlClearTTBuffer (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_CLEAR_TT,
              Value,
-             Port + 1,
+             (UINT16) (Port + 1),
              NULL,
              0
              );
@@ -265,7 +265,7 @@ UsbHubCtrlGetPortStatus (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_GET_STATUS,
              0,
-             Port + 1,
+             (UINT16) (Port + 1),
              State,
              4
              );
@@ -300,7 +300,7 @@ UsbHubCtrlResetTT (
              USB_HUB_TARGET_HUB,
              USB_HUB_REQ_RESET_TT,
              0,
-             Port + 1,
+             (UINT16) (Port + 1),
              NULL,
              0
              );
@@ -376,7 +376,7 @@ UsbHubCtrlSetPortFeature (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_SET_FEATURE,
              Feature,
-             Port + 1,
+             (UINT16) (Port + 1),
              NULL,
              0
              );
@@ -744,7 +744,7 @@ UsbHubInit (
   // for both gang/individual powered hubs.
   //
   for (Index = 0; Index < HubDesc.NumPorts; Index++) {
-    UsbHubCtrlSetPortFeature (HubIf->Device, Index, USB_HUB_PORT_POWER);
+    UsbHubCtrlSetPortFeature (HubIf->Device, Index, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
   }
 
   gBS->Stall (HubDesc.PwrOn2PwrGood * 2 * USB_STALL_1_MS);
@@ -852,7 +852,7 @@ UsbHubSetPortFeature (
 {
   EFI_STATUS              Status;
 
-  Status = UsbHubCtrlSetPortFeature (HubIf->Device, Port, Feature);
+  Status = UsbHubCtrlSetPortFeature (HubIf->Device, Port, (UINT8) Feature);
 
   return Status;
 }
@@ -879,7 +879,7 @@ UsbHubClearPortFeature (
 {
   EFI_STATUS              Status;
 
-  Status = UsbHubCtrlClearPortFeature (HubIf->Device, Port, Feature);
+  Status = UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT8) Feature);
 
   return Status;
 }
@@ -907,7 +907,7 @@ UsbHubResetPort (
   UINTN                   Index;
   EFI_STATUS              Status;
 
-  Status  = UsbHubSetPortFeature (HubIf, Port, USB_HUB_PORT_RESET);
+  Status  = UsbHubSetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_RESET);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1121,7 +1121,7 @@ UsbRootHubClearPortChange (
     Map = &mRootHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
-      UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, Map->Feature);
+      UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, (EFI_USB_PORT_FEATURE) Map->Feature);
     }
   }
 }

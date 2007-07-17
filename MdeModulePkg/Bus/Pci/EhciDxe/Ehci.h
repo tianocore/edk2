@@ -66,7 +66,7 @@ enum {
   EHC_SYNC_POLL_TIME        = 20 * EHC_STALL_1_MICROSECOND,
   EHC_ASYNC_POLL_TIME       = 50 * 10000UL,                 // The unit of time is 100us
 
-  EHC_TPL                   = TPL_NOTIFY,
+  EHC_TPL                   = TPL_NOTIFY
 };
 
 //
@@ -95,7 +95,7 @@ enum {
 
 #define EHC_FROM_THIS(a)   CR(a, USB2_HC_DEV, Usb2Hc, USB2_HC_DEV_SIGNATURE)
 
-typedef struct _USB2_HC_DEV {
+struct _USB2_HC_DEV {
   UINTN                     Signature;
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
 
@@ -143,7 +143,7 @@ typedef struct _USB2_HC_DEV {
   // Misc
   //
   EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
-} USB2_HC_DEV;
+};
 
 
 extern EFI_DRIVER_BINDING_PROTOCOL     gEhciDriverBinding;
