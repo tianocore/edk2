@@ -190,7 +190,7 @@ PciVgaMiniPortDriverBindingStart (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (PCI_VGA_MINI_PORT_DEV),
-                  &PciVgaMiniPortPrivate
+                  (VOID **) &PciVgaMiniPortPrivate
                   );
   if (EFI_ERROR (Status)) {
     goto Done;

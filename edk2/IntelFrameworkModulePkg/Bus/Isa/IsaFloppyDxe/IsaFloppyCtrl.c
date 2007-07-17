@@ -16,13 +16,13 @@ Module Name:
 Abstract:
 
   ISA Floppy Driver
-  1. Support two types diskette drive  
+  1. Support two types diskette drive
      1.44M drive and 2.88M drive (and now only support 1.44M)
   2. Support two diskette drives
   3. Use DMA channel 2 to transfer data
   4. Do not use interrupt
   5. Support diskette change line signal and write protect
-  
+
   The internal function for the floppy driver
 
 Revision History:
@@ -37,11 +37,11 @@ DiscoverFddDevice (
   )
 /*++
 
-  Routine Description:  Detect the floppy drive is presented or not   
+  Routine Description:  Detect the floppy drive is presented or not
   Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV       
+    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   Returns:
-    EFI_SUCCESS    Drive is presented 
+    EFI_SUCCESS    Drive is presented
     EFI_NOT_FOUND  Drive is not presented
 
 --*/
@@ -79,10 +79,10 @@ FddIdentify (
   Routine Description:   Do recalibrate  and see the drive is presented or not
          Set the media parameters
   Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV       
+    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   Returns:
-    EFI_SUCCESS:    
-    EFI_DEVICE_ERROR: 
+    EFI_SUCCESS:
+    EFI_DEVICE_ERROR:
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -119,35 +119,25 @@ FddIdentify (
   // Check Media
   //
   Status = DisketChanged (FdcDev);
-  switch (Status) {
-  case EFI_NO_MEDIA:
+
+  if (Status == EFI_NO_MEDIA) {
     FdcDev->BlkIo.Media->MediaPresent = FALSE;
-    break;
-
-  case EFI_MEDIA_CHANGED:
-  case EFI_SUCCESS:
-    break;
-
-  default:
+  } else if (Status != EFI_MEDIA_CHANGED) {
     MotorOff (FdcDev);
     return Status;
   }
+
   //
   // Check Disk Write Protected
   //
   Status = SenseDrvStatus (FdcDev, 0);
-  switch (Status) {
-  case EFI_WRITE_PROTECTED:
+
+  if (Status == EFI_WRITE_PROTECTED) {
     FdcDev->BlkIo.Media->ReadOnly = TRUE;
-    break;
-
-  case EFI_SUCCESS:
+  } else if (Status == EFI_SUCCESS) {
     FdcDev->BlkIo.Media->ReadOnly = FALSE;
-    break;
-
-  default:
+  } else {
     return EFI_DEVICE_ERROR;
-    break;
   }
 
   MotorOff (FdcDev);
@@ -167,12 +157,12 @@ FddReset (
   )
 /*++
 
-  Routine Description:  Reset the Floppy Logic Drive   
+  Routine Description:  Reset the Floppy Logic Drive
   Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV       
+    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   Returns:
     EFI_SUCCESS:    The Floppy Logic Drive is reset
-    EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and 
+    EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
                       can not be reset
 
 --*/
@@ -269,13 +259,13 @@ MotorOn (
 /*++
 
   Routine Description:  Turn the drive's motor on
-        The drive's motor must be on before any command can be executed   
+        The drive's motor must be on before any command can be executed
   Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV       
+    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   Returns:
     EFI_SUCCESS:       Turn the drive's motor on successfully
-    EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on 
-    EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)  
+    EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on
+    EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -354,10 +344,10 @@ MotorOff (
 
   Routine Description:  Set a Timer and when Timer goes off, turn the motor off
   Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV       
+    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   Returns:
     EFI_SUCCESS:       Set the Timer successfully
-    EFI_INVALID_PARAMETER: Fail to Set the timer  
+    EFI_INVALID_PARAMETER: Fail to Set the timer
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -377,7 +367,7 @@ DisketChanged (
 
   Routine Description:  Detect the disk in the drive is changed or not
   Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV   
+    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   Returns:
     EFI_SUCCESS:    No disk media change
     EFI_DEVICE_ERROR: Fail to do the recalibrate or seek operation
@@ -443,7 +433,7 @@ Specify (
 /*++
 
   Routine Description:  Do the Specify command, this command sets DMA operation
-                        and the initial values for each of the three internal 
+                        and the initial values for each of the three internal
                         times: HUT, SRT and HLT
   Parameters:
     None
@@ -675,11 +665,11 @@ SenseIntStatus (
   )
 /*++
 
-  Routine Description:  Do the Sense Interrupt Status command, this command 
+  Routine Description:  Do the Sense Interrupt Status command, this command
                         resets the interrupt signal
   Parameters:
-    StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC   
-    PresentCylinderNumber  UINT8 *: Be used to save present cylinder number 
+    StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
+    PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
                                     read from FDC
   Returns:
     EFI_SUCCESS:    Execute the Sense Interrupt Status command successfully
@@ -718,12 +708,12 @@ SenseDrvStatus (
 
   Routine Description:  Do the Sense Drive Status command
   Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV   
+    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
     Lba EFI_LBA     : Logic block address
   Returns:
     EFI_SUCCESS:    Execute the Sense Drive Status command successfully
     EFI_DEVICE_ERROR: Fail to execute the command
-    EFI_WRITE_PROTECTED:The disk is write protected 
+    EFI_WRITE_PROTECTED:The disk is write protected
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -782,10 +772,10 @@ DetectMedia (
   )
 /*++
 
-  Routine Description:  Update the disk media properties and if necessary 
+  Routine Description:  Update the disk media properties and if necessary
                         reinstall Block I/O interface
   Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV   
+    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   Returns:
     EFI_SUCCESS:    Do the operation successfully
     EFI_DEVICE_ERROR: Fail to the operation
@@ -807,21 +797,14 @@ DetectMedia (
   // Check disk change
   //
   Status = DisketChanged (FdcDev);
-  switch (Status) {
-  case EFI_MEDIA_CHANGED:
+
+  if (Status == EFI_MEDIA_CHANGED) {
     FdcDev->BlkIo.Media->MediaId++;
     FdcDev->BlkIo.Media->MediaPresent = TRUE;
     bReset = TRUE;
-    break;
-
-  case EFI_NO_MEDIA:
+  } else if (Status == EFI_NO_MEDIA) {
     FdcDev->BlkIo.Media->MediaPresent = FALSE;
-    break;
-
-  case EFI_SUCCESS:
-    break;
-
-  default:
+  } else if (Status != EFI_SUCCESS) {
     MotorOff (FdcDev);
     return Status;
     //
@@ -873,9 +856,9 @@ Setup (
 
   Routine Description: Set the data rate and so on
   Parameters:
-    None  
+    None
   Returns:
-    EFI_SUCCESS:  
+    EFI_SUCCESS:
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -919,9 +902,9 @@ ReadWriteDataSector (
     Buffer VOID *:
     Lba EFI_LBA:
     NumberOfBlocks UINTN:
-    Read BOOLEAN:     
+    Read BOOLEAN:
   Returns:
-    EFI_SUCCESS:  
+    EFI_SUCCESS:
 
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
@@ -1076,7 +1059,7 @@ FillPara (
   Routine Description: Fill in Parameter
   Parameters:
   Returns:
-    
+
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
 // GC_TODO:    FdcDev - add argument and description to function comment
@@ -1118,7 +1101,7 @@ DataInByte (
 
   Routine Description:  Read result byte from Data Register of FDC
   Parameters:
-    Pointer UINT8 *: Be used to save result byte read from FDC   
+    Pointer UINT8 *: Be used to save result byte read from FDC
   Returns:
     EFI_SUCCESS:    Read result byte from FDC successfully
     EFI_DEVICE_ERROR: The FDC is not ready to be read
@@ -1160,7 +1143,7 @@ DataOutByte (
 
   Routine Description:  Write command byte to Data Register of FDC
   Parameters:
-    Pointer UINT8 *: Be used to save command byte written to FDC   
+    Pointer UINT8 *: Be used to save command byte written to FDC
   Returns:
     EFI_SUCCESS:    Write command byte to FDC successfully
     EFI_DEVICE_ERROR: The FDC is not ready to be written
@@ -1201,14 +1184,14 @@ FddWaitForBSYClear (
   )
 /*++
 
-  Routine Description:  Detect the specified floppy logic drive is busy or 
+  Routine Description:  Detect the specified floppy logic drive is busy or
                         not within a period of time
   Parameters:
     Disk EFI_FDC_DISK:    Indicate it is drive A or drive B
-    TimeoutInSeconds UINTN: the time period for waiting   
+    TimeoutInSeconds UINTN: the time period for waiting
   Returns:
     EFI_SUCCESS:  The drive and command are not busy
-    EFI_TIMEOUT:  The drive or command is still busy after a period time that 
+    EFI_TIMEOUT:  The drive or command is still busy after a period time that
                   set by TimeoutInSeconds
 
 --*/
@@ -1264,7 +1247,7 @@ FddDRQReady (
   Routine Description:  Determine whether FDC is ready to write or read
   Parameters:
     Dio BOOLEAN:      Indicate the FDC is waiting to write or read
-    TimeoutInSeconds UINTN: The time period for waiting   
+    TimeoutInSeconds UINTN: The time period for waiting
   Returns:
     EFI_SUCCESS:  FDC is ready to write or read
     EFI_NOT_READY:  FDC is not ready within the specified time period
@@ -1384,9 +1367,9 @@ CheckStatus3 (
 
   Routine Description:  Check the drive status information
   Parameters:
-    StatusRegister3 UINT8: the value of Status Register 3    
+    StatusRegister3 UINT8: the value of Status Register 3
   Returns:
-    EFI_SUCCESS:     
+    EFI_SUCCESS:
     EFI_WRITE_PROTECTED:  The disk is write protected
 
 --*/
@@ -1408,14 +1391,14 @@ GetTransferBlockCount (
   )
 /*++
 
-  Routine Description:  Calculate the number of block in the same cylinder 
+  Routine Description:  Calculate the number of block in the same cylinder
                         according to LBA
   Parameters:
     FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-    LBA EFI_LBA:      The starting logic block address            
+    LBA EFI_LBA:      The starting logic block address
     NumberOfBlocks UINTN: The number of blocks
   Returns:
-    UINTN : The number of blocks in the same cylinder which the starting 
+    UINTN : The number of blocks in the same cylinder which the starting
         logic block address is LBA
 
 --*/
@@ -1452,9 +1435,9 @@ FddTimerProc (
 
   Routine Description:  When the Timer(2s) off, turn the drive's motor off
   Parameters:
-    Event EFI_EVENT: Event(the timer) whose notification function is being 
+    Event EFI_EVENT: Event(the timer) whose notification function is being
                      invoked
-    Context VOID *:  Pointer to the notification function's context 
+    Context VOID *:  Pointer to the notification function's context
   Returns:
     VOID
 
@@ -1494,10 +1477,10 @@ FdcReadPort (
   )
 /*++
 
-  Routine Description: Read I/O port for FDC  
+  Routine Description: Read I/O port for FDC
   Parameters:
   Returns:
-    
+
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
 // GC_TODO:    FdcDev - add argument and description to function comment
@@ -1527,10 +1510,10 @@ FdcWritePort (
   )
 /*++
 
-  Routine Description: Write I/O port for FDC  
+  Routine Description: Write I/O port for FDC
   Parameters:
   Returns:
-    
+
 --*/
 // GC_TODO: function comment is missing 'Arguments:'
 // GC_TODO:    FdcDev - add argument and description to function comment
