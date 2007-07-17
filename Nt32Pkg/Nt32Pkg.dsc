@@ -362,7 +362,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
-  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/FlashMap.inf
+  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
   $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf

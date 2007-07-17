@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiFlashMap
+  BASE_NAME                      = WinNtFlashMapPei
   FILE_GUID                      = 681F3771-6F1D-42DE-9AA2-F82BBCDBC5F9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
