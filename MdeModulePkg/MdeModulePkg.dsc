@@ -434,13 +434,13 @@
 [Components.Ia32]
   $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/VariableRuntimeDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 
 [Components.X64]
   $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/Variable.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariable.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EmuVariableRuntimeDxe/EmuVariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
 
 [Components.IPF]
