@@ -88,7 +88,7 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 
 *_VS2003_IA32_APP_FLAGS         = /nologo /E /TC
 *_VS2003_IA32_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-*_VS2003_IA32_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE
+*_VS2003_IA32_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 DEBUG_VS2003_IA32_CC_FLAGS      = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /O1ib2 /GL /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yu$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Gm
 RELEASE_VS2003_IA32_CC_FLAGS    = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /O1ib2 /GL /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yu$(DEST_DIR_DEBUG)/AutoGen.h
 DEBUG_VS2003_IA32_PCH_FLAGS     = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /O1ib2 /GL /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yc /TC /Zi /Gm
@@ -119,7 +119,7 @@ RELEASE_VS2003_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /O
 
 *_WINDDK3790x1830_*_APP_FLAGS       = /nologo /E /TC
 *_WINDDK3790x1830_*_SLINK_FLAGS     = /nologo /LTCG
-*_WINDDK3790x1830_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE
+*_WINDDK3790x1830_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -223,7 +223,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 #*_VS2005EXP_IA32_SLINK_FLAGS       = /NOLOGO /LTCG
 #*_VS2005EXP_IA32_APP_FLAGS         = /nologo /E /TC
 #*_VS2005EXP_IA32_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-#*_VS2005EXP_IA32_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE
+#*_VS2005EXP_IA32_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -292,7 +292,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 #*_VS2005STD_*_SLINK_FLAGS       = /NOLOGO /LTCG
 #*_VS2005STD_*_APP_FLAGS         = /nologo /E /TC
 #*_VS2005STD_*_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-#*_VS2005STD_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE
+#*_VS2005STD_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -358,7 +358,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 *_VS2005PRO_*_SLINK_FLAGS       = /NOLOGO /LTCG
 *_VS2005PRO_*_APP_FLAGS         = /nologo /E /TC
 *_VS2005PRO_*_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-*_VS2005PRO_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE
+*_VS2005PRO_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -445,7 +445,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 #*_VS2005TEAMSUITE_*_SLINK_FLAGS       = /NOLOGO /LTCG
 #*_VS2005TEAMSUITE_*_APP_FLAGS         = /nologo /E /TC
 #*_VS2005TEAMSUITE_*_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-#*_VS2005TEAMSUITE_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE
+#*_VS2005TEAMSUITE_*_VFRPP_FLAGS       = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -562,7 +562,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(ENTRYPOINT) --file-alignment 0x20 --section-alignment 0x20
 *_UNIXGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=_##name
 *_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_UNIXGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
+*_UNIXGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
 *_UNIXGCC_*_ASM_EXT         = .S
 
 
@@ -597,7 +597,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(ENTRYPOINT) --file-alignment 0x20 --section-alignment 0x20
 *_CYGWINGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=_##name
 *_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_CYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
+*_CYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
 *_CYGWINGCC_*_ASM_EXT         = .S
 
 *_CYGWINGCC_*_*_DPATH         = c:/Cygwin/bin
@@ -622,7 +622,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_ELFGCC_*_DLINK_FLAGS     = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry $(ENTRYPOINT) -u $(ENTRYPOINT)
 *_ELFGCC_*_ASM_FLAGS       = -m32 -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=name
 *_ELFGCC_*_PP_FLAGS        = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE
+*_ELFGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
 *_ELFGCC_*_ASM_EXT         = .S
 
 *_ELFGCC_IA32_*_PATH       = /usr/bin
@@ -687,7 +687,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_ICC_*_APP_NAME             = cl.exe
 *_ICC_*_ASM_NAME             = ml.exe
 
-*_ICC_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE
+*_ICC_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
@@ -769,8 +769,6 @@ RELEASE_ICC_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGN
 *_MYTOOLS_*_APP_NAME             = cl.exe
 *_MYTOOLS_*_ASM_NAME             = ml.exe
 
-*_MYTOOLS_*_VFRC_NAME            = VfrCompile.exe
-*_MYTOOLS_IA32_VFRC_PATH         =
 *_MYTOOLS_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 *_MYTOOLS_*_LZMA_NAME = Lzma.bat
@@ -813,7 +811,6 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /
 
 *_MYTOOLS_X64_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86\amd64
 *_MYTOOLS_X64_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
-*_MYTOOLS_X64_VFRC_PATH         =
 
 *_MYTOOLS_X64_SLINK_FLAGS       = /nologo /LTCG
 *_MYTOOLS_X64_APP_FLAGS         = /nologo /E /TC
@@ -835,7 +832,6 @@ RELEASE_MYTOOLS_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /O
 *_MYTOOLS_IPF_ASM_EXT           = .s
 
 *_MYTOOLS_IPF_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86
-*_MYTOOLS_IPF_VFRC_PATH         =
 
 *_MYTOOLS_IPF_APP_FLAGS         = /nologo /E /TC
 *_MYTOOLS_IPF_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
