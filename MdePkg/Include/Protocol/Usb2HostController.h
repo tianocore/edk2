@@ -28,6 +28,49 @@
 //
 typedef struct _EFI_USB2_HC_PROTOCOL EFI_USB2_HC_PROTOCOL;
 
+
+typedef struct {
+  UINT16          PortStatus;
+  UINT16          PortChangeStatus;
+} EFI_USB_PORT_STATUS;
+
+//
+// Constant value for Port Status & Port Change Status
+//
+#define USB_PORT_STAT_CONNECTION    0x0001
+#define USB_PORT_STAT_ENABLE        0x0002
+#define USB_PORT_STAT_SUSPEND       0x0004
+#define USB_PORT_STAT_OVERCURRENT   0x0008
+#define USB_PORT_STAT_RESET         0x0010
+#define USB_PORT_STAT_POWER         0x0100
+#define USB_PORT_STAT_LOW_SPEED     0x0200
+#define USB_PORT_STAT_HIGH_SPEED    0x0400
+#define USB_PORT_STAT_OWNER         0x0800
+
+#define USB_PORT_STAT_C_CONNECTION  0x0001
+#define USB_PORT_STAT_C_ENABLE      0x0002
+#define USB_PORT_STAT_C_SUSPEND     0x0004
+#define USB_PORT_STAT_C_OVERCURRENT 0x0008
+#define USB_PORT_STAT_C_RESET       0x0010
+
+
+//
+// Usb port features
+//
+typedef enum {
+  EfiUsbPortEnable            = 1,
+  EfiUsbPortSuspend           = 2,
+  EfiUsbPortReset             = 4,
+  EfiUsbPortPower             = 8,
+  EfiUsbPortOwner             = 13,
+  EfiUsbPortConnectChange     = 16,
+  EfiUsbPortEnableChange      = 17,
+  EfiUsbPortSuspendChange     = 18,
+  EfiUsbPortOverCurrentChange = 19,
+  EfiUsbPortResetChange       = 20
+} EFI_USB_PORT_FEATURE;
+
+
 #define EFI_USB_SPEED_FULL      0x0000  // 12 Mb/s, USB 1.1 OHCI and UHCI HC.
 #define EFI_USB_SPEED_LOW       0x0001  // 1 Mb/s, USB 1.1 OHCI and UHCI HC.
 #define EFI_USB_SPEED_HIGH      0x0002  // 480 Mb/s, USB 2.0 EHCI HC.
