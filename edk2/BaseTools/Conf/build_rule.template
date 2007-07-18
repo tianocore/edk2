@@ -46,21 +46,20 @@ FileTypeMapping = {
     ".so"   :   "Dynamic-Library",
 }
 
-DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL", "VFRC", "AUTOGEN"]
+DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL"]
 
 ToolCodeMapping = {
-    "C-Code"                        :   "CC",
-    "C-Header"                      :   "PCH",
-    "Masm-Code"                     :   "ASM",
-    "Iasm-Code"                     :   "ASM",          # IPF assembly code
-    "Gasm-Code"                     :   "ASM",          # GNU assembly code
-    "Unicode-Text"                  :   "AUTOGEN",
-    "Visual-Form-Representation"    :   "VFRC",
-    "Preprocessed-Code"             :   "CC",
-    "Acpi-Source-Language"          :   "ASL",
-    "Object"                        :   "SLINK",
-    "Static-Library"                :   "DLINK",
-    "Dependency-Expression"         :   "PP",
+    "C-Code"                        :   ["CC"],
+    "C-Header"                      :   ["PCH"],
+    "Masm-Code"                     :   ["PP", "ASM"],
+    "Iasm-Code"                     :   ["PP", "ASM"],      # IPF assembly code
+    "Gasm-Code"                     :   ["ASM"],          	# GNU assembly code
+    "Visual-Form-Representation"    :   ["PP", "CC"],
+    "Preprocessed-Code"             :   ["CC"],
+    "Acpi-Source-Language"          :   ["ASL"],
+    "Object"                        :   ["SLINK"],
+    "Static-Library"                :   ["DLINK"],
+    "Dependency-Expression"         :   ["PP"],
 }
 
 ToolChainFamilyMapping = {
