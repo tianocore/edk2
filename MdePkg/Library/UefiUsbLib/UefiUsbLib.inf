@@ -43,6 +43,7 @@
 ################################################################################
 
 [Sources.common]
+  UefiUsbLibInternal.h
   hid.c
   UsbDxeLib.c
 
