@@ -44,9 +44,9 @@ IoLibConstructor (
 {
   EFI_STATUS                        Status;
 
-  Status = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, &mPciRootBridgeIo);
+  Status = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, (VOID **) &mPciRootBridgeIo);
   if (EFI_ERROR (Status)) {
-    Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, &mCpuIo);
+    Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &mCpuIo);
   }
   ASSERT_EFI_ERROR (Status);
 
@@ -78,7 +78,7 @@ IoReadWorker (
   UINT64                            Data;
 
   if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Io.Read (mPciRootBridgeIo, Width, Port, 1, &Data);
+    Status = mPciRootBridgeIo->Io.Read (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Port, 1, &Data);
   } else {
     Status = mCpuIo->Io.Read (mCpuIo, Width, Port, 1, &Data);
   }
@@ -113,7 +113,7 @@ IoWriteWorker (
   EFI_STATUS                        Status;
 
   if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Io.Write (mPciRootBridgeIo, Width, Port, 1, &Data);
+    Status = mPciRootBridgeIo->Io.Write (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Port, 1, &Data);
   } else {
     Status = mCpuIo->Io.Write (mCpuIo, Width, Port, 1, &Data);
   }
@@ -147,7 +147,7 @@ MmioReadWorker (
   UINT64                            Data;
 
   if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Mem.Read (mPciRootBridgeIo, Width, Address, 1, &Data);
+    Status = mPciRootBridgeIo->Mem.Read (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Address, 1, &Data);
   } else {
     Status = mCpuIo->Mem.Read (mCpuIo, Width, Address, 1, &Data);
   }
@@ -181,7 +181,7 @@ MmioWriteWorker (
   EFI_STATUS                        Status;
 
   if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Mem.Write (mPciRootBridgeIo, Width, Address, 1, &Data);
+    Status = mPciRootBridgeIo->Mem.Write (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Address, 1, &Data);
   } else {
     Status = mCpuIo->Mem.Write (mCpuIo, Width, Address, 1, &Data);
   }

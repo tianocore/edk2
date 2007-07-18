@@ -49,6 +49,9 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiPciRootBridgeIoProtocolGuid</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
