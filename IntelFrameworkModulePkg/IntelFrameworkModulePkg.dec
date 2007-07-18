@@ -44,12 +44,9 @@
 #                                provided by this package.
 #
 ################################################################################
-[LibraryClass.common]
+[LibraryClasses.common]
   PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
-  GraphicsLib|Include/Library/GraphicsLib.h
-
-
 
 ################################################################################
 #
