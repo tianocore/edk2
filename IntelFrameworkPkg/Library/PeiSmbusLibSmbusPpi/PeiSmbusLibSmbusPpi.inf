@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiSmbusLib
+  BASE_NAME                      = PeiSmbusLibSmbusPpi
   FILE_GUID                      = 51C4C059-67F0-4e3c-9A55-FF42A8291C8C
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
