@@ -1,8 +1,8 @@
 #/** @file
-# Component description file for NullMemoryTest module.
+# Component description file for Ebc module.
 #
-# This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to 
-#  provide simple generic memory test functions.
+# This module for the EBC virtual machine implementation produces 
+#  EBC and EBC debug support protocols.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -22,19 +22,19 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = NullMemoryTest
-  FILE_GUID                      = 96B5C032-DF4C-4b6e-8232-438DCF448D0E
+  BASE_NAME                      = EbcDxe
+  FILE_GUID                      = 13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = GenericMemoryTestEntryPoint
+  ENTRY_POINT                    = InitializeEbcDriver
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
 ################################################################################
@@ -44,8 +44,25 @@
 ################################################################################
 
 [Sources.common]
-  NullMemoryTest.h
-  NullMemoryTest.c
+  EbcExecute.h
+  EbcExecute.c
+  EbcInt.h
+  EbcInt.c
+
+[Sources.Ia32]
+  Ia32/EbcSupport.c
+  Ia32/EbcLowLevel.S
+  Ia32/EbcLowLevel.asm
+
+[Sources.X64]
+  x64/EbcSupport.c
+  x64/EbcLowLevel.S
+  x64/EbcLowLevel.asm
+
+[Sources.IPF]
+  Ipf/EbcSupport.h
+  Ipf/EbcSupport.c
+  Ipf/EbcLowLevel.s
 
 
 ################################################################################
@@ -56,8 +73,8 @@
 ################################################################################
 
 [Packages]
-  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  
 
 
 ################################################################################
@@ -70,9 +87,10 @@
 [LibraryClasses]
   MemoryAllocationLib
   UefiBootServicesTableLib
-  DxeServicesTableLib
+  BaseMemoryLib
   UefiDriverEntryPoint
   DebugLib
+  BaseLib
 
 
 ################################################################################
@@ -83,7 +101,8 @@
 ################################################################################
 
 [Protocols]
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEfiDebugSupportProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+  gEfiEbcProtocolGuid                           # PROTOCOL ALWAYS_PRODUCED
 
 ################################################################################
 #

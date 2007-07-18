@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Crc32SectionExtract
+  BASE_NAME                      = Crc32SectionExtractDxe
   FILE_GUID                      = 51C9F40C-5243-4473-B265-B3C8FFAFF9FA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

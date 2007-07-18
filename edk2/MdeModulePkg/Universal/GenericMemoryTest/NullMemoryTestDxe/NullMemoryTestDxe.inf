@@ -1,7 +1,8 @@
 #/** @file
-# Component description file for MonotonicCounter module.
+# Component description file for NullMemoryTest module.
 #
-# This module produces UEFI Monotonic Counter Boot and Runtime Services.
+# This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to 
+#  provide simple generic memory test functions.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,14 +22,14 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MonotonicCounter
-  FILE_GUID                      = AD608272-D07F-4964-801E-7BD3B7888652
-  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  BASE_NAME                      = NullMemoryTestDxe
+  FILE_GUID                      = 96B5C032-DF4C-4b6e-8232-438DCF448D0E
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = MonotonicCounterDriverInitialize
+  ENTRY_POINT                    = GenericMemoryTestEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -43,8 +44,8 @@
 ################################################################################
 
 [Sources.common]
-  MonotonicCounter.h
-  MonotonicCounter.c
+  NullMemoryTest.h
+  NullMemoryTest.c
 
 
 ################################################################################
@@ -55,6 +56,7 @@
 ################################################################################
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 
@@ -66,12 +68,11 @@
 ################################################################################
 
 [LibraryClasses]
-  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
-  DebugLib
-  UefiRuntimeLib
+  DxeServicesTableLib
   UefiDriverEntryPoint
-  BaseLib
+  DebugLib
 
 
 ################################################################################
@@ -82,8 +83,7 @@
 ################################################################################
 
 [Protocols]
-  gEfiMonotonicCounterArchProtocolGuid          # PROTOCOL ALWAYS_PRODUCED
-
+  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
 
 ################################################################################
 #
@@ -93,5 +93,4 @@
 ################################################################################
 
 [Depex]
-  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
-
+  TRUE
