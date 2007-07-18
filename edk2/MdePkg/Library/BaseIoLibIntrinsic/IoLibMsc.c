@@ -36,6 +36,7 @@ unsigned short _outpw (unsigned short port, unsigned short dataword );
 unsigned long  _outpd (unsigned short port, unsigned long dataword );
 void          _ReadWriteBarrier (void);
 
+#ifdef _MSC_VER
 #pragma intrinsic(_inp)
 #pragma intrinsic(_inpw)
 #pragma intrinsic(_inpd)
@@ -43,7 +44,7 @@ void          _ReadWriteBarrier (void);
 #pragma intrinsic(_outpw)
 #pragma intrinsic(_outpd)
 #pragma intrinsic(_ReadWriteBarrier)
-
+#endif 
 //
 // _ReadWriteBarrier() forces memory reads and writes to complete at the point
 // in the call. This is only a hint to the compiler and does emit code.

@@ -115,10 +115,6 @@ EFI_STATUS
   IN OUT EFI_FV_ATTRIBUTES          *Attributes
   );
 
-typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
-
-#define EFI_FV_FILE_ATTRIB_ALIGNMENT  0x0000001F
-
 /**
   Read the requested file (NameGuid) and returns data in Buffer.
 
