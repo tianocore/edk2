@@ -384,26 +384,26 @@
   $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHub/Dxe/DataHub.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Ebc/Dxe/Ebc.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/Dxe/NullMemoryTest.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe/Crc32SectionExtract.inf  
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf  
   $(WORKSPACE)/Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf        
   $(WORKSPACE)/Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf        
-  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteLite/Dxe/FtwLite.inf      
-  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf      
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   $(WORKSPACE)/Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
   $(WORKSPACE)/Nt32Pkg/TimerDxe/TimerDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariableRuntimeDxe/VariableRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterDxe/MonotonicCounter.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Capsule/RuntimeDxe/CapsuleRuntime.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatform.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitter.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsole.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
@@ -411,10 +411,10 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBus/Dxe/PciBus.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
   $(WORKSPACE)/MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBus/Dxe/IdeBus.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
   $(WORKSPACE)/Nt32Pkg/WinNtConsoleDxe/WinNtConsoleDxe.inf
