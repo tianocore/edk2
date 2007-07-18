@@ -79,198 +79,198 @@
   BaseLibInternals.h
 
 [Sources.Ia32]
-  Ia32/Wbinvd.c
-  Ia32/WriteMm7.c
-  Ia32/WriteMm6.c
-  Ia32/WriteMm5.c
-  Ia32/WriteMm4.c
-  Ia32/WriteMm3.c
-  Ia32/WriteMm2.c
-  Ia32/WriteMm1.c
-  Ia32/WriteMm0.c
-  Ia32/WriteLdtr.c
-  Ia32/WriteIdtr.c
-  Ia32/WriteGdtr.c
-  Ia32/WriteDr7.c
-  Ia32/WriteDr6.c
-  Ia32/WriteDr5.c
-  Ia32/WriteDr4.c
-  Ia32/WriteDr3.c
-  Ia32/WriteDr2.c
-  Ia32/WriteDr1.c
-  Ia32/WriteDr0.c
-  Ia32/WriteCr4.c
-  Ia32/WriteCr3.c
-  Ia32/WriteCr2.c
-  Ia32/WriteCr0.c
-  Ia32/WriteMsr64.c
+  Ia32/Wbinvd.c || MSFT |||
+  Ia32/WriteMm7.c || MSFT |||
+  Ia32/WriteMm6.c || MSFT |||
+  Ia32/WriteMm5.c || MSFT |||
+  Ia32/WriteMm4.c || MSFT |||
+  Ia32/WriteMm3.c || MSFT |||
+  Ia32/WriteMm2.c || MSFT |||
+  Ia32/WriteMm1.c || MSFT |||
+  Ia32/WriteMm0.c || MSFT |||
+  Ia32/WriteLdtr.c || MSFT |||
+  Ia32/WriteIdtr.c || MSFT |||
+  Ia32/WriteGdtr.c || MSFT |||
+  Ia32/WriteDr7.c || MSFT |||
+  Ia32/WriteDr6.c || MSFT |||
+  Ia32/WriteDr5.c || MSFT |||
+  Ia32/WriteDr4.c || MSFT |||
+  Ia32/WriteDr3.c || MSFT |||
+  Ia32/WriteDr2.c || MSFT |||
+  Ia32/WriteDr1.c || MSFT |||
+  Ia32/WriteDr0.c || MSFT |||
+  Ia32/WriteCr4.c || MSFT |||
+  Ia32/WriteCr3.c || MSFT |||
+  Ia32/WriteCr2.c || MSFT |||
+  Ia32/WriteCr0.c || MSFT |||
+  Ia32/WriteMsr64.c || MSFT |||
   Ia32/Thunk16.asm
-  Ia32/SwapBytes64.c
-  Ia32/SetJump.c
-  Ia32/RRotU64.c
-  Ia32/RShiftU64.c
-  Ia32/ReadPmc.c
-  Ia32/ReadTsc.c
-  Ia32/ReadLdtr.c
-  Ia32/ReadIdtr.c
-  Ia32/ReadGdtr.c
-  Ia32/ReadTr.c
-  Ia32/ReadSs.c
-  Ia32/ReadGs.c
-  Ia32/ReadFs.c
-  Ia32/ReadEs.c
-  Ia32/ReadDs.c
-  Ia32/ReadCs.c
-  Ia32/ReadMsr64.c
-  Ia32/ReadMm7.c
-  Ia32/ReadMm6.c
-  Ia32/ReadMm5.c
-  Ia32/ReadMm4.c
-  Ia32/ReadMm3.c
-  Ia32/ReadMm2.c
-  Ia32/ReadMm1.c
-  Ia32/ReadMm0.c
-  Ia32/ReadEflags.c
-  Ia32/ReadDr7.c
-  Ia32/ReadDr6.c
-  Ia32/ReadDr5.c
-  Ia32/ReadDr4.c
-  Ia32/ReadDr3.c
-  Ia32/ReadDr2.c
-  Ia32/ReadDr1.c
-  Ia32/ReadDr0.c
-  Ia32/ReadCr4.c
-  Ia32/ReadCr3.c
-  Ia32/ReadCr2.c
-  Ia32/ReadCr0.c
-  Ia32/Mwait.c
-  Ia32/Monitor.c
-  Ia32/ModU64x32.c
-  Ia32/MultU64x64.c
-  Ia32/MultU64x32.c
-  Ia32/LShiftU64.c
-  Ia32/LRotU64.c
-  Ia32/LongJump.c
-  Ia32/Invd.c
-  Ia32/InterlockedCompareExchange64.c
-  Ia32/InterlockedCompareExchange32.c
-  Ia32/InterlockedDecrement.c
-  Ia32/InterlockedIncrement.c
-  Ia32/FxRestore.c
-  Ia32/FxSave.c
-  Ia32/FlushCacheLine.c
+  Ia32/SwapBytes64.c || MSFT |||
+  Ia32/SetJump.c || MSFT |||
+  Ia32/RRotU64.c || MSFT |||
+  Ia32/RShiftU64.c || MSFT |||
+  Ia32/ReadPmc.c || MSFT |||
+  Ia32/ReadTsc.c || MSFT |||
+  Ia32/ReadLdtr.c || MSFT |||
+  Ia32/ReadIdtr.c || MSFT |||
+  Ia32/ReadGdtr.c || MSFT |||
+  Ia32/ReadTr.c || MSFT |||
+  Ia32/ReadSs.c || MSFT |||
+  Ia32/ReadGs.c || MSFT |||
+  Ia32/ReadFs.c || MSFT |||
+  Ia32/ReadEs.c || MSFT |||
+  Ia32/ReadDs.c || MSFT |||
+  Ia32/ReadCs.c || MSFT |||
+  Ia32/ReadMsr64.c || MSFT |||
+  Ia32/ReadMm7.c || MSFT |||
+  Ia32/ReadMm6.c || MSFT |||
+  Ia32/ReadMm5.c || MSFT |||
+  Ia32/ReadMm4.c || MSFT |||
+  Ia32/ReadMm3.c || MSFT |||
+  Ia32/ReadMm2.c || MSFT |||
+  Ia32/ReadMm1.c || MSFT |||
+  Ia32/ReadMm0.c || MSFT |||
+  Ia32/ReadEflags.c || MSFT |||
+  Ia32/ReadDr7.c || MSFT |||
+  Ia32/ReadDr6.c || MSFT |||
+  Ia32/ReadDr5.c || MSFT |||
+  Ia32/ReadDr4.c || MSFT |||
+  Ia32/ReadDr3.c || MSFT |||
+  Ia32/ReadDr2.c || MSFT |||
+  Ia32/ReadDr1.c || MSFT |||
+  Ia32/ReadDr0.c || MSFT |||
+  Ia32/ReadCr4.c || MSFT |||
+  Ia32/ReadCr3.c || MSFT |||
+  Ia32/ReadCr2.c || MSFT |||
+  Ia32/ReadCr0.c || MSFT |||
+  Ia32/Mwait.c || MSFT |||
+  Ia32/Monitor.c || MSFT |||
+  Ia32/ModU64x32.c || MSFT |||
+  Ia32/MultU64x64.c || MSFT |||
+  Ia32/MultU64x32.c || MSFT |||
+  Ia32/LShiftU64.c || MSFT |||
+  Ia32/LRotU64.c || MSFT |||
+  Ia32/LongJump.c || MSFT |||
+  Ia32/Invd.c || MSFT |||
+  Ia32/InterlockedCompareExchange64.c || MSFT |||
+  Ia32/InterlockedCompareExchange32.c || MSFT |||
+  Ia32/InterlockedDecrement.c || MSFT |||
+  Ia32/InterlockedIncrement.c || MSFT |||
+  Ia32/FxRestore.c || MSFT |||
+  Ia32/FxSave.c || MSFT |||
+  Ia32/FlushCacheLine.c || MSFT |||
   Ia32/EnablePaging64.asm
-  Ia32/EnablePaging32.c
-  Ia32/EnableInterrupts.c
-  Ia32/EnableDisableInterrupts.c
-  Ia32/DivU64x64Remainder.c
-  Ia32/DivU64x32Remainder.c
-  Ia32/DivU64x32.c
-  Ia32/DisablePaging32.c
-  Ia32/DisableInterrupts.c
-  Ia32/CpuPause.c
-  Ia32/CpuIdEx.c
-  Ia32/CpuId.c
-  Ia32/CpuSleep.c
-  Ia32/CpuFlushTlb.c
-  Ia32/CpuBreakpoint.c
-  Ia32/ARShiftU64.c
-  Ia32/Thunk16.S
-  Ia32/CpuFlushTlb.S
-  Ia32/CpuBreakpoint.S
-  Ia32/CpuPause.S
-  Ia32/CpuSleep.S
-  Ia32/EnableDisableInterrupts.S
-  Ia32/DisableInterrupts.S
-  Ia32/EnableInterrupts.S
-  Ia32/InterlockedCompareExchange64.S
-  Ia32/InterlockedCompareExchange32.S
-  Ia32/InterlockedDecrement.S
-  Ia32/InterlockedIncrement.S
-  Ia32/FlushCacheLine.S
-  Ia32/Invd.S
-  Ia32/Wbinvd.S
-  Ia32/EnablePaging64.S
-  Ia32/DisablePaging32.S
-  Ia32/EnablePaging32.S
-  Ia32/Mwait.S
-  Ia32/Monitor.S
-  Ia32/ReadPmc.S
-  Ia32/ReadTsc.S
-  Ia32/WriteMm7.S
-  Ia32/WriteMm6.S
-  Ia32/WriteMm5.S
-  Ia32/WriteMm4.S
-  Ia32/WriteMm3.S
-  Ia32/WriteMm2.S
-  Ia32/WriteMm1.S
-  Ia32/WriteMm0.S
-  Ia32/ReadMm7.S
-  Ia32/ReadMm6.S
-  Ia32/ReadMm5.S
-  Ia32/ReadMm4.S
-  Ia32/ReadMm3.S
-  Ia32/ReadMm2.S
-  Ia32/ReadMm1.S
-  Ia32/ReadMm0.S
-  Ia32/FxRestore.S
-  Ia32/FxSave.S
-  Ia32/WriteLdtr.S
-  Ia32/ReadLdtr.S
-  Ia32/WriteIdtr.S
-  Ia32/ReadIdtr.S
-  Ia32/WriteGdtr.S
-  Ia32/ReadGdtr.S
-  Ia32/ReadTr.S
-  Ia32/ReadSs.S
-  Ia32/ReadGs.S
-  Ia32/ReadFs.S
-  Ia32/ReadEs.S
-  Ia32/ReadDs.S
-  Ia32/ReadCs.S
-  Ia32/WriteDr7.S
-  Ia32/WriteDr6.S
-  Ia32/WriteDr5.S
-  Ia32/WriteDr4.S
-  Ia32/WriteDr3.S
-  Ia32/WriteDr2.S
-  Ia32/WriteDr1.S
-  Ia32/WriteDr0.S
-  Ia32/ReadDr7.S
-  Ia32/ReadDr6.S
-  Ia32/ReadDr5.S
-  Ia32/ReadDr4.S
-  Ia32/ReadDr3.S
-  Ia32/ReadDr2.S
-  Ia32/ReadDr1.S
-  Ia32/ReadDr0.S
-  Ia32/WriteCr4.S
-  Ia32/WriteCr3.S
-  Ia32/WriteCr2.S
-  Ia32/WriteCr0.S
-  Ia32/ReadCr4.S
-  Ia32/ReadCr3.S
-  Ia32/ReadCr2.S
-  Ia32/ReadCr0.S
-  Ia32/WriteMsr64.S
-  Ia32/ReadMsr64.S
-  Ia32/ReadEflags.S
-  Ia32/CpuIdEx.S
-  Ia32/CpuId.S
-  Ia32/LongJump.S
-  Ia32/SetJump.S
-  Ia32/SwapBytes64.S
-  Ia32/DivU64x64Remainder.S
-  Ia32/DivU64x32Remainder.S
-  Ia32/ModU64x32.S
-  Ia32/DivU64x32.S
-  Ia32/MultU64x64.S
-  Ia32/MultU64x32.S
-  Ia32/RRotU64.S
-  Ia32/LRotU64.S
-  Ia32/ARShiftU64.S
-  Ia32/RShiftU64.S
-  Ia32/LShiftU64.S
+  Ia32/EnablePaging32.c || MSFT |||
+  Ia32/EnableInterrupts.c || MSFT |||
+  Ia32/EnableDisableInterrupts.c || MSFT |||
+  Ia32/DivU64x64Remainder.c || MSFT |||
+  Ia32/DivU64x32Remainder.c || MSFT |||
+  Ia32/DivU64x32.c || MSFT |||
+  Ia32/DisablePaging32.c || MSFT |||
+  Ia32/DisableInterrupts.c || MSFT |||
+  Ia32/CpuPause.c || MSFT |||
+  Ia32/CpuIdEx.c || MSFT |||
+  Ia32/CpuId.c || MSFT |||
+  Ia32/CpuSleep.c || MSFT |||
+  Ia32/CpuFlushTlb.c || MSFT |||
+  Ia32/CpuBreakpoint.c || MSFT |||
+  Ia32/ARShiftU64.c || MSFT |||
+  Ia32/Thunk16.S || GCC |||
+  Ia32/CpuFlushTlb.S || GCC |||
+  Ia32/CpuBreakpoint.S || GCC |||
+  Ia32/CpuPause.S || GCC |||
+  Ia32/CpuSleep.S || GCC |||
+  Ia32/EnableDisableInterrupts.S || GCC |||
+  Ia32/DisableInterrupts.S || GCC |||
+  Ia32/EnableInterrupts.S || GCC |||
+  Ia32/InterlockedCompareExchange64.S || GCC |||
+  Ia32/InterlockedCompareExchange32.S || GCC |||
+  Ia32/InterlockedDecrement.S || GCC |||
+  Ia32/InterlockedIncrement.S || GCC |||
+  Ia32/FlushCacheLine.S || GCC |||
+  Ia32/Invd.S || GCC |||
+  Ia32/Wbinvd.S || GCC |||
+  Ia32/EnablePaging64.S || GCC |||
+  Ia32/DisablePaging32.S || GCC |||
+  Ia32/EnablePaging32.S || GCC |||
+  Ia32/Mwait.S || GCC |||
+  Ia32/Monitor.S || GCC |||
+  Ia32/ReadPmc.S || GCC |||
+  Ia32/ReadTsc.S || GCC |||
+  Ia32/WriteMm7.S || GCC |||
+  Ia32/WriteMm6.S || GCC |||
+  Ia32/WriteMm5.S || GCC |||
+  Ia32/WriteMm4.S || GCC |||
+  Ia32/WriteMm3.S || GCC |||
+  Ia32/WriteMm2.S || GCC |||
+  Ia32/WriteMm1.S || GCC |||
+  Ia32/WriteMm0.S || GCC |||
+  Ia32/ReadMm7.S || GCC |||
+  Ia32/ReadMm6.S || GCC |||
+  Ia32/ReadMm5.S || GCC |||
+  Ia32/ReadMm4.S || GCC |||
+  Ia32/ReadMm3.S || GCC |||
+  Ia32/ReadMm2.S || GCC |||
+  Ia32/ReadMm1.S || GCC |||
+  Ia32/ReadMm0.S || GCC |||
+  Ia32/FxRestore.S || GCC |||
+  Ia32/FxSave.S || GCC |||
+  Ia32/WriteLdtr.S || GCC |||
+  Ia32/ReadLdtr.S || GCC |||
+  Ia32/WriteIdtr.S || GCC |||
+  Ia32/ReadIdtr.S || GCC |||
+  Ia32/WriteGdtr.S || GCC |||
+  Ia32/ReadGdtr.S || GCC |||
+  Ia32/ReadTr.S || GCC |||
+  Ia32/ReadSs.S || GCC |||
+  Ia32/ReadGs.S || GCC |||
+  Ia32/ReadFs.S || GCC |||
+  Ia32/ReadEs.S || GCC |||
+  Ia32/ReadDs.S || GCC |||
+  Ia32/ReadCs.S || GCC |||
+  Ia32/WriteDr7.S || GCC |||
+  Ia32/WriteDr6.S || GCC |||
+  Ia32/WriteDr5.S || GCC |||
+  Ia32/WriteDr4.S || GCC |||
+  Ia32/WriteDr3.S || GCC |||
+  Ia32/WriteDr2.S || GCC |||
+  Ia32/WriteDr1.S || GCC |||
+  Ia32/WriteDr0.S || GCC |||
+  Ia32/ReadDr7.S || GCC |||
+  Ia32/ReadDr6.S || GCC |||
+  Ia32/ReadDr5.S || GCC |||
+  Ia32/ReadDr4.S || GCC |||
+  Ia32/ReadDr3.S || GCC |||
+  Ia32/ReadDr2.S || GCC |||
+  Ia32/ReadDr1.S || GCC |||
+  Ia32/ReadDr0.S || GCC |||
+  Ia32/WriteCr4.S || GCC |||
+  Ia32/WriteCr3.S || GCC |||
+  Ia32/WriteCr2.S || GCC |||
+  Ia32/WriteCr0.S || GCC |||
+  Ia32/ReadCr4.S || GCC |||
+  Ia32/ReadCr3.S || GCC |||
+  Ia32/ReadCr2.S || GCC |||
+  Ia32/ReadCr0.S || GCC |||
+  Ia32/WriteMsr64.S || GCC |||
+  Ia32/ReadMsr64.S || GCC |||
+  Ia32/ReadEflags.S || GCC |||
+  Ia32/CpuIdEx.S || GCC |||
+  Ia32/CpuId.S || GCC |||
+  Ia32/LongJump.S || GCC |||
+  Ia32/SetJump.S || GCC |||
+  Ia32/SwapBytes64.S || GCC |||
+  Ia32/DivU64x64Remainder.S || GCC |||
+  Ia32/DivU64x32Remainder.S || GCC |||
+  Ia32/ModU64x32.S || GCC |||
+  Ia32/DivU64x32.S || GCC |||
+  Ia32/MultU64x64.S || GCC |||
+  Ia32/MultU64x32.S || GCC |||
+  Ia32/RRotU64.S || GCC |||
+  Ia32/LRotU64.S || GCC |||
+  Ia32/ARShiftU64.S || GCC |||
+  Ia32/RShiftU64.S || GCC |||
+  Ia32/LShiftU64.S || GCC |||
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c
   Ia32/Non-existing.c
@@ -296,16 +296,16 @@
 [Sources.X64]
   X64/Thunk16.asm
   X64/CpuFlushTlb.asm
-  X64/CpuBreakpoint.c
+  X64/CpuBreakpoint.c || MSFT |||
   X64/CpuPause.asm
   X64/CpuSleep.asm
   X64/EnableDisableInterrupts.asm
   X64/DisableInterrupts.asm
   X64/EnableInterrupts.asm
-  X64/InterlockedCompareExchange64.asm
-  X64/InterlockedCompareExchange32.asm
-  X64/InterlockedDecrement.c
-  X64/InterlockedIncrement.c
+  X64/InterlockedCompareExchange64.asm || MSFT |||
+  X64/InterlockedCompareExchange32.asm || MSFT |||
+  X64/InterlockedDecrement.c || MSFT |||
+  X64/InterlockedIncrement.c || MSFT |||
   X64/FlushCacheLine.asm
   X64/Invd.asm
   X64/Wbinvd.asm
@@ -370,8 +370,8 @@
   X64/ReadCr3.asm
   X64/ReadCr2.asm
   X64/ReadCr0.asm
-  X64/WriteMsr64.c
-  X64/ReadMsr64.c
+  X64/WriteMsr64.c || MSFT |||
+  X64/ReadMsr64.c || MSFT |||
   X64/ReadEflags.asm
   X64/CpuIdEx.asm
   X64/CpuId.asm
@@ -395,90 +395,90 @@
   x86EnablePaging32.c
   x86DisablePaging64.c
   x86DisablePaging32.c
-  X64/WriteMsr64.S
-  X64/WriteMm7.S
-  X64/WriteMm6.S
-  X64/WriteMm5.S
-  X64/WriteMm4.S
-  X64/WriteMm3.S
-  X64/WriteMm2.S
-  X64/WriteMm1.S
-  X64/WriteMm0.S
-  X64/WriteLdtr.S
-  X64/WriteIdtr.S
-  X64/WriteGdtr.S
-  X64/WriteDr7.S
-  X64/WriteDr6.S
-  X64/WriteDr5.S
-  X64/WriteDr4.S
-  X64/WriteDr3.S
-  X64/WriteDr2.S
-  X64/WriteDr1.S
-  X64/WriteDr0.S
-  X64/WriteCr4.S
-  X64/WriteCr3.S
-  X64/WriteCr2.S
-  X64/WriteCr0.S
-  X64/Wbinvd.S
-  X64/Thunk16.S
-  X64/SwitchStack.S
-  X64/SetJump.S
-  X64/ReadTsc.S
-  X64/ReadTr.S
-  X64/ReadSs.S
-  X64/ReadPmc.S
-  X64/ReadMsr64.S
-  X64/ReadMm7.S
-  X64/ReadMm6.S
-  X64/ReadMm5.S
-  X64/ReadMm4.S
-  X64/ReadMm3.S
-  X64/ReadMm2.S
-  X64/ReadMm1.S
-  X64/ReadMm0.S
-  X64/ReadLdtr.S
-  X64/ReadIdtr.S
-  X64/ReadGs.S
-  X64/ReadGdtr.S
-  X64/ReadFs.S
-  X64/ReadEs.S
-  X64/ReadEflags.S
-  X64/ReadDs.S
-  X64/ReadDr7.S
-  X64/ReadDr6.S
-  X64/ReadDr5.S
-  X64/ReadDr4.S
-  X64/ReadDr3.S
-  X64/ReadDr2.S
-  X64/ReadDr1.S
-  X64/ReadDr0.S
-  X64/ReadCs.S
-  X64/ReadCr4.S
-  X64/ReadCr3.S
-  X64/ReadCr2.S
-  X64/ReadCr0.S
-  X64/Mwait.S
-  X64/Monitor.S
-  X64/LongJump.S
-  X64/Invd.S
-  X64/InterlockedIncrement.S
-  X64/InterlockedDecrement.S
-  X64/InterlockedCompareExchange64.S
-  X64/InterlockedCompareExchange32.S
-  X64/FxSave.S
-  X64/FxRestore.S
-  X64/FlushCacheLine.S
-  X64/EnablePaging64.S
-  X64/EnableInterrupts.S
-  X64/EnableDisableInterrupts.S
-  X64/DisablePaging64.S
-  X64/DisableInterrupts.S
-  X64/CpuSleep.S
-  X64/CpuPause.S
-  X64/CpuId.S
-  X64/CpuIdEx.S
-  X64/CpuFlushTlb.S
-  X64/CpuBreakpoint.S
+  X64/WriteMsr64.S || GCC |||
+  X64/WriteMm7.S || GCC |||
+  X64/WriteMm6.S || GCC |||
+  X64/WriteMm5.S || GCC |||
+  X64/WriteMm4.S || GCC |||
+  X64/WriteMm3.S || GCC |||
+  X64/WriteMm2.S || GCC |||
+  X64/WriteMm1.S || GCC |||
+  X64/WriteMm0.S || GCC |||
+  X64/WriteLdtr.S || GCC |||
+  X64/WriteIdtr.S || GCC |||
+  X64/WriteGdtr.S || GCC |||
+  X64/WriteDr7.S || GCC |||
+  X64/WriteDr6.S || GCC |||
+  X64/WriteDr5.S || GCC |||
+  X64/WriteDr4.S || GCC |||
+  X64/WriteDr3.S || GCC |||
+  X64/WriteDr2.S || GCC |||
+  X64/WriteDr1.S || GCC |||
+  X64/WriteDr0.S || GCC |||
+  X64/WriteCr4.S || GCC |||
+  X64/WriteCr3.S || GCC |||
+  X64/WriteCr2.S || GCC |||
+  X64/WriteCr0.S || GCC |||
+  X64/Wbinvd.S || GCC |||
+  X64/Thunk16.S || GCC |||
+  X64/SwitchStack.S || GCC |||
+  X64/SetJump.S || GCC |||
+  X64/ReadTsc.S || GCC |||
+  X64/ReadTr.S || GCC |||
+  X64/ReadSs.S || GCC |||
+  X64/ReadPmc.S || GCC |||
+  X64/ReadMsr64.S || GCC |||
+  X64/ReadMm7.S || GCC |||
+  X64/ReadMm6.S || GCC |||
+  X64/ReadMm5.S || GCC |||
+  X64/ReadMm4.S || GCC |||
+  X64/ReadMm3.S || GCC |||
+  X64/ReadMm2.S || GCC |||
+  X64/ReadMm1.S || GCC |||
+  X64/ReadMm0.S || GCC |||
+  X64/ReadLdtr.S || GCC |||
+  X64/ReadIdtr.S || GCC |||
+  X64/ReadGs.S || GCC |||
+  X64/ReadGdtr.S || GCC |||
+  X64/ReadFs.S || GCC |||
+  X64/ReadEs.S || GCC |||
+  X64/ReadEflags.S || GCC |||
+  X64/ReadDs.S || GCC |||
+  X64/ReadDr7.S || GCC |||
+  X64/ReadDr6.S || GCC |||
+  X64/ReadDr5.S || GCC |||
+  X64/ReadDr4.S || GCC |||
+  X64/ReadDr3.S || GCC |||
+  X64/ReadDr2.S || GCC |||
+  X64/ReadDr1.S || GCC |||
+  X64/ReadDr0.S || GCC |||
+  X64/ReadCs.S || GCC |||
+  X64/ReadCr4.S || GCC |||
+  X64/ReadCr3.S || GCC |||
+  X64/ReadCr2.S || GCC |||
+  X64/ReadCr0.S || GCC |||
+  X64/Mwait.S || GCC |||
+  X64/Monitor.S || GCC |||
+  X64/LongJump.S || GCC |||
+  X64/Invd.S || GCC |||
+  X64/InterlockedIncrement.S || GCC |||
+  X64/InterlockedDecrement.S || GCC |||
+  X64/InterlockedCompareExchange64.S || GCC |||
+  X64/InterlockedCompareExchange32.S || GCC |||
+  X64/FxSave.S || GCC |||
+  X64/FxRestore.S || GCC |||
+  X64/FlushCacheLine.S || GCC |||
+  X64/EnablePaging64.S || GCC |||
+  X64/EnableInterrupts.S || GCC |||
+  X64/EnableDisableInterrupts.S || GCC |||
+  X64/DisablePaging64.S || GCC |||
+  X64/DisableInterrupts.S || GCC |||
+  X64/CpuSleep.S || GCC |||
+  X64/CpuPause.S || GCC |||
+  X64/CpuId.S || GCC |||
+  X64/CpuIdEx.S || GCC |||
+  X64/CpuFlushTlb.S || GCC |||
+  X64/CpuBreakpoint.S || GCC |||
   Synchronization.c     || INTEL |||
   SynchronizationMsc.c  || MSFT |||
   SynchronizationGcc.c  || GCC |||
