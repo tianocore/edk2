@@ -106,6 +106,7 @@
   BaseMemoryLib|Include/Library/BaseMemoryLib.h
   BaseLib|Include/Library/BaseLib.h
   BasePeCoffLib|Include/Library/PeCoffLib.h
+  GraphicsLib|Include/Library/GraphicsLib.h
   
 [LibraryClasses.IPF]
   SalLib|Include/Library/SalLib.h
