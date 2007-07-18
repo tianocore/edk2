@@ -607,7 +607,7 @@ EFI_STATUS
 
 **/
 typedef struct {
-  EFI_FVB2_ATTRIBUTES FvAttributes;
+  EFI_FVB_ATTRIBUTES  FvAttributes;
   EFI_GUID            FvFormat;
   EFI_GUID            FvName;
   VOID                *FvStart;
