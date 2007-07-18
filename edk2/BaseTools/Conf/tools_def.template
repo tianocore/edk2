@@ -77,7 +77,6 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 *_VS2003_IA32_APP_NAME          = cl.exe
 *_VS2003_IA32_PP_NAME           = cl.exe
 *_VS2003_IA32_ASM_NAME          = ml.exe
-*_VS2003_IA32_ASM_EXT           = .asm
 *_VS2003_IA32_PCH_NAME          = cl.exe
 
 ##################
@@ -125,7 +124,6 @@ RELEASE_VS2003_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /O
 # IA32 definitions
 ##################
 *_WINDDK3790x1830_IA32_ASM_NAME          = ml.exe
-*_WINDDK3790x1830_IA32_ASM_EXT           = .asm
 *_WINDDK3790x1830_IA32_*_PATH            = C:\WINDDK\3790.1830\bin\x86
 *_WINDDK3790x1830_IA32_*_DPATH           = C:\WINDDK\3790.1830\bin\x86
 *_WINDDK3790x1830_IA32_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
@@ -145,7 +143,6 @@ RELEASE_WINDDK3790x1830_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 # x64 definitions
 ##################
 *_WINDDK3790x1830_X64_ASM_NAME          = ml64.exe
-*_WINDDK3790x1830_X64_ASM_EXT           = .asm
 *_WINDDK3790x1830_X64_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86\amd64
 *_WINDDK3790x1830_X64_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
 
@@ -163,7 +160,6 @@ RELEASE_WINDDK3790x1830_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OP
 # IPF definitions
 ##################
 *_WINDDK3790x1830_IPF_ASM_NAME          = ias.exe
-*_WINDDK3790x1830_IPF_ASM_EXT           = .s
 *_WINDDK3790x1830_IPF_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86
 
 *_WINDDK3790x1830_IPF_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
@@ -229,7 +225,6 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 # IA32 definitions
 ##################
 #*_VS2005EXP_IA32_ASM_NAME     = ml.exe
-#*_VS2005EXP_IA32_ASM_EXT      = .asm
 #*_VS2005EXP_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 #*_VS2005EXP_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 #*_VS2005EXP_IA32_ASM_PATH     = C:\WINDDK\3790.1830\bin\x86
@@ -298,7 +293,6 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 # IA32 definitions
 ##################
 #*_VS2005STD_IA32_ASM_NAME     = ml.exe
-#*_VS2005STD_IA32_ASM_EXT      = .asm
 #*_VS2005STD_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 #*_VS2005STD_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 #*_VS2005STD_IA32_ASM_PATH     = C:\WINDDK\3790.1830\bin\x86
@@ -364,7 +358,6 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:
 # IA32 definitions
 ##################
 *_VS2005PRO_IA32_ASM_NAME     = ml.exe
-*_VS2005PRO_IA32_ASM_EXT      = .asm
 *_VS2005PRO_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 *_VS2005PRO_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 *_VS2005PRO_IA32_ASM_PATH     = C:\WINDDK\3790.1830\bin\x86
@@ -384,7 +377,6 @@ RELEASE_VS2005PRO_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF
 # x64 definitions
 ##################
 *_VS2005PRO_X64_ASM_NAME       = ml64.exe
-*_VS2005PRO_X64_ASM_EXT        = .asm
 *_VS2005PRO_X64_*_PATH         = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_amd64
 *_VS2005PRO_X64_*_DPATH        = C:\Program Files\Microsoft Visual Studio 8\VC\bin\x86_amd64;C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 *_VS2005PRO_X64_ASMLINK_PATH   = C:\WINDDK\3790.1830\bin\bin16\
@@ -451,7 +443,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 # IA32 definitions
 ##################
 #*_VS2005TEAMSUITE_IA32_ASM_NAME     = ml.exe
-#*_VS2005TEAMSUITE_IA32_ASM_EXT      = .asm
 #*_VS2005TEAMSUITE_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 #*_VS2005TEAMSUITE_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 #*_VS2005TEAMSUITE_IA32_ASM_PATH     = C:\WINDDK\3790.1830\bin\x86
@@ -471,7 +462,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 # x64 definitions
 ##################
 #*_VS2005TEAMSUITE_X64_ASM_NAME       = ml64.exe
-#*_VS2005TEAMSUITE_X64_ASM_EXT        = .asm
 #*_VS2005TEAMSUITE_X64_*_PATH         = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_amd64
 #*_VS2005TEAMSUITE_X64_*_DPATH        = C:\Program Files\Microsoft Visual Studio 8\VC\bin\x86_amd64;C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 #*_VS2005TEAMSUITE_X64_ASMLINK_PATH   = C:\WINDDK\3790.1830\bin\bin16\
@@ -489,7 +479,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 # IPF definitions
 ##################
 #*_VS2005TEAMSUITE_IPF_ASM_NAME          = ias.exe
-#*_VS2005TEAMSUITE_IPF_ASM_EXT           = .s
 #*_VS2005TEAMSUITE_IPF_*_PATH            = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 #*_VS2005TEAMSUITE_IPF_*_DPATH           = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 
@@ -560,10 +549,9 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 *_UNIXGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include $(DEST_DIR_DEBUG)/AutoGen.h -D_EFI_P64
 
 *_UNIXGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(ENTRYPOINT) --file-alignment 0x20 --section-alignment 0x20
-*_UNIXGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=_##name
+*_UNIXGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
-*_UNIXGCC_*_ASM_EXT         = .S
 
 
 ####################################################################################
@@ -595,10 +583,9 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_CYGWINGCC_X64_CC_FLAGS      = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include $(DEST_DIR_DEBUG)/AutoGen.h -D_EFI_P64
 *_CYGWINGCC_*_DLINK_FLAGS     = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(ENTRYPOINT) --file-alignment 0x20 --section-alignment 0x20
-*_CYGWINGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=_##name
+*_CYGWINGCC_*_ASM_FLAGS       = -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_CYGWINGCC_*_PP_FLAGS        = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_CYGWINGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
-*_CYGWINGCC_*_ASM_EXT         = .S
 
 *_CYGWINGCC_*_*_DPATH         = c:/Cygwin/bin
 
@@ -620,10 +607,9 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 
 *_ELFGCC_IA32_CC_FLAGS     = -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 *_ELFGCC_*_DLINK_FLAGS     = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry $(ENTRYPOINT) -u $(ENTRYPOINT)
-*_ELFGCC_*_ASM_FLAGS       = -m32 -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h -DASM_PFX(name)=name
+*_ELFGCC_*_ASM_FLAGS       = -m32 -c -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_*_PP_FLAGS        = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_*_VFRPP_FLAGS     = -x c -E -P -DVFRCOMPILE --include AutoGen.h
-*_ELFGCC_*_ASM_EXT         = .S
 
 *_ELFGCC_IA32_*_PATH       = /usr/bin
 
@@ -694,7 +680,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF 
 ##################
 *_ICC_IA32_*_PATH            = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
 *_ICC_IA32_PCH_NAME          = cl.exe
-*_ICC_IA32_ASM_EXT           = .asm
 *_ICC_IA32_*_DPATH           = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
 *_ICC_IA32_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
 
@@ -726,7 +711,6 @@ RELEASE_ICC_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:
 #*_ICC_IPF_PCH_NAME          = icl.exe
 *_ICC_IPF_APP_NAME          = icl.exe
 *_ICC_IPF_ASM_NAME          = ias.exe
-*_ICC_IPF_ASM_EXT           = .s
 
 *_ICC_IPF_APP_FLAGS         = /nologo /E /TC
 *_ICC_IPF_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
@@ -773,7 +757,7 @@ RELEASE_ICC_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGN
 
 *_MYTOOLS_*_LZMA_NAME = Lzma.bat
 *_MYTOOLS_*_LZMA_GUID = EE4E5898-3914-4259-9D6E-DC7B-D79403CF
-*_MYTOOLS_*_LAMA_PATH =
+*_MYTOOLS_*_LZMA_PATH =
 
 *_MYTOOLS_*_TIANO_NAME = Tiano.bat
 *_MYTOOLS_*_TIANO_GUID = A31280AD-481E-41B6-95E8-127F-4C984779
@@ -783,7 +767,6 @@ RELEASE_ICC_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGN
 # IA32 definitions
 ##################
 *_MYTOOLS_IA32_PCH_NAME          = cl.exe
-*_MYTOOLS_IA32_ASM_EXT           = .asm
 
 *_MYTOOLS_IA32_*_PATH            = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
 *_MYTOOLS_IA32_*_DPATH           = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
@@ -807,7 +790,6 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /
 ##################
 *_MYTOOLS_X64_PCH_NAME          = cl.exe
 *_MYTOOLS_X64_ASM_NAME          = ml64.exe
-*_MYTOOLS_X64_ASM_EXT           = .asm
 
 *_MYTOOLS_X64_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86\amd64
 *_MYTOOLS_X64_ASMLINK_PATH      = C:\WINDDK\3790.1830\bin\bin16\
@@ -829,7 +811,7 @@ RELEASE_MYTOOLS_X64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /O
 ##################
 *_MYTOOLS_IPF_PCH_NAME          = cl.exe
 *_MYTOOLS_IPF_ASM_NAME          = ias.exe
-*_MYTOOLS_IPF_ASM_EXT           = .s
+*_MYTOOLS_IPF_ASM_OUTPUT        = "-o "
 
 *_MYTOOLS_IPF_*_PATH            = C:\WINDDK\3790.1830\bin\win64\x86
 

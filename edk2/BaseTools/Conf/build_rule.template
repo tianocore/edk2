@@ -50,7 +50,7 @@ DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL"]
 
 ToolCodeMapping = {
     "C-Code"                        :   ["CC"],
-    "C-Header"                      :   ["PCH"],
+#    "C-Header"                      :   ["PCH"],
     "Masm-Code"                     :   ["PP", "ASM"],
     "Iasm-Code"                     :   ["PP", "ASM"],      # IPF assembly code
     "Gasm-Code"                     :   ["ASM"],          	# GNU assembly code
@@ -87,67 +87,71 @@ ToolChainFamilyMapping = {
 #   ${fbase}	File name without extension and path
 #   ${fext}   File extension
 #   ${fdep}   File dependencies
-#   ${sep}    Directory separator
+#   ${_sep_}    Directory separator
+#   ${_of_}     Output flag
+#   ${_if_}     Include flag
 #
 Makefile = {
-"nmake"	: {
+"MSFT"	: {
 "C-Code"    : '''\
-$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}	"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath}
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
 ''',
 
 "Masm-Code" : '''\
-$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}	"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
-	Trim -CONVERT $(@D)${sep}${fbase}.i
-	"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${sep}${fbase}.iii
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\tTrim -CONVERT $(@D)${_sep_}${fbase}.i
+\t"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${_sep_}${fbase}.iii
 ''',
 
 "Iasm-Code" : '''\
-$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
-	"$(ASM)" -o$@ $(ASM_FLAGS) $(@D)${sep}${fbase}.i
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\t"$(ASM)" -o $@ $(ASM_FLAGS) $(@D)${_sep_}${fbase}.i
 ''',
 
 "Visual-Form-Representation" : '''\
-$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
-${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
-\tTrim -VFR $(@D)${sep}${fbase}.i
-\t-mkdir $(DEBUG_DIR)${sep}${fdir} > NUL 2>&1
-\tVfrCompile -od $(DEBUG_DIR)${sep}${fdir} $(@D)${sep}${fbase}.iii
-\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${sep}${fdir}${sep}${fbase}.c
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
+\tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
+\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
 ''',
 },
 
-"gmake" : {
+
+"GCC" : {
+
 "C-Code"    : 
-'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
-\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $<''',
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(CC)" -o $@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
+''',
 
-"Masm-Code" : 
-'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
-\t"$(PP)" $(PP_FLAGS) $(INC) $? $(PP_OUTPUT)$(@D)/%(fbase)s.i
-\tTrim -CONVERT $(@D)/%(fbase)s.i
-\t"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)/%(fbase)s.iii''',
-    
 "Gasm-Code" : 
-'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
-\t"$(ASM)" $(ASM_FLAGS) $(INC) $(ASM_OUTPUT)$@ $<''',
-
-"Iasm-Code" : 
-'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
-\t"$(APP)" $(APP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)/%(fbase)s.i
-\t"$(ASM)" $(ASM_FLAGS) $(ASM_OUTPUT)$@ $(@D)/%(fbase)s.i''',
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(ASM)" -o $@ $(ASM_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
+''',
 
 "Visual-Form-Representation" : 
-'''$(OUTPUT_DIR)/%(fdir)s/%(fbase)s.obj : $(MODULE_DIR)/%(fdir)s/%(fname)s $(DEP_FILES)
-\t"$(PP)" $(PP_FLAGS) $(INC) $< $(PP_OUTPUT)$(@D)/%(fbase)s.i
-\t"$(VFRC)" $(VFRC_FLAGS) $(INC) $(VFRC_OUTPUT)$(DEBUG_DIR)/%(fdir)s/%(fbase)s.c $(@D)/%(fbase)s.i
-\t"$(CC)" $(CC_FLAGS) $(INC) $(CC_OUTPUT)$@ $(DEBUG_DIR)/%(fdir)s/%(fbase)s.c''',
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} -o $(@D)${_sep_}${fbase}.i
+\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
+\tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
+\t"$(CC)" -o $@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
+''',
 }
 }
 
