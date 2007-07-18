@@ -22,7 +22,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DebugPort
+  BASE_NAME                      = DebugPortDxe
   FILE_GUID                      = 73E9457A-CEA1-4917-9A9C-9F1F0F0FD322
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0

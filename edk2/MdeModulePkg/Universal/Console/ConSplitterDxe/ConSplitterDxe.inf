@@ -21,7 +21,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ConSplitter
+  BASE_NAME                      = ConSplitterDxe
   FILE_GUID                      = 408edcec-cf6d-477c-a5a8-b4844e3de281
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

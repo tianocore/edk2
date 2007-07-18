@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ConPlatform
+  BASE_NAME                      = ConPlatformDxe
   FILE_GUID                      = 51ccf399-4fdf-4e55-a45b-e123f84d456a
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
