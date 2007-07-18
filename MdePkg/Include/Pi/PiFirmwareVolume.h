@@ -30,7 +30,7 @@ typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 #define EFI_FV_FILE_ATTRIB_FIXED          0x00000100
 #define EFI_FV_FILE_ATTRIB_MEMORY_MAPPED  0x00000200
 
-typedef UINT32  EFI_FVB2_ATTRIBUTES;
+typedef UINT32  EFI_FVB_ATTRIBUTES;
 
 // 
 // Attributes bit definitions
@@ -98,7 +98,7 @@ typedef struct {
   EFI_GUID                  FileSystemGuid;
   UINT64                    FvLength;
   UINT32                    Signature;
-  EFI_FVB2_ATTRIBUTES        Attributes;
+  EFI_FVB_ATTRIBUTES        Attributes;
   UINT16                    HeaderLength;
   UINT16                    Checksum;
   UINT16                    ExtHeaderOffset;
