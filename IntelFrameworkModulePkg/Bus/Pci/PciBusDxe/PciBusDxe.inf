@@ -23,7 +23,7 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PciBus
+  BASE_NAME                      = PciBusDxe
   FILE_GUID                      = 93B80004-9FB3-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
