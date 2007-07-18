@@ -58,68 +58,6 @@
 #define USB_DEV_SYNCH_FRAME                 0x0C
 #define USB_DEV_SYNCH_FRAME_REQ_TYPE        0x82
 
-//
-// Definitions defined in UEFI spec
-//
-
-//
-// USB Transfer Results
-//
-#define EFI_USB_NOERROR             0x00
-#define EFI_USB_ERR_NOTEXECUTE      0x01
-#define EFI_USB_ERR_STALL           0x02
-#define EFI_USB_ERR_BUFFER          0x04
-#define EFI_USB_ERR_BABBLE          0x08
-#define EFI_USB_ERR_NAK             0x10
-#define EFI_USB_ERR_CRC             0x20
-#define EFI_USB_ERR_TIMEOUT         0x40
-#define EFI_USB_ERR_BITSTUFF        0x80
-#define EFI_USB_ERR_SYSTEM          0x100
-
-//
-// Constant value for Port Status & Port Change Status
-//
-#define USB_PORT_STAT_CONNECTION    0x0001
-#define USB_PORT_STAT_ENABLE        0x0002
-#define USB_PORT_STAT_SUSPEND       0x0004
-#define USB_PORT_STAT_OVERCURRENT   0x0008
-#define USB_PORT_STAT_RESET         0x0010
-#define USB_PORT_STAT_POWER         0x0100
-#define USB_PORT_STAT_LOW_SPEED     0x0200
-#define USB_PORT_STAT_HIGH_SPEED    0x0400
-#define USB_PORT_STAT_OWNER         0x0800
-
-#define USB_PORT_STAT_C_CONNECTION  0x0001
-#define USB_PORT_STAT_C_ENABLE      0x0002
-#define USB_PORT_STAT_C_SUSPEND     0x0004
-#define USB_PORT_STAT_C_OVERCURRENT 0x0008
-#define USB_PORT_STAT_C_RESET       0x0010
-
-//
-// USB data transfer direction
-//
-typedef enum {
-  EfiUsbDataIn,
-  EfiUsbDataOut,
-  EfiUsbNoData
-} EFI_USB_DATA_DIRECTION;
-
-//
-// Usb port features
-//
-typedef enum {
-  EfiUsbPortEnable            = 1,
-  EfiUsbPortSuspend           = 2,
-  EfiUsbPortReset             = 4,
-  EfiUsbPortPower             = 8,
-  EfiUsbPortOwner             = 13,
-  EfiUsbPortConnectChange     = 16,
-  EfiUsbPortEnableChange      = 17,
-  EfiUsbPortSuspendChange     = 18,
-  EfiUsbPortOverCurrentChange = 19,
-  EfiUsbPortResetChange       = 20
-} EFI_USB_PORT_FEATURE;
-
 
 //
 // USB standard descriptors and reqeust
@@ -131,7 +69,7 @@ typedef struct {
   UINT16          Value;
   UINT16          Index;
   UINT16          Length;
-} EFI_USB_DEVICE_REQUEST;
+} USB_DEVICE_REQUEST;
 
 typedef struct {
   UINT8           Length;
@@ -148,7 +86,7 @@ typedef struct {
   UINT8           StrProduct;
   UINT8           StrSerialNumber;
   UINT8           NumConfigurations;
-} EFI_USB_DEVICE_DESCRIPTOR;
+} USB_DEVICE_DESCRIPTOR;
 
 typedef struct {
   UINT8           Length;
@@ -159,7 +97,7 @@ typedef struct {
   UINT8           Configuration;
   UINT8           Attributes;
   UINT8           MaxPower;
-} EFI_USB_CONFIG_DESCRIPTOR;
+} USB_CONFIG_DESCRIPTOR;
 
 typedef struct {
   UINT8           Length;
@@ -171,7 +109,7 @@ typedef struct {
   UINT8           InterfaceSubClass;
   UINT8           InterfaceProtocol;
   UINT8           Interface;
-} EFI_USB_INTERFACE_DESCRIPTOR;
+} USB_INTERFACE_DESCRIPTOR;
 
 typedef struct {
   UINT8           Length;
@@ -180,7 +118,7 @@ typedef struct {
   UINT8           Attributes;
   UINT16          MaxPacketSize;
   UINT8           Interval;
-} EFI_USB_ENDPOINT_DESCRIPTOR;
+} USB_ENDPOINT_DESCRIPTOR;
 
 typedef struct {
   UINT8           Length;
@@ -190,16 +128,7 @@ typedef struct {
 
 #pragma pack()
 
-typedef struct {
-  UINT16          PortStatus;
-  UINT16          PortChangeStatus;
-} EFI_USB_PORT_STATUS;
 
-
-//
-// Following are definitions not specified by UEFI spec.
-// Add new definitions below this line
-//
 enum {
   //
   // USB request type
