@@ -60,6 +60,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
 ################################################################################
@@ -84,4 +85,4 @@
 
 [Protocols]
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
