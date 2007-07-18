@@ -95,7 +95,7 @@ Makefile = {
 "C-Code"    : '''\
 $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
-${END}	"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(WORKSPACE)${sep}${fpath}
+${END}	"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath}
 ''',
 
 "Masm-Code" : '''\
@@ -103,14 +103,14 @@ $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
 ${END}	"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
 	Trim -CONVERT $(@D)${sep}${fbase}.i
-	"$(ASM)" $(ASM_FLAGS) /Fo$@ $(@D)${sep}${fbase}.iii
+	"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${sep}${fbase}.iii
 ''',
 
 "Iasm-Code" : '''\
 $(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${sep}${fdir}${sep}${fbase}.obj : $(WORKSPACE)${sep}${fdep}
 ${END}	"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${fbase}.i
-	"$(ASM)" $(ASM_FLAGS) -o$@ $(@D)${sep}${fbase}.i
+	"$(ASM)" -o$@ $(ASM_FLAGS) $(@D)${sep}${fbase}.i
 ''',
 
 "Visual-Form-Representation" : '''\
@@ -120,7 +120,7 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${sep}${fpath} > $(@D)${sep}${
 \tTrim -VFR $(@D)${sep}${fbase}.i
 \t-mkdir $(DEBUG_DIR)${sep}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${sep}${fdir} $(@D)${sep}${fbase}.iii
-\t"$(CC)" $(CC_FLAGS) $(INC) /Fo$@ $(DEBUG_DIR)${sep}${fdir}${sep}${fbase}.c
+\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${sep}${fdir}${sep}${fbase}.c
 ''',
 },
 
