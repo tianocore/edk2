@@ -1,7 +1,7 @@
 #/** @file
-# Component description file for DebugSupport module.
+# Component description file for MonotonicCounter module.
 #
-# This driver installs DebugSupport protocol for the selected processor.
+# This module produces UEFI Monotonic Counter Boot and Runtime Services.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,19 +21,19 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DebugSupport
-  FILE_GUID                      = 911D584C-35F7-4955-BEF9-B452769DDC3A
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = MonotonicCounterRuntimeDxe
+  FILE_GUID                      = AD608272-D07F-4964-801E-7BD3B7888652
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = InitializeDebugSupportDriver
+  ENTRY_POINT                    = MonotonicCounterDriverInitialize
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 ################################################################################
@@ -43,26 +43,8 @@
 ################################################################################
 
 [Sources.common]
-  DebugSupport.c
-
-[Sources.Ia32]
-  Ia32/plDebugSupport.c
-  Ia32/plDebugSupport.h
-  Ia32/AsmFuncs.S
-  Ia32/AsmFuncs.asm
-
-[Sources.X64]
-  x64/plDebugSupport.c
-  x64/plDebugSupport.h
-  x64/AsmFuncs.S
-  x64/AsmFuncs.asm
-
-[Sources.IPF]
-  ipf/plDebugSupport.h
-  ipf/plDebugSupport.c
-  ipf/Ds64Macros.i
-  ipf/common.i
-  ipf/AsmFuncs.s
+  MonotonicCounter.h
+  MonotonicCounter.c
 
 
 ################################################################################
@@ -74,7 +56,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
 
 
 ################################################################################
@@ -85,17 +66,11 @@
 ################################################################################
 
 [LibraryClasses]
+  UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
-  MemoryAllocationLib
-  BaseMemoryLib
-  UefiDriverEntryPoint
   DebugLib
-
-[LibraryClasses.IA32]
-  PcdLib
-  BaseLib
-
-[LibraryClasses.X64]
+  UefiRuntimeLib
+  UefiDriverEntryPoint
   BaseLib
 
 
@@ -107,18 +82,7 @@
 ################################################################################
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiDebugSupportProtocolGuid                  # PROTOCOL SOMETIMES_PRODUCED
-
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
-
-[PcdsFeatureFlag.IA32]
-  PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid
+  gEfiMonotonicCounterArchProtocolGuid          # PROTOCOL ALWAYS_PRODUCED
 
 
 ################################################################################
@@ -129,5 +93,5 @@
 ################################################################################
 
 [Depex]
-  TRUE
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
 
