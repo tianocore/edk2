@@ -1,7 +1,8 @@
 #/** @file
-# Component description file for DataHub module.
+# Component description file for PS2 keyboard module.
 #
-# This driver initializes and installs the Data Hub protocol.
+# IDE bus driver. This driver will enumerate IDE device and export the blockIo
+#  protocol for every device.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,19 +22,24 @@
 ################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DataHub
-  FILE_GUID                      = 53BCC14F-C24F-434C-B294-8ED2D4CC1860
+  BASE_NAME                      = IdeBusDxe
+  FILE_GUID                      = 69FD8E47-A161-4550-B01A-5594CEB2B2B2
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = DataHubInstall
+  ENTRY_POINT                    = InitializeIdeBus
 
 #
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gIDEBusDriverBinding                         
+#  COMPONENT_NAME                =  gIDEBusComponentName                         
+#  Variable Guid C Name: gConfigurationGuid Variable Name: L"Configuration"
+#
 #
 
 ################################################################################
@@ -43,8 +49,17 @@
 ################################################################################
 
 [Sources.common]
-  DataHub.h
-  DataHub.c
+  DriverDiagnostics.c
+  DriverConfiguration.c
+  ComponentName.h
+  ComponentName.c
+  atapi.c
+  ata.c
+  ide.c
+  idebus.c
+  idedata.h
+  ide.h
+  idebus.h
 
 
 ################################################################################
@@ -55,8 +70,10 @@
 ################################################################################
 
 [Packages]
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  
 
 
 ################################################################################
@@ -67,14 +84,27 @@
 ################################################################################
 
 [LibraryClasses]
+  DevicePathLib
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
+  PerformanceLib
   MemoryAllocationLib
+  ReportStatusCodeLib
   BaseMemoryLib
-  BaseLib
   UefiLib
+  BaseLib
   UefiDriverEntryPoint
   DebugLib
+
+
+################################################################################
+#
+# Guid C Name Section - list of Guids that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiDiskInfoIdeInterfaceGuid                  # SOMETIMES_CONSUMED
 
 
 ################################################################################
@@ -85,16 +115,9 @@
 ################################################################################
 
 [Protocols]
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
-
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
-
-[Depex]
-  TRUE
+  gEfiDiskInfoProtocolGuid                      # PROTOCOL BY_START
+  gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
+  gEfiIdeControllerInitProtocolGuid             # PROTOCOL TO_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
