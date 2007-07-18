@@ -46,11 +46,9 @@
 #                                provided by this package.
 #
 ################################################################################
-[LibraryClass.common]
+[LibraryClasses.common]
   HiiLibFramework|Include/Library/HiiLibFramework.h
   IfrSupportLibFramework|Include/Library/IfrSupportLibFramework.h
-
-
 
 ################################################################################
 #
