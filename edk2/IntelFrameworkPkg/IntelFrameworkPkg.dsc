@@ -68,4 +68,4 @@
   $(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   $(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   $(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/PeiSmbusLibSmbus/PeiSmbusLib.inf
+  $(WORKSPACE)/IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
