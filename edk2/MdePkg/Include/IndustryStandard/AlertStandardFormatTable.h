@@ -15,7 +15,7 @@
 #ifndef _ALERT_STANDARD_FORMAT_TABLE_H
 #define _ALERT_STANDARD_FORMAT_TABLE_H
 
-#include "Acpi2_0.h"
+#include <IndustryStandard/Acpi.h>
 
 //
 // Ensure proper structure formats
