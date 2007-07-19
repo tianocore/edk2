@@ -21,7 +21,7 @@
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/StatusCode.h>
+#include <Guid/DataHubStatusCodeRecord.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SerialIo.h>
 #include <Guid/MemoryStatusCodeRecord.h>
