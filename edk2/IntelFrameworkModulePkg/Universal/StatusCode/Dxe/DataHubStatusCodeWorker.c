@@ -281,7 +281,7 @@ LogDataHubEventCallBack (
 
     mDataHubProtocol->LogData (
                         mDataHubProtocol,
-                        &gEfiStatusCodeGuid,
+                        &gEfiDataHubStatusCodeRecordGuid,
                         &gEfiStatusCodeRuntimeProtocolGuid,
                         DataRecordClass,
                         Record,

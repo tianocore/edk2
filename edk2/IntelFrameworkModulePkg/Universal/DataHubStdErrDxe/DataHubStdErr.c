@@ -28,7 +28,7 @@ Abstract:
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/StatusCode.h>
+#include <Guid/DataHubStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SimpleTextOut.h>
@@ -96,7 +96,7 @@ Returns:
   do {
     Status = DataHub->GetNextRecord (DataHub, &Mtc, &mDataHubStdErrEvent, &Record);
     if (!EFI_ERROR (Status)) {
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiStatusCodeGuid)) {
+      if (CompareGuid (&Record->DataRecordGuid, &gEfiDataHubStatusCodeRecordGuid)) {
         DataRecord = (DATA_HUB_STATUS_CODE_DATA_RECORD *) (((CHAR8 *) Record) + Record->HeaderSize);
 
         if (DataRecord->Data.HeaderSize > 0) {

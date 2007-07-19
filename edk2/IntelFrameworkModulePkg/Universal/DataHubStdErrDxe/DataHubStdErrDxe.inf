@@ -82,7 +82,7 @@
 
 [Guids]
   gEfiStatusCodeDataTypeDebugGuid               # SOMETIMES_CONSUMED
-  gEfiStatusCodeGuid                            # SOMETIMES_CONSUMED
+  gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
 
 
 ################################################################################
