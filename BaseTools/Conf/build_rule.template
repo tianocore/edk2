@@ -92,6 +92,7 @@ ToolChainFamilyMapping = {
 #   ${_if_}     Include flag
 #
 Makefile = {
+# MSFT tool chain family
 "MSFT"	: {
 "C-Code"    : '''\
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
@@ -125,7 +126,45 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep
 ''',
 },
 
+#
+# INTEL tool chain family
+#
+"INTEL"	: {
+"C-Code"    : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
+''',
 
+"Masm-Code" : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\tTrim -CONVERT $(@D)${_sep_}${fbase}.i
+\t"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${_sep_}${fbase}.iii
+''',
+
+"Iasm-Code" : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\t"$(ASM)" -o $@ $(ASM_FLAGS) $(@D)${_sep_}${fbase}.i
+''',
+
+"Visual-Form-Representation" : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
+\tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
+\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
+''',
+},
+
+#
+# GCC tool chain family
+#
 "GCC" : {
 
 "C-Code"    : 
