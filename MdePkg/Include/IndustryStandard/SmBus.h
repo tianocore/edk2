@@ -41,8 +41,6 @@ typedef struct {
   UINTN SmbusDeviceAddress : 7;
 } EFI_SMBUS_DEVICE_ADDRESS;
 
-typedef UINTN EFI_SMBUS_DEVICE_COMMAND;
-
 typedef enum _EFI_SMBUS_OPERATION
 {
   EfiSmbusQuickRead,
