@@ -50,8 +50,6 @@
   PeCoffGetEntryPoint|$(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PerformanceLib|$(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  #PostCodeLib|$(WORKSPACE)/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
-  #PostCodeLib|$(WORKSPACE)/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
   TimerLib|$(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiDecompressLib|$(WORKSPACE)/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
@@ -146,23 +144,13 @@
   PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPostCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid|0
-
-[PcdsPatchableInModule.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
 
 [PcdsDynamicDefault.common.DEFAULT]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
-
-[PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
 
 ################################################################################
 #
