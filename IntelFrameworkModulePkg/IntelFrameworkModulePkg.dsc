@@ -40,29 +40,24 @@
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
 [LibraryClasses.common]
-  CacheMaintenanceLib|$(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib|$(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PciCf8Lib|$(WORKSPACE)/MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   PciExpressLib|$(WORKSPACE)/MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PciLib|$(WORKSPACE)/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
-  PeCoffGetEntryPoint|$(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  PeCoffLib|$(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PerformanceLib|$(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|$(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
   TimerLib|$(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiDecompressLib|$(WORKSPACE)/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   OemHookStatusCodeLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|$(WORKSPACE)/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
-  GraphicsLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|$(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|$(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   PcdLib|$(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   IoLib|$(WORKSPACE)/MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
-  DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeimEntryPoint|$(WORKSPACE)/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|$(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   BaseMemoryLib|$(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -76,19 +71,18 @@
   DxeServiceTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   SmbusLib|$(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   UefiBootServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  DebugLib|$(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   DevicePathLib|$(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiDriverEntryPoint|$(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiLib|$(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DxeServicesTableLib|$(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  FvbServiceLib|$(WORKSPACE)/MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ReportStatusCodeLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   HiiLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   IfrSupportLibFramework|$(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   PciIncompatibleDeviceSupportLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-
+  GraphicsLib|$(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
+  
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|$(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
