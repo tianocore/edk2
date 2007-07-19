@@ -28,8 +28,6 @@ Note:
 Quick Start
 -----------
 
-NOTE: Please confirm you have already installed Python on your machine.
-
 In a command window, change to the top-level directory of the EDK II source.
 
 First, set up your workspace. If you have had a setup, please make sure that
@@ -43,7 +41,7 @@ and then begin to build
     c:\MyWork\edk2\> build
 
 If you want to build the modules in other packages
-(For example, MdePkg\Library\BaseLib\BaseLib.inf), please edit open the BaseTools\Conf\Target.txt firstly,
+(For example, MdePkg\Library\BaseLib\BaseLib.inf), please edit open the <WORKSPACE>\Conf\Target.txt first,
 
 change the following line
     ACTIVE_PLATFORM       = MdeModulePkg/MdeModulePkg.dsc
@@ -57,6 +55,32 @@ and then go to MdePkg\Library\BaseLib directory and build
 If you want build a platform, ACTIVE_PLATFORM must be set to your desired platform dsc file,
 go to directory which must be not a module's directory, and run "build" command.
 
+Instead of changing Target.txt, you can specify platform, module and/or architecture on command line.
+For example, if you want to build NT32 platform, you can just type 
+
+		c:\MyWork\edk2\> build -p Nt32Pkg\Nt32Pkg.dsc -a IA32
+
+and if you want to build HelloWorld module, you can just type
+
+		c:\MyWork\edk2\> build -p Nt32Pkg\Nt32Pkg.dsc -a IA32 -m MdeModulePkg\Application\HelloWorld\HelloWorld.inf
+
+Other helpful command line options of build tool include "-v" and "-d". "-v" option is used to turn on
+the verbose build, which provide more information during the build. "-d <debug level 0-9>" option is used to
+turn on the debug information which is helpful debugging build tools.
+
+For more information on build options, please try "build -h" on command line. Note that "/?" is not working.
+
+
+-------------------------------------------------------------------------------
+Supported build targets
+-----------------------
+
+all				- Build whole platform or module. It can be ignored.
+clean     - Clean intermediate files
+cleanall  - Clean all generated files and directories during build, except Makefile
+cleanlib  - Clean all generated files and directories during library build
+run				- Launch NT32 shell (only valid for NT32 platform)
+
 -------------------------------------------------------------------------------
 Tools in Python
 ---------------
@@ -69,14 +93,14 @@ have the Python interpreter (version 2.5) installed. The source of Python code i
 
 	where:
 
-		MyBuild.py	- The temporary "build" tool from which the "build.exe" is coming
+		Bld.py	    - The entry tool of build tools
 		AutoGen.py  - Generate AutoGen.c/.h and makefile only
 
 	"MyBuild.py" steps:
 		1. Run "edksetup.bat newbuild"
 		2. Set ACTIVE_PLATFORM in WORKSPACE\Conf
 		3. Go to platform or module directory
-		4. Run "<python_interpreter.exe> <python_source_dir>\MyBuild.py" or "<python_source_dir>\MyBuild.py"
+		4. Run "<python_interpreter.exe> <python_source_dir>\Bld.py" or "<python_source_dir>\Bld.py"
 		   directly.
 
 	"AutoGen.py" steps:
