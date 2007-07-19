@@ -1,6 +1,6 @@
 /** @file
-  This file contains some basic ACPI definitions that are consumed by drivers
-  that do not care about ACPI versions.
+  This file contains the latest ACPI definitions that are
+  consumed by drivers that do not care about ACPI versions.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
