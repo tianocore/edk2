@@ -381,7 +381,7 @@
   $(WORKSPACE)/Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
   $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf  
   $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
+  $(WORKSPACE)/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>Runtime</ModuleName>
+    <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
+    <GuidValue>B601F8C4-43B7-4784-95B1-F4226CB40CEE</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for Runtime module.</Abstract>
+    <Description>This module is used to produce the EFI runtime virtual switch over services.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>Runtime</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED" RecommendedInstanceGuid="bda39d3a-451b-4350-8266-81ab10fa0523">
+      <Keyword>DebugLib</Keyword>
+      <HelpText>Recommended libary Instance is PeiDxeDebugLibReportStatusCode instance in MdePkg.</HelpText>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>ReportStatusCodeLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiRuntimeServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>CacheMaintenanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeCoffLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Runtime.dxs</Filename>
+    <Filename>Runtime.c</Filename>
+    <Filename>Runtime.h</Filename>
+    <Filename>Crc32.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiRuntimeArchProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <SystemTables>
+    <SystemTableCNames Usage="SOMETIMES_CONSUMED">
+      <SystemTableCName>gEfiUgaIoProtocolGuid</SystemTableCName>
+    </SystemTableCNames>
+    <SystemTableCNames Usage="SOMETIMES_CONSUMED">
+      <SystemTableCName>gEfiCapsuleGuid</SystemTableCName>
+    </SystemTableCNames>
+  </SystemTables>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>RuntimeDriverInitialize</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>
