@@ -1,7 +1,6 @@
 #/** @file
-# Debug Library for Dxe drivers
 #
-# Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
+# PEI Services Table Library implementation that retrieves a pointer to the PEI
 # Copyright (c) 2006 - 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -16,35 +15,22 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeDebugLibSerialPort
-  FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = PeiServicesTablePointerLibKr7
+  FILE_GUID                      = E0E7D776-E7EB-4e5f-9AA8-54CF3AA64A43
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib 
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE 
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
+
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IPF
 #
 
-[Sources.common]
-  DebugLib.c
-
-[Packages]
-  MdePkg/MdePkg.dec
+[Sources.Ipf]
+  PeiServicesTablePointer.c
 
 [LibraryClasses]
-  SerialPortLib
-  BaseMemoryLib
-  PcdLib
-  PrintLib
-  BaseLib
-
-[PcdsFixedAtBuild.common]
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid
-
-[PcdsDynamic.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid
+  DebugLib
 

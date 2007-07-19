@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiHobLib
@@ -31,50 +26,21 @@
 
 
 #
-# The following information is for reference only and not required by the build tools.
-#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   HobLib.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   BaseMemoryLib
   PeiServicesLib
   DebugLib
-
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
 
 [Guids]
   gEfiHobMemoryAllocStackGuid                   # ALWAYS_CONSUMED
