@@ -99,7 +99,6 @@
   $(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
   $(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   $(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  #$(WORKSPACE)/MdePkg/Library/HiiLib/HiiLib.inf
   $(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   $(WORKSPACE)/MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   $(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -133,6 +132,7 @@
   $(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.X64]
   $(WORKSPACE)/MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
@@ -140,6 +140,7 @@
   $(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.IPF]
   $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
