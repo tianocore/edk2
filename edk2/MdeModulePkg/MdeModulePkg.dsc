@@ -403,7 +403,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
