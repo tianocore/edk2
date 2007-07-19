@@ -24,8 +24,6 @@ Abstract:
 //
 #include "InternalIsaIo.h"
 
-#include <IndustryStandard/Pcat.h>
-
 //
 // Driver Support Global Variables
 //

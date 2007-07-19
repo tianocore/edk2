@@ -184,6 +184,7 @@ Ps2KeyboardComponentNameGetControllerName (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
+
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
            ControllerHandle,
