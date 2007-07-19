@@ -59,7 +59,7 @@
 ################################################################################
 
 
-[Components.Ia32]
+[Components.common]
   $(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   $(WORKSPACE)/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
   $(WORKSPACE)/IntelFrameworkPkg/Library/UefiLibFramework/UefiLib.inf
