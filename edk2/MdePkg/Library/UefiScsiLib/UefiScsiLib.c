@@ -256,7 +256,7 @@ SubmitModeSense10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_MODE_SEN10;
-  Cdb[1]                        = (UINT8) (Lun & 0xe0 + (DBDField << 3) & 0x08);
+  Cdb[1]                        = (UINT8) ((Lun & 0xe0) + ((DBDField << 3) & 0x08));
   Cdb[2]                        = (UINT8) ((PageControl & 0xc0) | (PageCode & 0x3f));
   Cdb[7]                        = (UINT8) (*DataLength >> 8);
   Cdb[8]                        = (UINT8) (*DataLength);
