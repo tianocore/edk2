@@ -15,6 +15,10 @@ Intel Corporation.
 #ifndef _MAX_BBS_ENTRIES_H
 #define _MAX_BBS_ENTRIES_H
 
+//
+// BUGBUG: This entry maybe changed to PCD in future and wait for
+//         redesign of BDS library
+//
 #define MAX_BBS_ENTRIES 0x100
 
 #endif
