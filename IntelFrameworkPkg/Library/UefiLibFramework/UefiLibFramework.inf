@@ -25,7 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiLibFramework
-  FILE_GUID                      = 3a004ba5-efe0-4a61-9f1a-267a46ae5ba9
+  FILE_GUID                      = B2F0D71A-A39F-4094-854B-0C6BA6910CCE
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = UefiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
