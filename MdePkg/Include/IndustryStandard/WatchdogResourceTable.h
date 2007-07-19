@@ -16,10 +16,7 @@
 #ifndef _WATCHDOG_RESOURCE_TABLE_H_
 #define _WATCHDOG_RESOURCE_TABLE_H_
 
-//
-// Include files
-//
-#include "Acpi2_0.h"
+#include <IndustryStandard/Acpi.h>
 
 //
 // Ensure proper structure formats
