@@ -405,9 +405,9 @@
   $(WORKSPACE)/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 
-  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/RuntimeDxe/Runtime.inf
 

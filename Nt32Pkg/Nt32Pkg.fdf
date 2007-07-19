@@ -117,7 +117,7 @@ INF  $(WORKSPACE)/MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
 INF  $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
@@ -137,7 +137,7 @@ INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
 INF  $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf

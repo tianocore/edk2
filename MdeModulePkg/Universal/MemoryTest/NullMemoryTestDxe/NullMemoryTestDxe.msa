@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>NullMemoryTest</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>96B5C032-DF4C-4b6e-8232-438DCF448D0E</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for NullMemoryTest module.</Abstract>
+    <Description>This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to 
+      provide simple generic memory test functions.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>NullMemoryTest</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DxeServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Common.h</Filename>
+    <Filename>NullMemoryTest.c</Filename>
+    <Filename>NullMemoryTest.h</Filename>
+    <Filename>NullMemoryTest.dxs</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="1E73767F-8F52-4603-AEB4-F29B510B6766"/>
+    <Package PackageGuid="BA0D78D6-2CAF-414b-BD4D-B6762A894288"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiGenericMemTestProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>GenericMemoryTestEntryPoint</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>
