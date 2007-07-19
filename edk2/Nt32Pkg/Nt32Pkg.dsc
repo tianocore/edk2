@@ -363,7 +363,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   $(WORKSPACE)/Nt32Pkg/BootModePei/BootModePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/BaseMemoryTestPei/BaseMemoryTest.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
   $(WORKSPACE)/MdeModulePkg/Universal/VariablePei/VariablePei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   $(WORKSPACE)/Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
@@ -386,7 +386,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/GenericMemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   $(WORKSPACE)/Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf  
