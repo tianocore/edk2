@@ -20,14 +20,9 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = IsaFloppy
+  BASE_NAME                      = IsaFloppyDxe
   FILE_GUID                      = 0abd8284-6da3-4616-971a-83a5148067ba
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -36,22 +31,7 @@
 
   ENTRY_POINT                    = InitializeIsaFloppy
 
-#
-# The following information is for reference only and not required by the build tools.
-#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
-#
-#  DRIVER_BINDING                =  gFdcControllerDriver                         
-#  COMPONENT_NAME                =  gIsaFloppyComponentName                      
-#  Create Event Guid C Name:  Event Type: EVENT_TYPE_PERIODIC_TIMER
-#
-#
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   ComponentName.c
@@ -61,22 +41,9 @@
   IsaFloppy.c
   IsaFloppy.h
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   ReportStatusCodeLib
@@ -88,14 +55,6 @@
   UefiDriverEntryPoint
   DebugLib
   TimerLib
-
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START

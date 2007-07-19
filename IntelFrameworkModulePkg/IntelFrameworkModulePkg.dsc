@@ -177,9 +177,9 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBus.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppy.inf
-  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerial.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
