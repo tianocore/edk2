@@ -47,7 +47,6 @@
   PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
   PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
