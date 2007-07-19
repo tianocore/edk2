@@ -134,7 +134,7 @@ INF  $(WORKSPACE)/Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
-INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
+INF  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf

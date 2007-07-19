@@ -383,7 +383,7 @@
   $(WORKSPACE)/Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   $(WORKSPACE)/Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
