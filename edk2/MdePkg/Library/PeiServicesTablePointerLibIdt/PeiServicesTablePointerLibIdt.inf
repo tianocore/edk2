@@ -13,11 +13,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiServicesTablePointerLibIdt
@@ -30,16 +25,9 @@
 
 
 #
-# The following information is for reference only and not required by the build tools.
-#
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 [Sources.Ia32]
   Ia32/AsmPeiSevicesTablePointer.c||MSFT|||
   Ia32/AsmPeiSevicesTablePointer.S||GCC|||
@@ -49,14 +37,6 @@
   x64/AsmPeiSevicesTablePointer.asm||MSFT|||
   x64/AsmPeiSevicesTablePointer.S||GCC|||
   PeiServicesTablePointer.c
-
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   DebugLib

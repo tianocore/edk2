@@ -15,11 +15,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDevicePathLibDevicePathProtocol
@@ -33,38 +28,16 @@
   CONSTRUCTOR                    = DevicePathLibConstructor
 
 #
-# The following information is for reference only and not required by the build tools.
-#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   UefiDevicePathLib.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -73,13 +46,6 @@
   BaseLib
   DebugLib
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

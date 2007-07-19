@@ -17,11 +17,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiLib
@@ -34,16 +29,8 @@
 
 
 #
-# The following information is for reference only and not required by the build tools.
-#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   UefiLibPrint.c
@@ -54,23 +41,9 @@
   UefiLibInternal.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PrintLib
@@ -81,12 +54,6 @@
   BaseLib
   UefiBootServicesTableLib
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
 
 [Guids]
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
@@ -101,12 +68,6 @@
   gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
   gEfiDriverDiagnostics2ProtocolGuid             # SOMETIMES_CONSUMED
 
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFixedAtBuild.common]
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid

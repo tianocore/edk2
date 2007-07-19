@@ -144,3 +144,4 @@
 
 [Components.IPF]
   $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
