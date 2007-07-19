@@ -192,11 +192,9 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
 
 [Components.IA32]
-  $(WORKSPACE)/IntelFrameworkModulePkg/PcatCompatible/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 
 [Components.X64]
-  $(WORKSPACE)/IntelFrameworkModulePkg/PcatCompatible/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 
 [Components.IA32]

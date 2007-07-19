@@ -101,5 +101,5 @@
 ################################################################################
 
 [Depex]
-  gEfiCpuArchProtocolGuid AND gEfiMetronomeArchProtocolGuid AND gEfiCpuIoProtocolGuid
+  gEfiCpuArchProtocolGuid AND gEfiMetronomeArchProtocolGuid
 
