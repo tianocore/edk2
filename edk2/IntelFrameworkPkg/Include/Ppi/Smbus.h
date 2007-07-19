@@ -22,7 +22,7 @@
 #define _PEI_SMBUS_PPI_H
 
 #include <PiPei.h>
-#include <IndustryStandard/SmBus.h>
+#include <Ppi/Smbus2.h>
 
 #define EFI_PEI_SMBUS_PPI_GUID \
   { \
@@ -132,11 +132,6 @@ EFI_STATUS
   IN      EFI_SMBUS_UDID            *SmbusUdid, OPTIONAL
   IN OUT  EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
   );
-
-typedef struct {
-  EFI_SMBUS_DEVICE_ADDRESS  SmbusDeviceAddress;
-  EFI_SMBUS_UDID            SmbusDeviceUdid;
-} EFI_SMBUS_DEVICE_MAP;
 
 /**
   The GetArpMap() function returns the mapping of all the SMBus devices
