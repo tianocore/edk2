@@ -298,6 +298,7 @@
 #
 ################################################################################
 [PcdsFeatureFlag.common]
+  PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
