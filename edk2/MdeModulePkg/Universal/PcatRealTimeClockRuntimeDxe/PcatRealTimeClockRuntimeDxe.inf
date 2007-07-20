@@ -59,7 +59,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  #IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
 ################################################################################
