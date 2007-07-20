@@ -12,13 +12,9 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiPei.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>

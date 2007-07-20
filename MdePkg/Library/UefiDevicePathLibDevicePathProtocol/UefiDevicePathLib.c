@@ -12,18 +12,12 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <Uefi.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/DevicePathUtilities.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
