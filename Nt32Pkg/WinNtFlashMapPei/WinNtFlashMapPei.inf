@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = WinNtFlashMapPei
@@ -36,45 +31,18 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   FlashMap.c
 
 
-################################################################################
-#
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
 [Includes]
   $(WORKSPACE)/MdePkg/Include/Library
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PcdLib
@@ -85,45 +53,19 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiFlashMapHobGuid                           # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
   gEfiFirmwareFileSystem2Guid                    # ALWAYS_CONSUMED
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# PPI C Name Section - list of PPI and PPI Notify C Names that this module
-#                      uses or produces.
-#
-################################################################################
 
 [Ppis]
   gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
   gPeiFlashMapPpiGuid                           # PPI ALWAYS_PRODUCED
 
-
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsDynamic.common]
   PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid

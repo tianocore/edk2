@@ -15,11 +15,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DebugPortDxe
@@ -43,35 +38,15 @@
 #
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   ComponentName.c
   DebugPort.c
   DebugPort.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   DevicePathLib
@@ -84,13 +59,6 @@
   DebugLib
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
@@ -98,13 +66,6 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiDebugPortProtocolGuid                     # PROTOCOL BY_START
 
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   TRUE

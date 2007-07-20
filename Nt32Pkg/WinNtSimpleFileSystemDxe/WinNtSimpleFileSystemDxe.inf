@@ -17,11 +17,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = WinNtSimpleFileSystemDxe
@@ -42,35 +37,15 @@
 #  COMPONENT_NAME                =  gWinNtSimpleFileSystemComponentName          
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   ComponentName.c
   WinNtSimpleFileSystem.c
   WinNtSimpleFileSystem.h
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -82,25 +57,12 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiFileSystemVolumeLabelInfoIdGuid           # SOMETIMES_CONSUMED
   gEfiFileInfoGuid                              # SOMETIMES_CONSUMED
   gEfiFileSystemInfoGuid                        # SOMETIMES_CONSUMED
   gEfiWinNtFileSystemGuid                       # ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL BY_START

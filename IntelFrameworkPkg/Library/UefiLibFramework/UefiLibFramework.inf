@@ -17,11 +17,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiLibFramework
@@ -39,12 +34,6 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   UefiLibPrint.c
   UefiNotTiano.c
@@ -52,23 +41,9 @@
   UefiLib.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PrintLib
@@ -80,23 +55,11 @@
   UefiBootServicesTableLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiFrameworkDevicePathGuid                   # ALWAYS_CONSUMED
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFixedAtBuild.common]
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid

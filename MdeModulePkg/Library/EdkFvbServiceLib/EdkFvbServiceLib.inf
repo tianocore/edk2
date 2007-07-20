@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EdkFvbServiceLib
@@ -39,12 +34,6 @@
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  FvbVirtualAddressChangeNotifyEvent
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   Fvb.h
 
@@ -54,23 +43,9 @@
 [Sources.X64]
   x64/Fvb.c
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses.IA32]
   UefiBootServicesTableLib
@@ -88,13 +63,6 @@
   BaseLib
   UefiLib
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL_NOTIFY SOMETIMES_CONSUMED

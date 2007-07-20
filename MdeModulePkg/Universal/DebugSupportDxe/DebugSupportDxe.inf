@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DebugSupportDxe
@@ -35,12 +30,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   DebugSupport.c
@@ -65,24 +54,10 @@
   ipf/AsmFuncs.s
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -99,34 +74,14 @@
   BaseLib
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiDebugSupportProtocolGuid                  # PROTOCOL SOMETIMES_PRODUCED
 
 
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFeatureFlag.IA32]
   PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   TRUE

@@ -2,7 +2,7 @@
 # Platfrom BDS driver
 #
 # Do platform action customized by IBV/OEM.
-# Copyright (c) 2007 - 2007, Intel Corporation
+# Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformBds
@@ -35,12 +30,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   Generic/DeviceMngr/DeviceManagerVfr.Vfr
@@ -83,26 +72,12 @@
   BdsPlatform.h
   PlatformData.c
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PeCoffLib
@@ -126,12 +101,6 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
 #  MemoryArray                                   # SOMETIMES_CONSUMED  Data Hub
 #  ProcessorFrequency                            # SOMETIMES_CONSUMED  Data Hub
@@ -146,13 +115,6 @@
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
   gEfiBootStateGuid                             # ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMED

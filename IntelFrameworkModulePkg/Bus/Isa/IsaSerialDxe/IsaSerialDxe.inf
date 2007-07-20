@@ -13,11 +13,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaSerialDxe
@@ -38,12 +33,6 @@
 #  COMPONENT_NAME                =  gIsaSerialComponentName                      
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   ComponentName.c
   ComponentName.h
@@ -51,25 +40,11 @@
   serial.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PcdLib
@@ -84,24 +59,11 @@
   DebugLib
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
   gEfiSerialIoProtocolGuid                      # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFeatureFlag.common]
   PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid

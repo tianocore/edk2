@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxePerformanceLib
@@ -36,34 +31,14 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   DxePerformanceLib.c
 
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PcdLib
@@ -71,22 +46,9 @@
   DebugLib
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFixedAtBuild.common]
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid

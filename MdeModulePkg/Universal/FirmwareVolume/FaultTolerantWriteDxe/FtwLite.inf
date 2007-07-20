@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FtwLite
@@ -35,12 +30,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   FtwWorkSpace.c
@@ -61,25 +50,11 @@
   Ia32/Ia32FtwMisc.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -90,22 +65,9 @@
   PcdLib
   HobLib
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
   gEfiFlashMapHobGuid
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
@@ -118,24 +80,11 @@
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsDynamic.common]
   PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
   PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
   PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
   PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid

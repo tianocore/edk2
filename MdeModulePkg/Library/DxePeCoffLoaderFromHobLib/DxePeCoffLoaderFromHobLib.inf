@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EdkDxePeCoffLoaderFromHobLib
@@ -36,55 +31,22 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   PeCoff.c
   CommonHeader.h
 
 
-################################################################################
-#
-# Includes Section - list of Include locations that are required for
-#                    this module.
-#
-################################################################################
-
 [Includes]
   $(WORKSPACE)/MdePkg/Include/Library
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
-
 [LibraryClasses]
   HobLib
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
 
 [Guids]
   gEfiPeiPeCoffLoaderGuid                       # ALWAYS_CONSUMED

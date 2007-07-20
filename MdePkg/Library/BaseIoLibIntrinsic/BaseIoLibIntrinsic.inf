@@ -3,7 +3,7 @@
 #
 # I/O Library that uses compiler intrinsics to perform IN and OUT instructions
 #  for IA-32 and x64. It also performs direct memory access for MMIO services.
-# Copyright (c) 2007 - 2007, Intel Corporation.
+# Copyright (c) 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
