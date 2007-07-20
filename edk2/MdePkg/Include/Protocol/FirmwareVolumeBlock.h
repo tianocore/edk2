@@ -279,7 +279,7 @@ EFI_STATUS
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
-  IN CONST  UINT8                               *Buffer
+  IN        UINT8                               *Buffer
 );
 
 
