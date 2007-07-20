@@ -444,6 +444,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
 [Components.IPF]
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
