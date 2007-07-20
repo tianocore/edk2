@@ -443,11 +443,12 @@
   $(WORKSPACE)/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
 
 [Components.IPF]
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupport.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
 
 [Components.EBC]
+  $(WORKSPACE)/MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
