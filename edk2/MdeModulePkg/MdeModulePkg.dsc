@@ -430,8 +430,6 @@
   $(WORKSPACE)/MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 
   $(WORKSPACE)/MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  $(WORKSPACE)/MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
 
 [Components.Ia32]
   $(WORKSPACE)/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -446,6 +444,8 @@
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
 
 [Components.IPF]
   $(WORKSPACE)/MdeModulePkg/Universal/EbcDxe/EbcDxe.inf

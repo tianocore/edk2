@@ -29,7 +29,7 @@ Abstract:
 #include <Protocol/Decompress.h>
 #include <Ppi/Security.h>
 #include <Ppi/SectionExtraction.h>
-#include <Ppi/LoadFile.h>
+#include <Ppi/FvLoadFile.h>
 #include <Ppi/RecoveryModule.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Library/DebugLib.h>
