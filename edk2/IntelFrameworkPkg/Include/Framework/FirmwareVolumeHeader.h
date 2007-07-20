@@ -25,11 +25,6 @@
 #include <FrameworkPei.h>
 
 //
-// Firmware Volume Block Attributes definition
-//
-typedef UINT32  EFI_FVB_ATTRIBUTES;
-
-//
 // Firmware Volume Block Attributes bit definitions
 //
 #define EFI_FVB_READ_DISABLED_CAP   0x00000001
