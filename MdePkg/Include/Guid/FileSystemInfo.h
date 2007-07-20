@@ -15,7 +15,7 @@
 #ifndef __FILE_SYSTEM_INFO_H__
 #define __FILE_SYSTEM_INFO_H__
 
-#define EFI_FILE_SYSTEM_INFO_ID_GUID \
+#define EFI_FILE_SYSTEM_INFO_ID \
   { \
     0x9576e93, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }

@@ -52,5 +52,7 @@ extern EFI_GUID gEfiPcAnsiGuid;
 extern EFI_GUID gEfiVT100Guid;
 extern EFI_GUID gEfiVT100PlusGuid;
 extern EFI_GUID gEfiVTUTF8Guid;
+extern EFI_GUID gEfiUartDevicePathGuid;
+extern EFI_GUID gEfiSasDevicePathGuid;
 
 #endif
