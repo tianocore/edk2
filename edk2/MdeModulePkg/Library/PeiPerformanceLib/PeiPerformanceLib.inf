@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiPerformanceLib
@@ -36,34 +31,14 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   PeiPerformanceLib.c
 
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   BaseMemoryLib
@@ -74,31 +49,13 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gPeiPerformanceHobGuid                        # SOMETIMES_CONSUMED
 
 
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFixedAtBuild.common]
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsDynamic.common]
   PcdMaxPeiPerformanceLogEntries|gEfiMdeModulePkgTokenSpaceGuid

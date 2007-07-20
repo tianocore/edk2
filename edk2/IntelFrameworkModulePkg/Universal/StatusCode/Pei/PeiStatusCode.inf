@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiStatusCode
@@ -36,12 +31,6 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   PeiStatusCode.c
   MemoryStausCodeWorker.c
@@ -49,24 +38,10 @@
   PeiStatusCode.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PeimEntryPoint
@@ -82,44 +57,19 @@
   BaseLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
 
 
-################################################################################
-#
-# PPI C Name Section - list of PPI and PPI Notify C Names that this module
-#                      uses or produces.
-#
-################################################################################
-
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFeatureFlag.common]
   PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
   PcdStatusCodeUseMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
   PcdStatusCodeUseSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsDynamic.common]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid

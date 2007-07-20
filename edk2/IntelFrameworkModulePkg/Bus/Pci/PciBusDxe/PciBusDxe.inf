@@ -16,11 +16,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PciBusDxe
@@ -40,12 +35,6 @@
 #  DRIVER_BINDING                =  gPciBusDriverBinding                         
 #  COMPONENT_NAME                =  gPciBusComponentName                         
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   PciLib.c
@@ -77,13 +66,6 @@
   PciIo.h
   pcibus.h
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -91,13 +73,6 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PciIncompatibleDeviceSupportLib
@@ -113,25 +88,12 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
   gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED  System Table
   gEfiPciHotplugDeviceGuid                      # PRIVATE
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
@@ -146,23 +108,11 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
 
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFeatureFlag.common]
   PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
   PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid
   PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Pcd FIXED_AT_BUILD - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFixedAtBuild.common]
   PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid

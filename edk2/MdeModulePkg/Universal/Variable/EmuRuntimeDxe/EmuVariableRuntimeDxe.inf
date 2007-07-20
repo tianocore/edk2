@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EmuVariableRuntimeDxe
@@ -36,36 +31,16 @@
 #  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   InitVariable.c
   EmuVariable.c
   Variable.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   BaseLib
@@ -78,13 +53,6 @@
   BaseMemoryLib
 
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols.IA32]
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
@@ -93,13 +61,6 @@
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   TRUE

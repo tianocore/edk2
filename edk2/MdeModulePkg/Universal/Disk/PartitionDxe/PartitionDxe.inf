@@ -18,11 +18,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PartitionDxe
@@ -43,12 +38,6 @@
 #  COMPONENT_NAME                =  gPartitionComponentName
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   ComponentName.c
   Mbr.c
@@ -58,23 +47,9 @@
   Partition.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   DevicePathLib
@@ -87,23 +62,10 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiPartTypeUnusedGuid                        # SOMETIMES_CONSUMED
   gEfiPartTypeSystemPartGuid                    # SOMETIMES_CONSUMED
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START

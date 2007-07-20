@@ -16,11 +16,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to generate a binary image.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FullShell
@@ -37,13 +32,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
-
-################################################################################
-#
-# Binaries Section - list of binary files that are required for the build
-# to succeed.
-#
-################################################################################
 
 [Binaries.Ia32]
   UEFI_APP|RELEASE|ia32/Shell_Full.efi

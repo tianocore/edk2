@@ -16,11 +16,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeStatusCode
@@ -40,12 +35,6 @@
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VirtualAddressChangeCallBack
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   SerialStatusCodeWorker.c
   RtMemoryStatusCodeWorker.c
@@ -64,24 +53,10 @@
 
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   OemHookStatusCodeLib
@@ -100,36 +75,17 @@
   BaseLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
   gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
   gEfiStatusCodeSpecificDataGuid                # SOMETIMES_CONSUMED
   gEfiStatusCodeDataTypeDebugGuid               # PROTOCOL ALWAYS_CONSUMED
 
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
 
 [PcdsFeatureFlag.common]
   PcdStatusCodeReplayInOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
@@ -143,21 +99,8 @@
   PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
 
 
-################################################################################
-#
-# Pcd DYNAMIC - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsDynamic.common]
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiCpuIoProtocolGuid

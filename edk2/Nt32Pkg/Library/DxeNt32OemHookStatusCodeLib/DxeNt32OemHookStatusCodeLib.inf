@@ -16,11 +16,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeNt32OemHookStatusCodeLib
@@ -40,22 +35,9 @@
 #  HOB Guid C Name: gEfiWinNtThunkProtocolGuid Hob Type: GUID_EXTENSION
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   Nt32OemHookStatusCodeLib.c
 
-
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
 
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
@@ -64,13 +46,6 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
-
 [LibraryClasses]
   ReportStatusCodeLib
   BaseMemoryLib
@@ -78,12 +53,6 @@
   HobLib
   DebugLib
 
-
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
 
 [Guids]
   gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED

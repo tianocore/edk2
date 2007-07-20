@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiSmbusLibSmbusPpi
@@ -36,49 +31,22 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   SmbusLib.c
   PeiSmbusLib.c
   InternalSmbusLib.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   BaseMemoryLib
   PeiServicesTablePointerLib
   DebugLib
 
-
-################################################################################
-#
-# PPI C Name Section - list of PPI and PPI Notify C Names that this module
-#                      uses or produces.
-#
-################################################################################
 
 [Ppis]
   gEfiPeiSmbusPpiGuid                           # PPI ALWAYS_CONSUMED

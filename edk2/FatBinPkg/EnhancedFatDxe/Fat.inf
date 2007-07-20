@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to generate a binary image.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Fat
@@ -35,13 +30,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Binaries Section - list of binary files that are required for the build
-# to succeed.
-#
-################################################################################
 
 [Binaries.Ia32]
   FV|RELEASE|Ia32/Fat.efi

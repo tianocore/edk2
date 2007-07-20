@@ -14,11 +14,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIpl
@@ -35,12 +30,6 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
 
 [Sources.common]
   DxeIpl.h
@@ -66,25 +55,11 @@
   Ia32/ImageRead.c
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec  
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   PeCoffLib
@@ -105,32 +80,11 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
-
 [Protocols]
   gEfiCustomizedDecompressProtocolGuid          # PROTOCOL SOMETIMES_PRODUCED
   gEfiTianoDecompressProtocolGuid               # PROTOCOL SOMETIMES_PRODUCED
   gEfiDecompressProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
-
-################################################################################
-#
-# PPI C Name Section - list of PPI and PPI Notify C Names that this module
-#                      uses or produces.
-#
-################################################################################
 
 [Ppis]
   gEfiPeiSecurityPpiGuid                        # PPI SOMETIMES_CONSUMED
@@ -143,12 +97,6 @@
   gEfiPeiPeCoffLoaderGuid                       
 
 
-################################################################################
-#
-# Pcd FEATURE_FLAG - list of PCDs that this module is coded for.
-#
-################################################################################
-
 [PcdsFeatureFlag.common]
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid
   PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid
@@ -158,13 +106,6 @@
 [PcdsFeatureFlag.IA32]
   PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid
 
-
-################################################################################
-#
-# Dependency Expression Section - list of Dependency expressions that are required for
-#                              this module.
-#
-################################################################################
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid

@@ -17,11 +17,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = WinNtBlockIo
@@ -43,12 +38,6 @@
 #  DRIVER_DIAG                   =  gWinNtBlockIoDriverDiagnostics               
 #
 
-################################################################################
-#
-# Sources Section - list of files that are required for the build to succeed.
-#
-################################################################################
-
 [Sources.common]
   DriverDiagnostics.c
   DriverConfiguration.c
@@ -57,24 +46,10 @@
   WinNtBlockIo.h
 
 
-################################################################################
-#
-# Package Dependency Section - list of Package files that are required for
-#                              this module.
-#
-################################################################################
-
 [Packages]
   MdePkg/MdePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
-
-################################################################################
-#
-# Library Class Section - list of Library Classes that are required for
-#                         this module.
-#
-################################################################################
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -86,23 +61,10 @@
   DebugLib
 
 
-################################################################################
-#
-# Guid C Name Section - list of Guids that this module uses or produces.
-#
-################################################################################
-
 [Guids]
   gEfiWinNtPhysicalDisksGuid                    # SOMETIMES_CONSUMED
   gEfiWinNtVirtualDisksGuid                     # ALWAYS_CONSUMED
 
-
-################################################################################
-#
-# Protocol C Name Section - list of Protocol and Protocol Notify C Names
-#                           that this module uses or produces.
-#
-################################################################################
 
 [Protocols]
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
