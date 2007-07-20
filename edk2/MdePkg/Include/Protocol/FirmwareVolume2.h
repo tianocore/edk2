@@ -418,8 +418,8 @@ EFI_STATUS
 (EFIAPI * EFI_FV_READ_SECTION) (
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN CONST  EFI_GUID                      *NameGuid,
-  IN CONST  EFI_SECTION_TYPE              SectionType,
-  IN CONST  UINTN                         SectionInstance,
+  IN        EFI_SECTION_TYPE              SectionType,
+  IN        UINTN                         SectionInstance,
   IN OUT    VOID                          **Buffer,
   IN OUT    UINTN                         *BufferSize,
   OUT       UINT32                        *AuthenticationStatus
