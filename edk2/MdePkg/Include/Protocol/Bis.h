@@ -20,6 +20,19 @@
     0x0b64aab0, 0x5429, 0x11d4, {0x98, 0x16, 0x00, 0xa0, 0xc9, 0x1f, 0xad, 0xcf } \
   }
 
+//
+// X-Intel-BIS-ParameterSet
+// Attribute value
+// Binary Value of X-Intel-BIS-ParameterSet Attribute.
+// (Value is Base-64 encoded in actual signed manifest).
+//
+#define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUID \
+  { \
+    0xedd35e31, 0x7b9, 0x11d2, { 0x83,0xa3,0x0,0xa0,0xc9,0x1f,0xad,0xcf } \
+  }
+
+
+
 typedef struct _EFI_BIS_PROTOCOL  EFI_BIS_PROTOCOL;
 
 

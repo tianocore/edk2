@@ -188,5 +188,6 @@ struct _EFI_UNICODE_COLLATION_PROTOCOL {
 };
 
 extern EFI_GUID gEfiUnicodeCollationProtocolGuid;
+extern EFI_GUID gEfiUnicodeCollation2ProtocolGuid;
 
 #endif
