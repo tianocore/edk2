@@ -20,21 +20,15 @@ Abstract:
 #ifndef __DEBUGPORT_H__
 #define __DEBUGPORT_H__
 
-//
-// The package level header files this module uses
-//
+
 #include <Uefi.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/DevicePath.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/DebugPort.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>

@@ -22,18 +22,12 @@ Abstract:
 #ifndef  _CAPSULE_RUNTIME_H_
 #define  _CAPSULE_RUNTIME_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/Capsule.h>
 #include <Guid/CapsuleVendor.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>

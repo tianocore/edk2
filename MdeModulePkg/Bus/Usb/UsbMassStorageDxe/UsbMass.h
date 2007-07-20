@@ -31,18 +31,12 @@ Revision History
 #ifndef _EFI_USBMASS_H_
 #define _EFI_USBMASS_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>

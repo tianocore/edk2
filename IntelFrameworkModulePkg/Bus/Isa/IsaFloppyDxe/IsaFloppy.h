@@ -27,15 +27,11 @@ Revision History:
 
 #include <PiDxe.h>
 #include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/BlockIo.h>
 #include <Protocol/IsaIo.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

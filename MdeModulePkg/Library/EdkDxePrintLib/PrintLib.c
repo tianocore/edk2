@@ -21,17 +21,11 @@ Abstract:
 
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/Print.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 

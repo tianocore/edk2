@@ -17,13 +17,9 @@
 #ifndef __BASE_UEFI_TIANO_CUSTOM_DECOMPRESS_LIB_INTERNALS_H__
 #define __BASE_UEFI_TIANO_CUSTOM_DECOMPRESS_LIB_INTERNALS_H__
 
-//
-// The package level header files this module uses
-//
+
 #include <Base.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/UefiDecompressLib.h>
 #include <Library/CustomDecompressLib.h>
 #include <Library/DebugLib.h>

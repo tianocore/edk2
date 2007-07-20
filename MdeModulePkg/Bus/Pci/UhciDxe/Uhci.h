@@ -25,19 +25,13 @@ Revision History
 #ifndef _UHCI_H
 #define _UHCI_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/UsbHostController.h>
 #include <Protocol/PciIo.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>

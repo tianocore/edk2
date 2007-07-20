@@ -24,18 +24,12 @@ Revision History
 #define _DRIVER_SAMPLE_H
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/FormCallbackFramework.h>
 #include <Protocol/HiiFramework.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugLib.h>

@@ -15,13 +15,9 @@ Intel Corporation.
 #ifndef _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
 #define _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/PciIncompatibleDeviceSupportLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>

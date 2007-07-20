@@ -25,9 +25,7 @@ Revision History
 #define _WATCHDOG_TIMER_H_
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

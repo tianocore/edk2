@@ -16,13 +16,9 @@
 #define __COMMON_HEADER_H_
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/OEMBadging.h>
 #include <Protocol/ConsoleControl.h>
@@ -32,9 +28,7 @@
 #include <Protocol/HiiFramework.h>
 
 #include <Guid/Bmp.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/GraphicsLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseLib.h>

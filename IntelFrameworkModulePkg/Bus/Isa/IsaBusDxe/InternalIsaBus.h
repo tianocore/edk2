@@ -24,14 +24,10 @@ Revision History:
 #ifndef _EFI_ISA_BUS_H
 #define _EFI_ISA_BUS_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 #include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/PciIo.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/IsaIo.h>
@@ -40,9 +36,7 @@ Revision History:
 #include <Protocol/DriverBinding.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Guid/StatusCodeDataTypeId.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>

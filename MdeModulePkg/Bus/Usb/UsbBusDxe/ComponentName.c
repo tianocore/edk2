@@ -18,14 +18,10 @@ Abstract:
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 
-//
-// The Library classes this module consumes
-//
+
 #include <Library/UefiLib.h>
 
 

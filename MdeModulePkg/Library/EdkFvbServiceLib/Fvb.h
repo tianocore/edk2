@@ -12,18 +12,12 @@ http://opensource.org/licenses/bsd-license.php
 #ifndef __FVB_H__
 #define __FVB_H__
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/FvbExtension.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/FvbServiceLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>

@@ -12,19 +12,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkSmm.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SmmBase.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DxeSmmDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>

@@ -20,21 +20,15 @@ Abstract:
 
 --*/
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
 
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SimpleTextOut.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>

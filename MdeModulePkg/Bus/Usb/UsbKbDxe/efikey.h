@@ -22,20 +22,14 @@ Revision History
 #ifndef _USB_KB_H
 #define _USB_KB_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/SimpleTextIn.h>
 #include <Guid/HotPlugDevice.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/BaseMemoryLib.h>

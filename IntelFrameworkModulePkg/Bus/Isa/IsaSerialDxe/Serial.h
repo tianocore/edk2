@@ -25,20 +25,14 @@ Revision History:
 #ifndef _SERIAL_H
 #define _SERIAL_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 #include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/IsaIo.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>

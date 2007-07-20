@@ -18,19 +18,13 @@
 #ifndef _UEFI_LIB_FRAMEWORK_H_
 #define _UEFI_LIB_FRAMEWORK_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
 #include <Guid/FrameworkDevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>

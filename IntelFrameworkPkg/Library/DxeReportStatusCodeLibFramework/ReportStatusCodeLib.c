@@ -12,18 +12,12 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/StatusCode.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>

@@ -19,17 +19,11 @@ Abstract:
 
 --*/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/PeiPerformanceHob.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>

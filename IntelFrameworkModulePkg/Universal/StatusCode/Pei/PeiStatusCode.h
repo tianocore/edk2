@@ -19,19 +19,13 @@
 #define __PEI_STATUS_CODE_H__
 
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Ppi/StatusCode.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
