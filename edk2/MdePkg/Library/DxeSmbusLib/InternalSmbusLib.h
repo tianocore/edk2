@@ -16,17 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __INTERNAL_SMBUS_LIB_H
 #define __INTERNAL_SMBUS_LIB_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/SmbusHc.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/SmbusLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>

@@ -12,9 +12,7 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <Base.h>
 
 //

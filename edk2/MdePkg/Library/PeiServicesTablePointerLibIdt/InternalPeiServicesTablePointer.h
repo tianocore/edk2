@@ -18,9 +18,7 @@
 
 
 #include <PiPei.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
 

@@ -12,16 +12,10 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-//
-// The Library classes this module consumes
-//
+
+
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 

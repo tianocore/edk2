@@ -12,16 +12,10 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <Base.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-//
-// The Library classes this module consumes
-//
+
+
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/DebugLib.h>
 

@@ -12,17 +12,11 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/MemoryAllocationHob.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
