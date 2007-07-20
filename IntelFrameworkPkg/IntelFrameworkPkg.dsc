@@ -1,7 +1,7 @@
 #/** @file
 # Intel Framework Package Reference Implementations
 #
-# This FPD file is used for Package Level build.
+# This DSC file is used for Package Level build.
 #
 # Copyright (c) 2007, Intel Corporation
 #
@@ -31,13 +31,6 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 
-
-################################################################################
-#
-# Library Class section - list of all Library Classes needed by this Platform.
-#
-################################################################################
-
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
@@ -48,6 +41,7 @@
   PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+
 [PcdsPatchableInModule.common]
   PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
 
@@ -57,8 +51,6 @@
 # Components Section - list of all EDK II Modules needed by this Platform
 #
 ################################################################################
-
-
 [Components.common]
   $(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   $(WORKSPACE)/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
