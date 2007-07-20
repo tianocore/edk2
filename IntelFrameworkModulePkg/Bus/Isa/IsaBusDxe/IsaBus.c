@@ -1,19 +1,4 @@
-/*++
-
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IsaBus.c
-  
-Abstract:
+/**@file
 
   Discovers all the ISA Controllers and their resources by using the ISA PnP 
   Protocol, produces an instance of the ISA I/O Protocol for every ISA 
@@ -21,10 +6,18 @@ Abstract:
   Device Drivers with their respective ISA Controllers in a deterministic 
   manner, and informs a ISA Device Driver when it is to start managing an ISA
   Controller. 
+  
+Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Revision History:
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
---*/
+**/
+
 
 #include "InternalIsaBus.h"
 

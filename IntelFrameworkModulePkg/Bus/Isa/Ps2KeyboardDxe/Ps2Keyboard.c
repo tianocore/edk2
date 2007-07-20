@@ -1,4 +1,7 @@
-/*++
+/**@file
+
+  PS/2 Keyboard driver. Routines that interacts with callers,
+  conforming to EFI driver model
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,16 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Ps2Keyboard.c
-
-Abstract:
-
-  PS/2 Keyboard driver. Routines that interacts with callers,
-  conforming to EFI driver model
-
---*/
+**/
 
 #include "Ps2Keyboard.h"
 

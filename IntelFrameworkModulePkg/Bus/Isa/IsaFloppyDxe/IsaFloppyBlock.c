@@ -1,20 +1,4 @@
-/*++
-
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IsaFloppyBlock.c
-
-Abstract:
-
+/**@file
   ISA Floppy Driver
   1. Support two types diskette drive  
      1.44M drive and 2.88M drive (and now only support 1.44M)
@@ -24,10 +8,18 @@ Abstract:
   5. Support diskette change line signal and write protect
   
   Implement the Block IO interface
+  
+Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Revision History:
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
---*/
+**/
+
 
 #include "IsaFloppy.h"
 
