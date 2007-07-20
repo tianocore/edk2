@@ -147,7 +147,7 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_GET_BLOCK_SIZE) (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  IN CONST  EFI_LBA                             Lba,
+  IN        EFI_LBA                             Lba,
   OUT       UINTN                               *BlockSize,
   OUT       UINTN                               *NumberOfBlocks
 );
@@ -203,8 +203,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_FVB_READ) (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  IN CONST  EFI_LBA                             Lba,
-  IN CONST  UINTN                               Offset,
+  IN        EFI_LBA                             Lba,
+  IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
   IN OUT    UINT8                               *Buffer
 );
@@ -276,8 +276,8 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_WRITE) (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  IN CONST  EFI_LBA                             Lba,
-  IN CONST  UINTN                               Offset,
+  IN        EFI_LBA                             Lba,
+  IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
   IN CONST  UINT8                               *Buffer
 );
