@@ -16,18 +16,12 @@
 #define _APT_H
 
 
-//
-// The package level header files this module uses
-//
+
 #include <Uefi.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/ScsiPassThru.h>
 #include <Protocol/PciIo.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>

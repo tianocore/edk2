@@ -15,18 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PLDEBUG_SUPPORT_H
 #define _PLDEBUG_SUPPORT_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>

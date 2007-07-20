@@ -22,17 +22,11 @@ Abstract:
 #ifndef _MONOTONIC_COUNTER_DRIVER_H_
 #define _MONOTONIC_COUNTER_DRIVER_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/MonotonicCounter.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiRuntimeLib.h>

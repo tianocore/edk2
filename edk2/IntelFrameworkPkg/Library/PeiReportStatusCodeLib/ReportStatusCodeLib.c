@@ -12,17 +12,11 @@
 
 **/
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/StatusCodeDataTypeId.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>

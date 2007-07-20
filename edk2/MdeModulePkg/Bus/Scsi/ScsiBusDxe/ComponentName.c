@@ -17,23 +17,17 @@ Abstract:
 
 --*/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/ScsiPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiIo.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>

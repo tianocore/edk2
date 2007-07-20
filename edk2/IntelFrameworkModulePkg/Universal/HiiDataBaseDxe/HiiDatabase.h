@@ -23,19 +23,13 @@ Abstract:
 #ifndef _HIIDATABASE_H
 #define _HIIDATABASE_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/GlobalVariable.h>
 #include <Protocol/FormCallbackFramework.h>
 #include <Protocol/HiiFramework.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

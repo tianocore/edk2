@@ -26,17 +26,11 @@ Revision History
 #ifndef _RTC_H_
 #define _RTC_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/RealTimeClock.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>

@@ -23,14 +23,10 @@ Revision History
 #define _DXE_MAIN_H_
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 #include <FrameworkPei.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GuidedSectionExtraction.h>
 #include <Protocol/SectionExtraction.h>
@@ -74,9 +70,7 @@ Revision History
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/Performance.h>
 #include <Guid/StatusCodeDataTypeId.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>

@@ -16,18 +16,12 @@
 #define __COMMON_HEADER_H_
 
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/GlobalVariable.h>
 #include <Protocol/HiiFramework.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/IfrSupportLibFramework.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>

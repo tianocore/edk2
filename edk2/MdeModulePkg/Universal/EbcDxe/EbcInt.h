@@ -23,18 +23,12 @@ Abstract:
 #ifndef _EBC_INT_H_
 #define _EBC_INT_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/DebugSupport.h>
 #include <Protocol/Ebc.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

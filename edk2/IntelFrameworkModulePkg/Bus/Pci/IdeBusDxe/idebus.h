@@ -16,21 +16,15 @@
 #define _IDE_BUS_H
 
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DevicePath.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>

@@ -26,9 +26,7 @@ Revision History:
 
 --*/
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
 
 UINT32  mCrcTable[256];

@@ -22,17 +22,11 @@ Abstract:
 #ifndef _DATA_HUB_H_
 #define _DATA_HUB_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/DataHub.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>

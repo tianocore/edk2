@@ -23,20 +23,14 @@ Revision History
 #ifndef _SETUP_H
 #define _SETUP_H
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/FormCallbackFramework.h>
 #include <Protocol/FormBrowserFramework.h>
 #include <Protocol/HiiFramework.h>
 #include <Protocol/Print.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

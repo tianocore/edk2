@@ -23,18 +23,12 @@ Abstract:
 //
 // Statements that include other header files
 //
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Variable.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>

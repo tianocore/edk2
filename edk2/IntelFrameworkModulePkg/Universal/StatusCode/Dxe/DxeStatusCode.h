@@ -14,22 +14,16 @@
 #ifndef __DXE_STATUS_CODE_H__
 #define __DXE_STATUS_CODE_H__
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SerialIo.h>
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Protocol/StatusCode.h>
 #include <Guid/StatusCodeDataTypeId.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>

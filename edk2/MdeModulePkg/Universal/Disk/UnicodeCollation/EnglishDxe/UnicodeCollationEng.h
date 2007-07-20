@@ -25,18 +25,12 @@ Revision History
 #define _UNICODE_COLLATION_ENG_H
 
 
-//
-// The package level header files this module uses
-//
+
 #include <Uefi.h>
 
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/UnicodeCollation.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>

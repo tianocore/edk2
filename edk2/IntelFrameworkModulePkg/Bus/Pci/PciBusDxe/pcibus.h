@@ -24,14 +24,10 @@ Revision History
 #ifndef _EFI_PCI_BUS_H
 #define _EFI_PCI_BUS_H
 
-//
-// The package level header files this module uses
-//
+
 #include <FrameworkDxe.h>
 
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciIo.h>
@@ -45,9 +41,7 @@ Revision History
 #include <Guid/PciOptionRomTable.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/UgaIo.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>

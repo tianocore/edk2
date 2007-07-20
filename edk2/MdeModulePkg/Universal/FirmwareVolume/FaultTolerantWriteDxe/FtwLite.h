@@ -29,20 +29,14 @@ Abstract:
 #ifndef _EFI_FAULT_TOLERANT_WRITE_LITE_H_
 #define _EFI_FAULT_TOLERANT_WRITE_LITE_H_
 
-//
-// The package level header files this module uses
-//
+
 #include <PiDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
+
 #include <Protocol/PciRootBridgeIo.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Protocol/FaultTolerantWriteLite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-//
-// The Library classes this module consumes
-//
+
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
