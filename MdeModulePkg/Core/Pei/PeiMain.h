@@ -32,7 +32,7 @@ Revision History
 #include <Ppi/StatusCode.h>
 #include <Ppi/Security.h>
 #include <Ppi/Reset.h>
-#include <Ppi/LoadFile.h>
+#include <Ppi/FvLoadFile.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
