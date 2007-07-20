@@ -146,6 +146,9 @@
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
 
+[PcdsFixedAtBuild.IPF]
+  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
