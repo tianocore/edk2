@@ -120,7 +120,6 @@ Returns:
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
   EFI_LOADED_IMAGE_PROTOCOL *ImageInfo;
-  EFI_ACPI_S3_SAVE_PROTOCOL *AcpiS3Save;
   EFI_BLOCK_IO_PROTOCOL     *BlkIo;
   VOID                      *Buffer;
 
@@ -137,15 +136,6 @@ Returns:
   //
   EFI64_SHADOW_ALL_LEGACY_ROM ();
 
-  //
-  // Notes: this code can be remove after the s3 script table
-  // hook on the event EFI_EVENT_SIGNAL_READY_TO_BOOT or
-  // EFI_EVENT_SIGNAL_LEGACY_BOOT
-  //
-  Status = gBS->LocateProtocol (&gEfiAcpiS3SaveProtocolGuid, NULL, &AcpiS3Save);
-  if (!EFI_ERROR (Status)) {
-    AcpiS3Save->S3Save (AcpiS3Save, NULL);
-  }
   //
   // If it's Device Path that starts with a hard drive path,
   // this routine will do the booting.
