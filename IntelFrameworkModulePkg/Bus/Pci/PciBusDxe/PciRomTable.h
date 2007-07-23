@@ -1,4 +1,5 @@
-/*++
+/**@file
+  Option Rom Support for PCI Bus Driver
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -9,17 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  PciRomTable.h
-  
-Abstract:
-
-  Option Rom Support for PCI Bus Driver
-
-Revision History
-
---*/
+**/
 
 #ifndef _EFI_PCI_ROM_TABLE_H
 #define _EFI_PCI_ROM_TABLE_H

@@ -1,5 +1,8 @@
-/*++
+/**@file
 
+  This is an example of how a driver might export data to the HII protocol to be
+  later utilized by the Setup Protocol
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,17 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  DriverSample.h
-
-Abstract:
-
-
-Revision History
-
---*/
-
+**/
 #ifndef _DRIVER_SAMPLE_H
 #define _DRIVER_SAMPLE_H
 

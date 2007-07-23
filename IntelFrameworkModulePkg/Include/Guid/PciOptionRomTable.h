@@ -1,5 +1,6 @@
-/*++
-
+/**@file
+  GUID and data structure used to describe the list of PCI Option ROMs present in a system.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  PciOptionRomTable.h
-    
-Abstract:
-
-  GUID and data structure used to describe the list of PCI Option ROMs present in a system.
-
---*/
+**/
 
 #ifndef __PCI_OPTION_ROM_TABLE_GUID_H_
 #define __PCI_OPTION_ROM_TABLE_GUID_H_

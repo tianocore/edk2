@@ -1,4 +1,5 @@
-/*++
+/**@file
+
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,16 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Setup.h
-
-Abstract:
-
-
-Revision History
-
---*/
+**/
 
 #ifndef _SETUP_H
 #define _SETUP_H

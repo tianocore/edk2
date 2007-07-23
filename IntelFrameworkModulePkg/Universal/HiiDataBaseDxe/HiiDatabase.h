@@ -1,5 +1,8 @@
-/*++
+/**@file
 
+  This file contains global defines and prototype definitions
+  for the HII database.
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,16 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  HiiDatabase.h
-
-Abstract:
-
-  This file contains global defines and prototype definitions
-  for the HII database.
-
---*/
+**/
 
 #ifndef _HIIDATABASE_H
 #define _HIIDATABASE_H
