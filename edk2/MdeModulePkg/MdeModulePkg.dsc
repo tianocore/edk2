@@ -127,6 +127,8 @@
   ScsiLib|$(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   FrameworkHiiLib|$(WORKSPACE)/IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UsbLib|$(WORKSPACE)/MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  NetLib|$(WORKSPACE)/MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  IpIoLib|$(WORKSPACE)/MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|$(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -393,6 +395,12 @@
   $(WORKSPACE)/MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   $(WORKSPACE)/MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   $(WORKSPACE)/MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
+
+  $(WORKSPACE)/MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+  $(WORKSPACE)/MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+
+  $(WORKSPACE)/MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
 
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
