@@ -28,7 +28,6 @@
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/SimpleNetwork.h>
-#include <Protocol/AcpiS3Save.h>
 #include <Protocol/FormBrowserFramework.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/DriverBinding.h>

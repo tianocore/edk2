@@ -82,7 +82,6 @@
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL SOMETIMES_CONSUMED
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
-  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
   gEfiFirmwareVolumeProtocolGuid                # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 

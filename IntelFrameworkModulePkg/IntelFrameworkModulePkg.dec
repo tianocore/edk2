@@ -14,76 +14,33 @@
 #
 #**/
 
-
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
-
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = IntelFrameworkModulePkg
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
   PACKAGE_VERSION                = 0.1
 
-################################################################################
-#
-# Include Section - list of Include Paths that are provided by this package.
-#                   Comments are used for Keywords and Module Types.
-#
-# Supported Module Types:
-#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
-#
-################################################################################
 [Includes.common]
   Include                        # Root include for the package
 
-################################################################################
-#
-# Library Class Header section - list of Library Class header files that are
-#                                provided by this package.
-#
-################################################################################
 [LibraryClasses.common]
   PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
-################################################################################
-#
-# Global Guid Definition section - list of Global Guid C Name Data Structures
-#                                  that are provided by this package.
-#
-################################################################################
 [Guids.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
-  gEfiPciHotplugDeviceGuid        = { 0x0B280816, 0x52E7, 0x4E51, { 0xAA, 0x57, 0x11, 0xBD, 0x41, 0xCB, 0xEF, 0xC3 }}
-  gEfiPciOptionRomTableGuid       = { 0x7462660F, 0x1CBD, 0x48DA, { 0xAD, 0x11, 0x91, 0x71, 0x79, 0x13, 0x83, 0x1C }}
-  gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
   gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
+  gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
+  gEfiPciOptionRomTableGuid       = { 0x7462660F, 0x1CBD, 0x48DA, { 0xAD, 0x11, 0x91, 0x71, 0x79, 0x13, 0x83, 0x1C }}
+  gEfiPciHotplugDeviceGuid        = { 0x0B280816, 0x52E7, 0x4E51, { 0xAA, 0x57, 0x11, 0xBD, 0x41, 0xCB, 0xEF, 0xC3 }}
 
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
 
-################################################################################
-#
-# Global Protocols Definition section - list of Global Protocols C Name Data
-#                                  Structures that are provided by this package.
-#
-################################################################################
 [Protocols.common]
-  gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
-  gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
   gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
+  gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
   gEfiIsaIoProtocolGuid          = { 0x7ee2bd44, 0x3da0, 0x11d4, { 0x9a, 0x38, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
+  gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
   gEfiPs2PolicyProtocolGuid      = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 }}
-
-
-################################################################################
-#
-# PCD Declarations section - list of all PCDs Declared by this Package
-#                            Only this package should be providing the
-#                            declaration, other packages should not.
-#
-################################################################################
 
 [PcdsDynamic.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1
