@@ -1,4 +1,6 @@
-/*++
+/**@file
+
+  This file contains the keyboard processing code to the HII database.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -7,17 +9,9 @@ which accompanies this distribution.  The full text of the license may be found 
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Keyboard.c
-
-Abstract:
-
-  This file contains the keyboard processing code to the HII database.
-
---*/
+**/
 
 
 #include "HiiDatabase.h"

@@ -1,5 +1,7 @@
-/*++
-
+/**@file
+  GUID used to identify Data Hub records that originate from the Tiano 
+  ReportStatusCode API.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,16 +11,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
+**/
 
-  StatusCode.h
-    
-Abstract:
-
-  GUID used to identify Data Hub records that originate from the Tiano 
-  ReportStatusCode API.
-
---*/
 
 #ifndef __STATUS_CODE_H__
 #define __STATUS_CODE_H__

@@ -1,5 +1,7 @@
-/*++
-
+/**@file
+  This code supports a the private implementation 
+  of the Data Hub protocol
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,15 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  DataHub.h
-
-Abstract:
-  This code supports a the private implementation 
-  of the Data Hub protocol
-
---*/
+**/
 
 #ifndef _DATA_HUB_H_
 #define _DATA_HUB_H_

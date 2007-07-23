@@ -1,4 +1,9 @@
-/*++
+/**@file
+  Support for Basic Graphics operations.
+
+  BugBug: Currently *.BMP files are supported. This will be replaced
+          when Tiano graphics format is supported.
+
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -9,19 +14,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  Graphics.c
-
-Abstract:
-
-  Support for Basic Graphics operations.
-
-  BugBug: Currently *.BMP files are supported. This will be replaced
-          when Tiano graphics format is supported.
-
---*/
-
+**/
 
 //
 // Include common header file for this module.
