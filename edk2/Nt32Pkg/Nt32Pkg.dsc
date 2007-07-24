@@ -334,7 +334,7 @@
   PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
   PcdWinNtVirtualDisk|gEfiNt32PkgTokenSpaceGuid|L"FW;40960;512"|24
   PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid|L"Intel(R) Processor Model"|48
-  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"E:RW;245760;512"|30
+  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"a:RW;2880;512!e:RW;262144;512"|30
   PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid|L"UGA Window 1!UGA Window 2"|50
   PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
   PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid|0x280000
