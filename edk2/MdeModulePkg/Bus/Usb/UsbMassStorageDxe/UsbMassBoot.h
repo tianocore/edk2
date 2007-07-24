@@ -39,12 +39,14 @@ enum {
   USB_BOOT_INQUIRY_OPCODE         = 0x12,
   USB_BOOT_REQUEST_SENSE_OPCODE   = 0x03,
 
-  USB_BOOT_MODE_SENSE10_OPCODE    = 0x5a,
+  USB_BOOT_MODE_SENSE10_OPCODE    = 0x5A,
   USB_BOOT_READ_CAPACITY_OPCODE   = 0x25,
   USB_BOOT_TEST_UNIT_READY_OPCODE = 0x00,
   USB_BOOT_READ10_OPCODE          = 0x28,
-  USB_BOOT_WRITE10_OPCODE         = 0x2a,
+  USB_BOOT_WRITE10_OPCODE         = 0x2A,
 
+  USB_SCSI_MODE_SENSE6_OPCODE     = 0x1A,
+  
   //
   // The Sense Key part of the sense data. Sense data has three levels:
   // Sense key, Additional Sense Code and Additional Sense Code Qualifier
@@ -64,12 +66,8 @@ enum {
   USB_BOOT_SENSE_MISCOMPARE       = 0x0E, // Source data mis-match while verfying.
 
   USB_BOOT_ASC_NOT_READY          = 0x04,
-  USB_BOOT_ASC_MEDIA_UPSIDE_DOWN  = 0x06,
   USB_BOOT_ASC_NO_MEDIA           = 0x3A,
   USB_BOOT_ASC_MEDIA_CHANGE       = 0x28,
-
-  USB_BOOT_ASCQ_IN_PROGRESS       = 0x01,
-  USB_BOOT_ASCQ_DEVICE_BUSY       = 0xFF,
 
   //
   // Other parameters
@@ -90,11 +88,13 @@ enum {
   //
   // Boot Transfer timeout
   //
-  USB_BOOT_GENERAL_BLOCK_TIMEOUT  = 200 * USB_MASS_STALL_1_MS,
-  USB_BOOT_OPTICAL_BLOCK_TIMEOUT  = 1 * USB_MASS_STALL_1_S,
-  USB_BOOT_GENERAL_CMD_TIMEOUT    = 1 * USB_MASS_STALL_1_S,
-  USB_BOOT_INQUIRY_CMD_TIMEOUT    = 3 * USB_MASS_STALL_1_S,
-
+  // USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy, 
+  // USB CD-Rom and iPod devices are much slower than USB key when reponse 
+  // most of commands, So we set 5s as timeout here.
+  // 
+  //
+  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_STALL_1_S,
+  
   //
   // Supported PDT codes, or Peripheral Device Type
   //
@@ -159,7 +159,7 @@ typedef struct {
   UINT8             ParaListLenLsb;
   UINT8             Reserved1;
   UINT8             Pad[2];
-} USB_BOOT_MODE_SENSE_CMD;
+} USB_BOOT_MODE_SENSE10_CMD;
 
 typedef struct {
   UINT8             ModeDataLenMsb;
@@ -167,7 +167,7 @@ typedef struct {
   UINT8             Reserved0[4];
   UINT8             BlkDesLenMsb;
   UINT8             BlkDesLenLsb;
-} USB_BOOT_MODE_PARA_HEADER;
+} USB_BOOT_MODE_SENSE10_PARA_HEADER;
 
 typedef struct {
   UINT8             OpCode;
@@ -209,6 +209,22 @@ typedef struct {
   UINT8             ASCQ;           // Additional Sense Code Qualifier
   UINT8             Reserverd2[4];
 } USB_BOOT_REQUEST_SENSE_DATA;
+
+typedef struct {
+  UINT8             OpCode;
+  UINT8             Lun;
+  UINT8             PageCode;
+  UINT8             Reserved0;
+  UINT8             AllocateLen;
+  UINT8             Control;
+} USB_SCSI_MODE_SENSE6_CMD;
+
+typedef struct {
+  UINT8             ModeDataLen;
+ UINT8             MediumType;
+  UINT8             DevicePara;
+  UINT8             BlkDesLen;
+} USB_SCSI_MODE_SENSE6_PARA_HEADER;
 #pragma pack()
 
 //

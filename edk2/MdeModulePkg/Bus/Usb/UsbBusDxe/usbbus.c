@@ -645,9 +645,14 @@ UsbIoGetEndpointDescriptor (
 
   UsbIf  = USB_INTERFACE_FROM_USBIO (This);
 
-  if ((Descriptor == NULL) || (Index >= UsbIf->IfSetting->Desc.NumEndpoints)) {
+  if ((Descriptor == NULL) || (Index > 15)) {
     gBS->RestoreTPL (OldTpl);
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (Index >= UsbIf->IfSetting->Desc.NumEndpoints) {
+    gBS->RestoreTPL (OldTpl);
+    return EFI_NOT_FOUND;
   }
 
   CopyMem (
@@ -813,6 +818,11 @@ UsbIoPortReset (
   UsbIf  = USB_INTERFACE_FROM_USBIO (This);
   Dev    = UsbIf->Device;
 
+  if (UsbIf->IsHub == TRUE) {
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
+  }
+
   HubIf  = Dev->ParentIf;
   Status = HubIf->HubApi->ResetPort (HubIf, Dev->ParentPort);
 
@@ -875,7 +885,6 @@ EFI_USB_IO_PROTOCOL mUsbIoProtocol = {
   UsbIoPortReset
 };
 
-//@MT: EFI_DRIVER_ENTRY_POINT (UsbBusDriverEntryPoint)
 
 EFI_STATUS
 EFIAPI
