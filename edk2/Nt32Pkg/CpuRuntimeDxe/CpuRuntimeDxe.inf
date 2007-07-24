@@ -32,7 +32,6 @@
 #
 
 [Sources.common]
-  Cpu.dxs
   CpuIo.c
   Cpu.c
   CpuDriver.h
