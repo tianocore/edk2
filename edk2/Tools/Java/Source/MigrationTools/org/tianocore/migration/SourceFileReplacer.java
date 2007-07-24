@@ -419,14 +419,14 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		Matcher mtrr8onlyhead;
 
 		// add head comment
-		Matcher mtrr8onlyheadcomment = Critic.PTN_NEW_HEAD_COMMENT
-				.matcher(line);
-		if (mtrr8onlyheadcomment.find()) {
-			outfile1.append(mtrr8onlyheadcomment.group() + "\n\n");
-			outfile2.append(mtrr8onlyheadcomment.group() + "\n\n");
-		}
-
-		// add functions body
+        if (mi.license != null) {
+            String header = "/**@file\n  Copyright (c) 2007, Intel Corporation\n\n" + 
+            mi.license.replace("      ", "  ") + "**/\n\n";		
+            outfile1.append(header);
+    		outfile2.append(header);
+        }
+        
+    // add functions body
 		while (mtrr8only.find()) {
 			if (mi.hashr8only.contains(mtrr8only.group(3))) {
 				paragraph = mtrr8only.group(2);
