@@ -27,9 +27,9 @@
 typedef struct _EFI_SEC_PLATFORM_INFORMATION_PPI EFI_SEC_PLATFORM_INFORMATION_PPI;
 
 
-///
-/// EFI_HEALTH_FLAGS
-///
+//
+// EFI_HEALTH_FLAGS
+//
 typedef union {
   struct {
     UINT32   Status                   : 2;
@@ -43,6 +43,25 @@ typedef union {
   } Bits;
   UINT32     Uint32;
 } EFI_HEALTH_FLAGS;
+
+
+/**
+
+  @param BootPhase  entry r20 value.
+
+  @param UniqueId   PAL arbitration ID.
+
+  @param HealthStat Health Status
+
+  @param PALRetAddress  Return address to PAL
+   
+**/
+typedef struct {
+  UINTN BootPhase;
+  UINTN UniqueId;
+  UINTN HealthStat;
+  UINTN PALRetAddress;
+} IPF_HANDOFF_STATUS;
 
 typedef struct {
   EFI_HEALTH_FLAGS HealthFlags;
