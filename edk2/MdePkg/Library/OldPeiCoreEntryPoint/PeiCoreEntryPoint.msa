@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>PeiCoreEntryPoint</ModuleName>
     <ModuleType>PEI_CORE</ModuleType>
-    <GuidValue>b3b0654a-969d-4096-86cb-27e262a02083</GuidValue>
+    <GuidValue>7AA626A3-238A-4c4c-9313-E9F937A744F0</GuidValue>
     <Version>1.0</Version>
     <Abstract>Entry point to a the PEI Core</Abstract>
     <Description>The library contains the entry point to a PEI core Module Type.</Description>

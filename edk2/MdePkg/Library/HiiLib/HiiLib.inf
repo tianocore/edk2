@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HiiLib
-  FILE_GUID                      = 1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c
+  FILE_GUID                      = 3143687A-7C80-404e-B5FE-2D88980E1B1C
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER

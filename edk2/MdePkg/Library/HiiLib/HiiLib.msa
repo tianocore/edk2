@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>HiiLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <GuidValue>1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c</GuidValue>
+    <GuidValue>3143687A-7C80-404e-B5FE-2D88980E1B1C</GuidValue>
     <Version>1.0</Version>
     <Abstract>Library instance for HII common routines.</Abstract>
     <Description>This library instance implements the common HII routines.</Description>
