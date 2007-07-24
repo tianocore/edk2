@@ -21,7 +21,7 @@ Revision History
 
 
 #include "Variable.h"
-#include <Common/FlashMap.h>
+#include <Guid/FlashMapHob.h>
 
 //
 // Don't use module globals after the SetVirtualAddress map is signaled

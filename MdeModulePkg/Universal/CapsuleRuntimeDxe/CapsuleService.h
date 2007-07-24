@@ -37,8 +37,6 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <Common/CapsuleName.h>
-
 extern EFI_GUID gEfiCapsuleGuid;
 
 EFI_STATUS

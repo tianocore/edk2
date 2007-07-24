@@ -37,13 +37,9 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
-#include <Common/FlashMap.h>
 #include <Guid/FlashMapHob.h>
-
-//
-// BugBug: We need relcate the head file.
-//
-#include <Common/Variable.h>
+#include <Guid/FlashMapHob.h>
+#include <VariableFormat.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
 

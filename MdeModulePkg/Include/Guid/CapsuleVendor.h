@@ -30,6 +30,11 @@ Abstract:
 #define EFI_CAPSULE_VENDOR_GUID  \
   { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 } }
 
+//
+// Name of capsule variable
+// 
+#define EFI_CAPSULE_VARIABLE_NAME L"CapsuleUpdateData"
+
 extern EFI_GUID gEfiCapsuleVendorGuid;
 
 #endif // #ifndef _EFI_CAPSULE_VENDOR_GUID_H_
