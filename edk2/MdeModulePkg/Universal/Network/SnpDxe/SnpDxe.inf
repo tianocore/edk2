@@ -1,5 +1,5 @@
 #/** @file
-# Component name for module NetLib
+# Component name for module SNP
 #
 # FIX ME!
 # Copyright (c) 2006, Intel Corporation. All right reserved.
@@ -17,14 +17,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = NetLibDxe
-  FILE_GUID                      = db6dcef3-9f4e-4340-9351-fc35aa8a5888
+  BASE_NAME                      = SnpDxe
+  FILE_GUID                      = A2f436EA-A127-4EF8-957C-8048606FF670
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NetLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
+  ENTRY_POINT                    = InitializeSnpNiiDriver
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -33,9 +33,25 @@
 #
 
 [Sources.common]
-  DxeNetLib.c
-  NetBuffer.c
-  NetDebug.c
+  receive.c
+  snp.h
+  nvdata.c
+  get_status.c
+  start.c
+  snp.c
+  stop.c
+  statistics.c
+  reset.c
+  shutdown.c
+  mcast_ip_to_mac.c
+  transmit.c
+  WaitForPacket.c
+  receive_filters.c
+  initialize.c
+  ComponentName.c
+  callback.c
+  station_address.c
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,15 +59,17 @@
 
 
 [LibraryClasses]
-   NetLib
-   BaseLib
-   DebugLib
-   BaseMemoryLib
-   UefiBootServicesTableLib
-   UefiRuntimeServicesTableLib
-   UefiLib
-   MemoryAllocationLib
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+
 
 [Protocols]
+  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiNetworkInterfaceIdentifierProtocolGuid    # PROTOCOL ALWAYS_CONSUMED
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 # PROTOCOL ALWAYS_CONSUMED

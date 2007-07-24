@@ -401,6 +401,10 @@
   $(WORKSPACE)/MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
 
   $(WORKSPACE)/MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 

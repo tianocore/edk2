@@ -171,7 +171,7 @@ typedef struct _IP_IO_SEND_ENTRY {
   EFI_IP4_COMPLETION_TOKEN  *SndToken;
 } IP_IO_SEND_ENTRY;
 
-typedef struct _EFI_IP4_OVERRIDE_DATA IP_IO_OVERRIDE;
+typedef EFI_IP4_OVERRIDE_DATA IP_IO_OVERRIDE;
 
 typedef struct _IP_IO_IP_INFO {
   IP4_ADDR                  Addr;

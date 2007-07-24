@@ -1,5 +1,5 @@
 #/** @file
-# Component name for module NetLib
+# Component name for module Udp4
 #
 # FIX ME!
 # Copyright (c) 2006, Intel Corporation. All right reserved.
@@ -17,14 +17,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = NetLibDxe
-  FILE_GUID                      = db6dcef3-9f4e-4340-9351-fc35aa8a5888
+  BASE_NAME                      = Udp4
+  FILE_GUID                      = 6d6963ab-906d-4a65-a7ca-bd40e5d6af2b
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NetLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
+  ENTRY_POINT                    = Udp4DriverEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -33,9 +33,14 @@
 #
 
 [Sources.common]
-  DxeNetLib.c
-  NetBuffer.c
-  NetDebug.c
+  Udp4Impl.h
+  Udp4Main.c
+  ComponentName.c
+  Udp4Impl.c
+  Udp4Driver.h
+  Udp4Driver.c
+  CommonHeader.h
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,15 +48,19 @@
 
 
 [LibraryClasses]
-   NetLib
-   BaseLib
-   DebugLib
-   BaseMemoryLib
-   UefiBootServicesTableLib
-   UefiRuntimeServicesTableLib
-   UefiLib
-   MemoryAllocationLib
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  IpIoLib
+  NetLib
+
 
 [Protocols]
-  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
 

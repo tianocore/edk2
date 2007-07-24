@@ -41,25 +41,12 @@
 
 
 [LibraryClasses]
-  MemoryAllocationLib
-  UefiLib
+  IpIoLib
   BaseLib
-  UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
-  BaseMemoryLib
   DebugLib
-  PrintLib
-
+  UefiBootServicesTableLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverDiagnosticsProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverConfigurationProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
-  gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-
