@@ -44,7 +44,7 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <Common/WorkingBlockHeader.h>
+#include <WorkingBlockHeader.h>
 
 #define EFI_D_FTW_LITE  EFI_D_ERROR
 #define EFI_D_FTW_INFO  EFI_D_INFO

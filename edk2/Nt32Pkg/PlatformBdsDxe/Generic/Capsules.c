@@ -25,7 +25,7 @@ Abstract:
 //
 #include "CommonHeader.h"
 
-#include <Common/FlashMap.H>
+#include <Guid/FlashMapHob.h>
 
 VOID
 BdsLockFv (

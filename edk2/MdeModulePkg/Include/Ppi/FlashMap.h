@@ -24,7 +24,7 @@ Abstract:
 #ifndef _PEI_FLASH_MAP_PPI_H_
 #define _PEI_FLASH_MAP_PPI_H_
 
-#include <common/FlashMap.h>
+#include <Guid/FlashMapHob.h>
 
 #define PEI_FLASH_MAP_PPI_GUID \
   { 0xf34c2fa0, 0xde88, 0x4270, {0x84, 0x14, 0x96, 0x12, 0x22, 0xf4, 0x52, 0x1c } }

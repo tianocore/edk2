@@ -1,8 +1,6 @@
 #/** @file
 # EFI/PI Reference Module Package for All Architectures
 #
-# This FPD file is used for Package Level build.
-#
 # Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

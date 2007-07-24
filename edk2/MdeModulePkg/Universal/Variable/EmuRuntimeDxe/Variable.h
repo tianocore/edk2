@@ -37,11 +37,7 @@ Abstract:
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
-
-//
-// BugBug: We need relcate the head file.
-//
-#include <Common/Variable.h>
+#include <VariableFormat.h>
 
 #define VARIABLE_STORE_SIZE (64 * 1024)
 #define SCRATCH_SIZE        (4 * 1024)

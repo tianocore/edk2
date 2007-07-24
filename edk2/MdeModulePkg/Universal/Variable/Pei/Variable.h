@@ -30,12 +30,7 @@ Abstract:
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
-
-
-//
-// BugBug: We need relcate the head file.
-//
-#include <Common/Variable.h>
+#include <VariableFormat.h>
 
 //
 // Define GET_PAD_SIZE to optimize compiler

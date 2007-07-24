@@ -23,8 +23,8 @@ Revision History
 --*/
 
 
-#include <Variable.h>
-#include "Common/Variable.h"
+#include "Variable.h"
+#include <VariableFormat.h>
 
 EFI_STATUS
 GetFvbHandleByAddress (

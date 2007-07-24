@@ -23,7 +23,7 @@ Abstract:
 #include "DxeIpl.h"
 
 // porting note remove later
-#include "Common/DecompressLibraryHob.h"
+#include "DecompressLibrary.h"
 #include "FrameworkPei.h"
 // end of remove later
 
