@@ -30,8 +30,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gGraphicsConsoleDriverBinding                
-#  COMPONENT_NAME                =  gGraphicsConsoleComponentName                
+#  DRIVER_BINDING                =  gGraphicsConsoleDriverBinding
+#  COMPONENT_NAME                =  gGraphicsConsoleComponentName
 #
 
 [Sources.common]
@@ -52,7 +52,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-  HiiLib  
+  HiiLibFramework
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
