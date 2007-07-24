@@ -771,6 +771,67 @@ EhciDelAllAsyncIntTransfers (
   }
 }
 
+STATIC
+EFI_STATUS
+EhcFlushAsyncIntMap (
+  IN  USB2_HC_DEV         *Ehc,
+  IN  URB                 *Urb
+  )
+/*++
+
+Routine Description:
+
+  Flush data from PCI controller specific address to mapped system 
+  memory address.
+
+Arguments:
+
+  Ehc         - The EHCI device
+  Urb         - The URB to unmap
+  
+Returns:
+
+  EFI_SUCCESS      - Success to flush data to mapped system memory
+  EFI_DEVICE_ERROR - Fail to flush data to mapped system memory
+
+--*/
+{
+  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS          PhyAddr;
+  EFI_PCI_IO_PROTOCOL_OPERATION MapOp;
+  EFI_PCI_IO_PROTOCOL           *PciIo;
+  UINTN                         Len;
+  VOID                          *Map;
+
+  PciIo = Ehc->PciIo;
+  Len   = Urb->DataLen;
+
+  if (Urb->Ep.Direction == EfiUsbDataIn) {
+    MapOp = EfiPciIoOperationBusMasterWrite;
+  } else {
+    MapOp = EfiPciIoOperationBusMasterRead;
+  }
+  
+  Status = PciIo->Unmap (PciIo, Urb->DataMap);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Urb->DataMap = NULL;
+
+  Status = PciIo->Map (PciIo, MapOp, Urb->Data, &Len, &PhyAddr, &Map);
+  if (EFI_ERROR (Status) || (Len != Urb->DataLen)) {
+    goto ON_ERROR;
+  }
+
+  Urb->DataPhy  = (VOID *) ((UINTN) PhyAddr);
+  Urb->DataMap  = Map;
+  return EFI_SUCCESS;
+
+ON_ERROR:
+  return EFI_DEVICE_ERROR;
+}
+
 
 
 /**
@@ -873,6 +934,7 @@ EhcMoniteAsyncRequests (
   BOOLEAN                 Finished;
   UINT8                   *ProcBuf;
   URB                     *Urb;
+  EFI_STATUS              Status;
 
   OldTpl  = gBS->RaiseTPL (EHC_TPL);
   Ehc     = (USB2_HC_DEV *) Context;
@@ -890,6 +952,15 @@ EhcMoniteAsyncRequests (
       continue;
     }
 
+    //
+    // Flush any PCI posted write transactions from a PCI host 
+    // bridge to system memory.
+    //
+    Status = EhcFlushAsyncIntMap (Ehc, Urb);
+    if (EFI_ERROR (Status)) {
+      EHC_ERROR (("EhcMoniteAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
+    }
+    
     //
     // Allocate a buffer then copy the transferred data for user.
     // If failed to allocate the buffer, update the URB for next

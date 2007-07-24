@@ -881,40 +881,71 @@ UsbEnumeratePort (
   // connect/disconnect. Other three events are: ENABLE, SUSPEND, RESET.
   // ENABLE/RESET is used to reset port. SUSPEND isn't supported.
   //
-  Status = EFI_SUCCESS;
+  
+  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_OVERCURRENT)) {     
 
-  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_OVERCURRENT)) {
-    //
-    // If overcurrent condition is cleared, enable the port again
-    //
-    if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_OVERCURRENT)) {
-      HubApi->SetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
-    }
-
-  } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_CONNECTION)) {
-    //
-    // Device connected or disconnected. Either way, if there is
-    // already a device present in the bus, need to remove it.
-    //
-    Child = UsbFindChild (HubIf, Port);
-
-    if (Child != NULL) {
-      USB_DEBUG (("UsbEnumeratePort: device at port %d removed from system\n", Port));
-      UsbRemoveDevice (Child);
-    }
-
-    if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
+    if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_OVERCURRENT)) {
       //
-      // Now, new device connected, enumerate and configure the device
+      // Both OverCurrent and OverCurrentChange set, means over current occurs, 
+      // which probably is caused by short circuit. It has to wait system hardware
+      // to perform recovery.
       //
-      USB_DEBUG (("UsbEnumeratePort: new device connected at port %d\n", Port));
-      Status = UsbEnumerateNewDev (HubIf, Port);
-
+      USB_DEBUG (("UsbEnumeratePort: Critical Over Current\n", Port));
+      return EFI_DEVICE_ERROR;
+      
     } else {
-      USB_DEBUG (("UsbEnumeratePort: device disconnected event on port %d\n", Port));
+      //
+      // Only OverCurrentChange set, means system has been recoveried from 
+      // over current. As a result, all ports are nearly power-off, so
+      // it's necessary to detach and enumerate all ports again. 
+      //
+      USB_DEBUG (("UsbEnumeratePort: 2.0 device Recovery Over Current\n", Port)); 
+      goto ON_ENUMERATE;
+      
     }
   }
 
+  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_ENABLE)) {  
+    //
+    // 1.1 roothub port reg doesn't reflect over-current state, while its counterpart
+    // on 2.0 roothub does. When over-current has influence on 1.1 device, the port 
+    // would be disabled, so it's also necessary to detach and enumerate again.
+    //
+    USB_DEBUG (("UsbEnumeratePort: 1.1 device Recovery Over Current\n", Port));
+    goto ON_ENUMERATE;
+  }
+  
+  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_CONNECTION)) {
+    //
+    // Device connected or disconnected normally. 
+    //
+    goto ON_ENUMERATE;
+  }
+
+ON_ENUMERATE:
+
+  // 
+  // In case there is already a device on this port logically, it's safety to remove
+  // and enumerate again.
+  //
+  Child = UsbFindChild (HubIf, Port);
+  
+  if (Child != NULL) {
+    USB_DEBUG (("UsbEnumeratePort: device at port %d removed from system\n", Port));
+    UsbRemoveDevice (Child);
+  }
+  
+  if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
+    //
+    // Now, new device connected, enumerate and configure the device 
+    //
+    USB_DEBUG (("UsbEnumeratePort: new device connected at port %d\n", Port));
+    Status = UsbEnumerateNewDev (HubIf, Port);
+  
+  } else {
+    USB_DEBUG (("UsbEnumeratePort: device disconnected event on port %d\n", Port));
+  }
+  
   HubApi->ClearPortChange (HubIf, Port);
   return Status;
 }

@@ -150,10 +150,14 @@ EhcDumpBuf (
   #define EHC_DEBUG(arg)                  EhcDebug    arg
   #define EHC_ERROR(arg)                  EhcError    arg
   #define EHC_DUMP_QH(arg)                EhcDumpQh   arg
+  #define EHC_DUMP_QTD(arg)               EhcDumpQtd  arg
+  #define EHC_DUMP_BUF(arg)               EhcDumpBuf  arg
 #else
   #define EHC_DEBUG(arg)
   #define EHC_ERROR(arg)
   #define EHC_DUMP_QH(arg)
+  #define EHC_DUMP_QTD(arg)
+  #define EHC_DUMP_BUF(arg)
 #endif
 
 #endif
