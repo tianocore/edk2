@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiCoreEntryPoint
-  FILE_GUID                      = b3b0654a-969d-4096-86cb-27e262a02083
+  FILE_GUID                      = 7AA626A3-238A-4c4c-9313-E9F937A744F0
   MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeiCoreEntryPoint|PEI_CORE 
