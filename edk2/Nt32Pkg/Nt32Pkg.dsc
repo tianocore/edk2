@@ -80,6 +80,9 @@
 [LibraryClasses.common.BASE]
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
+[LibraryClasses.common.USER_DEFINED]
+  DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+
 [LibraryClasses.common.SEC]
   DebugLib|$(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
