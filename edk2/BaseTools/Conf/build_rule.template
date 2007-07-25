@@ -38,12 +38,29 @@ FileTypeMapping = {
     ".asl"  :   "Acpi-Source-Language",
     ".Asl"  :   "Acpi-Source-Language",
     ".ASL"  :   "Acpi-Source-Language",
+    ".aslc" :   "Acpi-Table-Source",
     ".obj"  :   "Object",
     ".o"    :   "Object",
     ".lib"  :   "Static-Library",
     ".a"    :   "Static-Library",
     ".dll"  :   "Dynamic-Library",
     ".so"   :   "Dynamic-Library",
+}
+
+ObjectFileMapping = {
+    "C-Code"                        :   ".obj",
+#    "C-Header"                      :   ".gch",
+    "Masm-Code"                     :   ".obj",
+    "Iasm-Code"                     :   ".obj",      # IPF assembly code
+    "Gasm-Code"                     :   ".obj",      # GNU assembly code
+    "Visual-Form-Representation"    :   ".obj",
+    "Preprocessed-Code"             :   ".obj",
+    "Object"                        :   ".dll",
+    "Static-Library"                :   ".dll",
+		"Dynamic-Library"               :   ".efi",
+    "Dependency-Expression"         :   ".depex",
+		"Acpi-Source-Language"          :   ".aml",
+		"Acpi-Table-Source"             :   ".acpi",
 }
 
 DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL"]
@@ -60,6 +77,8 @@ ToolCodeMapping = {
     "Object"                        :   ["SLINK"],
     "Static-Library"                :   ["DLINK"],
     "Dependency-Expression"         :   ["PP"],
+		"Acpi-Source-Language"          :   ["PP", "ASL"],
+		"Acpi-Table-Source"             :   ["CC", "DLINK"],
 }
 
 ToolChainFamilyMapping = {
@@ -123,6 +142,23 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep
 \t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
 \t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
+''',
+
+"Acpi-Source-Language" :
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\t"$(ASL)" /nologo /Fo$@ $(@D)${_sep_}${fbase}.i
+''',
+
+"Acpi-Table-Source" :
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
+\t"$(DLINK)" /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
+\tGenFw -o $@ -c $(@D)${_sep_}${fbase}.dll
 ''',
 },
 
