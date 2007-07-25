@@ -186,6 +186,63 @@ NT_ISA_SERIAL_DEVICE_PATH   gNtSerialDevicePath1 = {
   gEndEntire
 };
 
+NT_PLATFORM_CPU_MODEL_VIRTUAL_DEVICE_PATH gCpuModelDevicePath = {
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+    EFI_WIN_NT_THUNK_PROTOCOL_GUID
+  },
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
+    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
+    EFI_WIN_NT_CPU_MODEL_GUID,
+    0
+  },
+  gEndEntire
+};
+
+NT_PLATFORM_CPU_SPEED_VIRTUAL_DEVICE_PATH gCpuSpeedDevicePath = {
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+    EFI_WIN_NT_THUNK_PROTOCOL_GUID
+  },
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
+    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
+    EFI_WIN_NT_CPU_SPEED_GUID,
+    0
+  },
+  gEndEntire
+};
+
+NT_PLATFORM_MEMORY_VIRTUAL_DEVICE_PATH gMemoryDevicePath = {
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+    EFI_WIN_NT_THUNK_PROTOCOL_GUID
+  },
+  {
+    HARDWARE_DEVICE_PATH,
+    HW_VENDOR_DP,
+    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
+    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
+    EFI_WIN_NT_MEMORY_GUID,
+    0
+  },
+  gEndEntire
+};
+
 //
 // Predefined platform default console device path
 //
@@ -214,6 +271,18 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath1,
     (CONSOLE_OUT | CONSOLE_IN)
   },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *) &gCpuModelDevicePath,
+    (CONSOLE_OUT | CONSOLE_IN)
+  },  
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *) &gCpuSpeedDevicePath,
+    (CONSOLE_OUT | CONSOLE_IN)
+  },    
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *) &gMemoryDevicePath,
+    (CONSOLE_OUT | CONSOLE_IN)
+  },      
   {
     NULL,
     0

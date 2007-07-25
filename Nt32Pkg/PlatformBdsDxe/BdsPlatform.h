@@ -69,6 +69,24 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        End;
 } NT_PLATFORM_GOP_DEVICE_PATH;
 
+typedef struct {
+  VENDOR_DEVICE_PATH              NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE  NtCpuModelDevice;
+  EFI_DEVICE_PATH_PROTOCOL        End;
+} NT_PLATFORM_CPU_MODEL_VIRTUAL_DEVICE_PATH;
+
+typedef struct {
+  VENDOR_DEVICE_PATH              NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE  NtCpuSpeedDevice;
+  EFI_DEVICE_PATH_PROTOCOL        End;
+} NT_PLATFORM_CPU_SPEED_VIRTUAL_DEVICE_PATH;
+
+typedef struct {
+  VENDOR_DEVICE_PATH              NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE  NtMemoryDeivce;
+  EFI_DEVICE_PATH_PROTOCOL        End;
+} NT_PLATFORM_MEMORY_VIRTUAL_DEVICE_PATH;
+
 //
 // Platform BDS Functions
 //
