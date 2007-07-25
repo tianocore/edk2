@@ -18,11 +18,10 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecMain
   FILE_GUID                      = 4b837b03-6587-4d19-b82b-edfad836c0a0
-  MODULE_TYPE                    = SEC
+  MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
-  CUSTOM_MAKEFILE                = MSFT|Makefile
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -77,4 +76,7 @@
   #PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid
   #PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid
   
+[BuildOptions.common]
+  MSFT:DEBUG_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
+  MSFT:DEBUG_*_IA32_CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /D EFI32 /Od /DSTRING_ARRAY_NAME=SecMainStrings /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 
