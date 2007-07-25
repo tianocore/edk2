@@ -172,7 +172,7 @@ Udp4CreateService (
   //
   // Set the OpenData used to open the IpIo.
   //
-  OpenData.IpConfigData                 = mIpIoDefaultIpConfigData;
+  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
   OpenData.IpConfigData.AcceptBroadcast = TRUE;
   OpenData.RcvdContext                  = (VOID *) Udp4Service;
   OpenData.SndContext                   = NULL;
@@ -359,7 +359,7 @@ Udp4InitInstance (
   // Save the pointer to the UDP4_SERVICE_DATA, and initialize other members.
   //
   Instance->Udp4Service = Udp4Service;
-  Instance->Udp4Proto   = mUdp4Protocol;
+  CopyMem (&Instance->Udp4Proto, &mUdp4Protocol, sizeof (EFI_UDP4_PROTOCOL));
   Instance->IcmpError   = EFI_SUCCESS;
   Instance->Configured  = FALSE;
   Instance->IsNoMapping = FALSE;
@@ -613,7 +613,8 @@ Udp4BuildIp4ConfigData (
   IN EFI_IP4_CONFIG_DATA   *Ip4ConfigData
   )
 {
-  *Ip4ConfigData                   = mIpIoDefaultIpConfigData;
+  CopyMem (Ip4ConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+
   Ip4ConfigData->DefaultProtocol   = EFI_IP_PROTO_UDP;
   Ip4ConfigData->AcceptBroadcast   = Udp4ConfigData->AcceptBroadcast;
   Ip4ConfigData->AcceptPromiscuous = Udp4ConfigData->AcceptPromiscuous;
@@ -1280,7 +1281,7 @@ Udp4WrapRxData (
 
   NetListInit (&Wrap->Link);
 
-  Wrap->RxData = *RxData;
+  CopyMem (&Wrap->RxData, RxData, sizeof (EFI_UDP4_RECEIVE_DATA));
 
   //
   // Create the Recycle event.
@@ -1345,7 +1346,7 @@ Udp4EnqueueDgram (
       //
       // Wrap the RxData and put this Wrap into the instances RcvdDgramQue.
       //
-      Wrap = Udp4WrapRxData (Instance, Packet, RxData);
+      CopyMem (&Wrap, Udp4WrapRxData (Instance, Packet, RxData), sizeof (UDP4_RXDATA_WRAP));
       if (Wrap == NULL) {
         continue;
       }

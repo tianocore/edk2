@@ -454,7 +454,7 @@ EFI_STATUS
 NetLibGetMacString (
   IN           EFI_HANDLE  SnpHandle,
   IN           EFI_HANDLE  ImageHandle,
-  IN OUT CONST CHAR16      **MacString
+  IN OUT       CHAR16      **MacString
   );
 
 EFI_HANDLE

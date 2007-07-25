@@ -320,7 +320,7 @@ SockRcvdErr (
 //
 // the socket structure representing a network service access point
 //
-typedef struct _SOCKET {
+struct _SOCKET {
 
   //
   // socket description information
@@ -365,7 +365,7 @@ typedef struct _SOCKET {
     EFI_TCP4_PROTOCOL TcpProtocol;
     EFI_UDP4_PROTOCOL UdpProtocol;
   } NetProtocol;
-} SOCKET;
+};
 
 //
 // the token structure buffered in socket layer

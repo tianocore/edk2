@@ -44,7 +44,7 @@ EFI_TCP4_PROTOCOL mTcp4ProtocolTemplate = {
 
 SOCK_INIT_DATA mTcp4DefaultSockData = {
   SOCK_STREAM,
-  0,
+  (SOCK_STATE) 0,
   NULL,
   TCP_BACKLOG,
   TCP_SND_BUF_SIZE,
@@ -192,8 +192,8 @@ Returns:
   //
   Seed            = NetRandomInitSeed ();
   mTcpGlobalIss   = NET_RANDOM (Seed) % mTcpGlobalIss;
-  mTcp4RandomPort = TCP4_PORT_KNOWN +
-                    (UINT16) (NET_RANDOM(Seed) % TCP4_PORT_KNOWN);
+  mTcp4RandomPort = (UINT16) ( TCP4_PORT_KNOWN +
+                    (UINT16) (NET_RANDOM(Seed) % TCP4_PORT_KNOWN));
 
   return Status;
 }
@@ -306,7 +306,7 @@ Tcp4DriverBindingStart (
   //
   NetZeroMem (&OpenData, sizeof (IP_IO_OPEN_DATA));
 
-  OpenData.IpConfigData                 = mIpIoDefaultIpConfigData;
+  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
   OpenData.IpConfigData.DefaultProtocol = EFI_IP_PROTO_TCP;
 
   OpenData.PktRcvdNotify = Tcp4RxCallback;

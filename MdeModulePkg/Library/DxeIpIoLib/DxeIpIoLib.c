@@ -229,7 +229,7 @@ IpIoIcmpHandler (
     case ICMP_CODE_UNREACH_PROTOCOL:
     case ICMP_CODE_UNREACH_PORT:
     case ICMP_CODE_UNREACH_SRCFAIL:
-      IcmpErr = ICMP_ERR_UNREACH_NET + Code;
+      IcmpErr = (ICMP_ERROR) (ICMP_ERR_UNREACH_NET + Code);
 
       break;
 
@@ -266,7 +266,7 @@ IpIoIcmpHandler (
       return EFI_ABORTED;
     }
 
-    IcmpErr = Code + ICMP_ERR_TIMXCEED_INTRANS;
+    IcmpErr = (ICMP_ERROR) (Code + ICMP_ERR_TIMXCEED_INTRANS);
 
     break;
 
@@ -654,7 +654,7 @@ IpIoListenHandler (
 
   if (EFI_SUCCESS == Status) {
 
-    IpIo->PktRcvdNotify (EFI_SUCCESS, 0, &Session, Pkt, IpIo->RcvdContext);
+    IpIo->PktRcvdNotify (EFI_SUCCESS, (ICMP_ERROR) 0, &Session, Pkt, IpIo->RcvdContext);
   } else {
     //
     // Status is EFI_ICMP_ERROR
@@ -1050,7 +1050,7 @@ IpIoAddIp (
              IpIo->Controller,
              IpIo->Image,
              &IpInfo->ChildHandle,
-             &IpInfo->Ip
+             (VOID **) &IpInfo->Ip
              );
   if (EFI_ERROR (Status)) {
     goto ReleaseIpInfo;

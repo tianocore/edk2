@@ -1003,6 +1003,9 @@ TcpToSendAck (
   IN TCP_CB *Tcb
   )
 {
+  UINT32 TcpNow;
+
+  TcpNow = TcpRcvWinNow (Tcb);
   //
   // Generally, TCP should send a delayed ACK unless:
   //   1. ACK at least every other FULL sized segment received,
@@ -1011,7 +1014,7 @@ TcpToSendAck (
   //
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) ||
       (Tcb->DelayedAck >= 1) ||
-      (TcpRcvWinNow (Tcb) > TcpRcvWinOld (Tcb))
+      (TcpNow > TcpRcvWinOld (Tcb))
       ) {
     TcpSendAck (Tcb);
     return;

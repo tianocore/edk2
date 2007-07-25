@@ -48,7 +48,7 @@ Tcp4ChkDataBuf (
   UINT32 Len;
 
   for (Index = 0, Len = 0; Index < FragmentCount; Index++) {
-    Len = Len + FragmentTable[Index].FragmentLength;
+    Len = Len + (UINT32) FragmentTable[Index].FragmentLength;
   }
 
   if (DataLen != Len) {
@@ -380,8 +380,8 @@ Tcp4Transmit (
   }
 
   Status = Tcp4ChkDataBuf (
-            Token->Packet.TxData->DataLength,
-            Token->Packet.TxData->FragmentCount,
+            (UINT32) Token->Packet.TxData->DataLength,
+            (UINT32) Token->Packet.TxData->FragmentCount,
             Token->Packet.TxData->FragmentTable
             );
   if (EFI_ERROR (Status)) {
@@ -447,8 +447,8 @@ Tcp4Receive (
   }
 
   Status = Tcp4ChkDataBuf (
-            Token->Packet.RxData->DataLength,
-            Token->Packet.RxData->FragmentCount,
+            (UINT32) Token->Packet.RxData->DataLength,
+            (UINT32) Token->Packet.RxData->FragmentCount,
             Token->Packet.RxData->FragmentTable
             );
   if (EFI_ERROR (Status)) {

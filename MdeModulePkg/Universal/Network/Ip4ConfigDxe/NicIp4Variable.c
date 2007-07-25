@@ -150,7 +150,7 @@ Ip4ConfigReadVariable (
   //
   // Verify the checksum, variable size and count
   //
-  CheckSum = ~NetblockChecksum ((UINT8 *) Variable, (UINT32)Size);
+  CheckSum = (UINT16) (~NetblockChecksum ((UINT8 *) Variable, (UINT32)Size));
 
   if ((CheckSum != 0) || (Size != Variable->Len)) {
     goto REMOVE_VARIABLE;
@@ -378,6 +378,6 @@ Ip4ConfigModifyVariable (
 
   ASSERT (Next + Len == (UINT8 *) NewVar + TotalLen);
 
-  NewVar->CheckSum = ~NetblockChecksum ((UINT8 *) NewVar, TotalLen);
+  NewVar->CheckSum = (UINT16) (~NetblockChecksum ((UINT8 *) NewVar, TotalLen));
   return NewVar;
 }

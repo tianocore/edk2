@@ -55,8 +55,8 @@
 [LibraryClasses.IPF]
   IoLib|$(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
-[LibraryClasses.EBC]
-
+[LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
+  IoLib|$(WORKSPACE)/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint|$(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf

@@ -571,7 +571,7 @@ SockSend (
     goto Exit;
   }
 
-  DataLen = TxData->DataLength;
+  DataLen = (UINT32) TxData->DataLength;
 
   //
   // process this sending token now or buffer it only?

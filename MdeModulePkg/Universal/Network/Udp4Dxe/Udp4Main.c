@@ -86,7 +86,7 @@ Udp4GetModeData (
     //
     // Set the Udp4ConfigData.
     //
-    *Udp4ConfigData = Instance->ConfigData;
+    CopyMem (Udp4ConfigData, &Instance->ConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
   }
 
   Ip = Instance->IpInfo->Ip;
@@ -232,7 +232,7 @@ Udp4Configure (
       //
       // Save the configuration data.
       //
-      Instance->ConfigData                = *UdpConfigData;
+      CopyMem (&Instance->ConfigData, UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
       Instance->ConfigData.StationAddress = Ip4ConfigData.StationAddress;
       Instance->ConfigData.SubnetMask     = Ip4ConfigData.SubnetMask;
 

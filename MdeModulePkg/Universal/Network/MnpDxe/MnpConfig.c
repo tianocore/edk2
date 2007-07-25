@@ -523,12 +523,12 @@ MnpInitializeInstanceData (
   //
   // Copy the MNP Protocol interfaces from the template.
   //
-  Instance->ManagedNetwork = mMnpProtocolTemplate;
+  CopyMem (&Instance->ManagedNetwork, &mMnpProtocolTemplate, sizeof (EFI_MANAGED_NETWORK_PROTOCOL));
 
   //
   // Copy the default config data.
   //
-  Instance->ConfigData = mMnpDefaultConfigData;
+  CopyMem (&Instance->ConfigData, &mMnpDefaultConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
 
   //
   // Initialize the lists.
@@ -1024,7 +1024,7 @@ MnpConfigureInstance (
   //
   // Save the new configuration data.
   //
-  *OldConfigData        = *NewConfigData;
+  CopyMem (OldConfigData, NewConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
 
   Instance->Configured  = (BOOLEAN) (ConfigData != NULL);
 
@@ -1035,7 +1035,7 @@ MnpConfigureInstance (
     Status = MnpStart (
               MnpServiceData,
               IsConfigUpdate,
-              !NewConfigData->DisableBackgroundPolling
+              (BOOLEAN) !NewConfigData->DisableBackgroundPolling
               );
   } else {
     //
@@ -1138,7 +1138,7 @@ MnpConfigReceiveFilters (
       NET_LIST_FOR_EACH (Entry, &MnpServiceData->GroupAddressList) {
 
         GroupAddress            = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
-        *(MCastFilter + Index)  = GroupAddress->Address;
+        CopyMem (MCastFilter + Index, &GroupAddress->Address, sizeof (EFI_MAC_ADDRESS));
         Index++;
 
         ASSERT (Index <= MCastFilterCnt);
@@ -1252,7 +1252,7 @@ MnpGroupOpAddCtrlBlk (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    GroupAddress->Address = *MacAddress;
+    CopyMem (&GroupAddress->Address, MacAddress, sizeof (EFI_MAC_ADDRESS));
     GroupAddress->RefCnt  = 0;
     NetListInsertTail (
       &MnpServiceData->GroupAddressList,

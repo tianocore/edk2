@@ -68,7 +68,7 @@ MnpGetModeData (
     //
     // Copy the instance configuration data.
     //
-    *MnpConfigData = Instance->ConfigData;
+    CopyMem (MnpConfigData, &Instance->ConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
   }
 
   if (SnpModeData != NULL) {
@@ -76,7 +76,7 @@ MnpGetModeData (
     // Copy the underlayer Snp mode data.
     //
     Snp           = Instance->MnpServiceData->Snp;
-    *SnpModeData  = *(Snp->Mode);
+    CopyMem (SnpModeData, Snp->Mode, sizeof (EFI_SIMPLE_NETWORK_MODE));
   }
 
   if (!Instance->Configured) {
@@ -229,7 +229,7 @@ MnpMcastIpToMac (
     MacAddress->Addr[0] = 0x01;
     MacAddress->Addr[1] = 0x00;
     MacAddress->Addr[2] = 0x5E;
-    MacAddress->Addr[3] = IpAddress->v4.Addr[1] & 0x7F;
+    MacAddress->Addr[3] = (UINT8) (IpAddress->v4.Addr[1] & 0x7F);
     MacAddress->Addr[4] = IpAddress->v4.Addr[2];
     MacAddress->Addr[5] = IpAddress->v4.Addr[3];
 

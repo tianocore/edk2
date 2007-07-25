@@ -76,7 +76,7 @@ SockTcpDataToRcv (
 
   TcpRsvData  = (TCP_RSV_DATA *) RcvBufEntry->ProtoData;
 
-  *IsUrg      = ((TcpRsvData->UrgLen > 0) ? TRUE : FALSE);
+  *IsUrg      = (BOOLEAN) ((TcpRsvData->UrgLen > 0) ? TRUE : FALSE);
 
   if (*IsUrg && TcpRsvData->UrgLen < RcvBufEntry->TotalSize) {
 
@@ -100,7 +100,7 @@ SockTcpDataToRcv (
 
     TcpRsvData  = (TCP_RSV_DATA *) RcvBufEntry->ProtoData;
 
-    Urg         = ((TcpRsvData->UrgLen > 0) ? TRUE : FALSE);
+    Urg         = (BOOLEAN) ((TcpRsvData->UrgLen > 0) ? TRUE : FALSE);
 
     if (*IsUrg != Urg) {
       break;
@@ -165,7 +165,7 @@ SockSetTcpRxData (
   for (Index = 0; (Index < RxData->FragmentCount) && (RcvdBytes > 0); Index++) {
 
     Fragment  = &RxData->FragmentTable[Index];
-    CopyBytes = NET_MIN (Fragment->FragmentLength, RcvdBytes);
+    CopyBytes = NET_MIN ((UINT32) (Fragment->FragmentLength), RcvdBytes);
 
     NetbufQueCopy (
       Sock->RcvBuffer.DataQueue,
@@ -209,7 +209,7 @@ SockProcessRcvToken (
   TokenRcvdBytes = SockTcpDataToRcv (
                       &Sock->RcvBuffer,
                       &IsUrg,
-                      RxData->DataLength
+                      (UINT32) RxData->DataLength
                       );
 
   //
@@ -254,7 +254,7 @@ SockProcessTcpSndData (
   //
   SndData = NetbufFromExt (
               (NET_FRAGMENT *) TxData->FragmentTable,
-              TxData->FragmentCount,
+              (UINT32) TxData->FragmentCount,
               0,
               0,
               SockFreeFoo,
@@ -518,7 +518,7 @@ SockProcessSndToken (
     SndToken  = (SOCK_IO_TOKEN *) SockToken->Token;
     TxData    = SndToken->Packet.TxData;
 
-    DataLen = TxData->DataLength;
+    DataLen = (UINT32) TxData->DataLength;
     Status  = SockProcessTcpSndData (Sock, TxData);
 
     if (EFI_ERROR (Status)) {

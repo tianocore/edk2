@@ -881,7 +881,7 @@ NetLibDefaultUnload (
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiDriverBindingProtocolGuid,
-                    &DriverBinding
+                    (VOID **) &DriverBinding
                     );
 
     if (EFI_ERROR (Status)) {
@@ -897,24 +897,10 @@ NetLibDefaultUnload (
           &gEfiDriverBindingProtocolGuid,
           DriverBinding
           );
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-    Status = gBS->HandleProtocol (
-                    DeviceHandleBuffer[Index],
-                    &gEfiComponentName2ProtocolGuid,
-                    &ComponentName
-                    );
-    if (!EFI_ERROR (Status)) {
-      gBS->UninstallProtocolInterface (
-            ImageHandle,
-            &gEfiComponentName2ProtocolGuid,
-            ComponentName
-            );
-    }
-#else
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiComponentNameProtocolGuid,
-                    &ComponentName
+                    (VOID **) &ComponentName
                     );
     if (!EFI_ERROR (Status)) {
       gBS->UninstallProtocolInterface (
@@ -923,12 +909,11 @@ NetLibDefaultUnload (
              ComponentName
              );
     }
-#endif
 
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiDriverConfigurationProtocolGuid,
-                    &DriverConfiguration
+                    (VOID **) &DriverConfiguration
                     );
 
     if (!EFI_ERROR (Status)) {
@@ -942,7 +927,7 @@ NetLibDefaultUnload (
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiDriverDiagnosticsProtocolGuid,
-                    &DriverDiagnostics
+                    (VOID **) &DriverDiagnostics
                     );
 
     if (!EFI_ERROR (Status)) {
@@ -1085,7 +1070,7 @@ EFI_STATUS
 NetLibGetMacString (
   IN           EFI_HANDLE  SnpHandle,
   IN           EFI_HANDLE  ImageHandle,
-  IN OUT CONST CHAR16      **MacString
+  IN OUT       CHAR16      **MacString
   )
 {
   EFI_STATUS                   Status;
@@ -1126,7 +1111,7 @@ NetLibGetMacString (
   // Convert the mac address into a unicode string.
   //
   for (Index = 0; Index < Mode->HwAddressSize; Index++) {
-    MacAddress[Index * 2]     = NibbleToHexChar (Mode->CurrentAddress.Addr[Index] >> 4);
+    MacAddress[Index * 2]     = NibbleToHexChar ((UINT8) (Mode->CurrentAddress.Addr[Index] >> 4));
     MacAddress[Index * 2 + 1] = NibbleToHexChar (Mode->CurrentAddress.Addr[Index]);
   }
 

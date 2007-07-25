@@ -1711,7 +1711,7 @@ NetbufChecksum (
       // The checksum starts with an odd byte, swap
       // the checksum before added to total checksum
       //
-      BlockSum = NET_SWAP_SHORT (BlockSum);
+      BlockSum = (UINT16) NET_SWAP_SHORT (BlockSum);
     }
 
     TotalSum = NetAddChecksum (BlockSum, TotalSum);
