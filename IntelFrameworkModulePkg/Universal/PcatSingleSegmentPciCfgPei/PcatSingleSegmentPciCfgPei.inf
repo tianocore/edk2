@@ -1,0 +1,60 @@
+#/** @file
+#  Single Segment Pci Configuration PPI
+#
+#  This file declares PciCfg PPI used to access PCI configuration space in PEI
+#  Copyright (c) 2006 - 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PcatSingleSegmentPciCfgPei
+  FILE_GUID                      = 27A5159D-5E61-4809-919A-422E887101EF
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = PeimInitializePciCfg
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  PciCfg.c
+  PciCfg2.c
+  PciCfgInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+[LibraryClasses]
+  PeimEntryPoint
+  PciLib
+  BaseLib
+  DebugLib
+
+
+[Ppis]
+  gEfiPciCfg2PpiGuid                   # PPI ALWAYS_PRODUCED
+  gEfiPciCfgPpiInServiceTableGuid      # PPI ALWAYS_PRODUCED
+
+[PcdsFeatureFlag.common]
+  PcdPciCfgDisable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+  PcdPciCfg2Disable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+
+[Depex]
+  TRUE
+

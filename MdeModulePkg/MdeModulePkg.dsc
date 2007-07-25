@@ -401,6 +401,7 @@
   $(WORKSPACE)/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   $(WORKSPACE)/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  $(WORKSPACE)/MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/PcatSingleSegmentPciCfg2Pei.inf
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   $(WORKSPACE)/MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf

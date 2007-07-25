@@ -64,6 +64,8 @@
   PcdIsaBusSupportDma|0x00010040|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
   PcdIsaBusOnlySupportSlaveDma|0x00010041|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
   PcdIsaBusSupportIsaMemory|0x00010042|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|TRUE
+  PcdPciCfgDisable|0x00010043|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
+  PcdPciCfg2Disable|0x00010044|gEfiIntelFrameworkModulePkgTokenSpaceGuid|BOOLEAN|FALSE
 
 [PcdsFixedAtBuild.common]
   PcdStatusCodeMemorySize|0x00010025|gEfiIntelFrameworkModulePkgTokenSpaceGuid|UINT16|1

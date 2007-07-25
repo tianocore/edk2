@@ -126,6 +126,8 @@
   PcdIsaBusSupportDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
   PcdIsaBusOnlySupportSlaveDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
   PcdIsaBusSupportIsaMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
+  PcdPciCfgDisable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
+  PcdPciCfg2Disable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
   PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid|FALSE
 
 [PcdsFixedAtBuild.common]
@@ -174,6 +176,7 @@
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
+  $(WORKSPACE)/IntelFrameworkModulePkg/Universal/PcatSingleSegmentPciCfgPei/PcatSingleSegmentPciCfgPei.inf
   $(WORKSPACE)/IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
 
 [Components.IA32]
