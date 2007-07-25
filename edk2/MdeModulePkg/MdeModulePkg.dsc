@@ -13,11 +13,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   PLATFORM_NAME                  = MdeModule
   PLATFORM_GUID                  = 587CE499-6CBE-43cd-94E2-186218569478
@@ -29,12 +24,6 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 
-
-################################################################################
-#
-# Library Class section - list of all Library Classes needed by this Platform.
-#
-################################################################################
 
 [LibraryClasses.common]
   CacheMaintenanceLib|$(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
@@ -280,11 +269,6 @@
 [LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
   UefiRuntimeLib|$(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
-################################################################################
-#
-# Pcd Section - list of all EDK II PCD Entries defined by this Platform
-#
-################################################################################
 [PcdsFeatureFlag.common]
   PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE

@@ -33,16 +33,10 @@
 
 [Sources.common]
   PeCoff.c
-  CommonHeader.h
-
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-
 
 [LibraryClasses]
   HobLib
