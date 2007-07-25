@@ -362,7 +362,7 @@ IpIoCreateSndEntry (
   EFI_IP4_TRANSMIT_DATA     *TxData;
   EFI_STATUS                Status;
   EFI_IP4_OVERRIDE_DATA     *OverrideData;
-  UINT32                    Index;
+  volatile UINT32           Index;
 
   //
   // Allocate resource for SndEntry
@@ -429,8 +429,8 @@ IpIoCreateSndEntry (
   TxData->TotalDataLength               = Pkt->TotalSize;
   TxData->FragmentCount                 = Pkt->BlockOpNum;
 
-  for (Index = 0; Index < Pkt->BlockOpNum; Index++) {
 
+  for (Index = 0; Index < Pkt->BlockOpNum; Index++) {
     TxData->FragmentTable[Index].FragmentBuffer = Pkt->BlockOp[Index].Head;
     TxData->FragmentTable[Index].FragmentLength = Pkt->BlockOp[Index].Size;
   }
@@ -857,6 +857,7 @@ IpIoStop (
   //
   // Detroy the Ip List used by IpIo
   //
+
   while (!NetListIsEmpty (&(IpIo->IpList))) {
     IpInfo = NET_LIST_HEAD (&(IpIo->IpList), IP_IO_IP_INFO, Entry);
 
