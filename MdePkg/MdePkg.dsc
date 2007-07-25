@@ -1,8 +1,6 @@
 #/** @file
 # EFI/PI MdePkg Package
 #
-# This FPD file is used for Package Level build.
-#
 # Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -15,11 +13,6 @@
 #
 #**/
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
   PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
@@ -30,12 +23,6 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-
-################################################################################
-#
-# Pcd Section - list of all EDK II PCD Entries defined by this Platform
-#
-################################################################################
 
 [PcdsFeatureFlag.common]
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
@@ -66,12 +53,6 @@
 
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
-
-################################################################################
-#
-# Components Section - list of all EDK II Modules needed by this Platform
-#
-################################################################################
 
 [Components.common]
   $(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf

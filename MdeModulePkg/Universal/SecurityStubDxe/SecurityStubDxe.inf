@@ -33,10 +33,6 @@
   SecurityStub.c
   SecurityStub.h
 
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-
 [Packages]
   MdePkg/MdePkg.dec
 
