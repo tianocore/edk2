@@ -43,7 +43,6 @@ MnpIsValidTxToken (
   )
 {
   MNP_SERVICE_DATA                  *MnpServiceData;
-  EFI_SIMPLE_NETWORK_MODE           *SnpMode;
   EFI_MANAGED_NETWORK_TRANSMIT_DATA *TxData;
   UINT32                            Index;
   UINT32                            TotalLength;
@@ -52,7 +51,6 @@ MnpIsValidTxToken (
   MnpServiceData = Instance->MnpServiceData;
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
 
-  SnpMode = MnpServiceData->Snp->Mode;
   TxData  = Token->Packet.TxData;
 
   if ((Token->Event == NULL) || (TxData == NULL) || (TxData->FragmentCount == 0)) {
@@ -262,7 +260,7 @@ MnpSyncSendPacket (
       //
       // Get the recycled transmit buffer status.
       //
-      Snp->GetStatus (Snp, NULL, &TxBuf);
+      Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
 
       if (!EFI_ERROR (gBS->CheckEvent (MnpServiceData->TxTimeoutEvent))) {
 
@@ -749,7 +747,7 @@ MnpWrapRxData (
   //
   // Fill the RxData in RxDataWrap,
   //
-  RxDataWrap->RxData = *RxData;
+  CopyMem (&RxDataWrap->RxData, RxData, sizeof (EFI_MANAGED_NETWORK_RECEIVE_DATA));
 
   //
   // Create the recycle event.
@@ -829,7 +827,7 @@ MnpEnqueuePacket (
       //
       // Wrap the RxData.
       //
-      RxDataWrap = MnpWrapRxData (Instance, &RxData);
+      CopyMem (&RxDataWrap, MnpWrapRxData (Instance, &RxData), sizeof (MNP_RXDATA_WRAP));
       if (RxDataWrap == NULL) {
         continue;
       }

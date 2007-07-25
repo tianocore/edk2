@@ -214,7 +214,7 @@ SyslogSendPacket (
       //
       // Get the recycled transmit buffer status.
       //
-      Snp->GetStatus (Snp, NULL, &TxBuf);
+      Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
 
       if (!EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
         Status = EFI_TIMEOUT;
@@ -375,7 +375,7 @@ SyslogBuildPacket (
   //
   Len  = 0;
   Len += (UINT32) AsciiSPrint (
-                    Buf,
+                    (CHAR8 *) Buf,
                     BufLen,
                     "<%d> %a %d %d:%d:%d ",
                     Pri,
@@ -388,7 +388,7 @@ SyslogBuildPacket (
   Len--;
 
   Len += (UINT32) AsciiSPrint (
-                    Buf + Len,
+                    (CHAR8 *) (Buf + Len),
                     BufLen - Len,
                     "Tiano %a: %a (Line: %d File: %a)",
                     Module,
@@ -452,7 +452,7 @@ NetDebugASPrint (
   }
 
   VA_START (Marker, Format);
-  AsciiVSPrint (Buf, NET_DEBUG_MSG_LEN, Format, Marker);
+  AsciiVSPrint ((CHAR8 *) Buf, NET_DEBUG_MSG_LEN, (CHAR8 *) Format, Marker);
   VA_END (Marker);
 
   return Buf;

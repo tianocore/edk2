@@ -173,7 +173,7 @@ Ip4ConfigDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiIp4ConfigProtocolGuid,
-                  &Ip4Config,
+                  (VOID **) &Ip4Config,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -252,7 +252,7 @@ Ip4ConfigDriverBindingStart (
 
   Instance->NicAddr.Type    = (UINT16) SnpMode.IfType;
   Instance->NicAddr.Len     = (UINT8) SnpMode.HwAddressSize;
-  Instance->NicAddr.MacAddr = SnpMode.CurrentAddress;
+  CopyMem (&Instance->NicAddr.MacAddr, &SnpMode.CurrentAddress, sizeof (EFI_MAC_ADDRESS));
 
   //
   // Add it to the global list, and compose the name

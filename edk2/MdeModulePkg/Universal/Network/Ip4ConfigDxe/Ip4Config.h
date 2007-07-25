@@ -52,7 +52,7 @@ enum {
 
   DHCP_TAG_PARA_LIST            = 55,
   DHCP_TAG_NETMASK              = 1,
-  DHCP_TAG_ROUTER               = 3,
+  DHCP_TAG_ROUTER               = 3
 };
 
 //
@@ -66,7 +66,7 @@ typedef struct {
 } IP4_CONFIG_DHCP4_OPTION;
 #pragma pack()
 
-typedef struct _IP4_CONFIG_INSTANCE {
+struct _IP4_CONFIG_INSTANCE {
   UINT32                        Signature;
   EFI_HANDLE                    Controller;
   EFI_HANDLE                    Image;

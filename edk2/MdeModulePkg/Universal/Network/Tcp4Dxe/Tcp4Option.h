@@ -72,7 +72,7 @@ enum {
   TCP_OPTION_MAX_WIN        = 0xffff, // max window size in TCP header
   TCP_OPTION_RCVD_MSS       = 0x01,
   TCP_OPTION_RCVD_WS        = 0x02,
-  TCP_OPTION_RCVD_TS        = 0x04,
+  TCP_OPTION_RCVD_TS        = 0x04
 };
 
 UINT8

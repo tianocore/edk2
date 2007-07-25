@@ -287,7 +287,7 @@ UdpIoCreatePort (
   Status = gBS->OpenProtocol (
                   UdpIo->UdpHandle,
                   &gEfiUdp4ProtocolGuid,
-                  &UdpIo->Udp,
+                  (VOID **) &UdpIo->Udp,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER

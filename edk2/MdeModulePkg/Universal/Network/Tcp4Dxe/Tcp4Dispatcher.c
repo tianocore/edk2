@@ -104,7 +104,7 @@ Tcp4GetMode (
   }
 
   if (Mode->Tcp4State) {
-    *(Mode->Tcp4State) = Tcb->State;
+    *(Mode->Tcp4State) = (EFI_TCP4_CONNECTION_STATE) Tcb->State;
   }
 
   if (Mode->Tcp4ConfigData) {
@@ -139,9 +139,10 @@ Tcp4GetMode (
       Option->KeepAliveTime           = Tcb->KeepAliveIdle / TCP_TICK_HZ;
       Option->KeepAliveInterval       = Tcb->KeepAlivePeriod / TCP_TICK_HZ;
 
-      Option->EnableNagle      = !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_NAGLE);
-      Option->EnableTimeStamp     = !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_TS);
-      Option->EnableWindowScaling = !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS);
+      Option->EnableNagle         = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_NAGLE));
+      Option->EnableTimeStamp     = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_TS));
+      Option->EnableWindowScaling = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS))
+;
 
       Option->EnableSelectiveAck      = FALSE;
       Option->EnablePathMtuDiscovery  = FALSE;
@@ -341,7 +342,6 @@ Tcp4ConfigurePcb (
   IN EFI_TCP4_CONFIG_DATA *CfgData
   )
 {
-  IP_IO               *IpIo;
   EFI_IP4_CONFIG_DATA IpCfgData;
   EFI_STATUS          Status;
   EFI_TCP4_OPTION     *Option;
@@ -352,14 +352,13 @@ Tcp4ConfigurePcb (
 
   TcpProto = (TCP4_PROTO_DATA *) Sk->ProtoReserved;
   Tcb      = TcpProto->TcpPcb;
-  IpIo     = TcpProto->TcpService->IpIo;
 
   ASSERT (Tcb != NULL);
 
   //
   // Add Ip for send pkt to the peer
   //
-  IpCfgData                   = mIpIoDefaultIpConfigData;
+  CopyMem (&IpCfgData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
   IpCfgData.DefaultProtocol   = EFI_IP_PROTO_TCP;
   IpCfgData.UseDefaultAddress = CfgData->AccessPoint.UseDefaultAddress;
   IpCfgData.StationAddress    = CfgData->AccessPoint.StationAddress;
@@ -441,25 +440,34 @@ Tcp4ConfigurePcb (
   if (Option != NULL) {
     SET_RCV_BUFFSIZE (
       Sk,
-      TCP_COMP_VAL (TCP_RCV_BUF_SIZE_MIN,
-      TCP_RCV_BUF_SIZE,
-      TCP_RCV_BUF_SIZE,
-      Option->ReceiveBufferSize)
+      (UINT32) (TCP_COMP_VAL (
+                  TCP_RCV_BUF_SIZE_MIN,
+                  TCP_RCV_BUF_SIZE,
+                  TCP_RCV_BUF_SIZE,
+                  Option->ReceiveBufferSize
+                  )
+               )
       );
     SET_SND_BUFFSIZE (
       Sk,
-      TCP_COMP_VAL (TCP_SND_BUF_SIZE_MIN,
-      TCP_SND_BUF_SIZE,
-      TCP_SND_BUF_SIZE,
-      Option->SendBufferSize)
+      (UINT32) (TCP_COMP_VAL (
+                  TCP_SND_BUF_SIZE_MIN,
+                  TCP_SND_BUF_SIZE,
+                  TCP_SND_BUF_SIZE,
+                  Option->SendBufferSize
+                  )
+               )
       );
 
     SET_BACKLOG (
       Sk,
-      TCP_COMP_VAL (TCP_BACKLOG_MIN,
-      TCP_BACKLOG,
-      TCP_BACKLOG,
-      Option->MaxSynBackLog)
+      (UINT32) (TCP_COMP_VAL (
+                  TCP_BACKLOG_MIN,
+                  TCP_BACKLOG,
+                  TCP_BACKLOG,
+                  Option->MaxSynBackLog
+                  )
+               )
       );
 
     Tcb->MaxRexmit = (UINT16) TCP_COMP_VAL (
@@ -472,7 +480,7 @@ Tcp4ConfigurePcb (
                               TCP_FIN_WAIT2_TIME,
                               TCP_FIN_WAIT2_TIME_MAX,
                               TCP_FIN_WAIT2_TIME,
-                              Option->FinTimeout * TCP_TICK_HZ
+                              (UINT32) (Option->FinTimeout * TCP_TICK_HZ)
                               );
 
     if (Option->TimeWaitTimeout != 0) {
@@ -480,7 +488,7 @@ Tcp4ConfigurePcb (
                                TCP_TIME_WAIT_TIME,
                                TCP_TIME_WAIT_TIME_MAX,
                                TCP_TIME_WAIT_TIME,
-                               Option->TimeWaitTimeout * TCP_TICK_HZ
+                               (UINT32) (Option->TimeWaitTimeout * TCP_TICK_HZ)
                                );
     } else {
       Tcb->TimeWaitTimeout = 0;
@@ -499,13 +507,13 @@ Tcp4ConfigurePcb (
                              TCP_KEEPALIVE_IDLE_MIN,
                              TCP_KEEPALIVE_IDLE_MAX,
                              TCP_KEEPALIVE_IDLE_MIN,
-                             Option->KeepAliveTime * TCP_TICK_HZ
+                             (UINT32) (Option->KeepAliveTime * TCP_TICK_HZ)
                              );
       Tcb->KeepAlivePeriod = TCP_COMP_VAL (
                                TCP_KEEPALIVE_PERIOD_MIN,
                                TCP_KEEPALIVE_PERIOD,
                                TCP_KEEPALIVE_PERIOD,
-                               Option->KeepAliveInterval * TCP_TICK_HZ
+                               (UINT32) (Option->KeepAliveInterval * TCP_TICK_HZ)
                                );
     }
 
@@ -513,7 +521,7 @@ Tcp4ConfigurePcb (
                             TCP_CONNECT_TIME_MIN,
                             TCP_CONNECT_TIME,
                             TCP_CONNECT_TIME,
-                            Option->ConnectionTimeout * TCP_TICK_HZ
+                            (UINT32) (Option->ConnectionTimeout * TCP_TICK_HZ)
                             );
 
     if (Option->EnableNagle == FALSE) {

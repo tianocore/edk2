@@ -114,7 +114,7 @@ TcpSynBuildOption (
   IN NET_BUF *Nbuf
   )
 {
-  char    *Data;
+  UINT8   *Data;
   UINT16  Len;
 
   ASSERT (Tcb && Nbuf && !Nbuf->Tcp);
@@ -193,7 +193,7 @@ TcpBuildOption (
   IN NET_BUF *Nbuf
   )
 {
-  char    *Data;
+  UINT8   *Data;
   UINT16  Len;
 
   ASSERT (Tcb && Nbuf && !Nbuf->Tcp);
@@ -303,7 +303,7 @@ TcpParseOption (
         return -1;
       }
 
-      Option->WndScale = NET_MIN (14, Head[Cur + 2]);
+      Option->WndScale = (UINT8) NET_MIN (14, Head[Cur + 2]);
       TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_WS);
 
       Cur += TCP_OPTION_WS_LEN;
@@ -340,7 +340,7 @@ TcpParseOption (
         return -1;
       }
 
-      Cur = Cur + Len;
+      Cur = (UINT8) (Cur + Len);
       break;
     }
 

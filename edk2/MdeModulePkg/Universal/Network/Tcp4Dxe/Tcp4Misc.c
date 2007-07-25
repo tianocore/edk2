@@ -123,7 +123,7 @@ TcpInitTcbPeer (
   }
 
   if (TCP_FLG_ON (Opt->Flag, TCP_OPTION_RCVD_MSS)) {
-    Tcb->SndMss = NET_MAX (64, Opt->Mss);
+    Tcb->SndMss = (UINT16) NET_MAX (64, Opt->Mss);
 
     RcvMss = TcpGetRcvMss (Tcb->Sk);
     if (Tcb->SndMss > RcvMss) {
@@ -568,7 +568,7 @@ TcpChecksum (
               HTONS ((UINT16) Nbuf->TotalSize)
               );
 
-  return ~Checksum;
+  return (UINT16) ~Checksum;
 }
 
 
@@ -806,6 +806,7 @@ TcpOnAppConsume (
   IN TCP_CB *Tcb
   )
 {
+  UINT32 TcpOld;
 
   switch (Tcb->State) {
   case TCP_CLOSED:
@@ -822,9 +823,10 @@ TcpOnAppConsume (
     break;
 
   case TCP_ESTABLISHED:
-    if (TcpRcvWinNow (Tcb) > TcpRcvWinOld (Tcb)) {
+    TcpOld = TcpRcvWinOld (Tcb);
+    if (TcpRcvWinNow (Tcb) > TcpOld) {
 
-      if (TcpRcvWinOld (Tcb) < Tcb->RcvMss) {
+      if (TcpOld < Tcb->RcvMss) {
 
         TCP4_DEBUG_TRACE (("TcpOnAppConsume: send a window"
           " update for a window closed Tcb(%x)\n", Tcb));

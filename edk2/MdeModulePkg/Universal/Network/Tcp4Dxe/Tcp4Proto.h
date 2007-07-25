@@ -42,7 +42,7 @@ enum {
   TCP_CLOSING,
   TCP_TIME_WAIT,
   TCP_CLOSE_WAIT,
-  TCP_LAST_ACK,
+  TCP_LAST_ACK
 };
 
 //
@@ -56,7 +56,7 @@ enum {
   TCP_FLG_PSH     = 0x08,
   TCP_FLG_ACK     = 0x10,
   TCP_FLG_URG     = 0x20,
-  TCP_FLG_FLAG    = 0x3F, // mask for all the flags
+  TCP_FLG_FLAG    = 0x3F  // mask for all the flags
 };
 
 enum {
@@ -144,7 +144,7 @@ enum {
   TCP_KEEPALIVE_IDLE_MAX  = TCP_TICK_HZ *60 *60 *4,
   TCP_KEEPALIVE_PERIOD_MIN= TCP_TICK_HZ *30,
   TCP_FIN_WAIT2_TIME_MAX  = 4 *TCP_TICK_HZ,
-  TCP_TIME_WAIT_TIME_MAX  = 60 *TCP_TICK_HZ,
+  TCP_TIME_WAIT_TIME_MAX  = 60 *TCP_TICK_HZ
 };
 
 typedef struct _TCP_SEG {
@@ -165,7 +165,7 @@ typedef struct _TCP_PEER {
 //
 // tcp control block, it includes various states
 //
-typedef struct _TCP_CB {
+struct _TCP_CB {
   NET_LIST_ENTRY    List;
   TCP_CB            *Parent;
 
@@ -269,7 +269,7 @@ typedef struct _TCP_CB {
   // pointer reference to Ip used to send pkt
   //
   IP_IO_IP_INFO     *IpInfo;
-} TCP_CB;
+};
 
 extern NET_LIST_ENTRY mTcpRunQue;
 extern NET_LIST_ENTRY mTcpListenQue;
@@ -336,8 +336,8 @@ extern UINT32         mTcpTick;
     (((Pb)->Port == 0) || ((Pb)->Port == (Pa)->Port)))
 
 #define TCP_TIMER_ON(Flag, Timer)     ((Flag) & (1 << (Timer)))
-#define TCP_SET_TIMER(Flag, Timer)    ((Flag) |= (1 << (Timer)))
-#define TCP_CLEAR_TIMER(Flag, Timer)  ((Flag) &= ~(1 << (Timer)))
+#define TCP_SET_TIMER(Flag, Timer)    ((Flag) = (UINT16) ((Flag) | (1 << (Timer))))
+#define TCP_CLEAR_TIMER(Flag, Timer)  ((Flag) = (UINT16) ((Flag) & (~(1 << (Timer)))))
 
 #define TCP_TIME_LT(Ta, Tb)           ((INT32) ((Ta) - (Tb)) < 0)
 #define TCP_TIME_LEQ(Ta, Tb)          ((INT32) ((Ta) - (Tb)) <= 0)
