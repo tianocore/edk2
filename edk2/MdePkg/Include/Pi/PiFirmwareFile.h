@@ -37,6 +37,7 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 //
 // File Types Definitions
 // 
+#define EFI_FV_FILETYPE_ALL                   0x00
 #define EFI_FV_FILETYPE_RAW                   0x01
 #define EFI_FV_FILETYPE_FREEFORM              0x02
 #define EFI_FV_FILETYPE_SECURITY_CORE         0x03
