@@ -149,7 +149,7 @@ public class MsaWriter {
 		}
 
 		msaheader
-				.setCopyright("Copyright (c) 2006, Intel Corporation. All right reserved.");
+				.setCopyright("Copyright (c) 2007, Intel Corporation. All rights reserved.");
 		msaheader.setVersion("1.0");
 		msaheader.setAbstract("Component name for module " + mi.modulename);
 		msaheader.setDescription("FIX ME!");
