@@ -272,18 +272,6 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     (CONSOLE_OUT | CONSOLE_IN)
   },
   {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gCpuModelDevicePath,
-    (CONSOLE_OUT | CONSOLE_IN)
-  },  
-  {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gCpuSpeedDevicePath,
-    (CONSOLE_OUT | CONSOLE_IN)
-  },    
-  {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gMemoryDevicePath,
-    (CONSOLE_OUT | CONSOLE_IN)
-  },      
-  {
     NULL,
     0
   }
@@ -297,4 +285,8 @@ EFI_DEVICE_PATH_PROTOCOL    *gPlatformDriverOption[] = { NULL };
 //
 // Predefined platform connect sequence
 //
-EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { NULL };
+EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { 
+  (EFI_DEVICE_PATH_PROTOCOL *) &gCpuModelDevicePath,
+  (EFI_DEVICE_PATH_PROTOCOL *) &gCpuSpeedDevicePath,
+  (EFI_DEVICE_PATH_PROTOCOL *) &gMemoryDevicePath
+  };
