@@ -5,11 +5,11 @@
 # FD Section
 # The [FD] Section is made up of the definition statements and a
 # description of what goes into  the Flash Device Image.  Each FD section
-# defines one flash ¡°device¡± image.  A flash device image may be one of
+# defines one flash "device" image.  A flash device image may be one of
 # the following: Removable media bootable image (like a boot floppy
-# image,) an Option ROM image (that would be ¡°flashed¡± into an add-in
-# card,) a System ¡°Flash¡±  image (that would be burned into a system¡¯s
-# flash) or an Update (¡°Capsule¡±) image that will be used to update and
+# image,) an Option ROM image (that would be "flashed" into an add-in
+# card,) a System "Flash"  image (that would be burned into a system¡¯s
+# flash) or an Update ("Capsule") image that will be used to update and
 # existing system flash.
 #
 ################################################################################
@@ -27,9 +27,9 @@ NumBlocks     = 0x2a
 #
 # Regions must be defined in ascending order and may not overlap.
 #
-# A Layout Region start with a eight digit hex offset (leading ¡°0x¡± required) followed by
-# the pipe ¡°|¡± character, followed by the size of the region, also in hex with the leading
-# ¡°0x¡± characters. Like:
+# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
+# the pipe "|" character, followed by the size of the region, also in hex with the leading
+# "0x" characters. Like:
 # Offset|Size
 # PcdOffsetCName|PcdSizeCName
 # RegionType <FV, DATA, or FILE>
