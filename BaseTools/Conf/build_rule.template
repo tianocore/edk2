@@ -7,9 +7,13 @@ FileTypeMapping = {
     ".CPP"  :   "C-Code",
     ".h"    :   "C-Header",
     ".H"    :   "C-Header",
+    ".inc"  :   "Masm-Header",
     ".asm"  :   "Masm-Code",
     ".Asm"  :   "Masm-Code",
     ".ASM"  :   "Masm-Code",
+    ".asm16"  :   "Masm16-Code",  #RealAsm16 Link Code
+    ".Asm16"  :   "Masm16-Code",
+    ".ASM16"  :   "Masm16-Code",
     ".s"    :   "Iasm-Code",    # IPF assembly code
     ".S"    :   "Gasm-Code",    # GNU assembly code
     ".uni"  :   "Unicode-Text",
@@ -57,28 +61,30 @@ ObjectFileMapping = {
     "Preprocessed-Code"             :   ".obj",
     "Object"                        :   ".dll",
     "Static-Library"                :   ".dll",
-		"Dynamic-Library"               :   ".efi",
+    "Dynamic-Library"               :   ".efi",
     "Dependency-Expression"         :   ".depex",
-		"Acpi-Source-Language"          :   ".aml",
-		"Acpi-Table-Source"             :   ".acpi",
+    "Acpi-Source-Language"          :   ".aml",
+    "Acpi-Table-Source"             :   ".acpi",
+    "Masm16-Code"                   :   ".com",
 }
 
-DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL"]
+DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL", "ASMLINK"]
 
 ToolCodeMapping = {
     "C-Code"                        :   ["CC"],
 #    "C-Header"                      :   ["PCH"],
     "Masm-Code"                     :   ["PP", "ASM"],
     "Iasm-Code"                     :   ["PP", "ASM"],      # IPF assembly code
-    "Gasm-Code"                     :   ["ASM"],          	# GNU assembly code
+    "Gasm-Code"                     :   ["ASM"],            # GNU assembly code
     "Visual-Form-Representation"    :   ["PP", "CC"],
     "Preprocessed-Code"             :   ["CC"],
     "Acpi-Source-Language"          :   ["ASL"],
     "Object"                        :   ["SLINK"],
     "Static-Library"                :   ["DLINK"],
     "Dependency-Expression"         :   ["PP"],
-		"Acpi-Source-Language"          :   ["PP", "ASL"],
-		"Acpi-Table-Source"             :   ["CC", "DLINK"],
+    "Acpi-Source-Language"          :   ["PP", "ASL"],
+    "Acpi-Table-Source"             :   ["CC", "DLINK"],
+    "Masm16-Code"                   :   ["ASM", "ASMLINK"],
 }
 
 ToolChainFamilyMapping = {
@@ -96,14 +102,16 @@ ToolChainFamilyMapping = {
     "Bmp-Image"                     :   ["MSFT", "INTEL", "GCC"],
     "Preprocessed-Code"             :   ["MSFT", "INTEL"],
     "Acpi-Source-Language"          :   ["MSFT", "INTEL"],
+    "Acpi-Table-Source"             :   ["MSFT", "INTEL"],
+    "Masm16-Code"                   :   ["MSFT"],
 }
 
 ## Build rules for makefile
 # Placeholders for string substitution
 #   ${fpath}  File path relative to $(WORKSPACE)
-#   ${fdir}  	File relative directory within a module
-#   ${fname}	File full name without path
-#   ${fbase}	File name without extension and path
+#   ${fdir}    File relative directory within a module
+#   ${fname}  File full name without path
+#   ${fbase}  File name without extension and path
 #   ${fext}   File extension
 #   ${fdep}   File dependencies
 #   ${_sep_}    Directory separator
@@ -112,7 +120,7 @@ ToolChainFamilyMapping = {
 #
 Makefile = {
 # MSFT tool chain family
-"MSFT"	: {
+"MSFT"  : {
 "C-Code"    : '''\
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
@@ -149,7 +157,8 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\t"$(ASL)" /nologo /Fo$@ $(@D)${_sep_}${fbase}.i
+\t"$(ASL)" -p $@ $(@D)${_sep_}${fbase}.i
+\t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml $(OUTPUT_DIR)${_sep_}${fbase}.aml /Y
 ''',
 
 "Acpi-Table-Source" :
@@ -157,15 +166,24 @@ ${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
-\t"$(DLINK)" /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
+\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
 \tGenFw -o $@ -c $(@D)${_sep_}${fbase}.dll
+\t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi $(OUTPUT_DIR)${_sep_}${fbase}.acpi /Y
+''',
+
+"Masm16-Code" : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.com : $(COMMON_DEPS)
+\tpushd .
+\tcd $(OUTPUT_DIR)${_sep_}${fdir}
+\t"$(ASM)" /nologo /omf $(WORKSPACE)${_sep_}${fpath} /Bl"$(ASMLINK)" $(ASMLINK_FLAGS)
+\t-copy ${fbase}.com $(OUTPUT_DIR)${_sep_}${fbase}.com /Y & popd
 ''',
 },
 
 #
 # INTEL tool chain family
 #
-"INTEL"	: {
+"INTEL"  : {
 "C-Code"    : '''\
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
@@ -195,6 +213,25 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep
 \t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
 \t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
+''',
+
+"Acpi-Source-Language" :
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
+\t"$(ASL)" -p $@ $(@D)${_sep_}${fbase}.i
+\t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml $(OUTPUT_DIR)${_sep_}${fbase}.aml /Y
+''',
+
+"Acpi-Table-Source" :
+'''
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(WORKSPACE)${_sep_}${fdep}
+${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
+\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
+\tGenFw -o $@ -c $(@D)${_sep_}${fbase}.dll
+\t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi $(OUTPUT_DIR)${_sep_}${fbase}.acpi /Y
 ''',
 },
 
