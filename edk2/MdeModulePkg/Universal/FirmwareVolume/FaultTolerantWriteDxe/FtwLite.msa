@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>FtwLite</ModuleName>
@@ -81,22 +81,22 @@
   <PcdCoded>
     <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdeModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>To get base address of the FTW spare block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdeModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>To get size of the FTW spare block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdeModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>To get base address of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdeModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>To get size of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
   </PcdCoded>
