@@ -25,12 +25,6 @@ Abstract:
 
 extern UINT8  MiscSubclassStrings[];
 
-VOID
-EFIAPI
-WinNtIoProtocolNotifyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  );
 
 //
 //
@@ -70,7 +64,7 @@ Returns:
 --*/
 {
   EFI_MISC_SUBCLASS_DRIVER_DATA MiscSubclass;
-  EFI_STATUS                    EfiStatus;
+  EFI_STATUS                    Status;
 
   //
   // Do nothing if data parameters are not valid.
@@ -103,7 +97,7 @@ Returns:
   //
   // Log Data Hub record.
   //
-  EfiStatus = DataHub->LogData (
+  Status = DataHub->LogData (
                         DataHub,
                         &gEfiMiscSubClassGuid,
                         &gEfiMiscSubClassGuid,
@@ -112,16 +106,16 @@ Returns:
                         sizeof (EFI_SUBCLASS_TYPE1_HEADER) + RecordLen
                         );
 
-  if (EFI_ERROR (EfiStatus)) {
+  if (EFI_ERROR (Status)) {
     DEBUG (
       (EFI_D_ERROR,
       "LogData(%d bytes) == %r\n",
       sizeof (EFI_SUBCLASS_TYPE1_HEADER) + RecordLen,
-      EfiStatus)
+      Status)
       );
   }
 
-  return EfiStatus;
+  return Status;
 }
 
 
@@ -152,16 +146,17 @@ Returns:
 
 --*/
 {
-  EFI_MISC_SUBCLASS_DRIVER_DATA RecordData;
-  EFI_DATA_HUB_PROTOCOL         *DataHub;
-  EFI_HII_PROTOCOL              *Hii;
-  EFI_HII_PACKAGES              *PackageList;
-  EFI_HII_HANDLE                HiiHandle;
-  EFI_STATUS                    EfiStatus;
-  UINTN                         Index;
-  BOOLEAN                       LogRecordData;
-  EFI_EVENT                     Event;
-  VOID                          *Registration;
+  EFI_MISC_SUBCLASS_DRIVER_DATA     RecordData;
+  EFI_DATA_HUB_PROTOCOL             *DataHub;
+  EFI_HII_PROTOCOL                  *Hii;
+  EFI_HII_PACKAGES                  *PackageList;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  BOOLEAN                           LogRecordData;
+  EFI_MEMORY_SUBCLASS_DRIVER_DATA   MemorySubClassData; 
+  UINT64                            TotalMemorySize;
+  CHAR16                            *Nt32MemString;
 
 
   //
@@ -175,11 +170,11 @@ Returns:
   //
   // Locate data hub protocol.
   //
-  EfiStatus = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
 
-  if (EFI_ERROR (EfiStatus)) {
-    DEBUG ((EFI_D_ERROR, "Could not locate DataHub protocol.  %r\n", EfiStatus));
-    return EfiStatus;
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Could not locate DataHub protocol.  %r\n", Status));
+    return Status;
   } else if (DataHub == NULL) {
     DEBUG ((EFI_D_ERROR, "LocateProtocol(DataHub) returned NULL pointer!\n"));
     return EFI_DEVICE_ERROR;
@@ -187,11 +182,11 @@ Returns:
   //
   // Locate hii protocol.
   //
-  EfiStatus = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
+  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
 
-  if (EFI_ERROR (EfiStatus)) {
-    DEBUG ((EFI_D_ERROR, "Could not locate Hii protocol.  %r\n", EfiStatus));
-    return EfiStatus;
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Could not locate Hii protocol.  %r\n", Status));
+    return Status;
   } else if (Hii == NULL) {
     DEBUG ((EFI_D_ERROR, "LocateProtocol(Hii) returned NULL pointer!\n"));
     return EFI_DEVICE_ERROR;
@@ -200,12 +195,12 @@ Returns:
   // Add our default strings to the HII database. They will be modified later.
   //
   PackageList = PreparePackages (1, &gEfiMiscSubClassGuid, MiscSubclassStrings);
-  EfiStatus   = Hii->NewPack (Hii, PackageList, &HiiHandle);
+  Status   = Hii->NewPack (Hii, PackageList, &HiiHandle);
   FreePool (PackageList);
 
-  if (EFI_ERROR (EfiStatus)) {
-    DEBUG ((EFI_D_ERROR, "Could not log default strings to Hii.  %r\n", EfiStatus));
-    return EfiStatus;
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Could not log default strings to Hii.  %r\n", Status));
+    return Status;
   }
   //
   //
@@ -250,7 +245,7 @@ Returns:
       //
       // Log RecordData to Data Hub.
       //
-      EfiStatus = DataHub->LogData (
+      Status = DataHub->LogData (
                             DataHub,
                             &gEfiMiscSubClassGuid,
                             &gEfiMiscSubClassGuid,
@@ -259,12 +254,12 @@ Returns:
                             sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen
                             );
 
-      if (EFI_ERROR (EfiStatus)) {
+      if (EFI_ERROR (Status)) {
         DEBUG (
           (EFI_D_ERROR,
           "LogData(%d bytes) == %r\n",
           sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen,
-          EfiStatus)
+          Status)
           );
       }
 
@@ -276,29 +271,16 @@ Returns:
     // is no more data to log.
     //
     for (;;) {
-      //
-      //
-      //
-      EfiStatus = (*mMiscSubclassDataTable[Index].Function)
-        (
-          mMiscSubclassDataTable[Index].RecordType, &mMiscSubclassDataTable[Index].RecordLen, &RecordData.Record, &
-            LogRecordData
-        );
-
-      //
-      //
-      //
-      if (EFI_ERROR (EfiStatus)) {
+      Status = (*mMiscSubclassDataTable[Index].Function)(mMiscSubclassDataTable[Index].RecordType, &mMiscSubclassDataTable[Index].RecordLen, &RecordData.Record, &LogRecordData);
+      if (EFI_ERROR (Status)) {
         break;
       }
 
       if (!LogRecordData) {
         break;
       }
-      //
-      //
-      //
-      EfiStatus = DataHub->LogData (
+
+      Status = DataHub->LogData (
                             DataHub,
                             &gEfiMiscSubClassGuid,
                             &gEfiMiscSubClassGuid,
@@ -307,212 +289,62 @@ Returns:
                             sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen
                             );
 
-      if (EFI_ERROR (EfiStatus)) {
+      if (EFI_ERROR (Status)) {
         DEBUG (
           (EFI_D_ERROR,
           "LogData(%d bytes) == %r\n",
           sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen,
-          EfiStatus)
+          Status)
           );
       }
     }
   }
-  //
-  // Install notify function to fetch memory data through WinNtIo protocol and store to data hub.
-  //
-  EfiStatus = gBS->CreateEvent (
-                    EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    WinNtIoProtocolNotifyFunction,
-                    ImageHandle,
-                    &Event
-                    );
-  ASSERT (!EFI_ERROR (EfiStatus));
 
-  EfiStatus = gBS->RegisterProtocolNotify (
-                    &gEfiWinNtIoProtocolGuid,
-                    Event,
-                    &Registration
-                    );
-  ASSERT (!EFI_ERROR (EfiStatus));
+  
+  //
+  // Log Memory Size info based on PCD setting.
+  //
+  MemorySubClassData.Header.Instance    = 1;
+  MemorySubClassData.Header.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
+  MemorySubClassData.Header.RecordType  = EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER;
+
+  //
+  // Process Memory String in form size!size ...
+  // So 64!64 is 128 MB
+  //
+  Nt32MemString   = PcdGetPtr (PcdWinNtMemorySize);
+  for (TotalMemorySize = 0; *Nt32MemString != '\0';) {
+    TotalMemorySize += StrDecimalToUint64 (Nt32MemString);
+    while (*Nt32MemString != '\0') {
+      if (*Nt32MemString == '!') {
+        Nt32MemString++;       
+        break;
+      }
+      Nt32MemString++;
+    }
+  }
+
+  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayStartAddress               = 0;
+  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayEndAddress                 = LShiftU64 (TotalMemorySize, 20) - 1;
+  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName  = gEfiMemoryProducerGuid;
+  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance      = 1;
+  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance   = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
+  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayPartitionWidth             = 0;
+
+  //
+  // Store memory size data record to data hub.
+  //
+  Status = DataHub->LogData (
+                      DataHub,
+                      &gEfiMemorySubClassGuid,
+                      &gEfiMemoryProducerGuid,
+                      EFI_DATA_RECORD_CLASS_DATA,
+                      &MemorySubClassData,
+                      sizeof (EFI_SUBCLASS_TYPE1_HEADER) + sizeof (EFI_MEMORY_ARRAY_START_ADDRESS_DATA)
+                      );
+
 
   return EFI_SUCCESS;
 }
 
-UINTN
-Atoi (
-  CHAR16  *String
-  )
-/*++
-
-Routine Description:
-  Convert a unicode string to a UINTN
-
-Arguments:
-  String - Unicode string.
-
-Returns:
-  UINTN of the number represented by String.
-
---*/
-{
-  UINTN   Number;
-  CHAR16  *Str;
-
-  //
-  // skip preceeding white space
-  //
-  Str = String;
-  while ((*Str) && (*Str == ' ' || *Str == '"')) {
-    Str++;
-  }
-  //
-  // Convert ot a Number
-  //
-  Number = 0;
-  while (*Str != '\0') {
-    if ((*Str >= '0') && (*Str <= '9')) {
-      Number = (Number * 10) +*Str - '0';
-    } else {
-      break;
-    }
-
-    Str++;
-  }
-
-  return Number;
-}
-
-VOID
-EFIAPI
-WinNtIoProtocolNotifyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-/*++
-
-Routine Description:
-  This function will log memory size data to data hub.
-
-Arguments:
-Event        - Event whose notification function is being invoked.
-Context      - Pointer to the notification function's context.
-
-Returns:
-    EFI_STATUS.
-
---*/
-{
-  EFI_STATUS                      Status;
-  EFI_MEMORY_SUBCLASS_DRIVER_DATA MemorySubClassData;
-  EFI_DATA_RECORD_HEADER          *Record;
-  EFI_SUBCLASS_TYPE1_HEADER       *DataHeader;
-  UINTN                           HandleCount;
-  UINTN                           HandleIndex;
-  UINT64                          MonotonicCount;
-  BOOLEAN                         RecordFound;
-  EFI_HANDLE                      *HandleBuffer;
-  EFI_WIN_NT_IO_PROTOCOL          *WinNtIo;
-  EFI_DATA_HUB_PROTOCOL           *DataHub;
-  UINT64                          TotalMemorySize;
-
-  DataHub         = NULL;
-  MonotonicCount  = 0;
-  RecordFound     = FALSE;
-
-  //
-  // Retrieve the list of all handles from the handle database.
-  //
-  Status = gBS->LocateHandleBuffer (
-                  AllHandles,
-                  &gEfiWinNtIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-  //
-  // Locate DataHub protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-  //
-  // Search the Handle array to find the meory size information.
-  //
-  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
-    Status = gBS->OpenProtocol (
-                    HandleBuffer[HandleIndex],
-                    &gEfiWinNtIoProtocolGuid,
-                    &WinNtIo,
-                    Context,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    if ((WinNtIo->WinNtThunk->Signature == EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE) &&
-        CompareGuid (WinNtIo->TypeGuid, &gEfiWinNtMemoryGuid)
-          ) {
-      //
-      // Check if this record has been stored in data hub.
-      //
-      do {
-        Status = DataHub->GetNextRecord (DataHub, &MonotonicCount, NULL, &Record);
-        if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
-          DataHeader = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
-          if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-              (DataHeader->RecordType == EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER)
-              ) {
-            RecordFound = TRUE;
-          }
-        }
-      } while (MonotonicCount != 0);
-
-      if (RecordFound) {
-        RecordFound = FALSE;
-        continue;
-      }
-      //
-      // Initialize data record.
-      //
-      MemorySubClassData.Header.Instance    = 1;
-      MemorySubClassData.Header.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
-      MemorySubClassData.Header.RecordType  = EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER;
-
-      TotalMemorySize                       = (UINT64) Atoi (WinNtIo->EnvString);
-
-      MemorySubClassData.Record.ArrayStartAddress.MemoryArrayStartAddress               = 0;
-      MemorySubClassData.Record.ArrayStartAddress.MemoryArrayEndAddress                 = LShiftU64 (TotalMemorySize, 20) - 1;
-      MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName  = gEfiMemoryProducerGuid;
-      MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance      = 1;
-      MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
-      MemorySubClassData.Record.ArrayStartAddress.MemoryArrayPartitionWidth = 0;
-
-      //
-      // Store memory size data record to data hub.
-      //
-      Status = DataHub->LogData (
-                          DataHub,
-                          &gEfiMemorySubClassGuid,
-                          &gEfiMemoryProducerGuid,
-                          EFI_DATA_RECORD_CLASS_DATA,
-                          &MemorySubClassData,
-                          sizeof (EFI_SUBCLASS_TYPE1_HEADER) + sizeof (EFI_MEMORY_ARRAY_START_ADDRESS_DATA)
-                          );
-    }
-
-    gBS->CloseProtocol (
-          HandleBuffer[HandleIndex],
-          &gEfiWinNtIoProtocolGuid,
-          Context,
-          NULL
-          );
-  }
-}
 

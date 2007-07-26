@@ -186,62 +186,6 @@ NT_ISA_SERIAL_DEVICE_PATH   gNtSerialDevicePath1 = {
   gEndEntire
 };
 
-NT_PLATFORM_CPU_MODEL_VIRTUAL_DEVICE_PATH gCpuModelDevicePath = {
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
-    EFI_WIN_NT_THUNK_PROTOCOL_GUID
-  },
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
-    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
-    EFI_WIN_NT_CPU_MODEL_GUID,
-    0
-  },
-  gEndEntire
-};
-
-NT_PLATFORM_CPU_SPEED_VIRTUAL_DEVICE_PATH gCpuSpeedDevicePath = {
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
-    EFI_WIN_NT_THUNK_PROTOCOL_GUID
-  },
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
-    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
-    EFI_WIN_NT_CPU_SPEED_GUID,
-    0
-  },
-  gEndEntire
-};
-
-NT_PLATFORM_MEMORY_VIRTUAL_DEVICE_PATH gMemoryDevicePath = {
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
-    EFI_WIN_NT_THUNK_PROTOCOL_GUID
-  },
-  {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8) (sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)),
-    (UINT8) ((sizeof (WIN_NT_VENDOR_DEVICE_PATH_NODE)) >> 8),
-    EFI_WIN_NT_MEMORY_GUID,
-    0
-  },
-  gEndEntire
-};
 
 //
 // Predefined platform default console device path
@@ -285,8 +229,4 @@ EFI_DEVICE_PATH_PROTOCOL    *gPlatformDriverOption[] = { NULL };
 //
 // Predefined platform connect sequence
 //
-EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { 
-  (EFI_DEVICE_PATH_PROTOCOL *) &gCpuModelDevicePath,
-  (EFI_DEVICE_PATH_PROTOCOL *) &gCpuSpeedDevicePath,
-  (EFI_DEVICE_PATH_PROTOCOL *) &gMemoryDevicePath
-  };
+EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { NULL };

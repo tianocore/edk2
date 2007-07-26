@@ -150,10 +150,7 @@ static NT_PCD_ENTRY  mPcdEnvironment[] = {
   PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,
   PcdToken(PcdWinNtFileSystem),    &gEfiWinNtFileSystemGuid,
   PcdToken(PcdWinNtVirtualDisk),   &gEfiWinNtVirtualDisksGuid,
-  PcdToken(PcdWinNtPhysicalDisk),  &gEfiWinNtPhysicalDisksGuid,
-  PcdToken(PcdWinNtCpuModel),      &gEfiWinNtCPUModelGuid,
-  PcdToken(PcdWinNtCpuSpeed),      &gEfiWinNtCPUSpeedGuid,
-  PcdToken(PcdWinNtMemorySize),    &gEfiWinNtMemoryGuid
+  PcdToken(PcdWinNtPhysicalDisk),  &gEfiWinNtPhysicalDisksGuid
 };
 
 /**

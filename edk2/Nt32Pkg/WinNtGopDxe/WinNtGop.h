@@ -304,18 +304,5 @@ WinNtGopDestroySimpleTextInForWindow (
 ;
 
 
-/**
-  TODO: Add function description
-
-  @param  String               TODO: add argument description
-
-  @return TODO: add return values
-
-**/
-UINTN
-Atoi (
-  IN  CHAR16  *String
-  )
-;
 
 #endif

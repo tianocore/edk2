@@ -329,14 +329,14 @@
 ################################################################################
 
 [PcdsDynamicDefault.common.DEFAULT]
-  PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"3000"|8
   PcdWinNtSerialPort|gEfiNt32PkgTokenSpaceGuid|L"COM1!COM2"|18
   PcdWinNtFileSystem|gEfiNt32PkgTokenSpaceGuid|L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"|106
   PcdWinNtGop|gEfiNt32PkgTokenSpaceGuid|L"UGA Window 1!UGA Window 2"|50
   PcdWinNtConsole|gEfiNt32PkgTokenSpaceGuid|L"Bus Driver Console Window"|50
-  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
   PcdWinNtVirtualDisk|gEfiNt32PkgTokenSpaceGuid|L"FW;40960;512"|24
-  PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid|L"Intel(R) Processor Model"|48
+  PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid|L"NT32 Processor Emulation"|52
+  PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"1234"|8
+  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
   PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"a:RW;2880;512!e:RW;262144;512"|58
   PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid|L"UGA Window 1!UGA Window 2"|50
   PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
@@ -428,5 +428,5 @@
   $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
 [BuildOptions]
-	MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
-	MSFT:RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
+  MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  MSFT:RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
