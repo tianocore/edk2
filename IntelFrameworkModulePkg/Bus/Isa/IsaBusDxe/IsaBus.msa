@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
     <ModuleName>IsaBus</ModuleName>
@@ -111,7 +111,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdIsaBusSupportIsaMemory</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiIntelFrameworkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag is used to enable the implementation for interface 
       _EFI_ISA_IO_PROTOCOL.Mem.Read, _EFI_ISA_IO_PROTOCOL.Mem.Write and _EFI_ISA_IO_PROTOCOL.CopyMem. 
@@ -120,7 +120,7 @@
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdIsaBusSupportDma</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiIntelFrameworkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag is used to enable the implementation for interface 
       _EFI_ISA_IO_PROTOCOL.AllocateBuffer, _EFI_ISA_IO_PROTOCOL.FreeBuffer, _EFI_ISA_IO_PROTOCOL.Map 
@@ -129,7 +129,7 @@
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG" Usage="ALWAYS_CONSUMED">
       <C_Name>PcdIsaBusOnlySupportSlaveDma</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiIntelFrameworkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>This feature flag is used to enable the implementation for interface 
       _EFI_ISA_IO_PROTOCOL.Map and _EFI_ISA_IO_PROTOCOL.UnMap to only support Slave DMA 
