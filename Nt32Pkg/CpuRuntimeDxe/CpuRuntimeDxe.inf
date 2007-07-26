@@ -50,8 +50,6 @@
   DebugLib
 
 [Guids]
-  gEfiWinNtCPUSpeedGuid                         # SOMETIMES_CONSUMED
-  gEfiWinNtCPUModelGuid                         # SOMETIMES_CONSUMED
   gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
   gEfiProcessorProducerGuid                     # SOMETIMES_CONSUMED
 
@@ -62,6 +60,10 @@
   gEfiWinNtIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+
+[PcdsDynamic.common]
+  PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid
 
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid

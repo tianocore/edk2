@@ -25,21 +25,35 @@ Abstract:
 
 #include "CpuDriver.h"
 
+
+CPU_ARCH_PROTOCOL_PRIVATE mCpuTemplate = {
+  CPU_ARCH_PROT_PRIVATE_SIGNATURE,
+  NULL,
+  {
+    WinNtFlushCpuDataCache,
+    WinNtEnableInterrupt,
+    WinNtDisableInterrupt,
+    WinNtGetInterruptState,
+    WinNtInit,
+    WinNtRegisterInterruptHandler,
+    WinNtGetTimerValue,
+    WinNtSetMemoryAttributes,
+    0,
+    4
+  },
+  {
+    CpuMemoryServiceRead,
+    CpuMemoryServiceWrite,
+    CpuIoServiceRead,
+    CpuIoServiceWrite
+  },
+  0,
+  TRUE
+};
+
 #define EFI_CPU_DATA_MAXIMUM_LENGTH 0x100
 
-EFI_STATUS
-EFIAPI
-InitializeCpu (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  );
 
-VOID
-EFIAPI
-WinNtIoProtocolNotifyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  );
 
 typedef union {
   EFI_CPU_DATA_RECORD *DataRecord;
@@ -57,7 +71,6 @@ EFI_SUBCLASS_TYPE1_HEADER mCpuDataRecordHeader = {
 //
 // Service routines for the driver
 //
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtFlushCpuDataCache (
@@ -104,7 +117,7 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtEnableInterrupt (
@@ -138,7 +151,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtDisableInterrupt (
@@ -172,7 +185,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtGetInterruptState (
@@ -213,7 +226,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtInit (
@@ -247,7 +260,7 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtRegisterInterruptHandler (
@@ -293,7 +306,7 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtGetTimerValue (
@@ -333,7 +346,7 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
+
 EFI_STATUS
 EFIAPI
 WinNtSetMemoryAttributes (
@@ -385,6 +398,114 @@ Returns:
 }
 
 
+VOID
+CpuUpdateDataHub (
+  VOID
+  )
+/*++
+
+Routine Description:
+  This function will log processor version and frequency data to data hub.
+
+Arguments:
+  Event        - Event whose notification function is being invoked.
+  Context      - Pointer to the notification function's context.
+
+Returns:
+  None.
+
+--*/
+{
+  EFI_STATUS                  Status;
+  EFI_CPU_DATA_RECORD_BUFFER  RecordBuffer;
+  UINT32                      HeaderSize;
+  UINT32                      TotalSize;
+  EFI_DATA_HUB_PROTOCOL       *DataHub;
+  EFI_HII_PROTOCOL            *Hii;
+  EFI_HII_HANDLE              StringHandle;
+  EFI_HII_PACKAGES            *PackageList;
+  STRING_REF                  Token;
+
+
+  //
+  // Locate DataHub protocol.
+  //
+  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Locate DataHub protocol.
+  //
+  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Initialize data record header
+  //
+  mCpuDataRecordHeader.Instance = 1;
+  HeaderSize                    = sizeof (EFI_SUBCLASS_TYPE1_HEADER);
+
+  RecordBuffer.Raw              = AllocatePool (HeaderSize + EFI_CPU_DATA_MAXIMUM_LENGTH);
+  if (RecordBuffer.Raw == NULL) {
+    return ;
+  }
+
+  //
+  // Initialize strings to HII database
+  //
+  PackageList = PreparePackages (1, &gEfiProcessorProducerGuid, CpuStrings);
+  Status      = Hii->NewPack (Hii, PackageList, &StringHandle);
+  ASSERT (!EFI_ERROR (Status));
+  FreePool (PackageList);
+
+  CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
+
+  //
+  // Store processor version data record to data hub
+  //
+  Token = 0;
+  Status = Hii->NewString (Hii, NULL, StringHandle, &Token, (CHAR16 *)PcdGetPtr (PcdWinNtCpuModel));
+  ASSERT (!EFI_ERROR (Status));
+
+  RecordBuffer.DataRecord->DataRecordHeader.RecordType      = ProcessorVersionRecordType;
+  RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = Token;
+  TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_VERSION_DATA);
+
+  Status = DataHub->LogData (
+                      DataHub,
+                      &gEfiProcessorSubClassGuid,
+                      &gEfiProcessorProducerGuid,
+                      EFI_DATA_RECORD_CLASS_DATA,
+                      RecordBuffer.Raw,
+                      TotalSize
+                      );
+
+  //
+  // Store CPU frequency data record to data hub
+  //
+  RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = ProcessorCoreFrequencyRecordType;
+  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = (UINT16) StrDecimalToUintn (PcdGetPtr (PcdWinNtCpuSpeed));
+  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Exponent = 6;
+  TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_CORE_FREQUENCY_DATA);
+
+  Status = DataHub->LogData (
+                      DataHub,
+                      &gEfiProcessorSubClassGuid,
+                      &gEfiProcessorProducerGuid,
+                      EFI_DATA_RECORD_CLASS_DATA,
+                      RecordBuffer.Raw,
+                      TotalSize
+                      );
+
+  FreePool (RecordBuffer.Raw);
+}
+
+
+
 EFI_STATUS
 EFIAPI
 InitializeCpu (
@@ -411,317 +532,20 @@ Returns:
   EFI_DEVICE_ERROR      - cannot create the thread
 
 --*/
-// TODO:    SystemTable - add argument and description to function comment
 {
   EFI_STATUS                Status;
-  EFI_EVENT                 Event;
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-  VOID                      *Registration;
 
-  Private = AllocatePool (sizeof (CPU_ARCH_PROTOCOL_PRIVATE));
-  ASSERT (Private != NULL);
+  CpuUpdateDataHub ();
 
-  Private->Signature                    = CPU_ARCH_PROT_PRIVATE_SIGNATURE;
-  Private->Cpu.FlushDataCache           = WinNtFlushCpuDataCache;
-  Private->Cpu.EnableInterrupt          = WinNtEnableInterrupt;
-  Private->Cpu.DisableInterrupt         = WinNtDisableInterrupt;
-  Private->Cpu.GetInterruptState        = WinNtGetInterruptState;
-  Private->Cpu.Init                     = WinNtInit;
-  Private->Cpu.RegisterInterruptHandler = WinNtRegisterInterruptHandler;
-  Private->Cpu.GetTimerValue            = WinNtGetTimerValue;
-  Private->Cpu.SetMemoryAttributes      = WinNtSetMemoryAttributes;
-
-  Private->Cpu.NumberOfTimers           = 0;
-  Private->Cpu.DmaBufferAlignment       = 4;
-
-  Private->InterruptState               = TRUE;
-
-  Private->CpuIo.Mem.Read   = CpuMemoryServiceRead;
-  Private->CpuIo.Mem.Write  = CpuMemoryServiceWrite;
-  Private->CpuIo.Io.Read    = CpuIoServiceRead;
-  Private->CpuIo.Io.Write   = CpuIoServiceWrite;
-
-
-  Private->Handle                       = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Private->Handle,
-                  &gEfiCpuArchProtocolGuid,   &Private->Cpu,
-                  &gEfiCpuIoProtocolGuid,     &Private->CpuIo,
+                  &mCpuTemplate.Handle,
+                  &gEfiCpuArchProtocolGuid,   &mCpuTemplate.Cpu,
+                  &gEfiCpuIoProtocolGuid,     &mCpuTemplate.CpuIo,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Install notify function to store processor data to HII database and data hub.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  WinNtIoProtocolNotifyFunction,
-                  ImageHandle,
-                  &Event
-                  );
-  ASSERT (!EFI_ERROR (Status));
-
-  Status = gBS->RegisterProtocolNotify (
-                  &gEfiWinNtIoProtocolGuid,
-                  Event,
-                  &Registration
-                  );
-  ASSERT (!EFI_ERROR (Status));
-
-  //
-  // Should be at EFI_D_INFO, but lets us now things are running
-  //
-  DEBUG ((EFI_D_ERROR, "CPU Architectural Protocol Loaded\n"));
-
-
-
   return Status;
 }
 
-UINTN
-Atoi (
-  CHAR16  *String
-  )
-/*++
 
-Routine Description:
-  Convert a unicode string to a UINTN
-
-Arguments:
-  String - Unicode string.
-
-Returns:
-  UINTN of the number represented by String.
-
---*/
-{
-  UINTN   Number;
-  CHAR16  *Str;
-
-  //
-  // skip preceeding white space
-  //
-  Str = String;
-  while ((*Str) && (*Str == ' ' || *Str == '"')) {
-    Str++;
-  }
-  //
-  // Convert ot a Number
-  //
-  Number = 0;
-  while (*Str != '\0') {
-    if ((*Str >= '0') && (*Str <= '9')) {
-      Number = (Number * 10) +*Str - '0';
-    } else {
-      break;
-    }
-
-    Str++;
-  }
-
-  return Number;
-}
-
-VOID
-EFIAPI
-WinNtIoProtocolNotifyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-/*++
-
-Routine Description:
-  This function will log processor version and frequency data to data hub.
-
-Arguments:
-  Event        - Event whose notification function is being invoked.
-  Context      - Pointer to the notification function's context.
-
-Returns:
-  None.
-
---*/
-{
-  EFI_STATUS                  Status;
-  EFI_CPU_DATA_RECORD_BUFFER  RecordBuffer;
-  EFI_DATA_RECORD_HEADER      *Record;
-  EFI_SUBCLASS_TYPE1_HEADER   *DataHeader;
-  UINT32                      HeaderSize;
-  UINT32                      TotalSize;
-  UINTN                       HandleCount;
-  UINTN                       HandleIndex;
-  UINT64                      MonotonicCount;
-  BOOLEAN                     RecordFound;
-  EFI_HANDLE                  *HandleBuffer;
-  EFI_WIN_NT_IO_PROTOCOL      *WinNtIo;
-  EFI_DATA_HUB_PROTOCOL       *DataHub;
-  EFI_HII_PROTOCOL            *Hii;
-  EFI_HII_HANDLE              StringHandle;
-  EFI_HII_PACKAGES            *PackageList;
-  STRING_REF                  Token;
-
-  DataHub         = NULL;
-  Token           = 0;
-  MonotonicCount  = 0;
-  RecordFound     = FALSE;
-
-  //
-  // Retrieve the list of all handles from the handle database
-  //
-  Status = gBS->LocateHandleBuffer (
-                  AllHandles,
-                  &gEfiWinNtIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-  //
-  // Locate HII protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-  //
-  // Locate DataHub protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-  //
-  // Initialize data record header
-  //
-  mCpuDataRecordHeader.Instance = 1;
-  HeaderSize                    = sizeof (EFI_SUBCLASS_TYPE1_HEADER);
-
-  RecordBuffer.Raw              = AllocatePool (HeaderSize + EFI_CPU_DATA_MAXIMUM_LENGTH);
-  if (RecordBuffer.Raw == NULL) {
-    return ;
-  }
-
-  CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
-
-  //
-  // Search the Handle array to find the CPU model and speed information
-  //
-  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
-    Status = gBS->OpenProtocol (
-                    HandleBuffer[HandleIndex],
-                    &gEfiWinNtIoProtocolGuid,
-                    &WinNtIo,
-                    Context,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    if ((WinNtIo->WinNtThunk->Signature == EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE) &&
-        CompareGuid (WinNtIo->TypeGuid, &gEfiWinNtCPUModelGuid)
-          ) {
-      //
-      // Check if this record has been stored in data hub
-      //
-      do {
-        Status = DataHub->GetNextRecord (DataHub, &MonotonicCount, NULL, &Record);
-        if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
-          DataHeader = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
-          if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-              (DataHeader->RecordType == ProcessorVersionRecordType)
-              ) {
-            RecordFound = TRUE;
-          }
-        }
-      } while (MonotonicCount != 0);
-
-      if (RecordFound) {
-        RecordFound = FALSE;
-        continue;
-      }
-      //
-      // Initialize strings to HII database
-      //
-      PackageList = PreparePackages (1, &gEfiProcessorProducerGuid, CpuStrings);
-
-      Status      = Hii->NewPack (Hii, PackageList, &StringHandle);
-      ASSERT (!EFI_ERROR (Status));
-
-      FreePool (PackageList);
-
-      //
-      // Store processor version data record to data hub
-      //
-      Status = Hii->NewString (Hii, NULL, StringHandle, &Token, WinNtIo->EnvString);
-      ASSERT (!EFI_ERROR (Status));
-
-      RecordBuffer.DataRecord->DataRecordHeader.RecordType      = ProcessorVersionRecordType;
-      RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = Token;
-      TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_VERSION_DATA);
-
-      Status = DataHub->LogData (
-                          DataHub,
-                          &gEfiProcessorSubClassGuid,
-                          &gEfiProcessorProducerGuid,
-                          EFI_DATA_RECORD_CLASS_DATA,
-                          RecordBuffer.Raw,
-                          TotalSize
-                          );
-    }
-
-    if ((WinNtIo->WinNtThunk->Signature == EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE) &&
-        CompareGuid (WinNtIo->TypeGuid, &gEfiWinNtCPUSpeedGuid)
-          ) {
-      //
-      // Check if this record has been stored in data hub
-      //
-      do {
-        Status = DataHub->GetNextRecord (DataHub, &MonotonicCount, NULL, &Record);
-        if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
-          DataHeader = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
-          if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-              (DataHeader->RecordType == ProcessorCoreFrequencyRecordType)
-              ) {
-            RecordFound = TRUE;
-          }
-        }
-      } while (MonotonicCount != 0);
-
-      if (RecordFound) {
-        RecordFound = FALSE;
-        continue;
-      }
-      //
-      // Store CPU frequency data record to data hub
-      //
-      RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = ProcessorCoreFrequencyRecordType;
-      RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = (UINT16) Atoi (WinNtIo->EnvString);
-      RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Exponent = 6;
-      TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_CORE_FREQUENCY_DATA);
-
-      Status = DataHub->LogData (
-                          DataHub,
-                          &gEfiProcessorSubClassGuid,
-                          &gEfiProcessorProducerGuid,
-                          EFI_DATA_RECORD_CLASS_DATA,
-                          RecordBuffer.Raw,
-                          TotalSize
-                          );
-
-      FreePool (RecordBuffer.Raw);
-    }
-
-    gBS->CloseProtocol (
-          HandleBuffer[HandleIndex],
-          &gEfiWinNtIoProtocolGuid,
-          Context,
-          NULL
-          );
-  }
-}

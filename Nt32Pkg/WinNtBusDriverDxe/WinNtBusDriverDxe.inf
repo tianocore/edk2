@@ -60,9 +60,6 @@
 
 
 [Guids]
-  gEfiWinNtCPUSpeedGuid                         # ALWAYS_CONSUMED
-  gEfiWinNtCPUModelGuid                         # ALWAYS_CONSUMED
-  gEfiWinNtMemoryGuid                           # ALWAYS_CONSUMED
   gEfiWinNtConsoleGuid                          # ALWAYS_CONSUMED
   gEfiWinNtGopGuid                              # ALWAYS_CONSUMED
   gEfiWinNtSerialPortGuid                       # ALWAYS_CONSUMED

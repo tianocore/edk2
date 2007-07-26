@@ -36,6 +36,7 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
 #include <MiscDevicePath.h>
 

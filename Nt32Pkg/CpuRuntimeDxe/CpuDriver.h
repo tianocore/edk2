@@ -30,12 +30,14 @@ Abstract:
 #include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo.h>
 #include <Protocol/WinNtIo.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HiiLibFramework.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
 
 
 extern UINT8  CpuStrings[];
@@ -106,6 +108,79 @@ CpuIoServiceWrite (
   IN  UINTN                             Count,
   IN  OUT VOID                          *UserBuffer
   );
+
+
+EFI_STATUS
+EFIAPI
+InitializeCpu (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtFlushCpuDataCache (
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS   Start,
+  IN UINT64                 Length,
+  IN EFI_CPU_FLUSH_TYPE     FlushType
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtEnableInterrupt (
+  IN EFI_CPU_ARCH_PROTOCOL  *This
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtDisableInterrupt (
+  IN EFI_CPU_ARCH_PROTOCOL  *This
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtGetInterruptState (
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  OUT BOOLEAN               *State
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtInit (
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_CPU_INIT_TYPE      InitType
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtRegisterInterruptHandler (
+  IN EFI_CPU_ARCH_PROTOCOL      *This,
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtGetTimerValue (
+  IN  EFI_CPU_ARCH_PROTOCOL *This,
+  IN  UINT32                TimerIndex,
+  OUT UINT64                *TimerValue,
+  OUT UINT64                *TimerPeriod OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+WinNtSetMemoryAttributes (
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
+  IN UINT64                 Length,
+  IN UINT64                 Attributes
+  );
+
+
+
+
 
 
 #endif

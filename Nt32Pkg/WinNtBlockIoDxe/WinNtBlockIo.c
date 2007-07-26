@@ -284,10 +284,10 @@ Returns:
       WriteProtected  = (BOOLEAN) (*Str == 'O');
       Str             = GetNextElementPastTerminator (Str, ';');
 
-      NumberOfBlocks  = Atoi (Str);
+      NumberOfBlocks  = StrDecimalToUintn (Str);
       if (NumberOfBlocks != 0) {
         Str       = GetNextElementPastTerminator (Str, ';');
-        BlockSize = Atoi (Str);
+        BlockSize = StrDecimalToUintn (Str);
         if (BlockSize != 0) {
           //
           // If we get here the variable is valid so do the work.
@@ -1063,52 +1063,6 @@ WinNtBlockIoResetBlock (
   return EFI_SUCCESS;
 }
 
-UINTN
-Atoi (
-  CHAR16  *String
-  )
-/*++
-
-Routine Description:
-
-  Convert a unicode string to a UINTN
-
-Arguments:
-
-  String - Unicode string.
-
-Returns:
-
-  UINTN of the number represented by String.
-
---*/
-{
-  UINTN   Number;
-  CHAR16  *Str;
-
-  //
-  // skip preceeding white space
-  //
-  Str = String;
-  while ((*Str) && (*Str == ' ')) {
-    Str++;
-  }
-  //
-  // Convert ot a Number
-  //
-  Number = 0;
-  while (*Str != '\0') {
-    if ((*Str >= '0') && (*Str <= '9')) {
-      Number = (Number * 10) +*Str - '0';
-    } else {
-      break;
-    }
-
-    Str++;
-  }
-
-  return Number;
-}
 
 EFI_STATUS
 SetFilePointer64 (

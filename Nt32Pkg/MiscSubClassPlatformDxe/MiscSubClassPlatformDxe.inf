@@ -54,15 +54,6 @@
   MiscSubclassDriver.h
   MiscDevicePath.h
   MiscSubclassDriver.uni
-  MiscSystemSlotDesignation.uni
-  MiscSystemOptionString.uni
-  MiscSystemManufacturer.uni
-  MiscSystemLanguageString.uni
-  MiscPortInternalConnectorDesignator.uni
-  MiscOemString.uni
-  MiscChassisManufacturer.uni
-  MiscBiosVendor.uni
-  MiscBaseBoardManufacturer.uni
   CommonHeader.h
 
 [Packages]
@@ -81,20 +72,23 @@
   HiiLibFramework
   DebugLib
   BaseLib
+  PcdLib
 
 
 [Guids]
-  gEfiWinNtMemoryGuid                           # SOMETIMES_CONSUMED
   gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
   gEfiMiscSubClassGuid                          # SOMETIMES_CONSUMED
   gEfiMemoryProducerGuid                        # SOMETIMES_CONSUMED
   gEfiMemorySubClassGuid                        # SOMETIMES_CONSUMED
-  gEfiWinNtMemoryGuid                           # SOMETIMES_CONSUMED
 
 [Protocols]
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
+[PcdsDynamic.common]
+  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid
+
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid
+  
