@@ -115,19 +115,6 @@ typedef struct {
 #define BIS_GET_SIGINFO_ARRAY(BisDataPtr) ((EFI_BIS_SIGNATURE_INFO *) (BisDataPtr)->Data)
 
 //
-// Binary Value of "X-Intel-BIS-ParameterSet" Attribute.
-// (Value is Base64 encoded in actual signed manifest).
-// {EDD35E31-07B9-11d2-83A3-00A0C91FADCF}
-//
-#define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUID \
-  { \
-    0xedd35e31, 0x7b9, 0x11d2, \
-    { \
-      0x83, 0xa3, 0x0, 0xa0, 0xc9, 0x1f, 0xad, 0xcf \
-    } \
-  }
-
-//
 // Support old name for backward compatible
 //
 #define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUIDVALUE \
