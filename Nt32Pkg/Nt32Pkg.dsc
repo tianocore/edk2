@@ -2,7 +2,7 @@
 # EFI/Framework Emulation Platform
 #
 # The Emulation Platform can be used to debug individual modules, prior to creating
-#    a real platform. This also provides an example for how an FPD is created.
+#    a real platform. This also provides an example for how an DSC is created.
 #
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
