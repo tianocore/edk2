@@ -18,10 +18,7 @@ Abstract:
   The platform device manager reference implement
 
 --*/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+
 #include "DeviceManager.h"
 
 STATIC UINT16                     mTokenCount;

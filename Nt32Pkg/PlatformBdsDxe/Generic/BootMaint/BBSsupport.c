@@ -21,11 +21,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "BBSsupport.h"
 
 EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {

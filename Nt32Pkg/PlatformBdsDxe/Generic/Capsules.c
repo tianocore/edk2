@@ -19,12 +19,7 @@ Abstract:
 
 --*/
 
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
+#include "Bds.h"
 #include <Guid/FlashMapHob.h>
 
 VOID

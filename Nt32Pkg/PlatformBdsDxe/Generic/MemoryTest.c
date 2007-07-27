@@ -19,11 +19,6 @@ Abstract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "bds.h"
 #include "BdsPlatform.h"
 #include "BdsString.h"
