@@ -22,10 +22,7 @@ Abstract:
 #ifndef _BDS_PLATFORM_H
 #define _BDS_PLATFORM_H
 
-//
-// The rest of the includes
-//
-#include <Common/FirmwareRevision.h>
+#define FIRMWARE_REVISION 0
 
 extern UINT8 PlatformBdsStrings[];
 
