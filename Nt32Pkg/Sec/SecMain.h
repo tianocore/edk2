@@ -21,7 +21,7 @@ Abstract:
 #include <stdio.h>
 #include <Base.h>
 #include <PiPei.h>
-#include <FrameworkPei.h>
+#include <PiDxe.h>
 #include <WinNtPeim.h>
 #include <Library/BaseLib.h>
 #include <Library/PeCoffLib.h>
@@ -35,6 +35,10 @@ Abstract:
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/ReportStatusCodeLib.h>
+
+#include <IndustryStandard/PeImage.h>
+
 
 #define STACK_SIZE                0x20000      
 
