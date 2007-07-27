@@ -106,6 +106,7 @@
   $(WORKSPACE)/MdePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
   $(WORKSPACE)/MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
   $(WORKSPACE)/MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  $(WORKSPACE)/MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
 [Components.IA32]
   $(WORKSPACE)/MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
