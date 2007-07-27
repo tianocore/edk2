@@ -131,7 +131,7 @@ ${END}\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\tTrim -CONVERT $(@D)${_sep_}${fbase}.i
+\tTrim -s -c $(@D)${_sep_}${fbase}.i
 \t"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${_sep_}${fbase}.iii
 ''',
 
@@ -146,7 +146,7 @@ ${END}\t"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\tTrim -v $(@D)${_sep_}${fbase}.i
 \t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
 \t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
@@ -194,7 +194,7 @@ ${END}\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\tTrim -CONVERT $(@D)${_sep_}${fbase}.i
+\tTrim -s -c $(@D)${_sep_}${fbase}.i
 \t"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${_sep_}${fbase}.iii
 ''',
 
@@ -209,7 +209,7 @@ ${END}\t"$(APP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\tTrim -v $(@D)${_sep_}${fbase}.i
 \t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
 \t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
@@ -259,7 +259,7 @@ ${END}\t"$(ASM)" -o $@ $(ASM_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} -o $(@D)${_sep_}${fbase}.i
-\tTrim -VFR $(@D)${_sep_}${fbase}.i
+\tTrim -v $(@D)${_sep_}${fbase}.i
 \t-mkdir $(DEBUG_DIR)${_sep_}${fdir} > NUL 2>&1
 \tVfrCompile -od $(DEBUG_DIR)${_sep_}${fdir} $(@D)${_sep_}${fbase}.iii
 \t"$(CC)" -o $@ $(CC_FLAGS) $(INC) $(DEBUG_DIR)${_sep_}${fdir}${_sep_}${fbase}.c
