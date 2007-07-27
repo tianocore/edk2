@@ -33,7 +33,7 @@ Abstract:
 --*/
 
 #include "SecMain.h"
-#pragma warning(disable : 4996)
+
 
 //
 // Globals
@@ -420,70 +420,8 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
 #define BYTES_PER_RECORD  512
-
-/**
-  Extracts ASSERT() information from a status code structure.
-
-  Converts the status code specified by CodeType, Value, and Data to the ASSERT()
-  arguments specified by Filename, Description, and LineNumber.  If CodeType is 
-  an EFI_ERROR_CODE, and CodeType has a severity of EFI_ERROR_UNRECOVERED, and 
-  Value has an operation mask of EFI_SW_EC_ILLEGAL_SOFTWARE_STATE, extract 
-  Filename, Description, and LineNumber from the optional data area of the 
-  status code buffer specified by Data.  The optional data area of Data contains 
-  a Null-terminated ASCII string for the FileName, followed by a Null-terminated 
-  ASCII string for the Description, followed by a 32-bit LineNumber.  If the 
-  ASSERT() information could be extracted from Data, then return TRUE.  
-  Otherwise, FALSE is returned.  
-
-  If Data is NULL, then ASSERT().
-  If Filename is NULL, then ASSERT().
-  If Description is NULL, then ASSERT().
-  If LineNumber is NULL, then ASSERT().
-
-  @param  CodeType     The type of status code being converted.
-  @param  Value        The status code value being converted.
-  @param  Data         Pointer to status code data buffer. 
-  @param  Filename     Pointer to the source file name that generated the ASSERT().
-  @param  Description  Pointer to the description of the ASSERT().
-  @param  LineNumber   Pointer to source line number that generated the ASSERT().
-
-  @retval  TRUE   The status code specified by CodeType, Value, and Data was 
-                  converted ASSERT() arguments specified by Filename, Description, 
-                  and LineNumber.
-  @retval  FALSE  The status code specified by CodeType, Value, and Data could 
-                  not be converted to ASSERT() arguments.
-
-**/
-STATIC
-BOOLEAN
-ReportStatusCodeExtractAssertInfo (
-  IN EFI_STATUS_CODE_TYPE        CodeType,
-  IN EFI_STATUS_CODE_VALUE       Value,  
-  IN CONST EFI_STATUS_CODE_DATA  *Data, 
-  OUT CHAR8                      **Filename,
-  OUT CHAR8                      **Description,
-  OUT UINT32                     *LineNumber
-  )
-{
-  EFI_DEBUG_ASSERT_DATA  *AssertData;
-
-  ASSERT (Data        != NULL);
-  ASSERT (Filename    != NULL);
-  ASSERT (Description != NULL);
-  ASSERT (LineNumber  != NULL);
-
-  if (((CodeType & EFI_STATUS_CODE_TYPE_MASK)      == EFI_ERROR_CODE) && 
-      ((CodeType & EFI_STATUS_CODE_SEVERITY_MASK)  == EFI_ERROR_UNRECOVERED) &&
-      ((Value    & EFI_STATUS_CODE_OPERATION_MASK) == EFI_SW_EC_ILLEGAL_SOFTWARE_STATE)) {
-    AssertData   = (EFI_DEBUG_ASSERT_DATA *)(Data + 1);
-    *Filename    = (CHAR8 *)(AssertData + 1);
-    *Description = *Filename + AsciiStrLen (*Filename) + 1;
-    *LineNumber  = AssertData->LineNumber;
-    return TRUE;
-  }
-  return FALSE;
-}
 
 EFI_STATUS
 EFIAPI
@@ -492,8 +430,8 @@ SecPeiReportStatusCode (
   IN EFI_STATUS_CODE_TYPE       CodeType,
   IN EFI_STATUS_CODE_VALUE      Value,
   IN UINT32                     Instance,
-  IN EFI_GUID                   * CallerId,
-  IN EFI_STATUS_CODE_DATA       * Data OPTIONAL
+  IN EFI_GUID                   *CallerId,
+  IN EFI_STATUS_CODE_DATA       *Data OPTIONAL
   )
 /*++
 
@@ -520,47 +458,27 @@ Returns:
 // TODO:    Data - add argument and description to function comment
 {
   CHAR8           *Format;
-  EFI_DEBUG_INFO  *DebugInfo;
   VA_LIST         Marker;
   CHAR8           PrintBuffer[BYTES_PER_RECORD * 2];
   CHAR8           *Filename;
   CHAR8           *Description;
   UINT32          LineNumber;
+  UINT32          ErrorLevel;
 
-  if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE) {
-    //
-    // This supports DEBUG () marcos
-    // Data format
-    //  EFI_STATUS_CODE_DATA
-    //  EFI_DEBUG_INFO
-    //
-    // The first 12 * UINT64 bytes of the string are really an
-    // arguement stack to support varargs on the Format string.
-    //
-    if (Data != NULL) {
-      DebugInfo = (EFI_DEBUG_INFO *) (Data + 1);
-      Marker    = (VA_LIST) (DebugInfo + 1);
-      Format    = (CHAR8 *) (((UINT64 *) Marker) + 12);
 
-      AsciiVSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
-      printf (PrintBuffer);
-    } else {
-      printf ("DEBUG <null>\n");
-    }
-  }
+  if (Data == NULL) {
+  } else if (ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
+    //
+    // Processes ASSERT ()
+    //
+    printf ("ASSERT %s(%d): %s\n", Filename, LineNumber, Description);
 
-  if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) &&
-      ((CodeType & EFI_STATUS_CODE_SEVERITY_MASK) == EFI_ERROR_UNRECOVERED)
-      ) {
-    if (Data != NULL && ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
-      //
-      // Support ASSERT () macro
-      //
-      printf ("ASSERT %s(%d): %s\n", Filename, LineNumber, Description);
-    } else {
-      printf ("ASSERT <null>\n");
-    }
-    CpuBreakpoint ();
+  } else if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
+    //
+    // Process DEBUG () macro 
+    //
+    AsciiVSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
+    printf (PrintBuffer);
   }
 
   return EFI_SUCCESS;
@@ -1233,4 +1151,3 @@ _ModuleEntryPoint (
 {
 }
 
-#pragma warning(default : 4996)
