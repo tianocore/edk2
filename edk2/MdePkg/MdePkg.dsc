@@ -18,7 +18,7 @@
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/Mde
+  OUTPUT_DIRECTORY               = Build/Mde
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -55,77 +55,77 @@
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
 
 [Components.common]
-  $(WORKSPACE)/MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  $(WORKSPACE)/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  $(WORKSPACE)/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  $(WORKSPACE)/MdePkg/Library/BaseLib/BaseLib.inf
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
-  $(WORKSPACE)/MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
-  $(WORKSPACE)/MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  $(WORKSPACE)/MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
-  $(WORKSPACE)/MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
-  $(WORKSPACE)/MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  $(WORKSPACE)/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-  $(WORKSPACE)/MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
-  $(WORKSPACE)/MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  $(WORKSPACE)/MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
-  $(WORKSPACE)/MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-  $(WORKSPACE)/MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  $(WORKSPACE)/MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLib.inf
-  $(WORKSPACE)/MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
-  $(WORKSPACE)/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-  $(WORKSPACE)/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  $(WORKSPACE)/MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-  $(WORKSPACE)/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
-  $(WORKSPACE)/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  $(WORKSPACE)/MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
-  $(WORKSPACE)/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  $(WORKSPACE)/MdePkg/Library/UefiLib/UefiLib.inf
-  $(WORKSPACE)/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  $(WORKSPACE)/MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  $(WORKSPACE)/MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
-  $(WORKSPACE)/MdePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
-  $(WORKSPACE)/MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
-  $(WORKSPACE)/MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  $(WORKSPACE)/MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  MdePkg/Library/BaseLib/BaseLib.inf
+  MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+  MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
+  MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
+  MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
+  MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+  MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
+  MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
+  MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
+  MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
+  MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLib.inf
+  MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
+  MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+  MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+  MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
+  MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  MdePkg/Library/UefiLib/UefiLib.inf
+  MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
+  MdePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
+  MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
+  MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
 [Components.IA32]
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
-  $(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
+  MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
+  MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
+  MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.X64]
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  $(WORKSPACE)/MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
-  $(WORKSPACE)/MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
+  MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
+  MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
+  MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.IPF]
-  $(WORKSPACE)/MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  $(WORKSPACE)/MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
+  MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
