@@ -37,9 +37,6 @@
   SecMain.c
 
 
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdeModulePkg/MdeModulePkg.dec
