@@ -25,7 +25,7 @@
   PLATFORM_GUID                  = E76EB141-6EDB-43f3-A455-EF24A79673DD
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = $(WORKSPACE)/Build/IntelFramework
+  OUTPUT_DIRECTORY               = Build/IntelFramework
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -52,11 +52,12 @@
 #
 ################################################################################
 [Components.common]
-  $(WORKSPACE)/IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/UefiLibFramework/UefiLibFramework.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
-  $(WORKSPACE)/IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
+  IntelFrameworkPkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib.inf
+  IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
+  IntelFrameworkPkg/Library/UefiLibFramework/UefiLibFramework.inf
+  IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
+  IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+  IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
+  IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
