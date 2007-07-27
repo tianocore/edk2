@@ -23,7 +23,7 @@ Revision History:
 //
 // Include common header file for this module.
 //
-#include "CommonHeader.h"
+#include "IfrSupportLibInternal.h"
 
 EFI_STATUS
 CreateSubTitleOpCode (
