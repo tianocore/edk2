@@ -20,12 +20,7 @@ Abstract:
 Revision History
 
 --*/
-
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
+#include "Bds.h"
 #include "BdsString.h"
 #include "Language.h"
 

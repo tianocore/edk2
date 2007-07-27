@@ -18,10 +18,6 @@ Abstract:
   The platform boot manager reference implement
 
 --*/
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
 
 #include "BootManager.h"
 

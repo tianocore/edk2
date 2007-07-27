@@ -24,11 +24,6 @@ Revision History
 #ifndef _DEVICE_MANAGER_H
 #define _DEVICE_MANAGER_H
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Generic/FrontPage.h"
 
 #define EFI_NON_DEVICE_CLASS              0x00  // Useful when you do not want something in the Device Manager

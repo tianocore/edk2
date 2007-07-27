@@ -19,11 +19,6 @@ AgBStract:
 
 --*/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
-
 #include "Generic/Bds.h"
 #include "BootMaint.h"
 #include "BdsPlatform.h"
