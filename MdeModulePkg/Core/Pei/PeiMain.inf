@@ -63,10 +63,6 @@
 [Sources.EBC]
   Dispatcher/Stack.c
 
-
-[Includes]
-  $(WORKSPACE)/MdePkg\Include/Library
-
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
