@@ -34,15 +34,10 @@
 [Sources.common]
   FlashMap.c
 
-
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
 
 [LibraryClasses]
   PcdLib

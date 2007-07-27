@@ -36,19 +36,14 @@
   WinntFwh.c
 
 
-[Includes]
-  $(WORKSPACE)/MdePkg/Include/Library
-
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
-
 
 [LibraryClasses]
   HobLib
   PeimEntryPoint
   DebugLib
-
 
 [Ppis]
   gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
