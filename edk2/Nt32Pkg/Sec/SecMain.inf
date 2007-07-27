@@ -35,7 +35,6 @@
   WinNtThunk.c
   FwVol.c
   SecMain.c
-  SecMain_build.xml
 
 
 [Includes]
