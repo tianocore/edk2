@@ -33,7 +33,7 @@ pxe_start (
   SNP_DRIVER *snp
   )
 {
-  PXE_CPB_START_30     *cpb;
+  PXE_CPB_START_30  *cpb;
   PXE_CPB_START_31  *cpb_31;
 
   cpb     = snp->cpb;

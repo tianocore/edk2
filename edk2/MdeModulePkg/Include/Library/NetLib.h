@@ -186,9 +186,9 @@ typedef struct {
 //
 // Convert the EFI_IP4_ADDRESS to plain UINT32 IP4 address.
 //
-#define EFI_IP4(EfiIpAddr)                (*(IP4_ADDR *) ((EfiIpAddr).Addr))
-#define EFI_NTOHL(EfiIp)                  (NTOHL (EFI_IP4 ((EfiIp))))
-#define EFI_IP_EQUAL(Ip1, Ip2)            (EFI_IP4 (Ip1) == EFI_IP4 (Ip2))
+#define EFI_IP4(EfiIpAddr)       (*(IP4_ADDR *) ((EfiIpAddr).Addr))
+#define EFI_NTOHL(EfiIp)         (NTOHL (EFI_IP4 ((EfiIp))))
+#define EFI_IP4_EQUAL(Ip1, Ip2)  (NetCompareMem (&(Ip1), &(Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
 
 INTN
 NetGetMaskLength (
@@ -208,10 +208,10 @@ Ip4IsUnicast (
 
 extern IP4_ADDR mIp4AllMasks [IP4_MASK_NUM];
 
-//@MT:#include EFI_PROTOCOL_CONSUMER (LoadedImage)
-//@MT:#include EFI_PROTOCOL_CONSUMER (ServiceBinding)
-//@MT:#include EFI_PROTOCOL_CONSUMER (SimpleNetwork)
 
+extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
+
+#define NET_IS_DIGIT(Ch)  (('0' <= (Ch)) && ((Ch) <= '9'))
 //
 // Wrap functions to ease the impact of EFI library changes.
 //

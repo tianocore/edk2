@@ -103,8 +103,8 @@ TcpSendIpPacket (
   Override.TimeToLive               = 255;
   Override.DoNotFragment            = FALSE;
   Override.Protocol                 = EFI_IP_PROTO_TCP;
-  EFI_IP4 (Override.GatewayAddress) = 0;
-  EFI_IP4 (Override.SourceAddress)  = Src;
+  NetZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  NetCopyMem (&Override.SourceAddress, &Src, sizeof (EFI_IPv4_ADDRESS));
 
   Status = IpIoSend (IpIo, Nbuf, IpSender, NULL, NULL, Dest, &Override);
 

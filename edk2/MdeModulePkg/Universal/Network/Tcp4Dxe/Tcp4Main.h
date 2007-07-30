@@ -32,7 +32,6 @@ extern UINT16  mTcp4RandomPort;
 //
 // Driver Produced Protocol Prototypes
 //
-//@MT:#include EFI_PROTOCOL_PRODUCER (Tcp4)
 
 #define TCP4_DEBUG_ERROR(PrintArg) NET_DEBUG_ERROR   ("Tcp", PrintArg)
 #define TCP4_DEBUG_WARN(PrintArg)  NET_DEBUG_WARNING ("Tcp", PrintArg)

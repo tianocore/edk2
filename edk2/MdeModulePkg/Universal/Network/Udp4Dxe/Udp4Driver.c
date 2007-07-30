@@ -473,7 +473,6 @@ Udp4ServiceBindingDestroyChild (
   return EFI_SUCCESS;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (Udp4DriverEntryPoint)
 
 EFI_STATUS
 EFIAPI

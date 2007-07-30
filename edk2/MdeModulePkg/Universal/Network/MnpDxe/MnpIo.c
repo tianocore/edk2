@@ -974,7 +974,10 @@ MnpReceivePacket (
     //
     // No receiver for this packet.
     //
-    NetbufAllocSpace (Nbuf, Trimmed, NET_BUF_TAIL);
+    if (Trimmed > 0) {
+      NetbufAllocSpace (Nbuf, Trimmed, NET_BUF_TAIL);
+    }
+
     goto EXIT;
   }
   //

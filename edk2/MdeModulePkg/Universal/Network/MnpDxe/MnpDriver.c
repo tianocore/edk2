@@ -521,7 +521,6 @@ MnpServiceBindingDestroyChild (
   return Status;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (MnpDriverEntryPoint)
 
 EFI_STATUS
 EFIAPI

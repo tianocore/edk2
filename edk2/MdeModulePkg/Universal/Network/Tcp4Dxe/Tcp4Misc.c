@@ -267,7 +267,7 @@ TcpFindTcbByPeer (
   NET_LIST_FOR_EACH (Entry, &mTcpListenQue) {
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
-    if ((EFI_IP4 (*Addr) == Tcb->LocalEnd.Ip) &&
+    if (EFI_IP4_EQUAL (*Addr, Tcb->LocalEnd.Ip) &&
       (LocalPort == Tcb->LocalEnd.Port)) {
 
       return TRUE;
@@ -277,7 +277,7 @@ TcpFindTcbByPeer (
   NET_LIST_FOR_EACH (Entry, &mTcpRunQue) {
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
-    if (((EFI_IP4 (*Addr) == Tcb->LocalEnd.Ip)) &&
+    if (EFI_IP4_EQUAL (*Addr, Tcb->LocalEnd.Ip) &&
       (LocalPort == Tcb->LocalEnd.Port)) {
 
       return TRUE;
@@ -983,9 +983,9 @@ TcpSetVariableData (
       // This tcp instance belongs to the Tcp4Service.
       //
       Tcp4ServicePoint->InstanceHandle          = TcpPcb->Sk->SockHandle;
-      EFI_IP4 (Tcp4ServicePoint->LocalAddress)  = TcpPcb->LocalEnd.Ip;
+      NetCopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->LocalPort               = NTOHS (TcpPcb->LocalEnd.Port);
-      EFI_IP4 (Tcp4ServicePoint->RemoteAddress) = TcpPcb->RemoteEnd.Ip;
+      NetCopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->RemotePort              = NTOHS (TcpPcb->RemoteEnd.Port);
 
       Tcp4ServicePoint++;
@@ -1005,9 +1005,9 @@ TcpSetVariableData (
       // This tcp instance belongs to the Tcp4Service.
       //
       Tcp4ServicePoint->InstanceHandle          = TcpPcb->Sk->SockHandle;
-      EFI_IP4 (Tcp4ServicePoint->LocalAddress)  = TcpPcb->LocalEnd.Ip;
+      NetCopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->LocalPort               = NTOHS (TcpPcb->LocalEnd.Port);
-      EFI_IP4 (Tcp4ServicePoint->RemoteAddress) = TcpPcb->RemoteEnd.Ip;
+      NetCopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->RemotePort              = NTOHS (TcpPcb->RemoteEnd.Port);
 
       Tcp4ServicePoint++;

@@ -139,12 +139,20 @@ MnpAddFreeNbuf (
 
   for (Index = 0; Index < Count; Index++) {
 
-    Nbuf = NetbufAlloc (MnpServiceData->BufferLength);
+    Nbuf = NetbufAlloc (MnpServiceData->BufferLength + MnpServiceData->PaddingSize);
     if (Nbuf == NULL) {
 
       MNP_DEBUG_ERROR (("MnpAddFreeNbuf: NetBufAlloc failed.\n"));
       Status = EFI_OUT_OF_RESOURCES;
       break;
+    }
+
+    if (MnpServiceData->PaddingSize > 0) {
+      //
+      // Pad padding bytes before the media header
+      //
+      NetbufAllocSpace (Nbuf, MnpServiceData->PaddingSize, NET_BUF_TAIL);
+      NetbufTrim (Nbuf, MnpServiceData->PaddingSize, NET_BUF_HEAD);
     }
 
     NetbufQueAppend (&MnpServiceData->FreeNbufQue, Nbuf);
@@ -327,6 +335,12 @@ MnpInitializeServiceData (
   // from SNP. Do this before fill the FreeNetBufQue.
   //
   MnpServiceData->BufferLength = MnpServiceData->Mtu + SnpMode->MediaHeaderSize + NET_ETHER_FCS_SIZE;
+
+  //
+  // Make sure the protocol headers immediately following the media header 
+  // 4-byte aligned
+  //
+  MnpServiceData->PaddingSize = (4 - SnpMode->MediaHeaderSize) & 0x3;
 
   //
   // Initialize the FreeNetBufQue and pre-allocate some NET_BUFs.
