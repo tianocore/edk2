@@ -4,11 +4,11 @@
   This interface provides a means of decoding a set of sections into a linked list of
   leaf sections.  This provides for an extensible and flexible file format.
 
-  Copyright (c) 2006 - 2007, Intel Corporation All rights
-  reserved. This program and the accompanying materials are
-  licensed and made available under the terms and conditions of
-  the BSD License which accompanies this distribution.  The full
-  text of the license may be found at
+  Copyright (c) 2006 - 2007, Intel Corporation
+  All rights reserved. This program and the accompanying
+  materials are licensed and made available under the terms and
+  conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
   
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
