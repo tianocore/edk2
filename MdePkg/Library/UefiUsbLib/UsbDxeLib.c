@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -83,6 +84,7 @@ UsbGetDescriptor (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -132,6 +134,7 @@ UsbSetDescriptor (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Index,
@@ -178,6 +181,7 @@ UsbGetInterface (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  InterfaceNo,
@@ -224,6 +228,7 @@ UsbSetInterface (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   OUT UINT8                   *ConfigValue,
@@ -267,6 +272,7 @@ UsbGetConfiguration (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -312,6 +318,7 @@ UsbSetConfiguration (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN       Recipient,
@@ -377,6 +384,7 @@ UsbSetFeature (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbClearFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN       Recipient,
@@ -442,6 +450,7 @@ UsbClearFeature (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN       Recipient,
@@ -506,6 +515,7 @@ UsbGetStatus (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbClearEndpointHalt (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   EndpointNo,
