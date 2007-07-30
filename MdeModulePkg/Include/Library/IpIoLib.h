@@ -73,11 +73,6 @@ typedef struct _ICMP_ERROR_INFO {
   BOOLEAN     Notify;
 } ICMP_ERROR_INFO;
 
-//
-// Driver Consumed Protocol Prototypes
-//
-//@MT:#include EFI_PROTOCOL_CONSUMER (Ip4)
-//@MT:#include EFI_PROTOCOL_CONSUMER (Udp4)
 
 #define EFI_IP4_HEADER_LEN(HdrPtr) ((HdrPtr)->HeaderLength << 2)
 

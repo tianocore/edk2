@@ -41,20 +41,6 @@ Revision history:
 
 #define FOUR_GIGABYTES  (UINT64) 0x100000000ULL
 
-//
-// Driver Consumed Protocol Prototypes
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (DevicePath)
-//@MT:#include EFI_PROTOCOL_DEFINITION (PciIo)
-//@MT:#include EFI_PROTOCOL_DEFINITION (EfiNetworkInterfaceIdentifier)
-
-//
-// Driver Produced Protocol Prototypes
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (DriverBinding)
-//@MT:#include EFI_PROTOCOL_DEFINITION (ComponentName)
-//@MT:#include EFI_PROTOCOL_DEFINITION (ComponentName2)
-//@MT:#include EFI_PROTOCOL_DEFINITION (SimpleNetwork)
 
 #define SNP_DRIVER_SIGNATURE  EFI_SIGNATURE_32 ('s', 'n', 'd', 's')
 #define MAX_MAP_LENGTH        100

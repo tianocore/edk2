@@ -590,6 +590,8 @@ Ip4ConfigOnDhcp4Complete (
   EFI_STATUS                Status;
   BOOLEAN                   Perment;
   IP4_ADDR                  Subnet;
+  IP4_ADDR                  Ip1;
+  IP4_ADDR                  Ip2;
 
   Instance = (IP4_CONFIG_INSTANCE *) Context;
   ASSERT (Instance->Dhcp4 != NULL);
@@ -641,20 +643,24 @@ Ip4ConfigOnDhcp4Complete (
     //
     Ip4Config->RouteTableSize    = 1;
 
-    Subnet = EFI_NTOHL (Dhcp4Mode.ClientAddress) & EFI_NTOHL (Dhcp4Mode.SubnetMask);
+    NetCopyMem (&Ip1, &Dhcp4Mode.ClientAddress, sizeof (IP4_ADDR));
+    NetCopyMem (&Ip2, &Dhcp4Mode.SubnetMask, sizeof (IP4_ADDR));
+    
+    Subnet = Ip1 & Ip2;
 
-    EFI_IP4 (Ip4Config->RouteTable[0].SubnetAddress)  = HTONL (Subnet);
-    Ip4Config->RouteTable[0].SubnetMask               = Dhcp4Mode.SubnetMask;
-    EFI_IP4 (Ip4Config->RouteTable[0].GatewayAddress) = 0;
+    NetCopyMem (&Ip4Config->RouteTable[0].SubnetAddress, &Subnet, sizeof (EFI_IPv4_ADDRESS));
+    NetCopyMem (&Ip4Config->RouteTable[0].SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    NetZeroMem (&Ip4Config->RouteTable[0].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
 
     //
     // Create a route if there is a default router.
     //
-    if (EFI_IP4 (Dhcp4Mode.RouterAddress) != 0) {
-      Ip4Config->RouteTableSize                         = 2;
-      EFI_IP4 (Ip4Config->RouteTable[1].SubnetAddress)  = 0;
-      EFI_IP4 (Ip4Config->RouteTable[1].SubnetMask)     = 0;
-      Ip4Config->RouteTable[1].GatewayAddress           = Dhcp4Mode.RouterAddress;
+    if (!EFI_IP4_EQUAL (Dhcp4Mode.RouterAddress, mZeroIp4Addr)) {
+      Ip4Config->RouteTableSize = 2;
+
+      NetZeroMem (&Ip4Config->RouteTable[1].SubnetAddress, sizeof (EFI_IPv4_ADDRESS));
+      NetZeroMem (&Ip4Config->RouteTable[1].SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      NetCopyMem (&Ip4Config->RouteTable[1].GatewayAddress, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     Instance->Result = EFI_SUCCESS;

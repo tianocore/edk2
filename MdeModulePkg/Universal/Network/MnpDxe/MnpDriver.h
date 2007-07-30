@@ -82,6 +82,7 @@ typedef struct _MNP_SERVICE_DATA {
   // store a packet.
   //
   UINT32                        BufferLength;
+  UINT32                        PaddingSize;
   NET_BUF                       *RxNbufCache;
   UINT8                         *TxBuf;
 } MNP_SERVICE_DATA;

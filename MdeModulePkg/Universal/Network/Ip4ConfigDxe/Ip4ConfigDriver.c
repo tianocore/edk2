@@ -60,7 +60,6 @@ EfiIp4ConfigUnload (
   return NetLibDefaultUnload (ImageHandle);
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (Ip4ConfigDriverEntryPoint)
 
 EFI_STATUS
 Ip4ConfigDriverEntryPoint (

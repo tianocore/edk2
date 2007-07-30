@@ -118,11 +118,11 @@ Tcp4GetMode (
 
     AccessPoint->UseDefaultAddress  = Tcb->UseDefaultAddr;
 
-    EFI_IP4 (AccessPoint->StationAddress) = Tcb->LocalEnd.Ip;
+    NetCopyMem (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
     AccessPoint->SubnetMask         = Tcb->SubnetMask;
     AccessPoint->StationPort        = NTOHS (Tcb->LocalEnd.Port);
 
-    EFI_IP4 (AccessPoint->RemoteAddress) = Tcb->RemoteEnd.Ip;
+    NetCopyMem (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
     AccessPoint->RemotePort         = NTOHS (Tcb->RemoteEnd.Port);
     AccessPoint->ActiveFlag         = (BOOLEAN) (Tcb->State != TCP_LISTEN);
 
@@ -428,11 +428,11 @@ Tcp4ConfigurePcb (
   Tcb->TTL            = CfgData->TimeToLive;
   Tcb->TOS            = CfgData->TypeOfService;
 
-  Tcb->LocalEnd.Ip    = EFI_IP4 (CfgData->AccessPoint.StationAddress);
+  NetCopyMem (&Tcb->LocalEnd.Ip, &CfgData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
   Tcb->LocalEnd.Port  = HTONS (CfgData->AccessPoint.StationPort);
   Tcb->SubnetMask     = CfgData->AccessPoint.SubnetMask;
 
-  Tcb->RemoteEnd.Ip   = EFI_IP4 (CfgData->AccessPoint.RemoteAddress);
+  NetCopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
   Tcb->RemoteEnd.Port = HTONS (CfgData->AccessPoint.RemotePort);
 
   Option              = CfgData->ControlOption;

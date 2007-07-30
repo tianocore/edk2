@@ -1,0 +1,81 @@
+#/** @file
+# Component name for module Ip4
+#
+# Copyright (c) 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ip4Dxe
+  FILE_GUID                      = 9FB1A1F3-3B71-4324-B39A-745CBB015FFF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = Ip4DriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  Ip4Driver.c
+  Ip4Option.h
+  Ip4Route.h
+  Ip4If.c
+  Ip4Igmp.h
+  Ip4Output.c
+  Ip4Icmp.c
+  Ip4Igmp.c
+  Ip4Impl.c
+  Ip4Common.h
+  Ip4Impl.h
+  Ip4Driver.h
+  Ip4Common.c
+  Ip4If.h
+  Ip4Option.c
+  Ip4Output.h
+  ComponentName.c
+  Ip4Input.h
+  Ip4Route.c
+  Ip4Icmp.h
+  Ip4Input.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  NetLib
+
+
+[Protocols]
+  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+

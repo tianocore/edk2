@@ -153,6 +153,8 @@ Udp4Configure (
   IP4_ADDR             SubnetMask;
   IP4_ADDR             RemoteAddress;
   EFI_IP4_CONFIG_DATA  Ip4ConfigData;
+  IP4_ADDR             LocalAddr;
+  IP4_ADDR             RemoteAddr;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -171,9 +173,14 @@ Udp4Configure (
 
   if (UdpConfigData != NULL) {
 
-    StationAddress = EFI_NTOHL (UdpConfigData->StationAddress);
-    SubnetMask     = EFI_NTOHL (UdpConfigData->SubnetMask);
-    RemoteAddress  = EFI_NTOHL (UdpConfigData->RemoteAddress);
+    NetCopyMem (&StationAddress, &UdpConfigData->StationAddress, sizeof (IP4_ADDR));
+    NetCopyMem (&SubnetMask, &UdpConfigData->SubnetMask, sizeof (IP4_ADDR));
+    NetCopyMem (&RemoteAddress, &UdpConfigData->RemoteAddress, sizeof (IP4_ADDR));
+
+    StationAddress = NTOHL (StationAddress);
+    SubnetMask     = NTOHL (SubnetMask);
+    RemoteAddress  = NTOHL (RemoteAddress);
+    
 
     if (!UdpConfigData->UseDefaultAddress &&
       (!IP4_IS_VALID_NETMASK (SubnetMask) ||
@@ -251,9 +258,11 @@ Udp4Configure (
       //
       // Pre calculate the checksum for the pseudo head, ignore the UDP length first.
       //
+      NetCopyMem (&LocalAddr, &Instance->ConfigData.StationAddress, sizeof (IP4_ADDR));
+      NetCopyMem (&RemoteAddr, &Instance->ConfigData.RemoteAddress, sizeof (IP4_ADDR));
       Instance->HeadSum = NetPseudoHeadChecksum (
-                            EFI_IP4 (Instance->ConfigData.StationAddress),
-                            EFI_IP4 (Instance->ConfigData.RemoteAddress),
+                            LocalAddr,
+                            RemoteAddr,
                             EFI_IP_PROTO_UDP,
                             0
                             );
@@ -332,11 +341,19 @@ Udp4Groups (
   UDP4_INSTANCE_DATA  *Instance;
   EFI_IP4_PROTOCOL    *Ip;
   EFI_TPL             OldTpl;
+  IP4_ADDR            McastIp;
 
-  if ((This == NULL) ||
-    (JoinFlag && (MulticastAddress == NULL)) ||
-    (JoinFlag && !IP4_IS_MULTICAST (EFI_NTOHL (*MulticastAddress)))) {
+  if ((This == NULL) || (JoinFlag && (MulticastAddress == NULL))) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  McastIp = 0;
+  if (JoinFlag) {
+    NetCopyMem (&McastIp, MulticastAddress, sizeof (IP4_ADDR));
+
+    if (IP4_IS_MULTICAST (NTOHL (McastIp))) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   Instance = UDP4_INSTANCE_DATA_FROM_THIS (This);
@@ -370,11 +387,7 @@ Udp4Groups (
   //
   if (JoinFlag) {
 
-    NetMapInsertTail (
-      &Instance->McastIps,
-      (VOID *) (UINTN) EFI_IP4 (*MulticastAddress),
-      NULL
-      );
+    NetMapInsertTail (&Instance->McastIps, (VOID *) (UINTN) McastIp, NULL);
   } else {
 
     NetMapIterate (&Instance->McastIps, Udp4LeaveGroup, MulticastAddress);
@@ -506,6 +519,7 @@ Udp4Transmit (
   NET_BUF                 *Packet;
   EFI_UDP4_HEADER         *Udp4Header;
   EFI_UDP4_CONFIG_DATA    *ConfigData;
+  IP4_ADDR                Source;
   IP4_ADDR                Destination;
   EFI_UDP4_TRANSMIT_DATA  *TxData;
   EFI_UDP4_SESSION_DATA   *UdpSessionData;
@@ -590,25 +604,26 @@ Udp4Transmit (
     // Set the SourceAddress, SrcPort and Destination according to the specified
     // UdpSessionData.
     //
-    if (EFI_IP4 (UdpSessionData->SourceAddress) != 0) {
-      Override.SourceAddress = UdpSessionData->SourceAddress;
+    if (!EFI_IP4_EQUAL (UdpSessionData->SourceAddress, mZeroIp4Addr)) {
+      NetCopyMem (&Override.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     if (UdpSessionData->SourcePort != 0) {
       Udp4Header->SrcPort = HTONS (UdpSessionData->SourcePort);
     }
 
-    Destination = EFI_IP4 (UdpSessionData->DestinationAddress);
-
     if (UdpSessionData->DestinationPort != 0) {
       Udp4Header->DstPort = HTONS (UdpSessionData->DestinationPort);
     }
+
+    NetCopyMem (&Source, &Override.SourceAddress, sizeof (IP4_ADDR));
+    NetCopyMem (&Destination, &UdpSessionData->DestinationAddress, sizeof (IP4_ADDR));
 
     //
     // calculate the pseudo head checksum using the overridden parameters.
     //
     HeadSum = NetPseudoHeadChecksum (
-                EFI_IP4 (Override.SourceAddress),
+                Source,
                 Destination,
                 EFI_IP_PROTO_UDP,
                 0
@@ -617,8 +632,9 @@ Udp4Transmit (
     //
     // UdpSessionData is NULL, use the address and port information previously configured.
     //
-    Destination = EFI_IP4 (ConfigData->RemoteAddress);
-    HeadSum     = Instance->HeadSum;
+    NetCopyMem (&Destination, &ConfigData->RemoteAddress, sizeof (IP4_ADDR));
+
+    HeadSum = Instance->HeadSum;
   }
 
   //
@@ -635,8 +651,12 @@ Udp4Transmit (
   //
   // Fill the IpIo Override data.
   //
-  EFI_IP4 (Override.GatewayAddress) = (TxData->GatewayAddress != NULL) ?
-                                      EFI_IP4 (*(TxData->GatewayAddress)) : 0;
+  if (TxData->GatewayAddress != NULL) {
+    NetCopyMem (&Override.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  } else {
+    NetZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  }
+
   Override.Protocol                 = EFI_IP_PROTO_UDP;
   Override.TypeOfService            = ConfigData->TypeOfService;
   Override.TimeToLive               = ConfigData->TimeToLive;

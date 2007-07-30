@@ -143,7 +143,6 @@ Tcp4DestroyTimer (
   mTcp4Timer.TimerEvent = NULL;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (Tcp4DriverEntryPoint)
 
 EFI_STATUS
 EFIAPI

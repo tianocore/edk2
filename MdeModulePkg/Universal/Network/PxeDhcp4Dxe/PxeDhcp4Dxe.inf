@@ -1,0 +1,64 @@
+#/** @file
+# Component name for module PxeDhcp4
+#
+# Copyright (c) 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PxeDhcp4Dxe
+  FILE_GUID                      = a46c3330-be36-4977-9d24-a7cf92eef0fe
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = PxeDhcp4DriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  support.c
+  PxeDhcp4Release.c
+  PxeDhcp4Setup.c
+  ComponentName.c
+  PxeDhcp4RenewRebind.c
+  PxeDhcp4.h
+  PxeDhcp4.c
+  PxeDhcp4InitSelect.c
+  PxeDhcp4Run.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+
+
+[Protocols]
+  gEfiPxeBaseCodeProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiPxeDhcp4CallbackProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiPxeDhcp4ProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+
