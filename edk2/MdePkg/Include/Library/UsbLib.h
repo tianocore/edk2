@@ -24,6 +24,7 @@
 #define TIMEOUT_VALUE 3 * 1000
 
 EFI_STATUS
+EFIAPI
 UsbGetHidDescriptor (
   IN  EFI_USB_IO_PROTOCOL        *UsbIo,
   IN  UINT8                      InterfaceNum,
@@ -31,6 +32,7 @@ UsbGetHidDescriptor (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetReportDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   InterfaceNum,
@@ -39,6 +41,7 @@ UsbGetReportDescriptor (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetProtocolRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -46,6 +49,7 @@ UsbGetProtocolRequest (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetProtocolRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -53,6 +57,7 @@ UsbSetProtocolRequest (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetIdleRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -61,6 +66,7 @@ UsbSetIdleRequest (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetIdleRequest (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   Interface,
@@ -69,6 +75,7 @@ UsbGetIdleRequest (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetReportRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -79,6 +86,7 @@ UsbSetReportRequest (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetReportRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -104,6 +112,7 @@ UsbGetDescriptor (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -114,6 +123,7 @@ UsbSetDescriptor (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Index,
@@ -122,6 +132,7 @@ UsbGetInterface (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  InterfaceNo,
@@ -130,6 +141,7 @@ UsbSetInterface (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   OUT UINT8                   *ConfigValue,
@@ -137,6 +149,7 @@ UsbGetConfiguration (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -144,6 +157,7 @@ UsbSetConfiguration (
   );
 
 EFI_STATUS
+EFIAPI
 UsbSetFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN                   Recipient,
@@ -153,6 +167,7 @@ UsbSetFeature (
   );
 
 EFI_STATUS
+EFIAPI
 UsbClearFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN                   Recipient,
@@ -162,6 +177,7 @@ UsbClearFeature (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINTN                   Recipient,
@@ -171,6 +187,7 @@ UsbGetStatus (
   );
 
 EFI_STATUS
+EFIAPI
 UsbGetHubDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,
@@ -184,6 +201,7 @@ UsbGetHubDescriptor (
 // Clear endpoint stall
 //
 EFI_STATUS
+EFIAPI
 UsbClearEndpointHalt (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   EndpointNo,
