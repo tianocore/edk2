@@ -439,5 +439,6 @@
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
 
 [Components.EBC]
-  MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  #BugBug: Need DXE I/O library instance for EBC.
+  #MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
