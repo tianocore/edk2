@@ -49,8 +49,6 @@ extern EFI_HANDLE mBdsImageHandle;
 //
 // Load Option Attributes defined in EFI Specification
 //
-#define LOAD_OPTION_ACTIVE              0x00000001
-#define LOAD_OPTION_FORCE_RECONNECT     0x00000002
 #define IS_LOAD_OPTION_TYPE(_c, _Mask)  (BOOLEAN) (((_c) & (_Mask)) != 0)
 
 //

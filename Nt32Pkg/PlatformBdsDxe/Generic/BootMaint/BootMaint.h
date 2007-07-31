@@ -81,17 +81,6 @@ Revision History
 #define MAX_CHAR      480
 #define MAX_CHAR_SIZE (MAX_CHAR * 2)
 
-//
-// Check to see if current build support option active feature of
-// some driver option
-//
-#define LOAD_OPTION_ACTIVE  0x00000001
-
-//
-// Check to see if current build support force reconnect feature of
-// some driver option
-//
-#define LOAD_OPTION_FORCE_RECONNECT 0x00000002
 
 //
 // Below are the form ids for display, form id is used as callback key value,

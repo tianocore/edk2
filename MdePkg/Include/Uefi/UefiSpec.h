@@ -1713,6 +1713,44 @@ struct _EFI_SYSTEM_TABLE {
 };
 
 //
+// EFI Load Options Attributes
+//
+#define LOAD_OPTION_ACTIVE            0x00000001
+#define LOAD_OPTION_FORCE_RECONNECT   0x00000002
+#define LOAD_OPTION_GRAPHICS          0x00000004
+#define LOAD_OPTION_HIDDEN            0x00000008
+#define LOAD_OPTION_CATEGORY          0x00001F00
+
+#define LOAD_OPTION_CATEGORY_BOOT     0x00000000
+#define LOAD_OPTION_CATEGORY_APP      0x00000100
+
+#define EFI_BOOT_OPTION_SUPPORT_KEY   0x00000001
+#define EFI_BOOT_OPTION_SUPPORT_APP   0x00000002
+#define EFI_BOOT_OPTION_SUPPORT_COUNT 0x00000300
+
+typedef union {
+  struct {
+    UINT32  Revision        : 8;
+    UINT32  ShiftPressed    : 1;
+    UINT32  ControlPressed  : 1;
+    UINT32  AltPressed      : 1;
+    UINT32  LogoPressed     : 1;
+    UINT32  MenuPressed     : 1;
+    UINT32  SysReqPessed    : 1;
+    UINT32  Reserved        : 16;
+    UINT32  InputKeyCount   : 2;
+  }       Options;
+  UINT32  PackedValue;
+} EFI_KEY_DATA;
+
+typedef struct {
+  EFI_KEY_DATA      KeyData;
+  UINT32            BootOptionCrc;
+  UINT16            BootOption;
+  // EFI_INPUT_KEY  Keys[];
+} EFI_KEY_OPTION;
+
+//
 // EFI File location to boot from on removable media devices
 //
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA32    L"\\EFI\\BOOT\\BOOTIA32.EFI"
