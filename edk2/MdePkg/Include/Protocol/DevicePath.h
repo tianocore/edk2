@@ -19,6 +19,8 @@
 #ifndef __EFI_DEVICE_PATH_PROTOCOL_H__
 #define __EFI_DEVICE_PATH_PROTOCOL_H__
 
+#include <Guid/PcAnsi.h>
+
 //
 // Device Path protocol
 //
