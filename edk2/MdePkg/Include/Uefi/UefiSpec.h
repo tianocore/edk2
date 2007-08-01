@@ -1717,7 +1717,6 @@ struct _EFI_SYSTEM_TABLE {
 //
 #define LOAD_OPTION_ACTIVE            0x00000001
 #define LOAD_OPTION_FORCE_RECONNECT   0x00000002
-#define LOAD_OPTION_GRAPHICS          0x00000004
 #define LOAD_OPTION_HIDDEN            0x00000008
 #define LOAD_OPTION_CATEGORY          0x00001F00
 
@@ -1744,11 +1743,20 @@ typedef union {
 } EFI_KEY_DATA;
 
 typedef struct {
-  EFI_KEY_DATA      KeyData;
+  EFI_KEY_DATA      KeyOptions;
   UINT32            BootOptionCrc;
   UINT16            BootOption;
-  // EFI_INPUT_KEY  Keys[];
+//EFI_INPUT_KEY  Keys[];
 } EFI_KEY_OPTION;
+
+#define EFI_KEY_OPTION_SHIFT     0x00000001
+#define EFI_KEY_OPTION_CONTROL   0x00000002
+#define EFI_KEY_OPTION_ALT       0x00000004
+#define EFI_KEY_OPTION_LOGO      0x00000008
+#define EFI_KEY_OPTION_MENU      0x00000010
+#define EFI_KEY_OPTION_SYSREQ    0x00000020
+#define EFI_KEY_CODE_COUNT       0x00000300
+
 
 //
 // EFI File location to boot from on removable media devices
