@@ -33,5 +33,5 @@
 #
 
 [Binaries.common]
-  FV|RELEASE|Logo.bmp
+  BIN|RELEASE|Logo.bmp
 
