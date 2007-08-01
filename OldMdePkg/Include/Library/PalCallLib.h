@@ -2953,6 +2953,9 @@ typedef struct {
 
 
 **/
+#define PAL_CODE_TOKEN                      0x0
+#define PAL_IA32EMU_CODE_TOKEN              0x1
+
 #define PAL_COPY_INFO 30
 
 /**
