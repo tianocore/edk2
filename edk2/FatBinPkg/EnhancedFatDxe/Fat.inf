@@ -32,14 +32,14 @@
 #
 
 [Binaries.Ia32]
-  FV|RELEASE|Ia32/Fat.efi
+  FW|RELEASE|Ia32/Fat.efi
 
 [Binaries.X64]
-  FV|RELEASE|X64/Fat.efi
+  FW|RELEASE|X64/Fat.efi
 
 [Binaries.IPF]
-  FV|RELEASE|Ipf/Fat.efi
+  FW|RELEASE|Ipf/Fat.efi
 
 [Binaries.EBC]
-  FV|RELEASE|Ebc/Fat.efi
+  FW|RELEASE|Ebc/Fat.efi
 
