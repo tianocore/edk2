@@ -44,7 +44,6 @@ TARGET                = DEBUG
 #                                               If not specified, then all valid architectures specified
 #                                               in the FPD file, for which tools are available, will be
 #                                               built.
-# TARGET_ARCH           =
 TARGET_ARCH           = IA32
 
 #  TOOL_DEFINITION_FILE  Filename  Optional   Specify the name of the filename to use for specifying
@@ -64,7 +63,7 @@ TOOL_CHAIN_TAG        = MYTOOLS
 #                                             This feature is only available for "spawn" build mode, and 
 #                                             only for PLATFORM build. The clean, cleanall or
 #                                             stand-alone module build is still using the normal way.
-# MULTIPLE_THREAD       = Enable
+MULTIPLE_THREAD       = Enable
 
 # MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 2. Recommend to
 #                                                 set this value to one more than the number of your compurter
