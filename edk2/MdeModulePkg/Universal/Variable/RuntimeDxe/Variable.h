@@ -38,7 +38,6 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
 #include <Guid/FlashMapHob.h>
-#include <Guid/FlashMapHob.h>
 #include <VariableFormat.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
