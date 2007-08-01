@@ -273,6 +273,7 @@
   PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid|0x00051006
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004
   PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x00051003
+  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
 
 [PcdsFeatureFlag.IA32]
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
@@ -306,7 +307,6 @@
   PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPciBusHotplugDeviceSupport|gEfiGenericPlatformTokenSpaceGuid|TRUE
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
