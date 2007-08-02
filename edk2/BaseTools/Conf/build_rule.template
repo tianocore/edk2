@@ -25,6 +25,7 @@ FileTypeMapping = {
     ".dxs"  :   "Dependency-Expression",
     ".Dxs"  :   "Dependency-Expression",
     ".DXS"  :   "Dependency-Expression",
+    ".TXT"  :   "MicorCode-Text",
     ".fv"   :   "FirmwareVolume",
     ".Fv"   :   "FirmwareVolume",
     ".FV"   :   "FirmwareVolume",
@@ -66,6 +67,7 @@ ObjectFileMapping = {
     "Acpi-Source-Language"          :   ".aml",
     "Acpi-Table-Source"             :   ".acpi",
     "Masm16-Code"                   :   ".com",
+    "MicorCode-Text"                :   ".bin",
 }
 
 DefaultToolCode = ["CC", "ASM", "SLINK", "DLINK", "PCH", "PP", "ASL", "ASMLINK"]
@@ -104,6 +106,7 @@ ToolChainFamilyMapping = {
     "Acpi-Source-Language"          :   ["MSFT", "INTEL"],
     "Acpi-Table-Source"             :   ["MSFT", "INTEL"],
     "Masm16-Code"                   :   ["MSFT"],
+    "MicorCode-Text"                :   ["MSFT", "INTEL"], 
 }
 
 ## Build rules for makefile
@@ -173,10 +176,17 @@ ${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_s
 
 "Masm16-Code" : '''\
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.com : $(COMMON_DEPS)
-\tpushd .
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.com : $(WORKSPACE)${_sep_}${fdep}
+${END}\tpushd .
 \tcd $(OUTPUT_DIR)${_sep_}${fdir}
 \t"$(ASM)" /nologo /omf $(WORKSPACE)${_sep_}${fpath} /Bl"$(ASMLINK)" $(ASMLINK_FLAGS)
 \t-copy ${fbase}.com $(OUTPUT_DIR)${_sep_}${fbase}.com /Y & popd
+''',
+
+"MicorCode-Text" : '''\
+$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.bin : $(COMMON_DEPS)
+${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.bin : $(WORKSPACE)${_sep_}${fdep}
+${END}\tGenFw -o $@ -m $(WORKSPACE)${_sep_}${fpath}
 ''',
 },
 
