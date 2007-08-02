@@ -48,3 +48,5 @@
 [Protocols]
   gEfiSmbusHcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
 
+[Depex]
+  gEfiSmbusHcProtocolGuid

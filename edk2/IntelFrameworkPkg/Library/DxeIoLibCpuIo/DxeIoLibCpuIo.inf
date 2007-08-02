@@ -54,3 +54,6 @@
 [Protocols]
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiCpuIoProtocolGuid OR gEfiPciRootBridgeIoProtocolGuid      

@@ -48,3 +48,5 @@
 [Ppis]
   gPcdPpiGuid                                   # PPI ALWAYS_CONSUMED
 
+[Depex]
+  gPcdPpiGuid
