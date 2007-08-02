@@ -45,12 +45,6 @@
   PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
 
-[PcdsPatchableInModule.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-
-
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
 
