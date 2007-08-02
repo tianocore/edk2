@@ -346,11 +346,6 @@
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
 
-[PcdsPatchableInModule.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
