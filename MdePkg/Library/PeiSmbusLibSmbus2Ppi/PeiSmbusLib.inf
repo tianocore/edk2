@@ -47,3 +47,5 @@
 [Ppis]
   gEfiPeiSmbus2PpiGuid                           # PPI ALWAYS_CONSUMED
 
+[Depex]
+  gEfiPeiSmbus2PpiGuid 

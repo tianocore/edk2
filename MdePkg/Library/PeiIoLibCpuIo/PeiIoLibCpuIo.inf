@@ -45,3 +45,5 @@
   BaseLib
   DebugLib
 
+[Depex]
+  gEfiPeiCpuIoPpiInstalledGuid

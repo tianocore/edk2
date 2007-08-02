@@ -49,3 +49,6 @@
 [Protocols]
   gPcdProtocolGuid                              # PROTOCOL ALWAYS_CONSUMED
 
+
+[Depex]
+  gPcdProtocolGuid
