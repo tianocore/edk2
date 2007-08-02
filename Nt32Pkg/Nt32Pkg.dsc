@@ -234,11 +234,9 @@
   PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdUefiVariableDefaultLangDepricate|gEfiMdePkgTokenSpaceGuid|FALSE
 
-[PcdsPatchableInModule.IA32]
+[PcdsFixedAtBuild.IA32]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|128
-
-[PcdsFixedAtBuild.IA32]
   PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|12
   PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid|L"..\\Fv\\Fv_Recovery.fd"|52
   PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1
