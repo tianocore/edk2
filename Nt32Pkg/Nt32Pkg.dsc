@@ -305,7 +305,6 @@
   PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPciBusHotplugDeviceSupport|gEfiGenericPlatformTokenSpaceGuid|TRUE
   PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
   PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
