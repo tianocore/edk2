@@ -26,6 +26,7 @@ FileTypeMapping = {
     ".Dxs"  :   "Dependency-Expression",
     ".DXS"  :   "Dependency-Expression",
     ".TXT"  :   "MicorCode-Text",
+    ".txt"  :   "MicorCode-Text",
     ".fv"   :   "FirmwareVolume",
     ".Fv"   :   "FirmwareVolume",
     ".FV"   :   "FirmwareVolume",
@@ -87,6 +88,7 @@ ToolCodeMapping = {
     "Acpi-Source-Language"          :   ["PP", "ASL"],
     "Acpi-Table-Source"             :   ["CC", "DLINK"],
     "Masm16-Code"                   :   ["ASM", "ASMLINK"],
+    "MicorCode-Text"                :   ["CC"],
 }
 
 ToolChainFamilyMapping = {
