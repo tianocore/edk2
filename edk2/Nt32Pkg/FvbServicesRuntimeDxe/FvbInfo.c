@@ -48,10 +48,7 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-#include "FlashLayout.h"
-
-#define FIRMWARE_BLOCK_SIZE 0x10000
+#include <Library/PcdLib.h>
 
 typedef struct {
   UINT64                      FvLength;
@@ -62,22 +59,18 @@ typedef struct {
   EFI_FV_BLOCK_MAP_ENTRY      End[1];
 } EFI_FVB_MEDIA_INFO;
 
-#define FVB_MEDIA_BLOCK_SIZE    FIRMWARE_BLOCK_SIZE
-#define RECOVERY_BOIS_BLOCK_NUM FIRMWARE_BLOCK_NUMBER
-#define SYSTEM_NV_BLOCK_NUM     2
-
 EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
   //
   // Recovery BOIS FVB
   //
   {
-    EFI_WINNT_FIRMWARE_LENGTH,
+    FixedPcdGet32 (PcdWinNtFlashFvRecoverySize),
     {
       {
         0,
       },  // ZeroVector[16]
       EFI_FIRMWARE_FILE_SYSTEM2_GUID,
-      FVB_MEDIA_BLOCK_SIZE * RECOVERY_BOIS_BLOCK_NUM,
+      FixedPcdGet32 (PcdWinNtFlashFvRecoverySize),
       EFI_FVH_SIGNATURE,
       EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
@@ -92,8 +85,8 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       },  // Reserved[1]
       1,  // Revision
       {
-        RECOVERY_BOIS_BLOCK_NUM,
-        FVB_MEDIA_BLOCK_SIZE,
+        FixedPcdGet32 (PcdWinNtFlashFvRecoverySize)/FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
+        FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
       }
     },
     {
@@ -105,13 +98,19 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
   // Systen NvStorage FVB
   //
   {
-    EFI_WINNT_RUNTIME_UPDATABLE_LENGTH + EFI_WINNT_FTW_SPARE_BLOCK_LENGTH,
+    FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
+    FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+    FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+    FixedPcdGet32 (PcdWinNtFlashNvStorageEventLogSize),
     {
       {
         0,
       },  // ZeroVector[16]
       EFI_SYSTEM_NV_DATA_HOB_GUID,
-      FVB_MEDIA_BLOCK_SIZE * SYSTEM_NV_BLOCK_NUM,
+      FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
+      FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+      FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+      FixedPcdGet32 (PcdWinNtFlashNvStorageEventLogSize),
       EFI_FVH_SIGNATURE,
       EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
@@ -126,8 +125,11 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       },  // Reserved[1]
       1,  // Revision
       {
-        SYSTEM_NV_BLOCK_NUM,
-        FVB_MEDIA_BLOCK_SIZE,
+       (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
+        FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+        FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+        FixedPcdGet32 (PcdWinNtFlashNvStorageEventLogSize)) / FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
+        FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
       }
     },
     {

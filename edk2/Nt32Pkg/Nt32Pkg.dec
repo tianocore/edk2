@@ -105,6 +105,17 @@
   PcdWinNtFirmwareVolume|0x00001009|gEfiNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
   PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"
 
+  PcdWinNtFlashNvStorageEventLogBase|0x0000100e|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFlashNvStorageEventLogSize|0x0000100f|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFlashFvRecoveryBase|0x00001010|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFlashFvRecoverySize|0x00001011|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFirmwareFdSize|0x00001012|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFirmwareBlockSize|0x00001013|gEfiNt32PkgTokenSpaceGuid|UINT32|0
+
+  PcdWinNtFlashNvStorageVariableBase|0x00001014|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFlashNvStorageFtwSpareBase|0x00001015|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFlashNvStorageFtwWorkingBase|0x00001016|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+
 [PcdsDynamic.common]
   PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"
   PcdWinNtVirtualDisk|0x00001001|gEfiNt32PkgTokenSpaceGuid|VOID*|L"FW;40960;512"

@@ -70,3 +70,7 @@
   PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
   PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
 
+  PcdWinNtFlashNvStorageFtwWorkingBase|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashNvStorageFtwSpareBase|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashNvStorageVariableBase|gEfiNt32PkgTokenSpaceGuid
+

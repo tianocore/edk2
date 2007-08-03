@@ -44,9 +44,22 @@
   HobLib
   PeimEntryPoint
   DebugLib
+  PcdLib  
 
 [Ppis]
   gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
+
+
+[PcdsFixedAtBuild.common]
+  PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashFvRecoverySize|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashNvStorageEventLogSize|gEfiNt32PkgTokenSpaceGuid
+  PcdWinNtFlashNvStorageVariableBase|gEfiNt32PkgTokenSpaceGuid
+
+  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
+  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
 
 [depex]
   gNtFwhPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
