@@ -1281,6 +1281,7 @@ Returns:
   // Get the DXE services table
   //
   DxeServices = gDS;
+  __asm int 3;
 
   //
   // Allocate runtime services data for global variable, which contains

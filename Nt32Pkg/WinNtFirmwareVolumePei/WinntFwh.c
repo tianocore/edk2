@@ -34,9 +34,7 @@ Revision History
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/HobLib.h>
-
-#include <FlashLayout.h>
-
+#include <Library/PcdLib.h>
 
 EFI_STATUS
 EFIAPI
@@ -68,6 +66,7 @@ Returns:
 
   DEBUG ((EFI_D_ERROR, "NT 32 Firmware Volume PEIM Loaded\n"));
 
+  __asm int 3;
   //
   // Get the Fwh Information PPI
   //
@@ -107,15 +106,24 @@ Returns:
           EFI_RESOURCE_FIRMWARE_DEVICE,
           (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
           FdBase,
-          (FvHeader->FvLength + EFI_WINNT_RUNTIME_UPDATABLE_LENGTH + EFI_WINNT_FTW_SPARE_BLOCK_LENGTH)
+          ( 
+            FvHeader->FvLength + 
+            PcdGet32 (PcdFlashNvStorageVariableSize) +
+            PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+            PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+            PcdGet32 (PcdWinNtFlashNvStorageEventLogSize)
+          )
           );
-
         //
         // Hard code the address of the spare block and variable services.
         //  Assume it's a hard coded offset from FV0 in FD0.
         //
-        FdBase  = FdBase + EFI_WINNT_RUNTIME_UPDATABLE_OFFSET;
-        FdSize  = EFI_WINNT_RUNTIME_UPDATABLE_LENGTH + EFI_WINNT_FTW_SPARE_BLOCK_LENGTH;
+        FdBase  = FdBase + PcdGet32 (PcdWinNtFlashNvStorageVariableBase);
+        FdSize  = 
+          PcdGet32 (PcdFlashNvStorageVariableSize) +
+          PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+          PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+          PcdGet32 (PcdWinNtFlashNvStorageEventLogSize);
 
         BuildFvHob (FdBase, FdSize);
       } else {

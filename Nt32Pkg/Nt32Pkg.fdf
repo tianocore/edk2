@@ -25,7 +25,7 @@
 #
 ################################################################################
 [FD.Fv_Recovery]
-BaseAddress   = 0x0|PcdFdBaseAddress  #The base address of the FLASH Device.
+BaseAddress   = 0x0|PcdWinNtFdBaseAddress  #The base address of the FLASH Device.
 Size          = 0x002a0000            #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
@@ -47,11 +47,11 @@ NumBlocks     = 0x2a
 #
 ################################################################################
 0x00000000|0x00280000
-PcdFlashFvRecoveryBase|PcdFlashFvRecoverySize
+PcdWinNtFlashFvRecoveryBase|PcdWinNtFlashFvRecoverySize
 FV = FvRecovery
 
 0x00280000|0x0000c000
-PcdFlashNvStorageBase|PcdFlashNvStorageSize
+PcdWinNtFlashNvStorageVariableBase|PcdFlashNvStorageVariableSize
 DATA = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -67,10 +67,10 @@ DATA = {
 }
 
 0x0028c000|0x00002000
-PcdFlashNvStorageEventLogBase|PcdFlashNvStorageEventLogSize
+PcdWinNtFlashNvStorageEventLogBase|PcdWinNtFlashNvStorageEventLogSize
 
 0x0028e000|0x00002000
-PcdFlashNvStorageFtwWorkingBase|PcdFlashNvStorageFtwWorkingSize
+PcdWinNtFlashNvStorageFtwWorkingBase|PcdFlashNvStorageFtwWorkingSize
 DATA = {
   0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c,
   0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50,
@@ -79,7 +79,7 @@ DATA = {
 }
 
 0x00290000|0x00010000
-PcdFlashNvStorageFtwSpareBase|PcdFlashNvStorageFtwSpareBase
+PcdWinNtFlashNvStorageFtwSpareBase|PcdFlashNvStorageFtwSpareSize
 
 ################################################################################
 #

@@ -273,6 +273,21 @@
   PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x00051003
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
 
+  PcdWinNtFirmwareFdSize|gEfiNt32PkgTokenSpaceGuid|0x2a0000
+  PcdWinNtFirmwareBlockSize|gEfiNt32PkgTokenSpaceGuid|0x10000
+  PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid|0x28c000
+  PcdWinNtFlashNvStorageEventLogSize|gEfiNt32PkgTokenSpaceGuid|0x2000
+  PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid|0x0
+  PcdWinNtFlashFvRecoverySize|gEfiNt32PkgTokenSpaceGuid|0x280000
+
+  PcdWinNtFlashNvStorageVariableBase|gEfiNt32PkgTokenSpaceGuid|0x280000
+  PcdWinNtFlashNvStorageFtwSpareBase|gEfiNt32PkgTokenSpaceGuid|0x290000
+  PcdWinNtFlashNvStorageFtwWorkingBase|gEfiNt32PkgTokenSpaceGuid|0x28e000
+
+  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid|0x10000
+  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid|0x2000
+  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid|0x00c000
+
 [PcdsFeatureFlag.IA32]
   PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
   PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
@@ -329,12 +344,10 @@
   PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
   PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"a:RW;2880;512!e:RW;262144;512"|58
   PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid|L"UGA Window 1!UGA Window 2"|50
-  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid|0x280000
-  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid|0x28e000
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid|0x2000
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0x280000
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid|0x00c000
+
+  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0
+  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid|0
+  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0
 
 ################################################################################
 #
