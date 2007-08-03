@@ -2461,6 +2461,7 @@ Returns:
   ASSERT (NewHobList != NULL);
 
   *HobStart = NewHobList;
+  gHobList  = NewHobList;
 
   //
   // Add and allocate the remaining unallocated system memory to the memory services.
