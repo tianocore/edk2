@@ -57,7 +57,7 @@
   HobLib
   PeimEntryPoint
   DebugLib
-  PeiServiceTablePointerLib
+  PeiServicesTablePointerLib
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_CONSUMED
