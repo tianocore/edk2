@@ -66,7 +66,6 @@ Returns:
 
   DEBUG ((EFI_D_ERROR, "NT 32 Firmware Volume PEIM Loaded\n"));
 
-  __asm int 3;
   //
   // Get the Fwh Information PPI
   //

@@ -649,8 +649,6 @@ InitializeFtwLite (
 
   ASSERT_EFI_ERROR (Status);
 
-	__asm int 3;
-
   ZeroMem (FtwLiteDevice, sizeof (EFI_FTW_LITE_DEVICE));
   FtwLiteDevice->Signature = FTW_LITE_DEVICE_SIGNATURE;
 
