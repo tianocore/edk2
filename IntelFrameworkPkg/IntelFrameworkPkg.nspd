@@ -230,11 +230,6 @@
       <GuidValue>d7ad636e-b997-459b-bf3f-8846897980e1</GuidValue>
       <HelpText>HII protocol</HelpText>
     </Entry>
-    <Entry Name="FirmwareVolumeBlock">
-      <C_Name>gEfiFirmwareVolumeBlockProtocolGuid</C_Name>
-      <GuidValue>DE28BC59-6228-41BD-BDF6-a3b9adb5bda1</GuidValue>
-      <HelpText>Firmware Volume Block protocol</HelpText>
-    </Entry>
     <Entry Name="FirmwareVolume">
       <C_Name>gEfiFirmwareVolumeProtocolGuid</C_Name>
       <GuidValue>389F751F-1838-4388-8390-cd8154bd27f8</GuidValue>
