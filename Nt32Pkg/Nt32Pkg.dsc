@@ -352,7 +352,10 @@
   #  PEI Phase modules
   ##
   MdeModulePkg/Core/Pei/PeiMain.inf
-  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
+   <LibraryClass>
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   Nt32Pkg/BootModePei/BootModePei.inf
   Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
