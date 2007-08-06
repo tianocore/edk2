@@ -366,7 +366,7 @@ PartitionValidGptTable (
     return FALSE;
   }
 
-  if ((PartHdr->Header.Signature == EFI_PTAB_HEADER_ID) ||
+  if ((PartHdr->Header.Signature != EFI_PTAB_HEADER_ID) ||
       !PartitionCheckCrc (BlockSize, &PartHdr->Header) ||
       PartHdr->MyLBA != Lba
       ) {
