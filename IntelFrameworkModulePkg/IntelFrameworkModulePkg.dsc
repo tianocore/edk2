@@ -184,6 +184,3 @@
 
 [Components.X64]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-
-[Components.IA32]
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
