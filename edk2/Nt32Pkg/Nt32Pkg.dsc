@@ -101,7 +101,6 @@
   PeCoffLoaderLib|MdeModulePkg/Library/DxePeCoffLoaderFromHobLib/DxePeCoffLoaderFromHobLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DebugLib|IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
 
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
@@ -251,6 +250,7 @@
   PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
   PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x1f
   PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
+  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000040
   PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
   PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
   PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
@@ -349,8 +349,6 @@
   PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid|0
   PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0
 
-
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000040
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
