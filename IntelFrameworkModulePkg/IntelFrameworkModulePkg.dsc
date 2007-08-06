@@ -80,7 +80,7 @@
   HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   IfrSupportLibFramework|IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
-  IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   GraphicsLib|IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
@@ -97,7 +97,7 @@
   ReportStatusCodeLib|IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   IfrSupportLibFramework|IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
-  IoLib|${WORKSPACE}/MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 ################################################################################
 #
