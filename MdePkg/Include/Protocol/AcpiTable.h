@@ -66,10 +66,10 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ACPI_TABLE_INSTALL_ACPI_TABLE) (
-  IN CONST  EFI_ACPI_TABLE_PROTOCOL *This,
-  IN CONST  VOID                    *AcpiTableBuffer,
-  IN CONST  UINTN                   AcpiTableBufferSize,
-  OUT       UINTN                   *TableKey
+  IN   CONST EFI_ACPI_TABLE_PROTOCOL *This,
+  IN   CONST VOID                    *AcpiTableBuffer,
+  IN   UINTN                         AcpiTableBufferSize,
+  OUT  UINTN                         *TableKey
 );
 
 
@@ -100,8 +100,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE) (
-  IN CONST  EFI_ACPI_TABLE_PROTOCOL *This,
-  IN CONST  UINTN                   TableKey
+  IN CONST EFI_ACPI_TABLE_PROTOCOL *This,
+  IN UINTN                         TableKey
 );
 
 /**
