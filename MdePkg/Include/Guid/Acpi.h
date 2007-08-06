@@ -37,10 +37,9 @@
 // ACPI 2.0 or newer tables should use EFI_ACPI_TABLE_GUID.
 //
 #define EFI_ACPI_20_TABLE_GUID EFI_ACPI_TABLE_GUID
-#define EFI_ACPI_30_TABLE_GUID EFI_ACPI_TABLE_GUID
 
+extern EFI_GUID gEfiAcpiTableGuid;
 extern EFI_GUID gEfiAcpi10TableGuid;
 extern EFI_GUID gEfiAcpi20TableGuid;
-extern EFI_GUID gEfiAcpi30TableGuid;
 
 #endif
