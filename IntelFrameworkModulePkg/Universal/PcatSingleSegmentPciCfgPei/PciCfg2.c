@@ -71,6 +71,28 @@ EFI_PEI_PPI_DESCRIPTOR gPciCfgPpiList = {
   &gPciCfgPpi
 };
 
+
+/**
+   Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
+
+   @param Address   PCI address with
+                    EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS format.
+   
+   @return The PCI address with PCI_LIB_ADDRESS format.
+   
+**/
+UINTN
+PciCfgAddressConvert (
+  EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *Address
+  )
+{
+  if (Address->ExtendedRegister == 0) {
+    return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->Register);
+  }
+
+  return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->ExtendedRegister);
+}
+
 /**
   Reads from a given location in the PCI configuration space.
 
@@ -107,7 +129,7 @@ PciCfg2Read (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 
   if (Width == EfiPeiPciCfgWidthUint8) {
     *((UINT8 *) Buffer) = PciRead8 (PciLibAddress);
@@ -158,7 +180,7 @@ PciCfg2Write (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 
   if (Width == EfiPeiPciCfgWidthUint8) {
     PciWrite8 (PciLibAddress, *((UINT8 *) Buffer));
@@ -216,7 +238,7 @@ PciCfg2Modify (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 
   if (Width == EfiPeiPciCfgWidthUint8) {
     PciAndThenOr8 (PciLibAddress, ~(*(UINT8 *)ClearBits), *((UINT8 *) SetBits));

@@ -28,12 +28,20 @@
 
 #include <IndustryStandard\Pci.h>
 
-#define COMMON_TO_PCILIB_ADDRESS(A) (UINTN)PCI_LIB_ADDRESS( \
-	((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &A)->Bus, \
-	((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &A)->Device, \
-	((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &A)->Function, \
-	((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &A)->Register \
-	)
+
+/**
+   Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
+
+   @param Address   PCI address with
+                    EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS format.
+   
+   @return The PCI address with PCI_LIB_ADDRESS format.
+   
+**/
+UINTN
+PciCfgAddressConvert (
+  EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *Address
+  );
 
 
 /**

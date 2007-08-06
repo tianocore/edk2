@@ -84,7 +84,7 @@
   MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLib.inf
+  MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLibSmbus2Ppi.inf
   MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
   MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf

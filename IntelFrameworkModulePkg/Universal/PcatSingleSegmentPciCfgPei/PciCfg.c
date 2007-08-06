@@ -53,7 +53,7 @@ PciCfgRead (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 	switch (Width) {
     case EfiPeiPciCfgWidthUint8:
       * (UINT8 *) Buffer = PciRead8 (PciLibAddress);
@@ -103,7 +103,7 @@ PciCfgWrite (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
   switch (Width) {
     case EfiPeiPciCfgWidthUint8:
       PciWrite8 (PciLibAddress, *(UINT8 *) Buffer);
@@ -153,7 +153,7 @@ PciCfgModify (
 {
   UINTN  PciLibAddress;
 
-  PciLibAddress = COMMON_TO_PCILIB_ADDRESS (Address);
+  PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 	switch (Width) {
     case EfiPeiPciCfgWidthUint8:
       PciAndThenOr8 (PciLibAddress, (UINT8)~ClearBits, (UINT8)SetBits);

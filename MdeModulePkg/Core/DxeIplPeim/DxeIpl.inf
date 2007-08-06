@@ -67,7 +67,6 @@
   BaseMemoryLib
   PeiServicesTablePointerLib
   CustomDecompressLib
-  TianoDecompressLib
   UefiDecompressLib
   PeCoffLoaderLib
   CacheMaintenanceLib
