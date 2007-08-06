@@ -332,17 +332,6 @@ ReInitStrings:
 
   OptionCount = 0;
 
-  //
-  // Try for a 512 byte Buffer
-  //
-  BufferSize = 0x200;
-
-  //
-  // Allocate memory for our Form binary
-  //
-  StringBuffer = AllocateZeroPool (BufferSize);
-  ASSERT (StringBuffer != NULL);
-
   for (Index = 0; LanguageString[Index] != 0; Index += 3) {
     Token = 0;
     CopyMem (Lang, &LanguageString[Index], 6);
@@ -352,8 +341,14 @@ ReInitStrings:
       mLastSelection = (UINT16) OptionCount;
     }
 
+    BufferSize = 0;
+    Status = gHii->GetString (gHii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, NULL);
+    ASSERT(Status == EFI_BUFFER_TOO_SMALL);
+    StringBuffer = AllocateZeroPool (BufferSize);
+    ASSERT (StringBuffer != NULL);
     Status = gHii->GetString (gHii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, StringBuffer);
     gHii->NewString (gHii, NULL, gStringPackHandle, &Token, StringBuffer);
+    FreePool (StringBuffer);
     CopyMem (&OptionList[OptionCount].StringToken, &Token, sizeof (UINT16));
     CopyMem (&OptionList[OptionCount].Value, &OptionCount, sizeof (UINT16));
     Key = 0x1234;
@@ -365,7 +360,6 @@ ReInitStrings:
   FreePool (LanguageString);
 
   if (ReInitializeStrings) {
-    FreePool (StringBuffer);
     FreePool (OptionList);
     return EFI_SUCCESS;
   }
@@ -391,7 +385,6 @@ ReInitStrings:
   //
   // FreePool (OptionList);
   //
-  FreePool (StringBuffer);
   return Status;
 }
 
