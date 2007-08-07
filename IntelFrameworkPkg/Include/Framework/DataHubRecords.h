@@ -459,7 +459,6 @@ typedef struct {
 
 #define EFI_CACHE_SUBCLASS_VERSION    0x00010000
 
-
 typedef EFI_EXP_BASE2_DATA  EFI_CACHE_SIZE_DATA;
 
 typedef EFI_EXP_BASE2_DATA  EFI_MAXIMUM_CACHE_SIZE_DATA;
@@ -478,6 +477,8 @@ typedef struct {
   UINT32  Synchronous   :1;
   UINT32  Reserved      :25;
 } EFI_CACHE_SRAM_TYPE_DATA;
+
+typedef EFI_CACHE_SRAM_TYPE_DATA EFI_CACHE_SRAM_INSTALL_DATA;
 
 typedef enum {
   EfiCacheErrorOther     = 1,
