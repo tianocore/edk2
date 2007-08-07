@@ -162,7 +162,8 @@ ${END}\t"$(PP)" $(VFRPP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\t"$(ASL)" -p $@ $(@D)${_sep_}${fbase}.i
+\tTrim -s $(@D)${_sep_}${fbase}.i
+\t"$(ASL)" -p $@ $(@D)${_sep_}${fbase}.iii
 \t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.aml $(OUTPUT_DIR)${_sep_}${fbase}.aml /Y
 ''',
 
