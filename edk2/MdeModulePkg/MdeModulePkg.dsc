@@ -55,8 +55,11 @@
 [LibraryClasses.IPF]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
-[LibraryClasses.EBC]
+[LibraryClasses.EBC.DXE_DRIVER]
   IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
+
+[LibraryClasses.EBC.PEIM]
+  IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint|MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
@@ -420,6 +423,7 @@
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
 [Components.X64]
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -429,6 +433,7 @@
   MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
 [Components.IPF]
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
@@ -437,4 +442,5 @@
 [Components.EBC]
   #BugBug: Need DXE I/O library instance for EBC.
   #MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
