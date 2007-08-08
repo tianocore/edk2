@@ -728,7 +728,7 @@ Returns:
                                 SectionExtract,
                                 (VOID *) Section,
                                 (VOID **) &DstBuffer,
-                                &DstBufferSize,
+                                (UINTN *) &DstBufferSize,
                                 &AuthenticationStatus
                                 );
 
