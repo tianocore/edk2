@@ -21,11 +21,20 @@ Abstract:
 --*/
 
 #include "DxeIpl.h"
+#include <Ppi/GuidedSectionExtraction.h>
 
 // porting note remove later
-#include "DecompressLibrary.h"
 #include "FrameworkPei.h"
 // end of remove later
+
+EFI_STATUS
+CustomDecompressExtractSection (
+  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
+  IN CONST  VOID                                  *InputSection,
+  OUT       VOID                                  **OutputBuffer,
+  OUT       UINTN                                 *OutputSize,
+  OUT       UINT32                                *AuthenticationStatus
+);
 
 BOOLEAN gInMemory = FALSE;
 
@@ -39,6 +48,10 @@ static EFI_DXE_IPL_PPI mDxeIplPpi = {
 
 static EFI_PEI_FV_FILE_LOADER_PPI mLoadFilePpi = {
   DxeIplLoadFile
+};
+
+static EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomDecompressExtractiongPpi = {
+  CustomDecompressExtractSection
 };
 
 static EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
@@ -58,16 +71,6 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
-};
-
-GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gEfiDecompress = {
-  UefiDecompressGetInfo,
-  UefiDecompress
-};
-
-GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gCustomDecompress = {
-  CustomDecompressGetInfo,
-  CustomDecompress
 };
 
 EFI_STATUS
@@ -96,7 +99,10 @@ Returns:
   EFI_STATUS                                Status;
   EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader;
   EFI_BOOT_MODE                             BootMode;
-
+  EFI_GUID                                  **DecompressGuidList;
+  UINT32                                    DecompressMethodNumber;
+  EFI_PEI_PPI_DESCRIPTOR                    *GuidPpi;
+  
   Status = PeiServicesGetBootMode (&BootMode);
   ASSERT_EFI_ERROR (Status);
 
@@ -111,6 +117,35 @@ Returns:
     //
     Status = ShadowDxeIpl (FfsHeader, PeiEfiPeiPeCoffLoader);
   } else {
+    //
+    // Get custom decompress method guid list 
+    //
+    DecompressGuidList     = NULL;
+    DecompressMethodNumber = 0;
+    Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      DecompressGuidList = (EFI_GUID **) AllocatePages (EFI_SIZE_TO_PAGES (DecompressMethodNumber * sizeof (EFI_GUID *)));
+      ASSERT (DecompressGuidList != NULL);
+      Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
+    }
+    ASSERT_EFI_ERROR(Status);
+
+    //
+    // Install custom decompress extraction guid ppi
+    //
+    if (DecompressMethodNumber > 0) {
+      GuidPpi = NULL;
+      GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePages (EFI_SIZE_TO_PAGES (DecompressMethodNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR)));
+      ASSERT (GuidPpi != NULL);
+      while (DecompressMethodNumber-- > 0) {
+        GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+        GuidPpi->Ppi   = &mCustomDecompressExtractiongPpi;
+        GuidPpi->Guid  = DecompressGuidList [DecompressMethodNumber];
+        Status = PeiServicesInstallPpi (GuidPpi++);
+        ASSERT_EFI_ERROR(Status);
+      }
+    }
+    
     //
     // Install FvFileLoader and DxeIpl PPIs.
     //
@@ -205,7 +240,6 @@ Returns:
   PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
   ASSERT (PeiEfiPeiPeCoffLoader != NULL);
 
-
   //
   // Find the EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE type compressed Firmware Volume file
   // The file found will be processed by PeiProcessFile: It will first be decompressed to
@@ -252,44 +286,20 @@ Returns:
     );
 
   //
+  // Add HOB for the PE/COFF Loader Protocol
+  //
+  BuildGuidDataHob (
+    &gEfiPeiPeCoffLoaderGuid,
+    (VOID *)&PeiEfiPeiPeCoffLoader,
+    sizeof (VOID *)
+    );
+  //
   // Report Status Code EFI_SW_PEI_PC_HANDOFF_TO_NEXT
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
     EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
     );
-
-  if (FeaturePcdGet (PcdDxeIplBuildShareCodeHobs)) {
-    if (FeaturePcdGet (PcdDxeIplSupportEfiDecompress)) {
-      //
-      // Add HOB for the EFI Decompress Protocol
-      //
-      BuildGuidDataHob (
-        &gEfiDecompressProtocolGuid,
-        (VOID *)&gEfiDecompress,
-        sizeof (gEfiDecompress)
-        );
-    }
-    if (FeaturePcdGet (PcdDxeIplSupportCustomDecompress)) {
-      //
-      // Add HOB for the user customized Decompress Protocol
-      //
-      BuildGuidDataHob (
-        &gEfiCustomizedDecompressProtocolGuid,
-        (VOID *)&gCustomDecompress,
-        sizeof (gCustomDecompress)
-        );
-    }
-
-    //
-    // Add HOB for the PE/COFF Loader Protocol
-    //
-    BuildGuidDataHob (
-      &gEfiPeiPeCoffLoaderGuid,
-      (VOID *)&PeiEfiPeiPeCoffLoader,
-      sizeof (VOID *)
-      );
-  }
 
   //
   // Transfer control to the DXE Core
@@ -311,7 +321,7 @@ Returns:
 EFI_STATUS
 PeiFindFile (
   IN  UINT8                  Type,
-  IN  UINT16                 SectionType,
+  IN  EFI_SECTION_TYPE       SectionType,
   OUT EFI_GUID               *FileName,
   OUT VOID                   **Pe32Data
   )
@@ -609,7 +619,7 @@ Returns:
 
 EFI_STATUS
 PeiProcessFile (
-  IN      UINT16                 SectionType,
+  IN      EFI_SECTION_TYPE       SectionType,
   IN      EFI_FFS_FILE_HEADER    *FfsFileHeader,
   OUT     VOID                   **Pe32Data,
   IN      EFI_PEI_HOB_POINTERS   *OrigHob
@@ -635,8 +645,6 @@ Returns:
 --*/
 {
   EFI_STATUS                      Status;
-  VOID                            *SectionData;
-  DECOMPRESS_LIBRARY              *DecompressLibrary;
   UINT8                           *DstBuffer;
   UINT8                           *ScratchBuffer;
   UINT32                          DstBufferSize;
@@ -649,327 +657,367 @@ Returns:
   EFI_COMMON_SECTION_HEADER       *Section;
   UINTN                           SectionLength;
   UINTN                           OccupiedSectionLength;
-  UINT64                          FileSize;
-  UINT32                          AuthenticationStatus;
-  EFI_PEI_SECTION_EXTRACTION_PPI  *SectionExtract;
-  UINT32                          BufferSize;
-  UINT8                           *Buffer;
-  EFI_PEI_SECURITY_PPI            *Security;
-  BOOLEAN                         StartCrisisRecovery;
-  EFI_GUID                        TempGuid;
+  UINTN                           FileSize;
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
+  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *SectionExtract;
+  UINT32                          AuthenticationStatus;
 
   //
-  // Initialize local variables.
+  // First try to find the required section in this ffs file.
   //
-  DecompressLibrary = NULL;
-  DstBuffer         = NULL;
-  DstBufferSize     = 0;
-
   Status = PeiServicesFfsFindSectionData (
-             EFI_SECTION_COMPRESSION,
+             SectionType,
              FfsFileHeader,
-             &SectionData
+             Pe32Data
              );
-
-  //
-  // First process the compression section
-  //
   if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // If not found, the required section may be in guided or compressed section.
+  // So, search guided or compressed section to process
+  //
+  Section   = (EFI_COMMON_SECTION_HEADER *) (UINTN) (VOID *) ((UINT8 *) (FfsFileHeader) + (UINTN) sizeof (EFI_FFS_FILE_HEADER));
+  FileSize  = FfsFileHeader->Size[0] & 0xFF;
+  FileSize += (FfsFileHeader->Size[1] << 8) & 0xFF00;
+  FileSize += (FfsFileHeader->Size[2] << 16) & 0xFF0000;
+  FileSize &= 0x00FFFFFF;
+  OccupiedSectionLength = 0;
+
+  do {
     //
-    // Yes, there is a compression section, so extract the contents
-    // Decompress the image here
+    // Initialize local variables.
     //
-    Section = (EFI_COMMON_SECTION_HEADER *) (UINTN) (VOID *) ((UINT8 *) (FfsFileHeader) + (UINTN) sizeof (EFI_FFS_FILE_HEADER));
+    DstBuffer         = NULL;
+    DstBufferSize     = 0; 
 
-    do {
-      SectionLength         = *(UINT32 *) (Section->Size) & 0x00ffffff;
-      OccupiedSectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
+    Section               = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + OccupiedSectionLength);
+    SectionLength         = *(UINT32 *) (Section->Size) & 0x00ffffff;
+    OccupiedSectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
 
+    //
+    // Was the DXE Core file encapsulated in a GUID'd section?
+    //
+    if (Section->Type == EFI_SECTION_GUID_DEFINED) {
       //
-      // Was the DXE Core file encapsulated in a GUID'd section?
+      // Set a default authenticatino state
       //
-      if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+      AuthenticationStatus = 0;
+      //
+      // Locate extract guid section ppi
+      //
+      Status = PeiServicesLocatePpi (
+                 (EFI_GUID *) (Section + 1),
+                 0,
+                 NULL,
+                 (VOID **)&SectionExtract
+                 );
 
+      if (EFI_ERROR (Status)) {
         //
-        // This following code constitutes the addition of the security model
-        // to the DXE IPL.
+        // ignore the unknown guid section
         //
-        //
-        // Set a default authenticatino state
-        //
-        AuthenticationStatus = 0;
-
-        Status = PeiServicesLocatePpi (
-                   &gEfiPeiSectionExtractionPpiGuid,
-                   0,
-                   NULL,
-                   (VOID **)&SectionExtract
-                   );
-
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-        //
-        // Verify Authentication State
-        //
-        CopyMem (&TempGuid, Section + 1, sizeof (EFI_GUID));
-
-        Status = SectionExtract->PeiGetSection (
-                                  GetPeiServicesTablePointer(),
-                                  SectionExtract,
-                                  (EFI_SECTION_TYPE *) &SectionType,
-                                  &TempGuid,
-                                  0,
-                                  (VOID **) &Buffer,
-                                  &BufferSize,
-                                  &AuthenticationStatus
-                                  );
-
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-        //
-        // If not ask the Security PPI, if exists, for disposition
-        //
-        //
-        Status = PeiServicesLocatePpi (
-                   &gEfiPeiSecurityPpiGuid,
-                   0,
-                   NULL,
-                   (VOID **)&Security
-                   );
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        Status = Security->AuthenticationState (
-                            GetPeiServicesTablePointer(),
-                            (struct _EFI_PEI_SECURITY_PPI *) Security,
-                            AuthenticationStatus,
-                            FfsFileHeader,
-                            &StartCrisisRecovery
-                            );
-
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-        //
-        // If there is a security violation, report to caller and have
-        // the upper-level logic possible engender a crisis recovery
-        //
-        if (StartCrisisRecovery) {
-          return EFI_SECURITY_VIOLATION;
-        }
+        continue;
       }
+      //
+      // Extract the contents from guid section
+      //
+      Status = SectionExtract->ExtractSection (
+                                SectionExtract,
+                                (VOID *) Section,
+                                (VOID **) &DstBuffer,
+                                &DstBufferSize,
+                                &AuthenticationStatus
+                                );
 
-      if (Section->Type == EFI_SECTION_PE32) {
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Extract section content failed - %r\n", Status));
+        return Status;
+      }
+      //
+      // Todo check AuthenticationStatus and do the verify
+      //
+    } else if (Section->Type == EFI_SECTION_COMPRESSION) {
+      //
+      // This is a compression set, expand it
+      //
+      CompressionSection  = (EFI_COMPRESSION_SECTION *) Section;
+
+      switch (CompressionSection->CompressionType) {
+      case EFI_STANDARD_COMPRESSION:
+        //
+        // Load EFI standard compression.
+        // For compressed data, decompress them to dstbuffer.
+        //
+        Status = UefiDecompressGetInfo (
+                   (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                   (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                   &DstBufferSize,
+                   &ScratchBufferSize
+                   );
+        if (EFI_ERROR (Status)) {
+          //
+          // GetInfo failed
+          //
+          DEBUG ((EFI_D_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+          return EFI_NOT_FOUND;
+        }
+        //
+        // Allocate scratch buffer
+        //
+        ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+        if (ScratchBuffer == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        //
+        // Allocate destination buffer
+        //
+        DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+        if (DstBuffer == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        //
+        // Call decompress function
+        //
+        Status = UefiDecompress (
+                    (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                    DstBuffer,
+                    ScratchBuffer
+                    );
+        if (EFI_ERROR (Status)) {
+          //
+          // Decompress failed
+          //
+          DEBUG ((EFI_D_ERROR, "Decompress Failed - %r\n", Status));
+          return EFI_NOT_FOUND;
+        }
+        break;
+
+      // porting note the original branch for customized compress is removed, it should be change to use GUID compress
+
+      case EFI_NOT_COMPRESSED:
+        //
+        // Allocate destination buffer
+        //
+        DstBufferSize = CompressionSection->UncompressedLength;
+        DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+        if (DstBuffer == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        //
+        // stream is not actually compressed, just encapsulated.  So just copy it.
+        //
+        CopyMem (DstBuffer, CompressionSection + 1, DstBufferSize);
+        break;
+
+      default:
+        //
+        // Don't support other unknown compression type.
+        //
+        ASSERT_EFI_ERROR (Status);
+        return EFI_NOT_FOUND;
+      }
+    } else {
+      //
+      // ignore other type sections
+      //
+      continue;
+    }
+
+    //
+    // Extract contents from guided or compressed sections.
+    // Loop the decompressed data searching for expected section.
+    //
+    CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
+    CmpFileData = (VOID *) DstBuffer;
+    CmpFileSize = DstBufferSize;
+    do {
+      CmpSectionLength          = *(UINT32 *) (CmpSection->Size) & 0x00ffffff;
+      if (CmpSection->Type == SectionType) {
         //
         // This is what we want
         //
-        *Pe32Data = (VOID *) (Section + 1);
-        return EFI_SUCCESS;
-      } else if (Section->Type == EFI_SECTION_COMPRESSION) {
-        //
-        // This is a compression set, expand it
-        //
-        CompressionSection  = (EFI_COMPRESSION_SECTION *) Section;
+        if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+          // 
+          // Firmware Volume Image in this Section
+          // Skip the section header to get FvHeader
+          //
+          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
 
-        switch (CompressionSection->CompressionType) {
-        case EFI_STANDARD_COMPRESSION:
-          //
-          // Load EFI standard compression.
-          //
-          if (FeaturePcdGet (PcdDxeIplSupportTianoDecompress)) {
-            DecompressLibrary = &gEfiDecompress;
-          } else {
-            ASSERT (FALSE);
-            return EFI_NOT_FOUND;
-          }
-          break;
-
-        // porting note the original branch for customized compress is removed, it should be change to use GUID compress
-
-        case EFI_NOT_COMPRESSED:
-          //
-          // Allocate destination buffer
-          //
-          DstBufferSize = CompressionSection->UncompressedLength;
-          DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-          if (DstBuffer == NULL) {
-            return EFI_OUT_OF_RESOURCES;
-          }
-          //
-          // stream is not actually compressed, just encapsulated.  So just copy it.
-          //
-          CopyMem (DstBuffer, CompressionSection + 1, DstBufferSize);
-          break;
-
-        default:
-          //
-          // Don't support other unknown compression type.
-          //
-          ASSERT_EFI_ERROR (Status);
-          return EFI_NOT_FOUND;
-        }
-        
-        if (CompressionSection->CompressionType != EFI_NOT_COMPRESSED) {
-          //
-          // For compressed data, decompress them to dstbuffer.
-          //
-          Status = DecompressLibrary->GetInfo (
-                     (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                     (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
-                     &DstBufferSize,
-                     &ScratchBufferSize
-                     );
-          if (EFI_ERROR (Status)) {
+          if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
             //
-            // GetInfo failed
+            // Because FvLength in FvHeader is UINT64 type, 
+            // so FvHeader must meed at least 8 bytes alignment.
+            // If current FvImage base address doesn't meet its alignment,
+            // we need to reload this FvImage to another correct memory address.
             //
-            DEBUG ((EFI_D_ERROR, "Decompress GetInfo Failed - %r\n", Status));
-            return EFI_NOT_FOUND;
-          }
-  
-          //
-          // Allocate scratch buffer
-          //
-          ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
-          if (ScratchBuffer == NULL) {
-            return EFI_OUT_OF_RESOURCES;
-          }
-  
-          //
-          // Allocate destination buffer
-          //
-          DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-          if (DstBuffer == NULL) {
-            return EFI_OUT_OF_RESOURCES;
-          }
-  
-          //
-          // Call decompress function
-          //
-          Status = DecompressLibrary->Decompress (
-                      (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                      DstBuffer,
-                      ScratchBuffer
-                      );
-          if (EFI_ERROR (Status)) {
-            //
-            // Decompress failed
-            //
-            DEBUG ((EFI_D_ERROR, "Decompress Failed - %r\n", Status));
-            return EFI_NOT_FOUND;
-          }
-        }
-
-        //
-        // Decompress successfully.
-        // Loop the decompressed data searching for expected section.
-        //
-        CmpSection = (EFI_COMMON_SECTION_HEADER *) DstBuffer;
-        CmpFileData = (VOID *) DstBuffer;
-        CmpFileSize = DstBufferSize;
-        do {
-          CmpSectionLength = *(UINT32 *) (CmpSection->Size) & 0x00ffffff;
-          if (CmpSection->Type == SectionType) {
-            //
-            // This is what we want
-            //
-            if (SectionType == EFI_SECTION_PE32) {
-              *Pe32Data = (VOID *) (CmpSection + 1);
-              return EFI_SUCCESS;
-            } else if (SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
-              // 
-              // Firmware Volume Image in this Section
-              // Skip the section header to get FvHeader
-              //
-              FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (CmpSection + 1);
-    
-              if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
-                //
-                // Because FvLength in FvHeader is UINT64 type, 
-                // so FvHeader must meed at least 8 bytes alignment.
-                // If current FvImage base address doesn't meet its alignment,
-                // we need to reload this FvImage to another correct memory address.
-                //
-                if (((UINTN) FvHeader % sizeof (UINT64)) != 0) {
-                  DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) CmpSectionLength - sizeof (EFI_COMMON_SECTION_HEADER)), sizeof (UINT64));
-                  if (DstBuffer == NULL) {
-                    return EFI_OUT_OF_RESOURCES;
-                  }
-                  CopyMem (DstBuffer, FvHeader, (UINTN) CmpSectionLength - sizeof (EFI_COMMON_SECTION_HEADER));
-                  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
-                }
-
-                //
-                // Build new FvHob for new decompressed Fv image.
-                //
-                BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
-                
-                //
-                // Set the original FvHob to unused.
-                //
-                if (OrigHob != NULL) {
-                  OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
-                }
-                
-                //
-                // return found FvImage data.
-                //
-                *Pe32Data = (VOID *) FvHeader;
-                return EFI_SUCCESS;
-              }
+            if (((UINTN) FvHeader % sizeof (UINT64)) != 0) {
+              CopyMem (DstBuffer, FvHeader, (UINTN) CmpSectionLength - sizeof (EFI_COMMON_SECTION_HEADER));
+              FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
             }
+
+            //
+            // Build new FvHob for new decompressed Fv image.
+            //
+            BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
+            
+            //
+            // Set the original FvHob to unused.
+            //
+            if (OrigHob != NULL) {
+              OrigHob->Header->HobType = EFI_HOB_TYPE_UNUSED;
+            }
+            //
+            // return found FvImage data.
+            //
+            *Pe32Data = (VOID *) FvHeader;
+            return EFI_SUCCESS;
           }
-          OccupiedCmpSectionLength  = GET_OCCUPIED_SIZE (CmpSectionLength, 4);
-          CmpSection                = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) CmpSection + OccupiedCmpSectionLength);
-        } while (CmpSection->Type != 0 && (UINTN) ((UINT8 *) CmpSection - (UINT8 *) CmpFileData) < CmpFileSize);
+        } else {
+          //
+          // direct return the found section.
+          //
+          *Pe32Data = (VOID *) (CmpSection + 1);
+          return EFI_SUCCESS;
+        }
       }
-      //
-      // End of the decompression activity
-      //
+      OccupiedCmpSectionLength  = GET_OCCUPIED_SIZE (CmpSectionLength, 4);
+      CmpSection                = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) CmpSection + OccupiedCmpSectionLength);
+    } while (CmpSection->Type != 0 && (UINTN) ((UINT8 *) CmpSection - (UINT8 *) CmpFileData) < CmpFileSize);
+  } while (Section->Type != 0 && (UINTN) ((UINT8 *) Section + OccupiedSectionLength - (UINT8 *) FfsFileHeader) < FileSize);
 
-      Section   = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + OccupiedSectionLength);
-      FileSize  = FfsFileHeader->Size[0] & 0xFF;
-      FileSize += (FfsFileHeader->Size[1] << 8) & 0xFF00;
-      FileSize += (FfsFileHeader->Size[2] << 16) & 0xFF0000;
-      FileSize &= 0x00FFFFFF;
-    } while (Section->Type != 0 && (UINTN) ((UINT8 *) Section - (UINT8 *) FfsFileHeader) < FileSize);
-    
-    //
-    // search all sections (compression and non compression) in this FFS, don't 
-    // find expected section.
-    //
-    return EFI_NOT_FOUND;
-  } else {
-    //
-    // For those FFS that doesn't contain compression section, directly search 
-    // PE or TE section in this FFS.
-    //
-
-    Status = PeiServicesFfsFindSectionData (
-               EFI_SECTION_PE32,
-               FfsFileHeader,
-               &SectionData
-               );
-
-    if (EFI_ERROR (Status)) {
-      Status = PeiServicesFfsFindSectionData (
-                 EFI_SECTION_TE,
-                 FfsFileHeader,
-                 &SectionData
-                 );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-    }
-  }
-
-  *Pe32Data = SectionData;
-
-  return EFI_SUCCESS;
+  //
+  // search all sections (compression and non compression) in this FFS, don't 
+  // find expected section.
+  //
+  return EFI_NOT_FOUND;
 }
 
+/**
+  The ExtractSection() function processes the input section and
+  returns a pointer to the section contents. If the section being
+  extracted does not require processing (if the section
+  GuidedSectionHeader.Attributes has the
+  EFI_GUIDED_SECTION_PROCESSING_REQUIRED field cleared), then
+  OutputBuffer is just updated to point to the start of the
+  section's contents. Otherwise, *Buffer must be allocated
+  from PEI permanent memory.
+
+  @param This                   Indicates the
+                                EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI instance.
+                                Buffer containing the input GUIDed section to be
+                                processed. OutputBuffer OutputBuffer is
+                                allocated from PEI permanent memory and contains
+                                the new section stream.
+  
+  @param OutputSize             A pointer to a caller-allocated
+                                UINTN in which the size of *OutputBuffer
+                                allocation is stored. If the function
+                                returns anything other than EFI_SUCCESS,
+                                the value of OutputSize is undefined.
+  
+  @param AuthenticationStatus   A pointer to a caller-allocated
+                                UINT32 that indicates the
+                                authentication status of the
+                                output buffer. If the input
+                                section's GuidedSectionHeader.
+                                Attributes field has the
+                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID 
+                                bit as clear,
+                                AuthenticationStatus must return
+                                zero. These bits reflect the
+                                status of the extraction
+                                operation. If the function
+                                returns anything other than
+                                EFI_SUCCESS, the value of
+                                AuthenticationStatus is
+                                undefined.
+  
+  @retval EFI_SUCCESS           The InputSection was
+                                successfully processed and the
+                                section contents were returned.
+  
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient
+                                resources to process the request.
+  
+  @reteval EFI_INVALID_PARAMETER The GUID in InputSection does
+                                not match this instance of the
+                                GUIDed Section Extraction PPI.
+**/
+EFI_STATUS
+CustomDecompressExtractSection (
+  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
+  IN CONST  VOID                                  *InputSection,
+  OUT       VOID                                  **OutputBuffer,
+  OUT       UINTN                                 *OutputSize,
+  OUT       UINT32                                *AuthenticationStatus
+)
+{
+  EFI_STATUS      Status;
+  UINT8           *ScratchBuffer;
+  UINT32          ScratchSize;
+  UINT32          SectionLength;  
+  
+  //
+  // Set authentic value to zero.
+  //
+  *AuthenticationStatus = 0;
+  //
+  // Calculate Section data Size
+  //
+  SectionLength   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff;
+  //
+  // Get compressed data information
+  //
+  Status = CustomDecompressGetInfo (
+             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
+             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
+             SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
+             OutputSize,
+             &ScratchSize
+             );
+  if (EFI_ERROR (Status)) {
+    //
+    // GetInfo failed
+    //
+    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Allocate scratch buffer
+  //
+  ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchSize));
+  if (ScratchBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  //
+  // Allocate destination buffer
+  //
+  *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (*OutputSize));
+  if (*OutputBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Call decompress function
+  //
+  Status = CustomDecompress (
+             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
+             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
+             *OutputBuffer,
+             ScratchBuffer
+             );
+
+  if (EFI_ERROR (Status)) {
+    //
+    // Decompress failed
+    //
+    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
+    return Status;
+  }
+  
+  return EFI_SUCCESS;
+}

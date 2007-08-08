@@ -59,7 +59,7 @@ extern BOOLEAN gInMemory;
 EFI_STATUS
 PeiFindFile (
   IN  UINT8                  Type,
-  IN  UINT16                 SectionType,
+  IN  EFI_SECTION_TYPE       SectionType,
   OUT EFI_GUID               *FileName,
   OUT VOID                   **Pe32Data
   )
@@ -124,7 +124,7 @@ HandOffToDxeCore (
 
 EFI_STATUS
 PeiProcessFile (
-  IN      UINT16                 SectionType,
+  IN      EFI_SECTION_TYPE       SectionType,
   IN      EFI_FFS_FILE_HEADER    *FfsFileHeader,
   OUT     VOID                   **Pe32Data,
   IN      EFI_PEI_HOB_POINTERS   *OrigHob

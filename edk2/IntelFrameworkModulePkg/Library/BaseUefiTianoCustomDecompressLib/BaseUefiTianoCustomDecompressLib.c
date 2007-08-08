@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include <Guid/CustomDecompress.h>
 #include "BaseUefiTianoCustomDecompressLibInternals.h"
 
 VOID
@@ -775,6 +776,7 @@ Returns:
 RETURN_STATUS
 EFIAPI
 CustomDecompressGetInfo (
+  IN  CONST GUID *DecompressGuid,
   IN  CONST VOID  *Source,
   IN  UINT32      SourceSize,
   OUT UINT32      *DestinationSize,
@@ -787,7 +789,7 @@ Routine Description:
   The internal implementation of *_DECOMPRESS_PROTOCOL.GetInfo().
 
 Arguments:
-
+  DecompressGuid    The guid matches this decompress method.
   Source          - The source buffer containing the compressed data.
   SourceSize      - The size of source buffer
   DestinationSize - The size of destination buffer.
@@ -797,15 +799,21 @@ Returns:
 
   RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
   RETURN_INVALID_PARAMETER - The source data is corrupted
+  RETURN_UNSUPPORTED       - Decompress method is not supported.
 
 --*/
 {
-  return UefiDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
+  if (CompareGuid (DecompressGuid, &gTianoCustomDecompressGuid)) {
+    return UefiDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
+  } else {
+    return RETURN_UNSUPPORTED;
+  }
 }
 
 RETURN_STATUS
 EFIAPI
 CustomDecompress (
+  IN  CONST GUID *DecompressGuid,
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
@@ -817,7 +825,7 @@ Routine Description:
   The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
 
 Arguments:
-
+  DecompressGuid    The guid matches this decompress method.
   Source          - The source buffer containing the compressed data.
   Destination     - The destination buffer to store the decompressed data
   Scratch         - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
@@ -826,8 +834,50 @@ Returns:
 
   RETURN_SUCCESS           - Decompression is successfull
   RETURN_INVALID_PARAMETER - The source data is corrupted
+  RETURN_UNSUPPORTED       - Decompress method is not supported.
 
 --*/
 {
-  return UefiTianoDecompress (Source, Destination, Scratch, 2);
+  if (CompareGuid (DecompressGuid, &gTianoCustomDecompressGuid)) {
+    return UefiTianoDecompress (Source, Destination, Scratch, 2);
+  } else {
+    return RETURN_UNSUPPORTED;
+  }
+}
+
+/**
+  Get decompress method guid list.
+
+  @param[in, out]  AlgorithmGuidTable   The decompress method guid list.
+  @param[in, out]  NumberOfAlgorithms   The number of decompress methods.
+
+  @retval  RETURN_SUCCESS            Get all algorithmes list successfully.
+  @retval  RETURN_INVALID_PARAMETER  Input paramter error.
+  @retval  RETURN_OUT_OF_RESOURCES   Source is not enough.
+
+**/
+RETURN_STATUS
+EFIAPI
+CustomDecompressGetAlgorithms (
+   IN OUT  GUID   **AlgorithmGuidTable,
+   IN OUT  UINTN  *NumberOfAlgorithms
+  )
+{
+  if (NumberOfAlgorithms == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+  
+  if (*NumberOfAlgorithms < 1) {
+    *NumberOfAlgorithms = 1;
+    return RETURN_OUT_OF_RESOURCES;
+  }
+  
+  if (AlgorithmGuidTable == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  AlgorithmGuidTable [0] = &gTianoCustomDecompressGuid;
+  *NumberOfAlgorithms = 1;
+  
+  return RETURN_SUCCESS;  
 }

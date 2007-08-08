@@ -31,6 +31,7 @@
 RETURN_STATUS
 EFIAPI
 CustomDecompressGetInfo (
+  IN  CONST GUID  *DecompressGuid,
   IN  CONST VOID  *Source,
   IN  UINT32      SourceSize,
   OUT UINT32      *DestinationSize,
@@ -56,10 +57,30 @@ CustomDecompressGetInfo (
 RETURN_STATUS
 EFIAPI
 CustomDecompress (
+  IN const GUID  *DecompressGuid,
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   )
 {
   return RETURN_UNSUPPORTED;
+}
+
+/**
+  Get decompress method guid list.
+
+  @param[in, out]  AlgorithmGuidTable   The decompress method guid list.
+  @param[in, out]  NumberOfAlgorithms   The number of decompress methods.
+
+  @retval  RETURN_SUCCESS            Get all algorithmes list successfully..
+**/
+RETURN_STATUS
+EFIAPI
+CustomDecompressGetAlgorithms (
+   IN OUT  GUID   **AlgorithmGuidTable,
+   IN OUT  UINTN  *NumberOfAlgorithms
+  )
+{
+  *NumberOfAlgorithms = 0;
+  return RETURN_SUCCESS; 
 }

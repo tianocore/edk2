@@ -79,6 +79,7 @@
   CacheMaintenanceLib
   PeCoffLoaderLib
   UefiDecompressLib
+  CustomDecompressLib
   PerformanceLib
   HobLib
   BaseLib
