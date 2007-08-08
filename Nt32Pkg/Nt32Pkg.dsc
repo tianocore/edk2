@@ -75,7 +75,7 @@
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   CustomDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  HiiLib|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
 
 [LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
