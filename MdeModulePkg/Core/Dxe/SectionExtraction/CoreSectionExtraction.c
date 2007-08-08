@@ -212,7 +212,15 @@ IsValidSectionStream (
   IN  VOID                                    *SectionStream,
   IN  UINTN                                   SectionStreamLength
   );
-  
+
+EFI_STATUS
+CustomDecompressExtractSection (
+  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
+  IN CONST  VOID                                   *InputSection,
+  OUT       VOID                                   **OutputBuffer,
+  OUT       UINTN                                  *OutputSize,
+  OUT       UINT32                                 *AuthenticationStatus
+  );  
 //
 // Module globals
 //
@@ -226,6 +234,9 @@ EFI_SECTION_EXTRACTION_PROTOCOL mSectionExtraction = {
   CloseSectionStream
 };
 
+EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomDecompressExtraction = {
+  CustomDecompressExtractSection
+};
                                              
 EFI_STATUS
 EFIAPI
@@ -250,6 +261,8 @@ Returns:
 --*/
 {
   EFI_STATUS                         Status;
+  EFI_GUID                           **DecompressGuidList;
+  UINT32                             DecompressMethodNumber;
 
   //
   // Install SEP to a new handle
@@ -261,6 +274,34 @@ Returns:
             &mSectionExtraction
             );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Get custom decompress method guid list 
+  //
+  DecompressGuidList     = NULL;
+  DecompressMethodNumber = 0;
+  Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
+  if (Status == EFI_OUT_OF_RESOURCES) {
+    DecompressGuidList = (EFI_GUID **) CoreAllocateBootServicesPool (DecompressMethodNumber * sizeof (EFI_GUID *));
+    ASSERT (DecompressGuidList != NULL);
+    Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
+  }
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Install custom decompress guided extraction protocol 
+  //
+  while (DecompressMethodNumber-- > 0) {
+    Status = CoreInstallProtocolInterface (
+              &mSectionExtractionHandle,
+              DecompressGuidList [DecompressMethodNumber],
+              EFI_NATIVE_INTERFACE,
+              &mCustomDecompressExtraction
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+  
+  CoreFreePool (DecompressGuidList);
 
   return Status;
 }
@@ -742,7 +783,7 @@ Returns:
   EFI_COMMON_SECTION_HEADER                    *SectionHeader;
   EFI_COMPRESSION_SECTION                      *CompressionHeader;
   EFI_GUID_DEFINED_SECTION                     *GuidedHeader;
-  EFI_TIANO_DECOMPRESS_PROTOCOL                *Decompress;
+  EFI_DECOMPRESS_PROTOCOL                      *Decompress;
   EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL       *GuidedExtraction;
   VOID                                         *NewStreamBuffer;
   VOID                                         *ScratchBuffer;
@@ -1338,4 +1379,169 @@ Returns:
 
   ASSERT (FALSE);
   return FALSE;
+}
+
+/**
+  The ExtractSection() function processes the input section and
+  allocates a buffer from the pool in which it returns the section
+  contents. If the section being extracted contains
+  authentication information (the section's
+  GuidedSectionHeader.Attributes field has the
+  EFI_GUIDED_SECTION_AUTH_STATUS_VALID bit set), the values
+  returned in AuthenticationStatus must reflect the results of
+  the authentication operation. Depending on the algorithm and
+  size of the encapsulated data, the time that is required to do
+  a full authentication may be prohibitively long for some
+  classes of systems. To indicate this, use
+  EFI_SECURITY_POLICY_PROTOCOL_GUID, which may be published by
+  the security policy driver (see the Platform Initialization
+  Driver Execution Environment Core Interface Specification for
+  more details and the GUID definition). If the
+  EFI_SECURITY_POLICY_PROTOCOL_GUID exists in the handle
+  database, then, if possible, full authentication should be
+  skipped and the section contents simply returned in the
+  OutputBuffer. In this case, the
+  EFI_AUTH_STATUS_PLATFORM_OVERRIDE bit AuthenticationStatus
+  must be set on return. ExtractSection() is callable only from
+  TPL_NOTIFY and below. Behavior of ExtractSection() at any
+  EFI_TPL above TPL_NOTIFY is undefined. Type EFI_TPL is
+  defined in RaiseTPL() in the UEFI 2.0 specification.
+
+  
+  @param This   Indicates the
+                EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
+  
+  @param InputSection Buffer containing the input GUIDed section
+                      to be processed. OutputBuffer OutputBuffer
+                      is allocated from boot services pool
+                      memory and contains the new section
+                      stream. The caller is responsible for
+                      freeing this buffer.
+
+  @param OutputSize   A pointer to a caller-allocated UINTN in
+                      which the size of OutputBuffer allocation
+                      is stored. If the function returns
+                      anything other than EFI_SUCCESS, the value
+                      of OutputSize is undefined.
+
+  @param AuthenticationStatus A pointer to a caller-allocated
+                              UINT32 that indicates the
+                              authentication status of the
+                              output buffer. If the input
+                              section's
+                              GuidedSectionHeader.Attributes
+                              field has the
+                              EFI_GUIDED_SECTION_AUTH_STATUS_VAL
+                              bit as clear, AuthenticationStatus
+                              must return zero. Both local bits
+                              (19:16) and aggregate bits (3:0)
+                              in AuthenticationStatus are
+                              returned by ExtractSection().
+                              These bits reflect the status of
+                              the extraction operation. The bit
+                              pattern in both regions must be
+                              the same, as the local and
+                              aggregate authentication statuses
+                              have equivalent meaning at this
+                              level. If the function returns
+                              anything other than EFI_SUCCESS,
+                              the value of AuthenticationStatus
+                              is undefined.
+
+
+  @retval EFI_SUCCESS The InputSection was successfully
+                      processed and the section contents were
+                      returned.
+
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient
+                                resources to process the
+                                request.
+
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
+                                not match this instance of the
+                                GUIDed Section Extraction
+                                Protocol.
+
+**/
+EFI_STATUS
+CustomDecompressExtractSection (
+  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
+  IN CONST  VOID                                   *InputSection,
+  OUT       VOID                                   **OutputBuffer,
+  OUT       UINTN                                  *OutputSize,
+  OUT       UINT32                                 *AuthenticationStatus
+  )
+{
+  EFI_STATUS      Status;
+  UINT8           *ScratchBuffer;
+  UINT32          ScratchSize;
+  UINT32          SectionLength;  
+  
+  //
+  // Set authentic value to zero.
+  //
+  *AuthenticationStatus = 0;
+  //
+  // Calculate Section data Size
+  //
+  SectionLength   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff;
+  //
+  // Get compressed data information
+  //
+  Status = CustomDecompressGetInfo (
+             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
+             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
+             SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
+             OutputSize,
+             &ScratchSize
+             );
+  if (EFI_ERROR (Status)) {
+    //
+    // GetInfo failed
+    //
+    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Allocate scratch buffer
+  //
+  ScratchBuffer = CoreAllocateBootServicesPool (ScratchSize);
+  if (ScratchBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  //
+  // Allocate destination buffer
+  //
+  *OutputBuffer = CoreAllocateBootServicesPool (*OutputSize);
+  if (*OutputBuffer == NULL) {
+    CoreFreePool (ScratchBuffer);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Call decompress function
+  //
+  Status = CustomDecompress (
+             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
+             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
+             *OutputBuffer,
+             ScratchBuffer
+             );
+  if (EFI_ERROR (Status)) {
+    //
+    // Decompress failed
+    //
+    CoreFreePool (ScratchBuffer);
+    CoreFreePool (*OutputBuffer);
+    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
+    return Status;
+  }
+  
+  //
+  // Free unused scratch buffer.
+  //
+  CoreFreePool (ScratchBuffer);
+  
+  return EFI_SUCCESS;
 }
