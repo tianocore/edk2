@@ -958,7 +958,8 @@ CustomDecompressExtractSection (
   EFI_STATUS      Status;
   UINT8           *ScratchBuffer;
   UINT32          ScratchSize;
-  UINT32          SectionLength;  
+  UINT32          SectionLength;
+  UINT32          DestinationSize;  
   
   //
   // Set authentic value to zero.
@@ -975,7 +976,7 @@ CustomDecompressExtractSection (
              (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
              (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
              SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
-             OutputSize,
+             &DestinationSize,
              &ScratchSize
              );
   if (EFI_ERROR (Status)) {
@@ -996,6 +997,7 @@ CustomDecompressExtractSection (
   //
   // Allocate destination buffer
   //
+  *OutputSize   = (UINTN) DestinationSize;
   *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (*OutputSize));
   if (*OutputBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;

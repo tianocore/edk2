@@ -262,7 +262,7 @@ Returns:
 {
   EFI_STATUS                         Status;
   EFI_GUID                           **DecompressGuidList;
-  UINTN                              DecompressMethodNumber;
+  UINT32                             DecompressMethodNumber;
 
   //
   // Install SEP to a new handle
