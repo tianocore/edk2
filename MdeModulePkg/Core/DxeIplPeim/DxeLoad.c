@@ -647,7 +647,7 @@ Returns:
   EFI_STATUS                      Status;
   UINT8                           *DstBuffer;
   UINT8                           *ScratchBuffer;
-  UINT32                          DstBufferSize;
+  UINTN                           DstBufferSize;
   UINT32                          ScratchBufferSize;
   EFI_COMMON_SECTION_HEADER       *CmpSection;
   UINTN                           CmpSectionLength;
@@ -728,7 +728,7 @@ Returns:
                                 SectionExtract,
                                 (VOID *) Section,
                                 (VOID **) &DstBuffer,
-                                (UINTN *) &DstBufferSize,
+                                &DstBufferSize,
                                 &AuthenticationStatus
                                 );
 
@@ -736,6 +736,7 @@ Returns:
         DEBUG ((EFI_D_ERROR, "Extract section content failed - %r\n", Status));
         return Status;
       }
+      
       //
       // Todo check AuthenticationStatus and do the verify
       //
@@ -754,7 +755,7 @@ Returns:
         Status = UefiDecompressGetInfo (
                    (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
                    (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
-                   &DstBufferSize,
+                   (UINT32 *) &DstBufferSize,
                    &ScratchBufferSize
                    );
         if (EFI_ERROR (Status)) {
