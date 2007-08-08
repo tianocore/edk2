@@ -262,7 +262,7 @@ Returns:
 {
   EFI_STATUS                         Status;
   EFI_GUID                           **DecompressGuidList;
-  UINT32                             DecompressMethodNumber;
+  UINTN                              DecompressMethodNumber;
 
   //
   // Install SEP to a new handle
@@ -1474,6 +1474,7 @@ CustomDecompressExtractSection (
 {
   EFI_STATUS      Status;
   UINT8           *ScratchBuffer;
+  UINT32          DestinationSize;
   UINT32          ScratchSize;
   UINT32          SectionLength;  
   
@@ -1492,7 +1493,7 @@ CustomDecompressExtractSection (
              (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
              (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
              SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
-             OutputSize,
+             &DestinationSize,
              &ScratchSize
              );
   if (EFI_ERROR (Status)) {
@@ -1513,6 +1514,7 @@ CustomDecompressExtractSection (
   //
   // Allocate destination buffer
   //
+  *OutputSize = (UINTN) DestinationSize;
   *OutputBuffer = CoreAllocateBootServicesPool (*OutputSize);
   if (*OutputBuffer == NULL) {
     CoreFreePool (ScratchBuffer);
