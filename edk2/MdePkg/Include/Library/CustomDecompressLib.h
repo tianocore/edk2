@@ -18,7 +18,6 @@
 
 /**
   Decompress GetInfo fucntion.
-
   @param[in]     DecompressGuid   The guid matches this decompress method.
   @param[in]     Source           The source buffer containing the compressed data.
   @param[in]     SourceSize       The size of source buffer
@@ -71,8 +70,8 @@ CustomDecompress (
 RETURN_STATUS
 EFIAPI
 CustomDecompressGetAlgorithms (
-   IN OUT  GUID   **AlgorithmGuidTable,
-   IN OUT  UINTN  *NumberOfAlgorithms
+   IN OUT  GUID    **AlgorithmGuidTable,
+   IN OUT  UINT32  *NumberOfAlgorithms
   );
 
 #endif

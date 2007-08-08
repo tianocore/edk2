@@ -77,8 +77,8 @@ CustomDecompress (
 RETURN_STATUS
 EFIAPI
 CustomDecompressGetAlgorithms (
-   IN OUT  GUID   **AlgorithmGuidTable,
-   IN OUT  UINTN  *NumberOfAlgorithms
+   IN OUT  GUID    **AlgorithmGuidTable,
+   IN OUT  UINT32  *NumberOfAlgorithms
   )
 {
   *NumberOfAlgorithms = 0;
