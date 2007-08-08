@@ -29,36 +29,21 @@
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 
 [Sources.common]
   RuntimeLibInternal.h
-
-[Sources.Ia32]
   RuntimeService.c
   RuntimeLib.c
-
-[Sources.X64]
-  RuntimeService.c
-  RuntimeLib.c
-
-[Sources.EBC]
-  RuntimeService.c
-  RuntimeLib.c
-
-
 
 [Packages]
   MdePkg/MdePkg.dec
 
-[Packages.IPF]
-  MdePkg/MdePkg.dec
-
-
 [LibraryClasses]
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   DebugLib
 
 

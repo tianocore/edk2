@@ -87,8 +87,7 @@ RuntimeDriverLibConstruct (
 {
   EFI_STATUS  Status;
 
-  ASSERT (SystemTable != NULL);
-  mRT = SystemTable->RuntimeServices;
+  mRT = gRT;
   ASSERT (mRT != NULL);
   
   //

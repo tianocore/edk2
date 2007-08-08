@@ -19,6 +19,7 @@
 #include <Library/UefiRuntimeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 extern EFI_RUNTIME_SERVICES   *mRT;
 
