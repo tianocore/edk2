@@ -258,7 +258,7 @@ EfiConvertPointer (
   IN OUT VOID               **Address
   )
 {
-  return mRT->ConvertPointer (DebugDisposition, Address);
+  return gRT->ConvertPointer (DebugDisposition, Address);
 }
 
 
@@ -335,7 +335,7 @@ EfiSetVirtualAddressMap (
   IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
   )
 {
-  return mRT->SetVirtualAddressMap (
+  return gRT->SetVirtualAddressMap (
                 MemoryMapSize,
                 DescriptorSize,
                 DescriptorVersion,
