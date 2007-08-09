@@ -35,7 +35,21 @@ Revision History
 #define PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT       0x08
 #define PCI_INCOMPATIBLE_ACCESS_WIDTH_SUPPORT          0x0a
 
-VOID
+typedef struct {
+  EFI_HANDLE            Handle;
+} EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD;
+
+typedef struct {
+  UINT32                             Bar;
+  UINT16                             DevicePathSize;
+  UINT16                             ReqResSize;
+  UINT16                             AllocResSize;
+  UINT8                              *DevicePath;
+  UINT8                              *ReqRes;
+  UINT8                              *AllocRes;
+} EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD;
+
+void
 InstallHotPlugRequestProtocol (
   IN  EFI_STATUS                    *Status
   )
