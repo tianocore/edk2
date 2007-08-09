@@ -22,6 +22,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0xd083e94c, 0x6560, 0x42e4, {0xb6, 0xd4, 0x2d, 0xf7, 0x5a, 0xdf, 0x6a, 0x2a } \
   }
 
+typedef struct {
+  EFI_STATUS_CODE_TYPE  CodeType;
+  EFI_STATUS_CODE_VALUE Value;
+  UINT32                Instance;
+  EFI_GUID              CallerId;
+  EFI_STATUS_CODE_DATA  Data;
+} DATA_HUB_STATUS_CODE_DATA_RECORD;
+
 extern EFI_GUID gEfiDataHubStatusCodeRecordGuid;
 
 #endif
