@@ -14,9 +14,7 @@
 
 
 #include <Base.h>
-#include <Framework/StatusCodeDataTypeId.h>
 #include <Framework/StatusCode.h>
-
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
