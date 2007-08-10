@@ -26,6 +26,7 @@ Revision History
 
 #include <PiPei.h>
 #include <FrameworkPei.h>
+#include <Guid/StatusCodeDataTypeId.h>
 #include <Ppi/DxeIpl.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/FindFv.h>
@@ -43,7 +44,7 @@ Revision History
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
-
+#include <IndustryStandard/PeImage.h>
 
 extern EFI_GUID gEfiPeiCorePrivateGuid;
 
