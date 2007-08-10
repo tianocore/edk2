@@ -220,13 +220,6 @@ Returns:
   //
   *Size = FileLength - sizeof(EFI_FFS_FILE_HEADER);
 
-  if (FfsFileHeader->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
-    //
-    // If tail is present substract it's size;
-    //
-    *Size -= sizeof(EFI_FFS_FILE_TAIL);
-  }
-
   return EFI_SUCCESS;
 }
 
