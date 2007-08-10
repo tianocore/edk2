@@ -19,6 +19,7 @@
 //
 #include <FrameworkPei.h>
 #include <WinNtPeim.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
@@ -33,6 +34,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PeiServicesLib.h>
+#include <DebugInfo.h>
 
 //
 // Cache of WinNtThunk protocol

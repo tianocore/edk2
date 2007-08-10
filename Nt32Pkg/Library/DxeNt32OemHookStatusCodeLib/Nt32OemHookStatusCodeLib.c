@@ -19,6 +19,7 @@
 //
 #include <FrameWorkDxe.h>
 #include <WinNtDxe.h>
+#include <DebugInfo.h>
 
 //
 // The protocols, PPI and GUID defintions for this module
