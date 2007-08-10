@@ -28,6 +28,5 @@
 #include <Framework/Hob.h>
 #include <Framework/Legacy16.h>
 #include <Framework/StatusCode.h>
-#include <Framework/StatusCodeDataTypeId.h>
 
 #endif

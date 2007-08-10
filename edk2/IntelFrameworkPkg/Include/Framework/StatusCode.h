@@ -880,4 +880,16 @@
 //
 #define EFI_DC_UNSPECIFIED  0x0
 
+///////////////////////////////////////////////////////////////////////////////
+// Common Status Code Definitions
+///////////////////////////////////////////////////////////////////////////////
+///
+/// This is the max data size including all the headers which can be passed
+/// as Status Code data. This data should be multiple of 8 byte
+/// to avoid any kind of boundary issue. Also, sum of this data size (inclusive
+/// of size of EFI_STATUS_CODE_DATA should not exceed the max record size of
+/// data hub
+///
+#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
+
 #endif
