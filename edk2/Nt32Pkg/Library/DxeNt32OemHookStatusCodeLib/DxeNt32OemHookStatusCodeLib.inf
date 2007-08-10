@@ -44,7 +44,6 @@
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
-
 [LibraryClasses]
   ReportStatusCodeLib
   BaseMemoryLib
