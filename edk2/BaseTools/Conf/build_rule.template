@@ -172,7 +172,7 @@ ${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
-\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
+\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(SLINK_FLAGS)
 \tGenFw -o $@ -c $(@D)${_sep_}${fbase}.dll
 \t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi $(OUTPUT_DIR)${_sep_}${fbase}.acpi /Y
 ''',
@@ -242,7 +242,7 @@ ${END}\t"$(PP)" $(APP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(CC)" /Fo$(@D)${_sep_}${fbase}.obj $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
-\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS)
+\t"$(DLINK)" $(@D)${_sep_}${fbase}.obj /out:$(@D)${_sep_}${fbase}.dll $(SLINK_FLAGS)
 \tGenFw -o $@ -c $(@D)${_sep_}${fbase}.dll
 \t-copy $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.acpi $(OUTPUT_DIR)${_sep_}${fbase}.acpi /Y
 ''',
