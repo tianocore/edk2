@@ -22,8 +22,6 @@
 #ifndef __EFI_FIRMWARE_VOLUME_HEADER_H__
 #define __EFI_FIRMWARE_VOLUME_HEADER_H__
 
-#include <FrameworkPei.h>
-
 //
 // Firmware Volume Block Attributes bit definitions
 //
