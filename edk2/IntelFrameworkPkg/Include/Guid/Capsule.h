@@ -39,6 +39,50 @@
     0x98B8D59B, 0xE8BA, 0x48EE, {0x98, 0xDD, 0xC2, 0x95, 0x39, 0x2F, 0x1E, 0xDB } \
   }
 
+//
+// Bits in the flags field of the capsule header
+//
+#define EFI_CAPSULE_HEADER_FLAG_SETUP 0x00000001  // supports setup changes
+
+
+#define CAPSULE_BLOCK_DESCRIPTOR_SIGNATURE  EFI_SIGNATURE_32 ('C', 'B', 'D', 'S')
+
+//
+// An array of these describe the blocks that make up a capsule for
+// a capsule update.
+//
+typedef struct {
+  UINT64                Length;     // length of the data block
+  EFI_PHYSICAL_ADDRESS  Data;       // physical address of the data block
+  UINT32                Signature;  // CBDS
+  UINT32                CheckSum;   // to sum this structure to 0
+} FRAMEWORK_EFI_CAPSULE_BLOCK_DESCRIPTOR;
+
+typedef struct {
+  EFI_GUID  OemGuid;
+  UINT32    HeaderSize;
+  //
+  // UINT8                       OemHdrData[];
+  //
+} EFI_CAPSULE_OEM_HEADER;
+
+typedef struct {
+  EFI_GUID  CapsuleGuid;
+  UINT32    HeaderSize;
+  UINT32    Flags;
+  UINT32    CapsuleImageSize;
+  UINT32    SequenceNumber;
+  EFI_GUID  InstanceId;
+  UINT32    OffsetToSplitInformation;
+  UINT32    OffsetToCapsuleBody;
+  UINT32    OffsetToOemDefinedHeader;
+  UINT32    OffsetToAuthorInformation;
+  UINT32    OffsetToRevisionInformation;
+  UINT32    OffsetToShortDescription;
+  UINT32    OffsetToLongDescription;
+  UINT32    OffsetToApplicableDevices;
+} FRAMEWORK_EFI_CAPSULE_HEADER;
+
 extern EFI_GUID gEfiCapsuleGuid;
 extern EFI_GUID gEfiConfigFileNameGuid;
 
