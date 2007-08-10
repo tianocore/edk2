@@ -15,6 +15,7 @@
 #ifndef __BASE_PE_COFF_LIB_H__
 #define __BASE_PE_COFF_LIB_H__
 
+#include <IndustryStandard/PeImage.h>
 //
 // Return status codes from the PE/COFF Loader services
 // BUGBUG: Find where used and see if can be replaced by RETURN_STATUS codes
