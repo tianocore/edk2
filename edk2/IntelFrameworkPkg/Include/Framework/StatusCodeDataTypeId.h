@@ -25,11 +25,6 @@
 #include <Protocol/DebugSupport.h>
 
 ///
-/// The size of string
-///
-#define EFI_STATUS_CODE_DATA_MAX_STRING_SIZE  150
-
-///
 /// This is the max data size including all the headers which can be passed
 /// as Status Code data. This data should be multiple of 8 byte
 /// to avoid any kind of boundary issue. Also, sum of this data size (inclusive
@@ -61,19 +56,6 @@ typedef struct {
   EFI_STRING_TYPE                               StringType;
   EFI_STATUS_CODE_STRING                        String;
 } EFI_STATUS_CODE_STRING_DATA;
-
-#pragma pack()
-
-#pragma pack(1)
-
-typedef struct {
-  UINT32  ErrorLevel;
-  //
-  // 12 * sizeof (UINT64) Var Arg stack
-  //
-  // ascii DEBUG () Format string
-  //
-} EFI_DEBUG_INFO;
 
 #pragma pack()
 

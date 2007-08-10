@@ -52,12 +52,9 @@
 #
 ################################################################################
 [Components.common]
-  IntelFrameworkPkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib.inf
-  IntelFrameworkPkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
   IntelFrameworkPkg/Library/UefiLibFramework/UefiLibFramework.inf
   IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
   IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
-  IntelFrameworkPkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
