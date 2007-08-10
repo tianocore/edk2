@@ -22,7 +22,6 @@
 
 #include <PiPei.h>
 
-#include <Framework/Capsule.h>
 #include <Framework/DataHubRecords.h>
 #include <Framework/FirmwareFileSystem.h>
 #include <Framework/FirmwareVolumeImageFormat.h>
