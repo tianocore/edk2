@@ -1441,6 +1441,7 @@ Returns:
   MENU_REFRESH_ENTRY          *OldMenuRefreshEntry;
   UI_SCREEN_OPERATION         ScreenOperation;
   EFI_VARIABLE_DEFINITION     *VariableDefinition;
+  EFI_VARIABLE_DEFINITION     *UiDefaultVarDef; // Only used in CfUiDefault State
   EFI_FORM_CALLBACK_PROTOCOL  *FormCallback;
   EFI_HII_VARIABLE_PACK_LIST  *NvMapListHead;
   EFI_HII_VARIABLE_PACK_LIST  *NvMapListNode;
@@ -2977,34 +2978,40 @@ Returns:
         NvMapListNode = NvMapListHead;
 
         while (NULL != NvMapListNode) {
-          if (FileFormTags->VariableDefinitions->VariableId == NvMapListNode->VariablePack->VariableId) {
-            NvMap     = (VOID *) ((CHAR8 *) NvMapListNode->VariablePack + sizeof (EFI_HII_VARIABLE_PACK) + NvMapListNode->VariablePack->VariableNameLength);
-            NvMapSize = NvMapListNode->VariablePack->Header.Length  - sizeof (EFI_HII_VARIABLE_PACK) - NvMapListNode->VariablePack->VariableNameLength;
-            break;
+          
+          for (UiDefaultVarDef = FileFormTags->VariableDefinitions;
+                UiDefaultVarDef != NULL; 
+                UiDefaultVarDef = UiDefaultVarDef->Next ) {
+                
+            if (UiDefaultVarDef->VariableId == NvMapListNode->VariablePack->VariableId) {
+              NvMap     = (VOID *) ((CHAR8 *) NvMapListNode->VariablePack + sizeof (EFI_HII_VARIABLE_PACK) + NvMapListNode->VariablePack->VariableNameLength);
+              NvMapSize = NvMapListNode->VariablePack->Header.Length  - sizeof (EFI_HII_VARIABLE_PACK) - NvMapListNode->VariablePack->VariableNameLength;
+              //
+              // Free the buffer that was allocated.
+              //
+              FreePool (UiDefaultVarDef->NvRamMap);
+              FreePool (UiDefaultVarDef->FakeNvRamMap);
+              
+              //
+              // Allocate, copy the NvRamMap.
+              //
+              UiDefaultVarDef->VariableFakeSize = (UINT16) (UiDefaultVarDef->VariableFakeSize - UiDefaultVarDef->VariableSize);
+              UiDefaultVarDef->VariableSize = (UINT16) NvMapSize;
+              UiDefaultVarDef->VariableFakeSize = (UINT16) (UiDefaultVarDef->VariableFakeSize + UiDefaultVarDef->VariableSize);
+              
+              UiDefaultVarDef->NvRamMap = AllocateZeroPool (FileFormTags->VariableDefinitions->VariableSize);
+              ASSERT (UiDefaultVarDef->NvRamMap != NULL);
+              
+              UiDefaultVarDef->FakeNvRamMap = AllocateZeroPool (NvMapSize + UiDefaultVarDef->VariableFakeSize);
+              ASSERT (UiDefaultVarDef->FakeNvRamMap != NULL);
+              
+              CopyMem (UiDefaultVarDef->NvRamMap, NvMap, NvMapSize);
+              break;
             }
+          }
           NvMapListNode = NvMapListNode->NextVariablePack;
         }
 
-        //
-        // Free the buffer that was allocated.
-        //
-        FreePool (FileFormTags->VariableDefinitions->NvRamMap);
-        FreePool (FileFormTags->VariableDefinitions->FakeNvRamMap);
-
-        //
-        // Allocate, copy the NvRamMap.
-        //
-        FileFormTags->VariableDefinitions->VariableFakeSize = (UINT16) (FileFormTags->VariableDefinitions->VariableFakeSize - FileFormTags->VariableDefinitions->VariableSize);
-        FileFormTags->VariableDefinitions->VariableSize = (UINT16) NvMapSize;
-        FileFormTags->VariableDefinitions->VariableFakeSize = (UINT16) (FileFormTags->VariableDefinitions->VariableFakeSize + FileFormTags->VariableDefinitions->VariableSize);
-
-        FileFormTags->VariableDefinitions->NvRamMap = AllocateZeroPool (FileFormTags->VariableDefinitions->VariableSize);
-        ASSERT (FileFormTags->VariableDefinitions->NvRamMap != NULL);
-
-        FileFormTags->VariableDefinitions->FakeNvRamMap = AllocateZeroPool (NvMapSize + FileFormTags->VariableDefinitions->VariableFakeSize);
-        ASSERT (FileFormTags->VariableDefinitions->FakeNvRamMap != NULL);
-
-        CopyMem (FileFormTags->VariableDefinitions->NvRamMap, NvMap, NvMapSize);
         FreePool (NvMapListHead);
       }
 
