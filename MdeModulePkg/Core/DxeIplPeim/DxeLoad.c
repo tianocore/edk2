@@ -538,7 +538,7 @@ Returns:
     // Set gInMemory global variable to TRUE to indicate the dxeipl is shadowed.
     //
     *(BOOLEAN *) ((UINTN) &gInMemory + (UINTN) DxeIplEntryPoint - (UINTN) _ModuleEntryPoint) = TRUE;
-    Status = ((EFI_PEIM_ENTRY_POINT) (UINTN) DxeIplEntryPoint) ((EFI_PEI_FILE_HANDLE *) DxeIplFileHeader, GetPeiServicesTablePointer());
+    Status = ((EFI_PEIM_ENTRY_POINT2) (UINTN) DxeIplEntryPoint) ((EFI_PEI_FILE_HANDLE *) DxeIplFileHeader, GetPeiServicesTablePointer());
   }
 
   return Status;

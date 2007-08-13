@@ -50,8 +50,8 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEIM_ENTRY_POINT)(
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
+(EFIAPI *EFI_PEIM_ENTRY_POINT2)(
+  IN EFI_PEI_FILE_HANDLE       *FileHandle,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -103,8 +103,8 @@ struct _EFI_PEI_NOTIFY_DESCRIPTOR {
 typedef struct _EFI_HOB_LOAD_PEIM {
   EFI_HOB_GENERIC_HEADER            Header;
   EFI_PEI_FILE_HANDLE               FileHandle;
-  EFI_PEIM_ENTRY_POINT              EntryPoint;
-  EFI_PEIM_ENTRY_POINT              InMemEntryPoint;
+  EFI_PEIM_ENTRY_POINT2             EntryPoint;
+  EFI_PEIM_ENTRY_POINT2             InMemEntryPoint;
 } EFI_HOB_LOAD_PEIM;
 
 

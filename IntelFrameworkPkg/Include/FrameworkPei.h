@@ -22,6 +22,7 @@
 
 #include <PiPei.h>
 
+#include <Framework/PeiCis.h>
 #include <Framework/DataHubRecords.h>
 #include <Framework/FirmwareVolumeImageFormat.h>
 #include <Framework/FirmwareVolumeHeader.h>

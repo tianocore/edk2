@@ -129,7 +129,7 @@ EFI_STATUS
 //
 typedef union {
   PEI_CORE_ENTRY_POINT         PeiCore;
-  EFI_PEIM_ENTRY_POINT         PeimEntry;
+  EFI_PEIM_ENTRY_POINT2        PeimEntry;
   EFI_PEIM_NOTIFY_ENTRY_POINT  PeimNotifyEntry;
   EFI_DXE_IPL_PPI              *DxeIpl;
   EFI_PEI_PPI_DESCRIPTOR       *PpiDescriptor;
