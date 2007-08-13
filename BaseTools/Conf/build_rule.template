@@ -136,7 +136,7 @@ ${END}\t"$(CC)" /Fo$@ $(CC_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath}
 $(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(COMMON_DEPS)
 ${BEGIN}$(OUTPUT_DIR)${_sep_}${fdir}${_sep_}${fbase}.obj : $(WORKSPACE)${_sep_}${fdep}
 ${END}\t"$(PP)" $(PP_FLAGS) $(INC) $(WORKSPACE)${_sep_}${fpath} > $(@D)${_sep_}${fbase}.i
-\tTrim --source-code -convert-hex $(@D)${_sep_}${fbase}.i
+\tTrim --source-code --convert-hex $(@D)${_sep_}${fbase}.i
 \t"$(ASM)" /Fo$@ $(ASM_FLAGS) $(INC) $(@D)${_sep_}${fbase}.iii
 ''',
 
