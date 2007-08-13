@@ -1,5 +1,6 @@
 #/** @file
 # Component description file for PeiVariable module.
+# This module will produce EFI_PEI_READ_ONLY_VARIABLE_PPI and EFI_PEI_READ_ONLY_VARIABLE2_PPI
 #
 # Framework PEIM to provide the Variable functionality.
 # Copyright (c) 2006 - 2007, Intel Corporation
