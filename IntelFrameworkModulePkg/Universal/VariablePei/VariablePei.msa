@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>PeiVariable</ModuleName>
+    <ModuleType>PEIM</ModuleType>
+    <GuidValue>34C8C28F-B61C-45a2-8F2E-89E46BECC63B</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for PeiVariable module.</Abstract>
+    <Description>Framework PEIM to provide the Variable functionality.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>PeiVariable</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeimEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Variable.h</Filename>
+    <Filename>Variable.c</Filename>
+    <Filename>Variable.dxs</Filename>
+    <Filename SupArchList="IA32 X64 EBC">VariableWorker.c</Filename>
+    <Filename SupArchList="IPF">Ipf/VariableWorker.c</Filename>
+    <Filename SupArchList="IA32">Ia32/VarMachine.h</Filename>
+    <Filename SupArchList="EBC">Ebc/VarMachine.h</Filename>
+    <Filename SupArchList="X64">x64/VarMachine.h</Filename>
+    <Filename SupArchList="IPF">Ipf/VarMachine.h</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <PPIs>
+    <Ppi Usage="ALWAYS_CONSUMED">
+      <PpiCName>gEfiPeiReadOnlyVariablePpiGuid</PpiCName>
+    </Ppi>
+  </PPIs>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>PeimInitializeVariableServices</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The driver gets the Variable store base address from this PCD.  This base address point to
+        an EFI_FIRMWARE_VOLUMN_HEADER struct.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+</ModuleSurfaceArea>
