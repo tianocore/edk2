@@ -593,15 +593,23 @@ Returns:
   // Preprocess the FFS file to get a pointer to the PE32 information
   // in the enclosed PE32 image.
   //
-  Status = PeiProcessFile (
-            EFI_SECTION_PE32,
+ Status = PeiProcessFile (
+            EFI_SECTION_TE,
             FfsHeader,
             &Pe32Data,
             NULL
             );
-
   if (EFI_ERROR (Status)) {
-    return Status;
+    Status = PeiProcessFile (
+              EFI_SECTION_PE32,
+              FfsHeader,
+              &Pe32Data,
+              NULL
+              );
+    
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
   //
   // Load the PE image from the FFS file
