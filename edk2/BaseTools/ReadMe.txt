@@ -33,4 +33,63 @@ Notes:
 	 or modules because the AutoGen.* files have been be removed. The "makefile" itself
 	 cannot generate AutoGen.* files. Only "build" command can.
 
-25-Jun-2007
+
+Brief usage for Module Migration Tool msa2inf.exe:
+1. Command line format:
+  msa2inf [options]
+2. Input Files:
+  A syntactically valid MSA file
+3. Output Files:
+  An extended INF file with possible auto-generated EntryPoint.c, CommonHeader.h/CommonHeader.txt, depending on options and module contents.
+4. Prerequisite:
+   a. The workspace directory must be specified either by environment variable or –w option.  
+   b. The Framework Database file must exist to specify the available packages in current workspace. 
+      Two possible locations are: (The first location overrides the second)
+            $(WORKSPACE)\Tools\Conf\FrameworkDatabase.db
+            $(WORKSPACE)\Conf\FrameworkDatabase.db.  
+      The <PackageList> field in FrameworkDatabase.db lists all available packages in current workspace. 
+      One example:
+      <PackageList>
+        <Filename>MdePkg/MdePkg.nspd</Filename>
+        <Filename>MdeModulePkg/MdeModulePkg.spd</Filename>
+        <Filename>IntelFrameworkPkg/IntelFrameworkPkg.spd</Filename>
+      </PackageList>
+      The package list in FrameworkDatabase.db is important to the final quality of migration:
+      (1) It suggests the new package location: Translate package dependency Guid in MSA to Workspace relative path. 
+         If the package dependency Guid cannot be found in current workspace a warning message is raised. 
+      (2) It collects the Protocol/Guid/Ppi GuidCName a package contains. 
+         The GuidCName acts as "clue" to add e.g. #include <Protocol/DiskIo.h> in CommonHeader.h
+     
+5. Example:
+   WORKSAPCE has already been set: $(WORKSPACE) = c:\work\EdkII. 
+ 
+   a. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –o c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
+   b. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –a
+   Example a & b are equivalent to migrate WinNtThunk driver from EDKII to EDKII' code base.
+  
+   c. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –a -c
+   The extra "-c" option performs several hardcode mapping due to the naming change in EDKII’: 
+      OldMdePkg Guid -> MdePkgGuid, 
+      EdkModulePkg Guid -> MdeModulePkgGuid, 
+      EdkGraphicsLib -> GraphicsLib
+      HiiLib -> HiiLibFramework
+      ...
+   
+   d. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –m
+   The extra "-m" option suppresses the generation of "CommonHeader.h" and leave all C files intact. 
+   Instead, it generates "CommonHeader.txt". Developers can manually copy its content to a local common header file in a module. 
+ 
+6. Known Limitations:
+   a. Tool does not Exit Boot Services Callback & Virtual Address Changed Event. Developers need  to handle it manually.
+   b. The #include <Library/AbcLib.h> is based on library class naming convention: The header filename for "AbcLib" class are "AbcLib.h" by convention.
+   c. The #include <Guid/Xyz.h>, <Protocol/Xyz.h> and <Ppi/Xyz.h> are added based on gGuidCName listed in MSA. 
+      If a GuidCName cannot map to a package Guid/Protocol/Ppi header file, a warning message is raised.
+      If a module uses the definition in a pakcage Guid/Protocol/Ppi header file without list its associative GuidCName, the build will beak. Developer needs to       manually add the include statement.
+   d. The [Depex] sections are generated from DXS files with Guid Macro translated to Guid CName by naming convention, etc.
+    If tool fails to "guess" the Guid CName from Guid Macro, it will leave the GuidMacro in [Depex] section for manual resolution.
+   e. When tool generates [Sources] section, the modifiers for source files are lost. (Need to add proper tool chain, etc)
+   f. When tool generates [LibraryClasses] section, the recommended library instances are lost. (No impact to build)
+ 
+
+          
+13-August-2007
