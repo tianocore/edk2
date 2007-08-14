@@ -61,7 +61,7 @@
 
 **/
 EFI_STATUS
-SubmitTestUnitReadyCommand (
+ScsiTestUnitReadyCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   OUT VOID                  *SenseData,
@@ -103,7 +103,7 @@ SubmitTestUnitReadyCommand (
 
 **/
 EFI_STATUS
-SubmitInquiryCommand (
+ScsiInquiryCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   IN  VOID                  *SenseData,
@@ -150,7 +150,7 @@ SubmitInquiryCommand (
 
 **/
 EFI_STATUS
-SubmitModeSense10Command (
+ScsiModeSense10Command (
   IN  EFI_SCSI_IO_PROTOCOL    *ScsiIo,
   IN  UINT64                  Timeout,
   IN  VOID                    *SenseData,
@@ -202,7 +202,7 @@ SubmitModeSense10Command (
 
 **/
 EFI_STATUS
-SubmitRequestSenseCommand (
+ScsiRequestSenseCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   IN  VOID                  *SenseData,
@@ -244,7 +244,7 @@ SubmitRequestSenseCommand (
 
 **/
 EFI_STATUS
-SubmitReadCapacityCommand (
+ScsiReadCapacityCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   IN  VOID                  *SenseData,
@@ -290,7 +290,7 @@ SubmitReadCapacityCommand (
 
 **/
 EFI_STATUS
-SubmitRead10Command (
+ScsiRead10Command (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   IN  VOID                  *SenseData,
@@ -337,7 +337,7 @@ SubmitRead10Command (
 
 **/
 EFI_STATUS
-SubmitWrite10Command (
+ScsiWrite10Command (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
   IN  VOID                  *SenseData,

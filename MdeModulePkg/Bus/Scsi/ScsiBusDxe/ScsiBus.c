@@ -1075,7 +1075,7 @@ Returns:
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
   SenseDataLength   = sizeof (EFI_SCSI_SENSE_DATA);
 
-  Status = SubmitInquiryCommand (
+  Status = ScsiInquiryCommand (
             &ScsiIoDevice->ScsiIo,
             EfiScsiStallSeconds (1),
             (VOID *) &SenseData,

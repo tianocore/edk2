@@ -920,7 +920,7 @@ Returns:
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
   SenseDataLength   = 0;
 
-  Status = SubmitInquiryCommand (
+  Status = ScsiInquiryCommand (
             ScsiDiskDevice->ScsiIo,
             EfiScsiStallSeconds (1),
             NULL,
@@ -981,9 +981,9 @@ Returns:
   }
   
   //
-  // if goes here, meant SubmitInquiryCommand() failed.
+  // if goes here, meant ScsiInquiryCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
-  // better retry SubmitInquiryCommand(). (by setting *NeedRetry = TRUE)
+  // better retry ScsiInquiryCommand(). (by setting *NeedRetry = TRUE)
   //
   MaxRetry = 3;
   for (Index = 0; Index < MaxRetry; Index++) {
@@ -1057,7 +1057,7 @@ ScsiDiskTestUnitReady (
   //
   // Parameter 3 and 4: do not require sense data, retrieve it when needed.
   //
-  Status = SubmitTestUnitReadyCommand (
+  Status = ScsiTestUnitReadyCommand (
             ScsiDiskDevice->ScsiIo,
             EfiScsiStallSeconds (1),
             NULL,
@@ -1275,7 +1275,7 @@ Returns:
   //
   // submit Read Capacity Command. in this call,not request sense data
   //
-  CommandStatus = SubmitReadCapacityCommand (
+  CommandStatus = ScsiReadCapacityCommand (
                     ScsiDiskDevice->ScsiIo,
                     EfiScsiStallSeconds (1),
                     NULL,
@@ -1337,9 +1337,9 @@ Returns:
   }
   
   //
-  // if goes here, meant SubmitReadCapacityCommand() failed.
+  // if goes here, meant ScsiReadCapacityCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
-  // better retry SubmitReadCapacityCommand(). (by setting *NeedRetry = TRUE)
+  // better retry ScsiReadCapacityCommand(). (by setting *NeedRetry = TRUE)
   //
   MaxRetry = 3;
   for (Index = 0; Index < MaxRetry; Index++) {
@@ -1514,7 +1514,7 @@ ScsiDiskRequestSenseKeys (
 
   for (SenseReq = TRUE; SenseReq;) {
 
-    Status = SubmitRequestSenseCommand (
+    Status = ScsiRequestSenseCommand (
               ScsiDiskDevice->ScsiIo,
               EfiScsiStallSeconds (2),
               PtrSenseData,
@@ -1894,7 +1894,7 @@ Returns:
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
   SenseDataLength     = 0;
-  Status = SubmitRead10Command (
+  Status = ScsiRead10Command (
             ScsiDiskDevice->ScsiIo,
             Timeout,
             NULL,
@@ -1953,7 +1953,7 @@ Returns:
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
   SenseDataLength     = 0;
-  Status = SubmitWrite10Command (
+  Status = ScsiWrite10Command (
             ScsiDiskDevice->ScsiIo,
             Timeout,
             NULL,
