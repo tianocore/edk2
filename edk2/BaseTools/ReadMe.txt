@@ -42,7 +42,7 @@ Brief usage for Module Migration Tool msa2inf.exe:
 3. Output Files:
   An extended INF file with possible auto-generated EntryPoint.c, CommonHeader.h/CommonHeader.txt, depending on options and module contents.
 4. Prerequisite:
-   a. The workspace directory must be specified either by environment variable or –w option.  
+   a. The workspace directory must be specified either by environment variable or -w option.  
    b. The Framework Database file must exist to specify the available packages in current workspace. 
       Two possible locations are: (The first location overrides the second)
             $(WORKSPACE)\Tools\Conf\FrameworkDatabase.db
@@ -63,24 +63,24 @@ Brief usage for Module Migration Tool msa2inf.exe:
 5. Example:
    WORKSAPCE has already been set: $(WORKSPACE) = c:\work\EdkII. 
  
-   a. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –o c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
-   b. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –a
+   a. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -o c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
+   b. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a
    Example a & b are equivalent to migrate WinNtThunk driver from EDKII to EDKII' code base.
   
-   c. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –a -c
-   The extra "-c" option performs several hardcode mapping due to the naming change in EDKII’: 
+   c. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a -c
+   The extra "-c" option performs several hardcode mapping due to the naming change in EDKII': 
       OldMdePkg Guid -> MdePkgGuid, 
       EdkModulePkg Guid -> MdeModulePkgGuid, 
       EdkGraphicsLib -> GraphicsLib
       HiiLib -> HiiLibFramework
       ...
    
-   d. msa2inf –f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa –m
+   d. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -m
    The extra "-m" option suppresses the generation of "CommonHeader.h" and leave all C files intact. 
    Instead, it generates "CommonHeader.txt". Developers can manually copy its content to a local common header file in a module. 
  
 6. Known Limitations:
-   a. Tool does not Exit Boot Services Callback & Virtual Address Changed Event. Developers need  to handle it manually.
+   a. Tool does not handle Exit Boot Services Callback & Virtual Address Changed Event. Developers need  to handle it manually.
    b. The #include <Library/AbcLib.h> is based on library class naming convention: The header filename for "AbcLib" class are "AbcLib.h" by convention.
    c. The #include <Guid/Xyz.h>, <Protocol/Xyz.h> and <Ppi/Xyz.h> are added based on gGuidCName listed in MSA. 
       If a GuidCName cannot map to a package Guid/Protocol/Ppi header file, a warning message is raised.
