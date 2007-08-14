@@ -13,6 +13,7 @@
 **/
 
 #include <Base.h>
+#include <Library/DebugLib.h>
 #include <Library/CustomDecompressLib.h>
 
 
