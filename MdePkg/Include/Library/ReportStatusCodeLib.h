@@ -28,11 +28,6 @@
 // Extended Data structure definitions with EFI_STATUS_CODE_DATA headers removed
 //
 
-//
-// Extern for the modules Caller ID GUID
-//
-extern EFI_GUID gEfiCallerIdGuid;
-
 /**
   Converts a status code to an 8-bit POST code value.
 
