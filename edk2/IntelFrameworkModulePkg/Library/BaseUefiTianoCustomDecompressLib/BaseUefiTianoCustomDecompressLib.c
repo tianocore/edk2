@@ -852,7 +852,6 @@ Returns:
   @param[in, out]  NumberOfAlgorithms   The number of decompress methods.
 
   @retval  RETURN_SUCCESS            Get all algorithmes list successfully.
-  @retval  RETURN_INVALID_PARAMETER  Input paramter error.
   @retval  RETURN_OUT_OF_RESOURCES   Source is not enough.
 
 **/
@@ -863,18 +862,14 @@ CustomDecompressGetAlgorithms (
    IN OUT  UINT32  *NumberOfAlgorithms
   )
 {
-  if (NumberOfAlgorithms == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
+  ASSERT (NumberOfAlgorithms != NULL);
   
   if (*NumberOfAlgorithms < 1) {
     *NumberOfAlgorithms = 1;
     return RETURN_OUT_OF_RESOURCES;
   }
   
-  if (AlgorithmGuidTable == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
+  ASSERT (AlgorithmGuidTable != NULL);
 
   AlgorithmGuidTable [0] = &gTianoCustomDecompressGuid;
   *NumberOfAlgorithms = 1;

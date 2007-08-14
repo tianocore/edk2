@@ -57,7 +57,7 @@ CustomDecompressGetInfo (
 RETURN_STATUS
 EFIAPI
 CustomDecompress (
-  IN const GUID  *DecompressGuid,
+  IN CONST GUID  *DecompressGuid,
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
@@ -81,6 +81,8 @@ CustomDecompressGetAlgorithms (
    IN OUT  UINT32  *NumberOfAlgorithms
   )
 {
+  ASSERT (NumberOfAlgorithms != NULL);
+
   *NumberOfAlgorithms = 0;
   return RETURN_SUCCESS; 
 }

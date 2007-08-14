@@ -564,7 +564,7 @@ UsbClearEndpointHalt (
   Result = UsbClearFeature (
             UsbIo,
             USB_TARGET_ENDPOINT,
-            EfiUsbEndpointHalt,
+            USB_FEATURE_ENDPOINT_HALT,
             EndpointDescriptor.EndpointAddress,
             Status
             );

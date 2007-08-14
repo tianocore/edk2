@@ -96,11 +96,6 @@ UsbGetReportRequest (
   IN UINT8                   *Report
   );
 
-typedef enum {
-  EfiUsbEndpointHalt,
-  EfiUsbDeviceRemoteWakeup
-} EFI_USB_STANDARD_FEATURE_SELECTOR;
-
 EFI_STATUS
 UsbGetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
@@ -183,17 +178,6 @@ UsbGetStatus (
   IN  UINTN                   Recipient,
   IN  UINT16                  Target,
   OUT UINT16                  *DevStatus,
-  OUT UINT32                  *Status
-  );
-
-EFI_STATUS
-EFIAPI
-UsbGetHubDescriptor (
-  IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  Value,
-  IN  UINT16                  Index,
-  IN  UINT16                  DescriptorLength,
-  OUT VOID                    *Descriptor,
   OUT UINT32                  *Status
   );
 
