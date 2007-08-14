@@ -393,7 +393,7 @@ IDEBusDriverBindingStart (
       continue;
     }
 
-    EndIdeDevice = (UINT8) EFI_MIN ((MaxDevices - 1), EndIdeDevice);
+    EndIdeDevice = (UINT8) MIN ((MaxDevices - 1), EndIdeDevice);
 
     //
     // Now inform the IDE Controller Init Module. Sept10

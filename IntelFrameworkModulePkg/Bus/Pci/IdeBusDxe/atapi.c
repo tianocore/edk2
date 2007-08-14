@@ -754,7 +754,7 @@ PioReadWriteData (
     WordCount = WordCount & 0xffff;
     WordCount /= 2;
 
-    WordCount = EFI_MIN (WordCount, (RequiredWordCount - ActualWordCount));
+    WordCount = MIN (WordCount, (RequiredWordCount - ActualWordCount));
 
     if (Read) {
       IDEReadPortWMultiple (
