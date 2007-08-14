@@ -143,7 +143,8 @@
   PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid|0
-
+  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0xFFFB0000
+  
 [PcdsDynamicDefault.common.DEFAULT]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
   PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
