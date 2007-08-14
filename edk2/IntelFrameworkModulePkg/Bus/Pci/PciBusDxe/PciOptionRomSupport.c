@@ -15,12 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciResourceSupport.h"
 
 #include <IndustryStandard/Pci23.h>
-//
-// Min Max
-//
-#define EFI_MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define EFI_MAX(a, b) (((a) > (b)) ? (a) : (b))
-
 
 EFI_STATUS
 GetOpRomInfo (
@@ -245,7 +239,7 @@ Returns:
   // of the legacy length and the PCIR Image Length
   //
   if (CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
-    RomImageSize = EFI_MAX(RomImageSize, (((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512 * 512));
+    RomImageSize = MAX(RomImageSize, (((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512 * 512));
   }
 
   if (RomImageSize > 0) {

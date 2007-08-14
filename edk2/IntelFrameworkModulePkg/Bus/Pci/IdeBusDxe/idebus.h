@@ -43,8 +43,6 @@
 //
 // Extra Definition to porting
 //
-#define EFI_MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 #define MAX_IDE_DEVICE    4
 #define MAX_IDE_CHANNELS  2
 #define MAX_IDE_DRIVES    2

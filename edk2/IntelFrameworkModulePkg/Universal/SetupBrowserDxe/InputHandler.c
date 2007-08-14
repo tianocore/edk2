@@ -16,8 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ui.h"
 #include "Colors.h"
 
-#define EFI_MAX(_a, _b) ((_a) > (_b) ? (_a) : (_b))
-
 EFI_STATUS
 ReadString(
   IN  UI_MENU_OPTION              *MenuOption,
@@ -298,7 +296,7 @@ Error:
         // Display error popup
         //
         WidthOfString = GetStringWidth (Packet->String);
-        ScreenSize = EFI_MAX(WidthOfString, GetStringWidth (gPressEnter)) / 2;
+        ScreenSize = MAX(WidthOfString, GetStringWidth (gPressEnter)) / 2;
         CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
         FreePool (Packet);
 
@@ -407,11 +405,11 @@ Error:
             if (EFI_ERROR (Status)) {
               if (Packet->String == NULL) {
                 WidthOfString = GetStringWidth (gConfirmError);
-                ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
+                ScreenSize = MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, gConfirmError, gPressEnter, &NullCharacter);
               } else {
                 WidthOfString = GetStringWidth (Packet->String);
-                ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
+                ScreenSize = MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
                 FreePool (Packet);
               }
@@ -455,7 +453,7 @@ Error:
             goto Done;
           } else {
             WidthOfString = GetStringWidth (gConfirmError);
-            ScreenSize = EFI_MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
+            ScreenSize = MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
             CreatePopUp (ScreenSize, 4, &NullCharacter, gConfirmError, gPressEnter, &NullCharacter);
             StringPtr[0] = CHAR_NULL;
             do {
