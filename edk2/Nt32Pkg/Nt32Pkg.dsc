@@ -385,7 +385,7 @@
   MdeModulePkg/Core/Dxe/DxeMain.inf
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClass>
-      PcdLib|MdeModulePkg/Library/PcdDriverPcdLibNull/PcdLib.inf
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
   Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf  

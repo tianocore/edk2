@@ -261,7 +261,7 @@ typedef INTN RETURN_STATUS;
 #define ENCODE_ERROR(a)              (MAX_BIT | (a))
 
 #define ENCODE_WARNING(a)            (a)
-#define RETURN_ERROR(a)              ((a) < 0)
+#define RETURN_ERROR(a)              ((INTN) (a) < 0)
 
 #define RETURN_SUCCESS               0
 #define RETURN_LOAD_ERROR            ENCODE_ERROR (1)
