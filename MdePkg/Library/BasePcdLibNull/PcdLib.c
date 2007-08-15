@@ -33,9 +33,9 @@ LibPcdSetSku (
   IN UINTN  SkuId
   )
 {
-  ASSERT (SkuId < 0x100);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return SkuId;
+  return 0;
 }
 
 
@@ -54,6 +54,8 @@ LibPcdGet8 (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -73,6 +75,8 @@ LibPcdGet16 (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -92,6 +96,8 @@ LibPcdGet32 (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -111,6 +117,8 @@ LibPcdGet64 (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -130,6 +138,8 @@ LibPcdGetPtr (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -149,6 +159,8 @@ LibPcdGetBool (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -168,6 +180,8 @@ LibPcdGetSize (
   IN UINTN             TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -191,7 +205,7 @@ LibPcdGetEx8 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -216,7 +230,7 @@ LibPcdGetEx16 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -241,7 +255,7 @@ LibPcdGetEx32 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -266,7 +280,7 @@ LibPcdGetEx64 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -291,7 +305,7 @@ LibPcdGetExPtr (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -316,7 +330,7 @@ LibPcdGetExBool (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -341,7 +355,7 @@ LibPcdGetExSize (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
   return 0;
 }
@@ -365,7 +379,9 @@ LibPcdSet8 (
   IN UINT8             Value
   )
 {
-  return Value;
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
+  return 0;
 }
 
 
@@ -387,7 +403,9 @@ LibPcdSet16 (
   IN UINT16            Value
   )
 {
-  return Value;
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
+  return 0;
 }
 
 
@@ -409,7 +427,9 @@ LibPcdSet32 (
   IN UINT32             Value
   )
 {
-  return Value;
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
+  return 0;
 }
 
 
@@ -431,7 +451,9 @@ LibPcdSet64 (
   IN UINT64             Value
   )
 {
-  return Value;
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
+  return 0;
 }
 
 
@@ -465,13 +487,9 @@ LibPcdSetPtr (
   IN      VOID              *Buffer
   )
 {
-  ASSERT (SizeOfBuffer != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  if (*SizeOfBuffer > 0) {
-    ASSERT (Buffer != NULL);
-  }
-
-  return Buffer;
+  return NULL;
 }
 
 
@@ -493,7 +511,9 @@ LibPcdSetBool (
   IN BOOLEAN           Value
   )
 {
-  return Value;
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
+  return FALSE;
 }
 
 
@@ -519,9 +539,9 @@ LibPcdSetEx8 (
   IN UINT8             Value
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return Value;
+  return 0;
 }
 
 
@@ -547,9 +567,9 @@ LibPcdSetEx16 (
   IN UINT16            Value
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return Value;
+  return 0;
 }
 
 
@@ -575,9 +595,9 @@ LibPcdSetEx32 (
   IN UINT32            Value
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return Value;
+  return 0;
 }
 
 
@@ -603,9 +623,9 @@ LibPcdSetEx64 (
   IN UINT64            Value
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return Value;
+  return 0;
 }
 
 
@@ -637,15 +657,9 @@ LibPcdSetExPtr (
   IN      VOID              *Buffer
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  ASSERT (SizeOfBuffer != NULL);
-  
-  if (*SizeOfBuffer > 0) {
-    ASSERT (Buffer != NULL);
-  }
-
-  return Buffer;
+  return NULL;
 }
 
 
@@ -671,9 +685,9 @@ LibPcdSetExBool (
   IN BOOLEAN           Value
   )
 {
-  ASSERT (Guid != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 
-  return Value;
+  return FALSE;
 }
 
 
@@ -702,7 +716,7 @@ LibPcdCallbackOnSet (
   IN PCD_CALLBACK             NotificationFunction
   )
 {
-  ASSERT (NotificationFunction != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 }
 
 
@@ -726,7 +740,7 @@ LibPcdCancelCallback (
   IN PCD_CALLBACK             NotificationFunction
   )
 {
-  ASSERT (NotificationFunction != NULL);
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 }
 
 
@@ -754,6 +768,8 @@ LibPcdGetNextToken (
   IN       UINTN              TokenNumber
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return 0;
 }
 
@@ -782,6 +798,8 @@ LibPcdGetNextTokenSpace (
   IN CONST GUID  *Guid
   )
 {
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+
   return NULL;
 }
 
