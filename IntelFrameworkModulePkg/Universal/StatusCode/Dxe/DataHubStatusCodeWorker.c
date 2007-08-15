@@ -22,6 +22,8 @@ LIST_ENTRY                mRecordsFifo          = INITIALIZE_LIST_HEAD_VARIABLE 
 STATIC
 LIST_ENTRY                mRecordsBuffer        = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsBuffer);
 STATIC
+UINT32                    mLogDataHubStatus     = 0;
+STATIC
 EFI_EVENT                 mLogDataHubEvent;
 //
 // Cache data hub protocol.
@@ -59,6 +61,9 @@ AcquireRecordBuffer (
     Record = _CR (Node, DATAHUB_STATUSCODE_RECORD, Node);
   } else {
     if (CurrentTpl > TPL_NOTIFY) {
+      //
+      // Memory management should work at <=TPL_NOTIFY
+      // 
       gBS->RestoreTPL (CurrentTpl);
       return NULL;
     }
@@ -108,10 +113,9 @@ RetrieveRecord (
   if (!IsListEmpty (&mRecordsFifo)) {
     Node = GetFirstNode (&mRecordsFifo);
     Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
+    ASSERT (NULL != Record);
 
     RemoveEntryList (&Record->Node);
-    InsertTailList (&mRecordsBuffer, &Record->Node);
-    Record->Signature = 0;
     RecordData = (DATA_HUB_STATUS_CODE_DATA_RECORD *) Record->Data;
   }
 
@@ -119,6 +123,34 @@ RetrieveRecord (
 
   return RecordData;
 }
+
+/**
+  Release Records to FIFO.
+  
+  @param RecordData  Point to the record buffer allocated
+                     from AcquireRecordBuffer.
+
+**/
+STATIC
+VOID
+ReleaseRecord (
+  DATA_HUB_STATUS_CODE_DATA_RECORD  *RecordData
+  )
+{
+  DATAHUB_STATUSCODE_RECORD         *Record;
+  EFI_TPL                           CurrentTpl;
+
+  Record = CR (RecordData, DATAHUB_STATUSCODE_RECORD, Data[0], DATAHUB_STATUS_CODE_SIGNATURE);
+  ASSERT (NULL != Record);
+
+  CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+
+  InsertTailList (&mRecordsBuffer, &Record->Node);
+  Record->Signature = 0;
+
+  gBS->RestoreTPL (CurrentTpl);
+}
+
 
 
 /**
@@ -165,6 +197,15 @@ DataHubStatusCodeReportWorker (
   VA_LIST                           Marker;
   CHAR8                             *Format;
   UINTN                             CharCount;
+
+
+  //
+  // Use atom operation to avoid the reentant of report.
+  // If current status is not zero, then the function is reentrancy.
+  //
+  if (1 == InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 0)) {
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // See whether in runtime phase or not.
@@ -246,6 +287,14 @@ LogDataHubEventCallBack (
   UINT64                            DataRecordClass;
 
   //
+  // Use atom operation to avoid the reentant of report.
+  // If current status is not zero, then the function is reentrancy.
+  //
+  if (1 == InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 1)) {
+    return;
+  }
+
+  //
   // Log DataRecord in Data Hub.
   // Journal records fifo to find all record entry.
   //
@@ -288,7 +337,13 @@ LogDataHubEventCallBack (
                         Size
                         );
 
+    ReleaseRecord (Record);
   }
+
+  //
+  // Restore the nest status of report
+  //
+  InterlockedCompareExchange32 (&mLogDataHubStatus, 1, 0);
 }
 
 
