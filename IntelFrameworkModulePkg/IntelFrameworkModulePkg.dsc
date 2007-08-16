@@ -144,6 +144,12 @@
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
   PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid|0
   PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0xFFFB0000
+  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
+  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
+  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
+  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
+  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid|0
+
   
 [PcdsDynamicDefault.common.DEFAULT]
   PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
