@@ -87,7 +87,7 @@ Returns:
   // 
   PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdWinNtFlashNvStorageVariableBase) + (UINT32) FdBase);
   PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdWinNtFlashNvStorageFtwWorkingBase) + (UINT32) FdBase);
-  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdWinNtFlashNvStorageFtwWorkingBase) + (UINT32) FdBase);
+  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdWinNtFlashNvStorageFtwSpareBase) + (UINT32) FdBase);
 
   return EFI_SUCCESS;
 }
