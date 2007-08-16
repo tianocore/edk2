@@ -115,7 +115,7 @@
   PcdWinNtFlashNvStorageVariableBase|0x00001014|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
   PcdWinNtFlashNvStorageFtwSpareBase|0x00001015|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
   PcdWinNtFlashNvStorageFtwWorkingBase|0x00001016|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFdBaseAddress|0x00001016|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  PcdWinNtFdBaseAddress|0x00001017|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
 
 [PcdsDynamic.common]
   PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"
