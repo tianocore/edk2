@@ -303,13 +303,21 @@
   PcdStatusCodeValueRemoteConsoleReset|0x00000018|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   PcdStatusCodeValueRemoteConsoleInputError|0x00000019|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueRemoteConsoleOutputError|0x0000001a|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+
+[PcdsFixedAtBuild.IPF]
+  PcdIoBlockBaseAddressForIpf|0x0000000f|gEfiMdePkgTokenSpaceGuid|UINT64|0x0ffffc000000
+
+[PcdsDynamic.common]
   PcdUefiVariableDefaultTimeout|0x0000001b|gEfiMdePkgTokenSpaceGuid|UINT16|0x0008
   PcdUefiVariableDefaultLangCodes|0x0000001c|gEfiMdePkgTokenSpaceGuid|VOID*|"engfra"
   PcdUefiVariableDefaultLang|0x0000001d|gEfiMdePkgTokenSpaceGuid|VOID*|"eng"
   PcdUefiVariableDefaultPlatformLangCodes|0x0000001e|gEfiMdePkgTokenSpaceGuid|VOID*|"en"
   PcdUefiVariableDefaultPlatformLang|0x0000001f|gEfiMdePkgTokenSpaceGuid|VOID*|"en;fr"
+  PcdUartDefaultBaudRate|0x00000020|gEfiMdePkgTokenSpaceGuid|UINT64|115200
+  PcdUartDefaultDataBits|0x00000021|gEfiMdePkgTokenSpaceGuid|UINT8|8
+  PcdUartDefaultParity|0x00000022|gEfiMdePkgTokenSpaceGuid|UINT8|1
+  PcdUartDefaultStopBits|0x00000023|gEfiMdePkgTokenSpaceGuid|UINT8|1
+  PcdDefaultTerminalType|0x00000024|gEfiMdePkgTokenSpaceGuid|UINT8|0  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
 
-[PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|0x0000000f|gEfiMdePkgTokenSpaceGuid|UINT64|0x0ffffc000000
 
 
