@@ -20,7 +20,6 @@ Revision History:
 --*/
 
 
-
 #include "Terminal.h"
 
 //
@@ -34,6 +33,70 @@ EFI_DRIVER_BINDING_PROTOCOL gTerminalDriverBinding = {
   NULL,
   NULL
 };
+
+
+EFI_GUID  *gTerminalType[] = {
+  &gEfiPcAnsiGuid,
+  &gEfiVT100Guid,
+  &gEfiVT100PlusGuid,
+  &gEfiVTUTF8Guid
+};
+
+
+TERMINAL_DEV  gTerminalDevTemplate = {
+  TERMINAL_DEV_SIGNATURE,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  {   // SimpleTextInput
+    TerminalConInReset,
+    TerminalConInReadKeyStroke,
+    NULL
+  },
+  {   // SimpleTextOutput
+    TerminalConOutReset,
+    TerminalConOutOutputString,
+    TerminalConOutTestString,
+    TerminalConOutQueryMode,
+    TerminalConOutSetMode,
+    TerminalConOutSetAttribute,
+    TerminalConOutClearScreen,
+    TerminalConOutSetCursorPosition,
+    TerminalConOutEnableCursor,
+    NULL
+  },
+  {   // SimpleTextOutputMode
+    1,                                           // MaxMode
+    0,                                           // Mode?
+    EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK),    // Attribute
+    0,                                           // CursorColumn
+    0,                                           // CursorRow
+    TRUE                                         // CursorVisible
+  },
+  0,
+  {
+    0,
+    0,
+    { 0 }
+  },
+  {
+    0,
+    0,
+    { 0 }
+  },
+  {
+    0,
+    0,
+    { 0 }
+  },
+  NULL, // ControllerNameTable
+  NULL, 
+  INPUT_STATE_DEFAULT,
+  RESET_STATE_DEFAULT,
+  FALSE
+};
+
 
 
 EFI_STATUS
@@ -276,61 +339,47 @@ TerminalDriverBindingStart (
   // If RemainingDevicePath is NULL, then create default device path node
   //
   if (RemainingDevicePath == NULL) {
-    DefaultNode = AllocatePool (sizeof (VENDOR_DEVICE_PATH));
+    DefaultNode = AllocateZeroPool (sizeof (VENDOR_DEVICE_PATH));
     if (DefaultNode == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
 
-    CopyMem (&DefaultNode->Guid, &gEfiPcAnsiGuid, sizeof (EFI_GUID));
-    RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL*) DefaultNode;
-  }
-  //
-  // Use the RemainingDevicePath to determine the terminal type
-  //
-  Node = (VENDOR_DEVICE_PATH *) RemainingDevicePath;
+    TerminalType = FixedPcdGet8 (PcdDefaultTerminalType);
+    // must be between PcAnsiType (0) and VTUTF8Type (3)
+    ASSERT (TerminalType <= VTUTF8Type);
 
-  if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
-
-    TerminalType = PcAnsiType;
-
-  } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
-
-    TerminalType = VT100Type;
-
-  } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
-
-    TerminalType = VT100PlusType;
-
-  } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
-
-    TerminalType = VTUTF8Type;
-
+    CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
+    RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL*)DefaultNode;
   } else {
-    goto Error;
+    //
+    // Use the RemainingDevicePath to determine the terminal type
+    //
+    Node = (VENDOR_DEVICE_PATH *)RemainingDevicePath;
+    if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
+      TerminalType = PcAnsiType;
+    } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
+      TerminalType = VT100Type;
+    } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
+      TerminalType = VT100PlusType;
+    } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
+      TerminalType = VTUTF8Type;
+    } else {
+      goto Error;
+    }
   }
+
   //
   // Initialize the Terminal Dev
   //
-  TerminalDevice = AllocatePool (sizeof (TERMINAL_DEV));
+  TerminalDevice = AllocateCopyPool (sizeof (TERMINAL_DEV), &gTerminalDevTemplate);
   if (TerminalDevice == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
 
-  ZeroMem (TerminalDevice, sizeof (TERMINAL_DEV));
-
-  TerminalDevice->Signature     = TERMINAL_DEV_SIGNATURE;
-
   TerminalDevice->TerminalType  = TerminalType;
-
   TerminalDevice->SerialIo      = SerialIo;
-
-  //
-  // Simple Input Protocol
-  //
-  TerminalDevice->SimpleInput.Reset         = TerminalConInReset;
-  TerminalDevice->SimpleInput.ReadKeyStroke = TerminalConInReadKeyStroke;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -342,6 +391,7 @@ TerminalDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
+
   //
   // initialize the FIFO buffer used for accommodating
   // the pre-read pending characters
@@ -355,7 +405,6 @@ TerminalDriverBindingStart (
   // keystroke response performance issue
   //
   Mode            = TerminalDevice->SerialIo->Mode;
-
   SerialInTimeOut = 0;
   if (Mode->BaudRate != 0) {
     SerialInTimeOut = (1 + Mode->DataBits + Mode->StopBits) * 2 * 1000000 / (UINTN) Mode->BaudRate;
@@ -409,23 +458,7 @@ TerminalDriverBindingStart (
   //
   // Simple Text Output Protocol
   //
-  TerminalDevice->SimpleTextOutput.Reset              = TerminalConOutReset;
-  TerminalDevice->SimpleTextOutput.OutputString       = TerminalConOutOutputString;
-  TerminalDevice->SimpleTextOutput.TestString         = TerminalConOutTestString;
-  TerminalDevice->SimpleTextOutput.QueryMode          = TerminalConOutQueryMode;
-  TerminalDevice->SimpleTextOutput.SetMode            = TerminalConOutSetMode;
-  TerminalDevice->SimpleTextOutput.SetAttribute       = TerminalConOutSetAttribute;
-  TerminalDevice->SimpleTextOutput.ClearScreen        = TerminalConOutClearScreen;
-  TerminalDevice->SimpleTextOutput.SetCursorPosition  = TerminalConOutSetCursorPosition;
-  TerminalDevice->SimpleTextOutput.EnableCursor       = TerminalConOutEnableCursor;
   TerminalDevice->SimpleTextOutput.Mode               = &TerminalDevice->SimpleTextOutputMode;
-
-  TerminalDevice->SimpleTextOutputMode.MaxMode        = 1;
-  //
-  // For terminal devices, cursor is always visible
-  //
-  TerminalDevice->SimpleTextOutputMode.CursorVisible  = TRUE;
-  TerminalDevice->SimpleTextOutputMode.Attribute      = EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK);
 
   Status = TerminalDevice->SimpleTextOutput.Reset (
                                               &TerminalDevice->SimpleTextOutput,
@@ -450,11 +483,6 @@ TerminalDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
-  //
-  //
-  //
-  TerminalDevice->InputState  = INPUT_STATE_DEFAULT;
-  TerminalDevice->ResetState  = RESET_STATE_DEFAULT;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER,

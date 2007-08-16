@@ -27,6 +27,63 @@ EFI_DRIVER_BINDING_PROTOCOL gSerialControllerDriver = {
 };
 
 
+SERIAL_DEV  gSerialDevTempate = {
+  SERIAL_DEV_SIGNATURE,
+  NULL,
+  { // SerialIo
+    SERIAL_IO_INTERFACE_REVISION,
+    IsaSerialReset,
+    IsaSerialSetAttributes,
+    IsaSerialSetControl,
+    IsaSerialGetControl,
+    IsaSerialWrite,
+    IsaSerialRead,
+    NULL
+  },
+  { // SerialMode
+    SERIAL_PORT_DEFAULT_CONTROL_MASK,
+    SERIAL_PORT_DEFAULT_TIMEOUT,
+    FixedPcdGet64 (PcdUartDefaultBaudRate),     // BaudRate
+    SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH,
+    FixedPcdGet8 (PcdUartDefaultDataBits),      // DataBits
+    FixedPcdGet8 (PcdUartDefaultParity),        // Parity
+    FixedPcdGet8 (PcdUartDefaultStopBits)       // StopBits
+  },
+  NULL,
+  NULL,
+  { // UartDevicePath
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_UART_DP,
+      (UINT8) (sizeof (UART_DEVICE_PATH)),
+      (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8),
+    },
+    0,
+    FixedPcdGet64 (PcdUartDefaultBaudRate),    
+    FixedPcdGet8 (PcdUartDefaultDataBits),
+    FixedPcdGet8 (PcdUartDefaultParity),
+    FixedPcdGet8 (PcdUartDefaultStopBits)
+  },
+  NULL,
+  0,    //BaseAddress
+  {
+    0,
+    0,
+    SERIAL_MAX_BUFFER_SIZE,
+    { 0 }
+  },
+  {
+    0,
+    0,
+    SERIAL_MAX_BUFFER_SIZE,
+    { 0 }
+  },
+  FALSE,
+  FALSE,
+  UART16550A,
+  NULL
+};
+
 /**
   The user Entry Point for module IsaSerial. The user code starts with this function.
 
@@ -39,7 +96,7 @@ EFI_DRIVER_BINDING_PROTOCOL gSerialControllerDriver = {
 **/
 EFI_STATUS
 EFIAPI
-InitializeIsaSerial(
+InitializeIsaSerial (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
@@ -333,17 +390,15 @@ SerialControllerDriverStart (
   //
   // Initialize the serial device instance
   //
-  SerialDevice = AllocatePool (sizeof (SERIAL_DEV));
+  SerialDevice = AllocateCopyPool (sizeof (SERIAL_DEV), &gSerialDevTempate);
   if (SerialDevice == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
 
-  ZeroMem (SerialDevice, sizeof (SERIAL_DEV));
-
+  SerialDevice->SerialIo.Mode       = &(SerialDevice->SerialMode);
   SerialDevice->IsaIo               = IsaIo;
   SerialDevice->ParentDevicePath    = ParentDevicePath;
-  SerialDevice->ControllerNameTable = NULL;
 
   ADD_SERIAL_NAME (SerialDevice, IsaIo);
 
@@ -371,30 +426,6 @@ SerialControllerDriverStart (
     goto Error;
   }
 
-  SerialDevice->Signature               = SERIAL_DEV_SIGNATURE;
-  SerialDevice->Type                    = UART16550A;
-  SerialDevice->SoftwareLoopbackEnable  = FALSE;
-  SerialDevice->HardwareFlowControl     = FALSE;
-  SerialDevice->Handle                  = NULL;
-  SerialDevice->Receive.First           = 0;
-  SerialDevice->Receive.Last            = 0;
-  SerialDevice->Receive.Surplus         = SERIAL_MAX_BUFFER_SIZE;
-  SerialDevice->Transmit.First          = 0;
-  SerialDevice->Transmit.Last           = 0;
-  SerialDevice->Transmit.Surplus        = SERIAL_MAX_BUFFER_SIZE;
-
-  //
-  // Serial I/O
-  //
-  SerialDevice->SerialIo.Revision       = SERIAL_IO_INTERFACE_REVISION;
-  SerialDevice->SerialIo.Reset          = IsaSerialReset;
-  SerialDevice->SerialIo.SetAttributes  = IsaSerialSetAttributes;
-  SerialDevice->SerialIo.SetControl     = IsaSerialSetControl;
-  SerialDevice->SerialIo.GetControl     = IsaSerialGetControl;
-  SerialDevice->SerialIo.Write          = IsaSerialWrite;
-  SerialDevice->SerialIo.Read           = IsaSerialRead;
-  SerialDevice->SerialIo.Mode           = &(SerialDevice->SerialMode);
-
   if (RemainingDevicePath != NULL) {
     //
     // Match the configuration of the RemainingDevicePath. IsHandleSupported()
@@ -404,14 +435,9 @@ SerialControllerDriverStart (
     CopyMem (&SerialDevice->UartDevicePath, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
   } else {
     //
-    // Build the device path by appending the UART node to the ParentDevicePath
-    // from the WinNtIo handle. The Uart setings are zero here, since
-    // SetAttribute() will update them to match the default setings.
+    // Use the values from the gSerialDevTempate as no remaining device path was
+    // passed in.
     //
-    ZeroMem (&SerialDevice->UartDevicePath, sizeof (UART_DEVICE_PATH));
-    SerialDevice->UartDevicePath.Header.Type    = MESSAGING_DEVICE_PATH;
-    SerialDevice->UartDevicePath.Header.SubType = MSG_UART_DP;
-    SetDevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &SerialDevice->UartDevicePath, sizeof (UART_DEVICE_PATH));
   }
   //
   // Build the device path by appending the UART node to the ParentDevicePath
@@ -420,20 +446,17 @@ SerialControllerDriverStart (
   //
   SerialDevice->DevicePath = AppendDevicePathNode (
                                ParentDevicePath,
-                               (EFI_DEVICE_PATH_PROTOCOL *) &SerialDevice->UartDevicePath
+                               (EFI_DEVICE_PATH_PROTOCOL *)&SerialDevice->UartDevicePath
                                );
-
   if (SerialDevice->DevicePath == NULL) {
     Status = EFI_DEVICE_ERROR;
     goto Error;
   }
+
   //
   // Fill in Serial I/O Mode structure based on either the RemainingDevicePath or defaults.
   //
-  SerialDevice->SerialMode.ControlMask      = SERIAL_PORT_DEFAULT_CONTROL_MASK;
-  SerialDevice->SerialMode.Timeout          = SERIAL_PORT_DEFAULT_TIMEOUT;
   SerialDevice->SerialMode.BaudRate         = SerialDevice->UartDevicePath.BaudRate;
-  SerialDevice->SerialMode.ReceiveFifoDepth = SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH;
   SerialDevice->SerialMode.DataBits         = SerialDevice->UartDevicePath.DataBits;
   SerialDevice->SerialMode.Parity           = SerialDevice->UartDevicePath.Parity;
   SerialDevice->SerialMode.StopBits         = SerialDevice->UartDevicePath.StopBits;
@@ -1132,7 +1155,7 @@ IsaSerialSetAttributes (
   // Check for default settings and fill in actual values.
   //
   if (BaudRate == 0) {
-    BaudRate = SERIAL_PORT_DEFAULT_BAUD_RATE;
+    BaudRate = FixedPcdGet64 (PcdUartDefaultBaudRate);
   }
 
   if (ReceiveFifoDepth == 0) {
@@ -1144,15 +1167,15 @@ IsaSerialSetAttributes (
   }
 
   if (Parity == DefaultParity) {
-    Parity = SERIAL_PORT_DEFAULT_PARITY;
+    Parity = FixedPcdGet8 (PcdUartDefaultParity);
   }
 
   if (DataBits == 0) {
-    DataBits = SERIAL_PORT_DEFAULT_DATA_BITS;
+    DataBits = FixedPcdGet8 (PcdUartDefaultDataBits);
   }
 
   if (StopBits == DefaultStopBits) {
-    StopBits = (EFI_STOP_BITS_TYPE) SERIAL_PORT_DEFAULT_STOP_BITS;
+    StopBits = (EFI_STOP_BITS_TYPE) FixedPcdGet8 (PcdUartDefaultStopBits);
   }
   //
   // 5 and 6 data bits can not be verified on a 16550A UART
@@ -1801,8 +1824,7 @@ IsaSerialPortPresent (
   Temp = READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
   WRITE_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, 0xAA);
 
-  if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0xAA)
-  {
+  if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0xAA) {
     if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
       Status = FALSE;
     }
@@ -1810,8 +1832,7 @@ IsaSerialPortPresent (
 
   WRITE_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, 0x55);
 
-  if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0x55)
-  {
+  if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0x55) {
     if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
       Status = FALSE;
     }
