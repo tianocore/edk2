@@ -46,12 +46,6 @@ extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
 extern EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL gConPlatformComponentName;
 
-#define VarConsoleInpDev  L"ConInDev"
-#define VarConsoleInp     L"ConIn"
-#define VarConsoleOutDev  L"ConOutDev"
-#define VarConsoleOut     L"ConOut"
-#define VarErrorOutDev    L"ErrOutDev"
-#define VarErrorOut       L"ErrOut"
 
 typedef enum {
   CHECK,

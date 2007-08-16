@@ -306,9 +306,9 @@ TerminalDriverBindingStart (
                       EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                       );
       if (EFI_ERROR (Status)) {
-        TerminalUpdateConsoleDevVariable ((CHAR16 *)VarConsoleInpDev, ParentDevicePath);
-        TerminalUpdateConsoleDevVariable ((CHAR16 *)VarConsoleOutDev, ParentDevicePath);
-        TerminalUpdateConsoleDevVariable ((CHAR16 *)VarErrorOutDev, ParentDevicePath);
+        TerminalUpdateConsoleDevVariable (L"ConInDev", ParentDevicePath);
+        TerminalUpdateConsoleDevVariable ((L"ConOutDev", ParentDevicePath);
+        TerminalUpdateConsoleDevVariable (L"ErrOutDev", ParentDevicePath);
       }
     }
   }
@@ -707,9 +707,9 @@ TerminalDriverBindingStop (
       // Remove Parent Device Path from
       // the Console Device Environment Variables
       //
-      TerminalRemoveConsoleDevVariable ((CHAR16 *)VarConsoleInpDev, ParentDevicePath);
-      TerminalRemoveConsoleDevVariable ((CHAR16 *)VarConsoleOutDev, ParentDevicePath);
-      TerminalRemoveConsoleDevVariable ((CHAR16 *)VarErrorOutDev, ParentDevicePath);
+      TerminalRemoveConsoleDevVariable (L"ConInDev", ParentDevicePath);
+      TerminalRemoveConsoleDevVariable (L"ConOutDev", ParentDevicePath);
+      TerminalRemoveConsoleDevVariable (L"ErrOutDev", ParentDevicePath);
 
       //
       // Uninstall the Terminal Driver's GUID Tag from the Serial controller
