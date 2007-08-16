@@ -194,21 +194,21 @@ INF  $(WORKSPACE)/MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 CHECKSUM {
+FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
       }
     }
   }
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F CHECKSUM {
+FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
       }
     }
   }
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION RAW = MdeModulePkg/Logo/Logo.bmp
@@ -225,15 +225,35 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
 # content of the FFS file.
 #
 ################################################################################
+
+
+############################################################################
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   # 
+############################################################################
+#
+#[Rule.Common.DXE_DRIVER]
+#  FILE DRIVER = $(NAMED_GUID) CheckSum {
+#    COMPRESS PI_STD {
+#      GUIDED {
+#        DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
+#        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
+#        UI Optional            $(MODULE_NAME)
+#        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+#      }
+#    }
+#  }
+#
+############################################################################
+
 [Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) CheckSum {
+  FILE PEI_CORE = $(NAMED_GUID) {
     PE32                $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI Optional         $(MODULE_NAME)
     VERSION Optional    BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
   }
 
 [Rule.Common.PEIM]
-  FILE PEIM = $(NAMED_GUID) CheckSum {
+  FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).Depex
      PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI Optional               $(MODULE_NAME)
@@ -241,7 +261,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
   }
 
 [Rule.Common.DXE_CORE]
-  FILE DXE_CORE = $(NAMED_GUID) CheckSum {
+  FILE DXE_CORE = $(NAMED_GUID) {
     COMPRESS PI_STD {
       PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
       UI Optional               $(MODULE_NAME)
@@ -250,7 +270,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
   }
 
 [Rule.Common.UEFI_DRIVER]
-  FILE DRIVER = $(NAMED_GUID) CheckSum {
+  FILE DRIVER = $(NAMED_GUID) {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
@@ -262,7 +282,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
   }
 
 [Rule.Common.DXE_DRIVER]
-  FILE DRIVER = $(NAMED_GUID) CheckSum {
+  FILE DRIVER = $(NAMED_GUID) {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
@@ -274,7 +294,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
   }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
-  FILE DRIVER = $(NAMED_GUID) CheckSum {
+  FILE DRIVER = $(NAMED_GUID) {
     COMPRESS PI_STD {
       GUIDED {
         DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
@@ -286,7 +306,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D CHECKSUM {
   }
 
 [Rule.Common.UEFI_APPLICATION]
-  FILE APPLICATION = $(NAMED_GUID) CheckSum {
+  FILE APPLICATION = $(NAMED_GUID) {
     COMPRESS PI_STD {
       GUIDED {
         PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
