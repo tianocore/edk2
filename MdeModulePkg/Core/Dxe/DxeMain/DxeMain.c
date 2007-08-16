@@ -787,7 +787,7 @@ Returns:
   //
   // Report that ExitBootServices() has been called
   //
-  // We are using gEfiDxeServicesTableGuid as the caller ID for Dxe Core
+  // We are using gEfiCallerIdGuid as the caller ID for Dxe Core
   //
   CoreReportProgressCode ((EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES));
 

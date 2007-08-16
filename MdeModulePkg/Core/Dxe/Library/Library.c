@@ -41,7 +41,7 @@ CoreReportProgressCodeSpecific (
 
 Routine Description:
 
-  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiDxeServicesTableGuid,
+  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid,
   with a handle as additional information.
 
 Arguments:
@@ -65,7 +65,7 @@ Returns:
       EFI_PROGRESS_CODE,
       Value,
       0,
-      &gEfiDxeServicesTableGuid,
+      &gEfiCallerIdGuid,
       (EFI_STATUS_CODE_DATA *) &mStatusCodeData
       );
   }
@@ -79,7 +79,7 @@ CoreReportProgressCode (
 
 Routine Description:
 
-  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiDxeServicesTableGuid.
+  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid.
 
 Arguments:
 
@@ -97,7 +97,7 @@ Returns:
       EFI_PROGRESS_CODE,
       Value,
       0,
-      &gEfiDxeServicesTableGuid,
+      &gEfiCallerIdGuid,
       NULL
       );
   }
