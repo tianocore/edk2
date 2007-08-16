@@ -272,6 +272,11 @@
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004
   PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x00051003
   PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
+  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
+  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
+  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
+  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid|0
 
   PcdWinNtFirmwareFdSize|gEfiNt32PkgTokenSpaceGuid|0x2a0000
   PcdWinNtFirmwareBlockSize|gEfiNt32PkgTokenSpaceGuid|0x10000
@@ -342,7 +347,7 @@
   PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid|L"NT32 Processor Emulation"|52
   PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid|L"1234"|8
   PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid|L"64!64"|10
-  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"a:RW;2880;512!e:RW;262144;512"|58
+  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid|L"a:RW;2880;512!d:RO;307200;2048!j:RW;262144;512"|100
   PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid|L"UGA Window 1!UGA Window 2"|50
 
   PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0
