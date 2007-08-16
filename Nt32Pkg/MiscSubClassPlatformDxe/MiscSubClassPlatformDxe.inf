@@ -59,6 +59,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
 
