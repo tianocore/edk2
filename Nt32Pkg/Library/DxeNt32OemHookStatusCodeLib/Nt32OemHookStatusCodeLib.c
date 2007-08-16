@@ -17,7 +17,8 @@
 //
 // The package level header files this module uses
 //
-#include <FrameWorkDxe.h>
+#include <FrameworkDxe.h>
+#include <FrameworkModuleDxe.h>
 #include <WinNtDxe.h>
 #include <DebugInfo.h>
 
