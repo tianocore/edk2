@@ -21,6 +21,32 @@ Abstract:
 #ifndef _WIN_NT_SERIAL_IO_
 #define _WIN_NT_SERIAL_IO_
 
+//
+// The package level header files this module uses
+//
+#include <Uefi.h>
+#include <WinNtDxe.h>
+//
+// The protocols, PPI and GUID defintions for this module
+//
+#include <Protocol/WinNtIo.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/SerialIo.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/DevicePath.h>
+//
+// The Library classes this module consumes
+//
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
+
 
 #define SERIAL_MAX_BUFFER_SIZE  256
 #define TIMEOUT_STALL_INTERVAL  10

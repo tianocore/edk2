@@ -66,3 +66,9 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiWinNtIoProtocolGuid                       # PROTOCOL TO_START
 
+[PcdsFixedAtBuild.common]
+  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
+  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
+  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
+  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
+
