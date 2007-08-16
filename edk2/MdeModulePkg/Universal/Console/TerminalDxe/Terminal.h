@@ -74,7 +74,6 @@ typedef struct {
   UINT8                               TerminalType;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  VENDOR_DEVICE_PATH                  Node;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL      SimpleInput;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE         SimpleTextOutputMode;
@@ -85,7 +84,7 @@ typedef struct {
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
   EFI_EVENT                           TwoSecondTimeOut;
   UINT32                              InputState;
-  UINT32                           ResetState;
+  UINT32                              ResetState;
 
   //
   // Esc could not be output to the screen by user,
@@ -94,7 +93,7 @@ typedef struct {
   // This boolean is used by the terminal driver only
   // to indicate whether the Esc could be sent or not.
   //
-  BOOLEAN                       OutputEscChar;
+  BOOLEAN                             OutputEscChar;
 } TERMINAL_DEV;
 
 #define INPUT_STATE_DEFAULT               0x00

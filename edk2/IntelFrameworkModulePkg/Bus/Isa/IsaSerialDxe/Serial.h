@@ -121,13 +121,17 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gSerialControllerDriver;
 //
 // Serial Driver Defaults
 //
-#define SERIAL_PORT_DEFAULT_BAUD_RATE           115200
 #define SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH  1
 #define SERIAL_PORT_DEFAULT_TIMEOUT             1000000
+
+/*
+#define SERIAL_PORT_DEFAULT_BAUD_RATE           115200
 #define SERIAL_PORT_DEFAULT_PARITY              NoParity
 #define SERIAL_PORT_DEFAULT_DATA_BITS           8
 #define SERIAL_PORT_DEFAULT_STOP_BITS           1
+*/
 #define SERIAL_PORT_DEFAULT_CONTROL_MASK        0
+
 
 //
 // (24000000/13)MHz input clock

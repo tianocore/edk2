@@ -73,8 +73,10 @@
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
 
-[PcdsFixedAtBuild]
+[PcdsDynamic]
   PcdStatusCodeValueRemoteConsoleError|gEfiMdePkgTokenSpaceGuid
   PcdStatusCodeValueRemoteConsoleReset|gEfiMdePkgTokenSpaceGuid
   PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid
   PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid
+  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid
+  
