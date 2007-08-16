@@ -279,7 +279,7 @@ Returns:
     // Append the device path to the ConInDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
-      VarConsoleInpDev,
+      L"ConInDev",
       DevicePath,
       APPEND
       );
@@ -289,7 +289,7 @@ Returns:
     // then install EfiConsoleInDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              VarConsoleInp,
+              L"ConIn",
               DevicePath,
               CHECK
               );
@@ -387,7 +387,7 @@ Returns:
     // Append the device path to the ConOutDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
-      VarConsoleOutDev,
+      L"ConOutDev",
       DevicePath,
       APPEND
       );
@@ -395,7 +395,7 @@ Returns:
     // Append the device path to the StdErrDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
-      VarErrorOutDev,
+      L"ErrOutDev",
       DevicePath,
       APPEND
       );
@@ -405,7 +405,7 @@ Returns:
     // then install EfiConsoleOutDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              VarConsoleOut,
+              L"ConOut",
               DevicePath,
               CHECK
               );
@@ -496,7 +496,7 @@ Returns:
       // Remove DevicePath from ConInDev
       //
       ConPlatformUpdateDeviceVariable (
-        VarConsoleInpDev,
+        L"ConInDev",
         DevicePath,
         DELETE
         );
@@ -569,12 +569,12 @@ Returns:
       // Remove DevicePath from ConOutDev, and StdErrDev
       //
       ConPlatformUpdateDeviceVariable (
-        VarConsoleOutDev,
+        L"ConOutDev",
         DevicePath,
         DELETE
         );
       ConPlatformUpdateDeviceVariable (
-        VarErrorOutDev,
+        L"ErrOutDev",
         DevicePath,
         DELETE
         );

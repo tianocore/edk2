@@ -146,10 +146,6 @@ typedef struct {
   CHAR8   Ascii;
 } UNICODE_TO_CHAR;
 
-#define VarConsoleInpDev  L"ConInDev"
-#define VarConsoleOutDev  L"ConOutDev"
-#define VarErrorOutDev    L"ErrOutDev"
-
 //
 // Global Variables
 //
