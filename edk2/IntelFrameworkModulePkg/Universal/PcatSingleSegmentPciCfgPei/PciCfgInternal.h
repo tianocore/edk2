@@ -26,7 +26,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 
-#include <IndustryStandard\Pci.h>
+#include <IndustryStandard/Pci.h>
 
 
 /**
