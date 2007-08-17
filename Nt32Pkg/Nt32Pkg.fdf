@@ -19,7 +19,7 @@
 # defines one flash "device" image.  A flash device image may be one of
 # the following: Removable media bootable image (like a boot floppy
 # image,) an Option ROM image (that would be "flashed" into an add-in
-# card,) a System "Flash"  image (that would be burned into a system¡¯s
+# card,) a System "Flash"  image (that would be burned into a system's
 # flash) or an Update ("Capsule") image that will be used to update and
 # existing system flash.
 #
@@ -219,7 +219,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
 
 ################################################################################
 #
-# Rules are use with the [FV] section¡¯s module INF type to define
+# Rules are use with the [FV] section's module INF type to define
 # how an FFS file is created for a given INF file. The following Rule are the default
 # rules for the different module type. User can add the customized rules to define the
 # content of the FFS file.
