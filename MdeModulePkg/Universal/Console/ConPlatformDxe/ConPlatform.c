@@ -424,7 +424,7 @@ Returns:
     // then install EfiStandardErrorDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              VarErrorOut,
+              L"ErrOut",
               DevicePath,
               CHECK
               );
