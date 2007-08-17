@@ -53,14 +53,9 @@
   BaseMemoryLib
 
 
-[Protocols.IA32]
+[Protocols]
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
-
-[Protocols.X64]
-  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
-  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
-
 
 [Depex]
   TRUE
