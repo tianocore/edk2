@@ -273,6 +273,9 @@
 [LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
+[LibraryClasses.EBC.PEI_CORE]
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+
 [PcdsFeatureFlag.common]
   PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
   PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
@@ -345,6 +348,13 @@
   PcdStatusCodeValueKeyboardInputError|gEfiMdePkgTokenSpaceGuid|0x01010007        # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueMouseInputError|gEfiMdePkgTokenSpaceGuid|0x01020007           # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
   PcdStatusCodeValueMouseReset|gEfiMdePkgTokenSpaceGuid|0x01020001                # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
+
+  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
+  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
+  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
+  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
+  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid|0
+
 
 [PcdsFixedAtBuild.IPF]
   PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000

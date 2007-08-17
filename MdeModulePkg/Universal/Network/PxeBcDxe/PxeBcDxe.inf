@@ -48,17 +48,17 @@
   Pxe_bc_udp.c
 
 [Sources.IA32]
-  Ia32\PxeArch.h
+  Ia32/PxeArch.h
 
 [Sources.X64]
-  X64\PxeArch.h
+  X64/PxeArch.h
 
 [Sources.IPF]
-  Ipf\PxeArch.h
+  Ipf/PxeArch.h
 
 [Sources.EBC]
-  Ebc\PxeArch.h
-  Ebc\PxeArch.c
+  Ebc/PxeArch.h
+  Ebc/PxeArch.c
 
 
 [Packages]

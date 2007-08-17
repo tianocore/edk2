@@ -20,7 +20,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 
-#include <IndustryStandard\Pci.h>
+#include <IndustryStandard/Pci.h>
 
 /**
    Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
