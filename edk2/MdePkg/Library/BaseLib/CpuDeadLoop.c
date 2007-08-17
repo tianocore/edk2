@@ -17,7 +17,7 @@
 //
 
 #include <Base.h>
-#include <Library\BaseLib.h>
+#include <Library/BaseLib.h>
 
 /**
   Executes an infinite loop.
