@@ -307,7 +307,7 @@ TerminalDriverBindingStart (
                       );
       if (EFI_ERROR (Status)) {
         TerminalUpdateConsoleDevVariable (L"ConInDev", ParentDevicePath);
-        TerminalUpdateConsoleDevVariable ((L"ConOutDev", ParentDevicePath);
+        TerminalUpdateConsoleDevVariable (L"ConOutDev", ParentDevicePath);
         TerminalUpdateConsoleDevVariable (L"ErrOutDev", ParentDevicePath);
       }
     }
