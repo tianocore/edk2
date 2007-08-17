@@ -26,7 +26,7 @@ Abstract:
 
 extern UINT8 PlatformBdsStrings[];
 
-#include "IndustryStandard/Pci22.h"
+#include <IndustryStandard/Pci22.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
