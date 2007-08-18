@@ -172,7 +172,7 @@
         $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
 
     <Command.MSFT, Command.INTEL>
-        "$(SLINK)" /OUT:${dst} $(SLINK_FLAGS) ${src}
+        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} ${src}
 
     <Command.GCC>
         "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) ${src}
