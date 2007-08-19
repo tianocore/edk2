@@ -34,9 +34,9 @@ Notes:
 	 cannot generate AutoGen.* files. Only "build" command can.
 
 
-Brief usage for Module Migration Tool msa2inf.exe:
+Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
-  msa2inf [options]
+  MigrationMsa2Inf [options]
 2. Input Files:
   A syntactically valid MSA file
 3. Output Files:
@@ -63,11 +63,11 @@ Brief usage for Module Migration Tool msa2inf.exe:
 5. Example:
    WORKSAPCE has already been set: $(WORKSPACE) = c:\work\EdkII. 
  
-   a. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -o c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
-   b. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a
+   a. MigrationMsa2Inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -o c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.inf
+   b. MigrationMsa2Inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a
    Example a & b are equivalent to migrate WinNtThunk driver from EDKII to EDKII' code base.
   
-   c. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a -c
+   c. MigrationMsa2Inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -a -c
    The extra "-c" option performs several hardcode mapping due to the naming change in EDKII': 
       OldMdePkg Guid -> MdePkgGuid, 
       EdkModulePkg Guid -> MdeModulePkgGuid, 
@@ -75,7 +75,7 @@ Brief usage for Module Migration Tool msa2inf.exe:
       HiiLib -> HiiLibFramework
       ...
    
-   d. msa2inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -m
+   d. MigrationMsa2Inf -f c:\work\EdkII\Nt32Pkg\WinNtThunkDxe\WinNtThunk.msa -m
    The extra "-m" option suppresses the generation of "CommonHeader.h" and leave all C files intact. 
    Instead, it generates "CommonHeader.txt". Developers can manually copy its content to a local common header file in a module. 
  
