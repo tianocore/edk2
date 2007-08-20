@@ -194,16 +194,6 @@ UsbGetCurrentTpl (
   VOID
   );
 
-//
-// USB debug support routines
-//
-#ifdef EFI_DEBUG
-  #define USB_DEBUG(arg)            UsbDebug arg
-  #define USB_ERROR(arg)            UsbError arg
-#else
-  #define USB_DEBUG(arg)
-  #define USB_ERROR(arg)
-#endif
 
 VOID
 UsbDebug (

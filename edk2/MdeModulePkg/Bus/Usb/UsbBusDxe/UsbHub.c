@@ -553,7 +553,7 @@ UsbOnHubInterrupt (
                       );
 
     if (EFI_ERROR (Status)) {
-      USB_ERROR (("UsbOnHubInterrupt: failed to remove async transfer - %r\n", Status));
+      DEBUG (( EFI_D_ERROR, "UsbOnHubInterrupt: failed to remove async transfer - %r\n", Status));
       return Status;
     }
 
@@ -568,7 +568,7 @@ UsbOnHubInterrupt (
                       );
 
     if (EFI_ERROR (Status)) {
-      USB_ERROR (("UsbOnHubInterrupt: failed to submit new async transfer - %r\n", Status));
+      DEBUG (( EFI_D_ERROR, "UsbOnHubInterrupt: failed to submit new async transfer - %r\n", Status));
     }
 
     return Status;
@@ -668,20 +668,20 @@ UsbHubInit (
   }
 
   if (Index == Setting->Desc.NumEndpoints) {
-    USB_ERROR (("UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
+    DEBUG (( EFI_D_ERROR, "UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
     return EFI_DEVICE_ERROR;
   }
 
   Status = UsbHubReadDesc (HubDev, &HubDesc);
 
   if (EFI_ERROR (Status)) {
-    USB_ERROR (("UsbHubInit: failed to read HUB descriptor %r\n", Status));
+    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to read HUB descriptor %r\n", Status));
     return Status;
   }
 
   HubIf->NumOfPort = HubDesc.NumPorts;
 
-  USB_DEBUG (("UsbHubInit: hub %d has %d ports\n", HubDev->Address,HubIf->NumOfPort));
+  DEBUG (( EFI_D_INFO, "UsbHubInit: hub %d has %d ports\n", HubDev->Address,HubIf->NumOfPort));
 
   //
   // Create an event to enumerate the hub's port. On
@@ -695,7 +695,7 @@ UsbHubInit (
                   );
 
   if (EFI_ERROR (Status)) {
-    USB_ERROR (("UsbHubInit: failed to create signal for hub %d - %r\n",
+    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to create signal for hub %d - %r\n",
                 HubDev->Address, Status));
 
     return Status;
@@ -720,7 +720,7 @@ UsbHubInit (
                     );
 
   if (EFI_ERROR (Status)) {
-    USB_ERROR (("UsbHubInit: failed to queue interrupt transfer for hub %d - %r\n",
+    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to queue interrupt transfer for hub %d - %r\n",
                 HubDev->Address, Status));
 
     gBS->CloseEvent (HubIf->HubNotify);
@@ -750,7 +750,7 @@ UsbHubInit (
   gBS->Stall (HubDesc.PwrOn2PwrGood * 2 * USB_STALL_1_MS);
   UsbHubAckHubStatus (HubIf->Device);
 
-  USB_DEBUG (("UsbHubInit: hub %d initialized\n", HubDev->Address));
+  DEBUG (( EFI_D_INFO, "UsbHubInit: hub %d initialized\n", HubDev->Address));
   return Status;
 }
 
@@ -979,7 +979,7 @@ UsbHubRelease (
   HubIf->HubEp      = NULL;
   HubIf->HubNotify  = NULL;
 
-  USB_DEBUG (("UsbHubRelease: hub device %d released\n", HubIf->Device->Address));
+  DEBUG (( EFI_D_INFO, "UsbHubRelease: hub device %d released\n", HubIf->Device->Address));
   return EFI_SUCCESS;
 }
 
@@ -1011,7 +1011,7 @@ UsbRootHubInit (
     return Status;
   }
 
-  USB_DEBUG (("UsbRootHubInit: root hub %x - max speed %d, %d ports\n",
+  DEBUG (( EFI_D_INFO, "UsbRootHubInit: root hub %x - max speed %d, %d ports\n",
               HubIf, MaxSpeed, NumOfPort));
 
   HubIf->IsHub      = TRUE;
@@ -1035,6 +1035,12 @@ UsbRootHubInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // It should signal the event immediately here, or device detection
+  // by bus enumeration might be delayed by the timer interval.
+  //
+  gBS->SignalEvent (HubIf->HubNotify);
 
   Status = gBS->SetTimer (
                   HubIf->HubNotify,
@@ -1216,7 +1222,7 @@ UsbRootHubResetPort (
   Status  = UsbHcSetRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {
-    USB_ERROR (("UsbRootHubResetPort: failed to start reset on port %d\n", Port));
+    DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to start reset on port %d\n", Port));
     return Status;
   }
 
@@ -1229,7 +1235,7 @@ UsbRootHubResetPort (
   Status = UsbHcClearRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {
-    USB_ERROR (("UsbRootHubResetPort: failed to clear reset on port %d\n", Port));
+    DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to clear reset on port %d\n", Port));
     return Status;
   }
 
@@ -1256,7 +1262,7 @@ UsbRootHubResetPort (
   }
 
   if (Index == USB_HUB_LOOP) {
-    USB_ERROR (("UsbRootHubResetPort: reset not finished in time on port %d\n", Port));
+    DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: reset not finished in time on port %d\n", Port));
     return EFI_TIMEOUT;
   }
 
@@ -1268,7 +1274,7 @@ UsbRootHubResetPort (
     // automatically enable the port, we need to enable it manually.
     //
     if (RootIf->MaxSpeed == EFI_USB_SPEED_HIGH) {
-      USB_ERROR (("UsbRootHubResetPort: release low/full speed device (%d) to UHCI\n", Port));
+      DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: release low/full speed device (%d) to UHCI\n", Port));
 
       UsbRootHubSetPortFeature (RootIf, Port, EfiUsbPortOwner);
       return EFI_NOT_FOUND;
@@ -1278,7 +1284,7 @@ UsbRootHubResetPort (
       Status = UsbRootHubSetPortFeature (RootIf, Port, EfiUsbPortEnable);
 
       if (EFI_ERROR (Status)) {
-        USB_ERROR (("UsbRootHubResetPort: failed to enable port %d for UHCI\n", Port));
+        DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to enable port %d for UHCI\n", Port));
         return Status;
       }
 
@@ -1305,7 +1311,7 @@ UsbRootHubRelease (
   IN USB_INTERFACE        *HubIf
   )
 {
-  USB_DEBUG (("UsbRootHubRelease: root hub released for hub %x\n", HubIf));
+  DEBUG (( EFI_D_INFO, "UsbRootHubRelease: root hub released for hub %x\n", HubIf));
 
   gBS->SetTimer (HubIf->HubNotify, TimerCancel, USB_ROOTHUB_POLL_INTERVAL);
   gBS->CloseEvent (HubIf->HubNotify);
