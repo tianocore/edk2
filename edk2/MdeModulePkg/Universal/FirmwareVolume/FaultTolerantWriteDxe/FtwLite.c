@@ -743,7 +743,7 @@ InitializeFtwLite (
     }
 
     if ((FtwLiteDevice->SpareAreaAddress >= BaseAddress) &&
-        (FtwLiteDevice->SpareAreaAddress <= (BaseAddress + FwVolHeader->FvLength))
+        (FtwLiteDevice->SpareAreaAddress < (BaseAddress + FwVolHeader->FvLength))
         ) {
       FtwLiteDevice->FtwBackupFvb = Fvb;
       //
