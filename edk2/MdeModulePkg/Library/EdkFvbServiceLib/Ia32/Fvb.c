@@ -480,8 +480,8 @@ EfiFvbGetVolumeAttributes (
 **/
 EFI_STATUS
 EfiFvbSetVolumeAttributes (
-  IN UINTN                                Instance,
-  IN EFI_FVB_ATTRIBUTES                   Attributes
+  IN     UINTN                                Instance,
+  IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
   )
 {
   if (Instance >= mFvbCount) {
@@ -492,7 +492,7 @@ EfiFvbSetVolumeAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  return mFvbEntry[Instance].Fvb->SetAttributes (mFvbEntry[Instance].Fvb, &Attributes);
+  return mFvbEntry[Instance].Fvb->SetAttributes (mFvbEntry[Instance].Fvb, Attributes);
 }
 
 /**

@@ -119,8 +119,8 @@ EfiFvbGetVolumeAttributes (
 **/
 EFI_STATUS
 EfiFvbSetVolumeAttributes (
-  IN UINTN                                Instance,
-  IN EFI_FVB_ATTRIBUTES                   Attributes
+  IN     UINTN                                Instance,
+  IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
   );
 
 
