@@ -17,14 +17,14 @@
 # "*" is used to indicate that the source files will be processed at the same time.
 # "?" is used to indicate that the source files will be processed one by one.
 #
-# "[" Build.<File-Type>[.<version>][, Build.<File-Type>[.<version>]] "]"
-#   <InputFile[.<ToolChainFamily>]>
+# "[" Build.<File-Type>[.<version>][, Build.<File-Type>[.<version>]] "]" <EOL>
+#   <InputFile[.<ToolChainFamily>]> <EOL>
 #       [File-Type =] (?|*).<File-Extension> [(\n|,|;) (?|*).<File-Extension>]
 #
-#   <OutputFile[.<ToolChainFamily>]>
+#   <OutputFile[.<ToolChainFamily>]> <EOL>
 #       <FileFullPath>
 #
-#   <Command[.<ToolChainFamily>]>
+#   <Command[.<ToolChainFamily>]> <EOL>
 #       <Command1>
 #       [<Command2>]
 #
@@ -196,6 +196,7 @@
 [Build.Static-Library-File]
     <InputFile>
         ?.lib
+        $(LIBS)
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
