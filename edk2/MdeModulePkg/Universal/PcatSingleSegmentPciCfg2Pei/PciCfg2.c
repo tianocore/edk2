@@ -327,16 +327,24 @@ PciCfg2Modify (
   IN CONST  VOID                      *ClearBits
 )
 {
-  UINTN  PciLibAddress;
+  UINTN   PciLibAddress;
+  UINT16  ClearValue16;
+  UINT16  SetValue16;
+  UINT32  ClearValue32;
+  UINT32  SetValue32;
 
   PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
 
   if (Width == EfiPeiPciCfgWidthUint8) {
-    PciAndThenOr8 (PciLibAddress, ~(*(UINT8 *)ClearBits), *((UINT8 *) SetBits));
+    PciAndThenOr8 (PciLibAddress, (UINT8) (~(*(UINT8 *) ClearBits)), *((UINT8 *) SetBits));
   } else if (Width == EfiPeiPciCfgWidthUint16) {
-    PciAndThenOr16 (PciLibAddress, ~ReadUnaligned16 ((UINT16 *) ClearBits), ReadUnaligned16 ((UINT16 *) SetBits));
+    ClearValue16  = (UINT16) (~ReadUnaligned16 ((UINT16 *) ClearBits));
+    SetValue16    = ReadUnaligned16 ((UINT16 *) SetBits);
+    PciAndThenOr16 (PciLibAddress, ClearValue16, SetValue16);
   } else if (Width == EfiPeiPciCfgWidthUint32) {
-    PciAndThenOr32 (PciLibAddress, ~ReadUnaligned32 ((UINT32 *) ClearBits), ReadUnaligned32 ((UINT32 *) SetBits));
+    ClearValue32  = (UINT32) (~ReadUnaligned32 ((UINT32 *) ClearBits));
+    SetValue32    = ReadUnaligned32 ((UINT32 *) SetBits);
+    PciAndThenOr32 (PciLibAddress, ClearValue32, SetValue32);
   } else {
     return EFI_INVALID_PARAMETER;
   }
