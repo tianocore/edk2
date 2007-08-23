@@ -786,6 +786,59 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
+BOOLEAN
+FvFoundInHobFv2 (
+  IN  EFI_HANDLE                      FvHandle,
+  IN  CONST EFI_GUID                  *DriverName
+  )
+/*++
+
+Routine Description:
+
+  Check if a FV Image type file (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) is
+  described by a EFI_HOB_FIRMWARE_VOLUME2 Hob.
+
+Arguments:
+
+  FvHandle    - The handle which FVB protocol installed on.
+  DriverName  - The driver guid specified.
+
+Returns:
+
+  TRUE    - This file is found in a EFI_HOB_FIRMWARE_VOLUME2 Hob.
+
+  FALSE   - Not found.
+  
+
+--*/
+{
+  EFI_PEI_HOB_POINTERS                HobFv2;
+  EFI_STATUS                          Status;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
+  EFI_PHYSICAL_ADDRESS                FvHeaderAddr;
+  
+  HobFv2.Raw = GetHobList ();
+  
+  while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
+    if (CompareGuid (DriverName, &HobFv2.FirmwareVolume2->FileName)) {
+      Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeBlockProtocolGuid, &Fvb);
+      if (!EFI_ERROR (Status)) {
+        Status = Fvb->GetPhysicalAddress (Fvb, &FvHeaderAddr);
+        if (!EFI_ERROR (Status)) {
+          FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FvHeaderAddr;
+          if (CompareGuid (&FvHeader->FileSystemGuid, &HobFv2.FirmwareVolume2->FvName)) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    HobFv2.Raw = GET_NEXT_HOB (HobFv2);
+  }
+
+  return FALSE;
+}
 
 
 EFI_STATUS 
@@ -1038,6 +1091,14 @@ Returns:
               }
             }
           } else if (Type == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
+            //
+            // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already 
+            // been extracted.
+            //
+            if (FvFoundInHobFv2 (FvHandle, &NameGuid)) {
+              continue;
+            }
+            
             //
             // Found a firmware volume image. Produce a firmware volume block
             // protocol for it so it gets dispatched from. This is usually a 
