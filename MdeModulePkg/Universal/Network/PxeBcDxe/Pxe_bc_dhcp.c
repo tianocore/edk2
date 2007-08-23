@@ -214,7 +214,7 @@ OptionsStrucInit (
   CopyMem (DHCPOpStart.DhcpClassIdentifier.Data.UndiMajor, "yyy", sizeof ("yyy"));
   CopyMem (DHCPOpStart.DhcpClassIdentifier.Data.UndiMinor, "xxx", sizeof ("xxx"));
   DHCPOpStart.End[0] = OP_END;
-};
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -883,7 +883,7 @@ Parse (
   } else if (!RxBufPtr->OpAdds.PktOptAdds[OP_DHCP_BOOTFILE_IX - 1] && RxBufPtr->u.Dhcpv4.file[0]) {
     RxBufPtr->OpAdds.PktOptAdds[OP_DHCP_BOOTFILE_IX - 1] = (DHCPV4_OP_STRUCT *) (RxBufPtr->u.Dhcpv4.file - sizeof (DHCPV4_OP_HEADER));
 
-    RxBufPtr->OpAdds.PktOptAdds[OP_DHCP_BOOTFILE_IX - 1]->Header.Length = (UINT8) AsciiStrLen (RxBufPtr->u.Dhcpv4.file);
+    RxBufPtr->OpAdds.PktOptAdds[OP_DHCP_BOOTFILE_IX - 1]->Header.Length = (UINT8) AsciiStrLen ((CHAR8 *) RxBufPtr->u.Dhcpv4.file);
   }
 
   LocalPtr.OpPtr = RxBufPtr->OpAdds.PktOptAdds[OP_DHCP_CLASS_IDENTIFIER_IX - 1];
@@ -3169,13 +3169,11 @@ BcSetPackets (
 {
   EFI_PXE_BASE_CODE_MODE  *PxebcMode;
   EFI_STATUS              Status;
-  EFI_STATUS              StatCode;
   PXE_BASECODE_DEVICE     *Private;
 
   //
   // Lock the instance data and make sure started
   //
-  StatCode = EFI_SUCCESS;
 
   if (This == NULL) {
     DEBUG ((DEBUG_ERROR, "BC *This pointer == NULL"));

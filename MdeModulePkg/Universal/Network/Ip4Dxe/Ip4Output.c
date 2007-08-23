@@ -89,7 +89,7 @@ Ip4PrependHead (
   PacketHead->Protocol  = Head->Protocol;
   PacketHead->Src       = HTONL (Head->Src);
   PacketHead->Dst       = HTONL (Head->Dst);
-  PacketHead->Checksum  = ~NetblockChecksum ((UINT8 *) PacketHead, HeadLen);
+  PacketHead->Checksum  = (UINT16) (~NetblockChecksum ((UINT8 *) PacketHead, HeadLen));
 
   Packet->Ip            = PacketHead;
   return EFI_SUCCESS;

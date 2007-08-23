@@ -58,7 +58,7 @@ enum {
   //
   IP4_HEAD_DF_MASK     = 0x4000,
   IP4_HEAD_MF_MASK     = 0x2000,
-  IP4_HEAD_OFFSET_MASK = 0x1fff,
+  IP4_HEAD_OFFSET_MASK = 0x1fff
 };
 
 #define IP4_ALLZERO_ADDRESS   0x00000000u

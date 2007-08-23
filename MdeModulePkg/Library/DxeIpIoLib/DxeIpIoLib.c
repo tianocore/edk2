@@ -1272,18 +1272,47 @@ IpIoGetIcmpErrStatus (
   OUT BOOLEAN     *Notify OPTIONAL
   )
 {
-  ICMP_ERROR_INFO  IcmpErrMap[] = {
-    { EFI_NETWORK_UNREACHABLE,  FALSE, TRUE  }, // ICMP_ERR_UNREACH_NET
-    { EFI_HOST_UNREACHABLE,     FALSE, TRUE  }, // ICMP_ERR_UNREACH_HOST
-    { EFI_PROTOCOL_UNREACHABLE, TRUE,  TRUE  }, // ICMP_ERR_UNREACH_PROTOCOL
-    { EFI_PORT_UNREACHABLE,     TRUE,  TRUE  }, // ICMP_ERR_UNREACH_PORT
-    { EFI_ICMP_ERROR,           TRUE,  TRUE  }, // ICMP_ERR_MSGSIZE
-    { EFI_ICMP_ERROR,           FALSE, TRUE  }, // ICMP_ERR_UNREACH_SRCFAIL
-    { EFI_HOST_UNREACHABLE,     FALSE, TRUE  }, // ICMP_ERR_TIMXCEED_INTRANS
-    { EFI_HOST_UNREACHABLE,     FALSE, TRUE  }, // ICMP_ERR_TIMEXCEED_REASS
-    { EFI_ICMP_ERROR,           FALSE, FALSE }, // ICMP_ERR_QUENCH
-    { EFI_ICMP_ERROR,           FALSE, TRUE  }  // ICMP_ERR_PARAMPROB
-  };
+  ICMP_ERROR_INFO  IcmpErrMap[10];
+
+  IcmpErrMap[0].Error  = EFI_NETWORK_UNREACHABLE;
+  IcmpErrMap[0].IsHard = FALSE;
+  IcmpErrMap[0].Notify = TRUE;
+
+  IcmpErrMap[1].Error = EFI_HOST_UNREACHABLE;
+  IcmpErrMap[1].IsHard = FALSE;
+  IcmpErrMap[1].Notify = TRUE;
+
+  IcmpErrMap[2].Error = EFI_PROTOCOL_UNREACHABLE;
+  IcmpErrMap[2].IsHard = TRUE;
+  IcmpErrMap[2].Notify = TRUE;
+
+  IcmpErrMap[3].Error = EFI_PORT_UNREACHABLE;
+  IcmpErrMap[3].IsHard = TRUE;
+  IcmpErrMap[3].Notify = TRUE;
+
+  IcmpErrMap[4].Error = EFI_ICMP_ERROR;
+  IcmpErrMap[4].IsHard = TRUE;
+  IcmpErrMap[4].Notify = TRUE;
+
+  IcmpErrMap[5].Error = EFI_ICMP_ERROR;
+  IcmpErrMap[5].IsHard = FALSE;
+  IcmpErrMap[5].Notify = TRUE;
+
+  IcmpErrMap[6].Error = EFI_HOST_UNREACHABLE;
+  IcmpErrMap[6].IsHard = FALSE;
+  IcmpErrMap[6].Notify = TRUE;
+
+  IcmpErrMap[7].Error = EFI_HOST_UNREACHABLE;
+  IcmpErrMap[7].IsHard = FALSE;
+  IcmpErrMap[7].Notify = TRUE;
+
+  IcmpErrMap[8].Error = EFI_ICMP_ERROR;
+  IcmpErrMap[8].IsHard = FALSE;
+  IcmpErrMap[8].Notify = FALSE;
+
+  IcmpErrMap[9].Error = EFI_ICMP_ERROR;
+  IcmpErrMap[9].IsHard = FALSE;
+  IcmpErrMap[9].Notify = TRUE;
 
   ASSERT ((IcmpError >= ICMP_ERR_UNREACH_NET) && (IcmpError <= ICMP_ERR_PARAMPROB));
 

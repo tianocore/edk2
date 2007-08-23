@@ -305,7 +305,7 @@ Tcp4DriverBindingStart (
   //
   NetZeroMem (&OpenData, sizeof (IP_IO_OPEN_DATA));
 
-  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (OpenData.IpConfigData));
   OpenData.IpConfigData.DefaultProtocol = EFI_IP_PROTO_TCP;
 
   OpenData.PktRcvdNotify = Tcp4RxCallback;

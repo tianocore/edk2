@@ -139,7 +139,7 @@ Mtftp4WrqSendBlock (
     // Get data from PacketNeeded
     //
     DataBuf = NULL;
-    Status  = Token->PacketNeeded (&Instance->Mtftp4, Token, &DataLen, &DataBuf);
+    Status  = Token->PacketNeeded (&Instance->Mtftp4, Token, &DataLen, (VOID **) &DataBuf);
 
     if (EFI_ERROR (Status) || (DataLen > Instance->BlkSize)) {
       if (DataBuf != NULL) {

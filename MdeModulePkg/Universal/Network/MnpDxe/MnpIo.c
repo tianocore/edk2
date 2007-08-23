@@ -747,7 +747,7 @@ MnpWrapRxData (
   //
   // Fill the RxData in RxDataWrap,
   //
-  CopyMem (&RxDataWrap->RxData, RxData, sizeof (EFI_MANAGED_NETWORK_RECEIVE_DATA));
+  CopyMem (&RxDataWrap->RxData, RxData, sizeof (RxDataWrap->RxData));
 
   //
   // Create the recycle event.
@@ -827,7 +827,7 @@ MnpEnqueuePacket (
       //
       // Wrap the RxData.
       //
-      CopyMem (&RxDataWrap, MnpWrapRxData (Instance, &RxData), sizeof (MNP_RXDATA_WRAP));
+      RxDataWrap = MnpWrapRxData (Instance, &RxData);
       if (RxDataWrap == NULL) {
         continue;
       }

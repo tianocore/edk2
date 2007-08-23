@@ -69,9 +69,9 @@ EfiDhcp4GetModeData (
   // Caller can use GetModeData to retrieve current DHCP states
   // no matter whether it is the active child or not.
   //
-  Dhcp4ModeData->State                     = DhcpSb->DhcpState;
-  CopyMem (&Dhcp4ModeData->ConfigData, &DhcpSb->ActiveConfig, sizeof (EFI_DHCP4_CONFIG_DATA));
-  CopyMem (&Dhcp4ModeData->ClientMacAddress, &DhcpSb->Mac, sizeof (EFI_MAC_ADDRESS));
+  Dhcp4ModeData->State                     = (EFI_DHCP4_STATE) DhcpSb->DhcpState;
+  CopyMem (&Dhcp4ModeData->ConfigData, &DhcpSb->ActiveConfig, sizeof (Dhcp4ModeData->ConfigData));
+  CopyMem (&Dhcp4ModeData->ClientMacAddress, &DhcpSb->Mac, sizeof (Dhcp4ModeData->ClientMacAddress));
 
   Ip = HTONL (DhcpSb->ClientAddr);
   NetCopyMem (&Dhcp4ModeData->ClientAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
@@ -161,7 +161,7 @@ DhcpCopyConfigure (
   INTN                      Len;
   UINT32                    Index;
 
-  CopyMem (Dst, Src, sizeof (EFI_DHCP4_CONFIG_DATA));
+  CopyMem (Dst, Src, sizeof (Dst));
   Dst->DiscoverTimeout  = NULL;
   Dst->RequestTimeout   = NULL;
   Dst->OptionList       = NULL;
@@ -250,9 +250,7 @@ DhcpYieldControl (
   )
 {
   EFI_DHCP4_CONFIG_DATA     *Config;
-  DHCP_PROTOCOL             *Instance;
 
-  Instance  = DhcpSb->ActiveChild;
   Config    = &DhcpSb->ActiveConfig;
 
   DhcpSb->ServiceState  = DHCP_UNCONFIGED;

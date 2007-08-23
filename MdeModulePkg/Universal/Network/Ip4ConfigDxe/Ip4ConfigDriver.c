@@ -251,7 +251,7 @@ Ip4ConfigDriverBindingStart (
 
   Instance->NicAddr.Type    = (UINT16) SnpMode.IfType;
   Instance->NicAddr.Len     = (UINT8) SnpMode.HwAddressSize;
-  CopyMem (&Instance->NicAddr.MacAddr, &SnpMode.CurrentAddress, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (&Instance->NicAddr.MacAddr, &SnpMode.CurrentAddress, sizeof (Instance->NicAddr.MacAddr));
 
   //
   // Add it to the global list, and compose the name

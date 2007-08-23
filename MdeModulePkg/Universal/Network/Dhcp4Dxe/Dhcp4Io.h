@@ -63,7 +63,7 @@ enum {
   //
   DHCP_NOTIFY_COMPLETION  = 1,
   DHCP_NOTIFY_RENEWREBIND,
-  DHCP_NOTIFY_ALL,
+  DHCP_NOTIFY_ALL
 };
 
 #define DHCP_IS_BOOTP(Parameter)  (((Parameter) == NULL) || ((Parameter)->DhcpType == 0))

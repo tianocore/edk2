@@ -67,7 +67,7 @@ EfiIp4GetModeData (
     // IsConfigured is "whether the station address has been configured"
     //
     Ip4ModeData->IsStarted     = (BOOLEAN)(IpInstance->State == IP4_STATE_CONFIGED);
-    CopyMem (&Ip4ModeData->ConfigData, &IpInstance->ConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+    CopyMem (&Ip4ModeData->ConfigData, &IpInstance->ConfigData, sizeof (Ip4ModeData->ConfigData));
     Ip4ModeData->IsConfigured  = FALSE;
 
     Ip4ModeData->GroupCount    = IpInstance->GroupCount;
@@ -112,11 +112,11 @@ EfiIp4GetModeData (
   }
 
   if (MnpConfigData != NULL) {
-    CopyMem (MnpConfigData, &IpSb->MnpConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
+    CopyMem (MnpConfigData, &IpSb->MnpConfigData, sizeof (*MnpConfigData));
   }
 
   if (SnpModeData != NULL) {
-    CopyMem (SnpModeData, &IpSb->SnpMode, sizeof (EFI_SIMPLE_NETWORK_MODE));
+    CopyMem (SnpModeData, &IpSb->SnpMode, sizeof (*SnpModeData));
   }
 
   NET_RESTORE_TPL (OldTpl);
@@ -197,7 +197,7 @@ Ip4ServiceConfigMnp (
   // recover the original configuration if failed to set the configure.
   //
   if (EFI_ERROR (Status) && Reconfig) {
-    IpSb->MnpConfigData.EnablePromiscuousReceive = !PromiscReceive;
+    IpSb->MnpConfigData.EnablePromiscuousReceive = (BOOLEAN) !PromiscReceive;
   }
 
   return Status;
@@ -477,7 +477,7 @@ Ip4InitProtocol (
   NetZeroMem (IpInstance, sizeof (IP4_PROTOCOL));
 
   IpInstance->Signature = IP4_PROTOCOL_SIGNATURE;
-  CopyMem (&IpInstance->Ip4Proto, &mEfiIp4ProtocolTemplete, sizeof (EFI_IP4_PROTOCOL));
+  CopyMem (&IpInstance->Ip4Proto, &mEfiIp4ProtocolTemplete, sizeof (IpInstance->Ip4Proto));
   IpInstance->State     = IP4_STATE_UNCONFIGED;
   IpInstance->Service   = IpSb;
 
@@ -538,7 +538,7 @@ Ip4ConfigProtocol (
       return EFI_DEVICE_ERROR;
     }
 
-    CopyMem (&IpInstance->ConfigData, Config, sizeof (EFI_IP4_CONFIG_DATA));
+    CopyMem (&IpInstance->ConfigData, Config, sizeof (IpInstance->ConfigData));
     return EFI_SUCCESS;
   }
 
@@ -627,7 +627,7 @@ Ip4ConfigProtocol (
   IpInstance->Interface = IpIf;
   NetListInsertTail (&IpIf->IpInstances, &IpInstance->AddrLink);
 
-  CopyMem (&IpInstance->ConfigData, Config, sizeof (EFI_IP4_CONFIG_DATA));
+  CopyMem (&IpInstance->ConfigData, Config, sizeof (IpInstance->ConfigData));
   IpInstance->State       = IP4_STATE_CONFIGED;
 
   //
@@ -1616,7 +1616,6 @@ EfiIp4Receive (
   )
 {
   IP4_PROTOCOL              *IpInstance;
-  EFI_IP4_CONFIG_DATA       *Config;
   EFI_STATUS                Status;
   EFI_TPL                   OldTpl;
 
@@ -1635,8 +1634,6 @@ EfiIp4Receive (
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
-
-  Config = &IpInstance->ConfigData;
 
   //
   // Current Udp implementation creates an IP child for each Udp child.

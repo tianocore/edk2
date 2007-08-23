@@ -108,8 +108,8 @@ Ip4WrapLinkTxToken (
   Token->CallBack   = CallBack;
   Token->Packet     = Packet;
   Token->Context    = Context;
-  CopyMem (&Token->DstMac, &mZeroMacAddress, sizeof (EFI_MAC_ADDRESS));
-  CopyMem (&Token->SrcMac, &Interface->Mac, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (&Token->DstMac, &mZeroMacAddress, sizeof (Token->DstMac));
+  CopyMem (&Token->SrcMac, &Interface->Mac, sizeof (Token->SrcMac));
 
   MnpToken          = &(Token->MnpToken);
   MnpToken->Status  = EFI_NOT_READY;
@@ -213,7 +213,7 @@ Ip4CreateArpQue (
   }
 
   ArpQue->Ip  = DestIp;
-  CopyMem (&ArpQue->Mac, &mZeroMacAddress, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (&ArpQue->Mac, &mZeroMacAddress, sizeof (ArpQue->Mac));
 
   return ArpQue;
 }
@@ -485,8 +485,8 @@ Ip4CreateInterface (
     return NULL;
   }
 
-  CopyMem (&Interface->Mac, &SnpMode.CurrentAddress, sizeof (EFI_MAC_ADDRESS));
-  CopyMem (&Interface->BroadcastMac, &SnpMode.BroadcastAddress, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (&Interface->Mac, &SnpMode.CurrentAddress, sizeof (Interface->Mac));
+  CopyMem (&Interface->BroadcastMac, &SnpMode.BroadcastAddress, sizeof (Interface->BroadcastMac));
   Interface->HwaddrLen    = SnpMode.HwAddressSize;
 
   NetListInit (&Interface->IpInstances);
@@ -796,7 +796,7 @@ Ip4OnArpResolved (
     NetListRemoveEntry (Entry);
 
     Token         = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
-    CopyMem (&Token->DstMac, &ArpQue->Mac, sizeof (EFI_MAC_ADDRESS));
+    CopyMem (&Token->DstMac, &ArpQue->Mac, sizeof (Token->DstMac));
 
     Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
 
@@ -904,7 +904,7 @@ Ip4SendFrame (
   // all the broadcasts.
   //
   if (NextHop == IP4_ALLONE_ADDRESS) {
-    CopyMem (&Token->DstMac, &Interface->BroadcastMac, sizeof (EFI_MAC_ADDRESS));
+    CopyMem (&Token->DstMac, &Interface->BroadcastMac, sizeof (Token->DstMac));
     goto SEND_NOW;
 
   } else if (IP4_IS_MULTICAST (NextHop)) {

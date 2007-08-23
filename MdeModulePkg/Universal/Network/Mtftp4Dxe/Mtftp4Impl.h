@@ -61,10 +61,10 @@ enum {
 
   MTFTP4_STATE_UNCONFIGED    = 0,
   MTFTP4_STATE_CONFIGED,
-  MTFTP4_STATE_DESTORY,
+  MTFTP4_STATE_DESTORY
 };
 
-typedef struct _MTFTP4_SERVICE {
+struct _MTFTP4_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
 
@@ -92,7 +92,7 @@ typedef struct {
   EFI_STATUS                    Status;
 } MTFTP4_GETINFO_STATE;
 
-typedef struct _MTFTP4_PROTOCOL {
+struct _MTFTP4_PROTOCOL {
   UINT32                        Signature;
   NET_LIST_ENTRY                Link;
   EFI_MTFTP4_PROTOCOL           Mtftp4;

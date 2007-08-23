@@ -34,8 +34,6 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp4ServiceBindingTemplete = {
   Mtftp4ServiceBindingDestroyChild
 };
 
-//@MT: EFI_DRIVER_ENTRY_POINT (Mtftp4DriverEntryPoint)
-
 EFI_STATUS
 EFIAPI
 Mtftp4DriverEntryPoint (
@@ -429,7 +427,7 @@ Mtftp4InitProtocol (
 
   Instance->Signature = MTFTP4_PROTOCOL_SIGNATURE;
   NetListInit (&Instance->Link);
-  CopyMem (&Instance->Mtftp4, &gMtftp4ProtocolTemplate, sizeof (EFI_MTFTP4_PROTOCOL));
+  CopyMem (&Instance->Mtftp4, &gMtftp4ProtocolTemplate, sizeof (Instance->Mtftp4));
   Instance->State     = MTFTP4_STATE_UNCONFIGED;
   Instance->Indestory = FALSE;
   Instance->Service   = MtftpSb;

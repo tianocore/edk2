@@ -131,7 +131,7 @@ enum {
   DHCP_TAG_T1              = 58,         // Renewal (T1) Time Value
   DHCP_TAG_T2              = 59,         // Rebinding (T2) Time Value
   DHCP_TAG_VENDOR_CLASS    = 60,         // Vendor class identifier
-  DHCP_TAG_CLIENT_ID       = 61,         // Client-identifier
+  DHCP_TAG_CLIENT_ID       = 61          // Client-identifier
 };
 
 enum {
@@ -153,7 +153,7 @@ enum {
   //
   DHCP_OVERLOAD_FILENAME   = 1,
   DHCP_OVERLOAD_SVRNAME    = 2,
-  DHCP_OVERLOAD_BOTH       = 3,
+  DHCP_OVERLOAD_BOTH       = 3
 };
 
 //

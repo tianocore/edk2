@@ -40,15 +40,15 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#include "IP4Common.h"
-#include "IP4Driver.h"
-#include "IP4If.h"
+#include "Ip4Common.h"
+#include "Ip4Driver.h"
+#include "Ip4If.h"
 #include "Ip4Icmp.h"
-#include "IP4Option.h"
+#include "Ip4Option.h"
 #include "Ip4Igmp.h"
-#include "IP4Route.h"
-#include "IP4Input.h"
-#include "IP4Output.h"
+#include "Ip4Route.h"
+#include "Ip4Input.h"
+#include "Ip4Output.h"
 
 enum {
   IP4_PROTOCOL_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', '4', 'P'),
@@ -73,7 +73,7 @@ enum {
   IP4_SERVICE_UNSTARTED  = 0,
   IP4_SERVICE_STARTED,
   IP4_SERVICE_CONFIGED,
-  IP4_SERVICE_DESTORY,
+  IP4_SERVICE_DESTORY
 };
 
 //
@@ -109,7 +109,7 @@ typedef struct {
   EFI_IP4_RECEIVE_DATA      RxData;
 } IP4_RXDATA_WRAP;
 
-typedef struct _IP4_PROTOCOL {
+struct _IP4_PROTOCOL {
   UINT32                    Signature;
 
   EFI_IP4_PROTOCOL          Ip4Proto;
@@ -148,9 +148,9 @@ typedef struct _IP4_PROTOCOL {
 
   EFI_IP4_CONFIG_DATA       ConfigData;
 
-} IP4_PROTOCOL;
+};
 
-typedef struct _IP4_SERVICE {
+struct _IP4_SERVICE {
   UINT32                          Signature;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   INTN                            State;
@@ -200,7 +200,7 @@ typedef struct _IP4_SERVICE {
   // NIC this IP4_SERVICE works on.
   //
   CHAR16                          *MacString;
-} IP4_SERVICE;
+};
 
 #define IP4_INSTANCE_FROM_PROTOCOL(Ip4) \
           CR ((Ip4), IP4_PROTOCOL, Ip4Proto, IP4_PROTOCOL_SIGNATURE)

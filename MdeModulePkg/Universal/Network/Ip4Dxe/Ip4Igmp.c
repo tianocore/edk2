@@ -206,7 +206,7 @@ Ip4SendIgmpMessage (
   Igmp->MaxRespTime = 0;
   Igmp->Checksum    = 0;
   Igmp->Group       = HTONL (Group);
-  Igmp->Checksum    = ~NetblockChecksum ((UINT8 *) Igmp, sizeof (IGMP_HEAD));
+  Igmp->Checksum    = (UINT16) (~NetblockChecksum ((UINT8 *) Igmp, sizeof (IGMP_HEAD)));
 
   Head.Tos          = 0;
   Head.Protocol     = IP4_PROTO_IGMP;

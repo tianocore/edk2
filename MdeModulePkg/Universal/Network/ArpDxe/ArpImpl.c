@@ -54,7 +54,7 @@ ArpInitInstance (
   Instance->Signature  = ARP_INSTANCE_DATA_SIGNATURE;
   Instance->ArpService = ArpService;
 
-  CopyMem (&Instance->ArpProto, &mEfiArpProtocolTemplate, sizeof (ARP_SERVICE_DATA));
+  CopyMem (&Instance->ArpProto, &mEfiArpProtocolTemplate, sizeof (Instance->ArpProto));
 
   Instance->Configured = FALSE;
   Instance->Destroyed  = FALSE;
@@ -263,7 +263,9 @@ ArpOnFrameRcvd (
       }
     }
 
-    NetListRemoveEntry (&CacheEntry->List);
+    if (!IsListEmpty (&CacheEntry->List)) {
+      NetListRemoveEntry (&CacheEntry->List);
+    }
 
     //
     // Fill the addresses into the CacheEntry.
@@ -912,7 +914,7 @@ ArpConfigureInstance (
       //
       // Save the configuration.
       //
-      CopyMem (OldConfigData, ConfigData, sizeof (EFI_ARP_CONFIG_DATA));
+      CopyMem (OldConfigData, ConfigData, sizeof (*OldConfigData));
 
       OldConfigData->StationAddress = NetAllocatePool (OldConfigData->SwAddressLength);
       if (OldConfigData->StationAddress == NULL) {

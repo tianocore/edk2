@@ -33,7 +33,7 @@ enum {
   MTFTP4_BLKSIZE_EXIST     = 0x01,
   MTFTP4_TIMEOUT_EXIST     = 0x02,
   MTFTP4_TSIZE_EXIST       = 0x04,
-  MTFTP4_MCAST_EXIST       = 0x08,
+  MTFTP4_MCAST_EXIST       = 0x08
 };
 
 typedef struct {

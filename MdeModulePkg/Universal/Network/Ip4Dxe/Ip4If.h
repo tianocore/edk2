@@ -28,7 +28,7 @@ enum {
   IP4_FRAME_RX_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', 'F', 'R'),
   IP4_FRAME_TX_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', 'F', 'T'),
   IP4_FRAME_ARP_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', 'F', 'A'),
-  IP4_INTERFACE_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', 'I', 'F'),
+  IP4_INTERFACE_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', 'I', 'F')
 };
 
 //
@@ -134,7 +134,7 @@ BOOLEAN
 // Notice the special cases that DHCP can configure the interface
 // with 0.0.0.0/0.0.0.0.
 //
-typedef struct _IP4_INTERFACE {
+struct _IP4_INTERFACE {
   UINT32                        Signature;
   NET_LIST_ENTRY                Link;
   INTN                          RefCnt;
@@ -182,7 +182,7 @@ typedef struct _IP4_INTERFACE {
   //
   NET_LIST_ENTRY                IpInstances;
   BOOLEAN                       PromiscRecv;
-} IP4_INTERFACE;
+};
 
 IP4_INTERFACE *
 Ip4CreateInterface (

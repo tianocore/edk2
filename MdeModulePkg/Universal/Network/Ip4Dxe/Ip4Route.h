@@ -30,7 +30,7 @@ enum {
   IP4_DIRECT_ROUTE      = 0x00000001,
 
   IP4_ROUTE_CACHE_HASH  = 31,
-  IP4_ROUTE_CACHE_MAX   = 64, // Max NO. of cache entry per hash bucket
+  IP4_ROUTE_CACHE_MAX   = 64  // Max NO. of cache entry per hash bucket
 };
 
 #define IP4_ROUTE_CACHE_HASH(Dst, Src)  (((Dst) ^ (Src)) % IP4_ROUTE_CACHE_HASH)
@@ -91,7 +91,7 @@ typedef struct {
 //
 typedef struct _IP4_ROUTE_TABLE IP4_ROUTE_TABLE;
 
-typedef struct _IP4_ROUTE_TABLE {
+struct _IP4_ROUTE_TABLE {
   INTN                      RefCnt;
   UINT32                    TotalNum;
   NET_LIST_ENTRY            RouteArea[IP4_MASK_NUM];
