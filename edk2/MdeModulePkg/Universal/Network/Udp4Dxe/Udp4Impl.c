@@ -172,7 +172,7 @@ Udp4CreateService (
   //
   // Set the OpenData used to open the IpIo.
   //
-  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (OpenData.IpConfigData));
   OpenData.IpConfigData.AcceptBroadcast = TRUE;
   OpenData.RcvdContext                  = (VOID *) Udp4Service;
   OpenData.SndContext                   = NULL;
@@ -359,7 +359,7 @@ Udp4InitInstance (
   // Save the pointer to the UDP4_SERVICE_DATA, and initialize other members.
   //
   Instance->Udp4Service = Udp4Service;
-  CopyMem (&Instance->Udp4Proto, &mUdp4Protocol, sizeof (EFI_UDP4_PROTOCOL));
+  CopyMem (&Instance->Udp4Proto, &mUdp4Protocol, sizeof (Instance->Udp4Proto));
   Instance->IcmpError   = EFI_SUCCESS;
   Instance->Configured  = FALSE;
   Instance->IsNoMapping = FALSE;
@@ -612,7 +612,7 @@ Udp4BuildIp4ConfigData (
   IN EFI_IP4_CONFIG_DATA   *Ip4ConfigData
   )
 {
-  CopyMem (Ip4ConfigData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  CopyMem (Ip4ConfigData, &mIpIoDefaultIpConfigData, sizeof (*Ip4ConfigData));
 
   Ip4ConfigData->DefaultProtocol   = EFI_IP_PROTO_UDP;
   Ip4ConfigData->AcceptBroadcast   = Udp4ConfigData->AcceptBroadcast;
@@ -817,7 +817,7 @@ Udp4Checksum (
 
   Checksum  = NetAddChecksum (Checksum, HTONS ((UINT16) Packet->TotalSize));
 
-  return ~Checksum;
+  return (UINT16) ~Checksum;
 }
 
 
@@ -964,7 +964,7 @@ Udp4LeaveGroup (
 
   if ((McastIp != NULL) && (!EFI_IP4_EQUAL (*McastIp, (UINTN) Item->Key))) {
     //
-    // McastIp is not NULL and the multicast address contained in the Item 
+    // McastIp is not NULL and the multicast address contained in the Item
     // is not the same as McastIp.
     //
     return EFI_SUCCESS;
@@ -1284,7 +1284,7 @@ Udp4WrapRxData (
 
   NetListInit (&Wrap->Link);
 
-  CopyMem (&Wrap->RxData, RxData, sizeof (EFI_UDP4_RECEIVE_DATA));
+  CopyMem (&Wrap->RxData, RxData, sizeof (Wrap->RxData));
 
   //
   // Create the Recycle event.
@@ -1349,7 +1349,7 @@ Udp4EnqueueDgram (
       //
       // Wrap the RxData and put this Wrap into the instances RcvdDgramQue.
       //
-      CopyMem (&Wrap, Udp4WrapRxData (Instance, Packet, RxData), sizeof (UDP4_RXDATA_WRAP));
+      CopyMem (&Wrap, Udp4WrapRxData (Instance, Packet, RxData), sizeof (Wrap));
       if (Wrap == NULL) {
         continue;
       }
@@ -1636,7 +1636,7 @@ Udp4SendPortUnreach (
   //
   // Calculate the checksum.
   //
-  IcmpErrHdr->Head.Checksum = ~(NetbufChecksum (Packet));
+  IcmpErrHdr->Head.Checksum = (UINT16) ~(NetbufChecksum (Packet));
 
   //
   // Fill the override data.

@@ -120,7 +120,7 @@ DhcpCallUser (
   Status = Config->Dhcp4Callback (
                      &DhcpSb->ActiveChild->Dhcp4Protocol,
                      Config->CallbackContext,
-                     DhcpSb->DhcpState,
+                     (EFI_DHCP4_STATE) DhcpSb->DhcpState,
                      Event,
                      Packet,
                      NewPacket
@@ -948,7 +948,7 @@ DhcpHandleReboot (
   }
 
   DhcpSb->Selected  = Packet;
-  CopyMem (DhcpSb->Para, Para, sizeof (DHCP_PARAMETER));
+  CopyMem (DhcpSb->Para, Para, sizeof (*DhcpSb->Para));
 
   Status            = DhcpLeaseAcquired (DhcpSb);
 
@@ -1214,7 +1214,7 @@ DhcpSendMessage (
   Len = sizeof (EFI_DHCP4_PACKET) + 128 + DhcpSb->UserOptionLen;
 
   if (Msg != NULL) {
-    Len += (UINT32)AsciiStrLen (Msg);
+    Len += (UINT32)AsciiStrLen ((CHAR8 *) Msg);
   }
 
   Packet = NetAllocatePool (Len);
@@ -1310,7 +1310,7 @@ DhcpSendMessage (
   // Append the user's message if it isn't NULL
   //
   if (Msg != NULL) {
-    Len     = NET_MIN ((UINT32) AsciiStrLen (Msg), 255);
+    Len     = NET_MIN ((UINT32) AsciiStrLen ((CHAR8 *) Msg), 255);
     Buf     = DhcpAppendOption (Buf, DHCP_TAG_MESSAGE, (UINT16) Len, Msg);
   }
 

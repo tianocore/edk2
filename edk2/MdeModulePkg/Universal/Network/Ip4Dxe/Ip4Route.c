@@ -628,7 +628,6 @@ Ip4BuildEfiRouteTable (
   IN IP4_PROTOCOL           *IpInstance
   )
 {
-  IP4_SERVICE               *IpSb;
   NET_LIST_ENTRY            *Entry;
   IP4_ROUTE_TABLE           *RtTable;
   IP4_ROUTE_ENTRY           *RtEntry;
@@ -636,7 +635,6 @@ Ip4BuildEfiRouteTable (
   UINT32                    Count;
   INT32                     Index;
 
-  IpSb    = IpInstance->Service;
   RtTable = IpInstance->RouteTable;
 
   if (IpInstance->EfiRouteTable != NULL) {

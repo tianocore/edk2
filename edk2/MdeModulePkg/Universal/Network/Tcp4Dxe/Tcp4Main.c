@@ -145,6 +145,7 @@ Tcp4Configure (
   SOCKET           *Sock;
   EFI_STATUS       Status;
   IP4_ADDR         Ip;
+  IP4_ADDR         SubnetMask;
 
   if (NULL == This) {
     return EFI_INVALID_PARAMETER;
@@ -168,7 +169,8 @@ Tcp4Configure (
     if (!TcpConfigData->AccessPoint.UseDefaultAddress) {
 
       NetCopyMem (&Ip, &TcpConfigData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
-      if (!Ip4IsUnicast (NTOHL (Ip), 0) || !IP4_IS_VALID_NETMASK (NTOHL (Ip))) {
+      NetCopyMem (&SubnetMask, &TcpConfigData->AccessPoint.SubnetMask, sizeof (IP4_ADDR));
+      if (!Ip4IsUnicast (NTOHL (Ip), 0) || !IP4_IS_VALID_NETMASK (NTOHL (SubnetMask))) {
         return EFI_INVALID_PARAMETER;
       }
     }

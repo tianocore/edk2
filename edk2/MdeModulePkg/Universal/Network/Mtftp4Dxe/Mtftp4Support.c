@@ -229,7 +229,7 @@ Mtftp4RemoveBlockNum (
       if (Range->End == Num) {
         Range->End--;
       } else {
-        NewRange = Mtftp4AllocateRange (Num + 1, (UINT16) Range->End);
+        NewRange = Mtftp4AllocateRange ((UINT16) (Num + 1), (UINT16) Range->End);
 
         if (NewRange == NULL) {
           return EFI_OUT_OF_RESOURCES;
@@ -270,6 +270,8 @@ Mtftp4SendRequest (
   UINT8                     *Cur;
   UINT32                    Len;
   UINTN                     Index;
+  UINT32                    Len1;
+  UINT32                    Len2;
 
   Token   = Instance->Token;
   Options = Token->OptionList;
@@ -282,11 +284,14 @@ Mtftp4SendRequest (
   //
   // Compute the packet length
   //
-  Len = (UINT32) (AsciiStrLen (Token->Filename) + AsciiStrLen (Mode) + 4);
+  Len1 = (UINT32) AsciiStrLen ((CHAR8 *) Token->Filename);
+  Len2 = (UINT32) AsciiStrLen ((CHAR8 *) Mode);
+  Len  = (Len1 + Len2 + 4);
 
   for (Index = 0; Index < Token->OptionCount; Index++) {
-    Len += (UINT32) (AsciiStrLen (Options[Index].OptionStr) +
-                     AsciiStrLen (Options[Index].ValueStr) + 2);
+    Len1 = (UINT32) AsciiStrLen ((CHAR8 *) Options[Index].OptionStr);
+    Len2 = (UINT32) AsciiStrLen ((CHAR8 *) Options[Index].ValueStr);
+    Len += Len1 + Len2 + 2;
   }
 
   //
@@ -299,12 +304,12 @@ Mtftp4SendRequest (
   Packet         = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (Nbuf, Len, FALSE);
   Packet->OpCode = HTONS (Instance->Operation);
   Cur            = Packet->Rrq.Filename;
-  Cur            = AsciiStrCpy (Cur, Token->Filename);
-  Cur            = AsciiStrCpy (Cur, Mode);
+  Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Token->Filename);
+  Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Mode);
 
   for (Index = 0; Index < Token->OptionCount; ++Index) {
-    Cur = AsciiStrCpy (Cur, Options[Index].OptionStr);
-    Cur = AsciiStrCpy (Cur, Options[Index].ValueStr);
+    Cur = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].OptionStr);
+    Cur = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].ValueStr);
   }
 
   return Mtftp4SendPacket (Instance, Nbuf);
@@ -333,7 +338,7 @@ Mtftp4SendError (
   EFI_MTFTP4_PACKET         *TftpError;
   UINT32                    Len;
 
-  Len     = (UINT32) (AsciiStrLen (ErrInfo) + sizeof (EFI_MTFTP4_ERROR_HEADER));
+  Len     = (UINT32) (AsciiStrLen ((CHAR8 *) ErrInfo) + sizeof (EFI_MTFTP4_ERROR_HEADER));
   Packet  = NetbufAlloc (Len);
 
   if (Packet == NULL) {
@@ -344,7 +349,7 @@ Mtftp4SendError (
   TftpError->OpCode = HTONS (EFI_MTFTP4_OPCODE_ERROR);
   TftpError->Error.ErrorCode = HTONS (ErrCode);
 
-  AsciiStrCpy (TftpError->Error.ErrorMessage, ErrInfo);
+  AsciiStrCpy ((CHAR8 *) TftpError->Error.ErrorMessage, (CHAR8 *) ErrInfo);
 
   return Mtftp4SendPacket (Instance, Packet);
 }
@@ -419,6 +424,7 @@ Mtftp4SendPacket (
   UDP_POINTS                UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
+  UINT16                    Value;
 
   //
   // Save the packet for retransmission
@@ -440,7 +446,8 @@ Mtftp4SendPacket (
   // Send the requests to the listening port, other packets
   // to the connected port
   //
-  OpCode = NTOHS (*((UINT16 *) NetbufGetByte (Packet, 0, NULL)));
+  Value = *((UINT16 *) NetbufGetByte (Packet, 0, NULL));
+  OpCode = NTOHS (Value);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
       (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {
@@ -485,6 +492,7 @@ Mtftp4Retransmit (
   UDP_POINTS                UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
+  UINT16                    Value;
 
   ASSERT (Instance->LastPacket != NULL);
 
@@ -495,7 +503,8 @@ Mtftp4Retransmit (
   //
   // Set the requests to the listening port, other packets to the connected port
   //
-  OpCode = NTOHS (*(UINT16 *) NetbufGetByte (Instance->LastPacket, 0, NULL));
+  Value = *(UINT16 *) NetbufGetByte (Instance->LastPacket, 0, NULL);
+  OpCode = NTOHS (Value);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
       (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {

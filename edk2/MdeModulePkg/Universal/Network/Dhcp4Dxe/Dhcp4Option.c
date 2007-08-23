@@ -424,7 +424,7 @@ DhcpIterateOptions (
 
   if ((Overload == DHCP_OVERLOAD_FILENAME) || (Overload == DHCP_OVERLOAD_BOTH)) {
     Status = DhcpIterateBufferOptions (
-               Packet->Dhcp4.Header.BootFileName,
+               (UINT8 *) Packet->Dhcp4.Header.BootFileName,
                128,
                Check,
                Context,
@@ -438,7 +438,7 @@ DhcpIterateOptions (
 
   if ((Overload == DHCP_OVERLOAD_SVRNAME) || (Overload == DHCP_OVERLOAD_BOTH)) {
     Status = DhcpIterateBufferOptions (
-               Packet->Dhcp4.Header.ServerName,
+               (UINT8 *) Packet->Dhcp4.Header.ServerName,
                64,
                Check,
                Context,
@@ -480,7 +480,7 @@ DhcpGetOptionLen (
   DHCP_OPTION_COUNT         *OpCount;
 
   OpCount             = (DHCP_OPTION_COUNT *) Context;
-  OpCount[Tag].Offset = OpCount[Tag].Offset + Len;
+  OpCount[Tag].Offset = (UINT16) (OpCount[Tag].Offset + Len);
 
   return EFI_SUCCESS;
 }
@@ -528,8 +528,8 @@ DhcpFillOption (
 
   NetCopyMem (Buf + OptCount[Tag].Offset, Data, Len);
 
-  OptCount[Tag].Offset  = OptCount[Tag].Offset + Len;
-  Options[Index].Len    = Options[Index].Len + Len;
+  OptCount[Tag].Offset  = (UINT16) (OptCount[Tag].Offset + Len);
+  Options[Index].Len    = (UINT16) (Options[Index].Len + Len);
   return EFI_SUCCESS;
 }
 
@@ -606,8 +606,8 @@ DhcpParseOption (
     if (OptCount[Index].Offset != 0) {
       OptCount[Index].Index   = (UINT8) OptNum;
 
-      TotalLen                = TotalLen + OptCount[Index].Offset;
-      OptCount[Index].Offset  = TotalLen - OptCount[Index].Offset;
+      TotalLen                = (UINT16) (TotalLen + OptCount[Index].Offset);
+      OptCount[Index].Offset  = (UINT16) (TotalLen - OptCount[Index].Offset);
 
       OptNum++;
     }
@@ -727,7 +727,7 @@ DhcpValidateOptions (
       goto ON_EXIT;
     }
 
-    CopyMem (*Para, &Parameter, sizeof (DHCP_PARAMETER));
+    CopyMem (*Para, &Parameter, sizeof (**Para));
   }
 
 ON_EXIT:
@@ -879,7 +879,7 @@ DhcpBuild (
 
   Packet->Size         = Len;
   Packet->Length       = 0;
-  CopyMem (&Packet->Dhcp4.Header, &SeedPacket->Dhcp4.Header, sizeof (EFI_DHCP4_HEADER));
+  CopyMem (&Packet->Dhcp4.Header, &SeedPacket->Dhcp4.Header, sizeof (Packet->Dhcp4.Header));
   Packet->Dhcp4.Magik  = DHCP_OPTION_MAGIC;
   Buf                  = Packet->Dhcp4.Option;
 

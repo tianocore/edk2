@@ -358,7 +358,7 @@ Tcp4ConfigurePcb (
   //
   // Add Ip for send pkt to the peer
   //
-  CopyMem (&IpCfgData, &mIpIoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  CopyMem (&IpCfgData, &mIpIoDefaultIpConfigData, sizeof (IpCfgData));
   IpCfgData.DefaultProtocol   = EFI_IP_PROTO_TCP;
   IpCfgData.UseDefaultAddress = CfgData->AccessPoint.UseDefaultAddress;
   IpCfgData.StationAddress    = CfgData->AccessPoint.StationAddress;

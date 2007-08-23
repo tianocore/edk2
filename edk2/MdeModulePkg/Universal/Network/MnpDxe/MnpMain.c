@@ -68,7 +68,7 @@ MnpGetModeData (
     //
     // Copy the instance configuration data.
     //
-    CopyMem (MnpConfigData, &Instance->ConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
+    CopyMem (MnpConfigData, &Instance->ConfigData, sizeof (*MnpConfigData));
   }
 
   if (SnpModeData != NULL) {
@@ -76,7 +76,7 @@ MnpGetModeData (
     // Copy the underlayer Snp mode data.
     //
     Snp           = Instance->MnpServiceData->Snp;
-    CopyMem (SnpModeData, Snp->Mode, sizeof (EFI_SIMPLE_NETWORK_MODE));
+    CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
   }
 
   if (!Instance->Configured) {

@@ -414,7 +414,10 @@ UdpIoFreePort (
     UdpIo->UdpHandle
     );
 
-  NetListRemoveEntry (&UdpIo->Link);
+  if (!IsListEmpty(&UdpIo->Link)) {
+    NetListRemoveEntry (&UdpIo->Link);
+  }
+
   NetFreePool (UdpIo);
   return EFI_SUCCESS;
 }

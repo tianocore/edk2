@@ -435,7 +435,7 @@ Ip4Reassemble (
     }
 
     NewPacket->Ip                  = Assemble->Head;
-    CopyMem (IP4_GET_CLIP_INFO (NewPacket), Assemble->Info, sizeof (IP4_CLIP_INFO));
+    CopyMem (IP4_GET_CLIP_INFO (NewPacket), Assemble->Info, sizeof (*IP4_GET_CLIP_INFO (NewPacket)));
     return NewPacket;
   }
 
@@ -511,7 +511,7 @@ Ip4AccpetFrame (
   //
   // Some OS may send IP packets without checksum.
   //
-  Checksum = ~NetblockChecksum ((UINT8 *) Head, HeadLen);
+  Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Head, HeadLen));
 
   if ((Head->Checksum != 0) && (Checksum != 0)) {
     goto RESTART;

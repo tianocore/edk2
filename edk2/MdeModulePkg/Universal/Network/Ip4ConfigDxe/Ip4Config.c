@@ -66,7 +66,7 @@ EfiNicIp4ConfigGetName (
   }
 
   if (NicAddr != NULL) {
-    CopyMem (NicAddr, &Instance->NicAddr, sizeof (NIC_ADDR));
+    CopyMem (NicAddr, &Instance->NicAddr, sizeof (*NicAddr));
   }
 
   return EFI_SUCCESS;
@@ -630,7 +630,7 @@ Ip4ConfigOnDhcp4Complete (
       goto ON_EXIT;
     }
 
-    CopyMem (&Instance->NicConfig->NicAddr, &Instance->NicAddr, sizeof (NIC_ADDR));
+    CopyMem (&Instance->NicConfig->NicAddr, &Instance->NicAddr, sizeof (Instance->NicConfig->NicAddr));
     Instance->NicConfig->Source  = IP4_CONFIG_SOURCE_DHCP;
     Instance->NicConfig->Perment = Perment;
 

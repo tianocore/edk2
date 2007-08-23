@@ -61,10 +61,10 @@ enum {
   //
   DHCP_UNCONFIGED         = 0,
   DHCP_CONFIGED,
-  DHCP_DESTORY,
+  DHCP_DESTORY
 };
 
-typedef struct _DHCP_PROTOCOL {
+struct _DHCP_PROTOCOL {
   UINT32                            Signature;
   EFI_DHCP4_PROTOCOL                Dhcp4Protocol;
   NET_LIST_ENTRY                    Link;
@@ -83,7 +83,7 @@ typedef struct _DHCP_PROTOCOL {
 // DHCP driver is specical in that it is a singleton. Although it
 // has a service binding, there can be only one active child.
 //
-typedef struct _DHCP_SERVICE {
+struct _DHCP_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
 

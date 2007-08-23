@@ -553,7 +553,7 @@ UsbScsiModeSense (
   // ModeSense6 command is defined in [SCSI2Spec-Page151]
   //
   ModeSenseCmd.OpCode         = USB_SCSI_MODE_SENSE6_OPCODE;
-  ModeSenseCmd.Lun            = USB_BOOT_LUN (UsbMass->Lun);
+  ModeSenseCmd.Lun            = (UINT8) USB_BOOT_LUN (UsbMass->Lun);
   ModeSenseCmd.PageCode       = 0x3F;
   ModeSenseCmd.AllocateLen    = (UINT8) sizeof (USB_SCSI_MODE_SENSE6_PARA_HEADER);
 
@@ -572,7 +572,7 @@ UsbScsiModeSense (
   // devices support this command, so have a try here.
   //
   if (!EFI_ERROR (Status)) {
-    Media->ReadOnly = (ModeParaHeader.DevicePara & 0x80) ? TRUE : FALSE;
+    Media->ReadOnly = (BOOLEAN) ((ModeParaHeader.DevicePara & 0x80) ? TRUE : FALSE);
   }
 
   return Status;

@@ -47,9 +47,9 @@ Ip4OptionIsValid (
   UINT32                    Cur;
   UINT32                    Len;
   UINT32                    Point;
-  UINT8                     IcmpType;
-  UINT8                     IcmpCode;
-  UINT32                    IcmpPoint;
+  volatile UINT8            IcmpType;
+  volatile UINT8            IcmpCode;
+  volatile UINT32           IcmpPoint;
 
   IcmpType  = ICMP_PARAMETER_PROBLEM;
   IcmpCode  = 0;

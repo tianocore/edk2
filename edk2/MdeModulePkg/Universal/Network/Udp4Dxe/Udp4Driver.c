@@ -517,7 +517,7 @@ Returns:
     //
     // Initialize the UDP random port.
     //
-    mUdp4RandomPort = ((UINT16) NetRandomInitSeed ()) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN;
+    mUdp4RandomPort = (UINT16) (((UINT16) NetRandomInitSeed ()) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN);
   }
 
   return Status;

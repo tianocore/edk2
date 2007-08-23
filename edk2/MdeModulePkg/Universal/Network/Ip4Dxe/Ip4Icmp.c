@@ -251,7 +251,7 @@ Ip4IcmpReplyEcho (
   Icmp                = (IP4_ICMP_QUERY_HEAD *) NetbufGetByte (Data, 0, NULL);
   Icmp->Head.Type     = ICMP_ECHO_REPLY;
   Icmp->Head.Checksum = 0;
-  Icmp->Head.Checksum = ~NetblockChecksum ((UINT8 *) Icmp, Data->TotalSize);
+  Icmp->Head.Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Icmp, Data->TotalSize));
 
   ReplyHead.Tos       = 0;
   ReplyHead.Fragment  = 0;
@@ -353,7 +353,7 @@ Ip4IcmpHandle (
     goto DROP;
   }
 
-  Checksum = ~NetbufChecksum (Packet);
+  Checksum = (UINT16) (~NetbufChecksum (Packet));
   if ((Icmp.Checksum != 0) && (Checksum != 0)) {
     goto DROP;
   }

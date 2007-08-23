@@ -291,8 +291,12 @@ IpChecksum2 (
   )
 {
   UINT32  Sum;
+  UINT16  HeaderChecksum;
+  UINT16  MessageChecksum;
 
-  Sum = (UINT16)~IpChecksum (Header, HeaderLen) + (UINT16)~IpChecksum (Message, MessageLen);
+  HeaderChecksum = (UINT16)~IpChecksum (Header, HeaderLen);
+  MessageChecksum = (UINT16)~IpChecksum (Message, MessageLen);
+  Sum = HeaderChecksum + MessageChecksum;
 
   //
   // in case above carried
@@ -1350,7 +1354,7 @@ BcStart (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   BUFFER_ALLOCATE_SIZE,
-                  &Private->TransmitBufferPtr
+                  (VOID **) &Private->TransmitBufferPtr
                   );
 
   if (!EFI_ERROR (Status)) {
@@ -1364,7 +1368,7 @@ BcStart (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   BUFFER_ALLOCATE_SIZE,
-                  &Private->ReceiveBufferPtr
+                  (VOID **) &Private->ReceiveBufferPtr
                   );
 
   if (!EFI_ERROR (Status)) {
@@ -1379,7 +1383,7 @@ BcStart (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   256,
-                  &Private->TftpErrorBuffer
+                  (VOID **) &Private->TftpErrorBuffer
                   );
 
   if (EFI_ERROR (Status)) {
@@ -1389,7 +1393,7 @@ BcStart (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->AllocatePool (EfiBootServicesData, 256, &Private->TftpAckBuffer);
+  Status = gBS->AllocatePool (EfiBootServicesData, 256, (VOID **) &Private->TftpAckBuffer);
 
   if (EFI_ERROR (Status)) {
     gBS->FreePool (Private->TftpErrorBuffer);
@@ -1473,7 +1477,6 @@ BcStop (
   //
   // Lock the instance data
   //
-  EFI_PXE_BASE_CODE_MODE      *PxebcMode;
   EFI_SIMPLE_NETWORK_PROTOCOL *SnpPtr;
   EFI_SIMPLE_NETWORK_MODE     *SnpModePtr;
   EFI_STATUS                  StatCode;
@@ -1495,7 +1498,6 @@ BcStop (
 
   EfiAcquireLock (&Private->Lock);
 
-  PxebcMode   = Private->EfiBc.Mode;
   SnpPtr      = Private->SimpleNetwork;
   SnpModePtr  = SnpPtr->Mode;
 
@@ -1875,7 +1877,7 @@ BcSetParameters (
 
   if (SendGuidPtr != NULL) {
     if (*SendGuidPtr) {
-      if (PxeBcLibGetSmbiosSystemGuidAndSerialNumber (&TmpGuid, &SerialNumberPtr) != EFI_SUCCESS) {
+      if (PxeBcLibGetSmbiosSystemGuidAndSerialNumber (&TmpGuid, (CHAR8 **) &SerialNumberPtr) != EFI_SUCCESS) {
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -2395,7 +2397,7 @@ InitializeBCDriver (
   InitArpHeader ();
   OptionsStrucInit ();
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /* eof - bc.c */

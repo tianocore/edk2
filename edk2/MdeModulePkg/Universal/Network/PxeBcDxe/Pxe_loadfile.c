@@ -374,7 +374,6 @@ DoPrompt (
     if (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key) == EFI_NOT_READY) {
       UINT8       Buffer[512];
       UINTN       BufferSize;
-      EFI_STATUS  Status;
 
       BufferSize = sizeof Buffer;
 
@@ -1036,7 +1035,6 @@ DownloadFile (
 
   if (Private->EfiBc.Mode->BisSupported && Private->EfiBc.Mode->BisDetected && Private->EfiBc.Mode->PxeBisReplyReceived) {
     UINT64  CredentialLen;
-    UINTN   BlockSize;
     UINT8   CredentialFilename[256];
     UINT8   *op;
     VOID    *CredentialBuffer;
@@ -1327,6 +1325,12 @@ LoadFile (
   BOOLEAN         NewMakeCallback;
   EFI_STATUS      Status;
   EFI_STATUS      TempStatus;
+
+  //
+  // The following line is only used for passing ICC build.
+  //
+  DEBUG ((EFI_D_INFO, "FilePath = %x\n", FilePath));
+
   //
   //
   //

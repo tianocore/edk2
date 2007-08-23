@@ -86,7 +86,7 @@ Udp4GetModeData (
     //
     // Set the Udp4ConfigData.
     //
-    CopyMem (Udp4ConfigData, &Instance->ConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
+    CopyMem (Udp4ConfigData, &Instance->ConfigData, sizeof (*Udp4ConfigData));
   }
 
   Ip = Instance->IpInfo->Ip;
@@ -239,7 +239,7 @@ Udp4Configure (
       //
       // Save the configuration data.
       //
-      CopyMem (&Instance->ConfigData, UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
+      CopyMem (&Instance->ConfigData, UdpConfigData, sizeof (Instance->ConfigData));
       Instance->ConfigData.StationAddress = Ip4ConfigData.StationAddress;
       Instance->ConfigData.SubnetMask     = Ip4ConfigData.SubnetMask;
 
@@ -351,7 +351,7 @@ Udp4Groups (
   if (JoinFlag) {
     NetCopyMem (&McastIp, MulticastAddress, sizeof (IP4_ADDR));
 
-    if (IP4_IS_MULTICAST (NTOHL (McastIp))) {
+    if (!IP4_IS_MULTICAST (NTOHL (McastIp))) {
       return EFI_INVALID_PARAMETER;
     }
   }

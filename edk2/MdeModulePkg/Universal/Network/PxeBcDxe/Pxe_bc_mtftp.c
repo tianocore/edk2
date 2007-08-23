@@ -555,7 +555,7 @@ TftpRwReq (
   //
   u                 = Buffer;
   u->ReqStr.OpCode  = HTONS (Req);
-  TotalLen = sizeof (Mode) + sizeof (u->ReqStr.OpCode) + (Len = 1 + AsciiStrLen (FilenamePtr));
+  TotalLen = sizeof (Mode) + sizeof (u->ReqStr.OpCode) + (Len = 1 + AsciiStrLen ((CHAR8 *) FilenamePtr));
 
   CopyMem (u->ReqStr.FileName, FilenamePtr, Len);
   Ptr = (UINT8 *) (u->ReqStr.FileName + Len);
@@ -567,7 +567,7 @@ TftpRwReq (
     CopyMem (Ptr, BlockSizeOp, sizeof (BlockSizeOp));
     UtoA10 (*PacketSizePtr, Ptr + sizeof (BlockSizeOp));
 
-    TotalLen += (Len = 1 + AsciiStrLen (Ptr + sizeof (BlockSizeOp)) + sizeof (BlockSizeOp));
+    TotalLen += (Len = 1 + AsciiStrLen ((CHAR8 *) (Ptr + sizeof (BlockSizeOp))) + sizeof (BlockSizeOp));
 
     Ptr += Len;
   }
@@ -1387,7 +1387,7 @@ TftpInfo (
             (UINT16) ReplyLen,
             BufferSizePtr,
             Offset,
-            (INT8 *) &u,
+            (UINT8 *) &u,
             ServerIpPtr,
             &ServerReplyPort,
             &Private->EfiBc.Mode->StationIp,
@@ -1899,7 +1899,7 @@ PxeBcMtftp (
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     BUFFER_ALLOCATE_SIZE,
-                    &BufferPtrLocal
+                    (VOID **) &BufferPtrLocal
                     );
 
     if (EFI_ERROR (Status) || BufferPtrLocal == NULL) {

@@ -79,7 +79,7 @@ enum {
   //
   ICMP_INVALID_MESSAGE      = 0,
   ICMP_ERROR_MESSAGE        = 1,
-  ICMP_QUERY_MESSAGE        = 2,
+  ICMP_QUERY_MESSAGE        = 2
 };
 
 typedef struct {

@@ -31,7 +31,7 @@ enum {
   IP4_OPTION_SSRR      = 137,  // Strict source and record routing, 10001001
   IP4_OPTION_RR        = 7,    // Record routing, 00000111
 
-  IP4_OPTION_COPY_MASK = 0x80,
+  IP4_OPTION_COPY_MASK = 0x80
 };
 
 BOOLEAN

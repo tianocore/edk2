@@ -338,7 +338,7 @@ SendRequest (
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     SnpMode->MediaHeaderSize + sizeof (ARP_PACKET),
-                    &Private->ArpBuffer
+                    (VOID **) &Private->ArpBuffer
                     );
 
     if (EFI_ERROR (Status)) {
