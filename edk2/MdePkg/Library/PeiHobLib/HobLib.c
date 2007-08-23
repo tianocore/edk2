@@ -405,6 +405,39 @@ BuildFvHob (
 }
 
 /**
+  Builds a EFI_HOB_TYPE_FV2 HOB.
+
+  This function builds a EFI_HOB_TYPE_FV2 HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The base address of the Firmware Volume.
+  @param  Length        The size of the Firmware Volume in bytes.
+  @param  FvName       The name of the Firmware Volume.
+  @param  FileName      The name of the file.
+  
+**/
+VOID
+EFIAPI
+BuildFv2Hob (
+  IN          EFI_PHYSICAL_ADDRESS        BaseAddress,
+  IN          UINT64                      Length,
+  IN CONST    EFI_GUID                    *FvName,
+  IN CONST    EFI_GUID                    *FileName
+  )
+{
+  EFI_HOB_FIRMWARE_VOLUME2  *Hob;
+
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV2, sizeof (EFI_HOB_FIRMWARE_VOLUME2));
+
+  Hob->BaseAddress = BaseAddress;
+  Hob->Length      = Length;
+  CopyMem (&Hob->FvName, FvName, sizeof (EFI_GUID));
+  CopyMem (&Hob->FileName, FileName, sizeof (EFI_GUID));
+}
+
+/**
   Builds a Capsule Volume HOB.
 
   This function builds a Capsule Volume HOB.

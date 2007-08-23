@@ -247,6 +247,7 @@ typedef union {
   EFI_HOB_RESOURCE_DESCRIPTOR         *ResourceDescriptor;
   EFI_HOB_GUID_TYPE                   *Guid;
   EFI_HOB_FIRMWARE_VOLUME             *FirmwareVolume;
+  EFI_HOB_FIRMWARE_VOLUME2            *FirmwareVolume2;
   EFI_HOB_CPU                         *Cpu;
   EFI_HOB_MEMORY_POOL                 *Pool;
   UINT8                               *Raw;
