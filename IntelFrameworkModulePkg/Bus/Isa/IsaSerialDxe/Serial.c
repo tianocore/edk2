@@ -1167,7 +1167,7 @@ IsaSerialSetAttributes (
   }
 
   if (Parity == DefaultParity) {
-    Parity = FixedPcdGet8 (PcdUartDefaultParity);
+    Parity = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
   }
 
   if (DataBits == 0) {
