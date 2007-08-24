@@ -235,6 +235,16 @@ typedef struct {
 #define EFI_SAL_ST_PTC                4
 #define EFI_SAL_ST_AP_WAKEUP          5
 
+//
+// SAL System Type Sizes
+//
+#define EFI_SAL_ST_ENTRY_POINT_SIZE        48
+#define EFI_SAL_ST_MEMORY_DESCRIPTOR_SIZE  32
+#define EFI_SAL_ST_PLATFORM_FEATURES_SIZE  16
+#define EFI_SAL_ST_TR_USAGE_SIZE           32
+#define EFI_SAL_ST_PTC_SIZE                16
+#define EFI_SAL_ST_AP_WAKEUP_SIZE          16
+
 #pragma pack(1)
 typedef struct {
   UINT8   Type; //  Type == 0
