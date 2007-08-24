@@ -729,7 +729,8 @@ RELEASE_ICC_IPF_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGN
 ##################
 *_ICC_*_ASL_FAMILY  = INTEL
 *_ICC_*_ASL_NAME    = iasl.exe
-*_ICC_*_ASL_PATH    = C:\ASL
+DEBUG_ICC_*_ASL_PATH    = C:\ASL
+RELEASE_ICC_*_ASL_PATH  = C:\ASL
 
 ####################################################################################
 #
