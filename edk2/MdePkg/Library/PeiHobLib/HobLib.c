@@ -433,8 +433,8 @@ BuildFv2Hob (
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
-  CopyMem (&Hob->FvName, FvName, sizeof (EFI_GUID));
-  CopyMem (&Hob->FileName, FileName, sizeof (EFI_GUID));
+  CopyGuid (&Hob->FvName, FvName);
+  CopyGuid (&Hob->FileName, FileName);
 }
 
 /**
