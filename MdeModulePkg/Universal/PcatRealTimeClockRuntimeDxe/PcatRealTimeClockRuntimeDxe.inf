@@ -38,7 +38,6 @@
   PcRtc.c
   PcRtc.h
 
-
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -54,11 +53,8 @@
   DebugLib
   BaseLib
 
-
 [Protocols]
   gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
-
 [Depex]
-  gEfiCpuArchProtocolGuid AND gEfiMetronomeArchProtocolGuid
-
+  TRUE
