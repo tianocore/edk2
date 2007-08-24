@@ -823,7 +823,7 @@ Returns:
   
   while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
     if (CompareGuid (DriverName, &HobFv2.FirmwareVolume2->FileName)) {
-      Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeBlockProtocolGuid, &Fvb);
+      Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **) &Fvb);
       if (!EFI_ERROR (Status)) {
         Status = Fvb->GetPhysicalAddress (Fvb, &FvHeaderAddr);
         if (!EFI_ERROR (Status)) {
