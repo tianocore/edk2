@@ -723,7 +723,6 @@ ArpServiceBindingDestroyChild (
   return Status;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (ArpDriverEntryPoint)
 
 EFI_STATUS
 EFIAPI

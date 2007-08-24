@@ -31,8 +31,6 @@ EFI_DRIVER_BINDING_PROTOCOL gIp4DriverBinding = {
   NULL
 };
 
-//@MT: EFI_DRIVER_ENTRY_POINT (Ip4DriverEntryPoint)
-
 EFI_STATUS
 EFIAPI
 Ip4DriverEntryPoint (

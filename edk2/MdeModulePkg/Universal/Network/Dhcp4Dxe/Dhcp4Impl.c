@@ -161,7 +161,7 @@ DhcpCopyConfigure (
   INTN                      Len;
   UINT32                    Index;
 
-  CopyMem (Dst, Src, sizeof (Dst));
+  CopyMem (Dst, Src, sizeof (*Dst));
   Dst->DiscoverTimeout  = NULL;
   Dst->RequestTimeout   = NULL;
   Dst->OptionList       = NULL;
