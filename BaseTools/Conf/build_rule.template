@@ -227,7 +227,7 @@
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME).depex
 
-    <Command.MSFT>
+    <Command>
 #       GenDepex -o ${dst} ${src}
 
 [Build.Acpi-Source-Language-File]
@@ -249,7 +249,7 @@
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.acpi
 
-    <Command.MSFT>
+    <Command.MSFT, Command.INTEL>
         "$(CC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(INC) ${src}
         "$(DLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj 
         GenFw -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll
