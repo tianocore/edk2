@@ -594,8 +594,6 @@ EFI_DRIVER_BINDING_PROTOCOL gUSBMassDriverBinding = {
   NULL
 };
 
-//@MT: EFI_DRIVER_ENTRY_POINT (USBMassStorageEntryPoint)
-
 EFI_STATUS
 EFIAPI
 USBMassStorageEntryPoint (

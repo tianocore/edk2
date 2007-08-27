@@ -113,8 +113,6 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbKeyboardDriverBinding = {
   NULL
 };
 
-//@MT: EFI_DRIVER_ENTRY_POINT (USBKeyboardDriverBindingEntryPoint)
-
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingEntryPoint (
