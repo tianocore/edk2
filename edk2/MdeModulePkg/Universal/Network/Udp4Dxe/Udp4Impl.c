@@ -1349,7 +1349,7 @@ Udp4EnqueueDgram (
       //
       // Wrap the RxData and put this Wrap into the instances RcvdDgramQue.
       //
-      CopyMem (&Wrap, Udp4WrapRxData (Instance, Packet, RxData), sizeof (Wrap));
+      Wrap = Udp4WrapRxData (Instance, Packet, RxData);
       if (Wrap == NULL) {
         continue;
       }

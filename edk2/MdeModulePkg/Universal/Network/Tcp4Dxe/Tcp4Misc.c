@@ -23,6 +23,8 @@ Abstract:
 
 #include "Tcp4Main.h"
 
+#include <Library/DevicePathLib.h>
+
 NET_LIST_ENTRY  mTcpRunQue = {
   &mTcpRunQue,
   &mTcpRunQue
@@ -423,6 +425,7 @@ TcpCloneTcb (
   )
 {
   TCP_CB               *Clone;
+  TCP4_SERVICE_DATA  *TcpService;
 
   Clone = NetAllocatePool (sizeof (TCP_CB));
 
@@ -450,6 +453,19 @@ TcpCloneTcb (
   }
 
   ((TCP4_PROTO_DATA *) (Clone->Sk->ProtoReserved))->TcpPcb = Clone;
+
+  //
+  // Open the device path on the handle where service binding resides on.
+  //
+  TcpService = ((TCP4_PROTO_DATA *) (Clone->Sk->ProtoReserved))->TcpService;
+  gBS->OpenProtocol (
+         TcpService->ControllerHandle,
+         &gEfiDevicePathProtocolGuid,
+         (VOID **) &Clone->Sk->ParentDevicePath,
+         TcpService->DriverBindingHandle,
+         Clone->Sk->SockHandle,
+         EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+         );
 
   return Clone;
 }
@@ -530,6 +546,15 @@ TcpSetState (
   case TCP_ESTABLISHED:
 
     SockConnEstablished (Tcb->Sk);
+
+    if (Tcb->Parent != NULL) {
+      //
+      // A new connection is accepted by a listening socket, install
+      // the device path.
+      //
+      TcpInstallDevicePath (Tcb->Sk);
+    }
+
     break;
 
   case TCP_CLOSED:
@@ -1091,3 +1116,65 @@ TcpClearVariableData (
   Tcp4Service->MacString = NULL;
 }
 
+EFI_STATUS
+TcpInstallDevicePath (
+  IN SOCKET *Sock
+  )
+/*++
+
+Routine Description:
+
+  Install the device path protocol on the TCP instance.
+
+Arguments:
+
+  Sock - Pointer to the socket representing the TCP instance.
+
+Returns:
+
+  EFI_SUCCESS - The device path protocol is installed.
+  other       - Failed to install the device path protocol.
+
+--*/
+{
+  TCP4_PROTO_DATA    *TcpProto;
+  TCP4_SERVICE_DATA  *TcpService;
+  TCP_CB             *Tcb;
+  IPv4_DEVICE_PATH   Ip4DPathNode;
+  EFI_STATUS         Status;
+
+  TcpProto   = (TCP4_PROTO_DATA *) Sock->ProtoReserved;
+  TcpService = TcpProto->TcpService;
+  Tcb        = TcpProto->TcpPcb;
+
+  NetLibCreateIPv4DPathNode (
+    &Ip4DPathNode,
+    TcpService->ControllerHandle,
+    Tcb->LocalEnd.Ip,
+    NTOHS (Tcb->LocalEnd.Port),
+    Tcb->RemoteEnd.Ip,
+    NTOHS (Tcb->RemoteEnd.Port),
+    EFI_IP_PROTO_TCP,
+    Tcb->UseDefaultAddr
+    );
+
+  Sock->DevicePath = AppendDevicePathNode (
+                     Sock->ParentDevicePath,
+                     (EFI_DEVICE_PATH_PROTOCOL *) &Ip4DPathNode
+                     );
+  if (Sock->DevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->InstallProtocolInterface (
+                  &Sock->SockHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  Sock->DevicePath
+                  );
+  if (EFI_ERROR (Status)) {
+    NetFreePool (Sock->DevicePath);
+  }
+
+  return Status;
+}

@@ -328,6 +328,8 @@ struct _SOCKET {
   UINT32                Signature;
   EFI_HANDLE            SockHandle;     // the virtual handle of the socket
   EFI_HANDLE            DriverBinding;  // socket't driver binding protocol
+  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   SOCK_CONFIGURE_STATE  ConfigureState;
   SOCK_TYPE             Type;
   SOCK_STATE            State;

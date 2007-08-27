@@ -24,6 +24,7 @@ Abstract:
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/NicIp4Config.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
@@ -838,11 +839,7 @@ NetLibDefaultUnload (
   UINTN                             DeviceHandleCount;
   UINTN                             Index;
   EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName;
-#else
   EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
-#endif
   EFI_DRIVER_CONFIGURATION_PROTOCOL *DriverConfiguration;
   EFI_DRIVER_DIAGNOSTICS_PROTOCOL   *DriverDiagnostics;
 
@@ -1121,6 +1118,109 @@ NetLibGetMacString (
   *MacString = MacAddress;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Check the default address used by the IPv4 driver is static or dynamic (acquired
+  from DHCP).
+
+  @param  Controller     The controller handle which has the NIC Ip4 Config Protocol
+                         relative with the default address to judge.
+
+  @retval TRUE           If the default address is static.
+  @retval FALSE          If the default address is acquired from DHCP.
+
+**/
+STATIC
+BOOLEAN
+NetLibDefaultAddressIsStatic (
+  IN EFI_HANDLE  Controller
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_NIC_IP4_CONFIG_PROTOCOL  *NicIp4;
+  UINTN                        Len;
+  NIC_IP4_CONFIG_INFO          *ConfigInfo;
+  BOOLEAN                      IsStatic;
+
+  Status = gBS->HandleProtocol (
+                  Controller,
+                  &gEfiNicIp4ConfigProtocolGuid,
+                  (VOID **) &NicIp4
+                  );
+  if (EFI_ERROR (Status)) {
+    return TRUE;
+  }
+
+  Len = 0;
+  Status = NicIp4->GetInfo (NicIp4, &Len, NULL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return TRUE;
+  }
+
+  ConfigInfo = NetAllocatePool (Len);
+  if (ConfigInfo == NULL) {
+    return TRUE;
+  }
+
+  IsStatic = TRUE;
+  Status = NicIp4->GetInfo (NicIp4, &Len, ConfigInfo);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  IsStatic = (BOOLEAN) (ConfigInfo->Source == IP4_CONFIG_SOURCE_STATIC);
+
+ON_EXIT:
+
+  NetFreePool (ConfigInfo);
+
+  return IsStatic;
+}
+
+/**
+  Create an IPv4 device path node.
+
+  @param  Node                  Pointer to the IPv4 device path node.
+  @param  Controller            The handle where the NIC IP4 config protocol resides.
+  @param  LocalIp               The local IPv4 address.
+  @param  LocalPort             The local port.
+  @param  RemoteIp              The remote IPv4 address.
+  @param  RemotePort            The remote port.
+  @param  Protocol              The protocol type in the IP header.
+  @param  UseDefaultAddress     Whether this instance is using default address or not.
+
+  @retval None
+**/
+VOID
+NetLibCreateIPv4DPathNode (
+  IN OUT IPv4_DEVICE_PATH  *Node,
+  IN EFI_HANDLE            Controller,
+  IN IP4_ADDR              LocalIp,
+  IN UINT16                LocalPort,
+  IN IP4_ADDR              RemoteIp,
+  IN UINT16                RemotePort,
+  IN UINT16                Protocol,
+  IN BOOLEAN               UseDefaultAddress
+  )
+{
+  Node->Header.Type    = MESSAGING_DEVICE_PATH;
+  Node->Header.SubType = MSG_IPv4_DP;
+  SetDevicePathNodeLength (&Node->Header, 19);
+
+  NetCopyMem (&Node->LocalIpAddress, &LocalIp, sizeof (EFI_IPv4_ADDRESS));
+  NetCopyMem (&Node->RemoteIpAddress, &RemoteIp, sizeof (EFI_IPv4_ADDRESS));
+
+  Node->LocalPort  = LocalPort;
+  Node->RemotePort = RemotePort;
+
+  Node->Protocol = Protocol;
+
+  if (!UseDefaultAddress) {
+    Node->StaticIpAddress = TRUE;
+  } else {
+    Node->StaticIpAddress = NetLibDefaultAddressIsStatic (Controller);
+  }
 }
 
 
