@@ -77,7 +77,6 @@ typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 //
 // The following types are currently defined:
 //
-typedef UINT16  EFI_FORM_ID;
 typedef UINT16  EFI_FORM_LABEL;
 
 #pragma pack(1)
