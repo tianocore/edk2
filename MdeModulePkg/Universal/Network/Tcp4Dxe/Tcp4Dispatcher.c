@@ -248,6 +248,16 @@ Tcp4FlushPcb (
   if (SOCK_IS_CONFIGURED (Sock)) {
     NetListRemoveEntry (&Tcb->List);
 
+    //
+    // Uninstall the device path protocl.
+    //
+    gBS->UninstallProtocolInterface (
+           Sock->SockHandle,
+           &gEfiDevicePathProtocolGuid,
+           Sock->DevicePath
+           );
+    NetFreePool (Sock->DevicePath);
+
     TcpSetVariableData (TcpProto->TcpService);
   }
 
@@ -428,12 +438,19 @@ Tcp4ConfigurePcb (
   Tcb->TTL            = CfgData->TimeToLive;
   Tcb->TOS            = CfgData->TypeOfService;
 
+  Tcb->UseDefaultAddr = CfgData->AccessPoint.UseDefaultAddress;
+
   NetCopyMem (&Tcb->LocalEnd.Ip, &CfgData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
   Tcb->LocalEnd.Port  = HTONS (CfgData->AccessPoint.StationPort);
   Tcb->SubnetMask     = CfgData->AccessPoint.SubnetMask;
 
-  NetCopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
-  Tcb->RemoteEnd.Port = HTONS (CfgData->AccessPoint.RemotePort);
+  if (CfgData->AccessPoint.ActiveFlag) {
+    NetCopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
+    Tcb->RemoteEnd.Port = HTONS (CfgData->AccessPoint.RemotePort);
+  } else {
+    Tcb->RemoteEnd.Ip   = 0;
+    Tcb->RemoteEnd.Port = 0;
+  }
 
   Option              = CfgData->ControlOption;
 
@@ -535,6 +552,15 @@ Tcp4ConfigurePcb (
     if (Option->EnableWindowScaling == FALSE) {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_NO_WS);
     }
+  }
+
+  //
+  // The socket is bound, the <SrcIp, SrcPort, DstIp, DstPort> is
+  // determined, construct the IP device path and install it.
+  //
+  Status = TcpInstallDevicePath (Sk);
+  if (EFI_ERROR (Status)) {
+    goto OnExit;
   }
 
   //
@@ -681,8 +707,6 @@ Tcp4Dispatcher (
 
     return Tcp4Route (Tcb, (TCP4_ROUTE_INFO *) Data);
 
-  default:
-    return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;

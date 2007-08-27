@@ -350,4 +350,9 @@ TcpClearVariableData (
   IN TCP4_SERVICE_DATA  *Tcp4Service
   );
 
+EFI_STATUS
+TcpInstallDevicePath (
+  IN SOCKET  *Sock
+  );
+
 #endif

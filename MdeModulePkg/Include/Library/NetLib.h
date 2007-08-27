@@ -457,6 +457,18 @@ NetLibGetMacString (
   IN OUT       CHAR16      **MacString
   );
 
+VOID
+NetLibCreateIPv4DPathNode (
+  IN OUT IPv4_DEVICE_PATH  *Node,
+  IN EFI_HANDLE            Controller,
+  IN IP4_ADDR              LocalIp,
+  IN UINT16                LocalPort,
+  IN IP4_ADDR              RemoteIp,
+  IN UINT16                RemotePort,
+  IN UINT16                Protocol,
+  IN BOOLEAN               UseDefaultAddress
+  );
+
 EFI_HANDLE
 NetLibGetNicHandle (
   IN EFI_HANDLE             Controller,
