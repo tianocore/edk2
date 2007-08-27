@@ -29,9 +29,10 @@ Notes:
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
         r620 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r601 <buildtools_project>\BaseTools\Source\Python\Python\build
-        r569 <buildtools_project>\BaseTools\Source\Python\Python\Common
-        r564 <buildtools_project>\BaseTools\Source\Python\Python\CommonDataClass
+        r601 <buildtools_project>\BaseTools\Source\Python\build
+        r569 <buildtools_project>\BaseTools\Source\Python\Common
+        r564 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r564 <buildtools_project>\BaseTools\Source\Python\GenFds
 
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
