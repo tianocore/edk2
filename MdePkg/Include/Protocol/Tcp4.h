@@ -1,17 +1,17 @@
 /** @file
   EFI TCPv4 Protocol Definition
   The EFI TCPv4 Service Binding Protocol is used to locate EFI TCPv4 Protocol drivers to create
-  and destroy child of the driver to communicate with other host using TCP protocol.      
-  The EFI TCPv4 Protocol provides services to send and receive data stream.     
+  and destroy child of the driver to communicate with other host using TCP protocol.
+  The EFI TCPv4 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -57,16 +57,16 @@ typedef struct {
 } EFI_TCP4_ACCESS_POINT;
 
 typedef struct {
-  UINTN                   ReceiveBufferSize;
-  UINTN                   SendBufferSize;
-  UINTN                   MaxSynBackLog;
-  UINTN                   ConnectionTimeout;
-  UINTN                   DataRetries;
-  UINTN                   FinTimeout;
-  UINTN                   TimeWaitTimeout;
-  UINTN                   KeepAliveProbes;
-  UINTN                   KeepAliveTime;
-  UINTN                   KeepAliveInterval;
+  UINT32                  ReceiveBufferSize;
+  UINT32                  SendBufferSize;
+  UINT32                  MaxSynBackLog;
+  UINT32                  ConnectionTimeout;
+  UINT32                  DataRetries;
+  UINT32                  FinTimeout;
+  UINT32                  TimeWaitTimeout;
+  UINT32                  KeepAliveProbes;
+  UINT32                  KeepAliveTime;
+  UINT32                  KeepAliveInterval;
   BOOLEAN                 EnableNagle;
   BOOLEAN                 EnableTimeStamp;
   BOOLEAN                 EnableWindowScaling;
@@ -85,10 +85,10 @@ typedef struct {
   // Access Point
   //
   EFI_TCP4_ACCESS_POINT   AccessPoint;
-                          
-  //                      
-  // TCP Control Options  
-  //                      
+
+  //
+  // TCP Control Options
+  //
   EFI_TCP4_OPTION         *ControlOption;
 } EFI_TCP4_CONFIG_DATA;
 
@@ -121,22 +121,22 @@ typedef struct {
 } EFI_TCP4_LISTEN_TOKEN;
 
 typedef struct {
-  UINTN FragmentLength;
-  VOID  *FragmentBuffer;
+  UINT32 FragmentLength;
+  VOID   *FragmentBuffer;
 } EFI_TCP4_FRAGMENT_DATA;
 
 typedef struct {
   BOOLEAN                   UrgentFlag;
-  IN OUT UINTN              DataLength;
-  UINTN                     FragmentCount;
+  UINT32                    DataLength;
+  UINT32                    FragmentCount;
   EFI_TCP4_FRAGMENT_DATA    FragmentTable[1];
-} EFI_TCP4_RECEIVE_DATA;    
+} EFI_TCP4_RECEIVE_DATA;
 
-typedef struct {            
+typedef struct {
   BOOLEAN                   Push;
   BOOLEAN                   Urgent;
-  UINTN                     DataLength;
-  UINTN                     FragmentCount;
+  UINT32                    DataLength;
+  UINT32                    FragmentCount;
   EFI_TCP4_FRAGMENT_DATA    FragmentTable[1];
 } EFI_TCP4_TRANSMIT_DATA;
 
@@ -187,7 +187,7 @@ EFI_STATUS
   OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
   )
 ;
-  
+
 /**
   Initialize or brutally reset the operational parameters for this EFI TCPv4 instance.
 
@@ -215,7 +215,7 @@ EFI_STATUS
   IN EFI_TCP4_CONFIG_DATA                *TcpConfigData OPTIONAL
   )
 ;
-    
+
 
 /**
   Add or delete a route entry to the route table
@@ -259,7 +259,7 @@ EFI_STATUS
   IN EFI_IPv4_ADDRESS                    *SubnetMask,
   IN EFI_IPv4_ADDRESS                    *GatewayAddress
   )
-;  
+;
 
 /**
   Initiate a nonblocking TCP connection request for an active TCP instance.
@@ -267,7 +267,7 @@ EFI_STATUS
   @param  This                  Pointer to the EFI_TCP4_PROTOCOL instance.
   @param  ConnectionToken       Pointer to the connection token to return when the TCP three
                                 way handshake finishes.
-                                 
+
   @retval EFI_SUCCESS           The connection request is successfully initiated and the state
                                 - of this TCPv4 instance has been changed to
                                 - Tcp4StateSynSent.
@@ -289,8 +289,8 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CONNECTION_TOKEN           *ConnectionToken
   )
-;  
-  
+;
+
 
 /**
   Listen on the passive instance to accept an incoming connection request. This is a nonblocking operation.
@@ -319,7 +319,7 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_LISTEN_TOKEN               *ListenToken
   )
-;    
+;
 
 /**
   Queues outgoing data into the transmit queue.
@@ -358,7 +358,7 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
   )
-;      
+;
 
 
 /**
@@ -402,11 +402,11 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
   )
-;       
-   
+;
+
 /**
   Disconnecting a TCP connection gracefully or reset a TCP connection. This function is a
-  nonblocking operation.                                                                                                                                                                        
+  nonblocking operation.
 
   @param  This       Pointer to the EFI_TCP4_PROTOCOL instance.
   @param  CloseToken Pointer to the close token to return when operation finishes.
@@ -433,7 +433,7 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CLOSE_TOKEN                *CloseToken
   )
-;      
+;
 
 /**
   Abort an asynchronous connection, listen, transmission or receive request.
@@ -462,7 +462,7 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_COMPLETION_TOKEN           *Token OPTIONAL
   )
-;      
+;
 
 
 /**
@@ -483,7 +483,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_POLL) (
   IN EFI_TCP4_PROTOCOL                   *This
   )
-;      
+;
 
 struct _EFI_TCP4_PROTOCOL {
   EFI_TCP4_GET_MODE_DATA                 GetModeData;

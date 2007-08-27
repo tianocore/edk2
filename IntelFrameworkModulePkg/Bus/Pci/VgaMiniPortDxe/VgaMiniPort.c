@@ -36,8 +36,6 @@ EFI_DRIVER_BINDING_PROTOCOL gPciVgaMiniPortDriverBinding = {
 //
 // Driver Entry Point
 //
-//@MT: EFI_DRIVER_ENTRY_POINT (PciVgaMiniPortDriverEntryPoint)
-
 EFI_STATUS
 EFIAPI
 PciVgaMiniPortDriverEntryPoint (

@@ -83,13 +83,8 @@ typedef struct {
 #pragma pack(1)
 
 typedef struct {
-#ifdef EFI_NET_LITTLE_ENDIAN
   UINT8                   HeaderLength:4;
   UINT8                   Version:4;
-#else 
-  UINT8                   Version:4;
-  UINT8                   HeaderLength:4;
-#endif
   UINT8                   TypeOfService;
   UINT16                  TotalLength;
   UINT16                  Identification;

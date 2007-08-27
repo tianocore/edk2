@@ -24,19 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Usb.h>
 
 
-//
-// Driver Consumed Protocol Prototypes
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (DriverBinding)
-//@MT:#include EFI_PROTOCOL_DEFINITION (UsbIo)
-
-//
-// Driver Produced Protocol Prototypes
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (SimplePointer)
-
-//@MT:#include "UsbDxeLib.h"
-//@MT:#include "hid.h"
 #include "usbmouse.h"
 #include "mousehid.h"
 
@@ -147,8 +134,6 @@ UsbMouseReset (
 //
 // Driver start here
 //
-//@MT: EFI_DRIVER_ENTRY_POINT (USBMouseDriverBindingEntryPoint)
-
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingEntryPoint (

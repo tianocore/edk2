@@ -1828,8 +1828,6 @@ Uhci2AsyncIsochronousTransfer (
   return EFI_UNSUPPORTED;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (UhciDriverEntryPoint)
-
 EFI_STATUS
 EFIAPI
 UhciDriverEntryPoint (

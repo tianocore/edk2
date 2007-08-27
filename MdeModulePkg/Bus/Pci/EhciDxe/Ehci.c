@@ -1271,8 +1271,6 @@ EhcAsyncIsochronousTransfer (
   return EFI_UNSUPPORTED;
 }
 
-//@MT: EFI_DRIVER_ENTRY_POINT (EhcDriverEntryPoint)
-
 EFI_STATUS
 EFIAPI
 EhcDriverEntryPoint (
