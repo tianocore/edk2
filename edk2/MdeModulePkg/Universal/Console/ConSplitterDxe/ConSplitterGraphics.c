@@ -1130,6 +1130,9 @@ DevNullSyncGopStdOut (
   MaxColumn     = Private->DevNullColumns;
 
   Buffer        = AllocateZeroPool ((MaxColumn + 1) * sizeof (CHAR16));
+  if (Buffer == NULL) {
+    return ReturnStatus;
+  }
 
   for (Row = 0; Row < Private->DevNullRows; Row++, Screen += (MaxColumn + 1), Attributes += MaxColumn) {
 
