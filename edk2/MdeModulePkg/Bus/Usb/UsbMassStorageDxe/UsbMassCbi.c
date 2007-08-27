@@ -111,14 +111,14 @@ UsbCbiInit (
          (UsbCbi->BulkInEndpoint == NULL)) {
 
         UsbCbi->BulkInEndpoint  = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1);
-        *UsbCbi->BulkInEndpoint = EndPoint;
+        CopyMem(UsbCbi->BulkInEndpoint, &EndPoint, sizeof (EndPoint));;
       }
 
       if (USB_IS_OUT_ENDPOINT (EndPoint.EndpointAddress) &&
          (UsbCbi->BulkOutEndpoint == NULL)) {
 
         UsbCbi->BulkOutEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1) + 1;
-        *UsbCbi->BulkOutEndpoint  = EndPoint;
+        CopyMem(UsbCbi->BulkOutEndpoint, &EndPoint, sizeof (EndPoint));
       }
 
     } else if (USB_IS_INTERRUPT_ENDPOINT (EndPoint.Attributes)) {
@@ -129,7 +129,7 @@ UsbCbiInit (
           (UsbCbi->InterruptEndpoint == NULL)) {
 
         UsbCbi->InterruptEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1) + 2;
-        *UsbCbi->InterruptEndpoint  = EndPoint;
+        CopyMem(UsbCbi->InterruptEndpoint, &EndPoint, sizeof (EndPoint));
       }
     }
   }

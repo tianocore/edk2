@@ -26,8 +26,8 @@ STATIC EFI_PXE_BASE_CODE_UDP_PORT DhcpServerPort        = DHCP_SERVER_PORT;
 STATIC EFI_PXE_BASE_CODE_UDP_PORT DHCPClientPort        = DHCP_CLIENT_PORT;
 STATIC EFI_PXE_BASE_CODE_UDP_PORT PseudoDhcpServerPort  = PXE_DISCOVERY_PORT;
 #define PSEUDO_DHCP_CLIENT_PORT PseudoDhcpServerPort
-STATIC EFI_IP_ADDRESS             BroadcastIP       = { 0xffffffff };
-STATIC EFI_IP_ADDRESS             DefaultSubnetMask = { 0xffffff00 };
+STATIC EFI_IP_ADDRESS             BroadcastIP       = {{0xffffffff}};
+STATIC EFI_IP_ADDRESS             DefaultSubnetMask = {{0xffffff00}};
 
 typedef union {
   DHCPV4_OP_STRUCT          *OpPtr;
@@ -1470,7 +1470,7 @@ Release (
 
   CopyMem (
     &DHCPRELEASEoptions.DhcServerIpPtr,
-    &(DHCPV4_OP_SERVER_IP *) DHCPV4_ACK_BUFFER.OpAdds.PktOptAdds[OP_DHCP_SERVER_IP_IX - 1],
+    (DHCPV4_OP_SERVER_IP *) DHCPV4_ACK_BUFFER.OpAdds.PktOptAdds[OP_DHCP_SERVER_IP_IX - 1],
     sizeof DHCPRELEASEoptions.DhcServerIpPtr
     );
 

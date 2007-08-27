@@ -188,7 +188,7 @@ typedef struct {
 //
 #define EFI_IP4(EfiIpAddr)       (*(IP4_ADDR *) ((EfiIpAddr).Addr))
 #define EFI_NTOHL(EfiIp)         (NTOHL (EFI_IP4 ((EfiIp))))
-#define EFI_IP4_EQUAL(Ip1, Ip2)  (NetCompareMem (&(Ip1), &(Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
+#define EFI_IP4_EQUAL(Ip1, Ip2)  (NetCompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
 
 INTN
 NetGetMaskLength (
@@ -249,7 +249,7 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 
 #define NET_MIN(a, b)           ((a) < (b) ? (a) : (b))
 #define NET_MAX(a, b)           ((a) > (b) ? (a) : (b))
-#define NET_RANDOM(Seed)        (((Seed) * 1103515245L + 12345) % 4294967295L)
+#define NET_RANDOM(Seed)        ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
 
 
 UINT32

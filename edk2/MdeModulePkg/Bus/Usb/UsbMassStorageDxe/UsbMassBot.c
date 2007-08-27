@@ -108,14 +108,14 @@ UsbBotInit (
        (UsbBot->BulkInEndpoint == NULL)) {
 
       UsbBot->BulkInEndpoint  = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbBot + 1);
-      *UsbBot->BulkInEndpoint = EndPoint;
+      CopyMem(UsbBot->BulkInEndpoint, &EndPoint, sizeof (EndPoint));
     }
 
     if (USB_IS_OUT_ENDPOINT (EndPoint.EndpointAddress) &&
        (UsbBot->BulkOutEndpoint == NULL)) {
 
       UsbBot->BulkOutEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbBot + 1) + 1;
-      *UsbBot->BulkOutEndpoint  = EndPoint;
+      CopyMem(UsbBot->BulkOutEndpoint, &EndPoint, sizeof(EndPoint));
     }
   }
 

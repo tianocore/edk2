@@ -860,8 +860,8 @@ EfiIp4Configure (
       }
 
       if (!Current->UseDefaultAddress &&
-         (!EFI_IP4_EQUAL (Current->StationAddress, IpConfigData->StationAddress) ||
-          !EFI_IP4_EQUAL (Current->SubnetMask, IpConfigData->SubnetMask))) {
+         (!EFI_IP4_EQUAL (&Current->StationAddress, &IpConfigData->StationAddress) ||
+          !EFI_IP4_EQUAL (&Current->SubnetMask, &IpConfigData->SubnetMask))) {
         Status = EFI_ALREADY_STARTED;
         goto ON_EXIT;
       }
@@ -978,7 +978,7 @@ Ip4Groups (
   for (Index = IpInstance->GroupCount; Index > 0 ; Index--) {
     Group = IpInstance->Groups[Index - 1];
 
-    if ((GroupAddress == NULL) || EFI_IP4_EQUAL (Group, *GroupAddress)) {
+    if ((GroupAddress == NULL) || EFI_IP4_EQUAL (&Group, GroupAddress)) {
       if (EFI_ERROR (Ip4LeaveGroup (IpInstance, NTOHL (Group)))) {
         return EFI_DEVICE_ERROR;
       }

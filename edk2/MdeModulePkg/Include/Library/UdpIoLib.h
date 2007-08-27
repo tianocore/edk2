@@ -99,7 +99,7 @@ typedef struct {
   EFI_UDP4_TRANSMIT_DATA    UdpTxData;
 } UDP_TX_TOKEN;
 
-typedef struct _UDP_IO_PORT {
+struct _UDP_IO_PORT {
   UINT32                    Signature;
   NET_LIST_ENTRY            Link;
   INTN                      RefCnt;

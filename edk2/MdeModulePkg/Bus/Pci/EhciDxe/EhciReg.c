@@ -368,7 +368,6 @@ EhcEnablePeriodSchd (
   @return EFI_DEVICE_ERROR : Fail to disable periodic schedule
 
 **/
-STATIC
 EFI_STATUS
 EhcDisablePeriodSchd (
   IN USB2_HC_DEV          *Ehc,
@@ -422,7 +421,6 @@ EhcEnableAsyncSchd (
   @return Others      : Failed to disable the asynchronous schedule
 
 **/
-STATIC
 EFI_STATUS
 EhcDisableAsyncSchd (
   IN USB2_HC_DEV          *Ehc,

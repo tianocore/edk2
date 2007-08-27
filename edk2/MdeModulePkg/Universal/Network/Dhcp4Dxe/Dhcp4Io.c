@@ -755,7 +755,7 @@ DhcpHandleRequest (
   //
   Message = NULL;
 
-  if (!EFI_IP4_EQUAL (Head->YourAddr, Selected->YourAddr)) {
+  if (!EFI_IP4_EQUAL (&Head->YourAddr, &Selected->YourAddr)) {
     Message = "Lease confirmed isn't the same as that in the offer";
     goto REJECT;
   }
@@ -846,7 +846,7 @@ DhcpHandleRenewRebind (
   // The lease is different from the selected. Don't send a DECLINE
   // since it isn't existed in the client's FSM.
   //
-  if (!EFI_IP4_EQUAL (Head->YourAddr, Selected->YourAddr)) {
+  if (!EFI_IP4_EQUAL (&Head->YourAddr, &Selected->YourAddr)) {
     goto ON_EXIT;
   }
 

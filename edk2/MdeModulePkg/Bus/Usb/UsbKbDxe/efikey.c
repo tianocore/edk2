@@ -98,7 +98,7 @@ USBKeyboardCheckForKey (
   );
 
 EFI_GUID  gEfiUsbKeyboardDriverGuid = {
-  0xa05f5f78, 0xfb3, 0x4d10, 0x90, 0x90, 0xac, 0x4, 0x6e, 0xeb, 0x7c, 0x3c
+  0xa05f5f78, 0xfb3, 0x4d10, {0x90, 0x90, 0xac, 0x4, 0x6e, 0xeb, 0x7c, 0x3c}
 };
 
 //
@@ -330,7 +330,7 @@ USBKeyboardDriverBindingStart (
       //
       // We only care interrupt endpoint here
       //
-      UsbKeyboardDevice->IntEndpointDescriptor  = EndpointDescriptor;
+      CopyMem(&UsbKeyboardDevice->IntEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
       Found = TRUE;
     }
   }

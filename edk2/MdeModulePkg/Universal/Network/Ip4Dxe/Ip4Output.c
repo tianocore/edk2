@@ -306,7 +306,7 @@ Ip4Output (
   // them. Tag each fragment other than the first one as spawn from it.
   //
   Mtu            = IpSb->SnpMode.MaxPacketSize;
-  HeadLen        = sizeof (IP4_HEAD) + (OptLen + 3) &~0x03;
+  HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
   Head->Id       = mIp4Id++;
 
   if (Packet->TotalSize + HeadLen > Mtu) {

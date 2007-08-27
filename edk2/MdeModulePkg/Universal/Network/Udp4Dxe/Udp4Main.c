@@ -604,7 +604,7 @@ Udp4Transmit (
     // Set the SourceAddress, SrcPort and Destination according to the specified
     // UdpSessionData.
     //
-    if (!EFI_IP4_EQUAL (UdpSessionData->SourceAddress, mZeroIp4Addr)) {
+    if (!EFI_IP4_EQUAL (&UdpSessionData->SourceAddress, &mZeroIp4Addr)) {
       NetCopyMem (&Override.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 

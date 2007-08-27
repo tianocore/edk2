@@ -59,7 +59,7 @@ EfiMtftp4GetModeData (
   OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   Instance                         = MTFTP4_PROTOCOL_FROM_THIS (This);
-  ModeData->ConfigData             = Instance->Config;
+  CopyMem(&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
   ModeData->SupportedOptionCount   = MTFTP4_SUPPORTED_OPTIONS;
   ModeData->SupportedOptoins       = mMtftp4SupportedOptions;
   ModeData->UnsupportedOptionCount = 0;
@@ -228,7 +228,7 @@ EfiMtftp4Configure (
       return EFI_ACCESS_DENIED;
     }
 
-    Instance->Config = *ConfigData;
+    CopyMem(&Instance->Config, ConfigData, sizeof (*ConfigData));;
     Instance->State = MTFTP4_STATE_CONFIGED;
 
     NET_RESTORE_TPL (OldTpl);

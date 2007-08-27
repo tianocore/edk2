@@ -1146,9 +1146,6 @@ PxebcBisDetect (
   return TRUE;
 }
 
-static VOID *BCNotifyReg;
-
-
 /**
   Start and initialize the BaseCode protocol, Simple Network protocol and UNDI.
 
@@ -1559,7 +1556,7 @@ BcStop (
   return StatCode;
 }
 
-const IPV4_ADDR AllSystemsGroup = { 224, 0, 0, 1 };
+const IPV4_ADDR AllSystemsGroup = {{224, 0, 0, 1}};
 
 
 /**

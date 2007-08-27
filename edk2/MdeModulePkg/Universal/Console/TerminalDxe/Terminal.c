@@ -88,7 +88,7 @@ TERMINAL_DEV  gTerminalDevTemplate = {
   {
     0,
     0,
-    { 0 }
+    { {0} }
   },
   NULL, // ControllerNameTable
   NULL, 

@@ -655,7 +655,7 @@ Ip4ConfigOnDhcp4Complete (
     //
     // Create a route if there is a default router.
     //
-    if (!EFI_IP4_EQUAL (Dhcp4Mode.RouterAddress, mZeroIp4Addr)) {
+    if (!EFI_IP4_EQUAL (&Dhcp4Mode.RouterAddress, &mZeroIp4Addr)) {
       Ip4Config->RouteTableSize = 2;
 
       NetZeroMem (&Ip4Config->RouteTable[1].SubnetAddress, sizeof (EFI_IPv4_ADDRESS));

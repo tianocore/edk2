@@ -547,7 +547,7 @@ SCSIBusDriverBindingStop (
         gBS->OpenProtocol (
                Controller,
                &gEfiExtScsiPassThruProtocolGuid,
-               (VOID **) &(EFI_EXT_SCSI_PASS_THRU_PROTOCOL*)ScsiPassThru,
+               &ScsiPassThru,
                This->DriverBindingHandle,
                ChildHandleBuffer[Index],
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -556,7 +556,7 @@ SCSIBusDriverBindingStop (
         gBS->OpenProtocol (
                Controller,
                &gEfiScsiPassThruProtocolGuid,
-               (VOID **) &(EFI_SCSI_PASS_THRU_PROTOCOL*)ScsiPassThru,
+               &ScsiPassThru,
                This->DriverBindingHandle,
                ChildHandleBuffer[Index],
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
