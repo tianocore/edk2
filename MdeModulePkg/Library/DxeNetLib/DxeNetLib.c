@@ -77,7 +77,7 @@ IP4_ADDR  mIp4AllMasks[IP4_MASK_NUM] = {
   0xFFFFFFFF,
 };
 
-EFI_IPv4_ADDRESS  mZeroIp4Addr = {0, 0, 0, 0};
+EFI_IPv4_ADDRESS  mZeroIp4Addr = {{0, 0, 0, 0}};
 
 /**
   Converts the low nibble of a byte  to hex unicode character.

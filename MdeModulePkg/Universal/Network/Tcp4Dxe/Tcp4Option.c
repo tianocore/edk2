@@ -33,7 +33,6 @@ TcpGetUint16 (
   return NTOHS (Value);
 }
 
-STATIC
 VOID
 TcpPutUint16 (
   IN UINT8  *Buf,

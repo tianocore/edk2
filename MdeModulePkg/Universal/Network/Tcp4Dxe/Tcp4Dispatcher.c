@@ -681,6 +681,8 @@ Tcp4Dispatcher (
 
     return Tcp4Route (Tcb, (TCP4_ROUTE_INFO *) Data);
 
+  default:
+    return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;

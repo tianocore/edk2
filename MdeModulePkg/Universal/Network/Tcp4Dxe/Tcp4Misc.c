@@ -35,7 +35,7 @@ NET_LIST_ENTRY  mTcpListenQue = {
 
 TCP_SEQNO       mTcpGlobalIss = 0x4d7e980b;
 
-STATIC CHAR16   *mTcpStateName[] = {
+CHAR16   *mTcpStateName[] = {
   L"TCP_CLOSED",
   L"TCP_LISTEN",
   L"TCP_SYN_SENT",
@@ -267,7 +267,7 @@ TcpFindTcbByPeer (
   NET_LIST_FOR_EACH (Entry, &mTcpListenQue) {
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
-    if (EFI_IP4_EQUAL (*Addr, Tcb->LocalEnd.Ip) &&
+    if (EFI_IP4_EQUAL (Addr, &Tcb->LocalEnd.Ip) &&
       (LocalPort == Tcb->LocalEnd.Port)) {
 
       return TRUE;
@@ -277,7 +277,7 @@ TcpFindTcbByPeer (
   NET_LIST_FOR_EACH (Entry, &mTcpRunQue) {
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
-    if (EFI_IP4_EQUAL (*Addr, Tcb->LocalEnd.Ip) &&
+    if (EFI_IP4_EQUAL (Addr, &Tcb->LocalEnd.Ip) &&
       (LocalPort == Tcb->LocalEnd.Port)) {
 
       return TRUE;

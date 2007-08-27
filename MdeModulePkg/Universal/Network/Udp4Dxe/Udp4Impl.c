@@ -424,7 +424,7 @@ Udp4FindInstanceByPort (
       continue;
     }
 
-    if (EFI_IP4_EQUAL (ConfigData->StationAddress, *Address) &&
+    if (EFI_IP4_EQUAL (&ConfigData->StationAddress, Address) &&
       (ConfigData->StationPort == Port)) {
       //
       // if both the address and the port are the same, return TRUE.
@@ -566,8 +566,8 @@ Udp4IsReconfigurable (
     }
 
     if (!NewConfigData->UseDefaultAddress &&
-      (!EFI_IP4_EQUAL (NewConfigData->StationAddress, OldConfigData->StationAddress) ||
-      !EFI_IP4_EQUAL (NewConfigData->SubnetMask, OldConfigData->SubnetMask))) {
+      (!EFI_IP4_EQUAL (&NewConfigData->StationAddress, &OldConfigData->StationAddress) ||
+      !EFI_IP4_EQUAL (&NewConfigData->SubnetMask, &OldConfigData->SubnetMask))) {
       //
       // If the instance doesn't use the default address, and the new address or
       // new subnet mask is different from the old values.
@@ -576,14 +576,14 @@ Udp4IsReconfigurable (
     }
   }
 
-  if (!EFI_IP4_EQUAL (NewConfigData->RemoteAddress, OldConfigData->RemoteAddress)) {
+  if (!EFI_IP4_EQUAL (&NewConfigData->RemoteAddress, &OldConfigData->RemoteAddress)) {
     //
     // The remoteaddress is not the same.
     //
     return FALSE;
   }
 
-  if (!EFI_IP4_EQUAL (NewConfigData->RemoteAddress, mZeroIp4Addr) && (NewConfigData->RemotePort != OldConfigData->RemotePort)) {
+  if (!EFI_IP4_EQUAL (&NewConfigData->RemoteAddress, &mZeroIp4Addr) && (NewConfigData->RemotePort != OldConfigData->RemotePort)) {
     //
     // The RemotePort differs if it's designated in the configdata.
     //
@@ -733,13 +733,13 @@ Udp4ValidateTxToken (
       return EFI_INVALID_PARAMETER;
     }
 
-    if (EFI_IP4_EQUAL (UdpSessionData->DestinationAddress, mZeroIp4Addr)) {
+    if (EFI_IP4_EQUAL (&UdpSessionData->DestinationAddress, &mZeroIp4Addr)) {
       //
       // The DestinationAddress specified in the UdpSessionData is 0.
       //
       return EFI_INVALID_PARAMETER;
     }
-  } else if (EFI_IP4_EQUAL (ConfigData->RemoteAddress, mZeroIp4Addr)) {
+  } else if (EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &mZeroIp4Addr)) {
     //
     // the configured RemoteAddress is all zero, and the user doens't override the
     // destination address.
@@ -962,7 +962,7 @@ Udp4LeaveGroup (
 
   McastIp = Arg;
 
-  if ((McastIp != NULL) && (!EFI_IP4_EQUAL (*McastIp, (UINTN) Item->Key))) {
+  if ((McastIp != NULL) && (!EFI_IP4_EQUAL (McastIp, &(Item->Key)))) {
     //
     // McastIp is not NULL and the multicast address contained in the Item
     // is not the same as McastIp.
@@ -1172,16 +1172,16 @@ Udp4MatchDgram (
     return FALSE;
   }
 
-  if (!EFI_IP4_EQUAL (ConfigData->RemoteAddress, mZeroIp4Addr) &&
-    !EFI_IP4_EQUAL (ConfigData->RemoteAddress, Udp4Session->SourceAddress)) {
+  if (!EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &mZeroIp4Addr) &&
+    !EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &Udp4Session->SourceAddress)) {
     //
     // This datagram doesn't come from the instance's specified sender.
     //
     return FALSE;
   }
 
-  if (EFI_IP4_EQUAL (ConfigData->StationAddress, mZeroIp4Addr) ||
-    EFI_IP4_EQUAL (Udp4Session->DestinationAddress, ConfigData->StationAddress)) {
+  if (EFI_IP4_EQUAL (&ConfigData->StationAddress, &mZeroIp4Addr) ||
+    EFI_IP4_EQUAL (&Udp4Session->DestinationAddress, &ConfigData->StationAddress)) {
     //
     // The instance is configured to receive datagrams destinated to any station IP or
     // the destination address of this datagram matches the configured station IP.
@@ -1702,7 +1702,7 @@ Udp4IcmpHandler (
     if (!Instance->Configured ||
       Instance->ConfigData.AcceptPromiscuous ||
       Instance->ConfigData.AcceptAnyPort ||
-      EFI_IP4_EQUAL (Instance->ConfigData.StationAddress, mZeroIp4Addr)) {
+      EFI_IP4_EQUAL (&Instance->ConfigData.StationAddress, &mZeroIp4Addr)) {
       //
       // Don't try to deliver the ICMP error to this instance if it is not configured,
       // or it's configured to be promiscuous or accept any port or accept all the

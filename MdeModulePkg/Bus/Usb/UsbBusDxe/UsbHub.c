@@ -284,7 +284,6 @@ UsbHubCtrlGetPortStatus (
   @retval Others                Failed to reset the port
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlResetTT (
   IN  USB_DEVICE          *HubDev,
@@ -319,7 +318,6 @@ UsbHubCtrlResetTT (
   @retval Others                Failed to set the feature
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlSetHubFeature (
   IN  USB_DEVICE          *HubDev,

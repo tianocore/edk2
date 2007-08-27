@@ -51,7 +51,7 @@ Abstract:
 
 #define SUPPORT_IPV6                  0
 
-#define PXE_BASECODE_DEVICE_SIGNATURE 'pxed'
+#define PXE_BASECODE_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('p', 'x', 'e', 'd')
 
 //
 // Determine the classes of IPv4 address
@@ -166,7 +166,7 @@ typedef struct {
 //
 //
 //
-#define LOADFILE_DEVICE_SIGNATURE 'pxel'
+#define LOADFILE_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('p', 'x', 'e', 'l')
 
 typedef struct {
   UINTN                   Signature;
