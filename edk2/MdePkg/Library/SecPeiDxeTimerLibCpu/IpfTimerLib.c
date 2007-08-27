@@ -152,19 +152,23 @@ GetPerformanceCounterProperties (
   PAL_CALL_RETURN                   PalRet;
   UINT64                            BaseFrequence;
 
-  PalRet = PalCallStatic (NULL, 13, 0, 0, 0);
-  ASSERT (PalRet.Status == 0);
-  BaseFrequence = PalRet.r9;
-
-  PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
-  ASSERT (PalRet.Status == 0);
-
   if (StartValue != NULL) {
     *StartValue = 0;
   }
 
   if (EndValue != NULL) {
     *EndValue = (UINT64)(-1);
+  }
+
+  PalRet = PalCallStatic (NULL, 13, 0, 0, 0);
+  if (PalRet.Status != 0) {
+    return 1000000;
+  }
+  BaseFrequence = PalRet.r9;
+
+  PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
+  if (PalRet.Status != 0) {
+    return 1000000;
   }
 
   return BaseFrequence * (PalRet.r11 >> 32) / (UINT32)PalRet.r11;
