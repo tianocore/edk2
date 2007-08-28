@@ -273,6 +273,9 @@
 [LibraryClasses.EBC.DXE_RUNTIME_DRIVER]
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
+[LibraryClasses.IPF.DXE_RUNTIME_DRIVER]
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  
 [LibraryClasses.EBC.PEI_CORE]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
@@ -427,7 +430,7 @@
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
-[Components.Ia32]
+[Components.IA32]
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
@@ -446,6 +449,7 @@
   MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
 [Components.IPF]
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
 
