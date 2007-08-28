@@ -76,6 +76,7 @@ typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
 //
 // The following types are currently defined:
+// EFI_FROM_ID has been defined in UEFI spec.
 //
 typedef UINT16  EFI_FORM_LABEL;
 
