@@ -24,7 +24,7 @@ Revision History
 #define _GRAPHICS_CONSOLE_H
 
 #include <PiDxe.h>
-#include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiFramework.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
