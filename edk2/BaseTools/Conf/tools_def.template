@@ -714,8 +714,8 @@ RELEASE_ICC_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:
 
 *_ICC_IPF_APP_FLAGS         = /nologo /E /TC
 *_ICC_IPF_PP_FLAGS          = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
-DEBUG_ICC_IPF_CC_FLAGS      = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h
-RELEASE_ICC_IPF_CC_FLAGS    = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h
+DEBUG_ICC_IPF_CC_FLAGS      = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
+RELEASE_ICC_IPF_CC_FLAGS    = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 
 #DEBUG_ICC_IPF_PCH_FLAGS     = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h /Yc /TC /Zi
 #RELEASE_ICC_IPF_PCH_FLAGS   = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h /Yc /TC
 DEBUG_ICC_IPF_ASM_FLAGS     = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
