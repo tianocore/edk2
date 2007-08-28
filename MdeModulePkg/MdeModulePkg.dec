@@ -25,6 +25,14 @@
 [Includes.common]
   Include
 
+
+[LibraryClasses.common]
+  IpIoLib|Include/Library/IpIoLib.h
+  NetLib|Include/Library/NetLib.h  
+  PeCoffLoaderLib|Include/Library/PeCoffLoaderLib.h  
+  ResetSystemLib|Include/Library/ResetSystemLib.h  
+  UdpIoLib|Include/Library/UdpIoLib.h
+
 [Guids.common]
 
   gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
