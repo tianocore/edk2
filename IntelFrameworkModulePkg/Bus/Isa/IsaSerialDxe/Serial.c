@@ -55,8 +55,10 @@ SERIAL_DEV  gSerialDevTempate = {
     {
       MESSAGING_DEVICE_PATH,
       MSG_UART_DP,
-      (UINT8) (sizeof (UART_DEVICE_PATH)),
-      (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8),
+      {
+        (UINT8) (sizeof (UART_DEVICE_PATH)),
+        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+      }
     },
     0,
     FixedPcdGet64 (PcdUartDefaultBaudRate),    
