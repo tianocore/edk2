@@ -36,9 +36,8 @@
   ComponentName.c
   IsaIo.c
   IsaBus.c
-  IsaIo.h
-  IsaBus.h
-  IsaAcpi.h
+  InternalIsaIo.h
+  InternalIsaBus.h
   ComponentName.h
 
 [Packages]

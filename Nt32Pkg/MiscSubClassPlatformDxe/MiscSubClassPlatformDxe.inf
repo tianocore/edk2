@@ -54,7 +54,6 @@
   MiscSubclassDriver.h
   MiscDevicePath.h
   MiscSubclassDriver.uni
-  CommonHeader.h
 
 [Packages]
   MdePkg/MdePkg.dec
