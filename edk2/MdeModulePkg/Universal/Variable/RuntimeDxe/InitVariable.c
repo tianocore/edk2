@@ -22,9 +22,9 @@ Revision History
 #include "Variable.h"
 
 //
-// Event for Exit Boot Services Callback
+// Event for Virtual Address Change Callback
 //
-STATIC EFI_EVENT mVirtualAddressChangedEvent = NULL;
+STATIC EFI_EVENT mVirtualAddressChangeEvent = NULL;
 
 
 //
@@ -221,7 +221,7 @@ Returns:
                   TPL_NOTIFY,
                   VariableClassAddressChangeEvent,
                   NULL,
-                  &mVirtualAddressChangedEvent
+                  &mVirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
