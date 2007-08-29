@@ -28,6 +28,9 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
+[Packages]
+  MdePkg/MdePkg.dec
+
 [Sources.Ia32]
   Ia32/AsmPeiSevicesTablePointer.c|MSFT
   Ia32/AsmPeiSevicesTablePointer.S|GCC

@@ -30,6 +30,10 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
+[Packages]
+  MdePkg/MdePkg.dec
+
+
 [Sources.common]
   ScanMem64Wrapper.c
   ScanMem32Wrapper.c
