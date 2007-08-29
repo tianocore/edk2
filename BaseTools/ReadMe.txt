@@ -90,6 +90,7 @@ Brief usage for Migration Tool MigrationMsa2Inf.exe:
    e. When tool generates [Sources] section, the modifiers for source files are lost. (Need to add proper tool chain, etc)
    f. When tool generates [LibraryClasses] section, the recommended library instances are lost. (No impact to build)
  
+7. Pyton Source
+   r633 <buildtools_project>\BaseTools\Source\Python\MigrationMsa2Inf
 
-          
-20-August-2007
+29-August-2007
