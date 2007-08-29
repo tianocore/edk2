@@ -41,7 +41,7 @@
   BdsConnect.c
   BdsConsole.c
   BdsBoot.c
-  EdkGenericBdsLib.h
+  EdkGenericBdsLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec

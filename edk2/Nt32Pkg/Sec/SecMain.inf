@@ -29,7 +29,6 @@
 #
 
 [Sources.common]
-  OldDefinition.h
   SecMain.h
   WinNtThunk.c
   FwVol.c
