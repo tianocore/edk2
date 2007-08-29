@@ -24,7 +24,7 @@ Revision History
 //
 // Event for Exit Boot Services Callback
 //
-STATIC EFI_EVENT mExitBootServicesEvent = NULL;
+STATIC EFI_EVENT mVirtualAddressChangedEvent = NULL;
 
 
 //
@@ -217,11 +217,11 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   TPL_NOTIFY,
                   VariableClassAddressChangeEvent,
                   NULL,
-                  &mExitBootServicesEvent
+                  &mVirtualAddressChangedEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
