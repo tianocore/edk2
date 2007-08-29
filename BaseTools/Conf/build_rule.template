@@ -50,7 +50,7 @@
 
 ## Macro
 #   $(WORKSPACE)        Workspace directory
-#   $(OUTPUT_DIR)       Directory for intermediate files for building a module 
+#   $(OUTPUT_DIR)       Directory for intermediate files for building a module
 #   $(DEBUG_DIR)        Directory for files used to debug a module
 #   $(BUILD_DIR)        All files for building a platform will be put in this directory
 #   $(BIN_DIR)          Common directory for executable files
@@ -145,8 +145,9 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command.MSFT, Command.INTEL>
-        "$(APP)" $(APP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        "$(ASM)" -o ${dst} $(ASM_FLAGS) ${d_path}(+)${s_base}.i
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(ASM)" -o ${dst} $(ASM_FLAGS) ${d_path}(+)${s_base}.iii
 
 [Build.Visual-Form-Representation-File]
     <InputFile>
@@ -251,7 +252,7 @@
 
     <Command.MSFT, Command.INTEL>
         "$(CC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(INC) ${src}
-        "$(DLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj 
+        "$(DLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         GenFw -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll
 
 [Build.Masm16-Code-File]
