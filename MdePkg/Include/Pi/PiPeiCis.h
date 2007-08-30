@@ -563,7 +563,7 @@ typedef struct {
 
   @param FileHandle   Handle of the file.
 
-  @param FileInfo     Upon exit, points to the file¡¯s
+  @param FileInfo     Upon exit, points to the file's
                       information.
 
   @retval EFI_SUCCESS             File information returned.
@@ -622,7 +622,7 @@ typedef struct {
 
   @param VolumeHandle   Handle of the volume.
 
-  @param VolumeInfo     Upon exit, points to the volume¡¯s
+  @param VolumeInfo     Upon exit, points to the volume's
                         information.
 
   @retval EFI_SUCCESS             File information returned.
@@ -652,7 +652,7 @@ EFI_STATUS
   initialized after permanent memory is installed, even the first
   time.
 
-  @param FileHandle   PEIM¡¯s file handle. Must be the currently
+  @param FileHandle   PEIM's file handle. Must be the currently
                       xecuting PEIM.
   
   @retval EFI_SUCCESS   The PEIM was successfully registered for
