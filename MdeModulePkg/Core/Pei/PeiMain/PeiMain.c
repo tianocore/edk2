@@ -69,7 +69,13 @@ static EFI_PEI_SERVICES  mPS = {
 
   PeiReportStatusCode,
 
-  PeiResetSystem
+  PeiResetSystem,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  PeiRegisterForShadow
 };
 
 EFI_STATUS

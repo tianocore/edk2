@@ -536,3 +536,43 @@ Returns:
   return BuildGuidDataHob (&gEfiPeiCorePrivateGuid, PrivateData, sizeof (PEI_CORE_INSTANCE));
 }
 
+/**
+  This routine enable a PEIM to register itself to shadow when PEI Foundation
+  discovery permanent memory.
+
+	@param FileHandle  	File handle of a PEIM.
+  
+  @retval EFI_NOT_FOUND  				The file handle doesn't point to PEIM itself.
+  @retval EFI_ALREADY_STARTED		Indicate that the PEIM has been registered itself.
+  @retval EFI_SUCCESS						Successfully to register itself.
+
+**/ 
+EFI_STATUS
+EFIAPI
+PeiRegisterForShadow (
+  IN EFI_PEI_FILE_HANDLE       FileHandle
+  )
+{
+  PEI_CORE_INSTANCE            *Private;
+  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
+
+  if (Private->CurrentFileHandle != FileHandle) {
+    //
+    // The FileHandle must be for the current PEIM
+    //
+    return EFI_NOT_FOUND;
+  }
+
+  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] >= PEIM_STATE_REGISITER_FOR_SHADOW) {
+    //
+    // If the PEIM has already entered the PEIM_STATE_REGISTER_FOR_SHADOW or PEIM_STATE_DONE then it's already been started
+    //
+    return EFI_ALREADY_STARTED;
+  }
+  
+  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] = PEIM_STATE_REGISITER_FOR_SHADOW;
+
+  return EFI_SUCCESS;
+}
+
+
