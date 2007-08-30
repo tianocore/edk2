@@ -136,7 +136,7 @@
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
 [FeaturePcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes
