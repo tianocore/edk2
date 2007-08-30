@@ -57,7 +57,7 @@ OemHookStatusCodeInitialize (
 
   @param  Data          This optional parameter may be used to pass additional data
  
-  @return               The function always return EFI_UNSUPPORTED.
+  @return               The function always return EFI_SUCCESS.
 
 **/
 EFI_STATUS
@@ -70,6 +70,6 @@ OemHookStatusCodeReport (
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }
 

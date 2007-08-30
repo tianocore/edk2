@@ -1,7 +1,7 @@
 /** @file
   Library functions that abstract areas of conflict between Tiano an UEFI 2.0.
 
-  Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the
+  Help Port Framework/Tiano code that has conflicts with UEFI 2.0 by hiding the
   oldconflicts with library functions and supporting implementations of the old
   (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as
   it contains DXE enum extensions for EFI event services.
