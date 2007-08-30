@@ -489,7 +489,8 @@
   Ipf/Synchronization.c
   Ipf/InterlockedCompareExchange64.s
   Ipf/InterlockedCompareExchange32.s
-  Ipf/CpuBreakpoint.c
+  Ipf/CpuBreakpoint.c    | INTEL
+  Ipf/CpuBreakpointMsc.c | MSFT
   Ipf/Unaligned.c
   Ipf/SwitchStack.s
   Ipf/longjmp.s
