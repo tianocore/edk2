@@ -60,13 +60,13 @@
   gPeiNtThunkPpiGuid                            # PPI ALWAYS_PRODUCED
 
 
-[PcdsFixedAtBuild.common]
-  PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode
 
   
-[PcdsDynamic.common]
-  #PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid
-  #PcdWinNtFirmwareVolume|gEfiNt32PkgTokenSpaceGuid
+[Pcd.common]
+  #gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
+  #gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
   
 [BuildOptions.common]
   MSFT:DEBUG_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib

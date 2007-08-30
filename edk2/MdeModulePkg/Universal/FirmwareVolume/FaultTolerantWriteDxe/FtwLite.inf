@@ -80,11 +80,11 @@
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 
-[PcdsDynamic.common]
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
 
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid

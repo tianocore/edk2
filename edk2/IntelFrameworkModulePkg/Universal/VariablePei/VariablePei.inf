@@ -105,8 +105,8 @@
 #
 ################################################################################
 
-[PcdsDynamic.common]
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
 
 [depex]
   TRUE

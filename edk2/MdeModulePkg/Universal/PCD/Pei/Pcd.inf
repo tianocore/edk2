@@ -60,16 +60,16 @@
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gPcdPpiGuid                                   # PPI ALWAYS_PRODUCED
 
-[PcdsFeatureFlag.common]
-  PcdPeiPcdDatabaseSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseGetSizeEnabled|gEfiMdeModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseExEnabled|gEfiMdeModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid
-  PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled
 
-[PcdsFixedAtBuild.common]
-  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid
-  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry
 
 [Depex]
   TRUE

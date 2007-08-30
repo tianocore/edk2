@@ -62,9 +62,9 @@
   DebugLib
 
 
-[PcdsDynamic.IA32]
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid
+[Pcd.IA32]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
 
-[PcdsDynamic.X64]
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid
+[Pcd.X64]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
 

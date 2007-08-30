@@ -28,12 +28,16 @@ Notes:
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
-        r620 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r601 <buildtools_project>\BaseTools\Source\Python\build
-        r569 <buildtools_project>\BaseTools\Source\Python\Common
-        r564 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r641 <buildtools_project>\BaseTools\Source\Python\Autogen
+        r641 <buildtools_project>\BaseTools\Source\Python\build
+        r641 <buildtools_project>\BaseTools\Source\Python\Common
+        r641 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
         r564 <buildtools_project>\BaseTools\Source\Python\GenFds
-
+4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
+        r641 <buildtools_project>\BaseTools\Source\Python\Common
+        r641 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r564 <buildtools_project>\BaseTools\Source\Python\GenFds
+	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
   MigrationMsa2Inf [options]
@@ -93,4 +97,27 @@ Brief usage for Migration Tool MigrationMsa2Inf.exe:
 7. Pyton Source
    r633 <buildtools_project>\BaseTools\Source\Python\MigrationMsa2Inf
 
-29-August-2007
+
+Brief Usage for PcdSyntax Update:
+Usage:
+  PcdSyntaxUpdate.exe <directory_name>
+It searches all INF, DEC and DSC file under <directory_name> and update them with the following rules:
+1. Update INF files to conform to INF spec 0.44: 
+   a. Rename PCD section name: e.g. [PcdsFeatureFlag] -> [FeaturePcd]
+   b. Adjust PCD section item format: e.g. PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid -> gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
+   c. Update the syntax of binary INF file (not PCD related) 
+2. Update DEC files to confirm to DEC spec 0.36
+   Adjust PCD section item format: e.g. PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"-> gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize|0x0|UINT32|0x00001011
+3. Update DSC files to confirm to DSC spec 
+   a. Adjust string/array typed PCD item format: e.g. PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|12 -> gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|12
+   b. Adjust non-string/array typed PCD item format: e.g. PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1 -> gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1
+   c. Update the override library class in [Components] section: e.g.
+   <LibraryClass> {
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+   }
+   To 
+   <LibraryClasses> {
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+   }
+
+30-August-2007

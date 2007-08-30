@@ -87,20 +87,20 @@
   gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
 
-[PcdsFeatureFlag.common]
-  PcdStatusCodeReplayInOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeReplayInRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeReplayInDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeReplayInSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseEfiSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInSerial
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseRuntimeMemory
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial
 
 
-[PcdsDynamic.common]
-  PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize
 
 [Depex]
   gEfiDataHubProtocolGuid

@@ -66,9 +66,9 @@
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
 
-[PcdsDynamic.common]
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
 
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid AND gEfiFaultTolerantWriteLiteProtocolGuid

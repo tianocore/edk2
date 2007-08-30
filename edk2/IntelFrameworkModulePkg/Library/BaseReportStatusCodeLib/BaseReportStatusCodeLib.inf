@@ -53,6 +53,6 @@
   gEfiStatusCodeDataTypeDebugGuid               # ALWAYS_CONSUMED
 
 
-[PcdsFixedAtBuild.common]
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
 

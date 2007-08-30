@@ -69,12 +69,12 @@
   gEfiDriverDiagnostics2ProtocolGuid             # SOMETIMES_CONSUMED
 
 
-[PcdsFixedAtBuild.common]
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
 
-[PcdsFeatureFlag.common]
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid
-  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid
-  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
 

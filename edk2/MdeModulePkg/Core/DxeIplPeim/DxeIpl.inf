@@ -96,14 +96,14 @@
   gEfiPeiPeCoffLoaderGuid                       
 
 
-[PcdsFeatureFlag.common]
-  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid
-  PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid
-  PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid
-  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportEfiDecompress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs
 
-[PcdsFeatureFlag.IA32]
-  PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 
 [Depex]

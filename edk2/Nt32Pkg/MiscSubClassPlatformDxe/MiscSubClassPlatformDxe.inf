@@ -86,8 +86,8 @@
   gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsDynamic.common]
-  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid
+[Pcd.common]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize
 
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid

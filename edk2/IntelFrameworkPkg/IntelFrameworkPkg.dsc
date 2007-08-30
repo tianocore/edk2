@@ -37,13 +37,13 @@
 #
 ################################################################################
 [PcdsFixedAtBuild.common]
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
 [PcdsPatchableInModule.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
 
 ################################################################################

@@ -48,8 +48,8 @@
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
-[PcdsFixedAtBuild.common]
-  PcdStatusCodeValueEfiWatchDogTimerExpired|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired
 
 [depex]
   gEfiTimerArchProtocolGuid

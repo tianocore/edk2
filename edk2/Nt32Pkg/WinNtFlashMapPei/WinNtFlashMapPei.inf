@@ -62,15 +62,15 @@
   gPeiFlashMapPpiGuid                           # PPI ALWAYS_PRODUCED
 
 
-[PcdsDynamic.common]
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
 
-  PcdWinNtFlashNvStorageFtwWorkingBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageFtwSpareBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageVariableBase|gEfiNt32PkgTokenSpaceGuid
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase
 

@@ -280,87 +280,87 @@
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [PcdsFeatureFlag.common]
-  PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
-  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|TRUE
-  PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdDxePcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPeiPcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPeiPcdDatabaseSetEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPeiPcdDatabaseGetSizeEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPeiPcdDatabaseCallbackOnSetEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdPeiPcdDatabaseExEnabled|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplBuildShareCodeHobs|gEfiMdeModulePkgTokenSpaceGuid|FALSE
-  PcdDxeIplSupportEfiDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportTianoDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
-  PcdDxeIplSupportCustomDecompress|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportEfiDecompress|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
 
 [PcdsFeatureFlag.IA32]
-  PcdDxeIplSwitchToLongMode|gEfiMdeModulePkgTokenSpaceGuid|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
 
 [PcdsFixedAtBuild.common]
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPostCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdMaxSizeNonPopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaxSizePopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaxPeiPerformanceLogEntries|gEfiMdeModulePkgTokenSpaceGuid|28
-  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid|0x0
-  PcdMaxPeiPcdCallBackNumberPerPcdEntry|gEfiMdeModulePkgTokenSpaceGuid|0x08
-  PcdStatusCodeValueEfiWatchDogTimerExpired|gEfiMdePkgTokenSpaceGuid|0x00011003   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
-  PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid|0x00051006         # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
-  PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004      # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
-  PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid|0x0005100   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE3
-  PcdStatusCodeValueRemoteConsoleError|gEfiMdePkgTokenSpaceGuid|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
-  PcdStatusCodeValueRemoteConsoleReset|gEfiMdePkgTokenSpaceGuid|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
-  PcdStatusCodeValueRemoteConsoleInputError|gEfiMdePkgTokenSpaceGuid|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
-  PcdStatusCodeValueRemoteConsoleOutputError|gEfiMdePkgTokenSpaceGuid|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|28
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006         # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03101004      # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x0005100   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE3
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
-  PcdStatusCodeValueMouseInterfaceError|gEfiMdePkgTokenSpaceGuid|0x01020005       # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR
-  PcdStatusCodeValueMouseEnable|gEfiMdePkgTokenSpaceGuid|0x01020004               # EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE
-  PcdStatusCodeValueMouseDisable|gEfiMdePkgTokenSpaceGuid|0x01020002              # EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE
-  PcdStatusCodeValueKeyboardEnable|gEfiMdePkgTokenSpaceGuid|0x01010004            # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
-  PcdStatusCodeValueKeyboardPresenceDetect|gEfiMdePkgTokenSpaceGuid|0x01010003    # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
-  PcdStatusCodeValueKeyboardDisable|gEfiMdePkgTokenSpaceGuid|0x01010002           # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE
-  PcdStatusCodeValueKeyboardReset|gEfiMdePkgTokenSpaceGuid|0x01010001             # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
-  PcdStatusCodeValueKeyboardClearBuffer|gEfiMdePkgTokenSpaceGuid|0x01011000       # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
-  PcdStatusCodeValueKeyboardSelfTest|gEfiMdePkgTokenSpaceGuid|0x01011001          # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
-  PcdStatusCodeValueKeyboardInterfaceError|gEfiMdePkgTokenSpaceGuid|0x01010005    # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR
-  PcdStatusCodeValueKeyboardInputError|gEfiMdePkgTokenSpaceGuid|0x01010007        # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
-  PcdStatusCodeValueMouseInputError|gEfiMdePkgTokenSpaceGuid|0x01020007           # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
-  PcdStatusCodeValueMouseReset|gEfiMdePkgTokenSpaceGuid|0x01020001                # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError|0x01020005       # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004               # EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002              # EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004            # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect|0x01010003    # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002           # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset|0x01010001             # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer|0x01011000       # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest|0x01011001          # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError|0x01010005    # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError|0x01010007        # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007           # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001                # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
 
-  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
-  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
-  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
-  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
-  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid|0
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
 
 
 [PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
 
 ################################################################################
 #

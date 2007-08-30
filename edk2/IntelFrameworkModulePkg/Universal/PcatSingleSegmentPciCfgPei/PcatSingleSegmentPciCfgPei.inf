@@ -51,9 +51,9 @@
   gEfiPciCfg2PpiGuid                   # PPI ALWAYS_PRODUCED
   gEfiPciCfgPpiInServiceTableGuid      # PPI ALWAYS_PRODUCED
 
-[PcdsFeatureFlag.common]
-  PcdPciCfgDisable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdPciCfg2Disable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable
 
 [Depex]
   TRUE

@@ -79,8 +79,8 @@
   gEfiDebugSupportProtocolGuid                  # PROTOCOL SOMETIMES_PRODUCED
 
 
-[PcdsFeatureFlag.IA32]
-  PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable
 
 
 [Depex]

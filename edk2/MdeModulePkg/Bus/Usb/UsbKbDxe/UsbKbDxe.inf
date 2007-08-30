@@ -66,12 +66,12 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFixedAtBuild]
-  PcdStatusCodeValueKeyboardEnable|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardPresenceDetect|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardDisable|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardReset|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardClearBuffer|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardSelfTest|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardInterfaceError|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueKeyboardInputError|gEfiMdePkgTokenSpaceGuid
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError

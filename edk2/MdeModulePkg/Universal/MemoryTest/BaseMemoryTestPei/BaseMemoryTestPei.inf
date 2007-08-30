@@ -43,7 +43,7 @@
 [Ppis]
   gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_PRODUCED
 
-[PcdsFixedAtBuild.common]
-  PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueUncorrectableMemoryError|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError
 

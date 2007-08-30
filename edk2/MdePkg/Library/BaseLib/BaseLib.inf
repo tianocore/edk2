@@ -522,9 +522,9 @@
   BaseMemoryLib
 
 
-[PcdsFixedAtBuild.common]
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength
 

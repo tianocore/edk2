@@ -67,21 +67,21 @@
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
-[PcdsFixedAtBuild.common]
-  PcdWinNtFirmwareFdSize|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFirmwareBlockSize|gEfiNt32PkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize
 
-  PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashFvRecoverySize|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageEventLogSize|gEfiNt32PkgTokenSpaceGuid
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
 
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
 
 [depex]
   TRUE

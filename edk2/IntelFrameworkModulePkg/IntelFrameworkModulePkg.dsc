@@ -105,58 +105,58 @@
 #
 ################################################################################
 [PcdsFeatureFlag.common]
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseEfiSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseHardSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeUseDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInRuntimeMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInDataHub|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdStatusCodeReplayInOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
-  PcdIsaBusSupportDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
-  PcdIsaBusOnlySupportSlaveDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid|FALSE
-  PcdIsaBusSupportIsaMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
-  PcdPciCfgDisable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
-  PcdPciCfg2Disable|gEfiIntelFrameworkModulePkgTokenSpaceGuid|TRUE
-  PcdNtEmulatorEnable|gEfiMdeModulePkgTokenSpaceGuid|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseRuntimeMemory|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInSerial|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable|TRUE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
 
 [PcdsFixedAtBuild.common]
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
-  PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid|0
-  PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid|0xFFFB0000
-  PcdUartDefaultBaudRate|gEfiMdePkgTokenSpaceGuid|115200
-  PcdUartDefaultDataBits|gEfiMdePkgTokenSpaceGuid|8
-  PcdUartDefaultParity|gEfiMdePkgTokenSpaceGuid|1
-  PcdUartDefaultStopBits|gEfiMdePkgTokenSpaceGuid|1
-  PcdDefaultTerminalType|gEfiMdePkgTokenSpaceGuid|0
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0xFFFB0000
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
 
   
 [PcdsDynamicDefault.common.DEFAULT]
-  PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|1
-  PcdStatusCodeRuntimeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid|4
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|4
 
 [PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
 
 ################################################################################
 #

@@ -67,8 +67,8 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiGenericMemTestProtocolGuid                # PROTOCOL TO_START
 
-[PcdsFeatureFlag.common]
-  PcdIsaBusOnlySupportSlaveDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdIsaBusSupportDma|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdIsaBusSupportIsaMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory
 

@@ -25,28 +25,28 @@
 
 
 [PcdsFeatureFlag.common]
-  PcdComponentNameDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnosticsDisable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdComponentName2Disable|gEfiMdePkgTokenSpaceGuid|FALSE
-  PcdDriverDiagnostics2Disable|gEfiMdePkgTokenSpaceGuid|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
 
 [PcdsFixedAtBuild.common]
-  PcdMaximumUnicodeStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumAsciiStringLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdMaximumLinkedListLength|gEfiMdePkgTokenSpaceGuid|1000000
-  PcdSpinLockTimeout|gEfiMdePkgTokenSpaceGuid|10000000
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid|0x0f
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid|0x80000000
-  PcdReportStatusCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0x06
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid|0xAF
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPostCodePropertyMask|gEfiMdePkgTokenSpaceGuid|0
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid|0xE0000000
-  PcdFSBClock|gEfiMdePkgTokenSpaceGuid|200000000
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid|320
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
 [PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid|0x0ffffc000000
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
 
 [Components.common]
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
