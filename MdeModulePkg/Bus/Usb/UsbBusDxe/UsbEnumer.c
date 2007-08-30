@@ -1011,6 +1011,7 @@ UsbHubEnumeration (
 
 **/
 VOID
+EFIAPI
 UsbRootHubEnumeration (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
