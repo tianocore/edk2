@@ -48,6 +48,8 @@ Revision History
 
 extern EFI_GUID gEfiPeiCorePrivateGuid;
 
+#define PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE   0xff
+
 //
 // Pei Core private data structures
 //
@@ -69,6 +71,27 @@ typedef struct {
   INTN                    LastDispatchedNotify;
   PEI_PPI_LIST_POINTERS   PpiListPtrs[MAX_PPI_DESCRIPTORS];
 } PEI_PPI_DATABASE;
+
+
+#define PEI_CORE_MAX_FV_SUPPORTED   4
+#define PEI_CORE_MAX_PEIM_PER_FV    32
+
+//
+// PEI_CORE_FV_HANDE.PeimState
+// Do not change these values as there is code doing math to change states.
+// Look for Private->Fv[FvCount].PeimState[PeimCount]++;
+//
+#define PEIM_STATE_NOT_DISPATCHED         0x00
+#define PEIM_STATE_DISPATCHED             0x01
+#define PEIM_STATE_REGISITER_FOR_SHADOW   0x02
+#define PEIM_STATE_DONE                   0x03
+
+typedef struct {
+  EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
+  UINT8                               PeimState[PEI_CORE_MAX_PEIM_PER_FV];   
+  EFI_PEI_FILE_HANDLE                 FvFileHandles[PEI_CORE_MAX_PEIM_PER_FV];
+  BOOLEAN                             ScanFv;
+} PEI_CORE_FV_HANDLE;
 
 typedef struct {
   UINT8                       CurrentPeim;
@@ -93,6 +116,15 @@ typedef struct{
   EFI_PEI_SERVICES                   *PS;     // Point to ServiceTableShadow
   PEI_PPI_DATABASE                   PpiData;
   PEI_CORE_DISPATCH_DATA             DispatchData;
+  UINTN                              FvCount;
+  PEI_CORE_FV_HANDLE                 Fv[PEI_CORE_MAX_FV_SUPPORTED];
+  EFI_PEI_FILE_HANDLE                CurrentFvFileHandles[PEI_CORE_MAX_PEIM_PER_FV];
+  UINTN                              AprioriCount;
+  UINTN                              CurrentPeimFvCount; 
+  UINTN                              CurrentPeimCount;
+  EFI_PEI_FILE_HANDLE                CurrentFileHandle;
+  UINTN                              AllFvCount;
+  EFI_PEI_FV_HANDLE                  AllFv[PEI_CORE_MAX_FV_SUPPORTED];
   EFI_PEI_HOB_POINTERS               HobList;
   BOOLEAN                            SwitchStackSignal;
   BOOLEAN                            PeiMemoryInstalled;
