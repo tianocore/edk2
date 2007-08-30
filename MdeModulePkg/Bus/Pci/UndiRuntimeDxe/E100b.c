@@ -1,17 +1,17 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
-  
+
+
  E100B.C
 
 Abstract:
@@ -33,7 +33,7 @@ static UINT8 basic_config_cmd[22] = {
                     0x60,           0,
                     (UINT8)0xf2,        0x48,
                     0,        0x40,
-                    (UINT8)0xf2, (UINT8)0x80, // 0x40=Force full-duplex 
+                    (UINT8)0xf2, (UINT8)0x80, // 0x40=Force full-duplex
                     0x3f,       0x05,
 };
 
@@ -61,9 +61,9 @@ Routine Description:
   This function calls the MemIo callback to read a byte from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
-  
+
 Arguments:
   Port              - Which port to read from.
 
@@ -76,9 +76,9 @@ Returns:
   UINT8 Results;
 
   (*AdapterInfo->Mem_Io) (
-    AdapterInfo->Unique_ID, 
-    PXE_MEM_READ, 
-    1, 
+    AdapterInfo->Unique_ID,
+    PXE_MEM_READ,
+    1,
     (UINT64)Port,
     (UINT64) (UINTN) &Results
     );
@@ -96,7 +96,7 @@ Routine Description:
   This function calls the MemIo callback to read a word from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
 Arguments:
@@ -131,7 +131,7 @@ Routine Description:
   This function calls the MemIo callback to read a dword from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
 Arguments:
@@ -167,7 +167,7 @@ Routine Description:
   This function calls the MemIo callback to write a byte from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
 Arguments:
@@ -205,7 +205,7 @@ Routine Description:
   This function calls the MemIo callback to write a word from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
 Arguments:
@@ -243,7 +243,7 @@ Routine Description:
   This function calls the MemIo callback to write a dword from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
-  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have 
+  which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
 Arguments:
@@ -854,7 +854,7 @@ Returns:
   AdapterInfo->rx_phy_addr    = AdapterInfo->Mapped_MemoryPtr;
   AdapterInfo->tx_phy_addr    = AdapterInfo->Mapped_MemoryPtr + rx_size;
   AdapterInfo->stat_phy_addr  = AdapterInfo->tx_phy_addr + tx_size;
-  
+
   //
   // auto detect.
   //
@@ -1559,7 +1559,7 @@ Returns:
     cur_ptr[Index].PhysTCBAddress     =
     (UINT32) AdapterInfo->tx_phy_addr + (Index * sizeof (TxCB));
 
-    cur_ptr[Index].PhysArrayAddr      = (UINT32)(cur_ptr[Index].PhysTCBAddress + array_off);  
+    cur_ptr[Index].PhysArrayAddr      = (UINT32)(cur_ptr[Index].PhysTCBAddress + array_off);
     cur_ptr[Index].PhysTBDArrayAddres = (UINT32)(cur_ptr[Index].PhysTCBAddress + array_off);
 
     cur_ptr->free_data_ptr = (UINT64) 0;
@@ -2032,7 +2032,7 @@ Returns:
   UINTN wait;
   UINT8 tmp;
 
-  if ((AdapterInfo->DeviceID == D102_DEVICE_ID) || 
+  if ((AdapterInfo->DeviceID == D102_DEVICE_ID) ||
       (AdapterInfo->RevID >= D102_REVID)) {
 
     wait = 500;
@@ -2074,12 +2074,12 @@ Arguments:
 
 Returns:
  None
- 
+
 --*/
 {
   UINT8 tmp;
 
-  if ((AdapterInfo->DeviceID == D102_DEVICE_ID) || 
+  if ((AdapterInfo->DeviceID == D102_DEVICE_ID) ||
       (AdapterInfo->RevID >= D102_REVID)) {
 
     tmp = InByte (AdapterInfo, AdapterInfo->ioaddr + SCBGenCtrl2);
@@ -2396,7 +2396,7 @@ Returns:
   db.Data[0x08] = AdapterInfo->statistics->rx_crc_errs +
                   AdapterInfo->statistics->rx_align_errs;
 
-  db.Data[0x04] = db.Data[0x02] + 
+  db.Data[0x04] = db.Data[0x02] +
                   db.Data[0x08] +
                   AdapterInfo->statistics->rx_resource_errs +
                   AdapterInfo->statistics->rx_overrun_errs;
@@ -2557,9 +2557,9 @@ MdiWrite (
 
 Routine Description:
  This routine will write a value to the specified MII register
- of an external MDI compliant device (e.g. PHY 100).  The command will 
+ of an external MDI compliant device (e.g. PHY 100).  The command will
  execute in polled mode.
- 
+
 Arguments:
   AdapterInfo - pointer to the structure that contains the NIC's context.
   RegAddress - The MII register that we are writing to
@@ -2567,13 +2567,13 @@ Arguments:
   DataValue - The value that we are writing to the MII register.
 
 Returns:
- nothing  
+ nothing
 --*/
 {
   UINT32  WriteCommand;
 
   WriteCommand = ((UINT32) DataValue) |
-                 ((UINT32)(RegAddress << 16)) | 
+                 ((UINT32)(RegAddress << 16)) |
                  ((UINT32)(PhyAddress << 21)) |
                  ((UINT32)(MDI_WRITE << 26));
 
@@ -2589,7 +2589,7 @@ Returns:
 
   //
   // poll for the mdi write to complete
-  while ((InLong (AdapterInfo, AdapterInfo->ioaddr + SCBCtrlMDI) & 
+  while ((InLong (AdapterInfo, AdapterInfo->ioaddr + SCBCtrlMDI) &
                     MDI_PHY_READY) == 0){
     DelayIt (AdapterInfo, 20);
   }
@@ -2608,7 +2608,7 @@ Routine Description:
  This routine will read a value from the specified MII register
  of an external MDI compliant device (e.g. PHY 100), and return
  it to the calling routine.  The command will execute in polled mode.
- 
+
 Arguments:
  AdapterInfo - pointer to the structure that contains the NIC's context.
  RegAddress - The MII register that we are reading from
@@ -2616,7 +2616,7 @@ Arguments:
  DataValue - pointer to the value that we read from the MII register.
 
 Returns:
-  
+
 --*/
 {
   UINT32  ReadCommand;
@@ -2655,19 +2655,19 @@ PhyReset (
 
 Routine Description:
  This routine will reset the PHY that the adapter is currently
- configured to use. 
- 
+ configured to use.
+
 Arguments:
   AdapterInfo - pointer to the structure that contains the NIC's context.
 
 Returns:
-  
+
 --*/
 {
   UINT16  MdiControlReg;
 
-  MdiControlReg = (MDI_CR_AUTO_SELECT | 
-                  MDI_CR_RESTART_AUTO_NEG | 
+  MdiControlReg = (MDI_CR_AUTO_SELECT |
+                  MDI_CR_RESTART_AUTO_NEG |
                   MDI_CR_RESET);
 
   //
@@ -2721,14 +2721,14 @@ Routine Description:
               this range.
           6.  Driver ignores FORCEFDX and SPEED overrides if a 503 interface
               is detected.
- 
+
 Arguments:
   AdapterInfo - pointer to the structure that contains the NIC's context.
 
 Returns:
   TRUE - If a Phy was detected, and configured correctly.
-  FALSE - If a valid phy could not be detected and configured. 
-  
+  FALSE - If a valid phy could not be detected and configured.
+
 --*/
 {
   UINT16  *eedata;
@@ -2788,7 +2788,7 @@ Returns:
       &MdiStatusReg
       );
 
-    if (!((MdiControlReg == 0xffff) || 
+    if (!((MdiControlReg == 0xffff) ||
           ((MdiStatusReg == 0) && (MdiControlReg == 0)))) {
 
       //
@@ -3030,9 +3030,9 @@ Arguments:
 
 Returns:
  TRUE - If the phy could be configured correctly
- FALSE - If the phy couldn't be configured correctly, because an 
+ FALSE - If the phy couldn't be configured correctly, because an
          unsupported over-ride option was used
-  
+
 --*/
 {
   UINT16  MdiControlReg;
@@ -3258,7 +3258,7 @@ Returns:
   // value accordingly
   //
   AdapterInfo->LinkSpeed  = AdapterInfo->LinkSpeedReq;
-  AdapterInfo->Duplex = (UINT8) ((AdapterInfo->DuplexReq & PXE_FORCE_FULL_DUPLEX) ? 
+  AdapterInfo->Duplex = (UINT8) ((AdapterInfo->DuplexReq & PXE_FORCE_FULL_DUPLEX) ?
                         FULL_DUPLEX : HALF_DUPLEX);
 
   //
@@ -3363,7 +3363,7 @@ Returns:
   // advertised ablilities, and then assuming that the highest common
   // denominator was chosed by NWAY.
   //
-  if ((MdiLinkPartnerAdReg & NWAY_LP_ABILITY) && 
+  if ((MdiLinkPartnerAdReg & NWAY_LP_ABILITY) &&
       (MdiStatusReg & MDI_SR_AUTO_NEG_COMPLETE)) {
 
     //

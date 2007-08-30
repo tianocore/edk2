@@ -46,6 +46,7 @@
   DebugLib
   UefiBootServicesTableLib
   MemoryAllocationLib
+  BaseMemoryLib
 
 [Protocols]
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
