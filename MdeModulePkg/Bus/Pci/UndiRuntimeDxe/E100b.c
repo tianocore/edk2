@@ -595,7 +595,7 @@ Returns:
   }
 
   my_filter = (UINT8) ((AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS) ? 1 : 0);
-  my_filter = (UINT8) ((my_filter | (AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST) ? 0 : 2));
+  my_filter = (UINT8) (my_filter | ((AdapterInfo->Rx_Filter & PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST) ? 0 : 2));
 
   data_ptr[15]  = (UINT8) (data_ptr[15] | my_filter);
   data_ptr[19]  = (UINT8) (AdapterInfo->Duplex ? 0xC0 : 0x80);
