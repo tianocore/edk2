@@ -45,6 +45,7 @@ Revision History
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
 #include <IndustryStandard/PeImage.h>
+#include <Library/PeiServicesTablePointerLib.h>
 
 extern EFI_GUID gEfiPeiCorePrivateGuid;
 
@@ -1159,6 +1160,24 @@ Returns:
   Otherwise, resets the system.
 
 --*/
+;
+
+/**
+  This routine enable a PEIM to register itself to shadow when PEI Foundation
+  discovery permanent memory.
+
+	@param FileHandle  	File handle of a PEIM.
+  
+  @retval EFI_NOT_FOUND  				The file handle doesn't point to PEIM itself.
+  @retval EFI_ALREADY_STARTED		Indicate that the PEIM has been registered itself.
+  @retval EFI_SUCCESS						Successfully to register itself.
+
+**/  
+EFI_STATUS
+EFIAPI
+PeiRegisterForShadow (
+  IN EFI_PEI_FILE_HANDLE       FileHandle
+  )
 ;
 
 /**
