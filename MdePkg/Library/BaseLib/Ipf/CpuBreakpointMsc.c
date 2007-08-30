@@ -17,6 +17,11 @@
 //
 #include <BaseLibInternals.h>
 
+#pragma intrinsic (_enable)
+#pragma intrinsic (_disable)
+#pragma intrinsic (__break)
+#pragma intrinsic (__mfa)
+
 /**
   Generates a breakpoint on the CPU.
 
