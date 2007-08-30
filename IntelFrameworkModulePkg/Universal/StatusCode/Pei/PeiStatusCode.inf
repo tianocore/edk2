@@ -65,12 +65,12 @@
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_CONSUMED
 
 
-[PcdsFeatureFlag.common]
-  PcdStatusCodeUseOEM|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseMemory|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdStatusCodeUseSerial|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
 
-[PcdsDynamic.common]
-  PcdStatusCodeMemorySize|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize
 

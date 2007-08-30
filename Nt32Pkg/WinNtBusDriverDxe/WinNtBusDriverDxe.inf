@@ -75,15 +75,15 @@
   gEfiWinNtIoProtocolGuid                       # PROTOCOL BY_START
 
 
-[PcdsDynamic.common]
-  PcdWinNtMemorySize|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtCpuSpeed|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtCpuModel|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtPhysicalDisk|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtVirtualDisk|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFileSystem|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtSerialPort|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtGop|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtUga|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtConsole|gEfiNt32PkgTokenSpaceGuid
+[Pcd.common]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuSpeed
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuModel
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtPhysicalDisk
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtVirtualDisk
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFileSystem
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtSerialPort
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtGop
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtUga
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtConsole
 

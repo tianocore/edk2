@@ -85,5 +85,5 @@
   gEfiFirmwareVolumeProtocolGuid                # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFixedAtBuild.common]
-  PcdUefiVariableDefaultTimeout|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout

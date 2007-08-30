@@ -41,10 +41,10 @@
   PrintLib
   BaseLib
 
-[PcdsFixedAtBuild.common]
-  PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid
-  PcdDebugPropertyMask|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
 
-[PcdsDynamic.common]
-  PcdDebugPrintErrorLevel|gEfiMdePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel
 

@@ -108,12 +108,12 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
 
-[PcdsFeatureFlag.common]
-  PcdPciVgaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdPciBusHotplugDeviceSupport|gEfiIntelFrameworkModulePkgTokenSpaceGuid
-  PcdPciIsaEnable|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable
 
 
-[PcdsFixedAtBuild.common]
-  PcdPciIncompatibleDeviceSupportMask|gEfiIntelFrameworkModulePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
 

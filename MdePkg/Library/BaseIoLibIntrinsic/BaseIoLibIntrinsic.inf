@@ -60,6 +60,6 @@
 [LibraryClasses.IPF]
   PcdLib
 
-[PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.IPF]
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf
 

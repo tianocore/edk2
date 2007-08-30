@@ -101,35 +101,35 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  PcdWinNtBootMode|0x00001006|gEfiNt32PkgTokenSpaceGuid|UINT32|1
-  PcdWinNtFirmwareVolume|0x00001009|gEfiNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
-  PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
 
-  PcdWinNtFlashNvStorageEventLogBase|0x0000100e|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFlashNvStorageEventLogSize|0x0000100f|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFlashFvRecoveryBase|0x00001010|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFlashFvRecoverySize|0x00001011|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFirmwareFdSize|0x00001012|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFirmwareBlockSize|0x00001013|gEfiNt32PkgTokenSpaceGuid|UINT32|0
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|0x0|UINT32|0x0000100e
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|0x0|UINT32|0x00001010
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize|0x0|UINT32|0x00001011
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize|0x0|UINT32|0x00001012
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize|0|UINT32|0x00001013
 
-  PcdWinNtFlashNvStorageVariableBase|0x00001014|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFlashNvStorageFtwSpareBase|0x00001015|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFlashNvStorageFtwWorkingBase|0x00001016|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
-  PcdWinNtFdBaseAddress|0x00001017|gEfiNt32PkgTokenSpaceGuid|UINT32|0x0
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase|0x0|UINT32|0x00001014
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|0x0|UINT32|0x00001015
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress|0x0|UINT32|0x00001017
 
 [PcdsDynamic.common]
-  PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"
-  PcdWinNtVirtualDisk|0x00001001|gEfiNt32PkgTokenSpaceGuid|VOID*|L"FW;40960;512"
-  PcdWinNtSerialPort|0x00001002|gEfiNt32PkgTokenSpaceGuid|VOID*|L"COM1!COM2"
-  PcdWinNtUga|0x00001003|gEfiNt32PkgTokenSpaceGuid|VOID*|L"UGA Window 1!UGA Window 2"
-  PcdWinNtFileSystem|0x00001004|gEfiNt32PkgTokenSpaceGuid|VOID*|L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"
-  PcdWinNtMemorySize|0x00001005|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"
-  PcdWinNtCpuModel|0x00001007|gEfiNt32PkgTokenSpaceGuid|VOID*|L"Intel(R) Processor Model"
-  PcdWinNtCpuSpeed|0x00001008|gEfiNt32PkgTokenSpaceGuid|VOID*|L"3000"
-  PcdWinNtConsole|0x0000100a|gEfiNt32PkgTokenSpaceGuid|VOID*|L"Bus Driver Console Window"
-  PcdWinNtGop|0x0000100d|gEfiNt32PkgTokenSpaceGuid|VOID*|L"UGA Window 1!UGA Window 2"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtSerialPort|L"COM1!COM2"|VOID*|0x00001002
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtUga|L"UGA|VOID*|0x00001003 Window 1!UGA Window 2"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFileSystem|L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"|VOID*|0x00001004
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize|L"64!64"|VOID*|0x00001005
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuModel|L"Intel(R)|VOID*|0x00001007 Processor Model"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuSpeed|L"3000"|VOID*|0x00001008
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtConsole|L"Bus|VOID*|0x0000100a Driver Console Window"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtGop|L"UGA|VOID*|0x0000100d Window 1!UGA Window 2"
 
 [PcdsPatchableInModule.common]
-  PcdWinNtBootMode|0x00001006|gEfiNt32PkgTokenSpaceGuid|UINT32|1
-  PcdWinNtFirmwareVolume|0x00001009|gEfiNt32PkgTokenSpaceGuid|VOID*|L"..\\Fv\\Fv_Recovery.fd"
-  PcdWinNtMemorySizeForSecMain|0x0000100c|gEfiNt32PkgTokenSpaceGuid|VOID*|L"64!64"
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c

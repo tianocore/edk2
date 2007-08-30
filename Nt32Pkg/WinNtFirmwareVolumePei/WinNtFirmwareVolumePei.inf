@@ -50,16 +50,16 @@
   gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
 
 
-[PcdsFixedAtBuild.common]
-  PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashFvRecoverySize|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageEventLogSize|gEfiNt32PkgTokenSpaceGuid
-  PcdWinNtFlashNvStorageVariableBase|gEfiNt32PkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase
 
-  PcdFlashNvStorageFtwWorkingSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageFtwSpareSize|gEfiMdeModulePkgTokenSpaceGuid
-  PcdFlashNvStorageVariableSize|gEfiMdeModulePkgTokenSpaceGuid
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 
 [depex]
   gNtFwhPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid

@@ -55,12 +55,12 @@
 [Protocols]
   gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFeatureFlag.common]
-  PcdSupportUpdateCapsuleRest|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest
 
-[PcdsFixedAtBuild.common]
-  PcdMaxSizeNonPopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid
-  PcdMaxSizePopulateCapsule|gEfiMdeModulePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule
 
 [Depex]
   gEfiVariableArchProtocolGuid

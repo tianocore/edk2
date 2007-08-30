@@ -50,6 +50,6 @@
   gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
 
-[PcdsFixedAtBuild.common]
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
 

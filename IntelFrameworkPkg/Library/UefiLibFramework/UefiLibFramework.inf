@@ -61,6 +61,6 @@
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
 
 
-[PcdsFixedAtBuild.common]
-  PcdUefiLibMaxPrintBufferSize|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
 

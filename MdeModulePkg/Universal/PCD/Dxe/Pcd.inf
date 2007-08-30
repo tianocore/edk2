@@ -59,11 +59,11 @@
 [Protocols]
   gPcdProtocolGuid                              # PROTOCOL ALWAYS_PRODUCED
 
-[PcdsFeatureFlag.common]
-  PcdDxePcdDatabaseTraverseEnabled|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled
 
-[PcdsFixedAtBuild.common]
-  PcdVpdBaseAddress|gEfiMdeModulePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
 
 [Depex]
   TRUE

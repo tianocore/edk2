@@ -58,11 +58,11 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiSimplePointerProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFixedAtBuild]
-  PcdStatusCodeValueMouseInterfaceError|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueMouseEnable|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueMouseDisable|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueMouseInputError|gEfiMdePkgTokenSpaceGuid
-  PcdStatusCodeValueMouseReset|gEfiMdePkgTokenSpaceGuid
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset
 
 

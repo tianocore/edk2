@@ -59,10 +59,10 @@
   gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
 
 
-[PcdsFixedAtBuild.common]
-  PcdPerformanceLibraryPropertyMask|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
 
 
-[PcdsDynamic.common]
-  PcdMaxPeiPerformanceLogEntries|gEfiMdeModulePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
 

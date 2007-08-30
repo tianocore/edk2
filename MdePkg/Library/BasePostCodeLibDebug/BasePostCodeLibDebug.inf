@@ -44,6 +44,6 @@
   DebugLib
 
 
-[PcdsFixedAtBuild.common]
-  PcdPostCodePropertyMask|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask
 

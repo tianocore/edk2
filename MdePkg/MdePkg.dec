@@ -275,49 +275,49 @@
   gEfiFormBrowserProtocolGuid    = { 0xE5A1333E, 0xE1B4, 0x4D55, { 0xCE, 0xEB, 0x35, 0xC3, 0xEF, 0x13, 0x34, 0x43 }}
 
 [PcdsFeatureFlag.common]
-  PcdComponentNameDisable|0x0000000d|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdDriverDiagnosticsDisable|0x0000000e|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdComponentName2Disable|0x000000010|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdDriverDiagnostics2Disable|0x00000011|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
-  PcdUefiVariableDefaultLangDepricate|0x00000012|gEfiMdePkgTokenSpaceGuid|BOOLEAN|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE|BOOLEAN|0x0000000e
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x000000010
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|FALSE|BOOLEAN|0x00000012
 
 [PcdsFixedAtBuild.common]
-  PcdMaximumUnicodeStringLength|0x00000001|gEfiMdePkgTokenSpaceGuid|UINT32|1000000
-  PcdMaximumAsciiStringLength|0x00000002|gEfiMdePkgTokenSpaceGuid|UINT32|1000000
-  PcdMaximumLinkedListLength|0x00000003|gEfiMdePkgTokenSpaceGuid|UINT32|1000000
-  PcdSpinLockTimeout|0x00000004|gEfiMdePkgTokenSpaceGuid|UINT32|10000000
-  PcdDebugPropertyMask|0x00000005|gEfiMdePkgTokenSpaceGuid|UINT8|0x0f
-  PcdDebugPrintErrorLevel|0x00000006|gEfiMdePkgTokenSpaceGuid|UINT32|0x80000000
-  PcdReportStatusCodePropertyMask|0x00000007|gEfiMdePkgTokenSpaceGuid|UINT8|0x06
-  PcdDebugClearMemoryValue|0x00000008|gEfiMdePkgTokenSpaceGuid|UINT8|0xAF
-  PcdPerformanceLibraryPropertyMask|0x00000009|gEfiMdePkgTokenSpaceGuid|UINT8|0
-  PcdPciExpressBaseAddress|0x0000000a|gEfiMdePkgTokenSpaceGuid|UINT64|0xE0000000
-  PcdPostCodePropertyMask|0x0000000b|gEfiMdePkgTokenSpaceGuid|UINT8|0
-  PcdFSBClock|0x0000000c|gEfiMdePkgTokenSpaceGuid|UINT32|200000000
-  PcdUefiLibMaxPrintBufferSize|0x101|gEfiMdePkgTokenSpaceGuid|UINT32|320
-  PcdStatusCodeValueEfiWatchDogTimerExpired|0x00000013|gEfiMdePkgTokenSpaceGuid|UINT32|0x00011003   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
-  PcdStatusCodeValueSetVirtualAddressMap|0x00000014|gEfiMdePkgTokenSpaceGuid|UINT32|0x03101004      # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
-  PcdStatusCodeValueMemoryTestStarted|0x00000015|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051006         # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
-  PcdStatusCodeValueUncorrectableMemoryError|0x00000016|gEfiMdePkgTokenSpaceGuid|UINT32|0x00051003  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
-  PcdStatusCodeValueRemoteConsoleError|0x00000017|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
-  PcdStatusCodeValueRemoteConsoleReset|0x00000018|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
-  PcdStatusCodeValueRemoteConsoleInputError|0x00000019|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
-  PcdStatusCodeValueRemoteConsoleOutputError|0x0000001a|gEfiMdePkgTokenSpaceGuid|UINT32|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000|UINT32|0x00000002
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000|UINT32|0x00000003
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f|UINT8|0x00000005
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06|UINT8|0x00000007
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF|UINT8|0x00000008
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03101004|UINT32|0x00000014      # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006|UINT32|0x00000015         # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x00051003|UINT32|0x00000016  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006|UINT32|0x00000017        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001|UINT32|0x00000018        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007|UINT32|0x00000019   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008|UINT32|0x0000001a  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
 
 [PcdsFixedAtBuild.IPF]
-  PcdIoBlockBaseAddressForIpf|0x0000000f|gEfiMdePkgTokenSpaceGuid|UINT64|0x0ffffc000000
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
 
 [PcdsDynamic.common]
-  PcdUefiVariableDefaultTimeout|0x0000001b|gEfiMdePkgTokenSpaceGuid|UINT16|0x0008
-  PcdUefiVariableDefaultLangCodes|0x0000001c|gEfiMdePkgTokenSpaceGuid|VOID*|"engfra"
-  PcdUefiVariableDefaultLang|0x0000001d|gEfiMdePkgTokenSpaceGuid|VOID*|"eng"
-  PcdUefiVariableDefaultPlatformLangCodes|0x0000001e|gEfiMdePkgTokenSpaceGuid|VOID*|"en"
-  PcdUefiVariableDefaultPlatformLang|0x0000001f|gEfiMdePkgTokenSpaceGuid|VOID*|"en;fr"
-  PcdUartDefaultBaudRate|0x00000020|gEfiMdePkgTokenSpaceGuid|UINT64|115200
-  PcdUartDefaultDataBits|0x00000021|gEfiMdePkgTokenSpaceGuid|UINT8|8
-  PcdUartDefaultParity|0x00000022|gEfiMdePkgTokenSpaceGuid|UINT8|1
-  PcdUartDefaultStopBits|0x00000023|gEfiMdePkgTokenSpaceGuid|UINT8|1
-  PcdDefaultTerminalType|0x00000024|gEfiMdePkgTokenSpaceGuid|UINT8|0  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en;fr"|VOID*|0x0000001f
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
 
 
 

@@ -41,6 +41,6 @@
   DebugLib
   IoLib
 
-[PcdsDynamic.common]
-  PcdPciExpressBaseAddress|gEfiMdePkgTokenSpaceGuid
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 

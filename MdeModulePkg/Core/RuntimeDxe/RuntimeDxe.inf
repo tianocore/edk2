@@ -56,8 +56,8 @@
   gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFixedAtBuild.common]
-  PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap
   
 [depex]
   TRUE  

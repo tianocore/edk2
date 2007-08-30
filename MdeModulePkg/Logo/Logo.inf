@@ -21,7 +21,6 @@
   FILE_GUID                      = 7BB28B99-61BB-11D5-9A5D-0090273FC14D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  BINARY_MODULE                  = true
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -33,5 +32,5 @@
 #
 
 [Binaries.common]
-  BIN|RELEASE|Logo.bmp
+  BIN|Logo.bmp|RELEASE
 

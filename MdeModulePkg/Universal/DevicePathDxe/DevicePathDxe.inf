@@ -66,7 +66,7 @@
   gEfiDevicePathUtilitiesProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDebugPortProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
 
-[PcdsFeatureFlag.common]
-  PcdDevicePathSupportDevicePathFromText|gEfiMdeModulePkgTokenSpaceGuid
-  PcdDevicePathSupportDevicePathToText|gEfiMdeModulePkgTokenSpaceGuid
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText
 
