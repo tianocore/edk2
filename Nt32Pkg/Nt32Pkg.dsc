@@ -266,7 +266,7 @@
   PcdUefiVariableDefaultLangCodes|gEfiMdePkgTokenSpaceGuid|"engfra"|7
   PcdUefiVariableDefaultLang|gEfiMdePkgTokenSpaceGuid|"eng"|4
   PcdUefiVariableDefaultPlatformLangCodes|gEfiMdePkgTokenSpaceGuid|"en;fr"|6
-  PcdUefiVariableDefaultPlatformLang|gEfiMdePkgTokenSpaceGuid|"en"|2
+  PcdUefiVariableDefaultPlatformLang|gEfiMdePkgTokenSpaceGuid|"en"|3
   PcdStatusCodeValueEfiWatchDogTimerExpired|gEfiMdePkgTokenSpaceGuid|0x00011003
   PcdStatusCodeValueMemoryTestStarted|gEfiMdePkgTokenSpaceGuid|0x00051006
   PcdStatusCodeValueSetVirtualAddressMap|gEfiMdePkgTokenSpaceGuid|0x03101004
