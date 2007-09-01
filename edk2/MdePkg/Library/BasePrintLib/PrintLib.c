@@ -154,7 +154,7 @@ BasePrintLibVSPrint (
   //
   // Get the first character from the format string
   //
-  FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
+  FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
 
   //
   // Loop until the end of the format string is reached or the output buffer is full
@@ -183,7 +183,7 @@ BasePrintLibVSPrint (
       //
       for (Done = FALSE; !Done; ) {
         Format += BytesPerFormatCharacter;
-        FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
+        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
         switch (FormatCharacter) {
         case '.': 
           Flags |= PRECISION; 
@@ -228,7 +228,7 @@ BasePrintLibVSPrint (
           for (Count = 0; ((FormatCharacter >= '0') &&  (FormatCharacter <= '9')); ){
             Count = (Count * 10) + FormatCharacter - '0';
             Format += BytesPerFormatCharacter;
-            FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
+            FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
           }
           Format -= BytesPerFormatCharacter;
           if ((Flags & PRECISION) == 0) {
@@ -548,7 +548,7 @@ BasePrintLibVSPrint (
     //
     // Get the next character from the format string
     //
-    FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
+    FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
   }
 
   //
