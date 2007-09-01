@@ -424,7 +424,6 @@ Returns:
   EFI_HII_PROTOCOL            *Hii;
   EFI_HII_HANDLE              StringHandle;
   EFI_HII_PACKAGES            *PackageList;
-  STRING_REF                  Token;
 
 
   //
@@ -464,15 +463,9 @@ Returns:
 
   CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
 
-  //
-  // Store processor version data record to data hub
-  //
-  Token = 0;
-  Status = Hii->NewString (Hii, NULL, StringHandle, &Token, (CHAR16 *)PcdGetPtr (PcdWinNtCpuModel));
-  ASSERT (!EFI_ERROR (Status));
 
   RecordBuffer.DataRecord->DataRecordHeader.RecordType      = ProcessorVersionRecordType;
-  RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = Token;
+  RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = STRING_TOKEN (STR_PROCESSOR_VERSION);
   TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_VERSION_DATA);
 
   Status = DataHub->LogData (
@@ -485,10 +478,10 @@ Returns:
                       );
 
   //
-  // Store CPU frequency data record to data hub
+  // Store CPU frequency data record to data hub - It's an emulator so make up a value
   //
   RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = ProcessorCoreFrequencyRecordType;
-  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = (UINT16) StrDecimalToUintn (PcdGetPtr (PcdWinNtCpuSpeed));
+  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = 1234;
   RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Exponent = 6;
   TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_CORE_FREQUENCY_DATA);
 

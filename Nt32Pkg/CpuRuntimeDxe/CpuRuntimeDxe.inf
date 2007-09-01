@@ -63,9 +63,5 @@
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
-[Pcd.common]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuSpeed
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuModel
-
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid

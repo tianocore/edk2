@@ -124,8 +124,6 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtUga|L"UGA Window 1!UGA Window 2"|VOID*|0x00001003
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFileSystem|L".!..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"|VOID*|0x00001004
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize|L"64!64"|VOID*|0x00001005
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuSpeed|L"3000"|VOID*|0x00001008
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtConsole|L"Bus Driver Console Window"|VOID*|0x0000100a
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtGop|L"UGA Window 1!UGA Window 2"|VOID*|0x0000100d
 
