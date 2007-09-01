@@ -77,8 +77,6 @@
 
 [Pcd.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuSpeed
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtCpuModel
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtPhysicalDisk
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtVirtualDisk
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFileSystem
