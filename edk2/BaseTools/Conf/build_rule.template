@@ -240,8 +240,7 @@
 
     <Command.MSFT, Command.INTEL>
         "$(PP)" $(APP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
-        "$(ASL)" -p ${dst} ${d_path}(+)${s_base}.iii
+        "$(ASL)" -p ${dst} ${d_path}(+)${s_base}.i
 
 [Build.Acpi-Table-Code-File]
     <InputFile>
