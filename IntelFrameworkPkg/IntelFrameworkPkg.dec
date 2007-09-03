@@ -26,6 +26,7 @@
 [LibraryClasses.common]
   HiiLibFramework|Include/Library/HiiLibFramework.h
   IfrSupportLibFramework|Include/Library/IfrSupportLibFramework.h
+  SmmLib|Include/Library/SmmLib.h
 
 [Guids.common]
   gEfiAcpiTableStorageGuid       = { 0x7e374e25, 0x8e01, 0x4fee, { 0x87, 0xf2, 0x39, 0x0c, 0x23, 0xc6, 0x06, 0xcd }}
