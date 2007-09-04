@@ -199,6 +199,9 @@
   OemHookStatusCodeLib|Nt32Pkg/Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
   EdkGenericBdsLib|Nt32Pkg/Library/EdkGenericBdsLib/EdkGenericBdsLib.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
@@ -391,7 +394,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
-  Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf  
+  Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
@@ -401,10 +404,10 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
-  MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf  
-  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf        
-  Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf        
-  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf      
+  MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf
+  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
+  Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
+  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
   Nt32Pkg/TimerDxe/TimerDxe.inf
@@ -435,6 +438,20 @@
   Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
   IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+  #
+  # Network stack drivers
+  # To test network drivers, need network Io driver(SnpNt32Io.dll), please refer to NETWORK-IO Subproject.
+  #
+  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
+  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
 
 [BuildOptions]
   MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
