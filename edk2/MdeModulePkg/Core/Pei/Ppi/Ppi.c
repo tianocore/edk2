@@ -60,7 +60,7 @@ Returns:
 
 VOID
 ConvertPpiPointers (
-  IN EFI_PEI_SERVICES                     **PeiServices,
+  IN CONST EFI_PEI_SERVICES                     **PeiServices,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *OldHandOffHob,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
   )
@@ -139,8 +139,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiInstallPpi (
-  IN EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 /*++
 
@@ -202,7 +202,7 @@ Returns:
     }
 
     DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid)); 
-    PrivateData->PpiData.PpiListPtrs[Index].Ppi = PpiList;    
+    PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR*) PpiList;    
     PrivateData->PpiData.PpiListEnd++;
     
     //
@@ -220,7 +220,7 @@ Returns:
   // Dispatch any callback level notifies for newly installed PPIs.
   //
   DispatchNotify (
-    PeiServices,
+    (CONST EFI_PEI_SERVICES **) PeiServices,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     LastCallbackInstall,
     PrivateData->PpiData.PpiListEnd,
@@ -236,9 +236,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiReInstallPpi (
-  IN EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
-  IN EFI_PEI_PPI_DESCRIPTOR  *NewPpi
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
   )
 /*++
 
@@ -292,13 +292,13 @@ Returns:
   // Remove the old PPI from the database, add the new one.
   // 
   DEBUG((EFI_D_INFO, "Reinstall PPI: %g\n", NewPpi->Guid));
-  PrivateData->PpiData.PpiListPtrs[Index].Ppi = NewPpi;
+  PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) NewPpi;
 
   //
   // Dispatch any callback level notifies for the newly installed PPI.
   //
   DispatchNotify (
-    PeiServices,
+    (CONST EFI_PEI_SERVICES **) PeiServices,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     Index,
     Index+1,
@@ -314,8 +314,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiLocatePpi (
-  IN EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_GUID                *Guid,
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_GUID                *Guid,
   IN UINTN                   Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                **Ppi
@@ -389,8 +389,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiNotifyPpi (
-  IN EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   )
 /*++
 
@@ -458,7 +458,7 @@ Returns:
       NotifyDispatchCount ++; 
     }        
     
-    PrivateData->PpiData.PpiListPtrs[Index].Notify = NotifyList;      
+    PrivateData->PpiData.PpiListPtrs[Index].Notify = (EFI_PEI_NOTIFY_DESCRIPTOR *) NotifyList;      
    
     PrivateData->PpiData.NotifyListEnd--;
     DEBUG((EFI_D_INFO, "Register PPI Notify: %g\n", NotifyList->Guid));
@@ -496,7 +496,7 @@ Returns:
   // Dispatch any callback level notifies for all previously installed PPIs.
   //
   DispatchNotify (
-    PeiServices,
+    (CONST EFI_PEI_SERVICES **) PeiServices,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     0,
     PrivateData->PpiData.PpiListEnd,
@@ -545,7 +545,7 @@ Returns:
     while (PrivateData->PpiData.LastDispatchedNotify != PrivateData->PpiData.DispatchListEnd) {
       TempValue = PrivateData->PpiData.DispatchListEnd;
       DispatchNotify (
-        PeiServices,
+        (CONST EFI_PEI_SERVICES **) PeiServices,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         0,
         PrivateData->PpiData.LastDispatchedInstall,
@@ -566,7 +566,7 @@ Returns:
     while (PrivateData->PpiData.LastDispatchedInstall != PrivateData->PpiData.PpiListEnd) {
       TempValue = PrivateData->PpiData.PpiListEnd;
       DispatchNotify (
-        PeiServices,
+        (CONST EFI_PEI_SERVICES **) PeiServices,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         PrivateData->PpiData.LastDispatchedInstall,
         PrivateData->PpiData.PpiListEnd,
@@ -585,7 +585,7 @@ Returns:
 
 VOID
 DispatchNotify (
-  IN EFI_PEI_SERVICES    **PeiServices,
+  IN CONST EFI_PEI_SERVICES    **PeiServices,
   IN UINTN               NotifyType,
   IN INTN                InstallStartIndex,
   IN INTN                InstallStopIndex,
@@ -645,7 +645,7 @@ Returns:  None
           NotifyDescriptor->Notify
           ));
         NotifyDescriptor->Notify (
-                            PeiServices,
+                            (EFI_PEI_SERVICES **)PeiServices,
                             NotifyDescriptor,
                             (PrivateData->PpiData.PpiListPtrs[Index2].Ppi)->Ppi
                             );

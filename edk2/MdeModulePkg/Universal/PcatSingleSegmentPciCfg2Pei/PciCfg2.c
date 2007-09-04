@@ -364,7 +364,7 @@ PeimInitializePciCfg (
   ASSERT ((**PeiServices).Hdr.Revision >= PEI_SERVICES_REVISION);
 
   (**PeiServices).PciCfg = &gPciCfg2Ppi;
-  Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfg2PpiList);
+  Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfg2PpiList);
 
   return Status;
 }

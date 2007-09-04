@@ -462,7 +462,7 @@ Returns:
 
 VOID
 ConvertPpiPointers (
-  IN EFI_PEI_SERVICES              **PeiServices,
+  IN CONST EFI_PEI_SERVICES              **PeiServices,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *OldHandOffHob,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
   )
@@ -486,8 +486,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiInstallPpi (
-  IN EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 /*++
 
@@ -513,9 +513,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiReInstallPpi (
-  IN EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
-  IN EFI_PEI_PPI_DESCRIPTOR  *NewPpi
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
   )
 /*++
 
@@ -542,8 +542,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiLocatePpi (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_GUID                    *Guid,
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN CONST EFI_GUID                    *Guid,
   IN UINTN                       Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                    **Ppi
@@ -573,8 +573,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiNotifyPpi (
-  IN EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   )
 /*++
 
@@ -617,7 +617,7 @@ Returns:
 
 VOID
 DispatchNotify (
-  IN EFI_PEI_SERVICES    **PeiServices,
+  IN CONST EFI_PEI_SERVICES    **PeiServices,
   IN UINTN               NotifyType,
   IN INTN                InstallStartIndex,
   IN INTN                InstallStopIndex,
@@ -650,7 +650,7 @@ Returns:  None
 EFI_STATUS
 EFIAPI
 PeiGetBootMode (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT EFI_BOOT_MODE *BootMode
   )
 /*++
@@ -675,7 +675,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiSetBootMode (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN EFI_BOOT_MODE     BootMode
   )
 /*++
@@ -772,7 +772,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiGetHobList (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT VOID          **HobList
   )
 /*++
@@ -798,7 +798,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiCreateHob (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN UINT16            Type,
   IN UINT16            Length,
   IN OUT VOID          **Hob
@@ -858,10 +858,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiFfsFindNextFile (
-  IN EFI_PEI_SERVICES            **PeiServices,
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN UINT8                       SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER     **FileHeader
+  IN EFI_PEI_FV_HANDLE           FwVolHeader,
+  IN OUT EFI_PEI_FILE_HANDLE     *FileHeader
   )
 /*++
 
@@ -892,9 +892,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiFfsFindSectionData (
-  IN EFI_PEI_SERVICES            **PeiServices,
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
   IN EFI_SECTION_TYPE            SectionType,
-  IN EFI_FFS_FILE_HEADER         *FfsFileHeader,
+  IN EFI_PEI_FILE_HANDLE         FfsFileHeader,
   IN OUT VOID                    **SectionData
   )
 /*++
@@ -920,9 +920,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiFvFindNextVolume (
-  IN EFI_PEI_SERVICES                **PeiServices,
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
   IN UINTN                           Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER  **FwVolHeader
+  IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
   )
 /*++
 
@@ -982,7 +982,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiInstallPeiMemory (
-  IN EFI_PEI_SERVICES      **PeiServices,
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
   )
@@ -1009,7 +1009,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiAllocatePages (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
@@ -1043,7 +1043,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiAllocatePool (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN UINTN                      Size,
   OUT VOID                      **Buffer
   )
@@ -1101,12 +1101,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiReportStatusCode (
-  IN EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId,
-  IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST EFI_GUID                 *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   )
 /*++
 

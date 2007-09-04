@@ -39,6 +39,7 @@
   ReportStatusCodeLib
   PeimEntryPoint
   DebugLib
+  PeiServicesLib
 
 [Ppis]
   gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_PRODUCED

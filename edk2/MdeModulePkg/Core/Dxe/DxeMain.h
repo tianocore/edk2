@@ -48,7 +48,7 @@ Revision History
 #include <Protocol/RealTimeClock.h>
 #include <Guid/Apriori.h>
 #include <Protocol/WatchdogTimer.h>
-#include <Protocol/FirmwareVolume.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/MonotonicCounter.h>
 #include <Guid/DxeServices.h>
 #include <Guid/MemoryAllocationHob.h>
@@ -155,7 +155,7 @@ typedef struct {
   EFI_HANDLE                      FvHandle;
   EFI_GUID                        FileName;
   EFI_DEVICE_PATH_PROTOCOL        *FvFileDevicePath;
-  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv;
 
   VOID                            *Depex;
   UINTN                           DepexSize;

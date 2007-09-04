@@ -100,7 +100,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiInstallPeiMemory (
-  IN EFI_PEI_SERVICES      **PeiServices,
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
   )
@@ -182,7 +182,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiAllocatePages (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
@@ -275,7 +275,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiAllocatePool (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN UINTN                      Size,
   OUT VOID                      **Buffer
   )
