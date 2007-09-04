@@ -33,7 +33,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/FirmwareVolume.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/Performance.h>
 #include <Protocol/WinNtIo.h>
 #include <Guid/PcAnsi.h>

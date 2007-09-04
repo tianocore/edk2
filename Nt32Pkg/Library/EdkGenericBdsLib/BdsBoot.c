@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include <EdkGenericBdsLibInternal.h>
+#include "EdkGenericBdsLibInternal.h"
 
 BOOLEAN mEnumBootDevice = FALSE;
 
@@ -771,7 +771,7 @@ Returns:
   UINTN                         NumberLoadFileHandles;
   EFI_HANDLE                    *LoadFileHandles;
   VOID                          *ProtocolInstance;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   UINTN                         FvHandleCount;
   EFI_HANDLE                    *FvHandleBuffer;
   EFI_FV_FILETYPE               Type;
@@ -902,7 +902,7 @@ Returns:
   //
   gBS->LocateHandleBuffer (
         ByProtocol,
-        &gEfiFirmwareVolumeProtocolGuid,
+        &gEfiFirmwareVolume2ProtocolGuid,
         NULL,
         &FvHandleCount,
         &FvHandleBuffer
@@ -910,7 +910,7 @@ Returns:
   for (Index = 0; Index < FvHandleCount; Index++) {
     gBS->HandleProtocol (
           FvHandleBuffer[Index],
-          &gEfiFirmwareVolumeProtocolGuid,
+          &gEfiFirmwareVolume2ProtocolGuid,
           (VOID **) &Fv
           );
 
