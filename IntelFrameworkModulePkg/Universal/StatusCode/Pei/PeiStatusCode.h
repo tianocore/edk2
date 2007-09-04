@@ -71,8 +71,8 @@ SerialStatusCodeReportWorker (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId,
-  IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST EFI_GUID                 *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   );
 
 
@@ -147,12 +147,12 @@ MemoryStatusCodeReportWorker (
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
-  IN EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
   IN EFI_STATUS_CODE_TYPE     Type,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId OPTIONAL,
-  IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST EFI_GUID                 *CallerId OPTIONAL,
+  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   );
 
 #endif

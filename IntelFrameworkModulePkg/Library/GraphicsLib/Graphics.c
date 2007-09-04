@@ -56,14 +56,14 @@ Returns:
   EFI_STATUS                    Status;
   UINTN                         FvProtocolCount;
   EFI_HANDLE                    *FvHandles;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   UINTN                         Index;
   UINT32                        AuthenticationStatus;
 
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiFirmwareVolumeProtocolGuid,
+                  &gEfiFirmwareVolume2ProtocolGuid,
                   NULL,
                   &FvProtocolCount,
                   &FvHandles
@@ -75,7 +75,7 @@ Returns:
   for (Index = 0; Index < FvProtocolCount; Index++) {
     Status = gBS->HandleProtocol (
                     FvHandles[Index],
-                    &gEfiFirmwareVolumeProtocolGuid,
+                    &gEfiFirmwareVolume2ProtocolGuid,
                     (VOID **) &Fv
                     );
 

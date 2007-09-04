@@ -290,10 +290,10 @@ PeimInitializePciCfg (
   }
   
   if (!FeaturePcdGet (PcdPciCfgDisable)) {
-    Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfgPpiList);
+    Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfgPpiList);
   } 
   if (!FeaturePcdGet (PcdPciCfg2Disable)) {
-    Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfg2PpiList);
+    Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfg2PpiList);
   }
 
   return Status;
