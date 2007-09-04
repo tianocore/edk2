@@ -1029,8 +1029,23 @@ Returns:
 
 --*/
 {
-  UINT8   DayOfMonth[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  BOOLEAN Adjacent = FALSE;
+  UINT8   DayOfMonth[12];
+  BOOLEAN Adjacent;
+
+  DayOfMonth[0] = 31;
+  DayOfMonth[1] = 29;
+  DayOfMonth[2] = 31;
+  DayOfMonth[3] = 30;
+  DayOfMonth[4] = 31;
+  DayOfMonth[5] = 30;
+  DayOfMonth[6] = 31;
+  DayOfMonth[7] = 31;
+  DayOfMonth[8] = 30;
+  DayOfMonth[9] = 31;
+  DayOfMonth[10] = 30;
+  DayOfMonth[11] = 31;
+
+  Adjacent = FALSE;
 
   if (From->Year == To->Year) {
     if (From->Month == To->Month) {
