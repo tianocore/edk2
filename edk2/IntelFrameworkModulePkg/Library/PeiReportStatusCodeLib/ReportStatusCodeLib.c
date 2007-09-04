@@ -64,9 +64,9 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES  **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
   return (*PeiServices)->ReportStatusCode (
                            PeiServices,
                            Type,

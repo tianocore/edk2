@@ -23,7 +23,7 @@
 #include <Protocol/OEMBadging.h>
 #include <Protocol/ConsoleControl.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/FirmwareVolume.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/HiiFramework.h>
 
