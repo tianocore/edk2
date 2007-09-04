@@ -24,7 +24,7 @@ Abstract:
 EFI_STATUS
 EFIAPI
 PeiGetHobList (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT VOID          **HobList
   )
 /*++
@@ -71,7 +71,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiCreateHob (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN UINT16            Type,
   IN UINT16            Length,
   IN OUT VOID          **Hob

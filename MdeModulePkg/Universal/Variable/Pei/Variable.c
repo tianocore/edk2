@@ -64,7 +64,7 @@ Returns:
   //
   // Publish the variable capability to other modules
   //
-  return (**PeiServices).InstallPpi (PeiServices, &mPpiListVariable);
+  return (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &mPpiListVariable);
 
 }
 

@@ -128,7 +128,7 @@
   gEfiDriverBindingProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
-  gEfiFirmwareVolumeProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED

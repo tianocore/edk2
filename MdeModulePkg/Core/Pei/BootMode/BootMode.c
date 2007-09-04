@@ -28,8 +28,8 @@ Revision History
 EFI_STATUS
 EFIAPI
 PeiGetBootMode (
-  IN EFI_PEI_SERVICES  **PeiServices,
-  OUT EFI_BOOT_MODE *BootMode
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  OUT EFI_BOOT_MODE          *BootMode
   )
 /*++
 
@@ -71,8 +71,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiSetBootMode (
-  IN EFI_PEI_SERVICES  **PeiServices,
-  IN EFI_BOOT_MODE     BootMode
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_BOOT_MODE           BootMode
   )
 /*++
 

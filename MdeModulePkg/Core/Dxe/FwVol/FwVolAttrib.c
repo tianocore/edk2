@@ -24,8 +24,8 @@ Abstract:
 EFI_STATUS
 EFIAPI
 FvGetVolumeAttributes (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL  *This,
-  OUT EFI_FV_ATTRIBUTES             *Attributes
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  OUT       EFI_FV_ATTRIBUTES             *Attributes
   )
 /*++
 
@@ -76,8 +76,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvSetVolumeAttributes (
-  IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT EFI_FV_ATTRIBUTES          *Attributes
+  IN     CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN OUT       EFI_FV_ATTRIBUTES              *Attributes
   )
 /*++
 
@@ -96,4 +96,62 @@ Returns:
 {
   return EFI_UNSUPPORTED;
 }
+
+EFI_STATUS
+EFIAPI
+FvGetVolumeInfo (
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
+  IN  CONST EFI_GUID                            *InformationType,
+  IN OUT UINTN                                  *BufferSize,
+  OUT VOID                                      *Buffer
+  )
+/*++
+
+Routine Description:
+  Return information of type InformationType for the requested firmware
+  volume.
+  
+Arguments:
+    This                - Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+    InformationType     - InformationType for requested.
+    BufferSize          - On input, size of Buffer.On output, the amount of
+                          data returned in Buffer.
+    Buffer              - A poniter to the data buffer to return.
+Returns:
+    EFI_SUCCESS         - Successfully got volume Information.
+
+--*/
+{
+  return EFI_UNSUPPORTED;
+}
+
+
+EFI_STATUS
+EFIAPI
+FvSetVolumeInfo (
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
+  IN  CONST EFI_GUID                            *InformationType,
+  IN  UINTN                                     BufferSize,
+  IN CONST  VOID                                *Buffer
+  )
+/*++
+
+Routine Description:
+  Set information of type InformationType for the requested firmware
+  volume.
+
+Arguments:
+    This                - Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+    InformationType     - InformationType for requested.
+    BufferSize          - On input, size of Buffer.On output, the amount of
+                          data returned in Buffer.
+    Buffer              - A poniter to the data buffer to return.
+Returns:
+    EFI_SUCCESS         - Successfully set volume Information.
+
+--*/
+{
+  return EFI_UNSUPPORTED;
+}
+
 

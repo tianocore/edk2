@@ -377,8 +377,8 @@ Returns:
 
     Status = PeiServicesFfsFindNextFile (
                Type,
-               FwVolHeader,
-               &FfsFileHeader
+               (EFI_PEI_FV_HANDLE)    FwVolHeader,
+               (EFI_PEI_FILE_HANDLE*) &FfsFileHeader
                );
     if (!EFI_ERROR (Status)) {
       Status = PeiProcessFile (

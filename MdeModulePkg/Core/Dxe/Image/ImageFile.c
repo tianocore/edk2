@@ -74,7 +74,7 @@ Returns:
   EFI_FILE_HANDLE                   FileHandle;
   EFI_FILE_HANDLE                   LastHandle;
   EFI_LOAD_FILE_PROTOCOL            *LoadFile;
-  EFI_FIRMWARE_VOLUME_PROTOCOL      *FwVol;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL     *FwVol;
   EFI_SECTION_TYPE                  SectionType;
   UINT8                             *Pe32Buffer;
   UINTN                             Pe32BufferSize;
@@ -115,7 +115,7 @@ Returns:
   //
   FwVolFilePathNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)FilePath;
   Status = CoreDevicePathToInterface (
-            &gEfiFirmwareVolumeProtocolGuid, 
+            &gEfiFirmwareVolume2ProtocolGuid, 
             (EFI_DEVICE_PATH_PROTOCOL **)&FwVolFilePathNode, 
             (VOID*)&FwVol, 
             DeviceHandle

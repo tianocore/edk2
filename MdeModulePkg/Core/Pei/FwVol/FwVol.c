@@ -251,9 +251,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiFfsFindSectionData (
-  IN     EFI_PEI_SERVICES      **PeiServices,
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN     EFI_SECTION_TYPE      SectionType,
-  IN     EFI_FFS_FILE_HEADER   *FfsFileHeader,
+  IN     EFI_PEI_FILE_HANDLE   FileHandle,
   IN OUT VOID                  **SectionData
   )
 /*++
@@ -279,8 +279,10 @@ Returns:
   EFI_COMMON_SECTION_HEADER     *Section;
   UINT32                        SectionLength;
   UINT32                        ParsedLength;
-  
+  EFI_FFS_FILE_HEADER           *FfsFileHeader;
 
+  FfsFileHeader = (EFI_FFS_FILE_HEADER *) FileHandle;
+  
   //
   // Size is 24 bits wide so mask upper 8 bits. 
   //    Does not include FfsFileHeader header size
@@ -355,10 +357,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiFfsFindNextFile (
-  IN     EFI_PEI_SERVICES            **PeiServices,
-  IN     EFI_FV_FILETYPE             SearchType,
-  IN     EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER         **FileHeader
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
+  IN UINT8                       SearchType,
+  IN EFI_PEI_FV_HANDLE           VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE     *FileHandle
   )
 /*++
 
@@ -385,6 +387,12 @@ Returns:
 
 --*/
 {
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  EFI_FFS_FILE_HEADER         **FileHeader;
+
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER  *)VolumeHandle;
+  FileHeader = (EFI_FFS_FILE_HEADER **) FileHandle;
+
   return PeiFfsFindNextFileEx ( 
            SearchType,
            FwVolHeader,
@@ -396,9 +404,9 @@ Returns:
 EFI_STATUS 
 EFIAPI
 PeiFvFindNextVolume (
-  IN     EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN     UINTN                      Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader
+  IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   )
 /*++
 
@@ -429,7 +437,9 @@ Returns:
   EFI_STATUS              Status;
   EFI_PEI_FIND_FV_PPI     *FindFvPpi;
   UINT8                   LocalInstance;
+  EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader;
 
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER **) VolumeHandle;
 
   LocalInstance = (UINT8) Instance;
 
@@ -463,7 +473,7 @@ Returns:
     } else {
       Status = FindFvPpi->FindFv (
                             FindFvPpi,
-                            PeiServices,
+                            (EFI_PEI_SERVICES **)PeiServices,
                             &LocalInstance,
                             FwVolHeader
                             );  

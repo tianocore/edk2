@@ -118,7 +118,7 @@ CoreFwVolEventProtocolNotify (
 STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   );
@@ -126,7 +126,7 @@ CoreFvToDevicePath (
 STATIC 
 EFI_STATUS
 CoreAddToDriverList (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv,
   IN  EFI_HANDLE                    FvHandle,
   IN  EFI_GUID                      *DriverName
   );
@@ -134,7 +134,7 @@ CoreAddToDriverList (
 STATIC
 EFI_STATUS 
 CoreProcessFvImageFile (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   );
@@ -218,7 +218,7 @@ Returns:
   EFI_STATUS                    Status;
   EFI_SECTION_TYPE              SectionType;
   UINT32                        AuthenticationStatus;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
 
   
   Fv = DriverEntry->Fv;
@@ -670,7 +670,7 @@ Returns:
 STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
@@ -727,7 +727,7 @@ Returns:
 
 EFI_STATUS
 CoreAddToDriverList (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
@@ -843,7 +843,7 @@ Returns:
 
 EFI_STATUS 
 CoreProcessFvImageFile (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL    *Fv,
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
@@ -955,7 +955,7 @@ Returns:
   EFI_STATUS                    Status;
   EFI_STATUS                    GetNextFileStatus;
   EFI_STATUS                    SecurityStatus;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   EFI_DEVICE_PATH_PROTOCOL      *FvDevicePath;
   EFI_HANDLE                    FvHandle;
   UINTN                         BufferSize;
@@ -1011,7 +1011,7 @@ Returns:
     FvIsBeingProcesssed (FvHandle);
 
 
-    Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeProtocolGuid, (VOID **)&Fv);
+    Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (EFI_ERROR (Status)) {
       //
       // The Handle has a FirmwareVolumeDispatch protocol and should also contiain
@@ -1186,7 +1186,7 @@ Returns:
 --*/
 {
   mFwVolEvent = CoreCreateProtocolNotifyEvent (
-                  &gEfiFirmwareVolumeProtocolGuid, 
+                  &gEfiFirmwareVolume2ProtocolGuid, 
                   TPL_CALLBACK,
                   CoreFwVolEventProtocolNotify,
                   NULL,

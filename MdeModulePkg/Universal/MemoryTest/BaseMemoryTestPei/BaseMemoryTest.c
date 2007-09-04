@@ -20,6 +20,7 @@ Abstract:
 --*/
 
 #include <BaseMemoryTest.h>
+#include <Library/PeiServicesLib.h>
 
 static PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
 
@@ -51,11 +52,9 @@ Returns:
 
 --*/  
 {
-  EFI_STATUS  Status;
 
-  Status = (**PeiServices).InstallPpi (PeiServices, &PpiListPeiBaseMemoryTest);
-
-  return Status;
+  return PeiServicesInstallPpi (&PpiListPeiBaseMemoryTest);
+  
 }
 
 EFI_STATUS

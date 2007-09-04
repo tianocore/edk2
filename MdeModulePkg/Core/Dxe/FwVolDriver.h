@@ -24,6 +24,8 @@ Abstract:
 #define __FWVOL_H
 
 
+#define FV2_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('_', 'F', 'V', '2')
+
 //
 // Used to track all non-deleted files
 //
@@ -38,7 +40,7 @@ typedef struct {
   UINTN                                   Signature;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *Fvb;
   EFI_HANDLE                              Handle;
-  EFI_FIRMWARE_VOLUME_PROTOCOL            Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL           Fv;
 
   EFI_FIRMWARE_VOLUME_HEADER              *FwVolHeader;
   UINT8                                   *CachedFv;
@@ -51,14 +53,14 @@ typedef struct {
   UINT8                                   ErasePolarity;
 } FV_DEVICE;
 
-#define FV_DEVICE_FROM_THIS(a) CR(a, FV_DEVICE, Fv, FV_DEVICE_SIGNATURE)
+#define FV_DEVICE_FROM_THIS(a) CR(a, FV_DEVICE, Fv, FV2_DEVICE_SIGNATURE)
 
 
 EFI_STATUS
 EFIAPI
 FvGetVolumeAttributes (
-  IN    EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  OUT   EFI_FV_ATTRIBUTES              *Attributes
+  IN    CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  OUT         EFI_FV_ATTRIBUTES              *Attributes
   )
 /*++
 
@@ -79,8 +81,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvSetVolumeAttributes (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT EFI_FV_ATTRIBUTES              *Attributes
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN OUT    EFI_FV_ATTRIBUTES              *Attributes
   )
 /*++
 
@@ -100,12 +102,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvGetNextFile (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT VOID                           *Key,
-  IN OUT EFI_FV_FILETYPE                *FileType,
-  OUT    EFI_GUID                       *NameGuid,
-  OUT    EFI_FV_FILE_ATTRIBUTES         *Attributes,
-  OUT    UINTN                          *Size
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN OUT    VOID                           *Key,
+  IN OUT    EFI_FV_FILETYPE                *FileType,
+  OUT       EFI_GUID                       *NameGuid,
+  OUT       EFI_FV_FILE_ATTRIBUTES         *Attributes,
+  OUT       UINTN                          *Size
   )
 /*++
 
@@ -156,13 +158,13 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvReadFile (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN     EFI_GUID                       *NameGuid,
-  IN OUT VOID                           **Buffer,
-  IN OUT UINTN                          *BufferSize,
-  OUT    EFI_FV_FILETYPE                *FoundType,
-  OUT    EFI_FV_FILE_ATTRIBUTES         *FileAttributes,
-  OUT    UINT32                         *AuthenticationStatus
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL   *This,
+  IN CONST  EFI_GUID                       *NameGuid,
+  IN OUT    VOID                           **Buffer,
+  IN OUT    UINTN                          *BufferSize,
+  OUT       EFI_FV_FILETYPE                *FoundType,
+  OUT       EFI_FV_FILE_ATTRIBUTES         *FileAttributes,
+  OUT       UINT32                         *AuthenticationStatus
   )
 /*++
 
@@ -207,13 +209,13 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvReadFileSection (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN     EFI_GUID                       *NameGuid,
-  IN     EFI_SECTION_TYPE               SectionType,
-  IN     UINTN                          SectionInstance,
-  IN OUT VOID                           **Buffer,
-  IN OUT UINTN                          *BufferSize,
-  OUT    UINT32                         *AuthenticationStatus
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL   *This,
+  IN CONST  EFI_GUID                       *NameGuid,
+  IN        EFI_SECTION_TYPE               SectionType,
+  IN        UINTN                          SectionInstance,
+  IN OUT    VOID                           **Buffer,
+  IN OUT    UINTN                          *BufferSize,
+  OUT       UINT32                         *AuthenticationStatus
   )
 /*++
 
@@ -248,10 +250,10 @@ FvReadFileSection (
 EFI_STATUS
 EFIAPI
 FvWriteFile (
-  IN EFI_FIRMWARE_VOLUME_PROTOCOL       *This,
-  IN UINT32                             NumberOfFiles,
-  IN EFI_FV_WRITE_POLICY                WritePolicy,
-  IN EFI_FV_WRITE_FILE_DATA             *FileData
+  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
+  IN       UINT32                             NumberOfFiles,
+  IN       EFI_FV_WRITE_POLICY                WritePolicy,
+  IN       EFI_FV_WRITE_FILE_DATA             *FileData
   )
 /*++
 
@@ -278,7 +280,58 @@ FvWriteFile (
 --*/
 ;
 
+EFI_STATUS
+EFIAPI
+FvGetVolumeInfo (
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
+  IN  CONST EFI_GUID                            *InformationType,
+  IN  OUT   UINTN                               *BufferSize,
+  OUT       VOID                                *Buffer
+  )
+/*++
 
+Routine Description:
+  Return information of type InformationType for the requested firmware
+  volume.
+  
+Arguments:
+    This                - Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+    InformationType     - InformationType for requested.
+    BufferSize          - On input, size of Buffer.On output, the amount of
+                          data returned in Buffer.
+    Buffer              - A poniter to the data buffer to return.
+Returns:
+    EFI_SUCCESS         - Successfully got volume Information.
+
+--*/
+;
+
+
+EFI_STATUS
+EFIAPI
+FvSetVolumeInfo (
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
+  IN  CONST EFI_GUID                            *InformationType,
+  IN        UINTN                               BufferSize,
+  IN  CONST  VOID                               *Buffer
+  )
+/*++
+
+Routine Description:
+  Set information of type InformationType for the requested firmware
+  volume.
+
+Arguments:
+    This                - Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+    InformationType     - InformationType for requested.
+    BufferSize          - On input, size of Buffer.On output, the amount of
+                          data returned in Buffer.
+    Buffer              - A poniter to the data buffer to return.
+Returns:
+    EFI_SUCCESS         - Successfully set volume Information.
+
+--*/
+;
   
 //
 //Internal functions

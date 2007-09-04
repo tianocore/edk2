@@ -25,10 +25,10 @@ Abstract:
 EFI_STATUS
 EFIAPI
 FvWriteFile (
-  IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN UINT32                         NumberOfFiles,
-  IN EFI_FV_WRITE_POLICY            WritePolicy,
-  IN EFI_FV_WRITE_FILE_DATA         *FileData
+  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN       UINT32                         NumberOfFiles,
+  IN       EFI_FV_WRITE_POLICY            WritePolicy,
+  IN       EFI_FV_WRITE_FILE_DATA         *FileData
   )
 /*++
 

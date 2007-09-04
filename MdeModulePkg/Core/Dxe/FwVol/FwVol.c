@@ -25,7 +25,7 @@ VOID          *gEfiFwVolBlockNotifyReg;
 EFI_EVENT     gEfiFwVolBlockEvent;
 
 FV_DEVICE mFvDevice = {
-  FV_DEVICE_SIGNATURE,
+  FV2_DEVICE_SIGNATURE,
   NULL,
   NULL,
   {
@@ -35,7 +35,10 @@ FV_DEVICE mFvDevice = {
     FvReadFileSection,
     FvWriteFile,
     FvGetNextFile,
-    KEYSIZE
+    KEYSIZE,
+    NULL,
+    FvGetVolumeInfo,
+    FvSetVolumeInfo
   },
   NULL,
   NULL,
@@ -389,8 +392,8 @@ NotifyFwVolBlock (
 Routine Description:
     This notification function is invoked when an instance of the
     EFI_FW_VOLUME_BLOCK_PROTOCOL is produced.  It layers an instance of the
-    EFI_FIRMWARE_VOLUME_PROTOCOL on the same handle.  This is the function where
-    the actual initialization of the EFI_FIRMWARE_VOLUME_PROTOCOL is done.
+    EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.  This is the function where
+    the actual initialization of the EFI_FIRMWARE_VOLUME2_PROTOCOL is done.
 
 Arguments:
     Event - The event that occured
@@ -406,7 +409,7 @@ Returns:
   EFI_STATUS                            Status;
   UINTN                                 BufferSize;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
-  EFI_FIRMWARE_VOLUME_PROTOCOL          *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL         *Fv;
   FV_DEVICE                             *FvDevice;
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
   //
@@ -468,13 +471,13 @@ Returns:
     //
     // Check if there is an FV protocol already installed in that handle
     //
-    Status = CoreHandleProtocol (Handle, &gEfiFirmwareVolumeProtocolGuid, (VOID **)&Fv);
+    Status = CoreHandleProtocol (Handle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (!EFI_ERROR (Status)) {
       //
       // Update Fv to use a new Fvb
       //
       FvDevice = _CR (Fv, FV_DEVICE, Fv);
-      if (FvDevice->Signature == FV_DEVICE_SIGNATURE) {
+      if (FvDevice->Signature == FV2_DEVICE_SIGNATURE) {
         //
         // Only write into our device structure if it's our device structure
         //
@@ -500,7 +503,7 @@ Returns:
       //
       Status = CoreInstallProtocolInterface (
                   &Handle,
-                  &gEfiFirmwareVolumeProtocolGuid,
+                  &gEfiFirmwareVolume2ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &FvDevice->Fv
                   );

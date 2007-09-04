@@ -586,7 +586,7 @@ Returns:
   //
   if (!EFI_ERROR(Status)) {
     Ptr = NULL;
-    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolumeProtocolGuid, (VOID **)&Ptr);
+    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Ptr);
     if (EFI_ERROR(Status) || (Ptr == NULL)) {
       return EFI_VOLUME_CORRUPTED;
     }

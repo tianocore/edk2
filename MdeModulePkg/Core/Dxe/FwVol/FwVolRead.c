@@ -70,12 +70,12 @@ FfsAttributes2FvFileAttributes (
 EFI_STATUS
 EFIAPI
 FvGetNextFile (
-  IN         EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT     VOID                            *Key,
-  IN OUT     EFI_FV_FILETYPE                *FileType,
+  IN CONST   EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  IN OUT     VOID                          *Key,
+  IN OUT     EFI_FV_FILETYPE               *FileType,
   OUT        EFI_GUID                      *NameGuid,
   OUT        EFI_FV_FILE_ATTRIBUTES        *Attributes,
-  OUT        UINTN                           *Size
+  OUT        UINTN                          *Size
   )
 /*++
 
@@ -140,7 +140,7 @@ Returns:
   //
   // Check if read operation is enabled
   //
-  if ((FvAttributes & EFI_FV_READ_STATUS) == 0) {
+  if ((FvAttributes & EFI_FV2_READ_STATUS) == 0) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -227,13 +227,13 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvReadFile (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN     EFI_GUID                       *NameGuid,
-  IN OUT VOID                           **Buffer,
-  IN OUT UINTN                          *BufferSize,
-  OUT    EFI_FV_FILETYPE               *FoundType,
-  OUT    EFI_FV_FILE_ATTRIBUTES        *FileAttributes,
-  OUT    UINT32                        *AuthenticationStatus
+  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  IN CONST EFI_GUID                      *NameGuid,
+  IN OUT   VOID                          **Buffer,
+  IN OUT   UINTN                         *BufferSize,
+  OUT      EFI_FV_FILETYPE               *FoundType,
+  OUT      EFI_FV_FILE_ATTRIBUTES        *FileAttributes,
+  OUT      UINT32                        *AuthenticationStatus
   )
 /*++
 
@@ -370,13 +370,13 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvReadFileSection (
-  IN     EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN     EFI_GUID                       *NameGuid,
-  IN     EFI_SECTION_TYPE               SectionType,
-  IN     UINTN                          SectionInstance,
-  IN OUT VOID                           **Buffer,
-  IN OUT UINTN                          *BufferSize,
-  OUT    UINT32                         *AuthenticationStatus
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN CONST  EFI_GUID                       *NameGuid,
+  IN        EFI_SECTION_TYPE               SectionType,
+  IN        UINTN                          SectionInstance,
+  IN OUT    VOID                           **Buffer,
+  IN OUT    UINTN                          *BufferSize,
+  OUT       UINT32                         *AuthenticationStatus
   )
 /*++
 
