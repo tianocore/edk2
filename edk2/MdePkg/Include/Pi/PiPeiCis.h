@@ -126,8 +126,8 @@ typedef struct _EFI_HOB_LOAD_PEIM {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_INSTALL_PPI) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR      *PpiList
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpiList
   );
 
 /**
@@ -151,9 +151,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_REINSTALL_PPI) (
-  IN EFI_PEI_SERVICES                **PeiServices,
-  IN EFI_PEI_PPI_DESCRIPTOR          *OldPpi,
-  IN EFI_PEI_PPI_DESCRIPTOR          *NewPpi
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR          *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR          *NewPpi
   );
 
 /**
@@ -172,11 +172,11 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_LOCATE_PPI) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_GUID                    *Guid,
-  IN UINTN                       Instance,
-  IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
-  IN OUT VOID                    **Ppi
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN CONST EFI_GUID                    *Guid,
+  IN UINTN                             Instance,
+  IN OUT   EFI_PEI_PPI_DESCRIPTOR      **PpiDescriptor OPTIONAL,
+  IN OUT   VOID                        **Ppi
   );
 
 /**
@@ -197,8 +197,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_NOTIFY_PPI) (
-  IN EFI_PEI_SERVICES                **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR       *NotifyList
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR       *NotifyList
   );
 
 /**
@@ -213,8 +213,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_GET_BOOT_MODE) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  OUT EFI_BOOT_MODE              *BootMode
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  OUT EFI_BOOT_MODE                    *BootMode
   );
 
 /**
@@ -229,8 +229,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SET_BOOT_MODE) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_BOOT_MODE               BootMode
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN EFI_BOOT_MODE                     BootMode
   );
 
 /**
@@ -246,8 +246,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_GET_HOB_LIST) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN OUT VOID                    **HobList
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN OUT VOID                      **HobList
   );
 
 /**
@@ -265,10 +265,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_CREATE_HOB) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN UINT16                      Type,
-  IN UINT16                      Length,
-  IN OUT VOID                    **Hob
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN UINT16                            Type,
+  IN UINT16                            Length,
+  IN OUT VOID                          **Hob
   );
 
 /**
@@ -279,19 +279,19 @@ EFI_STATUS
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  Instance         This instance of the firmware volume to find. The value 0 is the Boot Firmware Volume (BFV).
-  @param  FwVolHeader      Pointer to the firmware volume header of the volume to return.
+  @param  VolumeHandle   On exit, points to the next volumn handle or NULL if it does not exist.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
-  @retval EFI_INVALID_PARAMETER FwVolHeader is NULL
+  @retval EFI_INVALID_PARAMETER VolHandle is NULL
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_NEXT_VOLUME2) (
-  IN EFI_PEI_SERVICES                **PeiServices,
-  IN UINTN                           Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER  **FwVolHeader
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN UINTN                                 Instance,
+  OUT EFI_PEI_FV_HANDLE                    *VolumeHandle
   );
 
 /**
@@ -315,10 +315,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_NEXT_FILE2) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_FV_FILETYPE             SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER     **FileHeader
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN EFI_FV_FILETYPE                       SearchType,
+  IN EFI_PEI_FV_HANDLE                     VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE               *FileHandle
   );
 
 /**
@@ -337,10 +337,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_SECTION_DATA2) (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_SECTION_TYPE            SectionType,
-  IN EFI_FFS_FILE_HEADER         *FfsFileHeader,
-  IN OUT VOID                    **SectionData
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN EFI_SECTION_TYPE                  SectionType,
+  IN EFI_PEI_FILE_HANDLE               FileHandle,
+  IN OUT VOID                          **SectionData
   );
 
 /**
@@ -358,7 +358,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_INSTALL_PEI_MEMORY) (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_PHYSICAL_ADDRESS       MemoryBegin,
   IN UINT64                     MemoryLength
   );
@@ -381,7 +381,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_ALLOCATE_PAGES) (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
   IN OUT EFI_PHYSICAL_ADDRESS   *Memory
@@ -402,7 +402,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_ALLOCATE_POOL) (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN UINTN                      Size,
   OUT VOID                      **Buffer
   );
@@ -470,12 +470,12 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_REPORT_STATUS_CODE) (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN EFI_STATUS_CODE_TYPE     Type,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId OPTIONAL,
-  IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
+  IN EFI_STATUS_CODE_TYPE           Type,
+  IN EFI_STATUS_CODE_VALUE          Value,
+  IN UINT32                         Instance,
+  IN CONST EFI_GUID                 *CallerId OPTIONAL,
+  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   );
 
 /**
@@ -578,7 +578,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_FILE_INFO) (
   IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
-  OUT       EFI_FV_FILE_INFO      *FileInfo
+  OUT EFI_FV_FILE_INFO            *FileInfo
   );
 
 
@@ -636,8 +636,8 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_VOLUME_INFO) (
-  IN CONST  EFI_PEI_FV_HANDLE *VolumeHandle,
-  OUT       EFI_FV_INFO       *VolumeInfo
+  IN  EFI_PEI_FV_HANDLE       VolumeHandle,
+  OUT EFI_FV_INFO             *VolumeInfo
   );
 
 /**
@@ -668,7 +668,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_REGISTER_FOR_SHADOW) (
-  IN CONST  EFI_PEI_FILE_HANDLE FileHandle
+  IN  EFI_PEI_FILE_HANDLE FileHandle
   );
 
 
