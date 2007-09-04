@@ -26,13 +26,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_PEI_SMBUS2_PPI *
 InternalGetSmbusPpi (
-  EFI_PEI_SERVICES      **PeiServices
+  VOID
   )
 {
   EFI_STATUS            Status;
   EFI_PEI_SMBUS2_PPI     *SmbusPpi;
 
-  Status = (*PeiServices)->LocatePpi (PeiServices, &gEfiPeiSmbus2PpiGuid, 0, NULL, (VOID **) &SmbusPpi);
+  Status = PeiServicesLocatePpi (&gEfiPeiSmbus2PpiGuid, 0, NULL, (VOID **) &SmbusPpi);
   ASSERT_EFI_ERROR (Status);
   ASSERT (SmbusPpi != NULL);
 
@@ -70,12 +70,10 @@ InternalSmBusExec (
   )
 {
   EFI_PEI_SMBUS2_PPI        *SmbusPpi;
-  EFI_PEI_SERVICES          **PeiServices;
   RETURN_STATUS             ReturnStatus;
   EFI_SMBUS_DEVICE_ADDRESS  SmbusDeviceAddress;
 
-  PeiServices = GetPeiServicesTablePointer ();
-  SmbusPpi    = InternalGetSmbusPpi (PeiServices);
+  SmbusPpi    = InternalGetSmbusPpi ();
   SmbusDeviceAddress.SmbusDeviceAddress = SMBUS_LIB_SLAVE_ADDRESS (SmBusAddress);
 
   ReturnStatus = SmbusPpi->Execute (

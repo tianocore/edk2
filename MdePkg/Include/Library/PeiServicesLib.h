@@ -30,7 +30,7 @@
 EFI_STATUS
 EFIAPI
 PeiServicesInstallPpi (
-  IN EFI_PEI_PPI_DESCRIPTOR     *PpiList
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *PpiList
   );
 
 /**
@@ -51,8 +51,8 @@ PeiServicesInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesReInstallPpi (
-  IN EFI_PEI_PPI_DESCRIPTOR     *OldPpi,
-  IN EFI_PEI_PPI_DESCRIPTOR     *NewPpi
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *NewPpi
   );
 
 /**
@@ -71,7 +71,7 @@ PeiServicesReInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesLocatePpi (
-  IN EFI_GUID                   *Guid,
+  IN CONST EFI_GUID                   *Guid,
   IN UINTN                      Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
   IN OUT VOID                   **Ppi
@@ -94,7 +94,7 @@ PeiServicesLocatePpi (
 EFI_STATUS
 EFIAPI
 PeiServicesNotifyPpi (
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   );
 
 /**
@@ -176,7 +176,7 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextVolume (
   IN UINTN                          Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader
+  IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   );
 
 /**
@@ -196,8 +196,8 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextFile (
   IN EFI_FV_FILETYPE            SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER    **FileHeader
+  IN EFI_PEI_FV_HANDLE          VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE    *FileHandle
   );
 
 /**
@@ -216,7 +216,7 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
-  IN EFI_FFS_FILE_HEADER        *FfsFileHeader,
+  IN EFI_PEI_FILE_HANDLE        FileHandle,
   IN OUT VOID                   **SectionData
   );
 

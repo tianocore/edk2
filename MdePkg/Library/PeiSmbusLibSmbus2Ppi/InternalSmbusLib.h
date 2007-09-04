@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmbusLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/PeiServicesLib.h>
 #include <Library/BaseMemoryLib.h>
 
 #define SMBUS_LIB_SLAVE_ADDRESS(SmBusAddress)      (((SmBusAddress) >> 1)  & 0x7f)
@@ -41,14 +42,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   This internal function retrieves Smbus PPI from PPI database.
 
-  @param  PeiServices   An indirect pointer to the EFI_PEI_SERVICES published by the PEI Foundation.
+  @param  VOID
 
   @return The pointer to Smbus PPI.
 
 **/
 EFI_PEI_SMBUS2_PPI *
 InternalGetSmbusPpi (
-  EFI_PEI_SERVICES      **PeiServices
+  VOID
   );
 
 /**

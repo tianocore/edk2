@@ -72,6 +72,7 @@
   MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  MdePkg/Library/DxePiLib/DxePiLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf

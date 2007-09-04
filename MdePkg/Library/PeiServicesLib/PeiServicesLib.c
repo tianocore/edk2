@@ -34,12 +34,12 @@
 EFI_STATUS
 EFIAPI
 PeiServicesInstallPpi (
-  IN EFI_PEI_PPI_DESCRIPTOR     *PpiList
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *PpiList
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES  **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
   return (*PeiServices)->InstallPpi (PeiServices, PpiList);
 }
 
@@ -61,13 +61,13 @@ PeiServicesInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesReInstallPpi (
-  IN EFI_PEI_PPI_DESCRIPTOR     *OldPpi,
-  IN EFI_PEI_PPI_DESCRIPTOR     *NewPpi
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR     *NewPpi
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->ReInstallPpi (PeiServices, OldPpi, NewPpi);
 }
 
@@ -87,15 +87,15 @@ PeiServicesReInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesLocatePpi (
-  IN EFI_GUID                   *Guid,
+  IN CONST EFI_GUID                   *Guid,
   IN UINTN                      Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
   IN OUT VOID                   **Ppi
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->LocatePpi (PeiServices, Guid, Instance, PpiDescriptor, Ppi);
 }
 
@@ -116,12 +116,12 @@ PeiServicesLocatePpi (
 EFI_STATUS
 EFIAPI
 PeiServicesNotifyPpi (
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->NotifyPpi (PeiServices, NotifyList);
 }
 
@@ -140,9 +140,9 @@ PeiServicesGetBootMode (
   IN OUT EFI_BOOT_MODE          *BootMode
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->GetBootMode (PeiServices, BootMode);
 }
 
@@ -160,9 +160,9 @@ PeiServicesSetBootMode (
   IN EFI_BOOT_MODE              BootMode
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->SetBootMode (PeiServices, BootMode);
 }
 
@@ -181,9 +181,9 @@ PeiServicesGetHobList (
   IN OUT VOID                   **HobList
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->GetHobList (PeiServices, HobList);
 }
 
@@ -206,9 +206,9 @@ PeiServicesCreateHob (
   IN OUT VOID                   **Hob
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->CreateHob (PeiServices, Type, Length, Hob);
 }
 
@@ -228,13 +228,13 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextVolume (
   IN UINTN                          Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader
+  IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FfsFindNextVolume (PeiServices, Instance, FwVolHeader);
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  return (*PeiServices)->FfsFindNextVolume (PeiServices, Instance, VolumeHandle);
 }
 
 /**
@@ -254,14 +254,14 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextFile (
   IN EFI_FV_FILETYPE            SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER    **FileHeader
+  IN EFI_PEI_FV_HANDLE          VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE    *FileHandle
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FfsFindNextFile (PeiServices, SearchType, FwVolHeader, FileHeader);
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  return (*PeiServices)->FfsFindNextFile (PeiServices, SearchType, VolumeHandle, FileHandle);
 }
 
 /**
@@ -280,13 +280,13 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
-  IN EFI_FFS_FILE_HEADER        *FfsFileHeader,
+  IN EFI_PEI_FILE_HANDLE        FfsFileHeader,
   IN OUT VOID                   **SectionData
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FfsFileHeader, SectionData);
 }
 
@@ -309,9 +309,9 @@ PeiServicesInstallPeiMemory (
   IN UINT64                     MemoryLength
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->InstallPeiMemory (PeiServices, MemoryBegin, MemoryLength);
 }
 
@@ -337,9 +337,9 @@ PeiServicesAllocatePages (
   IN OUT EFI_PHYSICAL_ADDRESS   *Memory
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->AllocatePages (PeiServices, MemoryType, Pages, Memory);
 }
 
@@ -361,9 +361,9 @@ PeiServicesAllocatePool (
   OUT VOID                      **Buffer
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
   return (*PeiServices)->AllocatePool (PeiServices, Size, Buffer);
 }
 
@@ -380,7 +380,7 @@ PeiServicesResetSystem (
   VOID
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->ResetSystem (PeiServices);

@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Ppi/Pcd.h>
 
+#include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
@@ -41,19 +42,8 @@ GetPcdPpiPtr (
 {
   EFI_STATUS        Status;
   PCD_PPI           *PcdPpi;
-  EFI_PEI_SERVICES  **PeiServices;
-
-
-  PeiServices = GetPeiServicesTablePointer ();
-
-  Status = (**PeiServices).LocatePpi (
-                             PeiServices,
-                             &gPcdPpiGuid,
-                             0,
-                             NULL,
-                             (VOID **)&PcdPpi
-                             );
-
+  
+  Status = PeiServicesLocatePpi (&gPcdPpiGuid, 0, NULL, (VOID **)&PcdPpi);
   ASSERT_EFI_ERROR (Status);
 
   return PcdPpi;

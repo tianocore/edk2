@@ -1,8 +1,9 @@
 #/** @file
-# Component description file for Pei Smbus Library.
+# Component description file library instance for PiLib for DXE phase.
 #
-# SMBUS library that layers on top of the SMBUS PPI.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Library to abstract utility functions that is related to PI Specification.
+#
+# Copyright (c) 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,11 +17,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiSmbusLibSmbus2Ppi
-  FILE_GUID                      = 2A1E1C92-AABA-4d62-AC40-F3A4C3387356
-  MODULE_TYPE                    = PEIM
+  BASE_NAME                      = DxePiLib
+  FILE_GUID                      = EE680C58-FFC0-4a5d-858F-66FF9C84BC9F
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SmbusLib|PEIM
+  LIBRARY_CLASS                  = PiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -30,23 +31,16 @@
 #
 
 [Sources.common]
-  SmbusLib.c
-  PeiSmbusLib.c
-  InternalSmbusLib.h
-
+  DxePiLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
 
 
 [LibraryClasses]
-  BaseMemoryLib
-  PeiServicesTablePointerLib
-  PeiServicesLib
+  MemoryAllocationLib
   DebugLib
 
-[Ppis]
-  gEfiPeiSmbus2PpiGuid                           # PPI ALWAYS_CONSUMED
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid               # ALWAYS_CONSUMED
 
-[Depex]
-  gEfiPeiSmbus2PpiGuid 
