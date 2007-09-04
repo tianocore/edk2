@@ -29,13 +29,13 @@ Module Name: PeiSmbusLib.c
 **/
 EFI_PEI_SMBUS_PPI *
 InternalGetSmbusPpi (
-  EFI_PEI_SERVICES      **PeiServices
+  VOID
   ) 
 {
   EFI_STATUS            Status;
   EFI_PEI_SMBUS_PPI     *SmbusPpi;
 
-  Status = (*PeiServices)->LocatePpi (PeiServices, &gEfiPeiSmbusPpiGuid, 0, NULL, (VOID **) &SmbusPpi);
+  Status = PeiServicesLocatePpi (&gEfiPeiSmbusPpiGuid, 0, NULL, (VOID **) &SmbusPpi);
   ASSERT_EFI_ERROR (Status);
   ASSERT (SmbusPpi != NULL);
 
@@ -78,7 +78,7 @@ InternalSmBusExec (
   EFI_SMBUS_DEVICE_ADDRESS  SmbusDeviceAddress;
 
   PeiServices = GetPeiServicesTablePointer ();
-  SmbusPpi    = InternalGetSmbusPpi (PeiServices);
+  SmbusPpi    = InternalGetSmbusPpi ();
   SmbusDeviceAddress.SmbusDeviceAddress = SMBUS_LIB_SLAVE_ADDRESS (SmBusAddress);
 
   ReturnStatus = SmbusPpi->Execute (

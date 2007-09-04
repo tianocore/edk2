@@ -45,6 +45,7 @@
 [LibraryClasses]
   BaseMemoryLib
   PeiServicesTablePointerLib
+  PeiServicesLib
   DebugLib
 
 
