@@ -24,9 +24,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Fvb.h"
 
 //
-// Event for Exit Boot Services Callback
+// Event for Set Virtual Map Changed Event
 //
-STATIC EFI_EVENT mExitBootServicesEvent = NULL;
+STATIC EFI_EVENT mSetVirtualMapChangedEvent = NULL;
 
 //
 // Lib will ASSERT if more FVB devices than this are added to the system.
@@ -312,11 +312,11 @@ FvbLibInitialize (
   // Register SetVirtualAddressMap () notify function
   //
   Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   TPL_NOTIFY,
                   FvbVirtualAddressChangeNotifyEvent,
                   NULL,
-                  &mExitBootServicesEvent
+                  &mSetVirtualMapChangedEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
