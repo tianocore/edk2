@@ -778,7 +778,7 @@ MtftpListen (
   //
   do {
     if ((SaveReplyLen = ReplyLen) > BufferSize) {
-      SaveReplyLen = (UINTN) BufferSize;
+      SaveReplyLen = 0;
     }
 
     /* %%TBD - add big block number support */
@@ -1818,8 +1818,10 @@ PxeBcMtftp (
     *(PacketSizePtr = &PacketSize) = MAX_TFTP_PKT_SIZE;
   }
 
-  if (*PacketSizePtr > *BufferSizePtr) {
-    *PacketSizePtr = (UINTN) *BufferSizePtr;
+  if ((*PacketSizePtr > *BufferSizePtr) &&
+    (Operation != EFI_PXE_BASE_CODE_TFTP_GET_FILE_SIZE) &&
+    (Operation != EFI_PXE_BASE_CODE_MTFTP_GET_FILE_SIZE)) {
+    *PacketSizePtr = MAX ((UINTN) *BufferSizePtr, MIN_TFTP_PKT_SIZE);
   }
 
   if (*PacketSizePtr < MIN_TFTP_PKT_SIZE) {
