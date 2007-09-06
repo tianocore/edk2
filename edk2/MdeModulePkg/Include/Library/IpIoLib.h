@@ -68,11 +68,9 @@ typedef enum {
 } ICMP_ERROR;
 
 typedef struct _ICMP_ERROR_INFO {
-  EFI_STATUS  Error;
   BOOLEAN     IsHard;
   BOOLEAN     Notify;
 } ICMP_ERROR_INFO;
-
 
 #define EFI_IP4_HEADER_LEN(HdrPtr) ((HdrPtr)->HeaderLength << 2)
 
