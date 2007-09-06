@@ -96,7 +96,7 @@ Brief usage for Migration Tool MigrationMsa2Inf.exe:
    f. When tool generates [LibraryClasses] section, the recommended library instances are lost. (No impact to build)
  
 7. Pyton Source
-   r633 <buildtools_project>\BaseTools\Source\Python\MigrationMsa2Inf
+   r682 <buildtools_project>\BaseTools\Source\Python\MigrationMsa2Inf
 
 
 Brief Usage for PcdSyntax Update:
