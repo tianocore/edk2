@@ -58,6 +58,19 @@ EFI_IP4_CONFIG_DATA  mIpIoDefaultIpConfigData = {
   0
 };
 
+STATIC ICMP_ERROR_INFO  mIcmpErrMap[10] = {
+  {FALSE, TRUE},
+  {FALSE, TRUE},
+  {TRUE, TRUE},
+  {TRUE, TRUE},
+  {TRUE, TRUE},
+  {FALSE, TRUE},
+  {FALSE, TRUE},
+  {FALSE, TRUE},
+  {FALSE, FALSE},
+  {FALSE, TRUE}
+};
+
 STATIC
 VOID
 EFIAPI
@@ -1271,58 +1284,42 @@ IpIoGetIcmpErrStatus (
   OUT BOOLEAN     *Notify OPTIONAL
   )
 {
-  ICMP_ERROR_INFO  IcmpErrMap[10];
-
-  IcmpErrMap[0].Error  = EFI_NETWORK_UNREACHABLE;
-  IcmpErrMap[0].IsHard = FALSE;
-  IcmpErrMap[0].Notify = TRUE;
-
-  IcmpErrMap[1].Error = EFI_HOST_UNREACHABLE;
-  IcmpErrMap[1].IsHard = FALSE;
-  IcmpErrMap[1].Notify = TRUE;
-
-  IcmpErrMap[2].Error = EFI_PROTOCOL_UNREACHABLE;
-  IcmpErrMap[2].IsHard = TRUE;
-  IcmpErrMap[2].Notify = TRUE;
-
-  IcmpErrMap[3].Error = EFI_PORT_UNREACHABLE;
-  IcmpErrMap[3].IsHard = TRUE;
-  IcmpErrMap[3].Notify = TRUE;
-
-  IcmpErrMap[4].Error = EFI_ICMP_ERROR;
-  IcmpErrMap[4].IsHard = TRUE;
-  IcmpErrMap[4].Notify = TRUE;
-
-  IcmpErrMap[5].Error = EFI_ICMP_ERROR;
-  IcmpErrMap[5].IsHard = FALSE;
-  IcmpErrMap[5].Notify = TRUE;
-
-  IcmpErrMap[6].Error = EFI_HOST_UNREACHABLE;
-  IcmpErrMap[6].IsHard = FALSE;
-  IcmpErrMap[6].Notify = TRUE;
-
-  IcmpErrMap[7].Error = EFI_HOST_UNREACHABLE;
-  IcmpErrMap[7].IsHard = FALSE;
-  IcmpErrMap[7].Notify = TRUE;
-
-  IcmpErrMap[8].Error = EFI_ICMP_ERROR;
-  IcmpErrMap[8].IsHard = FALSE;
-  IcmpErrMap[8].Notify = FALSE;
-
-  IcmpErrMap[9].Error = EFI_ICMP_ERROR;
-  IcmpErrMap[9].IsHard = FALSE;
-  IcmpErrMap[9].Notify = TRUE;
-
   ASSERT ((IcmpError >= ICMP_ERR_UNREACH_NET) && (IcmpError <= ICMP_ERR_PARAMPROB));
 
   if (IsHard != NULL) {
-    *IsHard = IcmpErrMap[IcmpError].IsHard;
+    *IsHard = mIcmpErrMap[IcmpError].IsHard;
   }
 
   if (Notify != NULL) {
-    *Notify = IcmpErrMap[IcmpError].Notify;
+    *Notify = mIcmpErrMap[IcmpError].Notify;
   }
 
-  return IcmpErrMap[IcmpError].Error;
+  switch (IcmpError) {
+  case ICMP_ERR_UNREACH_NET:
+    return  EFI_NETWORK_UNREACHABLE;
+
+  case ICMP_ERR_TIMXCEED_INTRANS:
+  case ICMP_ERR_TIMXCEED_REASS:
+  case ICMP_ERR_UNREACH_HOST:
+    return  EFI_HOST_UNREACHABLE;
+
+  case ICMP_ERR_UNREACH_PROTOCOL:
+    return  EFI_PROTOCOL_UNREACHABLE;
+
+  case ICMP_ERR_UNREACH_PORT:
+    return  EFI_PORT_UNREACHABLE;
+
+  case ICMP_ERR_MSGSIZE:
+  case ICMP_ERR_UNREACH_SRCFAIL:
+  case ICMP_ERR_QUENCH:
+  case ICMP_ERR_PARAMPROB:
+    return  EFI_ICMP_ERROR;
+  }
+
+  //
+  // will never run here!
+  //
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
 }
 
