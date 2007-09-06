@@ -1421,7 +1421,7 @@ DeclineOffer (
     OP_PAD
     );
   DHCPDECLINEoptions.DhcpMessageType.Type = DHCPDECLINE;
-  CopyMem (&DHCPDECLINEoptions.OpDeclineEnd, &DHCP_REQ_OPTIONS, sizeof (struct requestopendstr));
+  CopyMem (&DHCPDECLINEoptions.OpDeclineEnd, &DHCP_REQ_OPTIONS, sizeof (DHCPDECLINEoptions.OpDeclineEnd));
 
   {
     EFI_IP_ADDRESS  TmpIp;
@@ -1729,8 +1729,7 @@ TryFinishDORA (
   //
   DhcpRxBuf = &DHCPV4_ACK_BUFFER;
   DHCPV4_OPTIONS_BUFFER.DhcpMessageType.Type  = DHCPREQUEST;
-  CopyMem (&DHCP_REQ_OPTIONS, &RequestOpEndStr, sizeof (RequestOpEndStr));
-//  DHCP_REQ_OPTIONS = RequestOpEndStr;
+  CopyMem (&DHCP_REQ_OPTIONS, &RequestOpEndStr, sizeof (DHCP_REQ_OPTIONS));
   DHCP_REQ_OPTIONS.OpReqIP.Ip = *(EFI_IPv4_ADDRESS *) &RxBuf[OfferIx].u.Dhcpv4.yiaddr;
 
   CopyMem (
