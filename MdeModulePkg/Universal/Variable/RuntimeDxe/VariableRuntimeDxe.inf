@@ -57,9 +57,6 @@
   PcdLib
   HobLib
 
-[Guids]
-  gEfiFlashMapHobGuid
-
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
   gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL SOMETIMES_CONSUMED

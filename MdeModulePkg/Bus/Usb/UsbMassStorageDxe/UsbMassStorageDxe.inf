@@ -57,5 +57,5 @@
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
