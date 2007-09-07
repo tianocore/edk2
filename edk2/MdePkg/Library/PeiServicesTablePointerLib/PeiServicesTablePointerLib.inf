@@ -34,7 +34,7 @@
 
 [Sources.common]
   PeiServicesTablePointer.c
-
+  PeiServicesTablePointerInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec

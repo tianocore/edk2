@@ -32,7 +32,7 @@ extern const UINT32                   _gPeimRevision;
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -49,7 +49,7 @@ _ModuleEntryPoint (
 EFI_STATUS
 EFIAPI
 EfiMain (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -64,7 +64,7 @@ EfiMain (
 VOID
 EFIAPI
 ProcessLibraryConstructorList (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -79,7 +79,7 @@ ProcessLibraryConstructorList (
 VOID
 EFIAPI
 ProcessLibraryDestructorList (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
@@ -96,7 +96,7 @@ ProcessLibraryDestructorList (
 EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   );
 
