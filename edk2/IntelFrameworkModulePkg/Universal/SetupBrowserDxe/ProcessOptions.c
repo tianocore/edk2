@@ -341,31 +341,32 @@ ProcessOptions (
               //
               if (!Tag->Suppress && !Tag->GrayOut) {
                 CopyMem (NvRamMap, &Number, MenuOption->ThisTag->StorageWidth);
+                break;
               }
-              break;
+            } else {
+
+              StringPtr = GetToken (PopUp, MenuOption->Handle);
+
+              CreatePopUp (GetStringWidth (StringPtr) / 2, 3, &NullCharacter, StringPtr, &NullCharacter);
+
+              do {
+                Status = WaitForKeyStroke (&Key);
+
+                switch (Key.UnicodeChar) {
+
+                case CHAR_CARRIAGE_RETURN:
+                  //
+                  // Since the value can be one byte long or two bytes long, do a CopyMem based on StorageWidth
+                  //
+                  CopyMem (NvRamMap, &Number, MenuOption->ThisTag->StorageWidth);
+                  FreePool (StringPtr);
+                  break;
+
+                default:
+                  break;
+                }
+              } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
             }
-
-            StringPtr = GetToken (PopUp, MenuOption->Handle);
-
-            CreatePopUp (GetStringWidth (StringPtr) / 2, 3, &NullCharacter, StringPtr, &NullCharacter);
-
-            do {
-              Status = WaitForKeyStroke (&Key);
-
-              switch (Key.UnicodeChar) {
-
-              case CHAR_CARRIAGE_RETURN:
-                //
-                // Since the value can be one byte long or two bytes long, do a CopyMem based on StorageWidth
-                //
-                CopyMem (NvRamMap, &Number, MenuOption->ThisTag->StorageWidth);
-                FreePool (StringPtr);
-                break;
-
-              default:
-                break;
-              }
-            } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
           }
         }
 
