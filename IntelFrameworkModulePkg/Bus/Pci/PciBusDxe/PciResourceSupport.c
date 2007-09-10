@@ -642,6 +642,7 @@ Returns:
   Node    = NULL;
 
   Node    = AllocatePool (sizeof (PCI_RESOURCE_NODE));
+  ASSERT (Node != NULL);
   if (Node == NULL) {
     return NULL;
   }
