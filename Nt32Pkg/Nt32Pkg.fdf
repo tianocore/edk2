@@ -25,8 +25,8 @@
 #
 ################################################################################
 [FD.Fv_Recovery]
-BaseAddress   = 0x0|PcdWinNtFdBaseAddress  #The base address of the FLASH Device.
-Size          = 0x002a0000            #The size in bytes of the FLASH Device
+BaseAddress   = 0x0|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress  #The base address of the FLASH Device.
+Size          = 0x002a0000                                           #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0x2a
@@ -47,11 +47,11 @@ NumBlocks     = 0x2a
 #
 ################################################################################
 0x00000000|0x00280000
-PcdWinNtFlashFvRecoveryBase|PcdWinNtFlashFvRecoverySize
+gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
 FV = FvRecovery
 
 0x00280000|0x0000c000
-PcdWinNtFlashNvStorageVariableBase|PcdFlashNvStorageVariableSize
+gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 DATA = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -67,10 +67,10 @@ DATA = {
 }
 
 0x0028c000|0x00002000
-PcdWinNtFlashNvStorageEventLogBase|PcdWinNtFlashNvStorageEventLogSize
+gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
 
 0x0028e000|0x00002000
-PcdWinNtFlashNvStorageFtwWorkingBase|PcdFlashNvStorageFtwWorkingSize
+gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 DATA = {
   0x8d, 0x2b, 0xf1, 0xff, 0x96, 0x76, 0x8b, 0x4c,
   0xa9, 0x85, 0x27, 0x47, 0x07, 0x5b, 0x4f, 0x50,
@@ -79,7 +79,7 @@ DATA = {
 }
 
 0x00290000|0x00010000
-PcdWinNtFlashNvStorageFtwSpareBase|PcdFlashNvStorageFtwSpareSize
+gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 ################################################################################
 #
@@ -232,13 +232,13 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
 ############################################################################
 #
 #[Rule.Common.DXE_DRIVER]
-#  FILE DRIVER = $(NAMED_GUID) CheckSum {
+#  FILE DRIVER = $(NAMED_GUID) {
+#    DXE_DEPEX    DXE_DEPEX Optional      |.depex
 #    COMPRESS PI_STD {
 #      GUIDED {
-#        DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-#        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
-#        UI Optional            $(MODULE_NAME)
-#        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+#        PE32     PE32                    |.efi
+#        UI       STRING="$(MODULE_NAME)" Optional
+#        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
 #      }
 #    }
 #  }
@@ -247,60 +247,60 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
 
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
-    PE32                $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI Optional         $(MODULE_NAME)
-    VERSION Optional    BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+    PE32     PE32           |.efi
+    UI       STRING ="$(MODULE_NAME)" Optional         
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)    
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
-     PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).Depex
-     PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI Optional               $(MODULE_NAME)
-     VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+     PEI_DEPEX PEI_DEPEX Optional        |.depex
+     PE32      PE32                      |.efi
+     UI       STRING="$(MODULE_NAME)" Optional         
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
   }
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
     COMPRESS PI_STD {
-      PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
-      UI Optional               $(MODULE_NAME)
-      VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+      PE32     PE32           |.efi
+      UI       STRING="$(MODULE_NAME)" Optional
+      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
     }
   }
 
 [Rule.Common.UEFI_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      |.depex
     COMPRESS PI_STD {
       GUIDED {
-        DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
-        UI Optional            $(MODULE_NAME)
-        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+        PE32     PE32                    |.efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
     }
   }
 
 [Rule.Common.DXE_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      |.depex
     COMPRESS PI_STD {
       GUIDED {
-        DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
-        UI Optional            $(MODULE_NAME)
-        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+        PE32     PE32                    |.efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
     }
   }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      |.depex
     COMPRESS PI_STD {
       GUIDED {
-        DXE_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
-        UI Optional            $(MODULE_NAME)
-        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+        PE32     PE32                    |.efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
     }
   }
@@ -309,9 +309,9 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
   FILE APPLICATION = $(NAMED_GUID) {
     COMPRESS PI_STD {
       GUIDED {
-        PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
-        UI Optional            $(MODULE_NAME)
-        VERSION Optional       BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+        PE32     PE32                    |.efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
     }
   }
