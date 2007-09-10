@@ -678,30 +678,32 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS        = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 #
 ####################################################################################
 #   ICC              - Intel C Compiler V9.1
-*_ICC_*_*_FAMILY                    = MSFT
+*_ICC_*_*_FAMILY                    = INTEL
 
-*_ICC_IA32_*_PATH                   = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
-*_ICC_IA32_*_DPATH                  = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
-*_ICC_IA32_ASMLINK_PATH             = C:\WINDDK\3790.1830\bin\bin16
+*_ICC_IA32_*_PATH                   = C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin
+*_ICC_X64_*_PATH                   = C:\Program Files\Intel\Compiler\C++\9.1\EM64T\Bin
 *_ICC_IPF_*_PATH                    = C:\Program Files\Intel\Compiler\C++\9.1\Itanium\Bin
 DEBUG_ICC_*_ASL_PATH                = C:\ASL
 RELEASE_ICC_*_ASL_PATH              = C:\ASL
-
-*_ICC_*_CC_NAME                     = cl.exe
-*_ICC_*_SLINK_NAME                  = lib.exe
-*_ICC_*_DLINK_NAME                  = link.exe
-*_ICC_*_ASMLINK_NAME                = link.exe
-*_ICC_*_PP_NAME                     = cl.exe
-*_ICC_*_VFRPP_NAME                  = cl.exe
-*_ICC_*_APP_NAME                    = cl.exe
-*_ICC_*_ASM_NAME                    = ml.exe
 
 *_ICC_*_VFRPP_FLAGS                      = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 
 ##################
 # IA32 definitions
 ##################
-*_ICC_IA32_PCH_NAME                 = cl.exe
+*_ICC_IA32_ASM_FAMILY                  = MSFT
+*_ICC_IA32_ASM_PATH                    = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
+*_ICC_IA32_PCH_NAME                    = icl.exe
+
+*_ICC_IA32_CC_NAME                     = icl.exe
+*_ICC_IA32_SLINK_NAME                  = xilib.exe
+*_ICC_IA32_DLINK_NAME                  = xilink.exe
+*_ICC_IA32_ASMLINK_NAME                = xilink.exe
+*_ICC_IA32_PP_NAME                     = icl.exe
+*_ICC_IA32_VFRPP_NAME                  = icl.exe
+*_ICC_IA32_APP_NAME                    = icl.exe
+*_ICC_IA32_ASM_NAME                    = ml.exe
+
 
 *_ICC_IA32_APP_FLAGS                     = /nologo /E /TC
 *_ICC_IA32_PP_FLAGS                      = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
@@ -709,11 +711,41 @@ DEBUG_ICC_IA32_CC_FLAGS                  = /nologo /W4 /WX /Gy /c /D UNICODE /O1
 RELEASE_ICC_IA32_CC_FLAGS                = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192
 DEBUG_ICC_IA32_PCH_FLAGS                 = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Yc /TC /Zi /Gm
 RELEASE_ICC_IA32_PCH_FLAGS               = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Yc /TC
-DEBUG_ICC_IA32_ASM_FLAGS                 = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
-RELEASE_ICC_IA32_ASM_FLAGS               = /nologo /W3 /WX /c /coff /Cx /Zd /W0
-*_ICC_IA32_SLINK_FLAGS                   = /nologo /LTCG
+DEBUG_ICC_IA32_ASM_FLAGS                 = /nologo /W3 /WX /c /Zd /W0 /Zi
+RELEASE_ICC_IA32_ASM_FLAGS               = /nologo /W3 /WX /c /Zd /W0
+*_ICC_IA32_SLINK_FLAGS                   = /nologo
 DEBUG_ICC_IA32_DLINK_FLAGS               = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
+##################
+# X64 definitions
+##################
+*_ICC_X64_ASM_FAMILY                  = MSFT
+*_ICC_X64_ASM_PATH                    = C:\WINDDK\3790.1830\bin\win64\x86\amd64
+*_ICC_X64_PCH_NAME                    = icl.exe
+
+*_ICC_X64_CC_NAME                     = icl.exe
+*_ICC_X64_SLINK_NAME                  = xilib.exe
+*_ICC_X64_DLINK_NAME                  = xilink.exe
+*_ICC_X64_ASMLINK_NAME                = xilink.exe
+*_ICC_X64_PP_NAME                     = icl.exe
+*_ICC_X64_VFRPP_NAME                  = icl.exe
+*_ICC_X64_APP_NAME                    = icl.exe
+*_ICC_X64_ASM_NAME                    = ml64.exe
+
+
+*_ICC_X64_SLINK_FLAGS                = /nologo /LTCG
+*_ICC_X64_APP_FLAGS                  = /nologo /E /TC
+*_ICC_X64_PP_FLAGS                   = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+DEBUG_ICC_X64_CC_FLAGS               = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Gm /EHs-c- /GF
+RELEASE_ICC_X64_CC_FLAGS             = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF
+DEBUG_ICC_X64_PCH_FLAGS              = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /TC /Zi /Gm /EHs-c- /GF
+RELEASE_ICC_X64_PCH_FLAGS            = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /TC /EHs-c- /GF
+DEBUG_ICC_X64_ASM_FLAGS              = /nologo /W3 /WX /c /Cx /Zd /Zi
+RELEASE_ICC_X64_ASM_FLAGS            = /nologo /W3 /WX /c /Cx /Zd
+DEBUG_ICC_X64_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_ICC_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
 
 ##################
 # IPF definitions
@@ -734,14 +766,14 @@ RELEASE_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_ICC_IPF_APP_FLAGS                      = /nologo /E /TC
 *_ICC_IPF_PP_FLAGS                       = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
 DEBUG_ICC_IPF_CC_FLAGS                   = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
-RELEASE_ICC_IPF_CC_FLAGS                 = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 
+RELEASE_ICC_IPF_CC_FLAGS                 = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
 #DEBUG_ICC_IPF_PCH_FLAGS                  = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h /Yc /TC /Zi
 #RELEASE_ICC_IPF_PCH_FLAGS                = /nologo /W4 /WX /GX /Gy /c /Os /FI$(DEST_DIR_DEBUG)/AutoGen.h /Yc /TC
 DEBUG_ICC_IPF_ASM_FLAGS                  = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
 RELEASE_ICC_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -F COFF32
 DEBUG_ICC_IPF_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb /DEBUG
 RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb
-*_ICC_IPF_SLINK_FLAGS                    = /nologo /LTCG
+*_ICC_IPF_SLINK_FLAGS                    = /nologo
 
 ##################
 # ASL definitions
@@ -763,8 +795,8 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   MYTOOLS          - Settings compatible with previous versions of tools_def.template
 *_MYTOOLS_*_*_FAMILY                = MSFT
 
-DEBUG_MYTOOLS_*_TIANO_PATH          = 
-RELEASE_MYTOOLS_*_TIANO_PATH        = 
+DEBUG_MYTOOLS_*_TIANO_PATH          =
+RELEASE_MYTOOLS_*_TIANO_PATH        =
 *_MYTOOLS_IA32_*_PATH               = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
 *_MYTOOLS_IA32_*_DPATH              = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
 *_MYTOOLS_IA32_ASMLINK_PATH         = C:\WINDDK\3790.1830\bin\bin16
