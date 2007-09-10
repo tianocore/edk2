@@ -3020,7 +3020,7 @@ Returns:
       //
       // After the repaint operation, we should refresh the highlight.
       //
-      NewLine = TRUE;
+      NewLine    = TRUE;
       break;
 
     case CfUiNoOperation:
