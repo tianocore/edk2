@@ -1262,7 +1262,7 @@ InitializeSnpNiiDriver (
           SystemTable,
           &mSimpleNetworkDriverBinding,
           NULL,
-          COMPONENT_NAME,
+          &gSimpleNetworkComponentName,
           NULL,
           NULL
           );

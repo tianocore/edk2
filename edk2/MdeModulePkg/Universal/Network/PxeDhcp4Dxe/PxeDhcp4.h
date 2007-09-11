@@ -340,14 +340,6 @@ Returns:
 --*/
 ;
 
-#ifdef EFI_SIZE_REDUCTION_APPLIED
-  #define COMPONENT_NAME_CODE(code)
-  #define COMPONENT_NAME            NULL
-#else
-  #define COMPONENT_NAME_CODE(code) code
-  #define COMPONENT_NAME            &gPxeDhcp4ComponentName
-#endif
-
 #endif /* _PXEDHCP4_H */
 
 /* EOF - PxeDhcp4.h */
