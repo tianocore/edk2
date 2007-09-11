@@ -2386,7 +2386,7 @@ InitializeBCDriver (
             SystemTable,
             &mPxeBcDriverBinding,
             NULL,
-            COMPONENT_NAME,
+            &gPxeBcComponentName,
             NULL,
             NULL
             );

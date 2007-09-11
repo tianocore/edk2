@@ -426,14 +426,6 @@ InitializeSnpNiiDriver (
   )
 ;
 
-#ifdef EFI_SIZE_REDUCTION_APPLIED
-  #define COMPONENT_NAME_CODE(code)
-  #define COMPONENT_NAME            NULL
-#else
-  #define COMPONENT_NAME_CODE(code) code
-  #define COMPONENT_NAME            &gSimpleNetworkComponentName
-#endif
-
 #define SNP_MEM_PAGES(x)  (((x) - 1) / 4096 + 1)
 
 

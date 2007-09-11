@@ -99,7 +99,7 @@ PxeDhcp4DriverEntryPoint (
           SystemTable,
           &gPxeDhcp4DriverBinding,
           NULL,
-          COMPONENT_NAME,
+          &gPxeDhcp4ComponentName,
           NULL,
           NULL
           );

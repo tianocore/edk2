@@ -436,14 +436,6 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
   )
 ;
 
-#ifdef EFI_SIZE_REDUCTION_APPLIED
-  #define COMPONENT_NAME_CODE(code)
-  #define COMPONENT_NAME            NULL
-#else
-  #define COMPONENT_NAME_CODE(code) code
-  #define COMPONENT_NAME            &gPxeBcComponentName
-#endif
-
 
 //
 // Define SMBIOS tables.
