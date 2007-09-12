@@ -5,21 +5,36 @@
           when Tiano graphics format is supported.
 
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// Include common header file for this module.
-//
-#include "CommonHeader.h"
+
+#include <PiDxe.h>
+
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/OEMBadging.h>
+#include <Protocol/ConsoleControl.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/HiiFramework.h>
+
+#include <Guid/Bmp.h>
+
+#include <Library/GraphicsLib.h>
+#include <Library/PrintLib.h>
+#include <Library/BaseLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
 
 EFI_STATUS
 GetGraphicsBitMapFromFV (
@@ -39,15 +54,15 @@ Arguments:
 
   FileNameGuid  - File Name of graphics file in the FV(s).
 
-  Image         - Pointer to pointer to return graphics image.  If NULL, a 
+  Image         - Pointer to pointer to return graphics image.  If NULL, a
                   buffer will be allocated.
 
   ImageSize     - Size of the graphics Image in bytes. Zero if no image found.
 
 
-Returns: 
+Returns:
 
-  EFI_SUCCESS          - Image and ImageSize are valid. 
+  EFI_SUCCESS          - Image and ImageSize are valid.
   EFI_BUFFER_TOO_SMALL - Image not big enough. ImageSize has required size
   EFI_NOT_FOUND        - FileNameGuid not found
 
@@ -137,9 +152,9 @@ Arguments:
   PixelWidth    - Width of UgaBlt/BmpImage in pixels
 
 
-Returns: 
+Returns:
 
-  EFI_SUCCESS           - UgaBlt and UgaBltSize are returned. 
+  EFI_SUCCESS           - UgaBlt and UgaBltSize are returned.
   EFI_UNSUPPORTED       - BmpImage is not a valid *.BMP image
   EFI_BUFFER_TOO_SMALL  - The passed in UgaBlt buffer is not big enough.
                           UgaBltSize will contain the required size.
@@ -159,7 +174,7 @@ Returns:
   UINTN             Width;
   UINTN             ImageIndex;
   BOOLEAN           IsAllocated;
-  
+
   BmpHeader = (BMP_IMAGE_HEADER *) BmpImage;
   if (BmpHeader->CharB != 'B' || BmpHeader->CharM != 'M') {
     return EFI_UNSUPPORTED;
@@ -223,7 +238,7 @@ Returns:
         Blt --;
         Width --;
         break;
-      
+
       case 4:
         //
         // Convert BMP Palette to 24-bit color
@@ -288,7 +303,7 @@ LockKeyboards (
 /*++
 
 Routine Description:
-  Use Console Control Protocol to lock the Console In Spliter virtual handle. 
+  Use Console Control Protocol to lock the Console In Spliter virtual handle.
   This is the ConInHandle and ConIn handle in the EFI system table. All key
   presses will be ignored until the Password is typed in. The only way to
   disable the password is to type it in to a ConIn device.
@@ -297,7 +312,7 @@ Arguments:
   Password - Password used to lock ConIn device
 
 
-Returns: 
+Returns:
 
   EFI_SUCCESS     - ConsoleControl has been flipped to graphics and logo
                           displayed.
@@ -334,7 +349,7 @@ Arguments:
   LogoFile - File name of logo to display on the center of the screen.
 
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           - ConsoleControl has been flipped to graphics and logo
                           displayed.
@@ -374,7 +389,7 @@ Returns:
   //
   // Try to open GOP first
   //
-  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput); 
+  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
   if (EFI_ERROR(Status)) {
     GraphicsOutput = NULL;
     //
@@ -560,14 +575,14 @@ DisableQuietBoot (
 
 Routine Description:
 
-  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA 
+  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA
   Simple Text Out screens will now be synced up with all non UGA output devices
 
 Arguments:
 
   NONE
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           - UGA devices are back in text mode and synced up.
   EFI_UNSUPPORTED       - Logo not found
@@ -626,24 +641,24 @@ Routine Description:
 Arguments:
 
   GraphicsOutput  - Graphics output protocol interface
-  
+
   UgaDraw         - UGA draw protocol interface
-  
+
   Sto             - Simple text out protocol interface
-  
+
   X               - X coordinate to start printing
-  
+
   Y               - Y coordinate to start printing
-  
+
   Foreground      - Foreground color
-  
+
   Background      - Background color
-  
+
   fmt             - Format string
-  
+
   args            - Print arguments
 
-Returns: 
+Returns:
 
   EFI_SUCCESS             -  success
   EFI_OUT_OF_RESOURCES    -  out of resources
@@ -675,7 +690,7 @@ Returns:
   if (Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
@@ -798,11 +813,11 @@ Routine Description:
 Arguments:
 
     X           - X coordinate to start printing
-    
+
     Y           - Y coordinate to start printing
-    
+
     ForeGround  - Foreground color
-    
+
     BackGround  - Background color
 
     Fmt         - Format string
