@@ -571,8 +571,8 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS        = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 #   CYGWINGCC        - CygWin GCC
 *_CYGWINGCC_IA32_*_FAMILY           = GCC
 
-*_CYGWINGCC_IA32_*_PATH             = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-*_CYGWINGCC_X64_*_PATH              = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+*_CYGWINGCC_IA32_*_PATH             = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_CYGWINGCC_X64_*_PATH              = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
 *_CYGWINGCC_*_*_DPATH               = /bin
 *_CYGWINGCC_*_ASL_PATH              = /cygdrive/c/ASL
 
