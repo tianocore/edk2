@@ -177,8 +177,9 @@ typedef union {
 EFI_STATUS
 EFIAPI
 PeiCore (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN VOID                        *Data
+  IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
+  IN VOID                              *Data
   )
 /*++
 
@@ -248,7 +249,7 @@ Returns:
 
 EFI_STATUS
 PeiDispatcher (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *PrivateData,
   IN PEI_CORE_DISPATCH_DATA      *DispatchData
   )
@@ -278,7 +279,7 @@ VOID
 InitializeDispatcherData (
   IN EFI_PEI_SERVICES             **PeiServices,
   IN PEI_CORE_INSTANCE            *OldCoreData,
-  IN EFI_PEI_STARTUP_DESCRIPTOR   *PeiStartupDescriptor
+  IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
 /*++
 
@@ -956,7 +957,7 @@ Returns:
 VOID
 InitializeMemoryServices (
   IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
   )
 /*++
@@ -1208,6 +1209,7 @@ PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,  OPTIONAL
   IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context3,  OPTIONAL
   IN      VOID                      *NewStack,
   IN      VOID                      *NewBsp
   );

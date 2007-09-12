@@ -31,7 +31,7 @@ TransferOldDataToNewDataRange (
 
 EFI_STATUS
 PeiDispatcher (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *PrivateData,
   IN PEI_CORE_DISPATCH_DATA      *DispatchData
   )
@@ -44,7 +44,9 @@ Routine Description:
 
 Arguments:
 
-  PeiStartupDescriptor - Pointer to IN EFI_PEI_STARTUP_DESCRIPTOR
+  SecCoreData          - Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
   PrivateData          - Pointer to the private data passed in from caller
   DispatchData         - Pointer to PEI_CORE_DISPATCH_DATA data.
 
@@ -214,7 +216,8 @@ Returns:
 
                 PeiSwitchStacks (
                   (SWITCH_STACK_ENTRY_POINT)(UINTN)TempPtr.Raw,
-                  PeiStartupDescriptor,
+                  (VOID*) SecCoreData,
+                  NULL,
                   (VOID*)PrivateDataInMem,
                   TopOfStack,
                   (VOID*)(UINTN)PrivateData->StackBase
@@ -360,7 +363,7 @@ VOID
 InitializeDispatcherData (
   IN EFI_PEI_SERVICES             **PeiServices,
   IN PEI_CORE_INSTANCE            *OldCoreData,
-  IN EFI_PEI_STARTUP_DESCRIPTOR   *PeiStartupDescriptor
+  IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
 /*++
 
@@ -373,7 +376,9 @@ Arguments:
   PeiServices          - The PEI core services table.
   OldCoreData          - Pointer to old core data (before switching stack).
                          NULL if being run in non-permament memory mode.
-  PeiStartupDescriptor - Information and services provided by SEC phase.
+  SecCoreData          - Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
 
 Returns:
 
@@ -386,8 +391,8 @@ Returns:
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   if (OldCoreData == NULL) {
-    PrivateData->DispatchData.CurrentFvAddress = (EFI_FIRMWARE_VOLUME_HEADER *) PeiStartupDescriptor->BootFirmwareVolume;
-    PrivateData->DispatchData.BootFvAddress = (EFI_FIRMWARE_VOLUME_HEADER *) PeiStartupDescriptor->BootFirmwareVolume;
+    PrivateData->DispatchData.CurrentFvAddress = (EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase;
+    PrivateData->DispatchData.BootFvAddress = (EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase;
   } else {
 
     //
