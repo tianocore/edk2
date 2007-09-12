@@ -209,8 +209,13 @@
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -( $(DLINK_SPATH) $(LIBS) ${src} -)
 
 [Build.Dynamic-Library-File]
-    <InputFile>
+    <InputFile.MSFT, InputFile.INTEL>
         ?.dll
+        Makefile
+
+    <InputFile.GCC>
+        ?.dll
+        GnuMakefile
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
