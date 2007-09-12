@@ -29,7 +29,7 @@ Notes:
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
         r658 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r658 <buildtools_project>\BaseTools\Source\Python\build
+        r722 <buildtools_project>\BaseTools\Source\Python\build
         r700 <buildtools_project>\BaseTools\Source\Python\Common
         r695 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
         r710 <buildtools_project>\BaseTools\Source\Python\GenFds
