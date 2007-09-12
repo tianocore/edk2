@@ -24,7 +24,7 @@ Abstract:
 VOID
 InitializeMemoryServices (
   IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
   )
 /*++
@@ -36,7 +36,10 @@ Routine Description:
 Arguments:
 
   PeiServices          - The PEI core services table.
-  PeiStartupDescriptor - Information and services provided by SEC phase.
+  SecCoreData          - Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+
   OldCoreData          - Pointer to the PEI Core data.
                          NULL if being run in non-permament memory mode.
 
@@ -47,7 +50,6 @@ Returns:
 --*/
 {
   PEI_CORE_INSTANCE                    *PrivateData;
-  UINT64                               SizeOfCarHeap;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   PrivateData->SwitchStackSignal = FALSE;
@@ -56,18 +58,12 @@ Returns:
 
     PrivateData->PeiMemoryInstalled = FALSE;
 
-    PrivateData->BottomOfCarHeap = (VOID *) (((UINTN)(VOID *)(&PrivateData))
-                                   & (~((PeiStartupDescriptor->SizeOfCacheAsRam) - 1))); 
-    PrivateData->TopOfCarHeap = (VOID *)((UINTN)(PrivateData->BottomOfCarHeap) + PeiStartupDescriptor->SizeOfCacheAsRam);
-    //
-    // SizeOfCarHeap is 1/2 (arbitrary) of CacheAsRam Size.
-    //
-    SizeOfCarHeap = (UINT64) PeiStartupDescriptor->SizeOfCacheAsRam;
-    SizeOfCarHeap = RShiftU64 (SizeOfCarHeap, 1);
+    PrivateData->BottomOfCarHeap = SecCoreData->PeiTemporaryRamBase; 
+    PrivateData->TopOfCarHeap = (VOID *)((UINTN)(PrivateData->BottomOfCarHeap) + SecCoreData->PeiTemporaryRamSize);
  
     DEBUG_CODE_BEGIN ();
-      PrivateData->SizeOfCacheAsRam = PeiStartupDescriptor->SizeOfCacheAsRam;
-      PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) SizeOfCarHeap);
+      PrivateData->SizeOfCacheAsRam = SecCoreData->PeiTemporaryRamSize + SecCoreData->StackSize;
+      PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) PrivateData->SizeOfCacheAsRam);
     DEBUG_CODE_END ();
 
     PrivateData->HobList.Raw = PrivateData->BottomOfCarHeap;
@@ -75,7 +71,7 @@ Returns:
     PeiCoreBuildHobHandoffInfoTable (
       BOOT_WITH_FULL_CONFIGURATION,
       (EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->BottomOfCarHeap,
-      (UINTN) SizeOfCarHeap
+      (UINTN) SecCoreData->PeiTemporaryRamSize
       );
     //
     // Copy PeiServices from ROM to Cache in PrivateData

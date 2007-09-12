@@ -484,6 +484,63 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Transfers control to a function starting with a new stack.
+
+  Transfers control to the function specified by EntryPoint using the new stack
+  specified by NewStack and passing in the parameters specified by Context1 and
+  Context2. Context1 and Context2 are optional and may be NULL. The function
+  EntryPoint must never return.
+
+  If EntryPoint is NULL, then ASSERT().
+  If NewStack is NULL, then ASSERT().
+
+  @param  EntryPoint  A pointer to function to call with the new stack.
+  @param  Context1    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  Context2    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                      function.
+  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
+                      Reserved on other architectures.
+
+**/
+VOID
+EFIAPI
+PeiSwitchStacks (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context3,  OPTIONAL
+  IN      VOID                      *NewStack
+  )
+{
+  BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
+  
+  ASSERT (EntryPoint != NULL);
+  ASSERT (NewStack != NULL);
+
+  //
+  // Stack should be aligned with CPU_STACK_ALIGNMENT
+  //
+  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
+
+  JumpBuffer.Eip = (UINTN)EntryPoint;
+  JumpBuffer.Esp = (UINTN)NewStack - sizeof (VOID*);
+  JumpBuffer.Esp -= sizeof (Context1) + sizeof (Context2) + sizeof(Context3);
+  ((VOID**)JumpBuffer.Esp)[1] = Context1;
+  ((VOID**)JumpBuffer.Esp)[2] = Context2;
+  ((VOID**)JumpBuffer.Esp)[3] = Context3;
+
+  LongJump (&JumpBuffer, (UINTN)-1);
+  
+
+  //
+  // InternalSwitchStack () will never return
+  //
+  ASSERT (FALSE);  
+}
 
 VOID
 SecLoadFromCore (
@@ -514,7 +571,7 @@ Returns:
   UINT64                      PeiCoreSize;
   EFI_PHYSICAL_ADDRESS        PeiCoreEntryPoint;
   EFI_PHYSICAL_ADDRESS        PeiImageAddress;
-  EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartup;
+  EFI_SEC_PEI_HAND_OFF        *SecCoreData;
 
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
@@ -524,7 +581,7 @@ Returns:
   //
   // Allocate 128KB for the Stack
   //
-  TopOfStack  = (VOID *)((UINTN)TopOfMemory - sizeof (EFI_PEI_STARTUP_DESCRIPTOR) - CPU_STACK_ALIGNMENT);
+  TopOfStack  = (VOID *)((UINTN)TopOfMemory - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
   TopOfMemory = TopOfMemory - STACK_SIZE;
 
@@ -536,10 +593,16 @@ Returns:
   //
   // Bind this information into the SEC hand-off state
   //
-  PeiStartup = (EFI_PEI_STARTUP_DESCRIPTOR *) (UINTN) TopOfStack;
-  PeiStartup->DispatchTable      = (EFI_PEI_PPI_DESCRIPTOR *) &gPrivateDispatchTable;
-  PeiStartup->SizeOfCacheAsRam   = STACK_SIZE;
-  PeiStartup->BootFirmwareVolume = BootFirmwareVolumeBase;
+  SecCoreData                        = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
+  SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
+  SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
+  SecCoreData->BootFirmwareVolumeSize = FixedPcdGet32(PcdWinNtFirmwareFdSize);
+  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)TopOfMemory; 
+  SecCoreData->TemporaryRamSize       = STACK_SIZE;
+  SecCoreData->PeiTemporaryRamBase    = SecCoreData->TemporaryRamBase;
+  SecCoreData->PeiTemporaryRamSize    = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
+  SecCoreData->StackBase              = (VOID*)((UINTN)SecCoreData->TemporaryRamBase + (UINTN)SecCoreData->TemporaryRamSize);
+  SecCoreData->StackSize              = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
 
   //
   // Load the PEI Core from a Firmware Volume
@@ -553,12 +616,14 @@ Returns:
   if (EFI_ERROR (Status)) {
     return ;
   }
+  
   //
   // Transfer control to the PEI Core
   //
-  SwitchStack (
+  PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT) (UINTN) PeiCoreEntryPoint,
-    PeiStartup,
+    SecCoreData,
+    (VOID *) (UINTN) ((EFI_PEI_PPI_DESCRIPTOR *) &gPrivateDispatchTable),
     NULL,
     TopOfStack
     );

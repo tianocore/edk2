@@ -81,8 +81,9 @@ static EFI_PEI_SERVICES  mPS = {
 EFI_STATUS
 EFIAPI
 PeiCore (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN VOID                        *Data
+  IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
+  IN VOID                              *Data
   )
 /*++
 
@@ -94,8 +95,16 @@ Routine Description:
 
 Arguments:
 
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-  OldCoreData          - Pointer to old core data that is used to initialize the
+  SecCoreData          - Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  PpiList              - Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                         An empty PPI list consists of a single descriptor with the end-tag
+                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
+                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
+                         that both the PEI Foundation and any modules can leverage the associated service
+                         calls and/or code in these early PPIs
+  Data                 - Pointer to old core data that is used to initialize the
                          core's data areas.
 
 Returns:
@@ -142,13 +151,13 @@ Returns:
   //
   ProcessLibraryConstructorList (NULL, &PrivateData.PS);
 
-  InitializeMemoryServices (&PrivateData.PS, PeiStartupDescriptor, OldCoreData);
+  InitializeMemoryServices (&PrivateData.PS, SecCoreData, OldCoreData);
 
   InitializePpiServices (&PrivateData.PS, OldCoreData);
 
   InitializeSecurityServices (&PrivateData.PS, OldCoreData);
 
-  InitializeDispatcherData (&PrivateData.PS, OldCoreData, PeiStartupDescriptor);
+  InitializeDispatcherData (&PrivateData.PS, OldCoreData, SecCoreData);
 
   if (OldCoreData != NULL) {
 
@@ -210,8 +219,8 @@ Returns:
     //
     // If SEC provided any PPI services to PEI, install them.
     //
-    if (PeiStartupDescriptor->DispatchTable != NULL) {
-      Status = PeiServicesInstallPpi (PeiStartupDescriptor->DispatchTable);
+    if (PpList != NULL) {
+      Status = PeiServicesInstallPpi (PpList);
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -221,7 +230,7 @@ Returns:
   //
   // Call PEIM dispatcher
   //
-  PeiDispatcher (PeiStartupDescriptor, &PrivateData, DispatchData);
+  PeiDispatcher (SecCoreData, &PrivateData, DispatchData);
 
   //
   // Check if InstallPeiMemory service was called.
