@@ -30,14 +30,14 @@ Notes:
    Python source code:
         r658 <buildtools_project>\BaseTools\Source\Python\Autogen
         r658 <buildtools_project>\BaseTools\Source\Python\build
-        r658 <buildtools_project>\BaseTools\Source\Python\Common
-        r658 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r564 <buildtools_project>\BaseTools\Source\Python\GenFds
-        r576 <buildtools_project>\BaseTools\Source\Python\GenFds\FfsInfStatement.py
+        r700 <buildtools_project>\BaseTools\Source\Python\Common
+        r695 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r710 <buildtools_project>\BaseTools\Source\Python\GenFds
+        
 4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
-        r641 <buildtools_project>\BaseTools\Source\Python\Common
-        r641 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r564 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r700 <buildtools_project>\BaseTools\Source\Python\Common
+        r695 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r710 <buildtools_project>\BaseTools\Source\Python\GenFds
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
