@@ -1,0 +1,42 @@
+##########################################################################################
+!!!!!!!!!!!!!!!!!               Notes for this ChangeLog.txt             !!!!!!!!!!!!!!!!!
+
+This log file is used to record two kinds of important information:
+ a) "Non-Compatible Changes": all non-compatible changes should be recorded. These info
+    will help the package user to merge this package; and some non-compatible changes
+    can also be added into release notes as news features when we release this package.
+    Normally Non-Compatible Changes contains the following types:
+      1) Package's external services were changed/updated
+      2) Package's common .h file is renamed, deleted, or the file path is changed.
+      3) The definition of package's common data structure is changed
+      ...
+
+ b) "Important Compatible Changes": some important compatible changes can aslo be recorded
+    in this file, and we can add these updating into release notes when we release this
+    package.
+
+Non-Compatible and Compatible example format:
+==========================================================================================
+EDK_0010: Non-Compatible: owner
+
+	  Class_HFile: PPI A of MdePkg has been removed.
+
+		Code Change :
+		1) Removed the .h file: MdePkg\Include\Ppi\A.h
+
+		Possible Impacts:
+		1) All modules that used this PPI A should be updated.
+
+==========================================================================================
+EDK_0000: Compatible: owner
+
+	  Class_BuildTool: with the EDK_0000 build.exe, the build performance is enhanced great.
+
+		Code Change :
+		1) BaseTools\Bin\Win32\build.exe
+
+!!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
+##########################################################################################
+
+
+
