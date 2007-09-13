@@ -211,11 +211,11 @@
 [Build.Dynamic-Library-File]
     <InputFile.MSFT, InputFile.INTEL>
         ?.dll
-        Makefile
+        $(MODULE_BUILD_DIR)\Makefile
 
     <InputFile.GCC>
         ?.dll
-        GnuMakefile
+        $(MODULE_BUILD_DIR)/GnuMakefile
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
