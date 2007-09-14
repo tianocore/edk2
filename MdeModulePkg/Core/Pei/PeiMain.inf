@@ -60,7 +60,6 @@
   Ipf/IpfCpuCore.i
   Ipf/SwitchToCacheMode.c
   Ipf/InternalSwitchStack.c
-  Ipf/SwitchStack.s
 
 [Sources.EBC]
   Dispatcher/Stack.c

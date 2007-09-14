@@ -29,6 +29,13 @@ TransferOldDataToNewDataRange (
   IN PEI_CORE_INSTANCE        *PrivateData
   );
 
+STATIC
+VOID
+InvokePeiCore (
+  VOID          *Context1,
+  VOID          *Context2
+  );
+
 EFI_STATUS
 PeiDispatcher (
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
@@ -59,11 +66,12 @@ Returns:
 {
   EFI_STATUS                        Status;
   PEI_CORE_TEMP_POINTERS            TempPtr;
-  UINTN                             PrivateDataInMem;
   BOOLEAN                           NextFvFound;
   EFI_FIRMWARE_VOLUME_HEADER        *NextFvAddress;
   EFI_FIRMWARE_VOLUME_HEADER        *DefaultFvAddress;
   VOID                              *TopOfStack;
+  PEI_CORE_PARAMETERS               PeiCoreParameters;
+
   //
   // Debug data for uninstalled Peim list
   //
@@ -205,20 +213,21 @@ Returns:
               // nobody else should have any data on the stack.
               //
               if (PrivateData->SwitchStackSignal) {
-                TempPtr.PeiCore = (PEI_CORE_ENTRY_POINT)PeiCore;
-                PrivateDataInMem = (UINTN) TransferOldDataToNewDataRange (PrivateData);
-                ASSERT (PrivateDataInMem != 0);
                 //
                 // Adjust the top of stack to be aligned at CPU_STACK_ALIGNMENT
                 //
                 TopOfStack = (VOID *)((UINTN)PrivateData->StackBase + (UINTN)PrivateData->StackSize - CPU_STACK_ALIGNMENT);
                 TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+                
+                PeiCoreParameters.SecCoreData = SecCoreData;
+                PeiCoreParameters.PpiList     = NULL;
+                PeiCoreParameters.Data        = TransferOldDataToNewDataRange (PrivateData);
+                ASSERT (PeiCoreParameters.Data != 0);
 
                 PeiSwitchStacks (
-                  (SWITCH_STACK_ENTRY_POINT)(UINTN)TempPtr.Raw,
-                  (VOID*) SecCoreData,
-                  NULL,
-                  (VOID*)PrivateDataInMem,
+                  InvokePeiCore,
+                  (VOID*) (UINTN) PeiCore,
+                  (VOID*) &PeiCoreParameters,  
                   TopOfStack,
                   (VOID*)(UINTN)PrivateData->StackBase
                   );
@@ -579,5 +588,46 @@ PeiRegisterForShadow (
 
   return EFI_SUCCESS;
 }
+
+/**
+  This routine invoke the PeiCore's entry in new stack environment.
+
+	@param Context1  	The first context parameter is entry of PeiCore
+  @param Context2  	The second context parameter is parameter structure point for PeiCore
+
+**/ 
+STATIC
+VOID
+InvokePeiCore (
+  VOID          *Context1,
+  VOID          *Context2
+  )
+{
+  PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint;
+  PEI_CORE_PARAMETERS       *PeiCoreParameters;
+
+  //
+  // Running on new stack in SEC Core
+  //
+
+  PeiCoreEntryPoint = (PEI_CORE_ENTRY_POINT) (UINTN) Context1;
+  PeiCoreParameters = (PEI_CORE_PARAMETERS *)Context2;
+
+  //
+  // Call PEI Core using new stack
+  //
+  PeiCoreEntryPoint (
+    PeiCoreParameters->SecCoreData,
+    PeiCoreParameters->PpiList,
+    PeiCoreParameters->Data
+    );
+
+  //
+  // Never returns
+  //
+  ASSERT_EFI_ERROR (FALSE);
+}
+
+
 
 
