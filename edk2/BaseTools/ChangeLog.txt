@@ -107,7 +107,25 @@ EDK_3789: Non-Compatible: lgao4
         2) BaseTools/Bin/Win32/GenFds.exe
 
         Possible Impacts:
-        1) All platform's FDF file, if any, must be changed to new format
+        1) All platform's FDF file, if any, must be changed to new format.
+          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName, for example PcdWinNtFdBaseAddress in old FDF file will be replaced by gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddres.
+          b) Rule format adds binary file type and file postfix name support, and doesn't require the full file path. For example:
+          Old Peim Rule:
+          [Rule.Common.PEIM]
+          FILE PEIM = $(NAMED_GUID) {
+             PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).Depex
+             PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
+             UI Optional               $(MODULE_NAME)
+             VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+          }
+          New Peim Rule:
+          [Rule.Common.PEIM]
+            FILE PEIM = $(NAMED_GUID) {
+               PEI_DEPEX PEI_DEPEX Optional        |.Depex
+               PE32      PE32                      |.efi
+               UI       STRING="$(MODULE_NAME)" Optional         
+               VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
+            }
 
 ==========================================================================================
 EDK_3786: Compatible: vjeff
@@ -157,6 +175,6 @@ EDK_3766: Non-Compatible: lgao4
         1) Conf/build_rule.template
 
         Possible Impacts:
-        1) Platform with ACPI module.
+        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option for APP_FLAGS in module inf to override the default /E option from tools_def.txt file. 
 
 
