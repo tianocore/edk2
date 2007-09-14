@@ -16,6 +16,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Pci23.h>
 
+//
+// Module global for a template of the PCI option ROM Image Device Path Node
+//
+MEMMAP_DEVICE_PATH  mPciOptionRomImageDevicePathNodeTemplate = {
+  {                 
+    HARDWARE_DEVICE_PATH,
+    HW_MEMMAP_DP,
+    sizeof (MEMMAP_DEVICE_PATH)
+  },
+  EfiMemoryMappedIO,
+  0,
+  0
+};
+
 EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
@@ -415,6 +429,7 @@ Returns:
   EFI_DECOMPRESS_PROTOCOL       *Decompress;
   EFI_PCI_EXPANSION_ROM_HEADER  *EfiRomHeader;
   PCI_DATA_STRUCTURE            *Pcir;
+  EFI_DEVICE_PATH_PROTOCOL      *PciOptionRomImageDevicePath;
 
   Indicator = 0;
 
@@ -505,17 +520,31 @@ Returns:
         }
 
         if (!SkipImage) {
+          //   
+          // Build full device path to the PCI Option ROM Image being loaded
+          //
+          mPciOptionRomImageDevicePathNodeTemplate.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)RomBarOffset;
+          mPciOptionRomImageDevicePathNodeTemplate.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)(RomBarOffset + ImageSize - 1);
+          PciOptionRomImageDevicePath = AppendDevicePathNode (PciDevice->DevicePath, (const EFI_DEVICE_PATH_PROTOCOL *)&mPciOptionRomImageDevicePathNodeTemplate);
+          ASSERT (PciOptionRomImageDevicePath != NULL);
+
           //
           // load image and start image
           //
           Status = gBS->LoadImage (
                           FALSE,
                           gPciBusDriverBinding.DriverBindingHandle,
-                          PciDevice->Handle,
+                          PciOptionRomImageDevicePath,
                           ImageBuffer,
                           ImageLength,
                           &ImageHandle
                           );
+
+          //
+          // Free the device path after it has been used by LoadImage
+          //
+          gBS->FreePool (PciOptionRomImageDevicePath);
+
           if (!EFI_ERROR (Status)) {
             Status = gBS->StartImage (ImageHandle, NULL, NULL);
             if (!EFI_ERROR (Status)) {
