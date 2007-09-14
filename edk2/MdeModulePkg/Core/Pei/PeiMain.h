@@ -153,8 +153,9 @@ typedef struct{
 typedef
 EFI_STATUS
 (EFIAPI *PEI_CORE_ENTRY_POINT)(
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor,
-  IN PEI_CORE_INSTANCE           *OldCoreData
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
+  IN PEI_CORE_INSTANCE              *OldCoreData
   );
 
 //
@@ -170,6 +171,13 @@ typedef union {
   VOID                         *Raw;
 } PEI_CORE_TEMP_POINTERS;
 
+
+
+typedef struct {
+  CONST EFI_SEC_PEI_HAND_OFF    *SecCoreData;
+  EFI_PEI_PPI_DESCRIPTOR        *PpiList;
+  VOID                          *Data;
+} PEI_CORE_PARAMETERS;
 
 //
 // PeiCore function
@@ -1209,7 +1217,6 @@ PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,  OPTIONAL
   IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *Context3,  OPTIONAL
   IN      VOID                      *NewStack,
   IN      VOID                      *NewBsp
   );

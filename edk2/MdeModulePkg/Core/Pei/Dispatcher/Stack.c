@@ -47,33 +47,9 @@ PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,  OPTIONAL
   IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *Context3,  OPTIONAL
   IN      VOID                      *NewStack,
   IN      VOID                      *NewBsp
   )
 {
-  BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
-  
-  ASSERT (EntryPoint != NULL);
-  ASSERT (NewStack != NULL);
-
-  //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
-  //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
-
-  JumpBuffer.Eip = (UINTN)EntryPoint;
-  JumpBuffer.Esp = (UINTN)NewStack - sizeof (VOID*);
-  JumpBuffer.Esp -= sizeof (Context1) + sizeof (Context2) + sizeof(Context3);
-  ((VOID**)JumpBuffer.Esp)[1] = Context1;
-  ((VOID**)JumpBuffer.Esp)[2] = Context2;
-  ((VOID**)JumpBuffer.Esp)[3] = Context3;
-
-  LongJump (&JumpBuffer, (UINTN)-1);
-  
-
-  //
-  // InternalSwitchStack () will never return
-  //
-  ASSERT (FALSE);  
+  SwitchStack (EntryPoint, Context1, Context2, NewStack);
 }
