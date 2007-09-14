@@ -432,16 +432,16 @@ RELEASE_ICC_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:R
 ##################
 # IPF definitions
 ##################
-*_ICC_IPF_CC_PATH                   = DEF(WINDDK_BIN64)\icl.exe
-*_ICC_IPF_SLINK_PATH                = DEF(WINDDK_BIN64)\xilib.exe
-*_ICC_IPF_DLINK_PATH                = DEF(WINDDK_BIN64)\xilink.exe
-*_ICC_IPF_ASMLINK_PATH              = DEF(WINDDK_BIN64)\xilink.exe
-*_ICC_IPF_PP_PATH                   = DEF(WINDDK_BIN64)\icl.exe
-*_ICC_IPF_VFRPP_PATH                = DEF(WINDDK_BIN64)\icl.exe
+*_ICC_IPF_CC_PATH                   = DEF(ICC_BIN64)\icl.exe
+*_ICC_IPF_SLINK_PATH                = DEF(ICC_BIN64)\xilib.exe
+*_ICC_IPF_DLINK_PATH                = DEF(ICC_BIN64)\xilink.exe
+*_ICC_IPF_ASMLINK_PATH              = DEF(ICC_BIN64)\xilink.exe
+*_ICC_IPF_PP_PATH                   = DEF(ICC_BIN64)\icl.exe
+*_ICC_IPF_VFRPP_PATH                = DEF(ICC_BIN64)\icl.exe
 
-*_ICC_IPF_PCH_PATH                  = DEF(WINDDK_BIN64)\icl.exe
-*_ICC_IPF_APP_PATH                  = DEF(WINDDK_BIN64)\icl.exe
-*_ICC_IPF_ASM_PATH                  = DEF(WINDDK_BIN64)\ias.exe
+*_ICC_IPF_PCH_PATH                  = DEF(ICC_BIN64)\icl.exe
+*_ICC_IPF_APP_PATH                  = DEF(ICC_BIN64)\icl.exe
+*_ICC_IPF_ASM_PATH                  = DEF(ICC_BIN64)\ias.exe
 
 DEBUG_ICC_IPF_CC_FLAGS                   = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
 RELEASE_ICC_IPF_CC_FLAGS                 = /nologo /W4 /WX /GX /Gy /c /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
