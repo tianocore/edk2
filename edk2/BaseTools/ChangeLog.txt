@@ -19,24 +19,144 @@ Non-Compatible and Compatible example format:
 ==========================================================================================
 EDK_0010: Non-Compatible: owner
 
-	  Class_HFile: PPI A of MdePkg has been removed.
+      Class_HFile: PPI A of MdePkg has been removed.
 
-		Code Change :
-		1) Removed the .h file: MdePkg\Include\Ppi\A.h
+        Code Change :
+        1) Removed the .h file: MdePkg\Include\Ppi\A.h
 
-		Possible Impacts:
-		1) All modules that used this PPI A should be updated.
+        Possible Impacts:
+        1) All modules that used this PPI A should be updated.
 
 ==========================================================================================
 EDK_0000: Compatible: owner
 
-	  Class_BuildTool: with the EDK_0000 build.exe, the build performance is enhanced great.
+      Class_BuildTool: with the EDK_0000 build.exe, the build performance is enhanced great.
 
-		Code Change :
-		1) BaseTools\Bin\Win32\build.exe
+        Code Change :
+        1) BaseTools\Bin\Win32\build.exe
 
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
+
+==========================================================================================
+EDK_3832: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Added support of MACRO in tools_def.txt
+        2) Merged PATH and NAME attributes in tools_def.txt
+        3) Changed DPATH attribute to DLL in tools_def.txt
+        4) Removed SPATH attribute in tools_def.txt
+        5) Added support for library instance without library class
+        6) Fixed the issue in Trim tool which zero file will be generated if the trimmed 
+           file has not line directive
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+        3) BaseTools/Bin/Win32/Trim.exe
+        4) BaseTools/Conf/tools_def.template
+
+        Possible Impacts:
+        1) All platforms and modules build
+
+==========================================================================================
+EDK_3801: Compatible: jwang36
+
+      Class_BuildConfiguration: Added makefile as dependency for "Dynamic-Library-File" to 
+        solve the incremental build issue occurred when there's library changes
+
+        Code Change :
+        1) BaseTools/Conf/build_rule.template
+
+==========================================================================================
+EDK_3800: Compatible: lgao4
+
+      Class_BuildTool: Update EfiRom tool to fix checksum and PCI3.0 data structure
+
+        Code Change :
+        1) BaseTools/Bin/Win32/EfiRom.exe
+
+==========================================================================================
+EDK_3795: Compatible: htao
+
+      Class_BuildTool: GenVtf tool open/write file with "r+b"/"w+b" attribute, but this cause
+                       the RO attribute of the file changed. Fix this issue by changing 
+                       "r+b"/"w+b" to "rb"/"wb".
+
+        Code Change :
+        1) BaseTools/Bin/Win32/GenVtf.exe
+
+==========================================================================================
+EDK_3791: Compatible: jlin16
+
+      Class_BuildTool:
+        1) use '#' to indicate flash generation progress.
+        2) use -v to switch on detail output messages.
+
+        Code Change :
+        1) BaseTools/Bin/Win32/GenFds.exe
+
+==========================================================================================
+EDK_3789: Non-Compatible: lgao4
+
+      Class_BuildTool: support new Rules format and PCD format defined in FDF file
+
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) All platform's FDF file, if any, must be changed to new format
+
+==========================================================================================
+EDK_3786: Compatible: vjeff
+
+      Class_BuildConfiguration:
+        1) Redirect ICC_IA32_*_PATH from C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin 
+           to C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin. 
+        2) Add ICC X64 definition to enable ICC X64 build.
+
+        Code Change :
+        1) BaseTools/Conf/tools_def.template
+
+==========================================================================================
+EDK_3785: Non-Compatible: klu2
+
+      Class_BuildTool: Upgrade the format of EFI_PEIM_ENTRY_POINT to 
+                       EFI_PEIM_ENTRY_POINT2 according to PI specification.
+
+
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+
+        Possible Impacts:
+        1) All modules build
+
+
+==========================================================================================
+EDK_3780: Non-Compatible: qhuang8
+
+      Class_MigrationTool: Update the syntax of PCD section.
+                           Update the syntax of binary INF file
+                           The generated Extended INF file should follow Extended INF spec 0.44
+
+        Code Change :
+        1) BaseTools/Bin/Win32/MigrationMsa2Inf.exe
+
+        Possible Impacts:
+        1) New module migrated from old R9
+
+
+==========================================================================================
+EDK_3766: Non-Compatible: lgao4
+
+      Class_BuildConfiguration: Update Acpi Asl file Build rule to remove trim step.
+
+        Code Change :
+        1) Conf/build_rule.template
+
+        Possible Impacts:
+        1) Platform with ACPI module.
 
 
