@@ -30,7 +30,7 @@ CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
   IN VOID                           *SourceBuffer   OPTIONAL,
   IN UINTN                          SourceSize,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   *FilePath,
+  IN EFI_DEVICE_PATH_PROTOCOL       *FilePath,
   OUT EFI_HANDLE                    *DeviceHandle,
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
@@ -95,6 +95,7 @@ Returns:
     ImageFileHandle->Source     = SourceBuffer;
     ImageFileHandle->SourceSize = SourceSize;
     *DeviceHandle     = NULL;
+    CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &FilePath, DeviceHandle);
     if (SourceSize > 0) {
       Status = EFI_SUCCESS;
     } else {

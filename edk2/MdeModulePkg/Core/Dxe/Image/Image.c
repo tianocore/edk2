@@ -74,6 +74,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   0,                          // Machine
   NULL,                       // Ebc
   NULL,                       // RuntimeData
+  NULL,                       // DeviceHandleDevicePath
 };
 
 
@@ -644,6 +645,7 @@ Returns:
   if (!EFI_ERROR (Status)) {
     FilePathSize = CoreDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
     FilePath = (EFI_DEVICE_PATH_PROTOCOL *) ( ((UINT8 *)FilePath) + FilePathSize );
+    Image->DeviceHandleDevicePath = CoreDuplicateDevicePath (HandleFilePath);
   }
 
   //
@@ -655,6 +657,7 @@ Returns:
   Image->Info.Revision     = EFI_LOADED_IMAGE_INFORMATION_REVISION;
   Image->Info.FilePath     = CoreDuplicateDevicePath (FilePath);
   Image->Info.ParentHandle = ParentImageHandle;
+
 
   if (NumberOfPages != NULL) {
     Image->NumberOfPages = *NumberOfPages ;
@@ -1168,6 +1171,10 @@ Returns:
   //
   if (Image->Info.FilePath != NULL) {
     CoreFreePool (Image->Info.FilePath);
+  }
+
+  if (Image->DeviceHandleDevicePath != NULL) {
+    CoreFreePool (Image->DeviceHandleDevicePath);
   }
 
   if (Image->FixupData != NULL) {

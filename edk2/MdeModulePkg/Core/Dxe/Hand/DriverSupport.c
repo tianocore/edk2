@@ -23,20 +23,17 @@ Revision History
 
 #include <DxeMain.h>
 
+BOOLEAN mRepairLoadedImage = FALSE;
 
-
-STATIC
+//
+// Driver Support Function Prototypes
+//
 EFI_STATUS
 GetHandleFromDriverBinding (
   IN EFI_DRIVER_BINDING_PROTOCOL           *DriverBindingNeed,
   OUT  EFI_HANDLE                          *Handle 
   );
 
-
-//
-// Driver Support Function Prototypes
-//
-STATIC
 EFI_STATUS 
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -47,8 +44,6 @@ CoreConnectSingleController (
 //
 // Driver Support Functions
 //
-
-
 EFI_STATUS 
 EFIAPI
 CoreConnectController (
@@ -88,6 +83,14 @@ Returns:
   LIST_ENTRY                           *ProtLink;
   OPEN_PROTOCOL_DATA                   *OpenData;
   EFI_DEVICE_PATH_PROTOCOL             *AlignedRemainingDevicePath;
+  EFI_HANDLE                           *ChildHandleBuffer;
+  UINTN                                ChildHandleCount;
+  UINTN                                Index;
+  EFI_HANDLE                           *LoadedImageHandleBuffer;
+  UINTN                                LoadedImageHandleCount;
+  LOADED_IMAGE_PRIVATE_DATA            *Image;
+  EFI_HANDLE                           DeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
   
   //
   // Make sure ControllerHandle is valid
@@ -100,56 +103,179 @@ Returns:
   Handle = ControllerHandle;
 
   //
-  // Connect all drivers to ControllerHandle 
+  // Make a copy of RemainingDevicePath to guanatee it is aligned
   //
   AlignedRemainingDevicePath = NULL;
   if (RemainingDevicePath != NULL) {
     AlignedRemainingDevicePath = CoreDuplicateDevicePath (RemainingDevicePath);
   }
-  ReturnStatus = CoreConnectSingleController (
-                   ControllerHandle,
-                   DriverImageHandle,
-                   AlignedRemainingDevicePath
-                   );
+
+  //
+  // Connect all drivers to ControllerHandle
+  // If CoreConnectSingleController returns EFI_NOT_READY, then the number of
+  // Driver Binding Protocols in the handle database has increased during the call
+  // so the connect operation must be restarted
+  //
+  do {
+    ReturnStatus = CoreConnectSingleController (
+                    ControllerHandle,
+                    DriverImageHandle,
+                    AlignedRemainingDevicePath
+                    );
+  } while (ReturnStatus == EFI_NOT_READY);
+
+  //
+  // Free the aligned copy of RemainingDevicePath
+  //
   if (AlignedRemainingDevicePath != NULL) {
     CoreFreePool (AlignedRemainingDevicePath);
   }
 
   //
-  // If not recursive, then just return after connecting drivers to ControllerHandle
+  // If recursive, then connect all drivers to all of ControllerHandle's children
   //
-  if (!Recursive) {
-    return ReturnStatus;
+  if (Recursive) {
+    //
+    // Acquire the protocol lock on the handle database so the child handles can be collected
+    //
+    CoreAcquireProtocolLock ();
+
+    //
+    // Make sure the DriverBindingHandle is valid
+    //
+    Status = CoreValidateHandle (ControllerHandle);
+    if (EFI_ERROR (Status)) {
+      //
+      // Release the protocol lock on the handle database
+      //
+      CoreReleaseProtocolLock ();
+
+      return ReturnStatus;
+    }
+
+
+    //
+    // Count ControllerHandle's children
+    //
+    for (Link = Handle->Protocols.ForwardLink, ChildHandleCount = 0; Link != &Handle->Protocols; Link = Link->ForwardLink) {
+      Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
+      for (ProtLink = Prot->OpenList.ForwardLink; 
+          ProtLink != &Prot->OpenList; 
+          ProtLink = ProtLink->ForwardLink) {
+        OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
+        if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+          ChildHandleCount++;
+        }
+      }
+    }
+
+    //
+    // Allocate a handle buffer for ControllerHandle's children
+    //
+    ChildHandleBuffer = CoreAllocateBootServicesPool (ChildHandleCount * sizeof(EFI_HANDLE));
+
+    //
+    // Fill in a handle buffer with ControllerHandle's children
+    //
+    for (Link = Handle->Protocols.ForwardLink, ChildHandleCount = 0; Link != &Handle->Protocols; Link = Link->ForwardLink) {
+      Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
+      for (ProtLink = Prot->OpenList.ForwardLink; 
+          ProtLink != &Prot->OpenList; 
+          ProtLink = ProtLink->ForwardLink) {
+        OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
+        if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+          ChildHandleBuffer[ChildHandleCount] = OpenData->ControllerHandle;
+          ChildHandleCount++;
+        }
+      }
+    }
+
+    //
+    // Release the protocol lock on the handle database
+    //
+    CoreReleaseProtocolLock ();
+
+    //
+    // Recursively connect each child handle
+    //
+    for (Index = 0; Index < ChildHandleCount; Index++) {
+      CoreConnectController (
+        ChildHandleBuffer[Index],
+        NULL,
+        NULL,
+        TRUE
+        ); 
+    }
+
+    //
+    // Free the handle buffer of ControllerHandle's children
+    //
+    CoreFreePool (ChildHandleBuffer);
   }
 
   //
-  // If recursive, then connect all drivers to all of ControllerHandle's children
+  // If a Stop() function has been called one or more time successfully, then attempt to 
+  // repair the stale DeviceHandle fields of the Loaded Image Protocols
   //
-  CoreAcquireProtocolLock ();
-  for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
-    Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-    for (ProtLink = Prot->OpenList.ForwardLink; 
-           ProtLink != &Prot->OpenList; 
-           ProtLink = ProtLink->ForwardLink) {
-        OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-        if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
-          CoreReleaseProtocolLock ();
-          Status = CoreConnectController (
-                          OpenData->ControllerHandle,
-                          NULL,
-                          NULL,
-                          TRUE
-                          ); 
-          CoreAcquireProtocolLock ();
+  if (mRepairLoadedImage) {
+    //
+    // Assume that all Loaded Image Protocols can be repaired
+    //
+    mRepairLoadedImage = FALSE;
+
+    //
+    // Get list of all Loaded Image Protocol Instances
+    //
+    Status = CoreLocateHandleBuffer (
+              ByProtocol,   
+              &gEfiLoadedImageProtocolGuid,  
+              NULL,
+              &LoadedImageHandleCount, 
+              &LoadedImageHandleBuffer
+              );
+    if (!EFI_ERROR (Status) && LoadedImageHandleCount != 0) {
+      for (Index = 0; Index < LoadedImageHandleCount; Index++) {
+        //
+        // Retrieve the Loaded Image Protocol
+        //
+        Image = CoreLoadedImageInfo (LoadedImageHandleBuffer[Index]);
+        if (Image != NULL) {
+          //
+          // Check to see if the DeviceHandle field is a valid handle
+          //
+          Status = CoreValidateHandle (Image->Info.DeviceHandle);
+          if (EFI_ERROR (Status)) {
+            //
+            // The DeviceHandle field is not valid.
+            // Attempt to locate a device handle with a device path that matches the one
+            // that was used to originally load the image
+            //
+            DevicePath = Image->DeviceHandleDevicePath;
+            if (DevicePath != NULL) {
+              Status = CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &DevicePath, &DeviceHandle);
+              if (!EFI_ERROR (Status) && (DeviceHandle != NULL_HANDLE) && IsDevicePathEnd(DevicePath)) {
+                //
+                // A device handle with a matching device path was found, so update the Loaded Image Protocol
+                // with the device handle discovered
+                //
+                Image->Info.DeviceHandle = DeviceHandle;
+              } else {
+                //
+                // There is still at least one Loaded Image Protocol that requires repair
+                //
+                mRepairLoadedImage = TRUE;
+              }
+            }
+          }
         }
+      }
+      CoreFreePool (LoadedImageHandleBuffer);
     }
   }
-  CoreReleaseProtocolLock ();
-  
+
   return ReturnStatus;
 }
 
-STATIC
 VOID
 AddSortedDriverBindingProtocol (
   IN      EFI_HANDLE                   DriverBindingHandle,
@@ -213,7 +339,7 @@ Returns:
   //
   // See if DriverBinding is already in the sorted list
   //
-  for (Index = 0; Index < *NumberOfSortedDriverBindingProtocols; Index++) {
+  for (Index = 0; Index < *NumberOfSortedDriverBindingProtocols && Index < DriverBindingHandleCount; Index++) {
     if (DriverBinding == SortedDriverBindingProtocols[Index]) {
       return;
     }
@@ -222,7 +348,9 @@ Returns:
   //
   // Add DriverBinding to the end of the list
   //
-  SortedDriverBindingProtocols[*NumberOfSortedDriverBindingProtocols] = DriverBinding;
+  if (*NumberOfSortedDriverBindingProtocols < DriverBindingHandleCount) {
+    SortedDriverBindingProtocols[*NumberOfSortedDriverBindingProtocols] = DriverBinding;
+  }
   *NumberOfSortedDriverBindingProtocols = *NumberOfSortedDriverBindingProtocols + 1;
 
   //
@@ -235,7 +363,6 @@ Returns:
   }
 }
  
-STATIC
 EFI_STATUS 
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -405,6 +532,19 @@ Returns:
   CoreFreePool (DriverBindingHandleBuffer);
 
   //
+  // If the number of Driver Binding Protocols has increased since this function started, then return
+  // EFI_NOT_READY, so it will be restarted
+  //
+  if (NumberOfSortedDriverBindingProtocols > DriverBindingHandleCount) {
+    //
+    // Free any buffers that were allocated with AllocatePool()
+    //
+    CoreFreePool (SortedDriverBindingProtocols);
+
+    return EFI_NOT_READY;
+  }
+
+  //
   // Sort the remaining DriverBinding Protocol based on their Version field from
   // highest to lowest.
   //
@@ -555,6 +695,9 @@ Returns:
   OPEN_PROTOCOL_DATA                  *OpenData;
   PROTOCOL_INTERFACE                  *Prot;
   EFI_DRIVER_BINDING_PROTOCOL         *DriverBinding;
+  EFI_HANDLE                          *LoadedImageHandleBuffer;
+  UINTN                               LoadedImageHandleCount;
+  LOADED_IMAGE_PRIVATE_DATA           *Image;
 
   //
   // Make sure ControllerHandle is valid
@@ -756,6 +899,49 @@ Returns:
   }
 
   if (StopCount > 0) {
+    //
+    // If the Loaded Image Protocols do not already need to be repaired, then
+    // check the status of the DeviceHandle field of all Loaded Image Protocols
+    // to determine if any of them now need repair because a sucessful Stop()
+    // may have destroyed the DeviceHandle value in the Loaded Image Protocol
+    //
+    if (!mRepairLoadedImage) {
+      //
+      // Get list of all Loaded Image Protocol Instances
+      //
+      Status = CoreLocateHandleBuffer (
+                ByProtocol,   
+                &gEfiLoadedImageProtocolGuid,  
+                NULL,
+                &LoadedImageHandleCount, 
+                &LoadedImageHandleBuffer
+                );
+      if (!EFI_ERROR (Status) && LoadedImageHandleCount != 0) {
+        for (Index = 0; Index < LoadedImageHandleCount; Index++) {
+          //
+          // Retrieve the Loaded Image Protocol
+          //
+          Image = CoreLoadedImageInfo (LoadedImageHandleBuffer[Index]);
+          if (Image != NULL) {
+            //
+            // Check to see if the DeviceHandle field is a valid handle
+            //
+            Status = CoreValidateHandle (Image->Info.DeviceHandle);
+            if (EFI_ERROR (Status)) {
+              //
+              // The DeviceHandle field is not longer a valid handle.  This means
+              // that future calls to ConnectController() need to attemp to repair
+              // the Loaded Image Protocols with invalid DeviceHandle fields.  Set 
+              // the flag used by ConnectController().
+              //
+              mRepairLoadedImage = TRUE;
+              break;
+            }
+          }
+        }
+        CoreFreePool (LoadedImageHandleBuffer);
+      }
+    }
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_NOT_FOUND;
@@ -770,9 +956,6 @@ Done:
   return Status;
 }
 
-
-
-STATIC
 EFI_STATUS
 GetHandleFromDriverBinding (
   IN   EFI_DRIVER_BINDING_PROTOCOL           *DriverBindingNeed,

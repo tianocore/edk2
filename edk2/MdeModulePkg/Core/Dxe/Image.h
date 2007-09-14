@@ -55,6 +55,8 @@ typedef struct {
 
     EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   // Runtime image list
 
+    EFI_DEVICE_PATH_PROTOCOL      *DeviceHandleDevicePath;
+
     PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; // PeCoffLoader ImageContext
 
 } LOADED_IMAGE_PRIVATE_DATA;
@@ -98,7 +100,7 @@ CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
   IN VOID                           *SourceBuffer   OPTIONAL,
   IN UINTN                          SourceSize,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   *FilePath,
+  IN EFI_DEVICE_PATH_PROTOCOL       *FilePath,
   OUT EFI_HANDLE                    *DeviceHandle,
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
