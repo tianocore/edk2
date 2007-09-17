@@ -39,7 +39,7 @@
   UefiNotTiano.c
   Console.c
   UefiLib.c
-
+  UefiDriverModel.c
 
 [Packages]
   MdePkg/MdePkg.dec
