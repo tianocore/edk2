@@ -45,6 +45,11 @@
 [PcdsPatchableInModule.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
+[PcdsFeatureFlag.common]
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
 
 ################################################################################
 #
