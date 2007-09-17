@@ -35,6 +35,21 @@ EDK_0000: Compatible: owner
 		Code Change :
 		1) BaseTools\Bin\Win32\build.exe
 
+
+==========================================================================================
+EDK_3871: Non-Compatible: klu2
+	
+	Class_PIEnable[1]: Use new entry point for PeiCore defined in PI specification.
+	
+	Code Change:
+	1) Remove the definition and library instance for OldPeiCoreEntryPoinLib
+	
+	Possible Impacts:
+	1) Platform should select MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf for 
+	   PeiMain module.
+	2) The SecCore module should provide parameters for new entry point defined in 
+	   MdePkg\Include\Library\PeiCoreEntryPoint.h
+
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
