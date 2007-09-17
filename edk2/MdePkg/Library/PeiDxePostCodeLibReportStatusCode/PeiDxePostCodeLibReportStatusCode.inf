@@ -40,6 +40,6 @@
   PcdLib
   ReportStatusCodeLib
 
-[FixedPcd.common]
+[Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask
 

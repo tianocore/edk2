@@ -59,6 +59,6 @@
   gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 
-[FixedPcd.common]
+[Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
 

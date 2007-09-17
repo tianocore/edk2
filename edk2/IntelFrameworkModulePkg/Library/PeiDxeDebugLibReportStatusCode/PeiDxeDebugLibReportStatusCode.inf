@@ -46,12 +46,8 @@
   BaseMemoryLib
   BaseLib
 
-
-[FixedPcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
-
-
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
 
