@@ -62,7 +62,7 @@ EDK_3773:  Non-Compatible: qwang12
 
 
 ==========================================================================================
-EDK_3865:  Compatible: qhuang8
+EDK_3866:  Compatible: qhuang8
 
 	  Class_UefiEnable[0]:  Uefi2.1 feature - Add Hardware Error Record Persistence Support 
 		Code Change :
