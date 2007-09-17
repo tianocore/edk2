@@ -59,3 +59,12 @@ EDK_3773:  Non-Compatible: qwang12
 		3) The gEfiFirmwareVolumeProtocolGuid in [Depex] section of INF file should updated.
 		   And the package dependency should also be changed if needed due to this protocol
 		   GUID change.
+
+
+==========================================================================================
+EDK_3865:  Compatible: qhuang8
+
+	  Class_UefiEnable[0]:  Uefi2.1 feature - Add Hardware Error Record Persistence Support 
+		Code Change :
+		1) Modify MdeModulePkg/Universal/Variable/RuntimeDxe
+                2) Modify MdeModulePkg/Universal/Variable/EmuRuntimeDxe
