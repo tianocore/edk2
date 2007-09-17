@@ -854,20 +854,20 @@ AsciiErrorPrint (
   );
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol onto the
-  driver's DriverBindingHandle.  This is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple
-  DriverBinding Protocols.  This function also initializes the EFI Driver
-  Library that initializes the global variables gST, gBS, gRT.
+  Intialize a driver by installing the Driver Binding Protocol onto the driver's
+  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but
+  it can be different if the driver produces multiple DriverBinding Protocols. 
+  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the installation fails, then ASSERT ().
 
-  @param  ImageHandle          The image handle of the driver
-  @param  SystemTable          The EFI System Table that was passed to the driver's entry point
-  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing
-  @param  DriverBindingHandle  The handle that DriverBinding is to be installe onto.  If this
-                               parameter is NULL, then a new handle is created.
+  @param  ImageHandle                 The image handle of the driver.
+  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+                                      parameter is NULL, then a new handle is created.
 
-  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
-  @retval Other                Status from gBS->InstallProtocolInterface()
+  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
 EFI_STATUS
@@ -879,24 +879,26 @@ EfiLibInstallDriverBinding (
   IN EFI_HANDLE                   DriverBindingHandle
   );
 
+
 /**
-  Intialize a driver by installing the Driver Binding Protocol onto the
-  driver's DriverBindingHandle.  This is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple
-  DriverBinding Protocols.  This function also initializes the EFI Driver
-  Library that initializes the global variables gST, gBS, gRT.
+  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.  This is
+  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols. 
+  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the installation fails, then ASSERT ().
 
-  @ImageHandle                 The image handle of the driver
-  @SystemTable                 The EFI System Table that was passed to the driver's entry point
-  @DriverBinding               A Driver Binding Protocol instance that this driver is producing
-  @DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
-                               parameter is NULL, then a new handle is created.
-  @ComponentName               A Component Name Protocol instance that this driver is producing
-  @DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing
-  @DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing
+  @param  ImageHandle                 The image handle of the driver.
+  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+                                      parameter is NULL, then a new handle is created.
+  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
+  @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
+  @param  DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing.
 
-  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
-  @retval Other                Status from gBS->InstallProtocolInterface()
+  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
 EFI_STATUS
@@ -912,51 +914,59 @@ EfiLibInstallAllDriverProtocols (
   );
 
 
+
 /**
-  Intialize a driver by installing the Driver Binding Protocol
-  onto the driver's DriverBindingHandle.  This is typically the
-  same as the driver's ImageHandle, but it can be different if
-  the driver produces multiple DriverBinding Protocols.  This
-  function also initializes the EFI Driver Library that
-  initializes the global variables gST, gBS, gRT.
+  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Component Name 2 onto the driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple DriverBinding Protocols. 
+  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the installation fails, then ASSERT ().
 
-  @ImageHandle                  The image handle of the driver
-  
-  @SystemTable                  The EFI System Table that was
-                                passed to the driver's entry
-                                point
-  
-  @DriverBinding                A Driver Binding Protocol
-                                instance that this driver is
-                                producing
-  
-  @DriverBindingHandle          The handle that DriverBinding is
-                                to be installe onto.  If this
-                                parameter is NULL, then a new
-                                handle is created.
-  
-  @ComponentName                A Component Name Protocol
-                                instance that this driver is
-                                producing
-  
-  @ComponentName2               A Component Name 2 Protocol
-                                instance that this driver is
-                                producing
-  
-  @DriverConfiguration          A Driver Configuration Protocol
-                                instance that this driver is
-                                producing
-  
-  @DriverDiagnostics            A Driver Diagnostics Protocol
-                                instance that this driver is
-                                producing
-  
-  @DriverDiagnostics2           A Driver Diagnostics 2 Protocol
-                                instance that this driver is
-                                producing
+  @param  ImageHandle                 The image handle of the driver.
+  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+                                      parameter is NULL, then a new handle is created.
+  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
+  @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
 
-  @retval EFI_SUCCESS          DriverBinding is installed onto DriverBindingHandle
-  @retval Other                Status from gBS->InstallProtocolInterface()
+  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibInstallDriverBindingComponentName2 (
+  IN CONST EFI_HANDLE                         ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
+  IN EFI_HANDLE                               DriverBindingHandle,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
+  );
+
+
+/**
+  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
+  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but it can be different if
+  the driver produces multiple DriverBinding Protocols. 
+  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the installation fails, then ASSERT ().
+
+  @param  ImageHandle                 The image handle of the driver.
+  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+                                      parameter is NULL, then a new handle is created.
+  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
+  @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
+  @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
+  @param  DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing.
+  @param  DriverDiagnostics2          A Driver Diagnostics Protocol 2 instance that this driver is producing.
+
+  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
 EFI_STATUS
@@ -972,6 +982,5 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,   OPTIONAL
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2   OPTIONAL
   );
-
 
 #endif
