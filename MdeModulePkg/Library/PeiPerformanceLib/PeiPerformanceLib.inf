@@ -52,11 +52,7 @@
 [Guids]
   gPeiPerformanceHobGuid                        # SOMETIMES_CONSUMED
 
-
-[FixedPcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
-
-
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
 

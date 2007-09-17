@@ -58,11 +58,6 @@
 [Protocols]
   gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
 
-
-[FixedPcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
-
-
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
-
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask

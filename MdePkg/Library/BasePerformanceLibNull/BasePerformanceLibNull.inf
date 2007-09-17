@@ -43,6 +43,6 @@
   DebugLib
 
 
-[FixedPcd.common]
+[Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
 
