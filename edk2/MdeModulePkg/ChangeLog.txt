@@ -60,7 +60,22 @@ EDK_3773:  Non-Compatible: qwang12
 		   And the package dependency should also be changed if needed due to this protocol
 		   GUID change.
 
-
+==========================================================================================
+EDK_3871: Non-Compatible: klu2
+	
+	Class_PIEnable[1]: Use new entry point for PeiCore defined in PI specification.
+	
+	Code Change:
+	1) PeiMain module use PeiCoreEntryPoint library class but *not* original OldPeiCoreEntryPoint.
+	2) The memory service in PeiMain module get CAR base and size from parameter of PeiCore's
+	   Entry point directly but *not* computed from stack's base.
+	
+	Possible Impacts:
+	1) Platform should select MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf for 
+	   PeiMain module.
+	2) The SecCore module should provide parameters for new entry point defined in 
+	   MdePkg\Include\Library\PeiCoreEntryPoint.h
+	   
 ==========================================================================================
 EDK_3866:  Compatible: qhuang8
 
