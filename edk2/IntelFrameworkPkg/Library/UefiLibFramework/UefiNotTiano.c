@@ -297,7 +297,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  if (FrameworkFvDevicePathNode->Tiano.Header.Type == MEDIA_DEVICE_PATH ||
+  if (FrameworkFvDevicePathNode->Tiano.Header.Type == MEDIA_DEVICE_PATH &&
       FrameworkFvDevicePathNode->Tiano.Header.SubType == MEDIA_VENDOR_DP) {
     if (CompareGuid (&gEfiFrameworkDevicePathGuid, &FrameworkFvDevicePathNode->Tiano.TianoSpecificDevicePath)) {
       if (FrameworkFvDevicePathNode->Tiano.Type == TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
