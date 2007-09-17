@@ -29,21 +29,25 @@
     <xs:attribute name="Usage" type="BootModeUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="DataHubAttributes">
     <xs:attribute name="Usage" type="DataHubUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="EventAttributes">
     <xs:attribute name="Usage" type="EventUsage" use="required"/>
     <xs:attribute name="EventGuidCName" type="C_NameType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="ExternAttributes">
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="FilenameAttributes">
     <xs:attribute name="TagName" type="ToolsNameConvention" use="optional"/>
@@ -51,11 +55,13 @@
     <xs:attribute name="ToolChainFamily" type="ToolsNameConvention" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="GuidAttributes">
     <xs:attribute name="Usage" type="GuidUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="GuidDeclarationAttributes">
     <xs:attribute name="Name" type="UiNameType" use="required"/>
@@ -67,16 +73,19 @@
     <xs:attribute name="Usage" type="HiiPackageUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="HobAttributes">
     <xs:attribute name="Usage" type="HobUsage" use="required"/>
     <xs:attribute name="HobGuidCName" type="C_NameType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="IncludeHeaderAttributes">
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
     <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="IndustryStdHeaderAttributes">
@@ -91,6 +100,7 @@
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
     <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="LibraryClassDeclarationAttributes">
     <xs:attribute name="Name" type="KeywordType" use="required"/>
@@ -115,6 +125,7 @@
     <xs:attribute name="PackageVersion" type="VersionDataType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="PackageNameAttributes">
     <!--Used with the FrameworkDatabase PackageList.Packagename  -->
@@ -130,6 +141,7 @@
     <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="PcdDeclarationAttributes">
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
@@ -145,16 +157,19 @@
     <xs:attribute name="Usage" type="PpiUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="PpiNotifyAttributes">
     <xs:attribute name="Usage" type="PpiNotifyUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="ProtocolAttributes">
     <xs:attribute name="Usage" type="ProtocolUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="ProtocolDeclarationAttributes">
     <xs:attribute name="Name" type="UiNameType" use="required"/>
@@ -166,15 +181,18 @@
     <xs:attribute name="Usage" type="ProtocolNotifyUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="SystemTableAttributes">
     <xs:attribute name="Usage" type="SystemTableUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="VariableAttributes">
     <xs:attribute name="Usage" type="VariableUsage" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    <xs:attribute name="PcdFeatureFlag" type="xs:normalizedString" use="optional"/>
   </xs:attributeGroup>
 </xs:schema>
