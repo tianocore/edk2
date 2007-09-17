@@ -472,6 +472,11 @@
       <GuidValue>7CE88FB3-4BD7-4679-87A8-A8D8DEE50D2B</GuidValue>
       <HelpText/>
     </Entry>
+    <Entry Name="HardwareErrorVariable">
+      <C_Name>gEfiHardwareErrorVariableGuid</C_Name>
+      <GuidValue>414E6BDD-E47B-47CC-B244-BB61020CF516</GuidValue>
+      <HelpText/>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="Bds">
