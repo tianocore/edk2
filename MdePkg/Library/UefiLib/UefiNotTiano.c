@@ -283,9 +283,8 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 {
   ASSERT (FvFileDevicePathNode != NULL);
 
-  if (FvFileDevicePathNode->Header.Type == MEDIA_DEVICE_PATH &&
-      FvFileDevicePathNode->Header.SubType == MEDIA_PIWG_FW_FILE_DP
-     ) {
+  if (DevicePathType (&FvFileDevicePathNode->Header) == MEDIA_DEVICE_PATH &&
+      DevicePathSubType (&FvFileDevicePathNode->Header) == MEDIA_PIWG_FW_FILE_DP) {
     return (EFI_GUID *) &FvFileDevicePathNode->FvFileName;
   }
 
