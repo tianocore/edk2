@@ -55,11 +55,19 @@ AsmReadKr0::
 .text
 .type   AsmWriteKr0, @function
 .proc   AsmWriteKr0
-.regstk 1, 0, 0, 0
+.regstk 1, 3, 0, 0
 
 AsmWriteKr0::
+        alloc loc1=ar.pfs,1,4,0,0 ;;
+        mov             loc2 = psr;;
+        rsm             0x6000;;                      // Masking interrupts
         mov             ar.k0 = in0
+        srlz.i;;
+        mov             psr.l = loc2;;
+        srlz.i;;
+        srlz.d;;
         mov             r8 = in0;;
+        mov ar.pfs=loc1 ;;
         br.ret.dpnt     b0;;
 .endp   AsmWriteKr0
 
