@@ -204,13 +204,23 @@ AsmReadIva::
 .text
 .type   AsmWriteIva, @function
 .proc   AsmWriteIva
-.regstk 1, 0, 0, 0
+.regstk 1, 3, 0, 0
+
+        alloc loc1=ar.pfs,1,4,0,0 ;;
+
+        mov         loc2 = psr
+        rsm         0x6000                      // Make sure interrupts are masked
 
 AsmWriteIva::
-         mov            cr.iva = in0
-         mov            r8 = in0;;
-         br.ret.dpnt    b0;;
-.endp    AsmWriteIva
+        mov            cr.iva = in0
+        srlz.i;;
+        mov         psr.l = loc2;;
+        srlz.i;;
+        srlz.d;;
+        mov ar.pfs=loc1 ;;
+        mov            r8 = in0;;
+        br.ret.dpnt    b0;;
+.endp   AsmWriteIva
 
 
 //---------------------------------------------------------------------------------
