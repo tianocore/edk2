@@ -32,7 +32,6 @@ STATIC EFI_EVENT mSetVirtualMapChangedEvent = NULL;
 //
 STATIC FVB_ENTRY          *mFvbEntry;
 STATIC EFI_EVENT          mFvbRegistration;
-STATIC BOOLEAN            mEfiFvbInitialized        = FALSE;
 STATIC UINTN              mFvbCount;
 
 /**
@@ -318,8 +317,6 @@ FvbLibInitialize (
                   &mSetVirtualMapChangedEvent
                   );
   ASSERT_EFI_ERROR (Status);
-
-  mEfiFvbInitialized = TRUE;
 
   return EFI_SUCCESS;
 }

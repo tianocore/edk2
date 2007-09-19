@@ -80,11 +80,21 @@ CompareGuid (
   IN CONST GUID  *Guid2
   )
 {
-  return (BOOLEAN)(
-           ReadUnaligned64 ((CONST UINT64*)Guid1)
-             == ReadUnaligned64 ((CONST UINT64*)Guid2) &&
-           ReadUnaligned64 ((CONST UINT64*)Guid1 + 1)
-             == ReadUnaligned64 ((CONST UINT64*)Guid2 + 1)
+  UINT64 Guid1ValueLo;
+  UINT64 Guid1ValueHi;
+  UINT64 Guid2ValueLo;
+  UINT64 Guid2ValueHi;
+
+  Guid1ValueLo = ReadUnaligned64 ((CONST UINT64*)Guid1);
+  Guid2ValueLo = ReadUnaligned64 ((CONST UINT64*)Guid2);
+
+  Guid1ValueHi = ReadUnaligned64 ((CONST UINT64*)Guid1 + 1);
+  Guid2ValueHi = ReadUnaligned64 ((CONST UINT64*)Guid2 + 1);
+
+
+  return (BOOLEAN)
+           ((Guid1ValueLo == Guid2ValueLo) &&
+            (Guid1ValueHi == Guid2ValueHi)
            );
 }
 

@@ -249,7 +249,7 @@ TcpParseOption (
 
   Option->Flag  = 0;
 
-  TotalLen      = (Tcp->HeadLen << 2) - sizeof (TCP_HEAD);
+  TotalLen      = (UINT8) ((Tcp->HeadLen << 2) - sizeof (TCP_HEAD));
   if (TotalLen <= 0) {
     return 0;
   }

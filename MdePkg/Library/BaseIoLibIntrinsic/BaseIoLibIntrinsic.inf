@@ -38,12 +38,14 @@
   IoHighLevel.c
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
+  IoLibIcc.c    | INTEL
   IoLib.c
 
 [Sources.X64]
   IoHighLevel.c
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
+  IoLibIcc.c    | INTEL
   IoLib.c
 
 [Sources.IPF]

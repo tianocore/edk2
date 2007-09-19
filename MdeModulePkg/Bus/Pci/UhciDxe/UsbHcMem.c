@@ -232,7 +232,7 @@ UsbHcAllocMemFromBlock (
   for (Count = 0; Count < Units; Count++) {
     ASSERT (!USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-    Block->Bits[Byte] |= USB_HC_BIT (Bit);
+    Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] | (UINT8) USB_HC_BIT (Bit));
     NEXT_BIT (Byte, Bit);
   }
 
