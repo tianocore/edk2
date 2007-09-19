@@ -252,7 +252,7 @@ DevPathMemMap (
   MemMap = DevPath;
   CatPrint (
     Str,
-    L"MemMap(%d:%.lx-%.lx)",
+    L"MemMap(%d:%lx-%lx)",
     MemMap->MemoryType,
     MemMap->StartingAddress,
     MemMap->EndingAddress
