@@ -31,7 +31,7 @@ RtMemoryStatusCodeInitializeWorker (
   // Allocate runtime memory status code pool.
   //
   RtMemoryStatusCodeTable = 
-    (RUNTIME_MEMORY_STATUSCODE_HEADER *) AllocatePool (
+    (RUNTIME_MEMORY_STATUSCODE_HEADER *) AllocateRuntimePool (
                                            sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) +
                                            PcdGet16 (PcdStatusCodeRuntimeMemorySize) *
                                            1024
