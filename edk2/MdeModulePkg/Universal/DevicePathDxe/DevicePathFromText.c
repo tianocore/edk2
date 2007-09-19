@@ -812,7 +812,7 @@ ConvertFromTextVendor (
   Vendor  = (VENDOR_DEVICE_PATH *) CreateDeviceNode (
                                      Type,
                                      SubType,
-                                     sizeof (VENDOR_DEVICE_PATH) + (UINT16) Length
+                                     (UINT16) (sizeof (VENDOR_DEVICE_PATH) + Length)
                                      );
 
   StrToGuid (GuidStr, &Vendor->Guid);
@@ -1016,7 +1016,7 @@ DevPathFromTextAcpiExp (
   HIDStr    = GetNextParamStr (&TextDeviceNode);
   CIDStr    = GetNextParamStr (&TextDeviceNode);
   UIDSTRStr = GetNextParamStr (&TextDeviceNode);
-  Length    = sizeof (ACPI_EXTENDED_HID_DEVICE_PATH) + (UINT16) StrLen (UIDSTRStr) + 3;
+  Length    = (UINT16) (sizeof (ACPI_EXTENDED_HID_DEVICE_PATH) + StrLen (UIDSTRStr) + 3);
   AcpiExt   = (ACPI_EXTENDED_HID_DEVICE_PATH_WITH_STR *) CreateDeviceNode (
                                                            ACPI_DEVICE_PATH,
                                                            ACPI_EXTENDED_DP,
@@ -1382,7 +1382,7 @@ DevPathFromTextSAS (
       Info |= 0x0001;
     } else {
       Info |= 0x0002;
-      Info |= (Xtoi (DriveBayStr) << 8);
+      Info = (UINT16) (Info | (Xtoi (DriveBayStr) << 8));
     }
 
     if (StrCmp (SASSATAStr, L"SATA") == 0) {
@@ -1954,7 +1954,7 @@ DevPathFromTextiSCSI (
   iSCSI             = (ISCSI_DEVICE_PATH_WITH_NAME *) CreateDeviceNode (
                                                         MESSAGING_DEVICE_PATH,
                                                         MSG_ISCSI_DP,
-                                                        sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + (UINT16) (StrLen (NameStr) * 2)
+                                                        (UINT16) (sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr) * 2)
                                                         );
 
   StrCpy (iSCSI->iSCSITargetName, NameStr);
@@ -2093,7 +2093,7 @@ DevPathFromTextFilePath (
   File = (FILEPATH_DEVICE_PATH *) CreateDeviceNode (
                                     MEDIA_DEVICE_PATH,
                                     MEDIA_FILEPATH_DP,
-                                    sizeof (FILEPATH_DEVICE_PATH) + (UINT16) (StrLen (TextDeviceNode) * 2)
+                                    (UINT16) (sizeof (FILEPATH_DEVICE_PATH) + StrLen (TextDeviceNode) * 2)
                                     );
 
   StrCpy (File->PathName, TextDeviceNode);
@@ -2140,7 +2140,7 @@ DevPathFromTextBBS (
   Bbs       = (BBS_BBS_DEVICE_PATH *) CreateDeviceNode (
                                         BBS_DEVICE_PATH,
                                         BBS_BBS_DP,
-                                        sizeof (BBS_BBS_DEVICE_PATH) + (UINT16) (StrLen (IdStr))
+                                        (UINT16) (sizeof (BBS_BBS_DEVICE_PATH) + StrLen (IdStr))
                                         );
 
   if (StrCmp (TypeStr, L"Floppy") == 0) {

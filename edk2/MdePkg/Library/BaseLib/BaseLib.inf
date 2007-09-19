@@ -91,7 +91,6 @@
   Ia32/WriteCr2.c | MSFT 
   Ia32/WriteCr0.c | MSFT 
   Ia32/WriteMsr64.c | MSFT 
-  Ia32/Thunk16.asm
   Ia32/SwapBytes64.c | MSFT 
   Ia32/SetJump.c | MSFT 
   Ia32/RRotU64.c | MSFT 
@@ -146,7 +145,6 @@
   Ia32/FxRestore.c | MSFT 
   Ia32/FxSave.c | MSFT 
   Ia32/FlushCacheLine.c | MSFT 
-  Ia32/EnablePaging64.asm
   Ia32/EnablePaging32.c | MSFT 
   Ia32/EnableInterrupts.c | MSFT 
   Ia32/EnableDisableInterrupts.c | MSFT 
@@ -162,6 +160,107 @@
   Ia32/CpuFlushTlb.c | MSFT 
   Ia32/CpuBreakpoint.c | MSFT 
   Ia32/ARShiftU64.c | MSFT 
+  SynchronizationMsc.c  | MSFT
+
+  Ia32/Wbinvd.asm | INTEL 
+  Ia32/WriteMm7.asm | INTEL 
+  Ia32/WriteMm6.asm | INTEL 
+  Ia32/WriteMm5.asm | INTEL 
+  Ia32/WriteMm4.asm | INTEL 
+  Ia32/WriteMm3.asm | INTEL 
+  Ia32/WriteMm2.asm | INTEL 
+  Ia32/WriteMm1.asm | INTEL 
+  Ia32/WriteMm0.asm | INTEL 
+  Ia32/WriteLdtr.asm | INTEL 
+  Ia32/WriteIdtr.asm | INTEL 
+  Ia32/WriteGdtr.asm | INTEL 
+  Ia32/WriteDr7.asm | INTEL 
+  Ia32/WriteDr6.asm | INTEL 
+  Ia32/WriteDr5.asm | INTEL 
+  Ia32/WriteDr4.asm | INTEL 
+  Ia32/WriteDr3.asm | INTEL 
+  Ia32/WriteDr2.asm | INTEL 
+  Ia32/WriteDr1.asm | INTEL 
+  Ia32/WriteDr0.asm | INTEL 
+  Ia32/WriteCr4.asm | INTEL 
+  Ia32/WriteCr3.asm | INTEL 
+  Ia32/WriteCr2.asm | INTEL 
+  Ia32/WriteCr0.asm | INTEL 
+  Ia32/WriteMsr64.asm | INTEL 
+  Ia32/SwapBytes64.asm | INTEL 
+  Ia32/SetJump.asm | INTEL 
+  Ia32/RRotU64.asm | INTEL 
+  Ia32/RShiftU64.asm | INTEL 
+  Ia32/ReadPmc.asm | INTEL 
+  Ia32/ReadTsc.asm | INTEL 
+  Ia32/ReadLdtr.asm | INTEL 
+  Ia32/ReadIdtr.asm | INTEL 
+  Ia32/ReadGdtr.asm | INTEL 
+  Ia32/ReadTr.asm | INTEL 
+  Ia32/ReadSs.asm | INTEL 
+  Ia32/ReadGs.asm | INTEL 
+  Ia32/ReadFs.asm | INTEL 
+  Ia32/ReadEs.asm | INTEL 
+  Ia32/ReadDs.asm | INTEL 
+  Ia32/ReadCs.asm | INTEL 
+  Ia32/ReadMsr64.asm | INTEL 
+  Ia32/ReadMm7.asm | INTEL 
+  Ia32/ReadMm6.asm | INTEL 
+  Ia32/ReadMm5.asm | INTEL 
+  Ia32/ReadMm4.asm | INTEL 
+  Ia32/ReadMm3.asm | INTEL 
+  Ia32/ReadMm2.asm | INTEL 
+  Ia32/ReadMm1.asm | INTEL 
+  Ia32/ReadMm0.asm | INTEL 
+  Ia32/ReadEflags.asm | INTEL 
+  Ia32/ReadDr7.asm | INTEL 
+  Ia32/ReadDr6.asm | INTEL 
+  Ia32/ReadDr5.asm | INTEL 
+  Ia32/ReadDr4.asm | INTEL 
+  Ia32/ReadDr3.asm | INTEL 
+  Ia32/ReadDr2.asm | INTEL 
+  Ia32/ReadDr1.asm | INTEL 
+  Ia32/ReadDr0.asm | INTEL 
+  Ia32/ReadCr4.asm | INTEL 
+  Ia32/ReadCr3.asm | INTEL 
+  Ia32/ReadCr2.asm | INTEL 
+  Ia32/ReadCr0.asm | INTEL 
+  Ia32/Mwait.asm | INTEL 
+  Ia32/Monitor.asm | INTEL 
+  Ia32/ModU64x32.asm | INTEL 
+  Ia32/MultU64x64.asm | INTEL 
+  Ia32/MultU64x32.asm | INTEL 
+  Ia32/LShiftU64.asm | INTEL 
+  Ia32/LRotU64.asm | INTEL 
+  Ia32/LongJump.asm | INTEL 
+  Ia32/Invd.asm | INTEL 
+  Ia32/InterlockedCompareExchange64.asm | INTEL 
+  Ia32/InterlockedCompareExchange32.asm | INTEL 
+  Ia32/InterlockedDecrement.asm | INTEL 
+  Ia32/InterlockedIncrement.asm | INTEL 
+  Ia32/FxRestore.asm | INTEL 
+  Ia32/FxSave.asm | INTEL 
+  Ia32/FlushCacheLine.asm | INTEL 
+  Ia32/EnablePaging32.asm | INTEL 
+  Ia32/EnableInterrupts.asm | INTEL 
+  Ia32/EnableDisableInterrupts.asm | INTEL 
+  Ia32/DivU64x64Remainder.asm | INTEL 
+  Ia32/DivU64x32Remainder.asm | INTEL 
+  Ia32/DivU64x32.asm | INTEL 
+  Ia32/DisablePaging32.asm | INTEL 
+  Ia32/DisableInterrupts.asm | INTEL 
+  Ia32/CpuPause.asm | INTEL 
+  Ia32/CpuIdEx.asm | INTEL 
+  Ia32/CpuId.asm | INTEL 
+  Ia32/CpuSleep.asm | INTEL 
+  Ia32/CpuFlushTlb.asm | INTEL 
+  Ia32/CpuBreakpoint.asm | INTEL 
+  Ia32/ARShiftU64.asm | INTEL 
+  Synchronization.c | INTEL
+
+  Ia32/Thunk16.asm
+  Ia32/EnablePaging64.asm
+
   Ia32/Thunk16.S | GCC 
   Ia32/CpuFlushTlb.S | GCC 
   Ia32/CpuBreakpoint.S | GCC 
@@ -258,6 +357,8 @@
   Ia32/ARShiftU64.S | GCC 
   Ia32/RShiftU64.S | GCC 
   Ia32/LShiftU64.S | GCC 
+  SynchronizationGcc.c  | GCC
+
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c
   Ia32/Non-existing.c
@@ -276,23 +377,15 @@
   x86EnablePaging32.c
   x86DisablePaging64.c
   x86DisablePaging32.c
-  Synchronization.c     | INTEL
-  SynchronizationMsc.c  | MSFT
-  SynchronizationGcc.c  | GCC
 
 [Sources.X64]
   X64/Thunk16.asm
   X64/CpuFlushTlb.asm
-  X64/CpuBreakpoint.c | MSFT 
   X64/CpuPause.asm
   X64/CpuSleep.asm
   X64/EnableDisableInterrupts.asm
   X64/DisableInterrupts.asm
   X64/EnableInterrupts.asm
-  X64/InterlockedCompareExchange64.asm | MSFT 
-  X64/InterlockedCompareExchange32.asm | MSFT 
-  X64/InterlockedDecrement.c | MSFT 
-  X64/InterlockedIncrement.c | MSFT 
   X64/FlushCacheLine.asm
   X64/Invd.asm
   X64/Wbinvd.asm
@@ -357,14 +450,29 @@
   X64/ReadCr3.asm
   X64/ReadCr2.asm
   X64/ReadCr0.asm
-  X64/WriteMsr64.c | MSFT 
-  X64/ReadMsr64.c | MSFT 
   X64/ReadEflags.asm
   X64/CpuIdEx.asm
   X64/CpuId.asm
   X64/LongJump.asm
   X64/SetJump.asm
   X64/SwitchStack.asm
+  X64/InterlockedCompareExchange64.asm 
+  X64/InterlockedCompareExchange32.asm 
+
+  X64/InterlockedDecrement.c | MSFT 
+  X64/InterlockedIncrement.c | MSFT 
+  X64/CpuBreakpoint.c | MSFT 
+  X64/WriteMsr64.c | MSFT 
+  X64/ReadMsr64.c | MSFT 
+  SynchronizationMsc.c | MSFT 
+
+  X64/InterlockedDecrement.asm | INTEL 
+  X64/InterlockedIncrement.asm | INTEL 
+  X64/CpuBreakpoint.asm | INTEL 
+  X64/WriteMsr64.asm | INTEL 
+  X64/ReadMsr64.asm | INTEL 
+  Synchronization.c | INTEL 
+
   X64/Non-existing.c
   Math64.c
   Unaligned.c
@@ -466,8 +574,6 @@
   X64/CpuIdEx.S | GCC 
   X64/CpuFlushTlb.S | GCC 
   X64/CpuBreakpoint.S | GCC 
-  Synchronization.c     | INTEL 
-  SynchronizationMsc.c  | MSFT 
   SynchronizationGcc.c  | GCC 
 
 [Sources.IPF]
