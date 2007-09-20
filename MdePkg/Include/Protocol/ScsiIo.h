@@ -181,7 +181,7 @@ EFI_STATUS
                                     HostAdapterStatus, TargetStatus,
                                     SenseDataLength, and SenseData in that order
                                     for additional status information.
-  @retval EFI_WARN_BUFFER_TOO_SMALL The SCSI Request Packet was executed,
+  @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed,
                                     but the entire DataBuffer could not be transferred.
                                     The actual number of bytes transferred is returned
                                     in TransferLength. See HostAdapterStatus,
