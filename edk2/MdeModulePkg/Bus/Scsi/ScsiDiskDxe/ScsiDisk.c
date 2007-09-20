@@ -24,6 +24,7 @@ Abstract:
 #include <Protocol/ComponentName.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DriverBinding.h>
+#include <Protocol/ScsiPassThruExt.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -88,17 +89,25 @@ ScsiDiskDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 /*++
+
+Routine Description:
+
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  that has ScsiIoProtocol installed will be supported.
+
+Arguments:
+
+  This                - Protocol instance pointer.
+  Controller          - Handle of device to test
+  RemainingDevicePath - Not used
+
+Returns:
+
+  EFI_SUCCESS         - This driver supports this device.
+  EFI_UNSUPPORTED     - This driver does not support this device.
   
-  Routine Description:
-  
-  Arguments:
-  
-  Returns:
   
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS            Status;
   EFI_SCSI_IO_PROTOCOL  *ScsiIo;
@@ -126,11 +135,11 @@ ScsiDiskDriverBindingSupported (
   }
 
   gBS->CloseProtocol (
-        Controller,
-        &gEfiScsiIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiScsiIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
   return Status;
 }
 
@@ -142,19 +151,24 @@ ScsiDiskDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 /*++
+
+Routine Description:
+
+  Start SCSI Disk Driver, and attach BlockIoProtocol to it.
   
-  Routine Description:
+Arguments:
+
+  This                - Protocol instance pointer.
+  Controller          - Handle of device to test
+  RemainingDevicePath - Not used
+
+Returns:
+
+  EFI_SUCCESS         - This driver supports this device.
+  EFI_UNSUPPORTED     - This driver does not support this device.
   
-  Arguments:
-  
-  Returns:
   
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS            Status;
   EFI_SCSI_IO_PROTOCOL  *ScsiIo;
@@ -245,11 +259,11 @@ ScsiDiskDriverBindingStart (
     if (!NeedRetry) {
       gBS->FreePool (ScsiDiskDevice->SenseData);
       gBS->CloseProtocol (
-            Controller,
-            &gEfiScsiIoProtocolGuid,
-            This->DriverBindingHandle,
-            Controller
-            );
+             Controller,
+             &gEfiScsiIoProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );
       gBS->FreePool (ScsiDiskDevice);
       return EFI_DEVICE_ERROR;
     }
@@ -271,11 +285,11 @@ ScsiDiskDriverBindingStart (
   if (EFI_ERROR (Status)) {
     gBS->FreePool (ScsiDiskDevice->SenseData);
     gBS->CloseProtocol (
-          Controller,
-          &gEfiScsiIoProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+           Controller,
+           &gEfiScsiIoProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
     gBS->FreePool (ScsiDiskDevice);
     return Status;
   }
@@ -285,7 +299,7 @@ ScsiDiskDriverBindingStart (
     "eng",
     gScsiDiskComponentName.SupportedLanguages,
     &ScsiDiskDevice->ControllerNameTable,
-    (CHAR16 *) L"SCSI Disk Device"
+    L"SCSI Disk Device"
     );
 
   return EFI_SUCCESS;
@@ -301,19 +315,26 @@ ScsiDiskDriverBindingStop (
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
 /*++
-  
-  Routine Description:
-  
-  Arguments:
-  
-  Returns:
+
+Routine Description:
+
+    Stop this driver on ControllerHandle. Support stoping any child handles
+    created by this driver.
+
+Arguments:
+
+    This              - Protocol instance pointer.
+    Controller        - Handle of device to stop driver on
+    NumberOfChildren  - Number of Children in the ChildHandleBuffer
+    ChildHandleBuffer - List of handles for the children we need to stop.
+
+Returns:
+
+    EFI_SUCCESS
+    EFI_DEVICE_ERROR
+    others
   
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    NumberOfChildren - add argument and description to function comment
-// TODO:    ChildHandleBuffer - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_BLOCK_IO_PROTOCOL *BlkIo;
   SCSI_DISK_DEV         *ScsiDiskDevice;
@@ -339,11 +360,11 @@ ScsiDiskDriverBindingStop (
                   );
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          Controller,
-          &gEfiScsiIoProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+           Controller,
+           &gEfiScsiIoProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
 
     ReleaseScsiDiskDeviceResources (ScsiDiskDevice);
 
@@ -355,9 +376,6 @@ ScsiDiskDriverBindingStop (
   return Status;
 }
 
-//
-// Block I/O Protocol Interface
-//
 
 EFI_STATUS
 EFIAPI
@@ -369,22 +387,22 @@ ScsiDiskReset (
 
 Routine Description:
 
-  TODO: Add function description
+  Reset SCSI Disk  
 
 Arguments:
 
-  This                  - TODO: add argument description
-  ExtendedVerification  - TODO: add argument description
+  This                  - The pointer of EFI_BLOCK_IO_PROTOCOL
+  ExtendedVerification  - The flag about if extend verificate
 
 Returns:
 
-  TODO: add return values
+  EFI_STATUS
 
 --*/
 {
+  EFI_TPL       OldTpl;
   SCSI_DISK_DEV *ScsiDiskDevice;
   EFI_STATUS    Status;
-  EFI_TPL       OldTpl;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -416,27 +434,24 @@ ScsiDiskReadBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  The function is to Read Block from SCSI Disk
 
 Arguments:
 
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
+  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
+  MediaId     - The Id of Media detected
+  LBA         - The logic block address
+  BufferSize  - The size of Buffer
+  Buffer      - The buffer to fill the read out data
 
 Returns:
 
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_NO_MEDIA - TODO: Add description for return value
-  EFI_MEDIA_CHANGED - TODO: Add description for return value
-  EFI_BAD_BUFFER_SIZE - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
+  EFI_INVALID_PARAMETER - Invalid parameter passed in.
+  EFI_SUCCESS           - Successfully to read out block.
+  EFI_DEVICE_ERROR      - Fail to detect media.
+  EFI_NO_MEDIA          - Media is not present.
+  EFI_MEDIA_CHANGED     - Media has changed.
+  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
 
 --*/
 {
@@ -515,9 +530,9 @@ Returns:
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
-  
+
   //
-  // if all the parameters are valid, then perform read sectors command
+  // If all the parameters are valid, then perform read sectors command
   // to transfer data from device to host.
   //
   Status = ScsiDiskReadSectors (ScsiDiskDevice, Buffer, LBA, NumberOfBlocks);
@@ -540,27 +555,24 @@ ScsiDiskWriteBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  The function is to Write Block to SCSI Disk
 
 Arguments:
 
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
+  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
+  MediaId     - The Id of Media detected
+  LBA         - The logic block address
+  BufferSize  - The size of Buffer
+  Buffer      - The buffer to fill the read out data
 
 Returns:
 
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_NO_MEDIA - TODO: Add description for return value
-  EFI_MEDIA_CHANGED - TODO: Add description for return value
-  EFI_BAD_BUFFER_SIZE - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
+  EFI_INVALID_PARAMETER - Invalid parameter passed in.
+  EFI_SUCCESS           - Successfully to read out block.
+  EFI_DEVICE_ERROR      - Fail to detect media.
+  EFI_NO_MEDIA          - Media is not present.
+  EFI_MEDIA_CHANGED     - Media has changed.
+  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
 
 --*/
 {
@@ -647,7 +659,6 @@ Returns:
 
 Done:
   gBS->RestoreTPL (OldTpl);
-  
   return Status;
 }
 
@@ -660,15 +671,15 @@ ScsiDiskFlushBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  Flush Block to Disk
 
 Arguments:
 
-  This  - TODO: add argument description
+  This  - The pointer of EFI_BLOCK_IO_PROTOCOL
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_SUCCESS 
 
 --*/
 {
@@ -688,20 +699,18 @@ ScsiDiskDetectMedia (
 
 Routine Description:
 
-  TODO: Add function description
+  Dectect Device and read out capacity ,if error occurs, parse the sense key.
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  MustReadCapacity  - TODO: add argument description
-  MediaChange       - TODO: add argument description
+  ScsiDiskDevice     - The pointer of SCSI_DISK_DEV
+  MustReadCapacity   - The flag about reading device capacity
+  MediaChange        - The pointer of flag indicates if media has changed 
 
 Returns:
 
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to detect media
 
 --*/
 {
@@ -722,11 +731,9 @@ Returns:
   NumberOfSenseKeys   = 0;
   NeedReadCapacity    = FALSE;
   CopyMem (&OldMedia, ScsiDiskDevice->BlkIo.Media, sizeof (OldMedia));
-  // OldMedia            = *(ScsiDiskDevice->BlkIo.Media);
-
   *MediaChange        = FALSE;
-
   MaxRetry            = 3;
+
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiDiskTestUnitReady (
               ScsiDiskDevice,
@@ -765,13 +772,12 @@ Returns:
   } else {
     NeedReadCapacity = TRUE;
   }
-  
+
   //
   // either NeedReadCapacity is TRUE, or MustReadCapacity is TRUE,
   // retrieve capacity via Read Capacity command
   //
   if (NeedReadCapacity || MustReadCapacity) {
-    
     //
     // retrieve media information
     //
@@ -885,25 +891,17 @@ ScsiDiskInquiryDevice (
 
 Routine Description:
 
-  TODO: Add function description
+  Send out Inquiry command to Device
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  NeedRetry       - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  NeedRetry       - Indicates if needs try again when error happens
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to detect media
 
 --*/
 {
@@ -931,37 +929,34 @@ Returns:
             &InquiryDataLength,
             FALSE
             );
+    //
+    // no need to check HostAdapterStatus and TargetStatus
+    //
   if ((Status == EFI_SUCCESS) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    ParseInquiryData (ScsiDiskDevice);
-    return EFI_SUCCESS;
-  } else if (Status == EFI_NOT_READY) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    *NeedRetry = TRUE;
-    return EFI_DEVICE_ERROR;
-  } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    *NeedRetry = FALSE;
-    return EFI_DEVICE_ERROR;
-  }
-  //
-  // go ahead to check HostAdapterStatus and TargetStatus
-  // (EFI_TIMEOUT, EFI_DEVICE_ERROR)
-  //
-  Status = CheckHostAdapterStatus (HostAdapterStatus);
-  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
-    *NeedRetry = TRUE;
-    return EFI_DEVICE_ERROR;
-  } else if (Status == EFI_DEVICE_ERROR) {
-    //
-    // reset the scsi channel
-    //
+     ParseInquiryData (ScsiDiskDevice);
+     return EFI_SUCCESS;
+ 
+   } else if (Status == EFI_NOT_READY) {
+     *NeedRetry = TRUE;
+     return EFI_DEVICE_ERROR;
+ 
+   } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
+     *NeedRetry = FALSE;
+     return EFI_DEVICE_ERROR;
+   }
+   //
+   // go ahead to check HostAdapterStatus and TargetStatus
+   // (EFI_TIMEOUT, EFI_DEVICE_ERROR)
+   //
+ 
+   Status = CheckHostAdapterStatus (HostAdapterStatus);
+   if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+     *NeedRetry = TRUE;
+     return EFI_DEVICE_ERROR;
+   } else if (Status == EFI_DEVICE_ERROR) {
+      //
+      // reset the scsi channel
+      //
     ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
@@ -975,19 +970,19 @@ Returns:
     ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
+
   } else if (Status == EFI_DEVICE_ERROR) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
   
   //
-  // if goes here, meant ScsiInquiryCommand() failed.
+  // if goes here, meant SubmitInquiryCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
-  // better retry ScsiInquiryCommand(). (by setting *NeedRetry = TRUE)
+  // better retry SubmitInquiryCommand(). (by setting *NeedRetry = TRUE)
   //
   MaxRetry = 3;
   for (Index = 0; Index < MaxRetry; Index++) {
-
     Status = ScsiDiskRequestSenseKeys (
               ScsiDiskDevice,
               NeedRetry,
@@ -1019,30 +1014,27 @@ ScsiDiskTestUnitReady (
   EFI_SCSI_SENSE_DATA   **SenseDataArray,
   UINTN                 *NumberOfSenseKeys
   )
-// TODO: function comment should start with '/*++'
-/*
-  When Test Unit Ready command succeeds,
-  retrieve Sense Keys via Request Sense;
+ /*++
+
+Routine Description:
+
+  When Test Unit Ready command succeeds, retrieve Sense Keys via Request Sense;
   When Test Unit Ready command encounters any error caused by host adapter or
   target, return error without retrieving Sense Keys.
-*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO: function comment is missing 'Returns:'
-// TODO:    ScsiDiskDevice - add argument and description to function comment
-// TODO:    NeedRetry - add argument and description to function comment
-// TODO:    SenseDataArray - add argument and description to function comment
-// TODO:    NumberOfSenseKeys - add argument and description to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  
+Arguments:
+
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  NeedRetry       - The pointer of flag indicates try again
+  SenseDataArray  - The pointer of an array of sense data
+  NumberOfSenseKeys - The pointer of the number of sense data array
+  
+Returns:
+
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to test unit
+
+--*/
 {
   EFI_STATUS  Status;
   UINT8       SenseDataLength;
@@ -1065,26 +1057,26 @@ ScsiDiskTestUnitReady (
             &HostAdapterStatus,
             &TargetStatus
             );
+  //
+  // no need to check HostAdapterStatus and TargetStatus
+  //
   if (Status == EFI_NOT_READY) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
+
   } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
   //
-  // go ahead to check HostAdapterStatus and TargetStatus
+  // go ahead to check HostAdapterStatus and TargetStatus(in case of EFI_DEVICE_ERROR)
   //
+
   Status = CheckHostAdapterStatus (HostAdapterStatus);
   if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
+
   } else if (Status == EFI_DEVICE_ERROR) {
     //
     // reset the scsi channel
@@ -1102,6 +1094,7 @@ ScsiDiskTestUnitReady (
     ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
+
   } else if (Status == EFI_DEVICE_ERROR) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
@@ -1109,7 +1102,6 @@ ScsiDiskTestUnitReady (
 
   MaxRetry = 3;
   for (Index = 0; Index < MaxRetry; Index++) {
-
     Status = ScsiDiskRequestSenseKeys (
               ScsiDiskDevice,
               NeedRetry,
@@ -1144,26 +1136,19 @@ DetectMediaParsingSenseKeys (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Parsing Sense Keys which got from request sense command.
+  
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  SenseData         - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Action            - TODO: add argument description
+  ScsiDiskDevice    - The pointer of SCSI_DISK_DEV
+  SenseData         - The pointer of EFI_SCSI_SENSE_DATA
+  NumberOfSenseKeys - The number of sense key  
+  Action            - The pointer of action which indicates what is need to do next
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to complete the parsing
 
 --*/
 {
@@ -1232,27 +1217,19 @@ ScsiDiskReadCapacity (
 
 Routine Description:
 
-  TODO: Add function description
+  Send read capacity command to device and get the device parameter
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
+  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
+  NeedRetry          -  The pointer of flag indicates if need a retry
+  SenseDataArray     -  The pointer of an array of sense data
+  NumberOfSenseKeys  -  The number of sense key
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to read capacity
 
 --*/
 {
@@ -1286,35 +1263,32 @@ Returns:
                     &DataLength,
                     FALSE
                     );
-  if (CommandStatus == EFI_SUCCESS) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    GetMediaInfo (ScsiDiskDevice, &CapacityData);
-    return EFI_SUCCESS;
-  } else if (CommandStatus == EFI_NOT_READY) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    *NeedRetry = TRUE;
-    return EFI_DEVICE_ERROR;
-  } else if ((CommandStatus == EFI_INVALID_PARAMETER) || (CommandStatus == EFI_UNSUPPORTED)) {
-    //
-    // no need to check HostAdapterStatus and TargetStatus
-    //
-    *NeedRetry = FALSE;
-    return EFI_DEVICE_ERROR;
-  }
   //
-  // go ahead to check HostAdapterStatus and TargetStatus
-  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
-  //
-  
-  Status = CheckHostAdapterStatus (HostAdapterStatus);
-  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
-    *NeedRetry = TRUE;
-    return EFI_DEVICE_ERROR;
-  } else if (Status == EFI_DEVICE_ERROR) {
+    // no need to check HostAdapterStatus and TargetStatus
+    //
+   if (CommandStatus == EFI_SUCCESS) {
+     GetMediaInfo (ScsiDiskDevice, &CapacityData);
+     return EFI_SUCCESS;
+ 
+   } else if (CommandStatus == EFI_NOT_READY) {
+     *NeedRetry = TRUE;
+     return EFI_DEVICE_ERROR;
+ 
+   } else if ((CommandStatus == EFI_INVALID_PARAMETER) || (CommandStatus == EFI_UNSUPPORTED)) {
+     *NeedRetry = FALSE;
+     return EFI_DEVICE_ERROR;
+   }
+   //
+   // go ahead to check HostAdapterStatus and TargetStatus
+   // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+   //
+ 
+   Status = CheckHostAdapterStatus (HostAdapterStatus);
+   if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+     *NeedRetry = TRUE;
+     return EFI_DEVICE_ERROR;
+ 
+   } else if (Status == EFI_DEVICE_ERROR) {
     //
     // reset the scsi channel
     //
@@ -1331,15 +1305,16 @@ Returns:
     ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
+
   } else if (Status == EFI_DEVICE_ERROR) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
   
   //
-  // if goes here, meant ScsiReadCapacityCommand() failed.
+  // if goes here, meant SubmitReadCapacityCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
-  // better retry ScsiReadCapacityCommand(). (by setting *NeedRetry = TRUE)
+  // better retry SubmitReadCapacityCommand(). (by setting *NeedRetry = TRUE)
   //
   MaxRetry = 3;
   for (Index = 0; Index < MaxRetry; Index++) {
@@ -1376,40 +1351,39 @@ CheckHostAdapterStatus (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Check the HostAdapter status
+  
 Arguments:
 
-  HostAdapterStatus - TODO: add argument description
+  HostAdapterStatus - Host Adapter status
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_TIMEOUT - TODO: Add description for return value
-  EFI_NOT_READY - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_SUCCESS       
+  EFI_TIMEOUT       
+  EFI_NOT_READY     
+  EFI_DEVICE_ERROR  
 
 --*/
 {
   switch (HostAdapterStatus) {
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_OK:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK:
     return EFI_SUCCESS;
 
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_TIMEOUT:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_TIMEOUT_COMMAND:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT_COMMAND:
     return EFI_TIMEOUT;
 
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_MESSAGE_REJECT:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_PARITY_ERROR:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_RESET:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_MESSAGE_REJECT:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PARITY_ERROR:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_BUS_RESET:
     return EFI_NOT_READY;
 
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_FREE:
-  case EFI_SCSI_IO_STATUS_HOST_ADAPTER_PHASE_ERROR:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_BUS_FREE:
+  case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PHASE_ERROR:
     return EFI_DEVICE_ERROR;
 
   default:
@@ -1425,35 +1399,33 @@ CheckTargetStatus (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Check the target status
+  
 Arguments:
 
-  TargetStatus  - TODO: add argument description
+  TargetStatus  - Target status
 
 Returns:
 
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_NOT_READY - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_NOT_READY  
+  EFI_DEVICE_ERROR 
+  EFI_SUCCESS
 
 --*/
 {
   switch (TargetStatus) {
-  case EFI_SCSI_IO_STATUS_TARGET_GOOD:
-  case EFI_SCSI_IO_STATUS_TARGET_CHECK_CONDITION:
-  case EFI_SCSI_IO_STATUS_TARGET_CONDITION_MET:
+  case EFI_EXT_SCSI_STATUS_TARGET_GOOD:
+  case EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION:
+  case EFI_EXT_SCSI_STATUS_TARGET_CONDITION_MET:
     return EFI_SUCCESS;
 
-  case EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE:
-  case EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE_CONDITION_MET:
-  case EFI_SCSI_IO_STATUS_TARGET_BUSY:
-  case EFI_SCSI_IO_STATUS_TARGET_COMMOND_TERMINATED:
-  case EFI_SCSI_IO_STATUS_TARGET_QUEUE_FULL:
+  case EFI_EXT_SCSI_STATUS_TARGET_INTERMEDIATE:
+  case EFI_EXT_SCSI_STATUS_TARGET_INTERMEDIATE_CONDITION_MET:
+  case EFI_EXT_SCSI_STATUS_TARGET_BUSY:
+  case EFI_EXT_SCSI_STATUS_TARGET_TASK_SET_FULL:
     return EFI_NOT_READY;
 
-  case EFI_SCSI_IO_STATUS_TARGET_RESERVATION_CONFLICT:
+  case EFI_EXT_SCSI_STATUS_TARGET_RESERVATION_CONFLICT:
     return EFI_DEVICE_ERROR;
     break;
 
@@ -1470,27 +1442,31 @@ ScsiDiskRequestSenseKeys (
   UINTN                   *NumberOfSenseKeys,
   BOOLEAN                 AskResetIfError
   )
-// TODO: function comment should start with '/*++'
-/*
+/*++
+
+Routine Description:
+
   Retrieve all sense keys from the device.
   When encountering error during the process,
   if retrieve sense keys before error encounterred,
   return the sense keys with return status set to EFI_SUCCESS,
   and NeedRetry set to FALSE; otherwize, return the proper return
   status.
-*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO: function comment is missing 'Returns:'
-// TODO:    ScsiDiskDevice - add argument and description to function comment
-// TODO:    NeedRetry - add argument and description to function comment
-// TODO:    SenseDataArray - add argument and description to function comment
-// TODO:    NumberOfSenseKeys - add argument and description to function comment
-// TODO:    AskResetIfError - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
+
+Arguments:
+
+  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
+  NeedRetry          -  The pointer of flag indicates if need a retry
+  SenseDataArray     -  The pointer of an array of sense data
+  NumberOfSenseKeys  -  The number of sense key
+  AskResetIfError    -  The flag indicates if need reset when error occurs
+  
+Returns:
+
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to request sense key
+
+--*/
 {
   EFI_SCSI_SENSE_DATA *PtrSenseData;
   UINT8               SenseDataLength;
@@ -1513,7 +1489,6 @@ ScsiDiskRequestSenseKeys (
   PtrSenseData        = ScsiDiskDevice->SenseData;
 
   for (SenseReq = TRUE; SenseReq;) {
-
     Status = ScsiRequestSenseCommand (
               ScsiDiskDevice->ScsiIo,
               EfiScsiStallSeconds (2),
@@ -1522,20 +1497,23 @@ ScsiDiskRequestSenseKeys (
               &HostAdapterStatus,
               &TargetStatus
               );
-    if ((Status == EFI_SUCCESS) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
-      FallStatus = EFI_SUCCESS;
-    } else if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) { 
-      *NeedRetry  = TRUE;
-      FallStatus  = EFI_DEVICE_ERROR;
-    } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
-      *NeedRetry  = FALSE;
-      FallStatus  = EFI_DEVICE_ERROR;
-    } else if (Status == EFI_DEVICE_ERROR) {
-      if (AskResetIfError) {
-        ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
-      }
-
-      FallStatus = EFI_DEVICE_ERROR;
+     if ((Status == EFI_SUCCESS) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
+        FallStatus = EFI_SUCCESS;
+  
+     } else if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+       *NeedRetry  = TRUE;
+       FallStatus  = EFI_DEVICE_ERROR;
+ 
+     } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
+       *NeedRetry  = FALSE;
+       FallStatus  = EFI_DEVICE_ERROR;
+ 
+     } else if (Status == EFI_DEVICE_ERROR) {
+        if (AskResetIfError) {
+          ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+        }
+  
+        FallStatus = EFI_DEVICE_ERROR;
     }
 
     if (EFI_ERROR (FallStatus)) {
@@ -1557,11 +1535,8 @@ ScsiDiskRequestSenseKeys (
         (*NumberOfSenseKeys == ScsiDiskDevice->SenseDataNumber)) {
       SenseReq = FALSE;
     }
-
     PtrSenseData += 1;
-
   }
-
   return EFI_SUCCESS;
 }
 
@@ -1574,16 +1549,16 @@ GetMediaInfo (
 
 Routine Description:
 
-  TODO: Add function description
+  Get information from media read capacity command
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Capacity        - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  Capacity        - The pointer of EFI_SCSI_DISK_CAPACITY_DATA
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 {
@@ -1614,15 +1589,15 @@ ParseInquiryData (
 
 Routine Description:
 
-  TODO: Add function description
+  Parse Inquiry data
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 {
@@ -1631,6 +1606,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 ScsiDiskReadSectors (
   SCSI_DISK_DEV     *ScsiDiskDevice,
   VOID              *Buffer,
@@ -1641,20 +1617,19 @@ ScsiDiskReadSectors (
 
 Routine Description:
 
-  TODO: Add function description
+  Read sector from SCSI Disk
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Buffer          - TODO: add argument description
-  Lba             - TODO: add argument description
-  NumberOfBlocks  - TODO: add argument description
+  ScsiDiskDevice  - The poiniter of SCSI_DISK_DEV
+  Buffer          - The buffer to fill in the read out data
+  Lba             - Logic block address
+  NumberOfBlocks  - The number of blocks to read
 
 Returns:
 
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_DEVICE_ERROR
+  EFI_SUCCESS
 
 --*/
 {
@@ -1753,20 +1728,19 @@ ScsiDiskWriteSectors (
 
 Routine Description:
 
-  TODO: Add function description
+  Write SCSI Disk sectors
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Buffer          - TODO: add argument description
-  Lba             - TODO: add argument description
-  NumberOfBlocks  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  Buffer          - The data buffer to write sector
+  Lba             - Logic block address
+  NumberOfBlocks  - The number of blocks to write
 
 Returns:
 
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
+  EFI_DEVICE_ERROR 
+  EFI_SUCCESS
 
 --*/
 {
@@ -1866,24 +1840,24 @@ ScsiDiskRead10 (
 
 Routine Description:
 
-  TODO: Add function description
+  Sumbmit Read command 
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Timeout           - TODO: add argument description
-  DataBuffer        - TODO: add argument description
-  DataLength        - TODO: add argument description
-  StartLba          - TODO: add argument description
-  SectorSize        - TODO: add argument description
+  ScsiDiskDevice    - The pointer of ScsiDiskDevice
+  NeedRetry         - The pointer of flag indicates if needs retry if error happens
+  SenseDataArray    - The pointer of an array of sense data
+  NumberOfSenseKeys - The number of sense key
+  Timeout           - The time to complete the command
+  DataBuffer        - The buffer to fill with the read out data
+  DataLength        - The length of buffer
+  StartLba          - The start logic block address
+  SectorSize        - The size of sector
 
 Returns:
 
-  TODO: add return values
-
+  EFI_STATUS
+  
 --*/
 {
   UINT8       SenseDataLength;
@@ -1925,23 +1899,23 @@ ScsiDiskWrite10 (
 
 Routine Description:
 
-  TODO: Add function description
+  Submit Write Command
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Timeout           - TODO: add argument description
-  DataBuffer        - TODO: add argument description
-  DataLength        - TODO: add argument description
-  StartLba          - TODO: add argument description
-  SectorSize        - TODO: add argument description
+  ScsiDiskDevice    - The pointer of ScsiDiskDevice
+  NeedRetry         - The pointer of flag indicates if needs retry if error happens
+  SenseDataArray    - The pointer of an array of sense data
+  NumberOfSenseKeys - The number of sense key
+  Timeout           - The time to complete the command
+  DataBuffer        - The buffer to fill with the read out data
+  DataLength        - The length of buffer
+  StartLba          - The start logic block address
+  SectorSize        - The size of sector
 
 Returns:
 
-  TODO: add return values
+  EFI_STATUS
 
 --*/
 {
@@ -1977,16 +1951,16 @@ ScsiDiskIsNoMedia (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if media presents
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -1998,7 +1972,6 @@ Returns:
   SensePtr  = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-
     //
     // Sense Key is EFI_SCSI_SK_NOT_READY (0x2),
     // Additional Sense Code is ASC_NO_MEDIA (0x3A)
@@ -2007,7 +1980,6 @@ Returns:
         (SensePtr->Addnl_Sense_Code == EFI_SCSI_ASC_NO_MEDIA)) {
       IsNoMedia = TRUE;
     }
-
     SensePtr++;
   }
 
@@ -2023,16 +1995,16 @@ ScsiDiskIsMediaError (
 
 Routine Description:
 
-  TODO: Add function description
+  Parse sense key
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2113,16 +2085,16 @@ ScsiDiskIsHardwareError (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if hardware error happens
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2157,16 +2129,16 @@ ScsiDiskIsMediaChange (
 
 Routine Description:
 
-  TODO: Add function description
+ Check sense key to find if media has changed
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2202,16 +2174,16 @@ ScsiDiskIsResetBefore (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if reset happens
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2249,17 +2221,17 @@ ScsiDiskIsDriveReady (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if the drive is ready
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-  RetryLater  - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
+  RetryLater  - The flag means if need a retry 
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2325,16 +2297,16 @@ ScsiDiskHaveSenseKey (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if it has sense key
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 {
@@ -2374,15 +2346,15 @@ ReleaseScsiDiskDeviceResources (
 
 Routine Description:
 
-  TODO: Add function description
+  Release resource about disk device
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 {

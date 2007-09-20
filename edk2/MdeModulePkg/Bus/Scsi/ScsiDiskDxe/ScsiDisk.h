@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -119,16 +119,16 @@ ScsiDiskReset (
 
 Routine Description:
 
-  TODO: Add function description
+  Reset SCSI Disk  
 
 Arguments:
 
-  This                  - TODO: add argument description
-  ExtendedVerification  - TODO: add argument description
+  This                  - The pointer of EFI_BLOCK_IO_PROTOCOL
+  ExtendedVerification  - The flag about if extend verificate
 
 Returns:
 
-  TODO: add return values
+  EFI_STATUS
 
 --*/
 ;
@@ -146,19 +146,24 @@ ScsiDiskReadBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  The function is to Read Block from SCSI Disk
 
 Arguments:
 
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
+  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
+  MediaId     - The Id of Media detected
+  LBA         - The logic block address
+  BufferSize  - The size of Buffer
+  Buffer      - The buffer to fill the read out data
 
 Returns:
 
-  TODO: add return values
+  EFI_INVALID_PARAMETER - Invalid parameter passed in.
+  EFI_SUCCESS           - Successfully to read out block.
+  EFI_DEVICE_ERROR      - Fail to detect media.
+  EFI_NO_MEDIA          - Media is not present.
+  EFI_MEDIA_CHANGED     - Media has changed.
+  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
 
 --*/
 ;
@@ -176,19 +181,24 @@ ScsiDiskWriteBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  The function is to Write Block to SCSI Disk
 
 Arguments:
 
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
+  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
+  MediaId     - The Id of Media detected
+  LBA         - The logic block address
+  BufferSize  - The size of Buffer
+  Buffer      - The buffer to fill the read out data
 
 Returns:
 
-  TODO: add return values
+  EFI_INVALID_PARAMETER - Invalid parameter passed in.
+  EFI_SUCCESS           - Successfully to read out block.
+  EFI_DEVICE_ERROR      - Fail to detect media.
+  EFI_NO_MEDIA          - Media is not present.
+  EFI_MEDIA_CHANGED     - Media has changed.
+  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
 
 --*/
 ;
@@ -202,15 +212,15 @@ ScsiDiskFlushBlocks (
 
 Routine Description:
 
-  TODO: Add function description
+  Flush Block to Disk
 
 Arguments:
 
-  This  - TODO: add argument description
+  This  - The pointer of EFI_BLOCK_IO_PROTOCOL
 
 Returns:
 
-  TODO: add return values
+  EFI_SUCCESS 
 
 --*/
 ;
@@ -225,44 +235,48 @@ ScsiDiskDetectMedia (
 
 Routine Description:
 
-  TODO: Add function description
+  Dectect Device and read out capacity ,if error occurs, parse the sense key.
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  MustReadCap     - TODO: add argument description
-  MediaChange     - TODO: add argument description
+  ScsiDiskDevice     - The pointer of SCSI_DISK_DEV
+  MustReadCapacity   - The flag about reading device capacity
+  MediaChange        - The pointer of flag indicates if media has changed 
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to detect media
 
 --*/
 ;
-  
+
 EFI_STATUS
 ScsiDiskTestUnitReady (
-  SCSI_DISK_DEV        *ScsiDiskDevice,
-  BOOLEAN              *NeedRetry,
-  EFI_SCSI_SENSE_DATA  **SenseDataArray,
-  UINTN                *NumberOfSenseKeys
+  SCSI_DISK_DEV       *ScsiDiskDevice,
+  BOOLEAN             *NeedRetry,
+  EFI_SCSI_SENSE_DATA **SenseDataArray,
+  UINTN               *NumberOfSenseKeys
   )
 /*++
 
 Routine Description:
 
-  TODO: Add function description
-
+  When Test Unit Ready command succeeds, retrieve Sense Keys via Request Sense;
+  When Test Unit Ready command encounters any error caused by host adapter or
+  target, return error without retrieving Sense Keys.
+  
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  NeedRetry       - The pointer of flag indicates try again
+  SenseDataArray  - The pointer of an array of sense data
+  NumberOfSenseKeys - The pointer of the number of sense data array
+  
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to test unit
 
 --*/
 ;
@@ -278,45 +292,47 @@ DetectMediaParsingSenseKeys (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Parsing Sense Keys which got from request sense command.
+  
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  SenseData         - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Action            - TODO: add argument description
+  ScsiDiskDevice    - The pointer of SCSI_DISK_DEV
+  SenseData         - The pointer of EFI_SCSI_SENSE_DATA
+  NumberOfSenseKeys - The number of sense key  
+  Action            - The pointer of action which indicates what is need to do next
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to complete the parsing
 
 --*/
 ;
 
 EFI_STATUS
 ScsiDiskReadCapacity (
-  SCSI_DISK_DEV           *ScsiDiskDevice,
-  BOOLEAN                 *NeedRetry,
-  EFI_SCSI_SENSE_DATA     **SenseDataArray,
-  UINTN                   *NumberOfSenseKeys
+  SCSI_DISK_DEV       *ScsiDiskDevice,
+  BOOLEAN             *NeedRetry,
+  EFI_SCSI_SENSE_DATA **SenseDataArray,
+  UINTN               *NumberOfSenseKeys
   )
 /*++
 
 Routine Description:
 
-  TODO: Add function description
+  Send read capacity command to device and get the device parameter
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
+  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
+  NeedRetry          -  The pointer of flag indicates if need a retry
+  SenseDataArray     -  The pointer of an array of sense data
+  NumberOfSenseKeys  -  The number of sense key
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to read capacity
 
 --*/
 ;
@@ -329,15 +345,18 @@ CheckHostAdapterStatus (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Check the HostAdapter status
+  
 Arguments:
 
-  HostAdapterStatus - TODO: add argument description
+  HostAdapterStatus - Host Adapter status
 
 Returns:
 
-  TODO: add return values
+  EFI_SUCCESS       
+  EFI_TIMEOUT       
+  EFI_NOT_READY     
+  EFI_DEVICE_ERROR  
 
 --*/
 ;
@@ -350,15 +369,17 @@ CheckTargetStatus (
 
 Routine Description:
 
-  TODO: Add function description
-
+  Check the target status
+  
 Arguments:
 
-  TargetStatus  - TODO: add argument description
+  TargetStatus  - Target status
 
 Returns:
 
-  TODO: add return values
+  EFI_NOT_READY  
+  EFI_DEVICE_ERROR 
+  EFI_SUCCESS
 
 --*/
 ;
@@ -375,19 +396,25 @@ ScsiDiskRequestSenseKeys (
 
 Routine Description:
 
-  TODO: Add function description
+  Retrieve all sense keys from the device.
+  When encountering error during the process,
+  if retrieve sense keys before error encounterred,
+  return the sense keys with return status set to EFI_SUCCESS,
+  and NeedRetry set to FALSE; otherwize, return the proper return
+  status.
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  AskResetIfError   - TODO: add argument description
-
+  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
+  NeedRetry          -  The pointer of flag indicates if need a retry
+  SenseDataArray     -  The pointer of an array of sense data
+  NumberOfSenseKeys  -  The number of sense key
+  AskResetIfError    -  The flag indicates if need reset when error occurs
+  
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to request sense key
 
 --*/
 ;
@@ -401,16 +428,17 @@ ScsiDiskInquiryDevice (
 
 Routine Description:
 
-  TODO: Add function description
+  Send out Inquiry command to Device
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  NeedRetry       - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  NeedRetry       - Indicates if needs try again when error happens
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR   - Indicates that error occurs
+  EFI_SUCCESS        - Successfully to detect media
 
 --*/
 ;
@@ -423,15 +451,15 @@ ParseInquiryData (
 
 Routine Description:
 
-  TODO: Add function description
+  Parse Inquiry data
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 ;
@@ -447,18 +475,19 @@ ScsiDiskReadSectors (
 
 Routine Description:
 
-  TODO: Add function description
+  Read sector from SCSI Disk
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Buffer          - TODO: add argument description
-  Lba             - TODO: add argument description
-  NumberOfBlocks  - TODO: add argument description
+  ScsiDiskDevice  - The poiniter of SCSI_DISK_DEV
+  Buffer          - The buffer to fill in the read out data
+  Lba             - Logic block address
+  NumberOfBlocks  - The number of blocks to read
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR
+  EFI_SUCCESS
 
 --*/
 ;
@@ -474,18 +503,19 @@ ScsiDiskWriteSectors (
 
 Routine Description:
 
-  TODO: Add function description
+  Write SCSI Disk sectors
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Buffer          - TODO: add argument description
-  Lba             - TODO: add argument description
-  NumberOfBlocks  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  Buffer          - The data buffer to write sector
+  Lba             - Logic block address
+  NumberOfBlocks  - The number of blocks to write
 
 Returns:
 
-  TODO: add return values
+  EFI_DEVICE_ERROR 
+  EFI_SUCCESS
 
 --*/
 ;
@@ -506,23 +536,23 @@ ScsiDiskRead10 (
 
 Routine Description:
 
-  TODO: Add function description
+  Sumbmit Read command 
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Timeout           - TODO: add argument description
-  DataBuffer        - TODO: add argument description
-  DataLength        - TODO: add argument description
-  StartLba          - TODO: add argument description
-  SectorSize        - TODO: add argument description
+  ScsiDiskDevice    - The pointer of ScsiDiskDevice
+  NeedRetry         - The pointer of flag indicates if needs retry if error happens
+  SenseDataArray    - The pointer of an array of sense data
+  NumberOfSenseKeys - The number of sense key
+  Timeout           - The time to complete the command
+  DataBuffer        - The buffer to fill with the read out data
+  DataLength        - The length of buffer
+  StartLba          - The start logic block address
+  SectorSize        - The size of sector
 
 Returns:
 
-  TODO: add return values
+  EFI_STATUS
 
 --*/
 ;
@@ -543,23 +573,23 @@ ScsiDiskWrite10 (
 
 Routine Description:
 
-  TODO: Add function description
+  Submit Write Command
 
 Arguments:
 
-  ScsiDiskDevice    - TODO: add argument description
-  NeedRetry         - TODO: add argument description
-  SenseDataArray    - TODO: add argument description
-  NumberOfSenseKeys - TODO: add argument description
-  Timeout           - TODO: add argument description
-  DataBuffer        - TODO: add argument description
-  DataLength        - TODO: add argument description
-  StartLba          - TODO: add argument description
-  SectorSize        - TODO: add argument description
+  ScsiDiskDevice    - The pointer of ScsiDiskDevice
+  NeedRetry         - The pointer of flag indicates if needs retry if error happens
+  SenseDataArray    - The pointer of an array of sense data
+  NumberOfSenseKeys - The number of sense key
+  Timeout           - The time to complete the command
+  DataBuffer        - The buffer to fill with the read out data
+  DataLength        - The length of buffer
+  StartLba          - The start logic block address
+  SectorSize        - The size of sector
 
 Returns:
 
-  TODO: add return values
+  EFI_STATUS
 
 --*/
 ;
@@ -573,16 +603,16 @@ GetMediaInfo (
 
 Routine Description:
 
-  TODO: Add function description
+  Get information from media read capacity command
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
-  Capacity        - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
+  Capacity        - The pointer of EFI_SCSI_DISK_CAPACITY_DATA
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 ;
@@ -596,16 +626,16 @@ ScsiDiskIsNoMedia (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if media presents
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -619,16 +649,16 @@ ScsiDiskIsMediaError (
 
 Routine Description:
 
-  TODO: Add function description
+  Parse sense key
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -642,16 +672,16 @@ ScsiDiskIsHardwareError (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if hardware error happens
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -665,16 +695,18 @@ ScsiDiskIsMediaChange (
 
 Routine Description:
 
-  TODO: Add function description
+Routine Description:
+
+ Check sense key to find if media has changed
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -688,16 +720,16 @@ ScsiDiskIsResetBefore (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if reset happens
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -712,17 +744,17 @@ ScsiDiskIsDriveReady (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if the drive is ready
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-  NeedRetry   - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
+  RetryLater  - The flag means if need a retry 
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -736,16 +768,16 @@ ScsiDiskHaveSenseKey (
 
 Routine Description:
 
-  TODO: Add function description
+  Check sense key to find if it has sense key
 
 Arguments:
 
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
+  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  SenseCounts - The number of sense key
 
 Returns:
 
-  TODO: add return values
+  BOOLEAN
 
 --*/
 ;
@@ -758,15 +790,15 @@ ReleaseScsiDiskDeviceResources (
 
 Routine Description:
 
-  TODO: Add function description
+  Release resource about disk device
 
 Arguments:
 
-  ScsiDiskDevice  - TODO: add argument description
+  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
 
 Returns:
 
-  TODO: add return values
+  NONE
 
 --*/
 ;
