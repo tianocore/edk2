@@ -56,6 +56,28 @@ typedef union {
   UINT16  DeviceControl;  /* when write */
 } IDE_AltStatus_OR_DeviceControl;
 
+
+typedef enum {
+  IdePrimary    = 0,
+  IdeSecondary  = 1,
+  IdeMaxChannel = 2
+} EFI_IDE_CHANNEL;
+
+///
+
+
+//
+// Bit definitions in Programming Interface byte of the Class Code field
+// in PCI IDE controller's Configuration Space
+//
+#define IDE_PRIMARY_OPERATING_MODE            BIT0
+#define IDE_PRIMARY_PROGRAMMABLE_INDICATOR    BIT1
+#define IDE_SECONDARY_OPERATING_MODE          BIT2
+#define IDE_SECONDARY_PROGRAMMABLE_INDICATOR  BIT3
+
+
+#define ATAPI_MAX_CHANNEL 2
+
 ///
 /// IDE registers set
 ///
@@ -68,35 +90,36 @@ typedef struct {
   UINT16                          CylinderMsb;
   UINT16                          Head;
   IDE_CMD_OR_STATUS               Reg;
-
   IDE_AltStatus_OR_DeviceControl  Alt;
   UINT16                          DriveAddress;
-
-  UINT16                          MasterSlave;
 } IDE_BASE_REGISTERS;
 
 #define ATAPI_SCSI_PASS_THRU_DEV_SIGNATURE  EFI_SIGNATURE_32 ('a', 's', 'p', 't')
 
 typedef struct {
-  UINTN                       Signature;
-
-  EFI_HANDLE                  Handle;
-  EFI_SCSI_PASS_THRU_PROTOCOL ScsiPassThru;
-  EFI_SCSI_PASS_THRU_MODE     ScsiPassThruMode;
-  EFI_PCI_IO_PROTOCOL         *PciIo;
-
+  UINTN                            Signature;
+  EFI_HANDLE                       Handle;
+  EFI_SCSI_PASS_THRU_PROTOCOL      ScsiPassThru;
+  EFI_SCSI_PASS_THRU_MODE          ScsiPassThruMode;
+  EFI_PCI_IO_PROTOCOL              *PciIo;
   //
   // Local Data goes here
   //
-  IDE_BASE_REGISTERS          *IoPort;
-
-  CHAR16                      ControllerName[100];
-  CHAR16                      ChannelName[100];
-
-  UINT32                      LatestTargetId;
-  UINT64                      LatestLun;
-
+  IDE_BASE_REGISTERS               *IoPort;
+  IDE_BASE_REGISTERS               AtapiIoPortRegisters[2];
+  CHAR16                           ControllerName[100];
+  CHAR16                           ChannelName[100];
+  UINT32                           LatestTargetId;
+  UINT64                           LatestLun;
 } ATAPI_SCSI_PASS_THRU_DEV;
+
+//
+// IDE registers' base addresses
+//
+typedef struct {
+  UINT16  CommandBlockBaseAddr;
+  UINT16  ControlBlockBaseAddr;
+} IDE_REGISTERS_BASE_ADDR;
 
 #define ATAPI_SCSI_PASS_THRU_DEV_FROM_THIS(a) \
   CR (a, \
@@ -824,4 +847,51 @@ AtapiPassThruCheckErrorStatus (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate
   )
 ;
+EFI_STATUS
+GetIdeRegistersBaseAddr (
+  IN  EFI_PCI_IO_PROTOCOL         *PciIo,
+  OUT IDE_REGISTERS_BASE_ADDR     *IdeRegsBaseAddr
+  )
+/*++
+
+Routine Description:
+  Get IDE IO port registers' base addresses by mode. In 'Compatibility' mode,
+  use fixed addresses. In Native-PCI mode, get base addresses from BARs in
+  the PCI IDE controller's Configuration Space.
+
+Arguments:
+  PciIo             - Pointer to the EFI_PCI_IO_PROTOCOL instance
+  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to 
+                      receive IDE IO port registers' base addresses
+                      
+Returns:
+
+  EFI_STATUS
+    
+--*/
+;
+
+VOID
+InitAtapiIoPortRegisters (
+  IN  ATAPI_SCSI_PASS_THRU_DEV     *AtapiScsiPrivate,
+  IN  IDE_REGISTERS_BASE_ADDR      *IdeRegsBaseAddr
+  )
+/*++
+
+Routine Description:
+
+  Initialize each Channel's Base Address of CommandBlock and ControlBlock.
+
+Arguments:
+    
+  AtapiScsiPrivate            - The pointer of ATAPI_SCSI_PASS_THRU_DEV
+  IdeRegsBaseAddr             - The pointer of IDE_REGISTERS_BASE_ADDR
+  
+Returns:
+  
+  None
+
+--*/  
+;
+
 #endif

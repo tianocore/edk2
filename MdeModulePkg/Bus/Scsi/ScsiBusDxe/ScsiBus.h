@@ -18,9 +18,8 @@ Abstract:
     Header file for SCSI Bus Driver.
 
 Revision History
-++*/
+--*/
 
-// TODO: fix comment to end with --*/
 #ifndef _SCSI_BUS_H
 #define _SCSI_BUS_H
 
@@ -325,77 +324,16 @@ DiscoverScsiDevice (
 
 Routine Description:
 
-  TODO: Add function description
+  Discovery SCSI Device
 
 Arguments:
 
-  ScsiIoDevice  - TODO: add argument description
+  ScsiIoDevice    - The pointer of SCSI_IO_DEV
 
 Returns:
 
-  TODO: add return values
-
---*/
-;
-
-EFI_STATUS
-GetLunList (
-  EFI_SCSI_PASS_THRU_PROTOCOL *ScsiPassThru,
-  UINT32                      Target,
-  UINT64                      **LunArray,
-  UINTN                       *NumberOfLuns
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ScsiPassThru  - TODO: add argument description
-  Target        - TODO: add argument description
-  LunArray      - TODO: add argument description
-  NumberOfLuns  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
-
-EFI_STATUS
-ScsiBusSubmitReportLunCommand (
-  EFI_SCSI_PASS_THRU_PROTOCOL   *ScsiPassThru,
-  UINT32                        Target,
-  UINTN                         AllocationLength,
-  VOID                          *Buffer,
-  EFI_SCSI_SENSE_DATA           *SenseData,
-  UINT8                         *SenseDataLength,
-  UINT8                         *HostAdapterStatus,
-  UINT8                         *TargetStatus
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ScsiPassThru      - TODO: add argument description
-  Target            - TODO: add argument description
-  AllocationLength  - TODO: add argument description
-  Buffer            - TODO: add argument description
-  SenseData         - TODO: add argument description
-  SenseDataLength   - TODO: add argument description
-  HostAdapterStatus - TODO: add argument description
-  TargetStatus      - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
+  TRUE            - Find SCSI Device and verify it.
+  FALSE           - Unable to find SCSI Device.  
 
 --*/
 ;
