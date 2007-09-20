@@ -202,7 +202,7 @@ ScsiInquiryCommand (
   @param[in]     PageCode           Page code.
 
   @retval EFI_SUCCESS               The status of the unit is tested successfully.
-  @retval EFI_WARN_BUFFER_TOO_SMALL The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, 
                                     but the entire DataBuffer could not be transferred.
                                     The actual number of bytes transferred is returned
                                     in TransferLength.
@@ -294,7 +294,7 @@ ScsiModeSense10Command (
 
   @retval EFI_SUCCESS        Valid data returned
   @retval EFI_SUCCESS        The status of the unit is tested successfully.
-  @retval EFI_WARN_BUFFER_TOO_SMALL The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, 
                                     but the entire DataBuffer could not be transferred.
                                     The actual number of bytes transferred is returned
                                     in TransferLength.
@@ -374,7 +374,7 @@ ScsiRequestSenseCommand (
   @param[in]     PMI                Partial medium indicator.
 
   @retval  EFI_SUCCESS                The status of the unit is tested successfully.
-  @retval  EFI_WARN_BUFFER_TOO_SMALL  The SCSI Request Packet was executed, 
+  @retval  EFI_BAD_BUFFER_SIZE        The SCSI Request Packet was executed, 
                                       but the entire DataBuffer could not be transferred.
                                       The actual number of bytes transferred is returned
                                       in TransferLength.
@@ -466,7 +466,7 @@ ScsiReadCapacityCommand (
   @param[in]     SectorSize         The sector size.
 
   @retval EFI_SUCCESS               The status of the unit is tested successfully.
-  @retval EFI_WARN_BUFFER_TOO_SMALL The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, 
                                     but the entire DataBuffer could not be transferred.
                                     The actual number of bytes transferred is returned
                                     in TransferLength.
@@ -557,7 +557,7 @@ ScsiRead10Command (
   @param[in]     SectorSize         The sector size.
 
   @retval EFI_SUCCESS               The status of the unit is tested successfully.
-  @retval EFI_WARN_BUFFER_TOO_SMALL The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, 
                                     but the entire DataBuffer could not be transferred.
                                     The actual number of bytes transferred is returned
                                     in InTransferLength.
