@@ -113,7 +113,8 @@ FddIdentify (
 
   if (Status == EFI_NO_MEDIA) {
     FdcDev->BlkIo.Media->MediaPresent = FALSE;
-  } else if (Status != EFI_MEDIA_CHANGED) {
+  } else if ((Status != EFI_MEDIA_CHANGED) &&
+             (Status != EFI_SUCCESS)) {
     MotorOff (FdcDev);
     return Status;
   }
