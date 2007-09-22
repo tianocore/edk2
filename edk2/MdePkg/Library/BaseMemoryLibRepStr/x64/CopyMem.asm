@@ -39,7 +39,7 @@ InternalMemCopyMem  PROC    USES    rsi rdi
     cmp     rsi, rdi
     mov     rax, rdi                    ; rax <- Destination as return value
     jae     @F
-    cmp     r9, rsi
+    cmp     r9, rdi
     jae     @CopyBackward               ; Copy backward if overlapped
 @@:
     mov     rcx, r8
