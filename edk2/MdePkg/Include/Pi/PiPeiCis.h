@@ -51,8 +51,8 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEIM_ENTRY_POINT2)(
-  IN EFI_PEI_FILE_HANDLE       *FileHandle,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE             FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   );
 
 /**
@@ -491,7 +491,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_RESET_SYSTEM) (
-  IN EFI_PEI_SERVICES   **PeiServices
+  IN CONST EFI_PEI_SERVICES   **PeiServices
   );
 
 /**

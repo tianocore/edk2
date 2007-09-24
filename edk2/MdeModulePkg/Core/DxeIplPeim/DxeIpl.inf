@@ -58,8 +58,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
 
 [LibraryClasses]
   PeCoffLib
@@ -91,10 +89,10 @@
   gEfiPeiS3ResumePpiGuid                        # PPI SOMETIMES_CONSUMED
   gEfiPeiRecoveryModulePpiGuid                  # PPI SOMETIMES_CONSUMED
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
-  gEfiPeiFvFileLoaderPpiGuid                    # PPI SOMETIMES_PRODUCED
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
   gEfiPeiPeCoffLoaderGuid                       
-
+  gEfiPeiDecompressPpiGuid
+  gEfiPeiFirmwareVolumeInfoPpiGuid
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress

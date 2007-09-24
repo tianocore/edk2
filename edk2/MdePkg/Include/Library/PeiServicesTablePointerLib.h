@@ -30,5 +30,11 @@ GetPeiServicesTablePointer (
   VOID
   );
 
+VOID
+EFIAPI
+SetPeiServicesTablePointer (
+  EFI_PEI_SERVICES ** PeiServicesTablePointer
+  );
+
 #endif
 

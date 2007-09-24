@@ -32,7 +32,7 @@ SecurityPpiNotifyCallback (
 
 static EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-   &gEfiPeiSecurityPpiGuid,
+   &gEfiPeiSecurity2PpiGuid,
    SecurityPpiNotifyCallback
 };
 
@@ -101,15 +101,16 @@ Returns:
   // If there isn't a security PPI installed, use the one from notification
   //
   if (PrivateData->PrivateSecurityPpi == NULL) {
-    PrivateData->PrivateSecurityPpi = (EFI_PEI_SECURITY_PPI *)Ppi;
+    PrivateData->PrivateSecurityPpi = (EFI_PEI_SECURITY2_PPI *)Ppi;
   }
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 VerifyPeim (
-  IN EFI_PEI_SERVICES     **PeiServices,
-  IN EFI_FFS_FILE_HEADER  *CurrentPeimAddress
+  IN PEI_CORE_INSTANCE      *PrivateData,
+  IN EFI_PEI_FV_HANDLE      VolumeHandle,
+  IN EFI_PEI_FILE_HANDLE    FileHandle
   )
 /*++
 
@@ -129,20 +130,14 @@ Returns:
 
 --*/
 {
-  PEI_CORE_INSTANCE               *PrivateData;
   EFI_STATUS                      Status;
   UINT32                          AuthenticationStatus;
-  BOOLEAN                         StartCrisisRecovery;
+  BOOLEAN                         DeferExection;
 
   //
   // Set a default authentication state
   //
   AuthenticationStatus = 0;
-
-  //
-  // get security PPI instance from PEI private data
-  //
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   if (PrivateData->PrivateSecurityPpi == NULL) {
     Status = EFI_NOT_FOUND;
@@ -151,13 +146,14 @@ Returns:
     // Check to see if the image is OK
     //
     Status = PrivateData->PrivateSecurityPpi->AuthenticationState (
-                                                PeiServices,
+                                                (CONST EFI_PEI_SERVICES **) &PrivateData->PS,
                                                 PrivateData->PrivateSecurityPpi,
                                                 AuthenticationStatus,
-                                                CurrentPeimAddress,
-                                                &StartCrisisRecovery
+                                                VolumeHandle,
+                                                FileHandle,
+                                                &DeferExection
                                                 );
-    if (StartCrisisRecovery) {
+    if (DeferExection) {
       Status = EFI_SECURITY_VIOLATION;
     }
   }

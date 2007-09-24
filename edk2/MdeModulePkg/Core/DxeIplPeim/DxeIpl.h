@@ -32,6 +32,11 @@ Abstract:
 #include <Ppi/FvLoadFile.h>
 #include <Ppi/RecoveryModule.h>
 #include <Ppi/MemoryDiscovered.h>
+#include <Ppi/Decompress.h>
+#include <Ppi/FirmwareVolumeInfo.h>
+
+#include <Guid/FirmwareFileSystem2.h>
+
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -67,14 +72,27 @@ PeiFindFile (
 
 EFI_STATUS
 PeiLoadFile (
-  IN  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader,
-  IN  VOID                                      *Pe32Data,
+  IN  EFI_PEI_FILE_HANDLE                       FileHandle,
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
   OUT UINT64                                    *ImageSize,
   OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
   )
 ;
 
+EFI_STATUS
+DxeIplAddEncapsulatedFirmwareVolumes (
+  VOID
+  )
+;
+
+EFI_STATUS
+DxeIplFindFirmwareVolumeInstance (
+  IN OUT UINTN              *Instance,
+  IN  EFI_FV_FILETYPE       SeachType,
+  OUT EFI_PEI_FV_HANDLE     *VolumeHandle,
+  OUT EFI_PEI_FILE_HANDLE   *FileHandle
+  )
+;
 
 EFI_STATUS
 GetImageReadFunction (
@@ -133,9 +151,10 @@ PeiProcessFile (
 EFI_STATUS
 EFIAPI
 PeimInitializeDxeIpl (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE       FfsHandle,
   IN EFI_PEI_SERVICES          **PeiServices
-  );
+  )
+;
 
 
 #endif

@@ -22,6 +22,15 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
+VOID
+EFIAPI
+SetPeiServicesTablePointer (
+  IN EFI_PEI_SERVICES     **PeiServices
+  )
+{
+  AsmWriteMm7 ((UINT64)(UINTN)PeiServices);
+}
+
 /**
   The function returns the pointer to PeiServices.
 

@@ -87,11 +87,10 @@ Returns:
 }
 
 
-EFI_STATUS
+BOOLEAN
 PeimDispatchReadiness (
   IN EFI_PEI_SERVICES   **PeiServices,
-  IN VOID               *DependencyExpression,
-  OUT BOOLEAN           *Runnable
+  IN VOID               *DependencyExpression
   )
 /*++
 
@@ -130,7 +129,6 @@ Returns:
   EVAL_STACK_ENTRY               EvalStack[MAX_GRAMMAR_SIZE];
 
   Iterator  = DependencyExpression;
-  *Runnable = FALSE;
 
   StackPtr = &EvalStack[0];
 
@@ -149,7 +147,7 @@ Returns:
         // EvalStack on the push
         //
         if (StackPtr > &EvalStack[MAX_GRAMMAR_SIZE-1]) {
-          return EFI_INVALID_PARAMETER;
+          return FALSE;
         }
 
         //
@@ -170,7 +168,7 @@ Returns:
         // did two POPs.
         //
         if (StackPtr < &EvalStack[2]) {
-          return EFI_INVALID_PARAMETER;
+          return FALSE;
         }
 
         //
@@ -208,10 +206,9 @@ Returns:
         // an error in the dependency grammar, so return EFI_INVALID_PARAMETER.
         //
         if (StackPtr != &EvalStack[0]) {
-          return EFI_INVALID_PARAMETER;
+          return FALSE;
         }
-        *Runnable = IsPpiInstalled (PeiServices, StackPtr);
-        return EFI_SUCCESS;
+        return IsPpiInstalled (PeiServices, StackPtr);
         break;
 
       case (EFI_DEP_NOT):    
@@ -222,7 +219,7 @@ Returns:
         // did a POP.
         //
         if (StackPtr < &EvalStack[1]) {
-          return EFI_INVALID_PARAMETER;
+          return FALSE;
         }
         (StackPtr-1)->Result = (BOOLEAN) !IsPpiInstalled (PeiServices, (StackPtr-1));
         (StackPtr-1)->Operator = NULL;
@@ -235,7 +232,7 @@ Returns:
         // EvalStack on the push
         //
         if (StackPtr > &EvalStack[MAX_GRAMMAR_SIZE-1]) {
-          return EFI_INVALID_PARAMETER;
+          return FALSE;
         }
         //
         // Iterator has increased by 1 after we retrieve the operand, so here we 
@@ -255,7 +252,7 @@ Returns:
         //
         // The grammar should never arrive here
         //
-        return EFI_INVALID_PARAMETER;
+        return FALSE;
         break;
     }
   }

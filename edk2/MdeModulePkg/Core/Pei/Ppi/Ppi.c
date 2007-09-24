@@ -25,7 +25,7 @@ Revision History
 
 VOID
 InitializePpiServices (
-  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_CORE_INSTANCE *PrivateData,
   IN PEI_CORE_INSTANCE *OldCoreData
   )
 /*++
@@ -45,11 +45,7 @@ Returns:
 
 --*/
 {
-  PEI_CORE_INSTANCE                    *PrivateData;
-  
   if (OldCoreData == NULL) {
-    PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
-
     PrivateData->PpiData.NotifyListEnd = MAX_PPI_DESCRIPTORS-1;
     PrivateData->PpiData.DispatchListEnd = MAX_PPI_DESCRIPTORS-1;
     PrivateData->PpiData.LastDispatchedNotify = MAX_PPI_DESCRIPTORS-1;
@@ -220,7 +216,7 @@ Returns:
   // Dispatch any callback level notifies for newly installed PPIs.
   //
   DispatchNotify (
-    (CONST EFI_PEI_SERVICES **) PeiServices,
+    PrivateData,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     LastCallbackInstall,
     PrivateData->PpiData.PpiListEnd,
@@ -298,7 +294,7 @@ Returns:
   // Dispatch any callback level notifies for the newly installed PPI.
   //
   DispatchNotify (
-    (CONST EFI_PEI_SERVICES **) PeiServices,
+    PrivateData,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     Index,
     Index+1,
@@ -496,7 +492,7 @@ Returns:
   // Dispatch any callback level notifies for all previously installed PPIs.
   //
   DispatchNotify (
-    (CONST EFI_PEI_SERVICES **) PeiServices,
+    PrivateData,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     0,
     PrivateData->PpiData.PpiListEnd,
@@ -511,7 +507,7 @@ Returns:
 
 VOID
 ProcessNotifyList (
-  IN EFI_PEI_SERVICES    **PeiServices
+  IN PEI_CORE_INSTANCE  *PrivateData
   )
 /*++
 
@@ -528,11 +524,7 @@ Returns:
 --*/
 
 {
-  PEI_CORE_INSTANCE       *PrivateData;
   INTN                    TempValue;
-
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
-
  
   while (TRUE) {
     //
@@ -545,7 +537,7 @@ Returns:
     while (PrivateData->PpiData.LastDispatchedNotify != PrivateData->PpiData.DispatchListEnd) {
       TempValue = PrivateData->PpiData.DispatchListEnd;
       DispatchNotify (
-        (CONST EFI_PEI_SERVICES **) PeiServices,
+        PrivateData,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         0,
         PrivateData->PpiData.LastDispatchedInstall,
@@ -566,7 +558,7 @@ Returns:
     while (PrivateData->PpiData.LastDispatchedInstall != PrivateData->PpiData.PpiListEnd) {
       TempValue = PrivateData->PpiData.PpiListEnd;
       DispatchNotify (
-        (CONST EFI_PEI_SERVICES **) PeiServices,
+        PrivateData,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         PrivateData->PpiData.LastDispatchedInstall,
         PrivateData->PpiData.PpiListEnd,
@@ -585,7 +577,7 @@ Returns:
 
 VOID
 DispatchNotify (
-  IN CONST EFI_PEI_SERVICES    **PeiServices,
+  IN PEI_CORE_INSTANCE  *PrivateData,
   IN UINTN               NotifyType,
   IN INTN                InstallStartIndex,
   IN INTN                InstallStopIndex,
@@ -612,14 +604,11 @@ Returns:  None
 --*/
 
 {
-  PEI_CORE_INSTANCE       *PrivateData;
   INTN                   Index1;
   INTN                   Index2;
   EFI_GUID                *SearchGuid;
   EFI_GUID                *CheckGuid;
   EFI_PEI_NOTIFY_DESCRIPTOR   *NotifyDescriptor;
-
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 
   //
   // Remember that Installs moves up and Notifies moves down.
@@ -645,7 +634,7 @@ Returns:  None
           NotifyDescriptor->Notify
           ));
         NotifyDescriptor->Notify (
-                            (EFI_PEI_SERVICES **)PeiServices,
+                            GetPeiServicesTablePointer (),
                             NotifyDescriptor,
                             (PrivateData->PpiData.PpiListPtrs[Index2].Ppi)->Ppi
                             );

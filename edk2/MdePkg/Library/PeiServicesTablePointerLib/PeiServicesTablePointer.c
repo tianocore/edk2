@@ -20,6 +20,15 @@
 
 static EFI_PEI_SERVICES  **gPeiServices;
 
+VOID
+EFIAPI
+SetPeiServicesTablePointer (
+  EFI_PEI_SERVICES  **PeiServices
+  )
+{
+  gPeiServices = PeiServices;
+}
+
 /**
   The function returns the pointer to PEI services.
 
