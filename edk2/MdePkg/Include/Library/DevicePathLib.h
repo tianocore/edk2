@@ -84,8 +84,9 @@ AppendDevicePath (
   This function creates a new device path by appending a copy of the device node specified by
   DevicePathNode to a copy of the device path specified by DevicePath in an allocated buffer.
   The end-of-device-path device node is moved after the end of the appended device node.
-  If DeviceNode is NULL then a copy of DevicePath is returned.
   If DevicePathNode is NULL then a copy of DevicePath is returned.
+  If DevicePath is NULL then a copy of DevicePathNode, followed by an end-of-device path device
+  node is returned.
   If both DevicePathNode and DevicePath are NULL then a copy of an end-of-device-path device node
   is returned.
   If there is not enough memory to allocate space for the new device path, then NULL is returned.  
