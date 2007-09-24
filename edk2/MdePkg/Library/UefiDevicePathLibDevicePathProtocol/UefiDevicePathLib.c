@@ -111,7 +111,8 @@ DuplicateDevicePath (
   SecondDevicePath is retained. The newly created device path is returned.  
   If FirstDevicePath is NULL, then it is ignored, and a duplicate of SecondDevicePath is returned.  
   If SecondDevicePath is NULL, then it is ignored, and a duplicate of FirstDevicePath is returned.  
-  If both FirstDevicePath and SecondDevicePath are NULL, then NULL is returned.  
+  If both FirstDevicePath and SecondDevicePath are NULL, then a copy of an end-of-device-path is
+  returned.  
   If there is not enough memory for the newly allocated buffer, then NULL is returned.
   The memory for the new device path is allocated from EFI boot services memory. It is the
   responsibility of the caller to free the memory allocated.
@@ -138,8 +139,10 @@ AppendDevicePath (
   This function creates a new device path by appending a copy of the device node specified by
   DevicePathNode to a copy of the device path specified by DevicePath in an allocated buffer.
   The end-of-device-path device node is moved after the end of the appended device node.
-  If DevicePath is NULL, then NULL is returned.
-  If DevicePathNode is NULL, then NULL is returned.
+  If DeviceNode is NULL then a copy of DevicePath is returned.
+  If DevicePathNode is NULL then a copy of DevicePath is returned.
+  If both DevicePathNode and DevicePath are NULL then a copy of an end-of-device-path device node
+  is returned.
   If there is not enough memory to allocate space for the new device path, then NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
   free the memory allocated.
