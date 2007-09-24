@@ -2,14 +2,14 @@
   EFI_MANAGED_NETWORK_SERVICE_BINDING_PROTOCOL as defined in UEFI 2.0.
   EFI_MANAGED_NETWORK_PROTOCOL as defined in UEFI 2.0.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -25,7 +25,7 @@
 
 #define EFI_MANAGED_NETWORK_PROTOCOL_GUID \
   { \
-    0x3b95aa31, 0x3793, 0x434b, {0x86, 0x67, 0xc8, 0x7, 0x8, 0x92, 0xe0, 0x5e } \
+    0x7ab33a91, 0xace5, 0x4326, { 0xb5, 0x72, 0xe7, 0xee, 0x33, 0xd3, 0x9f, 0x16 } \
   }
 
 typedef struct _EFI_MANAGED_NETWORK_PROTOCOL EFI_MANAGED_NETWORK_PROTOCOL;
@@ -105,9 +105,9 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_GET_MODE_DATA) (
   IN  EFI_MANAGED_NETWORK_PROTOCOL     *This,
   OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL,
-  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData    OPTIONAL 
+  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData    OPTIONAL
   )
-;  
+;
 
 /**
   Sets or clears the operational parameters for the MNP child driver.
@@ -132,10 +132,10 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_CONFIGURE) (
   IN EFI_MANAGED_NETWORK_PROTOCOL     *This,
-  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL 
+  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL
   )
-;    
-    
+;
+
 /**
   Translates an IP multicast address to a hardware (MAC) multicast address.
 
@@ -163,9 +163,9 @@ EFI_STATUS
   IN  EFI_MANAGED_NETWORK_PROTOCOL  *This,
   IN  BOOLEAN                       Ipv6Flag,
   IN  EFI_IP_ADDRESS                *IpAddress,
-  OUT EFI_MAC_ADDRESS               *MacAddress 
+  OUT EFI_MAC_ADDRESS               *MacAddress
   )
-;      
+;
 
 /**
   Enables and disables receive filters for multicast address.
@@ -183,7 +183,7 @@ EFI_STATUS
   @retval EFI_NOT_STARTED       This MNP child driver instance has not been configured.
   @retval EFI_ALREADY_STARTED   The supplied multicast group is already joined.
   @retval EFI_NOT_FOUND         The supplied multicast group is not joined.
-  @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred.  
+  @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred.
   @retval EFI_UNSUPPORTED       The requested feature is unsupported in this MNP implementation.
   @retval Other                 The requested operation could not be completed.
 
@@ -193,10 +193,10 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_GROUPS) (
   IN EFI_MANAGED_NETWORK_PROTOCOL  *This,
   IN BOOLEAN                       JoinFlag,
-  IN EFI_MAC_ADDRESS               *MacAddress  OPTIONAL 
+  IN EFI_MAC_ADDRESS               *MacAddress  OPTIONAL
   )
-;      
-  
+;
+
 /**
   Places asynchronous outgoing data packets into the transmit queue.
 
@@ -217,10 +217,10 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_TRANSMIT) (
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token 
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   )
-;      
-    
+;
+
 /**
   Places an asynchronous receiving request into the receiving queue.
 
@@ -244,10 +244,10 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_RECEIVE) (
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token 
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   )
-;      
-   
+;
+
 
 /**
   Aborts an asynchronous transmit or receive request.
@@ -272,9 +272,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_CANCEL) (
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token  OPTIONAL 
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token  OPTIONAL
   )
-;   
+;
 
 /**
   Polls for incoming data packets and processes outgoing data packets.
@@ -293,9 +293,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_POLL) (
-  IN EFI_MANAGED_NETWORK_PROTOCOL    *This 
+  IN EFI_MANAGED_NETWORK_PROTOCOL    *This
   )
-;     
+;
 
 struct _EFI_MANAGED_NETWORK_PROTOCOL {
   EFI_MANAGED_NETWORK_GET_MODE_DATA       GetModeData;
