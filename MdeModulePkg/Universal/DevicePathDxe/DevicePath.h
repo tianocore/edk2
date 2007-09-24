@@ -109,6 +109,8 @@ typedef struct {
 #define USB_SUBCLASS_IRDA_BRIDGE   2
 #define USB_SUBCLASS_TEST          3
 
+#pragma pack(1)
+
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  Guid;
@@ -139,10 +141,9 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   UINT16                    NetworkProtocol;
   UINT16                    LoginOption;
-  UINT16                    Reserved;
-  UINT16                    TargetPortalGroupTag;
   UINT64                    Lun;
-  CHAR16                    iSCSITargetName[1];
+  UINT16                    TargetPortalGroupTag;
+  CHAR8                     iSCSITargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
 typedef struct {
@@ -150,6 +151,8 @@ typedef struct {
   EFI_GUID                  Guid;
   UINT8                     VendorDefinedData[1];
 } VENDOR_DEVICE_PATH_WITH_DATA;
+
+#pragma pack()
 
 CHAR16 *
 ConvertDeviceNodeToText (
