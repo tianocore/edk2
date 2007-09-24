@@ -16,6 +16,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PiLib.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadedImage.h>
 
@@ -40,7 +41,7 @@
 **/
 STATIC
 EFI_STATUS
-GetImageFromFv (
+InternalGetImageFromFv (
   IN         EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv,
   IN  CONST  EFI_GUID           *NameGuid,
   IN         EFI_SECTION_TYPE   SectionType,
@@ -193,7 +194,7 @@ GetSectionFromFvFile (
                     (VOID **) &ImageFv
                     );
     if (!EFI_ERROR (Status)) {
-      Status = GetImageFromFv (ImageFv, NameGuid, SectionType, Buffer, Size);
+      Status = InternalGetImageFromFv (ImageFv, NameGuid, SectionType, Buffer, Size);
     }
   }
 
@@ -231,7 +232,7 @@ GetSectionFromFvFile (
       continue;
     }
 
-    Status = GetImageFromFv (Fv, NameGuid, SectionType, Buffer, Size);
+    Status = InternalGetImageFromFv (Fv, NameGuid, SectionType, Buffer, Size);
 
     if (!EFI_ERROR (Status)) {
       goto Done;
@@ -252,5 +253,218 @@ Done:
   }
 
   return Status;
+}
+
+EFI_HANDLE
+EFIAPI
+ImageHandleToFvHandle (
+  EFI_HANDLE ImageHandle
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
+  
+  ASSERT (ImageHandle != NULL);
+
+  Status = gBS->HandleProtocol (
+             (EFI_HANDLE *) ImageHandle,
+             &gEfiLoadedImageProtocolGuid,
+             (VOID **) &LoadedImage
+             );
+
+  ASSERT_EFI_ERROR (Status);
+
+  return LoadedImage->DeviceHandle;
+
+}
+
+EFI_STATUS
+EFIAPI
+GetSectionFromAnyFv (
+  IN CONST  EFI_GUID           *NameGuid,
+  IN        EFI_SECTION_TYPE   SectionType,
+  IN        UINTN              Instance,
+  OUT       VOID               **Buffer,
+  OUT       UINTN              *Size
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_HANDLE                    *HandleBuffer;
+  UINTN                         HandleCount;
+  UINTN                         Index;
+  EFI_HANDLE                    FvHandle;
+  EFI_TPL                       OldTpl;
+
+  //
+  // Search the FV that contain the caller's FFS first.
+  // FV builder can choose to build FFS into the this FV
+  // so that this implementation of GetSectionFromAnyFv
+  // will locate the FFS faster.
+  //
+  FvHandle = ImageHandleToFvHandle (gImageHandle);
+  Status = GetSectionFromFv (
+             FvHandle,
+             NameGuid,
+             SectionType,
+             Instance,
+             Buffer,
+             Size
+             );
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  for (Index = 0; Index < HandleCount; ++Index) {
+    //
+    // Skip the FV that contain the caller's FFS
+    //
+    if (HandleBuffer[Index] == FvHandle) {
+      continue;
+    }
+
+    Status = GetSectionFromFv (
+               HandleBuffer[Index], 
+               NameGuid, 
+               SectionType, 
+               Instance,
+               Buffer, 
+               Size
+               );
+
+    if (!EFI_ERROR (Status)) {
+      goto Done;
+    }
+  }
+
+  if (Index == HandleCount) {
+    Status = EFI_NOT_FOUND;
+  }
+
+Done:
+  
+  gBS->RestoreTPL (OldTpl);
+  
+  if (HandleBuffer != NULL) {  
+    FreePool(HandleBuffer);
+  }
+  return Status;
+  
+}
+
+EFI_STATUS
+EFIAPI
+GetSectionFromFv (
+  IN  EFI_HANDLE                    FvHandle,
+  IN  CONST EFI_GUID                *NameGuid,
+  IN  EFI_SECTION_TYPE              SectionType,
+  IN  UINTN                         Instance,
+  OUT VOID                          **Buffer,
+  OUT UINTN                         *Size
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
+  UINT32                        AuthenticationStatus;
+
+  ASSERT (FvHandle != NULL);
+
+  Status = gBS->HandleProtocol (
+                  FvHandle,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  (VOID **) &Fv
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Read desired section content in NameGuid file
+  //
+  *Buffer     = NULL;
+  *Size       = 0;
+  Status      = Fv->ReadSection (
+                      Fv,
+                      NameGuid,
+                      SectionType,
+                      0,
+                      Buffer,
+                      Size,
+                      &AuthenticationStatus
+                      );
+
+  if (EFI_ERROR (Status) && (SectionType == EFI_SECTION_TE)) {
+    //
+    // Try reading PE32 section, if the required section is TE type 
+    //
+    *Buffer = NULL;
+    *Size   = 0;
+    Status  = Fv->ReadSection (
+                    Fv,
+                    NameGuid,
+                    EFI_SECTION_PE32,
+                    0,
+                    Buffer,
+                    Size,
+                    &AuthenticationStatus
+                    );
+  }
+
+  return Status;
+}
+
+
+EFI_STATUS
+EFIAPI
+GetSectionFromCurrentFv (
+  IN  CONST EFI_GUID                *NameGuid,
+  IN  EFI_SECTION_TYPE              SectionType,
+  IN  UINTN                         Instance,
+  OUT VOID                          **Buffer,
+  OUT UINTN                         *Size
+    )
+{
+  return GetSectionFromFv(
+          ImageHandleToFvHandle(gImageHandle),
+          NameGuid,
+          SectionType,
+          Instance,
+          Buffer,
+          Size
+          );
+}
+
+
+
+EFI_STATUS
+EFIAPI
+GetSectionFromCurrentFfs (
+  IN  EFI_SECTION_TYPE              SectionType,
+  IN  UINTN                         Instance,
+  OUT VOID                          **Buffer,
+  OUT UINTN                         *Size
+    )
+{
+  return GetSectionFromFv(
+          ImageHandleToFvHandle(gImageHandle),
+          &gEfiCallerIdGuid,
+          SectionType,
+          Instance,
+          Buffer,
+          Size
+          );
 }
 

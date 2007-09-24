@@ -21,35 +21,30 @@ Abstract:
 --*/
 
 #include <PiPei.h>
+#include <Library/DebugLib.h>
 #include <Guid/PeiPeCoffLoader.h>
-#include <Library/PeCoffLoaderLib.h>
+#include <Library/PeCoffLoaderLib.h>  
+#include <Library/PeiServicesLib.h>
 
 
-EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
+EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader = NULL;
 
-EFI_STATUS
-EFIAPI
-PeCoffLoaderConstructor (
-  IN EFI_FFS_FILE_HEADER      *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = (*PeiServices)->LocatePpi (
-                            PeiServices,
-                            &gEfiPeiPeCoffLoaderGuid,
-                            0,
-                            NULL,
-                            &mPeiEfiPeiPeCoffLoader
-                            );
-  return Status;
-}
 
 EFI_PEI_PE_COFF_LOADER_PROTOCOL *
 EFIAPI
 GetPeCoffLoaderProtocol (
   )
 {
+  EFI_STATUS Status;
+  
+  if (mPeiEfiPeiPeCoffLoader == NULL) {
+    Status = PeiServicesLocatePpi(
+                              &gEfiPeiPeCoffLoaderGuid,
+                              0,
+                              NULL,
+                              (VOID **) &mPeiEfiPeiPeCoffLoader
+                              );
+    ASSERT_EFI_ERROR (Status);
+   }
   return mPeiEfiPeiPeCoffLoader;
 }

@@ -26,7 +26,7 @@ Revision History
 EFI_STATUS
 EFIAPI
 PeiResetSystem (
-  IN EFI_PEI_SERVICES         **PeiServices
+  IN CONST EFI_PEI_SERVICES         **PeiServices
   )
 /*++
 

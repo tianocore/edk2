@@ -23,7 +23,7 @@ Abstract:
 
 VOID
 InitializeMemoryServices (
-  IN EFI_PEI_SERVICES            **PeiServices,
+  IN PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
   )
@@ -49,9 +49,6 @@ Returns:
 
 --*/
 {
-  PEI_CORE_INSTANCE                    *PrivateData;
-
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   PrivateData->SwitchStackSignal = FALSE;
 
   if (OldCoreData == NULL) {
@@ -64,6 +61,8 @@ Returns:
     DEBUG_CODE_BEGIN ();
       PrivateData->SizeOfCacheAsRam = SecCoreData->PeiTemporaryRamSize + SecCoreData->StackSize;
       PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) PrivateData->SizeOfCacheAsRam);
+      PrivateData->StackBase        = (EFI_PHYSICAL_ADDRESS) (UINTN) SecCoreData->StackBase;
+      PrivateData->StackSize        = (UINT64) SecCoreData->StackSize;
     DEBUG_CODE_END ();
 
     PrivateData->HobList.Raw = PrivateData->BottomOfCarHeap;
@@ -73,23 +72,13 @@ Returns:
       (EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->BottomOfCarHeap,
       (UINTN) SecCoreData->PeiTemporaryRamSize
       );
-    //
-    // Copy PeiServices from ROM to Cache in PrivateData
-    //
-    CopyMem (&(PrivateData->ServiceTableShadow), *PeiServices, sizeof (EFI_PEI_SERVICES));
 
     //
     // Set PS to point to ServiceTableShadow in Cache
     //
     PrivateData->PS = &(PrivateData->ServiceTableShadow);
-  } else {
-  //                                                                    
-  // Set PS to point to ServiceTableShadow in Cache one time after the  
-  // stack switched to main memory                                      
-  //                                                                    
-  PrivateData->PS = &(PrivateData->ServiceTableShadow);                 
-}                                                                       
-
+  }
+  
   return;
 }
 

@@ -61,20 +61,21 @@ static EFI_PEI_SERVICES  mPS = {
   PeiFfsFindNextFile,
   PeiFfsFindSectionData,
 
-  PeiInstallPeiMemory,
+  PeiInstallPeiMemory,      
   PeiAllocatePages,
   PeiAllocatePool,
   (EFI_PEI_COPY_MEM)CopyMem,
   (EFI_PEI_SET_MEM)SetMem,
 
   PeiReportStatusCode,
-
   PeiResetSystem,
+
   NULL,
   NULL,
-  NULL,
-  NULL,
-  NULL,
+
+  PeiFfsFindFileByName,
+  PeiFfsGetFileInfo,
+  PeiFfsGetVolumeInfo,
   PeiRegisterForShadow
 };
 
@@ -82,7 +83,7 @@ EFI_STATUS
 EFIAPI
 PeiCore (
   IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpiList,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
   IN VOID                              *Data
   )
 /*++
@@ -117,9 +118,10 @@ Returns:
   PEI_CORE_INSTANCE                                     PrivateData;
   EFI_STATUS                                            Status;
   PEI_CORE_TEMP_POINTERS                                TempPtr;
-  PEI_CORE_DISPATCH_DATA                                *DispatchData;
   UINT64                                                mTick;
   PEI_CORE_INSTANCE                                     *OldCoreData;
+  EFI_PEI_CPU_IO_PPI                                    *CpuIo;
+  EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
 
   mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
@@ -138,26 +140,31 @@ Returns:
 
   if (OldCoreData != NULL) {
     CopyMem (&PrivateData, OldCoreData, sizeof (PEI_CORE_INSTANCE));
+    
+    CpuIo = (VOID*)PrivateData.ServiceTableShadow.CpuIo;
+    PciCfg = (VOID*)PrivateData.ServiceTableShadow.PciCfg;
+    
+    CopyMem (&PrivateData.ServiceTableShadow, &mPS, sizeof (mPS));
+    
+    PrivateData.ServiceTableShadow.CpuIo  = CpuIo;
+    PrivateData.ServiceTableShadow.PciCfg = PciCfg;
   } else {
     ZeroMem (&PrivateData, sizeof (PEI_CORE_INSTANCE));
+    PrivateData.Signature = PEI_CORE_HANDLE_SIGNATURE;
+    CopyMem (&PrivateData.ServiceTableShadow, &mPS, sizeof (mPS));
   }
 
-  PrivateData.Signature = PEI_CORE_HANDLE_SIGNATURE;
-  PrivateData.PS = &mPS;
+  PrivateData.PS = &PrivateData.ServiceTableShadow;
 
   //
   // Initialize libraries that the PeiCore is linked against
-  // BUGBUG: The FfsHeader is passed in as NULL.  Do we look it up or remove it from the lib init?
+  // BUGBUG: The FileHandle is passed in as NULL.  Do we look it up or remove it from the lib init?
   //
   ProcessLibraryConstructorList (NULL, &PrivateData.PS);
 
-  InitializeMemoryServices (&PrivateData.PS, SecCoreData, OldCoreData);
+  InitializeMemoryServices (&PrivateData, SecCoreData, OldCoreData);
 
-  InitializePpiServices (&PrivateData.PS, OldCoreData);
-
-  InitializeSecurityServices (&PrivateData.PS, OldCoreData);
-
-  InitializeDispatcherData (&PrivateData.PS, OldCoreData, SecCoreData);
+  InitializePpiServices (&PrivateData, OldCoreData);
 
   if (OldCoreData != NULL) {
 
@@ -219,18 +226,25 @@ Returns:
     //
     // If SEC provided any PPI services to PEI, install them.
     //
-    if (PpiList != NULL) {
-      Status = PeiServicesInstallPpi (PpiList);
+    if (PpList != NULL) {
+      Status = PeiServicesInstallPpi (PpList);
       ASSERT_EFI_ERROR (Status);
     }
   }
 
-  DispatchData = &PrivateData.DispatchData;
+  InitializeSecurityServices (&PrivateData.PS, OldCoreData);
+
+  InitializeDispatcherData (&PrivateData, OldCoreData, SecCoreData);
+
+  //
+  // Install Pei Load File PPI. 
+  //
+  InitializeImageServices (&PrivateData, OldCoreData);
 
   //
   // Call PEIM dispatcher
   //
-  PeiDispatcher (SecCoreData, &PrivateData, DispatchData);
+  PeiDispatcher (SecCoreData, &PrivateData);
 
   //
   // Check if InstallPeiMemory service was called.

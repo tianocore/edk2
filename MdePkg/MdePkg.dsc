@@ -82,6 +82,7 @@
   MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
   MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  MdePkg/Library/PeiPiLib/PeiPiLib.inf
   MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
