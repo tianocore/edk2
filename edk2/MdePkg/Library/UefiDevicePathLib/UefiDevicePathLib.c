@@ -34,11 +34,13 @@
 //
 // Template for an end-of-device path node.
 //
-STATIC EFI_DEVICE_PATH_PROTOCOL  mEndDevicePath[] = {
+STATIC EFI_DEVICE_PATH_PROTOCOL  mEndDevicePath = {
   END_DEVICE_PATH_TYPE,
   END_ENTIRE_DEVICE_PATH_SUBTYPE,
-  END_DEVICE_PATH_LENGTH,
-  0
+  {
+    END_DEVICE_PATH_LENGTH,
+    0
+  }
 };
 
 /**
@@ -153,7 +155,7 @@ AppendDevicePath (
   // If there's only 1 path, just duplicate it.
   //
   if (FirstDevicePath == NULL) {
-    return DuplicateDevicePath ((SecondDevicePath != NULL) ? SecondDevicePath : mEndDevicePath);
+    return DuplicateDevicePath ((SecondDevicePath != NULL) ? SecondDevicePath : &mEndDevicePath);
   }
 
   if (SecondDevicePath == NULL) {
@@ -217,7 +219,7 @@ AppendDevicePathNode (
   UINTN                     NodeLength;
 
   if (DevicePathNode == NULL) {
-    return DuplicateDevicePath ((DevicePath != NULL) ? DevicePath : mEndDevicePath);
+    return DuplicateDevicePath ((DevicePath != NULL) ? DevicePath : &mEndDevicePath);
   }
   //
   // Build a Node that has a terminator on it
