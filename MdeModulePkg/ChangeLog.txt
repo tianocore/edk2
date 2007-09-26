@@ -75,6 +75,49 @@ EDK_3871: Non-Compatible: klu2
 	   PeiMain module.
 	2) The SecCore module should provide parameters for new entry point defined in 
 	   MdePkg\Include\Library\PeiCoreEntryPoint.h
+
+==========================================================================================
+EDK_3922:  Non-Compatible: qwang12, klu2
+  Class_PIEnable[2]:  Update PEI core to only consume EFI_PEI_FIRMWARE_VOLUME_INFO_PPI
+
+  Code Change :
+  1) Update PEI core to consume EFI_PEI_FIRMWARE_VOLUME_INFO_PPI to get the location of new FVs other than BFV
+     reported by PEIMs . 
+
+  Possible Impacts:
+  1) Platform code that is going to inform PEI core about the new FVs other than BFV should install 
+     EFI_PEI_FIRMWARE_VOLUME_INFO_PPI. A library function named PeiPiLibBuildPiFvInfoPpi() defined in 
+     MdePkg\Include\Library\PeiPiLib.h can be used to install the PPI. 
+     There are two notes worth mentioning:
+     1) Platform PEIMs should report at least FVs containing DXE_CORE and all other PEIM to PEI Core if they
+        are not in the BFV. 
+     2) PEI core will dispatch PEIMs in the FV reported by PeiPiLibBuildPiFvInfoPpi() and invoke BuildFvHob () to build the 
+        FV HOB for this FV (see Section 4.8.1.2 of Vol 1 named Multiple Firmware Volume Support for details). 
+        If PEIM only want to inform DXE core about the existance of the new FV, it should call BuildFvHob instead.
+  
+  
+  Class_PIEnable[3]:  Update PEI core to support RegisterForShadow feature introduced by PI spec
+
+     Code Change :
+     1) DXEIPL no longer produce EFI_PEI_FV_FILE_LOADER_PPI defined in Framework PEI CIS.
+
+     Possible Impacts:
+
+     1)All PEIMs that need to shadow itself into memory and rerun the entry point should be updated to call RegisterForShadow
+     (PeiServicesLibRegisterForShadow () is a helper function).
+     2)The depex of PEIMs that including EFI_PEI_FV_FILE_LOADER_PPI (or gEfiPeiFvFileLoaderPpiGuid) should be removed.
+ 
+
+  Class_PIEnable[4]:  Update PEI core to produce other new features defined in PI spec
+
+      Code Change :
+      1) Add the following services: FfsGetFileInfo, FfsFindFileByName and FfsGetVolumeInfo
+
+      Possible Impacts:
+
+      1) Platform code is recommended to make use of these new PI features. The functions in MdePkg/Include/Library/PeiServicesLib.h are 
+         recommended as PeiServices is saved for every PEI Services API invokation.
+
 	   
 ==========================================================================================
 EDK_3866:  Compatible: qhuang8
