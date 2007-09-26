@@ -215,7 +215,7 @@
 
     <InputFile.GCC>
         ?.dll
-        $(MODULE_BUILD_DIR)/GnuMakefile
+        $(MODULE_BUILD_DIR)\Makefile
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
