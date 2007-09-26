@@ -39,6 +39,24 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_3926: Compatible: jlin16
+
+      Class_BuildTool:
+        1) Added support of Capsule generation from FDF file.
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) To generate capsule, insert [Capsule] section after [FV] sections and specifying
+        what FV will be put into capsule, For example:
+        [Capsule.Fob]
+        CAPSULE_GUID = 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
+        CAPSULE_FLAG = PersistAcrossReset
+        FV = BiosUpdate
+
+==========================================================================================
 EDK_3911: Compatible: jlin16
 
       Class_BuildTool:
