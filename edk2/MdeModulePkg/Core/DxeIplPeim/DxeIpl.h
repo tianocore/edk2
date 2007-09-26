@@ -22,7 +22,6 @@ Abstract:
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
-#include <Ppi/S3Resume.h>
 #include <Protocol/EdkDecompress.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Protocol/CustomizedDecompress.h>
@@ -30,7 +29,6 @@ Abstract:
 #include <Ppi/Security.h>
 #include <Ppi/SectionExtraction.h>
 #include <Ppi/FvLoadFile.h>
-#include <Ppi/RecoveryModule.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/Decompress.h>
 #include <Ppi/FirmwareVolumeInfo.h>
@@ -52,7 +50,8 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeCoffLib.h>
-
+#include <Library/S3Lib.h>
+#include <Library/RecoveryLib.h>
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000

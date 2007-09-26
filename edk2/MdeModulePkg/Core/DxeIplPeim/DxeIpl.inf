@@ -75,7 +75,8 @@
   BaseLib
   PeimEntryPoint
   DebugLib
-
+  S3Lib
+  RecoveryLib
 
 [Protocols]
   gEfiCustomizedDecompressProtocolGuid          # PROTOCOL SOMETIMES_PRODUCED
