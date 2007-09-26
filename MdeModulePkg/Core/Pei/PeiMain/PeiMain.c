@@ -83,7 +83,7 @@ EFI_STATUS
 EFIAPI
 PeiCore (
   IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpiList,
   IN VOID                              *Data
   )
 /*++
@@ -226,8 +226,8 @@ Returns:
     //
     // If SEC provided any PPI services to PEI, install them.
     //
-    if (PpList != NULL) {
-      Status = PeiServicesInstallPpi (PpList);
+    if (PpiList != NULL) {
+      Status = PeiServicesInstallPpi (PpiList);
       ASSERT_EFI_ERROR (Status);
     }
   }
