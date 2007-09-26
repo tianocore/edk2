@@ -309,9 +309,8 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   UINT16                          NetworkProtocol;
   UINT16                          LoginOption;
-  UINT16                          Reserved;
+  UINT64                          Lun;
   UINT16                          TargetPortalGroupTag;
-  UINT64                          LUN;
   // CHAR8                        iSCSI Target Name
 } ISCSI_DEVICE_PATH;
 
