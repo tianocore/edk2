@@ -277,7 +277,7 @@ echo.
 
 :NewBuild
 @IF NOT EXIST "BaseTools\toolsetup.bat" goto AntBuild
-@set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
 @call BaseTools\toolsetup.bat
 @goto end
 
