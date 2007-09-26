@@ -185,8 +185,6 @@ DxeLoadCore (
   EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
   EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader;
   EFI_BOOT_MODE                             BootMode;
-  EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
-  EFI_PEI_S3_RESUME_PPI                     *S3Resume;
   EFI_PEI_FV_HANDLE                         VolumeHandle;
   EFI_PEI_FILE_HANDLE                       FileHandle;
   UINTN                                     Instance;
@@ -198,27 +196,10 @@ DxeLoadCore (
   ASSERT_EFI_ERROR(Status);
 
   if (BootMode == BOOT_ON_S3_RESUME) {
-    Status = PeiServicesLocatePpi (
-               &gEfiPeiS3ResumePpiGuid,
-               0,
-               NULL,
-               (VOID **)&S3Resume
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = S3Resume->S3RestoreConfig (PeiServices);
+    Status = S3RestoreConfig();
     ASSERT_EFI_ERROR (Status);
   } else if (BootMode == BOOT_IN_RECOVERY_MODE) {
-
-    Status = PeiServicesLocatePpi (
-               &gEfiPeiRecoveryModulePpiGuid,
-               0,
-               NULL,
-               (VOID **)&PeiRecovery
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = PeiRecovery->LoadRecoveryCapsule (PeiServices, PeiRecovery);
+    Status = Recovery ();
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
       CpuDeadLoop ();
