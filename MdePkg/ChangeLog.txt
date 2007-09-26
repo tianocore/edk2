@@ -35,6 +35,10 @@ EDK_0000: Compatible: owner
 		Code Change :
 		1) BaseTools\Bin\Win32\build.exe
 
+!!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
+##########################################################################################
+
+
 
 ==========================================================================================
 EDK_3871: Non-Compatible: klu2
@@ -50,8 +54,25 @@ EDK_3871: Non-Compatible: klu2
 	2) The SecCore module should provide parameters for new entry point defined in 
 	   MdePkg\Include\Library\PeiCoreEntryPoint.h
 
-!!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
-##########################################################################################
 
+EDK_3922:  Non-Compatible: qwang12, klu2
+  Class_PIEnable[0]:  Update PeiServicesLib based on new features defined in PI spec.
 
+      Code Change :
+      1) Add the following services:PeiServicesRegisterForShadow, PeiServicesFfsGetFileInfo, PeiServicesFfsFindFileByName and PeiServicesFfsGetVolumeInfo
+      2) The paramter list of these functiuon has also been updated to replace EFI_FIRMWARE_VOLUME_HEADER to EFI_PEI_FV_HANDLE and EFI_FFS_FILE_HEADER
+         to EFI_PEI_FILE_HANDLE.
+      3) Add CONST to parameter of PeiServices EFI_PEI_SERVICES.EFI_PEI_RESET_SYSTEM
+
+      Possible Impacts:
+
+      1) Platform code should be updated to make use of these new PI features. The functions in MdePkg/Include/Library/PeiServicesLib.h are 
+         recommended as PeiServices is saved for every PEI Services API invokation.
+      2) Now PEIM entry point is upadted to pass in PeiServices in type of (CONST EFI_PEI_SERVICS **). Platform code should be updated to 
+         add (EFI_PEI_SERVICS **) cast to PeiServices before passing it to the previously defined PPI interface which needs a (EFI_PEI_SERVICS **)
+         type for PeiServices parameter.
+      3) The newly defined PPI should not inlcude PeiSevices in the paramter list as PI spec has standard way to retrive PeiServices (check VOL 1
+         Section 4.4 PEI Sevices Table Retrieval) for details. Beside, GetPeiServicesTablePointer() in MdePkg\Include\Library\PeiServicesTablePointerLib.h
+         also provide convinient way to retrieve the pointer to Pei Service Table.
+         
 
