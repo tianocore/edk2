@@ -343,10 +343,11 @@ ReInitStrings:
 
     BufferSize = 0;
     Status = gHii->GetString (gHii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, NULL);
-    ASSERT(Status == EFI_BUFFER_TOO_SMALL);
+    ASSERT (Status == EFI_BUFFER_TOO_SMALL);
     StringBuffer = AllocateZeroPool (BufferSize);
     ASSERT (StringBuffer != NULL);
     Status = gHii->GetString (gHii, gStringPackHandle, 1, TRUE, Lang, &BufferSize, StringBuffer);
+    ASSERT_EFI_ERROR (Status);
     gHii->NewString (gHii, NULL, gStringPackHandle, &Token, StringBuffer);
     FreePool (StringBuffer);
     CopyMem (&OptionList[OptionCount].StringToken, &Token, sizeof (UINT16));
@@ -382,9 +383,7 @@ ReInitStrings:
   gHii->UpdateForm (gHii, gFrontPageHandle, (EFI_FORM_LABEL) 0x0002, TRUE, UpdateData);
 
   FreePool (UpdateData);
-  //
-  // FreePool (OptionList);
-  //
+  FreePool (OptionList);
   return Status;
 }
 
