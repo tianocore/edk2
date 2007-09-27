@@ -19,7 +19,7 @@
   FILE_GUID                      = DED3F743-CE2C-4ba6-92A2-FFCE2A6D72D9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE 
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE SEC
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 

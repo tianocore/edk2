@@ -21,7 +21,7 @@
   FILE_GUID                      = b694e0dc-cd4e-4b30-885b-9c164ed3e74a
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemoryAllocationLib|PEIM PEI_CORE 
+  LIBRARY_CLASS                  = MemoryAllocationLib|PEIM PEI_CORE SEC
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
