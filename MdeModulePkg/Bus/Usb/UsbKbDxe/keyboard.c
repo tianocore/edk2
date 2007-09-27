@@ -857,7 +857,18 @@ USBKeyCodeToEFIScanCode (
 
     }
   }
-
+  //
+  // Translate the CTRL-Alpha characters to their corresponding control value  (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
+  //
+  if (UsbKeyboardDevice->CtrlOn) {
+    if (Key->UnicodeChar >= 'a' && Key->UnicodeChar <= 'z') {
+      Key->UnicodeChar = (UINT16) (Key->UnicodeChar - 'a' + 1);
+    } else if (Key->UnicodeChar >= 'A' && Key->UnicodeChar <= 'Z') {
+      Key->UnicodeChar = (UINT16) (Key->UnicodeChar - 'A' + 1);
+    }
+  }
+  
+  
   if (KeyChar >= 0x59 && KeyChar <= 0x63) {
 
     if (UsbKeyboardDevice->NumLockOn && !UsbKeyboardDevice->ShiftOn) {
