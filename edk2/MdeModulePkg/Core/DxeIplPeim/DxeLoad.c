@@ -196,10 +196,10 @@ DxeLoadCore (
   ASSERT_EFI_ERROR(Status);
 
   if (BootMode == BOOT_ON_S3_RESUME) {
-    Status = S3RestoreConfig();
+    Status = AcpiS3ResumeOs();
     ASSERT_EFI_ERROR (Status);
   } else if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = Recovery ();
+    Status = PeiRecoverFirmware ();
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
       CpuDeadLoop ();
