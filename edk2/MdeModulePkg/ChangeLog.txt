@@ -38,43 +38,26 @@ EDK_0000: Compatible: owner
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
-
-
-
-==========================================================================================
-EDK_3773:  Non-Compatible: qwang12
-
-	  Class_PIEnable[0]:  Enable DXE Core to produce EFI_FIRMWARE_VOLUME2_PROTOCOL only.
-
-		Code Change :
-		1) Modify MdeModulePkg/Core/Dxe/DxeMain.inf module to produce only
-		   EFI_FIRMWARE_VOLUME2_PROTOCOL.	Previously, EFI_FIRMWARE_VOLUME_PROTOCOL
-		   is produced by Dxe Core.
-
-		Possible Impacts:
-		1) All modules that references EFI_FIRMWARE_VOLUME_PROTOCOL must be updated to use
-	 	   EFI_FIRMWARE_VOLUME2_PROTOCOL.
-		2) All modules that references gEfiFirmwareVolumeProtocolGuid must be updated to
-		   use gEfiFirmwareVolume2ProtocolGuid.
-		3) The gEfiFirmwareVolumeProtocolGuid in [Depex] section of INF file should updated.
-		   And the package dependency should also be changed if needed due to this protocol
-		   GUID change.
-
 ==========================================================================================
 EDK_3871: Non-Compatible: klu2
 	
-	Class_PIEnable[1]: Use new entry point for PeiCore defined in PI specification.
+	Class_PIEnable[5]: New library class for S3Resume and Recovery for DxeIpl PEIM.
 	
 	Code Change:
-	1) PeiMain module use PeiCoreEntryPoint library class but *not* original OldPeiCoreEntryPoint.
-	2) The memory service in PeiMain module get CAR base and size from parameter of PeiCore's
-	   Entry point directly but *not* computed from stack's base.
+	1) Add new library class 
+	   a) MdeModulePkg/Include/Library/S3Lib.h
+	   b) MdeModulePkg/Include/Library/RecoveryLib.h
+	2) Add NULL library instances for MdeModulePkg:
+	   a) MdeModulePkg/Library/PeiS3Lib.inf.
+	   b) MdeModulePkg/Library/PeiRecoveryLib.inf
+	3) Add framework implement library instances:
+	   a) IntelFrameworkModulePkg/Library/PeiS3Lib.inf
+	   b) IntelFrameworkModulePkg/Library/PeiRecovery.inf
 	
 	Possible Impacts:
-	1) Platform should select MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf for 
-	   PeiMain module.
-	2) The SecCore module should provide parameters for new entry point defined in 
-	   MdePkg\Include\Library\PeiCoreEntryPoint.h
+	1) In DSC file, if platform use framework implementation, should select:
+	   S3Lib library class       -> IntelFrameworkModulePkg/Library/PeiS3Lib.inf
+	   RecoveryLib library class -> IntelFrameworkModulePkg/Library/PeiRecovery.inf
 
 ==========================================================================================
 EDK_3922:  Non-Compatible: qwang12, klu2
@@ -118,6 +101,21 @@ EDK_3922:  Non-Compatible: qwang12, klu2
       1) Platform code is recommended to make use of these new PI features. The functions in MdePkg/Include/Library/PeiServicesLib.h are 
          recommended as PeiServices is saved for every PEI Services API invokation.
 
+==========================================================================================
+EDK_3871: Non-Compatible: klu2
+	
+	Class_PIEnable[1]: Use new entry point for PeiCore defined in PI specification.
+	
+	Code Change:
+	1) PeiMain module use PeiCoreEntryPoint library class but *not* original OldPeiCoreEntryPoint.
+	2) The memory service in PeiMain module get CAR base and size from parameter of PeiCore's
+	   Entry point directly but *not* computed from stack's base.
+	
+	Possible Impacts:
+	1) Platform should select MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf for 
+	   PeiMain module.
+	2) The SecCore module should provide parameters for new entry point defined in 
+	   MdePkg\Include\Library\PeiCoreEntryPoint.h
 	   
 ==========================================================================================
 EDK_3866:  Compatible: qhuang8
@@ -126,3 +124,22 @@ EDK_3866:  Compatible: qhuang8
 		Code Change :
 		1) Modify MdeModulePkg/Universal/Variable/RuntimeDxe
                 2) Modify MdeModulePkg/Universal/Variable/EmuRuntimeDxe
+
+==========================================================================================
+EDK_3773:  Non-Compatible: qwang12
+
+	  Class_PIEnable[0]:  Enable DXE Core to produce EFI_FIRMWARE_VOLUME2_PROTOCOL only.
+
+		Code Change :
+		1) Modify MdeModulePkg/Core/Dxe/DxeMain.inf module to produce only
+		   EFI_FIRMWARE_VOLUME2_PROTOCOL.	Previously, EFI_FIRMWARE_VOLUME_PROTOCOL
+		   is produced by Dxe Core.
+
+		Possible Impacts:
+		1) All modules that references EFI_FIRMWARE_VOLUME_PROTOCOL must be updated to use
+	 	   EFI_FIRMWARE_VOLUME2_PROTOCOL.
+		2) All modules that references gEfiFirmwareVolumeProtocolGuid must be updated to
+		   use gEfiFirmwareVolume2ProtocolGuid.
+		3) The gEfiFirmwareVolumeProtocolGuid in [Depex] section of INF file should updated.
+		   And the package dependency should also be changed if needed due to this protocol
+		   GUID change.
