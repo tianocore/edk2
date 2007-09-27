@@ -20,7 +20,7 @@
   FILE_GUID                      = 9643128f-ac24-4b3e-b6be-d8849a306153
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HobLib|PEIM PEI_CORE 
+  LIBRARY_CLASS                  = HobLib|PEIM PEI_CORE SEC
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
