@@ -28,16 +28,16 @@ Notes:
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
-        r764 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r764 <buildtools_project>\BaseTools\Source\Python\build
-        r764 <buildtools_project>\BaseTools\Source\Python\Common
-        r764 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r764 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r750 <buildtools_project>\BaseTools\Source\Python\Autogen
+        r750 <buildtools_project>\BaseTools\Source\Python\build
+        r750 <buildtools_project>\BaseTools\Source\Python\Common
+        r750 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r750 <buildtools_project>\BaseTools\Source\Python\GenFds
         
 4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
-        r764 <buildtools_project>\BaseTools\Source\Python\Common
-        r764 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r764 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r750 <buildtools_project>\BaseTools\Source\Python\Common
+        r750 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r750 <buildtools_project>\BaseTools\Source\Python\GenFds
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
@@ -121,4 +121,28 @@ It searches all INF, DEC and DSC file under <directory_name> and update them wit
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
    }
 
-30-August-2007
+Brief usage for Migration Tool Fpd2Dsc.exe:
+1. Command line format:
+  Fpd2Dsc [options] input_filename
+2. Input File:
+  A syntactically valid FPD file
+3. Output Files:
+  A DSC file which syntax confirms to DSC spec.
+4. Prerequisite:
+   a. The workspace directory must be specified either by environment variable or -w option.
+     
+5. Example:
+   WORKSAPCE has already been set: $(WORKSPACE) = c:\work\EdkII. 
+ 
+   a. Fpd2Dsc -o c:\work\EdkII\Nt32Pkg\Nt32.dsc c:\work\EdkII\Nt32Pkg\Nt32.fpd
+   b. Fpd2Dsc -a c:\work\EdkII\Nt32Pkg\Nt32.fpd
+   Example a & b are equivalent to migrate Nt32 platform description file from EDKII to EDKII' snytax.
+  
+6. Known Limitations:
+   a. Tool does not handle Libraries Section since no related info in original FPD file. Developers need  to handle it manually in the output DSC file.
+   b. If MSA file which is corresponds to module guid could not be found in currect workspace, tool will dump the module guid.
+ 
+7. Pyton Source
+   r767 <buildtools_project>\BaseTools\Source\Python\Fpd2Dsc
+
+27-September-2007
