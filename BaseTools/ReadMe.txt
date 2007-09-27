@@ -28,11 +28,11 @@ Notes:
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
-        r773 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r773 <buildtools_project>\BaseTools\Source\Python\build
-        r773 <buildtools_project>\BaseTools\Source\Python\Common
-        r773 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r773 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r776 <buildtools_project>\BaseTools\Source\Python\Autogen
+        r776 <buildtools_project>\BaseTools\Source\Python\build
+        r776 <buildtools_project>\BaseTools\Source\Python\Common
+        r776 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r776 <buildtools_project>\BaseTools\Source\Python\GenFds
         
 4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
         r750 <buildtools_project>\BaseTools\Source\Python\Common
