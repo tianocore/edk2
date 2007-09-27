@@ -43,8 +43,8 @@ EDK_3947: Compatible: jwang36
 
       Class_BuildTool:
         1) Improved spawn mode (multi-thread) build performance (build -s)
-				2) Changed the error/debug/warning message format
-				3) Added "--log" command line option to support storing log in file
+        2) Changed the error/debug/warning message format
+        3) Added "--log" command line option to support storing log in file
  
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
@@ -108,13 +108,13 @@ EDK_3911: Compatible: jlin16
         
         Specifying how to process the binary file by defining corresponding Rule like this:
         [Rule.Common.Base.Test]
-	       FILE FREEFORM = $(NAMED_GUID) {
-	         COMPRESS PI_STD {
-  	         GUIDED {
+         FILE FREEFORM = $(NAMED_GUID) {
+           COMPRESS PI_STD {
+             GUIDED {
                 RAW BIN |.bmp   
              }
-	         }
-	       }
+           }
+         }
 
 ==========================================================================================
 EDK_3832: Non-Compatible: jwang36
