@@ -121,6 +121,22 @@ It searches all INF, DEC and DSC file under <directory_name> and update them wit
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
    }
 
+Brief usage for Migration Tool Spd2Dec.exe:
+1. Command line format:
+  Spd2Dec [options] input_filename
+2. Input File:
+  A syntactically valid SPD file
+3. Output Files:
+  A DEC file whose syntax confirms to DEC spec.
+     
+4. Example:
+   a. Spd2Dec -o c:\work\EdkII\Nt32Pkg\Nt32.spd c:\work\EdkII\Nt32Pkg\Nt32.dec
+   b. Spd2Dec -a c:\work\EdkII\Nt32Pkg\Nt32.spd
+   Example a & b are equivalent to migrate Nt32 package SPD file from EDKII to EDKII' snytax.
+  
+6. Pyton Source
+   r777 <buildtools_project>\BaseTools\Source\Python\spd2Dec
+
 Brief usage for Migration Tool Fpd2Dsc.exe:
 1. Command line format:
   Fpd2Dsc [options] input_filename
