@@ -20,7 +20,7 @@
   FILE_GUID                      = F72DE735-B24F-4ef6-897F-70A85D01A047
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PerformanceLib|PEIM PEI_CORE
+  LIBRARY_CLASS                  = PerformanceLib|PEIM PEI_CORE SEC
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
