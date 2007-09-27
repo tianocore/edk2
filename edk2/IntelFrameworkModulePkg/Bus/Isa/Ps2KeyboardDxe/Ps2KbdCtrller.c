@@ -1622,6 +1622,16 @@ Returns:
           ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
         }
       }
+      //
+      // Translate the CTRL-Alpha characters to their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
+      //
+      if (ConsoleIn->Ctrled) {
+        if (ConsoleIn->Key.UnicodeChar >= 'a' && ConsoleIn->Key.UnicodeChar <= 'z') {
+          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - 'a' + 1);
+        } else if (ConsoleIn->Key.UnicodeChar >= 'A' && ConsoleIn->Key.UnicodeChar <= 'Z') {
+          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - 'A' + 1);
+        }
+      }
 
       break;
     }
