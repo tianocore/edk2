@@ -33,11 +33,11 @@
 #
 
 [Binaries.Ia32]
-  UEFI_APP|ia32/Shell_Full.efi
+  PE32|ia32/Shell_Full.efi|*
 
 [Binaries.X64]
-  UEFI_APP|x64/Shell_full.efi
+  PE32|x64/Shell_full.efi|*
 
 [Binaries.IPF]
-  UEFI_APP|ipf/Shell_Full.efi
+  PE32|ipf/Shell_Full.efi|*
 
