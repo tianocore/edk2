@@ -39,7 +39,7 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
-EDK_3871: Non-Compatible: klu2
+EDK_39331: Non-Compatible: klu2
 	
 	Class_PIEnable[5]: New library class for S3Resume and Recovery for DxeIpl PEIM.
 	
@@ -48,17 +48,21 @@ EDK_3871: Non-Compatible: klu2
 	   a) MdeModulePkg/Include/Library/S3Lib.h
 	   b) MdeModulePkg/Include/Library/RecoveryLib.h
 	2) Add NULL library instances for MdeModulePkg:
-	   a) MdeModulePkg/Library/PeiS3Lib.inf.
-	   b) MdeModulePkg/Library/PeiRecoveryLib.inf
+	   a) MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf.
+	   b) MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 	3) Add framework implement library instances:
-	   a) IntelFrameworkModulePkg/Library/PeiS3Lib.inf
-	   b) IntelFrameworkModulePkg/Library/PeiRecovery.inf
+	   a) IntelFrameworkModulePkg/Library/PeiS3Lib/PeiS3Lib.inf
+	   b) IntelFrameworkModulePkg/Library/PeiRecovery/PeiRecovery.inf
 	
 	Possible Impacts:
-	1) In DSC file, if platform use framework implementation, should select:
-	   S3Lib library class       -> IntelFrameworkModulePkg/Library/PeiS3Lib.inf
-	   RecoveryLib library class -> IntelFrameworkModulePkg/Library/PeiRecovery.inf
-
+	1) In DSC file, real platform should select:
+	   S3Lib library class       -> IntelFrameworkModulePkg/Library/PeiS3Lib/PeiS3Lib.inf
+	   RecoveryLib library class -> IntelFrameworkModulePkg/Library/PeiRecovery/PeiRecovery.inf
+	   
+	   Nt32 platform should select:
+	   S3Lib library class       -> MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf.
+	   RecoveryLib library class -> MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
+	   
 ==========================================================================================
 EDK_3922:  Non-Compatible: qwang12, klu2
   Class_PIEnable[2]:  Update PEI core to only consume EFI_PEI_FIRMWARE_VOLUME_INFO_PPI
