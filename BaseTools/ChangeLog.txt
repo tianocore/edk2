@@ -173,8 +173,11 @@ EDK_3789: Non-Compatible: lgao4
 
         Possible Impacts:
         1) All platform's FDF file, if any, must be changed to new format.
-          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName, for example PcdWinNtFdBaseAddress in old FDF file will be replaced by gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddres.
-          b) Rule format adds binary file type and file postfix name support, and doesn't require the full file path. For example:
+          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName, 
+             for example PcdWinNtFdBaseAddress in old FDF file will be replaced 
+             by gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddres.
+          b) Rule format adds binary file type and file postfix name support, 
+             and doesn't require the full file path. Examples for Peim and AcpiTable module:
           Old Peim Rule:
           [Rule.Common.PEIM]
           FILE PEIM = $(NAMED_GUID) {
@@ -190,6 +193,22 @@ EDK_3789: Non-Compatible: lgao4
                PE32      PE32                      |.efi
                UI       STRING="$(MODULE_NAME)" Optional         
                VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
+            }
+
+          Old AcpiTable Rule:
+          [Rule.Common.DXE_DRIVER.ACPITABLE]
+            FILE FREEFORM = $(NAMED_GUID) {
+              RAW                    $(INF_OUTPUT)/Madt.acpi
+              RAW                    $(INF_OUTPUT)/Fadt.acpi
+              RAW                    $(INF_OUTPUT)/Facs.acpi
+              RAW                    $(INF_OUTPUT)/Spcr.acpi
+              RAW                    $(INF_OUTPUT)/Dsdt.aml
+            }
+          New AcpiTable Rule:
+          [Rule.Common.DXE_DRIVER.ACPITABLE]
+            FILE FREEFORM = $(NAMED_GUID) {
+              RAW ACPI |.acpi
+              RAW ASL  |.aml
             }
 
 ==========================================================================================
@@ -240,6 +259,7 @@ EDK_3766: Non-Compatible: lgao4
         1) Conf/build_rule.template
 
         Possible Impacts:
-        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option for APP_FLAGS in module inf to override the default /E option from tools_def.txt file. 
+        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option 
+        for APP_FLAGS in module inf to override the default /E option defined in tools_def.txt file. 
 
 
