@@ -87,8 +87,6 @@
 [Ppis]
   gEfiPeiSecurityPpiGuid                        # PPI SOMETIMES_CONSUMED
   gEfiPeiSectionExtractionPpiGuid               # PPI SOMETIMES_CONSUMED
-  gEfiPeiS3ResumePpiGuid                        # PPI SOMETIMES_CONSUMED
-  gEfiPeiRecoveryModulePpiGuid                  # PPI SOMETIMES_CONSUMED
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
   gEfiPeiPeCoffLoaderGuid                       
