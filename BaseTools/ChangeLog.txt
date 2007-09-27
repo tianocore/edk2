@@ -39,6 +39,18 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_3947: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Improved spawn mode (multi-thread) build performance (build -s)
+				2) Changed the error/debug/warning message format
+				3) Added "--log" command line option to support storing log in file
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+
+
+==========================================================================================
 EDK_3936: Compatible: klu2
 
       Class_BuildTool:
