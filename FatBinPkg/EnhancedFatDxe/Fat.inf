@@ -31,14 +31,14 @@
 #
 
 [Binaries.Ia32]
-  FW|Ia32/Fat.efi
+  PE32|Ia32/Fat.efi|*
 
 [Binaries.X64]
-  FW|X64/Fat.efi
+  PE32|X64/Fat.efi|*
 
 [Binaries.IPF]
-  FW|Ipf/Fat.efi
+  PE32|Ipf/Fat.efi|*
 
 [Binaries.EBC]
-  FW|Ebc/Fat.efi
+  PE32|Ebc/Fat.efi|*
 
