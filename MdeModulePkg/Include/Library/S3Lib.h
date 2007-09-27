@@ -16,14 +16,14 @@
 #define __S3_LIB_H__
 
 /**
-  Calling this function causes the system restore config from S3.
+  This function is responsible for calling the S3 resume vector in the ACPI Tables.
   
   @retval EFI_SUCESS   Sucess to restore config from S3.
   @retval Others       Fail to restore config from S3.
 **/
 EFI_STATUS
 EFIAPI
-S3RestoreConfig (
+AcpiS3ResumeOs (
   VOID
   )
 ;
