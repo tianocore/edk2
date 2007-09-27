@@ -109,15 +109,14 @@ PeimInitializeDxeIpl (
   if (BootMode != BOOT_ON_S3_RESUME) {
     Status = PeiServicesRegisterForShadow (FfsHandle);
     if (Status == EFI_SUCCESS) {
-
-      gInMemory = TRUE;
       //
       // EFI_SUCESS means the first time call register for shadow 
       // 
       return Status;
     } else if (Status == EFI_ALREADY_STARTED) {
-
-
+      
+      gInMemory = TRUE;
+      
       //
       // Get custom decompress method guid list 
       //
