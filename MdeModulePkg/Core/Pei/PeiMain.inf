@@ -82,13 +82,12 @@
   DebugLib
   MemoryAllocationLib
   CacheMaintenanceLib
-  PeCoffLoaderLib
   PeCoffLib
 
 [Guids]
   gPeiAprioriFileNameGuid
   gEfiFirmwareFileSystem2Guid
-
+  gEfiPeiPeCoffLoaderGuid
 
 [Ppis]
   gEfiPeiSecurityPpiGuid                        # PPI_NOTIFY SOMETIMES_CONSUMED

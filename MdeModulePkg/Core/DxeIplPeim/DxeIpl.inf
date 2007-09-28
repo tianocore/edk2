@@ -67,7 +67,6 @@
   PeiServicesTablePointerLib
   CustomDecompressLib
   UefiDecompressLib
-  PeCoffLoaderLib
   CacheMaintenanceLib
   ReportStatusCodeLib
   PeiServicesLib
@@ -90,7 +89,6 @@
   gEfiPeiSectionExtractionPpiGuid               # PPI SOMETIMES_CONSUMED
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
-  gEfiPeiPeCoffLoaderGuid                       
   gEfiPeiDecompressPpiGuid
   gEfiPeiFirmwareVolumeInfoPpiGuid
 

@@ -25,7 +25,6 @@ Abstract:
 // DXE Core Global Variables for Protocols from PEI
 //
 EFI_HANDLE                                mDecompressHandle = NULL;
-EFI_PEI_PE_COFF_LOADER_PROTOCOL           *gEfiPeiPeCoffLoader          = NULL;
 
 //
 // DXE Core globals for Architecture Protocols
@@ -369,9 +368,6 @@ Returns:
               NULL
               );
   ASSERT_EFI_ERROR (Status);
-
-  gEfiPeiPeCoffLoader = GetPeCoffLoaderProtocol ();
-  ASSERT (gEfiPeiPeCoffLoader != NULL);
 
   //
   // Register for the GUIDs of the Architectural Protocols, so the rest of the

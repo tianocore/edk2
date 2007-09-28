@@ -54,7 +54,6 @@ Revision History
 #include <Library/MemoryAllocationLib.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/AprioriFileName.h>
-#include <Guid/PeiPeCoffLoader.h>
 
 #define PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE   0xff
 
@@ -133,7 +132,6 @@ typedef struct{
   UINTN                              SizeOfCacheAsRam;
   VOID                               *MaxTopOfCarHeap;
   EFI_PEI_PPI_DESCRIPTOR             *XipLoadFile;
-  EFI_PEI_PE_COFF_LOADER_PROTOCOL    *PeCoffLoader; 
 } PEI_CORE_INSTANCE;
 
 //
