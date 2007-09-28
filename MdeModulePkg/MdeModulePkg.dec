@@ -29,7 +29,6 @@
 [LibraryClasses.common]
   IpIoLib|Include/Library/IpIoLib.h
   NetLib|Include/Library/NetLib.h  
-  PeCoffLoaderLib|Include/Library/PeCoffLoaderLib.h  
   ResetSystemLib|Include/Library/ResetSystemLib.h  
   UdpIoLib|Include/Library/UdpIoLib.h
   S3Lib|Include/Library/S3Lib.h

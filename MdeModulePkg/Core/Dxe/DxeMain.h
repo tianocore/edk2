@@ -79,7 +79,6 @@ Revision History
 #include <Library/PerformanceLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/CustomDecompressLib.h>
-#include <Library/PeCoffLoaderLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
@@ -203,7 +202,6 @@ extern EFI_DXE_SERVICES                         *gDxeCoreDS;
 extern EFI_HANDLE                               gDxeCoreImageHandle;
 
 extern EFI_DECOMPRESS_PROTOCOL                  gEfiDecompress;
-extern EFI_PEI_PE_COFF_LOADER_PROTOCOL          *gEfiPeiPeCoffLoader;
 
 extern EFI_RUNTIME_ARCH_PROTOCOL                *gRuntime;
 extern EFI_CPU_ARCH_PROTOCOL                    *gCpu;
