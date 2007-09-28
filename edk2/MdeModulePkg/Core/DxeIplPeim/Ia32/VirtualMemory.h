@@ -49,6 +49,12 @@ typedef union {
   UINT64  Uint64;
 } IA32_GDT;
 
+typedef struct {
+  IA32_IDT_GATE_DESCRIPTOR  Ia32IdtEntry;
+  UINT32                    Offset32To63;
+  UINT32                    Reserved;
+} X64_IDT_GATE_DESCRIPTOR;
+
 //
 // Page-Map Level-4 Offset (PML4) and
 // Page-Directory-Pointer Offset (PDPE) entries 4K & 2MB
@@ -103,5 +109,39 @@ CreateIdentityMappingPageTables (
   VOID
   )
 ;
+
+
+/**
+ 
+  Fix up the vector number in the vector code.
+ 
+  @param VectorBase   Base address of the vector handler.
+ 
+  @param VectorNum    Index of vector.
+ 
+**/
+VOID
+EFIAPI
+AsmVectorFixup (
+  VOID    *VectorBase,
+  UINT8   VectorNum
+  );
+
+
+/**
+ 
+  Get the information of vector template.
+  
+  @param TemplateBase   Base address of the template code.
+ 
+  @return               Size of the Template code.
+ 
+**/
+UINTN
+EFIAPI
+AsmGetVectorTemplatInfo (
+  OUT   VOID  **TemplateBase
+  );
+
 
 #endif 
