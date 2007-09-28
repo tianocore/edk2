@@ -68,6 +68,7 @@
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 
+  
 [LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib.inf
@@ -124,7 +125,8 @@
   PeCoffGetEntryPointLib|Nt32Pkg/Library/Nt32PeiPeCoffGetEntryPointLib/Nt32PeiPeCoffGetEntryPointLib.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PeCoffLib|Nt32Pkg/Library/PeiNT32PeCoffLib/PeiNT32PeCoffLib.inf
-
+  PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
+  
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
