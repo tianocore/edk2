@@ -228,6 +228,7 @@ Returns:
   BOOLEAN                             PeimNeedingDispatch;
   BOOLEAN                             PeimDispatchOnThisPass;
   UINTN                               SaveCurrentPeimCount;
+  UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
   VOID                                *TopOfStack;
   PEI_CORE_PARAMETERS                 PeiCoreParameters;
@@ -244,9 +245,10 @@ Returns:
     // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW to PEIM_STATE_DONE.
     //
     SaveCurrentPeimCount  = Private->CurrentPeimCount;
+    SaveCurrentFvCount    = Private->CurrentPeimFvCount;
     SaveCurrentFileHandle =  Private->CurrentFileHandle;
 
-    for (Index1 = 0;Index1 <= Private->CurrentPeimFvCount; Index1++) {
+    for (Index1 = 0; Index1 <= SaveCurrentFvCount; Index1++) {
       for (Index2 = 0; (Index2 < PEI_CORE_MAX_PEIM_PER_FV) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
         if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];  
@@ -261,8 +263,9 @@ Returns:
             // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
             //
             Private->Fv[Index1].PeimState[Index2]++;
-            Private->CurrentFileHandle = PeimFileHandle;
-            Private->CurrentPeimCount  = Index2;        
+            Private->CurrentFileHandle   = PeimFileHandle;
+            Private->CurrentPeimFvCount  = Index1;        
+            Private->CurrentPeimCount    = Index2;        
             //
             // Call the PEIM entry point
             //
@@ -281,8 +284,9 @@ Returns:
         }
       }
     }
-    Private->CurrentFileHandle = SaveCurrentFileHandle;   
-    Private->CurrentPeimCount  = SaveCurrentPeimCount;    
+    Private->CurrentFileHandle  = SaveCurrentFileHandle;   
+    Private->CurrentPeimFvCount = SaveCurrentFvCount;    
+    Private->CurrentPeimCount   = SaveCurrentPeimCount;    
   }
 
   //
