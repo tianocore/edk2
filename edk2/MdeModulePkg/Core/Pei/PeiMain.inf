@@ -87,7 +87,6 @@
 [Guids]
   gPeiAprioriFileNameGuid
   gEfiFirmwareFileSystem2Guid
-  gEfiPeiPeCoffLoaderGuid
 
 [Ppis]
   gEfiPeiSecurityPpiGuid                        # PPI_NOTIFY SOMETIMES_CONSUMED

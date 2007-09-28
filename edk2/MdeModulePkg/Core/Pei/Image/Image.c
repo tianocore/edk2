@@ -557,8 +557,7 @@ InitializeImageServices (
 
 Routine Description:
 
-  Regitser PeCoffLoader to PeiCore PrivateData. And install
-  Pei Load File PPI.
+  Install Pei Load File PPI.
 
 Arguments:
 

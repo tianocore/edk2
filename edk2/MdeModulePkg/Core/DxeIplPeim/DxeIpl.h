@@ -42,7 +42,6 @@ Abstract:
 #include <Library/PeiServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CacheMaintenanceLib.h>
-#include <Library/PeCoffLoaderLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/CustomDecompressLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
@@ -60,15 +59,6 @@ Abstract:
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) ((ActualSize + (Alignment - 1)) & ~(Alignment - 1))
 
 extern BOOLEAN gInMemory;
-
-EFI_STATUS
-PeiFindFile (
-  IN  UINT8                  Type,
-  IN  EFI_SECTION_TYPE       SectionType,
-  OUT EFI_GUID               *FileName,
-  OUT VOID                   **Pe32Data
-  )
-;
 
 EFI_STATUS
 PeiLoadFile (
@@ -101,31 +91,6 @@ GetImageReadFunction (
 ;
 
 EFI_STATUS
-PeiImageRead (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN OUT UINTN   *ReadSize,
-  OUT    VOID    *Buffer
-  )
-;
-
-EFI_STATUS
-EFIAPI
-DxeIplLoadFile (
-  IN EFI_PEI_FV_FILE_LOADER_PPI                 *This,
-  IN  EFI_FFS_FILE_HEADER                       *FfsHeader,
-  OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
-  OUT UINT64                                    *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  );
-
-EFI_STATUS
-ShadowDxeIpl (
-  IN EFI_FFS_FILE_HEADER                       *DxeIpl,
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader
-  );
-
-EFI_STATUS
 EFIAPI
 DxeLoadCore (
   IN EFI_DXE_IPL_PPI       *This,
@@ -138,14 +103,6 @@ HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
   IN EFI_PEI_HOB_POINTERS   HobList,
   IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
-  );
-
-EFI_STATUS
-PeiProcessFile (
-  IN      EFI_SECTION_TYPE       SectionType,
-  IN      EFI_FFS_FILE_HEADER    *FfsFileHeader,
-  OUT     VOID                   **Pe32Data,
-  IN      EFI_PEI_HOB_POINTERS   *OrigHob
   );
 
 EFI_STATUS

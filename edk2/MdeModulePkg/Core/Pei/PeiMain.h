@@ -44,11 +44,11 @@ Revision History
 #include <Library/PerformanceLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/PeCoffLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/TimerLib.h>
-#include <Library/PeCoffLoaderLib.h>
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -1399,8 +1399,7 @@ InitializeImageServices (
 
 Routine Description:
 
-  Regitser PeCoffLoader to PeiCore PrivateData. And install
-  Pei Load File PPI.
+  Install Pei Load File PPI.
 
 Arguments:
 
