@@ -174,7 +174,6 @@ DxeLoadCore (
   EFI_PHYSICAL_ADDRESS                      DxeCoreAddress;
   UINT64                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
-  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader;
   EFI_BOOT_MODE                             BootMode;
   EFI_PEI_FV_HANDLE                         VolumeHandle;
   EFI_PEI_FILE_HANDLE                       FileHandle;
@@ -200,12 +199,6 @@ DxeLoadCore (
     // Now should have a HOB with the DXE core w/ the old HOB destroyed
     //
   }
-
-  //
-  // Install the PEI Protocols that are shared between PEI and DXE
-  //
-  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *) GetPeCoffLoaderProtocol ();
-  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
   
   //
   // If any FV contains an encapsulated FV extract that FV
@@ -243,14 +236,6 @@ DxeLoadCore (
     DxeCoreEntryPoint
     );
 
-  //
-  // Add HOB for the PE/COFF Loader Protocol
-  //
-  BuildGuidDataHob (
-    &gEfiPeiPeCoffLoaderGuid,
-    (VOID *)&PeiEfiPeiPeCoffLoader,
-    sizeof (VOID *)
-    );
   //
   // Report Status Code EFI_SW_PEI_PC_HANDOFF_TO_NEXT
   //
@@ -456,9 +441,6 @@ PeiLoadFile (
   EFI_STATUS                        Status;
   PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
   VOID                              *Pe32Data;
-  EFI_PEI_PE_COFF_LOADER_PROTOCOL   *PeiEfiPeiPeCoffLoader;
-
-  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
   //
   // First try to find the required section in this ffs file.
   //
@@ -489,7 +471,7 @@ PeiLoadFile (
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiEfiPeiPeCoffLoader->GetImageInfo (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -502,14 +484,14 @@ PeiLoadFile (
   //
   // Load the image to our new buffer
   //
-  Status = PeiEfiPeiPeCoffLoader->LoadImage (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
   //
   // Relocate the image in our new buffer
   //
-  Status = PeiEfiPeiPeCoffLoader->RelocateImage (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }

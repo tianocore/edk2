@@ -1,75 +1,98 @@
-/** @file
-  Memory Only PE COFF loader. 
+/*++
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
+
+  PeiNt32PeCoffLib.c
+
+Abstract:
+
+  Wrap the Nt32 PE/COFF loader with the PE COFF LOADER guid structure
+  to produce PeCoff library class.
+
+
+--*/
+
+#include <PiPei.h>
+#include <Guid/PeiPeCoffLoader.h>
+#include <Library/DebugLib.h>
+#include <Library/PeCoffLib.h>
+#include <Library/HobLib.h>
+
+EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
+
+/**
+  The constructor function caches the pointer of PeCofferLoader guid structure
+  into the guid data hob.
+
+  The constructor must be called after PeCofferLoader guid structure is installed.
+  It will ASSERT() if PeCofferLoader guid structure is not installed.
+
+  @param  FfsHeader   Pointer to FFS header the loaded driver.
+  @param  PeiServices Pointer to the PEI services.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
+EFI_STATUS
+EFIAPI
+PeiNt32PeCoffLibConstructor (
+  IN EFI_FFS_FILE_HEADER      *FfsHeader,
+  IN EFI_PEI_SERVICES         **PeiServices
+  )
+{
+  EFI_STATUS           Status;
+  EFI_HOB_GUID_TYPE    *GuidHob;
 
-#ifndef __BASE_PE_COFF_LIB_H__
-#define __BASE_PE_COFF_LIB_H__
+  Status = EFI_NOT_FOUND;
+  
+  //
+  // Try to get guid data hob that contains PeCoffLoader guid structure.
+  //
+  GuidHob = GetFirstGuidHob (&gEfiPeiPeCoffLoaderGuid);
 
-#include <IndustryStandard/PeImage.h>
-//
-// Return status codes from the PE/COFF Loader services
-// BUGBUG: Find where used and see if can be replaced by RETURN_STATUS codes
-//
-#define IMAGE_ERROR_SUCCESS                      0
-#define IMAGE_ERROR_IMAGE_READ                   1  
-#define IMAGE_ERROR_INVALID_PE_HEADER_SIGNATURE  2
-#define IMAGE_ERROR_INVALID_MACHINE_TYPE         3
-#define IMAGE_ERROR_INVALID_SUBSYSTEM            4
-#define IMAGE_ERROR_INVALID_IMAGE_ADDRESS        5
-#define IMAGE_ERROR_INVALID_IMAGE_SIZE           6
-#define IMAGE_ERROR_INVALID_SECTION_ALIGNMENT    7
-#define IMAGE_ERROR_SECTION_NOT_LOADED           8
-#define IMAGE_ERROR_FAILED_RELOCATION            9
-#define IMAGE_ERROR_FAILED_ICACHE_FLUSH          10
+  if (GuidHob == NULL) {
+    //
+    // GuidHob is not ready, try to locate PeCoffLoader guid structure.
+    //
+    Status = (*PeiServices)->LocatePpi (
+                              PeiServices,
+                              &gEfiPeiPeCoffLoaderGuid,
+                              0,
+                              NULL,
+                              &mPeiEfiPeiPeCoffLoader
+                              );
+    
+    //
+    // PeCofferLoader guid structure must be installed before this library runs.
+    //
+    ASSERT_EFI_ERROR (Status);
+    
+    //
+    // Build guid data hob of PeCofferLoader guid structure for DXE module use. 
+    //
+    BuildGuidDataHob (
+      &gEfiPeiPeCoffLoaderGuid,
+      (VOID *) &mPeiEfiPeiPeCoffLoader,
+      sizeof (VOID *)
+      );
+  } else {
+    //
+    // Get PeCofferLoader guid structure directly from guid hob data.
+    //
+    mPeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)(*(UINTN *)(GET_GUID_HOB_DATA (GuidHob)));
+  }
 
-//
-// PE/COFF Loader Read Function passed in by caller
-//
-typedef
-RETURN_STATUS
-(EFIAPI *PE_COFF_LOADER_READ_FILE) (
-  IN     VOID   *FileHandle,
-  IN     UINTN  FileOffset,
-  IN OUT UINTN  *ReadSize,
-  OUT    VOID   *Buffer
-  );
-
-//
-// Context structure used while PE/COFF image is being loaded and relocated
-//
-typedef struct {
-  PHYSICAL_ADDRESS                  ImageAddress;
-  UINT64                            ImageSize;
-  PHYSICAL_ADDRESS                  DestinationAddress;
-  PHYSICAL_ADDRESS                  EntryPoint;
-  PE_COFF_LOADER_READ_FILE          ImageRead;
-  VOID                              *Handle;
-  VOID                              *FixupData;
-  UINT32                            SectionAlignment;
-  UINT32                            PeCoffHeaderOffset;
-  UINT32                            DebugDirectoryEntryRva;
-  VOID                              *CodeView;
-  CHAR8                             *PdbPointer;
-  UINTN                             SizeOfHeaders;
-  UINT32                            ImageCodeMemoryType;
-  UINT32                            ImageDataMemoryType;
-  UINT32                            ImageError;
-  UINTN                             FixupDataSize;
-  UINT16                            Machine;
-  UINT16                            ImageType;
-  BOOLEAN                           RelocationsStripped;
-  BOOLEAN                           IsTeImage;
-} PE_COFF_LOADER_IMAGE_CONTEXT;
+  return EFI_SUCCESS;
+}
 
 /**
   Retrieves information about a PE/COFF image.
@@ -95,7 +118,9 @@ EFIAPI
 PeCoffLoaderGetImageInfo (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-;
+{
+    return mPeiEfiPeiPeCoffLoader->GetImageInfo (mPeiEfiPeiPeCoffLoader, ImageContext);
+}
 
 /**
   Applies relocation fixups to a PE/COFF image that was loaded with PeCoffLoaderLoadImage().
@@ -122,7 +147,9 @@ EFIAPI
 PeCoffLoaderRelocateImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-;
+{
+  return mPeiEfiPeiPeCoffLoader->RelocateImage (mPeiEfiPeiPeCoffLoader, ImageContext);
+}
 
 /**
   Loads a PE/COFF image into memory.
@@ -152,8 +179,9 @@ EFIAPI
 PeCoffLoaderLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-;
-
+{
+  return mPeiEfiPeiPeCoffLoader->LoadImage (mPeiEfiPeiPeCoffLoader, ImageContext);
+}
 
 /**
   ImageRead function that operates on a memory buffer whos base is passed into
@@ -175,7 +203,9 @@ PeCoffLoaderImageReadFromMemory (
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
   )
-;
+{
+  return RETURN_UNSUPPORTED;
+}
 
 
 /**
@@ -200,7 +230,8 @@ PeCoffLoaderRelocateImageForRuntime (
   IN  UINTN                   ImageSize,
   IN  VOID                    *RelocationData
   )
-;
+{
+}
 
 /**
   Unloads a loaded PE/COFF image from memory and releases its taken resource.
@@ -217,7 +248,8 @@ PeCoffLoaderRelocateImageForRuntime (
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
-;
-#endif
+{
+  return mPeiEfiPeiPeCoffLoader->UnloadImage (mPeiEfiPeiPeCoffLoader, ImageContext);
+}

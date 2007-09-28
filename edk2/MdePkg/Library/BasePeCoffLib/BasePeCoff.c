@@ -1334,3 +1334,23 @@ PeCoffLoaderImageReadFromMemory (
   return RETURN_SUCCESS;
 }
 
+/**
+  Unloads a loaded PE/COFF image from memory and releases its taken resource.
+   
+  For NT32 emulator, the PE/COFF image loaded by system needs to release.
+  For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
+  this function can simply return RETURN_SUCCESS.
+
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image to be unloaded.
+
+  @retval RETURN_SUCCESS            The PE/COFF image was unloaded successfully.
+**/
+RETURN_STATUS
+EFIAPI
+PeCoffLoaderUnloadImage (
+  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  )
+{
+  return RETURN_SUCCESS;
+}

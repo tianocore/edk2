@@ -82,6 +82,7 @@ Revision History
 #include <Library/PeCoffLoaderLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PeCoffLib.h>
 
 #include "DebugImageInfo.h"
 #include "Library.h"

@@ -195,7 +195,6 @@ Returns:
 STATIC
 EFI_STATUS
 LoadAndRelocatePeCoffImage (
-  IN  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader,
   IN  VOID                                      *Pe32Data,
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
   OUT UINT64                                    *ImageSize,
@@ -208,8 +207,6 @@ Routine Description:
   Loads and relocates a PE/COFF image into memory.
 
 Arguments:
-
-  PeiEfiPeiPeCoffLoader - Pointer to a PE COFF loader protocol
 
   Pe32Data         - The base address of the PE/COFF file that is to be loaded and relocated
 
@@ -230,15 +227,13 @@ Returns:
   EFI_STATUS                            Status;
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
 
-  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
-
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle = Pe32Data;
   Status              = GetImageReadFunction (&ImageContext);
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiEfiPeiPeCoffLoader->GetImageInfo (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -251,14 +246,14 @@ Returns:
   //
   // Load the image to our new buffer
   //
-  Status = PeiEfiPeiPeCoffLoader->LoadImage (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
   //
   // Relocate the image in our new buffer
   //
-  Status = PeiEfiPeiPeCoffLoader->RelocateImage (PeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -312,14 +307,12 @@ Returns:
   EFI_PHYSICAL_ADDRESS        ImageAddress;
   UINT64                      ImageSize;
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
-  EFI_TE_IMAGE_HEADER         *TEImageHeader;
   UINT16                      Machine;
   PEI_CORE_INSTANCE           *Private;
   VOID                        *EntryPointArg;
 
-  *EntryPoint   = 0;
-  TEImageHeader = NULL;
-  ImageSize = 0;
+  *EntryPoint          = 0;
+  ImageSize            = 0;
   *AuthenticationState = 0;
 
   //
@@ -330,11 +323,8 @@ Returns:
              FileHandle,
              &Pe32Data
              );
-  if (!EFI_ERROR (Status)) {
-     TEImageHeader = (EFI_TE_IMAGE_HEADER *)Pe32Data;
-  }
   //
-  // If we didn't find a PE32 section, try to find a TE section.
+  // If we didn't find a TE section, try to find a PE32 section.
   //
   if (EFI_ERROR (Status)) {
     Status = PeiServicesFfsFindSectionData (
@@ -355,57 +345,38 @@ Returns:
 
   if (Private->PeiMemoryInstalled && 
       (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
-    {
-      //
-      // If memory is installed, perform the shadow operations
-      //
-      Status = LoadAndRelocatePeCoffImage (
-        Private->PeCoffLoader,
-        Pe32Data,
-        &ImageAddress,
-        &ImageSize,
-        &ImageEntryPoint
-      );
+    //
+    // If memory is installed, perform the shadow operations
+    //
+    Status = LoadAndRelocatePeCoffImage (
+      Pe32Data,
+      &ImageAddress,
+      &ImageSize,
+      &ImageEntryPoint
+    );
 
-      if (EFI_ERROR (Status)) {
-        return EFI_NOT_FOUND;
-      }
-
-      //
-      // Got the entry point from ImageEntryPoint and ImageStartAddress
-      //
-      Pe32Data    = (VOID *) ((UINTN) ImageAddress);
-      *EntryPoint = ImageEntryPoint;
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
+
+    //
+    // Got the entry point from the loaded Pe32Data
+    //
+    Pe32Data    = (VOID *) ((UINTN) ImageAddress);
+    *EntryPoint = ImageEntryPoint;
   } else {
-   if (TEImageHeader != NULL) {
-      //
-      // Retrieve the entry point from the TE image header
-      //
-      ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) TEImageHeader;
-      ImageSize = 0;
-      *EntryPoint  = (EFI_PHYSICAL_ADDRESS)((UINTN) TEImageHeader + sizeof (EFI_TE_IMAGE_HEADER) +
-                    TEImageHeader->AddressOfEntryPoint - TEImageHeader->StrippedSize);
-    } else {
-      //
-      // Retrieve the entry point from the PE/COFF image header
-      //
-      ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) Pe32Data;
-      ImageSize = 0;
-      Status = PeCoffLoaderGetEntryPoint (Pe32Data, &EntryPointArg);
-      *EntryPoint = (EFI_PHYSICAL_ADDRESS) (UINTN) EntryPointArg;
-      if (EFI_ERROR (Status)) {
-        return EFI_NOT_FOUND;
-      }
+    //
+    // Retrieve the entry point from the PE/COFF or TE image header
+    //
+    ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) Pe32Data;
+    Status = PeCoffLoaderGetEntryPoint (Pe32Data, &EntryPointArg);
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
+    *EntryPoint = (EFI_PHYSICAL_ADDRESS) (UINTN) EntryPointArg;
   }
-
-  if (((EFI_TE_IMAGE_HEADER *) (UINTN) ImageAddress)->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
-    TEImageHeader = (EFI_TE_IMAGE_HEADER *) (UINTN) ImageAddress;
-    Machine = TEImageHeader->Machine;
-  } else {
-    Machine = PeCoffLoaderGetMachineType (Pe32Data);
-  } 
+  
+  Machine = PeCoffLoaderGetMachineType (Pe32Data);
   
   if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Machine)) {
     return EFI_UNSUPPORTED;  
@@ -424,120 +395,29 @@ Returns:
   //
   DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", (UINTN) ImageAddress, *EntryPoint));
   DEBUG_CODE_BEGIN ();
-    EFI_IMAGE_DATA_DIRECTORY            *DirectoryEntry;
-    EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *DebugEntry;
-    UINTN                               DirCount;
-    UINTN                               Index;
-    UINTN                               Index1;
-    BOOLEAN                             FileNameFound;
-    CHAR8                               *AsciiString;
-    CHAR8                               AsciiBuffer[512];
-    VOID                                *CodeViewEntryPointer;
-    INTN                                TEImageAdjust;
-    EFI_IMAGE_DOS_HEADER                *DosHeader;
-    EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION Hdr;
-    UINT32                              NumberOfRvaAndSizes;
-
-    Hdr.Pe32 = NULL;
-    if (TEImageHeader == NULL) {
-      DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-      if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-        //
-        // DOS image header is present, so read the PE header after the DOS image header
-        //
-        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHeader->e_lfanew) & 0x0ffff));
-      } else {
-        //
-        // DOS image header is not present, so PE header is at the image base
-        //
-        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
-      }
-    }
-
-    //
-    // Find the codeview info in the image and display the file name
-    // being loaded.
-    //
-    // Per the PE/COFF spec, you can't assume that a given data directory
-    // is present in the image. You have to check the NumberOfRvaAndSizes in
-    // the optional header to verify a desired directory entry is there.
-    //
-    DebugEntry          = NULL;
-    DirectoryEntry      = NULL;
-    NumberOfRvaAndSizes = 0;
-    TEImageAdjust       = 0;
+    CHAR8                              *AsciiString;
+    CHAR8                              AsciiBuffer[512];
+    INT32                              Index;
+    INT32                              Index1;
     
-    if (TEImageHeader == NULL) {
-      if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-        //     
-        // Use PE32 offset get Debug Directory Entry
-        //
-        NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
-        DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
-        DebugEntry     = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) ((UINTN) Pe32Data + DirectoryEntry->VirtualAddress);
-      } else if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-        //     
-        // Use PE32+ offset get Debug Directory Entry
-        //
-        NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
-        DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
-        DebugEntry     = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) ((UINTN) Pe32Data + DirectoryEntry->VirtualAddress);
-      }
-
-      if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_DEBUG) {
-        DirectoryEntry = NULL;
-        DebugEntry = NULL;
-      }
-    } else {
-      if (TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) {
-        DirectoryEntry  = &TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG];
-        TEImageAdjust   = sizeof (EFI_TE_IMAGE_HEADER) - TEImageHeader->StrippedSize;
-        DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)((UINTN) TEImageHeader +
-                      TEImageHeader->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress +
-                      TEImageAdjust);
-      }
-    }
-
-    if (DebugEntry != NULL && DirectoryEntry != NULL) {
-      for (DirCount = 0; DirCount < DirectoryEntry->Size; DirCount += sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY), DebugEntry++) {
-        if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-          if (DebugEntry->SizeOfData > 0) {
-            CodeViewEntryPointer = (VOID *) ((UINTN) DebugEntry->RVA + (UINTN) ImageAddress + (UINTN)TEImageAdjust);
-            switch (* (UINT32 *) CodeViewEntryPointer) {
-              case CODEVIEW_SIGNATURE_NB10:
-                AsciiString = (CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
-                break;
-
-              case CODEVIEW_SIGNATURE_RSDS:
-                AsciiString = (CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
-                break;
-
-              default:
-                AsciiString = NULL;
-                break;
-            }
-            if (AsciiString != NULL) {
-              FileNameFound = FALSE;
-              for (Index = 0, Index1 = 0; AsciiString[Index] != '\0'; Index++) {
-                if (AsciiString[Index] == '\\') {
-                  Index1 = Index;
-                  FileNameFound = TRUE;
-                }
-              }
-
-              if (FileNameFound) {
-                for (Index = Index1 + 1; AsciiString[Index] != '.'; Index++) {
-                  AsciiBuffer[Index - (Index1 + 1)] = AsciiString[Index];
-                }
-                AsciiBuffer[Index - (Index1 + 1)] = 0;
-                DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a.efi", AsciiBuffer));
-                break;
-              }
-            }
-          }
+    AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
+    
+    if (AsciiString != NULL) {
+      for (Index = AsciiStrLen (AsciiString) - 1; Index >= 0; Index --) {
+        if (AsciiString[Index] == '\\') {
+          break;
         }
       }
+
+      if (Index != 0) {
+        for (Index1 = 0; AsciiString[Index + 1 + Index1] != '.'; Index1 ++) {
+          AsciiBuffer [Index1] = AsciiString[Index + 1 + Index1];
+        }
+        AsciiBuffer [Index1] = '\0';
+        DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a.efi", AsciiBuffer));
+      }
     }
+
   DEBUG_CODE_END ();
 
   DEBUG ((EFI_D_INFO | EFI_D_LOAD, "\n"));
@@ -691,12 +571,6 @@ Returns:
   
 --*/      
 {
-  //
-  // Always update PeCoffLoader pointer as PEI core itself may get 
-  // shadowed into memory
-  //
-  PrivateData->PeCoffLoader = GetPeCoffLoaderProtocol ();
-  
   if (OldCoreData == NULL) {
     //
     // The first time we are XIP (running from FLASH). We need to remember the

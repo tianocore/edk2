@@ -213,7 +213,7 @@ Returns:
   //
   // Get information about the image being loaded
   //
-  Status = gEfiPeiPeCoffLoader->GetImageInfo (gEfiPeiPeCoffLoader, &Image->ImageContext);
+  Status = PeCoffLoaderGetImageInfo (&Image->ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -305,7 +305,7 @@ Returns:
   //
   // Load the image from the file into the allocated memory
   //
-  Status = gEfiPeiPeCoffLoader->LoadImage (gEfiPeiPeCoffLoader, &Image->ImageContext);
+  Status = PeCoffLoaderLoadImage (&Image->ImageContext);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -328,7 +328,7 @@ Returns:
   //
   // Relocate the image in memory
   //
-  Status = gEfiPeiPeCoffLoader->RelocateImage (gEfiPeiPeCoffLoader, &Image->ImageContext);
+  Status = PeCoffLoaderRelocateImage (&Image->ImageContext);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -1085,7 +1085,7 @@ Returns:
   //
   // Unload image, free Image->ImageContext->ModHandle
   //
-  gEfiPeiPeCoffLoader->UnloadImage (gEfiPeiPeCoffLoader, &Image->ImageContext);
+  PeCoffLoaderUnloadImage (&Image->ImageContext);
 
   //
   // Free our references to the image handle
