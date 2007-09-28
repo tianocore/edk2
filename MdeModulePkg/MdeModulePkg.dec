@@ -161,5 +161,6 @@
 
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt|FALSE|BOOLEAN|0x0001003d
 
 

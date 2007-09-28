@@ -40,6 +40,8 @@
   Ia32/VirtualMemory.c
   Ia32/DxeLoadFunc.c
   Ia32/ImageRead.c
+  Ia32/IdtVectorAsm.asm
+  Ia32/IdtVectorAsm.S | GCC
 
 [Sources.X64]
   X64/DxeLoadFunc.c
@@ -99,6 +101,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs
 
 [FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 
