@@ -2161,7 +2161,7 @@ Returns:
 }
 
 EFI_STATUS
-ResetAllPpbBusReg (
+ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
   )
@@ -2188,6 +2188,7 @@ Returns:
   UINT32                          Register;
   UINT8                           Func;
   UINT64                          Address;
+  UINT8                           SecondaryBus;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
 
   PciRootBridgeIo = Bridge->PciRootBridgeIo;
@@ -2207,6 +2208,7 @@ Returns:
                 );
 
       if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci))) {
+
         Register  = 0;
         Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
         Status   = PciRootBridgeIoRead (
@@ -2217,6 +2219,12 @@ Returns:
                                         1,
                                         &Register
                                         );
+        SecondaryBus = (UINT8)(Register >> 8);
+
+        if (SecondaryBus != 0) {
+          ResetAllPpbBusNumber (Bridge, SecondaryBus);
+        }
+
         //
         // Reset register 18h, 19h, 1Ah on PCI Bridge
         //

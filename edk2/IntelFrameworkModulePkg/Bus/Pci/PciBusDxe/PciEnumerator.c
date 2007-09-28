@@ -200,11 +200,20 @@ Returns:
   // Get the bus number to start with
   //
   StartBusNumber = (UINT8) (pConfiguration->AddrRangeMin);
+  PaddedBusRange  = (UINT8) (pConfiguration->AddrRangeMax);
 
   //
   // Initialize the subordinate bus number
   //
   SubBusNumber = StartBusNumber;
+
+  //
+  // Reset all assigned PCI bus number
+  //
+  ResetAllPpbBusNumber (
+    RootBridgeDev, 
+    StartBusNumber
+  );
 
   //
   // Assign bus number

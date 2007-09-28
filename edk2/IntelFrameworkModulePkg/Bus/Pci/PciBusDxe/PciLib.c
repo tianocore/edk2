@@ -1258,8 +1258,6 @@ Returns:
   SecondBus       = 0;
   Register        = 0;
 
-  ResetAllPpbBusReg (Bridge, StartBusNumber);
-
   for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
     for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
 
@@ -1278,6 +1276,8 @@ Returns:
           (IS_PCI_BRIDGE (&Pci) ||
           IS_CARDBUS_BRIDGE (&Pci))) {
 
+        DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
+
         //
         // Get the bridge information
         //
@@ -1292,6 +1292,14 @@ Returns:
 
         if (EFI_ERROR (Status)) {
           return Status;
+        }
+
+        //
+        // Add feature to support customized secondary bus number
+        //
+       	if (*SubBusNumber == 0) {        
+          *SubBusNumber   = *PaddedBusRange;
+          *PaddedBusRange = 0;
         }
 
         (*SubBusNumber)++;
@@ -1350,6 +1358,7 @@ Returns:
             EfiPciBeforeChildBusEnumeration
             );
 
+          DEBUG((EFI_D_ERROR, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber ));
           Status = PciScanBus (
                     PciDevice,
                     (UINT8) (SecondBus),
@@ -1446,8 +1455,6 @@ Returns:
   Attributes      = (EFI_HPC_PADDING_ATTRIBUTES) 0;
   BusRange        = 0;
 
-  ResetAllPpbBusReg (Bridge, StartBusNumber);
-
   for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
     for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
 
@@ -1473,6 +1480,8 @@ Returns:
         continue;
       }
 
+      DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
+      
       //
       // Get the PCI device information
       //
@@ -1534,7 +1543,6 @@ Returns:
               PciDevice->FunctionNumber,
               EfiPciBeforeChildBusEnumeration
             );
-            continue;
           }
         }
       }
@@ -1583,6 +1591,14 @@ Returns:
           }
         }
 
+        //
+        // Add feature to support customized secondary bus number
+        //
+       	if (*SubBusNumber == 0) {        
+          *SubBusNumber   = *PaddedBusRange;
+          *PaddedBusRange = 0;
+        }
+
         (*SubBusNumber)++;
         SecondBus = *SubBusNumber;
 
@@ -1629,6 +1645,7 @@ Returns:
             EfiPciBeforeChildBusEnumeration
             );
 
+          DEBUG((EFI_D_ERROR, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber ));
           Status = PciScanBus (
                     PciDevice,
                     (UINT8) (SecondBus),
@@ -1851,6 +1868,7 @@ Returns:
   //
   NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
 
+  DEBUG((EFI_D_ERROR, "PCI Bus First Scanning\n"));
   RootBridgeHandle = NULL;
   while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 
@@ -1901,6 +1919,7 @@ Returns:
       //
       NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
 
+      DEBUG((EFI_D_ERROR, "PCI Bus Second Scanning\n"));  
       RootBridgeHandle = NULL;
       while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 
