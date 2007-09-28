@@ -1,6 +1,6 @@
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <ModuleName>Udp4</ModuleName>
+    <ModuleName>Udp4Dxe</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>6d6963ab-906d-4a65-a7ca-bd40e5d6af2b</GuidValue>
     <Version>1.0</Version>
@@ -11,7 +11,7 @@
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
-      
+
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
@@ -19,7 +19,7 @@
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>Udp4</OutputFileBasename>
+    <OutputFileBasename>Udp4Dxe</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
