@@ -627,7 +627,7 @@ ScsiWrite10Command (
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
-  *DataLength                   = CommandPacket.InTransferLength;
+  *DataLength                   = CommandPacket.OutTransferLength;
 
   return Status;
 }
