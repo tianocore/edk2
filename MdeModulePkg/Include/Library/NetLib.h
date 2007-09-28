@@ -475,39 +475,10 @@ NetLibGetNicHandle (
   IN EFI_GUID               *ProtocolGuid
   );
 
-typedef
-EFI_STATUS
-(EFIAPI *NET_LIB_DRIVER_UNLOAD) (
-  IN EFI_HANDLE             ImageHandle
-  );
-
 EFI_STATUS
 EFIAPI
 NetLibDefaultUnload (
   IN EFI_HANDLE             ImageHandle
-  );
-
-EFI_STATUS
-NetLibInstallAllDriverProtocolsWithUnload (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding,
-  IN EFI_HANDLE                         DriverBindingHandle,
-  IN EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
-  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics, OPTIONAL
-  IN NET_LIB_DRIVER_UNLOAD              CustomizedUnload
-  );
-
-EFI_STATUS
-NetLibInstallAllDriverProtocols (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding,
-  IN EFI_HANDLE                         DriverBindingHandle,
-  IN EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
-  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics OPTIONAL
   );
 
 enum {

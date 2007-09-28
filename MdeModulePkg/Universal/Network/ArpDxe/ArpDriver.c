@@ -749,7 +749,7 @@ Returns:
 
 --*/
 {
-  return NetLibInstallAllDriverProtocols (
+  return EfiLibInstallAllDriverProtocols (
            ImageHandle,
            SystemTable,
            &gArpDriverBinding,

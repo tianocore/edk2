@@ -58,7 +58,7 @@ Returns:
 
 --*/
 {
-  return NetLibInstallAllDriverProtocols (
+  return EfiLibInstallAllDriverProtocols (
            ImageHandle,
            SystemTable,
            &gMtftp4DriverBinding,

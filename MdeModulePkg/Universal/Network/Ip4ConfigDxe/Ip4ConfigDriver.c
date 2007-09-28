@@ -85,15 +85,14 @@ Returns:
 
 --*/
 {
-  return NetLibInstallAllDriverProtocolsWithUnload (
+  return EfiLibInstallAllDriverProtocols (
            ImageHandle,
            SystemTable,
            &gIp4ConfigDriverBinding,
            ImageHandle,
            &gIp4ConfigComponentName,
            NULL,
-           NULL,
-           EfiIp4ConfigUnload
+           NULL
            );
 }
 

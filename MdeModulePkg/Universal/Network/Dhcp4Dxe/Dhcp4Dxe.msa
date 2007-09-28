@@ -72,6 +72,7 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <ModuleEntryPoint>Dhcp4DriverEntryPoint</ModuleEntryPoint>
+      <ModuleUnloadImage>NetLibDefaultUnload</ModuleUnloadImage>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>

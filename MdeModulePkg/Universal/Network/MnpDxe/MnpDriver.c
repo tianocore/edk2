@@ -547,13 +547,13 @@ Returns:
 
 --*/
 {
-  return NetLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &gMnpDriverBinding,
-          ImageHandle,
-          &gMnpComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallAllDriverProtocols (
+           ImageHandle,
+           SystemTable,
+           &gMnpDriverBinding,
+           ImageHandle,
+           &gMnpComponentName,
+           NULL,
+           NULL
+           );
 }
