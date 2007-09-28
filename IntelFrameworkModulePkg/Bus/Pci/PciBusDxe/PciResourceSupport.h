@@ -705,7 +705,7 @@ Returns:
 ;
 
 EFI_STATUS
-ResetAllPpbBusReg (
+ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
   )
