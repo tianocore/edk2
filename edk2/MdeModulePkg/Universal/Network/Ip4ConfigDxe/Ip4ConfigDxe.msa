@@ -72,6 +72,7 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <ModuleEntryPoint>Ip4ConfigDriverEntryPoint</ModuleEntryPoint>
+      <ModuleUnloadImage>EfiIp4ConfigUnload</ModuleUnloadImage>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>

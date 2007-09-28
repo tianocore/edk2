@@ -176,7 +176,7 @@ Returns:
   //
   // Install the TCP4 Driver Binding Protocol
   //
-  Status = NetLibInstallAllDriverProtocols (
+  Status = EfiLibInstallAllDriverProtocols (
              ImageHandle,
              SystemTable,
              &mTcp4DriverBinding,
@@ -185,7 +185,7 @@ Returns:
              NULL,
              NULL
              );
-
+  ASSERT_EFI_ERROR (Status);
   //
   // Initialize ISS and random port.
   //

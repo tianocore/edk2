@@ -504,7 +504,7 @@ Returns:
   //
   // Install the Udp4DriverBinding and Udp4ComponentName protocols.
   //
-  Status = NetLibInstallAllDriverProtocols (
+  Status = EfiLibInstallAllDriverProtocols (
              ImageHandle,
              SystemTable,
              &gUdp4DriverBinding,

@@ -67,6 +67,7 @@
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <ModuleEntryPoint>ArpDriverEntryPoint</ModuleEntryPoint>
+      <ModuleUnloadImage>NetLibDefaultUnload</ModuleUnloadImage>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
