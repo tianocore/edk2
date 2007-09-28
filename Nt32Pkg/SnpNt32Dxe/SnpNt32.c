@@ -1018,15 +1018,14 @@ Returns:
   // Install the Driver Protocols
   //
 
-  Status = NetLibInstallAllDriverProtocolsWithUnload (
+  Status = EfiLibInstallAllDriverProtocols (
             ImageHandle,
             SystemTable,
             &gSnpNt32DriverBinding,
             ImageHandle,
             &gSnpNt32DriverComponentName,
             NULL,
-            NULL,
-            SnpNt32Unload
+            NULL
             );
   if (EFI_ERROR (Status)) {
     return Status;
