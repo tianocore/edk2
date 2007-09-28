@@ -403,7 +403,7 @@ Returns:
     AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
     
     if (AsciiString != NULL) {
-      for (Index = AsciiStrLen (AsciiString) - 1; Index >= 0; Index --) {
+      for (Index = (INT32) AsciiStrLen (AsciiString) - 1; Index >= 0; Index --) {
         if (AsciiString[Index] == '\\') {
           break;
         }
