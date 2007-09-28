@@ -74,14 +74,6 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   NULL
 };
 
-STATIC EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
-  EFI_FIRMWARE_FILE_SYSTEM2_GUID,
-  NULL,
-  0,    //FvInfoSize
-  NULL, //ParentFvName
-  NULL //ParentFileName;
-};
-
 /**
   Initializes the Dxe Ipl PPI
 
@@ -327,8 +319,6 @@ DxeIplAddEncapsulatedFirmwareVolumes (
   EFI_FIRMWARE_VOLUME_IMAGE_SECTION *SectionHeader;
   VOID                        *DstBuffer;
   UINT32                       FvAlignment;
-  EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *FvInfoPpi;
-  EFI_PEI_PPI_DESCRIPTOR           *FvInfoPpiDescriptor;
 
   Status = EFI_NOT_FOUND;
   Index  = 0;
@@ -378,33 +368,13 @@ DxeIplAddEncapsulatedFirmwareVolumes (
           //
           PeiServicesFfsGetVolumeInfo (&VolumeHandle, &VolumeInfo);
 
-          //
-          // Prepare to install FirmwareVolumeInfo PPI to expose new FV to PeiCore.
-          //
-          FvInfoPpi = AllocateCopyPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI), &mFvInfoPpiTemplate);
-          ASSERT(FvInfoPpi != NULL);
-
-          FvInfoPpi->FvInfo     = (VOID*)FvHeader;
-          FvInfoPpi->FvInfoSize = (UINT32)FvHeader->FvLength;
-          CopyMem (
-            &FvInfoPpi->ParentFvName,
+          PeiPiLibBuildPiFvInfoPpi (
+            (EFI_PHYSICAL_ADDRESS) FvHeader,
+            FvHeader->FvLength,
             &(VolumeInfo.FvName),
-            sizeof (EFI_GUID)
+            &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name)
             );
-          CopyMem (
-            &FvInfoPpi->ParentFileName,
-            &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name),
-            sizeof (EFI_GUID)
-            );
-
-          FvInfoPpiDescriptor = AllocatePool (sizeof(EFI_PEI_PPI_DESCRIPTOR));
-          ASSERT (FvInfoPpiDescriptor != NULL);
-    	  
-          FvInfoPpiDescriptor->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI|EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-          FvInfoPpiDescriptor->Guid  = &gEfiPeiFirmwareVolumeInfoPpiGuid;
-          FvInfoPpiDescriptor->Ppi   = (VOID *) FvInfoPpi;
-
-          Status          = PeiServicesInstallPpi (FvInfoPpiDescriptor);
+            
           ASSERT_EFI_ERROR (Status);
 
           //

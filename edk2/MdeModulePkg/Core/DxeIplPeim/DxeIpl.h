@@ -52,6 +52,7 @@ Abstract:
 #include <Library/PeCoffLib.h>
 #include <Library/S3Lib.h>
 #include <Library/RecoveryLib.h>
+#include <Library/PeiPiLib.h>
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000
