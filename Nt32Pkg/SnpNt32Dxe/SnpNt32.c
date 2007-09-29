@@ -1018,15 +1018,14 @@ Returns:
   // Install the Driver Protocols
   //
 
-  Status = EfiLibInstallAllDriverProtocols (
-            ImageHandle,
-            SystemTable,
-            &gSnpNt32DriverBinding,
-            ImageHandle,
-            &gSnpNt32DriverComponentName,
-            NULL,
-            NULL
-            );
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gSnpNt32DriverBinding,
+             ImageHandle,
+             &gSnpNt32DriverComponentName,
+             &gSnpNt32DriverComponentName2
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
