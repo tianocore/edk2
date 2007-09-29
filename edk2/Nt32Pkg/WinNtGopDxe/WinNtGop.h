@@ -121,8 +121,9 @@ typedef struct {
 //
 // Global Protocol Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gWinNtGopDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gWinNtGopComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtGopDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtGopComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtGopComponentName2;
 
 //
 // Gop Hardware abstraction internal worker functions
