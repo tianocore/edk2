@@ -38,7 +38,40 @@ EDK_0000: Compatible: owner
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
+==========================================================================================
+EDK_3983: Non-Compatible: lgao4
+	
+	Class_Library: Remove CustomDecompressLib library class.
+	
+	Code Change:
+	1) Remove the definition MdePkg\Include\Library\CustomDecompressLib.h and 
+	   library instance MdePkg\Library\BaseCustomDecompressLibNull for CustomDecompressLib.
+	
+	Possible Impacts:
+	1) Drivers don't use this library class any longer. But they can use new ExtractGuidedSectionLib
+	   library class to extract the compressed guided section data.
+	2) The instance of CustomDecompressLib should be changed to register the decode function 
+	   into ExtractGuidedSectionHandler list, and not to produce CustomDecompressLib class.
+	3) Platform.dsc file doesn't use this library instance any longer.
 
+==========================================================================================
+EDK_3980: Non-Compatible: lgao4
+	
+	Class_Library: Add ExtractGuidedSectionLib library class to replace CustomDecompressLib.
+	
+	Code Change:
+	1) Add the definition MdePkg\Include\Library\ExtractGuidedSectionLib.h and 
+	   library instance MdePkg\Library\PeiDxeExtractGuidedSectionLib for new ExtractGuidedSectionLib.
+	2) Add gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler in MdePkg, which is used by 
+	   PeiDxeExtractGuidedSectionLib library instance.
+	3) Update DxeIpl and DxeMain modules of MdeModulePkg to use new ExtractGuidedSectionLib library class.
+	4) Update BaseUefiTianoCustomDecompressLib of IntelFrameworkModulePkg not to produce CustomDecompressLib,
+	   and to register TianoDecomress handler into ExtractGuidedSectionHandler list.
+	
+	Possible Impacts:
+	1) Platform.dsc file should update library instance and PCD if it contains DxeIpl and DxeMain modules.
+	   It should use MdePkg\Library\PeiDxeExtractGuidedSectionLib library instance and 
+	   set gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler PCD value.
 
 ==========================================================================================
 EDK_3871: Non-Compatible: klu2
