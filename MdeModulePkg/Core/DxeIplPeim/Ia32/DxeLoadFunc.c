@@ -125,8 +125,8 @@ HandOffToDxeCore (
         IdtTable[Index].Ia32IdtEntry.Bits.Selector    =  SYS_CODE64_SEL;
   
         IdtTable[Index].Ia32IdtEntry.Bits.OffsetLow   = (UINT16) VectorAddress;
-        IdtTable[Index].Ia32IdtEntry.Bits.OffsetHigh  = (UINT16) (VectorAddress >> 16);
-        IdtTable[Index].Offset32To63                  = (UINT32) (VectorAddress >> 32);
+        IdtTable[Index].Ia32IdtEntry.Bits.OffsetHigh  = (UINT16) (RShiftU64 (VectorAddress, 16));
+        IdtTable[Index].Offset32To63                  = (UINT32) (RShiftU64 (VectorAddress, 32));
         IdtTable[Index].Reserved                      = 0;
   
         CopyMem ((VOID *) (UINTN) VectorAddress, TemplateBase, SizeOfTemplate);
