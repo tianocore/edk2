@@ -320,8 +320,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
