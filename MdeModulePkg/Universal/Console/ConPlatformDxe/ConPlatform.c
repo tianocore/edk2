@@ -41,9 +41,9 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
 /**
   The user Entry Point for module ConPlatform. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -739,8 +739,7 @@ Returns:
 --*/
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath1;
-  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath2;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
   UINTN                     Size;
 
@@ -753,7 +752,7 @@ Returns:
   //
   // if performing Delete operation, the NewDevicePath must not be NULL.
   //
-  TempDevicePath1 = NULL;
+  TempDevicePath  = NULL;
 
   DevicePath      = Multi;
   DevicePathInst  = GetNextDevicePathInstance (&DevicePath, &Size);
@@ -769,14 +768,10 @@ Returns:
       }
     } else {
       if (Delete) {
-        TempDevicePath2 = AppendDevicePathInstance (
-                            TempDevicePath1,
+        TempDevicePath = AppendDevicePathInstance (
+                            NULL,
                             DevicePathInst
                             );
-        if (TempDevicePath1 != NULL) {
-          FreePool (TempDevicePath1);
-        }
-        TempDevicePath1 = TempDevicePath2;
       }
     }
 
@@ -785,7 +780,7 @@ Returns:
   }
 
   if (Delete) {
-    *NewDevicePath = TempDevicePath1;
+    *NewDevicePath = TempDevicePath;
     return EFI_SUCCESS;
   }
 
@@ -878,15 +873,17 @@ Returns:
     return Status;
   }
 
-  Status = gRT->SetVariable (
-                  VariableName,
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  GetDevicePathSize (NewVariableDevicePath),
-                  NewVariableDevicePath
-                  );
+  if (NewVariableDevicePath != NULL) {
+    Status = gRT->SetVariable (
+                    VariableName,
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    GetDevicePathSize (NewVariableDevicePath),
+                    NewVariableDevicePath
+                    );
 
-  FreePool (NewVariableDevicePath);
+    FreePool (NewVariableDevicePath);
+  }
 
   return Status;
 }
