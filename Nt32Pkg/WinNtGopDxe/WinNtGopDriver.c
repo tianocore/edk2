@@ -80,14 +80,13 @@ InitializeWinNtGop(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gWinNtGopDriverBinding,
              ImageHandle,
              &gWinNtGopComponentName,
-             NULL,
-             NULL
+             &gWinNtGopComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -200,12 +199,21 @@ WinNtGopDriverBindingStart (
 
   Private->ControllerNameTable  = NULL;
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gWinNtGopComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
-    WinNtIo->EnvString
+    WinNtIo->EnvString,
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gWinNtGopComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    WinNtIo->EnvString,
+    FALSE
+    );
+
 
   Private->WindowName = WinNtIo->EnvString;
 
