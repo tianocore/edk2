@@ -83,14 +83,13 @@ InitializeWinNtSerialIo(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gWinNtSerialIoDriverBinding,
              ImageHandle,
              &gWinNtSerialIoComponentName,
-             NULL,
-             NULL
+             &gWinNtSerialIoComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -399,12 +398,21 @@ Returns:
   Private->Fifo.Last              = 0;
   Private->Fifo.Surplus           = SERIAL_MAX_BUFFER_SIZE;
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gWinNtSerialIoComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
-    WinNtIo->EnvString
+    WinNtIo->EnvString,
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gWinNtSerialIoComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    WinNtIo->EnvString,
+    FALSE
+    );
+
 
   Private->SerialIo.Revision      = SERIAL_IO_INTERFACE_REVISION;
   Private->SerialIo.Reset         = WinNtSerialIoReset;
