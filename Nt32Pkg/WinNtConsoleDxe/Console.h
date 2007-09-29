@@ -70,8 +70,9 @@ typedef struct {
 //
 // Console Globale Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gWinNtConsoleDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gWinNtConsoleComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtConsoleDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtConsoleComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtConsoleComponentName2;
 
 typedef struct {
   UINTN ColumnsX;

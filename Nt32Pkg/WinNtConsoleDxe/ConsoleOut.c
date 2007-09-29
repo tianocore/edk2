@@ -595,12 +595,21 @@ Returns:
     WindowName          = L"EFI Emulator Error Console";
   }
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gWinNtConsoleComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
-    WindowName
+    WindowName,
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gWinNtConsoleComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    WindowName,
+    FALSE
+    );
+
 
   //
   // Fill in protocol member functions

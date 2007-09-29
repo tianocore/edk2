@@ -101,14 +101,13 @@ InitializeWinNtConsole(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gWinNtConsoleDriverBinding,
              ImageHandle,
              &gWinNtConsoleComponentName,
-             NULL,
-             NULL
+             &gWinNtConsoleComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
