@@ -102,8 +102,9 @@ typedef struct {
 //
 // Global Protocol Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gWinNtSerialIoDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gWinNtSerialIoComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtSerialIoDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtSerialIoComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtSerialIoComponentName2;
 
 //
 // Macros to convert EFI serial types to NT serial types.
