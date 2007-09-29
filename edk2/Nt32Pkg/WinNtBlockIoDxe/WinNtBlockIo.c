@@ -110,14 +110,16 @@ InitializeWinNtBlockIo(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallAllDriverProtocols2 (
              ImageHandle,
              SystemTable,
              &gWinNtBlockIoDriverBinding,
              ImageHandle,
              &gWinNtBlockIoComponentName,
+             &gWinNtBlockIoComponentName2,
              NULL,
-             &gWinNtBlockIoDriverDiagnostics
+             &gWinNtBlockIoDriverDiagnostics,
+             NULL
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -509,12 +511,21 @@ Returns:
 
   Private->ControllerNameTable  = NULL;
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gWinNtBlockIoComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
-    Private->Filename
+    Private->Filename,
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gWinNtBlockIoComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    Private->Filename,
+    FALSE
+    );
+
 
   BlockIo = &Private->BlockIo;
   BlockIo->Revision = EFI_BLOCK_IO_PROTOCOL_REVISION;
