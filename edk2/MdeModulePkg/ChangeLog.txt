@@ -39,7 +39,21 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
-EDK_39331: Non-Compatible: klu2
+EDK_3967:  Non-Compatible: lgao4
+
+	  Class_Library:  Remove PeCoffLoader library class and its instances.
+
+		Code Change :
+		1) Remove MdeModulePkg/Include/Library/PeCoffLoaderLib.h
+		2) Remove MdeModulePkg/Library/DxePeCoffLoaderFromHobLib and PeiDxePeCoffLoaderLib instance
+		3) Modify PeiCore, DxeIpl and DxeCore to use PeCoffLib in place of PeCoffLoaderLib.
+
+		Possible Impacts:
+		1) All modules don't use PeCoffloader library class any longer to load PeImage. 
+		   If necessary, they should use PeCoffLib of MdePkg to load PeImage.
+
+==========================================================================================
+EDK_3931: Non-Compatible: klu2
 	
 	Class_PIEnable[5]: New library class for S3Resume and Recovery for DxeIpl PEIM.
 	
@@ -147,17 +161,3 @@ EDK_3773:  Non-Compatible: qwang12
 		3) The gEfiFirmwareVolumeProtocolGuid in [Depex] section of INF file should updated.
 		   And the package dependency should also be changed if needed due to this protocol
 		   GUID change.
-
-==========================================================================================
-EDK_3967:  Non-Compatible: lgao4
-
-	  Class_Library:  Remove PeCoffLoader library class and its instances.
-
-		Code Change :
-		1) Remove MdeModulePkg/Include/Library/PeCoffLoaderLib.h
-		2) Remove MdeModulePkg/Library/DxePeCoffLoaderFromHobLib and PeiDxePeCoffLoaderLib instance
-		3) Modify PeiCore, DxeIpl and DxeCore to use PeCoffLib in place of PeCoffLoaderLib.
-
-		Possible Impacts:
-		1) All modules don't use PeCoffloader library class any longer to load PeImage. 
-		   If necessary, they should use PeCoffLib of MdePkg to load PeImage.

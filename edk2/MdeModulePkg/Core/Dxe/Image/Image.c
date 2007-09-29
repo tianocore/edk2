@@ -225,7 +225,28 @@ Returns:
     //
     return EFI_UNSUPPORTED;
   }
-
+  
+  //
+  // Set EFI memory type based on ImageType
+  //
+  switch (Image->ImageContext.ImageType) {
+  case EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION:
+    Image->ImageContext.ImageCodeMemoryType = EfiLoaderCode;
+    Image->ImageContext.ImageDataMemoryType = EfiLoaderData;
+    break;
+  case EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:
+    Image->ImageContext.ImageCodeMemoryType = EfiBootServicesCode;
+    Image->ImageContext.ImageDataMemoryType = EfiBootServicesData;
+    break;
+  case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
+  case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
+    Image->ImageContext.ImageCodeMemoryType = EfiRuntimeServicesCode;
+    Image->ImageContext.ImageDataMemoryType = EfiRuntimeServicesData;
+    break;
+  default:
+    Image->ImageContext.ImageError = IMAGE_ERROR_INVALID_SUBSYSTEM;
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Allocate memory of the correct memory type aligned on the required image boundry
