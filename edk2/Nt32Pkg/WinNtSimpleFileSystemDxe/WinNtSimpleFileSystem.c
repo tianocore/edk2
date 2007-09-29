@@ -83,14 +83,13 @@ InitializeWinNtSimpleFileSystem(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gWinNtSimpleFileSystemDriverBinding,
              ImageHandle,
              &gWinNtSimpleFileSystemComponentName,
-             NULL,
-             NULL
+             &gWinNtSimpleFileSystemComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -373,12 +372,21 @@ Returns:
 
   Private->ControllerNameTable = NULL;
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gWinNtSimpleFileSystemComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
-    WinNtIo->EnvString
+    WinNtIo->EnvString,
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gWinNtSimpleFileSystemComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    WinNtIo->EnvString,
+    FALSE
+    );
+
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,

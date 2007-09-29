@@ -80,8 +80,9 @@ typedef struct {
 //
 // Global Protocol Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gWinNtSimpleFileSystemDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gWinNtSimpleFileSystemComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtSimpleFileSystemDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtSimpleFileSystemComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtSimpleFileSystemComponentName2;
 
 //
 // Driver Binding protocol member functions
