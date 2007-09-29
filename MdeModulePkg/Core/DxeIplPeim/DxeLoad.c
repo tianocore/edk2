@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <FrameworkPei.h>
 
 EFI_STATUS
-CustomDecompressExtractSection (
+CustomGuidedSectionExtract (
   IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
   IN CONST  VOID                                  *InputSection,
   OUT       VOID                                  **OutputBuffer,
@@ -47,8 +47,8 @@ static EFI_DXE_IPL_PPI mDxeIplPpi = {
   DxeLoadCore
 };
 
-STATIC EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomDecompressExtractiongPpi = {
-  CustomDecompressExtractSection
+STATIC EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
+  CustomGuidedSectionExtract
 };
 
 STATIC EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
@@ -91,8 +91,8 @@ PeimInitializeDxeIpl (
 {
   EFI_STATUS                                Status;
   EFI_BOOT_MODE                             BootMode;
-  EFI_GUID                                  **DecompressGuidList;
-  UINT32                                    DecompressMethodNumber;
+  EFI_GUID                                  *ExtractHandlerGuidTable;
+  UINTN                                     ExtractHandlerNumber;
   EFI_PEI_PPI_DESCRIPTOR                    *GuidPpi;
   
   Status = PeiServicesGetBootMode (&BootMode);
@@ -110,29 +110,21 @@ PeimInitializeDxeIpl (
       gInMemory = TRUE;
       
       //
-      // Get custom decompress method guid list 
+      // Get custom extract guided section method guid list 
       //
-      DecompressGuidList     = NULL;
-      DecompressMethodNumber = 0;
-      Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
-      if (Status == EFI_OUT_OF_RESOURCES) {
-      DecompressGuidList = (EFI_GUID **) AllocatePages (EFI_SIZE_TO_PAGES (DecompressMethodNumber * sizeof (EFI_GUID *)));
-      ASSERT (DecompressGuidList != NULL);
-      Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
-      }
-      ASSERT_EFI_ERROR(Status);
+      ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
       
       //
-      // Install custom decompress extraction guid ppi
+      // Install custom extraction guid ppi
       //
-      if (DecompressMethodNumber > 0) {
+      if (ExtractHandlerNumber > 0) {
       	GuidPpi = NULL;
-      	GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePages (EFI_SIZE_TO_PAGES (DecompressMethodNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR)));
+      	GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
       	ASSERT (GuidPpi != NULL);
-      	while (DecompressMethodNumber-- > 0) {
+      	while (ExtractHandlerNumber-- > 0) {
       	  GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-      	  GuidPpi->Ppi   = &mCustomDecompressExtractiongPpi;
-      	  GuidPpi->Guid  = DecompressGuidList [DecompressMethodNumber];
+      	  GuidPpi->Ppi   = &mCustomGuidedSectionExtractionPpi;
+      	  GuidPpi->Guid  = &(ExtractHandlerGuidTable [ExtractHandlerNumber]);
       	  Status = PeiServicesInstallPpi (GuidPpi++);
       	  ASSERT_EFI_ERROR(Status);
       	}
@@ -560,7 +552,7 @@ PeiLoadFile (
                                 GUIDed Section Extraction PPI.
 **/
 EFI_STATUS
-CustomDecompressExtractSection (
+CustomGuidedSectionExtract (
   IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
   IN CONST  VOID                                  *InputSection,
   OUT       VOID                                  **OutputBuffer,
@@ -570,69 +562,66 @@ CustomDecompressExtractSection (
 {
   EFI_STATUS      Status;
   UINT8           *ScratchBuffer;
-  UINT32          ScratchSize;
-  UINT32          SectionLength;
-  UINT32          DestinationSize;  
+  UINT32          ScratchBufferSize;
+  UINT32          OutputBufferSize;
+  UINT16          SectionAttribute;
   
   //
-  // Set authentic value to zero.
+  // Init local variable
   //
-  *AuthenticationStatus = 0;
+  ScratchBuffer = NULL;
+
   //
-  // Calculate Section data Size
+  // Call GetInfo to get the size and attribute of input guided section data.
   //
-  SectionLength   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff;
-  //
-  // Get compressed data information
-  //
-  Status = CustomDecompressGetInfo (
-             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
-             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
-             SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
-             &DestinationSize,
-             &ScratchSize
-             );
+  Status = ExtractGuidedSectionGetInfo (
+            InputSection,
+            &OutputBufferSize,
+            &ScratchBufferSize,
+            &SectionAttribute
+           );
+  
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "GetInfo from guided section Failed - %r\n", Status));
+    return Status;
+  }
+  
+  if (ScratchBufferSize != 0) {
+    //
+    // Allocate scratch buffer
+    //
+    ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+    if (ScratchBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  if ((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) && OutputBufferSize > 0) {  
+    //
+    // Allocate output buffer
+    //
+    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize));
+    if (*OutputBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+  
+  Status = ExtractGuidedSectionDecode (
+             InputSection, 
+             OutputBuffer,
+             ScratchBuffer,
+             AuthenticationStatus
+           );
+
   if (EFI_ERROR (Status)) {
     //
-    // GetInfo failed
+    // Decode failed
     //
     DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
     return Status;
   }
-
-  //
-  // Allocate scratch buffer
-  //
-  ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchSize));
-  if (ScratchBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // Allocate destination buffer
-  //
-  *OutputSize   = (UINTN) DestinationSize;
-  *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (*OutputSize));
-  if (*OutputBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Call decompress function
-  //
-  Status = CustomDecompress (
-             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
-             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
-             *OutputBuffer,
-             ScratchBuffer
-             );
-
-  if (EFI_ERROR (Status)) {
-    //
-    // Decompress failed
-    //
-    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
-    return Status;
-  }
+  
+  *OutputSize = (UINTN) OutputBufferSize;
   
   return EFI_SUCCESS;
 }

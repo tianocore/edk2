@@ -17,13 +17,11 @@
 #ifndef __BASE_UEFI_TIANO_CUSTOM_DECOMPRESS_LIB_INTERNALS_H__
 #define __BASE_UEFI_TIANO_CUSTOM_DECOMPRESS_LIB_INTERNALS_H__
 
-
-#include <Base.h>
+#include <PiPei.h>
 
 #include <Library/UefiDecompressLib.h>
-#include <Library/CustomDecompressLib.h>
 #include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
+#include <Library/ExtractGuidedSectionLib.h>
 
 //
 // Decompression algorithm begins here

@@ -38,7 +38,6 @@
   Include/Ebc
 
 [LibraryClasses.common]
-  CustomDecompressLib|Include/Library/CustomDecompressLib.h
   UsbLib|Include/Library/UsbLib.h
   UefiRuntimeServicesTableLib|Include/Library/UefiRuntimeServicesTableLib.h
   UefiRuntimeLib|Include/Library/UefiRuntimeLib.h
@@ -83,6 +82,7 @@
   BaseLib|Include/Library/BaseLib.h
   BasePeCoffLib|Include/Library/PeCoffLib.h
   GraphicsLib|Include/Library/GraphicsLib.h
+  ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
 
 [LibraryClasses.IPF]
   SalLib|Include/Library/SalLib.h
@@ -303,6 +303,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001|UINT32|0x00000018        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007|UINT32|0x00000019   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008|UINT32|0x0000001a  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x0000001b
 
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f

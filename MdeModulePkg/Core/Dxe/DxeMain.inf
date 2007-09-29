@@ -79,7 +79,6 @@
   BaseMemoryLib
   CacheMaintenanceLib
   UefiDecompressLib
-  CustomDecompressLib
   PerformanceLib
   HobLib
   BaseLib
@@ -87,6 +86,7 @@
   DebugLib
   DxeCoreEntryPoint
   PeCoffLib
+  ExtractGuidedSectionLib
 
 [Guids]
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED

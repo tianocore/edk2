@@ -629,18 +629,17 @@ Returns:
   ASSERT (DestinationSize != NULL);
   ASSERT (ScratchSize != NULL);
 
-  *ScratchSize  = sizeof (SCRATCH_DATA);
-
   if (SourceSize < 8) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  CopyMem (&CompressedSize, Source, sizeof (UINT32));
-  CopyMem (DestinationSize, (VOID *)((UINT8 *)Source + 4), sizeof (UINT32));
-
+  CompressedSize   = *(UINT32 *) Source;
   if (SourceSize < (CompressedSize + 8)) {
     return RETURN_INVALID_PARAMETER;
   }
+
+  *ScratchSize  = sizeof (SCRATCH_DATA);
+  *DestinationSize = *((UINT32 *) Source + 1);
 
   return RETURN_SUCCESS;
 }
@@ -775,104 +774,117 @@ Returns:
 
 RETURN_STATUS
 EFIAPI
-CustomDecompressGetInfo (
-  IN  CONST GUID *DecompressGuid,
-  IN  CONST VOID  *Source,
-  IN  UINT32      SourceSize,
-  OUT UINT32      *DestinationSize,
-  OUT UINT32      *ScratchSize
+TianoDecompressGetInfo (
+  IN  CONST VOID  *InputSection,
+  OUT UINT32      *OutputBufferSize,
+  OUT UINT32      *ScratchBufferSize,
+  OUT UINT16      *SectionAttribute
   )
 /*++
 
 Routine Description:
 
-  The internal implementation of *_DECOMPRESS_PROTOCOL.GetInfo().
+  The internal implementation of Tiano decompress GetInfo.
 
 Arguments:
-  DecompressGuid    The guid matches this decompress method.
-  Source          - The source buffer containing the compressed data.
-  SourceSize      - The size of source buffer
-  DestinationSize - The size of destination buffer.
-  ScratchSize     - The size of scratch buffer.
+  InputSection          Buffer containing the input GUIDed section to be processed. 
+  OutputBufferSize      The size of OutputBuffer.
+  ScratchBufferSize     The size of ScratchBuffer.
+  SectionAttribute      The attribute of the input guided section.
 
 Returns:
 
   RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
   RETURN_INVALID_PARAMETER - The source data is corrupted
-  RETURN_UNSUPPORTED       - Decompress method is not supported.
 
 --*/
 {
-  if (CompareGuid (DecompressGuid, &gTianoCustomDecompressGuid)) {
-    return UefiDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
-  } else {
-    return RETURN_UNSUPPORTED;
+  ASSERT (SectionAttribute != NULL);
+
+  if (InputSection == NULL) {
+    return RETURN_INVALID_PARAMETER;
   }
+  //
+  // Get guid attribute of guid section. 
+  //
+  *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+
+  //
+  // Call Tiano GetInfo to get the required size info.
+  //
+  return UefiDecompressGetInfo (
+          (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+          *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+          OutputBufferSize,
+          ScratchBufferSize
+         );
 }
 
 RETURN_STATUS
 EFIAPI
-CustomDecompress (
-  IN  CONST GUID *DecompressGuid,
-  IN CONST VOID  *Source,
-  IN OUT VOID    *Destination,
-  IN OUT VOID    *Scratch
+TianoDecompress (
+  IN CONST  VOID    *InputSection,
+  OUT       VOID    **OutputBuffer,
+  IN        VOID    *ScratchBuffer,        OPTIONAL
+  OUT       UINT32  *AuthenticationStatus
   )
 /*++
 
 Routine Description:
 
-  The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
+  The implementation of Tiano Decompress().
 
 Arguments:
-  DecompressGuid    The guid matches this decompress method.
-  Source          - The source buffer containing the compressed data.
-  Destination     - The destination buffer to store the decompressed data
-  Scratch         - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  InputSection           Buffer containing the input GUIDed section to be processed. 
+  OutputBuffer           OutputBuffer to point to the start of the section's contents.
+                         if guided data is not prcessed. Otherwise,
+                         OutputBuffer to contain the output data, which is allocated by the caller.
+  ScratchBuffer          A pointer to a caller-allocated buffer for function internal use. 
+  AuthenticationStatus   A pointer to a caller-allocated UINT32 that indicates the
+                         authentication status of the output buffer. 
 
 Returns:
 
   RETURN_SUCCESS           - Decompression is successfull
   RETURN_INVALID_PARAMETER - The source data is corrupted
-  RETURN_UNSUPPORTED       - Decompress method is not supported.
 
 --*/
 {
-  if (CompareGuid (DecompressGuid, &gTianoCustomDecompressGuid)) {
-    return UefiTianoDecompress (Source, Destination, Scratch, 2);
-  } else {
-    return RETURN_UNSUPPORTED;
-  }
+  ASSERT (OutputBuffer != NULL);
+
+  if (InputSection == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }  
+  //
+  // Set Authentication to Zero.
+  //
+  *AuthenticationStatus = 0;
+  
+  //
+  // Call Tiano Decompress to get the raw data
+  //
+  return UefiTianoDecompress (
+          (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+          *OutputBuffer,
+          ScratchBuffer,
+          2
+         );
 }
 
 /**
-  Get decompress method guid list.
+  Register TianoDecompress handler.
 
-  @param[in, out]  AlgorithmGuidTable   The decompress method guid list.
-  @param[in, out]  NumberOfAlgorithms   The number of decompress methods.
-
-  @retval  RETURN_SUCCESS            Get all algorithmes list successfully.
-  @retval  RETURN_OUT_OF_RESOURCES   Source is not enough.
-
+  @retval  RETURN_SUCCESS            Register successfully.
+  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to store this handler.
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
-CustomDecompressGetAlgorithms (
-   IN OUT  GUID    **AlgorithmGuidTable,
-   IN OUT  UINT32  *NumberOfAlgorithms
-  )
+TianoDecompressLibConstructor (
+)
 {
-  ASSERT (NumberOfAlgorithms != NULL);
-  
-  if (*NumberOfAlgorithms < 1) {
-    *NumberOfAlgorithms = 1;
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  
-  ASSERT (AlgorithmGuidTable != NULL);
-
-  AlgorithmGuidTable [0] = &gTianoCustomDecompressGuid;
-  *NumberOfAlgorithms = 1;
-  
-  return RETURN_SUCCESS;  
+  return ExtractGuidedSectionRegisterHandlers (
+          &gTianoCustomDecompressGuid,
+          TianoDecompressGetInfo,
+          TianoDecompress
+          );      
 }

@@ -62,12 +62,11 @@
   GraphicsLib|IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  CustomDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
-
+  ExtractGuidedSectionLib|MdePkg/Library/PeiDxeExtractGuidedSectionLib/PeiDxeExtractGuidedSectionLib.inf
   
 [LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -288,6 +287,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x10000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00c000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
 
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled|TRUE
@@ -378,7 +378,6 @@
   Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
   Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-
   ##
   #  DXE Phase modules
   ##

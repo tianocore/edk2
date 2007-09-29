@@ -78,7 +78,7 @@ Revision History
 #include <Library/HobLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/UefiDecompressLib.h>
-#include <Library/CustomDecompressLib.h>
+#include <Library/ExtractGuidedSectionLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>

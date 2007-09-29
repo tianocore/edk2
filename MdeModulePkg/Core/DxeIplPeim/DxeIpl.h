@@ -43,7 +43,7 @@ Abstract:
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/UefiDecompressLib.h>
-#include <Library/CustomDecompressLib.h>
+#include <Library/ExtractGuidedSectionLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
