@@ -131,8 +131,9 @@ EFI_WIN_NT_PASS_THRU      - associates a device with our PCI support
 //
 // WinNt Bus Driver Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gWinNtBusDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gWinNtBusDriverComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtBusDriverComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtBusDriverComponentName2;
 
 //
 // WinNt Bus Controller Structure

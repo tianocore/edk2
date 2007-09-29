@@ -175,14 +175,13 @@ InitializeWinNtBusDriver(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gWinNtBusDriverBinding,
              ImageHandle,
              &gWinNtBusDriverComponentName,
-             NULL,
-             NULL
+             &gWinNtBusDriverComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -401,12 +400,21 @@ Returns:
     WinNtBusDevice->Signature           = WIN_NT_BUS_DEVICE_SIGNATURE;
     WinNtBusDevice->ControllerNameTable = NULL;
 
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gWinNtBusDriverComponentName.SupportedLanguages,
       &WinNtBusDevice->ControllerNameTable,
-      L"Windows Bus Controller"
+      L"Windows Bus Controller",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gWinNtBusDriverComponentName2.SupportedLanguages,
+      &WinNtBusDevice->ControllerNameTable,
+      L"Windows Bus Controller",
+      FALSE
+      );
+
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &ControllerHandle,
@@ -516,12 +524,21 @@ Returns:
           return EFI_OUT_OF_RESOURCES;
         }
 
-        AddUnicodeString (
+        AddUnicodeString2 (
           "eng",
           gWinNtBusDriverComponentName.SupportedLanguages,
           &WinNtDevice->ControllerNameTable,
-          ComponentName
+          ComponentName,
+          TRUE
           );
+        AddUnicodeString2 (
+          "en",
+          gWinNtBusDriverComponentName2.SupportedLanguages,
+          &WinNtDevice->ControllerNameTable,
+          ComponentName,
+          FALSE
+          );
+
 
         WinNtDevice->WinNtIo.TypeGuid       = mPcdEnvironment[Index].DevicePathGuid;
         WinNtDevice->WinNtIo.InstanceNumber = Count;
