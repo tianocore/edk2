@@ -62,14 +62,7 @@
 
 [FixedPcd.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode
-
-  
-[Pcd.common]
-  #gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
-  #gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
-  
-[FixedPcd.common]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize  
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
   
 [BuildOptions.common]
   MSFT:DEBUG_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
