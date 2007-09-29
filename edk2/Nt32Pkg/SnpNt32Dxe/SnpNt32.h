@@ -198,8 +198,9 @@ typedef struct _SNPNT32_INSTANCE_DATA {
   SNP_NT32_INSTANCE_SIGNATURE \
   )
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gSnpNt32DriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gSnpNt32DriverComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gSnpNt32DriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL    gSnpNt32DriverComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   gSnpNt32DriverComponentName2;
 
 EFI_STATUS
 EFIAPI
