@@ -214,7 +214,7 @@ IsValidSectionStream (
   );
 
 EFI_STATUS
-CustomDecompressExtractSection (
+CustomGuidedSectionExtract (
   IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
   IN CONST  VOID                                   *InputSection,
   OUT       VOID                                   **OutputBuffer,
@@ -234,8 +234,8 @@ EFI_SECTION_EXTRACTION_PROTOCOL mSectionExtraction = {
   CloseSectionStream
 };
 
-EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomDecompressExtraction = {
-  CustomDecompressExtractSection
+EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomGuidedSectionExtractionProtocol = {
+  CustomGuidedSectionExtract
 };
                                              
 EFI_STATUS
@@ -261,8 +261,8 @@ Returns:
 --*/
 {
   EFI_STATUS                         Status;
-  EFI_GUID                           **DecompressGuidList;
-  UINT32                             DecompressMethodNumber;
+  EFI_GUID                           *ExtractHandlerGuidTable;
+  UINTN                              ExtractHandlerNumber;
 
   //
   // Install SEP to a new handle
@@ -276,32 +276,22 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get custom decompress method guid list 
+  // Get custom extract guided section method guid list 
   //
-  DecompressGuidList     = NULL;
-  DecompressMethodNumber = 0;
-  Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
-  if (Status == EFI_OUT_OF_RESOURCES) {
-    DecompressGuidList = (EFI_GUID **) CoreAllocateBootServicesPool (DecompressMethodNumber * sizeof (EFI_GUID *));
-    ASSERT (DecompressGuidList != NULL);
-    Status = CustomDecompressGetAlgorithms (DecompressGuidList, &DecompressMethodNumber);
-  }
-  ASSERT_EFI_ERROR(Status);
+  ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
 
   //
-  // Install custom decompress guided extraction protocol 
+  // Install custom guided extraction protocol 
   //
-  while (DecompressMethodNumber-- > 0) {
+  while (ExtractHandlerNumber-- > 0) {
     Status = CoreInstallProtocolInterface (
               &mSectionExtractionHandle,
-              DecompressGuidList [DecompressMethodNumber],
+              &ExtractHandlerGuidTable [ExtractHandlerNumber],
               EFI_NATIVE_INTERFACE,
-              &mCustomDecompressExtraction
+              &mCustomGuidedSectionExtractionProtocol
               );
     ASSERT_EFI_ERROR (Status);
   }
-  
-  CoreFreePool (DecompressGuidList);
 
   return Status;
 }
@@ -1464,7 +1454,7 @@ Returns:
 
 **/
 EFI_STATUS
-CustomDecompressExtractSection (
+CustomGuidedSectionExtract (
   IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
   IN CONST  VOID                                   *InputSection,
   OUT       VOID                                   **OutputBuffer,
@@ -1473,77 +1463,97 @@ CustomDecompressExtractSection (
   )
 {
   EFI_STATUS      Status;
-  UINT8           *ScratchBuffer;
-  UINT32          DestinationSize;
-  UINT32          ScratchSize;
-  UINT32          SectionLength;  
+  VOID            *ScratchBuffer;
+  VOID            *AllocatedOutputBuffer;
+  UINT32          OutputBufferSize;
+  UINT32          ScratchBufferSize;
+  UINT16          SectionAttribute;
   
   //
-  // Set authentic value to zero.
+  // Init local variable
   //
-  *AuthenticationStatus = 0;
+  ScratchBuffer         = NULL;
+  AllocatedOutputBuffer = NULL;
+
   //
-  // Calculate Section data Size
+  // Call GetInfo to get the size and attribute of input guided section data.
   //
-  SectionLength   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff;
+  Status = ExtractGuidedSectionGetInfo (
+            InputSection,
+            &OutputBufferSize,
+            &ScratchBufferSize,
+            &SectionAttribute
+           );
+  
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "GetInfo from guided section Failed - %r\n", Status));
+    return Status;
+  }
+  
+  if (ScratchBufferSize != 0) {
+    //
+    // Allocate scratch buffer
+    //
+    ScratchBuffer = CoreAllocateBootServicesPool (ScratchBufferSize);
+    if (ScratchBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  if (OutputBufferSize > 0) {  
+    //
+    // Allocate output buffer
+    //
+    AllocatedOutputBuffer = CoreAllocateBootServicesPool (OutputBufferSize);
+    if (AllocatedOutputBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    *OutputBuffer = AllocatedOutputBuffer;
+  }
+
   //
-  // Get compressed data information
+  // Call decode function to extract raw data from the guided section.
   //
-  Status = CustomDecompressGetInfo (
-             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
-             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
-             SectionLength - sizeof (EFI_GUID_DEFINED_SECTION),
-             &DestinationSize,
-             &ScratchSize
-             );
+  Status = ExtractGuidedSectionDecode (
+             InputSection, 
+             OutputBuffer,
+             ScratchBuffer,
+             AuthenticationStatus
+           );
   if (EFI_ERROR (Status)) {
     //
-    // GetInfo failed
+    // Decode failed
     //
+    if (AllocatedOutputBuffer != NULL) {
+      CoreFreePool (AllocatedOutputBuffer);
+    }
+    if (ScratchBuffer != NULL) {
+      CoreFreePool (ScratchBuffer);
+    }
     DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
     return Status;
   }
 
-  //
-  // Allocate scratch buffer
-  //
-  ScratchBuffer = CoreAllocateBootServicesPool (ScratchSize);
-  if (ScratchBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // Allocate destination buffer
-  //
-  *OutputSize = (UINTN) DestinationSize;
-  *OutputBuffer = CoreAllocateBootServicesPool (*OutputSize);
-  if (*OutputBuffer == NULL) {
-    CoreFreePool (ScratchBuffer);
-    return EFI_OUT_OF_RESOURCES;
+  if (*OutputBuffer != AllocatedOutputBuffer) {
+    //
+    // OutputBuffer was returned as a different value, 
+    // so copy section contents to the allocated memory buffer.
+    // 
+    CopyMem (AllocatedOutputBuffer, *OutputBuffer, OutputBufferSize);
+    *OutputBuffer = AllocatedOutputBuffer;
   }
 
   //
-  // Call decompress function
+  // Set real size of output buffer.
   //
-  Status = CustomDecompress (
-             (GUID *) ((UINT8 *) InputSection + sizeof (EFI_COMMON_SECTION_HEADER)),
-             (UINT8 *) InputSection + sizeof (EFI_GUID_DEFINED_SECTION),
-             *OutputBuffer,
-             ScratchBuffer
-             );
-  if (EFI_ERROR (Status)) {
-    //
-    // Decompress failed
-    //
-    CoreFreePool (ScratchBuffer);
-    CoreFreePool (*OutputBuffer);
-    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
-    return Status;
-  }
-  
+  *OutputSize = (UINTN) OutputBufferSize;
+
   //
   // Free unused scratch buffer.
   //
-  CoreFreePool (ScratchBuffer);
-  
+  if (ScratchBuffer != NULL) {
+    CoreFreePool (ScratchBuffer);
+  }
+
   return EFI_SUCCESS;
 }

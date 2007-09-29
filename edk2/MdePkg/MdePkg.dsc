@@ -44,6 +44,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
 
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
@@ -99,10 +100,10 @@
   MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
-  MdePkg/Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.inf
   MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  MdePkg/Library/PeiDxeExtractGuidedSectionLib/PeiDxeExtractGuidedSectionLib.inf
 
 [Components.IA32]
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf

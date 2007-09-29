@@ -67,7 +67,7 @@
   MemoryAllocationLib
   BaseMemoryLib
   PeiServicesTablePointerLib
-  CustomDecompressLib
+  ExtractGuidedSectionLib
   UefiDecompressLib
   CacheMaintenanceLib
   ReportStatusCodeLib
