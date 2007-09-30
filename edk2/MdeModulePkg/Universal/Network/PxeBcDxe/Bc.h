@@ -216,7 +216,8 @@ PxebcBisDetect (
 //
 // Global Variables
 //
-extern EFI_COMPONENT_NAME_PROTOCOL  gPxeBcComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL   gPxeBcComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gPxeBcComponentName2;
 
 //
 // //////////////////////////////////////////////////////////

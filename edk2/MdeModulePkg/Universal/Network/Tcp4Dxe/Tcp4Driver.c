@@ -22,7 +22,8 @@ Abstract:
 
 
 UINT16                               mTcp4RandomPort;
-extern EFI_COMPONENT_NAME_PROTOCOL   gTcp4ComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL    gTcp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   gTcp4ComponentName2;
 
 TCP4_HEARTBEAT_TIMER  mTcp4Timer = {
   NULL,
@@ -176,14 +177,13 @@ Returns:
   //
   // Install the TCP4 Driver Binding Protocol
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &mTcp4DriverBinding,
              ImageHandle,
              &gTcp4ComponentName,
-             NULL,
-             NULL
+             &gTcp4ComponentName2
              );
   ASSERT_EFI_ERROR (Status);
   //

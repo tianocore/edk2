@@ -38,8 +38,9 @@ Abstract:
 //
 // Global variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gArpDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gArpComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL    gArpDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL    gArpComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   gArpComponentName2;
 
 EFI_STATUS
 EFIAPI

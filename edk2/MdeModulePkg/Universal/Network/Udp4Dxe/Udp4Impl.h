@@ -41,10 +41,11 @@ Abstract:
 #include "Udp4Driver.h"
 
 
-extern EFI_COMPONENT_NAME_PROTOCOL    gUdp4ComponentName;
-extern EFI_SERVICE_BINDING_PROTOCOL   mUdp4ServiceBinding;
-extern EFI_UDP4_PROTOCOL              mUdp4Protocol;
-extern UINT16                         mUdp4RandomPort;
+extern EFI_COMPONENT_NAME_PROTOCOL     gUdp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL    gUdp4ComponentName2;
+extern EFI_SERVICE_BINDING_PROTOCOL    mUdp4ServiceBinding;
+extern EFI_UDP4_PROTOCOL               mUdp4Protocol;
+extern UINT16                          mUdp4RandomPort;
 
 #define ICMP_ERROR_PACKET_LENGTH  8
 

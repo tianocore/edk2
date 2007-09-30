@@ -1257,13 +1257,12 @@ InitializeSnpNiiDriver (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
-  return EfiLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &mSimpleNetworkDriverBinding,
-          NULL,
-          &gSimpleNetworkComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &mSimpleNetworkDriverBinding,
+           NULL,
+           &gSimpleNetworkComponentName,
+           &gSimpleNetworkComponentName2
+           );
 }

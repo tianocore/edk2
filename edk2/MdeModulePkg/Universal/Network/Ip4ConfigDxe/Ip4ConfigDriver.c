@@ -85,14 +85,13 @@ Returns:
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
+  return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
            &gIp4ConfigDriverBinding,
            ImageHandle,
            &gIp4ConfigComponentName,
-           NULL,
-           NULL
+           &gIp4ConfigComponentName2
            );
 }
 

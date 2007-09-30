@@ -114,7 +114,7 @@ typedef struct {
 // Protocol function prototypes.
 //
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Run (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -124,7 +124,7 @@ PxeDhcp4Run (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Setup (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -133,7 +133,7 @@ PxeDhcp4Setup (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Init (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -144,7 +144,7 @@ PxeDhcp4Init (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Select (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -154,7 +154,7 @@ PxeDhcp4Select (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Renew (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -163,7 +163,7 @@ PxeDhcp4Renew (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Rebind (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
@@ -172,7 +172,7 @@ PxeDhcp4Rebind (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 PxeDhcp4Release (
   IN EFI_PXE_DHCP4_PROTOCOL *This
@@ -185,21 +185,21 @@ PxeDhcp4Release (
 // Support function prototypes.
 //
 extern
-UINT16
+UINT16 
 htons (
   UINTN n
   )
 ;
 
 extern
-UINT32
+UINT32 
 htonl (
   UINTN n
   )
 ;
 
 extern
-VOID
+VOID 
 EFIAPI
 timeout_notify (
   IN EFI_EVENT Event,
@@ -208,7 +208,7 @@ timeout_notify (
 ;
 
 extern
-VOID
+VOID 
 EFIAPI
 periodic_notify (
   IN EFI_EVENT Event,
@@ -217,7 +217,7 @@ periodic_notify (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 find_opt (
   IN DHCP4_PACKET *Packet,
   IN UINT8        OpCode,
@@ -227,7 +227,7 @@ find_opt (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 add_opt (
   IN DHCP4_PACKET *Packet,
   IN DHCP4_OP     *OpPtr
@@ -235,7 +235,7 @@ add_opt (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 start_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN OPTIONAL EFI_IP_ADDRESS         *station_ip,
@@ -244,14 +244,14 @@ start_udp (
 ;
 
 extern
-VOID
+VOID 
 stop_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private
   )
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 start_receive_events (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN UINTN                  seconds_timeout
@@ -259,14 +259,14 @@ start_receive_events (
 ;
 
 extern
-VOID
+VOID 
 stop_receive_events (
   IN PXE_DHCP4_PRIVATE_DATA *Private
   )
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 tx_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN EFI_IP_ADDRESS         *dest_ip,
@@ -278,7 +278,7 @@ tx_udp (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 rx_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   OUT VOID                  *buffer,
@@ -290,7 +290,7 @@ rx_udp (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 tx_rx_udp (
   IN PXE_DHCP4_PRIVATE_DATA    *Private,
   IN OUT EFI_IP_ADDRESS        *ServerIp,
@@ -317,7 +317,8 @@ tx_rx_udp (
 //
 // Global variable definitions.
 //
-extern EFI_COMPONENT_NAME_PROTOCOL   gPxeDhcp4ComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL    gPxeDhcp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   gPxeDhcp4ComponentName2;
 
 EFI_STATUS
 EFIAPI

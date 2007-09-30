@@ -749,14 +749,13 @@ Returns:
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
+  return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
            &gArpDriverBinding,
            ImageHandle,
            &gArpComponentName,
-           NULL,
-           NULL
+           &gArpComponentName2
            );
 }
 
