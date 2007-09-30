@@ -720,14 +720,13 @@ InitializeDiskIo (
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gDiskIoDriverBinding,
              ImageHandle,
              &gDiskIoComponentName,
-             NULL,
-             NULL
+             &gDiskIoComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

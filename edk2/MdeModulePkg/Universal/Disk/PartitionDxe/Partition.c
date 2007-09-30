@@ -695,14 +695,13 @@ InitializePartition (
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gPartitionDriverBinding,
              ImageHandle,
              &gPartitionComponentName,
-             NULL,
-             NULL
+             &gPartitionComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
