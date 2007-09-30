@@ -109,14 +109,13 @@ InitializeScsiBus(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gSCSIBusDriverBinding,
              ImageHandle,
              &gScsiBusComponentName,
-             NULL,
-             NULL
+             &gScsiBusComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

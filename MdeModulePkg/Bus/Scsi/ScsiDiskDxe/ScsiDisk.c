@@ -66,14 +66,13 @@ InitializeScsiDisk(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gScsiDiskDriverBinding,
              ImageHandle,
              &gScsiDiskComponentName,
-             NULL,
-             NULL
+             &gScsiDiskComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -295,12 +294,21 @@ Returns:
   }
 
   ScsiDiskDevice->ControllerNameTable = NULL;
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gScsiDiskComponentName.SupportedLanguages,
     &ScsiDiskDevice->ControllerNameTable,
-    L"SCSI Disk Device"
+    L"SCSI Disk Device",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gScsiDiskComponentName2.SupportedLanguages,
+    &ScsiDiskDevice->ControllerNameTable,
+    L"SCSI Disk Device",
+    FALSE
+    );
+
 
   return EFI_SUCCESS;
 
