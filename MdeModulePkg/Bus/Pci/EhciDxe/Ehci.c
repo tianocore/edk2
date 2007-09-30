@@ -1295,14 +1295,13 @@ Returns:
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
+  return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
            &gEhciDriverBinding,
            ImageHandle,
            &gEhciComponentName,
-           NULL,
-           NULL
+           &gEhciComponentName2
            );
 }
 
@@ -1565,12 +1564,21 @@ EhcDriverBindingStart (
   // Install the component name protocol, don't fail the start
   // because of something for display.
   //
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gEhciComponentName.SupportedLanguages,
     &Ehc->ControllerNameTable,
-    L"Enhanced Host Controller (USB 2.0)"
+    L"Enhanced Host Controller (USB 2.0)",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gEhciComponentName2.SupportedLanguages,
+    &Ehc->ControllerNameTable,
+    L"Enhanced Host Controller (USB 2.0)",
+    FALSE
+    );
+
 
   EHC_DEBUG (("EhcDriverBindingStart: EHCI started for controller @ %x\n", Controller));
   return EFI_SUCCESS;

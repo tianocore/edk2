@@ -2393,14 +2393,13 @@ InitializeAtapiPassThru(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gAtapiScsiPassThruDriverBinding,
              ImageHandle,
              &gAtapiScsiPassThruComponentName,
-             NULL,
-             NULL
+             &gAtapiScsiPassThruComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
