@@ -54,15 +54,14 @@ PciVgaMiniPortDriverEntryPoint (
     EFI_STATUS
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &gPciVgaMiniPortDriverBinding,
-          ImageHandle,
-          &gPciVgaMiniPortComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &gPciVgaMiniPortDriverBinding,
+           ImageHandle,
+           &gPciVgaMiniPortComponentName,
+           &gPciVgaMiniPortComponentName2
+           );
 }
 
 

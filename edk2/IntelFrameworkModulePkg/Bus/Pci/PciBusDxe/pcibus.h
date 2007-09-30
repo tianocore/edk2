@@ -239,6 +239,7 @@ typedef struct _PCI_IO_DEVICE {
 //
 extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
 extern LIST_ENTRY                                   gPciDevicePool;
 extern BOOLEAN                                      gFullEnumeration;
 extern UINTN                                        gPciHostBridgeNumber;
