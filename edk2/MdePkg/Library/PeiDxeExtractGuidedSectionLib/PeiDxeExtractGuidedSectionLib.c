@@ -26,6 +26,7 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
+#include <Library/HobLib.h>
 
 STATIC GUID                 *mExtractHandlerGuidTable;
 STATIC UINT32               mNumberOfExtractHandler;
@@ -109,6 +110,13 @@ ExtractGuidedSectionRegisterHandlers (
   IN        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    DecodeHandler
   )
 {
+  if (GetBootModeHob () == BOOT_ON_S3_RESUME) {
+    //
+    // (Work around fix to bypass registeration on S3 resume.)
+    // S3 resume does not shadow DxeIpl.
+    //
+    return RETURN_SUCCESS;
+  }
   //
   // Check input paramter.
   //
