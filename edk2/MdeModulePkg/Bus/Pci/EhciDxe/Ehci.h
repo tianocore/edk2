@@ -140,7 +140,8 @@ struct _USB2_HC_DEV {
 };
 
 
-extern EFI_DRIVER_BINDING_PROTOCOL     gEhciDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL     gEhciComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL      gEhciDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL      gEhciComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL     gEhciComponentName2;
 
 #endif

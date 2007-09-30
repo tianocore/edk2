@@ -128,7 +128,8 @@ struct _USB_HC_DEV {
   VOID                      *FrameMapping;
 };
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gUhciDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gUhciComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gUhciDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUhciComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUhciComponentName2;
 
 #endif

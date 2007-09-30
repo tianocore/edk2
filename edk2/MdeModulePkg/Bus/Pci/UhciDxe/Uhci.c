@@ -1852,14 +1852,13 @@ UhciDriverEntryPoint (
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
+  return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
            &gUhciDriverBinding,
            ImageHandle,
            &gUhciComponentName,
-           NULL,
-           NULL
+           &gUhciComponentName2
            );
 }
 
@@ -2217,12 +2216,21 @@ UhciDriverBindingStart (
   //
   Uhc->CtrlNameTable = NULL;
 
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gUhciComponentName.SupportedLanguages,
     &Uhc->CtrlNameTable,
-    L"Usb Universal Host Controller"
+    L"Usb Universal Host Controller",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gUhciComponentName2.SupportedLanguages,
+    &Uhc->CtrlNameTable,
+    L"Usb Universal Host Controller",
+    FALSE
+    );
+
 
   //
   // Start the UHCI hardware, also set its reclamation point to 64 bytes
