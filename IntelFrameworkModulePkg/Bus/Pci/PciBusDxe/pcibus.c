@@ -76,14 +76,13 @@ Returns:
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gPciBusDriverBinding,
              ImageHandle,
              &gPciBusComponentName,
-             NULL,
-             NULL
+             &gPciBusComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

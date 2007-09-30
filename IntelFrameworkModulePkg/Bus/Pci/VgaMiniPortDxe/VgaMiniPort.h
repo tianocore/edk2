@@ -54,8 +54,9 @@ typedef struct {
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL gPciVgaMiniPortDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gPciVgaMiniPortComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL  gPciVgaMiniPortDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL  gPciVgaMiniPortComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortComponentName2;
 
 //
 // Driver Binding Protocol functions
