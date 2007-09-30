@@ -87,7 +87,9 @@ ExtractGuidedSectionRegisterHandlers (
   );
 
 /**
-  Get the supported exract guided section Handler guid list.
+  Get the supported exract guided section Handler guid table, which is maintained
+  by library. The caller can directly get this guid table pointer 
+  without responsibility to allocate or free this table buffer.  
   It will ASSERT () if ExtractHandlerGuidTable = NULL.
 
   @param[in, out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
