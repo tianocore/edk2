@@ -245,47 +245,43 @@ InitializeConSplitter(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConSplitterConInDriverBinding,
              ImageHandle,
              &gConSplitterConInComponentName,
-             NULL,
-             NULL
+             &gConSplitterConInComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConSplitterSimplePointerDriverBinding,
              NULL,
              &gConSplitterSimplePointerComponentName,
-             NULL,
-             NULL
+             &gConSplitterSimplePointerComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConSplitterConOutDriverBinding,
              NULL,
              &gConSplitterConOutComponentName,
-             NULL,
-             NULL
+             &gConSplitterConOutComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConSplitterStdErrDriverBinding,
              NULL,
              &gConSplitterStdErrComponentName,
-             NULL,
-             NULL
+             &gConSplitterStdErrComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

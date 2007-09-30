@@ -498,39 +498,75 @@ TerminalDriverBindingStart (
   TerminalDevice->ControllerNameTable = NULL;
   switch (TerminalDevice->TerminalType) {
   case PcAnsiType:
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
       &TerminalDevice->ControllerNameTable,
-      (CHAR16 *)L"PC-ANSI Serial Console"
+      (CHAR16 *)L"PC-ANSI Serial Console",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gTerminalComponentName2.SupportedLanguages,
+      &TerminalDevice->ControllerNameTable,
+      (CHAR16 *)L"PC-ANSI Serial Console",
+      FALSE
+      );
+
     break;
 
   case VT100Type:
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
       &TerminalDevice->ControllerNameTable,
-      (CHAR16 *)L"VT-100 Serial Console"
+      (CHAR16 *)L"VT-100 Serial Console",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gTerminalComponentName2.SupportedLanguages,
+      &TerminalDevice->ControllerNameTable,
+      (CHAR16 *)L"VT-100 Serial Console",
+      FALSE
+      );
+
     break;
 
   case VT100PlusType:
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
       &TerminalDevice->ControllerNameTable,
-      (CHAR16 *)L"VT-100+ Serial Console"
+      (CHAR16 *)L"VT-100+ Serial Console",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gTerminalComponentName2.SupportedLanguages,
+      &TerminalDevice->ControllerNameTable,
+      (CHAR16 *)L"VT-100+ Serial Console",
+      FALSE
+      );
+
     break;
 
   case VTUTF8Type:
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
       &TerminalDevice->ControllerNameTable,
-      (CHAR16 *)L"VT-UTF8 Serial Console"
+      (CHAR16 *)L"VT-UTF8 Serial Console",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gTerminalComponentName2.SupportedLanguages,
+      &TerminalDevice->ControllerNameTable,
+      (CHAR16 *)L"VT-UTF8 Serial Console",
+      FALSE
+      );
+
     break;
   }
   //
@@ -1221,14 +1257,13 @@ InitializeTerminal(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gTerminalDriverBinding,
              ImageHandle,
              &gTerminalComponentName,
-             NULL,
-             NULL
+             &gTerminalComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

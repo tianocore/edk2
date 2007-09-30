@@ -1842,14 +1842,13 @@ InitializeGraphicsConsole (
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gGraphicsConsoleDriverBinding,
              ImageHandle,
              &gGraphicsConsoleComponentName,
-             NULL,
-             NULL
+             &gGraphicsConsoleComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

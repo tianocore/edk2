@@ -60,25 +60,23 @@ InitializeConPlatform(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConPlatformTextInDriverBinding,
              ImageHandle,
              &gConPlatformComponentName,
-             NULL,
-             NULL
+             &gConPlatformComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gConPlatformTextOutDriverBinding,
              NULL,
              &gConPlatformComponentName,
-             NULL,
-             NULL
+             &gConPlatformComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
