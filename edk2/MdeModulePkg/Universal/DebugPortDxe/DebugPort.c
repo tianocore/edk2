@@ -165,14 +165,13 @@ Returns:
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gDebugPortDriverBinding,
              ImageHandle,
              &gDebugPortComponentName,
-             NULL,
-             NULL
+             &gDebugPortComponentName2
              );
   ASSERT_EFI_ERROR (Status);
   //
