@@ -48,14 +48,13 @@ InitializeVgaClass(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gVgaClassDriverBinding,
              ImageHandle,
              &gVgaClassComponentName,
-             NULL,
-             NULL
+             &gVgaClassComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
