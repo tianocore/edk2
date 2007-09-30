@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiCoreNt32PeCoffLib
   FILE_GUID                      = ef9fd7ee-3181-4b16-adc1-8615f88b58b8
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeCoffLib|PEI_CORE
   EDK_RELEASE_VERSION            = 0x00020000
