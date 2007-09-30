@@ -55,14 +55,13 @@ InitializeIsaBus(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gIsaBusControllerDriver,
              ImageHandle,
              &gIsaBusComponentName,
-             NULL,
-             NULL
+             &gIsaBusComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

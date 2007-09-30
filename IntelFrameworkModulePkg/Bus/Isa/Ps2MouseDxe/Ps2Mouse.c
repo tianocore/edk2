@@ -294,12 +294,21 @@ Returns:
   }
 
   MouseDev->ControllerNameTable = NULL;
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gPs2MouseComponentName.SupportedLanguages,
     &MouseDev->ControllerNameTable,
-    L"PS/2 Mouse Device"
+    L"PS/2 Mouse Device",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gPs2MouseComponentName2.SupportedLanguages,
+    &MouseDev->ControllerNameTable,
+    L"PS/2 Mouse Device",
+    FALSE
+    );
+
 
   //
   // Install protocol interfaces for the mouse device.
@@ -771,14 +780,13 @@ InitializePs2Mouse(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gPS2MouseDriver,
              ImageHandle,
              &gPs2MouseComponentName,
-             NULL,
-             NULL
+             &gPs2MouseComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

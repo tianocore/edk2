@@ -59,14 +59,13 @@ InitializeIsaFloppy(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gFdcControllerDriver,
              ImageHandle,
              &gIsaFloppyComponentName,
-             NULL,
-             NULL
+             &gIsaFloppyComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

@@ -35,8 +35,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Driver Binding Externs
 //
-extern EFI_DRIVER_BINDING_PROTOCOL gFdcControllerDriver;
-extern EFI_COMPONENT_NAME_PROTOCOL gIsaFloppyComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL  gFdcControllerDriver;
+extern EFI_COMPONENT_NAME_PROTOCOL  gIsaFloppyComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gIsaFloppyComponentName2;
 
 //
 // define some value
@@ -486,7 +487,7 @@ typedef struct {
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gFdcControllerDriver;
+extern EFI_DRIVER_BINDING_PROTOCOL   gFdcControllerDriver;
 
 //
 // EFI Driver Binding Protocol Functions

@@ -36,8 +36,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Driver Binding Externs
 //
-extern EFI_DRIVER_BINDING_PROTOCOL gSerialControllerDriver;
-extern EFI_COMPONENT_NAME_PROTOCOL gIsaSerialComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL  gSerialControllerDriver;
+extern EFI_COMPONENT_NAME_PROTOCOL  gIsaSerialComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gIsaSerialComponentName2;
 
 //
 // Internal Data Structures
@@ -116,7 +117,7 @@ typedef struct {
 //
 // Globale Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gSerialControllerDriver;
+extern EFI_DRIVER_BINDING_PROTOCOL   gSerialControllerDriver;
 
 //
 // Serial Driver Defaults
