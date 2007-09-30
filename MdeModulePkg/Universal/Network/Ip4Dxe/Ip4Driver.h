@@ -24,8 +24,9 @@ Abstract:
 
 #include <Protocol/ServiceBinding.h>
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gIp4DriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gIp4ComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gIp4DriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gIp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gIp4ComponentName2;
 
 //
 // Function prototype for the driver's entry point

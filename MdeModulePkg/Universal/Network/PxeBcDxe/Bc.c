@@ -2381,15 +2381,14 @@ InitializeBCDriver (
   //
   // Initialize EFI library
   //
-  Status = EfiLibInstallAllDriverProtocols (
-            ImageHandle,
-            SystemTable,
-            &mPxeBcDriverBinding,
-            NULL,
-            &gPxeBcComponentName,
-            NULL,
-            NULL
-            );
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &mPxeBcDriverBinding,
+             NULL,
+             &gPxeBcComponentName,
+             &gPxeBcComponentName2
+             );
 
   InitArpHeader ();
   OptionsStrucInit ();

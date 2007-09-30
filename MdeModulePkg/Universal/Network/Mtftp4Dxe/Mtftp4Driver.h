@@ -63,7 +63,8 @@ Mtftp4ServiceBindingDestroyChild (
   IN EFI_HANDLE                   ChildHandle
   );
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gMtftp4ComponentName;
-extern EFI_DRIVER_BINDING_PROTOCOL  gMtftp4DriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gMtftp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gMtftp4ComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gMtftp4DriverBinding;
 
 #endif

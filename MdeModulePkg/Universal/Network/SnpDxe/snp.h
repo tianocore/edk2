@@ -127,7 +127,8 @@ SNP_DRIVER;
 //
 // Global Variables
 //
-extern EFI_COMPONENT_NAME_PROTOCOL   gSimpleNetworkComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL    gSimpleNetworkComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   gSimpleNetworkComponentName2;
 
 //
 //  Virtual to physical mapping for all UNDI 3.0s.
@@ -164,21 +165,21 @@ del_v2p (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_block_30 (
   IN UINT32 Enable
   )
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_delay_30 (
   IN UINT64 MicroSeconds
   )
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_memio_30 (
   IN UINT8      ReadOrWrite,
   IN UINT8      NumBytes,
@@ -188,7 +189,7 @@ snp_undi32_callback_memio_30 (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_v2p_30 (
   IN UINT64     CpuAddr,
   IN OUT UINT64 DeviceAddrPtr
@@ -196,7 +197,7 @@ snp_undi32_callback_v2p_30 (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_block (
   IN UINT64 UniqueId,
   IN UINT32 Enable
@@ -204,7 +205,7 @@ snp_undi32_callback_block (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_delay (
   IN UINT64 UniqueId,
   IN UINT64 MicroSeconds
@@ -212,7 +213,7 @@ snp_undi32_callback_delay (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_memio (
   IN UINT64     UniqueId,
   IN UINT8      ReadOrWrite,
@@ -223,7 +224,7 @@ snp_undi32_callback_memio (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_map (
   IN UINT64     UniqueId,
   IN UINT64     CpuAddr,
@@ -234,7 +235,7 @@ snp_undi32_callback_map (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_unmap (
   IN UINT64             UniqueId,
   IN UINT64             CpuAddr,
@@ -245,7 +246,7 @@ snp_undi32_callback_unmap (
 ;
 
 extern
-VOID
+VOID 
 snp_undi32_callback_sync (
   IN UINT64             UniqueId,
   IN UINT64             CpuAddr,
@@ -256,7 +257,7 @@ snp_undi32_callback_sync (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_start (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
@@ -264,7 +265,7 @@ snp_undi32_start (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_stop (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
@@ -272,7 +273,7 @@ snp_undi32_stop (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_initialize (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this,
@@ -282,7 +283,7 @@ snp_undi32_initialize (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_reset (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *this,
@@ -291,7 +292,7 @@ snp_undi32_reset (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_shutdown (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
@@ -299,7 +300,7 @@ snp_undi32_shutdown (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_receive_filters (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
@@ -312,7 +313,7 @@ snp_undi32_receive_filters (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_station_address (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
@@ -322,7 +323,7 @@ snp_undi32_station_address (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_statistics (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  * this,
@@ -333,7 +334,7 @@ snp_undi32_statistics (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_mcast_ip_to_mac (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this,
@@ -344,7 +345,7 @@ snp_undi32_mcast_ip_to_mac (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_nvdata (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this,
@@ -356,7 +357,7 @@ snp_undi32_nvdata (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_get_status (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
@@ -366,7 +367,7 @@ snp_undi32_get_status (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_transmit (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
@@ -380,7 +381,7 @@ snp_undi32_transmit (
 ;
 
 extern
-EFI_STATUS
+EFI_STATUS 
 EFIAPI
 snp_undi32_receive (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,

@@ -94,15 +94,14 @@ PxeDhcp4DriverEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return EfiLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &gPxeDhcp4DriverBinding,
-          NULL,
-          &gPxeDhcp4ComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &gPxeDhcp4DriverBinding,
+           NULL,
+           &gPxeDhcp4ComponentName,
+           &gPxeDhcp4ComponentName2
+           );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

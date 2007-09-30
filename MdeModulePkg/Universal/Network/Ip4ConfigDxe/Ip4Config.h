@@ -114,11 +114,12 @@ struct _IP4_CONFIG_INSTANCE {
 #define IP4_CONFIG_INSTANCE_FROM_NIC_IP4CONFIG(this) \
   CR (this, IP4_CONFIG_INSTANCE, NicIp4Protocol, IP4_CONFIG_INSTANCE_SIGNATURE)
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gIp4ConfigDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gIp4ConfigComponentName;
-extern IP4_CONFIG_INSTANCE          *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
-extern EFI_IP4_CONFIG_PROTOCOL      mIp4ConfigProtocolTemplate;
-extern EFI_NIC_IP4_CONFIG_PROTOCOL  mNicIp4ConfigProtocolTemplate;
+extern EFI_DRIVER_BINDING_PROTOCOL   gIp4ConfigDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gIp4ConfigComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gIp4ConfigComponentName2;
+extern IP4_CONFIG_INSTANCE           *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
+extern EFI_IP4_CONFIG_PROTOCOL       mIp4ConfigProtocolTemplate;
+extern EFI_NIC_IP4_CONFIG_PROTOCOL   mNicIp4ConfigProtocolTemplate;
 
 VOID
 Ip4ConfigCleanDhcp4 (

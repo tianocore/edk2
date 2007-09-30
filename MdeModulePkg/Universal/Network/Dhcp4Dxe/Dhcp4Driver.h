@@ -23,7 +23,8 @@ Abstract:
 #ifndef __EFI_DHCP4_DRIVER_H__
 #define __EFI_DHCP4_DRIVER_H__
 
-extern EFI_COMPONENT_NAME_PROTOCOL gDhcp4ComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL  gDhcp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gDhcp4ComponentName2;
 
 EFI_STATUS
 EFIAPI

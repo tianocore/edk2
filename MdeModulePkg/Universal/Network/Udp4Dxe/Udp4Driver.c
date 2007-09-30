@@ -504,14 +504,13 @@ Returns:
   //
   // Install the Udp4DriverBinding and Udp4ComponentName protocols.
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gUdp4DriverBinding,
              ImageHandle,
              &gUdp4ComponentName,
-             NULL,
-             NULL
+             &gUdp4ComponentName2
              );
   if (!EFI_ERROR (Status)) {
     //
