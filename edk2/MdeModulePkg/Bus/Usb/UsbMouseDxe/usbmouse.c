@@ -154,15 +154,14 @@ USBMouseDriverBindingEntryPoint (
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &gUsbMouseDriverBinding,
-          ImageHandle,
-          &gUsbMouseComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &gUsbMouseDriverBinding,
+           ImageHandle,
+           &gUsbMouseComponentName,
+           &gUsbMouseComponentName2
+           );
 }
 
 
@@ -413,12 +412,21 @@ USBMouseDriverBindingStart (
   if (!EFI_ERROR (Status)) {
 
     UsbMouseDevice->ControllerNameTable = NULL;
-    AddUnicodeString (
+    AddUnicodeString2 (
       "eng",
       gUsbMouseComponentName.SupportedLanguages,
       &UsbMouseDevice->ControllerNameTable,
-      L"Generic Usb Mouse"
+      L"Generic Usb Mouse",
+      TRUE
       );
+    AddUnicodeString2 (
+      "en",
+      gUsbMouseComponentName2.SupportedLanguages,
+      &UsbMouseDevice->ControllerNameTable,
+      L"Generic Usb Mouse",
+      FALSE
+      );
+
 
     return EFI_SUCCESS;
   }

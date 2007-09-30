@@ -132,15 +132,14 @@ USBKeyboardDriverBindingEntryPoint (
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
-          ImageHandle,
-          SystemTable,
-          &gUsbKeyboardDriverBinding,
-          ImageHandle,
-          &gUsbKeyboardComponentName,
-          NULL,
-          NULL
-          );
+  return EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &gUsbKeyboardDriverBinding,
+           ImageHandle,
+           &gUsbKeyboardComponentName,
+           &gUsbKeyboardComponentName2
+           );
 }
 
 
@@ -462,12 +461,21 @@ USBKeyboardDriverBindingStart (
   }
 
   UsbKeyboardDevice->ControllerNameTable = NULL;
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gUsbKeyboardComponentName.SupportedLanguages,
     &UsbKeyboardDevice->ControllerNameTable,
-    L"Generic Usb Keyboard"
+    L"Generic Usb Keyboard",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gUsbKeyboardComponentName2.SupportedLanguages,
+    &UsbKeyboardDevice->ControllerNameTable,
+    L"Generic Usb Keyboard",
+    FALSE
+    );
+
 
   return EFI_SUCCESS;
 }

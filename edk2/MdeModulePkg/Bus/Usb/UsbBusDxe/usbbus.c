@@ -909,14 +909,13 @@ Returns:
 
 --*/
 {
-  return EfiLibInstallAllDriverProtocols (
+  return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
            &mUsbBusDriverBinding,
            ImageHandle,
            &mUsbBusComponentName,
-           NULL,
-           NULL
+           &mUsbBusComponentName2
            );
 }
 

@@ -624,14 +624,13 @@ Returns:
   //
   // Install driver binding protocol
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gUSBMassDriverBinding,
              ImageHandle,
              &gUsbMassStorageComponentName,
-             NULL,
-             NULL
+             &gUsbMassStorageComponentName2
              );
 
   return Status;
