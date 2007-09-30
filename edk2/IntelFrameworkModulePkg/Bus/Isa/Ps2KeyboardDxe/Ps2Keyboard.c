@@ -274,12 +274,21 @@ Returns:
   }
 
   ConsoleIn->ControllerNameTable = NULL;
-  AddUnicodeString (
+  AddUnicodeString2 (
     "eng",
     gPs2KeyboardComponentName.SupportedLanguages,
     &ConsoleIn->ControllerNameTable,
-    L"PS/2 Keyboard Device"
+    L"PS/2 Keyboard Device",
+    TRUE
     );
+  AddUnicodeString2 (
+    "en",
+    gPs2KeyboardComponentName2.SupportedLanguages,
+    &ConsoleIn->ControllerNameTable,
+    L"PS/2 Keyboard Device",
+    FALSE
+    );
+
 
   //
   // Install protocol interfaces for the keyboard device.
@@ -484,14 +493,13 @@ InitializePs2Keyboard(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallAllDriverProtocols (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gKeyboardControllerDriver,
              ImageHandle,
              &gPs2KeyboardComponentName,
-             NULL,
-             NULL
+             &gPs2KeyboardComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
