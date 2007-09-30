@@ -38,5 +38,19 @@ EDK_0000: Compatible: owner
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
+==========================================================================================
+EDK_3896-3898: Compatible: qhuang8
 
+           Class_UefiEnable[0]: Uefi feature -Add component name 2 protocol support for
+                                all drivers that support component name protocol
+	
+
+    Code Change :
+    1) Update IntelFrameworkModulePkg/Bus/Isa/* 
+    2) Update IntelFrameworkModulePkg/Bus/Pci/*
+    3) Update IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/*
+
+    possible impact:
+    1) To produce the component name 2 protocol, platform DSC file needs to set feature
+       flag 'PcdComponentName2Disable' to 'FALSE'
 
