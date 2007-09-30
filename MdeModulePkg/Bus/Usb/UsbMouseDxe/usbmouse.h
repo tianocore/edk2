@@ -88,9 +88,10 @@ USBMouseRecoveryHandler (
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gUsbMouseDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseComponentName;
-extern EFI_GUID                     gEfiUsbMouseDriverGuid;
+extern EFI_DRIVER_BINDING_PROTOCOL   gUsbMouseDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMouseComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMouseComponentName2;
+extern EFI_GUID                      gEfiUsbMouseDriverGuid;
 
 VOID
 MouseReportStatusCode (

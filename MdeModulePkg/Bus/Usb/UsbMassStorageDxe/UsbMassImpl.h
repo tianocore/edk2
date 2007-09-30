@@ -52,6 +52,7 @@ struct _USB_MASS_DEVICE {
 #define USB_MASS_DEVICE_FROM_BLOCKIO(a) \
         CR (a, USB_MASS_DEVICE, BlockIo, USB_MASS_SIGNATURE)
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gUsbMassStorageComponentName;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMassStorageComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMassStorageComponentName2;
 
 #endif

@@ -99,9 +99,10 @@ typedef struct {
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gUsbKeyboardDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gUsbKeyboardComponentName;
-extern EFI_GUID                     gEfiUsbKeyboardDriverGuid;
+extern EFI_DRIVER_BINDING_PROTOCOL   gUsbKeyboardDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUsbKeyboardComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbKeyboardComponentName2;
+extern EFI_GUID                      gEfiUsbKeyboardDriverGuid;
 
 VOID
 KbdReportStatusCode (

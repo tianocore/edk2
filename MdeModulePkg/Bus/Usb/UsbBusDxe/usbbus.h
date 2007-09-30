@@ -197,8 +197,9 @@ struct _USB_BUS {
   USB_DEVICE                *Devices[USB_MAX_DEVICES];
 };
 
-extern EFI_USB_IO_PROTOCOL           mUsbIoProtocol;
-extern EFI_DRIVER_BINDING_PROTOCOL   mUsbBusDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   mUsbBusComponentName;
+extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
+extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL    mUsbBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL   mUsbBusComponentName2;
 
 #endif
