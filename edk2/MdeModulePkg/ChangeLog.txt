@@ -39,6 +39,26 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_4000-4006: Compatible: qhuang8
+
+           Class_UefiEnable[0]: Uefi feature -Add component name 2 protocol support for
+                                all drivers that support component name protocol
+	
+
+    Code Change :
+    1) Update MdeModulePkg/Bus/Pci/*
+    2) Update MdeModulePkg/Bus/Scsi/*
+    3) Update MdeModulePkg/Bus/Usb/*
+    4) Update MdeModulePkg/Universal/Disk/*
+    5) Update MdeModulePkg/Universal/DebugPortDxe/*
+    6) Update MdeModulePkg/Universal/Console/*
+    7) Update MdeModulePkg/Universal/Network/*
+   
+    possible impact:
+    1) To produce the component name 2 protocol, platform DSC file needs to set feature
+       flag 'PcdComponentName2Disable' to 'FALSE'
+
+==========================================================================================
 EDK_3967:  Non-Compatible: lgao4
 
 	  Class_Library:  Remove PeCoffLoader library class and its instances.
