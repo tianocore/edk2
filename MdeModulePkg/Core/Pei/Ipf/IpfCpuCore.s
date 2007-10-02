@@ -20,7 +20,6 @@
 .file  "IpfCpuCore.s"
 
 #include  "IpfMacro.i"
-#include  "Ipf/IpfCpuCore.i"
 
 //---------------------------------------------------------------------------------
 //++
