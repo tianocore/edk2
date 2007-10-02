@@ -22,7 +22,6 @@ Revision History
 --*/
 
 #include "IpfPeiMain.h"
-#include "IpfCpuCore.i"
 
 VOID
 SwitchToCacheMode (
