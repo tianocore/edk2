@@ -22,6 +22,7 @@ Revision History
 --*/
 
 #include "IpfPeiMain.h"
+#define  RecoveryFn                             0x03
 
 VOID
 SwitchToCacheMode (
