@@ -22,18 +22,23 @@ Revision History
 
 #include "Variable.h"
 #include <Guid/FlashMapHob.h>
+#include <Guid/VariableInfo.h>
+#include <Guid/GlobalVariable.h>
+
+
+
 
 //
 // Don't use module globals after the SetVirtualAddress map is signaled
 //
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
+
 //
 // This is a temperary function which will be removed
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
-STATIC
 VOID
 AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -49,7 +54,6 @@ AcquireLockOnlyAtBootTime (
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
-STATIC
 VOID
 ReleaseLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -59,6 +63,76 @@ ReleaseLockOnlyAtBootTime (
     EfiReleaseLock (Lock);
   }
 }
+
+
+GLOBAL_REMOVE_IF_UNREFERENCED VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
+
+
+VOID
+UpdateVariableInfo (
+  IN  CHAR16                  *VariableName,
+  IN  EFI_GUID                *VendorGuid,
+  IN  BOOLEAN                 Volatile,
+  IN  BOOLEAN                 Read,
+  IN  BOOLEAN                 Write,
+  IN  BOOLEAN                 Delete,
+  IN  BOOLEAN                 Cache
+  )
+{
+  VARIABLE_INFO_ENTRY   *Entry;
+
+  if (FeaturePcdGet (PcdVariableCollectStatistics)) {
+
+    if (EfiAtRuntime ()) {
+      // Don't collect statistics at runtime
+      return;
+    }
+
+    if (gVariableInfo == NULL) {
+      gVariableInfo = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
+      CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
+      gVariableInfo->Name = AllocatePool (StrLen (VariableName));
+      StrCpy (gVariableInfo->Name, VariableName);
+      gVariableInfo->Volatile = Volatile;
+
+      gBS->InstallConfigurationTable (&gEfiVariableInfoGuid, gVariableInfo);
+    }
+
+    
+    for (Entry = gVariableInfo; Entry != NULL; Entry = Entry->Next) {
+      if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
+        if (StrCmp (VariableName, Entry->Name) == 0) {
+          if (Read) {
+            Entry->ReadCount++;
+          }
+          if (Write) {
+            Entry->WriteCount++;
+          }
+          if (Delete) {
+            Entry->DeleteCount++;
+          }
+          if (Cache) {
+            Entry->CacheCount++;
+          }
+
+          return;
+        }
+      }
+
+      if (Entry->Next == NULL) {
+        Entry->Next = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
+
+        CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
+        Entry->Next->Name = AllocatePool (StrLen (VariableName));
+        StrCpy (Entry->Next->Name, VariableName);
+        Entry->Next->Volatile = Volatile;
+      }
+
+    }
+  }
+}
+
+
 
 STATIC
 BOOLEAN
@@ -485,9 +559,111 @@ Returns:
   return Status;
 }
 
-STATIC
+typedef struct {
+  EFI_GUID    *Guid;
+  CHAR16      *Name;
+  UINT32      Attributes;
+  UINTN       DataSize;
+  VOID        *Data;
+} VARIABLE_CACHE_ENTRY;
+
+//
+// The current Hii implementation accesses this variable a larg # of times on every boot.
+// Other common variables are only accessed a single time. This is why this cache algorithm
+// only targets a single variable. Probably to get an performance improvement out of
+// a Cache you would need a cache that improves the search performance for a variable.
+//
+VARIABLE_CACHE_ENTRY mVariableCache[] = {
+  {
+    &gEfiGlobalVariableGuid,
+    L"Lang",
+    0x00000000,
+    0x00,
+    NULL
+  }
+};
+
+VOID
+UpdateVariableCache (
+  IN      CHAR16            *VariableName,
+  IN      EFI_GUID          *VendorGuid,
+  OUT     UINT32            Attributes,
+  IN OUT  UINTN             DataSize,
+  OUT     VOID              *Data
+  )
+{
+  VARIABLE_CACHE_ENTRY      *Entry;
+  UINTN                     Index;
+
+  if (EfiAtRuntime ()) {
+    // Don't use the cache at runtime
+    return;
+  }
+
+  for (Index = 0, Entry = mVariableCache; Index < sizeof (mVariableCache)/sizeof (VARIABLE_CACHE_ENTRY); Index++, Entry++) {
+    if (CompareGuid (VendorGuid, Entry->Guid)) {
+      if (StrCmp (VariableName, Entry->Name) == 0) { 
+        Entry->Attributes = Attributes;
+        if (DataSize == 0) {
+          // Delete Case
+          if (Entry->DataSize != 0) {
+            FreePool (Entry->Data);
+          }
+          Entry->DataSize = DataSize;
+        } else if (DataSize == Entry->DataSize) {
+          CopyMem (Entry->Data, Data, DataSize);
+        } else {
+          Entry->Data = AllocatePool (DataSize);
+          Entry->DataSize = DataSize;
+          CopyMem (Entry->Data, Data, DataSize);
+        }
+      }
+    }
+  }
+}
+
+
 EFI_STATUS
-EFIAPI
+FindVariableInCache (
+  IN      CHAR16            *VariableName,
+  IN      EFI_GUID          *VendorGuid,
+  OUT     UINT32            *Attributes OPTIONAL,
+  IN OUT  UINTN             *DataSize,
+  OUT     VOID              *Data
+  )
+{
+  VARIABLE_CACHE_ENTRY      *Entry;
+  UINTN                     Index;
+
+  if (EfiAtRuntime ()) {
+    // Don't use the cache at runtime
+    return EFI_NOT_FOUND;
+  }
+
+  for (Index = 0, Entry = mVariableCache; Index < sizeof (mVariableCache)/sizeof (VARIABLE_CACHE_ENTRY); Index++, Entry++) {
+    if (CompareGuid (VendorGuid, Entry->Guid)) {
+      if (StrCmp (VariableName, Entry->Name) == 0) {
+        if (Entry->DataSize == 0) {
+          return EFI_NOT_FOUND;
+        } else if (Entry->DataSize != *DataSize) {
+          *DataSize = Entry->DataSize;
+          return EFI_BUFFER_TOO_SMALL;
+        } else {
+          CopyMem (Data, Entry->Data, Entry->DataSize);
+          if (Attributes != NULL) {
+            *Attributes = Entry->Attributes;
+          }
+          return EFI_SUCCESS;
+        }
+      }
+    }
+  }
+  
+  return EFI_NOT_FOUND;
+}
+
+
+EFI_STATUS
 FindVariable (
   IN  CHAR16                  *VariableName,
   IN  EFI_GUID                *VendorGuid,
@@ -527,10 +703,10 @@ Returns:
   AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
 
   //
-  // 0: Non-Volatile, 1: Volatile
+  // 0: Volatile, 1: Non-Volatile
   //
-  VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
-  VariableStoreHeader[1]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);
+  VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);
+  VariableStoreHeader[1]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
 
   //
   // Start Pointers for the variable.
@@ -543,7 +719,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   //
-  // Find the variable by walk through non-volatile and volatile variable store
+  // Find the variable by walk through volatile and then non-volatile variable store
   //
   for (Index = 0; Index < 2; Index++) {
     PtrTrack->StartPtr  = (VARIABLE_HEADER *) (VariableStoreHeader[Index] + 1);
@@ -554,13 +730,13 @@ Returns:
         if (!EfiAtRuntime () || (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
           if (VariableName[0] == 0) {
             PtrTrack->CurrPtr   = Variable[Index];
-            PtrTrack->Volatile  = (BOOLEAN) Index;
+            PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
               if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), Variable[Index]->NameSize)) {
                 PtrTrack->CurrPtr   = Variable[Index];
-                PtrTrack->Volatile  = (BOOLEAN) Index;
+                PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
                 return EFI_SUCCESS;
               }
             }
@@ -570,16 +746,11 @@ Returns:
 
       Variable[Index] = GetNextVariablePtr (Variable[Index]);
     }
-    //
-    // While (...)
-    //
   }
-  //
-  // for (...)
-  //
   PtrTrack->CurrPtr = NULL;
   return EFI_NOT_FOUND;
 }
+
 
 EFI_STATUS
 EFIAPI
@@ -626,14 +797,22 @@ Returns:
   if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Find existing variable
   //
+  Status = FindVariableInCache (VariableName, VendorGuid, Attributes, DataSize, Data);
+  if ((Status == EFI_BUFFER_TOO_SMALL) || (Status == EFI_SUCCESS)){
+    // Hit in the Cache
+    UpdateVariableInfo (VariableName, VendorGuid, FALSE, TRUE, FALSE, FALSE, TRUE);
+    return Status;
+  }
+  
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
-
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Get data size
   //
@@ -650,6 +829,9 @@ Returns:
     }
 
     *DataSize = VarDataSize;
+    UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, TRUE, FALSE, FALSE, FALSE);
+    UpdateVariableCache (VariableName, VendorGuid, Variable.CurrPtr->Attributes, VarDataSize, Data);
+ 
     Status = EFI_SUCCESS;
     goto Done;
   } else {
@@ -901,6 +1083,10 @@ Returns:
                  sizeof (UINT8),
                  &State
                  ); 
+      if (!EFI_ERROR (Status)) {
+        UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, FALSE, TRUE, FALSE);
+        UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
+      }
       goto Done;     
     }
     //
@@ -909,6 +1095,8 @@ Returns:
     //
     if (Variable.CurrPtr->DataSize == DataSize &&
         (CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0)) {
+      
+      UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
       Status = EFI_SUCCESS;
       goto Done;
     } else if ((Variable.CurrPtr->State == VAR_ADDED) ||
@@ -930,7 +1118,7 @@ Returns:
                  );      
       if (EFI_ERROR (Status)) {
         goto Done;  
-      }
+      } 
     }    
   } else if (Status == EFI_NOT_FOUND) {
     //
@@ -1010,6 +1198,7 @@ Returns:
     //
     // Create a nonvolatile variable
     //
+    Variable.Volatile = FALSE;
     
     if ((UINT32) (VarSize +*NonVolatileOffset) >
           ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->NonVolatileVariableBase)))->Size
@@ -1099,6 +1288,7 @@ Returns:
     //
     // Create a volatile variable
     //      
+    Variable.Volatile = TRUE;
 
     if ((UINT32) (VarSize +*VolatileOffset) >
         ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->VolatileVariableBase)))->Size) {
@@ -1155,10 +1345,18 @@ Returns:
                sizeof (UINT8),
                &State
                );
+    
+    if (!EFI_ERROR (Status)) {
+      UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+      UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
+    }
     goto Done;      
   }
 
   Status = EFI_SUCCESS;
+  UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+  UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
+
 Done:
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return Status;

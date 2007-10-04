@@ -63,9 +63,16 @@
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
 
+[Guids]
+  gEfiVariableInfoGuid
+  gEfiGlobalVariableGuid
+
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
 
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid AND gEfiFaultTolerantWriteLiteProtocolGuid
