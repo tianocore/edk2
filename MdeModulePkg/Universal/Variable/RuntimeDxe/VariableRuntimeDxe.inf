@@ -71,7 +71,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   
-[FeaturePcd.IA32]
+[FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
 
 [Depex]
