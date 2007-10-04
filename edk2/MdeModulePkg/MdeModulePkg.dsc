@@ -433,6 +433,7 @@
   MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
 
 [Components.IA32]
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
