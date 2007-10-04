@@ -228,6 +228,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE
 
 [PcdsFixedAtBuild.IA32]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
