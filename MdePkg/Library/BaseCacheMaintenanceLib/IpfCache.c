@@ -20,6 +20,7 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PalCallLib.h>
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
@@ -35,7 +36,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  PalCallStatic (NULL, 1, 1, 1, 0);
+  PalCall (1, 1, 1, 0);
 }
 
 /**
@@ -89,7 +90,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  PalCallStatic (NULL, 1, 2, 1, 0);
+  PalCall (1, 2, 1, 0);
 }
 
 /**
@@ -146,7 +147,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  PalCallStatic (NULL, 1, 2, 0, 0);
+  PalCall (1, 2, 0, 0);
 }
 
 /**
