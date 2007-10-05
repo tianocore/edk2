@@ -54,6 +54,7 @@
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseLib/BaseLib.inf
+  CpuLib|MdePkg/Library/CpuLib/CpuLib.inf
   MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
