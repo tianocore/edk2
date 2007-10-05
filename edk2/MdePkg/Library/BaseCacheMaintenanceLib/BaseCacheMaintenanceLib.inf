@@ -48,6 +48,9 @@
 [LibraryClasses]
   DebugLib
 
+[LibraryClasses.Ipf]
+  PalCallLib
+
 [LibraryClasses.common]
   BaseLib
 
