@@ -37,8 +37,11 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
-#include <Guid/FlashMapHob.h>
+#include <Guid/VariableInfo.h>
+#include <Guid/GlobalVariable.h>
 #include <VariableFormat.h>
+
+
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
 
@@ -56,10 +59,6 @@ Abstract:
 
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
-typedef enum {
-  Physical,
-  Virtual
-} VARIABLE_POINTER_TYPE;
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
@@ -75,23 +74,24 @@ typedef struct {
 } VARIABLE_GLOBAL;
 
 typedef struct {
-  VARIABLE_GLOBAL VariableGlobal[2];
+  VARIABLE_GLOBAL VariableGlobal;
   UINTN           VolatileLastVariableOffset;
   UINTN           NonVolatileLastVariableOffset;
   UINT32          FvbInstance;
-} ESAL_VARIABLE_GLOBAL;
+} VARIABLE_MODULE_GLOBAL;
 
-extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
+typedef struct {
+  EFI_GUID    *Guid;
+  CHAR16      *Name;
+  UINT32      Attributes;
+  UINTN       DataSize;
+  VOID        *Data;
+} VARIABLE_CACHE_ENTRY;
+
 
 //
 // Functions
 //
-EFI_STATUS
-EFIAPI
-VariableCommonInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
 
 EFI_STATUS
 EFIAPI
@@ -100,65 +100,6 @@ VariableServiceInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   );
 
-VOID
-EFIAPI
-VariableClassAddressChangeEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  );
-
-EFI_STATUS
-EFIAPI
-GetVariable (
-  IN      CHAR16            *VariableName,
-  IN      EFI_GUID          * VendorGuid,
-  OUT     UINT32            *Attributes OPTIONAL,
-  IN OUT  UINTN             *DataSize,
-  OUT     VOID              *Data,
-  IN      VARIABLE_GLOBAL   * Global,
-  IN      UINT32            Instance
-  );
-
-EFI_STATUS
-EFIAPI
-GetNextVariableName (
-  IN OUT  UINTN             *VariableNameSize,
-  IN OUT  CHAR16            *VariableName,
-  IN OUT  EFI_GUID          *VendorGuid,
-  IN      VARIABLE_GLOBAL   *Global,
-  IN      UINT32            Instance
-  );
-
-EFI_STATUS
-EFIAPI
-SetVariable (
-  IN CHAR16                  *VariableName,
-  IN EFI_GUID                *VendorGuid,
-  IN UINT32                  Attributes,
-  IN UINTN                   DataSize,
-  IN VOID                    *Data,
-  IN VARIABLE_GLOBAL         *Global,
-  IN UINTN                   *VolatileOffset,
-  IN UINTN                   *NonVolatileOffset,
-  IN UINT32                  Instance
-  );
-
-EFI_STATUS
-EFIAPI
-QueryVariableInfo (
-  IN  UINT32                 Attributes,
-  OUT UINT64                 *MaximumVariableStorageSize,
-  OUT UINT64                 *RemainingVariableStorageSize,
-  OUT UINT64                 *MaximumVariableSize,
-  IN  VARIABLE_GLOBAL        *Global,
-  IN  UINT32                 Instance
-  );
-
-EFI_STATUS
-GetFvbHandleByAddress (
-  IN  EFI_PHYSICAL_ADDRESS   VariableStoreBase,
-  OUT EFI_HANDLE             *FvbHandle
-  );
 
 EFI_STATUS
 FtwVariableSpace (
