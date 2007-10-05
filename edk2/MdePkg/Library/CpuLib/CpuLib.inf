@@ -1,0 +1,68 @@
+#/** @file
+# Component description file for Base Library
+#
+# Base Library implementation.
+# Copyright (c) 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuLib
+  FILE_GUID                      = 4FBD2538-249C-4b50-8F4A-A9E66609CBF6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+
+[Sources.Ia32]
+  Ia32/CpuSleep.c | MSFT 
+  Ia32/CpuFlushTlb.c | MSFT 
+
+  Ia32/CpuSleep.asm | INTEL 
+  Ia32/CpuFlushTlb.asm | INTEL 
+
+  Ia32/CpuSleep.S | GCC 
+  Ia32/CpuFlushTlb.S | GCC 
+
+[Sources.X64]
+  X64/CpuFlushTlb.asm
+  X64/CpuSleep.asm
+
+  X64/CpuSleep.S | GCC 
+  X64/CpuFlushTlb.S | GCC 
+
+[Sources.IPF]
+  Ipf/CpuFlushTlb.s
+  Ipf/CpuSleep.c
+
+[Sources.EBC]
+  Ebc/CpuSleepFlushTlb.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses.Ipf]
+PalCallLib
+
+
+[Pcd.common]
+
