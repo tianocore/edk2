@@ -42,6 +42,7 @@
 [LibraryClasses.common]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+  CpuLib|MdePkg/Library/CpuLib/CpuLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
