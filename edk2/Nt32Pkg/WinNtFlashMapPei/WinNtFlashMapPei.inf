@@ -49,7 +49,6 @@
 
 
 [Guids]
-  gEfiFlashMapHobGuid                           # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
   gEfiFirmwareFileSystem2Guid                    # ALWAYS_CONSUMED
 
 

@@ -34,7 +34,6 @@
 #
 
 [Sources.common]
-  InitVariable.c
   reclaim.c
   Variable.c
   Variable.h

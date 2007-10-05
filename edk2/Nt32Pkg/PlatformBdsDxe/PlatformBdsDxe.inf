@@ -108,7 +108,6 @@
 #  ProcessorVersion                              # SOMETIMES_CONSUMED  Data Hub
 #  SystemManufacturer                            # SOMETIMES_CONSUMED  Data Hub
 #  BiosVendor                                    # SOMETIMES_CONSUMED  Data Hub
-  gEfiFlashMapHobGuid                           # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
   gEfiDefaultBmpLogoGuid                        # SOMETIMES_CONSUMED
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
   gEfiFileSystemVolumeLabelInfoIdGuid           # ALWAYS_CONSUMED

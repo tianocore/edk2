@@ -67,7 +67,6 @@
 
 [Guids]
   gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
-  gEfiFlashMapHobGuid
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
