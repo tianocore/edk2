@@ -60,6 +60,7 @@
 
 [LibraryClasses.IPF]
   DebugLib
+  PalCallLib
 
 
 [Pcd.IA32]

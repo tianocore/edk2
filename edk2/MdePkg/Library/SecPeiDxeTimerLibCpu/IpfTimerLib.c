@@ -160,13 +160,13 @@ GetPerformanceCounterProperties (
     *EndValue = (UINT64)(-1);
   }
 
-  PalRet = PalCallStatic (NULL, 13, 0, 0, 0);
+  PalRet = PalCall (13, 0, 0, 0);
   if (PalRet.Status != 0) {
     return 1000000;
   }
   BaseFrequence = PalRet.r9;
 
-  PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
+  PalRet = PalCall (14, 0, 0, 0);
   if (PalRet.Status != 0) {
     return 1000000;
   }
