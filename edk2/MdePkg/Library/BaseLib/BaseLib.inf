@@ -156,8 +156,6 @@
   Ia32/CpuPause.c | MSFT 
   Ia32/CpuIdEx.c | MSFT 
   Ia32/CpuId.c | MSFT 
-  Ia32/CpuSleep.c | MSFT 
-  Ia32/CpuFlushTlb.c | MSFT 
   Ia32/CpuBreakpoint.c | MSFT 
   Ia32/ARShiftU64.c | MSFT 
   SynchronizationMsc.c  | MSFT
@@ -252,8 +250,6 @@
   Ia32/CpuPause.asm | INTEL 
   Ia32/CpuIdEx.asm | INTEL 
   Ia32/CpuId.asm | INTEL 
-  Ia32/CpuSleep.asm | INTEL 
-  Ia32/CpuFlushTlb.asm | INTEL 
   Ia32/CpuBreakpoint.asm | INTEL 
   Ia32/ARShiftU64.asm | INTEL 
   Synchronization.c | INTEL
@@ -262,10 +258,8 @@
   Ia32/EnablePaging64.asm
 
   Ia32/Thunk16.S | GCC 
-  Ia32/CpuFlushTlb.S | GCC 
   Ia32/CpuBreakpoint.S | GCC 
   Ia32/CpuPause.S | GCC 
-  Ia32/CpuSleep.S | GCC 
   Ia32/EnableDisableInterrupts.S | GCC 
   Ia32/DisableInterrupts.S | GCC 
   Ia32/EnableInterrupts.S | GCC 
@@ -380,9 +374,7 @@
 
 [Sources.X64]
   X64/Thunk16.asm
-  X64/CpuFlushTlb.asm
   X64/CpuPause.asm
-  X64/CpuSleep.asm
   X64/EnableDisableInterrupts.asm
   X64/DisableInterrupts.asm
   X64/EnableInterrupts.asm
@@ -568,11 +560,9 @@
   X64/EnableDisableInterrupts.S | GCC 
   X64/DisablePaging64.S | GCC 
   X64/DisableInterrupts.S | GCC 
-  X64/CpuSleep.S | GCC 
   X64/CpuPause.S | GCC 
   X64/CpuId.S | GCC 
   X64/CpuIdEx.S | GCC 
-  X64/CpuFlushTlb.S | GCC 
   X64/CpuBreakpoint.S | GCC 
   SynchronizationGcc.c  | GCC 
 
@@ -590,7 +580,6 @@
   Ipf/FlushCacheRange.s
   Ipf/InternalSwitchStack.c
   Ipf/GetInterruptState.s
-  Ipf/CpuFlushTlb.s
   Ipf/CpuPause.s
   Ipf/Synchronization.c
   Ipf/InterlockedCompareExchange64.s
