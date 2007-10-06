@@ -1033,6 +1033,7 @@ RuntimeServiceSetVariable (
   UINTN                   *VolatileOffset;
   UINTN                   *NonVolatileOffset;
   UINT32                  Instance;
+  BOOLEAN                 Volatile;
 
   Reclaimed         = FALSE;
   VolatileOffset    = &mVariableModuleGlobal->VolatileLastVariableOffset;
@@ -1076,11 +1077,11 @@ RuntimeServiceSetVariable (
   //
   
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
-
   if (Status == EFI_SUCCESS && Variable.CurrPtr != NULL) {
     //
     // Update/Delete existing variable
     //
+    Volatile = Variable.Volatile;
     
     if (EfiAtRuntime ()) {        
       //
@@ -1118,7 +1119,7 @@ RuntimeServiceSetVariable (
                  &State
                  ); 
       if (!EFI_ERROR (Status)) {
-        UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, FALSE, TRUE, FALSE);
+        UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, FALSE, TRUE, FALSE);
         UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
       }
       goto Done;     
@@ -1130,7 +1131,7 @@ RuntimeServiceSetVariable (
     if (Variable.CurrPtr->DataSize == DataSize &&
         (CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0)) {
       
-      UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+      UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
       Status = EFI_SUCCESS;
       goto Done;
     } else if ((Variable.CurrPtr->State == VAR_ADDED) ||
@@ -1232,7 +1233,7 @@ RuntimeServiceSetVariable (
     //
     // Create a nonvolatile variable
     //
-    Variable.Volatile = FALSE;
+    Volatile = FALSE;
     
     if ((UINT32) (VarSize +*NonVolatileOffset) >
           ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase)))->Size
@@ -1322,7 +1323,7 @@ RuntimeServiceSetVariable (
     //
     // Create a volatile variable
     //      
-    Variable.Volatile = TRUE;
+    Volatile = TRUE;
 
     if ((UINT32) (VarSize +*VolatileOffset) >
         ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase)))->Size) {
@@ -1381,14 +1382,14 @@ RuntimeServiceSetVariable (
                );
     
     if (!EFI_ERROR (Status)) {
-      UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+      UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
       UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
     }
     goto Done;      
   }
 
   Status = EFI_SUCCESS;
-  UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+  UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
   UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
 
 Done:
