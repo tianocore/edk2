@@ -1,0 +1,104 @@
+#/** @file
+# Component description file for RepStr Base Memory Library
+#
+# Base Memory Library that uses REP string instructions for
+#  high performance and small size. Optimized for use in PEI.
+# Copyright (c) 2007, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseMemoryLibOptPei
+  FILE_GUID                      = D6F43B1B-0F21-462b-B8B7-A033C3EB4261
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseMemoryLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  MemLibInternals.h
+
+[Sources.Ia32]
+  Ia32/ScanMem64.S
+  Ia32/ScanMem32.S
+  Ia32/ScanMem16.S
+  Ia32/ScanMem8.S
+  Ia32/CompareMem.S
+  Ia32/ZeroMem.S
+  Ia32/SetMem64.S
+  Ia32/SetMem32.S
+  Ia32/SetMem16.S
+  Ia32/SetMem.S
+  Ia32/CopyMem.S
+  Ia32/ScanMem64.asm
+  Ia32/ScanMem32.asm
+  Ia32/ScanMem16.asm
+  Ia32/ScanMem8.asm
+  Ia32/CompareMem.asm
+  Ia32/ZeroMem.asm
+  Ia32/SetMem64.asm
+  Ia32/SetMem32.asm
+  Ia32/SetMem16.asm
+  Ia32/SetMem.asm
+  Ia32/CopyMem.asm
+  ScanMem64Wrapper.c
+  ScanMem32Wrapper.c
+  ScanMem16Wrapper.c
+  ScanMem8Wrapper.c
+  ZeroMemWrapper.c
+  CompareMemWrapper.c
+  SetMem64Wrapper.c
+  SetMem32Wrapper.c
+  SetMem16Wrapper.c
+  SetMemWrapper.c
+  CopyMemWrapper.c
+  MemLibGuid.c
+
+[Sources.X64]
+  x64/ScanMem64.asm
+  x64/ScanMem32.asm
+  x64/ScanMem16.asm
+  x64/ScanMem8.asm
+  x64/CompareMem.asm
+  x64/ZeroMem.asm
+  x64/SetMem64.asm
+  x64/SetMem32.asm
+  x64/SetMem16.asm
+  x64/SetMem.asm
+  x64/CopyMem.asm
+  ScanMem64Wrapper.c
+  ScanMem32Wrapper.c
+  ScanMem16Wrapper.c
+  ScanMem8Wrapper.c
+  ZeroMemWrapper.c
+  CompareMemWrapper.c
+  SetMem64Wrapper.c
+  SetMem32Wrapper.c
+  SetMem16Wrapper.c
+  SetMemWrapper.c
+  CopyMemWrapper.c
+  MemLibGuid.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+
