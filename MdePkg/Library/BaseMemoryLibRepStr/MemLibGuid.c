@@ -26,6 +26,7 @@
 //
 #include "MemLibInternals.h"
 
+
 /**
   Copies a source GUID to a destination GUID.
 
@@ -80,22 +81,17 @@ CompareGuid (
   IN CONST GUID  *Guid2
   )
 {
-  UINT64 Guid1ValueLo;
-  UINT64 Guid1ValueHi;
-  UINT64 Guid2ValueLo;
-  UINT64 Guid2ValueHi;
+  UINT64  LowPartOfGuid1;
+  UINT64  LowPartOfGuid2;
+  UINT64  HighPartOfGuid1;
+  UINT64  HighPartOfGuid2;
 
-  Guid1ValueLo = ReadUnaligned64 ((CONST UINT64*)Guid1);
-  Guid2ValueLo = ReadUnaligned64 ((CONST UINT64*)Guid2);
+  LowPartOfGuid1  = ReadUnaligned64 ((CONST UINT64*) Guid1);
+  LowPartOfGuid2  = ReadUnaligned64 ((CONST UINT64*) Guid2);
+  HighPartOfGuid1 = ReadUnaligned64 ((CONST UINT64*) Guid1 + 1);
+  HighPartOfGuid2 = ReadUnaligned64 ((CONST UINT64*) Guid2 + 1);
 
-  Guid1ValueHi = ReadUnaligned64 ((CONST UINT64*)Guid1 + 1);
-  Guid2ValueHi = ReadUnaligned64 ((CONST UINT64*)Guid2 + 1);
-
-
-  return (BOOLEAN)
-           ((Guid1ValueLo == Guid2ValueLo) &&
-            (Guid1ValueHi == Guid2ValueHi)
-           );
+  return (BOOLEAN) (LowPartOfGuid1 == LowPartOfGuid2 && HighPartOfGuid1 == HighPartOfGuid2);
 }
 
 /**
