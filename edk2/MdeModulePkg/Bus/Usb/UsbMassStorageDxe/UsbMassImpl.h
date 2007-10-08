@@ -39,7 +39,7 @@ enum {
   //
   USB_MASS_TPL          = TPL_NOTIFY,
   
-  USB_MASS_SIGNATURE    = EFI_SIGNATURE_32 ('U', 's', 'b', 'M'),
+  USB_MASS_SIGNATURE    = EFI_SIGNATURE_32 ('U', 's', 'b', 'M')
 };
 
 struct _USB_MASS_DEVICE {

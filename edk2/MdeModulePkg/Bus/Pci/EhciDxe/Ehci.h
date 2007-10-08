@@ -77,7 +77,7 @@ enum {
   //
   EHC_TPL                      = TPL_NOTIFY,
 
-  USB2_HC_DEV_SIGNATURE        = EFI_SIGNATURE_32 ('e', 'h', 'c', 'i'),
+  USB2_HC_DEV_SIGNATURE        = EFI_SIGNATURE_32 ('e', 'h', 'c', 'i')
 };
 
 //

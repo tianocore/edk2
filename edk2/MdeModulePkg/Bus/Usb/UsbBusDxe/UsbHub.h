@@ -94,7 +94,7 @@ enum {
   // Host software return timeout if port status doesn't change 
   // after 500ms(LOOP * STALL = 100 * 5ms), set by experience
   //
-  USB_WAIT_PORT_STS_CHANGE_LOOP   = 100,
+  USB_WAIT_PORT_STS_CHANGE_LOOP   = 100
 };
 
 #pragma pack(1)
