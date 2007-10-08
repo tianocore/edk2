@@ -464,7 +464,7 @@ UsbCtrlRequest (
              Direction,
              Buf,
              &Len,
-             50 * USB_STALL_1_MS,
+             USB_GENERAL_DEVICE_REQUEST_TIMEOUT,
              &UsbDev->Translator,
              &Result
              );
@@ -554,7 +554,7 @@ UsbGetMaxPacketSize0 (
       return EFI_SUCCESS;
     }
 
-    gBS->Stall (100 * USB_STALL_1_MS);
+    gBS->Stall (USB_RETRY_MAX_PACK_SIZE_STALL);
   }
 
   return EFI_DEVICE_ERROR;
@@ -981,7 +981,7 @@ UsbIoClearFeature (
                     UsbIo,
                     &DevReq,
                     EfiUsbNoData,
-                    10 * USB_STALL_1_MS,
+                    USB_CLEAR_FEATURE_REQUEST_TIMEOUT,
                     NULL,
                     0,
                     &UsbResult

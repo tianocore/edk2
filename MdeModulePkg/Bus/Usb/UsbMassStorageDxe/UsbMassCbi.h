@@ -30,14 +30,19 @@ enum {
   USB_CBI_RESET_CMD_LEN         = 12,
 
   //
-  // Usb CBI retry times
+  // Usb Cbi retry C/B/I transport times, set by experience
   //
   USB_CBI_MAX_RETRY             = 3,
 
   //
-  // Usb Cbi transfer timeout
+  // Usb Cbi wait device reset complete, set by experience
+  //  
+  USB_CBI_RESET_DEVICE_STALL    = 50 * USB_MASS_1_MILLISECOND,
+
   //
-  USB_CBI_RESET_TIMEOUT         = 1 * USB_MASS_STALL_1_S
+  // Usb Cbi transport timeout, set by experience
+  //
+  USB_CBI_RESET_DEVICE_TIMEOUT  = 1 * USB_MASS_1_SECOND,
 };
 
 //

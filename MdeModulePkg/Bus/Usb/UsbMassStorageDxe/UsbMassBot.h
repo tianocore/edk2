@@ -46,21 +46,21 @@ enum {
   USB_BOT_COMMAND_ERROR    = 0x02, // Phase error, need to reset the device
 
   //
-  // Usb Bot retry times
+  // Usb Bot retry to get CSW, refers to specification[BOT10-5.3, it says 2 times]
   //
-  USB_BOT_GET_STATUS_RETRY = 3,
+  USB_BOT_RECV_CSW_RETRY       = 3,
 
   //
-  // Usb Bot stall time
+  // Usb Bot wait device reset complete, set by experience
+  //  
+  USB_BOT_RESET_DEVICE_STALL   = 100 * USB_MASS_1_MILLISECOND,
+  
   //
-  USB_BOT_RESET_STALL      = 100 * USB_MASS_STALL_1_MS,
-
+  // Usb Bot transport timeout, set by experience
   //
-  // Usb Bot transfer timeout
-  //
-  USB_BOT_CBW_TIMEOUT      = 1 * USB_MASS_STALL_1_S,
-  USB_BOT_CSW_TIMEOUT      = 1 * USB_MASS_STALL_1_S,
-  USB_BOT_RESET_TIMEOUT    = 3 * USB_MASS_STALL_1_S
+  USB_BOT_SEND_CBW_TIMEOUT     = 3 * USB_MASS_1_SECOND,
+  USB_BOT_RECV_CSW_TIMEOUT     = 3 * USB_MASS_1_SECOND,
+  USB_BOT_RESET_DEVICE_TIMEOUT = 3 * USB_MASS_1_SECOND,
 };
 
 //

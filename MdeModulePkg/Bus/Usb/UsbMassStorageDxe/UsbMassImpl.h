@@ -33,7 +33,13 @@ typedef struct _USB_MASS_DEVICE USB_MASS_DEVICE;
 #include "UsbMassBoot.h"
 
 enum {
-  USB_MASS_SIGNATURE= EFI_SIGNATURE_32 ('U', 's', 'b', 'K')
+  //
+  // MassStorage raises TPL to TPL_NOTIFY to serialize all its operations
+  // to protect shared data structures.
+  //
+  USB_MASS_TPL          = TPL_NOTIFY,
+  
+  USB_MASS_SIGNATURE    = EFI_SIGNATURE_32 ('U', 's', 'b', 'M'),
 };
 
 struct _USB_MASS_DEVICE {

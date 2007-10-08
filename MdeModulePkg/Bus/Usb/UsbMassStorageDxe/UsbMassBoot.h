@@ -31,14 +31,13 @@ enum {
   // The opcodes of various usb boot commands:
   // INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
   // by MMC command set. Others are "Group 1 Timeout Commands". That
-  // is they should be retried if driver is ready.
-  // We can't use the Peripheral Device Type in Inquiry data to
+  // is they should be retried if driver is ready. 
+  // We can't use the Peripheral Device Type in Inquiry data to 
   // determine the timeout used. For example, both floppy and flash
   // are likely set their PDT to 0, or Direct Access Device.
   //
   USB_BOOT_INQUIRY_OPCODE         = 0x12,
   USB_BOOT_REQUEST_SENSE_OPCODE   = 0x03,
-
   USB_BOOT_MODE_SENSE10_OPCODE    = 0x5A,
   USB_BOOT_READ_CAPACITY_OPCODE   = 0x25,
   USB_BOOT_TEST_UNIT_READY_OPCODE = 0x00,
@@ -70,45 +69,45 @@ enum {
   USB_BOOT_ASC_MEDIA_CHANGE       = 0x28,
 
   //
-  // Other parameters
+  // Supported PDT codes, or Peripheral Device Type
   //
-  USB_BOOT_IO_BLOCKS              = 64,
+  USB_PDT_DIRECT_ACCESS           = 0x00,       // Direct access device
+  USB_PDT_CDROM                   = 0x05,       // CDROM
+  USB_PDT_OPTICAL                 = 0x07,       // Non-CD optical disks
+  USB_PDT_SIMPLE_DIRECT           = 0x0E,       // Simplified direct access device
+  
+  //
+  // Other parameters, Max carried size is 512B * 128 = 64KB
+  //
+  USB_BOOT_IO_BLOCKS              = 128,
 
   //
-  // Boot Retry times
+  // Retry mass command times, set by experience
   //
   USB_BOOT_COMMAND_RETRY          = 5,
-  USB_BOOT_WAIT_RETRY             = 5,
+  USB_BOOT_INIT_MEDIA_RETRY       = 5,
 
   //
-  // Boot Stall time
+  // Wait for unit ready command, set by experience
   //
-  USB_BOOT_UNIT_READY_STALL       = 50 * USB_MASS_STALL_1_MS,
+  USB_BOOT_RETRY_UNIT_READY_STALL = 500 * USB_MASS_1_MILLISECOND,
 
   //
-  // Boot Transfer timeout
+  // Mass command timeout, refers to specification[USB20-9.2.6.1]
   //
   // USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy, 
   // USB CD-Rom and iPod devices are much slower than USB key when reponse 
   // most of commands, So we set 5s as timeout here.
   // 
   //
-  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_STALL_1_S,
-  
-  //
-  // Supported PDT codes, or Peripheral Device Type
-  //
-  USB_PDT_DIRECT_ACCESS           = 0x00,       // Direct access device
-  USB_PDT_CDROM                   = 0x05,       // CDROM
-  USB_PDT_OPTICAL                 = 0x07,       // Non-CD optical disks
-  USB_PDT_SIMPLE_DIRECT           = 0x0E        // Simplified direct access device
+  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND,
 };
 
 //
 // The required commands are INQUIRY, READ CAPACITY, TEST UNIT READY,
 // READ10, WRITE10, and REQUEST SENSE. The BLOCK_IO protocol uses LBA
 // so it isn't necessary to issue MODE SENSE / READ FORMAT CAPACITY
-// command to retrieve the disk gemotrics.
+// command to retrieve the disk gemotrics. 
 //
 #pragma pack(1)
 typedef struct {
@@ -221,7 +220,7 @@ typedef struct {
 
 typedef struct {
   UINT8             ModeDataLen;
- UINT8             MediumType;
+  UINT8             MediumType;
   UINT8             DevicePara;
   UINT8             BlkDesLen;
 } USB_SCSI_MODE_SENSE6_PARA_HEADER;
@@ -245,7 +244,7 @@ typedef struct {
 //
 #define USB_BOOT_SWAP32(Data32) \
                 ((((Data32) & 0x000000ff) << 24) | (((Data32) & 0xff000000) >> 24) | \
-                 (((Data32) & 0x0000ff00) << 8)  | (((Data32) & 0x00ff0000) >> 8))
+                 (((Data32) & 0x0000ff00) << 8)  | (((Data32) & 0x00ff0000) >> 8)) 
 
 #define USB_BOOT_SWAP16(Data16) \
                 ((((Data16) & 0x00ff) << 8) | (((Data16) & 0xff00) >> 8))

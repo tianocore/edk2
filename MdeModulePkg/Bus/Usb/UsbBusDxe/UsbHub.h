@@ -90,8 +90,11 @@ enum {
   USB_HUB_CLASS_CODE          = 0x09,
   USB_HUB_SUBCLASS_CODE       = 0x00,
 
-
-  USB_HUB_LOOP                = 50
+  //
+  // Host software return timeout if port status doesn't change 
+  // after 500ms(LOOP * STALL = 100 * 5ms), set by experience
+  //
+  USB_WAIT_PORT_STS_CHANGE_LOOP   = 100,
 };
 
 #pragma pack(1)
@@ -112,7 +115,7 @@ typedef struct {
 
 typedef struct {
   UINT16                ChangedBit;
-  UINT8                 Feature;
+  EFI_USB_PORT_FEATURE  Feature;
 } USB_CHANGE_FEATURE_MAP;
 
 

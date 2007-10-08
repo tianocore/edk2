@@ -55,21 +55,77 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #include "UsbEnumer.h"
 
 enum {
-  //
-  // Time definition
-  //
-  USB_STALL_1_MS            = 1000,
-  TICKS_PER_MS              = 10000U,
-  USB_ROOTHUB_POLL_INTERVAL = 1000 * TICKS_PER_MS,
-  USB_HUB_POLL_INTERVAL     = 64,
-
-  //
-  // Maximum definition
-  //
   USB_MAX_LANG_ID           = 16,
   USB_MAX_INTERFACE         = 16,
   USB_MAX_DEVICES           = 128,
 
+  USB_BUS_1_MILLISECOND     = 1000,
+
+  //
+  // Roothub and hub's polling interval, set by experience,
+  // The unit of roothub is 100us, means 1s as interval, and
+  // the unit of hub is 1ms, means 64ms as interval.
+  //
+  USB_ROOTHUB_POLL_INTERVAL = 1000 * 10000U,
+  USB_HUB_POLL_INTERVAL     = 64,
+
+  //
+  // Wait for port stable to work, refers to specification
+  // [USB20-9.1.2]
+  //
+  USB_WAIT_PORT_STABLE_STALL     = 100 * USB_BUS_1_MILLISECOND,
+
+  // 
+  // Wait for port statue reg change, set by experience
+  //
+  USB_WAIT_PORT_STS_CHANGE_STALL = 5 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for set device address, refers to specification
+  // [USB20-9.2.6.3, it says 2ms]
+  //
+  USB_SET_DEVICE_ADDRESS_STALL   = 20 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for retry max packet size, set by experience
+  //
+  USB_RETRY_MAX_PACK_SIZE_STALL  = 100 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for hub port power-on, refers to specification
+  // [USB20-11.23.2]
+  //
+  USB_SET_PORT_POWER_STALL       = 2 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for port reset, refers to specification 
+  // [USB20-7.1.7.5, it says 10ms for hub and 50ms for 
+  // root hub]
+  //
+  USB_SET_PORT_RESET_STALL       = 20 * USB_BUS_1_MILLISECOND,
+  USB_SET_ROOT_PORT_RESET_STALL  = 50 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for clear roothub port reset, set by experience
+  //
+  USB_CLR_ROOT_PORT_RESET_STALL  = 1 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Wait for set roothub port enable, set by experience
+  // 
+  USB_SET_ROOT_PORT_ENABLE_STALL = 20 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Send general device request timeout, refers to 
+  // specification[USB20-11.24.1]
+  //
+  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 50 * USB_BUS_1_MILLISECOND,
+
+  //
+  // Send clear feature request timeout, set by experience
+  //
+  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10 * USB_BUS_1_MILLISECOND,
+  
   //
   // Bus raises TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.

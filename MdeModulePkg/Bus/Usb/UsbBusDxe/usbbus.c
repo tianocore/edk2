@@ -1142,43 +1142,8 @@ UsbBusControllerDriverStart (
     goto CLOSE_HC;
   }
 
-  //
-  // Create a fake usb device for root hub
-  //
-  RootHub = AllocateZeroPool (sizeof (USB_DEVICE));
-
-  if (RootHub == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto CLOSE_HC;
-  }
-
-  RootIf = AllocateZeroPool (sizeof (USB_INTERFACE));
-
-  if (RootIf == NULL) {
-    gBS->FreePool (RootHub);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto CLOSE_HC;
-  }
-
-  RootHub->Bus            = UsbBus;
-  RootHub->NumOfInterface = 1;
-  RootHub->Interfaces[0]  = RootIf;
-  RootIf->Signature       = USB_INTERFACE_SIGNATURE;
-  RootIf->Device          = RootHub;
-  RootIf->DevicePath      = UsbBus->DevicePath;
-
-  
   UsbHcReset (UsbBus, EFI_USB_HC_RESET_GLOBAL);
   UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
-
-  Status                  = mUsbRootHubApi.Init (RootIf);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to init root hub %r\n", Status));
-    goto FREE_ROOTHUB;
-  }
-
-  UsbBus->Devices[0] = RootHub;
 
   //
   // Install an EFI_USB_BUS_PROTOCOL to host controler to identify it.
@@ -1191,20 +1156,58 @@ UsbBusControllerDriverStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to install bus protocol %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to install bus protocol %r\n", Status));
+    goto CLOSE_HC;
+  }
 
-    mUsbRootHubApi.Release (RootIf);
+  //
+  // Create a fake usb device for root hub
+  //
+  RootHub = AllocateZeroPool (sizeof (USB_DEVICE));
+
+  if (RootHub == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto UNINSTALL_USBBUS;
+  }
+
+  RootIf = AllocateZeroPool (sizeof (USB_INTERFACE));
+
+  if (RootIf == NULL) {
+    gBS->FreePool (RootHub);
+    Status = EFI_OUT_OF_RESOURCES;
     goto FREE_ROOTHUB;
   }
 
+  RootHub->Bus            = UsbBus;
+  RootHub->NumOfInterface = 1;
+  RootHub->Interfaces[0]  = RootIf;
+  RootIf->Signature       = USB_INTERFACE_SIGNATURE;
+  RootIf->Device          = RootHub;
+  RootIf->DevicePath      = UsbBus->DevicePath;
+  
+  Status                  = mUsbRootHubApi.Init (RootIf);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to init root hub %r\n", Status));
+    goto FREE_ROOTHUB;
+  }
+
+  UsbBus->Devices[0] = RootHub;
 
   DEBUG (( EFI_D_INFO, "UsbBusStart: usb bus started on %x, root hub %x\n", Controller, RootIf));
   return EFI_SUCCESS;
-
+  
 FREE_ROOTHUB:
-  gBS->FreePool (RootIf);
-  gBS->FreePool (RootHub);
-
+  if (RootIf != NULL) {
+    gBS->FreePool (RootIf);
+  }
+  if (RootHub != NULL) {
+    gBS->FreePool (RootHub);
+  }
+  
+UNINSTALL_USBBUS:
+  gBS->UninstallProtocolInterface (Controller, &mUsbBusProtocolGuid, &UsbBus->BusId);
+  
 CLOSE_HC:
   if (UsbBus->Usb2Hc != NULL) {
     gBS->CloseProtocol (
@@ -1214,7 +1217,6 @@ CLOSE_HC:
           Controller
           );
   }
-
   if (UsbBus->UsbHc != NULL) {
     gBS->CloseProtocol (
           Controller,
@@ -1223,14 +1225,12 @@ CLOSE_HC:
           Controller
           );
   }
-
   gBS->CloseProtocol (
          Controller,
          &gEfiDevicePathProtocolGuid,
          This->DriverBindingHandle,
          Controller
          );
-
   gBS->FreePool (UsbBus);
 
   DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to start bus driver %r\n", Status));
