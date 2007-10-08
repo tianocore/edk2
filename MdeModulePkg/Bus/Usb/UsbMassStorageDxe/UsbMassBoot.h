@@ -100,7 +100,7 @@ enum {
   // most of commands, So we set 5s as timeout here.
   // 
   //
-  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND,
+  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND
 };
 
 //

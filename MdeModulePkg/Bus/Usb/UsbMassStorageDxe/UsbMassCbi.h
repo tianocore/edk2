@@ -42,7 +42,7 @@ enum {
   //
   // Usb Cbi transport timeout, set by experience
   //
-  USB_CBI_RESET_DEVICE_TIMEOUT  = 1 * USB_MASS_1_SECOND,
+  USB_CBI_RESET_DEVICE_TIMEOUT  = 1 * USB_MASS_1_SECOND
 };
 
 //

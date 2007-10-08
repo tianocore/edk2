@@ -604,11 +604,11 @@ UsbOnHubInterrupt (
 #define USB_HUB_MAP_SIZE  5
 
 USB_CHANGE_FEATURE_MAP  mHubFeatureMap[USB_HUB_MAP_SIZE] = {
-  {USB_PORT_STAT_C_CONNECTION,  USB_HUB_C_PORT_CONNECT},
-  {USB_PORT_STAT_C_ENABLE,      USB_HUB_C_PORT_ENABLE},
-  {USB_PORT_STAT_C_SUSPEND,     USB_HUB_C_PORT_SUSPEND},
-  {USB_PORT_STAT_C_OVERCURRENT, USB_HUB_C_PORT_OVER_CURRENT},
-  {USB_PORT_STAT_C_RESET,       USB_HUB_C_PORT_RESET},
+  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
+  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
+  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
+  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
+  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
 };
 
 #define USB_ROOT_HUB_MAP_SIZE 5
@@ -822,7 +822,7 @@ UsbHubClearPortChange (
     Map = &mHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
-      UsbHubCtrlClearPortFeature (HubIf->Device, Port, Map->Feature);
+      UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT16) Map->Feature);
     }
   }
 }

@@ -87,7 +87,7 @@ enum {
   //
   UHCI_TPL                 = TPL_NOTIFY,
 
-  USB_HC_DEV_SIGNATURE          = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i'),
+  USB_HC_DEV_SIGNATURE          = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
 };
 
 #pragma pack(1)
