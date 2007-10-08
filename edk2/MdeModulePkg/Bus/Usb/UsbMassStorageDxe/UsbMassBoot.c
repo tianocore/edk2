@@ -935,7 +935,7 @@ UsbClearEndpointStall (
   Request.Value       = USB_FEATURE_ENDPOINT_HALT;
   Request.Index       = EndpointAddr;
   Request.Length      = 0;
-  Timeout             = USB_BOOT_GENERAL_CMD_TIMEOUT / USB_MASS_STALL_1_MS;
+  Timeout             = USB_BOOT_GENERAL_CMD_TIMEOUT / USB_MASS_1_MILLISECOND;
 
   Status = UsbIo->UsbControlTransfer (
                     UsbIo,

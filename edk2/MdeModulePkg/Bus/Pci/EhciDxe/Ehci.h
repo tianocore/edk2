@@ -49,18 +49,35 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #include "EhciDebug.h"
 
 enum {
-  USB2_HC_DEV_SIGNATURE     = EFI_SIGNATURE_32 ('e', 'h', 'c', 'i'),
-  EHC_STALL_1_MICROSECOND   = 1,
-  EHC_STALL_1_MILLISECOND   = 1000 * EHC_STALL_1_MICROSECOND,
-  EHC_STALL_1_SECOND        = 1000 * EHC_STALL_1_MILLISECOND,
+  EHC_1_MICROSECOND            = 1,
+  EHC_1_MILLISECOND            = 1000 * EHC_1_MICROSECOND,
+  EHC_1_SECOND                 = 1000 * EHC_1_MILLISECOND,
 
-  EHC_SET_PORT_RESET_TIME   = 50 * EHC_STALL_1_MILLISECOND,
-  EHC_CLEAR_PORT_RESET_TIME = EHC_STALL_1_MILLISECOND,
-  EHC_GENERIC_TIME          = 10 * EHC_STALL_1_MILLISECOND,
-  EHC_SYNC_POLL_TIME        = 20 * EHC_STALL_1_MICROSECOND,
-  EHC_ASYNC_POLL_TIME       = 50 * 10000UL,                 // The unit of time is 100us
+  //
+  // EHCI register operation timeout, set by experience
+  //
+  EHC_RESET_TIMEOUT            = 1 * EHC_1_SECOND,
+  EHC_GENERIC_TIMEOUT          = 10 * EHC_1_MILLISECOND,
 
-  EHC_TPL                   = TPL_NOTIFY
+  //
+  // Wait for roothub port power stable, refers to Spec[EHCI1.0-2.3.9]
+  //
+  EHC_ROOT_PORT_RECOVERY_STALL = 20 * EHC_1_MILLISECOND,
+
+  //
+  // Sync and Async transfer polling interval, set by experience, 
+  // and the unit of Async is 100us, means 50ms as interval.
+  //
+  EHC_SYNC_POLL_INTERVAL       = 20 * EHC_1_MICROSECOND,
+  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U,                  
+
+  //
+  // EHC raises TPL to TPL_NOTIFY to serialize all its operations
+  // to protect shared data structures.
+  //
+  EHC_TPL                      = TPL_NOTIFY,
+
+  USB2_HC_DEV_SIGNATURE        = EFI_SIGNATURE_32 ('e', 'h', 'c', 'i'),
 };
 
 //

@@ -214,12 +214,12 @@ EhcWaitOpRegBit (
 {
   UINT32                  Index;
 
-  for (Index = 0; Index < Timeout / EHC_SYNC_POLL_TIME + 1; Index++) {
+  for (Index = 0; Index < Timeout / EHC_SYNC_POLL_INTERVAL + 1; Index++) {
     if (EHC_REG_BIT_IS_SET (Ehc, Offset, Bit) == WaitToSet) {
       return EFI_SUCCESS;
     }
 
-    gBS->Stall (EHC_SYNC_POLL_TIME);
+    gBS->Stall (EHC_SYNC_POLL_INTERVAL);
   }
 
   return EFI_TIMEOUT;
@@ -614,14 +614,19 @@ EhcInitHC (
   //
   EhcSetOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
 
-  Status = EhcEnablePeriodSchd (Ehc, EHC_GENERIC_TIME);
+  //
+  // Wait roothub port power stable
+  //
+  gBS->Stall (EHC_ROOT_PORT_RECOVERY_STALL);
+
+  Status = EhcEnablePeriodSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
     EHC_ERROR (("EhcInitHC: failed to enable period schedule\n"));
     return Status;
   }
 
-  Status = EhcEnableAsyncSchd (Ehc, EHC_GENERIC_TIME);
+  Status = EhcEnableAsyncSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
     EHC_ERROR (("EhcInitHC: failed to enable async schedule\n"));

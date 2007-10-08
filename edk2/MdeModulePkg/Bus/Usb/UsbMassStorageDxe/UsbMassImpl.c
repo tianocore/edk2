@@ -91,7 +91,7 @@ UsbMassInitMedia (
   //
   Status = EFI_SUCCESS;
 
-  for (Index = 0; Index < USB_BOOT_WAIT_RETRY; Index++) {
+  for (Index = 0; Index < USB_BOOT_INIT_MEDIA_RETRY; Index++) {
 
     Status = UsbBootGetParams (UsbMass);
     if ((Status != EFI_MEDIA_CHANGED)
@@ -102,7 +102,7 @@ UsbMassInitMedia (
 
     Status = UsbBootIsUnitReady (UsbMass);
     if (EFI_ERROR (Status)) {
-      gBS->Stall (USB_BOOT_UNIT_READY_STALL * (Index + 1));
+      gBS->Stall (USB_BOOT_RETRY_UNIT_READY_STALL * (Index + 1)); 
     }
 
   }
@@ -128,9 +128,17 @@ UsbMassReset (
   )
 {
   USB_MASS_DEVICE *UsbMass;
+  EFI_TPL         OldTpl;
+  EFI_STATUS      Status;
+
+  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
 
   UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
-  return UsbMass->Transport->Reset (UsbMass->Context, ExtendedVerification);
+  Status  = UsbMass->Transport->Reset (UsbMass->Context, ExtendedVerification);
+
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
 }
 
 
@@ -165,8 +173,10 @@ UsbMassReadBlocks (
   USB_MASS_DEVICE     *UsbMass;
   EFI_BLOCK_IO_MEDIA  *Media;
   EFI_STATUS          Status;
+  EFI_TPL             OldTpl;
   UINTN               TotalBlock;
-
+  
+  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
   UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
   Media   = &UsbMass->BlockIoMedia;
 
@@ -174,40 +184,47 @@ UsbMassReadBlocks (
   // First, validate the parameters
   //
   if ((Buffer == NULL) || (BufferSize == 0)) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
   }
-
+  
   //
-  // If it is a remoable media, such as CD-Rom or Usb-Floppy,
-  // if, need to detect the media before each rw, while Usb-Flash
-  // needn't. However, it's hard to identify Usb-Floppy between
-  // Usb-Flash by now, so detect media every time.
-  //
-  Status = UsbBootDetectMedia (UsbMass);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbMassReadBlocks: UsbBootDetectMedia (%r)\n", Status));
-    return Status;
+  // If it is a removable media, such as CD-Rom or Usb-Floppy,
+  // need to detect the media before each rw. While some of 
+  // Usb-Flash is marked as removable media.
+  // 
+  // 
+  if (Media->RemovableMedia == TRUE) {
+    Status = UsbBootDetectMedia (UsbMass);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((mUsbMscError, "UsbMassReadBlocks: UsbBootDetectMedia (%r)\n", Status));
+      goto ON_EXIT;
+    } 
   }
-
+  
   //
   // Make sure BlockSize and LBA is consistent with BufferSize
   //
   if ((BufferSize % Media->BlockSize) != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto ON_EXIT;
   }
 
   TotalBlock = BufferSize / Media->BlockSize;
 
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto ON_EXIT;
   }
-
+  
   Status = UsbBootReadBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
   if (EFI_ERROR (Status)) {
     DEBUG ((mUsbMscError, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
 
+ON_EXIT:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -243,8 +260,10 @@ UsbMassWriteBlocks (
   USB_MASS_DEVICE     *UsbMass;
   EFI_BLOCK_IO_MEDIA  *Media;
   EFI_STATUS          Status;
+  EFI_TPL             OldTpl;
   UINTN               TotalBlock;
 
+  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
   UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
   Media   = &UsbMass->BlockIoMedia;
 
@@ -252,34 +271,39 @@ UsbMassWriteBlocks (
   // First, validate the parameters
   //
   if ((Buffer == NULL) || (BufferSize == 0)) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
   }
-
+  
   //
-  // If it is a remoable media, such as CD-Rom or Usb-Floppy,
-  // if, need to detect the media before each rw, while Usb-Flash
-  // needn't. However, it's hard to identify Usb-Floppy between
-  // Usb-Flash by now, so detect media every time.
-  //
-  Status = UsbBootDetectMedia (UsbMass);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbMassWriteBlocks: UsbBootDetectMedia (%r)\n", Status));
-    return Status;
+  // If it is a removable media, such as CD-Rom or Usb-Floppy,
+  // need to detect the media before each rw. While some of 
+  // Usb-Flash is marked as removable media.
+  // 
+  // 
+  if (Media->RemovableMedia == TRUE) {
+    Status = UsbBootDetectMedia (UsbMass);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((mUsbMscError, "UsbMassWriteBlocks: UsbBootDetectMedia (%r)\n", Status));
+      goto ON_EXIT;
+    } 
   }
-
+  
   //
   // Make sure BlockSize and LBA is consistent with BufferSize
   //
   if ((BufferSize % Media->BlockSize) != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto ON_EXIT;
   }
 
   TotalBlock = BufferSize / Media->BlockSize;
 
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto ON_EXIT;
   }
-
+  
   //
   // Try to write the data even the device is marked as ReadOnly,
   // and clear the status should the write succeed.
@@ -289,7 +313,9 @@ UsbMassWriteBlocks (
     DEBUG ((mUsbMscError, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
-
+  
+ON_EXIT:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

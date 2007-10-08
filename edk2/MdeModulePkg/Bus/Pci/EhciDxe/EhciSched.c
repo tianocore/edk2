@@ -342,7 +342,7 @@ EhcUnlinkQhFromAsync (
   //
   // Set and wait the door bell to synchronize with the hardware
   //
-  Status = EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIME);
+  Status = EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
     EHC_ERROR (("EhcUnlinkQhFromAsync: Failed to synchronize with doorbell\n"));
@@ -659,7 +659,7 @@ EhcExecTransfer (
   BOOLEAN                 Finished;
 
   Status    = EFI_SUCCESS;
-  Loop      = (TimeOut * EHC_STALL_1_MILLISECOND / EHC_SYNC_POLL_TIME) + 1;
+  Loop      = (TimeOut * EHC_1_MILLISECOND / EHC_SYNC_POLL_INTERVAL) + 1;
   Finished  = FALSE;
 
   for (Index = 0; Index < Loop; Index++) {
@@ -669,7 +669,7 @@ EhcExecTransfer (
       break;
     }
 
-    gBS->Stall (EHC_SYNC_POLL_TIME);
+    gBS->Stall (EHC_SYNC_POLL_INTERVAL);
   }
 
   if (!Finished) {

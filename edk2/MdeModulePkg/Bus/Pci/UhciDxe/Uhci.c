@@ -56,44 +56,33 @@ UhciReset (
     //
     // Stop schedule and set the Global Reset bit in the command register
     //
-    UhciStopHc (Uhc, STALL_1_SECOND);
+    UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
     UhciSetRegBit (Uhc->PciIo, USBCMD_OFFSET, USBCMD_GRESET);
 
-    //
-    // Wait 50ms for root port to let reset complete
-    // See UHCI spec page122 Reset signaling
-    //
-    gBS->Stall (ROOT_PORT_REST_TIME);
+    gBS->Stall (UHC_ROOT_PORT_RESET_STALL);
 
     //
     // Clear the Global Reset bit to zero.
     //
     UhciClearRegBit (Uhc->PciIo, USBCMD_OFFSET, USBCMD_GRESET);
 
-    //
-    // UHCI spec page120 reset recovery time
-    //
-    gBS->Stall (PORT_RESET_RECOVERY_TIME);
+    gBS->Stall (UHC_ROOT_PORT_RECOVERY_STALL);
     break;
 
   case EFI_USB_HC_RESET_HOST_CONTROLLER:
     //
     // Stop schedule and set Host Controller Reset bit to 1
     //
-    UhciStopHc (Uhc, STALL_1_SECOND);
+    UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
     UhciSetRegBit (Uhc->PciIo, USBCMD_OFFSET, USBCMD_HCRESET);
 
-    //
-    // this bit will be reset by Host Controller when reset is completed.
-    // wait 10ms to let reset complete
-    //
-    gBS->Stall (PORT_RESET_RECOVERY_TIME);
+    gBS->Stall (UHC_ROOT_PORT_RECOVERY_STALL);
     break;
 
   default:
     goto ON_INVAILD_PARAMETER;
   }
-
+  
   //
   // Delete all old transactions on the USB bus, then
   // reinitialize the frame list
@@ -103,13 +92,13 @@ UhciReset (
   UhciInitFrameList (Uhc);
 
   gBS->RestoreTPL (OldTpl);
-
+  
   return EFI_SUCCESS;
 
 ON_INVAILD_PARAMETER:
-
+  
   gBS->RestoreTPL (OldTpl);
-
+  
   return EFI_INVALID_PARAMETER;
 }
 
@@ -202,7 +191,7 @@ UhciSetState (
 
   switch (State) {
   case EfiUsbHcStateHalt:
-    Status = UhciStopHc (Uhc, STALL_1_SECOND);
+    Status = UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
     break;
 
   case EfiUsbHcStateOperational:
@@ -224,11 +213,11 @@ UhciSetState (
         UsbCmd |= USBCMD_FGR;
         UhciWriteReg (Uhc->PciIo, USBCMD_OFFSET, UsbCmd);
       }
-
+      
       //
       // wait 20ms to let resume complete (20ms is specified by UHCI spec)
       //
-      gBS->Stall (FORCE_GLOBAL_RESUME_TIME);
+      gBS->Stall (UHC_FORCE_GLOBAL_RESUME_STALL);
 
       //
       // Write FGR bit to 0 and EGSM(Enter Global Suspend Mode) bit to 0
@@ -248,7 +237,7 @@ UhciSetState (
       Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
-
+    
     //
     // Set Enter Global Suspend Mode bit to 1.
     //
@@ -2084,7 +2073,7 @@ UhciCleanDevUp (
   // Uninstall the USB_HC and USB_HC2 protocol, then disable the controller
   //
   Uhc = UHC_FROM_USB_HC_PROTO (This);
-  UhciStopHc (Uhc, STALL_1_SECOND);
+  UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
 
   gBS->UninstallProtocolInterface (
         Controller,
@@ -2188,7 +2177,7 @@ UhciDriverBindingStart (
   Status = gBS->SetTimer (
                   Uhc->AsyncIntMonitor,
                   TimerPeriodic,
-                  INTERRUPT_POLLING_TIME
+                  UHC_ASYNC_POLL_INTERVAL
                   );
 
   if (EFI_ERROR (Status)) {

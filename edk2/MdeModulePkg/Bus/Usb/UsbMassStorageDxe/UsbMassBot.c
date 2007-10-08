@@ -191,7 +191,7 @@ UsbBotSendCommand (
 
   Result        = 0;
   DataLen       = sizeof (USB_BOT_CBW);
-  Timeout       = USB_BOT_CBW_TIMEOUT / USB_MASS_STALL_1_MS;
+  Timeout       = USB_BOT_SEND_CBW_TIMEOUT / USB_MASS_1_MILLISECOND;
 
   //
   // Use the UsbIo to send the command to the device. The default
@@ -266,7 +266,7 @@ UsbBotDataTransfer (
   }
 
   Result  = 0;
-  Timeout = Timeout / USB_MASS_STALL_1_MS;
+  Timeout = Timeout / USB_MASS_1_MILLISECOND;
 
   Status = UsbBot->UsbIo->UsbBulkTransfer (
                             UsbBot->UsbIo,
@@ -323,14 +323,14 @@ UsbBotGetStatus (
   EFI_USB_IO_PROTOCOL       *UsbIo;
   UINT32                    Index;
   UINTN                     Timeout;
-
+  
   *CmdStatus = USB_BOT_COMMAND_ERROR;
   Status     = EFI_DEVICE_ERROR;
   Endpoint   = UsbBot->BulkInEndpoint->EndpointAddress;
   UsbIo      = UsbBot->UsbIo;
-  Timeout    = USB_BOT_CSW_TIMEOUT / USB_MASS_STALL_1_MS;
+  Timeout    = USB_BOT_RECV_CSW_TIMEOUT / USB_MASS_1_MILLISECOND;
 
-  for (Index = 0; Index < USB_BOT_GET_STATUS_RETRY; Index++) {
+  for (Index = 0; Index < USB_BOT_RECV_CSW_RETRY; Index++) {
     //
     // Attemp to the read CSW from bulk in endpoint
     //
@@ -499,7 +499,7 @@ UsbBotResetDevice (
   Request.Value       = 0;
   Request.Index       = UsbBot->Interface.InterfaceNumber;
   Request.Length      = 0;
-  Timeout             = USB_BOT_RESET_TIMEOUT / USB_MASS_STALL_1_MS;
+  Timeout             = USB_BOT_RESET_DEVICE_TIMEOUT / USB_MASS_1_MILLISECOND;
 
   Status = UsbBot->UsbIo->UsbControlTransfer (
                             UsbBot->UsbIo,
@@ -521,7 +521,7 @@ UsbBotResetDevice (
   // complete. We can use this to sync the device and host. For
   // now just stall 100ms to wait the device.
   //
-  gBS->Stall (USB_BOT_RESET_STALL);
+  gBS->Stall (USB_BOT_RESET_DEVICE_STALL);
 
   //
   // Clear the Bulk-In and Bulk-Out stall condition.

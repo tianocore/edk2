@@ -51,25 +51,43 @@ typedef struct _USB_HC_DEV  USB_HC_DEV;
 #include "UhciDebug.h"
 
 enum {
-  //
-  // Stall times
-  //
-  STALL_1_MS               = 1000,
-  STALL_1_SECOND           = 1000 *STALL_1_MS,
+  UHC_1_MICROSECOND             = 1,
+  UHC_1_MILLISECOND             = 1000 * UHC_1_MICROSECOND,
+  UHC_1_SECOND                  = 1000 * UHC_1_MILLISECOND,
 
-  UHC_SYN_POLL             = 50,
-  FORCE_GLOBAL_RESUME_TIME = 20 *STALL_1_MS,
-  ROOT_PORT_REST_TIME      = 50 *STALL_1_MS,
-  PORT_RESET_RECOVERY_TIME = 10 *STALL_1_MS,
-  INTERRUPT_POLLING_TIME   = 50 * 10000UL,
+  //
+  // UHCI register operation timeout, set by experience
+  //
+  UHC_GENERIC_TIMEOUT           = UHC_1_SECOND,
+  
+  //
+  // Wait for force global resume(FGR) complete, refers to
+  // specification[UHCI11-2.1.1]
+  // 
+  UHC_FORCE_GLOBAL_RESUME_STALL = 20 * UHC_1_MILLISECOND,
 
+  //
+  // Wait for roothub port reset and recovery, reset stall
+  // is set by experience, and recovery stall refers to 
+  // specification[UHCI11-2.1.1]
+  //
+  UHC_ROOT_PORT_RESET_STALL     = 50 * UHC_1_MILLISECOND,
+  UHC_ROOT_PORT_RECOVERY_STALL  = 10 * UHC_1_MILLISECOND,
+
+  //
+  // Sync and Async transfer polling interval, set by experience, 
+  // and the unit of Async is 100us.
+  //
+  UHC_SYNC_POLL_INTERVAL        = 50 * UHC_1_MICROSECOND,
+  UHC_ASYNC_POLL_INTERVAL       = 50 * 10000UL,
+  
   //
   // UHC raises TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
   UHCI_TPL                 = TPL_NOTIFY,
 
-  USB_HC_DEV_SIGNATURE     = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
+  USB_HC_DEV_SIGNATURE          = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i'),
 };
 
 #pragma pack(1)

@@ -73,8 +73,8 @@ enum {
   USB_MASS_STORE_CBI1     = 0x01, // CBI protocol without command completion interrupt
   USB_MASS_STORE_BOT      = 0x50, // Bulk-Only Transport
 
-  USB_MASS_STALL_1_MS     = 1000,
-  USB_MASS_STALL_1_S      = 1000 * USB_MASS_STALL_1_MS,
+  USB_MASS_1_MILLISECOND  = 1000,
+  USB_MASS_1_SECOND       = 1000 * USB_MASS_1_MILLISECOND,
 
   USB_MASS_CMD_SUCCESS    = 0,
   USB_MASS_CMD_FAIL,
