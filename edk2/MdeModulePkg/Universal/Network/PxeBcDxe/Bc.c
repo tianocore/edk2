@@ -1662,7 +1662,7 @@ IpFilter (
       Enable = EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
 
       for (Index = 0; Index < Filter->IpCnt; ++Index) {
-        PxebcMode->IpFilter.IpList[Index] = Filter->IpList[Index];
+        CopyMem (&PxebcMode->IpFilter.IpList[Index], &Filter->IpList[Index], sizeof (EFI_IP_ADDRESS));
 
         if (IS_MULTICAST (&Filter->IpList[Index])) {
           EFI_IP_ADDRESS  *TmpIp;
@@ -1674,7 +1674,7 @@ IpFilter (
           //
           if (!Index2)
           {
-              TmpIp = (EFI_IP_ADDRESS *) &AllSystemsGroup;
+            TmpIp = (EFI_IP_ADDRESS *) &AllSystemsGroup;
             --Index;
           } else {
             TmpIp = (EFI_IP_ADDRESS *) &Filter->IpList[Index];
@@ -2009,8 +2009,8 @@ BcSetStationIP (
     goto RELEASE_LOCK;
   }
 
-  PxebcMode->StationIp   = *StationIpPtr;
-  PxebcMode->SubnetMask  = *SubnetMaskPtr;
+  CopyMem (&PxebcMode->StationIp, StationIpPtr, sizeof (EFI_IP_ADDRESS));
+  CopyMem (&PxebcMode->SubnetMask, SubnetMaskPtr, sizeof (EFI_IP_ADDRESS));
   Private->GoodStationIp = TRUE;
 
 RELEASE_LOCK:

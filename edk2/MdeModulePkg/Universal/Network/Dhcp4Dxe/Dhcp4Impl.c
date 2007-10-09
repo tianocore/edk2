@@ -559,7 +559,7 @@ EfiDhcp4RenewRebind (
              DhcpSb->Selected,
              DhcpSb->Para,
              DHCP_MSG_REQUEST,
-             "Extra renew/rebind by the application"
+             (UINT8 *) "Extra renew/rebind by the application"
              );
 
   if (EFI_ERROR (Status)) {

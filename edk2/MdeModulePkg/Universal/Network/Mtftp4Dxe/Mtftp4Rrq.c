@@ -172,7 +172,7 @@ Mtftp4RrqSaveBlock (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_ILLEGAL_OPERATION,
-        "User aborted download"
+        (UINT8 *) "User aborted download"
         );
 
       return EFI_ABORTED;
@@ -203,7 +203,7 @@ Mtftp4RrqSaveBlock (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_DISK_FULL,
-        "User provided memory block is too small"
+        (UINT8 *) "User provided memory block is too small"
         );
 
       return EFI_BUFFER_TOO_SMALL;
@@ -480,7 +480,7 @@ Mtftp4RrqHandleOack (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_ILLEGAL_OPERATION,
-        "Mal-formated OACK packet"
+        (UINT8 *) "Mal-formated OACK packet"
         );
     }
 
@@ -501,7 +501,7 @@ Mtftp4RrqHandleOack (
         Mtftp4SendError (
           Instance,
           EFI_MTFTP4_ERRORCODE_ILLEGAL_OPERATION,
-          "Illegal multicast setting"
+          (UINT8 *) "Illegal multicast setting"
           );
 
         return EFI_TFTP_ERROR;
@@ -529,7 +529,7 @@ Mtftp4RrqHandleOack (
         Mtftp4SendError (
           Instance,
           EFI_MTFTP4_ERRORCODE_ACCESS_VIOLATION,
-          "Failed to create socket to receive multicast packet"
+          (UINT8 *) "Failed to create socket to receive multicast packet"
           );
 
         return Status;
@@ -675,7 +675,7 @@ Mtftp4RrqInput (
         Mtftp4SendError (
           Instance,
           EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-          "User aborted the transfer"
+          (UINT8 *) "User aborted the transfer"
           );
       }
 

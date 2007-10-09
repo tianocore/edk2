@@ -225,8 +225,8 @@ Ip4ConfigDriverBindingStart (
   Instance->Controller        = ControllerHandle;
   Instance->Image             = This->DriverBindingHandle;
 
-  Instance->Ip4ConfigProtocol = mIp4ConfigProtocolTemplate;
-  Instance->NicIp4Protocol    = mNicIp4ConfigProtocolTemplate;
+  CopyMem (&Instance->Ip4ConfigProtocol, &mIp4ConfigProtocolTemplate, sizeof (mIp4ConfigProtocolTemplate));
+  CopyMem (&Instance->NicIp4Protocol, &mNicIp4ConfigProtocolTemplate, sizeof (mNicIp4ConfigProtocolTemplate));
 
   Instance->State             = IP4_CONFIG_STATE_IDLE;
   Instance->Mnp               = Mnp;

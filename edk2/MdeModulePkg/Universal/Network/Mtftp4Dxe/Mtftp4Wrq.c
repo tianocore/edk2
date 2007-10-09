@@ -149,7 +149,7 @@ Mtftp4WrqSendBlock (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-        "User aborted the transfer"
+        (UINT8 *) "User aborted the transfer"
         );
 
       return EFI_ABORTED;
@@ -235,7 +235,7 @@ Mtftp4WrqHandleAck (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-        "Block number rolls back, not supported, try blksize option"
+        (UINT8 *) "Block number rolls back, not supported, try blksize option"
         );
 
       return EFI_TFTP_ERROR;
@@ -339,7 +339,7 @@ Mtftp4WrqHandleOack (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_ILLEGAL_OPERATION,
-        "Mal-formated OACK packet"
+        (UINT8 *) "Mal-formated OACK packet"
         );
     }
 
@@ -465,7 +465,7 @@ Mtftp4WrqInput (
         Mtftp4SendError (
           Instance,
           EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-          "User aborted the transfer"
+          (UINT8 *) "User aborted the transfer"
           );
       }
 

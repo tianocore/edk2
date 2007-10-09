@@ -1101,8 +1101,8 @@ MtftpDownload (
 
   Filter.Filters    = EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST;
   Filter.IpCnt      = 2;
-  Filter.IpList[0]  = Private->EfiBc.Mode->StationIp;
-  Filter.IpList[1]  = MtftpInfoPtr->MCastIp;
+  CopyMem (&Filter.IpList[0], &Private->EfiBc.Mode->StationIp, sizeof (EFI_IP_ADDRESS));
+  CopyMem (&Filter.IpList[1], &MtftpInfoPtr->MCastIp, sizeof (EFI_IP_ADDRESS));
 
   if ((Status = IpFilter (Private, &Filter)) != EFI_SUCCESS) {
     return Status;

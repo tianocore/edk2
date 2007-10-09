@@ -278,7 +278,7 @@ Mtftp4SendRequest (
   Mode    = Instance->Token->ModeStr;
 
   if (Mode == NULL) {
-    Mode = "octet";
+    Mode = (UINT8 *) "octet";
   }
 
   //
@@ -583,7 +583,7 @@ Mtftp4OnTimerTick (
       Mtftp4SendError (
          Instance,
          EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-         "User aborted the transfer in time out"
+         (UINT8 *) "User aborted the transfer in time out"
          );
 
       Mtftp4CleanOperation (Instance, EFI_ABORTED);

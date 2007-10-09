@@ -69,5 +69,5 @@ Mtftp4ParseOptionOack (
   OUT MTFTP4_OPTION         *Option
   );
 
-extern UINT8  *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS];
+extern CHAR8  *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS];
 #endif
