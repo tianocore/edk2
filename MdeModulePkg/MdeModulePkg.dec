@@ -113,6 +113,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs|FALSE|BOOLEAN|0x0001003c
   gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE|BOOLEAN|0x0001003e
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE|BOOLEAN|0x00010040
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE|BOOLEAN|0x00010041
 
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f
