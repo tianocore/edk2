@@ -737,6 +737,8 @@ Returns:
 
   //
   // 0: Volatile, 1: Non-Volatile
+  // The index and attributes mapping must be kept in this order as RuntimeServiceGetNextVariableName
+  // make use of this mapping to implement search algorithme.
   //
   VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
   VariableStoreHeader[1]  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
@@ -933,9 +935,9 @@ RuntimeServiceGetNextVariableName (
     //
     if (Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL) {
       Variable.Volatile = (BOOLEAN) (Variable.Volatile ^ ((BOOLEAN) 0x1));
-      if (Variable.Volatile) {
-        Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
-        Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
+      if (!Variable.Volatile) {
+        Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
+        Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase));
       } else {
         Status = EFI_NOT_FOUND;
         goto Done;
