@@ -152,7 +152,7 @@ ExtractGuidedSectionGetInfo (
                             A pointer to a caller-allocated UINT32 that indicates the
                             authentication status of the output buffer. 
 
-  @retval  RETURN_SUCCESS           Get the output data, size and AuthenticationStatus successfully.
+  @retval  RETURN_SUCCESS           Get the output data and AuthenticationStatus successfully.
   @retval  RETURN_UNSUPPORTED       Guided section data is not supported to be decoded.
   @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
 **/

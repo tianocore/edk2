@@ -67,7 +67,6 @@
   HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
-  ExtractGuidedSectionLib|MdePkg/Library/PeiDxeExtractGuidedSectionLib/PeiDxeExtractGuidedSectionLib.inf
   
 [LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -95,6 +94,7 @@
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PeCoffLib|Nt32Pkg/Library/DxeNT32PeCoffLib/DxeNT32PeCoffLib.inf
+  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
@@ -128,6 +128,7 @@
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PeCoffLib|Nt32Pkg/Library/PeiNT32PeCoffLib/PeiNT32PeCoffLib.inf
   PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
+  ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   
 [LibraryClasses.common.PEI_CORE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf

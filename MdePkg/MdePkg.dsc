@@ -104,7 +104,8 @@
   MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  MdePkg/Library/PeiDxeExtractGuidedSectionLib/PeiDxeExtractGuidedSectionLib.inf
+  MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
 [Components.IA32]
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
