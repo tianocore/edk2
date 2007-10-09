@@ -2115,7 +2115,7 @@ ReadConfigData (
 
        Stride = 1 << AccessWidth;
         AccessAddress += Stride;
-        if (AccessAddress >= (Address + (1 << Width))) {
+        if (AccessAddress >= (Address + (1ULL << Width))) {
           //
           // if all datas have been read, exist
           //
@@ -2382,7 +2382,7 @@ WriteConfigData (
 
         Stride = 1 << AccessWidth;
         AccessAddress += Stride;
-        if (AccessAddress >= (Address + (1 << Width))) {
+        if (AccessAddress >= (Address + (1ULL << Width))) {
           //
           // if all datas have been written, exist
           //
