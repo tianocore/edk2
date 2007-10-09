@@ -302,6 +302,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE
 
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
