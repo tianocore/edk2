@@ -1088,7 +1088,7 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  return FvbWriteBlock (FvbDevice->Instance, Lba, Offset, NumBytes, Buffer, mFvbModuleGlobal, EfiGoneVirtual ());
+  return FvbWriteBlock (FvbDevice->Instance, (EFI_LBA)Lba, (UINTN)Offset, NumBytes, (UINT8 *)Buffer, mFvbModuleGlobal, EfiGoneVirtual ());
 }
 
 EFI_STATUS
