@@ -15,20 +15,20 @@
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gIDEBusComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIDEBusComponentName = {
   IDEBusComponentNameGetDriverName,
   IDEBusComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gIDEBusComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIDEBusComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) IDEBusComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) IDEBusComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC EFI_UNICODE_STRING_TABLE mIDEBusDriverNameTable[] = {

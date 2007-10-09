@@ -175,20 +175,20 @@ WinNtConsoleComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gWinNtConsoleComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gWinNtConsoleComponentName = {
   WinNtConsoleComponentNameGetDriverName,
   WinNtConsoleComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gWinNtConsoleComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtConsoleComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) WinNtConsoleComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) WinNtConsoleComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mWinNtConsoleDriverNameTable[] = {

@@ -16,20 +16,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gIsaBusComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIsaBusComponentName = {
   IsaBusComponentNameGetDriverName,
   IsaBusComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gIsaBusComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIsaBusComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) IsaBusComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) IsaBusComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC EFI_UNICODE_STRING_TABLE mIsaBusDriverNameTable[] = {

@@ -22,77 +22,77 @@ Abstract:
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConInComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConInComponentName = {
   ConSplitterComponentNameGetDriverName,
   ConSplitterConInComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConInComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConInComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterConInComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gConSplitterSimplePointerComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterSimplePointerComponentName = {
   ConSplitterComponentNameGetDriverName,
   ConSplitterSimplePointerComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gConSplitterSimplePointerComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterSimplePointerComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterSimplePointerComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConOutComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConOutComponentName = {
   ConSplitterComponentNameGetDriverName,
   ConSplitterConOutComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConOutComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConOutComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterConOutComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrComponentName = {
   ConSplitterComponentNameGetDriverName,
   ConSplitterStdErrComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterStdErrComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTable[] = {

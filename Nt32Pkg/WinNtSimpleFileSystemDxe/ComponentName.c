@@ -177,20 +177,20 @@ WinNtSimpleFileSystemComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gWinNtSimpleFileSystemComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gWinNtSimpleFileSystemComponentName = {
   WinNtSimpleFileSystemComponentNameGetDriverName,
   WinNtSimpleFileSystemComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gWinNtSimpleFileSystemComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtSimpleFileSystemComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) WinNtSimpleFileSystemComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) WinNtSimpleFileSystemComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mWinNtSimpleFileSystemDriverNameTable[] = {

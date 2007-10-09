@@ -156,20 +156,20 @@ WinNtBlockIoComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gWinNtBlockIoComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gWinNtBlockIoComponentName = {
   WinNtBlockIoComponentNameGetDriverName,
   WinNtBlockIoComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gWinNtBlockIoComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtBlockIoComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) WinNtBlockIoComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) WinNtBlockIoComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mWinNtBlockIoDriverNameTable[] = {

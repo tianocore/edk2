@@ -154,20 +154,20 @@ UsbKeyboardComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gUsbKeyboardComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbKeyboardComponentName = {
   UsbKeyboardComponentNameGetDriverName,
   UsbKeyboardComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gUsbKeyboardComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbKeyboardComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UsbKeyboardComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UsbKeyboardComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC EFI_UNICODE_STRING_TABLE mUsbKeyboardDriverNameTable[] = {
