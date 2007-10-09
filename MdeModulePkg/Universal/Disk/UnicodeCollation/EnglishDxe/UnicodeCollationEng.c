@@ -60,9 +60,12 @@ CHAR8 mOtherChars[] = {
   '\0'
 };
 
-EFI_HANDLE  mHandle = NULL;
+STATIC EFI_HANDLE  mHandle = NULL;
 
-EFI_UNICODE_COLLATION_PROTOCOL  UnicodeEng = {
+//
+// EFI Unicode Collation Protocol supporting ISO 639-2 language code
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_COLLATION_PROTOCOL  UnicodeEng = {
   EngStriColl,
   EngMetaiMatch,
   EngStrLwr,
@@ -73,9 +76,23 @@ EFI_UNICODE_COLLATION_PROTOCOL  UnicodeEng = {
 };
 
 //
+// EFI Unicode Collation2 Protocol supporting RFC 3066 language code
 //
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_COLLATION_PROTOCOL  Unicode2Eng = {
+  EngStriColl,
+  EngMetaiMatch,
+  EngStrLwr,
+  EngStrUpr,
+  EngFatToStr,
+  EngStrToFat,
+  "en"
+};
+
+//
+// Driver entry point.
 //
 EFI_STATUS
+EFIAPI
 InitializeUnicodeCollationEng (
   IN EFI_HANDLE       ImageHandle,
   IN EFI_SYSTEM_TABLE *SystemTable
@@ -99,6 +116,7 @@ Returns:
 
 --*/
 {
+  EFI_STATUS  Status;
   UINTN       Index;
   UINTN       Index2;
 
@@ -125,15 +143,47 @@ Returns:
     Index2 = mOtherChars[Index];
     mEngInfoMap[Index2] |= CHAR_FAT_VALID;
   }
-  //
-  // Create a handle for the device
-  //
-  return gBS->InstallProtocolInterface (
-                &mHandle,
-                &gEfiUnicodeCollationProtocolGuid,
-                EFI_NATIVE_INTERFACE,
-                &UnicodeEng
-                );
+
+  if (FeaturePcdGet (PcdUnicodeCollation2Support)) {
+    if (FeaturePcdGet (PcdUnicodeCollationSupport)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mHandle,
+                      &gEfiUnicodeCollationProtocolGuid,
+                      &UnicodeEng,
+                      &gEfiUnicodeCollation2ProtocolGuid,
+                      &Unicode2Eng,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mHandle,
+                      &gEfiUnicodeCollation2ProtocolGuid,
+                      &Unicode2Eng,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
+  } else {
+    if (FeaturePcdGet (PcdUnicodeCollationSupport)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mHandle,
+                      &gEfiUnicodeCollationProtocolGuid,
+                      &UnicodeEng,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      //
+      // This module must support to produce at least one of Unicode Collation Protocol
+      // and Unicode Collation 2 Protocol.
+      //
+      ASSERT (FALSE);
+      Status = EFI_UNSUPPORTED;
+    }
+  }
+
+  return Status;
 }
 
 INTN

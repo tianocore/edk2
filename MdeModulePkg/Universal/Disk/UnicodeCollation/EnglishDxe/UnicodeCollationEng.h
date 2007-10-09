@@ -34,6 +34,7 @@ Revision History
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
 
 //
 // Defines

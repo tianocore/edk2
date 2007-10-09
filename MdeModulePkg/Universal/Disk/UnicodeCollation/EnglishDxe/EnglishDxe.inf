@@ -38,13 +38,19 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   DebugLib
+  PcdLib
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support
 
 [Protocols]
   gEfiUnicodeCollationProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
+  gEfiUnicodeCollation2ProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
