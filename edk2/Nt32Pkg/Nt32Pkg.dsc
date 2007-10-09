@@ -233,6 +233,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE
 
 [PcdsFixedAtBuild.IA32]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
