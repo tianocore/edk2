@@ -395,7 +395,8 @@ Returns:
               // Migrate IDT from CAR into real memory, so after stack switches to
               // the new memory, the caller can get memory version PeiServiceTable. 
               //
-              //MigrateIdtTable (PeiServices);              
+              MigrateIdtTable (PeiServices);
+
               //
               // Since we are at dispatch level, only the Core's private data 
               // is preserved, nobody else should have any data on the stack. 

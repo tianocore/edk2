@@ -31,16 +31,16 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-[Sources.Ia32]
-  Ia32/AsmPeiSevicesTablePointer.c|MSFT
-  Ia32/AsmPeiSevicesTablePointer.S|GCC
+[Sources]
   PeiServicesTablePointer.c
+  InternalPeiServicesTablePointer.h
 
-[Sources.X64]
-  x64/AsmPeiSevicesTablePointer.asm|MSFT
-  x64/AsmPeiSevicesTablePointer.S|GCC
-  PeiServicesTablePointer.c
 
 [LibraryClasses]
   DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+  BaseLib
+
+
 

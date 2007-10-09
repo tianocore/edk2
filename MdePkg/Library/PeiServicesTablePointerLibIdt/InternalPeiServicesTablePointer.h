@@ -19,15 +19,11 @@
 
 #include <PiPei.h>
 
+#include <Library/BaseLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/BaseMemoryLib.h>
 
-extern 
-EFI_PEI_SERVICES **
-EFIAPI
-AsmPeiSevicesTablePointer (
-  VOID
-  );
-
-
+  
 #endif
