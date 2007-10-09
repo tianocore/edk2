@@ -20,6 +20,12 @@
 
 static EFI_PEI_SERVICES  **gPeiServices;
 
+/**
+  The function set the pointer of PEI services immediately preceding the IDT table
+  according to PI specification.
+  
+  @param    PeiServices   The address of PeiServices pointer.
+**/
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
@@ -70,3 +76,18 @@ PeiServicesTablePointerLibConstructor (
   gPeiServices = PeiServices;
   return EFI_SUCCESS;
 }
+
+/**
+  After memory initialization in PEI phase, the IDT table in temporary memory should 
+  be migrated to memory, and the address of PeiServicesPointer also need to be updated  
+  immediately preceding the new IDT table.
+  
+  @param    PeiServices   The address of PeiServices pointer.
+**/
+VOID
+MigrateIdtTable (
+  IN EFI_PEI_SERVICES  **PeiServices
+  )
+{
+}
+

@@ -44,4 +44,5 @@
 [LibraryClasses]
   DebugLib
   BaseLib
-
+  BaseMemoryLib
+  PeiServicesLib

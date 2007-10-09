@@ -166,6 +166,11 @@ Returns:
 
   InitializePpiServices (&PrivateData, OldCoreData);
 
+  //
+  // Save PeiServicePointer so that it can be retrieved anywhere.
+  //
+  SetPeiServicesTablePointer(&PrivateData.PS);
+  
   if (OldCoreData != NULL) {
 
     PERF_END (NULL,"PreMem", NULL, 0);

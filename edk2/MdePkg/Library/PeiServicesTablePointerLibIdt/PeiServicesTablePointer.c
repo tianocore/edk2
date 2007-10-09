@@ -33,9 +33,66 @@ GetPeiServicesTablePointer (
   )
 {
   EFI_PEI_SERVICES  **PeiServices;
-
-  PeiServices = (EFI_PEI_SERVICES **) AsmPeiSevicesTablePointer ();
+  IA32_DESCRIPTOR   Idtr;
+  
+  AsmReadIdtr (&Idtr);
+  PeiServices = (EFI_PEI_SERVICES **) (*(UINTN*)(Idtr.Base - 4));
   ASSERT (PeiServices != NULL);
   return PeiServices;
 }
+
+/**
+  
+  The function returns the pointer to PeiServicee following
+  PI1.0.
+  
+  For IA32, the four-bytes field immediately prior to new IDT
+  base addres is used to save the EFI_PEI_SERVICES**.
+  For x64, the eight-bytes field immediately prior to new IDT
+  base addres is used to save the EFI_PEI_SERVICES**
+  @retval  The pointer to PeiServices.
+
+**/
+VOID
+EFIAPI
+SetPeiServicesTablePointer (
+  EFI_PEI_SERVICES ** PeiServicesTablePointer
+  )
+{
+  IA32_DESCRIPTOR   Idtr;
+  
+  AsmReadIdtr (&Idtr);
+  (*(UINTN*)(Idtr.Base - 4)) = (UINTN)PeiServicesTablePointer;
+}
+
+/**
+  After memory initialization in PEI phase, the IDT table in temporary memory should 
+  be migrated to memory, and the address of PeiServicesPointer also need to be updated  
+  immediately preceding the new IDT table.
+  
+  @param    PeiServices   The address of PeiServices pointer.
+**/
+VOID
+MigrateIdtTable (
+  IN EFI_PEI_SERVICES  **PeiServices
+  )
+{
+  UINTN           Size;
+  VOID            *NewBase;
+  EFI_STATUS      Status;
+  IA32_DESCRIPTOR Idtr;
+  
+  AsmReadIdtr (&Idtr);
+  
+  Size = sizeof(UINTN) + (Idtr.Limit + 1); 
+  
+  Status = PeiServicesAllocatePool (Size, &NewBase);
+  ASSERT_EFI_ERROR (Status);
+  
+  CopyMem ((VOID*)((UINTN)NewBase + sizeof(UINTN)), (VOID*)Idtr.Base, (Idtr.Limit + 1));
+  
+  Idtr.Base = (UINTN)NewBase + sizeof(UINTN);
+  AsmWriteIdtr (&Idtr);
+  SetPeiServicesTablePointer(PeiServices);  
+}  
 

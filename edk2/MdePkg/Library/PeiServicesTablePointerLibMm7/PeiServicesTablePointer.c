@@ -21,6 +21,8 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PeiServicesLib.h>
 
 VOID
 EFIAPI
@@ -75,3 +77,34 @@ PeiServicesTablePointerLibConstructor (
   AsmWriteMm7 ((UINT64)(UINTN)PeiServices);
   return EFI_SUCCESS;
 }
+
+/**
+  After memory initialization in PEI phase, the IDT table in temporary memory should 
+  be migrated to memory, and the address of PeiServicesPointer also need to be updated  
+  immediately preceding the new IDT table.
+  
+  @param    PeiServices   The address of PeiServices pointer.
+**/
+VOID
+MigrateIdtTable (
+  IN EFI_PEI_SERVICES  **PeiServices
+  )
+{
+  UINTN           Size;
+  VOID            *NewBase;
+  EFI_STATUS      Status;
+  IA32_DESCRIPTOR Idtr;
+  
+  AsmReadIdtr (&Idtr);
+  
+  Size = Idtr.Limit + 1;
+  
+  Status = PeiServicesAllocatePool (Size, &NewBase);
+  ASSERT_EFI_ERROR (Status);
+  
+  CopyMem (NewBase, (VOID*)Idtr.Base, Size);
+  
+  Idtr.Base = (UINTN)NewBase;
+  AsmWriteIdtr (&Idtr);
+}
+
