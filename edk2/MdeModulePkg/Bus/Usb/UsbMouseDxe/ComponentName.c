@@ -154,20 +154,20 @@ UsbMouseComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseComponentName = {
   UsbMouseComponentNameGetDriverName,
   UsbMouseComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gUsbMouseComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbMouseComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UsbMouseComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UsbMouseComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 

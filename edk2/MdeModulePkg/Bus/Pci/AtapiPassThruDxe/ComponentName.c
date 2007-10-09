@@ -16,20 +16,20 @@
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gAtapiScsiPassThruComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gAtapiScsiPassThruComponentName = {
   AtapiScsiPassThruComponentNameGetDriverName,
   AtapiScsiPassThruComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gAtapiScsiPassThruComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gAtapiScsiPassThruComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) AtapiScsiPassThruComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) AtapiScsiPassThruComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mAtapiScsiPassThruDriverNameTable[] = {

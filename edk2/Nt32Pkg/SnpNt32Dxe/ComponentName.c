@@ -153,20 +153,20 @@ SnpNt32DriverComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gSnpNt32DriverComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gSnpNt32DriverComponentName = {
   SnpNt32DriverComponentNameGetDriverName,
   SnpNt32DriverComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gSnpNt32DriverComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gSnpNt32DriverComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) SnpNt32DriverComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) SnpNt32DriverComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mSnpNt32DriverNameTable[] = {

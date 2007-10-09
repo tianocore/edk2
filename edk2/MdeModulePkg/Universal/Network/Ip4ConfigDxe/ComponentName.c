@@ -154,20 +154,20 @@ Ip4ConfigComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gIp4ConfigComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIp4ConfigComponentName = {
   Ip4ConfigComponentNameGetDriverName,
   Ip4ConfigComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gIp4ConfigComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIp4ConfigComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ip4ConfigComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ip4ConfigComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC

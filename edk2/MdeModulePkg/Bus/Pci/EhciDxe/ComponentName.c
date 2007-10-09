@@ -155,20 +155,20 @@ EhciComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName = {
   EhciComponentNameGetDriverName,
   EhciComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gEhciComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gEhciComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) EhciComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) EhciComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mEhciDriverNameTable[] = {

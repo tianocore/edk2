@@ -27,20 +27,20 @@ Abstract:
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gConPlatformComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConPlatformComponentName = {
   ConPlatformComponentNameGetDriverName,
   ConPlatformComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gConPlatformComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConPlatformComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConPlatformComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConPlatformComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC EFI_UNICODE_STRING_TABLE mConPlatformDriverNameTable[] = {

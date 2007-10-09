@@ -154,20 +154,20 @@ MnpComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName = {
   MnpComponentNameGetDriverName,
   MnpComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) MnpComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) MnpComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 STATIC EFI_UNICODE_STRING_TABLE mMnpDriverNameTable[] = {

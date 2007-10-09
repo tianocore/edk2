@@ -146,20 +146,20 @@ PciVgaMiniPortComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gPciVgaMiniPortComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gPciVgaMiniPortComponentName = {
   PciVgaMiniPortComponentNameGetDriverName,
   PciVgaMiniPortComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) PciVgaMiniPortComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) PciVgaMiniPortComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mPciVgaMiniPortDriverNameTable[] = {

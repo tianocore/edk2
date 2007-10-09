@@ -167,20 +167,20 @@ WinNtBusDriverComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gWinNtBusDriverComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gWinNtBusDriverComponentName = {
   WinNtBusDriverComponentNameGetDriverName,
   WinNtBusDriverComponentNameGetControllerName,
   "eng"
-  };
+};
 
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gWinNtBusDriverComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtBusDriverComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) WinNtBusDriverComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) WinNtBusDriverComponentNameGetControllerName,
   "en"
-  };
+};
 
 
 static EFI_UNICODE_STRING_TABLE mWinNtBusDriverNameTable[] = {

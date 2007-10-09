@@ -22,7 +22,7 @@ Abstract:
 //
 // EFI Component Name Protocol
 //
-EFI_COMPONENT_NAME_PROTOCOL  gDebugPortComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gDebugPortComponentName = {
   DebugPortComponentNameGetDriverName,
   DebugPortComponentNameGetControllerName,
   "eng"
@@ -31,7 +31,7 @@ EFI_COMPONENT_NAME_PROTOCOL  gDebugPortComponentName = {
 //
 // EFI Component Name 2 Protocol
 //
-EFI_COMPONENT_NAME2_PROTOCOL gDebugPortComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDebugPortComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) DebugPortComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) DebugPortComponentNameGetControllerName,
   "en"
