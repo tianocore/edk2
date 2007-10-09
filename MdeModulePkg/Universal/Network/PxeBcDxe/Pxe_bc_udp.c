@@ -317,7 +317,7 @@ UdpRead (
 
   if (DestIpPtr == NULL) {
     DestIpPtr = &TmpDestIp;
-    TmpDestIp = Private->EfiBc.Mode->StationIp;
+    CopyMem (&TmpDestIp, &Private->EfiBc.Mode->StationIp, sizeof (EFI_IP_ADDRESS));
   }
 
 #if SUPPORT_IPV6
@@ -384,7 +384,7 @@ UdpRead (
           DEBUG (
             (DEBUG_INFO,
             "\nUdpRead()  Hdrs.Udpv4PseudoHeader == %Xh",
-            Hdrs.Udpv4PseudoHeader)
+            &Hdrs.Udpv4PseudoHeader)
             );
           DEBUG (
             (DEBUG_INFO,

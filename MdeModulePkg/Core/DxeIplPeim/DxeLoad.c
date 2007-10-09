@@ -346,7 +346,7 @@ DxeIplAddEncapsulatedFirmwareVolumes (
           PeiServicesFfsGetVolumeInfo (&VolumeHandle, &VolumeInfo);
 
           PeiPiLibBuildPiFvInfoPpi (
-            (EFI_PHYSICAL_ADDRESS) FvHeader,
+            (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
             FvHeader->FvLength,
             &(VolumeInfo.FvName),
             &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name)

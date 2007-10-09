@@ -142,8 +142,8 @@ PeiFileHandleToVolume (
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
   for (Index = 0; Index < PrivateData->FvCount; Index++) {
     FwVolHeader = PrivateData->Fv[Index].FvHeader;
-    if (((UINT64) FileHandle > (UINT64) FwVolHeader ) &&   \
-        ((UINT64) FileHandle <= ((UINT64) FwVolHeader + FwVolHeader->FvLength - 1))) {
+    if (((UINT64) (UINTN) FileHandle > (UINT64) (UINTN) FwVolHeader ) &&   \
+        ((UINT64) (UINTN) FileHandle <= ((UINT64) (UINTN) FwVolHeader + FwVolHeader->FvLength - 1))) {
       *VolumeHandle = (EFI_PEI_FV_HANDLE)FwVolHeader;
       return TRUE;
     }

@@ -54,7 +54,7 @@ UINT8  mSyslogDstMac [NET_ETHER_ADDR_LEN] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 UINT32 mSyslogDstIp                       = 0xffffffff;
 UINT32 mSyslogSrcIp                       = 0;
 
-UINT8 *
+CHAR8 *
 MonthName[] = {
   "Jan",
   "Feb",

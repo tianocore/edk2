@@ -795,6 +795,8 @@ MnpEnqueuePacket (
   MNP_GROUP_ADDRESS                 *GroupAddress;
   MNP_RXDATA_WRAP                   *RxDataWrap;
 
+
+  GroupAddress = NULL;
   //
   // First, analyse the packet header.
   //

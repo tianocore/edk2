@@ -21,7 +21,7 @@ Abstract:
 
 #include "Mtftp4Impl.h"
 
-UINT8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
+CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
   "blksize",
   "timeout",
   "tsize",
@@ -438,7 +438,7 @@ Mtftp4ParseOption (
       return EFI_INVALID_PARAMETER;
     }
 
-    if (NetStringEqualNoCase (This->OptionStr, "blksize")) {
+    if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "blksize")) {
       //
       // block size option, valid value is between [8, 65464]
       //
@@ -451,7 +451,7 @@ Mtftp4ParseOption (
       MtftpOption->BlkSize = (UINT16) Value;
       MtftpOption->Exist |= MTFTP4_BLKSIZE_EXIST;
 
-    } else if (NetStringEqualNoCase (This->OptionStr, "timeout")) {
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "timeout")) {
       //
       // timeout option, valid value is between [1, 255]
       //
@@ -463,14 +463,14 @@ Mtftp4ParseOption (
 
       MtftpOption->Timeout = (UINT8) Value;
 
-    } else if (NetStringEqualNoCase (This->OptionStr, "tsize")) {
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "tsize")) {
       //
       // tsize option, the biggest transfer supported is 4GB with block size option
       //
       MtftpOption->Tsize = NetStringToU32 (This->ValueStr);
       MtftpOption->Exist |= MTFTP4_TSIZE_EXIST;
 
-    } else if (NetStringEqualNoCase (This->OptionStr, "multicast")) {
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "multicast")) {
       //
       // Multicast option, if it is a request, the value must be a zero
       // length string, otherwise, it is formated like "204.0.0.1,1857,1\0"

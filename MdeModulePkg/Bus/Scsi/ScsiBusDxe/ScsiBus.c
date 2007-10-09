@@ -1188,7 +1188,7 @@ Returns:
     }
   }
 
-  if (0x1e >= InquiryData.Peripheral_Type >= 0xa) {
+  if (0x1e >= InquiryData.Peripheral_Type && InquiryData.Peripheral_Type >= 0xa) {
     return FALSE;
   }
 

@@ -756,14 +756,14 @@ DhcpHandleRequest (
   Message = NULL;
 
   if (!EFI_IP4_EQUAL (&Head->YourAddr, &Selected->YourAddr)) {
-    Message = "Lease confirmed isn't the same as that in the offer";
+    Message = (UINT8 *) "Lease confirmed isn't the same as that in the offer";
     goto REJECT;
   }
 
   Status = DhcpCallUser (DhcpSb, Dhcp4RcvdAck, Packet, NULL);
 
   if (EFI_ERROR (Status)) {
-    Message = "Lease is denied upon received ACK";
+    Message = (UINT8 *) "Lease is denied upon received ACK";
     goto REJECT;
   }
 
@@ -773,7 +773,7 @@ DhcpHandleRequest (
   Status = DhcpLeaseAcquired (DhcpSb);
 
   if (EFI_ERROR (Status)) {
-    Message = "Lease is denied upon entering bound";
+    Message = (UINT8 *) "Lease is denied upon entering bound";
     goto REJECT;
   }
 
