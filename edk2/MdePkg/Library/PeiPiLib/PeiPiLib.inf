@@ -21,7 +21,7 @@
   FILE_GUID                      = 6196FE81-4FA4-469a-B759-2C4DFE935B79
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PiLib|PEIM
+  LIBRARY_CLASS                  = DxePiLib|PEIM
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 

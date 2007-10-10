@@ -21,9 +21,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiPiLib.h>
+#include <Library/BaseMemoryLib.h>
 
 
-STATIC CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
+CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
   EFI_FIRMWARE_FILE_SYSTEM2_GUID,
   NULL,
   0,    //FvInfoSize
@@ -33,11 +34,12 @@ STATIC CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
 
 VOID
 EFIAPI
-PeiPiLibBuildPiFvInfoPpi (
-  IN EFI_PHYSICAL_ADDRESS    FvStart,
-  IN UINT64                  FvLength,
-  IN EFI_GUID                *ParentFvName,
-  IN EFI_GUID                *ParentFileName
+PiLibInstallFvInfoPpi (
+  IN EFI_GUID                *FvFormat, OPTIONAL
+  IN VOID                    *FvInfo,
+  IN UINT32                  FvInfoSize,
+  IN EFI_GUID                *ParentFvName, OPTIONAL
+  IN EFI_GUID                *ParentFileName OPTIONAL
   ) {
   
   EFI_STATUS                       Status;   
@@ -47,8 +49,11 @@ PeiPiLibBuildPiFvInfoPpi (
   FvInfoPpi = AllocateCopyPool (sizeof (*FvInfoPpi), &mFvInfoPpiTemplate);
   ASSERT( FvInfoPpi != NULL);
 
-  FvInfoPpi->FvInfo = (VOID *) (UINTN) FvStart;
-  FvInfoPpi->FvInfoSize = (UINT32) FvLength;
+  if (FvFormat != NULL) {
+    CopyMem (&FvInfoPpi->FvFormat, FvFormat, sizeof (*FvFormat));
+  }
+  FvInfoPpi->FvInfo = (VOID *) (UINTN) FvInfo;
+  FvInfoPpi->FvInfoSize = (UINT32) FvInfoSize;
   FvInfoPpi->ParentFvName = ParentFvName;
   FvInfoPpi->ParentFileName = ParentFileName;
 
@@ -62,6 +67,5 @@ PeiPiLibBuildPiFvInfoPpi (
   Status = PeiServicesInstallPpi (FvInfoPpiDescriptor);
   ASSERT_EFI_ERROR (Status);
 
-   
 }
 
