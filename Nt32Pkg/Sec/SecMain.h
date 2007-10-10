@@ -47,14 +47,10 @@ typedef struct {
   UINT64                Size;
 } NT_FD_INFO;
 
-#define NT_SYSTEM_MEMORY_FILENAME_SIZE  40
-
 typedef struct {
-  CHAR16                FileName[NT_SYSTEM_MEMORY_FILENAME_SIZE];
   EFI_PHYSICAL_ADDRESS  Memory;
   UINT64                Size;
 } NT_SYSTEM_MEMORY;
-
 
 #define MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE 0x100
 

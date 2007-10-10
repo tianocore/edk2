@@ -17,18 +17,14 @@ Abstract:
   WinNt emulator of SEC phase. It's really a Win32 application, but this is
   Ok since all the other modules for NT32 are NOT Win32 applications.
 
-  This program processes Windows environment variables and figures out
-  what the memory layout will be, how may FD's will be loaded and also
-  what the boot mode is.
+  This program gets NT32 PCD setting and figures out what the memory layout 
+  will be, how may FD's will be loaded and also what the boot mode is.
 
   The SEC registers a set of services with the SEC core. gPrivateDispatchTable
   is a list of PPI's produced by the SEC that are availble for usage in PEI.
 
-  This code produces 128 K of temporary memory for the PEI stack by opening a
-  Windows file and mapping it directly to memory addresses.
-
-  The system.cmd script is used to set windows environment variables that drive
-  the configuration opitons of the SEC.
+  This code produces 128 K of temporary memory for the PEI stack by directly
+  allocate memory space with ReadWrite and Execute attribute.
 
 --*/
 
@@ -99,19 +95,18 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
 
 //
 // Default information about where the FD is located.
-//  This array gets filled in with information from EFI_FIRMWARE_VOLUMES
-//  EFI_FIRMWARE_VOLUMES is a Windows environment variable set by system.cmd.
+//  This array gets filled in with information from PcdWinNtFirmwareVolume
 //  The number of array elements is allocated base on parsing
-//  EFI_FIRMWARE_VOLUMES and the memory is never freed.
+//  PcdWinNtFirmwareVolume and the memory is never freed.
 //
 UINTN                                     gFdInfoCount = 0;
 NT_FD_INFO                                *gFdInfo;
 
 //
 // Array that supports seperate memory rantes.
-//  The memory ranges are set in system.cmd via the EFI_MEMORY_SIZE variable.
+//  The memory ranges are set by PcdWinNtMemorySizeForSecMain.
 //  The number of array elements is allocated base on parsing
-//  EFI_MEMORY_SIZE and the memory is never freed.
+//  PcdWinNtMemorySizeForSecMain value and the memory is never freed.
 //
 UINTN                                     gSystemMemoryCount = 0;
 NT_SYSTEM_MEMORY                          *gSystemMemory;
@@ -159,9 +154,9 @@ Returns:
   VOID                  *PeiCoreFile;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
-
-  MemorySizeStr      = (CHAR16 *)L"64!64";
-  FirmwareVolumesStr = (CHAR16 *)L"..\\Fv\\Fv_Recovery.fd";
+  
+  MemorySizeStr      = (CHAR16 *) FixedPcdGetPtr (PcdWinNtMemorySizeForSecMain);
+  FirmwareVolumesStr = (CHAR16 *) FixedPcdGetPtr (PcdWinNtFirmwareVolume);
 
   printf ("\nEDK SEC Main NT Emulation Environment from www.TianoCore.org\n");
 
@@ -196,21 +191,14 @@ Returns:
   printf ("  BootMode 0x%02x\n", FixedPcdGet32 (PcdWinNtBootMode));
 
   //
-  // Open up a 128K file to emulate temp memory for PEI.
+  //  Allocate 128K memory to emulate temp memory for PEI.
   //  on a real platform this would be SRAM, or using the cache as RAM.
   //  Set InitialStackMemory to zero so WinNtOpenFile will allocate a new mapping
   //
-  InitialStackMemory      = 0;
-  InitialStackMemorySize  = 0x20000;
-  Status = WinNtOpenFile (
-            L"SecStack",
-            (UINT32) InitialStackMemorySize,
-            OPEN_ALWAYS,
-            &InitialStackMemory,
-            &InitialStackMemorySize
-            );
-  if (EFI_ERROR (Status)) {
-    printf ("ERROR : Can not open SecStack Exiting\n");
+  InitialStackMemorySize  = STACK_SIZE;
+  InitialStackMemory = (EFI_PHYSICAL_ADDRESS) (UINTN) VirtualAlloc (NULL, (SIZE_T) (InitialStackMemorySize), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+  if (InitialStackMemory == 0) {
+    printf ("ERROR : Can not allocate enough space for SecStack\n");
     exit (1);
   }
 
@@ -286,7 +274,6 @@ Returns:
     // Save the size of the memory and make a Unicode filename SystemMemory00, ...
     //
     gSystemMemory[Index].Size = _wtoi (MemorySizeStr) * 0x100000;
-    _snwprintf (gSystemMemory[Index].FileName, NT_SYSTEM_MEMORY_FILENAME_SIZE, L"SystemMemory%02d", Index);
 
     //
     // Find the next region
@@ -646,9 +633,9 @@ Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
   It allows discontiguous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
-  parsing the Windows environment variable EFI_MEMORY_SIZE.
-  The size comes from the varaible and the address comes from the call to
-  WinNtOpenFile.
+  parsing PcdWinNtMemorySizeForSecMain value.
+  The size comes from the Pcd value and the address comes from the memory space 
+  with ReadWrite and Execute attributes allocated by VirtualAlloc() API.
 
 Arguments:
   Index      - Which memory region to use
@@ -661,24 +648,22 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-
   if (Index >= gSystemMemoryCount) {
     return EFI_UNSUPPORTED;
   }
+  
+  //
+  // Allocate enough memory space for emulator 
+  //
+  gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) VirtualAlloc (NULL, (SIZE_T) (gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+  if (gSystemMemory[Index].Memory == 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  *MemoryBase = gSystemMemory[Index].Memory;
+  *MemorySize = gSystemMemory[Index].Size;
 
-  *MemoryBase = 0;
-  Status = WinNtOpenFile (
-            gSystemMemory[Index].FileName,
-            (UINT32) gSystemMemory[Index].Size,
-            OPEN_ALWAYS,
-            MemoryBase,
-            MemorySize
-            );
-
-  gSystemMemory[Index].Memory = *MemoryBase;
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 VOID *
@@ -744,9 +729,10 @@ Returns:
     return Status;
   }
   //
-  // Allocate space in NT (not emulator) memory. Extra space is for alignment
+  // Allocate space in NT (not emulator) memory with ReadWrite and Execute attribue. 
+  // Extra space is for alignment
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) malloc ((UINTN) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)));
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) VirtualAlloc (NULL, (SIZE_T) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
   if (ImageContext.ImageAddress == 0) {
     return EFI_OUT_OF_RESOURCES;
   }
