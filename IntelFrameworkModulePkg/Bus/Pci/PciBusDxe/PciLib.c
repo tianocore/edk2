@@ -2113,7 +2113,7 @@ ReadConfigData (
           return Status;
         }
 
-       Stride = 1 << AccessWidth;
+       Stride = (UINTN)1 << AccessWidth;
         AccessAddress += Stride;
         if (AccessAddress >= (Address + LShiftU64 (1ULL, (UINTN)Width))) {
           //
@@ -2380,7 +2380,7 @@ WriteConfigData (
 
         Data = RShiftU64 (Data, ((1 << AccessWidth) * 8));
 
-        Stride = 1 << AccessWidth;
+        Stride = (UINTN)1 << AccessWidth;
         AccessAddress += Stride;
         if (AccessAddress >= (Address + LShiftU64 (1ULL, (UINTN)Width))) {
           //
