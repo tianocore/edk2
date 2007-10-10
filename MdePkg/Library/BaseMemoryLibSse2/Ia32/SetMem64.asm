@@ -40,9 +40,9 @@ InternalMemSetMem64 PROC
     mov     ecx, [esp + 8]              ; ecx <- Count
     test    al, 8
     mov     edx, eax
-    movq    xmm0, [esp + 12]
+    movq    xmm0, qword ptr [esp + 12]
     jz      @F
-    movq    [edx], xmm0
+    movq    qword ptr [edx], xmm0
     add     edx, 8
     dec     ecx
 @@:
@@ -56,7 +56,7 @@ InternalMemSetMem64 PROC
     mfence
 @SetQwords:
     jnc     @F
-    movq    [edx], xmm0
+    movq    qword ptr [edx], xmm0
 @@:
     ret
 InternalMemSetMem64 ENDP

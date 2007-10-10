@@ -38,7 +38,7 @@
 InternalMemSetMem32 PROC
     mov     eax, [esp + 4]              ; eax <- Buffer as return value
     mov     ecx, [esp + 8]              ; ecx <- Count
-    movd    mm0, [esp + 12]             ; mm0 <- Value
+    movd    mm0, dword ptr [esp + 12]             ; mm0 <- Value
     shr     ecx, 1                      ; ecx <- number of qwords to set
     mov     edx, eax                    ; edx <- Buffer
     jz      @SetDwords
@@ -46,12 +46,12 @@ InternalMemSetMem32 PROC
     psllq   mm1, 32
     por     mm0, mm1
 @@:
-    movq    [edx], mm0
+    movq    qword ptr [edx], mm0
     lea     edx, [edx + 8]              ; use "lea" to avoid change in flags
     loop    @B
 @SetDwords:
     jnc     @F
-    movd    [edx], mm0
+    movd    dword ptr [edx], mm0
 @@:
     ret
 InternalMemSetMem32 ENDP
