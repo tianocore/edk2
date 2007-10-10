@@ -1545,10 +1545,10 @@ ArpFindCacheEntry (
 
   if (EntryLength != NULL) {
     //
-    // Return the entry length.
+    // Return the entry length, make sure its 8 bytes alignment.
     //
-    *EntryLength = sizeof (EFI_ARP_FIND_DATA) + Instance->ConfigData.SwAddressLength +
-                   ArpService->SnpMode.HwAddressSize;
+    *EntryLength = (((sizeof (EFI_ARP_FIND_DATA) + Instance->ConfigData.SwAddressLength +
+                   ArpService->SnpMode.HwAddressSize) + 3) & ~(0x3));
   }
 
   if (EntryCount != NULL) {
