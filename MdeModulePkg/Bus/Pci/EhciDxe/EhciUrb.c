@@ -294,7 +294,7 @@ EhcConvertPollRate (
     BitCount++;
   }
 
-  return 1 << (BitCount - 1);
+  return (UINTN)1 << (BitCount - 1);
 }
 
 
