@@ -30,6 +30,8 @@ Abstract:
 
 #define MAX_LINE_LEN  256
 
+#define STATUS_IGNORE 0xA
+
 //
 // Structure definition for a microcode header
 //
@@ -120,6 +122,7 @@ Returns:
 {
   char  Line[MAX_LINE_LEN];
   char  *cptr;
+  unsigned int  ctr;
 
   Line[MAX_LINE_LEN - 1]  = 0;
   *Data                   = 0;
@@ -132,6 +135,17 @@ Returns:
   if (Line[MAX_LINE_LEN - 1] != 0) {
     return STATUS_ERROR;
   }
+
+  // Strip leading white-space characters (except carriage returns) from Line
+  //
+  if (isspace(Line[0]) && Line[0] != '\n') {
+    while (isspace(Line[0])) {
+       for (ctr = 0; ctr < strlen(Line); ctr++)
+         if (Line[ctr] != '\n')
+           Line[ctr] = Line[ctr + 1];
+    }
+  }
+
   //
   // Look for
   // dd 000000001h ; comment
@@ -154,6 +168,12 @@ Returns:
       }
     }
     return STATUS_SUCCESS;
+  }
+  if (strlen(Line) == 1) {
+    return STATUS_IGNORE;
+  }
+  if (tolower(cptr[0]) == ';') {
+    return STATUS_IGNORE;
   }
   return STATUS_ERROR;
 }
@@ -188,6 +208,7 @@ Returns:
   unsigned int            Checksum;
   char                    *Buffer;
   char                    *Ptr;
+  char                    *OrigPtr;
   unsigned int            TotalSize;
 
   Status  = STATUS_ERROR;
@@ -211,6 +232,9 @@ Returns:
     Status = MicrocodeReadData (InFptr, &Data);
     if (Status == STATUS_SUCCESS) {
       Size += sizeof (Data);
+    }
+    if (Status == STATUS_IGNORE) {
+      Status = STATUS_SUCCESS;
     }
   } while (Status == STATUS_SUCCESS);
   //
@@ -237,11 +261,17 @@ Returns:
   //
   fseek (InFptr, 0, SEEK_SET);
   Ptr = Buffer;
+  OrigPtr = Ptr;
   do {
+    OrigPtr = Ptr;
     Status = MicrocodeReadData (InFptr, &Data);
     if (Status == STATUS_SUCCESS) {
       *(unsigned int *) Ptr = Data;
       Ptr += sizeof (Data);
+    }
+    if (Status == STATUS_IGNORE) {
+      Ptr = OrigPtr;
+      Status = STATUS_SUCCESS;
     }
   } while (Status == STATUS_SUCCESS);
   //
