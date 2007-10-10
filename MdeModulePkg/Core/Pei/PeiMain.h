@@ -80,7 +80,7 @@ typedef struct {
 } PEI_PPI_DATABASE;
 
 
-#define PEI_CORE_MAX_FV_SUPPORTED   4
+#define PEI_CORE_MAX_FV_SUPPORTED   6
 #define PEI_CORE_MAX_PEIM_PER_FV    32
 
 //
