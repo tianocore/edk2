@@ -28,16 +28,16 @@ Notes:
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
    Python source code:
-        r803 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r803 <buildtools_project>\BaseTools\Source\Python\build
-        r803 <buildtools_project>\BaseTools\Source\Python\Common
-        r803 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r803 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r811 <buildtools_project>\BaseTools\Source\Python\Autogen
+        r811 <buildtools_project>\BaseTools\Source\Python\build
+        r811 <buildtools_project>\BaseTools\Source\Python\Common
+        r811 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r811 <buildtools_project>\BaseTools\Source\Python\GenFds
         
 4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
-        r802 <buildtools_project>\BaseTools\Source\Python\Common
-        r802 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r802 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r811 <buildtools_project>\BaseTools\Source\Python\Common
+        r811 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r811 <buildtools_project>\BaseTools\Source\Python\GenFds
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
