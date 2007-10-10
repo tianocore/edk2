@@ -345,12 +345,21 @@ DxeIplAddEncapsulatedFirmwareVolumes (
           //
           PeiServicesFfsGetVolumeInfo (&VolumeHandle, &VolumeInfo);
 
-          PeiPiLibBuildPiFvInfoPpi (
-            (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-            FvHeader->FvLength,
+          PiLibInstallFvInfoPpi (
+            NULL,
+            FvHeader,
+            (UINT32) FvHeader->FvLength,
             &(VolumeInfo.FvName),
             &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name)
             );
+
+          //
+          // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
+          //
+          BuildFvHob (
+            (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+            FvHeader->FvLength
+          );
             
           ASSERT_EFI_ERROR (Status);
 

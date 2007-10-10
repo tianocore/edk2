@@ -379,7 +379,6 @@ Returns:
        }
      }
     PrivateData->Fv[PrivateData->FvCount++].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo;
-    BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo, (UINT64) Fv->FvInfoSize);
   }
 
   //
