@@ -109,3 +109,35 @@ EDK_3922:  Non-Compatible: qwang12, klu2
          also provide convinient way to retrieve the pointer to Pei Service Table.
          
 
+EDK_4067:  Non-Compatible: qwang12
+  Class_PIEnable[1]:  Add PeiPiLib library class and replace PiLib with DxePiLib library class.
+
+      Code Change :
+      1) Change MdePkg/Include/Library/PiLib.h to MdePkg/Include/Library/DxePiLib.h. DxePiLib is mainly used
+         for modules in DXE phase. Add a DxePiLib.h library instance at MdePkg/Library/DxePiLib/DxePiLib.inf.
+      2) Add MdePkg/Include/Library/PeiPiLib.h. PeiPiLib is mainly used by modules in PEI phase. 
+         Add a DxePiLib.h library instance at MdePkg/Library/PeiPiLib/PeiPiLib.inf.
+      3) Rename API in PeiPiLib.h from PeiPiLibBuildPiFvInfoPpi to PiLibInstallFvInfoPpi.
+      4) Rename APIs originally in PiLib.h with new names defined in DxePiLib.h:
+          4.1) GetSectionFrom*Fv functions are changed to PiLibGetSectionFrom*Fv to reduce possibility of name collision.
+          4.2) Remove API named ImageHandleToFvHandle and GetSectionFromFvFile 
+
+
+      Possible Impacts:
+
+      1) Platform modules that reference PeiPiLibBuildPiFvInfoPpi and GetSectionFrom*Fv should reference the new
+         names defined.
+      2) Platform DSC file that specifying library instance for PiLib should be updated to add one line (a example 
+         is given below):
+          [LibraryClasses.common.DXE_DRIVER]
+              ...
+              DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf
+              ...
+      3) Platform DSC file including modules that make use of API from PeiPiLib.h should add the following line (a example 
+         is given below):
+          [LibraryClasses.common.PEIM]
+              ...
+              PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
+              ...
+          
+
