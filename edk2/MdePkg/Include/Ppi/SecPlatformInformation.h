@@ -56,12 +56,38 @@ typedef union {
   @param PALRetAddress  Return address to PAL
    
 **/
+/*
 typedef struct {
   UINTN BootPhase;
   UINTN UniqueId;
   UINTN HealthStat;
   UINTN PALRetAddress;
 } IPF_HANDOFF_STATUS;
+*/
+
+#define NORMAL_BOOT_CALL    0x0
+#define RECOVERY_CHECK_CALL 0x3
+
+typedef struct {
+  UINT8 BootPhase;
+  UINT8 FWStatus;
+  UINT16 Reserved1;
+  UINT32 Reserved2;
+
+  UINT16 ProcId;
+  UINT16 Reserved3;
+  UINT8  IdMask;
+  UINT8  EidMask;
+  UINT16 Reserved4;
+
+  UINT64 PalCallAddress;
+  UINT64 PalSpecialAddress;
+  UINT64 SelfTestStatus;
+  UINT64 SelfTestControl;
+  UINT64 MemoryBufferRequired;
+
+} IPF_HANDOFF_STATUS;
+
 
 typedef struct {
   EFI_HEALTH_FLAGS HealthFlags;

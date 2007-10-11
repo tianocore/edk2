@@ -221,12 +221,6 @@ typedef INT64   INTN;
 #endif
 
 //
-// For IPF boot mode
-//
-#define RECOVERY_CHECK_CALL 0x3
-#define NORMAL_BOOT_CALL    0x0
-
-//
 // A pointer to a function in IPF points to a plabel.
 //
 typedef struct {
