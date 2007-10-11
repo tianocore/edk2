@@ -33,7 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIsaFloppyComponentNa
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mIsaFloppyDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIsaFloppyDriverNameTable[] = {
   {
     "eng;en",
     L"ISA Floppy Driver"

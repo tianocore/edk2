@@ -169,7 +169,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gArpComponentName2 = 
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mArpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpDriverNameTable[] = {
   { "eng;en", L"ARP Network Service Driver" },
   { NULL, NULL }
 };

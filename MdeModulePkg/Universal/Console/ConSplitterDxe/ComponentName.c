@@ -95,7 +95,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrCom
 };
 
 
-static EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"Console Splitter Driver"
@@ -106,7 +106,7 @@ static EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTable[] = {
   }
 };
 
-static EFI_UNICODE_STRING_TABLE mConSplitterConInControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConInControllerNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"Primary Console Input Device"
@@ -117,7 +117,7 @@ static EFI_UNICODE_STRING_TABLE mConSplitterConInControllerNameTable[] = {
   }
 };
 
-static EFI_UNICODE_STRING_TABLE mConSplitterSimplePointerControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterSimplePointerControllerNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"Primary Simple Pointer Device"
@@ -128,7 +128,7 @@ static EFI_UNICODE_STRING_TABLE mConSplitterSimplePointerControllerNameTable[] =
   }
 };
 
-static EFI_UNICODE_STRING_TABLE mConSplitterConOutControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConOutControllerNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"Primary Console Output Device"
@@ -139,7 +139,7 @@ static EFI_UNICODE_STRING_TABLE mConSplitterConOutControllerNameTable[] = {
   }
 };
 
-static EFI_UNICODE_STRING_TABLE mConSplitterStdErrControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterStdErrControllerNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"Primary Standard Error Device"

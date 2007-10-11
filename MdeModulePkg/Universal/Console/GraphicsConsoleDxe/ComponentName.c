@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gGraphicsConsoleCompo
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mGraphicsConsoleDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mGraphicsConsoleDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *)L"UGA Console Driver"

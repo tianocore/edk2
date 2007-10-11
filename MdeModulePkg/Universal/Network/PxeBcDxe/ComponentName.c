@@ -168,7 +168,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPxeBcComponentName2 
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPxeBcDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPxeBcDriverNameTable[] = {
   {
     "eng;en",
     L"PXE Base Code Driver"

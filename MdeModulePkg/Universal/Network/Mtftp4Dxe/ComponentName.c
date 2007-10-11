@@ -169,7 +169,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMtftp4ComponentName2
 };
 
 
-static EFI_UNICODE_STRING_TABLE mMtftp4DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMtftp4DriverNameTable[] = {
   {
     "eng;en",
     L"MTFTP4 Network Service"

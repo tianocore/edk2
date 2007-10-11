@@ -170,7 +170,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUdp4ComponentName2 =
 };
 
 
-static EFI_UNICODE_STRING_TABLE mUdpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdpDriverNameTable[] = {
   {
     "eng;en",
     L"UDP Network Service Driver"

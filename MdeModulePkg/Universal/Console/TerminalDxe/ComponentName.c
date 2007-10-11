@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gTerminalComponentNam
 };
 
 
-static EFI_UNICODE_STRING_TABLE mTerminalDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTerminalDriverNameTable[] = {
   {
     "eng;en",
    (CHAR16 *) L"Serial Terminal Driver"

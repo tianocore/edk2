@@ -170,7 +170,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIp4ComponentName2 = 
 };
 
 
-static EFI_UNICODE_STRING_TABLE mIp4DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIp4DriverNameTable[] = {
   {
     "eng;en",
     L"IP4 Network Service Driver"

@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDebugPortComponentNa
 };
 
 
-static EFI_UNICODE_STRING_TABLE mDebugPortDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDebugPortDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *) L"DebugPort Driver"

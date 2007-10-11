@@ -183,7 +183,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtBusDriverCompon
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtBusDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtBusDriverNameTable[] = {
   { "eng;en", L"Windows Bus Driver" },
   { NULL , NULL }
 };

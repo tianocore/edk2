@@ -33,7 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIsaSerialComponentNa
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mIsaSerialDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIsaSerialDriverNameTable[] = {
   {
     "eng;en",
     L"ISA Serial Driver"

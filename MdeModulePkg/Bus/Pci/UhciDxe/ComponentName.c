@@ -169,7 +169,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUhciComponentName2 =
 };
 
 
-static EFI_UNICODE_STRING_TABLE mUhciDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUhciDriverNameTable[] = {
   { "eng;en", L"Usb Uhci Driver" },
   { NULL, NULL }
 };
