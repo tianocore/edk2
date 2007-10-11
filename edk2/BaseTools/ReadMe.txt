@@ -35,9 +35,9 @@ Notes:
         r811 <buildtools_project>\BaseTools\Source\Python\GenFds
         
 4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
-        r811 <buildtools_project>\BaseTools\Source\Python\Common
-        r811 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r811 <buildtools_project>\BaseTools\Source\Python\GenFds
+        r815 <buildtools_project>\BaseTools\Source\Python\Common
+        r815 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
+        r815 <buildtools_project>\BaseTools\Source\Python\GenFds
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
