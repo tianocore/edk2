@@ -116,6 +116,7 @@ DEFINE ASL_BIN = C:\ASL
 ##################
 *_VS2003_IA32_*_DLL                 = DEF(VSNET2003_DLL)
 
+*_VS2003_IA32_MAKE_PATH             = DEF(VSNET2003_BIN)\nmake.exe
 *_VS2003_IA32_CC_PATH               = DEF(VSNET2003_BIN)\cl.exe
 *_VS2003_IA32_VFRPP_PATH            = DEF(VSNET2003_BIN)\cl.exe
 *_VS2003_IA32_SLINK_PATH            = DEF(VSNET2003_BIN)\lib.exe
@@ -126,17 +127,18 @@ DEFINE ASL_BIN = C:\ASL
 *_VS2003_IA32_ASM_PATH              = DEF(VSNET2003_BIN)\ml.exe
 *_VS2003_IA32_PCH_PATH              = DEF(VSNET2003_BIN)\cl.exe
 
-*_VS2003_IA32_APP_FLAGS                  = /nologo /E /TC
-*_VS2003_IA32_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
-*_VS2003_IA32_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
-DEBUG_VS2003_IA32_CC_FLAGS               = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
+      *_VS2003_IA32_MAKE_FLAGS           = /nologo
+      *_VS2003_IA32_APP_FLAGS            = /nologo /E /TC
+      *_VS2003_IA32_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
+      *_VS2003_IA32_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+  DEBUG_VS2003_IA32_CC_FLAGS             = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 RELEASE_VS2003_IA32_CC_FLAGS             = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192
-DEBUG_VS2003_IA32_PCH_FLAGS              = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yc /TC /Zi /Gm
+  DEBUG_VS2003_IA32_PCH_FLAGS            = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yc /TC /Zi /Gm
 RELEASE_VS2003_IA32_PCH_FLAGS            = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yc /TC
-DEBUG_VS2003_IA32_ASM_FLAGS              = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
+  DEBUG_VS2003_IA32_ASM_FLAGS            = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
 RELEASE_VS2003_IA32_ASM_FLAGS            = /nologo /W3 /WX /c /coff /Cx /Zd /W0
-*_VS2003_IA32_SLINK_FLAGS                = /nologo /LTCG
-DEBUG_VS2003_IA32_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+      *_VS2003_IA32_SLINK_FLAGS          = /nologo /LTCG
+  DEBUG_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
 
 ####################################################################################
@@ -162,6 +164,7 @@ RELEASE_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 ##################
 *_VS2005PRO_IA32_*_DLL              = DEF(VS2005PRO_DLL)
 
+*_VS2005PRO_IA32_MAKE_PATH          = DEF(VS2005PRO_BIN)\nmake.exe
 *_VS2005PRO_IA32_CC_PATH            = DEF(VS2005PRO_BIN)\cl.exe
 *_VS2005PRO_IA32_VFRPP_PATH         = DEF(VS2005PRO_BIN)\cl.exe
 *_VS2005PRO_IA32_SLINK_PATH         = DEF(VS2005PRO_BIN)\lib.exe
@@ -171,6 +174,7 @@ RELEASE_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_VS2005PRO_IA32_PP_PATH            = DEF(VS2005PRO_BIN)\cl.exe
 *_VS2005PRO_IA32_ASM_PATH           = DEF(VS2005PRO_BIN)\ml.exe
 
+     *_VS2005PRO_IA32_MAKE_FLAGS         = /nologo
   DEBUG_VS2005PRO_IA32_CC_FLAGS          = /GS- /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 RELEASE_VS2005PRO_IA32_CC_FLAGS          = /GS- /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GF /Gs8192 
   DEBUG_VS2005PRO_IA32_ASM_FLAGS         = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi  
@@ -466,14 +470,14 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ICC_IA32_ASM_PATH                 = DEF(VSNET2003_BIN)\ml.exe
 *_ICC_IA32_ASM_DLL                  = DEF(VSNET2003_DLL)
 
-DEBUG_ICC_IA32_CC_FLAGS                  = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
+  DEBUG_ICC_IA32_CC_FLAGS                = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
 RELEASE_ICC_IA32_CC_FLAGS                = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FIAutoGen.h /EHs-c- /GF /Gs8192
-DEBUG_ICC_IA32_PCH_FLAGS                 = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Yc /TC /Zi /Gm
+  DEBUG_ICC_IA32_PCH_FLAGS               = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Yc /TC /Zi /Gm
 RELEASE_ICC_IA32_PCH_FLAGS               = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Yc /TC
-DEBUG_ICC_IA32_ASM_FLAGS                 = /nologo /W3 /WX /c /Zd /W0 /Zi
+  DEBUG_ICC_IA32_ASM_FLAGS               = /nologo /W3 /WX /c /Zd /W0 /Zi
 RELEASE_ICC_IA32_ASM_FLAGS               = /nologo /W3 /WX /c /Zd /W0
-*_ICC_IA32_SLINK_FLAGS                   = /nologo
-DEBUG_ICC_IA32_DLINK_FLAGS               = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+      *_ICC_IA32_SLINK_FLAGS             = /nologo
+  DEBUG_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(ENTRYPOINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
 
 ##################
@@ -549,6 +553,7 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 ##################
 *_MYTOOLS_IA32_*_DLL                = DEF(VSNET2003_DLL)
 
+*_MYTOOLS_IA32_MAKE_PATH            = DEF(VSNET2003_BIN)\nmake.exe
 *_MYTOOLS_IA32_CC_PATH              = DEF(VSNET2003_BIN)\cl.exe
 *_MYTOOLS_IA32_SLINK_PATH           = DEF(VSNET2003_BIN)\lib.exe
 *_MYTOOLS_IA32_DLINK_PATH           = DEF(VSNET2003_BIN)\link.exe
@@ -559,6 +564,7 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_IA32_ASM_PATH             = DEF(VSNET2003_BIN)\ml.exe
 *_MYTOOLS_IA32_PCH_PATH             = DEF(VSNET2003_BIN)\cl.exe
 
+      *_MYTOOLS_IA32_MAKE_FLAGS          = /nologo
       *_MYTOOLS_IA32_APP_FLAGS           = /nologo /E /TC
       *_MYTOOLS_IA32_PP_FLAGS            = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
   DEBUG_MYTOOLS_IA32_CC_FLAGS            = /nologo /W4 /WX /Gy /c /D UNICODE /O1ib2 /GL /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm
@@ -575,6 +581,7 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS         = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 ##################
 # x64 definitions
 ##################
+*_MYTOOLS_X64_MAKE_PATH             = DEF(WINDDK_BIN32)\nmake.exe
 *_MYTOOLS_X64_CC_PATH               = DEF(WINDDK_BINX64)\cl.exe
 *_MYTOOLS_X64_SLINK_PATH            = DEF(WINDDK_BINX64)\lib.exe
 *_MYTOOLS_X64_DLINK_PATH            = DEF(WINDDK_BINX64)\link.exe
@@ -588,6 +595,7 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS         = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
       *_MYTOOLS_X64_SLINK_FLAGS          = /nologo /LTCG
       *_MYTOOLS_X64_APP_FLAGS            = /nologo /E /TC
       *_MYTOOLS_X64_PP_FLAGS             = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+      *_MYTOOLS_X64_MAKE_FLAGS           = /nologo
   DEBUG_MYTOOLS_X64_CC_FLAGS             = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Gm /EHs-c- /GF
 RELEASE_MYTOOLS_X64_CC_FLAGS             = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF
   DEBUG_MYTOOLS_X64_PCH_FLAGS            = /nologo /X /W4 /WX /c /Gs8192 /GS- /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /TC /Zi /Gm /EHs-c- /GF
@@ -600,6 +608,7 @@ RELEASE_MYTOOLS_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 ##################
 # IPF definitions
 ##################
+*_MYTOOLS_IPF_MAKE_PATH             = DEF(WINDDK_BIN32)\nmake.exe
 *_MYTOOLS_IPF_CC_PATH               = DEF(WINDDK_BIN64)\cl.exe
 *_MYTOOLS_IPF_SLINK_PATH            = DEF(WINDDK_BIN64)\lib.exe
 *_MYTOOLS_IPF_DLINK_PATH            = DEF(WINDDK_BIN64)\link.exe
@@ -612,6 +621,7 @@ RELEASE_MYTOOLS_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 
       *_MYTOOLS_IPF_ASM_OUTPUT           = "-o "
 
+      *_MYTOOLS_IPF_MAKE_FLAGS           = /nologo
       *_MYTOOLS_IPF_APP_FLAGS            = /nologo /E /TC
       *_MYTOOLS_IPF_PP_FLAGS             = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
   DEBUG_MYTOOLS_IPF_CC_FLAGS             = /GS- /nologo /W4 /WX /EHs-c- /Gy /c /Ox /GF /GL /X /FI$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Zx
@@ -629,11 +639,13 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 ##################
 *_MYTOOLS_EBC_*_FAMILY              = INTEL
 
+*_MYTOOLS_EBC_MAKE_PATH             = DEF(VSNET2003_BIN)\nmake.exe
 *_MYTOOLS_EBC_PP_PATH               = DEF(EBC_BIN)\iec.exe
 *_MYTOOLS_EBC_CC_PATH               = DEF(EBC_BIN)\iec.exe
 *_MYTOOLS_EBC_SLINK_PATH            = DEF(EBC_BIN)\link.exe
 *_MYTOOLS_EBC_DLINK_PATH            = DEF(EBC_BIN)\link.exe
 
+*_MYTOOLS_EBC_MAKE_FLAGS                 = /nologo
 *_MYTOOLS_EBC_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
 *_MYTOOLS_EBC_CC_FLAGS                   = /nologo /c /W3 /WX /FIAutoGen.h
 *_MYTOOLS_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC

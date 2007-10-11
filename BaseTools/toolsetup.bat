@@ -32,16 +32,6 @@ REM
 REM Check the required system environment variables
 REM
 
-:check_vc
-if defined VCINSTALLDIR goto setup_workspace
-if defined VS71COMNTOOLS (
-  call "%VS71COMNTOOLS%\vsvars32.bat"
-) else (
-  echo.
-  echo !!!WARNING!!! Cannot find Visual Studio !!!
-  echo.
-)
-
 :setup_workspace
 REM
 REM check the EDK_TOOLS_PATH
