@@ -39,6 +39,37 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_4067:  Non-Compatible: qwang12
+  Class_PIEnable[6]:  PEI core does not build FV HOB upon notification of a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI automatically.
+
+      Code Change :
+      1) MdeModulePkg/Core/Pei/FwVol/FwVol.c 
+      
+      Impact to platform code:
+      1) If platform module want to inform both PEI core and DXE core about the existance of new FV 
+         it must both install EFI_PEI_FIRMWARE_VOLUME_INFO_PPI and FV HOB. 
+
+          A example is given belows:
+    
+            PiLibInstallFvInfoPpi (
+              NULL,
+              Buffer,
+              (UINT32) FvHeader->FvLength,
+              NULL,
+              NULL
+              );
+    
+            BuildFvHob (
+              (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer,
+              (UINT32) FvHeader->FvLength
+              );
+
+            PEI core does not automatically build FV HOB upon notification of a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI. 
+            The description in Item 2 in Section 4.8.1.2 in Vol 1 of PI spec will be updated to remove the 
+            "Create a new firmware volume HOB" wording.
+      
+
+==========================================================================================
 EDK_4000-4006: Compatible: qhuang8
 
            Class_UefiEnable[0]: Uefi feature -Add component name 2 protocol support for
