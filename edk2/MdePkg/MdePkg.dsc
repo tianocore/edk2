@@ -128,3 +128,4 @@
 [Components.IPF]
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
+  MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf

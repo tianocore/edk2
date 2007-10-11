@@ -36,7 +36,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  PalCall (1, 1, 1, 0);
+  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_INSTRUCTION_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES, 0);
 }
 
 /**
@@ -90,7 +90,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  PalCall (1, 2, 1, 0);
+  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_DATA_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES, 0);
 }
 
 /**
@@ -147,7 +147,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  PalCall (1, 2, 0, 0);
+  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_DATA_ALL, PAL_CACHE_FLUSH_NO_INVALIDATE_LINES | PAL_CACHE_FLUSH_NO_INTERRUPT, 0);
 }
 
 /**

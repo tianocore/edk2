@@ -55,6 +55,8 @@
 
 [LibraryClasses.IPF]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  PalCallLib|MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
 
 [LibraryClasses.EBC.DXE_DRIVER]
   IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
@@ -240,30 +242,6 @@
   TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.X64.UEFI_APPLICATION]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.BASE]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.SEC]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.PEI_CORE]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.PEIM]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.DXE_DRIVER]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.DXE_SAL_DRIVER]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.UEFI_DRIVER]
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-
-[LibraryClasses.IPF.UEFI_APPLICATION]
   TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 [LibraryClasses.IA32.DXE_RUNTIME_DRIVER]
