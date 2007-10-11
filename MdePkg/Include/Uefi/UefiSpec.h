@@ -1740,13 +1740,13 @@ typedef union {
     UINT32  InputKeyCount   : 2;
   }       Options;
   UINT32  PackedValue;
-} EFI_KEY_DATA;
+} HOT_KEY_EFI_KEY_DATA;
 
 typedef struct {
-  EFI_KEY_DATA      KeyOptions;
-  UINT32            BootOptionCrc;
-  UINT16            BootOption;
-//EFI_INPUT_KEY  Keys[];
+  HOT_KEY_EFI_KEY_DATA  KeyOptions;
+  UINT32                BootOptionCrc;
+  UINT16                BootOption;
+//EFI_INPUT_KEY         Keys[];
 } EFI_KEY_OPTION;
 
 #define EFI_KEY_OPTION_SHIFT     0x00000001
