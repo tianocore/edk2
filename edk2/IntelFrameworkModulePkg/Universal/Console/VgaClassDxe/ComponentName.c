@@ -32,7 +32,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gVgaClassComponentNam
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mVgaClassDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mVgaClassDriverNameTable[] = {
   {
     "eng;en",
     L"VGA Class Driver"

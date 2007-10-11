@@ -194,7 +194,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtGopComponentNam
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtGopDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtGopDriverNameTable[] = {
   { "eng;en", L"Windows GOP Driver" },
   { NULL , NULL }
 };

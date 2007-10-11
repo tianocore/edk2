@@ -32,7 +32,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPs2MouseComponentNam
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPs2MouseDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2MouseDriverNameTable[] = {
   {
     "eng;en",
     L"PS/2 Mouse Driver"

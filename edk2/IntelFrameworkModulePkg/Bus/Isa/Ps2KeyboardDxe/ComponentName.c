@@ -162,7 +162,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPs2KeyboardComponent
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPs2KeyboardDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2KeyboardDriverNameTable[] = {
   {
     "eng;en",
     L"PS/2 Keyboard Driver"

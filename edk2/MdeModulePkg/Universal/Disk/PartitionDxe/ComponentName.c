@@ -33,7 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPartitionComponentNa
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPartitionDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPartitionDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *)L"Partition Driver(MBR/GPT/El Torito)"

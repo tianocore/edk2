@@ -54,7 +54,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gScsiDiskComponentNam
 };
 
 
-static EFI_UNICODE_STRING_TABLE mScsiDiskDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mScsiDiskDriverNameTable[] = {
   { "eng;en", (CHAR16 *) L"Scsi Disk Driver" },
   { NULL , NULL }
 };

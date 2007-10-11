@@ -162,7 +162,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortCompon
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPciVgaMiniPortDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPciVgaMiniPortDriverNameTable[] = {
   {
     "eng;en",
     L"PCI VGA Mini Port Driver"

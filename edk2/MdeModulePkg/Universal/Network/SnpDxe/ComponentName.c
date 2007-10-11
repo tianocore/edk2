@@ -171,7 +171,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gSimpleNetworkCompone
 };
 
 
-static EFI_UNICODE_STRING_TABLE mSimpleNetworkDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSimpleNetworkDriverNameTable[] = {
   {
     "eng;en",
     L"Simple Network Protocol Driver"

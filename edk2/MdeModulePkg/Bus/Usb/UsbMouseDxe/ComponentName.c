@@ -171,7 +171,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbMouseComponentNam
 
 
 
-STATIC EFI_UNICODE_STRING_TABLE mUsbMouseDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbMouseDriverNameTable[] = {
   { "eng;en", L"Usb Mouse Driver" },
   { NULL , NULL }
 };

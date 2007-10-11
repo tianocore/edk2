@@ -32,7 +32,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gAtapiScsiPassThruCom
 };
 
 
-static EFI_UNICODE_STRING_TABLE mAtapiScsiPassThruDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mAtapiScsiPassThruDriverNameTable[] = {
   { "eng;en", (CHAR16 *) L"ATAPI SCSI Pass Thru Driver" },
   { NULL , NULL }
 };

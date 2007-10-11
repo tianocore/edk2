@@ -170,7 +170,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2 = 
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mMnpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMnpDriverNameTable[] = {
   {
     "eng;en",
     L"MNP Network Service Driver"

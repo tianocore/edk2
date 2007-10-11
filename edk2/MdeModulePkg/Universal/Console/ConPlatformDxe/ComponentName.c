@@ -43,7 +43,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConPlatformComponent
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mConPlatformDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConPlatformDriverNameTable[] = {
   {
     "eng;en",
     L"Platform Console Management Driver"

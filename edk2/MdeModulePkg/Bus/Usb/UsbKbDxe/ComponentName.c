@@ -170,7 +170,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbKeyboardComponent
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mUsbKeyboardDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbKeyboardDriverNameTable[] = {
   { "eng;en", L"Usb Keyboard Driver" },
   { NULL , NULL }
 };

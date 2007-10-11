@@ -191,7 +191,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtConsoleComponen
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtConsoleDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtConsoleDriverNameTable[] = {
   { "eng;en", L"Windows Text Console Driver" },
   { NULL , NULL }
 };

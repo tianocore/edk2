@@ -33,7 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDiskIoComponentName2
 };
 
 
-static EFI_UNICODE_STRING_TABLE mDiskIoDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDiskIoDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *)L"Generic Disk I/O Driver"

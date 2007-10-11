@@ -172,7 +172,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtBlockIoComponen
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtBlockIoDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtBlockIoDriverNameTable[] = {
   { "eng;en", L"Windows Block I/O Driver" },
   { NULL , NULL }
 };

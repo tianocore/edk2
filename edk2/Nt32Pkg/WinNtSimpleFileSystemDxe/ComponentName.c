@@ -193,7 +193,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtSimpleFileSyste
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtSimpleFileSystemDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtSimpleFileSystemDriverNameTable[] = {
   {
     "eng;en",
     L"Windows Simple File System Driver"

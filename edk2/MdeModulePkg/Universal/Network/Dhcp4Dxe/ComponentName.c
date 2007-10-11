@@ -170,7 +170,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDhcp4ComponentName2 
 };
 
 
-static EFI_UNICODE_STRING_TABLE mDhcpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDhcpDriverNameTable[] = {
   {
     "eng;en",
     L"DHCP Protocol Driver"

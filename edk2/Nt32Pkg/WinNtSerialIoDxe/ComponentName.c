@@ -168,7 +168,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gWinNtSerialIoCompone
 };
 
 
-static EFI_UNICODE_STRING_TABLE mWinNtSerialIoDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mWinNtSerialIoDriverNameTable[] = {
   { "eng;en", L"Windows Serial I/O Driver" },
   { NULL , NULL }
 };

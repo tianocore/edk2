@@ -58,7 +58,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gScsiBusComponentName
 };
 
 
-static EFI_UNICODE_STRING_TABLE mScsiBusDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mScsiBusDriverNameTable[] = {
   { "eng;en", (CHAR16 *) L"SCSI Bus Driver" },
   { NULL , NULL }
 };

@@ -169,7 +169,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gTcp4ComponentName2 =
 };
 
 
-static EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
   {
     "eng;en",
     L"Tcp Network Service Driver"
