@@ -1,0 +1,52 @@
+#/** @file
+# Component description file for Pei PAL call Library
+#
+# PAL Call Library implementation to wrap the PAL call in PEI.
+# Copyright (c) 2006, Intel Corporation
+#
+#  All rights reserved.
+#  This software and associated documentation (if any) is furnished
+#  under a license and may only be used or copied in accordance
+#  with the terms of the license. Except as permitted by such
+#  license, no part of this software or documentation may be
+#  reproduced, stored in a retrieval system, or transmitted in any
+#  form or by any means without the express written consent of
+#  Intel Corporation.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiPalCallLib
+  FILE_GUID                      = B53DC524-6B98-4584-940B-8F1363DEF09E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PalCallLib 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IPF
+#
+
+[Sources.common]
+  PalCallLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+
+
+[Ppis]
+  gEfiSecPlatformInformationPpiGuid             # PPI ALWAYS_CONSUMED
+
