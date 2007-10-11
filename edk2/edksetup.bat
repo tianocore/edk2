@@ -28,8 +28,15 @@
 @REM
 @REM Set the WORKSPACE to the current working directory
 @REM
+pushd .
+cd %~dp0
 set WORKSPACE=%CD%
 
+@if /I not "%1"=="--nt32" goto check_new_build
+shift
+goto check_vc
+
+:check_new_build
 @if /I "%1"=="NewBuild" goto NewBuild
 
 :AntBuild
@@ -40,12 +47,13 @@ set WORKSPACE=%CD%
 :check_vc
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
-  call "%VS71COMNTOOLS%\vsvars32.bat"
+ call "%VS71COMNTOOLS%\vsvars32.bat"
 ) else (
   echo.
   echo !!! WARNING !!!! Cannot find Visual Studio !!!
   echo.
 )
+goto check_new_build
 
 :check_cygwin
 if defined CYGWIN_HOME goto check_java
@@ -282,5 +290,6 @@ if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
 @goto end
 
 :end
+@popd
 @echo on
 
