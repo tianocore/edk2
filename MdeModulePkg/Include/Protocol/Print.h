@@ -23,7 +23,7 @@ Abstract:
 #define __PPRINT_H__
 
 #define EFI_PRINT_PROTOCOL_GUID  \
-   { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0 } }
+   { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0xc, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0xc } }
 
 //
 // Forward reference for pure ANSI compatability
@@ -33,17 +33,66 @@ typedef struct _EFI_PRINT_PROTOCOL  EFI_PRINT_PROTOCOL;
 
 typedef
 UINTN
-(EFIAPI *EFI_VSPRINT) (
+(EFIAPI *UNI_VSPRINT) (
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
   );
 
-struct _EFI_PRINT_PROTOCOL {
-  EFI_VSPRINT                                   VSPrint;
-};
+typedef
+UINTN
+(EFIAPI *UNI_VSPRINT_ASCII) (
+  OUT CHAR16       *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  IN  VA_LIST      Marker
+  );
 
+typedef
+UINTN
+(EFIAPI *VALUE_TO_UNISTRING) (
+  IN OUT CHAR16  *Buffer,
+  IN UINTN       Flags,
+  IN INT64       Value,
+  IN UINTN       Width
+  );
+
+typedef
+UINTN
+(EFIAPI *ASCII_VSPRINT) (
+  OUT CHAR8         *StartOfBuffer,
+  IN  UINTN         BufferSize,
+  IN  CONST CHAR8   *FormatString,
+  IN  VA_LIST       Marker
+  );
+
+typedef
+UINTN
+(EFIAPI *ASCII_VSPRINT_UNI) (
+  OUT CHAR8         *StartOfBuffer,
+  IN  UINTN         BufferSize,
+  IN  CONST CHAR16  *FormatString,
+  IN  VA_LIST       Marker
+  );
+
+typedef
+UINTN
+(EFIAPI *VALUE_TO_ASCIISTRING) (
+  IN OUT CHAR8  *Buffer,
+  IN UINTN      Flags,
+  IN INT64      Value,
+  IN UINTN      Width
+  );
+
+struct _EFI_PRINT_PROTOCOL {
+  UNI_VSPRINT               VSPrint;
+  UNI_VSPRINT_ASCII         UniVSPrintAscii;
+  VALUE_TO_UNISTRING        UniValueToString;                         
+  ASCII_VSPRINT             AsciiVSPrint;          
+  ASCII_VSPRINT_UNI         AsciiVSPrintUni;
+  VALUE_TO_ASCIISTRING      AsciiValueToString;
+};
 
 extern EFI_GUID gEfiPrintProtocolGuid;
 

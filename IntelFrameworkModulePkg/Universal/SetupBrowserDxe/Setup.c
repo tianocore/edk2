@@ -2203,7 +2203,15 @@ Returns:
 }
 
 EFI_HANDLE          PrintHandle     = NULL;
-EFI_PRINT_PROTOCOL  mPrintProtocol  = { UnicodeVSPrint };
+EFI_PRINT_PROTOCOL  mPrintProtocol  = 
+{
+  UnicodeVSPrint,
+  UnicodeVSPrintAsciiFormat,
+  UnicodeValueToString,
+  AsciiVSPrint,
+  AsciiVSPrintUnicodeFormat,
+  AsciiValueToString
+};
 
 STATIC
 EFI_STATUS
