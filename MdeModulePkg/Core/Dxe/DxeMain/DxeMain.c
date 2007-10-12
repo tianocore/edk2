@@ -299,6 +299,10 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
+  // The HobStart is relocated in gcd service init. Sync mHobStart varible.
+  //
+  mHobStart = HobStart;
+  
   // Install the DXE Services Table into the EFI System Tables's Configuration Table
   //
   Status = CoreInstallConfigurationTable (&gEfiDxeServicesTableGuid, gDxeCoreDS);
@@ -867,4 +871,3 @@ DxeMainUefiDecompress (
 
   return UefiDecompress (Source, Destination, Scratch);
 }
-

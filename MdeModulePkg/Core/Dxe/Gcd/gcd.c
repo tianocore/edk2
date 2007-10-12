@@ -2242,7 +2242,7 @@ Returns:
 
 EFI_STATUS
 CoreInitializeGcdServices (
-  IN VOID                  **HobStart,
+  IN OUT VOID                  **HobStart,
   IN EFI_PHYSICAL_ADDRESS  MemoryBaseAddress,
   IN UINT64                MemoryLength
   )
@@ -2255,7 +2255,8 @@ Routine Description:
   memory map, so memory allocations and resource allocations can be made.  The first
   part of this function can not depend on any memory services until at least one
   memory descriptor is provided to the memory services.  Then the memory services
-  can be used to intialize the GCD map.
+  can be used to intialize the GCD map. The HobStart will be relocated to a pool 
+  buffer.
 
 Arguments:
 
