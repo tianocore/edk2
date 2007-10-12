@@ -58,7 +58,7 @@ InternalPrint (
 
   Return = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
-  if (Console != NULL) {
+  if (Console != NULL && Return > 0) {
     //
     // To be extra safe make sure Console has been initialized
     //
