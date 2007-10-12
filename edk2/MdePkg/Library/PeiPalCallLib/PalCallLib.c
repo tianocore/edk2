@@ -61,8 +61,7 @@ PalCall (
 {
   UINT64                            PalCallAddress;
   PAL_CALL_RETURN                   ReturnVal;
-
-  EFI_PEI_SERVICES                  **PeiServices;
+  CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_STATUS                        Status;
   EFI_SEC_PLATFORM_INFORMATION_PPI  *SecPlatformPpi;
   IPF_HANDOFF_STATUS                IpfStatus;
@@ -71,7 +70,7 @@ PalCall (
   //
   // Get Pei Service Table Pointer
   //
-  PeiServices = GetPeiServicesTablePointer ();
+  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
 
   //
   // Locate SEC Ppi
