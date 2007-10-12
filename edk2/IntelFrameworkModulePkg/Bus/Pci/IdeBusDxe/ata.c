@@ -56,6 +56,7 @@ ATAIdentify (
   EFI_IDENTIFY_DATA *AtaIdentifyPointer;
   UINT32            Capacity;
   UINT8             DeviceSelect;
+  UINTN				Retry;
 
   //
   //  AtaIdentifyPointer is used for accommodating returned IDENTIFY data of
@@ -68,81 +69,101 @@ ATAIdentify (
   //  and receive data from device
   //
   DeviceSelect  = (UINT8) ((IdeDev->Device) << 4);
-  Status = AtaPioDataIn (
-            IdeDev,
-            (VOID *) AtaIdentifyPointer,
-            sizeof (EFI_IDENTIFY_DATA),
-            ATA_CMD_IDENTIFY_DRIVE,
-            DeviceSelect,
-            0,
-            0,
-            0,
-            0
-            );
-  //
-  // If ATA Identify command succeeds, then according to the received
-  // IDENTIFY data,
-  // identify the device type ( ATA or not ).
-  // If ATA device, fill the information in IdeDev.
-  // If not ATA device, return IDE_DEVICE_ERROR
-  //
-  if (!EFI_ERROR (Status)) {
 
-    IdeDev->pIdData = AtaIdentifyPointer;
+  
+  Retry = 3;
+  while (Retry > 0) {	
+    Status = AtaPioDataIn (
+              IdeDev,
+              (VOID *) AtaIdentifyPointer,
+              sizeof (EFI_IDENTIFY_DATA),
+              ATA_CMD_IDENTIFY_DRIVE,
+              DeviceSelect,
+              0,
+              0,
+              0,
+              0
+              );
+    //
+    // If ATA Identify command succeeds, then according to the received
+    // IDENTIFY data,
+    // identify the device type ( ATA or not ).
+    // If ATA device, fill the information in IdeDev.
+    // If not ATA device, return IDE_DEVICE_ERROR
+    //
+    if (!EFI_ERROR (Status)) {
 
-    //
-    // Print ATA Module Name
-    //
-    PrintAtaModuleName (IdeDev);
-
-    //
-    // bit 15 of pAtaIdentify->config is used to identify whether device is
-    // ATA device or ATAPI device.
-    // if 0, means ATA device; if 1, means ATAPI device.
-    //
-    if ((AtaIdentifyPointer->AtaData.config & 0x8000) == 0x00) {
-      //
-      // Detect if support S.M.A.R.T. If yes, enable it as default
-      //
-      AtaSMARTSupport (IdeDev);
+      IdeDev->pIdData = AtaIdentifyPointer;
 
       //
-      // Check whether this device needs 48-bit addressing (ATAPI-6 ata device)
+      // Print ATA Module Name
       //
-      Status = AtaAtapi6Identify (IdeDev);
-      if (!EFI_ERROR (Status)) {
+      PrintAtaModuleName (IdeDev);
+
+      //
+      // bit 15 of pAtaIdentify->config is used to identify whether device is
+      // ATA device or ATAPI device.
+      // if 0, means ATA device; if 1, means ATAPI device.
+      //
+      if ((AtaIdentifyPointer->AtaData.config & 0x8000) == 0x00) {
         //
-        // It's a disk with >120GB capacity, initialized in AtaAtapi6Identify()
+        // Detect if support S.M.A.R.T. If yes, enable it as default
         //
+        AtaSMARTSupport (IdeDev);
+
+        //
+        // Check whether this device needs 48-bit addressing (ATAPI-6 ata device)
+        //
+        Status = AtaAtapi6Identify (IdeDev);
+        if (!EFI_ERROR (Status)) {
+          //
+          // It's a disk with >120GB capacity, initialized in AtaAtapi6Identify()
+          //
+          return EFI_SUCCESS;
+        } else if (Status == EFI_DEVICE_ERROR) {
+		  //
+		  // Some disk with big capacity (>200GB) is slow when being identified
+		  // and will return all zero for word83.
+		  // We try twice at first. If it fails, we do a SoftRest and try again.
+		  //
+		  Retry--;
+		  if (Retry == 1) {
+		    //
+		    // Do a SoftRest before the third attempt.
+		    //
+		    AtaSoftReset (IdeDev);
+		  }
+		  continue;
+	    }
+        //
+        // This is a hard disk <= 120GB capacity, treat it as normal hard disk
+        //
+        IdeDev->Type = IdeHardDisk;
+
+        //
+        // Block Media Information:
+        // Media->LogicalPartition , Media->WriteCaching will be filled
+        // in the DiscoverIdeDevcie() function.
+        //
+        IdeDev->BlkIo.Media->IoAlign        = 4;
+        IdeDev->BlkIo.Media->MediaId        = 1;
+        IdeDev->BlkIo.Media->RemovableMedia = FALSE;
+        IdeDev->BlkIo.Media->MediaPresent   = TRUE;
+        IdeDev->BlkIo.Media->ReadOnly       = FALSE;
+        IdeDev->BlkIo.Media->BlockSize      = 0x200;
+
+        //
+        // Calculate device capacity
+        //
+        Capacity = ((UINT32)AtaIdentifyPointer->AtaData.user_addressable_sectors_hi << 16) |
+                  AtaIdentifyPointer->AtaData.user_addressable_sectors_lo ;
+        IdeDev->BlkIo.Media->LastBlock = Capacity - 1;
+
         return EFI_SUCCESS;
       }
-      //
-      // This is a hard disk <= 120GB capacity, treat it as normal hard disk
-      //
-      IdeDev->Type = IdeHardDisk;
-
-      //
-      // Block Media Information:
-      // Media->LogicalPartition , Media->WriteCaching will be filled
-      // in the DiscoverIdeDevcie() function.
-      //
-      IdeDev->BlkIo.Media->IoAlign        = 4;
-      IdeDev->BlkIo.Media->MediaId        = 1;
-      IdeDev->BlkIo.Media->RemovableMedia = FALSE;
-      IdeDev->BlkIo.Media->MediaPresent   = TRUE;
-      IdeDev->BlkIo.Media->ReadOnly       = FALSE;
-      IdeDev->BlkIo.Media->BlockSize      = 0x200;
-
-      //
-      // Calculate device capacity
-      //
-      Capacity = ((UINT32)AtaIdentifyPointer->AtaData.user_addressable_sectors_hi << 16) |
-                  AtaIdentifyPointer->AtaData.user_addressable_sectors_lo ;
-      IdeDev->BlkIo.Media->LastBlock = Capacity - 1;
-
-      return EFI_SUCCESS;
 
     }
+  	break;
   }
 
   gBS->FreePool (AtaIdentifyPointer);
@@ -167,8 +188,9 @@ ATAIdentify (
   and 48-bit addressing must be used
 
   @retval  EFI_UNSUPPORTED The disk dosn't not support Atapi6 or it supports but
-  the capacity is below 120G, 48bit addressing is not
-  needed
+  the capacity is below 120G, 48bit addressing is not needed
+
+  @retval  EFI_DEVICE_ERROR The identify data in IdeDev is incorrect
 
   @note
   This function must be called after DEVICE_IDENTITY command has been
@@ -190,6 +212,13 @@ AtaAtapi6Identify (
   }
 
   Atapi6IdentifyStruct = IdeDev->pIdData;
+
+  if ((Atapi6IdentifyStruct->AtapiData.cmd_set_support_83 & (BIT15 | BIT14)) != 0x4000) {
+    //
+    // Per ATA-6 spec, word83: bit15 is zero and bit14 is one
+    //
+    return EFI_DEVICE_ERROR;
+  }
 
   if ((Atapi6IdentifyStruct->AtapiData.cmd_set_support_83 & BIT10) == 0) {
     //
@@ -2298,17 +2327,16 @@ DoAtaUdma (
   }
 
   //
-  // Channel and device differential
+  // Select device
   //
   Device = (UINT8) ((IdeDev->Device << 4) | 0xe0);
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, Device);
 
   //
-  // Enable interrupt to support UDMA and Select device
+  // Enable interrupt to support UDMA
   //
   DeviceControl = 0;
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
-
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Head, Device);
 
   if (IdePrimary == IdeDev->Channel) {
     IoPortForBmic = IdeDev->IoPort->BusMasterBaseAddr + BMICP_OFFSET;
@@ -2324,6 +2352,31 @@ DoAtaUdma (
     }
   }
 
+  //
+  // Read BMIS register and clear ERROR and INTR bit
+  //
+  IdeDev->PciIo->Io.Read (
+					  IdeDev->PciIo,
+					  EfiPciIoWidthUint8,
+					  EFI_PCI_IO_PASS_THROUGH_BAR,
+					  IoPortForBmis,
+					  1,
+					  &RegisterValue
+					  );
+  
+  RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+  
+  IdeDev->PciIo->Io.Write (
+					  IdeDev->PciIo,
+					  EfiPciIoWidthUint8,
+					  EFI_PCI_IO_PASS_THROUGH_BAR,
+					  IoPortForBmis,
+					  1,
+					  &RegisterValue
+					  );
+
+  Status = EFI_SUCCESS;
+  
   RemainBlockNum = NumberOfBlocks;
   while (RemainBlockNum > 0) {
 
@@ -2452,29 +2505,6 @@ DoAtaUdma (
                         &RegisterValue
                         );
 
-    //
-    // Read BMIS register and clear ERROR and INTR bit
-    //
-    IdeDev->PciIo->Io.Read (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
-    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-
-    IdeDev->PciIo->Io.Write (
-                        IdeDev->PciIo,
-                        EfiPciIoWidthUint8,
-                        EFI_PCI_IO_PASS_THROUGH_BAR,
-                        IoPortForBmis,
-                        1,
-                        &RegisterValue
-                        );
-
     if (UdmaOp == AtaUdmaWriteExtOp || UdmaOp == AtaUdmaReadExtOp) {
       Status = AtaCommandIssueExt (
                  IdeDev,
@@ -2530,6 +2560,7 @@ DoAtaUdma (
     // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
     // So set the variable Count to 2000, for about 2 second timeout time.
     //
+    Status = EFI_SUCCESS;
     Count = 2000;
     while (TRUE) {
 
@@ -2543,31 +2574,8 @@ DoAtaUdma (
                           );
       if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
         if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
-          //
-          // Clear START bit of BMIC register before return EFI_DEVICE_ERROR
-          //
-          IdeDev->PciIo->Io.Read (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-
-          RegisterValue &= ~((UINT8)BMIC_START);
-
-          IdeDev->PciIo->Io.Write (
-                              IdeDev->PciIo,
-                              EfiPciIoWidthUint8,
-                              EFI_PCI_IO_PASS_THROUGH_BAR,
-                              IoPortForBmic,
-                              1,
-                              &RegisterValue
-                              );
-          IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
-          IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
-          return EFI_DEVICE_ERROR;
+		  Status = EFI_DEVICE_ERROR;
+		  break;
         }
         break;
       }
@@ -2579,6 +2587,28 @@ DoAtaUdma (
     IdeDev->PciIo->FreeBuffer (IdeDev->PciIo, PageCount, MemPage);
     IdeDev->PciIo->Unmap (IdeDev->PciIo, Map);
     //
+    // Read BMIS register and clear ERROR and INTR bit
+    //
+    IdeDev->PciIo->Io.Read (
+                        IdeDev->PciIo,
+                        EfiPciIoWidthUint8,
+                        EFI_PCI_IO_PASS_THROUGH_BAR,
+                        IoPortForBmis,
+                        1,
+                        &RegisterValue
+                        );
+
+    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+
+    IdeDev->PciIo->Io.Write (
+                        IdeDev->PciIo,
+                        EfiPciIoWidthUint8,
+                        EFI_PCI_IO_PASS_THROUGH_BAR,
+                        IoPortForBmis,
+                        1,
+                        &RegisterValue
+                        );
+	//
     // Read Status Register of IDE device to clear interrupt
     //
     RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
@@ -2609,6 +2639,9 @@ DoAtaUdma (
       return EFI_DEVICE_ERROR;
     }
 
+	if (EFI_ERROR (Status)) {
+	  break;
+	}
     DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
     StartLba += NumberOfBlocks;
   }
@@ -2620,5 +2653,6 @@ DoAtaUdma (
   DeviceControl |= ATA_CTLREG_IEN_L;
   IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, DeviceControl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
+
