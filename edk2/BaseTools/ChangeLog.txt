@@ -39,6 +39,37 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_4096: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Removed the calling of vsvars32.bat in edksetup.bat, unless
+				"--nt32" switch is used.
+				2) Added MAKE command in tools_def.txt. This is used to locate where
+				the nmake.exe or make.exe is because it will not be in PATH any more.
+				3) Removed the calling of vsvars32.bat in toolsetup.bat.
+				4) Solved the hang issue of build.exe when error occurred or Ctrl+C is
+				pressed.
+				5) Passed "-v/-d/-q" command line option to GenFds.exe in makefile if
+				it's used by build.exe.
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+        3) BaseTools/Conf/tools_def.template
+        4) BaseTools/toolsetup.bat
+				5) edksetup.bat
+
+        Possible Impacts:
+        1) Nt32Pkg build needs to run vsvars32.bat before edksetup.bat or run
+				edksetup.bat with "--nt32" option, like
+
+						edksetup.bat --nt32 newbuild
+
+				2) $(WORKSPACE)/Conf/tools_def.txt must be deleted before running
+				edksetup.bat because of new tools_def.template. Otherwise the
+				build.exe cannot find the nmake.exe to call.
+
+==========================================================================================
 EDK_3947: Compatible: jwang36
 
       Class_BuildTool:
