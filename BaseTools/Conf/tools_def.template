@@ -495,6 +495,8 @@ RELEASE_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_ICC_X64_PCH_PATH                  = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_CC_PATH                   = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_SLINK_PATH                = DEF(ICC_BINX64)\xilib.exe
+# xilib.exe needs lib.exe from Visual Studio
+*_ICC_X64_SLINK_DLL                 = DEF(VSNET2003_BIN)
 *_ICC_X64_DLINK_PATH                = DEF(ICC_BINX64)\xilink.exe
 *_ICC_X64_ASMLINK_PATH              = DEF(ICC_BINX64)\xilink.exe
 *_ICC_X64_PP_PATH                   = DEF(ICC_BINX64)\icl.exe
@@ -518,7 +520,11 @@ RELEASE_ICC_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 # IPF definitions
 ##################
 *_ICC_IPF_CC_PATH                   = DEF(ICC_BIN64)\icl.exe
+# icl.exe needs cl.exe from Visual Studio
+*_ICC_IPF_CC_DLL                    = DEF(VSNET2003_BIN)
 *_ICC_IPF_SLINK_PATH                = DEF(ICC_BIN64)\xilib.exe
+# xilib.exe needs lib.exe from Visual Studio
+*_ICC_IPF_SLINK_DLL                 = DEF(VSNET2003_BIN);DEF(VSNET2003_DLL)
 *_ICC_IPF_DLINK_PATH                = DEF(ICC_BIN64)\xilink.exe
 *_ICC_IPF_ASMLINK_PATH              = DEF(ICC_BIN64)\xilink.exe
 *_ICC_IPF_PP_PATH                   = DEF(ICC_BIN64)\icl.exe
