@@ -16,7 +16,6 @@
 
 
 #include <PiPei.h>
-#include <ItaniumFamilyCpuPeim.h>
 
 #include <Ppi/SecPlatformInformation.h>
 
