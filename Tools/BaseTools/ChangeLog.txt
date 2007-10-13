@@ -1,0 +1,308 @@
+##########################################################################################
+!!!!!!!!!!!!!!!!!               Notes for this ChangeLog.txt             !!!!!!!!!!!!!!!!!
+
+This log file is used to record two kinds of important information:
+ a) "Non-Compatible Changes": all non-compatible changes should be recorded. These info
+    will help the package user to merge this package; and some non-compatible changes
+    can also be added into release notes as news features when we release this package.
+    Normally Non-Compatible Changes contains the following types:
+      1) Package's external services were changed/updated
+      2) Package's common .h file is renamed, deleted, or the file path is changed.
+      3) The definition of package's common data structure is changed
+      ...
+
+ b) "Important Compatible Changes": some important compatible changes can aslo be recorded
+    in this file, and we can add these updating into release notes when we release this
+    package.
+
+Non-Compatible and Compatible example format:
+==========================================================================================
+EDK_0010: Non-Compatible: owner
+
+      Class_HFile: PPI A of MdePkg has been removed.
+
+        Code Change :
+        1) Removed the .h file: MdePkg\Include\Ppi\A.h
+
+        Possible Impacts:
+        1) All modules that used this PPI A should be updated.
+
+==========================================================================================
+EDK_0000: Compatible: owner
+
+      Class_BuildTool: with the EDK_0000 build.exe, the build performance is enhanced great.
+
+        Code Change :
+        1) BaseTools\Bin\Win32\build.exe
+
+!!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
+##########################################################################################
+
+==========================================================================================
+EDK_4096: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Removed the calling of vsvars32.bat in edksetup.bat, unless
+				"--nt32" switch is used.
+				2) Added MAKE command in tools_def.txt. This is used to locate where
+				the nmake.exe or make.exe is because it will not be in PATH any more.
+				3) Removed the calling of vsvars32.bat in toolsetup.bat.
+				4) Solved the hang issue of build.exe when error occurred or Ctrl+C is
+				pressed.
+				5) Passed "-v/-d/-q" command line option to GenFds.exe in makefile if
+				it's used by build.exe.
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+        3) BaseTools/Conf/tools_def.template
+        4) BaseTools/toolsetup.bat
+				5) edksetup.bat
+
+        Possible Impacts:
+        1) Nt32Pkg build needs to run vsvars32.bat before edksetup.bat or run
+				edksetup.bat with "--nt32" option, like
+
+						edksetup.bat --nt32 newbuild
+
+				2) $(WORKSPACE)/Conf/tools_def.txt must be deleted before running
+				edksetup.bat because of new tools_def.template. Otherwise the
+				build.exe cannot find the nmake.exe to call.
+
+==========================================================================================
+EDK_3947: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Improved spawn mode (multi-thread) build performance (build -s)
+        2) Changed the error/debug/warning message format
+        3) Added "--log" command line option to support storing log in file
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+
+
+==========================================================================================
+EDK_3936: Compatible: klu2
+
+      Class_BuildTool:
+        1) The first parameter of PEIM's entry point in autogen.c has been changed to 
+           EFI_PEI_FILE_HANDLE
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_3926: Compatible: jlin16
+
+      Class_BuildTool:
+        1) Added support of Capsule generation from FDF file.
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) To generate capsule, insert [Capsule] section after [FV] sections and specifying
+        what FV will be put into capsule, For example:
+        [Capsule.Fob]
+        CAPSULE_GUID = 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
+        CAPSULE_FLAG = PersistAcrossReset
+        FV = BiosUpdate
+
+==========================================================================================
+EDK_3911: Compatible: jlin16
+
+      Class_BuildTool:
+        1) Added support of Apriori file generation from FDF file.
+        2) Added support of INF that describes binary files to put binary into FV.
+        3) Fixed single FV/FD generation error when specifying -i/-r option in GenFds.
+        
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) To generate Apriori file in FV, insert APRIORI statement just before the INF or
+        FILE statement list of the FV, For example:
+        APRIORI PEI {
+          INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+          FILE PEIM = B7A5041A-78BA-49e3-B73B-54C757811FB6 {
+                  SECTION PE32 = MyBinPkg\bin\ia32\PeimAfterPcd.efi
+          }
+          INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+        }
+        2) To add binary file described by INF file into FV, only insert the INF statement
+        into the INF statements list of that FV, like this:
+        
+        INF RuleOverride=Test MdeModulePkg/Logo/Logo.inf
+        
+        Specifying how to process the binary file by defining corresponding Rule like this:
+        [Rule.Common.Base.Test]
+         FILE FREEFORM = $(NAMED_GUID) {
+           COMPRESS PI_STD {
+             GUIDED {
+                RAW BIN |.bmp   
+             }
+           }
+         }
+
+==========================================================================================
+EDK_3832: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Added support of MACRO in tools_def.txt
+        2) Merged PATH and NAME attributes in tools_def.txt
+        3) Changed DPATH attribute to DLL in tools_def.txt
+        4) Removed SPATH attribute in tools_def.txt
+        5) Added support for library instance without library class
+        6) Fixed the issue in Trim tool which zero file will be generated if the trimmed 
+           file has not line directive
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+        3) BaseTools/Bin/Win32/Trim.exe
+        4) BaseTools/Conf/tools_def.template
+
+        Possible Impacts:
+        1) All platforms and modules build
+
+==========================================================================================
+EDK_3801: Compatible: jwang36
+
+      Class_BuildConfiguration: Added makefile as dependency for "Dynamic-Library-File" to 
+        solve the incremental build issue occurred when there's library changes
+
+        Code Change :
+        1) BaseTools/Conf/build_rule.template
+
+==========================================================================================
+EDK_3800: Compatible: lgao4
+
+      Class_BuildTool: Update EfiRom tool to fix checksum and PCI3.0 data structure
+
+        Code Change :
+        1) BaseTools/Bin/Win32/EfiRom.exe
+
+==========================================================================================
+EDK_3795: Compatible: htao
+
+      Class_BuildTool: GenVtf tool open/write file with "r+b"/"w+b" attribute, but this cause
+                       the RO attribute of the file changed. Fix this issue by changing 
+                       "r+b"/"w+b" to "rb"/"wb".
+
+        Code Change :
+        1) BaseTools/Bin/Win32/GenVtf.exe
+
+==========================================================================================
+EDK_3791: Compatible: jlin16
+
+      Class_BuildTool:
+        1) use '#' to indicate flash generation progress.
+        2) use -v to switch on detail output messages.
+
+        Code Change :
+        1) BaseTools/Bin/Win32/GenFds.exe
+
+==========================================================================================
+EDK_3789: Non-Compatible: lgao4
+
+      Class_BuildTool: support new Rules format and PCD format defined in FDF file
+
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        2) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) All platform's FDF file, if any, must be changed to new format.
+          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName, 
+             for example PcdWinNtFdBaseAddress in old FDF file will be replaced 
+             by gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddres.
+          b) Rule format adds binary file type and file postfix name support, 
+             and doesn't require the full file path. Examples for Peim and AcpiTable module:
+          Old Peim Rule:
+          [Rule.Common.PEIM]
+          FILE PEIM = $(NAMED_GUID) {
+             PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).Depex
+             PE32                      $(INF_OUTPUT)/$(MODULE_NAME).efi
+             UI Optional               $(MODULE_NAME)
+             VERSION Optional          BUILD_NUM=$(BUILD_NUMBER) $(INF_VERSION)
+          }
+          New Peim Rule:
+          [Rule.Common.PEIM]
+            FILE PEIM = $(NAMED_GUID) {
+               PEI_DEPEX PEI_DEPEX Optional        |.Depex
+               PE32      PE32                      |.efi
+               UI       STRING="$(MODULE_NAME)" Optional         
+               VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
+            }
+
+          Old AcpiTable Rule:
+          [Rule.Common.DXE_DRIVER.ACPITABLE]
+            FILE FREEFORM = $(NAMED_GUID) {
+              RAW                    $(INF_OUTPUT)/Madt.acpi
+              RAW                    $(INF_OUTPUT)/Fadt.acpi
+              RAW                    $(INF_OUTPUT)/Facs.acpi
+              RAW                    $(INF_OUTPUT)/Spcr.acpi
+              RAW                    $(INF_OUTPUT)/Dsdt.aml
+            }
+          New AcpiTable Rule:
+          [Rule.Common.DXE_DRIVER.ACPITABLE]
+            FILE FREEFORM = $(NAMED_GUID) {
+              RAW ACPI |.acpi
+              RAW ASL  |.aml
+            }
+
+==========================================================================================
+EDK_3786: Compatible: vjeff
+
+      Class_BuildConfiguration:
+        1) Redirect ICC_IA32_*_PATH from C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin 
+           to C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin. 
+        2) Add ICC X64 definition to enable ICC X64 build.
+
+        Code Change :
+        1) BaseTools/Conf/tools_def.template
+
+==========================================================================================
+EDK_3785: Non-Compatible: klu2
+
+      Class_BuildTool: Upgrade the format of EFI_PEIM_ENTRY_POINT to 
+                       EFI_PEIM_ENTRY_POINT2 according to PI specification.
+
+
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+
+        Possible Impacts:
+        1) All modules build
+
+
+==========================================================================================
+EDK_3780: Non-Compatible: qhuang8
+
+      Class_MigrationTool: Update the syntax of PCD section.
+                           Update the syntax of binary INF file
+                           The generated Extended INF file should follow Extended INF spec 0.44
+
+        Code Change :
+        1) BaseTools/Bin/Win32/MigrationMsa2Inf.exe
+
+        Possible Impacts:
+        1) New module migrated from old R9
+
+
+==========================================================================================
+EDK_3766: Non-Compatible: lgao4
+
+      Class_BuildConfiguration: Update Acpi Asl file Build rule to remove trim step.
+
+        Code Change :
+        1) Conf/build_rule.template
+
+        Possible Impacts:
+        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option 
+        for APP_FLAGS in module inf to override the default /E option defined in tools_def.txt file. 
+
+
