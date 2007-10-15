@@ -32,6 +32,12 @@ pushd .
 cd %~dp0
 set WORKSPACE=%CD%
 
+@if /I "%1"=="-h" goto Usage
+@if /I "%1"=="-help" goto Usage
+@if /I "%1"=="--help" goto Usage
+@if /I "%1"=="/h" goto Usage
+@if /I "%1"=="/?" goto Usage
+@if /I "%1"=="/help" goto Usage
 @if /I not "%1"=="--nt32" goto check_new_build
 shift
 goto check_vc
@@ -95,12 +101,6 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 
 :path_ok
 
-@if /I "%1"=="-h" goto Usage
-@if /I "%1"=="-help" goto Usage
-@if /I "%1"=="--help" goto Usage
-@if /I "%1"=="/h" goto Usage
-@if /I "%1"=="/?" goto Usage
-@if /I "%1"=="/help" goto Usage
 @if /I "%1"=="ForceRebuild" goto ForceBuild
 @if /I "%1"=="Reconfig" goto Reconfig
 
@@ -273,7 +273,9 @@ goto end
 
 :Usage
 echo.
-echo  Usage: %0 [Rebuild] [ForceRebuild] [Reconfig]
+echo  Usage: %0 [--nt32] [NewBuild] [Rebuild] [ForceRebuild] [Reconfig]
+echo         --nt32         Call vsvars32.bat for NT32 platform build
+echo         NewBuild       Using new build tools in BaseTools package
 echo         Rebuild:       Incremental build, only build those updated tools; 
 echo         ForceRebuild:  Rebuild all tools neither updated or not; 
 echo         Reconfig:      Reinstall target.txt, tools_def.txt, FrameworkDatabase.db. 
@@ -282,6 +284,7 @@ echo  Note that target.template, tools_def.template, FrameworkDatabase.template 
 echo  only copied to target.txt, tools_def.txt, FrameworkDatabase.db respectively if they
 echo  are not existed. Using option [Reconfig] to do the force copy. 
 echo.
+@goto end
 
 :NewBuild
 @IF NOT EXIST "BaseTools\toolsetup.bat" goto AntBuild
