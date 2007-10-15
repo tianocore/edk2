@@ -86,5 +86,11 @@ ClearDebugRegisters (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+UpdateFvFileDevicePath (
+  IN  OUT EFI_DEVICE_PATH_PROTOCOL      **DevicePath,
+  IN  EFI_GUID                          *FileGuid
+  );
 
 #endif
