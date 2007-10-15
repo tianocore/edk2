@@ -114,7 +114,6 @@
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
-  MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.X64]
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
@@ -123,7 +122,6 @@
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
-  MdePkg/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.IPF]
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
