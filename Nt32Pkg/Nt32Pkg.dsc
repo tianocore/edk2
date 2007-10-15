@@ -298,6 +298,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00c000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
+
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled|TRUE

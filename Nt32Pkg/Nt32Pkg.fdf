@@ -123,6 +123,14 @@ READ_LOCK_STATUS   = TRUE
   ##
   #  PEI Phase modules
   ##
+  ##
+  #  PEI Apriori file example, more PEIM module added later.
+  ##
+APRIORI PEI {
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  }
+
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
