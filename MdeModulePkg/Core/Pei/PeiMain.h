@@ -49,6 +49,7 @@ Revision History
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -80,9 +81,6 @@ typedef struct {
 } PEI_PPI_DATABASE;
 
 
-#define PEI_CORE_MAX_FV_SUPPORTED   6
-#define PEI_CORE_MAX_PEIM_PER_FV    32
-
 //
 // PEI_CORE_FV_HANDE.PeimState
 // Do not change these values as there is code doing math to change states.
@@ -95,8 +93,8 @@ typedef struct {
 
 typedef struct {
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
-  UINT8                               PeimState[PEI_CORE_MAX_PEIM_PER_FV];   
-  EFI_PEI_FILE_HANDLE                 FvFileHandles[PEI_CORE_MAX_PEIM_PER_FV];
+  UINT8                               PeimState[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];   
+  EFI_PEI_FILE_HANDLE                 FvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   BOOLEAN                             ScanFv;
 } PEI_CORE_FV_HANDLE;
 
@@ -111,14 +109,14 @@ typedef struct{
   EFI_PEI_SERVICES                   *PS;     // Point to ServiceTableShadow
   PEI_PPI_DATABASE                   PpiData;
   UINTN                              FvCount;
-  PEI_CORE_FV_HANDLE                 Fv[PEI_CORE_MAX_FV_SUPPORTED];
-  EFI_PEI_FILE_HANDLE                CurrentFvFileHandles[PEI_CORE_MAX_PEIM_PER_FV];
+  PEI_CORE_FV_HANDLE                 Fv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+  EFI_PEI_FILE_HANDLE                CurrentFvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   UINTN                              AprioriCount;
   UINTN                              CurrentPeimFvCount; 
   UINTN                              CurrentPeimCount;
   EFI_PEI_FILE_HANDLE                CurrentFileHandle;
   UINTN                              AllFvCount;
-  EFI_PEI_FV_HANDLE                  AllFv[PEI_CORE_MAX_FV_SUPPORTED];
+  EFI_PEI_FV_HANDLE                  AllFv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
   EFI_PEI_HOB_POINTERS               HobList;
   BOOLEAN                            SwitchStackSignal;
   BOOLEAN                            PeiMemoryInstalled;
