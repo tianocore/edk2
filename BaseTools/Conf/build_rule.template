@@ -135,7 +135,9 @@
         "$(ASM)" /Fo${dst} $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
 
     <Command.GCC>
-        "$(ASM)" -o ${dst} $(ASM_FLAGS) $(INC) ${src}
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(ASM)" -o ${dst} $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
 
 [Build.Iasm-Code-File]
     <InputFile>
