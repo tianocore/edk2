@@ -1232,7 +1232,7 @@ Returns:
   Status = gBS->HandleProtocol (
              mBdsImageHandle,
              &gEfiLoadedImageProtocolGuid,
-             &LoadedImage
+             (VOID **) &LoadedImage
              );
   if (!EFI_ERROR (Status)) {
     Status = gBS->HandleProtocol (

@@ -2068,6 +2068,7 @@ UhciCleanDevUp (
   )
 {
   USB_HC_DEV          *Uhc;
+  UINT64              Supports;
 
   //
   // Uninstall the USB_HC and USB_HC2 protocol, then disable the controller
@@ -2089,11 +2090,18 @@ UhciCleanDevUp (
 
   UhciFreeAllAsyncReq (Uhc);
   UhciDestoryFrameList (Uhc);
-
+  
+  Uhc->PciIo->Attributes (
+                Uhc->PciIo,
+                EfiPciIoAttributeOperationSupported,
+                0,
+                &Supports
+                );
+  Supports &= EFI_PCI_DEVICE_ENABLE;
   Uhc->PciIo->Attributes (
                 Uhc->PciIo,
                 EfiPciIoAttributeOperationDisable,
-                EFI_PCI_DEVICE_ENABLE,
+                Supports,
                 NULL
                 );
 
@@ -2126,6 +2134,7 @@ UhciDriverBindingStart (
   EFI_STATUS          Status;
   EFI_PCI_IO_PROTOCOL *PciIo;
   USB_HC_DEV          *Uhc;
+  UINT64              Supports;
 
   //
   // Open PCIIO, then enable the EHC device and turn off emulation
@@ -2148,10 +2157,19 @@ UhciDriverBindingStart (
 
   Status = PciIo->Attributes (
                     PciIo,
-                    EfiPciIoAttributeOperationEnable,
-                    EFI_PCI_DEVICE_ENABLE,
-                    NULL
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
                     );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      Supports,
+                      NULL
+                      );
+  }
 
   if (EFI_ERROR (Status)) {
     goto CLOSE_PCIIO;

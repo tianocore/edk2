@@ -1462,19 +1462,21 @@ Returns:
   }
   //
   // Just a trick for ENABLE attribute
+  // EFI_PCI_DEVICE_ENABLE is not defined in UEFI spec, which is the internal usage.
+  // So, this logic doesn't confrom to UEFI spec, which should be removed.
   //
-  if ((Attributes & EFI_PCI_DEVICE_ENABLE) == EFI_PCI_DEVICE_ENABLE) {
-    Attributes &= (PciIoDevice->Supports);
-
-    //
-    // Raise the EFI_P_PC_ENABLE Status code
-    //
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-      EFI_PROGRESS_CODE,
-      EFI_IO_BUS_PCI | EFI_P_PC_ENABLE,
-      PciIoDevice->DevicePath
-      );
-  }
+  //  if ((Attributes & EFI_PCI_DEVICE_ENABLE) == EFI_PCI_DEVICE_ENABLE) {
+  //    Attributes &= (PciIoDevice->Supports);
+  //
+  //    //
+  //    // Raise the EFI_P_PC_ENABLE Status code
+  //    //
+  //    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+  //      EFI_PROGRESS_CODE,
+  //      EFI_IO_BUS_PCI | EFI_P_PC_ENABLE,
+  //      PciIoDevice->DevicePath
+  //      );
+  //  }
 
   //
   // If no attributes can be supported, then return.
