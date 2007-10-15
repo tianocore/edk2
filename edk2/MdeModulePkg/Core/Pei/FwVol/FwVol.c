@@ -366,7 +366,7 @@ Returns:
   
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
-  if (PrivateData->FvCount >= PEI_CORE_MAX_FV_SUPPORTED) {
+  if (PrivateData->FvCount >= FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
     ASSERT (FALSE);
   }
 

@@ -97,6 +97,10 @@
   gEfiPeiLoadFilePpiGuid
   gEfiPeiSecurity2PpiGuid
 
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv
+
 [BuildOptions.common]
   MSFT:DEBUG_*_IA32_CC_FLAGS = /FAcs
 

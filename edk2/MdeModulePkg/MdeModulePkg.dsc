@@ -343,6 +343,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
+
+
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
 
