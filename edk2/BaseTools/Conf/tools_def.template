@@ -357,7 +357,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 
 *_CYGWINGCC_*_MAKE_FLAGS                 = /nologo
 *_CYGWINGCC_*_DLINK_FLAGS                = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(ENTRYPOINT) --file-alignment 0x20 --section-alignment 0x20
-*_CYGWINGCC_*_ASM_FLAGS                  = -c -imacros AutoGen.h
+*_CYGWINGCC_*_ASM_FLAGS                  = -c -x assembler -imacros AutoGen.h
 *_CYGWINGCC_*_PP_FLAGS                   = -E -x assembler-with-cpp -include AutoGen.h
 *_CYGWINGCC_*_VFRPP_FLAGS                = -x c -E -P -DVFRCOMPILE --include AutoGen.h
 
