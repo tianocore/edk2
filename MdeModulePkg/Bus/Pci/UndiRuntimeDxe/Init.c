@@ -287,6 +287,7 @@ Returns:
   UINT8                     *TmpPxePointer;
   EFI_PCI_IO_PROTOCOL       *PciIoFncs;
   UINTN                     Len;   
+  UINT64                    Supports;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -380,10 +381,19 @@ Returns:
 
   Status = PciIoFncs->Attributes (
                         PciIoFncs,
-                        EfiPciIoAttributeOperationEnable,
-                        EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_MEMORY | EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_BUS_MASTER,
-                        NULL
+                        EfiPciIoAttributeOperationSupported,
+                        0,
+                        &Supports
                         );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = PciIoFncs->Attributes (
+                          PciIoFncs,
+                          EfiPciIoAttributeOperationEnable,
+                          Supports,
+                          NULL
+                          );
+  }
   //
   // Read all the registers from device's PCI Configuration space
   //

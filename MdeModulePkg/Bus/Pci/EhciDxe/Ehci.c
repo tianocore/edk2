@@ -1491,6 +1491,7 @@ EhcDriverBindingStart (
   EFI_STATUS              Status;
   USB2_HC_DEV             *Ehc;
   EFI_PCI_IO_PROTOCOL     *PciIo;
+  UINT64                  Supports;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1511,10 +1512,19 @@ EhcDriverBindingStart (
 
   Status = PciIo->Attributes (
                     PciIo,
-                    EfiPciIoAttributeOperationEnable,
-                    EFI_PCI_DEVICE_ENABLE,
-                    NULL
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
                     );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      Supports,
+                      NULL
+                      );
+  }
 
   if (EFI_ERROR (Status)) {
     EHC_ERROR (("EhcDriverBindingStart: failed to enable controller\n"));
@@ -1643,6 +1653,7 @@ EhcDriverBindingStop (
   EFI_USB2_HC_PROTOCOL  *Usb2Hc;
   EFI_PCI_IO_PROTOCOL   *PciIo;
   USB2_HC_DEV           *Ehc;
+  UINT64                Supports;
 
   //
   // Test whether the Controller handler passed in is a valid
@@ -1695,12 +1706,21 @@ EhcDriverBindingStop (
   //
   // Disable the USB Host Controller
   //
-  PciIo->Attributes (
-           PciIo,
-           EfiPciIoAttributeOperationDisable,
-           EFI_PCI_DEVICE_ENABLE,
-           NULL
-           );
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
+                    );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationDisable,
+                      Supports,
+                      NULL
+                      );
+  }
 
   gBS->CloseProtocol (
          Controller,
@@ -1710,7 +1730,7 @@ EhcDriverBindingStop (
          );
 
   gBS->FreePool (Ehc);
-  return Status;
+  return EFI_SUCCESS;
 }
 
 EFI_DRIVER_BINDING_PROTOCOL
