@@ -622,13 +622,14 @@ Ip4ConfigOnDhcp4Complete (
       NetFreePool (Instance->NicConfig);
     }
 
-    Instance->NicConfig = NetAllocatePool (sizeof (NIC_IP4_CONFIG_INFO) +
-                                           sizeof (EFI_IP4_ROUTE_TABLE));
+    Instance->NicConfig = NetAllocatePool (sizeof (NIC_IP4_CONFIG_INFO) + 2* sizeof (EFI_IP4_ROUTE_TABLE));
 
     if (Instance->NicConfig == NULL) {
       Instance->Result = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
+
+    Instance->NicConfig->Ip4Info.RouteTable = (EFI_IP4_ROUTE_TABLE *) (Instance->NicConfig + 1);
 
     CopyMem (&Instance->NicConfig->NicAddr, &Instance->NicAddr, sizeof (Instance->NicConfig->NicAddr));
     Instance->NicConfig->Source  = IP4_CONFIG_SOURCE_DHCP;
@@ -645,7 +646,7 @@ Ip4ConfigOnDhcp4Complete (
 
     NetCopyMem (&Ip1, &Dhcp4Mode.ClientAddress, sizeof (IP4_ADDR));
     NetCopyMem (&Ip2, &Dhcp4Mode.SubnetMask, sizeof (IP4_ADDR));
-    
+
     Subnet = Ip1 & Ip2;
 
     NetCopyMem (&Ip4Config->RouteTable[0].SubnetAddress, &Subnet, sizeof (EFI_IPv4_ADDRESS));
