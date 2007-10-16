@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [ ! $WORKSPACE=="" ]
+then
+  echo WORKSPACE environment variable must be set
+elif [ -e $WORKSPACE/Conf/BaseToolsCBinaries ]
+then
+  $WORKSPACE/Conf/BaseToolsCBinaries/`basename $0`
+elif [ -e $WORKSPACE/Conf/BaseToolsSource ]
+then
+  if [ ! -e $WORKSPACE/Conf/BaseToolsSource/Source/C/bin/`basename $0` ]
+  then
+    echo BaseTools C Tool binary was not found \(`basename $0`\)
+    echo You may need to run:
+    echo "  make -C $WORKSPACE/Conf/BaseToolsSource/Source/C"
+  else
+    $WORKSPACE/Conf/BaseToolsSource/Source/C/bin/`basename $0` $*
+  fi
+else
+  echo Unable to find the real \'`basename $0`\' to run
+  echo A symbolic link is needed under
+  echo "  $WORKSPACE/Conf"
+  echo This message was printed by
+  echo "  $0"
+  exit -1
+fi
+
