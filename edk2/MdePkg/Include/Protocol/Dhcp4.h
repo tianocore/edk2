@@ -1,17 +1,17 @@
 /** @file
   EFI_DHCP4_PROTOCOL as defined in UEFI 2.0.
   EFI_DHCP4_SERVICE_BINDING_PROTOCOL as defined in UEFI 2.0.
-  These protocols are used to collect configuration information for the EFI IPv4 Protocol 
+  These protocols are used to collect configuration information for the EFI IPv4 Protocol
   drivers and to provide DHCPv4 server and PXE boot server discovery services.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -27,7 +27,7 @@
   { \
     0x9d9a39d8, 0xbd42, 0x4a73, {0xa4, 0xd5, 0x8e, 0xe9, 0x4b, 0xe1, 0x13, 0x80 } \
   }
-  
+
 typedef struct _EFI_DHCP4_PROTOCOL EFI_DHCP4_PROTOCOL;
 
 
@@ -51,10 +51,10 @@ typedef struct {
     UINT16            Reserved;
     EFI_IPv4_ADDRESS  ClientAddr;       //Client IP address from client
     EFI_IPv4_ADDRESS  YourAddr;         //Client IP address from server
-    EFI_IPv4_ADDRESS  ServerAddr;       //IP address of next server in bootstrap 
+    EFI_IPv4_ADDRESS  ServerAddr;       //IP address of next server in bootstrap
     EFI_IPv4_ADDRESS  GatewayAddr;      //Relay agent IP address
     UINT8             ClientHwAddr[16]; //Client hardware address
-    CHAR8             ServerName[64];   
+    CHAR8             ServerName[64];
     CHAR8             BootFileName[128];
 }EFI_DHCP4_HEADER;
 #pragma pack()
@@ -102,42 +102,42 @@ typedef enum{
   Dhcp4Fail           = 0x0c
 } EFI_DHCP4_EVENT;
 
-/**                                                                 
-  Callback routine 
-    
+/**
+  Callback routine
+
   @param  This                  Pointer to the EFI DHCPv4 Protocol instance that is used to
-                                configure this callback function.                          
+                                configure this callback function.
   @param  Context               Pointer to the context that is initialized by
-                                EFI_DHCP4_PROTOCOL.Configure().                                              
+                                EFI_DHCP4_PROTOCOL.Configure().
   @param  CurrentState          The current operational state of the EFI DHCPv4 Protocol
-                                driver.                                                 
+                                driver.
   @param  Dhcp4Event            The event that occurs in the current state, which usually means a
-                                state transition.                                                
-  @param  Packet                The DHCP packet that is going to be sent or already received.                
+                                state transition.
+  @param  Packet                The DHCP packet that is going to be sent or already received.
   @param  NewPacket             The packet that is used to replace the above Packet.
-                                
+
   @retval EFI_SUCCESS           Tells the EFI DHCPv4 Protocol driver to continue the DHCP process.
-  @retval EFI_NOT_READY         Only used in the Dhcp4Selecting state. The EFI DHCPv4 Protocol         
+  @retval EFI_NOT_READY         Only used in the Dhcp4Selecting state. The EFI DHCPv4 Protocol
                                 driver will continue to wait for more DHCPOFFER packets until the retry
-                                timeout expires.                                                       
+                                timeout expires.
   @retval EFI_ABORTED           Tells the EFI DHCPv4 Protocol driver to abort the current process and
-                                return to the Dhcp4Init or Dhcp4InitReboot state.                    
-                                   
+                                return to the Dhcp4Init or Dhcp4InitReboot state.
+
 **/
-typedef 
-EFI_STATUS 
+typedef
+EFI_STATUS
 (EFIAPI *EFI_DHCP4_CALLBACK) (
   IN  EFI_DHCP4_PROTOCOL         *This,
   IN  VOID                       *Context,
   IN  EFI_DHCP4_STATE            CurrentState,
   IN  EFI_DHCP4_EVENT            Dhcp4Event,
-  IN  EFI_DHCP4_PACKET           *Packet     OPTIONAL, 
+  IN  EFI_DHCP4_PACKET           *Packet     OPTIONAL,
   OUT EFI_DHCP4_PACKET           **NewPacket OPTIONAL
   );
 
 
 typedef struct {
-  UINT32                      DiscoverTryCount;      
+  UINT32                      DiscoverTryCount;
   UINT32                      *DiscoverTimeout;
   UINT32                      RequestTryCount;
   UINT32                      *RequestTimeout;
@@ -170,17 +170,17 @@ typedef struct {
 
 
 typedef struct {
-  OUT EFI_STATUS              Status;
-  IN  EFI_EVENT               CompletionEvent;
-  IN  EFI_IPv4_ADDRESS        RemoteAddress;
-  IN  UINT16                  RemotePort;
-  IN  EFI_IPv4_ADDRESS        GatewayAddress;
-  IN  UINT32                  ListenPointCount;
-  IN  EFI_DHCP4_LISTEN_POINT  *ListenPoints;
-  IN  UINT32                  TimeoutValue;
-  IN  EFI_DHCP4_PACKET        *Packet;
-  OUT UINT32                  ResponseCount;
-  OUT EFI_DHCP4_PACKET        *ResponseList;
+  EFI_STATUS              Status;
+  EFI_EVENT               CompletionEvent;
+  EFI_IPv4_ADDRESS        RemoteAddress;
+  UINT16                  RemotePort;
+  EFI_IPv4_ADDRESS        GatewayAddress;
+  UINT32                  ListenPointCount;
+  EFI_DHCP4_LISTEN_POINT  *ListenPoints;
+  UINT32                  TimeoutValue;
+  EFI_DHCP4_PACKET        *Packet;
+  UINT32                  ResponseCount;
+  EFI_DHCP4_PACKET        *ResponseList;
 } EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN;
 
 
@@ -194,9 +194,9 @@ typedef struct {
   @retval EFI_INVALID_PARAMETER This is NULL.
 
 **/
-typedef 
-EFI_STATUS 
-(EFIAPI *EFI_DHCP4_GET_MODE_DATA)(
+typedef
+EFI_STATUS
+(EFIAPI *EFI_DHCP4_GET_MODE_DATA) (
   IN  EFI_DHCP4_PROTOCOL      *This,
   OUT EFI_DHCP4_MODE_DATA     *Dhcp4ModeData
   )
@@ -221,7 +221,7 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_CONFIGURE) (
   IN EFI_DHCP4_PROTOCOL       *This,
@@ -256,7 +256,7 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_START) (
   IN EFI_DHCP4_PROTOCOL       *This,
@@ -297,7 +297,7 @@ EFI_STATUS
   IN BOOLEAN                  RebindRequest,
   IN EFI_EVENT                CompletionEvent  OPTIONAL
   )
-;  
+;
 
 /**
   Releases the current address configuration.
@@ -310,34 +310,34 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_RELEASE) (
   IN EFI_DHCP4_PROTOCOL       *This
   )
-;  
+;
 
 /**
   Stops the current address configuration.
 
   @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
-                                 
+
   @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Stopped phase.
   @retval EFI_INVALID_PARAMETER This is NULL.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_STOP) (
   IN EFI_DHCP4_PROTOCOL       *This
   )
-; 
+;
 
 /**
   Builds a DHCP packet, given the options to be appended or deleted or replaced.
 
   @param  This        Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  SeedPacket  Initial packet to be used as a base for building new packet.
+ @param  SeedPacket  Initial packet to be used as a base for building new packet.
   @param  DeleteCount Number of opcodes in the DeleteList.
   @param  DeleteList  List of opcodes to be deleted from the seed packet.
                       Ignored if DeleteCount is zero.
@@ -366,7 +366,7 @@ EFI_STATUS
   IN  EFI_DHCP4_PACKET_OPTION *AppendList[]       OPTIONAL,
   OUT EFI_DHCP4_PACKET        **NewPacket
   );
-;   
+;
 
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
@@ -383,7 +383,7 @@ EFI_STATUS
   @retval Others                Some other unexpected error occurred.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_TRANSMIT_RECEIVE) (
   IN EFI_DHCP4_PROTOCOL                *This,

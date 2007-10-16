@@ -1,12 +1,12 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -24,7 +24,7 @@ typedef struct _EFI_IP4_CONFIG_PROTOCOL EFI_IP4_CONFIG_PROTOCOL;
 
 #define IP4_CONFIG_VARIABLE_ATTRIBUTES \
         (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | \
-         EFI_VARIABLE_RUNTIME_ACCESS )
+         EFI_VARIABLE_RUNTIME_ACCESS)
 
 typedef struct {
   EFI_IPv4_ADDRESS             StationAddress;
@@ -61,9 +61,9 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_CONFIG_START) (
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN EFI_EVENT                 DoneEvent,
-  IN EFI_EVENT                 ReconfigEvent 
+  IN EFI_EVENT                 ReconfigEvent
   )
-;    
+;
 
 /**
   Stops running the configuration policy for the EFI IPv4 Protocol driver.
@@ -78,9 +78,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_IP4_CONFIG_STOP) (
-  IN EFI_IP4_CONFIG_PROTOCOL   *This 
+  IN EFI_IP4_CONFIG_PROTOCOL   *This
   )
-;   
+;
 
 /**
   Returns the default configuration data (if any) for the EFI IPv4 Protocol driver.
@@ -106,9 +106,9 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_CONFIG_GET_DATA) (
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN OUT UINTN                 *IpConfigDataSize,
-  OUT EFI_IP4_IPCONFIG_DATA    *IpConfigData    OPTIONAL 
+  OUT EFI_IP4_IPCONFIG_DATA    *IpConfigData    OPTIONAL
   )
-;    
+;
 
 struct _EFI_IP4_CONFIG_PROTOCOL {
   EFI_IP4_CONFIG_START         Start;
