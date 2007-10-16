@@ -244,9 +244,22 @@ class SetupBuildEnvironmentApp:
     print 'Storing environment configuration into',
     print   self.RelativeToWorkspace(scriptFilename)
     script = open(scriptFilename, 'w')
+
     print >> script, 'export WORKSPACE="%s"' % workspace
     print >> script, 'export TOOLCHAIN="%s"' % self.conf['compiler']
     print >> script, 'export EDK_CC_PATH_PREFIX="%s"' % self.conf['compiler-prefix']
+
+    #
+    # Change PATH variable
+    #
+    newPath = os.environ['PATH'].split(os.path.pathsep)
+    binDir = \
+      os.path.join(workspace, 'Tools', 'BaseTools', 'Bin', sys.platform.title())
+    if binDir not in newPath:
+      newPath.append(binDir)
+    newPath = os.path.pathsep.join(newPath)
+    print >> script, 'export PATH=%s' % newPath
+
     script.close()
 
   def RelativeToWorkspace(self, path):
