@@ -160,5 +160,12 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_PEI_CPU_IO_PPI          *CpuIo;
   EFI_PEI_PCI_CFG_PPI        *PciCfg;
 };
-  
+
+typedef struct {
+  UINTN                   BootFirmwareVolume;
+  UINTN                   SizeOfCacheAsRam;
+  EFI_PEI_PPI_DESCRIPTOR  *DispatchTable;
+} EFI_PEI_STARTUP_DESCRIPTOR;
+
 #endif  
+
