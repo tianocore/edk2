@@ -262,13 +262,12 @@
         ?.asm16, ?.Asm16, ?.ASM16
 
     <OutputFile>
-        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.com
+        $(OUTPUT_DIR)(+)${s_base}.com
 
     <Command.MSFT, Command.INTEL>
-        pushd .
         cd $(OUTPUT_DIR)(+)${s_dir}
-        "$(ASM)" /nologo /omf ${src} /Bl"$(ASMLINK)" $(ASMLINK_FLAGS)
-        -$(CP) ${dst} $(OUTPUT_DIR) & popd
+        "$(ASM)" /nologo /c /omf /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${src}
+        "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
 
 [Build.Microcode-File]
     <InputFile>
