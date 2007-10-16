@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.TianoCore.org/2007/Edk2.1" xmlns="http://www.TianoCore.org/2007/Edk2.1">
+  <!--
+    Filename: SurfaceArea.xsd
+    
+    Copyright (c) 2007, Intel Corp.
+    All rights reserved. This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which may be found at http://opensource.org/licenses/bsd-license.php
+    
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    
+    APPROVED: 05-Jun-2007
+  -->
+  <xs:include schemaLocation="FrameworkHeaders.xsd"/>
+  <xs:include schemaLocation="FrameworkDataElements.xsd"/>
+  <xs:annotation>
+    <xs:documentation xml:lang="en">This describes the valid content of a FrameworkDatabase (DB) File.</xs:documentation>
+  </xs:annotation>
+  <xs:element name="FrameworkDatabase">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="FdbHeader"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="PackageList"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="FarList"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:annotation>
+    <xs:documentation xml:lang="en">This describes the valid content for a Module Surface Area Description (MSA) file.</xs:documentation>
+  </xs:annotation>
+  <xs:element name="ModuleSurfaceArea">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="MsaHeader"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="ModuleDefinitions"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="BinaryFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="NonProcessedFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="HiiPackages"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PcdCoded"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Depex"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="ModuleBuildOptions"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:annotation>
+    <xs:documentation xml:lang="en">This describes the valid content for a Package Surface Area Description (SPD) file.</xs:documentation>
+  </xs:annotation>
+  <xs:element name="PackageSurfaceArea">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="SpdHeader"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="PackageDefinitions"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDeclarations"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdIncludes"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PackageHeaders"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="GuidDeclarations"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="ProtocolDeclarations"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PpiDeclarations"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PcdDeclarations"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
