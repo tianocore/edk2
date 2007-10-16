@@ -205,6 +205,8 @@ class SetupBuildEnvironmentApp:
     print 'Templates & Conf directory'
     print '  Templates dir:', self.RelativeToWorkspace(templatesDir)
     for filename in os.listdir(templatesDir):
+      if filename.startswith('.'): continue
+
       srcFilename = os.path.join(templatesDir, filename)
       destFilename = os.path.join(confDir, filename)
       print ' ', self.RelativeToWorkspace(destFilename),
