@@ -191,6 +191,8 @@ ATAIdentify (
   the capacity is below 120G, 48bit addressing is not needed
 
   @retval  EFI_DEVICE_ERROR The identify data in IdeDev is incorrect
+  
+  @retval  EFI_INVALID_PARAMETER The identify data in IdeDev is NULL.
 
   @note
   This function must be called after DEVICE_IDENTITY command has been
@@ -208,7 +210,7 @@ AtaAtapi6Identify (
   EFI_IDENTIFY_DATA *Atapi6IdentifyStruct;
 
   if (IdeDev->pIdData == NULL) {
-    return EFI_UNSUPPORTED;
+    return EFI_INVALID_PARAMETER;
   }
 
   Atapi6IdentifyStruct = IdeDev->pIdData;

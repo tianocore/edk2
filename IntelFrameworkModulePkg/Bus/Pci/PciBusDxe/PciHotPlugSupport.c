@@ -275,9 +275,6 @@ Returns:
   EFI_TIMEOUT - Time out
 
 --*/
-// TODO:    TimeoutInMilliSeconds - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_TIMEOUT - add return value to function comment
 {
   UINT32  Delay;
   UINTN   Index;
