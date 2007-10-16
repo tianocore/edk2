@@ -1,0 +1,39 @@
+#
+# Copyright (c) 2006 - 2007, Intel Corporation
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# 
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+# Setup the environment for unix-like systems running a bash-like shell.
+# This file must be "sourced" not merely executed. For example: ". edksetup.sh"
+
+if [ ! -e ./Tools/BaseTools/BuildEnv.py ]
+then
+  echo Run this script from the base of your tree.  For example:
+  echo "  cd /Path/To/Edk/Root"
+  echo "  . Tools/BuildEnv"
+  return
+fi
+
+#
+# First, we run a python tool that will ask the user to configure
+# the environment in a (relatively) user friendly manner.
+#
+python ./Tools/BaseTools/BuildEnv.py $*
+
+#
+# The python tool will write ./Conf/BuildEnv.sh to actually configure
+# the environment.
+#
+if [ -e ./Conf/BuildEnv.sh ]
+then
+  . ./Conf/BuildEnv.sh
+else
+  echo There was a failure while trying to setup the environment!
+fi
+
+
