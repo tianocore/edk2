@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.TianoCore.org/2007/Edk2.1" xmlns="http://www.TianoCore.org/2007/Edk2.1">
+  <!--
+    Filename: NamingConvention.xsd
+    
+    Copyright (c) 2007, Intel Corp.
+    All rights reserved. This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which may be found at http://opensource.org/licenses/bsd-license.php
+    
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    
+  -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en"> This schema defines various data types and naming conventions including: base name, filename and directory naming conventions. These are all simple data types.</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="C_NameType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*(_)*[a-zA-Z]+((_)*[a-zA-Z0-9]*)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileNameConvention">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This defines what a Filename is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a optional dot and more alphanumeric characters. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*[a-zA-Z](\.?[\-_a-zA-Z0-9]+)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> The GUID data was a union of GuidType1 and GuidType2; standardizing on GuidType2. </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="GuidType2"/>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType1">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This defines the minimum specification for a GUID Array which is 8 Hex Digits - 4 Hex Digits - 4 Hex Digits - 8 Hex Bytes, the last 16 Hex Digits can be enclosed in sqiggle {} brackets.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType2">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> A GUID must contain five different Hexadecimal character sets that are separated by a dash (-) character. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Hex64BitDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex 64 Bit Value to be 0x[a-f0-9]{16}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*(0x)?[a-fA-F0-9]{1,16}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexAddressType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Address, 0x[a-fA-F0-9]{1,16}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,16}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexByteDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Byte Value to be 0x[a-f0-9]{2}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*(0x)?[a-fA-F0-9]{1,2}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Value to be 0x[a-f0-9]+</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*0x[a-fA-F0-9]+\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDigitType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Diget to be 0x[a-f0-9]</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*[a-fA-F0-9]{1}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDoubleWordDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Double Word Value to be 0x[a-f0-9]{8}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,8}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexWordDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Word Value to be 0x[a-f0-9]{4}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*0x[a-fA-F0-9]{1,4}\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KeywordList">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:pattern value="\s*[a-zA-Z]+(\ *_*[a-zA-Z0-9]*)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KeywordType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="\s*[a-zA-Z]+(_*[a-zA-Z0-9]*)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Paragraph">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This describes the normal text of a paragraph that can be used in a license or description tag.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="PathAndFilename">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Naming convention for a path and file name</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="xs:normalizedString xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="Polarity">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Limit Polarity vaild values to 0 and 1</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:pattern value="\s*0|1\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Sentence">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This data type requires two or more words </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="\s*(\w+\W*)+( )+(\W*\w*\W*\s*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ToolsNameConvention">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This data type is used for ToolCommand, ToolChainFamily and TagName.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NCName">
+      <xs:pattern value="\s*[a-zA-Z][a-zA-Z0-9]*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UCNameType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Definition of a UpperCase Name, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*[A-Z]+(_*[A-Z0-9]*)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VersionDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Definition of a Version Number, which is one or more strings of decimal digits separated by dots. </xs:documentation>
+      <xs:documentation>
+        The algorithm to compare two versions A and B is as follows. if A==B, then A is the same version as B. Otherwise, say A is a1.a2.a3...an and B is b1.b2.b3...bn. For the first pair (ai, bi), for i less than n and i less than m, where ai is not equal to bi, if ai is less than bi, then A is less than B. If ai is greater than bi, then A is greater than B.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*\d+(\.\d+)*\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Zero">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:pattern value="\s*0\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
