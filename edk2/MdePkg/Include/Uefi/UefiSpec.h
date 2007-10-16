@@ -27,7 +27,7 @@
 
 //
 // Enumeration of memory allocation.
-// 
+//
 typedef enum {
   AllocateAnyPages,
   AllocateMaxAddress,
@@ -78,7 +78,7 @@ typedef struct {
 
 //
 // Build macros to find next EFI_MEMORY_DESCRIPTOR.
-// 
+//
 #define NextMemoryDescriptor(_Ptr, _Size)   ((EFI_MEMORY_DESCRIPTOR *) (((UINT8 *) (_Ptr)) + (_Size)))
 #define NEXT_MEMORY_DESCRIPTOR(_Ptr, _Size) NextMemoryDescriptor (_Ptr, _Size)
 
@@ -342,9 +342,9 @@ EFI_STATUS
 
 //
 // The event¡¯s NotifyContext pointer points to a runtime memory
-// address. 
+// address.
 // The event is deprecated in UEFI2.0 and later specifications.
-// 
+//
 #define EVT_RUNTIME_CONTEXT               0x20000000
 
 
@@ -628,10 +628,10 @@ EFI_STATUS
   );
 
 
-// 
+//
 // This provides the capabilities of the
 // real time clock device as exposed through the EFI interfaces.
-// 
+//
 typedef struct {
   UINT32    Resolution;
   UINT32    Accuracy;
@@ -889,7 +889,7 @@ EFI_STATUS
 
 //
 // Enumeration of reset types.
-// 
+//
 typedef enum {
   EfiResetCold,
   EfiResetWarm,
@@ -1596,7 +1596,7 @@ typedef struct {
 
 typedef struct {
   EFI_TABLE_HEADER  Hdr;
-  
+
   //
   // Task Priority Services
   //
@@ -1688,9 +1688,9 @@ typedef struct {
 } EFI_BOOT_SERVICES;
 
 //
-// Contains a set of GUID/pointer pairs comprised of the ConfigurationTable field in the 
+// Contains a set of GUID/pointer pairs comprised of the ConfigurationTable field in the
 // EFI System Table.
-// 
+//
 typedef struct{
   EFI_GUID                          VendorGuid;
   VOID                              *VendorTable;

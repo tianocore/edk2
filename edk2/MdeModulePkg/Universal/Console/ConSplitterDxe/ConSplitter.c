@@ -105,6 +105,16 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
     FALSE,
   },
   {
+    ConSpliterUgaDrawGetMode,
+    ConSpliterUgaDrawSetMode,
+    ConSpliterUgaDrawBlt
+  },
+  0,
+  0,
+  0,
+  0,
+  (EFI_UGA_PIXEL *) NULL,
+  {
     ConSpliterGraphicsOutputQueryMode,
     ConSpliterGraphicsOutputSetMode,
     ConSpliterGraphicsOutputBlt,
@@ -157,6 +167,16 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
     0,
     FALSE,
   },
+  {
+    ConSpliterUgaDrawGetMode,
+    ConSpliterUgaDrawSetMode,
+    ConSpliterUgaDrawBlt
+  },
+  0,
+  0,
+  0,
+  0,
+  (EFI_UGA_PIXEL *) NULL,
   {
     ConSpliterGraphicsOutputQueryMode,
     ConSpliterGraphicsOutputSetMode,
@@ -226,9 +246,9 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
 /**
   The user Entry Point for module ConSplitter. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -317,6 +337,8 @@ Returns:
 {
   EFI_STATUS  Status;
 
+  ASSERT (FeaturePcdGet (PcdConOutGopSupport) ||
+          FeaturePcdGet (PcdConOutUgaSupport));
   //
   // The driver creates virtual handles for ConIn, ConOut, and StdErr.
   // The virtual handles will always exist even if no console exist in the
@@ -364,21 +386,58 @@ Returns:
   //
   Status = ConSplitterTextOutConstructor (&mConOut);
   if (!EFI_ERROR (Status)) {
-    //
-    // In UEFI mode, Graphics Output Protocol is installed on virtual handle.
-    //
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mConOut.VirtualHandle,
-                    &gEfiSimpleTextOutProtocolGuid,
-                    &mConOut.TextOut,
-                    &gEfiGraphicsOutputProtocolGuid,
-                    &mConOut.GraphicsOutput,
-                    &gEfiConsoleControlProtocolGuid,
-                    &mConOut.ConsoleControl,
-                    &gEfiPrimaryConsoleOutDeviceGuid,
-                    NULL,
-                    NULL
-                    );
+    if (!FeaturePcdGet (PcdConOutGopSupport)) {
+      //
+      // In EFI mode, UGA Draw protocol is installed
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mConOut.TextOut,
+                      &gEfiUgaDrawProtocolGuid,
+                      &mConOut.UgaDraw,
+                      &gEfiConsoleControlProtocolGuid,
+                      &mConOut.ConsoleControl,
+                      &gEfiPrimaryConsoleOutDeviceGuid,
+                      NULL,
+                      NULL
+                      );
+    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
+      //
+      // In UEFI mode, Graphics Output Protocol is installed on virtual handle.
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mConOut.TextOut,
+                      &gEfiGraphicsOutputProtocolGuid,
+                      &mConOut.GraphicsOutput,
+                      &gEfiConsoleControlProtocolGuid,
+                      &mConOut.ConsoleControl,
+                      &gEfiPrimaryConsoleOutDeviceGuid,
+                      NULL,
+                      NULL
+                      );
+    } else {
+      //
+      // In EFI and UEFI comptible mode, Graphics Output Protocol and UGA are
+      // installed on virtual handle.
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mConOut.TextOut,
+                      &gEfiGraphicsOutputProtocolGuid,
+                      &mConOut.GraphicsOutput,
+                      &gEfiUgaDrawProtocolGuid,
+                      &mConOut.UgaDraw,
+                      &gEfiConsoleControlProtocolGuid,
+                      &mConOut.ConsoleControl,
+                      &gEfiPrimaryConsoleOutDeviceGuid,
+                      NULL,
+                      NULL
+                      );
+    }
 
     if (!EFI_ERROR (Status)) {
       //
@@ -513,41 +572,49 @@ ConSplitterTextOutConstructor (
   ConOutPrivate->TextOutQueryData[0].Rows     = 25;
   DevNullTextOutSetMode (ConOutPrivate, 0);
 
-  //
-  // Setup resource for mode information in Graphics Output Protocol interface
-  //
-  if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  if (FeaturePcdGet (PcdConOutUgaSupport)) {
+    //
+    // Setup the DevNullUgaDraw to 800 x 600 x 32 bits per pixel
+    //
+    ConSpliterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
   }
-  if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
-  //
-  if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (TEXT_OUT_GOP_MODE))) == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  ConOutPrivate->GraphicsOutputModeBuffer[0].HorizontalResolution = 800;
-  ConOutPrivate->GraphicsOutputModeBuffer[0].VerticalResolution = 600;
+  if (FeaturePcdGet (PcdConOutGopSupport)) {
+    //
+    // Setup resource for mode information in Graphics Output Protocol interface
+    //
+    if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
+    // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
+    //
+    if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (TEXT_OUT_GOP_MODE))) == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ConOutPrivate->GraphicsOutputModeBuffer[0].HorizontalResolution = 800;
+    ConOutPrivate->GraphicsOutputModeBuffer[0].VerticalResolution = 600;
 
-  //
-  // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
-  //  GraphicsOutputMode->Info->Version, GraphicsOutputMode->Info->PixelFormat
-  //  GraphicsOutputMode->SizeOfInfo, GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
-  //
-  ConOutPrivate->GraphicsOutput.Mode->Info->Version = 0;
-  ConOutPrivate->GraphicsOutput.Mode->Info->PixelFormat = PixelBltOnly;
-  ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-  ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
-  ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
+    //
+    // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
+    //  GraphicsOutputMode->Info->Version, GraphicsOutputMode->Info->PixelFormat
+    //  GraphicsOutputMode->SizeOfInfo, GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
+    //
+    ConOutPrivate->GraphicsOutput.Mode->Info->Version = 0;
+    ConOutPrivate->GraphicsOutput.Mode->Info->PixelFormat = PixelBltOnly;
+    ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+    ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+    ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
 
-  ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
-  //
-  // Initial current mode to unknow state, and then set to mode 0
-  //
-  ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
-  ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
+    ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
+    //
+    // Initial current mode to unknow state, and then set to mode 0
+    //
+    ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
+    ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
+  }
 
   return Status;
 }
@@ -967,6 +1034,20 @@ Returns:
   Status = ConSplitterTextOutAddDevice (&mConOut, TextOut, GraphicsOutput, UgaDraw);
   ConSplitterTextOutSetAttribute (&mConOut.TextOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
 
+  if (FeaturePcdGet (PcdConOutUgaSupport)) {
+    //
+    // Match the UGA mode data of ConOut with the current mode
+    //
+    if (UgaDraw != NULL) {
+      UgaDraw->GetMode (
+                 UgaDraw,
+                 &mConOut.UgaHorizontalResolution,
+                 &mConOut.UgaVerticalResolution,
+                 &mConOut.UgaColorDepth,
+                 &mConOut.UgaRefreshRate
+                 );
+    }
+  }
   return Status;
 }
 
@@ -2211,15 +2292,21 @@ Returns:
   MaxMode     = Private->TextOutMode.MaxMode;
   ASSERT (MaxMode >= 1);
 
-  if ((GraphicsOutput != NULL) || (UgaDraw != NULL)) {
-    ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
+  if (FeaturePcdGet (PcdConOutGopSupport)) {
+    if ((GraphicsOutput != NULL) || (UgaDraw != NULL)) {
+      ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
+    }
   }
 
   if (Private->ConsoleOutputMode == EfiConsoleControlScreenGraphics && GraphicsOutput != NULL) {
     //
     // We just added a new UGA device in graphics mode
     //
-    DevNullGopSync (Private, GraphicsOutput, UgaDraw);
+    if (FeaturePcdGet (PcdConOutGopSupport)) {
+      DevNullGopSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
+    } else if (FeaturePcdGet (PcdConOutUgaSupport)) {
+      DevNullUgaSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
+    }
   } else if ((CurrentMode >= 0) && ((GraphicsOutput != NULL) || (UgaDraw != NULL)) && (CurrentMode < Private->TextOutMode.MaxMode)) {
     //
     // The new console supports the same mode of the current console so sync up
