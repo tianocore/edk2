@@ -30,14 +30,14 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gConSplitterConInDriverBinding               
-#  COMPONENT_NAME                =  gConSplitterConInComponentName               
-#  DRIVER_BINDING                =  gConSplitterSimplePointerDriverBinding       
-#  COMPONENT_NAME                =  gConSplitterSimplePointerComponentName       
-#  DRIVER_BINDING                =  gConSplitterConOutDriverBinding              
-#  COMPONENT_NAME                =  gConSplitterConOutComponentName              
-#  DRIVER_BINDING                =  gConSplitterStdErrDriverBinding              
-#  COMPONENT_NAME                =  gConSplitterStdErrComponentName              
+#  DRIVER_BINDING                =  gConSplitterConInDriverBinding
+#  COMPONENT_NAME                =  gConSplitterConInComponentName
+#  DRIVER_BINDING                =  gConSplitterSimplePointerDriverBinding
+#  COMPONENT_NAME                =  gConSplitterSimplePointerComponentName
+#  DRIVER_BINDING                =  gConSplitterConOutDriverBinding
+#  COMPONENT_NAME                =  gConSplitterConOutComponentName
+#  DRIVER_BINDING                =  gConSplitterStdErrDriverBinding
+#  COMPONENT_NAME                =  gConSplitterStdErrComponentName
 #
 
 [Sources.common]
@@ -58,6 +58,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
+  PcdLib
 
 [Guids]
   gEfiConsoleInDeviceGuid                       # ALWAYS_CONSUMED
@@ -75,3 +76,6 @@
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport

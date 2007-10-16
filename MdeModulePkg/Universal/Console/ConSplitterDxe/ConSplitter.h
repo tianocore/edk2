@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
 #include <Protocol/UgaDraw.h>
+#include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
@@ -55,7 +56,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 // These definitions were in the old Hii protocol, but are not in the new UEFI
 // version. So they are defined locally.
 #define UNICODE_NARROW_CHAR   0xFFF0
-#define UNICODE_WIDE_CHAR     0xFFF1 
+#define UNICODE_WIDE_CHAR     0xFFF1
 
 
 //
@@ -137,6 +138,13 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    TextOut;
   EFI_SIMPLE_TEXT_OUTPUT_MODE        TextOutMode;
 
+  EFI_UGA_DRAW_PROTOCOL              UgaDraw;
+  UINT32                             UgaHorizontalResolution;
+  UINT32                             UgaVerticalResolution;
+  UINT32                             UgaColorDepth;
+  UINT32                             UgaRefreshRate;
+  EFI_UGA_PIXEL                      *UgaBlt;
+
   EFI_GRAPHICS_OUTPUT_PROTOCOL       GraphicsOutput;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *GraphicsOutputBlt;
   TEXT_OUT_GOP_MODE                  *GraphicsOutputModeBuffer;
@@ -152,12 +160,12 @@ typedef struct {
   UINTN                              TextOutQueryDataCount;
   INT32                              *TextOutModeMap;
 
-  EFI_CONSOLE_CONTROL_SCREEN_MODE ConsoleOutputMode;
+  EFI_CONSOLE_CONTROL_SCREEN_MODE    ConsoleOutputMode;
 
-  UINTN                           DevNullColumns;
-  UINTN                           DevNullRows;
-  CHAR16                          *DevNullScreen;
-  INT32                           *DevNullAttributes;
+  UINTN                              DevNullColumns;
+  UINTN                              DevNullRows;
+  CHAR16                             *DevNullScreen;
+  INT32                              *DevNullAttributes;
 
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
@@ -976,6 +984,51 @@ DevNullGopSync (
   )
 ;
 
+EFI_STATUS
+EFIAPI
+ConSpliterUgaDrawGetMode (
+  IN  EFI_UGA_DRAW_PROTOCOL           *This,
+  OUT UINT32                          *HorizontalResolution,
+  OUT UINT32                          *VerticalResolution,
+  OUT UINT32                          *ColorDepth,
+  OUT UINT32                          *RefreshRate
+  )
+;
+
+EFI_STATUS
+EFIAPI
+ConSpliterUgaDrawSetMode (
+  IN  EFI_UGA_DRAW_PROTOCOL           *This,
+  IN UINT32                           HorizontalResolution,
+  IN UINT32                           VerticalResolution,
+  IN UINT32                           ColorDepth,
+  IN UINT32                           RefreshRate
+  )
+;
+
+EFI_STATUS
+EFIAPI
+ConSpliterUgaDrawBlt (
+  IN  EFI_UGA_DRAW_PROTOCOL                         *This,
+  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
+  IN  EFI_UGA_BLT_OPERATION                         BltOperation,
+  IN  UINTN                                         SourceX,
+  IN  UINTN                                         SourceY,
+  IN  UINTN                                         DestinationX,
+  IN  UINTN                                         DestinationY,
+  IN  UINTN                                         Width,
+  IN  UINTN                                         Height,
+  IN  UINTN                                         Delta         OPTIONAL
+  )
+;
+
+EFI_STATUS
+DevNullUgaSync (
+  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
+  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
+  )
+;
 
 EFI_STATUS
 DevNullTextOutOutputString (

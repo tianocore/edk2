@@ -87,7 +87,7 @@
   SmBusLib|MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLibSmbus2Ppi.inf
   PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
-  
+
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
@@ -255,7 +255,7 @@
 
 [LibraryClasses.IPF.DXE_RUNTIME_DRIVER]
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  
+
 [LibraryClasses.EBC.PEI_CORE]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
@@ -283,6 +283,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE
 
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
@@ -363,7 +365,7 @@
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
-  
+
   MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
