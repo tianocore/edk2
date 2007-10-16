@@ -29,10 +29,10 @@ DEFINE VS2005PRO_BIN    = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
 DEFINE VS2005PRO_BINX64 = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_amd64
 DEFINE VS2005PRO_DLL    = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 
-DEFINE VS2005TEAMSUITE_BIN    = C:\Program Files\Microsoft Visual Studio 8 Team Suite\Vc\bin
-DEFINE VS2005TEAMSUITE_BINX64 = C:\Program Files\Microsoft Visual Studio 8 Team Suite\Vc\bin\x86_amd64
-DEFINE VS2005TEAMSUITE_BIN64  = C:\Program Files\Microsoft Visual Studio 8 Team Suite\Vc\bin\x86_ia64
-DEFINE VS2005TEAMSUITE_DLL    = C:\Program Files\Microsoft Visual Studio 8 Team Suite\Common7\IDE
+DEFINE VS2005TEAMSUITE_BIN    = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
+DEFINE VS2005TEAMSUITE_BINX64 = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_amd64
+DEFINE VS2005TEAMSUITE_BIN64  = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_ia64
+DEFINE VS2005TEAMSUITE_DLL    = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 
 DEFINE WINDDK_BIN16   = C:\WINDDK\3790.1830\bin\bin16
 DEFINE WINDDK_BIN32   = C:\WINDDK\3790.1830\bin\x86
