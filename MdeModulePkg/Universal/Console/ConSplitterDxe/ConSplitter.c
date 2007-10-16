@@ -3460,11 +3460,26 @@ ConSplitterTextOutSetCursorPosition (
   EFI_STATUS                      ReturnStatus;
   UINTN                           MaxColumn;
   UINTN                           MaxRow;
+  INT32                           *TextOutModeMap;
+  INT32                           ModeNumber;
+  INT32                           CurrentMode;
 
   Private   = TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  MaxColumn = Private->TextOutQueryData[Private->TextOutMode.Mode].Columns;
-  MaxRow    = Private->TextOutQueryData[Private->TextOutMode.Mode].Rows;
+  TextOutModeMap  = NULL;
+  ModeNumber      = Private->TextOutMode.Mode;
+  
+  //
+  // Get current MaxColumn and MaxRow from intersection map
+  //
+  if (Private->TextOutModeMap != NULL) {
+    TextOutModeMap = Private->TextOutModeMap + Private->TextOutListCount * ModeNumber;
+    CurrentMode    = *TextOutModeMap;
+  } else {
+    CurrentMode = ModeNumber;
+  }
+  
+  MaxColumn = Private->TextOutQueryData[CurrentMode].Columns;
+  MaxRow    = Private->TextOutQueryData[CurrentMode].Rows;
 
   if (Column >= MaxColumn || Row >= MaxRow) {
     return EFI_UNSUPPORTED;
