@@ -109,10 +109,6 @@ Arguments:
 
   DependencyExpression      - Pointer to a dependency expression.  The Grammar adheres to 
                               the BNF described above and is stored in postfix notation.
-  Runnable                  - is True if the driver can be scheduled and False if the driver 
-                              cannot be scheduled.  This is the value that the schedulers 
-                              should use for deciding the state of the driver.
-
 Returns:
 
   Status = EFI_SUCCESS            if it is a well-formed Grammar
