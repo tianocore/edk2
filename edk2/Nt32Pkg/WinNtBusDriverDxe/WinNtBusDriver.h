@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,18 +15,18 @@ Module Name:
 
 Abstract:
 
-This following section documents the envirnoment variables for the Win NT 
-build.  These variables are used to define the (virtual) hardware 
+This following section documents the envirnoment variables for the Win NT
+build.  These variables are used to define the (virtual) hardware
 configuration of the NT environment
 
-A ! can be used to seperate multiple instances in a variable. Each 
-instance represents a seperate hardware device. 
+A ! can be used to seperate multiple instances in a variable. Each
+instance represents a seperate hardware device.
 
 EFI_WIN_NT_PHYSICAL_DISKS - maps to drives on your system
 EFI_WIN_NT_VIRTUAL_DISKS  - maps to a device emulated by a file
 EFI_WIN_NT_FILE_SYSTEM    - mouts a directory as a file system
 EFI_WIN_NT_CONSOLE        - make a logical comand line window (only one!)
-EFI_WIN_NT_UGA            - Builds UGA Windows of Width and Height
+EFI_WIN_NT_GOP            - Builds GOP Windows of Width and Height
 EFI_WIN_NT_SERIAL_PORT    - maps physical serial ports
 EFI_WIN_NT_PASS_THRU      - associates a device with our PCI support
 
@@ -37,20 +37,20 @@ EFI_WIN_NT_PASS_THRU      - associates a device with our PCI support
  <block count> - Decimal number of blocks a device supports.
  <block size>  - Decimal number of bytes per block.
 
- NT envirnonment variable contents. '<' and '>' are not part of the variable, 
- they are just used to make this help more readable. There should be no 
- spaces between the ';'. Extra spaces will break the variable. A '!' is  
+ NT envirnonment variable contents. '<' and '>' are not part of the variable,
+ they are just used to make this help more readable. There should be no
+ spaces between the ';'. Extra spaces will break the variable. A '!' is
  used to seperate multiple devices in a variable.
 
- EFI_WIN_NT_VIRTUAL_DISKS = 
+ EFI_WIN_NT_VIRTUAL_DISKS =
    <F | R><O | W>;<block count>;<block size>[!...]
 
  EFI_WIN_NT_PHYSICAL_DISKS =
    <drive letter>:<F | R><O | W>;<block count>;<block size>[!...]
 
  Virtual Disks: These devices use a file to emulate a hard disk or removable
-                media device. 
-                
+                media device.
+
    Thus a 20 MB emulated hard drive would look like:
    EFI_WIN_NT_VIRTUAL_DISKS=FW;40960;512
 
@@ -65,25 +65,25 @@ EFI_WIN_NT_PASS_THRU      - associates a device with our PCI support
    Thus a standard CD-ROM floppy would look like:
    EFI_WIN_NT_PHYSICAL_DISKS=Z:RO;307200;2048
 
- EFI_WIN_NT_FILE_SYSTEM = 
+ EFI_WIN_NT_FILE_SYSTEM =
    <directory path>[!...]
 
    Mounting the two directories C:\FOO and C:\BAR would look like:
    EFI_WIN_NT_FILE_SYSTEM=c:\foo!c:\bar
 
- EFI_WIN_NT_CONSOLE = 
+ EFI_WIN_NT_CONSOLE =
    <window title>
 
    Declaring a text console window with the title "My EFI Console" woild look like:
    EFI_WIN_NT_CONSOLE=My EFI Console
 
- EFI_WIN_NT_UGA = 
+ EFI_WIN_NT_GOP =
    <width> <height>[!...]
 
-   Declaring a two UGA windows with resolutions of 800x600 and 1024x768 would look like:
-   Example : EFI_WIN_NT_UGA=800 600!1024 768
+   Declaring a two GOP windows with resolutions of 800x600 and 1024x768 would look like:
+   Example : EFI_WIN_NT_GOP=800 600!1024 768
 
- EFI_WIN_NT_SERIAL_PORT = 
+ EFI_WIN_NT_SERIAL_PORT =
    <port name>[!...]
 
    Declaring two serial ports on COM1 and COM2 would look like:

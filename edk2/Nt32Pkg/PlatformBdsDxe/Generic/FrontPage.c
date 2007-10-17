@@ -65,13 +65,13 @@ Returns:
 
 --*/
 {
-  CHAR16        *LanguageString;
-  UINTN         Count;
-  CHAR16        UnicodeLang[3];
-  CHAR8         Lang[3];
-  EFI_STATUS    Status;
-  UINTN         Index;
-  CHAR16        *TmpStr;
+  CHAR16                        *LanguageString;
+  UINTN                         Count;
+  CHAR16                        UnicodeLang[3];
+  CHAR8                         Lang[3];
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  CHAR16                        *TmpStr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Color;

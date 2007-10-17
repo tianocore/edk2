@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
                                                                                           
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -27,7 +27,6 @@ Abstract:
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/Runtime.h>
-#include <Protocol/UgaIo.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -65,7 +64,7 @@ Arguments:
 Returns:
 
   EFI_SUCCESS           - The CRC32 for target data is calculated successfully.
-  EFI_INVALID_PARAMETER - Some parameter is not valid, so the CRC32 is not 
+  EFI_INVALID_PARAMETER - Some parameter is not valid, so the CRC32 is not
                           calculated.
 
 --*/
@@ -84,7 +83,7 @@ Routine Description:
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
 Arguments:
-  
+
   DebugDisposition    - Supplies type information for the pointer being converted.
   ConvertAddress      - A pointer to a pointer that is to be fixed to be the value needed
                         for the new virtual address mappings being applied.
@@ -114,7 +113,7 @@ Routine Description:
   Changes the runtime addressing mode of EFI firmware from physical to virtual.
 
 Arguments:
-  
+
   MemoryMapSize     - The size in bytes of VirtualMap.
   DescriptorSize    - The size in bytes of an entry in the VirtualMap.
   DescriptorVersion - The version of the structure entries in VirtualMap.
@@ -166,11 +165,11 @@ RuntimeDriverInitialize (
 
 Routine Description:
 
-  Install Runtime AP. This code includes the EfiRuntimeLib, but it only 
-  functions at RT in physical mode. 
+  Install Runtime AP. This code includes the EfiRuntimeLib, but it only
+  functions at RT in physical mode.
 
 Arguments:
-  
+
   ImageHandle   - Image handle of this driver.
   SystemTable   - Pointer to the EFI System Table.
 

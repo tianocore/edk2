@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -60,16 +60,6 @@ extern EFI_GUID gEfiWinNtVirtualDisksGuid;
 extern EFI_GUID gEfiWinNtPhysicalDisksGuid;
 
 //
-// EFI_WIN_NT_GOP_GUID
-//
-#define EFI_WIN_NT_GOP_GUID \
-  { \
-    0x4e11e955, 0xccca, 0x11d4, {0xbd, 0x0d, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81} \
-  }
-
-extern EFI_GUID gEfiWinNtGopGuid;
-
-//
 // EFI_WIN_NT_FILE_SYSTEM
 //
 #define EFI_WIN_NT_FILE_SYSTEM_GUID \
@@ -98,6 +88,16 @@ extern EFI_GUID gEfiWinNtSerialPortGuid;
   }
 
 extern EFI_GUID gEfiWinNtUgaGuid;
+
+//
+// EFI_WIN_NT_GOP
+//
+#define EFI_WIN_NT_GOP_GUID \
+  { \
+    0x4e11e955, 0xccca, 0x11d4, 0xbd, 0xd, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 \
+  }
+
+extern EFI_GUID gEfiWinNtGopGuid;
 
 //
 // EFI_WIN_NT_CONSOLE

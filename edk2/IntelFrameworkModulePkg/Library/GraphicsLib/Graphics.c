@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
+#include <Library/DebugLib.h>
 
 EFI_STATUS
 GetGraphicsBitMapFromFV (
@@ -133,8 +133,8 @@ ConvertBmpToGopBlt (
 
 Routine Description:
 
-  Convert a *.BMP graphics image to a UGA blt buffer. If a NULL UgaBlt buffer
-  is passed in a UgaBlt buffer will be allocated by this routine. If a UgaBlt
+  Convert a *.BMP graphics image to a GOP/UGA blt buffer. If a NULL Blt buffer
+  is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
   buffer is passed in it will be used if it is big enough.
 
 Arguments:
@@ -143,21 +143,21 @@ Arguments:
 
   BmpImageSize  - Number of bytes in BmpImage
 
-  UgaBlt        - Buffer containing UGA version of BmpImage.
+  GopBlt        - Buffer containing GOP version of BmpImage.
 
-  UgaBltSize    - Size of UgaBlt in bytes.
+  GopBltSize    - Size of GopBlt in bytes.
 
-  PixelHeight   - Height of UgaBlt/BmpImage in pixels
+  PixelHeight   - Height of GopBlt/BmpImage in pixels
 
-  PixelWidth    - Width of UgaBlt/BmpImage in pixels
+  PixelWidth    - Width of GopBlt/BmpImage in pixels
 
 
 Returns:
 
-  EFI_SUCCESS           - UgaBlt and UgaBltSize are returned.
+  EFI_SUCCESS           - GopBlt and GopBltSize are returned.
   EFI_UNSUPPORTED       - BmpImage is not a valid *.BMP image
-  EFI_BUFFER_TOO_SMALL  - The passed in UgaBlt buffer is not big enough.
-                          UgaBltSize will contain the required size.
+  EFI_BUFFER_TOO_SMALL  - The passed in GopBlt buffer is not big enough.
+                          GopBltSize will contain the required size.
   EFI_OUT_OF_RESOURCES  - No enough buffer to allocate
 
 --*/
@@ -575,8 +575,8 @@ DisableQuietBoot (
 
 Routine Description:
 
-  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA
-  Simple Text Out screens will now be synced up with all non UGA output devices
+  Use Console Control to turn on GOP/UGA based Simple Text Out consoles. The GOP/UGA
+  Simple Text Out screens will now be synced up with all non GOP/UGA output devices
 
 Arguments:
 
@@ -584,7 +584,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - UGA devices are back in text mode and synced up.
+  EFI_SUCCESS           - GOP/UGA devices are back in text mode and synced up.
   EFI_UNSUPPORTED       - Logo not found
 
 --*/
@@ -665,21 +665,23 @@ Returns:
 
 --*/
 {
-  VOID              *Buffer;
-  EFI_STATUS        Status;
-  UINT16            GlyphWidth;
-  UINT32            GlyphStatus;
-  UINT16            StringIndex;
-  UINTN             Index;
-  CHAR16            *UnicodeWeight;
-  EFI_NARROW_GLYPH  *Glyph;
-  EFI_HII_PROTOCOL  *Hii;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL     *LineBuffer;
-  UINT32            HorizontalResolution;
-  UINT32            VerticalResolution;
-  UINT32            ColorDepth;
-  UINT32            RefreshRate;
-  UINTN             BufferGlyphWidth;
+  VOID                           *Buffer;
+  EFI_STATUS                     Status;
+  UINT16                         GlyphWidth;
+  UINT32                         GlyphStatus;
+  UINT16                         StringIndex;
+  UINTN                          Index;
+  CHAR16                         *UnicodeWeight;
+  EFI_NARROW_GLYPH               *Glyph;
+  EFI_HII_PROTOCOL               *Hii;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *LineBuffer;
+  UINT32                         HorizontalResolution;
+  UINT32                         VerticalResolution;
+  UINT32                         ColorDepth;
+  UINT32                         RefreshRate;
+  UINTN                          BufferLen;
+  UINTN                          LineBufferLen;
+  UINTN                          BufferGlyphWidth;
 
   GlyphStatus = 0;
 
@@ -700,8 +702,10 @@ Returns:
     //
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   }
+  ASSERT ((HorizontalResolution != 0) && (VerticalResolution !=0));
 
-  LineBuffer = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * GLYPH_WIDTH * GLYPH_HEIGHT);
+  LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * GLYPH_HEIGHT;
+  LineBuffer = AllocatePool (LineBufferLen);
   if (LineBuffer == NULL) {
     gBS->FreePool (Buffer);
     return EFI_OUT_OF_RESOURCES;
@@ -724,7 +728,14 @@ Returns:
     }
   }
 
-  for (Index = 0; Index < StrLen (Buffer); Index++) {
+  BufferLen = StrLen (Buffer);
+
+  if (GLYPH_WIDTH * GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * BufferLen > LineBufferLen) {
+     Status = EFI_INVALID_PARAMETER;
+     goto Error;
+  }
+
+  for (Index = 0; Index < BufferLen; Index++) {
     StringIndex = (UINT16) Index;
     Status      = Hii->GetGlyph (Hii, UnicodeWeight, &StringIndex, (UINT8 **) &Glyph, &GlyphWidth, &GlyphStatus);
     if (EFI_ERROR (Status)) {
@@ -737,7 +748,7 @@ Returns:
                       (UINT8 *) Glyph,
                       mEfiColors[Sto->Mode->Attribute & 0x0f],
                       mEfiColors[Sto->Mode->Attribute >> 4],
-                      StrLen (Buffer),
+                      BufferLen,
                       GlyphWidth,
                       GLYPH_HEIGHT,
                       &LineBuffer[Index * GLYPH_WIDTH]
@@ -748,7 +759,7 @@ Returns:
                       (UINT8 *) Glyph,
                       *Foreground,
                       *Background,
-                      StrLen (Buffer),
+                      BufferLen,
                       GlyphWidth,
                       GLYPH_HEIGHT,
                       &LineBuffer[Index * GLYPH_WIDTH]
@@ -759,7 +770,7 @@ Returns:
   //
   // Blt a character to the screen
   //
-  BufferGlyphWidth = GLYPH_WIDTH * StrLen (Buffer);
+  BufferGlyphWidth = GLYPH_WIDTH * BufferLen;
   if (GraphicsOutput != NULL) {
     Status = GraphicsOutput->Blt (
                         GraphicsOutput,

@@ -1,6 +1,6 @@
 /*++ 
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Abstraction of a Text mode or UGA screen
+  Abstraction of a Text mode or GOP/UGA screen
 
 --*/
 
@@ -40,20 +40,21 @@ EFI_STATUS
 (EFIAPI *EFI_CONSOLE_CONTROL_PROTOCOL_GET_MODE) (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL      *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE   *Mode,
-  OUT BOOLEAN                           *UgaExists,   OPTIONAL  
-  OUT BOOLEAN                           *StdInLocked  OPTIONAL
+  OUT BOOLEAN                           *GopUgaExists,  OPTIONAL  
+  OUT BOOLEAN                           *StdInLocked    OPTIONAL
   )
 /*++
 
   Routine Description:
     Return the current video mode information. Also returns info about existence
-    of UGA Draw devices in system, and if the Std In device is locked. All the
-    arguments are optional and only returned if a non NULL pointer is passed in.
+    of Graphics Output devices or UGA Draw devices in system, and if the Std In
+    device is locked. All the arguments are optional and only returned if a non
+    NULL pointer is passed in.
 
   Arguments:
     This - Protocol instance pointer.
     Mode        - Are we in text of grahics mode.
-    UgaExists   - TRUE if UGA Spliter has found a UGA device
+    GopUgaExists - TRUE if Console Spliter has found a GOP or UGA device
     StdInLocked - TRUE if StdIn device is keyboard locked
 
   Returns:
