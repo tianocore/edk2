@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Filename: FarManifest.xsd
+
+Copyright (c) 2007, Intel Corp.
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which may be found at http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.TianoCore.org/2007/Edk2.1" xmlns="http://www.TianoCore.org/2007/Edk2.1">
+  <xs:include schemaLocation="FrameworkHeaders.xsd"/>  
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      The Framework Archive File Format is defined as a Java Archive file, with a special xml file called FrameworkArchiveManifest.xml at the top of the archive. The FrameworkArchiveManifest.xml must be an instance of this schema.
+    </xs:documentation>
+  </xs:annotation>
+  <xs:element name="FrameworkArchiveManifest">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        This schema defines the Framework Archive Manifest. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="FarHeader"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="FarPackageList">   
+          <xs:annotation>
+            <xs:documentation>
+              The list of packages in this FAR.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Contents">   
+          <xs:annotation>
+            <xs:documentation>
+              Extra contents that are not part of any Package. These file paths are WORKSPACE relative.  If a file exists in the workspace at this location, then the user should be asked whether to overwrite.  When the user removes the far, these should be removed also, unless they have been modified (per md5sum).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FarPackageList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="FarPackage"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FarPackage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="FarFilename">
+          <xs:annotation>
+            <xs:documentation>
+              This is the name of the .spd or file that describes the package. It must exist in the directory identified by DefaultPath.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element ref="GuidValue"></xs:element>
+        <xs:element ref="Version"></xs:element>
+        <xs:element ref="DefaultPath">
+          <xs:annotation>
+            <xs:documentation>
+              This is the default installation location within the workspace. This also serves as the location within the far itself of the package root. The Contents of the pacakage will be found there. The user may choose some other location within the workspace to install the package, as long as it does not overlap a package that is already installed.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element ref="Contents">
+          <xs:annotation>
+            <xs:documentation>
+              This is the list of files that belong to the package. They are specified by relative path from the root of the pacakge.                            
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DefaultPath" type="PathAndFilename"/>
+  <xs:element name="FarFilename" type="DbPathAndFilename">
+    <xs:annotation>
+      <xs:documentation>
+        The FarFilename is used to build up the Contents list. It has an md5sum attribute for keeping track of whether the file is changed after it is installed. The Md5sum can also be used to check the integrity of a far before it is installed into the workspace.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="GuidValue" type="GuidType">
+    <xs:annotation>
+      <xs:documentation>
+        The purpose of this element is to allow Guids to be assigned to or used by other elements in the schema.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Contents">
+    <xs:annotation>
+      <xs:documentation>
+        This tag allows us to specify a tree of files all having a common root. All the files specified are relative to that common root.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="FarFilename"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      Definitions and rules for creating, installing, updating and removing fars within the workspace.
+    </xs:documentation>
+    <xs:documentation>
+      1.  A module m is said to depend upon a package p, iff there exists a tuple (PackageGuid, PackageVerion) in the set m->PackageDependencies for which p->Guid==PackageGuid, and if PackageVersion is not empty, then p->Version== PackageVersion.
+    </xs:documentation>
+    <xs:documentation>
+      2.  A far f is said to depend on a far g, iff there is a module in a package in f that depends on a package in g.
+    </xs:documentation>
+    <xs:documentation>
+      3.  A far f is said to depend on a package p, iff there is a module m contained in f that depends on p.
+    </xs:documentation>
+    <xs:documentation>
+      4.  A far f may be installed into the workspace w, iff for each module m in f, m's dependencies are met by the packages in w or f.
+    </xs:documentation>
+    <xs:documentation>
+      a.  It is supported to "partially" install a far. A partial installation of a far means that 1 or more packages are installed into the workspace from the far. For each package p in f, p's dependencies must be satisfied by a package in the workspace.
+    </xs:documentation>
+    <xs:documentation>
+      5.  A far f may be removed from the workspace w, iff for each module m in w, and for each package p in f, m does not depend on p.
+    </xs:documentation>
+    <xs:documentation>
+      a.  It is supported to "partially" remove a far. In this case, one or more of the packages in the far can be removed, provided that for each package p in the workspace w, there does not exist a module m such that m depends on p.
+    </xs:documentation>
+    <xs:documentation>
+      6.  When installing a far f into workspace w, for each package p in f, allow the user to install in p's default location, or choose a new location l (which must be unoccupied) within the workspace. Record this location l in the database. Each package p in f will be recorded in the database, associated with the GUID of f, as well as the actual install location l. (So we will know which far each package belongs to.)
+    </xs:documentation>
+    <xs:documentation>
+      7.  When installing a far f into workspace w, if there exists a package p in w, and p is in f, then the user must be prompted to choose a location that does not collide with the location of p in workspace w. We will end up with two instances of p in w at two distinct locations. Alternately, the user may elect to partially install the far, leaving out the redundant package.
+    </xs:documentation>
+    <xs:documentation>
+      8.  A far f may replace a far g in the workspace w, iff for each module m contained in w, if m depends on a package p, and p is only contained in g, then there must exist a package q in f, such that m depends on q. The net effect is that g is removed and f is installed, in one operation. The normal rules for installing f still apply--the dependencies of the modules of f must be satisfied. After the replacement, it must be the case that all the modules dependencies in the workspace are satisfied. Note that it is possible to backrev a package in this way. 
+    </xs:documentation>
+    <xs:documentation>
+          (If we find that the replace is not permitted, then the user may install f and keep g. Next, he could _port_ every module m in w that depends on g, to f and eventually remove g.)
+    </xs:documentation>
+    <xs:documentation>
+      9.  A special case of the above rule is that a far f may be reinstalled into the workspace. (This would allow the user to get a fresh copy, or change the location in the workspace where one or more of the packages of f are installed.)
+    </xs:documentation>
+    <xs:documentation>
+      10. When a far f is removed from the workspace w, for each package p in f, we will remove p from w.
+    </xs:documentation>
+    <xs:documentation>
+      11. If a package p belongs to a far f, then it is legal to remove p from the workspace w iff, there does not exist a module m in w such that m depends on p.
+    </xs:documentation>
+    <xs:documentation>
+      12. When a far f is removed from the workspace, the we will remove all the files in f from the workspace tree. If a file has been modified from the original as installed from the far (per md5sum) then the user should be asked if he is "sure" he wants to remove it.
+    </xs:documentation>
+    <xs:documentation>
+      13. When a far is created, a GUID is generated and assigned to the far. If a far is created from the same components at a later time, it would have a different GUID.
+    </xs:documentation>
+    <xs:documentation>
+      14. If a package p is marked with p->RePackage==false, then p may not be added to a far.
+    </xs:documentation>
+    <xs:documentation>
+      15. A far f is identical to a far g, iff f->Guid == g->Guid.
+    </xs:documentation>
+    <xs:documentation>
+      17. A far f may be installed into the workspace w, iff there is no far g in w such that f->Guid==g->Guid. In that case, it is called "updating" the far in the workspace. The user may select some subset of packages to reinstall or update, to ensure that the files in the workspace are correct.
+    </xs:documentation>
+  </xs:annotation>
+</xs:schema>
