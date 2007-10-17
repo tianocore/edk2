@@ -395,7 +395,10 @@
   ##
   #  DXE Phase modules
   ##
-  MdeModulePkg/Core/Dxe/DxeMain.inf
+  MdeModulePkg/Core/Dxe/DxeMain.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/Crc32GuidedSectionExtractLib/Crc32GuidedSectionExtractLib.inf
+  }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -411,7 +414,6 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
-  MdeModulePkg/Universal/FirmwareVolume/Crc32SectionExtractDxe/Crc32SectionExtractDxe.inf
   Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
   Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
   MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
