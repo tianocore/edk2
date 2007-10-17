@@ -32,8 +32,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32
 #
-#  DRIVER_BINDING                =  gWinNtBusDriverBinding                       
-#  COMPONENT_NAME                =  gWinNtBusDriverComponentName                 
+#  DRIVER_BINDING                =  gWinNtBusDriverBinding
+#  COMPONENT_NAME                =  gWinNtBusDriverComponentName
 #
 
 [Sources.common]

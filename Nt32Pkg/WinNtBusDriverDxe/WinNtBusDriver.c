@@ -26,7 +26,7 @@ EFI_WIN_NT_PHYSICAL_DISKS - maps to drives on your system
 EFI_WIN_NT_VIRTUAL_DISKS  - maps to a device emulated by a file
 EFI_WIN_NT_FILE_SYSTEM    - mouts a directory as a file system
 EFI_WIN_NT_CONSOLE        - make a logical comand line window (only one!)
-EFI_WIN_NT_UGA            - Builds UGA Windows of Width and Height
+EFI_WIN_NT_GOP            - Builds GOP Windows of Width and Height
 EFI_WIN_NT_SERIAL_PORT    - maps physical serial ports
 
  <F>ixed       - Fixed disk like a hard drive.
@@ -76,11 +76,11 @@ EFI_WIN_NT_SERIAL_PORT    - maps physical serial ports
    Declaring a text console window with the title "My EFI Console" woild look like:
    EFI_WIN_NT_CONSOLE=My EFI Console
 
- EFI_WIN_NT_UGA =
+ EFI_WIN_NT_GOP =
    <width> <height>[!...]
 
-   Declaring a two UGA windows with resolutions of 800x600 and 1024x768 would look like:
-   Example : EFI_WIN_NT_UGA=800 600!1024 768
+   Declaring a two GOP windows with resolutions of 800x600 and 1024x768 would look like:
+   Example : EFI_WIN_NT_GOP=800 600!1024 768
 
  EFI_WIN_NT_SERIAL_PORT =
    <port name>[!...]
@@ -156,9 +156,9 @@ static NT_PCD_ENTRY  mPcdEnvironment[] = {
 /**
   The user Entry Point for module WinNtBusDriver. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

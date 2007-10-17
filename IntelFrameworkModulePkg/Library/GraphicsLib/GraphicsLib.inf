@@ -45,7 +45,7 @@
   MemoryAllocationLib
   BaseLib
   PrintLib
-
+  DebugLib
 
 [Protocols]
   gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
