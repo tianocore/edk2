@@ -65,7 +65,7 @@ class SetupBuildEnvironmentApp:
       }
 
   def ProcessCommandLine(self):
-    Parser = OptionParser(description=__copyright__,version=__version__,prog="Tools/BuildEnv")
+    Parser = OptionParser(description=__copyright__,version=__version__,prog="BaseTools/BuildEnv")
     Parser.add_option("-q", "--quiet", action="store_true", type=None, help="Disable all messages except FATAL ERRORS.")
     Parser.add_option("-v", "--verbose", action="store_true", type=None, help="Turn on verbose output with informational messages printed, "\
                                                                                "including library instances selected, final dependency expression, "\
@@ -198,7 +198,7 @@ class SetupBuildEnvironmentApp:
     todo = self.conf['templates and Conf directory']
     workspace = os.path.realpath(self.Opt.workspace)
     templatesDir = \
-      os.path.join(workspace, 'Tools', 'BaseTools', 'ConfTemplates', sys.platform.title())
+      os.path.join(workspace, 'BaseTools', 'ConfTemplates', sys.platform.title())
     confDir = \
       os.path.join(workspace, 'Conf')
     print
@@ -249,12 +249,18 @@ class SetupBuildEnvironmentApp:
     print >> script, 'export TOOLCHAIN="%s"' % self.conf['compiler']
     print >> script, 'export EDK_CC_PATH_PREFIX="%s"' % self.conf['compiler-prefix']
 
+    EDK_TOOLS_PATH = os.path.join(workspace, 'BaseTools')
+    print >> script, 'if [ $EDK_TOOLS_PATH=="" ]'
+    print >> script, 'then'
+    print >> script, '  export EDK_TOOLS_PATH="%s"' % EDK_TOOLS_PATH
+    print >> script, 'fi'
+
     #
     # Change PATH variable
     #
     newPath = os.environ['PATH'].split(os.path.pathsep)
     binDir = \
-      os.path.join(workspace, 'Tools', 'BaseTools', 'Bin', sys.platform.title())
+      os.path.join(workspace, 'BaseTools', 'Bin', sys.platform.title())
     if binDir not in newPath:
       newPath.append(binDir)
     newPath = os.path.pathsep.join(newPath)

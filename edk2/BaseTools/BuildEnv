@@ -11,11 +11,11 @@
 # Setup the environment for unix-like systems running a bash-like shell.
 # This file must be "sourced" not merely executed. For example: ". edksetup.sh"
 
-if [ ! -e ./Tools/BaseTools/BuildEnv.py ]
+if [ ! -e ./BaseTools/BuildEnv.py ]
 then
   echo Run this script from the base of your tree.  For example:
   echo "  cd /Path/To/Edk/Root"
-  echo "  . Tools/BuildEnv"
+  echo "  . BaseTools/BuildEnv"
   return
 fi
 
@@ -23,7 +23,7 @@ fi
 # First, we run a python tool that will ask the user to configure
 # the environment in a (relatively) user friendly manner.
 #
-python ./Tools/BaseTools/BuildEnv.py $*
+python ./BaseTools/BuildEnv.py $*
 
 #
 # The python tool will write ./Conf/BuildEnv.sh to actually configure
