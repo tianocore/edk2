@@ -362,7 +362,7 @@
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
-      NULL|MdeModulePkg/Library/Crc32GuidedSectionExtractLib/Crc32GuidedSectionExtractLib.inf
+      NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   }
   
   MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
