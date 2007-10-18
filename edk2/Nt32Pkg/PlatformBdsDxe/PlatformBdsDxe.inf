@@ -124,7 +124,6 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadFileProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMED
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL SOMETIMES_CONSUMED
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiFormBrowserProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
@@ -145,4 +144,4 @@
 
 [depex]
   gEfiHiiProtocolGuid
-  
+
