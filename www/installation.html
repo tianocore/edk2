@@ -44,7 +44,7 @@
 				<P ALIGN=CENTER><B>1.4.5</B></P>
 			</TD>
 			<TD>
-				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download">http://prdownloads.sourceforge.net/tortoisesvn/</A><BR><A HREF="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download">TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download</A></P>
+				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download">http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi</A></P>
 			</TD>
 		</TR>
 <!--
@@ -210,7 +210,8 @@
 					<P ALIGN=CENTER><B>3.0.0NT or later</B></P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/MS_ASL-Compiler_3.0.1.msi">http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/MS_ASL-Compiler_3.0.1.msi</A><BR><A HREF="http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/MS_ASL-Compiler_3.0.1.msi">http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/MS_ASL-Compiler_3.0.1.msi</A></P>
+					<P ALIGN=CENTER><A HREF="http://www.microsoft.com/whdc/system/pnppwr/powermgmt/default.mspx">
+              http://www.microsoft.com/whdc/system/pnppwr/powermgmt/default.mspx</A></P>
 				</TD>
 			</TR>
 			<TR>
@@ -247,13 +248,13 @@
     are supported do care about case.<BR><BR>You need to set
 		WORKSPACE to the location of the edk2 directory that you pulled
 		from Subversion. For example</P>
-		<PRE STYLE="margin-bottom: 0.2in">set WORKSPACE=c:\workspace\edk2\</PRE><P>
+		<PRE STYLE="margin-bottom: 0.2in">set WORKSPACE=c:\workspace\edk2</PRE><P>
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
 		<H3 CLASS="heading-2">The first build</H3>
 		<P>You will need to edit the text file, tools_def.txt, located
-		in the %WORKSPACE%/Conf directory. This file contains the names of the
+		in the %WORKSPACE%\Conf directory. This file contains the names of the
 		compiler tool chains and the location of the compiler binaries. It
 		has been pre-populated with the standard location for the Microsoft
 		tool chains and includes the standard location of the Intel C
@@ -267,13 +268,13 @@
       <UL>This will set the PATH to point to the directory containing the 
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
-			Using the --nt32 switch will run \"%VS80COMNTOOLS%\vsvars32\" or 
-      \"%VS71COMNTOOLS%\vsvars32\" to setup standard C FLAGS, Library and 
-      Include locations to build the Nt32 emulation environment.<BR><B>Note:</B>
-      If you do not want to build the Nt32 emulation environment, you do not
+			Using the --nt32 switch will run &quot;%VS80COMNTOOLS%\vsvars32&quot; (VS2005) or 
+      &quot;%VS71COMNTOOLS%\vsvars32&quot; (VS2003.NET) to setup standard C FLAGS, 
+      Library and Include locations to build the Nt32 emulation environment.<BR>
+      <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL></P>
 			<LI><P STYLE="margin-bottom: 0in">cd Nt32Pkg</P>
-			<LI><P>type build 
+			<LI><P STYLE="margin-bottom: 0in">type build 
 			</P>
 		</OL>
 	</DIV>
