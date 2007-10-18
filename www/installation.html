@@ -193,7 +193,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)</B></P>
+					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)***</B></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>3790.1830</B></P>
@@ -225,9 +225,9 @@
 				</TD>
 			</TR>
       <TR>
-        <TD ALIGN=LEFT COLSPAN=3><Sup>*</Sup>The default tool chain for the IA32 and X64 Builds</TD>
-      <TR>
-        <TD ALIGN=LEFT COLSPAN=3><Sup>**</Sup>Needed for building IPF targets if the DDK is not installed.</TD>
+        <TD ALIGN=LEFT COLSPAN=3><Sup>*</Sup>The default tool chain for the IA32 and X64 builds<BR>
+        <Sup>**</Sup>Needed for building IPF targets if the DDK is not installed.<BR>
+        <Sup>***</Sup>The default tool chain for IPF builds.</TD>
       </TR>
 		</TABLE>
 		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP</H3>
@@ -263,10 +263,10 @@
 		a build.</P>
 		<OL>
 			<LI><P STYLE="margin-bottom: 0in">cd to %WORKSPACE%</P>
-			<LI><P STYLE="margin-bottom: 0in">run edksetup.bat newbuild (this
+			<LI><P STYLE="margin-bottom: 0in">run edksetup.bat newbuild <UL>(this
       will set the PATH to point to the directory containing the Win32
-      binaries of the EDK II tools used in edk2 development.) It will
-			fail if the external tools above are not properly installed.)</P>
+      binaries of the EDK II tools used in edk2 development. It will
+			fail if the external tools above are not properly installed.</UL></P>
 			<LI><P STYLE="margin-bottom: 0in">If your Visual Studio installation
       did not setup the environment globally, you will need to run the
       vsvars32.bat file to setup standard C FLAGS, Library and Include
