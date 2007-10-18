@@ -254,6 +254,9 @@ BuildModuleHob (
 {
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
+  ASSERT (((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
+          ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0));
+
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
   CopyGuid (&(Hob->MemoryAllocationHeader.Name), &gEfiHobMemoryAllocModuleGuid);
@@ -512,6 +515,9 @@ BuildStackHob (
 {
   EFI_HOB_MEMORY_ALLOCATION_STACK  *Hob;
 
+  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
+
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
@@ -547,6 +553,9 @@ BuildBspStoreHob (
   )
 {
   EFI_HOB_MEMORY_ALLOCATION_BSP_STORE  *Hob;
+
+  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
 
@@ -584,8 +593,11 @@ BuildMemoryAllocationHob (
 {
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
+  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
+  
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
-
+  
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;

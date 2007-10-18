@@ -224,7 +224,7 @@ DxeLoadCore (
   BuildModuleHob (
     &DxeCoreFileName,
     DxeCoreAddress,
-    DxeCoreSize,
+    EFI_SIZE_TO_PAGES ((UINT32) DxeCoreSize) * EFI_PAGE_SIZE,
     DxeCoreEntryPoint
     );
 
