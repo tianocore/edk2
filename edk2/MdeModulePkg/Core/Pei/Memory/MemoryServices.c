@@ -248,7 +248,7 @@ Returns:
     //
     BuildMemoryAllocationHob (
       Hob.HandoffInformationTable->EfiFreeMemoryTop,
-      Pages * EFI_PAGE_SIZE + Offset,
+      Pages * EFI_PAGE_SIZE,
       MemoryType
       );
 
