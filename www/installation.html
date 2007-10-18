@@ -24,7 +24,11 @@
 <P>The following are required to be able to build the EDK II using the new Makefile build: 
 </P>
 <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
-	<TABLE BORDER=1 CELLPADDING=0 CELLSPACING=0>
+  <UL>
+    <LI>An IA32 or X64 Based Development Workstation (IPF Workstations are not supported)</LI>
+    <LI>Internet Access with SSL (https) support</LI>
+  </UL>
+	<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 		<TR>
 			<TH>
 				<P STYLE="border: none; padding: 0in"><FONT COLOR="#ffffff">Name</FONT></P>
@@ -47,67 +51,14 @@
 				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download">http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi</A></P>
 			</TD>
 		</TR>
-<!--
-		<TR>
-			<TD>
-				<P ALIGN=CENTER><B>Ant</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><B>1.6.5</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><A HREF="http://ant.apache.org/bindownload.cgi">http://ant.apache.org/bindownload.cgi</A></P>
-			</TD>
-		</TR>
-		<TR>
-			<TD>
-				<P ALIGN=CENTER><B>Ant Contrib</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><B>1.0b2</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/ant-contrib/ant-contrib-1.0b2-bin.zip?download">http://prdownloads.sourceforge.net/ant-contrib/ant-contrib-1.0b2-bin.zip?download</A></P>
-			</TD>
-		</TR>
-		<TR>
-			<TD>
-				<P ALIGN=CENTER><B>Java JDK</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><B>1.5.x</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><A HREF="http://java.sun.com/j2se/1.5.0/download.jsp">http://java.sun.com/j2se/1.5.0/download.jsp</A></P>
-			</TD>
-		</TR>
-		<TR>
-			<TD>
-				<P ALIGN=CENTER><B>Saxon-B</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><B>8.1.1 for Java</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip">http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip</A></P>
-			</TD>
-		</TR>
-		<TR>
-			<TD>
-				<P ALIGN=CENTER><B>XMLBeans</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><B>2.1.0</B></P>
-			</TD>
-			<TD>
-				<P ALIGN=CENTER><A HREF="http://www.apache.org/dyn/closer.cgi/xmlbeans/binaries">http://www.apache.org/dyn/closer.cgi/xmlbeans/binaries</A></P>
-			</TD>
-		</TR>
--->
+
+    <!-- Removed ANT/JAVA information -->
+
 	</TABLE>
 	<P><BR><BR>
 	</P>
 	<P>The following tools are optional:</P>
+  <DIV>At least one compiler tool chain will be required</DIV>
 	<DIV ID="Section1" DIR="LTR"><A NAME="requirements"></A><A NAME="requirements_table1"></A>
 		<TABLE BORDER=1 CELLPADDING=0 CELLSPACING=0>
 			<TR>
@@ -129,7 +80,10 @@
 					<P ALIGN=CENTER><B>Current</B></P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://www.cygwin.com/">http://www.cygwin.com</A></P>
+					<P ALIGN=CENTER><A HREF="http://www.cygwin.com/">http://www.cygwin.com</A><BR>
+          <FONT Size="-1">Instructions for installation of GCC are included in the 
+          BaseTools\Conf directory.</FONT>
+          </P>
 				</TD>
 			</TR>
 			<TR>
@@ -231,7 +185,7 @@
         <Sup>***</Sup>The default tool chain for IPF builds.</TD>
       </TR>
 		</TABLE>
-		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP</H3>
+		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP or Windows Vista</H3>
 		<H3>Software Installation Order</H3>
 		<P>After installing the compiler tools and your Subversion client,
 		download the edk2, read the BuildNotes2.txt file and you will be
@@ -275,6 +229,8 @@
       need to use the --nt32 switch or run vsvars32.bat.</UL></P>
 			<LI><P STYLE="margin-bottom: 0in">cd Nt32Pkg</P>
 			<LI><P STYLE="margin-bottom: 0in">type build 
+			</P>
+      <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ 
 			</P>
 		</OL>
 	</DIV>
