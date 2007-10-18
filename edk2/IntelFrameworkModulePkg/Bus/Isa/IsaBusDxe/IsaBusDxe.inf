@@ -48,7 +48,6 @@
 
 [LibraryClasses]
   PcdLib
-  BootScriptLib
   ReportStatusCodeLib
   UefiBootServicesTableLib
   MemoryAllocationLib
