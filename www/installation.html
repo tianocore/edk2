@@ -21,13 +21,15 @@
 	</P>
 </UL>
 <H3 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H3>
-<P>The following are required to be able to build the EDK II using the new Makefile build: 
-</P>
 <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
   <UL>
     <LI>An IA32 or X64 Based Development Workstation (IPF Workstations are not supported)</LI>
-    <LI>Internet Access with SSL (https) support</LI>
+    <LI>Microsoft Windows, Linux or Apple Mac OS/X (10.4 or later) Operating System</LI>
+    <LI>Disk Space for compiler tools </LI>
+    <LI>Minimum of 1GB of Disk Space for edk2 development trees (A clean edk2 checkout is about 325MB.)</LI>
+    <LI>Minimum of 512MB of system memory (1GB is recommended.)</LI>
   </UL>
+  <P>The following are required to be able to build the EDK II using the new Makefile build:</P>
 	<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 		<TR>
 			<TH>
@@ -74,21 +76,19 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Cygwin</B></P>
+					<P ALIGN=CENTER><B>Cygwin</B><sup>1</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>Current</B></P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://www.cygwin.com/">http://www.cygwin.com</A><BR>
-          <FONT Size="1">Instructions for installation of GCC are included in the 
-          BaseTools\Conf directory.</FONT>
+					<P ALIGN=CENTER><A HREF="http://www.cygwin.com/">http://www.cygwin.com</A>
           </P>
 				</TD>
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Visual Studio*</B></P>
+					<P ALIGN=CENTER><B>Microsoft Visual Studio</B><sup>2</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>2005 Professional</B>
@@ -100,7 +100,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Visual Studio**</B></P>
+					<P ALIGN=CENTER><B>Microsoft Visual Studio</B><sup>3</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>2005 Team Suite</B>
@@ -147,7 +147,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)***</B></P>
+					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)</B><sup>4</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>3790.1830</B></P>
@@ -180,9 +180,11 @@
 				</TD>
 			</TR>
       <TR>
-        <TD ALIGN=LEFT COLSPAN=3><Sup>*</Sup>The default tool chain for the IA32 and X64 builds<BR>
-        <Sup>**</Sup>Needed for building IPF targets if the DDK is not installed.<BR>
-        <Sup>***</Sup>The default tool chain for IPF builds.</TD>
+        <TD ALIGN=LEFT COLSPAN=3>
+          <Sup>1</Sup><FONT SIZE="1">&nbsp;Instructions for installation of GCC are included in the BaseTools\Conf directory.</FONT><BR>
+          <Sup>2</Sup><FONT SIZE="1">&nbsp;The default tool chain for the IA32 and X64 builds</FONT><BR>
+          <Sup>3</Sup><FONT SIZE="1">&nbsp;Needed for building IPF targets if the DDK is not installed.</FONT><BR>
+          <Sup>4</Sup><FONT SIZE="1">&nbsp;The default tool chain for IPF builds.</FONT></TD>
       </TR>
 		</TABLE>
 		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP or Windows Vista</H3>
