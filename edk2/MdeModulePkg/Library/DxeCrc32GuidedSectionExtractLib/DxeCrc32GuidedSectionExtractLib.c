@@ -27,6 +27,7 @@ Abstract:
 #include <Protocol/SecurityPolicy.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 typedef struct {
@@ -57,10 +58,16 @@ Arguments:
 Returns:
 
   EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
-  EFI_INVALID_PARAMETER - The source data is corrupted
+  EFI_INVALID_PARAMETER - The source data is corrupted, or
+                          The GUID in InputSection does not match this instance guid.
 
 --*/
 {
+  if (!CompareGuid (
+        &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Retrieve the size and attribute of the input section data.
   //
@@ -97,8 +104,9 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - Decompression is successfull
-  EFI_INVALID_PARAMETER - The source data is corrupted
+  RETURN_SUCCESS           - Decompression is successfull
+  RETURN_INVALID_PARAMETER - The source data is corrupted, or
+                             The GUID in InputSection does not match this instance guid.
 
 --*/
 {
@@ -107,6 +115,12 @@ Returns:
   UINT32                    Crc32Checksum;
   UINT32                    OutputBufferSize;
   VOID                      *DummyInterface;
+
+  if (!CompareGuid (
+        &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Crc32Checksum = 0;
   //

@@ -42,6 +42,7 @@
 
 [LibraryClasses]
   DebugLib
+  BaseMemoryLib
   ExtractGuidedSectionLib
 
 [Guids]

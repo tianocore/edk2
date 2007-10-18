@@ -141,7 +141,7 @@ ExtractGuidedSectionRegisterHandlers (
   Get information from the guided section. This function first gets the guid value
   from guided section header, then match this guid in the registered extract Handler list
   to its corresponding getinfo Handler. 
-  If not found, RETURN_UNSUPPORTED will be return. 
+  If not found, RETURN_INVALID_PARAMETER will be return. 
   If found, it will call the getinfo Handler to get the required size and attribute.
 
   It will ASSERT () if the pointer to OutputBufferSize is NULL.
@@ -154,8 +154,8 @@ ExtractGuidedSectionRegisterHandlers (
   @param[out] SectionAttribute      The attribute of the input guided section.
 
   @retval  RETURN_SUCCESS           Get the required information successfully.
-  @retval  RETURN_UNSUPPORTED       Guided section data is not supported.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly. 
+                                    The GUID in InputSection does not match any registered guid list.
 
 **/
 RETURN_STATUS
@@ -190,7 +190,7 @@ ExtractGuidedSectionGetInfo (
   // Not found, the input guided section is not supported. 
   //
   if (Index == mNumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
+    return RETURN_INVALID_PARAMETER;
   }
 
   //
@@ -208,7 +208,7 @@ ExtractGuidedSectionGetInfo (
   Extract data from the guided section. This function first gets the guid value
   from guided section header, then match this guid in the registered extract Handler list
   to its corresponding extract Handler. 
-  If not found, RETURN_UNSUPPORTED will be return. 
+  If not found, RETURN_INVALID_PARAMETER will be return. 
   If found, it will call this extract Handler to get output data and AuthenticationStatus.
 
   It will ASSERT () if the pointer to OutputBuffer is NULL.
@@ -225,8 +225,8 @@ ExtractGuidedSectionGetInfo (
                             authentication status of the output buffer. 
 
   @retval  RETURN_SUCCESS           Get the output data, size and AuthenticationStatus successfully.
-  @retval  RETURN_UNSUPPORTED       Guided section data is not supported to be decoded.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly. 
+                                    The GUID in InputSection does not match any registered guid.
 
 **/
 RETURN_STATUS
@@ -260,7 +260,7 @@ ExtractGuidedSectionDecode (
   // Not found, the input guided section is not supported. 
   //
   if (Index == mNumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
+    return RETURN_INVALID_PARAMETER;
   }
 
   //
