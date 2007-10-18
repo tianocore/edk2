@@ -796,12 +796,19 @@ Returns:
 
   RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
   RETURN_INVALID_PARAMETER - The source data is corrupted
+                             The GUID in InputSection does not match this instance guid.
 
 --*/
 {
   ASSERT (SectionAttribute != NULL);
 
   if (InputSection == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (!CompareGuid (
+        &gTianoCustomDecompressGuid, 
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
     return RETURN_INVALID_PARAMETER;
   }
   //
@@ -846,7 +853,8 @@ Arguments:
 Returns:
 
   RETURN_SUCCESS           - Decompression is successfull
-  RETURN_INVALID_PARAMETER - The source data is corrupted
+  RETURN_INVALID_PARAMETER - The source data is corrupted, or
+                             The GUID in InputSection does not match this instance guid.
 
 --*/
 {
@@ -854,7 +862,14 @@ Returns:
 
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
-  }  
+  }
+
+  if (!CompareGuid (
+        &gTianoCustomDecompressGuid, 
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   //
   // Set Authentication to Zero.
   //

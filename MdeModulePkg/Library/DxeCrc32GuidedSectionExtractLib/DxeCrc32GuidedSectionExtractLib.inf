@@ -41,6 +41,7 @@
   ExtractGuidedSectionLib
   UefiBootServicesTableLib
   DebugLib
+  BaseMemoryLib
 
 [Protocols]
   gEfiCrc32GuidedSectionExtractionProtocolGuid
