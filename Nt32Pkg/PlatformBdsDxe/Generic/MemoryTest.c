@@ -55,59 +55,33 @@ Returns:
 
 --*/
 {
-  EFI_STATUS            Status;
+  EFI_STATUS                     Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL   *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL *UgaDraw;
-  UINT32                SizeOfX;
-  UINT32                SizeOfY;
-  UINT32                ColorDepth;
-  UINT32                RefreshRate;
+  UINT32                         SizeOfX;
+  UINT32                         SizeOfY;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Color;
-  UINTN                 BlockHeight;
-  UINTN                 BlockWidth;
-  UINTN                 BlockNum;
-  UINTN                 PosX;
-  UINTN                 PosY;
-  UINTN                 Index;
+  UINTN                          BlockHeight;
+  UINTN                          BlockWidth;
+  UINTN                          BlockNum;
+  UINTN                          PosX;
+  UINTN                          PosY;
+  UINTN                          Index;
 
   if (Progress > 100) {
     return EFI_INVALID_PARAMETER;
   }
 
-  UgaDraw = NULL;
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
                   &gEfiGraphicsOutputProtocolGuid,
                   &GraphicsOutput
                   );
   if (EFI_ERROR (Status)) {
-    GraphicsOutput = NULL;
-
-    Status = gBS->HandleProtocol (
-                    gST->ConsoleOutHandle,
-                    &gEfiUgaDrawProtocolGuid,
-                    &UgaDraw
-                    );
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
+    return EFI_UNSUPPORTED;
   }
 
-  if (GraphicsOutput != NULL) {
-    SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
-    SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
-    Status = UgaDraw->GetMode (
-                        UgaDraw,
-                        &SizeOfX,
-                        &SizeOfY,
-                        &ColorDepth,
-                        &RefreshRate
-                        );
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
-  }
+  SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
+  SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
 
   BlockWidth  = SizeOfX / 100;
   BlockHeight = SizeOfY / 50;
@@ -123,8 +97,7 @@ Returns:
     //
     SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
 
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->Blt (
+    Status = GraphicsOutput->Blt (
                           GraphicsOutput,
                           &Color,
                           EfiBltVideoFill,
@@ -136,28 +109,13 @@ Returns:
                           SizeOfY - (PosY - GLYPH_HEIGHT - 1),
                           SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
-    } else {
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *) &Color,
-                          EfiUgaVideoFill,
-                          0,
-                          0,
-                          0,
-                          PosY - GLYPH_HEIGHT - 1,
-                          SizeOfX,
-                          SizeOfY - (PosY - GLYPH_HEIGHT - 1),
-                          SizeOfX * sizeof (EFI_UGA_PIXEL)
-                          );
-    }
   }
   //
   // Show progress by drawing blocks
   //
   for (Index = PreviousValue; Index < BlockNum; Index++) {
     PosX = Index * BlockWidth;
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->Blt (
+    Status = GraphicsOutput->Blt (
                           GraphicsOutput,
                           &ProgressColor,
                           EfiBltVideoFill,
@@ -169,20 +127,6 @@ Returns:
                           BlockHeight,
                           (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
-    } else {
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *) &ProgressColor,
-                          EfiUgaVideoFill,
-                          0,
-                          0,
-                          PosX,
-                          PosY,
-                          BlockWidth - 1,
-                          BlockHeight,
-                          (BlockWidth) * sizeof (EFI_UGA_PIXEL)
-                          );
-    }
   }
 
   PrintXY (
