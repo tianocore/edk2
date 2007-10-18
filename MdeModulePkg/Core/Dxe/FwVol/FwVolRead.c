@@ -148,7 +148,7 @@ Returns:
     //
     // File type needs to be in 0 - 0x0B
     //
-    return EFI_INVALID_PARAMETER;
+    return EFI_NOT_FOUND;
   }
 
   KeyValue = (UINTN *)Key;
