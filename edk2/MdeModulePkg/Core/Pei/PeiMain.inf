@@ -96,6 +96,7 @@
   gEfiPeiFirmwareVolumeInfoPpiGuid
   gEfiPeiLoadFilePpiGuid
   gEfiPeiSecurity2PpiGuid
+  gEfiSecPlatformInformationPpiGuid
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
