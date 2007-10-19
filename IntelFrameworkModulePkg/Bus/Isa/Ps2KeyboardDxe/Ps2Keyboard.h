@@ -1,5 +1,5 @@
 /**@file
-	PS/2 keyboard driver header file
+  PS/2 keyboard driver header file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Framework/StatusCode.h>
 
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 #include <Protocol/IsaIo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/Ps2Policy.h>
@@ -30,18 +31,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 
 //
 // Driver Private Data
 //
 #define KEYBOARD_BUFFER_MAX_COUNT         32
 #define KEYBOARD_CONSOLE_IN_DEV_SIGNATURE EFI_SIGNATURE_32 ('k', 'k', 'e', 'y')
+#define KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('k', 'c', 'e', 'n')
+
+typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
+  UINTN                                 Signature;
+  EFI_HANDLE                            NotifyHandle;
+  EFI_KEY_DATA                          KeyData;
+  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
+  LIST_ENTRY                            NotifyEntry;
+} KEYBOARD_CONSOLE_IN_EX_NOTIFY;
+
 
 typedef struct {
   UINTN                               Signature;
 
   EFI_HANDLE                          Handle;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL      ConIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL   ConInEx;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
 
   EFI_EVENT                           TimerEvent;
@@ -51,6 +65,14 @@ typedef struct {
   UINT32                              CommandRegisterAddress;
 
   EFI_INPUT_KEY                       Key;
+  EFI_KEY_STATE                       KeyState;
+
+  BOOLEAN                             LeftShift;
+  BOOLEAN                             RightShift;  
+  BOOLEAN                             LeftLogo;
+  BOOLEAN                             RightLogo;
+  BOOLEAN                             Menu;
+  BOOLEAN                             SysReq;
 
   BOOLEAN                             Ctrl;
   BOOLEAN                             Alt;
@@ -81,9 +103,19 @@ typedef struct {
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
 
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  //
+  // Notification Function List
+  //
+  LIST_ENTRY                          NotifyList;
 } KEYBOARD_CONSOLE_IN_DEV;
 
 #define KEYBOARD_CONSOLE_IN_DEV_FROM_THIS(a)  CR (a, KEYBOARD_CONSOLE_IN_DEV, ConIn, KEYBOARD_CONSOLE_IN_DEV_SIGNATURE)
+#define TEXT_INPUT_EX_KEYBOARD_CONSOLE_IN_DEV_FROM_THIS(a) \
+  CR (a, \
+      KEYBOARD_CONSOLE_IN_DEV, \
+      ConInEx, \
+      KEYBOARD_CONSOLE_IN_DEV_SIGNATURE \
+      )
 
 #define TABLE_END 0x0
 
@@ -94,10 +126,13 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gKeyboardControllerDriver;
 extern EFI_COMPONENT_NAME_PROTOCOL   gPs2KeyboardComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2KeyboardComponentName2;
 
+extern EFI_GUID                      gSimpleTextInExNotifyGuid;
+
 //
 // Driver entry point
 //
 EFI_STATUS
+EFIAPI
 InstallPs2KeyboardDriver (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -144,11 +179,42 @@ Returns:
 #define SCANCODE_CAPS_LOCK_MAKE         0x3A
 #define SCANCODE_NUM_LOCK_MAKE          0x45
 #define SCANCODE_SCROLL_LOCK_MAKE       0x46
-#define SCANCODE_MAX_MAKE               0x59
+#define SCANCODE_LEFT_LOGO_MAKE         0x5B //GUI key defined in Keyboard scan code
+#define SCANCODE_LEFT_LOGO_BREAK        0xDB
+#define SCANCODE_RIGHT_LOGO_MAKE        0x5C
+#define SCANCODE_RIGHT_LOGO_BREAK       0xDC
+#define SCANCODE_MENU_MAKE              0x5D //APPS key defined in Keyboard scan code 
+#define SCANCODE_MENU_BREAK             0xDD
+#define SCANCODE_SYS_REQ_MAKE           0x37
+#define SCANCODE_MAX_MAKE               0x60
 
 //
 // Other functions that are used among .c files
 //
+
+EFI_STATUS
+UpdateStatusLights (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  )
+/*++
+
+Routine Description:
+
+  Show keyboard status light for ScrollLock, NumLock and CapsLock
+  according to indicators in ConsoleIn.
+
+Arguments:
+
+  ConsoleIn   - driver private structure
+
+Returns:
+
+  EFI_SUCCESS - Show the status light successfully.
+  EFI_TIMEOUT - Timeout when operating read/write on registers.
+
+--*/  
+;
+
 EFI_STATUS
 KeyboardRead (
   IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
@@ -361,8 +427,8 @@ Returns:
 
   @param[in]  BiosKeyboardPrivate   Keyboard Private Data Structure
 
-  @retval  		TRUE  								Keyboard in System.
-  @retval  		FALSE 								Keyboard not in System.
+  @retval     TRUE                  Keyboard in System.
+  @retval     FALSE                 Keyboard not in System.
 **/
 BOOLEAN
 EFIAPI
@@ -370,4 +436,157 @@ CheckKeyboardConnect (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
 ;
+
+VOID
+EFIAPI
+KeyboardWaitForKeyEx (
+  IN  EFI_EVENT               Event,
+  IN  VOID                    *Context
+  )
+/*++
+
+Routine Description:
+
+  Event notification function for SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
+  Signal the event if there is key available
+
+Arguments:
+
+Returns:
+
+--*/    
+;  
+
+//
+// Simple Text Input Ex protocol function prototypes
+//
+
+EFI_STATUS
+EFIAPI
+KeyboardEfiResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Reset the input device and optionaly run diagnostics
+
+  Arguments:
+    This                 - Protocol instance pointer.
+    ExtendedVerification - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                            not be reset.
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+KeyboardReadKeyStrokeEx (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    This       - Protocol instance pointer.
+    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+KeyboardSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+/*++
+
+  Routine Description:
+    Set certain state for the input device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                            state for the input device.
+                          
+  Returns:                
+    EFI_SUCCESS           - The device state was set successfully.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+KeyboardRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT EFI_HANDLE                        *NotifyHandle
+  )
+/*++
+
+  Routine Description:
+    Register a notification function for a particular keystroke for the input device.
+
+  Arguments:
+    This                    - Protocol instance pointer.
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+  Returns:
+    EFI_SUCCESS             - The notification function was registered successfully.
+    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+KeyboardUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_HANDLE                         NotificationHandle
+  )
+/*++
+
+  Routine Description:
+    Remove a registered notification function from a particular keystroke.
+
+  Arguments:
+    This                    - Protocol instance pointer.    
+    NotificationHandle      - The handle of the notification function being unregistered.
+
+  Returns:
+    EFI_SUCCESS             - The notification function was unregistered successfully.
+    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+--*/   
+;
+
 #endif
