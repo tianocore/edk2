@@ -130,6 +130,10 @@ APRIORI PEI {
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   }
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
+  }
 
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
