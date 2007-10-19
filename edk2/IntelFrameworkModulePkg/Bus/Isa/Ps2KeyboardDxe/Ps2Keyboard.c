@@ -44,9 +44,12 @@ KbdControllerDriverStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
-//
-// Global variables
-//
+STATIC
+EFI_STATUS
+KbdFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  );  
+
 //
 // DriverBinding Protocol Instance
 //
@@ -215,6 +218,13 @@ Returns:
   ConsoleIn->Alted                  = FALSE;
   ConsoleIn->DevicePath             = ParentDevicePath;
 
+  ConsoleIn->ConInEx.Reset               = KeyboardEfiResetEx;
+  ConsoleIn->ConInEx.ReadKeyStrokeEx     = KeyboardReadKeyStrokeEx;
+  ConsoleIn->ConInEx.SetState            = KeyboardSetState;
+  ConsoleIn->ConInEx.RegisterKeyNotify   = KeyboardRegisterKeyNotify;
+  ConsoleIn->ConInEx.UnregisterKeyNotify = KeyboardUnregisterKeyNotify;  
+  
+  InitializeListHead (&ConsoleIn->NotifyList);
   //
   // Setup the WaitForKey event
   //
@@ -231,6 +241,20 @@ Returns:
     goto ErrorExit;
   }
   //
+  // Setup the WaitForKeyEx event
+  //  
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
+                  KeyboardWaitForKeyEx,
+                  &(ConsoleIn->ConInEx),
+                  &(ConsoleIn->ConInEx.WaitForKeyEx)
+                  );
+  if (EFI_ERROR (Status)) {
+    Status      = EFI_OUT_OF_RESOURCES;
+    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
+    goto ErrorExit;
+  }
   // Setup a periodic timer, used for reading keystrokes at a fixed interval
   //
   Status = gBS->CreateEvent (
@@ -297,6 +321,8 @@ Returns:
                   &Controller,
                   &gEfiSimpleTextInProtocolGuid,
                   &ConsoleIn->ConIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &ConsoleIn->ConInEx,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -325,7 +351,10 @@ ErrorExit:
   if ((ConsoleIn != NULL) && (ConsoleIn->TimerEvent != NULL)) {
     gBS->CloseEvent (ConsoleIn->TimerEvent);
   }
-
+  if ((ConsoleIn != NULL) && (ConsoleIn->ConInEx.WaitForKeyEx != NULL)) {
+    gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
+  }
+  KbdFreeNotifyList (&ConsoleIn->NotifyList);
   if ((ConsoleIn != NULL) && (ConsoleIn->ControllerNameTable != NULL)) {
     FreeUnicodeStringTable (ConsoleIn->ControllerNameTable);
   }
@@ -401,7 +430,18 @@ KbdControllerDriverStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   ConsoleIn = KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (ConIn);
 
   //
@@ -431,12 +471,15 @@ KbdControllerDriverStop (
     Status = KeyboardRead (ConsoleIn, &Data);;
   }
   //
-  // Uninstall the Simple TextIn Protocol
+  // Uninstall the SimpleTextIn and SimpleTextInEx protocols
   //
-  Status = gBS->UninstallProtocolInterface (
+  Status = gBS->UninstallMultipleProtocolInterfaces (
                   Controller,
                   &gEfiSimpleTextInProtocolGuid,
-                  &ConsoleIn->ConIn
+                  &ConsoleIn->ConIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &ConsoleIn->ConInEx,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -463,13 +506,55 @@ KbdControllerDriverStop (
     gBS->CloseEvent ((ConsoleIn->ConIn).WaitForKey);
     (ConsoleIn->ConIn).WaitForKey = NULL;
   }
-
+  if (ConsoleIn->ConInEx.WaitForKeyEx != NULL) {
+    gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
+    ConsoleIn->ConInEx.WaitForKeyEx = NULL;
+  }
+  KbdFreeNotifyList (&ConsoleIn->NotifyList);
   FreeUnicodeStringTable (ConsoleIn->ControllerNameTable);
   gBS->FreePool (ConsoleIn);
 
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_STATUS
+KbdFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  ListHead   - The list head
+
+Returns:
+
+  EFI_SUCCESS           - Free the notify list successfully
+  EFI_INVALID_PARAMETER - ListHead is invalid.
+
+--*/
+{
+  KEYBOARD_CONSOLE_IN_EX_NOTIFY *NotifyNode;
+
+  if (ListHead == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  while (!IsListEmpty (ListHead)) {
+    NotifyNode = CR (
+                   ListHead->ForwardLink, 
+                   KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
+                   NotifyEntry, 
+                   KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                   );
+    RemoveEntryList (ListHead->ForwardLink);
+    gBS->FreePool (NotifyNode);
+  }
+  
+  return EFI_SUCCESS;
+}
 
 /**
   The user Entry Point for module Ps2Keyboard. The user code starts with this function.

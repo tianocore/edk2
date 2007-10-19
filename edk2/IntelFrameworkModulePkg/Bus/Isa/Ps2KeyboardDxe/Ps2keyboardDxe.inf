@@ -51,10 +51,16 @@
   UefiBootServicesTableLib
   UefiLib
   UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
 
 [Protocols]
   gEfiPs2PolicyProtocolGuid                     # PROTOCOL TO_START
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
+[Guids]
+  gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
 
