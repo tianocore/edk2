@@ -23,23 +23,40 @@ Abstract:
 #ifndef _WIN_NT_GOP_H_
 #define _WIN_NT_GOP_H_
 
-//@MT:#include "EfiWinNT.h"
-//@MT:#include "Tiano.h"
-//@MT:#include "EfiDriverLib.h"
+
+#include <Uefi.h>
+#include <WinNtDxe.h>
+
+#include <Guid/EventGroup.h>
+#include <Protocol/WinNtIo.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/GraphicsOutput.h>
+
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 //
-// Driver Consumed Protocols
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (DevicePath)
-//@MT:#include EFI_PROTOCOL_DEFINITION (WinNtIo)
+// WM_SYSKEYDOWN/WM_SYSKEYUP Notification
+// lParam
+// bit 24: Specifies whether the key is an extended key, 
+// such as the right-hand ALT and CTRL keys that appear on 
+// an enhanced 101- or 102-key keyboard. 
+// The value is 1 if it is an extended key; otherwise, it is 0.
+// bit 29:Specifies the context code. 
+// The value is 1 if the ALT key is down while the key is pressed/released; 
+// it is 0 if the WM_SYSKEYDOWN message is posted to the active window 
+// because no window has the keyboard focus.
+#define GOP_EXTENDED_KEY         (0x1 << 24)
+#define GOP_ALT_KEY_PRESSED      (0x1 << 29)
 
-//
-// Driver Produced Protocols
-//
-//@MT:#include EFI_PROTOCOL_DEFINITION (DriverBinding)
-//@MT:#include EFI_PROTOCOL_DEFINITION (ComponentName)
-//@MT:#include EFI_PROTOCOL_DEFINITION (GraphicsOutput)
-//@MT:#include "LinkedList.h"
 
 #define MAX_Q 256
 
@@ -53,6 +70,16 @@ typedef struct {
 #define WIN_NT_GOP_CLASS_NAME       L"WinNtGopWindow"
 
 #define GOP_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('S', 'g', 'o', 'N')
+
+#define WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('W', 'g', 'S', 'n')
+
+typedef struct _WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY {
+  UINTN                                 Signature;
+  EFI_HANDLE                            NotifyHandle;
+  EFI_KEY_DATA                          KeyData;
+  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
+  LIST_ENTRY                            NotifyEntry;
+} WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY;
 
 #define GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER 0xffff
 
@@ -110,6 +137,22 @@ typedef struct {
   CRITICAL_SECTION              QCriticalSection;
   GOP_QUEUE_FIXED               Queue;
 
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleTextInEx;
+  EFI_KEY_STATE                     KeyState;
+  LIST_ENTRY                        NotifyList;
+  BOOLEAN                           LeftShift;
+  BOOLEAN                           RightShift;  
+  BOOLEAN                           LeftAlt;
+  BOOLEAN                           RightAlt;
+  BOOLEAN                           LeftCtrl;
+  BOOLEAN                           RightCtrl;
+  BOOLEAN                           LeftLogo;
+  BOOLEAN                           RightLogo;
+  BOOLEAN                           Menu;
+  BOOLEAN                           SysReq;  
+  BOOLEAN                           NumLock;
+  BOOLEAN                           ScrollLock;
+  BOOLEAN                           CapsLock;  
 } GOP_PRIVATE_DATA;
 
 #define GOP_PRIVATE_DATA_FROM_THIS(a)  \
@@ -118,12 +161,17 @@ typedef struct {
 #define GOP_PRIVATE_DATA_FROM_TEXT_IN_THIS(a)  \
          CR(a, GOP_PRIVATE_DATA, SimpleTextIn, GOP_PRIVATE_DATA_SIGNATURE)
 
+#define GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS(a)  \
+         CR(a, GOP_PRIVATE_DATA, SimpleTextInEx, GOP_PRIVATE_DATA_SIGNATURE)
+
 //
 // Global Protocol Variables
 //
 extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtGopDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtGopComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtGopComponentName2;
+
+extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 
 //
 // Gop Hardware abstraction internal worker functions
