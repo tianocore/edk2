@@ -676,11 +676,12 @@ FindVariableInCache (
         if (Entry->DataSize == 0) {
           // Variable was deleted so return not found
           return EFI_NOT_FOUND;
-        } else if (Entry->DataSize != *DataSize) {
+        } else if (Entry->DataSize > *DataSize) {
           // If the buffer is too small return correct size
           *DataSize = Entry->DataSize;
           return EFI_BUFFER_TOO_SMALL;
         } else {
+          *DataSize = Entry->DataSize;
           // Return the data
           CopyMem (Data, Entry->Data, Entry->DataSize);
           if (Attributes != NULL) {
