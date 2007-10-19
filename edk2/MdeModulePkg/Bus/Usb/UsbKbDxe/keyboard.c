@@ -94,8 +94,8 @@ UINT8 KeyConvertionTable[USB_KEYCODE_MAX_MAKE][3] = {
   { SCAN_F8,        0x00,     0x00 },     // 0x41
   { SCAN_F9,        0x00,     0x00 },     // 0x42
   { SCAN_F10,       0x00,     0x00 },     // 0x43
-  { SCAN_F11,      0x00,     0x00 },     // 0x44   F11
-  { SCAN_F12,      0x00,     0x00 },     // 0x45   F12
+  { SCAN_F11,       0x00,     0x00 },     // 0x44   F11
+  { SCAN_F12,       0x00,     0x00 },     // 0x45   F12
   { SCAN_NULL,      0x00,     0x00 },     // 0x46   PrintScreen
   { SCAN_NULL,      0x00,     0x00 },     // 0x47   Scroll Lock
   { SCAN_NULL,      0x00,     0x00 },     // 0x48   Pause
@@ -129,7 +129,22 @@ UINT8 KeyConvertionTable[USB_KEYCODE_MAX_MAKE][3] = {
   { SCAN_NULL,      '\\',     '|' },      // 0x64 Keyboard Non-US \ and |
   { SCAN_NULL,      0x00,     0x00 },     // 0x65 Keyboard Application
   { SCAN_NULL,      0x00,     0x00 },     // 0x66 Keyboard Power
-  { SCAN_NULL,      '=' ,     '='  }      // 0x67 Keypad =
+  { SCAN_NULL,      '=' ,     '='  },     // 0x67 Keypad =
+  { SCAN_F13,       0x00,     0x00 },     // 0x68
+  { SCAN_F14,       0x00,     0x00 },     // 0x69
+  { SCAN_F15,       0x00,     0x00 },     // 0x6A  
+  { SCAN_F16,       0x00,     0x00 },     // 0x6B  
+  { SCAN_F17,       0x00,     0x00 },     // 0x6C
+  { SCAN_F18,       0x00,     0x00 },     // 0x6D
+  { SCAN_F19,       0x00,     0x00 },     // 0x6E
+  { SCAN_F20,       0x00,     0x00 },     // 0x6F
+  { SCAN_F21,       0x00,     0x00 },     // 0x70
+  { SCAN_F22,       0x00,     0x00 },     // 0x71
+  { SCAN_F23,       0x00,     0x00 },     // 0x72
+  { SCAN_F24,       0x00,     0x00 },     // 0x73
+  { SCAN_MUTE,      0x00,     0x00 },     // 0x7F
+  { SCAN_VOLUME_UP, 0x00,     0x00 },     // 0x80
+  { SCAN_VOLUME_DOWN, 0x00,   0x00 },     // 0x81
 };
 
 STATIC KB_MODIFIER  KB_Mod[8] = {
@@ -140,7 +155,7 @@ STATIC KB_MODIFIER  KB_Mod[8] = {
   { MOD_ALT_L,      0xe2 }, // 11100010
   { MOD_ALT_R,      0xe6 }, // 11100110
   { MOD_WIN_L,      0xe3 }, // 11100011
-  { MOD_WIN_R,      0xe7 }  // 11100111
+  { MOD_WIN_R,      0xe7 }, // 11100111 
 };
 
 
@@ -286,6 +301,17 @@ InitUSBKeyboard (
   UsbKeyboardDevice->NumLockOn  = 0;
   UsbKeyboardDevice->CapsOn     = 0;
   UsbKeyboardDevice->ScrollOn   = 0;
+  
+  UsbKeyboardDevice->LeftCtrlOn   = 0;
+  UsbKeyboardDevice->LeftAltOn    = 0;
+  UsbKeyboardDevice->LeftShiftOn  = 0;  
+  UsbKeyboardDevice->LeftLogoOn   = 0;  
+  UsbKeyboardDevice->RightCtrlOn  = 0;
+  UsbKeyboardDevice->RightAltOn   = 0;
+  UsbKeyboardDevice->RightShiftOn = 0;  
+  UsbKeyboardDevice->RightLogoOn  = 0;  
+  UsbKeyboardDevice->MenuKeyOn    = 0;
+  UsbKeyboardDevice->SysReqOn     = 0;  
 
   //
   // Sync the initial state of lights
@@ -675,21 +701,65 @@ USBParseKey (
     if (!UsbKey.Down) {
       switch (UsbKey.KeyCode) {
 
+      //
+      // CTRL release
+      //
       case 0xe0:
+        UsbKeyboardDevice->LeftCtrlOn = 0;
+        UsbKeyboardDevice->CtrlOn = 0;
+        break;
       case 0xe4:
+        UsbKeyboardDevice->RightCtrlOn = 0;
         UsbKeyboardDevice->CtrlOn = 0;
         break;
 
+      //
+      // Shift release
+      //
       case 0xe1:
+        UsbKeyboardDevice->LeftShiftOn = 0;
+        UsbKeyboardDevice->ShiftOn = 0;
+        break;
       case 0xe5:
+        UsbKeyboardDevice->RightShiftOn = 0;
         UsbKeyboardDevice->ShiftOn = 0;
         break;
 
+      //
+      // Alt release
+      //
       case 0xe2:
+        UsbKeyboardDevice->LeftAltOn = 0;
+        UsbKeyboardDevice->AltOn = 0;
+        break;
       case 0xe6:
+        UsbKeyboardDevice->RightAltOn = 0;
         UsbKeyboardDevice->AltOn = 0;
         break;
 
+      //
+      // Logo release
+      //
+     case 0xe3:
+        UsbKeyboardDevice->LeftLogoOn = 0;
+        break;
+      case 0xe7:
+        UsbKeyboardDevice->RightLogoOn = 0;
+        break;
+
+      //
+      // Menu key (App/Apps) release
+      //
+      case 0x65:
+        UsbKeyboardDevice->MenuKeyOn = 0;
+        break;
+
+      //
+      // SysReq release
+      //
+      case 0x46:
+        UsbKeyboardDevice->SysReqOn = 0;
+        break;
       default:
         break;
       }
@@ -703,51 +773,95 @@ USBParseKey (
     switch (UsbKey.KeyCode) {
 
     case 0xe0:
+      UsbKeyboardDevice->LeftCtrlOn = 1;
+      UsbKeyboardDevice->CtrlOn = 1;
+      continue;      
+      break;
     case 0xe4:
+      UsbKeyboardDevice->RightCtrlOn = 1;
       UsbKeyboardDevice->CtrlOn = 1;
       continue;
       break;
 
+    //
+    // Shift press
+    //
     case 0xe1:
+      UsbKeyboardDevice->LeftShiftOn = 1;
+      UsbKeyboardDevice->ShiftOn = 1;
+      continue;
+      break;
     case 0xe5:
+      UsbKeyboardDevice->RightShiftOn = 1;      
       UsbKeyboardDevice->ShiftOn = 1;
       continue;
       break;
 
+    //
+    // Alt press
+    //
     case 0xe2:
+      UsbKeyboardDevice->LeftAltOn = 1;
+      UsbKeyboardDevice->AltOn = 1;
+      continue;
+      break;
     case 0xe6:
+      UsbKeyboardDevice->RightAltOn = 1;      
       UsbKeyboardDevice->AltOn = 1;
       continue;
       break;
 
+    //
+    // Logo press
+    //
     case 0xe3:
+      UsbKeyboardDevice->LeftLogoOn = 1;
+      continue;      
+      break;
     case 0xe7:
+      UsbKeyboardDevice->RightLogoOn = 1;
       continue;
+      break;
+
+    //
+    // Menu key (App/Apps) press
+    //
+    case 0x65:
+      UsbKeyboardDevice->MenuKeyOn = 1;
+      continue;      
+      break;
+
+    //
+    // SysReq press
+    //
+    case 0x46:
+      UsbKeyboardDevice->SysReqOn = 1;
+      continue;      
       break;
 
     case 0x53:
       UsbKeyboardDevice->NumLockOn ^= 1;
-    //
-    // Turn on the NumLock light on KB
-    //
+      //
+      // Turn on the NumLock light on KB
+      //
       SetKeyLED (UsbKeyboardDevice);
       continue;
       break;
 
     case 0x39:
       UsbKeyboardDevice->CapsOn ^= 1;
-    //
-    // Turn on the CapsLock light on KB
-    //
+      //
+      // Turn on the CapsLock light on KB
+      //
       SetKeyLED (UsbKeyboardDevice);
       continue;
       break;
 
     case 0x47:
       UsbKeyboardDevice->ScrollOn ^= 1;
-    //
-    // Turn on the ScrollLock light on KB
-    //
+      //
+      // Turn on the ScrollLock light on KB
+      //
       SetKeyLED (UsbKeyboardDevice);
       continue;
       break;
@@ -757,15 +871,11 @@ USBParseKey (
     // keys are not valid EFI key
     //
 
-    case 0x46:
     //
-    // fall through
-    //
+    // PrintScreen/SysRq key and Application key
+    // Should be handled by UEFI2.1 compliant code
+
     case 0x48:
-    //
-    // fall through
-    //
-    case 0x65:
     //
     // fall through
     //
@@ -834,11 +944,26 @@ USBKeyCodeToEFIScanCode (
     return EFI_NOT_READY;
   }
 
+  //
+  // Undefined entries from 0x74 to 0x7E
+  //
+  if (KeyChar > USB_KEYCODE_MAX_MAKE) {
+    Index = (UINT8) (Index - 11);
+  }
+
   Key->ScanCode = KeyConvertionTable[Index][0];
 
   if (UsbKeyboardDevice->ShiftOn) {
 
     Key->UnicodeChar = KeyConvertionTable[Index][2];
+    //
+    // Need not return associated shift state if a class of printable characters that
+    // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
+    //
+    if (Key->UnicodeChar >= 'A' && Key->UnicodeChar <= 'Z') {
+      UsbKeyboardDevice->LeftShiftOn = 0;
+      UsbKeyboardDevice->RightShiftOn = 0;
+    }
 
   } else {
 
@@ -883,6 +1008,51 @@ USBKeyCodeToEFIScanCode (
 
   if (Key->UnicodeChar == 0 && Key->ScanCode == SCAN_NULL) {
     return EFI_NOT_READY;
+  }
+
+
+  //
+  // Save Shift/Toggle state
+  //
+  if (UsbKeyboardDevice->LeftCtrlOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightCtrlOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftAltOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightAltOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftShiftOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightShiftOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftLogoOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightLogoOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->MenuKeyOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_MENU_KEY_PRESSED;
+  }
+  if (UsbKeyboardDevice->SysReqOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyShiftState |= EFI_SYS_REQ_PRESSED;
+  }  
+
+  if (UsbKeyboardDevice->ScrollOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->NumLockOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->CapsOn == 1) {
+    UsbKeyboardDevice->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
   }
 
   return EFI_SUCCESS;

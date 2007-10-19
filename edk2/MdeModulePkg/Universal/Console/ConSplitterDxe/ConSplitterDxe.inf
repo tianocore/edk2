@@ -67,11 +67,13 @@
   gEfiPrimaryConsoleOutDeviceGuid               # ALWAYS_PRODUCED
   gEfiPrimaryConsoleInDeviceGuid                # ALWAYS_PRODUCED
   gEfiPrimaryStandardErrorDeviceGuid            # ALWAYS_PRODUCED
+  gSimpleTextInExNotifyGuid                     # ALWAYS_PRODUCED
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiSimplePointerProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED

@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 #include <Protocol/ConsoleControl.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
@@ -53,6 +54,8 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterStdErrDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 
+extern EFI_GUID                     gSimpleTextInExNotifyGuid;
+
 // These definitions were in the old Hii protocol, but are not in the new UEFI
 // version. So they are defined locally.
 #define UNICODE_NARROW_CHAR   0xFFF0
@@ -76,6 +79,16 @@ typedef struct {
 //
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE EFI_SIGNATURE_32 ('T', 'i', 'S', 'p')
 
+#define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('T', 'i', 'S', 'n')
+
+typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
+  UINTN                                 Signature;
+  EFI_HANDLE                            *NotifyHandleList;
+  EFI_HANDLE                            NotifyHandle;
+  EFI_KEY_DATA                          KeyData;
+  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
+  LIST_ENTRY                            NotifyEntry;
+} TEXT_IN_EX_SPLITTER_NOTIFY;
 typedef struct {
   UINT64                         Signature;
   EFI_HANDLE                     VirtualHandle;
@@ -84,6 +97,13 @@ typedef struct {
   UINTN                          CurrentNumberOfConsoles;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL **TextInList;
   UINTN                          TextInListCount;
+
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL TextInEx;
+  UINTN                             CurrentNumberOfExConsoles;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL **TextInExList;
+  UINTN                             TextInExListCount;
+  LIST_ENTRY                        NotifyList;    
+
 
   EFI_SIMPLE_POINTER_PROTOCOL    SimplePointer;
   EFI_SIMPLE_POINTER_MODE        SimplePointerMode;
@@ -113,6 +133,19 @@ typedef struct {
       TEXT_IN_SPLITTER_PRIVATE_DATA,                              \
       SimplePointer,                                              \
       TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE                     \
+      )
+#define TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
+  CR (a, \
+      TEXT_IN_SPLITTER_PRIVATE_DATA, \
+      TextInEx, \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
+      )
+
+#define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS(a) \
+  CR (a, \
+      TEXT_IN_SPLITTER_PRIVATE_DATA, \
+      AbsolutePointer, \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
       )
 
 //
@@ -770,7 +803,151 @@ ConSplitterTextInReadKeyStroke (
   OUT EFI_INPUT_KEY                      *Key
   )
 ;
+EFI_STATUS
+ConSplitterTextInExAddDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
+  )
+;
 
+EFI_STATUS
+ConSplitterTextInExDeleteDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
+  )
+;
+
+//
+// Simple Text Input Ex protocol function prototypes
+//
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Reset the input device and optionaly run diagnostics
+
+  Arguments:
+    This                 - Protocol instance pointer.
+    ExtendedVerification - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                            not be reset.
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInReadKeyStrokeEx (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    This       - Protocol instance pointer.
+    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+/*++
+
+  Routine Description:
+    Set certain state for the input device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                            state for the input device.
+                          
+  Returns:                
+    EFI_SUCCESS           - The device state was set successfully.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT EFI_HANDLE                        *NotifyHandle
+  )
+/*++
+
+  Routine Description:
+    Register a notification function for a particular keystroke for the input device.
+
+  Arguments:
+    This                    - Protocol instance pointer.
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+  Returns:
+    EFI_SUCCESS             - The notification function was registered successfully.
+    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_HANDLE                         NotificationHandle
+  )
+/*++
+
+  Routine Description:
+    Remove a registered notification function from a particular keystroke.
+
+  Arguments:
+    This                    - Protocol instance pointer.    
+    NotificationHandle      - The handle of the notification function being unregistered.
+
+  Returns:
+    EFI_SUCCESS             - The notification function was unregistered successfully.
+    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+--*/   
+;
 VOID
 EFIAPI
 ConSplitterTextInWaitForKey (
@@ -945,10 +1122,10 @@ ConSpliterConsoleControlSetMode (
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputQueryMode (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL		    *This,
-  IN  UINT32		                        ModeNumber,
-  OUT UINTN		                           *SizeOfInfo,
-  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION	**Info
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
+  IN  UINT32                            ModeNumber,
+  OUT UINTN                              *SizeOfInfo,
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
 ;
 
