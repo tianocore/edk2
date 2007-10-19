@@ -441,7 +441,6 @@
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
   Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
-  Nt32Pkg/WinNtConsoleDxe/WinNtConsoleDxe.inf
   Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
   Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
   Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
