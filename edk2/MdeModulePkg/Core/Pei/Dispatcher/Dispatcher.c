@@ -445,7 +445,7 @@ Returns:
 
               PeiSwitchStacks (
                 InvokePeiCore,
-                (VOID*) (UINTN) PeiCore,
+                (VOID*) ((UINTN) EntryPoint + ((UINTN) PeiCore - (UINTN) _ModuleEntryPoint)),
                 (VOID*) &PeiCoreParameters,  
                 TopOfStack,
                 (VOID*)(UINTN)Private->StackBase
