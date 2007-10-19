@@ -186,7 +186,6 @@ INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows 
 INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
 INF  Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
 INF  Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
-INF  Nt32Pkg/WinNtConsoleDxe/WinNtConsoleDxe.inf
 INF  Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
 INF  Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
 INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
