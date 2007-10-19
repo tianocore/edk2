@@ -114,12 +114,32 @@ ExtractGuidedSectionRegisterHandlers (
   IN        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    DecodeHandler
   )
 {
+  UINT32 Index;
   //
   // Check input paramter.
   //
   if (SectionGuid == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
+
+  //
+  // Search the match registered GetInfo handler for the input guided section.
+  //
+  for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
+    if (CompareGuid (&mExtractHandlerGuidTable[Index], SectionGuid)) {
+      break;
+    }
+  }
+
+  //
+  // If the guided handler has been registered before, only update its handler.
+  //
+  if (Index < mNumberOfExtractHandler) {
+    mExtractDecodeHandlerTable [Index] = DecodeHandler;
+    mExtractGetInfoHandlerTable [Index] = GetInfoHandler;
+    return RETURN_SUCCESS;
+  }
+  
   //
   // Check the global table is enough to contain new Handler.
   //
