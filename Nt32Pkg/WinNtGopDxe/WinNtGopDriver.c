@@ -21,33 +21,46 @@ Abstract:
 
 
 **/
-
-//
-// The package level header files this module uses
-//
-#include <Uefi.h>
-#include <WinNtDxe.h>
-//
-// The protocols, PPI and GUID defintions for this module
-//
-#include <Guid/EventGroup.h>
-#include <Protocol/WinNtIo.h>
-#include <Protocol/ComponentName.h>
-#include <Protocol/SimpleTextIn.h>
-#include <Protocol/DriverBinding.h>
-#include <Protocol/GraphicsOutput.h>
-//
-// The Library classes this module consumes
-//
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-
 #include "WinNtGop.h"
+
+STATIC
+EFI_STATUS
+FreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  ListHead   - The list head
+
+Returns:
+
+  EFI_SUCCESS           - Free the notify list successfully
+  EFI_INVALID_PARAMETER - ListHead is invalid.
+
+--*/
+{
+  WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NotifyNode;
+
+  if (ListHead == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  while (!IsListEmpty (ListHead)) {
+    NotifyNode = CR (
+                   ListHead->ForwardLink, 
+                   WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
+                   NotifyEntry, 
+                   WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
+                   );
+    RemoveEntryList (ListHead->ForwardLink);
+    gBS->FreePool (NotifyNode);
+  }
+  
+  return EFI_SUCCESS;
+}
 
 EFI_DRIVER_BINDING_PROTOCOL gWinNtGopDriverBinding = {
   WinNtGopDriverBindingSupported,
@@ -188,6 +201,7 @@ WinNtGopDriverBindingStart (
   Private = NULL;
   Private = AllocatePool (sizeof (GOP_PRIVATE_DATA));
   if (Private == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
   //
@@ -230,6 +244,8 @@ WinNtGopDriverBindingStart (
                   &Private->GraphicsOutput,
                   &gEfiSimpleTextInProtocolGuid,
                   &Private->SimpleTextIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &Private->SimpleTextInEx,
                   NULL
                   );
 
@@ -251,6 +267,13 @@ Done:
         FreeUnicodeStringTable (Private->ControllerNameTable);
       }
 
+      if (Private->SimpleTextIn.WaitForKey != NULL) {
+        gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
+      }
+      if (Private->SimpleTextInEx.WaitForKeyEx != NULL) {
+        gBS->CloseEvent (Private->SimpleTextInEx.WaitForKeyEx);
+      }
+      FreeNotifyList (&Private->NotifyList);
       FreePool (Private);
     }
   }
@@ -313,6 +336,8 @@ WinNtGopDriverBindingStop (
                   &Private->GraphicsOutput,
                   &gEfiSimpleTextInProtocolGuid,
                   &Private->SimpleTextIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &Private->SimpleTextInEx,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -335,8 +360,13 @@ WinNtGopDriverBindingStop (
     // Free our instance data
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
+    Status = gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
+    ASSERT_EFI_ERROR (Status);
+    Status = gBS->CloseEvent (Private->SimpleTextInEx.WaitForKeyEx);
+    ASSERT_EFI_ERROR (Status);
+    FreeNotifyList (&Private->NotifyList);
 
-    FreePool (Private);
+    gBS->FreePool (Private);
 
   }
 

@@ -46,6 +46,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
 
@@ -62,10 +63,11 @@
 [Guids]
   gEfiEventExitBootServicesGuid                 # SOMETIMES_CONSUMED  Create Event: EVENT_GROUP_GUID
   gEfiWinNtGopGuid                              # ALWAYS_CONSUMED
-
+  gSimpleTextInExNotifyGuid                     # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiWinNtIoProtocolGuid                       # PROTOCOL TO_START
 
