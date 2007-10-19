@@ -22,6 +22,12 @@ Revision History:
 
 #include "Terminal.h"
 
+STATIC
+EFI_STATUS
+TerminalFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  );  
+
 //
 // Globals
 //
@@ -94,7 +100,19 @@ TERMINAL_DEV  gTerminalDevTemplate = {
   NULL, 
   INPUT_STATE_DEFAULT,
   RESET_STATE_DEFAULT,
-  FALSE
+  FALSE,
+  {   // SimpleTextInputEx
+    TerminalConInResetEx,
+    TerminalConInReadKeyStrokeEx,
+    NULL,
+    TerminalConInSetState,
+    TerminalConInRegisterKeyNotify,
+    TerminalConInUnregisterKeyNotify,
+  },
+  {
+    NULL,
+    NULL,
+  }
 };
 
 
@@ -381,6 +399,19 @@ TerminalDriverBindingStart (
   TerminalDevice->TerminalType  = TerminalType;
   TerminalDevice->SerialIo      = SerialIo;
 
+  InitializeListHead (&TerminalDevice->NotifyList);
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
+                  TerminalConInWaitForKeyEx,
+                  &TerminalDevice->SimpleInputEx,
+                  &TerminalDevice->SimpleInputEx.WaitForKeyEx
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -391,7 +422,6 @@ TerminalDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-
   //
   // initialize the FIFO buffer used for accommodating
   // the pre-read pending characters
@@ -405,6 +435,7 @@ TerminalDriverBindingStart (
   // keystroke response performance issue
   //
   Mode            = TerminalDevice->SerialIo->Mode;
+
   SerialInTimeOut = 0;
   if (Mode->BaudRate != 0) {
     SerialInTimeOut = (1 + Mode->DataBits + Mode->StopBits) * 2 * 1000000 / (UINTN) Mode->BaudRate;
@@ -578,6 +609,8 @@ TerminalDriverBindingStart (
                   TerminalDevice->DevicePath,
                   &gEfiSimpleTextInProtocolGuid,
                   &TerminalDevice->SimpleInput,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &TerminalDevice->SimpleInputEx,
                   &gEfiSimpleTextOutProtocolGuid,
                   &TerminalDevice->SimpleTextOutput,
                   NULL
@@ -654,6 +687,12 @@ Error:
       if (TerminalDevice->SimpleInput.WaitForKey != NULL) {
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
       }
+
+      if (TerminalDevice->SimpleInputEx.WaitForKeyEx != NULL) {
+        gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
+      }
+
+      TerminalFreeNotifyList (&TerminalDevice->NotifyList);
 
       if (TerminalDevice->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
@@ -809,6 +848,8 @@ TerminalDriverBindingStop (
                       ChildHandleBuffer[Index],
                       &gEfiSimpleTextInProtocolGuid,
                       &TerminalDevice->SimpleInput,
+                      &gEfiSimpleTextInputExProtocolGuid,
+                      &TerminalDevice->SimpleInputEx,
                       &gEfiSimpleTextOutProtocolGuid,
                       &TerminalDevice->SimpleTextOutput,
                       &gEfiDevicePathProtocolGuid,
@@ -851,6 +892,8 @@ TerminalDriverBindingStop (
 
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
+        gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
+        TerminalFreeNotifyList (&TerminalDevice->NotifyList);
         FreePool (TerminalDevice->DevicePath);
         FreePool (TerminalDevice);
       }
@@ -867,6 +910,47 @@ TerminalDriverBindingStop (
 
   return EFI_SUCCESS;
 }
+
+STATIC
+EFI_STATUS
+TerminalFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  ListHead   - The list head
+
+Returns:
+
+  EFI_SUCCESS           - Free the notify list successfully
+  EFI_INVALID_PARAMETER - ListHead is invalid.
+
+--*/
+{
+  TERMINAL_CONSOLE_IN_EX_NOTIFY *NotifyNode;
+
+  if (ListHead == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  while (!IsListEmpty (ListHead)) {
+    NotifyNode = CR (
+                   ListHead->ForwardLink, 
+                   TERMINAL_CONSOLE_IN_EX_NOTIFY, 
+                   NotifyEntry, 
+                   TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                   );
+    RemoveEntryList (ListHead->ForwardLink);
+    gBS->FreePool (NotifyNode);
+  }
+  
+  return EFI_SUCCESS;
+}
+
+
 
 VOID
 TerminalUpdateConsoleDevVariable (

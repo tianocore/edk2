@@ -1,6 +1,6 @@
 /**@file
-	Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
-	
+  Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
+  
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -13,6 +13,78 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Terminal.h"
+
+
+STATIC
+EFI_STATUS
+ReadKeyStrokeWorker (
+  IN  TERMINAL_DEV *TerminalDevice,
+  OUT EFI_KEY_DATA *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    TerminalDevice        - Terminal driver private structure
+    KeyData               - A pointer to a buffer that is filled in with the keystroke 
+                            state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+{
+  EFI_STATUS                      Status;
+  LIST_ENTRY                      *Link;
+  TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
+
+  if (KeyData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }  
+
+  //
+  // Initialize *Key to nonsense value.
+  //
+  KeyData->Key.ScanCode    = SCAN_NULL;
+  KeyData->Key.UnicodeChar = 0;
+
+  Status = TerminalConInCheckForKey (&TerminalDevice->SimpleInput);
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_READY;
+  }
+
+  if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
+    return EFI_NOT_READY;
+  }
+
+  KeyData->KeyState.KeyShiftState  = 0;
+  KeyData->KeyState.KeyToggleState = 0;
+
+  //
+  // Invoke notification functions if exist
+  //
+  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = CR (
+                      Link, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY, 
+                      NotifyEntry, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+      CurrentNotify->KeyNotificationFn (KeyData);
+    }
+  }
+
+  return EFI_SUCCESS;
+
+}
 
 
 EFI_STATUS
@@ -111,27 +183,357 @@ TerminalConInReadKeyStroke (
 {
   TERMINAL_DEV  *TerminalDevice;
   EFI_STATUS    Status;
+  EFI_KEY_DATA  KeyData;
 
-  //
-  // Initialize *Key to nonsense value.
-  //
-  Key->ScanCode     = SCAN_NULL;
-  Key->UnicodeChar  = 0;
   //
   //  get TERMINAL_DEV from "This" parameter.
   //
   TerminalDevice  = TERMINAL_CON_IN_DEV_FROM_THIS (This);
 
-  Status          = TerminalConInCheckForKey (This);
+  Status = ReadKeyStrokeWorker (TerminalDevice, &KeyData);
   if (EFI_ERROR (Status)) {
-    return EFI_NOT_READY;
+    return Status;
   }
 
-  EfiKeyFiFoRemoveOneKey (TerminalDevice, Key);
+  CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
 
   return EFI_SUCCESS;
 
 }
+
+
+BOOLEAN
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *InputData
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was registered.
+  InputData         - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was pressed.
+
+Returns:
+  TRUE              - Key be pressed matches a registered key.
+  FLASE             - Match failed. 
+  
+--*/
+{
+  ASSERT (RegsiteredData != NULL && InputData != NULL);
+  
+  if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
+      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
+    return FALSE;  
+  }      
+  
+  return TRUE;
+}
+
+
+VOID
+EFIAPI
+TerminalConInWaitForKeyEx (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+/*++
+  Routine Description:
+  
+    Event notification function for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
+    Signal the event if there is key available     
+  
+  Arguments:
+  
+    Event - Indicates the event that invoke this function.
+    
+    Context - Indicates the calling context.
+        
+  Returns:
+  
+    N/A
+                
+--*/
+{
+  TERMINAL_DEV            *TerminalDevice;
+  
+  TerminalDevice  = TERMINAL_CON_IN_EX_DEV_FROM_THIS (Context);
+
+  TerminalConInWaitForKey (Event, &TerminalDevice->SimpleInput);
+
+}
+
+//
+// Simple Text Input Ex protocol functions
+//
+
+EFI_STATUS
+EFIAPI
+TerminalConInResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Reset the input device and optionaly run diagnostics
+
+  Arguments:
+    This                 - Protocol instance pointer.
+    ExtendedVerification - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                            not be reset.
+
+--*/
+{
+  EFI_STATUS              Status;
+  TERMINAL_DEV            *TerminalDevice;
+
+  TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
+
+  Status = TerminalDevice->SimpleInput.Reset (&TerminalDevice->SimpleInput, ExtendedVerification);
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+  
+}
+
+EFI_STATUS
+EFIAPI
+TerminalConInReadKeyStrokeEx (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    This       - Protocol instance pointer.
+    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+{
+  TERMINAL_DEV                    *TerminalDevice;
+
+  if (KeyData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }  
+
+  TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
+
+  return ReadKeyStrokeWorker (TerminalDevice, KeyData);
+
+}
+
+EFI_STATUS
+EFIAPI
+TerminalConInSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+/*++
+
+  Routine Description:
+    Set certain state for the input device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                            state for the input device.
+                          
+  Returns:                
+    EFI_SUCCESS           - The device state was set successfully.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+--*/   
+{
+  if (KeyToggleState == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+TerminalConInRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT EFI_HANDLE                        *NotifyHandle
+  )
+/*++
+
+  Routine Description:
+    Register a notification function for a particular keystroke for the input device.
+
+  Arguments:
+    This                    - Protocol instance pointer.
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+  Returns:
+    EFI_SUCCESS             - The notification function was registered successfully.
+    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+--*/   
+{
+  EFI_STATUS                      Status;
+  TERMINAL_DEV                    *TerminalDevice;
+  TERMINAL_CONSOLE_IN_EX_NOTIFY   *NewNotify;
+  LIST_ENTRY                      *Link;
+  TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;  
+
+  if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
+
+  //
+  // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
+  //
+  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = CR (
+                      Link, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY, 
+                      NotifyEntry, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+      if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
+        *NotifyHandle = CurrentNotify->NotifyHandle;        
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  //
+  // Allocate resource to save the notification function
+  //  
+  NewNotify = (TERMINAL_CONSOLE_IN_EX_NOTIFY *) AllocateZeroPool (sizeof (TERMINAL_CONSOLE_IN_EX_NOTIFY));
+  if (NewNotify == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }  
+
+  NewNotify->Signature         = TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE;     
+  NewNotify->KeyNotificationFn = KeyNotificationFunction;
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  InsertTailList (&TerminalDevice->NotifyList, &NewNotify->NotifyEntry);
+  //
+  // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
+  //  
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &NewNotify->NotifyHandle,
+                  &gSimpleTextInExNotifyGuid,
+                  NULL,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+  *NotifyHandle                = NewNotify->NotifyHandle;  
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+TerminalConInUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_HANDLE                         NotificationHandle
+  )
+/*++
+
+  Routine Description:
+    Remove a registered notification function from a particular keystroke.
+
+  Arguments:
+    This                    - Protocol instance pointer.    
+    NotificationHandle      - The handle of the notification function being unregistered.
+
+  Returns:
+    EFI_SUCCESS             - The notification function was unregistered successfully.
+    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+--*/   
+{
+  EFI_STATUS                      Status;
+  TERMINAL_DEV                    *TerminalDevice;
+  LIST_ENTRY                      *Link;
+  TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
+
+  if (NotificationHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  } 
+  
+  Status = gBS->OpenProtocol (
+                  NotificationHandle,
+                  &gSimpleTextInExNotifyGuid,
+                  NULL,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
+
+  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = CR (
+                      Link, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY, 
+                      NotifyEntry, 
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                      );
+    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+      //
+      // Remove the notification function from NotifyList and free resources
+      //
+      RemoveEntryList (&CurrentNotify->NotifyEntry);      
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+                      CurrentNotify->NotifyHandle,
+                      &gSimpleTextInExNotifyGuid,
+                      NULL,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+      gBS->FreePool (CurrentNotify);            
+      return EFI_SUCCESS;
+    }
+  }
+  
+  return EFI_NOT_FOUND;  
+}
+
 
 VOID
 TranslateRawDataToEfiKey (
@@ -787,7 +1189,9 @@ Symbols used in table below
 | F9      | 0x13 | ESC [ U   | ESC 9    | ESC O p  |
 | F10     | 0x14 | ESC [ V   | ESC 0    | ESC O M  |
 | Escape  | 0x17 | ESC       | ESC      | ESC      |
-+=========+======+===========+==========+=========+
+| F11     | 0x15 |           | ESC !    |          |
+| F12     | 0x16 |           | ESC @    |          |
++=========+======+===========+==========+==========+
 
 Special Mappings
 ================
@@ -882,6 +1286,12 @@ ESC R ESC r ESC R = Reset System
         case '0': 
           Key.ScanCode = SCAN_F10;        
           break;
+        case '!':
+          Key.ScanCode = SCAN_F11;
+          break;
+        case '@':
+          Key.ScanCode = SCAN_F12;
+          break;          
         case 'h': 
           Key.ScanCode = SCAN_HOME;       
           break;
@@ -1149,6 +1559,10 @@ ESC R ESC r ESC R = Reset System
 
     if (UnicodeChar == ESC) {
       TerminalDevice->InputState = INPUT_STATE_ESC;
+    }
+
+    if (UnicodeChar == CSI) {
+      TerminalDevice->InputState = INPUT_STATE_CSI;
     }
     
     if (TerminalDevice->InputState != INPUT_STATE_DEFAULT) {

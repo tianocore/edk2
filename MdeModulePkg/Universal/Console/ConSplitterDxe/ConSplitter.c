@@ -43,6 +43,21 @@ STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   0,
   (EFI_SIMPLE_TEXT_INPUT_PROTOCOL **) NULL,
   0,
+  {
+    ConSplitterTextInResetEx,
+    ConSplitterTextInReadKeyStrokeEx,
+    (EFI_EVENT) NULL,
+    ConSplitterTextInSetState,
+    ConSplitterTextInRegisterKeyNotify,
+    ConSplitterTextInUnregisterKeyNotify
+  },
+  0,
+  (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL **) NULL,
+  0,
+  {
+    (struct _LIST_ENTRY     *) NULL,
+    (struct _LIST_ENTRY     *) NULL
+  },
 
   {
     ConSplitterSimplePointerReset,
@@ -367,6 +382,8 @@ Returns:
                     &mConIn.VirtualHandle,
                     &gEfiSimpleTextInProtocolGuid,
                     &mConIn.TextIn,
+                    &gEfiSimpleTextInputExProtocolGuid,
+                    &mConIn.TextInEx,
                     &gEfiSimplePointerProtocolGuid,
                     &mConIn.SimplePointer,
                     &gEfiPrimaryConsoleInDeviceGuid,
@@ -513,6 +530,30 @@ Returns:
                   &ConInPrivate->TextIn.WaitForKey
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Buffer for Simple Text Input Ex Protocol
+  //  
+  Status = ConSplitterGrowBuffer (
+             sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
+             &ConInPrivate->TextInExListCount,
+             (VOID **) &ConInPrivate->TextInExList
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
+                  ConSplitterTextInWaitForKey,
+                  ConInPrivate,
+                  &ConInPrivate->TextInEx.WaitForKeyEx
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  InitializeListHead (&ConInPrivate->NotifyList); 
+
 
   ConInPrivate->SimplePointer.Mode = &ConInPrivate->SimplePointerMode;
 
@@ -898,6 +939,7 @@ Returns:
 {
   EFI_STATUS                     Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInEx;
 
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
@@ -914,6 +956,23 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  (VOID **) &TextInEx,
+                  This->DriverBindingHandle,
+                  mConIn.VirtualHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }  
 
   return ConSplitterTextInAddDevice (&mConIn, TextIn);
 }
@@ -1195,10 +1254,29 @@ Returns:
   EFI_STATUS                     Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
 
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInEx;
   if (NumberOfChildren == 0) {
     return EFI_SUCCESS;
   }
 
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  (VOID **) &TextInEx,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ConSplitterTextInExDeleteDevice (&mConIn, TextInEx);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -1505,6 +1583,66 @@ Returns:
       }
 
       Private->CurrentNumberOfConsoles--;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+ConSplitterTextInExAddDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // If the TextInEx List is full, enlarge it by calling growbuffer().
+  //
+  if (Private->CurrentNumberOfExConsoles >= Private->TextInExListCount) {
+    Status = ConSplitterGrowBuffer (
+              sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
+              &Private->TextInExListCount,
+              (VOID **) &Private->TextInExList
+              );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+  //
+  // Add the new text-in device data structure into the Text In List.
+  //
+  Private->TextInExList[Private->CurrentNumberOfExConsoles] = TextInEx;
+  Private->CurrentNumberOfExConsoles++;
+
+  //
+  // Extra CheckEvent added to reduce the double CheckEvent() in UI.c
+  //
+  gBS->CheckEvent (TextInEx->WaitForKeyEx);
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ConSplitterTextInExDeleteDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
+  )
+{
+  UINTN Index;
+  //
+  // Remove the specified text-in device data structure from the Text In List,
+  // and rearrange the remaining data structures in the Text In List.
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    if (Private->TextInExList[Index] == TextInEx) {
+      for (Index = Index; Index < Private->CurrentNumberOfExConsoles - 1; Index++) {
+        Private->TextInExList[Index] = Private->TextInExList[Index + 1];
+      }
+
+      Private->CurrentNumberOfExConsoles--;
       return EFI_SUCCESS;
     }
   }
@@ -2759,6 +2897,433 @@ Returns:
     }
   }
 }
+
+
+STATIC
+BOOLEAN
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *InputData
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was registered.
+  InputData         - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was pressed.
+
+Returns:
+  TRUE              - Key be pressed matches a registered key.
+  FLASE             - Match failed. 
+  
+--*/
+{
+  ASSERT (RegsiteredData != NULL && InputData != NULL);
+  
+  if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
+      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
+    return FALSE;  
+  }      
+  
+  //
+  // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
+  //
+  if (RegsiteredData->KeyState.KeyShiftState != 0 &&
+      RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
+    return FALSE;    
+  }   
+  if (RegsiteredData->KeyState.KeyToggleState != 0 &&
+      RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
+    return FALSE;    
+  }     
+  
+  return TRUE;
+
+}
+
+//
+// Simple Text Input Ex protocol functions
+//
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Reset the input device and optionaly run diagnostics
+
+  Arguments:
+    This                 - Protocol instance pointer.
+    ExtendedVerification - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                            not be reset.
+
+--*/
+{
+  EFI_STATUS                    Status;
+  EFI_STATUS                    ReturnStatus;
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  UINTN                         Index;
+
+  Private                       = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  Private->KeyEventSignalState  = FALSE;
+
+  //
+  // return the worst status met
+  //
+  for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    Status = Private->TextInExList[Index]->Reset (
+                                             Private->TextInExList[Index],
+                                             ExtendedVerification
+                                             );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
+    }
+  }
+
+  return ReturnStatus;
+
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInReadKeyStrokeEx (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    This       - Protocol instance pointer.
+    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+{
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  EFI_KEY_DATA                  CurrentKeyData;
+
+  
+  if (KeyData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+  if (Private->PasswordEnabled) {
+    //
+    // If StdIn Locked return not ready
+    //
+    return EFI_NOT_READY;
+  }
+
+  Private->KeyEventSignalState = FALSE;
+
+  KeyData->Key.UnicodeChar  = 0;
+  KeyData->Key.ScanCode     = SCAN_NULL;
+
+  //
+  // if no physical console input device exists, return EFI_NOT_READY;
+  // if any physical console input device has key input,
+  // return the key and EFI_SUCCESS.
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    Status = Private->TextInExList[Index]->ReadKeyStrokeEx (
+                                          Private->TextInExList[Index],
+                                          &CurrentKeyData
+                                          );
+    if (!EFI_ERROR (Status)) {
+      CopyMem (KeyData, &CurrentKeyData, sizeof (CurrentKeyData));
+      return Status;
+    }
+  }
+
+  return EFI_NOT_READY;  
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+/*++
+
+  Routine Description:
+    Set certain state for the input device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                            state for the input device.
+                          
+  Returns:                
+    EFI_SUCCESS           - The device state was set successfully.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+--*/   
+{
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+
+  if (KeyToggleState == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // if no physical console input device exists, return EFI_SUCCESS;
+  // otherwise return the status of setting state of physical console input device
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    Status = Private->TextInExList[Index]->SetState (
+                                             Private->TextInExList[Index],
+                                             KeyToggleState
+                                             );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;  
+
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT EFI_HANDLE                        *NotifyHandle
+  )
+/*++
+
+  Routine Description:
+    Register a notification function for a particular keystroke for the input device.
+
+  Arguments:
+    This                    - Protocol instance pointer.
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+  Returns:
+    EFI_SUCCESS             - The notification function was registered successfully.
+    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+--*/   
+{
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  TEXT_IN_EX_SPLITTER_NOTIFY    *NewNotify;
+  LIST_ENTRY                    *Link;
+  TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;  
+  
+
+  if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // if no physical console input device exists, 
+  // return EFI_SUCCESS directly.
+  //
+  if (Private->CurrentNumberOfExConsoles <= 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
+  //
+  for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = CR (
+                      Link, 
+                      TEXT_IN_EX_SPLITTER_NOTIFY, 
+                      NotifyEntry, 
+                      TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+      if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
+        *NotifyHandle = CurrentNotify->NotifyHandle;        
+        return EFI_SUCCESS;
+      }
+    }
+  }
+  
+  //
+  // Allocate resource to save the notification function
+  //  
+  NewNotify = (TEXT_IN_EX_SPLITTER_NOTIFY *) AllocateZeroPool (sizeof (TEXT_IN_EX_SPLITTER_NOTIFY));
+  if (NewNotify == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  NewNotify->NotifyHandleList = (EFI_HANDLE *) AllocateZeroPool (sizeof (EFI_HANDLE) * Private->CurrentNumberOfExConsoles);
+  if (NewNotify->NotifyHandleList == NULL) {
+    gBS->FreePool (NewNotify);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;     
+  NewNotify->KeyNotificationFn = KeyNotificationFunction;
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  
+  //
+  // Return the wrong status of registering key notify of 
+  // physical console input device if meet problems
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    Status = Private->TextInExList[Index]->RegisterKeyNotify (
+                                             Private->TextInExList[Index],
+                                             KeyData,
+                                             KeyNotificationFunction,
+                                             &NewNotify->NotifyHandleList[Index]
+                                             );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (NewNotify->NotifyHandleList);
+      gBS->FreePool (NewNotify);
+      return Status;
+    }
+  }
+
+  //
+  // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
+  //  
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &NewNotify->NotifyHandle,
+                  &gSimpleTextInExNotifyGuid,
+                  NULL,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  InsertTailList (&mConIn.NotifyList, &NewNotify->NotifyEntry);
+  
+  *NotifyHandle                = NewNotify->NotifyHandle;  
+  
+  return EFI_SUCCESS;  
+  
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterTextInUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_HANDLE                         NotificationHandle
+  )
+/*++
+
+  Routine Description:
+    Remove a registered notification function from a particular keystroke.
+
+  Arguments:
+    This                    - Protocol instance pointer.    
+    NotificationHandle      - The handle of the notification function being unregistered.
+
+  Returns:
+    EFI_SUCCESS             - The notification function was unregistered successfully.
+    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+--*/   
+{
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;
+  LIST_ENTRY                    *Link;            
+
+  if (NotificationHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->OpenProtocol (
+                  NotificationHandle,
+                  &gSimpleTextInExNotifyGuid,
+                  NULL,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // if no physical console input device exists, 
+  // return EFI_SUCCESS directly.
+  //
+  if (Private->CurrentNumberOfExConsoles <= 0) {
+    return EFI_SUCCESS;
+  }
+
+  for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = CR (Link, TEXT_IN_EX_SPLITTER_NOTIFY, NotifyEntry, TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE);
+    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+      for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+        Status = Private->TextInExList[Index]->UnregisterKeyNotify (
+                                                 Private->TextInExList[Index], 
+                                                 CurrentNotify->NotifyHandleList[Index]
+                                                 );
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }        
+      }
+      RemoveEntryList (&CurrentNotify->NotifyEntry);      
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+                      CurrentNotify->NotifyHandle,
+                      &gSimpleTextInExNotifyGuid,
+                      NULL,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+      gBS->FreePool (CurrentNotify->NotifyHandleList);
+      gBS->FreePool (CurrentNotify);
+      return EFI_SUCCESS;      
+    }    
+  }
+
+  return EFI_NOT_FOUND;    
+  
+}
+
+
 
 EFI_STATUS
 EFIAPI

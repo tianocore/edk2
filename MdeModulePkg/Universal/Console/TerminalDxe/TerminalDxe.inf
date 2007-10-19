@@ -58,6 +58,7 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
+  BaseLib
 
 [Guids]
   gEfiGlobalVariableGuid                        # SOMETIMES_CONSUMED L"ErrOutDev"
@@ -65,13 +66,14 @@
   gEfiVT100Guid                                 # SOMETIMES_CONSUMED
   gEfiVT100PlusGuid                             # SOMETIMES_CONSUMED
   gEfiPcAnsiGuid                                # SOMETIMES_CONSUMED
-
+  gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
 
 [Protocols]
   gEfiHotPlugDeviceGuid                         # PROTOCOL SOMETIMES_CONSUMED
   gEfiSerialIoProtocolGuid                      # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
 
 [Pcd]

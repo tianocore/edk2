@@ -55,16 +55,17 @@
   DebugLib
   PcdLib
   UsbLib
-
+  BaseLib
 
 [Guids]
   gEfiHotPlugDeviceGuid                         # ALWAYS_CONSUMED
-
+  gSimpleTextInExNotifyGuid                     # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable

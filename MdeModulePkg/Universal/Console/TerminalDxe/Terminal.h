@@ -30,6 +30,7 @@ Revision History
 #include <Guid/GlobalVariable.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 #include <Guid/HotPlugDevice.h>
 #include <Guid/PcAnsi.h>
 #include <Library/DebugLib.h>
@@ -42,7 +43,7 @@ Revision History
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
-
+#include <Library/BaseLib.h>
 
 
 #define RAW_FIFO_MAX_NUMBER 256
@@ -68,6 +69,15 @@ typedef struct {
 
 #define TERMINAL_DEV_SIGNATURE  EFI_SIGNATURE_32 ('t', 'm', 'n', 'l')
 
+#define TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('t', 'm', 'e', 'n')
+
+typedef struct _TERMINAL_CONSOLE_IN_EX_NOTIFY {
+  UINTN                                 Signature;
+  EFI_HANDLE                            NotifyHandle;
+  EFI_KEY_DATA                          KeyData;
+  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
+  LIST_ENTRY                            NotifyEntry;
+} TERMINAL_CONSOLE_IN_EX_NOTIFY;
 typedef struct {
   UINTN                               Signature;
   EFI_HANDLE                          Handle;
@@ -94,6 +104,8 @@ typedef struct {
   // to indicate whether the Esc could be sent or not.
   //
   BOOLEAN                             OutputEscChar;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL   SimpleInputEx;
+  LIST_ENTRY                          NotifyList;
 } TERMINAL_DEV;
 
 #define INPUT_STATE_DEFAULT               0x00
@@ -109,6 +121,7 @@ typedef struct {
 
 #define TERMINAL_CON_IN_DEV_FROM_THIS(a)  CR (a, TERMINAL_DEV, SimpleInput, TERMINAL_DEV_SIGNATURE)
 #define TERMINAL_CON_OUT_DEV_FROM_THIS(a) CR (a, TERMINAL_DEV, SimpleTextOutput, TERMINAL_DEV_SIGNATURE)
+#define TERMINAL_CON_IN_EX_DEV_FROM_THIS(a)  CR (a, TERMINAL_DEV, SimpleInputEx, TERMINAL_DEV_SIGNATURE)
 
 typedef union {
   UINT8 Utf8_1;
@@ -153,6 +166,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gTerminalDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gTerminalComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gTerminalComponentName2;
 
+extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 //
 // Prototypes
 //
@@ -178,6 +192,169 @@ TerminalConInReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
   )
+;
+
+
+BOOLEAN
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *InputData
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was registered.
+  InputData         - A pointer to a buffer that is filled in with the keystroke 
+                      state data for the key that was pressed.
+
+Returns:
+  TRUE              - Key be pressed matches a registered key.
+  FLASE             - Match failed. 
+  
+--*/
+;
+
+VOID
+EFIAPI
+TerminalConInWaitForKeyEx (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+;  
+//
+// Simple Text Input Ex protocol prototypes
+//
+
+EFI_STATUS
+EFIAPI
+TerminalConInResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Reset the input device and optionaly run diagnostics
+
+  Arguments:
+    This                 - Protocol instance pointer.
+    ExtendedVerification - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                            not be reset.
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+TerminalConInReadKeyStrokeEx (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+/*++
+
+  Routine Description:
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+  Arguments:
+    This       - Protocol instance pointer.
+    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+  Returns:
+    EFI_SUCCESS           - The keystroke information was returned.
+    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
+TerminalConInSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+/*++
+
+  Routine Description:
+    Set certain state for the input device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                            state for the input device.
+                          
+  Returns:                
+    EFI_SUCCESS           - The device state was set successfully.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+TerminalConInRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT EFI_HANDLE                        *NotifyHandle
+  )
+/*++
+
+  Routine Description:
+    Register a notification function for a particular keystroke for the input device.
+
+  Arguments:
+    This                    - Protocol instance pointer.
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+  Returns:
+    EFI_SUCCESS             - The notification function was registered successfully.
+    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+--*/   
+;
+
+EFI_STATUS
+EFIAPI
+TerminalConInUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_HANDLE                         NotificationHandle
+  )
+/*++
+
+  Routine Description:
+    Remove a registered notification function from a particular keystroke.
+
+  Arguments:
+    This                    - Protocol instance pointer.    
+    NotificationHandle      - The handle of the notification function being unregistered.
+
+  Returns:
+    EFI_SUCCESS             - The notification function was unregistered successfully.
+    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+--*/   
 ;
 
 VOID
