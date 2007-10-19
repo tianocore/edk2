@@ -151,6 +151,7 @@ ExtractGuidedSectionRegisterHandlers (
   )
 {
   EFI_STATUS Status;
+  UINT32     Index;
   PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
 
   //
@@ -167,6 +168,25 @@ ExtractGuidedSectionRegisterHandlers (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Search the match registered GetInfo handler for the input guided section.
+  //
+  for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
+    if (CompareGuid (&(HandlerInfo->ExtractHandlerGuidTable[Index]), SectionGuid)) {
+      break;
+    }
+  }
+
+  //
+  // If the guided handler has been registered before, only update its handler.
+  //
+  if (Index < HandlerInfo->NumberOfExtractHandler) {
+    HandlerInfo->ExtractDecodeHandlerTable [Index] = DecodeHandler;
+    HandlerInfo->ExtractGetInfoHandlerTable [Index] = GetInfoHandler;
+    return RETURN_SUCCESS;
+  }
+
   //
   // Check the global table is enough to contain new Handler.
   //
