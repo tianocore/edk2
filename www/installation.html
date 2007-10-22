@@ -255,7 +255,7 @@
     are supported do care about case.<BR><BR>You need to set
 		WORKSPACE to the location of the edk2 directory that you pulled
 		from Subversion. For example:</P>
-		<P><FONT STYLE="margin-bottom: 0.2in; font-size: 10pt;" FACE="courier, 'courier new', monospace" color="#771100">set WORKSPACE=c:\workspace\edk2</FONT><P>
+		<P><FONT STYLE="margin-bottom: 0.2in;" FACE="courier, 'courier new', monospace" color="#771100">set WORKSPACE=c:\workspace\edk2</FONT><P>
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
@@ -273,8 +273,8 @@
 		are set, you can try a build.
     </P>
 		<OL>
-			<LI><FONT STYLE="margin-bottom: 0in; font-size: 10pt;" FACE="courier, 'courier new', monospace" color='#771100'>cd %WORKSPACE%</FONT>
-			<LI><FONT STYLE="margin-bottom: 0in; font-size: 10pt;" FACE="courier, 'courier new', monospace" color='#771100'>edksetup.bat --nt32 newbuild</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>cd %WORKSPACE%</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>edksetup.bat --nt32 newbuild</FONT>
       <UL>This will set the PATH to point to the directory containing the 
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
@@ -284,8 +284,8 @@
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL>
       <LI><FONT STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></FONT>
-			<LI><FONT STYLE="margin-bottom: 0in; font-size: 10pt;" FACE="courier, 'courier new', monospace" color='#771100'>cd Nt32Pkg</FONT>
-			<LI><FONT STYLE="margin-bottom: 0in; font-size: 10pt;" FACE="courier, 'courier new', monospace" color='#771100'>build</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>cd Nt32Pkg</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>build</FONT>
       <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
