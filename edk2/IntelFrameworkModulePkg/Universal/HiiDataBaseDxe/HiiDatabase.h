@@ -21,8 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Guid/GlobalVariable.h>
-#include <Protocol/FormCallbackFramework.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkFormCallback.h>
+#include <Protocol/FrameworkHii.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/IfrSupportLibFramework.h>
+#include <Library/FrameworkIfrSupportLib.h>
 
 //
 // HII Database Global data

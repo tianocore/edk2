@@ -18,7 +18,7 @@
 #include <FrameworkDxe.h>
 
 
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 

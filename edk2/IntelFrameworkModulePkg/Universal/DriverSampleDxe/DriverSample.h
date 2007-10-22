@@ -20,8 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/FormCallbackFramework.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkFormCallback.h>
+#include <Protocol/FrameworkHii.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -29,10 +29,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
-#include <Library/IfrSupportLibFramework.h>
+#include <Library/FrameworkIfrSupportLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 
 #include "NVDataStruc.h"
 

@@ -13,7 +13,7 @@
 
 **/
 
-#include "UefiLibFramework.h"
+#include "FrameworkUefiLib.h"
 
 /**
   Internal function which prints a formatted Unicode string to the console output device

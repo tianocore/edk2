@@ -52,7 +52,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-  HiiLibFramework
+  FrameworkHiiLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

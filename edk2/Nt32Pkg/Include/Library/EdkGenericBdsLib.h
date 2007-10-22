@@ -23,7 +23,7 @@ Abstract:
 #define _BDS_LIB_H_
 
 #include <Protocol/SimpleTextOut.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 
 extern EFI_HANDLE mBdsImageHandle;
 

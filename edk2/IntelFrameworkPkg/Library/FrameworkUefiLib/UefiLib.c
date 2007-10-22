@@ -14,7 +14,7 @@
 
 **/
 
-#include "UefiLibFramework.h"
+#include "FrameworkUefiLib.h"
 
 /**
   Compare whether two names of languages are identical.

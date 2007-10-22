@@ -46,10 +46,10 @@
 
 
 [LibraryClasses]
-  HiiLibFramework
+  FrameworkHiiLib
   MemoryAllocationLib
   BaseMemoryLib
-  IfrSupportLibFramework
+  FrameworkIfrSupportLib
   PrintLib
   BaseLib
   UefiDriverEntryPoint

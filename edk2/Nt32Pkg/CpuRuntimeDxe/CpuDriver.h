@@ -26,14 +26,14 @@ Abstract:
 #include <FrameworkDxe.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/DataHub.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 #include <Guid/DataHubRecords.h>
 #include <Guid/DataHubProducer.h>
 #include <Protocol/CpuIo.h>
 #include <Protocol/WinNtIo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>

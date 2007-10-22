@@ -46,7 +46,7 @@
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
-  IfrSupportLibFramework
+  FrameworkIfrSupportLib
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
   BaseMemoryLib

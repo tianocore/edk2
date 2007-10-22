@@ -19,7 +19,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = UefiLibFramework
+  BASE_NAME                      = FrameworkUefiLib
   FILE_GUID                      = B2F0D71A-A39F-4094-854B-0C6BA6910CCE
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

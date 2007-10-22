@@ -18,9 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/FormCallbackFramework.h>
-#include <Protocol/FormBrowserFramework.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkFormCallback.h>
+#include <Protocol/FrameworkFormBrowser.h>
+#include <Protocol/FrameworkHii.h>
 #include <Protocol/Print.h>
 
 #include <Library/BaseLib.h>
@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 #include <Library/GraphicsLib.h>
 
 
