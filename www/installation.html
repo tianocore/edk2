@@ -7,10 +7,10 @@
 	<META NAME="CREATED" CONTENT="20060512;12074440">
 	<META NAME="CHANGEDBY" CONTENT="Larry Hauch">
 	<META NAME="CHANGED" CONTENT="20071022;14380303">
-	<STYLE>
+	<STYLE TYPE="text/css">
 	<!--
-		H2.heading-2 { font-size: 18pt }
-		H3.heading-3 { font-size: 16pt }
+		H2.heading-2 { font-family: tahoma, verdana, sans-serif; color="GRAY"; font-size: 18pt; }
+		H3.heading-3 { font-size: 16pt; font-variant: small-caps; }
 	-->
 	</STYLE>
 </HEAD>
@@ -255,7 +255,7 @@
     are supported do care about case.<BR><BR>You need to set
 		WORKSPACE to the location of the edk2 directory that you pulled
 		from Subversion. For example</P>
-		<PRE STYLE="margin-bottom: 0.2in">set WORKSPACE=c:\workspace\edk2</PRE><P>
+		<PRE STYLE="margin-bottom: 0.2in font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">set WORKSPACE=c:\workspace\edk2</PRE><P>
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
@@ -273,8 +273,8 @@
 		are set, you can try a build.
     </P>
 		<OL>
-			<LI><P STYLE="margin-bottom: 0in">cd to %WORKSPACE%</P>
-			<LI><P STYLE="margin-bottom: 0in">run edksetup.bat --nt32 newbuild
+			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">cd %WORKSPACE%</P>
+			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">edksetup.bat --nt32 newbuild</FONT></P>
       <UL>This will set the PATH to point to the directory containing the 
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
@@ -284,14 +284,14 @@
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL></P>
       <LI><P STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></P>
-			<LI><P STYLE="margin-bottom: 0in">cd Nt32Pkg </P>
-			<LI><P STYLE="margin-bottom: 0in">type build </P>
+			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">cd Nt32Pkg</P>
+			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">build</FONT></P>
       <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
   <P><FONT SIZE="2"><sup>6</sup>&nbsp;The first time the edksetup script is executed, it
-  creates three files in the %WORKSPACE%\Conf directory.  The tools_def.txt, target.txt and
-  build_rule.txt files are only created if they do not exist, if they exist, then they are 
+  creates three files in the %WORKSPACE%\Conf directory.  The files tools_def.txt, target.txt and
+  build_rule.txt are only created if they do not exist, if they exist, then they are 
   not touched.</FONT><BR>
   <FONT SIZE="2"><sup>7</sup>&nbsp;The tools_def.txt file only needs to be modified the
   first time, or if you modify the location of the 3<sup>rd</sup> party tool chains after
