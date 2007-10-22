@@ -65,6 +65,11 @@ EDK_0000: Compatible: owner
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/TargetTool
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
+    BaseTools/Bin/Win32/Spd2Dec.exe
+        r777 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/spd2dec
+
+    BaseTools/Bin/Win32/Fpd2Dsc.exe
+        r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
 
 ==========================================================================================
 EDK_4190: Non-Compatible: jwang36
