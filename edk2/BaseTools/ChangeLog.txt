@@ -55,12 +55,15 @@ EDK_0000: Compatible: owner
 
     BaseTools/Bin/Win32/Trim.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/MigrationMsa2Inf.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/MigrationMsa2Inf
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/TargetTool.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/TargetTool
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
 
 ==========================================================================================
