@@ -9,13 +9,14 @@
 	<META NAME="CHANGED" CONTENT="20071022;14380303">
 	<STYLE>
 	<!--
-		H3.heading-2 { font-size: 18pt }
+		H2.heading-2 { font-size: 18pt }
+		H3.heading-3 { font-size: 16pt }
 	-->
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Getting and Installing the Required Tools for Building EDK II</H1>
-<H3 CLASS="heading-2">Table of Contents<A NAME="TOP"></A></H3>
+<H2 CLASS="heading-2">Table of Contents<A NAME="TOP"></A></H2>
 <UL>
 	<LI><A HREF="#Requirements">Requirements</A></LI>
 	<LI><A HREF="#3rdPartyTools">Third Party Tools</A></LI>
@@ -25,7 +26,7 @@
 </UL>
 
 <P><BR></P>
-<H3 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H3>
+<H2 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H2>
 <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
   <UL>
     <LI>An IA32 or X64 based development workstation (IPF workstations are not supported)</LI>
@@ -100,7 +101,7 @@
   <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 
 	<P><BR></P>
-  <H3 CLASS="heading-2"><A NAME="3rdPartyTools"></A>3<sup>rd</sup> Party Tools</H3>
+  <H2 CLASS="heading-2"><A NAME="3rdPartyTools"></A>Third Party Tools</H2>
 	<P>The following tools are optional:<BR>
   <FONT SIZE="2">At least one 3<sup>rd</sup> party compiler tool chain is required.</FONT></P>
 	<DIV ID="Section1" DIR="LTR">
@@ -154,7 +155,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Visual Studio<sup>4</sup></B></P>
+					<P ALIGN=CENTER><B>Microsoft Visual Studio</B><sup>4</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>2003 .NET</B>
@@ -189,7 +190,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)</B><sup>5</sup></P>
+					<P ALIGN=CENTER><B>Microsoft Driver Development Kit</B><sup>5</sup><B> (DDK)</B></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>3790.1830</B></P>
@@ -235,7 +236,7 @@
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 
 	  <P><BR></P>
-		<H3 CLASS="heading-2"><A NAME="Install"></A>Install and Configure Tools on Windows XP or Windows Vista</H3>
+		<H2 CLASS="heading-2"><A NAME="Install"></A>Install and Configure Tools on Windows XP or Windows Vista</H2>
 		<H3 CLASS="heading-3">Software Installation Order</H3>
 		<P>After installing the compiler tools and your Subversion client,
 		download the edk2, read the BuildNotes2.txt file and you will be
@@ -247,7 +248,7 @@
 		compile in &quot;DOS&quot; mode.</P>
 
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
-		<H3 CLASS="heading-2"><A NAME="EnvVars"></A>Environment Variables</H3>
+		<H2 CLASS="heading-2"><A NAME="EnvVars"></A>Environment Variables</H2>
 		<P>Environment variables are <B>case sensitive</B>. You must use
 		the exact case as in the examples of this document. Even though
 		windows does not care about case, other operating systems that
@@ -260,7 +261,7 @@
 		development in your EDK II workspace.</P>
 
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
-		<H3 CLASS="heading-2"><A NAME="FirstBuild"></A>First Build</H3>
+		<H2 CLASS="heading-2"><A NAME="FirstBuild"></A>First Build</H2>
 		<P>You will need to edit the text file, tools_def.txt which is created
     the first time you run the edksetup script<sup>6</sup>.  The file is located
 		in the %WORKSPACE%\Conf directory. This file contains the names of the
