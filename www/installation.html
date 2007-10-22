@@ -254,8 +254,8 @@
 		windows does not care about case, other operating systems that
     are supported do care about case.<BR><BR>You need to set
 		WORKSPACE to the location of the edk2 directory that you pulled
-		from Subversion. For example</P>
-		<PRE STYLE="margin-bottom: 0.2in font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">set WORKSPACE=c:\workspace\edk2</PRE><P>
+		from Subversion. For example:</P>
+		<P><FONT STYLE="margin-bottom: 0.2in; font-size: 12pt;" FACE="courier, 'courier new', monospace" color="#771100">set WORKSPACE=c:\workspace\edk2</FONT><P>
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
@@ -273,8 +273,8 @@
 		are set, you can try a build.
     </P>
 		<OL>
-			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">cd %WORKSPACE%</P>
-			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">edksetup.bat --nt32 newbuild</FONT></P>
+			<LI><FONT STYLE="margin-bottom: 0in; font-size: 12pt;" FACE="courier, 'courier new', monospace" color='#771100'>cd %WORKSPACE%</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in; font-size: 12pt;" FACE="courier, 'courier new', monospace" color='#771100'>edksetup.bat --nt32 newbuild</FONT>
       <UL>This will set the PATH to point to the directory containing the 
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
@@ -282,10 +282,10 @@
       &quot;%VS71COMNTOOLS%\vsvars32&quot; (VS2003.NET) to setup standard C FLAGS, 
       Library and Include locations to build the Nt32 emulation environment.<BR>
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
-      need to use the --nt32 switch or run vsvars32.bat.</UL></P>
-      <LI><P STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></P>
-			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">cd Nt32Pkg</P>
-			<LI><P STYLE="margin-bottom: 0in; font-family: courier, 'courier new', monospace; color='#771100'; size='12pt'">build</FONT></P>
+      need to use the --nt32 switch or run vsvars32.bat.</UL>
+      <LI><FONT STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></FONT>
+			<LI><FONT STYLE="margin-bottom: 0in; font-size: 12pt;" FACE="courier, 'courier new', monospace" color='#771100'>cd Nt32Pkg</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in; font-size: 12pt;" FACE="courier, 'courier new', monospace" color='#771100'>build</FONT>
       <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
