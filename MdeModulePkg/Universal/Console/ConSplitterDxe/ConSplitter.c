@@ -957,6 +957,11 @@ Returns:
     return Status;
   }
 
+  Status = ConSplitterTextInAddDevice (&mConIn, TextIn);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimpleTextInputExProtocolGuid,
@@ -970,11 +975,8 @@ Returns:
   }
 
   Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }  
-
-  return ConSplitterTextInAddDevice (&mConIn, TextIn);
+   
+  return Status;
 }
 
 EFI_STATUS
