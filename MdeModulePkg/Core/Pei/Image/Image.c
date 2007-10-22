@@ -242,6 +242,15 @@ Returns:
   //
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
   ASSERT (ImageContext.ImageAddress != 0);
+  
+  //
+  // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
+  //
+  if (ImageContext.IsTeImage) {
+    ImageContext.ImageAddress = ImageContext.ImageAddress + 
+                                ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
+                                sizeof (EFI_TE_IMAGE_HEADER);
+  }
 
   //
   // Load the image to our new buffer
