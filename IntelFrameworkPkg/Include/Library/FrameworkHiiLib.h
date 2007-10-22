@@ -17,7 +17,7 @@
 #ifndef __HII_LIB_H__
 #define __HII_LIB_H__
 
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 
 /**
   This function allocates pool for an EFI_HII_PACKAGES structure

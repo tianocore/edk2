@@ -54,7 +54,7 @@
 
 [LibraryClasses]
   GraphicsLib
-  HiiLibFramework
+  FrameworkHiiLib
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
   PrintLib

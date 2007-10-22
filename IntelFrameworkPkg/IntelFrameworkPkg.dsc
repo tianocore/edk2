@@ -58,8 +58,8 @@
 ################################################################################
 [Components.common]
   IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
-  IntelFrameworkPkg/Library/UefiLibFramework/UefiLibFramework.inf
+  IntelFrameworkPkg/Library/FrameworkUefiLib/FrameworkUefiLib.inf
   IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
-  IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
-  IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
+  IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
+  IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf

@@ -13,7 +13,7 @@
 
 **/ 
 
-#include "UefiLibFramework.h"
+#include "FrameworkUefiLib.h"
 
 /**
   Intialize a driver by installing the Driver Binding Protocol onto the driver's

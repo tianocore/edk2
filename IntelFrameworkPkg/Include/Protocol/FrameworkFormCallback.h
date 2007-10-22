@@ -14,7 +14,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  FormCallbackFramework.h
+  Module Name:  FrameworkFormCallback.h
 
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
@@ -26,8 +26,8 @@
 
 #include <PiDxe.h>
 
-#include <Protocol/HiiFramework.h>
-#include <Protocol/FormBrowserFramework.h>
+#include <Protocol/FrameworkHii.h>
+#include <Protocol/FrameworkFormBrowser.h>
 
 #define EFI_FORM_CALLBACK_PROTOCOL_GUID \
   { \

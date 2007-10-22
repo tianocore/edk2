@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/UgaDraw.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 
 #include <Guid/Bmp.h>
 

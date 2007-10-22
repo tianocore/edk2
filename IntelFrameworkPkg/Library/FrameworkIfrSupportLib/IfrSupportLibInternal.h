@@ -20,9 +20,9 @@
 #include <PiDxe.h>
 
 #include <Guid/GlobalVariable.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 
-#include <Library/IfrSupportLibFramework.h>
+#include <Library/FrameworkIfrSupportLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

@@ -1,6 +1,6 @@
 /** @file
   Header file to include header files common to all source files in
-  UefiLibFramework.
+  FrameworkUefiLib.
 
   Copyright (c) 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -11,7 +11,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  UefiLibFramework.h
+  Module Name:  FrameworkUefiLib.h
 
 **/
 

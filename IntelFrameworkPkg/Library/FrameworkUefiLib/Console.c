@@ -14,7 +14,7 @@
 
 **/
 
-#include "UefiLibFramework.h"
+#include "FrameworkUefiLib.h"
 
 typedef struct {
   CHAR16  WChar;

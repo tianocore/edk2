@@ -24,7 +24,7 @@
 #ifndef __FRAMEWORK_FORM_BROWSER_H__
 #define __FRAMEWORK_FORM_BROWSER_H__
 
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 
 
 #define EFI_FORM_BROWSER_PROTOCOL_GUID \

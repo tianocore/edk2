@@ -26,19 +26,19 @@ Revision History
 
 #include <PiDxe.h>
 #include <Common/MaxBbsEntries.h>
-#include <Protocol/FormCallbackFramework.h>
+#include <Protocol/FrameworkFormCallback.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/CpuIo.h>
 #include <Protocol/Bds.h>
 #include <Protocol/DataHub.h>
-#include <Protocol/FormBrowserFramework.h>
+#include <Protocol/FrameworkFormBrowser.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/ConsoleControl.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/SimpleFileSystem.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/Performance.h>
@@ -59,7 +59,7 @@ Revision History
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
-#include <Library/IfrSupportLibFramework.h>
+#include <Library/FrameworkIfrSupportLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/HobLib.h>
 #include <Library/EdkGenericBdsLib.h>
@@ -68,7 +68,7 @@ Revision History
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/PcdLib.h>
 

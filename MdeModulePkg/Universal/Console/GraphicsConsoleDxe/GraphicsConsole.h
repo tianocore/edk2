@@ -24,7 +24,7 @@ Revision History
 #define _GRAPHICS_CONSOLE_H
 
 #include <PiDxe.h>
-#include <Protocol/HiiFramework.h>
+#include <Protocol/FrameworkHii.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
@@ -32,7 +32,7 @@ Revision History
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
-#include <Library/HiiLibFramework.h>
+#include <Library/FrameworkHiiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>

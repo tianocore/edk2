@@ -82,7 +82,7 @@
 
 [LibraryClasses]
   PeCoffLib
-  HiiLibFramework
+  FrameworkHiiLib
   DevicePathLib
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
@@ -91,7 +91,7 @@
   EdkGenericBdsLib
   HobLib
   ReportStatusCodeLib
-  IfrSupportLibFramework
+  FrameworkIfrSupportLib
   PrintLib
   PerformanceLib
   DxeServicesTableLib

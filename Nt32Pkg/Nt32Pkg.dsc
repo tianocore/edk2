@@ -59,12 +59,12 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  IfrSupportLibFramework|IntelFrameworkPkg/Library/IfrSupportLibFramework/IfrSupportLib.inf
+  FrameworkIfrSupportLib|IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
   GraphicsLib|IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 
@@ -99,7 +99,7 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -153,7 +153,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
@@ -171,7 +171,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -188,7 +188,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -203,7 +203,7 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  HiiLibFramework|IntelFrameworkPkg/Library/HiiLibFramework/HiiLib.inf
+  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
