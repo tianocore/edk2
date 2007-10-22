@@ -5,8 +5,8 @@
 	<TITLE>EDK II Installation Guide</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20060512;12074440">
-	<META NAME="CHANGEDBY" CONTENT="Bruce Bahnsen">
-	<META NAME="CHANGED" CONTENT="20060706;14380303">
+	<META NAME="CHANGEDBY" CONTENT="Larry Hauch">
+	<META NAME="CHANGED" CONTENT="20071022;14380303">
 	<STYLE>
 	<!--
 		H3.heading-2 { font-size: 18pt }
@@ -14,22 +14,27 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H1>Getting and installing the required tools for building the EDK II</H1>
-<H3 CLASS="heading-2">Table of Contents</H3>
+<H1>Getting and Installing the Required Tools for Building EDK II</H1>
+<H3 CLASS="heading-2">Table of Contents<A NAME="TOP"></A></H3>
 <UL>
-	<LI><P><A HREF="#Requirements">Requirements</A> 
-	</P>
+	<LI><A HREF="#Requirements">Requirements</A></LI>
+	<LI><A HREF="#3rdPartyTools">Third Party Tools</A></LI>
+	<LI><A HREF="#Install">Installation & Configuration</A></LI>
+	<LI><A HREF="#EnvVars">Environment Variables</A></LI>
+	<LI><A HREF="#FirstBuild">First Build</A></LI>
 </UL>
+
+<P><BR></P>
 <H3 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H3>
 <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
   <UL>
-    <LI>An IA32 or X64 Based Development Workstation (IPF Workstations are not supported)</LI>
-    <LI>Microsoft Windows XP or Vista, Apple Mac OS/X (10.4 or later) or Linux Operating System</LI>
-    <LI>Disk Space for compiler tools</LI>
-    <LI>Minimum of 1GB of Disk Space for edk2 development tree and output files</LI>
+    <LI>An IA32 or X64 based development workstation (IPF workstations are not supported)</LI>
+    <LI>Microsoft Windows XP or Vista, Apple Mac OS/X (10.4 or later) or Linux operating system</LI>
+    <LI>Disk space for compiler tools</LI>
+    <LI>Minimum of 1GB of disk space for edk2 development tree and output files</LI>
     <LI>Minimum of 512MB (1GB recommended) of system memory </LI>
   </UL>
-  <P>The following are required to be able to build the EDK II using the new Makefile build:</P>
+  <P>The one of the following is required to be able to obtain the EDK II.</P>
 	<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 		<TR>
 			<TH>
@@ -50,18 +55,55 @@
 				<P ALIGN=CENTER><B>1.4.5</B></P>
 			</TD>
 			<TD>
-				<P ALIGN=CENTER><A HREF="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi?download">http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.4.5.10425-win32-svn-1.4.5.msi</A></P>
+				<P ALIGN=CENTER><A HREF="http://tortoisesvn.net/downloads">http://tortoisesvn.net/downloads</A></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER><B>Windows SVN Command Line Tool</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><B>1.4.5</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><A HREF="http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=91">http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=91</A></P>
+			</TD>
+		</TR>
+
+		<TR>
+			<TD>
+				<P ALIGN=CENTER><B>Max OS/X SVN Command Line Tool</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><B>1.4.4</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><A HREF="http://downloads.open.collab.net/binaries.html">http://downloads.open.collab.net/binaries.html</A></P>
+			</TD>
+		</TR>
+
+		<TR>
+			<TD>
+				<P ALIGN=CENTER><B>Linux SVN Command Line Tool</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><B>1.4.5</B></P>
+			</TD>
+			<TD>
+				<P ALIGN=CENTER><A HREF="http://subversion.tigris.org/project_packages.html">http://subversion.tigris.org/project_packages.html</A></P>
 			</TD>
 		</TR>
 
     <!-- Removed ANT/JAVA information -->
 
 	</TABLE>
-	<P><BR><BR>
-	</P>
+  <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
+
+	<P><BR></P>
+  <H3 CLASS="heading-2"><A NAME="3rdPartyTools"></A>3<sup>rd</sup> Party Tools</H3>
 	<P>The following tools are optional:<BR>
-  <FONT SIZE="1">At least one compiler tool chain will be required</FONT></P>
-	<DIV ID="Section1" DIR="LTR"><A NAME="requirements"></A><A NAME="requirements_table1"></A>
+  <FONT SIZE="2">At least one 3<sup>rd</sup> party compiler tool chain is required.</FONT></P>
+	<DIV ID="Section1" DIR="LTR">
 		<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 			<TR>
 				<TH>
@@ -95,7 +137,7 @@
 					</P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://www.intel.com/">http://www.intel.com</A></P>
+					<P ALIGN=CENTER><A HREF="http://msdn2.microsoft.com/en-us/vstudio/default.aspx">http://msdn2.microsoft.com/en-us/vstudio</A></P>
 				</TD>
 			</TR>
 			<TR>
@@ -107,19 +149,19 @@
 					</P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://www.intel.com/">http://www.intel.com</A></P>
+					<P ALIGN=CENTER><A HREF="http://msdn2.microsoft.com/en-us/vstudio/default.aspx">http://msdn2.microsoft.com/en-us/vstudio</A></P>
 				</TD>
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Visual Studio</B></P>
+					<P ALIGN=CENTER><B>Microsoft Visual Studio<sup>4</sup></B></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>2003 .NET</B>
 					</P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><A HREF="http://www.intel.com/">http://www.intel.com</A></P>
+					<P ALIGN=CENTER><A HREF="http://msdn2.microsoft.com/en-us/vstudio/default.aspx">http://msdn2.microsoft.com/en-us/vstudio</A></P>
 				</TD>
 			</TR>
 			<TR>
@@ -147,7 +189,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)</B><sup>4</sup></P>
+					<P ALIGN=CENTER><B>Microsoft Driver Development Kit (DDK)</B><sup>5</sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>3790.1830</B></P>
@@ -180,25 +222,32 @@
 				</TD>
 			</TR>
       <TR>
-        <TD ALIGN=LEFT COLSPAN=3>
-          <Sup>1</Sup><FONT SIZE="1">&nbsp;Instructions for installation of GCC are included in the BaseTools\Conf directory.</FONT><BR>
-          <Sup>2</Sup><FONT SIZE="1">&nbsp;The default tool chain for the IA32 and X64 builds</FONT><BR>
-          <Sup>3</Sup><FONT SIZE="1">&nbsp;Needed for building IPF targets if the DDK is not installed.</FONT><BR>
-          <Sup>4</Sup><FONT SIZE="1">&nbsp;The default tool chain for IPF builds.</FONT></TD>
       </TR>
 		</TABLE>
     <BR>
-		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP or Windows Vista</H3>
-		<H3>Software Installation Order</H3>
+    <P ALIGN=LEFT>
+          <FONT SIZE="2"><sup>1</sup>&nbsp;Instructions for installation of GCC are included in the BaseTools\gcc directory.</FONT><BR>
+          <FONT SIZE="2"><sup>2</sup>&nbsp;The default tool chain for the IA32 and X64 builds.</FONT><BR>
+          <FONT SIZE="2"><sup>3</sup>&nbsp;Needed for building IPF targets if the DDK is not installed.</FONT><BR>
+          <FONT SIZE="2"><sup>4</sup>&nbsp;May only be available through a MSDN subscription.</FONT><BR>
+          <FONT SIZE="2"><sup>5</sup>&nbsp;The default tool chain for IPF builds.</FONT>
+    </P>
+    <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
+
+	  <P><BR></P>
+		<H3 CLASS="heading-2"><A NAME="Install"></A>Install and Configure Tools on Windows XP or Windows Vista</H3>
+		<H3 CLASS="heading-3">Software Installation Order</H3>
 		<P>After installing the compiler tools and your Subversion client,
 		download the edk2, read the BuildNotes2.txt file and you will be
-    ready to build and image.</P> 
+    ready to build an image.</P> 
     <P>All builds are started from a command prompt window.</P>
-    <H3>Cygwin</H3>
+    <H3 CLASS="heading-3">Cygwin</H3>
 		<P>If you optionally install cygwin (for gcc support) you should
 		install it in &quot;Unix&quot; mode. The gcc tool chain will not
 		compile in &quot;DOS&quot; mode.</P>
-		<H3 CLASS="heading-2">Environment Variables</H3>
+
+    <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
+		<H3 CLASS="heading-2"><A NAME="EnvVars"></A>Environment Variables</H3>
 		<P>Environment variables are <B>case sensitive</B>. You must use
 		the exact case as in the examples of this document. Even though
 		windows does not care about case, other operating systems that
@@ -209,16 +258,19 @@
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
-		<H3 CLASS="heading-2">The first build</H3>
-		<P>You will need to edit the text file, tools_def.txt, located
+
+    <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
+		<H3 CLASS="heading-2"><A NAME="FirstBuild"></A>First Build</H3>
+		<P>You will need to edit the text file, tools_def.txt which is created
+    the first time you run the edksetup script<sup>6</sup>.  The file is located
 		in the %WORKSPACE%\Conf directory. This file contains the names of the
 		compiler tool chains and the location of the compiler binaries. It
 		has been pre-populated with the standard location for the Microsoft
 		tool chains and includes the standard location of the Intel C
 		Compiler for EFI Byte Code (EBC).</P>
-		<P>Once the external tools are installed, the environment variables
-		are set, and you have the ant executable in your path, you can try
-		a build.</P>
+		<P>Once the external tools are installed and the environment variables
+		are set, you can try a build.
+    </P>
 		<OL>
 			<LI><P STYLE="margin-bottom: 0in">cd to %WORKSPACE%</P>
 			<LI><P STYLE="margin-bottom: 0in">run edksetup.bat --nt32 newbuild
@@ -230,13 +282,20 @@
       Library and Include locations to build the Nt32 emulation environment.<BR>
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL></P>
-			<LI><P STYLE="margin-bottom: 0in">cd Nt32Pkg</P>
-			<LI><P STYLE="margin-bottom: 0in">type build 
-			</P>
-      <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ 
-			</P>
+      <LI><P STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></P>
+			<LI><P STYLE="margin-bottom: 0in">cd Nt32Pkg </P>
+			<LI><P STYLE="margin-bottom: 0in">type build </P>
+      <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
+  <P><FONT SIZE="2"><sup>6</sup>&nbsp;The first time the edksetup script is executed, it
+  creates three files in the %WORKSPACE%\Conf directory.  The tools_def.txt, target.txt and
+  build_rule.txt files are only created if they do not exist, if they exist, then they are 
+  not touched.</FONT><BR>
+  <FONT SIZE="2"><sup>7</sup>&nbsp;The tools_def.txt file only needs to be modified the
+  first time, or if you modify the location of the 3<sup>rd</sup> party tool chains after
+  having setup the file.</FONT></P>
+  <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 </DIV>
 </BODY>
 </HTML>
