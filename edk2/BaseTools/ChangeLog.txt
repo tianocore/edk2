@@ -36,7 +36,51 @@ EDK_0000: Compatible: owner
         1) BaseTools\Bin\Win32\build.exe
 
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
+
 ##########################################################################################
+
+##########################################################################################
+##########                 Revision number of tools source code                 ##########
+    BaseTools/Bin/Win32/build.exe
+        r844 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r844 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r844 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r844 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r844 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+
+    BaseTools/Bin/Win32/GenFds.exe
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+
+    BaseTools/Bin/Win32/Trim.exe
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
+
+    BaseTools/Bin/Win32/MigrationMsa2Inf.exe
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/MigrationMsa2Inf
+
+    BaseTools/Bin/Win32/TargetTool.exe
+        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/TargetTool
+
+
+==========================================================================================
+EDK_4190: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Added support of using PCD default value from DEC/INF file if one
+				PCD is declared in INF file but not found in DSC file.
+				2) Added support of breaking build if no library instance is found for
+				a library class.
+ 
+        Code Change :
+        1) BaseTools/Bin/Win32/build.exe
+        1) BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) All packages/platforms/modules, which have wrong library classes
+				declared or have no library instance for some library classes, must be
+				changed to make sure each library class declared in INF file has
+				corresponding library instance.
 
 ==========================================================================================
 EDK_4096: Non-Compatible: jwang36
