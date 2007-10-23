@@ -102,8 +102,7 @@
 
 	<P><BR></P>
   <H2 CLASS="heading-2"><A NAME="3rdPartyTools"></A>Third Party Tools</H2>
-	<P>The following tools are optional:<BR>
-  <FONT SIZE="2">At least one 3<sup>rd</sup> party compiler tool chain is required.</FONT></P>
+	<P>The following tools are optional (at least one 3<sup>rd</sup> party compiler tool chain is required):</P>
 	<DIV ID="Section1" DIR="LTR">
 		<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 			<TR>
@@ -167,7 +166,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Intel C++ Compiler for Windows</B></P>
+					<P ALIGN=CENTER><B>Intel C++ Compiler for Windows</B><sup>5></sup></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>9.1</B>
@@ -190,7 +189,7 @@
 			</TR>
 			<TR>
 				<TD>
-					<P ALIGN=CENTER><B>Microsoft Driver Development Kit</B><sup>5</sup><B> (DDK)</B></P>
+					<P ALIGN=CENTER><B>Microsoft Driver Development Kit</B><sup>6</sup><B> (DDK)</B></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><B>3790.1830</B></P>
@@ -231,7 +230,8 @@
           <FONT SIZE="2"><sup>2</sup>&nbsp;The default tool chain for the IA32 and X64 builds.</FONT><BR>
           <FONT SIZE="2"><sup>3</sup>&nbsp;Needed for building IPF targets if the DDK is not installed.</FONT><BR>
           <FONT SIZE="2"><sup>4</sup>&nbsp;May only be available through a MSDN subscription.</FONT><BR>
-          <FONT SIZE="2"><sup>5</sup>&nbsp;The default tool chain for IPF builds.</FONT>
+          <FONT SIZE="2"><sup>5</sup>&nbsp;The Intel Compiler requires a Microsoft Visual Studio installation.</FONT><BR>
+          <FONT SIZE="2"><sup>6</sup>&nbsp;The default tool chain for IPF builds.</FONT>
     </P>
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 
@@ -263,7 +263,7 @@
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 		<H2 CLASS="heading-2"><A NAME="FirstBuild"></A>First Build</H2>
 		<P>You will need to edit the text file, tools_def.txt which is created
-    the first time you run the edksetup script<sup>6</sup>.  The file is located
+    the first time you run the edksetup script<sup>7</sup>.  The file is located
 		in the %WORKSPACE%\Conf directory. This file contains the names of the
 		compiler tool chains and the location of the compiler binaries. It
 		has been pre-populated with the standard location for the Microsoft
@@ -283,17 +283,17 @@
       Library and Include locations to build the Nt32 emulation environment.<BR>
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL>
-      <LI><FONT STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>7</sup></LI></FONT>
+      <LI><FONT STYLE="margin-bottom: 0in">Modify Conf/tools_def.txt<sup>8</sup></LI></FONT>
 			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>cd Nt32Pkg</FONT>
 			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>build</FONT>
       <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
-  <P><FONT SIZE="2"><sup>6</sup>&nbsp;The first time the edksetup script is executed, it
+  <P><FONT SIZE="2"><sup>7</sup>&nbsp;The first time the edksetup script is executed, it
   creates three files in the %WORKSPACE%\Conf directory.  The files tools_def.txt, target.txt and
   build_rule.txt are only created if they do not exist, if they exist, then they are 
   not touched.</FONT><BR>
-  <FONT SIZE="2"><sup>7</sup>&nbsp;The tools_def.txt file only needs to be modified the
+  <FONT SIZE="2"><sup>8</sup>&nbsp;The tools_def.txt file only needs to be modified the
   first time, or if you modify the location of the 3<sup>rd</sup> party tool chains after
   having setup the file.</FONT></P>
   <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
