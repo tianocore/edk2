@@ -1549,7 +1549,7 @@ EFI_STATUS
 #define EFI_RUNTIME_SERVICES_REVISION   EFI_2_10_SYSTEM_TABLE_REVISION
 
 typedef struct {
-  EFI_TABLE_HEADER Hdr;
+  EFI_TABLE_HEADER                Hdr;
 
   //
   // Time Services
@@ -1595,7 +1595,7 @@ typedef struct {
 #define EFI_BOOT_SERVICES_REVISION    EFI_2_10_SYSTEM_TABLE_REVISION
 
 typedef struct {
-  EFI_TABLE_HEADER  Hdr;
+  EFI_TABLE_HEADER                Hdr;
 
   //
   // Task Priority Services
@@ -1697,7 +1697,7 @@ typedef struct{
 } EFI_CONFIGURATION_TABLE;
 
 struct _EFI_SYSTEM_TABLE {
-  EFI_TABLE_HEADER  Hdr;
+  EFI_TABLE_HEADER                  Hdr;
   CHAR16                            *FirmwareVendor;
   UINT32                            FirmwareRevision;
   EFI_HANDLE                        ConsoleInHandle;
