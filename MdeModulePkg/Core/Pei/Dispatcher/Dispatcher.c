@@ -666,5 +666,6 @@ InvokePeiCore (
   //
   // Never returns
   //
-  ASSERT_EFI_ERROR (FALSE);
+  ASSERT (FALSE);
+  CpuDeadLoop ();
 }
