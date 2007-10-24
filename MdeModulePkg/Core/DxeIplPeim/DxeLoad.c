@@ -130,7 +130,7 @@ PeimInitializeDxeIpl (
       	}
       }
     } else {
-      ASSERT_EFI_ERROR (FALSE);
+      ASSERT (FALSE);
     }
   }
   
