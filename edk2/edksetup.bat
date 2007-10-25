@@ -55,11 +55,11 @@ goto check_vc
 @REM platform emulation environment.
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
- @REM Use Visual Studio .NET 2003 if it is installed
- call "%VS71COMNTOOLS%\vsvars32.bat"
+  @REM Use Visual Studio .NET 2003 if it is installed
+  call "%VS71COMNTOOLS%\vsvars32.bat"
 ) else if defined VS80COMNTOOLS (
- @REM Use Visual Studio 2005 iff Visual Studio .NET 2003 is not installed.
- call "%VS80COMNTOOLS%\vsvars32.bat"
+  @REM Use Visual Studio 2005 iff Visual Studio .NET 2003 is not installed.
+  call "%VS80COMNTOOLS%\vsvars32.bat"
 ) else (
   echo.
   echo !!! WARNING !!!! Cannot find Visual Studio !!!
@@ -68,6 +68,7 @@ if defined VS71COMNTOOLS (
 goto check_new_build
 
 :check_cygwin
+@if /I "%1"=="NewBuild" goto NewBuild
 if defined CYGWIN_HOME goto check_java
 if exist c:\cygwin (
   set CYGWIN_HOME=c:\cygwin
@@ -293,6 +294,7 @@ echo.
 @goto end
 
 :NewBuild
+echo in NewBuild
 @IF NOT EXIST "BaseTools\toolsetup.bat" goto AntBuild
 if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
 @call BaseTools\toolsetup.bat
