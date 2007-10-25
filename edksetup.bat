@@ -294,7 +294,6 @@ echo.
 @goto end
 
 :NewBuild
-echo in NewBuild
 @IF NOT EXIST "BaseTools\toolsetup.bat" goto AntBuild
 if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
 @call BaseTools\toolsetup.bat
