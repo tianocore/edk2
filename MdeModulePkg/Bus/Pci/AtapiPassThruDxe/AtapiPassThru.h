@@ -1,12 +1,12 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  AtapiPassThru.h
 
@@ -102,6 +102,7 @@ typedef struct {
   EFI_SCSI_PASS_THRU_PROTOCOL      ScsiPassThru;
   EFI_SCSI_PASS_THRU_MODE          ScsiPassThruMode;
   EFI_PCI_IO_PROTOCOL              *PciIo;
+  UINT64                           OriginalPciAttributes;
   //
   // Local Data goes here
   //
@@ -454,6 +455,7 @@ AtapiScsiPassThruDriverEntryPoint (
   @param  This
   @param  Controller
   @param  PciIo
+  @param  OriginalPciAttributes
 
   @todo Add function description
   @todo This add argument description
@@ -463,9 +465,10 @@ AtapiScsiPassThruDriverEntryPoint (
 **/
 EFI_STATUS
 RegisterAtapiScsiPassThru (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_DRIVER_BINDING_PROTOCOL *This,
   IN  EFI_HANDLE                  Controller,
-  IN  EFI_PCI_IO_PROTOCOL         *PciIo
+  IN  EFI_PCI_IO_PROTOCOL         *PciIo,
+  IN  UINT64                      OriginalPciAttributes
   )
 ;
 
@@ -971,13 +974,13 @@ Routine Description:
 
 Arguments:
   PciIo             - Pointer to the EFI_PCI_IO_PROTOCOL instance
-  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to 
+  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to
                       receive IDE IO port registers' base addresses
-                      
+
 Returns:
 
   EFI_STATUS
-    
+
 --*/
 ;
 
@@ -993,15 +996,15 @@ Routine Description:
   Initialize each Channel's Base Address of CommandBlock and ControlBlock.
 
 Arguments:
-    
+
   AtapiScsiPrivate            - The pointer of ATAPI_SCSI_PASS_THRU_DEV
   IdeRegsBaseAddr             - The pointer of IDE_REGISTERS_BASE_ADDR
-  
+
 Returns:
-  
+
   None
 
---*/  
+--*/
 ;
 
 #endif

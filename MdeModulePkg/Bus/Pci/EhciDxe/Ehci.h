@@ -65,11 +65,11 @@ enum {
   EHC_ROOT_PORT_RECOVERY_STALL = 20 * EHC_1_MILLISECOND,
 
   //
-  // Sync and Async transfer polling interval, set by experience, 
+  // Sync and Async transfer polling interval, set by experience,
   // and the unit of Async is 100us, means 50ms as interval.
   //
   EHC_SYNC_POLL_INTERVAL       = 20 * EHC_1_MICROSECOND,
-  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U,                  
+  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U,
 
   //
   // EHC raises TPL to TPL_NOTIFY to serialize all its operations
@@ -111,6 +111,7 @@ struct _USB2_HC_DEV {
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
 
   EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINT64                    OriginalPciAttributes;
   USBHC_MEM_POOL            *MemPool;
 
   //

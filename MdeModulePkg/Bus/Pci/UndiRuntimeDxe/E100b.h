@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -113,15 +113,15 @@ typedef struct CONFIG_HEADER {
 
 //-------------------------------------------------------------------------
 // Offsets to the various registers.
-//   All accesses need not be longword aligned. 
+//   All accesses need not be longword aligned.
 //-------------------------------------------------------------------------
 enum speedo_offsets {
-  SCBStatus = 0, SCBCmd = 2,     // Rx/Command Unit command and status. 
-  SCBPointer = 4,                // General purpose pointer. 
-  SCBPort = 8,                   // Misc. commands and operands.  
-  SCBflash = 12, SCBeeprom = 14, // EEPROM and flash memory control. 
-  SCBCtrlMDI = 16,               // MDI interface control. 
-  SCBEarlyRx = 20,               // Early receive byte count. 
+  SCBStatus = 0, SCBCmd = 2,     // Rx/Command Unit command and status.
+  SCBPointer = 4,                // General purpose pointer.
+  SCBPort = 8,                   // Misc. commands and operands.
+  SCBflash = 12, SCBeeprom = 14, // EEPROM and flash memory control.
+  SCBCtrlMDI = 16,               // MDI interface control.
+  SCBEarlyRx = 20,               // Early receive byte count.
   SCBEarlyRxInt = 24, SCBFlowCtrlReg = 25, SCBPmdr = 27,
   // offsets for general control registers (GCRs)
   SCBGenCtrl = 28, SCBGenStatus = 29, SCBGenCtrl2 = 30, SCBRsvd = 31
@@ -130,7 +130,7 @@ enum speedo_offsets {
 #define GCR2_EEPROM_ACCESS_SEMAPHORE 0x80 // bit offset into the gcr2
 
 //-------------------------------------------------------------------------
-// Action commands - Commands that can be put in a command list entry. 
+// Action commands - Commands that can be put in a command list entry.
 //-------------------------------------------------------------------------
 enum commands {
   CmdNOp = 0, CmdIASetup = 1, CmdConfigure = 2, CmdMulticastList = 3,
@@ -249,7 +249,7 @@ enum commands {
 #define BIT_4_6     0x0070
 #define BIT_4_7     0x00F0
 #define BIT_5_7     0x00E0
-#define BIT_5_9     0x03E0 
+#define BIT_5_9     0x03E0
 #define BIT_5_12    0x1FE0
 #define BIT_5_15    0xFFE0
 #define BIT_6_7     0x00c0
@@ -640,6 +640,10 @@ typedef struct s_data_instance {
   UINT64 Unique_ID;
 
   EFI_PCI_IO_PROTOCOL   *Io_Function;
+  //
+  // Original PCI attributes
+  //
+  UINT64                OriginalPciAttributes;
 
   VOID (*Delay_30)(UINTN);  // call back routine
   VOID (*Virt2Phys_30)(UINT64 virtual_addr, UINT64 physical_ptr);  // call back routine

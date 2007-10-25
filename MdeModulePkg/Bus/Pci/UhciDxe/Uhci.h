@@ -59,28 +59,28 @@ enum {
   // UHCI register operation timeout, set by experience
   //
   UHC_GENERIC_TIMEOUT           = UHC_1_SECOND,
-  
+
   //
   // Wait for force global resume(FGR) complete, refers to
   // specification[UHCI11-2.1.1]
-  // 
+  //
   UHC_FORCE_GLOBAL_RESUME_STALL = 20 * UHC_1_MILLISECOND,
 
   //
   // Wait for roothub port reset and recovery, reset stall
-  // is set by experience, and recovery stall refers to 
+  // is set by experience, and recovery stall refers to
   // specification[UHCI11-2.1.1]
   //
   UHC_ROOT_PORT_RESET_STALL     = 50 * UHC_1_MILLISECOND,
   UHC_ROOT_PORT_RECOVERY_STALL  = 10 * UHC_1_MILLISECOND,
 
   //
-  // Sync and Async transfer polling interval, set by experience, 
+  // Sync and Async transfer polling interval, set by experience,
   // and the unit of Async is 100us.
   //
   UHC_SYNC_POLL_INTERVAL        = 50 * UHC_1_MICROSECOND,
   UHC_ASYNC_POLL_INTERVAL       = 50 * 10000UL,
-  
+
   //
   // UHC raises TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
@@ -117,6 +117,7 @@ struct _USB_HC_DEV {
   EFI_USB_HC_PROTOCOL       UsbHc;
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
   EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINT64                    OriginalPciAttributes;
 
   //
   // Schedule data structures

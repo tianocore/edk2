@@ -1,12 +1,12 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -51,7 +51,7 @@ static SCSI_COMMAND_SET     gSupportedATAPICommands[] = {
   { OP_WRITE_10,                    DataOut },
   { OP_WRITE_12,                    DataOut },
   { OP_WRITE_AND_VERIFY,            DataOut },
-  { 0xff,                           (DATA_DIRECTION) 0xff    } 
+  { 0xff,                           (DATA_DIRECTION) 0xff    }
 };
 
 static CHAR16               *gControllerNameString  = (CHAR16 *) L"ATAPI Controller";
@@ -163,9 +163,9 @@ AtapiScsiPassThruDriverBindingStart (
   )
 {
   EFI_STATUS          Status;
-  EFI_STATUS          DisableStatus;
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT64              Supports;
+  UINT64              OriginalPciAttributes;
 
   PciIo = NULL;
   Status = gBS->OpenProtocol (
@@ -176,6 +176,20 @@ AtapiScsiPassThruDriverBindingStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Save original PCI attributes
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationGet,
+                    0,
+                    &OriginalPciAttributes
+                    );
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -204,29 +218,19 @@ AtapiScsiPassThruDriverBindingStart (
   //
   // Create SCSI Pass Thru instance for the IDE channel.
   //
-  Status = RegisterAtapiScsiPassThru (This, Controller, PciIo);
+  Status = RegisterAtapiScsiPassThru (This, Controller, PciIo, OriginalPciAttributes);
 
 Done:
   if (EFI_ERROR (Status)) {
-    if (PciIo) {
-      DisableStatus = PciIo->Attributes (
-                               PciIo,
-                               EfiPciIoAttributeOperationSupported,
-                               0,
-                               &Supports
-                               );
-      if (!EFI_ERROR (DisableStatus)) {
-        Supports &= (EFI_PCI_DEVICE_ENABLE               |
-                     EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO |
-                     EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO);
-        DisableStatus = PciIo->Attributes (
-                                 PciIo,
-                                 EfiPciIoAttributeOperationDisable,
-                                 Supports,
-                                 NULL
-                                 );
-      }
-    }
+    //
+    // Restore original PCI attributes
+    //
+    PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSet,
+                    OriginalPciAttributes,
+                    NULL
+                    );
 
     gBS->CloseProtocol (
            Controller,
@@ -264,7 +268,6 @@ AtapiScsiPassThruDriverBindingStop (
   EFI_STATUS                  Status;
   EFI_SCSI_PASS_THRU_PROTOCOL *ScsiPassThru;
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate;
-  UINT64                      Supports;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -288,26 +291,16 @@ AtapiScsiPassThruDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
-  // Release Pci Io protocol on the controller handle.
+  // Restore original PCI attributes
   //
-  Status = AtapiScsiPrivate->PciIo->Attributes (
-                                      AtapiScsiPrivate->PciIo,
-                                      EfiPciIoAttributeOperationSupported,
-                                      0,
-                                      &Supports
-                                      );
-  if (!EFI_ERROR (Status)) {
-    Supports &= (EFI_PCI_DEVICE_ENABLE               |
-                 EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO |
-                 EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO);
-    Status = AtapiScsiPrivate->PciIo->Attributes (
-                                        AtapiScsiPrivate->PciIo,
-                                        EfiPciIoAttributeOperationDisable,
-                                        Supports,
-                                        NULL
-                                        );
-  }
+  AtapiScsiPrivate->PciIo->Attributes (
+                  AtapiScsiPrivate->PciIo,
+                  EfiPciIoAttributeOperationSet,
+                  AtapiScsiPrivate->OriginalPciAttributes,
+                  NULL
+                  );
 
   gBS->CloseProtocol (
          Controller,
@@ -324,8 +317,10 @@ AtapiScsiPassThruDriverBindingStop (
 /**
   Attaches SCSI Pass Thru Protocol for specified IDE channel.
 
-  @param Controller:       Parent device handle to the IDE channel.
-  @param PciIo:            PCI I/O protocol attached on the "Controller".
+  @param Controller:            Parent device handle to the IDE channel.
+  @param PciIo:                 PCI I/O protocol attached on the "Controller".
+  @param OriginalPciAttributes  Original PCI attributes
+
 
   @return EFI_SUCCESS Always returned unless installing SCSI Pass Thru Protocol failed.
 
@@ -338,12 +333,12 @@ EFI_STATUS
 RegisterAtapiScsiPassThru (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                  Controller,
-  IN  EFI_PCI_IO_PROTOCOL         *PciIo
+  IN  EFI_PCI_IO_PROTOCOL         *PciIo,
+  IN  UINT64                      OriginalPciAttributes
   )
 {
   EFI_STATUS                Status;
   ATAPI_SCSI_PASS_THRU_DEV  *AtapiScsiPrivate;
-  UINT64                    Supports;
   IDE_REGISTERS_BASE_ADDR   IdeRegsBaseAddr[ATAPI_MAX_CHANNEL];
 
   AtapiScsiPrivate = AllocateZeroPool (sizeof (ATAPI_SCSI_PASS_THRU_DEV));
@@ -353,35 +348,15 @@ RegisterAtapiScsiPassThru (
 
   CopyMem (AtapiScsiPrivate->ChannelName, gAtapiChannelString, sizeof (gAtapiChannelString));
 
-  //
-  // Enable channel
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= (EFI_PCI_DEVICE_ENABLE               |
-                 EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO |
-                 EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO);
-    Status = PciIo->Attributes (
-                      PciIo,
-                      EfiPciIoAttributeOperationEnable,
-                      Supports,
-                      NULL
-                      );
-  }
-
   AtapiScsiPrivate->Signature = ATAPI_SCSI_PASS_THRU_DEV_SIGNATURE;
   AtapiScsiPrivate->Handle    = Controller;
 
   //
   // will reset the IoPort inside each API function.
   //
-  AtapiScsiPrivate->IoPort  = NULL;
-  AtapiScsiPrivate->PciIo   = PciIo;
+  AtapiScsiPrivate->IoPort                = NULL;
+  AtapiScsiPrivate->PciIo                 = PciIo;
+  AtapiScsiPrivate->OriginalPciAttributes = OriginalPciAttributes;
 
   //
   // Obtain IDE IO port registers' base addresses
@@ -414,7 +389,7 @@ RegisterAtapiScsiPassThru (
   //
   // non-RAID SCSI controllers should set both physical and logical attributes
   //
-  AtapiScsiPrivate->ScsiPassThruMode.Attributes = EFI_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL | 
+  AtapiScsiPrivate->ScsiPassThruMode.Attributes = EFI_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL |
                                                   EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL;
   AtapiScsiPrivate->ScsiPassThruMode.IoAlign = 0;
 
@@ -477,7 +452,7 @@ AtapiScsiPassThruFunction (
   if ((Target > MAX_TARGET_ID) || (Lun != 0)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // check the data fields in Packet parameter.
   //
@@ -494,7 +469,7 @@ AtapiScsiPassThruFunction (
     Packet->TransferLength = 0;
     return EFI_SUCCESS;
   }
-  
+
   //
   // According to Target ID, reset the Atapi I/O Register mapping
   // (Target Id in [0,1] area, using AtapiIoPortRegisters[0],
@@ -507,7 +482,7 @@ AtapiScsiPassThruFunction (
     Target = Target % 2;
     AtapiScsiPrivate->IoPort = &AtapiScsiPrivate->AtapiIoPortRegisters[1];
   }
-  
+
   //
   // the ATAPI SCSI interface does not support non-blocking I/O
   // ignore the Event parameter
@@ -519,7 +494,7 @@ AtapiScsiPassThruFunction (
 }
 
 /**
-  Used to retrieve the list of legal Target IDs for SCSI devices 
+  Used to retrieve the list of legal Target IDs for SCSI devices
   on a SCSI channel.
 
   @param  This Protocol instance pointer.
@@ -592,7 +567,7 @@ AtapiScsiPassThruGetNextDevice (
 }
 
 /**
-  Used to allocate and build a device path node for a SCSI device 
+  Used to allocate and build a device path node for a SCSI device
   on a SCSI channel. Would not build device path for a SCSI Host Controller.
 
   @param  This Protocol instance pointer.
@@ -633,11 +608,11 @@ AtapiScsiPassThruBuildDevicePath (
   //
   // Validate parameters passed in.
   //
-  
+
   if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // can not build device path for the SCSI Host Controller.
   //
@@ -703,7 +678,7 @@ AtapiScsiPassThruGetTargetLun (
   if (DevicePath == NULL || Target == NULL || Lun == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check whether the DevicePath belongs to SCSI_DEVICE_PATH
   //
@@ -726,7 +701,7 @@ AtapiScsiPassThruGetTargetLun (
 }
 
 /**
-  Resets a SCSI channel.This operation resets all the 
+  Resets a SCSI channel.This operation resets all the
   SCSI devices connected to the SCSI channel.
 
   @param  This Protocol instance pointer.
@@ -789,7 +764,7 @@ AtapiScsiPassThruResetChannel (
     // 0xfb:1111,1011
     //
     DeviceControlValue &= 0xfb;
-    
+
     WritePortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Alt.DeviceControl, DeviceControlValue);
 
     //
@@ -803,7 +778,7 @@ AtapiScsiPassThruResetChannel (
   if (ResetFlag) {
     return EFI_SUCCESS;
   }
-  
+
   return EFI_TIMEOUT;
 }
 
@@ -849,7 +824,7 @@ AtapiScsiPassThruResetTarget (
   if (Target == This->Mode->AdapterId) {
     return EFI_SUCCESS;
   }
-  
+
   //
   // According to Target ID, reset the Atapi I/O Register mapping
   // (Target Id in [0,1] area, using AtapiIoPortRegisters[0],
@@ -860,7 +835,7 @@ AtapiScsiPassThruResetTarget (
   } else {
     AtapiScsiPrivate->IoPort = &AtapiScsiPrivate->AtapiIoPortRegisters[1];
   }
-  
+
   //
   // for ATAPI device, no need to wait DRDY ready after device selecting.
   //
@@ -880,7 +855,7 @@ AtapiScsiPassThruResetTarget (
   if (EFI_ERROR (StatusWaitForBSYClear (AtapiScsiPrivate, 31000000))) {
     return EFI_TIMEOUT;
   }
-  
+
   //
   // stall 5 seconds to make the device status stable
   //
@@ -903,13 +878,13 @@ Routine Description:
 
 Arguments:
   PciIo             - Pointer to the EFI_PCI_IO_PROTOCOL instance
-  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to 
+  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to
                       receive IDE IO port registers' base addresses
-                      
+
 Returns:
 
   EFI_STATUS
-    
+
 --*/
 {
   EFI_STATUS  Status;
@@ -934,7 +909,7 @@ Returns:
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[0] & BIT0) == 0 || 
+    if ((PciData.Device.Bar[0] & BIT0) == 0 ||
         (PciData.Device.Bar[1] & BIT0) == 0) {
       return EFI_UNSUPPORTED;
     }
@@ -978,23 +953,23 @@ Routine Description:
   Initialize each Channel's Base Address of CommandBlock and ControlBlock.
 
 Arguments:
-    
+
   AtapiScsiPrivate            - The pointer of ATAPI_SCSI_PASS_THRU_DEV
   IdeRegsBaseAddr             - The pointer of IDE_REGISTERS_BASE_ADDR
-  
+
 Returns:
-  
+
   None
 
---*/  
+--*/
 {
-  
+
   UINT8               IdeChannel;
   UINT16              CommandBlockBaseAddr;
   UINT16              ControlBlockBaseAddr;
   IDE_BASE_REGISTERS  *RegisterPointer;
 
-  
+
   for (IdeChannel = 0; IdeChannel < ATAPI_MAX_CHANNEL; IdeChannel++) {
 
     RegisterPointer =  &AtapiScsiPrivate->AtapiIoPortRegisters[IdeChannel];
@@ -1005,7 +980,7 @@ Returns:
     //
     CommandBlockBaseAddr = IdeRegsBaseAddr[IdeChannel].CommandBlockBaseAddr;
     ControlBlockBaseAddr = IdeRegsBaseAddr[IdeChannel].ControlBlockBaseAddr;
-  
+
     RegisterPointer->Data = CommandBlockBaseAddr;
     (*(UINT16 *) &RegisterPointer->Reg1) = (UINT16) (CommandBlockBaseAddr + 0x01);
     RegisterPointer->SectorCount = (UINT16) (CommandBlockBaseAddr + 0x02);
@@ -1014,14 +989,14 @@ Returns:
     RegisterPointer->CylinderMsb = (UINT16) (CommandBlockBaseAddr + 0x05);
     RegisterPointer->Head = (UINT16) (CommandBlockBaseAddr + 0x06);
     (*(UINT16 *) &RegisterPointer->Reg) = (UINT16) (CommandBlockBaseAddr + 0x07);
-  
+
     (*(UINT16 *) &RegisterPointer->Alt) = ControlBlockBaseAddr;
     RegisterPointer->DriveAddress = (UINT16) (ControlBlockBaseAddr + 0x01);
   }
 
 }
 
-    
+
 EFI_STATUS
 CheckSCSIRequestPacket (
   EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET      *Packet
@@ -1035,7 +1010,7 @@ Routine Description:
 
 Arguments:
 
-  Packet         -  The pointer of EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET   
+  Packet         -  The pointer of EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET
 
 Returns:
 
@@ -1054,7 +1029,7 @@ Returns:
   if (Packet->Cdb == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Checks whether the request command is supported.
   //
@@ -1066,7 +1041,7 @@ Returns:
 }
 
 /**
-  Checks the requested SCSI command: 
+  Checks the requested SCSI command:
   Is it supported by this driver?
   Is the Data transfer direction reasonable?
 
@@ -1169,7 +1144,7 @@ SubmitBlockingIoCommand (
     Packet->SenseDataLength = 0;
     return PacketCommandStatus;
   }
-  
+
   //
   // Check if SenseData meets the alignment requirement.
   //
@@ -1180,7 +1155,7 @@ SubmitBlockingIoCommand (
     }
   }
 
-  
+
   //
   // Return SenseData if PacketCommandStatus matches
   // the following return codes.
@@ -1188,7 +1163,7 @@ SubmitBlockingIoCommand (
   if ((PacketCommandStatus ==  EFI_BAD_BUFFER_SIZE) ||
       (PacketCommandStatus == EFI_DEVICE_ERROR) ||
       (PacketCommandStatus == EFI_TIMEOUT)) {
-    
+
     //
     // avoid submit request sense command continuously.
     //
@@ -1678,7 +1653,7 @@ WritePortW (
 /**
   Check whether DRQ is clear in the Status Register. (BSY must also be cleared)
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRQ clear. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRQ clear. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -1756,10 +1731,10 @@ StatusDRQClear (
 }
 
 /**
-  Check whether DRQ is clear in the Alternate Status Register. 
+  Check whether DRQ is clear in the Alternate Status Register.
   (BSY must also be cleared).
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRQ clear. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRQ clear. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -1837,7 +1812,7 @@ AltStatusDRQClear (
 /**
   Check whether DRQ is ready in the Status Register. (BSY must also be cleared)
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRQ ready. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRQ ready. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -1915,10 +1890,10 @@ StatusDRQReady (
 }
 
 /**
-  Check whether DRQ is ready in the Alternate Status Register. 
+  Check whether DRQ is ready in the Alternate Status Register.
   (BSY must also be cleared)
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRQ ready. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRQ ready. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -1997,7 +1972,7 @@ AltStatusDRQReady (
 /**
   Check whether BSY is clear in the Status Register.
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  BSY clear. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  BSY clear. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -2058,7 +2033,7 @@ StatusWaitForBSYClear (
 /**
   Check whether BSY is clear in the Alternate Status Register.
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  BSY clear. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  BSY clear. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -2116,10 +2091,10 @@ AltStatusWaitForBSYClear (
 }
 
 /**
-  Check whether DRDY is ready in the Status Register. 
+  Check whether DRDY is ready in the Status Register.
   (BSY must also be cleared)
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRDY ready. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRDY ready. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -2169,7 +2144,7 @@ StatusDRDYReady (
         return EFI_ABORTED;
       }
     }
-    
+
     //
     // Stall for 30 us
     //
@@ -2192,10 +2167,10 @@ StatusDRDYReady (
 }
 
 /**
-  Check whether DRDY is ready in the Alternate Status Register. 
+  Check whether DRDY is ready in the Alternate Status Register.
   (BSY must also be cleared)
   If TimeoutInMicroSeconds is zero, this routine should wait infinitely for
-  DRDY ready. Otherwise, it will return EFI_TIMEOUT when specified time is 
+  DRDY ready. Otherwise, it will return EFI_TIMEOUT when specified time is
   elapsed.
 
   @todo function comment is missing 'Routine Description:'
@@ -2268,7 +2243,7 @@ AltStatusDRDYReady (
 }
 
 /**
-  Check Error Register for Error Information. 
+  Check Error Register for Error Information.
 
   @todo function comment is missing 'Routine Description:'
   @todo function comment is missing 'Arguments:'
@@ -2289,7 +2264,7 @@ AtapiPassThruCheckErrorStatus (
                     AtapiScsiPrivate->PciIo,
                     AtapiScsiPrivate->IoPort->Reg.Status
                     );
-  
+
   DEBUG_CODE_BEGIN ();
 
     if (StatusRegister & DWF) {
@@ -2310,7 +2285,7 @@ AtapiPassThruCheckErrorStatus (
 
     if (StatusRegister & ERR) {
       ErrorRegister = ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Reg1.Error);
-      
+
 
       if (ErrorRegister & BBK_ERR) {
         DEBUG (
@@ -2367,16 +2342,16 @@ AtapiPassThruCheckErrorStatus (
     return EFI_SUCCESS;
   }
 
- 
+
   return EFI_DEVICE_ERROR;
 }
 
 /**
   The user Entry Point for module AtapiPassThru. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

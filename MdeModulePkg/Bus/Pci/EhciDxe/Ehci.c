@@ -133,7 +133,7 @@ EhcReset (
         goto ON_EXIT;
       }
     }
-    
+
     //
     // Clean up the asynchronous transfers, currently only
     // interrupt supports asynchronous operation.
@@ -262,9 +262,9 @@ EhcSetState (
 
     //
     // Software must not write a one to this field unless the host controller
-    // is in the Halted state. Doing so will yield undefined results. 
+    // is in the Halted state. Doing so will yield undefined results.
     // refers to Spec[EHCI1.0-2.3.1]
-    // 
+    //
     if (!EHC_REG_BIT_IS_SET (Ehc, EHC_USBSTS_OFFSET, USBSTS_HALT)) {
       Status = EFI_DEVICE_ERROR;
       break;
@@ -454,7 +454,7 @@ EhcSetRootHubPortFeature (
         break;
       }
     }
-    
+
     //
     // Set one to PortReset bit must also set zero to PortEnable bit
     //
@@ -1395,7 +1395,8 @@ ON_EXIT:
 /**
   Create and initialize a USB2_HC_DEV
 
-  @param  PciIo                The PciIo on this device
+  @param  PciIo                  The PciIo on this device
+  @param  OriginalPciAttributes  Original PCI attributes
 
   @return The allocated and initialized USB2_HC_DEV structure
   @return if created, otherwise NULL.
@@ -1404,7 +1405,8 @@ ON_EXIT:
 STATIC
 USB2_HC_DEV *
 EhcCreateUsb2Hc (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT64               OriginalPciAttributes
   )
 {
   USB2_HC_DEV             *Ehc;
@@ -1437,7 +1439,8 @@ EhcCreateUsb2Hc (
   Ehc->Usb2Hc.MajorRevision             = 0x1;
   Ehc->Usb2Hc.MinorRevision             = 0x1;
 
-  Ehc->PciIo = PciIo;
+  Ehc->PciIo                 = PciIo;
+  Ehc->OriginalPciAttributes = OriginalPciAttributes;
 
   InitializeListHead (&Ehc->AsyncIntTransfers);
 
@@ -1492,6 +1495,7 @@ EhcDriverBindingStart (
   USB2_HC_DEV             *Ehc;
   EFI_PCI_IO_PROTOCOL     *PciIo;
   UINT64                  Supports;
+  UINT64                  OriginalPciAttributes;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1508,6 +1512,20 @@ EhcDriverBindingStart (
   if (EFI_ERROR (Status)) {
     EHC_ERROR (("EhcDriverBindingStart: failed to open PCI_IO\n"));
     return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Save original PCI attributes
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationGet,
+                    0,
+                    &OriginalPciAttributes
+                    );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Status = PciIo->Attributes (
@@ -1534,7 +1552,7 @@ EhcDriverBindingStart (
   //
   // Create then install USB2_HC_PROTOCOL
   //
-  Ehc = EhcCreateUsb2Hc (PciIo);
+  Ehc = EhcCreateUsb2Hc (PciIo, OriginalPciAttributes);
 
   if (Ehc == NULL) {
     EHC_ERROR (("EhcDriverBindingStart: failed to create USB2_HC\n"));
@@ -1616,6 +1634,16 @@ FREE_POOL:
   gBS->FreePool (Ehc);
 
 CLOSE_PCIIO:
+  //
+  // Restore original PCI attributes
+  //
+  PciIo->Attributes (
+                  PciIo,
+                  EfiPciIoAttributeOperationSet,
+                  OriginalPciAttributes,
+                  NULL
+                  );
+
   gBS->CloseProtocol (
          Controller,
          &gEfiPciIoProtocolGuid,
@@ -1653,7 +1681,6 @@ EhcDriverBindingStop (
   EFI_USB2_HC_PROTOCOL  *Usb2Hc;
   EFI_PCI_IO_PROTOCOL   *PciIo;
   USB2_HC_DEV           *Ehc;
-  UINT64                Supports;
 
   //
   // Test whether the Controller handler passed in is a valid
@@ -1704,23 +1731,14 @@ EhcDriverBindingStop (
   }
 
   //
-  // Disable the USB Host Controller
+  // Restore original PCI attributes
   //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE;
-    Status = PciIo->Attributes (
-                      PciIo,
-                      EfiPciIoAttributeOperationDisable,
-                      Supports,
-                      NULL
-                      );
-  }
+  PciIo->Attributes (
+                  PciIo,
+                  EfiPciIoAttributeOperationSet,
+                  Ehc->OriginalPciAttributes,
+                  NULL
+                  );
 
   gBS->CloseProtocol (
          Controller,
@@ -1729,7 +1747,8 @@ EhcDriverBindingStop (
          Controller
          );
 
-  gBS->FreePool (Ehc);
+  FreePool (Ehc);
+
   return EFI_SUCCESS;
 }
 
