@@ -51,9 +51,15 @@ goto check_vc
 @REM
 
 :check_vc
+@REM The following setup is required for building the Nt32Pkg\Nt32.dsc
+@REM platform emulation environment.
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
+ @REM Use Visual Studio .NET 2003 if it is installed
  call "%VS71COMNTOOLS%\vsvars32.bat"
+) else if defined VS80COMNTOOLS (
+ @REM Use Visual Studio 2005 iff Visual Studio .NET 2003 is not installed.
+ call "%VS80COMNTOOLS%\vsvars32.bat"
 ) else (
   echo.
   echo !!! WARNING !!!! Cannot find Visual Studio !!!
