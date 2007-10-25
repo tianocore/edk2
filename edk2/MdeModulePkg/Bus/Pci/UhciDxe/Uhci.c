@@ -82,7 +82,7 @@ UhciReset (
   default:
     goto ON_INVAILD_PARAMETER;
   }
-  
+
   //
   // Delete all old transactions on the USB bus, then
   // reinitialize the frame list
@@ -92,13 +92,13 @@ UhciReset (
   UhciInitFrameList (Uhc);
 
   gBS->RestoreTPL (OldTpl);
-  
+
   return EFI_SUCCESS;
 
 ON_INVAILD_PARAMETER:
-  
+
   gBS->RestoreTPL (OldTpl);
-  
+
   return EFI_INVALID_PARAMETER;
 }
 
@@ -213,7 +213,7 @@ UhciSetState (
         UsbCmd |= USBCMD_FGR;
         UhciWriteReg (Uhc->PciIo, USBCMD_OFFSET, UsbCmd);
       }
-      
+
       //
       // wait 20ms to let resume complete (20ms is specified by UHCI spec)
       //
@@ -237,7 +237,7 @@ UhciSetState (
       Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
-    
+
     //
     // Set Enter Global Suspend Mode bit to 1.
     //
@@ -1941,7 +1941,8 @@ ON_EXIT:
 STATIC
 USB_HC_DEV *
 UhciAllocateDev (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT64                 OriginalPciAttributes
   )
 {
   USB_HC_DEV  *Uhc;
@@ -1990,8 +1991,9 @@ UhciAllocateDev (
   Uhc->Usb2Hc.MajorRevision             = 0x1;
   Uhc->Usb2Hc.MinorRevision             = 0x1;
 
-  Uhc->PciIo   = PciIo;
-  Uhc->MemPool = UsbHcInitMemPool (PciIo, TRUE, 0);
+  Uhc->PciIo                 = PciIo;
+  Uhc->OriginalPciAttributes = OriginalPciAttributes;
+  Uhc->MemPool               = UsbHcInitMemPool (PciIo, TRUE, 0);
 
   if (Uhc->MemPool == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -2068,7 +2070,6 @@ UhciCleanDevUp (
   )
 {
   USB_HC_DEV          *Uhc;
-  UINT64              Supports;
 
   //
   // Uninstall the USB_HC and USB_HC2 protocol, then disable the controller
@@ -2090,20 +2091,16 @@ UhciCleanDevUp (
 
   UhciFreeAllAsyncReq (Uhc);
   UhciDestoryFrameList (Uhc);
-  
+
+  //
+  // Restore original PCI attributes
+  //
   Uhc->PciIo->Attributes (
-                Uhc->PciIo,
-                EfiPciIoAttributeOperationSupported,
-                0,
-                &Supports
-                );
-  Supports &= EFI_PCI_DEVICE_ENABLE;
-  Uhc->PciIo->Attributes (
-                Uhc->PciIo,
-                EfiPciIoAttributeOperationDisable,
-                Supports,
-                NULL
-                );
+                  Uhc->PciIo,
+                  EfiPciIoAttributeOperationSet,
+                  Uhc->OriginalPciAttributes,
+                  NULL
+                  );
 
   UhciFreeDev (Uhc);
 }
@@ -2135,6 +2132,7 @@ UhciDriverBindingStart (
   EFI_PCI_IO_PROTOCOL *PciIo;
   USB_HC_DEV          *Uhc;
   UINT64              Supports;
+  UINT64              OriginalPciAttributes;
 
   //
   // Open PCIIO, then enable the EHC device and turn off emulation
@@ -2148,6 +2146,20 @@ UhciDriverBindingStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Save original PCI attributes
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationGet,
+                    0,
+                    &OriginalPciAttributes
+                    );
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -2175,7 +2187,7 @@ UhciDriverBindingStart (
     goto CLOSE_PCIIO;
   }
 
-  Uhc = UhciAllocateDev (PciIo);
+  Uhc = UhciAllocateDev (PciIo, OriginalPciAttributes);
 
   if (Uhc == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -2250,6 +2262,16 @@ FREE_UHC:
   UhciFreeDev (Uhc);
 
 CLOSE_PCIIO:
+  //
+  // Restore original PCI attributes
+  //
+  PciIo->Attributes (
+                  PciIo,
+                  EfiPciIoAttributeOperationSet,
+                  OriginalPciAttributes,
+                  NULL
+                  );
+
   gBS->CloseProtocol (
         Controller,
         &gEfiPciIoProtocolGuid,

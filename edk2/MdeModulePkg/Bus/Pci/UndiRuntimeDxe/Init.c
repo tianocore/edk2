@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -22,7 +22,7 @@ Revision History
 --*/
 
 #include "Undi32.h"
-
+#include <Library/BaseLib.h>
 //
 // Global Variables
 //
@@ -30,7 +30,7 @@ PXE_SW_UNDI             *pxe = 0;     // 3.0 entry point
 PXE_SW_UNDI             *pxe_31 = 0;  // 3.1 entry
 UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 
-NII_TABLE               *UnidiDataPointer=NULL;    
+NII_TABLE               *UndiDataPointer = NULL;
 
 VOID
 EFIAPI
@@ -103,7 +103,7 @@ UndiNotifyExitBs (
 
 Routine Description:
 
-  When EFI is shuting down the boot services, we need to install a 
+  When EFI is shuting down the boot services, we need to install a
   configuration table for UNDI to work at runtime!
 
 Arguments:
@@ -152,15 +152,15 @@ Routine Description:
 Arguments:
 
   This                - Protocol instance pointer.
-  
+
   Controller          - Handle of device to test.
-  
+
   RemainingDevicePath - Not used.
 
 Returns:
 
   EFI_SUCCESS         - This driver supports this device.
-  
+
   other               - This driver does not support this device.
 
 --*/
@@ -266,15 +266,15 @@ Routine Description:
 Arguments:
 
   This                - Protocol instance pointer.
-  
+
   Controller          - Handle of device to work with.
-  
+
   RemainingDevicePath - Not used, always produce all possible children.
 
 Returns:
 
   EFI_SUCCESS         - This driver is added to Controller.
-  
+
   other               - This driver does not support this device.
 
 --*/
@@ -286,7 +286,7 @@ Returns:
   UINT16                    NewCommand;
   UINT8                     *TmpPxePointer;
   EFI_PCI_IO_PROTOCOL       *PciIoFncs;
-  UINTN                     Len;   
+  UINTN                     Len;
   UINT64                    Supports;
 
   Status = gBS->OpenProtocol (
@@ -333,6 +333,20 @@ Returns:
   }
 
   ZeroMem ((CHAR8 *) UNDI32Device, sizeof (UNDI32_DEV));
+
+  //
+  // Get original PCI attributes
+  //
+  Status = PciIoFncs->Attributes (
+                    PciIoFncs,
+                    EfiPciIoAttributeOperationGet,
+                    0,
+                    &UNDI32Device->NicInfo.OriginalPciAttributes
+                    );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // allocate and initialize both (old and new) the !pxe structures here,
@@ -509,22 +523,22 @@ Returns:
   }
 
   //
-  // if the table exists, free it and alloc again, or alloc it directly 
+  // if the table exists, free it and alloc again, or alloc it directly
   //
-  if (UnidiDataPointer != NULL) {
-  	Status = gBS->FreePool(UnidiDataPointer);
+  if (UndiDataPointer != NULL) {
+  	Status = gBS->FreePool(UndiDataPointer);
   }
   if (EFI_ERROR (Status)) {
     goto UndiErrorDeleteDevicePath;
   }
 
-  Len = (pxe_31->IFcnt * sizeof (NII_ENTRY)) + sizeof (UnidiDataPointer);
-  Status = gBS->AllocatePool (EfiRuntimeServicesData, Len, (VOID **) &UnidiDataPointer);
+  Len = (pxe_31->IFcnt * sizeof (NII_ENTRY)) + sizeof (UndiDataPointer);
+  Status = gBS->AllocatePool (EfiRuntimeServicesData, Len, (VOID **) &UndiDataPointer);
 
   if (EFI_ERROR (Status)) {
     goto UndiErrorAllocDataPointer;
   }
-  
+
   //
   // Open For Child Device
   //
@@ -563,6 +577,16 @@ UndiErrorDeletePxe:
   }
 
 UndiErrorDeleteDevice:
+  //
+  // Restore original PCI attributes
+  //
+  PciIoFncs->Attributes (
+                  PciIoFncs,
+                  EfiPciIoAttributeOperationSet,
+                  UNDI32Device->NicInfo.OriginalPciAttributes,
+                  NULL
+                  );
+
   gBS->FreePool (UNDI32Device);
 
 UndiError:
@@ -659,6 +683,17 @@ Returns:
 
       UNDI32Device = UNDI_DEV_FROM_THIS (NIIProtocol);
 
+      //
+      // Restore original PCI attributes
+      //
+      Status = UNDI32Device->NicInfo.Io_Function->Attributes (
+                            UNDI32Device->NicInfo.Io_Function,
+                            EfiPciIoAttributeOperationSet,
+                            UNDI32Device->NicInfo.OriginalPciAttributes,
+                            NULL
+                            );
+      ASSERT_EFI_ERROR (Status);
+
       Status = gBS->CloseProtocol (
                       Controller,
                       &gEfiPciIoProtocolGuid,
@@ -721,7 +756,7 @@ Routine Description:
 Arguments:
 
   UnqId             - Runtime O/S routine might use this, this temp routine does not use it
-  
+
   MicroSeconds      - Determines the length of pause.
 
 Returns:
@@ -751,13 +786,13 @@ Routine Description:
 Arguments:
 
   UnqId             - Runtime O/S routine may use this field, this temp routine does not.
-  
+
   ReadWrite         - Determine if it is an I/O or Memory Read/Write Operation.
-  
+
   Len               - Determines the width of the data operation.
-  
+
   Port              - What port to Read/Write from.
-  
+
   BuffAddr          - Address to read to or write from.
 
 Returns:
@@ -851,15 +886,15 @@ Routine Description:
 Arguments:
 
   DevPtr            - Pointer which will point to the newly created device path with the MAC node attached.
-  
+
   BaseDevPtr        - Pointer to the device path which the UNDI device driver is latching on to.
-  
+
   AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
 
 Returns:
 
   EFI_SUCCESS       - A MAC address was successfully appended to the Base Device Path.
-  
+
   other             - Not enough resources available to create new Device Path node.
 
 --*/
@@ -991,7 +1026,7 @@ Arguments:
 Returns:
 
   EFI_SUCCESS       - Install a GUID/Pointer pair into the system's configuration table.
-  
+
   other             - Did not successfully install the GUID/Pointer pair into the configuration table.
 
 --*/
@@ -1007,12 +1042,12 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  if(UnidiDataPointer == NULL) { 
+  if(UndiDataPointer == NULL) {
   	return EFI_SUCCESS;
   }
-  
-  UndiData = (NII_TABLE *)UnidiDataPointer;  
-  
+
+  UndiData = (NII_TABLE *)UndiDataPointer;
+
   UndiData->NumEntries  = pxe_31->IFcnt;
   UndiData->NextLink    = NULL;
 
@@ -1067,12 +1102,12 @@ Returns:
 }
 
 /**
-  
+
   Install driver binding protocol of UNDI.
-  
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
