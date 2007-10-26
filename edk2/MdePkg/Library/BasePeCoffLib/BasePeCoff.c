@@ -271,6 +271,8 @@ PeCoffLoaderGetImageInfo (
   //
   if ((!(ImageContext->IsTeImage)) && ((Hdr.Pe32->FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0)) {
     ImageContext->RelocationsStripped = TRUE;
+  } else if ((ImageContext->IsTeImage) && (Hdr.Te->DataDirectory[0].Size == 0) && (Hdr.Te->DataDirectory[0].VirtualAddress == 0)) {
+    ImageContext->RelocationsStripped = TRUE;
   } else {
     ImageContext->RelocationsStripped = FALSE;
   }
