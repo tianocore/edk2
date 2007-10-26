@@ -59,5 +59,5 @@ $(EDK_PREFIX)Foundation\Library\Dxe\GraphicsLite\Graphics.inf
 #
 # Module Libraries
 #
-$(EDK_PREFIX)Sample\Platform\Generic\Dxe\GenericBds\GenericBds.inf
-$(EDK_PREFIX)Sample\Bus\Usb\UsbLib\Dxe\UsbDxeLib.inf
+#$(EDK_PREFIX)Sample\Platform\Generic\Dxe\GenericBds\GenericBds.inf
+#$(EDK_PREFIX)Sample\Bus\Usb\UsbLib\Dxe\UsbDxeLib.inf
