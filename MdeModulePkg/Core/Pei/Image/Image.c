@@ -238,6 +238,13 @@ Returns:
     return Status;
   }
   //
+  // When Image has no reloc section, it can't be relocated into memory.
+  //
+  if (ImageContext.RelocationsStripped) {
+    DEBUG ((EFI_D_ERROR, "The image at 0x%08x without reloc section can't be loaded into memory", (UINTN) Pe32Data));
+    return EFI_INVALID_PARAMETER;
+  }
+  //
   // Allocate Memory for the image
   //
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
