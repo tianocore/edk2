@@ -34,14 +34,15 @@ class SetupBuildEnvironmentApp:
     (self.Opt, self.Args) = self.ProcessCommandLine()
     self.SetupDefaults()
     self.DetermineEnvironment()
+    self.DeleteEnvironmentConfigurationScript()
     self.CopyTemplates()
     self.WriteEnvironmentConfigurationScript()
 
   def SetupDefaults(self):
     self.itemsToConfigure = (
       'compiler',
-      'compiler-prefix',
-      'templates and Conf directory',
+      #'compiler-prefix',
+      'templates',
       )
 
     self.defaults = {
@@ -53,7 +54,8 @@ class SetupBuildEnvironmentApp:
         'options': ('/usr/bin', '/usr/bin/x86_64-pc-mingw32-'),
         'freeform': True,
         },
-      'templates and Conf directory': {
+      'templates': {
+        'description': 'templates and Conf directory',
         'options': (
           'copy once (no-overwrite)',
           'copy with overwrite',
@@ -116,28 +118,28 @@ class SetupBuildEnvironmentApp:
     pickle.dump(conf, confFile)
     confFile.close()
 
-  def AskCompiler(self):
-    self.AskForValueOfOption('compiler')
-
-  def AskCompilerPrefix(self):
-    self.AskForValueOfOption('compiler-prefix')
-
   def AskForValueOfOption(self, option):
+
     options = self.defaults[option]['options']
+
     if self.defaults[option].has_key('default'):
       default = self.defaults[option]['default']
     else:
       default = None
+
     if self.defaults[option].has_key('freeform'):
       freeform = self.defaults[option]['freeform']
     else:
       freeform = False
-    self.AskForValue(option, options, default, freeform)
 
-  def AskForValue(self, index, options, default=None, freeform=False):
+    if self.defaults[option].has_key('description'):
+      description = self.defaults[option]['description']
+    else:
+      description = option
+
     conf = self.conf
-    if conf.has_key(index):
-      default = conf[index]
+    if conf.has_key(option):
+      default = conf[option]
     options = list(options) # in case options came in as a tuple
     assert((default == '') or (default is None) or ('' not in options))
     if (default is not None) and (default not in options):
@@ -148,7 +150,7 @@ class SetupBuildEnvironmentApp:
     while True:
       print
       if len(options) > 0:
-        print 'Options for', index
+        print 'Options for', description
         for i in range(len(options)):
           print '  %d.' % (i + 1),
           if options[i] != '':
@@ -163,7 +165,7 @@ class SetupBuildEnvironmentApp:
       if len(options) > 0:
         prompt = 'Select number or type value: '
       else:
-        prompt = 'Type value for %s: ' % index
+        prompt = 'Type value: '
       response = raw_input(prompt)
       response = response.strip()
 
@@ -182,8 +184,8 @@ class SetupBuildEnvironmentApp:
 
       break
 
-    conf[index] = response
-    print 'Using', conf[index], 'for', index
+    conf[option] = response
+    print 'Using', conf[option], 'for', description
 
   def SummarizeCurrentState(self):
     print
@@ -195,20 +197,20 @@ class SetupBuildEnvironmentApp:
       print ' ', item, '->', value
 
   def CopyTemplates(self):
-    todo = self.conf['templates and Conf directory']
+    todo = self.conf['templates']
     workspace = os.path.realpath(self.Opt.workspace)
     templatesDir = \
-      os.path.join(workspace, 'BaseTools', 'ConfTemplates', sys.platform.title())
+      os.path.join(workspace, 'BaseTools', 'Conf')
     confDir = \
       os.path.join(workspace, 'Conf')
     print
     print 'Templates & Conf directory'
     print '  Templates dir:', self.RelativeToWorkspace(templatesDir)
     for filename in os.listdir(templatesDir):
-      if filename.startswith('.'): continue
+      if not filename.endswith('.template'): continue
 
       srcFilename = os.path.join(templatesDir, filename)
-      destFilename = os.path.join(confDir, filename)
+      destFilename = os.path.join(confDir, filename[:-len('template')] + 'txt')
       print ' ', self.RelativeToWorkspace(destFilename),
 
       if todo == 'copy once (no-overwrite)':
@@ -225,17 +227,23 @@ class SetupBuildEnvironmentApp:
         shutil.copy(srcFilename, destFilename)
         print '[copied' + overwrite + ']'
       elif todo == 'symlink to templates':
-        if os.path.exists(destFilename):
+        if os.path.islink(destFilename) or os.path.exists(destFilename):
           if not os.path.islink(destFilename):
             raise Exception, '%s is not a symlink! (remove file if you want to start using symlinks)' % \
                              (self.RelativeToWorkspace(destFilename))
           os.remove(destFilename)
-        os.symlink(srcFilename, destFilename)
+        os.symlink(os.path.join('..', self.RelativeToWorkspace(srcFilename)), destFilename)
         print '[symlinked]'
       elif todo == 'do nothing':
         print '[skipped by user request]'
       else:
         raise Exception, 'Unknown action for templates&conf: %s' % todo
+
+  def DeleteEnvironmentConfigurationScript(self):
+    workspace = os.path.realpath(self.Opt.workspace)
+    scriptFilename = os.path.join(workspace, 'Conf', 'BuildEnv.sh')
+    if os.path.exists(scriptFilename):
+      os.remove(scriptFilename)
 
   def WriteEnvironmentConfigurationScript(self):
     workspace = os.path.realpath(self.Opt.workspace)
@@ -247,7 +255,7 @@ class SetupBuildEnvironmentApp:
 
     print >> script, 'export WORKSPACE="%s"' % workspace
     print >> script, 'export TOOLCHAIN="%s"' % self.conf['compiler']
-    print >> script, 'export EDK_CC_PATH_PREFIX="%s"' % self.conf['compiler-prefix']
+    #print >> script, 'export COMPILER_SUITE_PATH_PREFIX="%s"' % self.conf['compiler-prefix']
 
     EDK_TOOLS_PATH = os.path.join(workspace, 'BaseTools')
     print >> script, 'if [ $EDK_TOOLS_PATH=="" ]'
@@ -273,7 +281,6 @@ class SetupBuildEnvironmentApp:
     for prefix in (workspace + os.path.sep, workspace):
       if path.startswith(prefix):
         return path[len(prefix):]
-    
 
 if __name__ == '__main__':
   SetupBuildEnvironmentApp()
