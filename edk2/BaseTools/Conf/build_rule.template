@@ -197,10 +197,15 @@
 #        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) ${src1} -( ${src2} -)
 #
 [Build.Static-Library-File]
-    <InputFile>
+    <InputFile.MSFT, InputFile.Intel>
         ?.lib
         $(LIBS)
         $(MODULE_BUILD_DIR)\Makefile
+
+    <InputFile.GCC>
+        ?.lib
+        $(LIBS)
+        $(MODULE_BUILD_DIR)/GNUmakefile
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
@@ -209,7 +214,7 @@
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS) ${src}
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -( $(DLINK_SPATH) $(LIBS) ${src} -)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(LIBS) ${src} -\)
 
 [Build.Dynamic-Library-File]
     <InputFile>
