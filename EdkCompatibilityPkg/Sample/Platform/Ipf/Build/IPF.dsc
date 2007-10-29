@@ -95,7 +95,8 @@ Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\BsSerialStatusCode\BsSerialSta
 [Components]
 DEFINE PACKAGE=Default
 
+#Add EDK INF file here:
 #Other\Maintained\Application\Shell\Shell.inf
-Other\Maintained\Application\Shell\ShellFull.inf
+
 
 [=============================================================================]

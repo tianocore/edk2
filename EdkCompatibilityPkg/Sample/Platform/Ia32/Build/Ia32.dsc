@@ -11,7 +11,7 @@
 # 
 #  Module Name:
 #
-#    Nt32.dsc
+#    Ia32.dsc
 #
 #  Abstract:
 #
@@ -82,14 +82,11 @@ DEFINE EDK_PREFIX=
 #
 [=============================================================================]
 [Libraries.Platform]
-Sample\Platform\Nt32\Protocol\EdkNt32ProtocolLib.inf
-Sample\Library\Dxe\WinNt\WinNtLib.inf
-#Sample\Platform\Generic\MonoStatusCode\Library\Pei\MemoryStatusCode\MemoryStatusCode.inf
 Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\BsDataHubStatusCode\BsDataHubStatusCode.inf
 Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtMemoryStatusCode\RtMemoryStatusCode.inf
 Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtPlatformStatusCode\$(PROJECT_NAME)\RtPlatformStatusCode.inf
 
-Other\Maintained\Application\Shell\Library\EfiShellLib.inf
+#Other\Maintained\Application\Shell\Library\EfiShellLib.inf
 
 [=============================================================================]
 #
@@ -99,56 +96,8 @@ Other\Maintained\Application\Shell\Library\EfiShellLib.inf
 [Components]
 DEFINE PACKAGE=Default
 
-#Other\Maintained\Application\Shell\Shell.inf
+#Add EDK INF file here:
 #Other\Maintained\Application\Shell\ShellFull.inf
-Other\Maintained\Application\Shell\attrib\attrib.inf
-Other\Maintained\Application\Shell\cls\cls.inf
-Other\Maintained\Application\Shell\comp\comp.inf
-Other\Maintained\Application\Shell\cp\cp.inf
-Other\Maintained\Application\Shell\date\date.inf
-Other\Maintained\Application\Shell\dblk\dblk.inf
-Other\Maintained\Application\Shell\devices\devices.inf
-Other\Maintained\Application\Shell\DeviceTree\devicetree.inf
-Other\Maintained\Application\Shell\dmem\dmem.inf
-Other\Maintained\Application\Shell\dmpstore\dmpstore.inf
-Other\Maintained\Application\Shell\drivers\drivers.inf
-Other\Maintained\Application\Shell\drvcfg\drvcfg.inf
-Other\Maintained\Application\Shell\drvdiag\drvdiag.inf
-Other\Maintained\Application\Shell\edit\edit.inf
-Other\Maintained\Application\Shell\EfiCompress\compress.inf
-Other\Maintained\Application\Shell\EfiDecompress\Decompress.inf
-Other\Maintained\Application\Shell\err\err.inf
-Other\Maintained\Application\Shell\guid\guid.inf
-Other\Maintained\Application\Shell\hexedit\hexedit.inf
-Other\Maintained\Application\Shell\IfConfig\IfConfig.inf
-Other\Maintained\Application\Shell\IpConfig\IpConfig.inf
-Other\Maintained\Application\Shell\load\load.inf
-Other\Maintained\Application\Shell\LoadPciRom\LoadPciRom.inf
-Other\Maintained\Application\Shell\ls\ls.inf
-Other\Maintained\Application\Shell\mem\mem.inf
-Other\Maintained\Application\Shell\memmap\memmap.inf
-Other\Maintained\Application\Shell\mkdir\mkdir.inf
-Other\Maintained\Application\Shell\mm\mm.inf
-Other\Maintained\Application\Shell\mode\mode.inf
-Other\Maintained\Application\Shell\mount\mount.inf
-Other\Maintained\Application\Shell\mv\mv.inf
-Other\Maintained\Application\Shell\newshell\nshell.inf
-Other\Maintained\Application\Shell\openinfo\openinfo.inf
-Other\Maintained\Application\Shell\pci\pci.inf
-Other\Maintained\Application\Shell\Ping\Ping.inf
-Other\Maintained\Application\Shell\reset\reset.inf
-Other\Maintained\Application\Shell\rm\rm.inf
-Other\Maintained\Application\Shell\sermode\sermode.inf
-Other\Maintained\Application\Shell\SmbiosView\Smbiosview.inf
-Other\Maintained\Application\Shell\stall\stall.inf
-Other\Maintained\Application\Shell\TelnetMgmt\TelnetMgmt.inf
-Other\Maintained\Application\Shell\time\time.inf
-Other\Maintained\Application\Shell\touch\touch.inf
-Other\Maintained\Application\Shell\type\type.inf
-Other\Maintained\Application\Shell\tzone\timezone.inf
-Other\Maintained\Application\Shell\unload\unload.inf
-Other\Maintained\Application\Shell\ver\Ver.inf
-Other\Maintained\Application\Shell\vol\Vol.inf
 
 [=============================================================================]
 
