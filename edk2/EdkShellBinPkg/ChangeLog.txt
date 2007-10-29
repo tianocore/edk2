@@ -38,7 +38,19 @@ EDK_0000: Compatible: owner
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
-==========================================================================================
+=========================================================================================
+EDK_4227: Compatible: qhuang8
+	
+	Shell Applications: Update shell binaries: built from Edk Shell release 1.03 and 
+	EdkCompatibilityPkg r2246. For more details on how to build these binaries,
+        please refer to ReadMe.txt in this package.
+	
+	Code Change:
+	Shell binaries under EdkShellBinPkg
+	
+	
+
+=========================================================================================
 EDK_4222: Non-Compatible: qhuang8
 	
 	Shell Applications: Remove duplicate applications. There are duplicate copies in
@@ -61,8 +73,8 @@ EDK_4222: Non-Compatible: qhuang8
 
 	
 	Possible Impacts:
-	1) Platform FDF files that directly refer to these applications should update the locations
-	to avoid build break.
+	1) Platform FDF files that directly refer to these applications should update the
+        locations to avoid build break.
 
 
 
