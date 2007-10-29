@@ -89,8 +89,6 @@ DEFINE PROCESSOR=X64
 Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\BsDataHubStatusCode\BsDataHubStatusCode.inf
 Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtMemoryStatusCode\RtMemoryStatusCode.inf
 
-#Other\Maintained\Application\Shell\Library\EfiShellLib.inf
-
 [=============================================================================]
 #
 # These are the components that will be built by the master makefile
@@ -99,7 +97,7 @@ Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtMemoryStatusCode\RtMemorySta
 [Components]
 DEFINE PACKAGE=Default
 
-#Other\Maintained\Application\Shell\Shell.inf
+#Add EDK INF file here:
 #Other\Maintained\Application\Shell\ShellFull.inf
 
 
