@@ -1419,13 +1419,16 @@ InitializeIdeBus(
   //
   // Install driver model protocol(s).
   //
-  Status = EfiLibInstallDriverBindingComponentName2 (
+  Status = EfiLibInstallAllDriverProtocols2 (
              ImageHandle,
              SystemTable,
              &gIDEBusDriverBinding,
              ImageHandle,
              &gIDEBusComponentName,
-             &gIDEBusComponentName2
+             &gIDEBusComponentName2,
+             NULL,
+             &gIDEBusDriverDiagnostics,
+             &gIDEBusDriverDiagnostics2
              );
   ASSERT_EFI_ERROR (Status);
 
