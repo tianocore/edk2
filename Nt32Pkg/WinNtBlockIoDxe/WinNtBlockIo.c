@@ -119,7 +119,7 @@ InitializeWinNtBlockIo(
              &gWinNtBlockIoComponentName2,
              NULL,
              &gWinNtBlockIoDriverDiagnostics,
-             NULL
+             &gWinNtBlockIoDriverDiagnostics2
              );
   ASSERT_EFI_ERROR (Status);
 
