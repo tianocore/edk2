@@ -43,9 +43,17 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
 //
 // EFI Driver Diagnostics Protocol
 //
-EFI_DRIVER_DIAGNOSTICS_PROTOCOL gWinNtBlockIoDriverDiagnostics = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS_PROTOCOL gWinNtBlockIoDriverDiagnostics = {
   WinNtBlockIoDriverDiagnosticsRunDiagnostics,
-  LANGUAGESUPPORTED
+  "eng"
+};
+
+//
+// EFI Driver Diagnostics 2 Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gWinNtBlockIoDriverDiagnostics2 = {
+  (EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS) WinNtBlockIoDriverDiagnosticsRunDiagnostics,
+  "en"
 };
 
 EFI_STATUS
@@ -78,7 +86,8 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
                        specified by ControllerHandle and ChildHandle.   See
                        "Related Definitions" for the list of supported types.
     Language         - A pointer to a three character ISO 639-2 language
-                       identifier.  This is the language in which the optional
+                       identifier or a Null-terminated ASCII string array indicating
+                       the language.  This is the language in which the optional
                        error message should be returned in Buffer, and it must
                        match one of the languages specified in SupportedLanguages.
                        The number of languages supported by a driver is up to
@@ -121,7 +130,10 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
 {
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
-  CHAR8                 *SupportedLanguage;
+  CHAR8                 *SupportedLanguages;
+  BOOLEAN               Iso639Language;
+  BOOLEAN               Found;
+  UINTN                 Index;
 
   if (Language         == NULL ||
       ErrorType        == NULL ||
@@ -132,22 +144,36 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
     return EFI_INVALID_PARAMETER;
   }
 
-  SupportedLanguage = This->SupportedLanguages;
-
-  Status            = EFI_UNSUPPORTED;
-  while (*SupportedLanguage != 0) {
-    if (AsciiStrnCmp (Language, SupportedLanguage, 3) == 0) {
-      Status = EFI_SUCCESS;
-      break;
+  SupportedLanguages = This->SupportedLanguages;
+  Iso639Language = (BOOLEAN)(This == &gWinNtBlockIoDriverDiagnostics);
+  //
+  // Make sure Language is in the set of Supported Languages
+  //
+  Found = FALSE;
+  while (*SupportedLanguages != 0) {
+    if (Iso639Language) {
+      if (CompareMem (Language, SupportedLanguages, 3) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += 3;
+    } else {
+      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
+      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += Index;
+      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
     }
-
-    SupportedLanguage += 3;
   }
-
-  if (EFI_ERROR (Status)) {
+  //
+  // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
+  //
+  if (!Found) {
     return EFI_UNSUPPORTED;
   }
-
+  
   *ErrorType  = NULL;
   *BufferSize = 0;
   if (DiagnosticType != EfiDriverDiagnosticTypeStandard) {

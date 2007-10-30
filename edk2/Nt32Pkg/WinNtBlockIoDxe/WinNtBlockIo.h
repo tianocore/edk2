@@ -99,6 +99,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL         gWinNtBlockIoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL        gWinNtBlockIoComponentName2;
 extern EFI_DRIVER_CONFIGURATION_PROTOCOL   gWinNtBlockIoDriverConfiguration;
 extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL     gWinNtBlockIoDriverDiagnostics;
+extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL    gWinNtBlockIoDriverDiagnostics2;
 
 //
 // EFI Driver Binding Functions
