@@ -565,6 +565,7 @@
   X64/CpuIdEx.S | GCC 
   X64/CpuBreakpoint.S | GCC 
   SynchronizationGcc.c  | GCC 
+  ChkStkGcc.c  | GCC 
 
 [Sources.IPF]
   Ipf/AccessGp.s
