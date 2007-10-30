@@ -70,6 +70,17 @@
   MemLibGuid.c
 
 [Sources.X64]
+  x64/ScanMem64.S
+  x64/ScanMem32.S
+  x64/ScanMem16.S
+  x64/ScanMem8.S
+  x64/CompareMem.S
+  x64/ZeroMem.S
+  x64/SetMem64.S
+  x64/SetMem32.S
+  x64/SetMem16.S
+  x64/SetMem.S
+  x64/CopyMem.S
   x64/ScanMem64.asm
   x64/ScanMem32.asm
   x64/ScanMem16.asm
