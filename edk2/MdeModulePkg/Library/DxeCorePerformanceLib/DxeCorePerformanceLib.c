@@ -600,6 +600,8 @@ GetPerformanceMeasurement (
   EFI_STATUS        Status;
   GAUGE_DATA_ENTRY  *GaugeData;
 
+  GaugeData = NULL;
+  
   ASSERT (Handle != NULL);
   ASSERT (Token != NULL);
   ASSERT (Module != NULL);
