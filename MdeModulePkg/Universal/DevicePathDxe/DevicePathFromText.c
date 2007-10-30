@@ -355,6 +355,8 @@ HexStringToBuf (
   UINT8       Digit;
   UINT8       Byte;
 
+  Digit = 0;
+
   //
   // Find out how many hex characters the string has.
   //
@@ -693,6 +695,8 @@ StrToBuf (
   UINTN       StrLength;
   UINT8       Digit;
   UINT8       Byte;
+
+  Digit = 0;
 
   //
   // Two hex char make up one byte
