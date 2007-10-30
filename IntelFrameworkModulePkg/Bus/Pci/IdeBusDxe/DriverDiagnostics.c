@@ -18,9 +18,17 @@
 //
 // EFI Driver Diagnostics Protocol
 //
-EFI_DRIVER_DIAGNOSTICS_PROTOCOL gIDEBusDriverDiagnostics = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS_PROTOCOL gIDEBusDriverDiagnostics = {
   IDEBusDriverDiagnosticsRunDiagnostics,
   "eng"
+};
+
+//
+// EFI Driver Diagnostics 2 Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiagnostics2 = {
+  (EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS) IDEBusDriverDiagnosticsRunDiagnostics,
+  "en"
 };
 
 /**
@@ -98,6 +106,49 @@ IDEBusDriverDiagnosticsRunDiagnostics (
   IDE_BLK_IO_DEV        *IdeBlkIoDevice;
   UINT32                VendorDeviceId;
   VOID                  *BlockBuffer;
+  CHAR8                 *SupportedLanguages;
+  BOOLEAN               Iso639Language;
+  BOOLEAN               Found;
+  UINTN                 Index;
+
+  if (Language         == NULL ||
+      ErrorType        == NULL ||
+      Buffer           == NULL ||
+      ControllerHandle == NULL ||
+      BufferSize       == NULL) {
+
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SupportedLanguages = This->SupportedLanguages;
+  Iso639Language = (BOOLEAN)(This == &gIDEBusDriverDiagnostics);
+  //
+  // Make sure Language is in the set of Supported Languages
+  //
+  Found = FALSE;
+  while (*SupportedLanguages != 0) {
+    if (Iso639Language) {
+      if (CompareMem (Language, SupportedLanguages, 3) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += 3;
+    } else {
+      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
+      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
+        Found = TRUE;
+        break;
+      }
+      SupportedLanguages += Index;
+      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
+    }
+  }
+  //
+  // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
+  //
+  if (!Found) {
+    return EFI_UNSUPPORTED;
+  }
 
   *ErrorType  = NULL;
   *BufferSize = 0;
