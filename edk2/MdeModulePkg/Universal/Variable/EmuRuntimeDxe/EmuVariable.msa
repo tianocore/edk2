@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>EmuVariable</ModuleName>
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
-    <GuidValue>CBD2E4D5-7068-4FF5-B866-9822B4AD8D61</GuidValue>
+    <GuidValue>02B01AD5-7E59-43e8-A6D8-238180613A5A</GuidValue>
     <Version>1.0</Version>
     <Abstract>Emulation Variable for EFI_RUNTIME_SERVICES.</Abstract>
     <Description>This module provides three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName</Description>
