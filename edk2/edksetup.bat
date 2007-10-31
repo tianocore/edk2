@@ -39,8 +39,20 @@ set WORKSPACE=%CD%
 @if /I "%1"=="/?" goto Usage
 @if /I "%1"=="/help" goto Usage
 @if /I not "%1"=="--nt32" goto check_new_build
+if not defined VCINSTALLDIR (
+  if defined VS71COMNTOOLS (
+    call "%VS71COMNTOOLS%\vsvars32.bat"
+  ) else (
+    if defined VS80COMNTOOLS (
+      call "%VS80COMNTOOLS%\vsvars32.bat"
+    ) else (
+      echo.
+      echo !!! WARNING !!! Cannot find Visual Studio !!!
+      echo.
+    )
+  )
+)
 shift
-goto check_vc
 
 :check_new_build
 @if /I "%1"=="NewBuild" goto NewBuild
@@ -51,30 +63,22 @@ goto check_vc
 @REM
 
 :check_vc
-@REM The following setup is required for building the Nt32Pkg\Nt32.dsc
-@REM platform emulation environment.
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
-  @REM Use Visual Studio .NET 2003 if it is installed
-  call "%VS71COMNTOOLS%\vsvars32.bat"
-) else if defined VS80COMNTOOLS (
-  @REM Use Visual Studio 2005 iff Visual Studio .NET 2003 is not installed.
-  call "%VS80COMNTOOLS%\vsvars32.bat"
+ call "%VS71COMNTOOLS%\vsvars32.bat"
 ) else (
   echo.
-  echo !!! WARNING !!!! Cannot find Visual Studio !!!
+  echo !!! WARNING !!! Cannot find Visual Studio !!!
   echo.
 )
-goto check_new_build
 
 :check_cygwin
-@if /I "%1"=="NewBuild" goto NewBuild
 if defined CYGWIN_HOME goto check_java
 if exist c:\cygwin (
   set CYGWIN_HOME=c:\cygwin
 ) else (
   echo.
-  echo !!! WARNING !!!! Not set CYGWIN_HOME, gcc build may not be used !!!
+  echo !!! WARNING !!! No CYGWIN_HOME set, gcc build may not be used !!!
   echo.
 )
 
@@ -280,12 +284,12 @@ goto end
 
 :Usage
 echo.
-echo  Usage: %0 [--nt32] [NewBuild] [Rebuild] [ForceRebuild] [Reconfig]
+echo  Usage: "%0 [--nt32] [NewBuild | Rebuild | ForceRebuild | Reconfig]"
 echo         --nt32         Call vsvars32.bat for NT32 platform build
 echo         NewBuild       Using new build tools in BaseTools package
-echo         Rebuild:       Incremental build, only build those updated tools; 
-echo         ForceRebuild:  Rebuild all tools neither updated or not; 
-echo         Reconfig:      Reinstall target.txt, tools_def.txt, FrameworkDatabase.db. 
+echo         Rebuild        Incremental build, only build those updated tools (Ant build only)
+echo         ForceRebuild   Rebuild all tools neither updated or not (Ant build only)
+echo         Reconfig       Reinstall target.txt, tools_def.txt, FrameworkDatabase.db (Ant build only) 
 echo.
 echo  Note that target.template, tools_def.template, FrameworkDatabase.template will be
 echo  only copied to target.txt, tools_def.txt, FrameworkDatabase.db respectively if they
