@@ -342,7 +342,7 @@ Returns:
     gDxeCoreImageHandle
     );
 
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "HOBLIST address in DXE = 0x%08x\n", HobStart));
+  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "HOBLIST address in DXE = 0x%016lx\n", (UINT64) (UINTN) HobStart));
 
   //
   // Initialize the Event Services
