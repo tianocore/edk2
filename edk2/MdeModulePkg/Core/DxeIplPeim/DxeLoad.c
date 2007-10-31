@@ -236,11 +236,25 @@ DxeLoadCore (
     EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
     );
 
+  DEBUG_CODE_BEGIN ();
+
+    EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION       PtrPeImage;
+    PtrPeImage.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) ((UINTN) DxeCoreAddress + ((EFI_IMAGE_DOS_HEADER *) (UINTN) DxeCoreAddress)->e_lfanew);
+    
+    if (PtrPeImage.Pe32->FileHeader.Machine != IMAGE_FILE_MACHINE_IA64) {
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%08x EntryPoint=0x%08x\n", (UINTN) DxeCoreAddress, (UINTN) DxeCoreEntryPoint));
+    } else {
+      //
+      // For IPF Image, the real entry point should be print.
+      //
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%08x EntryPoint=0x%08x\n", (UINTN) DxeCoreAddress, (UINTN) (*(UINT64 *)(UINTN)DxeCoreEntryPoint)));
+    }
+
+  DEBUG_CODE_END ();
   //
   // Transfer control to the DXE Core
   // The handoff state is simply a pointer to the HOB list
   //
-  DEBUG ((EFI_D_INFO, "DXE Core Entry Point 0x%08x\n", (UINTN) DxeCoreEntryPoint));
   HandOffToDxeCore (DxeCoreEntryPoint, HobList, &mPpiSignal);
   //
   // If we get here, then the DXE Core returned.  This is an error

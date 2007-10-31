@@ -406,16 +406,27 @@ Returns:
     *ImageSizeArg = ImageSize;
   }
   
-  //
-  // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
-  //
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", (UINTN) ImageAddress, *EntryPoint));
   DEBUG_CODE_BEGIN ();
     CHAR8                              *AsciiString;
     CHAR8                              AsciiBuffer[512];
     INT32                              Index;
     INT32                              Index1;
+
+    //
+    // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
+    //
+    if (Machine != IMAGE_FILE_MACHINE_IA64) {
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", (UINTN) ImageAddress, *EntryPoint));
+    } else {
+      //
+      // For IPF Image, the real entry point should be print.
+      //
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", (UINTN) ImageAddress, (UINTN) (*(UINT64 *)(UINTN)*EntryPoint)));
+    }
     
+    //
+    // Print Module Name by PeImage PDB file name.
+    //
     AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
     
     if (AsciiString != NULL) {

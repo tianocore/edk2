@@ -446,8 +446,25 @@ Returns:
     UINTN Index;
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
-
-    DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading driver at 0x%10p EntryPoint=0x%10p ", (VOID *)(UINTN)Image->ImageContext.ImageAddress, (VOID *)(UINTN)Image->ImageContext.EntryPoint));
+    
+    if (Image->ImageContext.Machine != IMAGE_FILE_MACHINE_IA64) {
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, 
+              "Loading driver at 0x%10p EntryPoint=0x%10p ", 
+              (VOID *)(UINTN)Image->ImageContext.ImageAddress, 
+              (VOID *)(UINTN)Image->ImageContext.EntryPoint));
+    } else {
+      //
+      // For IPF Image, the real entry point should be print.
+      //      
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, 
+              "Loading driver at 0x%10p EntryPoint=0x%10p ", 
+              (VOID *)(UINTN)Image->ImageContext.ImageAddress, 
+              (VOID *)(UINTN)(*(UINT64 *)(UINTN)Image->ImageContext.EntryPoint)));
+    }
+    
+    //
+    // Print Module Name by Pdb file path
+    //
     if (Image->ImageContext.PdbPointer != NULL) {
       StartIndex = 0;
       for (Index = 0; Image->ImageContext.PdbPointer[Index] != 0; Index++) {

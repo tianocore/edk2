@@ -224,10 +224,10 @@ Returns:
     FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
-
+  
   FileOffset = (UINT32) ((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
   ASSERT (FileOffset <= 0xFFFFFFFF);
-  
+
   while (FileOffset < (FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
     //
     // Get FileState which is the highest bit of the State 
@@ -244,6 +244,7 @@ Returns:
     case EFI_FILE_MARKED_FOR_UPDATE:
       if (CalculateHeaderChecksum (FfsFileHeader) != 0) {
         ASSERT (FALSE);
+        *FileHeader = NULL;
         return EFI_NOT_FOUND;
       }
 
@@ -285,11 +286,12 @@ Returns:
       break;
 
     default:
+      *FileHeader = NULL;
       return EFI_NOT_FOUND;
-
     } 
   }
-
+  
+  *FileHeader = NULL;
   return EFI_NOT_FOUND;  
 }
 
