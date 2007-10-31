@@ -190,13 +190,13 @@ Returns:
       UINTN  StackValue;
 
       StackValue = INIT_CAR_VALUE;
-      for (StackPointer = (UINTN *) OldCoreData->MaxTopOfCarHeap;
-           ((UINTN) StackPointer < ((UINTN) OldCoreData->BottomOfCarHeap + OldCoreData->SizeOfCacheAsRam))
+      for (StackPointer = (UINTN *) OldCoreData->TopOfCarHeap;
+           ((UINTN) StackPointer < ((UINTN) OldCoreData->MaxTopOfCarHeap))
            && StackValue == INIT_CAR_VALUE;
            StackPointer++) {
         StackValue = *StackPointer;
       }
-
+      
       DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", OldCoreData->SizeOfCacheAsRam));
       DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
         ((UINTN) OldCoreData->TopOfCarHeap - (UINTN) StackPointer)
