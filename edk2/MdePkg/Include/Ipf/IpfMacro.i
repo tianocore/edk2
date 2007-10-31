@@ -1,13 +1,13 @@
 //++
-// Copyright (c) 2006, Intel Corporation                                                         
-// All rights reserved. This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
+// Copyright (c) 2006, Intel Corporation
+// All rights reserved. This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
 // Module Name:
 //  IpfMacro.i
 //
@@ -43,7 +43,15 @@ name::
 
 #define GLOBAL_FUNCTION(Function) \
          .##type   Function, @function; \
-         .##global Function
+         .##globl Function
+
+#define GLOBAL_OBJECT(Object) \
+         .##type   Object, @object; \
+         .##globl  Object
+
+#define GLOBAL_CONSTANT(Constant) \
+         .##type   Constant, @notype; \
+         .##globl  Constant
 
 #define INTERRUPT_HANDLER_BEGIN(name) \
 PROCEDURE_ENTRY(name##HandlerBegin) \
@@ -53,7 +61,7 @@ PROCEDURE_EXIT(name##HandlerBegin)
 #define INTERRUPT_HANDLER_END(name) \
 PROCEDURE_ENTRY(name##HandlerEnd) \
 ;; \
-PROCEDURE_EXIT(name##HandlerEnd) 
+PROCEDURE_EXIT(name##HandlerEnd)
 
 
 #define INTERRUPT_HANDLER_BLOCK_BEGIN \
