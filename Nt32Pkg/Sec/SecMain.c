@@ -154,6 +154,7 @@ Returns:
   VOID                  *PeiCoreFile;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
+  UINTN                 *StackPointer;
   
   MemorySizeStr      = (CHAR16 *) FixedPcdGetPtr (PcdWinNtMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *) FixedPcdGetPtr (PcdWinNtFirmwareVolume);
@@ -202,6 +203,12 @@ Returns:
     exit (1);
   }
 
+  for (StackPointer = (UINTN*) (UINTN) InitialStackMemory;
+       StackPointer < (UINTN*) ((UINTN)InitialStackMemory + (SIZE_T) InitialStackMemorySize);
+       StackPointer ++) {
+    *StackPointer = 0x5AA55AA5;
+  }
+  
   printf ("  SEC passing in %d bytes of temp RAM to PEI\n", InitialStackMemorySize);
 
   //
