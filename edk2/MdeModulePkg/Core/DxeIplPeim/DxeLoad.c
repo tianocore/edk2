@@ -242,12 +242,12 @@ DxeLoadCore (
     PtrPeImage.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) ((UINTN) DxeCoreAddress + ((EFI_IMAGE_DOS_HEADER *) (UINTN) DxeCoreAddress)->e_lfanew);
     
     if (PtrPeImage.Pe32->FileHeader.Machine != IMAGE_FILE_MACHINE_IA64) {
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%08x EntryPoint=0x%08x\n", (UINTN) DxeCoreAddress, (UINTN) DxeCoreEntryPoint));
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)DxeCoreAddress, (VOID *)(UINTN)DxeCoreEntryPoint));
     } else {
       //
       // For IPF Image, the real entry point should be print.
       //
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%08x EntryPoint=0x%08x\n", (UINTN) DxeCoreAddress, (UINTN) (*(UINT64 *)(UINTN)DxeCoreEntryPoint)));
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DXE CORE at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)DxeCoreAddress, (VOID *)(UINTN)(*(UINT64 *)(UINTN)DxeCoreEntryPoint)));
     }
 
   DEBUG_CODE_END ();
