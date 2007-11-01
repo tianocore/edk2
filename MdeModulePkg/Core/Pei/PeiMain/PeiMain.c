@@ -199,7 +199,7 @@ Returns:
       
       DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", OldCoreData->SizeOfCacheAsRam));
       DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
-        ((UINTN) OldCoreData->TopOfCarHeap - (UINTN) StackPointer)
+        ((UINTN) OldCoreData->MaxTopOfCarHeap - (UINTN) StackPointer)
         ));
       DEBUG ((EFI_D_INFO, "  CAR heap used:       %d bytes.\n",
         ((UINTN) OldCoreData->HobList.HandoffInformationTable->EfiFreeMemoryBottom -
