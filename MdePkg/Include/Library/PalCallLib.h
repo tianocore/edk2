@@ -4058,6 +4058,17 @@ typedef struct {
 **/
 #define PAL_ROUTE_CONFIG        0x0301
 
+//
+// PAL_ROUTE_CONFIG definitions
+//
+#define PAL_INVALID_CSR_DATA_WRITE_BITS_REQUESTED  0xfffffffffffffffc
+#define PAL_INVALID_CSR_MAP_REQUESTED              0xfffffffffffffffb
+#define PAL_INVALID_CSR_BUFFER_ADDRESS             0xfffffffffffffffa
+
+typedef struct {
+  UINT64  Csr[12];
+} PAL_ROUTE_CONFIG_CSR_BUFFER;
+
 /**
   Makes a PAL procedure call.
 
