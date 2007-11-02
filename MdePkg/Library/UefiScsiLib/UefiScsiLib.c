@@ -17,7 +17,7 @@
 #include <Library/ScsiLib.h>
 #include <Library/BaseMemoryLib.h>
 
-#include <IndustryStandard/scsi.h>
+#include <IndustryStandard/Scsi.h>
 
 
 /**
