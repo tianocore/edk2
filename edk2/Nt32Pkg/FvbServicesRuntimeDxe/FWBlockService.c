@@ -740,6 +740,7 @@ Returns:
   UINT32              OldStatus;
   UINT32              NewStatus;
   EFI_STATUS          Status;
+  EFI_FVB_ATTRIBUTES  UnchangedAttributes;
 
   //
   // Find the right instance of the FVB private data
@@ -758,6 +759,24 @@ Returns:
   OldStatus     = OldAttributes & EFI_FVB2_STATUS;
   NewStatus     = *Attributes & EFI_FVB2_STATUS;
 
+  UnchangedAttributes = EFI_FVB2_READ_DISABLED_CAP  | \
+                        EFI_FVB2_READ_ENABLED_CAP   | \
+                        EFI_FVB2_WRITE_DISABLED_CAP | \
+                        EFI_FVB2_WRITE_ENABLED_CAP  | \
+                        EFI_FVB2_LOCK_CAP           | \
+                        EFI_FVB2_STICKY_WRITE       | \
+                        EFI_FVB2_MEMORY_MAPPED      | \
+                        EFI_FVB2_ERASE_POLARITY     | \
+                        EFI_FVB2_READ_LOCK_CAP      | \
+                        EFI_FVB2_WRITE_LOCK_CAP     | \
+                        EFI_FVB2_ALIGNMENT;
+
+  //
+  // Some attributes of FV is read only can *not* be set
+  //
+  if ((OldAttributes & UnchangedAttributes) ^ (*Attributes & UnchangedAttributes)) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // If firmware volume is locked, no status bit can be updated
   //
