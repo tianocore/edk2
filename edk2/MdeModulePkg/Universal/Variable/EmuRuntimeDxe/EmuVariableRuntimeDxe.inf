@@ -57,6 +57,11 @@
   gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+
 [Depex]
   TRUE
 
