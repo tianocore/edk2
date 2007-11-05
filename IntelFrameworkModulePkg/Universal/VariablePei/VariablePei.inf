@@ -107,6 +107,7 @@
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
 
 [depex]
   TRUE

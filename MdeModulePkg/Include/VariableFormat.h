@@ -17,12 +17,12 @@
 
 #define VARIABLE_STORE_SIGNATURE  EFI_SIGNATURE_32 ('$', 'V', 'S', 'S')
 
-#define MAX_VARIABLE_SIZE                 1024
+#define MAX_VARIABLE_SIZE                 FixedPcdGet32(PcdMaxVariableSize)
 
 //
 // Enlarges the hardware error record maximum variable size to 32K bytes
 //
-#define MAX_HARDWARE_ERROR_VARIABLE_SIZE  0x8000
+#define MAX_HARDWARE_ERROR_VARIABLE_SIZE  FixedPcdGet32(PcdMaxHardwareErrorVariableSize)
 
 #define VARIABLE_DATA                     0x55AA
 

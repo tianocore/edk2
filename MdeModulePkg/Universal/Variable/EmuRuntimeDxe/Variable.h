@@ -37,10 +37,11 @@ Abstract:
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
+#include <Library/PcdLib.h>
 #include <VariableFormat.h>
 
-#define VARIABLE_STORE_SIZE (64 * 1024)
-#define SCRATCH_SIZE        (4 * 1024)
+#define VARIABLE_STORE_SIZE FixedPcdGet32(PcdVariableStoreSize)
+#define SCRATCH_SIZE        FixedPcdGet32(PcdMaxVariableSize)
 
 //
 // Define GET_PAD_SIZE to optimize compiler
