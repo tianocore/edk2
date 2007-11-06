@@ -1236,7 +1236,7 @@ Returns:
       Selection->ThisTag->StorageWidth
       );
 
-    if (Packet != NULL) {
+    if (Packet != NULL && Packet->String != NULL) {
       //
       // Upon error, we will likely receive a string to print out
       //

@@ -290,7 +290,7 @@ ReadPassword (
       SecondEntry = TRUE;
     } else if (Status == EFI_NOT_READY) {
 Error:
-      if (Packet != NULL) {
+      if (Packet != NULL && Packet->String != NULL) {
         //
         // Upon error, we will likely receive a string to print out
         // Display error popup
@@ -403,7 +403,7 @@ Error:
           //
           if (Confirmation) {
             if (EFI_ERROR (Status)) {
-              if (Packet->String == NULL) {
+              if (Packet == NULL || Packet->String == NULL) {
                 WidthOfString = GetStringWidth (gConfirmError);
                 ScreenSize = MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, gConfirmError, gPressEnter, &NullCharacter);
@@ -513,12 +513,14 @@ Error:
       //
       default:
         if ((StringPtr[0] == CHAR_NULL) && (Key.UnicodeChar != CHAR_BACKSPACE)) {
+          StringPtr[0] = Key.UnicodeChar;
+          StringPtr[1] = CHAR_NULL;
           if (!Confirmation) {
-            StrnCpy (StringPtr, &Key.UnicodeChar, 1);
-            StrnCpy (TempString, &Key.UnicodeChar, 1);
+            TempString[0] = Key.UnicodeChar;
+            TempString[1] = CHAR_NULL;
           } else {
-            StrnCpy (StringPtr, &Key.UnicodeChar, 1);
-            StrnCpy (TempString2, &Key.UnicodeChar, 1);
+            TempString2[0] = Key.UnicodeChar;
+            TempString2[1] = CHAR_NULL;
             ConfirmationComplete = FALSE;
           }
         } else if ((GetStringWidth (StringPtr) / 2 <= (UINTN) (MenuOption->ThisTag->Maximum - 1) / 2) &&
