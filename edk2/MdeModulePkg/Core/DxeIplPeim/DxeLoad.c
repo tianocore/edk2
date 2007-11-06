@@ -207,7 +207,7 @@ DxeLoadCore (
   CopyMem(&DxeCoreFileName, &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name), sizeof (EFI_GUID));
 
   //
-  // Load the DXE Core from a Firmware Volume
+  // Load the DXE Core from a Firmware Volume, may use LoadFile ppi to do this for save code size.
   //
   Status = PeiLoadFile (
             FileHandle,
@@ -457,21 +457,13 @@ PeiLoadFile (
   PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
   VOID                              *Pe32Data;
   //
-  // First try to find the required section in this ffs file.
+  // First try to find the PE32 section in this ffs file.
   //
   Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_PE32,
              FileHandle,
              &Pe32Data
              );
-
-  if (EFI_ERROR (Status)) {
-    Status = PeiServicesFfsFindSectionData (
-               EFI_SECTION_TE,
-               FileHandle,
-               &Pe32Data
-               );
-  }
   
   if (EFI_ERROR (Status)) {
     //
@@ -495,15 +487,6 @@ PeiLoadFile (
   //
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
   ASSERT (ImageContext.ImageAddress != 0);
-
-  //
-  // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
-  //
-  if (ImageContext.IsTeImage) {
-    ImageContext.ImageAddress = ImageContext.ImageAddress + 
-                                ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
-                                sizeof (EFI_TE_IMAGE_HEADER);
-  }
 
   //
   // Load the image to our new buffer
