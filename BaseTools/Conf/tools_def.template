@@ -464,7 +464,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_CYGWINGCC_IA32_PP_PATH            = DEF(CYGWIN_BIN32)/gcc
 *_CYGWINGCC_IA32_VFRPP_PATH         = DEF(CYGWIN_BIN32)/gcc
 
-*_CYGWINGCC_IA32_CC_FLAGS                = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include AutoGen.h
+*_CYGWINGCC_IA32_CC_FLAGS           = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include AutoGen.h
 
 ##################
 # X64 definitions
@@ -476,7 +476,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_CYGWINGCC_X64_PP_PATH             = DEF(CYGWIN_BINX64)/gcc
 *_CYGWINGCC_X64_VFRPP_PATH          = DEF(CYGWIN_BINX64)/gcc
 
-*_CYGWINGCC_X64_CC_FLAGS                 = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include AutoGen.h -D_EFI_P64
+*_CYGWINGCC_X64_CC_FLAGS            = -Os -fshort-wchar -fno-strict-aliasing -mno-red-zone -Wall -Werror -c -include AutoGen.h -D_EFI_P64
 
 ####################################################################################
 #
