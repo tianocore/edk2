@@ -4029,46 +4029,6 @@ typedef struct {
 #define PAL_VP_TERMINATE       272
 
 
-
-/**
-
-  PAL Procedure - PAL_ROUTE_CONFIG.
-
-  Set allowable requested Route configuration bits in all
-  Ports[11:0] specified in the port_map.
-
-
-  @param Index         Index of PAL_ROUTE_CONFIG within the list of PAL
-                       procedures.
-
-  @param route_cfg_ctl 32-bit vector of routing configuration control bits
-
-  @param write_map     bits[11:0] map to desired Ports[11:0] to be modified.
-
-  @param buffer_addr   Addr of CSR read buffer64(12)
-
-  @return Status  0  - Call completed without error
-
-  @return Status  -4 - Invalid CSR data write bit requested
-
-  @return Status  -5 - Invalid CSR map requested
-
-  @return Status  -6 - Invalid CSR buffer address
-
-**/
-#define PAL_ROUTE_CONFIG        0x0301
-
-//
-// PAL_ROUTE_CONFIG definitions
-//
-#define PAL_INVALID_CSR_DATA_WRITE_BITS_REQUESTED  0xfffffffffffffffc
-#define PAL_INVALID_CSR_MAP_REQUESTED              0xfffffffffffffffb
-#define PAL_INVALID_CSR_BUFFER_ADDRESS             0xfffffffffffffffa
-
-typedef struct {
-  UINT64  Csr[12];
-} PAL_ROUTE_CONFIG_CSR_BUFFER;
-
 /**
   Makes a PAL procedure call.
 
