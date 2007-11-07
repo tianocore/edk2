@@ -411,6 +411,7 @@ Error:
                 WidthOfString = GetStringWidth (Packet->String);
                 ScreenSize = MAX (WidthOfString, GetStringWidth (gPressEnter)) / 2;
                 CreatePopUp (ScreenSize, 4, &NullCharacter, Packet->String, gPressEnter, &NullCharacter);
+                FreePool (Packet->String);
                 FreePool (Packet);
               }
 
