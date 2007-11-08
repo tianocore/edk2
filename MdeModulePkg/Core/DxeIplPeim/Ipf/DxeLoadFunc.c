@@ -62,6 +62,11 @@ HandOffToDxeCore (
   Status = PeiServicesInstallPpi (EndOfPeiSignal);
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
+  //
+  UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
+
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
     HobList.Raw,

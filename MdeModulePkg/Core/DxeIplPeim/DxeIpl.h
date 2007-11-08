@@ -33,6 +33,7 @@ Abstract:
 #include <Ppi/Decompress.h>
 #include <Ppi/FirmwareVolumeInfo.h>
 
+#include <Guid/MemoryAllocationHob.h>
 #include <Guid/FirmwareFileSystem2.h>
 
 #include <Library/DebugLib.h>
@@ -103,6 +104,12 @@ HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
   IN EFI_PEI_HOB_POINTERS   HobList,
   IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
+  );
+
+VOID
+UpdateStackHob (
+  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                      Length
   );
 
 EFI_STATUS

@@ -751,3 +751,33 @@ Decompress (
   return EFI_SUCCESS;
 }
 
+VOID
+UpdateStackHob (
+  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                      Length
+  )
+{
+  EFI_PEI_HOB_POINTERS           Hob;
+
+  Hob.Raw = GetHobList ();
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
+      //
+      // Build a new memory allocation HOB with old stack info with EfiConventionalMemory type
+      // to be reclaimed by DXE core.
+      //
+      BuildMemoryAllocationHob (
+        Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
+        Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
+        EfiConventionalMemory
+        );
+      //
+      // Update the BSP Stack Hob to reflect the new stack info.
+      //
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength = Length;
+      break;
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+}
