@@ -11,7 +11,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
+#include <Base.h>
+#include <Library/DebugLib.h>
 
 /**
   Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.

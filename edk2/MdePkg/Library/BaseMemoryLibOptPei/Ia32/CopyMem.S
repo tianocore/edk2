@@ -40,7 +40,7 @@ _InternalMemCopyMem:
     movl    20(%esp), %edx              # edx <- Count
     cmpl    %esi, %edi
     je      L_CopyDone
-    cmpl    %edx, $0
+    cmpl    $0, %edx
     je      L_CopyDone
     leal    -1(%esi, %edx), %eax        # eax <- End of Source
     cmpl    %esi, %edi

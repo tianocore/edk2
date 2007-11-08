@@ -108,6 +108,8 @@
   MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
 [Components.IA32]
+  MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
+  MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
@@ -116,6 +118,8 @@
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
 [Components.X64]
+  MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
+  MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf

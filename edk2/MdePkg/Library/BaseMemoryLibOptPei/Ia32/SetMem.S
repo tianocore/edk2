@@ -37,18 +37,18 @@
 _InternalMemSetMem:
     push    %edi
     movl    12(%esp),%ecx
-    movl    16(%esp),%al
+    movb    16(%esp),%al
     movb    %ah, %al
-    shrd    %edx, %eax, $16
-    shld    %eax, %edx, $16
+    shrd    $16, %eax, %edx
+    shld    $16, %edx, %eax
     movl    %edx, %ecx
     movl    8(%esp),%edi
-    shr     $2, %ecx
-    rep 
-    stosd
+    shrd    $2, %ecx, %ecx
+    rep    
+    stosl
     movl    %ecx, %edx
     andl    $3, %ecx
-    rep
+    rep     
     stosb
     movl    8(%esp),%eax
     pop     %edi
