@@ -200,12 +200,12 @@
     <InputFile.MSFT, InputFile.Intel>
         ?.lib
         $(LIBS)
-        $(MODULE_BUILD_DIR)\Makefile
+        $(MAKE_FILE)
 
     <InputFile.GCC>
         ?.lib
         $(LIBS)
-        $(MODULE_BUILD_DIR)/GNUmakefile
+        $(MAKE_FILE)
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
