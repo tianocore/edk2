@@ -2415,18 +2415,18 @@ Returns:
     if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
       MemoryHob = Hob.MemoryAllocation;
       BaseAddress = MemoryHob->AllocDescriptor.MemoryBaseAddress;
-      Status = CoreAllocateMemorySpace (
-                 EfiGcdAllocateAddress,
-                 EfiGcdMemoryTypeSystemMemory, 
-                 0,
-                 MemoryHob->AllocDescriptor.MemoryLength,
-                 &BaseAddress,
-                 gDxeCoreImageHandle,
-                 NULL
-                 );
+      Status = CoreGetMemorySpaceDescriptor  (BaseAddress, &Descriptor);
       if (!EFI_ERROR (Status)) {
-        Status = CoreGetMemorySpaceDescriptor (MemoryHob->AllocDescriptor.MemoryBaseAddress, &Descriptor);
-        if (!EFI_ERROR (Status)) {
+        Status = CoreAllocateMemorySpace (
+                   EfiGcdAllocateAddress,
+                   Descriptor.GcdMemoryType, 
+                   0,
+                   MemoryHob->AllocDescriptor.MemoryLength,
+                   &BaseAddress,
+                   gDxeCoreImageHandle,
+                   NULL
+                   );
+        if (!EFI_ERROR (Status) && Descriptor.GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
           CoreAddMemoryDescriptor (
             MemoryHob->AllocDescriptor.MemoryType,
             MemoryHob->AllocDescriptor.MemoryBaseAddress,
