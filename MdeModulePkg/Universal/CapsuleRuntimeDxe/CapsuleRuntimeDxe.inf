@@ -63,4 +63,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule
 
 [Depex]
-  gEfiVariableArchProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
