@@ -114,6 +114,8 @@ Returns:
   UINT64                                PeiStackSize;
   UINT64                                EfiFreeMemorySize;
   EFI_PHYSICAL_ADDRESS                  PhysicalAddressOfOldHob;
+
+  DEBUG ((EFI_D_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
   
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
@@ -137,8 +139,8 @@ Returns:
 
   EfiFreeMemorySize = OldHandOffHob->EfiFreeMemoryBottom - PhysicalAddressOfOldHob;
   
-  DEBUG ((EFI_D_INFO, "HOBLIST address before memory init = 0x%08x\n", OldHandOffHob));
-  DEBUG ((EFI_D_INFO, "HOBLIST address after memory init = 0x%08x\n", NewHandOffHob));
+  DEBUG ((EFI_D_INFO, "HOBLIST address before memory init = 0x%p\n",  OldHandOffHob));
+  DEBUG ((EFI_D_INFO, "HOBLIST address after memory init = 0x%p\n", NewHandOffHob));
 
   CopyMem (
     NewHandOffHob,
@@ -155,7 +157,13 @@ Returns:
   NewHandOffHob->EfiEndOfHobList     = (UINTN)NewHandOffHob +
                                        (OldHandOffHob->EfiEndOfHobList -
                                         PhysicalAddressOfOldHob);
-
+  
+  //
+  // For IPF in CAR mode the real memory access is uncached,in InstallPeiMemory()
+  //  the 63-bit of address is set to 1.
+  //
+  SWITCH_TO_CACHE_MODE (PrivateData);
+  
   ConvertPpiPointers (PeiServices, OldHandOffHob, NewHandOffHob);
 
   BuildStackHob (PrivateData->StackBase, PrivateData->StackSize);
@@ -223,6 +231,7 @@ Returns:
     Hob.HandoffInformationTable->EfiFreeMemoryTop -= Offset;
   }
 
+  ASSERT (Hob.HandoffInformationTable->EfiFreeMemoryTop >= Hob.HandoffInformationTable->EfiFreeMemoryBottom);
   //
   // Verify that there is sufficient memory to satisfy the allocation
   //

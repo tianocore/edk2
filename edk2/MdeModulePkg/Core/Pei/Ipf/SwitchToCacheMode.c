@@ -44,13 +44,6 @@ Returns:
 {
   EFI_HOB_HANDOFF_INFO_TABLE    *Phit;
 
-  if (CoreData == NULL) {
-    //
-    // the first call with CoreData as NULL.
-    //
-    return;
-  }
-  
   if ((GetHandOffStatus().r10 & 0xFF) == RecoveryFn) {
     CoreData->StackBase = CoreData->StackBase &  CACHE_MODE_ADDRESS_MASK;
     CoreData->HobList.Raw = (UINT8 *)((UINTN)CoreData->HobList.Raw & CACHE_MODE_ADDRESS_MASK);
