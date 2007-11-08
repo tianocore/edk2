@@ -523,7 +523,7 @@ BuildStackHob (
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
-  Hob->AllocDescriptor.MemoryType        = EfiConventionalMemory;
+  Hob->AllocDescriptor.MemoryType        = EfiBootServicesData;
 
   //
   // Zero the reserved space to match HOB spec
