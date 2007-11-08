@@ -372,6 +372,12 @@ Returns:
                 );
               PERF_END (0, "PEIM", NULL, 0);
 
+            } else {
+              //
+              // If PeiLoadImage fails, the section extraction PPI or Decompress PPI may not be ready,
+              // we flag that more Peims need to be dispatched.
+              //
+              PeimNeedingDispatch = TRUE;
             }
 
             //
