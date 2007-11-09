@@ -1,22 +1,22 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  
+
   ImageFile.c
 
 
 Abstract:
 
-  
+
 
 
 Revision History
@@ -30,7 +30,7 @@ CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
   IN VOID                           *SourceBuffer   OPTIONAL,
   IN UINTN                          SourceSize,
-  IN EFI_DEVICE_PATH_PROTOCOL       *FilePath,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL   **FilePath,
   OUT EFI_HANDLE                    *DeviceHandle,
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
@@ -52,16 +52,16 @@ Arguments:
   FilePath      - The specific file path from which the image is loaded
   DeviceHandle  - Pointer to the return device handle.
   ImageFileHandle      - Pointer to the image file handle.
-  AuthenticationStatus - Pointer to a caller-allocated UINT32 in which the authentication status is returned. 
-    
+  AuthenticationStatus - Pointer to a caller-allocated UINT32 in which the authentication status is returned.
+
 Returns:
 
     EFI_SUCCESS     - Image file successfully opened.
-    
+
     EFI_LOAD_ERROR  - If the caller passed a copy of the file, and SourceSize is 0.
-    
+
     EFI_INVALID_PARAMETER   - File path is not valid.
-    
+
     EFI_NOT_FOUND   - File not found.
 
 --*/
@@ -95,7 +95,7 @@ Returns:
     ImageFileHandle->Source     = SourceBuffer;
     ImageFileHandle->SourceSize = SourceSize;
     *DeviceHandle     = NULL;
-    CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &FilePath, DeviceHandle);
+    CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, FilePath, DeviceHandle);
     if (SourceSize > 0) {
       Status = EFI_SUCCESS;
     } else {
@@ -107,18 +107,18 @@ Returns:
   //
   // Make sure FilePath is valid
   //
-  if (FilePath == NULL) {
+  if (*FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Check to see if it's in a Firmware Volume
   //
-  FwVolFilePathNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)FilePath;
+  FwVolFilePathNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) *FilePath;
   Status = CoreDevicePathToInterface (
-            &gEfiFirmwareVolume2ProtocolGuid, 
-            (EFI_DEVICE_PATH_PROTOCOL **)&FwVolFilePathNode, 
-            (VOID*)&FwVol, 
+            &gEfiFirmwareVolume2ProtocolGuid,
+            (EFI_DEVICE_PATH_PROTOCOL **)&FwVolFilePathNode,
+            (VOID*)&FwVol,
             DeviceHandle
             );
   if (!EFI_ERROR (Status)) {
@@ -131,9 +131,9 @@ Returns:
       SectionType = EFI_SECTION_PE32;
       Pe32Buffer  = NULL;
       Status = FwVol->ReadSection (
-                        FwVol, 
-                        NameGuid,  
-                        SectionType,   
+                        FwVol,
+                        NameGuid,
+                        SectionType,
                         0,
                         (VOID **)&Pe32Buffer,
                         &Pe32BufferSize,
@@ -149,8 +149,8 @@ Returns:
         }
         Pe32Buffer = NULL;
         Status = FwVol->ReadFile (
-                          FwVol, 
-                          NameGuid, 
+                          FwVol,
+                          NameGuid,
                           (VOID **)&Pe32Buffer,
                           &Pe32BufferSize,
                           &Type,
@@ -158,7 +158,7 @@ Returns:
                           AuthenticationStatus
                           );
       }
-            
+
       if (!EFI_ERROR (Status)) {
         //
         // One of the reads passed so we are done
@@ -174,11 +174,11 @@ Returns:
   //
   // Attempt to access the file via a file system interface
   //
-  FilePathNode = (FILEPATH_DEVICE_PATH *) FilePath;
+  FilePathNode = (FILEPATH_DEVICE_PATH *) *FilePath;
   Status = CoreDevicePathToInterface (
-            &gEfiSimpleFileSystemProtocolGuid, 
-            (EFI_DEVICE_PATH_PROTOCOL **)&FilePathNode, 
-            (VOID*)&Volume, 
+            &gEfiSimpleFileSystemProtocolGuid,
+            (EFI_DEVICE_PATH_PROTOCOL **)&FilePathNode,
+            (VOID*)&Volume,
             DeviceHandle
             );
   if (!EFI_ERROR (Status)) {
@@ -187,7 +187,7 @@ Returns:
     //
     Status = Volume->OpenVolume (Volume, &FileHandle);
     if (!EFI_ERROR (Status)) {
-     
+
       //
       // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
       //  directory information and filename can be seperate. The goal is to inch
@@ -239,7 +239,7 @@ Returns:
                                 FileHandle,
                                 &gEfiFileInfoGuid,
                                 &FileInfoSize,
-                                FileInfo                               
+                                FileInfo
                                 );
         }
         if (!EFI_ERROR (Status)) {
@@ -267,14 +267,14 @@ Returns:
         }
       }
     }
-  } 
+  }
 
 
   //
   // Try LoadFile style
   //
 
-  TempFilePath = FilePath;
+  TempFilePath = *FilePath;
   Status = CoreDevicePathToInterface (
               &gEfiLoadFileProtocolGuid,
               &TempFilePath,
@@ -350,12 +350,12 @@ Routine Description:
 Arguments:
 
   UserHandle      - Image file handle
-  
+
   Offset          - Offset to the source file
-  
+
   ReadSize        - For input, pointer of size to read;
                     For output, pointer of size actually read.
-  
+
   Buffer          - Buffer to write into
 
 Returns:
@@ -376,7 +376,7 @@ Returns:
   EndPosition = Offset + *ReadSize;
   if (EndPosition > FHand->SourceSize) {
     *ReadSize = (UINT32)(FHand->SourceSize - Offset);
-  }  
+  }
   if (Offset >= FHand->SourceSize) {
       *ReadSize = 0;
   }
@@ -402,13 +402,13 @@ Routine Description:
 Arguments:
 
   Protocol      - The protocol to search for
-  
+
   FilePath      - The specified device path
-  
+
   Interface     - Interface of the protocol on the handle
-  
+
   Handle        - The handle to the device on the specified device path that supports the protocol.
-  
+
 Returns:
 
   Status code.
@@ -435,7 +435,7 @@ CoreGrowBuffer (
 Routine Description:
 
     Helper function called as part of the code needed
-    to allocate the proper sized buffer for various 
+    to allocate the proper sized buffer for various
     EFI interfaces.
 
 Arguments:
@@ -445,10 +445,10 @@ Arguments:
     Buffer      - Current allocated buffer, or NULL
 
     BufferSize  - Current buffer size needed
-    
+
 Returns:
-    
-    TRUE - if the buffer was reallocated and the caller 
+
+    TRUE - if the buffer was reallocated and the caller
     should try the API again.
 
     FALSE - buffer could not be allocated and the caller
@@ -473,7 +473,7 @@ Returns:
   //
   // If the status code is "buffer too small", resize the buffer
   //
-      
+
   if (*Status == EFI_BUFFER_TOO_SMALL) {
     if (*Buffer != NULL) {
       CoreFreePool (*Buffer);
@@ -482,9 +482,9 @@ Returns:
     *Buffer = CoreAllocateBootServicesPool (BufferSize);
     if (*Buffer != NULL) {
       TryAgain = TRUE;
-    } else {    
+    } else {
       *Status = EFI_OUT_OF_RESOURCES;
-    } 
+    }
   }
 
   //

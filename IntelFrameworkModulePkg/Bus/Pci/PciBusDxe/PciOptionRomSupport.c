@@ -1,13 +1,13 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Module global for a template of the PCI option ROM Image Device Path Node
 //
 MEMMAP_DEVICE_PATH  mPciOptionRomImageDevicePathNodeTemplate = {
-  {                 
+  {
     HARDWARE_DEVICE_PATH,
     HW_MEMMAP_DP,
     sizeof (MEMMAP_DEVICE_PATH)
@@ -133,7 +133,7 @@ LoadOpRomImage (
 /*++
 
 Routine Description:
- 
+
     Load option rom image for specified PCI device
 
 Arguments:
@@ -265,7 +265,7 @@ Returns:
       gBS->FreePool (RomPcir);
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     //
     // Copy Rom image into memory
     //
@@ -337,7 +337,7 @@ Returns:
     for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
       PciIoWrite (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
     }
-    
+
     //
     // set the Rom base address: now is hardcode
     // enable its decoder
@@ -362,7 +362,7 @@ Returns:
     PciEnableCommandRegister(PciDevice, EFI_PCI_COMMAND_MEMORY_SPACE);
 
   } else {
-    
+
     //
     // disable command register decode to memory
     //
@@ -400,14 +400,14 @@ ProcessOpRomImage (
 Routine Description:
 
   Process the oprom image.
-  
+
 Arguments:
   PciDevice       A pointer to a pci device.
 
 Returns:
 
   EFI Status.
-  
+
 --*/
 {
   UINT8                         Indicator;
@@ -457,7 +457,7 @@ Returns:
     ImageSize   = (UINT32) (Pcir->ImageLength * 512);
     Indicator   = Pcir->Indicator;
 
-    if ((Pcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) && 
+    if ((Pcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) &&
         (EfiRomHeader->EfiSignature == EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE)) {
 
       if ((EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER)  ||
@@ -520,11 +520,11 @@ Returns:
         }
 
         if (!SkipImage) {
-          //   
-          // Build full device path to the PCI Option ROM Image being loaded
           //
-          mPciOptionRomImageDevicePathNodeTemplate.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)RomBarOffset;
-          mPciOptionRomImageDevicePathNodeTemplate.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)(RomBarOffset + ImageSize - 1);
+          // Build Memory Mapped device path node to record the image offset into the PCI Option ROM
+          //
+          mPciOptionRomImageDevicePathNodeTemplate.StartingAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) (RomBarOffset - (UINT8 *) RomBar);
+          mPciOptionRomImageDevicePathNodeTemplate.EndingAddress   = (EFI_PHYSICAL_ADDRESS) (UINTN) (RomBarOffset + ImageSize - 1 - (UINT8 *) RomBar);
           PciOptionRomImageDevicePath = AppendDevicePathNode (PciDevice->DevicePath, (const EFI_DEVICE_PATH_PROTOCOL *)&mPciOptionRomImageDevicePathNodeTemplate);
           ASSERT (PciOptionRomImageDevicePath != NULL);
 

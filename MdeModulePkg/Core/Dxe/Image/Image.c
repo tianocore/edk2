@@ -639,7 +639,7 @@ Returns:
              BootPolicy,
              SourceBuffer,
              SourceSize,
-             FilePath,
+             &FilePath,
              &DeviceHandle,
              &FHand,
              &AuthenticationStatus
@@ -679,6 +679,7 @@ Returns:
   //
   // Pull out just the file portion of the DevicePath for the LoadedImage FilePath
   //
+  FilePath = OriginalFilePath;
   Status = CoreHandleProtocol (DeviceHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
   if (!EFI_ERROR (Status)) {
     FilePathSize = CoreDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
