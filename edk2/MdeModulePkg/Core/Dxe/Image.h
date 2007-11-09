@@ -100,7 +100,7 @@ CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
   IN VOID                           *SourceBuffer   OPTIONAL,
   IN UINTN                          SourceSize,
-  IN EFI_DEVICE_PATH_PROTOCOL       *FilePath,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL   **FilePath,
   OUT EFI_HANDLE                    *DeviceHandle,
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
