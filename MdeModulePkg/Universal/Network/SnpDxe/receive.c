@@ -54,47 +54,13 @@ pxe_receive (
   PXE_CPB_RECEIVE *cpb;
   PXE_DB_RECEIVE  *db;
   UINTN           buf_size;
-  UINT64          TempData;
 
   cpb       = snp->cpb;
   db        = snp->db;
   buf_size  = *BuffSizePtr;
-  //
-  // IMPORTANT NOTE:
-  // In case of the older 3.0 UNDI, if the input buffer address is beyond 4GB,
-  // DO NOT call the map function on the given buffer, instead use
-  // a global buffer. The reason is that UNDI3.0 has some unnecessary check of
-  // making sure that all the addresses (whether or not they will be given
-  // to the NIC ) supplied to it are below 4GB. It may or may not use
-  // the mapped address after all (like in case of CPB and DB)!
-  // Instead of using the global buffer whose address is allocated within the
-  // 2GB limit if I start mapping the given buffer we lose the data, here is
-  // why!!!
-  // if our address is > 4GB, the map call creates another buffer below 2GB and
-  // copies data to/from the original buffer to the mapped buffer either at
-  // map time or unmap time depending on the map direction.
-  // UNDI will not complain since we already mapped the buffer to be
-  // within the 2GB limit but will not use (I know undi) the mapped address
-  // since it does not give the user buffers to the NIC's receive unit,
-  // It just copies the received packet into the user buffer using the virtual
-  // (CPU) address rather than the mapped (device or physical) address.
-  // When the UNDI call returns, if we then unmap the buffer, we will lose
-  // the contents because unmap copies the contents of the mapped buffer into
-  // the original buffer (since the direction is FROM_DEVICE) !!!
-  //
-  // this is not a problem in Undi 3.1 because this undi uses it's map callback
-  // routine to map a cpu address to device address and it does it only if
-  // it is giving the address to the device and unmaps it before using the cpu
-  // address!
-  //
-  TempData = (UINT64) (UINTN) BufferPtr;
-  if (snp->IsOldUndi && (TempData >= FOUR_GIGABYTES)) {
-    cpb->BufferAddr = (UINT64)(UINTN) snp->receive_buf;
-    cpb->BufferLen  = (UINT32) (snp->init_info.MediaHeaderLen + snp->init_info.FrameDataLen);
-  } else {
-    cpb->BufferAddr = (UINT64)(UINTN) BufferPtr;
-    cpb->BufferLen  = (UINT32) *BuffSizePtr;
-  }
+
+  cpb->BufferAddr = (UINT64)(UINTN) BufferPtr;
+  cpb->BufferLen  = (UINT32) *BuffSizePtr;
 
   cpb->reserved       = 0;
 
@@ -160,11 +126,6 @@ pxe_receive (
 
   if (ProtocolPtr != NULL) {
     *ProtocolPtr = (UINT16) PXE_SWAP_UINT16 (db->Protocol); /*  we need to do the byte swapping */
-  }
-
-  TempData = (UINT64) (UINTN) BufferPtr;
-  if (snp->IsOldUndi && (TempData >= FOUR_GIGABYTES)) {
-    CopyMem (BufferPtr, snp->receive_buf, snp->init_info.MediaHeaderLen + snp->init_info.FrameDataLen);
   }
 
   return (*BuffSizePtr <= buf_size) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;

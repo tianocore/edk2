@@ -329,9 +329,7 @@ SimpleNetworkDriverSupported (
   EFI_STATUS                                Status;
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *NiiProtocol;
   PXE_UNDI                                  *pxe;
-  BOOLEAN                                   IsUndi31;
 
-  IsUndi31 = FALSE;
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
@@ -352,34 +350,16 @@ SimpleNetworkDriverSupported (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (Status == EFI_ALREADY_STARTED)
-  {
-    DEBUG ((EFI_D_INFO, "Support(): Already Started. on handle %x\n", Controller));
-    return EFI_ALREADY_STARTED;
-  }
 
-  if (!EFI_ERROR (Status))
-  {
-    DEBUG ((EFI_D_INFO, "Support(): UNDI3.1 found on handle %x\n", Controller));
-    IsUndi31 = TRUE;
-  } else {
-    //
-    // try the older 3.0 driver
-    //
-    Status = gBS->OpenProtocol (
-                    Controller,
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                    (VOID **) &NiiProtocol,
-                    This->DriverBindingHandle,
-                    Controller,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_ALREADY_STARTED) {
+      DEBUG ((EFI_D_INFO, "Support(): Already Started. on handle %x\n", Controller));
     }
-
-    DEBUG ((EFI_D_INFO, "Support(): UNDI3.0 found on handle %x\n", Controller));
+    return Status;
   }
+
+  DEBUG ((EFI_D_INFO, "Support(): UNDI3.1 found on handle %x\n", Controller));
+
   //
   // check the version, we don't want to connect to the undi16
   //
@@ -445,22 +425,12 @@ SimpleNetworkDriverSupported (
   DEBUG ((EFI_D_INFO, "Support(): supported on %x\n", Controller));
 
 Done:
-  if (IsUndi31) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-          This->DriverBindingHandle,
-          Controller
-          );
-
-  } else {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiNetworkInterfaceIdentifierProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-  }
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+        This->DriverBindingHandle,
+        Controller
+        );
 
   return Status;
 }
@@ -491,11 +461,7 @@ SimpleNetworkDriverStart (
   PXE_UNDI                                  *pxe;
   SNP_DRIVER                                *snp;
   VOID                                      *addr;
-  VOID                                      *addrUnmap;
-  EFI_PHYSICAL_ADDRESS                      paddr;
   EFI_HANDLE                                Handle;
-  UINTN                                     Size;
-  BOOLEAN                                   UndiNew;
   PXE_PCI_CONFIG_INFO                       ConfigInfo;
   PCI_TYPE00                                *ConfigHeader;
   UINT32                                    *TempBar;
@@ -539,8 +505,7 @@ SimpleNetworkDriverStart (
     return Status;
   }
   //
-  // Get the NII interface. look for 3.1 undi first, if it is not there
-  // then look for 3.0, validate the interface.
+  // Get the NII interface.
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -550,7 +515,7 @@ SimpleNetworkDriverStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (Status == EFI_ALREADY_STARTED) {
+  if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
           Controller,
           &gEfiDevicePathProtocolGuid,
@@ -560,36 +525,7 @@ SimpleNetworkDriverStart (
     return Status;
   }
 
-  if (!EFI_ERROR (Status)) {
-    //
-    // probably not a 3.1 UNDI
-    //
-    UndiNew = TRUE;
-    DEBUG ((EFI_D_INFO, "Start(): UNDI3.1 found\n"));
-
-  } else {
-    UndiNew = FALSE;
-    Status = gBS->OpenProtocol (
-                    Controller,
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                    (VOID **) &Nii,
-                    This->DriverBindingHandle,
-                    Controller,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
-                    );
-    if (EFI_ERROR (Status)) {
-      gBS->CloseProtocol (
-            Controller,
-            &gEfiDevicePathProtocolGuid,
-            This->DriverBindingHandle,
-            Controller
-            );
-
-      return Status;
-    }
-
-    DEBUG ((EFI_D_INFO, "Start(): UNDI3.0 found\n"));
-  }
+  DEBUG ((EFI_D_INFO, "Start(): UNDI3.1 found\n"));
 
   pxe = (PXE_UNDI *) (UINTN) (Nii->ID);
 
@@ -632,30 +568,9 @@ SimpleNetworkDriverStart (
 
   snp = (SNP_DRIVER *) (UINTN) addr;
 
-  if (!UndiNew) {
-    Size = SNP_MEM_PAGES (sizeof (SNP_DRIVER));
-
-    Status = mPciIoFncs->Map (
-                          mPciIoFncs,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          addr,
-                          &Size,
-                          &paddr,
-                          &addrUnmap
-                          );
-
-    ASSERT (paddr);
-
-    DEBUG ((EFI_D_NET, "\nSNP_DRIVER @ %Xh, sizeof(SNP_DRIVER) == %d", addr, sizeof (SNP_DRIVER)));
-    snp                 = (SNP_DRIVER *) (UINTN) paddr;
-    snp->SnpDriverUnmap = addrUnmap;
-  }
-
   ZeroMem (snp, sizeof (SNP_DRIVER));
 
   snp->IoFncs     = mPciIoFncs;
-  snp->IsOldUndi  = (BOOLEAN) (!UndiNew);
-
   snp->Signature  = SNP_DRIVER_SIGNATURE;
 
   EfiInitializeLock (&snp->lock, TPL_NOTIFY);
@@ -725,26 +640,9 @@ SimpleNetworkDriverStart (
     goto Error_DeleteSNP;
   }
 
-  if (snp->IsOldUndi) {
-    Size = SNP_MEM_PAGES (4096);
+  snp->cpb  = (VOID *) (UINTN) addr;
+  snp->db   = (VOID *) ((UINTN) addr + 2048);
 
-    Status = mPciIoFncs->Map (
-                          mPciIoFncs,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          addr,
-                          &Size,
-                          &paddr,
-                          &snp->CpbUnmap
-                          );
-
-    ASSERT (paddr);
-
-    snp->cpb  = (VOID *) (UINTN) paddr;
-    snp->db   = (VOID *) ((UINTN) paddr + 2048);
-  } else {
-    snp->cpb  = (VOID *) (UINTN) addr;
-    snp->db   = (VOID *) ((UINTN) addr + 2048);
-  }
   //
   // pxe_start call is going to give the callback functions to UNDI, these callback
   // functions use the BarIndex values from the snp structure, so these must be initialized
@@ -762,7 +660,7 @@ SimpleNetworkDriverStart (
   Status = pxe_start (snp);
 
   if (Status != EFI_SUCCESS) {
-    goto Error_DeleteCPBDB;
+    goto Error_DeleteSNP;
   }
 
   snp->cdb.OpCode     = PXE_OPCODE_GET_INIT_INFO;
@@ -792,7 +690,7 @@ SimpleNetworkDriverStart (
   if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG ((EFI_D_NET, "\nsnp->undi.init_info()  %xh:%xh\n", snp->cdb.StatFlags, snp->cdb.StatCode));
     pxe_stop (snp);
-    goto Error_DeleteCPBDB;
+    goto Error_DeleteSNP;
   }
 
   snp->cdb.OpCode     = PXE_OPCODE_GET_CONFIG_INFO;
@@ -817,7 +715,7 @@ SimpleNetworkDriverStart (
   if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG ((EFI_D_NET, "\nsnp->undi.config_info()  %xh:%xh\n", snp->cdb.StatFlags, snp->cdb.StatCode));
     pxe_stop (snp);
-    goto Error_DeleteCPBDB;
+    goto Error_DeleteSNP;
   }
   //
   // Find the correct BAR to do IO.
@@ -846,79 +744,6 @@ SimpleNetworkDriverStart (
     TempBar++;
   }
 
-  //
-  // We allocate 2 more global buffers for undi 3.0 interface. We use these
-  // buffers to pass to undi when the user buffers are beyond 4GB.
-  // UNDI 3.0 wants all the addresses passed to it to be
-  // within 2GB limit, create them here and map them so that when undi calls
-  // v2p callback to check if the physical address is < 2gb, we will pass.
-  //
-  // For 3.1 and later UNDIs, we do not do this because undi is
-  // going to call the map() callback if and only if it wants to use the
-  // device address for any address it receives.
-  //
-  if (snp->IsOldUndi) {
-    //
-    // buffer for receive
-    //
-    Size = SNP_MEM_PAGES (snp->init_info.MediaHeaderLen + snp->init_info.FrameDataLen);
-    Status = mPciIoFncs->AllocateBuffer (
-                          mPciIoFncs,
-                          AllocateAnyPages,
-                          EfiBootServicesData,
-                          Size,
-                          &addr,
-                          0
-                          );
-
-    if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "\nCould not allocate receive buffer.\n"));
-      goto Error_DeleteCPBDB;
-    }
-
-    Status = mPciIoFncs->Map (
-                          mPciIoFncs,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          addr,
-                          &Size,
-                          &paddr,
-                          &snp->ReceiveBufUnmap
-                          );
-
-    ASSERT (paddr);
-
-    snp->receive_buf = (UINT8 *) (UINTN) paddr;
-
-    //
-    // buffer for fill_header
-    //
-    Size = SNP_MEM_PAGES (snp->init_info.MediaHeaderLen);
-    Status = mPciIoFncs->AllocateBuffer (
-                          mPciIoFncs,
-                          AllocateAnyPages,
-                          EfiBootServicesData,
-                          Size,
-                          &addr,
-                          0
-                          );
-
-    if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "\nCould not allocate fill_header buffer.\n"));
-      goto Error_DeleteRCVBuf;
-    }
-
-    Status = mPciIoFncs->Map (
-                          mPciIoFncs,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          addr,
-                          &Size,
-                          &paddr,
-                          &snp->FillHdrBufUnmap
-                          );
-
-    ASSERT (paddr);
-    snp->fill_hdr_buf = (UINT8 *) (UINTN) paddr;
-  }
   //
   //  Initialize simple network protocol mode structure
   //
@@ -992,7 +817,7 @@ SimpleNetworkDriverStart (
 
   if (Status) {
     pxe_stop (snp);
-    goto Error_DeleteHdrBuf;
+    goto Error_DeleteSNP;
   }
 
   Status = pxe_get_stn_addr (snp);
@@ -1001,7 +826,7 @@ SimpleNetworkDriverStart (
     DEBUG ((EFI_D_ERROR, "\nsnp->undi.get_station_addr()  failed.\n"));
     pxe_shutdown (snp);
     pxe_stop (snp);
-    goto Error_DeleteHdrBuf;
+    goto Error_DeleteSNP;
   }
 
   snp->mode.MediaPresent = FALSE;
@@ -1033,43 +858,6 @@ SimpleNetworkDriverStart (
     return Status;
   }
 
-Error_DeleteHdrBuf:
-  if (snp->IsOldUndi) {
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          snp->FillHdrBufUnmap
-                          );
-    Size = SNP_MEM_PAGES (snp->init_info.MediaHeaderLen);
-    mPciIoFncs->FreeBuffer (
-                  mPciIoFncs,
-                  Size,
-                  snp->fill_hdr_buf
-                  );
-  }
-
-Error_DeleteRCVBuf:
-  if (snp->IsOldUndi) {
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          snp->ReceiveBufUnmap
-                          );
-    Size = SNP_MEM_PAGES (snp->init_info.MediaHeaderLen + snp->init_info.FrameDataLen);
-    mPciIoFncs->FreeBuffer (
-                  mPciIoFncs,
-                  Size,
-                  snp->receive_buf
-                  );
-
-  }
-
-Error_DeleteCPBDB:
-  if (snp->IsOldUndi) {
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          snp->CpbUnmap
-                          );
-  }
-
   Status = mPciIoFncs->FreeBuffer (
                         mPciIoFncs,
                         SNP_MEM_PAGES (4096),
@@ -1077,12 +865,6 @@ Error_DeleteCPBDB:
                         );
 
 Error_DeleteSNP:
-  if (snp->IsOldUndi) {
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          snp->SnpDriverUnmap
-                          );
-  }
 
   mPciIoFncs->FreeBuffer (
                 mPciIoFncs,
@@ -1090,21 +872,12 @@ Error_DeleteSNP:
                 snp
                 );
 NiiError:
-  if (!UndiNew) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiNetworkInterfaceIdentifierProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-  } else {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-          This->DriverBindingHandle,
-          Controller
-          );
-  }
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+        This->DriverBindingHandle,
+        Controller
+        );
 
   gBS->CloseProtocol (
         Controller,
@@ -1163,21 +936,12 @@ SimpleNetworkDriverStop (
     return Status;
   }
 
-  if (!Snp->IsOldUndi) {
-    Status = gBS->CloseProtocol (
-                    Controller,
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                    This->DriverBindingHandle,
-                    Controller
-                    );
-  } else {
-    Status = gBS->CloseProtocol (
-                    Controller,
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                    This->DriverBindingHandle,
-                    Controller
-                    );
-  }
+  Status = gBS->CloseProtocol (
+                  Controller,
+                  &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+                  This->DriverBindingHandle,
+                  Controller
+                  );
 
   Status = gBS->CloseProtocol (
                   Controller,
@@ -1188,38 +952,6 @@ SimpleNetworkDriverStop (
 
   pxe_shutdown (Snp);
   pxe_stop (Snp);
-
-  if (Snp->IsOldUndi) {
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          Snp->FillHdrBufUnmap
-                          );
-
-    mPciIoFncs->FreeBuffer (
-                  mPciIoFncs,
-                  SNP_MEM_PAGES (Snp->init_info.MediaHeaderLen),
-                  Snp->fill_hdr_buf
-                  );
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          Snp->ReceiveBufUnmap
-                          );
-
-    mPciIoFncs->FreeBuffer (
-                  mPciIoFncs,
-                  SNP_MEM_PAGES (Snp->init_info.MediaHeaderLen + Snp->init_info.FrameDataLen),
-                  Snp->receive_buf
-                  );
-
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          Snp->CpbUnmap
-                          );
-    Status = mPciIoFncs->Unmap (
-                          mPciIoFncs,
-                          Snp->SnpDriverUnmap
-                          );
-  }
 
   mPciIoFncs->FreeBuffer (
                 mPciIoFncs,

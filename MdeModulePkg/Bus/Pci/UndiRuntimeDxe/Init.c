@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,10 +26,9 @@ Revision History
 //
 // Global Variables
 //
-PXE_SW_UNDI             *pxe = 0;     // 3.0 entry point
-PXE_SW_UNDI             *pxe_31 = 0;  // 3.1 entry
-UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 
+PXE_SW_UNDI             *pxe_31 = NULL;  // 3.1 entry
+UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 NII_TABLE               *UndiDataPointer = NULL;
 
 VOID
@@ -381,16 +380,10 @@ Returns:
     } else {
       pxe_31 = (PXE_SW_UNDI *) TmpPxePointer;
     }
-    //
-    // assuming that the sizeof pxe_31 is a 16 byte multiple
-    //
-    pxe = (PXE_SW_UNDI *) ((CHAR8 *) (pxe_31) + sizeof (PXE_SW_UNDI));
 
-    PxeStructInit (pxe, 0x30);
-    PxeStructInit (pxe_31, 0x31);
+    PxeStructInit (pxe_31);
   }
 
-  UNDI32Device->NIIProtocol.ID    = (UINT64) (UINTN) (pxe);
   UNDI32Device->NIIProtocol_31.ID = (UINT64) (UINTN) (pxe_31);
 
   Status = PciIoFncs->Attributes (
@@ -454,15 +447,13 @@ Returns:
   // the IfNum index for the current interface will be the total number
   // of interfaces initialized so far
   //
-  UNDI32Device->NIIProtocol.IfNum     = pxe->IFcnt;
   UNDI32Device->NIIProtocol_31.IfNum  = pxe_31->IFcnt;
 
-  PxeUpdate (&UNDI32Device->NicInfo, pxe);
   PxeUpdate (&UNDI32Device->NicInfo, pxe_31);
 
-  UNDI32Device->NicInfo.Io_Function                 = PciIoFncs;
-  UNDI32DeviceList[UNDI32Device->NIIProtocol.IfNum] = UNDI32Device;
-  UNDI32Device->Undi32BaseDevPath                   = UndiDevicePath;
+  UNDI32Device->NicInfo.Io_Function                    = PciIoFncs;
+  UNDI32DeviceList[UNDI32Device->NIIProtocol_31.IfNum] = UNDI32Device;
+  UNDI32Device->Undi32BaseDevPath                      = UndiDevicePath;
 
   Status = AppendMac2DevPath (
             &UNDI32Device->Undi32DevPath,
@@ -475,19 +466,6 @@ Returns:
   }
 
   UNDI32Device->Signature                     = UNDI_DEV_SIGNATURE;
-
-  UNDI32Device->NIIProtocol.Revision          = EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION;
-  UNDI32Device->NIIProtocol.Type              = EfiNetworkInterfaceUndi;
-  UNDI32Device->NIIProtocol.MajorVer          = PXE_ROMID_MAJORVER;
-  UNDI32Device->NIIProtocol.MinorVer          = PXE_ROMID_MINORVER;
-  UNDI32Device->NIIProtocol.ImageSize         = 0;
-  UNDI32Device->NIIProtocol.ImageAddr         = 0;
-  UNDI32Device->NIIProtocol.Ipv6Supported     = FALSE;
-
-  UNDI32Device->NIIProtocol.StringId[0]       = 'U';
-  UNDI32Device->NIIProtocol.StringId[1]       = 'N';
-  UNDI32Device->NIIProtocol.StringId[2]       = 'D';
-  UNDI32Device->NIIProtocol.StringId[3]       = 'I';
 
   UNDI32Device->NIIProtocol_31.Revision       = EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION_31;
   UNDI32Device->NIIProtocol_31.Type           = EfiNetworkInterfaceUndi;
@@ -511,8 +489,6 @@ Returns:
                   &UNDI32Device->DeviceHandle,
                   &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
                   &UNDI32Device->NIIProtocol_31,
-                  &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                  &UNDI32Device->NIIProtocol,
                   &gEfiDevicePathProtocolGuid,
                   UNDI32Device->Undi32DevPath,
                   NULL
@@ -557,19 +533,16 @@ UndiErrorAllocDataPointer:
                   &UNDI32Device->DeviceHandle,
                   &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
                   &UNDI32Device->NIIProtocol_31,
-                  &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                  &UNDI32Device->NIIProtocol,
                   &gEfiDevicePathProtocolGuid,
                   UNDI32Device->Undi32DevPath,
                   NULL
                   );
 
 UndiErrorDeleteDevicePath:
-  UNDI32DeviceList[UNDI32Device->NIIProtocol.IfNum] = NULL;
+  UNDI32DeviceList[UNDI32Device->NIIProtocol_31.IfNum] = NULL;
   gBS->FreePool (UNDI32Device->Undi32DevPath);
 
 UndiErrorDeletePxe:
-  PxeUpdate (NULL, pxe);
   PxeUpdate (NULL, pxe_31);
   if (TmpPxePointer != NULL) {
     gBS->FreePool (TmpPxePointer);
@@ -673,7 +646,7 @@ Returns:
 
     Status = gBS->OpenProtocol (
                     ChildHandleBuffer[Index],
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid,
+                    &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
                     (VOID **) &NIIProtocol,
                     This->DriverBindingHandle,
                     Controller,
@@ -707,8 +680,6 @@ Returns:
                       UNDI32Device->Undi32DevPath,
                       &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
                       &UNDI32Device->NIIProtocol_31,
-                      &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                      &UNDI32Device->NIIProtocol,
                       NULL
                       );
 

@@ -2172,19 +2172,9 @@ PxeBcDriverStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    Status = gBS->OpenProtocol (
-                    Controller,
-                    &gEfiNetworkInterfaceIdentifierProtocolGuid,
-                    (VOID **) &Private->NiiPtr,
-                    This->DriverBindingHandle,
-                    Controller,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-
-    if (EFI_ERROR (Status)) {
-      goto PxeBcError;
-    }
+    goto PxeBcError;
   }
+  
   //
   // Get the Snp interface
   //

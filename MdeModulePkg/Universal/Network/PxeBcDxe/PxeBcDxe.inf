@@ -86,7 +86,6 @@
   gEfiLoadFileProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleNetworkProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiNetworkInterfaceIdentifierProtocolGuid      # PROTOCOL ALWAYS_CONSUMED
   gEfiTcpProtocolGuid                             # PROTOCOL ALWAYS_CONSUMED
   gEfiNetworkInterfaceIdentifierProtocolGuid_31   # PROTOCOL ALWAYS_CONSUMED
 
