@@ -33,10 +33,8 @@ pxe_start (
   SNP_DRIVER *snp
   )
 {
-  PXE_CPB_START_30  *cpb;
   PXE_CPB_START_31  *cpb_31;
 
-  cpb     = snp->cpb;
   cpb_31  = snp->cpb;
   //
   // Initialize UNDI Start CDB for H/W UNDI
@@ -57,37 +55,23 @@ pxe_start (
   // a S/W UNDI.
   //
   if (snp->is_swundi) {
-    if (snp->IsOldUndi) {
-      snp->cdb.CPBsize  = sizeof (PXE_CPB_START_30);
-      snp->cdb.CPBaddr  = (UINT64)(UINTN) cpb;
+    snp->cdb.CPBsize  = sizeof (PXE_CPB_START_31);
+    snp->cdb.CPBaddr  = (UINT64)(UINTN) cpb_31;
 
-      cpb->Delay        = (UINT64)(UINTN) &snp_undi32_callback_delay_30;
-      cpb->Block        = (UINT64)(UINTN) &snp_undi32_callback_block_30;
+    cpb_31->Delay     = (UINT64)(UINTN) &snp_undi32_callback_delay;
+    cpb_31->Block     = (UINT64)(UINTN) &snp_undi32_callback_block;
 
-      //
-      // Virtual == Physical.  This can be set to zero.
-      //
-      cpb->Virt2Phys  = (UINT64)(UINTN) &snp_undi32_callback_v2p_30;
-      cpb->Mem_IO     = (UINT64)(UINTN) &snp_undi32_callback_memio_30;
-    } else {
-      snp->cdb.CPBsize  = sizeof (PXE_CPB_START_31);
-      snp->cdb.CPBaddr  = (UINT64)(UINTN) cpb_31;
+    //
+    // Virtual == Physical.  This can be set to zero.
+    //
+    cpb_31->Virt2Phys = (UINT64)(UINTN) 0;
+    cpb_31->Mem_IO    = (UINT64)(UINTN) &snp_undi32_callback_memio;
 
-      cpb_31->Delay     = (UINT64)(UINTN) &snp_undi32_callback_delay;
-      cpb_31->Block     = (UINT64)(UINTN) &snp_undi32_callback_block;
+    cpb_31->Map_Mem   = (UINT64)(UINTN) &snp_undi32_callback_map;
+    cpb_31->UnMap_Mem = (UINT64)(UINTN) &snp_undi32_callback_unmap;
+    cpb_31->Sync_Mem  = (UINT64)(UINTN) &snp_undi32_callback_sync;
 
-      //
-      // Virtual == Physical.  This can be set to zero.
-      //
-      cpb_31->Virt2Phys = (UINT64)(UINTN) 0;
-      cpb_31->Mem_IO    = (UINT64)(UINTN) &snp_undi32_callback_memio;
-
-      cpb_31->Map_Mem   = (UINT64)(UINTN) &snp_undi32_callback_map;
-      cpb_31->UnMap_Mem = (UINT64)(UINTN) &snp_undi32_callback_unmap;
-      cpb_31->Sync_Mem  = (UINT64)(UINTN) &snp_undi32_callback_sync;
-
-      cpb_31->Unique_ID = (UINT64)(UINTN) snp;
-    }
+    cpb_31->Unique_ID = (UINT64)(UINTN) snp;
   }
   //
   // Issue UNDI command and check result.

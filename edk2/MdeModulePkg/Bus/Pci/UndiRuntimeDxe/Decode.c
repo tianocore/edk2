@@ -1290,52 +1290,6 @@ Returns:
   return ;
 }
 
-VOID
-UNDI_APIEntry_old (
-  IN  UINT64 cdb
-  )
-/*++
-
-Routine Description:
-  This is the main SW UNDI API entry using the older nii protocol.
-  The parameter passed in is a 64 bit flat model virtual
-  address of the cdb.  We then jump into the common routine for both old and
-  new nii protocol entries.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
-// TODO:    cdb - add argument and description to function comment
-{
-  PXE_CDB           *CdbPtr;
-  NIC_DATA_INSTANCE *AdapterInfo;
-
-  if (cdb == (UINT64) 0) {
-    return ;
-
-  }
-
-  CdbPtr = (PXE_CDB *) (UINTN) cdb;
-
-  if (CdbPtr->IFnum >= pxe->IFcnt) {
-    CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
-    CdbPtr->StatCode  = PXE_STATCODE_INVALID_CDB;
-    return ;
-  }
-
-  AdapterInfo               = &(UNDI32DeviceList[CdbPtr->IFnum]->NicInfo);
-
-  //
-  // entering from older entry point
-  //
-  AdapterInfo->VersionFlag  = 0x30;
-  UNDI_APIEntry_Common (cdb);
-}
 
 VOID
 UNDI_APIEntry_new (
@@ -1580,8 +1534,7 @@ Returns:
 
 VOID
 PxeStructInit (
-  IN PXE_SW_UNDI *PxePtr,
-  IN UINTN       VersionFlag
+  IN PXE_SW_UNDI *PxePtr
   )
 /*++
 
@@ -1629,12 +1582,8 @@ Returns:
     PXE_ROMID_IMP_SOFTWARE_INT_SUPPORTED |
     PXE_ROMID_IMP_PACKET_RX_INT_SUPPORTED;
 
-  if (VersionFlag == 0x30) {
-    PxePtr->EntryPoint = (UINT64) UNDI_APIEntry_old;
-  } else {
-    PxePtr->EntryPoint  = (UINT64) UNDI_APIEntry_new;
-    PxePtr->MinorVer    = PXE_ROMID_MINORVER_31;
-  }
+  PxePtr->EntryPoint  = (UINT64) UNDI_APIEntry_new;
+  PxePtr->MinorVer    = PXE_ROMID_MINORVER_31;
 
   PxePtr->reserved2[0]  = 0;
   PxePtr->reserved2[1]  = 0;

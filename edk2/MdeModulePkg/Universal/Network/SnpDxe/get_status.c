@@ -42,7 +42,6 @@ pxe_getstatus (
 {
   PXE_DB_GET_STATUS *db;
   UINT16            InterruptFlags;
-  UINT64            TempData;
 
   db                = snp->db;
   snp->cdb.OpCode   = PXE_OPCODE_GET_STATUS;
@@ -122,10 +121,6 @@ pxe_getstatus (
         (snp->cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY)
       ) ? 0 : (VOID *) (UINTN) db->TxBuffer[0];
 
-    TempData = (UINT64) (UINTN) (*TransmitBufferListPtr);
-    if (snp->IsOldUndi && (TempData >= FOUR_GIGABYTES)) {
-      del_v2p ((VOID *) (UINTN) (db->TxBuffer[0]));
-    }
   }
 
   return EFI_SUCCESS;

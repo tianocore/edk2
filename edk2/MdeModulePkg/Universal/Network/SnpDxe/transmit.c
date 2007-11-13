@@ -52,9 +52,6 @@ pxe_fillheader (
   )
 {
   PXE_CPB_FILL_HEADER_FRAGMENTED  *cpb;
-  EFI_STATUS                      Status;
-  struct s_v2p                    *pkt_v2p;
-  UINT64                          TempData;
 
   cpb = snp->cpb;
   if (SourceAddrPtr) {
@@ -95,35 +92,6 @@ pxe_fillheader (
 
   cpb->FragDesc[0].reserved = cpb->FragDesc[1].reserved = 0;
 
-  if (snp->IsOldUndi) {
-    TempData = (UINT64) (UINTN) MacHeaderPtr;
-    if (TempData >= FOUR_GIGABYTES) {
-      cpb->FragDesc[0].FragAddr = (UINT64) (UINTN) snp->fill_hdr_buf;
-      cpb->FragDesc[0].FragLen  = (UINT32) snp->init_info.MediaHeaderLen;
-    }
-
-    TempData = (UINT64) (UINTN) (BufferPtr);
-    if (TempData >= FOUR_GIGABYTES) {
-      //
-      // Let the device just read this buffer
-      //
-      Status = add_v2p (
-                &pkt_v2p,
-                EfiPciIoOperationBusMasterRead,
-                BufferPtr,
-                BufferLength
-                );
-      if (Status != EFI_SUCCESS) {
-        return Status;
-      }
-      //
-      // give the virtual address to UNDI and it will call back on Virt2Phys
-      // to get the mapped address, if it needs it
-      //
-      cpb->FragDesc[1].FragLen = (UINT32) pkt_v2p->bsize;
-    }
-  }
-
   snp->cdb.OpCode     = PXE_OPCODE_FILL_HEADER;
   snp->cdb.OpFlags    = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
 
@@ -144,24 +112,6 @@ pxe_fillheader (
   DEBUG ((EFI_D_NET, "\nsnp->undi.fill_header()  "));
 
   (*snp->issue_undi32_command) ((UINT64) (UINTN) &snp->cdb);
-
-  if (snp->IsOldUndi) {
-    TempData = (UINT64) (UINTN) (BufferPtr);
-    if (TempData >= FOUR_GIGABYTES) {
-      del_v2p (BufferPtr);
-    }
-    //
-    // if we used the global buffer for header, copy the contents
-    //
-    TempData = (UINT64) (UINTN) MacHeaderPtr;
-    if (TempData >= FOUR_GIGABYTES) {
-      CopyMem (
-        MacHeaderPtr,
-        snp->fill_hdr_buf,
-        snp->init_info.MediaHeaderLen
-        );
-    }
-  }
 
   switch (snp->cdb.StatCode) {
   case PXE_STATCODE_SUCCESS:
@@ -211,32 +161,10 @@ pxe_transmit (
 {
   PXE_CPB_TRANSMIT  *cpb;
   EFI_STATUS        Status;
-  struct s_v2p      *v2p;
-  UINT64            TempData;
 
   cpb             = snp->cpb;
   cpb->FrameAddr  = (UINT64) (UINTN) BufferPtr;
   cpb->DataLen    = (UINT32) BufferLength;
-  
-  TempData = (UINT64) (UINTN) BufferPtr;
-  if (snp->IsOldUndi && (TempData >= FOUR_GIGABYTES)) {
-    //
-    // we need to create a mapping now and give it to the undi when it calls
-    // the Virt2Phys on this address.
-    // this is a transmit, just map it for the device to READ
-    //
-    Status = add_v2p (
-              &v2p,
-              EfiPciIoOperationBusMasterRead,
-              BufferPtr,
-              BufferLength
-              );
-    if (Status != EFI_SUCCESS) {
-      return Status;
-    }
-
-    cpb->DataLen = (UINT32) v2p->bsize;
-  }
 
   cpb->MediaheaderLen = 0;
   cpb->reserved       = 0;

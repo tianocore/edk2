@@ -1,7 +1,7 @@
 
 /*++
 
-Copyright (c) 2006, Intel Corporation.
+Copyright (c) 2006 - 2007, Intel Corporation.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -61,12 +61,11 @@ Revision History
 #define MUST_BE_INITIALIZED 2
 
 #define UNDI_DEV_SIGNATURE   EFI_SIGNATURE_32('u','n','d','i')
-#define UNDI_DEV_FROM_THIS(a) CR(a, UNDI32_DEV, NIIProtocol, UNDI_DEV_SIGNATURE)
+#define UNDI_DEV_FROM_THIS(a) CR(a, UNDI32_DEV, NIIProtocol_31, UNDI_DEV_SIGNATURE)
 #define UNDI_DEV_FROM_NIC(a) CR(a, UNDI32_DEV, NicInfo, UNDI_DEV_SIGNATURE)
 
 typedef struct {
   UINTN                                     Signature;
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL NIIProtocol;
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL NIIProtocol_31;
   EFI_HANDLE                                DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL                  *Undi32BaseDevPath;
@@ -110,7 +109,6 @@ typedef VOID (*unmap_mem)(UINT64, UINT64, UINT32, UINT32, UINT64);
 typedef VOID (*sync_mem)(UINT64, UINT64, UINT32, UINT32, UINT64);
 
 extern UNDI_CALL_TABLE  api_table[];
-extern PXE_SW_UNDI      *pxe;     // !pxe structure
 extern PXE_SW_UNDI      *pxe_31;  // !pxe structure for 3.1 drivers
 extern UNDI32_DEV       *UNDI32DeviceList[MAX_NIC_INTERFACES];
 
@@ -362,13 +360,12 @@ UNDI_Receive (
   );
 
 VOID UNDI_APIEntry_new(UINT64);
-VOID UNDI_APIEntry_old(UINT64);
 VOID UNDI_APIEntry_Common(UINT64);
 
 PXE_IPV4 convert_mcip(PXE_MAC_ADDR *);
 INT32 validate_mcip (PXE_MAC_ADDR *MCastAddr);
 
-VOID PxeStructInit (PXE_SW_UNDI *PxePtr, UINTN VersionFlag);
+VOID PxeStructInit (PXE_SW_UNDI *PxePtr);
 VOID PxeUpdate (NIC_DATA_INSTANCE *NicPtr, PXE_SW_UNDI *PxePtr);
 
 #endif

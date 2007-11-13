@@ -51,13 +51,12 @@
 
 
 [Guids]
-  gEfiEventExitBootServicesGuid                
-  gEfiEventVirtualAddressChangeGuid            
+  gEfiEventExitBootServicesGuid
+  gEfiEventVirtualAddressChangeGuid
 
 
 [Protocols]
   gEfiNetworkInterfaceIdentifierProtocolGuid_31
-  gEfiNetworkInterfaceIdentifierProtocolGuid   
-  gEfiPciIoProtocolGuid                        
-  gEfiDevicePathProtocolGuid                   
+  gEfiPciIoProtocolGuid
+  gEfiDevicePathProtocolGuid
 

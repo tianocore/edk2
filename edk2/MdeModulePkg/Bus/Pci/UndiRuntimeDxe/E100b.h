@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -630,7 +630,7 @@ typedef struct s_data_instance {
   UINT8 Rx_Filter;
   UINT8 VersionFlag;  // UNDI30 or UNDI31??
   UINT8 rsvd[3];
-  
+
   struct mc{
     UINT16 reserved [3]; // padding for this structure to make it 8 byte aligned
     UINT16 list_len;

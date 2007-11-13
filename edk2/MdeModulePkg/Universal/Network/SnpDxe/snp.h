@@ -95,7 +95,7 @@ typedef struct {
   EFI_PCI_IO_PROTOCOL   *IoFncs;
   UINT8                 IoBarIndex;
   UINT8                 MemoryBarIndex;
-  BOOLEAN               IsOldUndi;  // true for EFI1.0 UNDI (3.0) drivers
+
   //
   // Buffers for command descriptor block, command parameter block
   // and data block.
