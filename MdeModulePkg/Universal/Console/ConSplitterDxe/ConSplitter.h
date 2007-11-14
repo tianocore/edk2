@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/GraphicsOutput.h>
 #include <Guid/PrimaryConsoleInDevice.h>
 #include <Protocol/SimplePointer.h>
+#include <Protocol/AbsolutePointer.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Protocol/SimpleTextIn.h>
@@ -47,6 +48,8 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConInComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterSimplePointerDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterSimplePointerComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterSimplePointerComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterAbsolutePointerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterAbsolutePointerComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterConOutDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConOutComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConOutComponentName2;
@@ -89,6 +92,7 @@ typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
   EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
   LIST_ENTRY                            NotifyEntry;
 } TEXT_IN_EX_SPLITTER_NOTIFY;
+
 typedef struct {
   UINT64                         Signature;
   EFI_HANDLE                     VirtualHandle;
@@ -110,6 +114,13 @@ typedef struct {
   UINTN                          CurrentNumberOfPointers;
   EFI_SIMPLE_POINTER_PROTOCOL    **PointerList;
   UINTN                          PointerListCount;
+
+  EFI_ABSOLUTE_POINTER_PROTOCOL	 AbsolutePointer;
+  EFI_ABSOLUTE_POINTER_MODE		 AbsolutePointerMode;
+  UINTN							 CurrentNumberOfAbsolutePointers;
+  EFI_ABSOLUTE_POINTER_PROTOCOL	 **AbsolutePointerList;
+  UINTN							 AbsolutePointerListCount;
+  BOOLEAN 						 AbsoluteInputEventSignalState; 
 
   BOOLEAN                        PasswordEnabled;
   CHAR16                         Password[MAX_STD_IN_PASSWORD];
@@ -368,6 +379,111 @@ ConSplitterStdErrDriverBindingStop (
   )
 ;
 
+//
+// Driver binding functions
+//
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerDriverBindingSupported (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  )
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerDriverBindingStart (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  )
+;
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  )
+;
+
+EFI_STATUS
+ConSplitterAbsolutePointerAddDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
+  IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
+  )
+;
+
+EFI_STATUS
+ConSplitterAbsolutePointerDeleteDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
+  IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
+  )
+;
+
+//
+// Absolute Pointer protocol interfaces
+//
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerReset (
+  IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
+  IN BOOLEAN                         ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Resets the pointer device hardware.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    ExtendedVerification  - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not be reset.
+                            
+--*/
+;
+
+EFI_STATUS
+EFIAPI 
+ConSplitterAbsolutePointerGetState (
+  IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
+  IN OUT EFI_ABSOLUTE_POINTER_STATE  *State
+  )
+/*++
+
+  Routine Description:
+    Retrieves the current state of a pointer device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    State                 - A pointer to the state information on the pointer device.
+
+  Returns:
+    EFI_SUCCESS           - The state of the pointer device was returned in State..
+    EFI_NOT_READY         - The state of the pointer device has not changed since the last call to
+                            GetState().                                                           
+    EFI_DEVICE_ERROR      - A device error occurred while attempting to retrieve the pointer
+                            device's current state.                                         
+--*/
+;
+
+VOID
+EFIAPI
+ConSplitterAbsolutePointerWaitForInput (
+  IN  EFI_EVENT                       Event,
+  IN  VOID                            *Context
+  )
+;
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -573,6 +689,16 @@ ConSplitterSimplePointerComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                    *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  )
+;
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller

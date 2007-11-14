@@ -76,6 +76,27 @@ STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   (EFI_SIMPLE_POINTER_PROTOCOL **) NULL,
   0,
 
+  {
+    ConSplitterAbsolutePointerReset,
+    ConSplitterAbsolutePointerGetState,
+    (EFI_EVENT) NULL,
+    (EFI_ABSOLUTE_POINTER_MODE *) NULL
+  },
+
+  {
+    0,       //AbsoluteMinX
+    0,       //AbsoluteMinY
+    0,       //AbsoluteMinZ
+    0x10000, //AbsoluteMaxX
+    0x10000, //AbsoluteMaxY
+    0x10000, //AbsoluteMaxZ
+    0        //Attributes    
+  },
+  0,
+  (EFI_ABSOLUTE_POINTER_PROTOCOL **) NULL,
+  0,
+  FALSE,
+
   FALSE,
   {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -240,6 +261,18 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterSimplePointerDriverBinding = {
   NULL
 };
 
+//
+// Driver binding instance for Absolute Pointer protocol
+//
+EFI_DRIVER_BINDING_PROTOCOL           gConSplitterAbsolutePointerDriverBinding = {
+  ConSplitterAbsolutePointerDriverBindingSupported,
+  ConSplitterAbsolutePointerDriverBindingStart,
+  ConSplitterAbsolutePointerDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConOutDriverBinding = {
   ConSplitterConOutDriverBindingSupported,
   ConSplitterConOutDriverBindingStart,
@@ -297,6 +330,16 @@ InitializeConSplitter(
              NULL,
              &gConSplitterSimplePointerComponentName,
              &gConSplitterSimplePointerComponentName2
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gConSplitterAbsolutePointerDriverBinding,
+             NULL,
+             &gConSplitterAbsolutePointerComponentName,
+             &gConSplitterAbsolutePointerComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -386,6 +429,8 @@ Returns:
                     &mConIn.TextInEx,
                     &gEfiSimplePointerProtocolGuid,
                     &mConIn.SimplePointer,
+					&gEfiAbsolutePointerProtocolGuid,
+					&mConIn.AbsolutePointer,
                     &gEfiPrimaryConsoleInDeviceGuid,
                     NULL,
                     NULL
@@ -554,6 +599,28 @@ Returns:
 
   InitializeListHead (&ConInPrivate->NotifyList); 
 
+  //
+  // Allocate Buffer and Create Event for Absolute Pointer and Simple Pointer Protocols
+  //
+  ConInPrivate->AbsolutePointer.Mode = &ConInPrivate->AbsolutePointerMode;
+
+  Status = ConSplitterGrowBuffer (
+	  			  sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
+	  			  &ConInPrivate->AbsolutePointerListCount,
+	  			  (VOID **) &ConInPrivate->AbsolutePointerList
+	  			  );
+  if (EFI_ERROR (Status)) {
+	  return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->CreateEvent (
+			  EVT_NOTIFY_WAIT,
+			  TPL_NOTIFY,
+			  ConSplitterAbsolutePointerWaitForInput,
+			  ConInPrivate,
+			  &ConInPrivate->AbsolutePointer.WaitForInput
+			  );
+  ASSERT_EFI_ERROR (Status);
 
   ConInPrivate->SimplePointer.Mode = &ConInPrivate->SimplePointerMode;
 
@@ -789,6 +856,36 @@ Returns:
 
 EFI_STATUS
 EFIAPI
+ConSplitterAbsolutePointerDriverBindingSupported (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  )
+/*++
+
+Routine Description:
+  Absolute Pointer Supported Check
+
+Arguments:
+  This              - Pointer to protocol.
+  ControllerHandle  - Controller handle.
+  RemainingDevicePath  - Remaining device path.
+
+Returns:
+
+  EFI_STATUS
+
+--*/
+{
+  return ConSplitterSupported (
+          This,
+          ControllerHandle,
+          &gEfiAbsolutePointerProtocolGuid
+          );
+}
+
+EFI_STATUS
+EFIAPI
 ConSplitterConOutDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
@@ -1019,6 +1116,49 @@ Returns:
   }
 
   return ConSplitterSimplePointerAddDevice (&mConIn, SimplePointer);
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerDriverBindingStart (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  )
+/*++
+
+Routine Description:
+  Start ConSplitter on ControllerHandle, and create the virtual
+  agrogated console device on first call Start for a ConIn handle.
+
+Arguments:
+  This                 - Pointer to protocol.
+  ControllerHandle     - Controller handle.
+  RemainingDevicePath  - Remaining device path.
+
+Returns:
+
+  EFI_ERROR if a AbsolutePointer protocol is not started.
+
+--*/
+{
+  EFI_STATUS                        Status;
+  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer;
+
+  Status = ConSplitterStart (
+             This,
+             ControllerHandle,
+             mConIn.VirtualHandle,
+             &gEfiAbsolutePointerProtocolGuid,
+             &gEfiAbsolutePointerProtocolGuid,
+             (VOID **) &AbsolutePointer
+             );
+  
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return ConSplitterAbsolutePointerAddDevice (&mConIn, AbsolutePointer);
 }
 
 EFI_STATUS
@@ -1339,6 +1479,51 @@ Returns:
   // Delete this console input device's data structures.
   //
   return ConSplitterSimplePointerDeleteDevice (&mConIn, SimplePointer);
+}
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN  EFI_HANDLE                      ControllerHandle,
+  IN  UINTN                           NumberOfChildren,
+  IN  EFI_HANDLE                      *ChildHandleBuffer
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+  (Standard DriverBinding Protocol Stop() function)
+
+Returns:
+
+  None
+
+--*/
+{
+  EFI_STATUS                        Status;
+  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer;
+
+  if (NumberOfChildren == 0) {
+    return EFI_SUCCESS;
+  }
+
+  Status = ConSplitterStop (
+             This,
+             ControllerHandle,
+             mConIn.VirtualHandle,
+             &gEfiAbsolutePointerProtocolGuid,
+             &gEfiAbsolutePointerProtocolGuid,
+             (VOID **) &AbsolutePointer
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Delete this console input device's data structures.
+  //
+  return ConSplitterAbsolutePointerDeleteDevice (&mConIn, AbsolutePointer);
 }
 
 EFI_STATUS
@@ -1722,6 +1907,83 @@ Returns:
       }
 
       Private->CurrentNumberOfPointers--;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+ConSplitterAbsolutePointerAddDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
+  IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+Returns:
+
+  EFI_OUT_OF_RESOURCES
+  EFI_SUCCESS
+
+--*/
+{
+  EFI_STATUS  Status;
+
+  //
+  // If the Absolute Pointer List is full, enlarge it by calling growbuffer().
+  //
+  if (Private->CurrentNumberOfAbsolutePointers >= Private->AbsolutePointerListCount) {
+    Status = ConSplitterGrowBuffer (
+              sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
+              &Private->AbsolutePointerListCount,
+              (VOID **) &Private->AbsolutePointerList
+              );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+  //
+  // Add the new text-in device data structure into the Text In List.
+  //
+  Private->AbsolutePointerList[Private->CurrentNumberOfAbsolutePointers] = AbsolutePointer;
+  Private->CurrentNumberOfAbsolutePointers++;
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ConSplitterAbsolutePointerDeleteDevice (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
+  IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+Returns:
+
+  None
+
+--*/
+{
+  UINTN Index;
+  //
+  // Remove the specified text-in device data structure from the Text In List,
+  // and rearrange the remaining data structures in the Text In List.
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
+    if (Private->AbsolutePointerList[Index] == AbsolutePointer) {
+      for (Index = Index; Index < Private->CurrentNumberOfAbsolutePointers - 1; Index++) {
+        Private->AbsolutePointerList[Index] = Private->AbsolutePointerList[Index + 1];
+      }
+
+      Private->CurrentNumberOfAbsolutePointers--;
       return EFI_SUCCESS;
     }
   }
@@ -3325,8 +3587,6 @@ ConSplitterTextInUnregisterKeyNotify (
   
 }
 
-
-
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerReset (
@@ -3548,6 +3808,198 @@ Returns:
     if (!EFI_ERROR (Status)) {
       gBS->SignalEvent (Event);
       Private->InputEventSignalState = TRUE;
+    }
+  }
+}
+
+//
+// Absolute Pointer Protocol functions
+//
+
+EFI_STATUS
+EFIAPI
+ConSplitterAbsolutePointerReset (
+  IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
+  IN BOOLEAN                         ExtendedVerification
+  )
+/*++
+
+  Routine Description:
+    Resets the pointer device hardware.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    ExtendedVerification  - Driver may perform diagnostics on reset.
+
+  Returns:
+    EFI_SUCCESS           - The device was reset.
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not be reset.
+                            
+--*/
+{
+  EFI_STATUS                    Status;
+  EFI_STATUS                    ReturnStatus;
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  UINTN                         Index;
+
+  Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS (This);
+
+  Private->AbsoluteInputEventSignalState = FALSE;
+    
+  if (Private->CurrentNumberOfAbsolutePointers == 0) {
+    return EFI_SUCCESS;
+  }
+  //
+  // return the worst status met
+  //
+  for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
+    Status = Private->AbsolutePointerList[Index]->Reset (
+                                                    Private->AbsolutePointerList[Index],
+                                                    ExtendedVerification
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
+    }
+  }
+
+  return ReturnStatus;
+}
+
+EFI_STATUS
+EFIAPI 
+ConSplitterAbsolutePointerGetState (
+  IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
+  IN OUT EFI_ABSOLUTE_POINTER_STATE  *State
+  )
+/*++
+
+  Routine Description:
+    Retrieves the current state of a pointer device.
+
+  Arguments:
+    This                  - Protocol instance pointer.
+    State                 - A pointer to the state information on the pointer device.
+
+  Returns:
+    EFI_SUCCESS           - The state of the pointer device was returned in State..
+    EFI_NOT_READY         - The state of the pointer device has not changed since the last call to
+                            GetState().                                                           
+    EFI_DEVICE_ERROR      - A device error occurred while attempting to retrieve the pointer
+                            device's current state.                                         
+--*/
+{
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  EFI_STATUS                    Status;
+  EFI_STATUS                    ReturnStatus;
+  UINTN                         Index;
+  EFI_ABSOLUTE_POINTER_STATE    CurrentState;
+
+
+  Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS (This);
+  if (Private->PasswordEnabled) {
+    //
+    // If StdIn Locked return not ready
+    //
+    return EFI_NOT_READY;
+  }
+
+  Private->AbsoluteInputEventSignalState = FALSE;
+
+  State->CurrentX                        = 0;
+  State->CurrentY                        = 0;
+  State->CurrentZ                        = 0;
+  State->ActiveButtons                   = 0;
+    
+  //
+  // if no physical pointer device exists, return EFI_NOT_READY;
+  // if any physical pointer device has changed state,
+  // return the state and EFI_SUCCESS.
+  //
+  ReturnStatus = EFI_NOT_READY;
+  for (Index = 0; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
+
+    Status = Private->AbsolutePointerList[Index]->GetState (
+                                                    Private->AbsolutePointerList[Index],
+                                                    &CurrentState
+                                                    );
+    if (!EFI_ERROR (Status)) {
+      if (ReturnStatus == EFI_NOT_READY) {
+        ReturnStatus = EFI_SUCCESS;
+      }
+
+      State->ActiveButtons = CurrentState.ActiveButtons;
+
+      if (!(Private->AbsolutePointerMode.AbsoluteMinX == 0 && Private->AbsolutePointerMode.AbsoluteMaxX == 0)) {
+        State->CurrentX = CurrentState.CurrentX;
+      }
+      if (!(Private->AbsolutePointerMode.AbsoluteMinY == 0 && Private->AbsolutePointerMode.AbsoluteMaxY == 0)) {
+        State->CurrentY = CurrentState.CurrentY;
+      }
+      if (!(Private->AbsolutePointerMode.AbsoluteMinZ == 0 && Private->AbsolutePointerMode.AbsoluteMaxZ == 0)) {
+        State->CurrentZ = CurrentState.CurrentZ;
+      }
+      
+    } else if (Status == EFI_DEVICE_ERROR) {
+      ReturnStatus = EFI_DEVICE_ERROR;
+    }
+  }
+
+  return ReturnStatus;
+}
+
+VOID
+EFIAPI
+ConSplitterAbsolutePointerWaitForInput (
+  IN  EFI_EVENT                       Event,
+  IN  VOID                            *Context
+  )
+/*++
+
+Routine Description:
+  This event agregates all the events of the pointer devices in the splitter.
+  If the ConIn is password locked then return.
+  If any events of physical pointer devices are signaled, signal the pointer
+  splitter event. This will cause the calling code to call
+  ConSplitterAbsolutePointerGetState ().
+
+Arguments:
+  Event   - The Event assoicated with callback.
+  Context - Context registered when Event was created.
+
+Returns:
+  None
+
+--*/
+{
+  EFI_STATUS                    Status;
+  TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
+  UINTN                         Index;
+
+  Private = (TEXT_IN_SPLITTER_PRIVATE_DATA *) Context;
+  if (Private->PasswordEnabled) {
+    //
+    // If StdIn Locked return not ready
+    //
+    return ;
+  }
+
+  //
+  // if AbsoluteInputEventSignalState is flagged before, 
+  // and not cleared by Reset() or GetState(), signal it
+  //
+  if (Private->AbsoluteInputEventSignalState) {
+    gBS->SignalEvent (Event);
+    return ;
+  }
+  //
+  // if any physical console input device has key input, signal the event.
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
+    Status = gBS->CheckEvent (Private->AbsolutePointerList[Index]->WaitForInput);
+    if (!EFI_ERROR (Status)) {
+      gBS->SignalEvent (Event);
+      Private->AbsoluteInputEventSignalState = TRUE;
     }
   }
 }
