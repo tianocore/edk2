@@ -119,6 +119,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE|BOOLEAN|0x00010041
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE|BOOLEAN|0x00010042
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE|BOOLEAN|0x00010043
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|TRUE|BOOLEAN|0x00010044
 
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f

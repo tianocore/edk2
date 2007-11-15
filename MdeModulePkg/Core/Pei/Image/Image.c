@@ -326,25 +326,35 @@ Returns:
   UINT16                      Machine;
   PEI_CORE_INSTANCE           *Private;
   VOID                        *EntryPointArg;
+  EFI_SECTION_TYPE            SearchType1;
+  EFI_SECTION_TYPE            SearchType2;
 
   *EntryPoint          = 0;
   ImageSize            = 0;
   *AuthenticationState = 0;
 
+  if (FeaturePcdGet (PcdPeiCoreImageLoaderSearchTeSectionFirst)) {
+    SearchType1 = EFI_SECTION_TE;
+    SearchType2 = EFI_SECTION_PE32;
+  } else {
+    SearchType1 = EFI_SECTION_PE32;
+    SearchType2 = EFI_SECTION_TE;
+  }
   //
-  // Try to find a TE section.
+  // Try to find a first exe section (if PcdPeiCoreImageLoaderSearchTeSectionFirst 
+  // is true, TE will be searched first).
   //
   Status = PeiServicesFfsFindSectionData (
-             EFI_SECTION_TE,
+             SearchType1,
              FileHandle,
              &Pe32Data
              );
   //
-  // If we didn't find a TE section, try to find a PE32 section.
+  // If we didn't find a first exe section, try to find the second exe section.
   //
   if (EFI_ERROR (Status)) {
     Status = PeiServicesFfsFindSectionData (
-               EFI_SECTION_PE32,
+               SearchType2,
                FileHandle,
                &Pe32Data
                );
