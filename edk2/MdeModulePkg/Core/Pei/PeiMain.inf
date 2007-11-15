@@ -102,6 +102,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv
 
-[BuildOptions.common]
-  MSFT:DEBUG_*_IA32_CC_FLAGS = /FAcs
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
+
+
 
