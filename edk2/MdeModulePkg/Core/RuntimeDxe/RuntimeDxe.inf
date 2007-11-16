@@ -38,6 +38,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   PeCoffLib
@@ -51,6 +52,7 @@
   BaseLib
 
 [Guids]
+  gEfiCapsuleInfoGuid
 
 [Protocols]
   gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
