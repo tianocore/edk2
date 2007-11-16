@@ -66,14 +66,25 @@ Returns:
   CapsuleHeader   = NULL;
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
+    //
+    // A capsule which has the CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flag must have
+    // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
+    //
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-      return EFI_UNSUPPORTED;
-    }
+    //
+    // To remove this check. Capsule update supports non reset image.
+    // 
+    //    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+    //      return EFI_UNSUPPORTED;
+    //    }
   }
+
+  //
+  // Check capsule guid is suppored by this platform. To do
+  //
 
   //
   //Assume that capsules have the same flags on reseting or not.
@@ -87,10 +98,18 @@ Returns:
     if (!FeaturePcdGet(PcdSupportUpdateCapsuleRest)) {
       return EFI_UNSUPPORTED;
     }
-
-    if (ScatterGatherList == 0) {
+    //
+    // ScatterGatherList is only referenced if the capsules are defined to persist across
+    // system reset. 
+    //
+    if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) NULL) {
       return EFI_INVALID_PARAMETER;
     } else {
+      //
+      // ScatterGatherList is only referenced if the capsules are defined to persist across
+      // system reset. Set its value into NV storage to let pre-boot driver to pick it up 
+      // after coming through a system reset.
+      //
       Status = EfiSetVariable (
                  EFI_CAPSULE_VARIABLE_NAME,
                  &gEfiCapsuleVendorGuid,
@@ -99,21 +118,23 @@ Returns:
                  (VOID *) &ScatterGatherList
                  );
       if (Status != EFI_SUCCESS) {
-        return EFI_DEVICE_ERROR;
+        return Status;
       }
     }
     return EFI_SUCCESS;
   }
 
   //
-  //The rest occurs in the condition of non-reset mode
+  // The rest occurs in the condition of non-reset mode
+  // Current Runtime mode doesn't support the non-reset capsule image.
   //
   if (EfiAtRuntime ()) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  //Here should be in the boot-time
+  // Here should be in the boot-time for non-reset capsule image
+  // Default process to Update Capsule image into Flash for any guid image.
   //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
@@ -121,7 +142,7 @@ Returns:
 
     BufferPtr = AllocatePool (CapsuleSize);
     if (BufferPtr == NULL) {
-      return EFI_DEVICE_ERROR;
+      return EFI_OUT_OF_RESOURCES;
     }
 
     CopyMem (BufferPtr, (UINT8*)CapsuleHeader+ CapsuleHeader->HeaderSize, CapsuleSize);
@@ -132,7 +153,7 @@ Returns:
     Status = gDS->ProcessFirmwareVolume (BufferPtr, CapsuleSize, &FvHandle);
     if (Status != EFI_SUCCESS) {
       FreePool (BufferPtr);
-      return EFI_DEVICE_ERROR;
+      return Status;
     }
     gDS->Dispatch ();
     FreePool (BufferPtr);
@@ -189,12 +210,19 @@ Returns:
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
+    //
+    // A capsule which has the CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flag must have
+    // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
+    //
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
-    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-      return EFI_UNSUPPORTED;
-    }
+    //
+    // To remove this check. Capsule update supports non reset image.
+    // 
+    //    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+    //      return EFI_UNSUPPORTED;
+    //    }
   }
 
   //
