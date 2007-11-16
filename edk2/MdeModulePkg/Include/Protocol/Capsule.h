@@ -30,10 +30,4 @@ Abstract:
 
 extern EFI_GUID gEfiCapsuleArchProtocolGuid;
 
-typedef struct {
-  UINT32   CapsuleArrayNumber;
-  VOID*    CapsulePtr[1];
-} EFI_CAPSULE_TABLE;
-
-
 #endif
