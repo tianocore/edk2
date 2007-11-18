@@ -281,7 +281,7 @@ EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FfsFileHeader,
-  IN OUT VOID                   **SectionData
+  OUT VOID                      **SectionData
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
@@ -334,7 +334,7 @@ EFIAPI
 PeiServicesAllocatePages (
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
-  IN OUT EFI_PHYSICAL_ADDRESS   *Memory
+  OUT EFI_PHYSICAL_ADDRESS      *Memory
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
@@ -368,9 +368,11 @@ PeiServicesAllocatePool (
 }
 
 /**
-  This service resets the entire platform, including all processors and devices, and reboots the
-  system.
+  Resets the entire platform.
 
+  @param  VOID
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_AVAILABLE_YET The service has not been installed yet.
 
 **/
@@ -386,6 +388,23 @@ PeiServicesResetSystem (
   return (*PeiServices)->ResetSystem (PeiServices);
 }
 
+/**
+  This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services 
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
+  Specification for details. 
+
+  @param FileHandle   PEIM's file handle. Must be the currently
+                      executing PEIM.
+  
+  @retval EFI_SUCCESS   The PEIM was successfully registered for
+                        shadowing.
+
+  @retval EFI_ALREADY_STARTED   The PEIM was previously
+                                registered for shadowing.
+
+  @retval EFI_NOT_FOUND   The FileHandle does not refer to a
+                          valid file handle.
+**/
 EFI_STATUS
 EFIAPI
 PeiServicesRegisterForShadow (
@@ -398,6 +417,24 @@ PeiServicesRegisterForShadow (
   return (*PeiServices)->RegisterForShadow (FileHandle);
 }
 
+/**
+  This service is a wrapper for the PEI Service FfsGetFileInfo(), except the pointer to the PEI Services 
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
+  Specification for details. 
+
+  @param FileHandle   Handle of the file.
+
+  @param FileInfo     Upon exit, points to the file's
+                      information.
+
+  @retval EFI_SUCCESS             File information returned.
+  
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiServicesFfsGetFileInfo (
@@ -412,6 +449,26 @@ PeiServicesFfsGetFileInfo (
 }
 
 
+/**
+  This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services 
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
+  Specification for details. 
+
+  @param FileName       A pointer to the name of the file to
+                        find within the firmware volume.
+
+  @param VolumeHandle   The firmware volume to search FileHandle
+                        Upon exit, points to the found file's
+                        handle or NULL if it could not be found.
+
+  @retval EFI_SUCCESS             File was found.
+
+  @retval EFI_NOT_FOUND           File was not found.
+
+  @retval EFI_INVALID_PARAMETER   VolumeHandle or FileHandle or
+                                  FileName was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiServicesFfsFindFileByName (
@@ -424,6 +481,24 @@ PeiServicesFfsFindFileByName (
 }
 
 
+/**
+  This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services 
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
+  Specification for details. 
+
+  @param VolumeHandle   Handle of the volume.
+
+  @param VolumeInfo     Upon exit, points to the volume's
+                        information.
+
+  @retval EFI_SUCCESS             File information returned.
+  
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiServicesFfsGetVolumeInfo (
