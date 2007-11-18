@@ -247,7 +247,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_GET_HOB_LIST) (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
-  IN OUT VOID                      **HobList
+  OUT VOID                         **HobList
   );
 
 /**
@@ -268,7 +268,7 @@ EFI_STATUS
   IN CONST EFI_PEI_SERVICES            **PeiServices,
   IN UINT16                            Type,
   IN UINT16                            Length,
-  IN OUT VOID                          **Hob
+  OUT VOID                             **Hob
   );
 
 /**
@@ -653,7 +653,7 @@ EFI_STATUS
   time.
 
   @param FileHandle   PEIM's file handle. Must be the currently
-                      xecuting PEIM.
+                      executing PEIM.
   
   @retval EFI_SUCCESS   The PEIM was successfully registered for
                         shadowing.
