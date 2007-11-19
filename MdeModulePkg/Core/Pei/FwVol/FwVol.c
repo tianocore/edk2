@@ -269,7 +269,8 @@ Returns:
             }           
           } 
         }
-      } else if ((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) { 
+      } else if (((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) && 
+                 (FfsFileHeader->Type != EFI_FV_FILETYPE_FFS_PAD)) { 
         *FileHeader = FfsFileHeader;
         return EFI_SUCCESS;
       }
@@ -551,43 +552,6 @@ Returns:
           );
 }
 
-
-EFI_STATUS
-FindNextPeim (
-  IN     EFI_PEI_SERVICES            **PeiServices,
-  IN     EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER         **PeimFileHeader
-  )
-/*++
-
-Routine Description:
-    Given the input file pointer, search for the next matching file in the
-    FFS volume. The search starts from FileHeader inside
-    the Firmware Volume defined by FwVolHeader.
-
-Arguments:
-    PeiServices - Pointer to the PEI Core Services Table.
-
-    FwVolHeader - Pointer to the FV header of the volume to search.
-                     This parameter must point to a valid FFS volume.
-                     
-    PeimFileHeader  - Pointer to the current file from which to begin searching.
-                  This pointer will be updated upon return to reflect the file found.
-
-Returns:
-    EFI_NOT_FOUND - No files matching the search criteria were found
-    EFI_SUCCESS
-
---*/
-{
-  return PeiFindFileEx (
-           (EFI_PEI_FV_HANDLE) FwVolHeader, 
-           NULL, 
-           EFI_FV_FILETYPE_PEIM, 
-           (EFI_PEI_FILE_HANDLE *)PeimFileHeader, 
-           NULL
-           );
-}
 
 EFI_STATUS
 EFIAPI
