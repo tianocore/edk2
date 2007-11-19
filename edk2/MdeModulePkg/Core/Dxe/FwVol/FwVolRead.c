@@ -187,7 +187,7 @@ Returns:
       continue;
     }
 
-    if (*FileType == 0) {
+    if (*FileType == EFI_FV_FILETYPE_ALL) {
       //
       // Process all file types so we have a match
       //
