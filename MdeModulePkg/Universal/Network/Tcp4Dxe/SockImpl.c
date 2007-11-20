@@ -80,7 +80,7 @@ SockTcpDataToRcv (
 
   if (*IsUrg && TcpRsvData->UrgLen < RcvBufEntry->TotalSize) {
 
-    DataLen = NET_MIN (TcpRsvData->UrgLen, BufLen);
+    DataLen = MIN (TcpRsvData->UrgLen, BufLen);
 
     if (DataLen < TcpRsvData->UrgLen) {
       TcpRsvData->UrgLen = TcpRsvData->UrgLen - DataLen;
@@ -114,7 +114,7 @@ SockTcpDataToRcv (
         TcpRsvData->UrgLen = TcpRsvData->UrgLen - (BufLen - DataLen);
       }
 
-      return NET_MIN (TcpRsvData->UrgLen + DataLen, BufLen);
+      return MIN (TcpRsvData->UrgLen + DataLen, BufLen);
 
     }
 
@@ -123,7 +123,7 @@ SockTcpDataToRcv (
     RcvBufEntry = SockBufNext (SockBuffer, RcvBufEntry);
   }
 
-  DataLen = NET_MIN (BufLen, DataLen);
+  DataLen = MIN (BufLen, DataLen);
   return DataLen;
 }
 
@@ -165,7 +165,7 @@ SockSetTcpRxData (
   for (Index = 0; (Index < RxData->FragmentCount) && (RcvdBytes > 0); Index++) {
 
     Fragment  = &RxData->FragmentTable[Index];
-    CopyBytes = NET_MIN ((UINT32) (Fragment->FragmentLength), RcvdBytes);
+    CopyBytes = MIN ((UINT32) (Fragment->FragmentLength), RcvdBytes);
 
     NetbufQueCopy (
       Sock->RcvBuffer.DataQueue,

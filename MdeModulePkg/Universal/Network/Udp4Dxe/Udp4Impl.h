@@ -261,8 +261,8 @@ Udp4LeaveGroup (
   );
 
 VOID
-Udp4FlushRxData (
-  IN NET_LIST_ENTRY  *RcvdDgramQue
+Udp4FlushRcvdDgram (
+  IN UDP4_INSTANCE_DATA  *Instance
   );
 
 EFI_STATUS

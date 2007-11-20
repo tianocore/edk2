@@ -33,6 +33,7 @@ TcpGetUint16 (
   return NTOHS (Value);
 }
 
+STATIC
 VOID
 TcpPutUint16 (
   IN UINT8  *Buf,
@@ -302,7 +303,7 @@ TcpParseOption (
         return -1;
       }
 
-      Option->WndScale = (UINT8) NET_MIN (14, Head[Cur + 2]);
+      Option->WndScale = (UINT8) MIN (14, Head[Cur + 2]);
       TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_WS);
 
       Cur += TCP_OPTION_WS_LEN;

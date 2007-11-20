@@ -194,6 +194,7 @@ struct _IP4_SERVICE {
   EFI_IP4_CONFIG_PROTOCOL         *Ip4Config;
   EFI_EVENT                       DoneEvent;
   EFI_EVENT                       ReconfigEvent;
+  EFI_EVENT                       ActiveEvent;
 
   //
   // The string representation of the current mac address of the

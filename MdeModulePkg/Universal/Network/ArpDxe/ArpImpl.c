@@ -66,7 +66,6 @@ ArpInitInstance (
 /**
   Process the Arp packets received from Mnp, the procedure conforms to RFC826.
 
-  @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
                                  Event.
 
@@ -75,8 +74,7 @@ ArpInitInstance (
 **/
 VOID
 EFIAPI
-ArpOnFrameRcvd (
-  IN EFI_EVENT  Event,
+ArpOnFrameRcvdDpc (
   IN VOID       *Context
   )
 {
@@ -146,11 +144,6 @@ ArpOnFrameRcvd (
   ArpAddress.TargetHwAddr    = ArpAddress.SenderProtoAddr + Head->ProtoAddrLen;
   ArpAddress.TargetProtoAddr = ArpAddress.TargetHwAddr + Head->HwAddrLen;
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    ARP_DEBUG_ERROR (("ArpOnFrameRcvd: Faild to acquire the CacheTableLock.\n"));
-    goto RECYCLE_RXDATA;
-  }
-
   SenderAddress[Hardware].Type       = Head->HwType;
   SenderAddress[Hardware].Length     = Head->HwAddrLen;
   SenderAddress[Hardware].AddressPtr = ArpAddress.SenderHwAddr;
@@ -172,7 +165,7 @@ ArpOnFrameRcvd (
     // This address (either hardware or protocol address, or both) is configured to
     // be a deny entry, silently skip the normal process.
     //
-    goto UNLOCK_EXIT;
+    goto RECYCLE_RXDATA;
   }
 
   ProtoMatched = FALSE;
@@ -211,7 +204,7 @@ ArpOnFrameRcvd (
     //
     // Protocol type unmatchable, skip.
     //
-    goto UNLOCK_EXIT;
+    goto RECYCLE_RXDATA;
   }
 
   //
@@ -238,7 +231,7 @@ ArpOnFrameRcvd (
     //
     // This arp packet isn't targeted to us, skip now.
     //
-    goto UNLOCK_EXIT;
+    goto RECYCLE_RXDATA;
   }
 
   if (!MergeFlag) {
@@ -259,7 +252,7 @@ ArpOnFrameRcvd (
       //
       CacheEntry = ArpAllocCacheEntry (NULL);
       if (CacheEntry == NULL) {
-        goto UNLOCK_EXIT;
+        goto RECYCLE_RXDATA;
       }
     }
 
@@ -295,10 +288,6 @@ ArpOnFrameRcvd (
     ArpSendFrame (Instance, CacheEntry, ARP_OPCODE_REPLY);
   }
 
-UNLOCK_EXIT:
-
-  NET_UNLOCK (&ArpService->Lock);
-
 RECYCLE_RXDATA:
 
   //
@@ -321,9 +310,8 @@ RESTART_RECEIVE:
   );
 }
 
-
 /**
-  Process the already sent arp packets.
+  Queue ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK.
 
   @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
@@ -334,8 +322,29 @@ RESTART_RECEIVE:
 **/
 VOID
 EFIAPI
-ArpOnFrameSent (
+ArpOnFrameRcvd (
   IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // Request ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, ArpOnFrameRcvdDpc, Context);
+}
+
+/**
+  Process the already sent arp packets.
+
+  @param  Context                Pointer to the context data registerd to the
+                                 Event.
+
+  @return None.
+
+**/
+VOID
+EFIAPI
+ArpOnFrameSentDpc (
   IN VOID       *Context
   )
 {
@@ -360,6 +369,29 @@ ArpOnFrameSent (
   NetFreePool (TxData);
   gBS->CloseEvent (TxToken->Event);
   NetFreePool (TxToken);
+}
+
+/**
+  Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK.
+
+  @param  Event                  The Event this notify function registered to.
+  @param  Context                Pointer to the context data registerd to the
+                                 Event.
+
+  @return None.
+
+**/
+VOID
+EFIAPI
+ArpOnFrameSent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, ArpOnFrameSentDpc, Context);
 }
 
 
@@ -389,10 +421,6 @@ ArpTimerHandler (
 
   ASSERT (Context != NULL);
   ArpService = (ARP_SERVICE_DATA *)Context;
-
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return;
-  }
 
   //
   // Iterate all the pending requests to see whether a retry is needed to send out
@@ -492,8 +520,6 @@ ArpTimerHandler (
       CacheEntry->DecayTime -= ARP_PERIODIC_TIMER_INTERVAL;
     }
   }
-
-  NET_UNLOCK (&ArpService->Lock);
 }
 
 
@@ -789,6 +815,11 @@ ArpAddressResolved (
     }
   }
 
+  //
+  // Dispatch the DPCs queued by the NotifyFunction of the Context->UserRequestEvent.
+  //
+  NetLibDispatchDpc ();
+
   return Count;
 }
 
@@ -958,7 +989,7 @@ ArpConfigureInstance (
       //
       // Cancel the arp requests issued by this instance.
       //
-      ArpCancelRequest (Instance, NULL, NULL);
+      Instance->ArpProto.Cancel (&Instance->ArpProto, NULL, NULL);
 
       //
       // Free the buffer previously allocated to hold the station address.

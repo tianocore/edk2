@@ -68,6 +68,7 @@
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
 [LibraryClasses.IA32]
@@ -241,12 +242,13 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   }
-  
+
   MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
 
+  MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
@@ -265,6 +267,7 @@
   MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
   MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
 
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 

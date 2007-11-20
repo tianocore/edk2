@@ -415,7 +415,7 @@ EfiIp4ConfigStart (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  NET_TPL_LOCK,
                   Ip4ConfigOnDhcp4Complete,
                   Instance,
                   &Instance->Dhcp4Event

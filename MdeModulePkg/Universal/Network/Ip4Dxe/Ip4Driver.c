@@ -208,6 +208,7 @@ Ip4CreateService (
   IpSb->Ip4Config                   = NULL;
   IpSb->DoneEvent                   = NULL;
   IpSb->ReconfigEvent               = NULL;
+  IpSb->ActiveEvent                 = NULL;
 
   //
   // Create various resources. First create the route table, timer
@@ -223,7 +224,7 @@ Ip4CreateService (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  TPL_CALLBACK,
+                  NET_TPL_TIMER,
                   Ip4TimerTicking,
                   IpSb,
                   &IpSb->Timer
@@ -375,6 +376,7 @@ Ip4CleanService (
 
     gBS->CloseEvent (IpSb->DoneEvent);
     gBS->CloseEvent (IpSb->ReconfigEvent);
+    IpSb->ActiveEvent = NULL;
     IpSb->Ip4Config = NULL;
   }
 

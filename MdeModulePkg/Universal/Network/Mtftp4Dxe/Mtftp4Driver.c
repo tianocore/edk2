@@ -174,7 +174,7 @@ Mtftp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  TPL_CALLBACK,
+                  NET_TPL_TIMER,
                   Mtftp4OnTimerTick,
                   MtftpSb,
                   &MtftpSb->Timer
@@ -191,7 +191,7 @@ Mtftp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER,
-                  TPL_CALLBACK,
+                  NET_TPL_TIMER,
                   NULL,
                   NULL,
                   &MtftpSb->TimerToGetMap

@@ -260,13 +260,11 @@ Mtftp4GetInfoCheckPacket (
   IN EFI_MTFTP4_PACKET      *Packet
   )
 {
-  MTFTP4_PROTOCOL           *Instance;
   MTFTP4_GETINFO_STATE      *State;
   EFI_STATUS                Status;
   UINT16                    OpCode;
 
-  Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
-  State    = &Instance->GetInfoState;
+  State   = (MTFTP4_GETINFO_STATE *) Token->Context;
   OpCode   = NTOHS (Packet->OpCode);
 
   //
@@ -337,8 +335,7 @@ EfiMtftp4GetInfo (
   )
 {
   EFI_MTFTP4_TOKEN          Token;
-  MTFTP4_PROTOCOL           *Instance;
-  MTFTP4_GETINFO_STATE      *State;
+  MTFTP4_GETINFO_STATE      State;
   EFI_STATUS                Status;
 
   if ((This == NULL) || (Filename == NULL) || (PacketLength == NULL) ||
@@ -351,11 +348,9 @@ EfiMtftp4GetInfo (
   }
 
   *PacketLength         = 0;
-  Instance              = MTFTP4_PROTOCOL_FROM_THIS (This);
-  State                 = &Instance->GetInfoState;
-  State->Packet          = Packet;
-  State->PacketLen       = PacketLength;
-  State->Status          = EFI_SUCCESS;
+  State.Packet          = Packet;
+  State.PacketLen       = PacketLength;
+  State.Status          = EFI_SUCCESS;
 
   //
   // Fill in the Token to issue an synchronous ReadFile operation
@@ -369,6 +364,7 @@ EfiMtftp4GetInfo (
   Token.OptionList      = OptionList;
   Token.BufferSize      = 0;
   Token.Buffer          = NULL;
+  Token.Context         = &State;
   Token.CheckPacket     = Mtftp4GetInfoCheckPacket;
   Token.TimeoutCallback = NULL;
   Token.PacketNeeded    = NULL;
@@ -376,7 +372,7 @@ EfiMtftp4GetInfo (
   Status                = EfiMtftp4ReadFile (This, &Token);
 
   if (EFI_ABORTED == Status) {
-    return State->Status;
+    return State.Status;
   }
 
   return Status;

@@ -1310,7 +1310,7 @@ DhcpSendMessage (
   // Append the user's message if it isn't NULL
   //
   if (Msg != NULL) {
-    Len     = NET_MIN ((UINT32) AsciiStrLen ((CHAR8 *) Msg), 255);
+    Len     = MIN ((UINT32) AsciiStrLen ((CHAR8 *) Msg), 255);
     Buf     = DhcpAppendOption (Buf, DHCP_TAG_MESSAGE, (UINT16) Len, Msg);
   }
 

@@ -93,7 +93,7 @@ Tcp4CreateTimer (
 
     Status = gBS->CreateEvent (
                     EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                    NET_TPL_TIMER,
+                    NET_TPL_EVENT,
                     TcpTicking,
                     NULL,
                     &mTcp4Timer.TimerEvent

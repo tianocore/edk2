@@ -36,6 +36,8 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 
 
+EFI_DPC_PROTOCOL *mDpc = NULL;
+
 //
 // All the supported IP4 maskes in host byte order.
 //
@@ -227,7 +229,7 @@ NetRandomInitSeed (
   UINT32                    Seed;
 
   gRT->GetTime (&Time, NULL);
-  Seed = (~Time.Hour << 24 | Time.Second << 16 | Time.Minute << 8 | Time.Day);
+  Seed = (~Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
   Seed ^= Time.Nanosecond;
   Seed ^= Time.Year << 7;
 
@@ -1276,3 +1278,71 @@ NetLibGetNicHandle (
   return Handle;
 }
 
+/**
+  Add a Deferred Procedure Call to the end of the DPC queue.
+
+  @DpcTpl           The EFI_TPL that the DPC should be invoked.
+  @DpcProcedure     Pointer to the DPC's function.
+  @DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
+                    when DpcProcedure is invoked.
+
+  @retval  EFI_SUCCESS              The DPC was queued.
+  @retval  EFI_INVALID_PARAMETER    DpcTpl is not a valid EFI_TPL.
+                                    DpcProcedure is NULL.
+  @retval  EFI_OUT_OF_RESOURCES     There are not enough resources available to
+                                    add the DPC to the queue.
+
+**/
+EFI_STATUS
+NetLibQueueDpc (
+  IN EFI_TPL            DpcTpl,
+  IN EFI_DPC_PROCEDURE  DpcProcedure,
+  IN VOID               *DpcContext    OPTIONAL
+  )
+{
+  return mDpc->QueueDpc (mDpc, DpcTpl, DpcProcedure, DpcContext);
+}
+
+/**
+  Add a Deferred Procedure Call to the end of the DPC queue.
+
+  @retval  EFI_SUCCESS              One or more DPCs were invoked.
+  @retval  EFI_NOT_FOUND            No DPCs were invoked.
+
+**/
+EFI_STATUS
+NetLibDispatchDpc (
+  VOID
+  )
+{
+  return mDpc->DispatchDpc(mDpc);
+}
+
+
+/**
+  The constructor function caches the pointer to DPC protocol.
+
+  The constructor function locates DPC protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibConstructor (
+  IN EFI_HANDLE                ImageHandle,
+  IN EFI_SYSTEM_TABLE          *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->LocateProtocol (&gEfiDpcProtocolGuid, NULL, (VOID**) &mDpc);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mDpc != NULL);
+
+  return Status;
+}

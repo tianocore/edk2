@@ -607,6 +607,12 @@ Ip4AccpetFrame (
 
   Packet = NULL;
 
+  //
+  // Dispatch the DPCs queued by the NotifyFunction of the rx token's events
+  // which are signaled with received data.
+  //
+  NetLibDispatchDpc ();
+
 RESTART:
   Ip4ReceiveFrame (IpSb->DefaultInterface, NULL, Ip4AccpetFrame, IpSb);
 

@@ -178,7 +178,7 @@ DhcpCopyConfigure (
     }
 
     for (Index = 0; Index < Src->DiscoverTryCount; Index++) {
-      Dst->DiscoverTimeout[Index] = NET_MAX (Src->DiscoverTimeout[Index], 1);
+      Dst->DiscoverTimeout[Index] = MAX (Src->DiscoverTimeout[Index], 1);
     }
   }
 
@@ -194,7 +194,7 @@ DhcpCopyConfigure (
     }
 
     for (Index = 0; Index < Src->RequestTryCount; Index++) {
-      Dst->RequestTimeout[Index] = NET_MAX (Src->RequestTimeout[Index], 1);
+      Dst->RequestTimeout[Index] = MAX (Src->RequestTimeout[Index], 1);
     }
   }
 
@@ -214,7 +214,7 @@ DhcpCopyConfigure (
     SrcOptions  = Src->OptionList;
 
     for (Index = 0; Index < Src->OptionCount; Index++) {
-      Len = sizeof (EFI_DHCP4_PACKET_OPTION) + NET_MAX (SrcOptions[Index]->Length - 1, 0);
+      Len = sizeof (EFI_DHCP4_PACKET_OPTION) + MAX (SrcOptions[Index]->Length - 1, 0);
 
       DstOptions[Index] = NetAllocatePool (Len);
 
@@ -819,7 +819,7 @@ Dhcp4ParseCheckOption (
   Parse = (DHCP_PARSE_CONTEXT *) Context;
   Parse->Index++;
 
-  if (Parse->Index < Parse->OptionCount) {
+  if (Parse->Index <= Parse->OptionCount) {
     //
     // Use _CR to get the memory position of EFI_DHCP4_PACKET_OPTION for
     // the EFI_DHCP4_PACKET_OPTION->Data because DhcpIterateOptions only
