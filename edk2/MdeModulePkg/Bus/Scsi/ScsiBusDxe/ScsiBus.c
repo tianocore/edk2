@@ -393,6 +393,7 @@ Returns:
     }
   }
 
+  DEBUG ((EFI_D_ERROR, "ScsiExted Support: %d Frome First Target: %d\r\n" , ScsiBusDev->ExtScsiSupport, FromFirstTarget));
   while(ScanOtherPuns) {
     if (FromFirstTarget) {
       //
@@ -404,6 +405,7 @@ Returns:
       } else {
         Status = ScsiBusDev->ScsiInterface->GetNextDevice (ScsiBusDev->ScsiInterface, &ScsiTargetId->ScsiId.Scsi, &Lun);
       }
+      DEBUG ((EFI_D_ERROR, "ScsiExte Error= %r\r\n" , Status));
       if (EFI_ERROR (Status)) {
         //
         // no legal Pun and Lun found any more
@@ -430,6 +432,7 @@ Returns:
     // then create handle and install scsi i/o protocol.
     //
     Status = ScsiScanCreateDevice (This, Controller, ScsiTargetId, Lun, ScsiBusDev);
+    DEBUG ((EFI_D_ERROR, "CreateDevice %d, %d at %p Status = %r\r\n" , ScsiTargetId, Lun, Controller, Status));
   }
   gBS->FreePool (ScsiTargetId);
   return EFI_SUCCESS;
