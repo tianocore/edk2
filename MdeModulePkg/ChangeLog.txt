@@ -39,6 +39,20 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 
 ==========================================================================================
+EDK_4310:  Non-Compatible: qhuang8
+  Class_ModuleRemove[0]:  Remove AtapiPassThru module from MdeModulePkg.  AtapiPassThru
+      module is only used for testing. We already have a driver in OptionRomPkg to
+      produce ScsiPassThru and ExtScsiPassThru based on PCD setting. We can remove it
+      from MdeModulePkg.
+
+      Code Change :
+      1) Remove module MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf 
+
+      Impact to platform code:
+      If a platform happens to refer to this module in their dsc file, please use the
+      counterpart module in OptionRomPkg.
+
+==========================================================================================
 EDK_4067:  Non-Compatible: qwang12
   Class_PIEnable[6]:  PEI core does not build FV HOB upon notification of a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI automatically.
 
