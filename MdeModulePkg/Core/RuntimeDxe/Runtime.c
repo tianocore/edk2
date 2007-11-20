@@ -274,12 +274,6 @@ Returns:
   EFI_RUNTIME_IMAGE_ENTRY       *RuntimeImage;
   LIST_ENTRY                    *Link;
   EFI_PHYSICAL_ADDRESS          VirtImageBase;
-  UINTN                         Index;
-  UINTN                         Index1;
-  UINTN                         Index2;
-  UINTN                         Index3;
-  EFI_CAPSULE_TABLE             *CapsuleTable; 
-  EFI_CAPSULE_INFO_TABLE        *CapsuleInfoTable; 
 
   //
   // Can only switch to virtual addresses once the memory map is locked down,
@@ -372,44 +366,8 @@ Returns:
   RuntimeDriverCalculateEfiHdrCrc (&gRT->Hdr);
 
   //
-  // BugBug: PI requires System Configuration Tables Conversion.
-  // Currently, we do not implement it.
-  //
-  for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    //
-    // CapsuleInfoGuid in ConfigTable refers to an array of CapsuleGuid, it is information
-    // from which you can tell which vendorGuids in ConfigTable are related to CapsuleTable.
-    // Each CapsuleTable points to a array of capsules across a system reset. Then convert 
-    // the array contents to make these capsules visiable in Runtime.
-    //
-
-    //
-    // Firstly, Get CapsulInfoGuid in ConfigTable, it points to CapsuleInfoTable, which
-    // gather all the installed capsules' guids.
-    //
-    if (CompareGuid (&gEfiCapsuleInfoGuid, &(gST->ConfigurationTable[Index].VendorGuid))) {
-      CapsuleInfoTable = gST->ConfigurationTable[Index].VendorTable;
-      //
-      // For each known CapsuleGuid in CapsuleInfoTable, loop the whole ConfigTable to
-      // find out this guid related to CapsuleTable.
-      //
-      for (Index1 = 0; Index1 < CapsuleInfoTable->CapsuleGuidNumber; Index1++) {
-        for (Index2 = 0; Index2 < gST->NumberOfTableEntries; Index2++) {
-          //
-          // Find out certain CapsuleTable, go through its contents array, and convert them.
-          //
-          if (CompareGuid (&CapsuleInfoTable->CapsuleGuidPtr[Index1], &(gST->ConfigurationTable[Index2].VendorGuid))) {
-            CapsuleTable = gST->ConfigurationTable[Index2].VendorTable;
-            for (Index3 = 0; Index3 < CapsuleTable->CapsuleArrayNumber; Index3++) {
-              RuntimeDriverConvertInternalPointer ((VOID **) &CapsuleTable->CapsulePtr[Index3]);
-            }     
-            RuntimeDriverConvertInternalPointer ((VOID **) &(gST->ConfigurationTable[Index2].VendorTable));
-          }
-        }
-      }
-      break;
-    }
-  }
+  // UEFI don't require System Configuration Tables Conversion.
+  // 
 
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32

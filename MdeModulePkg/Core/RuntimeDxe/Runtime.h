@@ -25,7 +25,6 @@ Abstract:
 #define _RUNTIME_H_
 
 #include <PiDxe.h>
-#include <Guid/CapsuleInfo.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/Runtime.h>
 #include <Library/BaseLib.h>
