@@ -435,7 +435,6 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
   IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
