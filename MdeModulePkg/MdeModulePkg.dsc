@@ -271,7 +271,6 @@
 
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
-  MdeModulePkg/Bus/Pci/AtapiPassThruDxe/AtapiPassThru.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
