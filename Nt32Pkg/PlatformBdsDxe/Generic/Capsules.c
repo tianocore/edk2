@@ -20,21 +20,6 @@ Abstract:
 --*/
 
 #include "Bds.h"
-#include <Guid/FlashMapHob.h>
-
-VOID
-BdsLockFv (
-  IN EFI_CPU_IO_PROTOCOL          *CpuIo,
-  IN EFI_FLASH_SUBAREA_ENTRY      *FlashEntry
-  );
-
-VOID
-BdsLockFv (
-  IN EFI_CPU_IO_PROTOCOL          *CpuIo,
-  IN EFI_FLASH_SUBAREA_ENTRY      *FlashEntry
-  )
-{
-}
 
 VOID
 BdsLockNonUpdatableFlash (
