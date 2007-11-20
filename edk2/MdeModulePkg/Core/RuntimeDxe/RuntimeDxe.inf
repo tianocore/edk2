@@ -38,7 +38,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   PeCoffLib
@@ -50,9 +49,6 @@
   DebugLib
   UefiDriverEntryPoint
   BaseLib
-
-[Guids]
-  gEfiCapsuleInfoGuid
 
 [Protocols]
   gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
