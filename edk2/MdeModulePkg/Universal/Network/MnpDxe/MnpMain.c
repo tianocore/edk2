@@ -531,6 +531,11 @@ MnpReceive (
     // Try to deliver any buffered packets.
     //
     Status = MnpInstanceDeliverPacket (Instance);
+
+    //
+    // Dispatch the DPC queued by the NotifyFunction of Token->Event.
+    //
+    NetLibDispatchDpc ();
   }
 
 ON_EXIT:
@@ -596,6 +601,11 @@ MnpCancel (
     Status = (Status == EFI_ABORTED) ? EFI_SUCCESS : EFI_NOT_FOUND;
   }
 
+  //
+  // Dispatch the DPC queued by the NotifyFunction of the cancled token's events.
+  //
+  NetLibDispatchDpc ();
+
 ON_EXIT:
   NET_RESTORE_TPL (OldTpl);
 
@@ -648,8 +658,11 @@ MnpPoll (
   //
   Status = MnpReceivePacket (Instance->MnpServiceData);
 
+  NetLibDispatchDpc ();
+
 ON_EXIT:
   NET_RESTORE_TPL (OldTpl);
 
   return Status;
 }
+

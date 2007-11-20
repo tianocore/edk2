@@ -125,7 +125,7 @@ TcpInitTcbPeer (
   }
 
   if (TCP_FLG_ON (Opt->Flag, TCP_OPTION_RCVD_MSS)) {
-    Tcb->SndMss = (UINT16) NET_MAX (64, Opt->Mss);
+    Tcb->SndMss = (UINT16) MAX (64, Opt->Mss);
 
     RcvMss = TcpGetRcvMss (Tcb->Sk);
     if (Tcb->SndMss > RcvMss) {

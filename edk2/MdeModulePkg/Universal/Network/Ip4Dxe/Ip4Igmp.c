@@ -482,7 +482,7 @@ Ip4IgmpHandle (
         // is longer than the MaxRespTime. TODO: randomize the DelayTime.
         //
         if ((Group->DelayTime == 0) || (Group->DelayTime > Igmp.MaxRespTime)) {
-          Group->DelayTime = NET_MAX (1, Igmp.MaxRespTime);
+          Group->DelayTime = MAX (1, Igmp.MaxRespTime);
         }
       }
     }

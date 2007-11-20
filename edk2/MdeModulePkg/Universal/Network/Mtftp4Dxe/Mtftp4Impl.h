@@ -86,12 +86,6 @@ struct _MTFTP4_SERVICE {
   UDP_IO_PORT                   *ConnectUdp;
 };
 
-typedef struct {
-  EFI_MTFTP4_PACKET             **Packet;
-  UINT32                        *PacketLen;
-  EFI_STATUS                    Status;
-} MTFTP4_GETINFO_STATE;
-
 struct _MTFTP4_PROTOCOL {
   UINT32                        Signature;
   NET_LIST_ENTRY                Link;
@@ -146,9 +140,13 @@ struct _MTFTP4_PROTOCOL {
   UINT16                        McastPort;
   BOOLEAN                       Master;
   UDP_IO_PORT                   *McastUdpPort;
-
-  MTFTP4_GETINFO_STATE          GetInfoState;
 };
+
+typedef struct {
+  EFI_MTFTP4_PACKET             **Packet;
+  UINT32                        *PacketLen;
+  EFI_STATUS                    Status;
+} MTFTP4_GETINFO_STATE;
 
 VOID
 Mtftp4CleanOperation (

@@ -28,6 +28,7 @@ Abstract:
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverDiagnostics.h>
+#include <Protocol/Dpc.h>
 
 #define EFI_NET_LITTLE_ENDIAN
 
@@ -228,16 +229,13 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 // to the standard EFI enviornment. It will NOT consider multiprocessor.
 //
 #define NET_TPL_LOCK            TPL_CALLBACK
-#define NET_TPL_RECYCLE_LOCK    (NET_TPL_LOCK + 1)
-#define NET_TPL_EVENT           TPL_CALLBACK
-#define NET_TPL_RECYCLE         (NET_TPL_LOCK + 1)
-#define NET_TPL_SLOW_TIMER      (TPL_CALLBACK - 1)
-#define NET_TPL_FAST_TIMER      NET_TPL_RECYCLE
-#define NET_TPL_TIMER           TPL_CALLBACK
+#define NET_TPL_EVENT           TPL_NOTIFY
+#define NET_TPL_RECYCLE         TPL_NOTIFY
+#define NET_TPL_TIMER           NET_TPL_LOCK
 
 #define NET_LOCK                 EFI_LOCK
 #define NET_LOCK_INIT(x)         EfiInitializeLock (x, NET_TPL_LOCK)
-#define NET_RECYCLE_LOCK_INIT(x) EfiInitializeLock (x, NET_TPL_RECYCLE_LOCK)
+#define NET_RECYCLE_LOCK_INIT(x) EfiInitializeLock (x, NET_TPL_RECYCLE)
 #define NET_TRYLOCK(x)           EfiAcquireLockOrFail (x)
 #define NET_UNLOCK(x)            EfiReleaseLock (x)
 
@@ -247,8 +245,6 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 #define TICKS_PER_MS            10000U
 #define TICKS_PER_SECOND        10000000U
 
-#define NET_MIN(a, b)           ((a) < (b) ? (a) : (b))
-#define NET_MAX(a, b)           ((a) > (b) ? (a) : (b))
 #define NET_RANDOM(Seed)        ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
 
 
@@ -473,6 +469,18 @@ EFI_HANDLE
 NetLibGetNicHandle (
   IN EFI_HANDLE             Controller,
   IN EFI_GUID               *ProtocolGuid
+  );
+
+EFI_STATUS
+NetLibQueueDpc (
+  IN EFI_TPL            DpcTpl,
+  IN EFI_DPC_PROCEDURE  DpcProcedure,
+  IN VOID               *DpcContext    OPTIONAL
+  );
+
+EFI_STATUS
+NetLibDispatchDpc (
+  VOID
   );
 
 EFI_STATUS

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -176,11 +176,6 @@ ArpCreateService (
   if (EFI_ERROR (Status)) {
     goto ERROR_EXIT;
   }
-
-  //
-  // Init the lock.
-  //
-  NET_LOCK_INIT (&ArpService->Lock);
 
   //
   // Init the lists.
@@ -506,6 +501,7 @@ ArpServiceBindingCreateChild (
   ARP_SERVICE_DATA   *ArpService;
   ARP_INSTANCE_DATA  *Instance;
   VOID               *Mnp;
+  EFI_TPL            OldTpl;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -564,11 +560,7 @@ ArpServiceBindingCreateChild (
     goto ERROR;
   }
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-
-    Status = EFI_ACCESS_DENIED;
-    goto ERROR;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Insert the instance into children list managed by the arp service context data.
@@ -576,7 +568,7 @@ ArpServiceBindingCreateChild (
   NetListInsertTail (&ArpService->ChildrenList, &Instance->List);
   ArpService->ChildrenNumber++;
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
 ERROR:
 
@@ -633,6 +625,7 @@ ArpServiceBindingDestroyChild (
   ARP_SERVICE_DATA   *ArpService;
   ARP_INSTANCE_DATA  *Instance;
   EFI_ARP_PROTOCOL   *Arp;
+  EFI_TPL            OldTpl;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -693,10 +686,7 @@ ArpServiceBindingDestroyChild (
     return Status;
   }
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    Instance->Destroyed = FALSE;
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   if (Instance->Configured) {
     //
@@ -716,7 +706,7 @@ ArpServiceBindingDestroyChild (
   NetListRemoveEntry (&Instance->List);
   ArpService->ChildrenNumber--;
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   NetFreePool (Instance);
 

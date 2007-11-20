@@ -144,7 +144,7 @@ TcpComputeWnd (
     Tcb->RcvWnd = Wnd;
   }
 
-  Wnd = NET_MIN (Wnd >> Tcb->RcvWndScale, 0xffff);
+  Wnd = MIN (Wnd >> Tcb->RcvWndScale, 0xffff);
   return NTOHS ((UINT16) Wnd);
 }
 
@@ -230,7 +230,7 @@ TcpDataToSend (
   Left  = GET_SND_DATASIZE (Sk) +
           TCP_SUB_SEQ (TcpGetMaxSndNxt (Tcb), Tcb->SndNxt);
 
-  Len   = NET_MIN (Win, Left);
+  Len   = MIN (Win, Left);
 
   if (Len > Tcb->SndMss) {
     Len = Tcb->SndMss;
@@ -379,7 +379,7 @@ TcpTransmitSegment (
       Seg->Urg = (UINT16) TCP_SUB_SEQ (Tcb->SndUp, Seg->Seq);
     } else {
 
-      Seg->Urg = (UINT16) NET_MIN (
+      Seg->Urg = (UINT16) MIN (
                             TCP_SUB_SEQ (Tcb->SndUp,
                             Seg->Seq),
                             0xffff
@@ -686,7 +686,7 @@ TcpRetransmit (
   }
 
   Len   = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
-  Len   = NET_MIN (Len, Tcb->SndMss);
+  Len   = MIN (Len, Tcb->SndMss);
 
   Nbuf  = TcpGetSegmentSndQue (Tcb, Seq, Len);
   if (Nbuf == NULL) {

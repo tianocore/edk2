@@ -32,11 +32,11 @@ Abstract:
 //
 #define SIZEOF_IP4_CONFIG_INFO(Ip4Config) \
   (sizeof (EFI_IP4_IPCONFIG_DATA) + \
-   sizeof (EFI_IP4_ROUTE_TABLE) * (NET_MAX (1, (Ip4Config)->RouteTableSize) - 1))
+   sizeof (EFI_IP4_ROUTE_TABLE) * (MAX (1, (Ip4Config)->RouteTableSize) - 1))
 
 #define SIZEOF_NIC_IP4_CONFIG_INFO(NicConfig) \
   (sizeof (NIC_IP4_CONFIG_INFO) + \
-   sizeof (EFI_IP4_ROUTE_TABLE) * (NET_MAX (1, (NicConfig)->Ip4Info.RouteTableSize) - 1))
+   sizeof (EFI_IP4_ROUTE_TABLE) * (MAX (1, (NicConfig)->Ip4Info.RouteTableSize) - 1))
 
 //
 // Compare whether two NIC address are equal includes their type and length.

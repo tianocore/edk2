@@ -51,6 +51,7 @@ ArpConfigure (
 {
   EFI_STATUS         Status;
   ARP_INSTANCE_DATA  *Instance;
+  EFI_TPL            OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -65,16 +66,14 @@ ArpConfigure (
 
   Instance = ARP_INSTANCE_DATA_FROM_THIS (This);
 
-  if (EFI_ERROR (NET_TRYLOCK (&Instance->ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Configure this instance, the ConfigData has already passed the basic checks.
   //
   Status = ArpConfigureInstance (Instance, ConfigData);
 
-  NET_UNLOCK (&Instance->ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   return Status;
 }
@@ -131,6 +130,7 @@ ArpAdd (
   ARP_CACHE_ENTRY          *CacheEntry;
   EFI_SIMPLE_NETWORK_MODE  *SnpMode;
   NET_ARP_ADDRESS          MatchAddress[2];
+  EFI_TPL                  OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -166,9 +166,7 @@ ArpAdd (
   MatchAddress[Protocol].Length     = Instance->ConfigData.SwAddressLength;
   MatchAddress[Protocol].AddressPtr = TargetSwAddress;
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // See whether the entry to add exists. Check the DeinedCacheTable first.
@@ -262,7 +260,7 @@ ArpAdd (
 
 UNLOCK_EXIT:
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   return Status;
 }
@@ -309,7 +307,7 @@ ArpFind (
 {
   EFI_STATUS         Status;
   ARP_INSTANCE_DATA  *Instance;
-  ARP_SERVICE_DATA   *ArpService;
+  EFI_TPL            OldTpl;
 
   if ((This == NULL) ||
     (!Refresh && (EntryCount == NULL) && (EntryLength == NULL)) ||
@@ -318,15 +316,12 @@ ArpFind (
   }
 
   Instance   = ARP_INSTANCE_DATA_FROM_THIS (This);
-  ArpService = Instance->ArpService;
 
   if (!Instance->Configured) {
     return EFI_NOT_STARTED;
   }
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // All the check passed, find the cache entries now.
@@ -341,7 +336,7 @@ ArpFind (
              Refresh
              );
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   return Status;
 }
@@ -373,8 +368,8 @@ ArpDelete (
   )
 {
   ARP_INSTANCE_DATA  *Instance;
-  ARP_SERVICE_DATA   *ArpService;
   UINTN              Count;
+  EFI_TPL            OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -386,18 +381,14 @@ ArpDelete (
     return EFI_NOT_STARTED;
   }
 
-  ArpService = Instance->ArpService;
-
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Delete the specified cache entries.
   //
   Count = ArpDeleteCacheEntry (Instance, BySwAddress, AddressBuffer, TRUE);
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
@@ -422,8 +413,8 @@ ArpFlush (
   )
 {
   ARP_INSTANCE_DATA  *Instance;
-  ARP_SERVICE_DATA   *ArpService;
   UINTN              Count;
+  EFI_TPL            OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -435,18 +426,14 @@ ArpFlush (
     return EFI_NOT_STARTED;
   }
 
-  ArpService = Instance->ArpService;
-
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Delete the dynamic entries from the cache table.
   //
   Count = ArpDeleteCacheEntry (Instance, FALSE, NULL, FALSE);
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
@@ -491,6 +478,7 @@ ArpRequest (
   NET_ARP_ADDRESS          HardwareAddress;
   NET_ARP_ADDRESS          ProtocolAddress;
   USER_REQUEST_CONTEXT     *RequestContext;
+  EFI_TPL                  OldTpl;
 
   if ((This == NULL) || (TargetHwAddress == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -545,9 +533,7 @@ ArpRequest (
   //
   NetZeroMem (TargetHwAddress, SnpMode->HwAddressSize);
 
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Check whether the software address is in the denied table.
@@ -653,12 +639,17 @@ ArpRequest (
 
 UNLOCK_EXIT:
 
-  NET_UNLOCK (&ArpService->Lock);
+  NET_RESTORE_TPL (OldTpl);
 
 SIGNAL_USER:
 
   if ((ResolvedEvent != NULL) && (Status == EFI_SUCCESS)) {
     gBS->SignalEvent (ResolvedEvent);
+
+    //
+    // Dispatch the DPC queued by the NotifyFunction of ResolvedEvent.
+    //
+    NetLibDispatchDpc ();
   }
 
   return Status;
@@ -695,8 +686,8 @@ ArpCancel (
   )
 {
   ARP_INSTANCE_DATA  *Instance;
-  ARP_SERVICE_DATA   *ArpService;
   UINTN              Count;
+  EFI_TPL            OldTpl;
 
   if ((This == NULL) ||
     ((TargetSwAddress != NULL) && (ResolvedEvent == NULL)) ||
@@ -710,18 +701,20 @@ ArpCancel (
     return EFI_NOT_STARTED;
   }
 
-  ArpService = Instance->ArpService;
-
-  if (EFI_ERROR (NET_TRYLOCK (&ArpService->Lock))) {
-    return EFI_ACCESS_DENIED;
-  }
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
   //
   // Cancel the specified request.
   //
   Count = ArpCancelRequest (Instance, TargetSwAddress, ResolvedEvent);
 
-  NET_UNLOCK (&ArpService->Lock);
+  //
+  // Dispatch the DPCs queued by the NotifyFunction of the events signaled
+  // by ArpCancleRequest.
+  //
+  NetLibDispatchDpc ();
+
+  NET_RESTORE_TPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }

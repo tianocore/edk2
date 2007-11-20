@@ -192,7 +192,7 @@ Udp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  NET_TPL_FAST_TIMER,
+                  NET_TPL_TIMER,
                   Udp4CheckTimeout,
                   Udp4Service,
                   &Udp4Service->TimeoutEvent
@@ -618,8 +618,8 @@ Udp4BuildIp4ConfigData (
   Ip4ConfigData->AcceptBroadcast   = Udp4ConfigData->AcceptBroadcast;
   Ip4ConfigData->AcceptPromiscuous = Udp4ConfigData->AcceptPromiscuous;
   Ip4ConfigData->UseDefaultAddress = Udp4ConfigData->UseDefaultAddress;
-  Ip4ConfigData->StationAddress    = Udp4ConfigData->StationAddress;
-  Ip4ConfigData->SubnetMask        = Udp4ConfigData->SubnetMask;
+  CopyMem (&Ip4ConfigData->StationAddress, &Udp4ConfigData->StationAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Ip4ConfigData->SubnetMask, &Udp4ConfigData->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
 
   //
   // use the -1 magic number to disable the receiving process of the ip instance.
@@ -891,6 +891,7 @@ Udp4DgramSent (
     //
     Token->Status = Status;
     gBS->SignalEvent (Token->Event);
+    NetLibDispatchDpc ();
   }
 }
 
@@ -935,6 +936,12 @@ Udp4DgramRcvd (
     //
     Udp4IcmpHandler ((UDP4_SERVICE_DATA *) Context, IcmpError, NetSession, Packet);
   }
+
+  //
+  // Dispatch the DPC queued by the NotifyFunction of the rx token's events
+  // which are signaled with received data.
+  //
+  NetLibDispatchDpc ();
 }
 
 
@@ -1033,11 +1040,10 @@ Udp4CancelTokens (
     // The token is a receive token. Abort it and remove it from the Map.
     //
     TokenToCancel = (EFI_UDP4_COMPLETION_TOKEN *) Item->Key;
+    NetMapRemoveItem (Map, Item, NULL);
 
     TokenToCancel->Status = EFI_ABORTED;
     gBS->SignalEvent (TokenToCancel->Event);
-
-    NetMapRemoveItem (Map, Item, NULL);
   }
 
   if (Arg != NULL) {
@@ -1057,28 +1063,23 @@ Udp4CancelTokens (
 
 **/
 VOID
-Udp4FlushRxData (
-  IN NET_LIST_ENTRY  *RcvdDgramQue
+Udp4FlushRcvdDgram (
+  IN UDP4_INSTANCE_DATA  *Instance
   )
 {
   UDP4_RXDATA_WRAP  *Wrap;
-  EFI_TPL           OldTpl;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
-
-  while (!NetListIsEmpty (RcvdDgramQue)) {
+  while (!NetListIsEmpty (&Instance->RcvdDgramQue)) {
     //
     // Iterate all the Wraps in the RcvdDgramQue.
     //
-    Wrap = NET_LIST_HEAD (RcvdDgramQue, UDP4_RXDATA_WRAP, Link);
+    Wrap = NET_LIST_HEAD (&Instance->RcvdDgramQue, UDP4_RXDATA_WRAP, Link);
 
     //
     // The Wrap will be removed from the RcvdDgramQue by this function call.
     //
     Udp4RecycleRxDataWrap (NULL, (VOID *) Wrap);
   }
-
-  NET_RESTORE_TPL (OldTpl);
 }
 
 
@@ -1383,6 +1384,7 @@ Udp4InstanceDeliverDgram (
   EFI_UDP4_COMPLETION_TOKEN  *Token;
   NET_BUF                    *Dup;
   EFI_UDP4_RECEIVE_DATA      *RxData;
+  EFI_TPL                    OldTpl;
 
   if (!NetListIsEmpty (&Instance->RcvdDgramQue) &&
     !NetMapIsEmpty (&Instance->RxTokens)) {
@@ -1401,7 +1403,7 @@ Udp4InstanceDeliverDgram (
       NetbufFree (Wrap->Packet);
 
       Wrap->Packet = Dup;
-    }
+    } 
 
     NetListRemoveHead (&Instance->RcvdDgramQue);
 
@@ -1422,9 +1424,11 @@ Udp4InstanceDeliverDgram (
     Token->Status        = EFI_SUCCESS;
     Token->Packet.RxData = &Wrap->RxData;
 
-    gBS->SignalEvent (Token->Event);
-
+    OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
     NetListInsertTail (&Instance->DeliveredDgramQue, &Wrap->Link);
+    NET_RESTORE_TPL (OldTpl);
+
+    gBS->SignalEvent (Token->Event);
   }
 }
 

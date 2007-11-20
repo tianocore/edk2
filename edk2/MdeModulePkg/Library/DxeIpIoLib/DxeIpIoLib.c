@@ -74,6 +74,13 @@ STATIC ICMP_ERROR_INFO  mIcmpErrMap[10] = {
 STATIC
 VOID
 EFIAPI
+IpIoTransmitHandlerDpc (
+  IN VOID      *Context
+  );
+
+STATIC
+VOID
+EFIAPI
 IpIoTransmitHandler (
   IN EFI_EVENT Event,
   IN VOID      *Context
@@ -430,7 +437,7 @@ IpIoCreateSndEntry (
     //
     // Set the fields of OverrideData
     //
-    NetCopyMem (OverrideData, Override, sizeof (*OverrideData));
+    CopyMem (OverrideData, Override, sizeof (*OverrideData));
   }
 
   //
@@ -523,7 +530,6 @@ IpIoDestroySndEntry (
 /**
   Notify function for IP transmit token.
 
-  @param  Event                 The event signaled.
   @param  Context               The context passed in by the event notifier.
 
   @return None.
@@ -532,8 +538,7 @@ IpIoDestroySndEntry (
 STATIC
 VOID
 EFIAPI
-IpIoTransmitHandler (
-  IN EFI_EVENT Event,
+IpIoTransmitHandlerDpc (
   IN VOID      *Context
   )
 {
@@ -556,11 +561,71 @@ IpIoTransmitHandler (
   IpIoDestroySndEntry (SndEntry);
 }
 
+/**
+  Notify function for IP transmit token.
+
+  @param  Event                 The event signaled.
+  @param  Context               The context passed in by the event notifier.
+
+  @return None.
+
+**/
+
+STATIC
+VOID
+EFIAPI
+IpIoTransmitHandler (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  //
+  // Request IpIoTransmitHandlerDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, IpIoTransmitHandlerDpc, Context);
+}
+
 
 /**
   The dummy handler for the dummy IP receive token.
 
-  @param  Evt                   The event signaled.
+  @param  Context               The context passed in by the event notifier.
+
+  @return None.
+
+**/
+STATIC
+VOID
+EFIAPI
+IpIoDummyHandlerDpc (
+  IN VOID      *Context
+  )
+{
+  IP_IO_IP_INFO             *IpInfo;
+  EFI_IP4_COMPLETION_TOKEN  *DummyToken;
+
+  IpInfo      = (IP_IO_IP_INFO *) Context;
+  DummyToken  = &(IpInfo->DummyRcvToken);
+
+  if (EFI_ABORTED == DummyToken->Status) {
+    //
+    // The reception is actively aborted by the consumer, directly return.
+    //
+    return;
+  } else if (EFI_SUCCESS == DummyToken->Status) {
+    ASSERT (DummyToken->Packet.RxData);
+
+    gBS->SignalEvent (DummyToken->Packet.RxData->RecycleSignal);
+  }
+
+  IpInfo->Ip->Receive (IpInfo->Ip, DummyToken);
+}
+
+
+/**
+  Request IpIoDummyHandlerDpc as a DPC at TPL_CALLBACK.
+
+  @param  Event                 The event signaled.
   @param  Context               The context passed in by the event notifier.
 
   @return None.
@@ -574,21 +639,10 @@ IpIoDummyHandler (
   IN VOID      *Context
   )
 {
-  IP_IO_IP_INFO             *IpInfo;
-  EFI_IP4_COMPLETION_TOKEN  *DummyToken;
-
-  ASSERT (Event && Context);
-
-  IpInfo      = (IP_IO_IP_INFO *) Context;
-  DummyToken  = &(IpInfo->DummyRcvToken);
-
-  if (EFI_SUCCESS == DummyToken->Status) {
-    ASSERT (DummyToken->Packet.RxData);
-
-    gBS->SignalEvent (DummyToken->Packet.RxData->RecycleSignal);
-  }
-
-  IpInfo->Ip->Receive (IpInfo->Ip, DummyToken);
+  //
+  // Request IpIoDummyHandlerDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, IpIoDummyHandlerDpc, Context);
 }
 
 
@@ -596,7 +650,6 @@ IpIoDummyHandler (
   Notify function for the IP receive token, used to process
   the received IP packets.
 
-  @param  Event                 The event signaled.
   @param  Context               The context passed in by the event notifier.
 
   @return None.
@@ -605,8 +658,7 @@ IpIoDummyHandler (
 STATIC
 VOID
 EFIAPI
-IpIoListenHandler (
-  IN EFI_EVENT Event,
+IpIoListenHandlerDpc (
   IN VOID      *Context
   )
 {
@@ -622,6 +674,13 @@ IpIoListenHandler (
   Ip      = IpIo->Ip;
   Status  = IpIo->RcvToken.Status;
   RxData  = IpIo->RcvToken.Packet.RxData;
+
+  if (EFI_ABORTED == Status) {
+    //
+    // The reception is actively aborted by the consumer, directly return.
+    //
+    return;
+  }
 
   if (((EFI_SUCCESS != Status) && (EFI_ICMP_ERROR != Status)) || (NULL == RxData)) {
     //
@@ -686,6 +745,30 @@ CleanUp:
 
 Resume:
   Ip->Receive (Ip, &(IpIo->RcvToken));
+}
+
+
+/**
+  Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
+
+  @param  Event                 The event signaled.
+  @param  Context               The context passed in by the event notifier.
+
+  @return None.
+
+**/
+STATIC
+VOID
+EFIAPI
+IpIoListenHandler (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  //
+  // Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, IpIoListenHandlerDpc, Context);
 }
 
 

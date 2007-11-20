@@ -72,7 +72,7 @@ TcpFastRecover (
     //
     FlightSize = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
 
-    Tcb->Ssthresh     = NET_MAX (FlightSize >> 1, (UINT32) (2 * Tcb->SndMss));
+    Tcb->Ssthresh     = MAX (FlightSize >> 1, (UINT32) (2 * Tcb->SndMss));
     Tcb->Recover      = Tcb->SndNxt;
 
     Tcb->CongestState = TCP_CONGEST_RECOVER;
@@ -120,7 +120,7 @@ TcpFastRecover (
       //
       FlightSize = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
 
-      Tcb->CWnd         = NET_MIN (Tcb->Ssthresh, FlightSize + Tcb->SndMss);
+      Tcb->CWnd         = MIN (Tcb->Ssthresh, FlightSize + Tcb->SndMss);
 
       Tcb->CongestState = TCP_CONGEST_OPEN;
       TCP4_DEBUG_TRACE (("TcpFastRecover: received a full ACK(%d)"
@@ -241,7 +241,7 @@ TcpComputeRtt (
     Tcb->RttVar = Measure << (TCP_RTT_SHIFT - 1);
   }
 
-  Tcb->Rto = (Tcb->SRtt + NET_MAX (8, 4 * Tcb->RttVar)) >> TCP_RTT_SHIFT;
+  Tcb->Rto = (Tcb->SRtt + MAX (8, 4 * Tcb->RttVar)) >> TCP_RTT_SHIFT;
 
   //
   // Step 2.4: Limit the RTO to at least 1 second
@@ -1044,7 +1044,7 @@ TcpInput (
         TCP_SEQ_LEQ (Seg->Ack, Tcb->SndNxt)) {
 
       Tcb->SndWnd     = Seg->Wnd;
-      Tcb->SndWndMax  = NET_MAX (Tcb->SndWnd, Tcb->SndWndMax);
+      Tcb->SndWndMax  = MAX (Tcb->SndWnd, Tcb->SndWndMax);
       Tcb->SndWl1     = Seg->Seq;
       Tcb->SndWl2     = Seg->Ack;
       TcpSetState (Tcb, TCP_ESTABLISHED);
@@ -1143,10 +1143,10 @@ TcpInput (
         Tcb->CWnd += Tcb->SndMss;
       } else {
 
-        Tcb->CWnd += NET_MAX (Tcb->SndMss * Tcb->SndMss / Tcb->CWnd, 1);
+        Tcb->CWnd += MAX (Tcb->SndMss * Tcb->SndMss / Tcb->CWnd, 1);
       }
 
-      Tcb->CWnd = NET_MIN (Tcb->CWnd, TCP_MAX_WIN << Tcb->SndWndScale);
+      Tcb->CWnd = MIN (Tcb->CWnd, TCP_MAX_WIN << Tcb->SndWndScale);
     }
 
     if (Tcb->CongestState == TCP_CONGEST_LOSS) {
@@ -1214,7 +1214,7 @@ TcpInput (
     }
 
     Tcb->SndWnd     = Seg->Wnd;
-    Tcb->SndWndMax  = NET_MAX (Tcb->SndWnd, Tcb->SndWndMax);
+    Tcb->SndWndMax  = MAX (Tcb->SndWnd, Tcb->SndWndMax);
     Tcb->SndWl1     = Seg->Seq;
     Tcb->SndWl2     = Seg->Ack;
   }

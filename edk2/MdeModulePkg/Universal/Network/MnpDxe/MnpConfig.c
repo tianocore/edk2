@@ -395,7 +395,7 @@ MnpInitializeServiceData (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_EVENT,
+                  NET_TPL_TIMER,
                   MnpCheckPacketTimeout,
                   MnpServiceData,
                   &MnpServiceData->TimeoutCheckTimer
@@ -411,7 +411,7 @@ MnpInitializeServiceData (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER,
-                  NET_TPL_SLOW_TIMER,
+                  NET_TPL_TIMER,
                   NULL,
                   NULL,
                   &MnpServiceData->TxTimeoutEvent
@@ -636,15 +636,15 @@ MnpCancelTokens (
   TokenToCancel         = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *) Item->Key;
 
   //
+  // Remove the item from the map.
+  //
+  NetMapRemoveItem (Map, Item, NULL);
+
+  //
   // Cancel this token with status set to EFI_ABORTED.
   //
   TokenToCancel->Status = EFI_ABORTED;
   gBS->SignalEvent (TokenToCancel->Event);
-
-  //
-  // Remove the item from the map.
-  //
-  NetMapRemoveItem (Map, Item, NULL);
 
   if (Arg != NULL) {
     //
@@ -1027,7 +1027,7 @@ MnpConfigureInstance (
 
   if (ConfigData == NULL) {
 
-    NetMapIterate (&Instance->RxTokenMap, MnpCancelTokens, NULL);
+    Instance->ManagedNetwork.Cancel (&Instance->ManagedNetwork, NULL);
   }
 
   if (!NewConfigData->EnableMulticastReceive) {

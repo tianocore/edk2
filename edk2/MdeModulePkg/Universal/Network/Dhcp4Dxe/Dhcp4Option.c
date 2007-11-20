@@ -763,7 +763,7 @@ DhcpAppendOption (
   ASSERT (DataLen != 0);
 
   for (Index = 0; Index < (DataLen + 254) / 255; Index++) {
-    Len      = NET_MIN (255, DataLen - Index * 255);
+    Len      = MIN (255, DataLen - Index * 255);
 
     *(Buf++) = Tag;
     *(Buf++) = (UINT8) Len;

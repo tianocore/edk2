@@ -32,6 +32,13 @@ STATIC EFI_MAC_ADDRESS  mZeroMacAddress;
 STATIC
 VOID
 EFIAPI
+Ip4OnFrameSentDpc (
+  IN VOID                   *Context
+  );
+
+STATIC
+VOID
+EFIAPI
 Ip4OnFrameSent (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
@@ -40,8 +47,22 @@ Ip4OnFrameSent (
 STATIC
 VOID
 EFIAPI
+Ip4OnArpResolvedDpc (
+  IN VOID                   *Context
+  );
+
+STATIC
+VOID
+EFIAPI
 Ip4OnArpResolved (
   IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  );
+
+STATIC
+VOID
+EFIAPI
+Ip4OnFrameReceivedDpc (
   IN VOID                   *Context
   );
 
@@ -116,7 +137,7 @@ Ip4WrapLinkTxToken (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  NET_TPL_EVENT,
                   Ip4OnFrameSent,
                   Token,
                   &MnpToken->Event
@@ -201,7 +222,7 @@ Ip4CreateArpQue (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  NET_TPL_EVENT,
                   Ip4OnArpResolved,
                   ArpQue,
                   &ArpQue->OnResolved
@@ -289,7 +310,7 @@ Ip4CreateLinkRxToken (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  NET_TPL_EVENT,
                   Ip4OnFrameReceived,
                   Token,
                   &MnpToken->Event
@@ -404,10 +425,7 @@ Ip4CancelFrames (
     Ip4CancelFrameArp (ArpQue, IoStatus, FrameToCancel, Context);
 
     if (NetListIsEmpty (&ArpQue->Frames)) {
-      NetListRemoveEntry (Entry);
-
       Interface->Arp->Cancel (Interface->Arp, &ArpQue->Ip, ArpQue->OnResolved);
-      Ip4FreeArpQue (ArpQue, EFI_ABORTED);
     }
   }
 
@@ -419,11 +437,7 @@ Ip4CancelFrames (
     Token = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
 
     if ((FrameToCancel == NULL) || FrameToCancel (Token, Context)) {
-      NetListRemoveEntry (Entry);
-
       Interface->Mnp->Cancel (Interface->Mnp, &Token->MnpToken);
-      Token->CallBack (Token->IpInstance, Token->Packet, IoStatus, 0, Token->Context);
-      Ip4FreeLinkTxToken (Token);
     }
   }
 }
@@ -540,7 +554,7 @@ Ip4SetAddress (
 
   Type                      = NetGetIpClass (IpAddr);
   Len                       = NetGetMaskLength (SubnetMask);
-  Netmask                   = mIp4AllMasks[NET_MIN (Len, Type << 3)];
+  Netmask                   = mIp4AllMasks[MIN (Len, Type << 3)];
   Interface->NetBrdcast     = (IpAddr | ~Netmask);
 
   //
@@ -747,7 +761,6 @@ Ip4FreeInterface (
   all the queued frame if the ARP requests failed. Or transmit them
   if the request succeed.
 
-  @param  Event                 The Arp request event
   @param  Context               The context of the callback, a point to the ARP
                                 queue
 
@@ -757,8 +770,7 @@ Ip4FreeInterface (
 STATIC
 VOID
 EFIAPI
-Ip4OnArpResolved (
-  IN EFI_EVENT              Event,
+Ip4OnArpResolvedDpc (
   IN VOID                   *Context
   )
 {
@@ -798,27 +810,64 @@ Ip4OnArpResolved (
     Token         = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
     CopyMem (&Token->DstMac, &ArpQue->Mac, sizeof (Token->DstMac));
 
-    Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
+    //
+    // Insert the tx token before transmitting it via MNP as the FrameSentDpc
+    // may be called before Mnp->Transmit returns which will remove this tx
+    // token from the SentFrames list. Remove it from the list if the returned
+    // Status of Mnp->Transmit is not EFI_SUCCESS as in this case the
+    // FrameSentDpc won't be queued.
+    //
+    NetListInsertTail (&Interface->SentFrames, &Token->Link);
 
+    Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
     if (EFI_ERROR (Status)) {
+      NetListRemoveEntry (Entry);
       Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
 
       Ip4FreeLinkTxToken (Token);
       continue;
     }
-
-    NetListInsertTail (&Interface->SentFrames, &Token->Link);
   }
 
   Ip4FreeArpQue (ArpQue, EFI_SUCCESS);
 }
+
+STATIC
+VOID
+EFIAPI
+Ip4OnArpResolved (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+/*++
+
+Routine Description:
+
+  Request Ip4OnArpResolvedDpc as a DPC at TPL_CALLBACK
+
+Arguments:
+
+  Event   - The Arp request event
+  Context - The context of the callback, a point to the ARP queue
+
+Returns:
+
+  None
+
+--*/
+{
+  //
+  // Request Ip4OnArpResolvedDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, Ip4OnArpResolvedDpc, Context);
+}
+
 
 
 /**
   Callback funtion when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
-  @param  Event                 The transmit token's event
   @param  Context               Context which is point to the token.
 
   @return None.
@@ -827,8 +876,7 @@ Ip4OnArpResolved (
 STATIC
 VOID
 EFIAPI
-Ip4OnFrameSent (
-  IN EFI_EVENT               Event,
+Ip4OnFrameSentDpc (
   IN VOID                    *Context
   )
 {
@@ -848,6 +896,36 @@ Ip4OnFrameSent (
           );
 
   Ip4FreeLinkTxToken (Token);
+}
+
+STATIC
+VOID
+EFIAPI
+Ip4OnFrameSent (
+  IN EFI_EVENT               Event,
+  IN VOID                    *Context
+  )
+/*++
+
+Routine Description:
+
+  Request Ip4OnFrameSentDpc as a DPC at TPL_CALLBACK
+
+Arguments:
+
+  Event   - The transmit token's event
+  Context - Context which is point to the token.
+
+Returns:
+
+  None.
+
+--*/
+{
+  //
+  // Request Ip4OnFrameSentDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, Ip4OnFrameSentDpc, Context);
 }
 
 
@@ -983,13 +1061,17 @@ Ip4SendFrame (
   return EFI_SUCCESS;
 
 SEND_NOW:
+  //
+  // Insert the tx token into the SentFrames list before calling Mnp->Transmit.
+  // Remove it if the returned status is not EFI_SUCCESS.
+  //
+  NetListInsertTail (&Interface->SentFrames, &Token->Link);
   Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
-
   if (EFI_ERROR (Status)) {
+    NetListRemoveEntry (&Interface->SentFrames);
     goto ON_ERROR;
   }
 
-  NetListInsertTail (&Interface->SentFrames, &Token->Link);
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -1031,7 +1113,6 @@ Ip4RecycleFrame (
   again call the Ip4RecycleFrame to signal MNP's event and free
   the token used.
 
-  @param  Event                 The receive event delivered to MNP for receive.
   @param  Context               Context for the callback.
 
   @return None.
@@ -1040,8 +1121,7 @@ Ip4RecycleFrame (
 STATIC
 VOID
 EFIAPI
-Ip4OnFrameReceived (
-  IN EFI_EVENT                Event,
+Ip4OnFrameReceivedDpc (
   IN VOID                     *Context
   )
 {
@@ -1096,6 +1176,36 @@ Ip4OnFrameReceived (
   Token->CallBack (Token->IpInstance, Packet, EFI_SUCCESS, Flag, Token->Context);
 }
 
+STATIC
+VOID
+EFIAPI
+Ip4OnFrameReceived (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+/*++
+
+Routine Description:
+
+  Request Ip4OnFrameReceivedDpc as a DPC at TPL_CALLBACK
+
+Arguments:
+
+  Event   - The receive event delivered to MNP for receive.
+  Context - Context for the callback.
+
+Returns:
+
+  None.
+
+--*/
+{
+  //
+  // Request Ip4OnFrameReceivedDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, Ip4OnFrameReceivedDpc, Context);
+}
+
 
 /**
   Request to receive the packet from the interface.
@@ -1134,13 +1244,12 @@ Ip4ReceiveFrame (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  Interface->RecvRequest = Token;
   Status = Interface->Mnp->Receive (Interface->Mnp, &Token->MnpToken);
-
   if (EFI_ERROR (Status)) {
+    Interface->RecvRequest = NULL;
     Ip4FreeFrameRxToken (Token);
     return Status;
   }
-
-  Interface->RecvRequest = Token;
   return EFI_SUCCESS;
 }
