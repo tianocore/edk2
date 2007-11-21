@@ -282,6 +282,7 @@ USBMouseSimulateTouchPadDriverBindingStart (
   UsbMouseSimulateTouchPadDevice->Signature           = USB_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE;
 
   UsbMouseSimulateTouchPadDevice->InterfaceDescriptor = AllocatePool (sizeof (EFI_USB_INTERFACE_DESCRIPTOR));
+
   if (UsbMouseSimulateTouchPadDevice->InterfaceDescriptor == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
@@ -352,32 +353,32 @@ USBMouseSimulateTouchPadDriverBindingStart (
     goto ErrorExit;
   }
 
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.GetState = GetMouseSimulateTouchPadState;
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.Reset	   = UsbMouseSimulateTouchPadReset;
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.Mode	   = &UsbMouseSimulateTouchPadDevice->AbsolutePointerMode;
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.GetState = GetMouseSimulateTouchPadState;
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.Reset	   = UsbMouseSimulateTouchPadReset;
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol.Mode	   = &UsbMouseSimulateTouchPadDevice->AbsolutePointerMode;
 
-	Status = gBS->CreateEvent (
-					EVT_NOTIFY_WAIT,
-					TPL_NOTIFY,
-					UsbMouseSimulateTouchPadWaitForInput,
-					UsbMouseSimulateTouchPadDevice,
-					&((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput)
-					);
-	if (EFI_ERROR (Status)) {
-		goto ErrorExit;
-	}
+  Status = gBS->CreateEvent (
+          EVT_NOTIFY_WAIT,
+          TPL_NOTIFY,
+          UsbMouseSimulateTouchPadWaitForInput,
+          UsbMouseSimulateTouchPadDevice,
+          &((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput)
+          );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
 
-	Status = gBS->InstallProtocolInterface (
-					&Controller,
-					&gEfiAbsolutePointerProtocolGuid,
-					EFI_NATIVE_INTERFACE,
-					&UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol
-					);
+  Status = gBS->InstallProtocolInterface (
+          &Controller,
+          &gEfiAbsolutePointerProtocolGuid,
+          EFI_NATIVE_INTERFACE,
+          &UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol
+          );
 
- 	if (EFI_ERROR (Status)) {
-   	Status = EFI_DEVICE_ERROR;
-   	goto ErrorExit;
- 	}
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto ErrorExit;
+  }
 
   //
   // After Enabling Async Interrupt Transfer on this mouse Device
@@ -435,13 +436,12 @@ USBMouseSimulateTouchPadDriverBindingStart (
   Status = EFI_DEVICE_ERROR;
 
   gBS->UninstallProtocolInterface (
-  		Controller,
-  		&gEfiAbsolutePointerProtocolGuid,
-  		&UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol
+        Controller,
+        &gEfiAbsolutePointerProtocolGuid,
+        &UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol
   );
 
 ErrorExit:
-	DEBUG ((EFI_D_ERROR, __FUNCTION__ " driver start fail\n"));
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
           Controller,
@@ -459,9 +459,9 @@ ErrorExit:
         gBS->FreePool (UsbMouseSimulateTouchPadDevice->IntEndpointDescriptor);
       }
   
-  	  if ((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput != NULL) {
-  	  	gBS->CloseEvent ((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput);
-  	  }
+      if ((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput != NULL) {
+        gBS->CloseEvent ((UsbMouseSimulateTouchPadDevice->AbsolutePointerProtocol).WaitForInput);
+      }
 
       gBS->FreePool (UsbMouseSimulateTouchPadDevice);
       UsbMouseSimulateTouchPadDevice = NULL;
@@ -503,18 +503,18 @@ USBMouseSimulateTouchPadDriverBindingStop (
   //
   // Get our context back.
   //
-	Status = gBS->OpenProtocol (
-			Controller,
-			&gEfiAbsolutePointerProtocolGuid,
-			(VOID **) &AbsolutePointerProtocol,
-			This->DriverBindingHandle,
-			Controller,
-			EFI_OPEN_PROTOCOL_GET_PROTOCOL
-	);
+  Status = gBS->OpenProtocol (
+      Controller,
+      &gEfiAbsolutePointerProtocolGuid,
+      (VOID **) &AbsolutePointerProtocol,
+      This->DriverBindingHandle,
+      Controller,
+      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+  );
 
-	if (EFI_ERROR (Status)) {
-  		return EFI_UNSUPPORTED;
-	}
+  if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+  }
   UsbMouseSimulateTouchPadDevice = USB_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_MOUSE_PROTOCOL (AbsolutePointerProtocol);
 
   gBS->CloseProtocol (
@@ -703,13 +703,13 @@ InitializeUsbMouseSimulateTouchPadDevice (
     return Status;
   }
 
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxX = 1024;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxY = 1024;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxZ = 0;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinX = 0;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinY = 0;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinZ = 0;
-	UsbMouseSimulateTouchPadDev->AbsolutePointerMode.Attributes   = 0x3;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxX = 1024;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxY = 1024;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMaxZ = 0;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinX = 0;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinY = 0;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.AbsoluteMinZ = 0;
+  UsbMouseSimulateTouchPadDev->AbsolutePointerMode.Attributes   = 0x3;
   
   //
   // Here we just assume interface 0 is the mouse interface
@@ -835,16 +835,16 @@ OnMouseSimulateTouchPadInterruptComplete (
     return EFI_SUCCESS;
   }
 
-	//
-	//Check mouse Data
-	//
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerStateChanged = TRUE;
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentX += *((INT8 *) Data + 1);
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentY += *((INT8 *) Data + 2);
-	if (DataLength > 3) {
-		UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentZ += *((INT8 *) Data + 3);
-	}
-	UsbMouseSimulateTouchPadDevice->AbsolutePointerState.ActiveButtons = *(UINT8 *)Data & 0x3;
+  //
+  //Check mouse Data
+  //
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerStateChanged = TRUE;
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentX += *((INT8 *) Data + 1);
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentY += *((INT8 *) Data + 2);
+  if (DataLength > 3) {
+    UsbMouseSimulateTouchPadDevice->AbsolutePointerState.CurrentZ += *((INT8 *) Data + 3);
+  }
+  UsbMouseSimulateTouchPadDevice->AbsolutePointerState.ActiveButtons = *(UINT8 *)Data & 0x3;
 
   return EFI_SUCCESS;
 }
