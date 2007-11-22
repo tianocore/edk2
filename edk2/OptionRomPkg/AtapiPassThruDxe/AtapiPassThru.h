@@ -22,6 +22,7 @@
 #include <Protocol/ScsiPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/DriverSupportedEfiVersion.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -139,9 +140,10 @@ typedef struct {
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gAtapiScsiPassThruDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gAtapiScsiPassThruComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gAtapiScsiPassThruComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL                gAtapiScsiPassThruDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL                gAtapiScsiPassThruComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL               gAtapiScsiPassThruComponentName2;
+extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gAtapiScsiPassThruDriverSupportedEfiVersion;
 
 //
 // ATAPI Command op code

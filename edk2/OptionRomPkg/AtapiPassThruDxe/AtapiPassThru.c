@@ -3390,5 +3390,18 @@ InitializeAtapiPassThru(
              );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Install EFI Driver Supported EFI Version Protocol required for 
+  // EFI drivers that are on PCI and other plug in cards.
+  //
+  gAtapiScsiPassThruDriverSupportedEfiVersion.FirmwareVersion = PcdGet32 (PcdDriverSupportedEfiVersion);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &ImageHandle,
+                  &gEfiDriverSupportedEfiVersionProtocolGuid,
+                  &gAtapiScsiPassThruDriverSupportedEfiVersion,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
