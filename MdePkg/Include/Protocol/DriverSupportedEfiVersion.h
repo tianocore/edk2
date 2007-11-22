@@ -27,17 +27,17 @@
   The EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL provides a
   mechanism for an EFI driver to publish the version of the EFI   
   specification it conforms to. This protocol must be placed on   
-  the drivers image handle when the driver????s entry point is   
+  the drivers image handle when the driver's entry point is   
   called.
   
   @param Length The size, in bytes, of the entire structure.
                 Future versions of this specification may grow
                 the size of the structure.
   
-  @param irmwareVersion The version of the EFI specification
-                        that this driver conforms to.
-                        EFI_2_10_SYSTEM_TABLE_REVISION for this
-                        version of this specification.
+  @param firmwareVersion The version of the EFI specification
+                         that this driver conforms to.
+                         EFI_2_10_SYSTEM_TABLE_REVISION for this
+                         version of this specification.
 
 **/ 
 typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
