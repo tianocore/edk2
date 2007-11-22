@@ -49,6 +49,7 @@
 ################################################################################
 
 [LibraryClasses.common]
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   SerialPortLib|MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
@@ -300,9 +301,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00c000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
 
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled|TRUE
@@ -341,7 +344,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
 
 
 ################################################################################

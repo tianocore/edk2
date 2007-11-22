@@ -39,6 +39,7 @@
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   HobLib
