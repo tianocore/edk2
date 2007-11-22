@@ -595,7 +595,7 @@ CoreExitBootServices (
 
 Routine Description:
 
-  EFI 1.0 API to terminate Boot Services
+  UEFI 2.0 API to terminate Boot Services
 
 Arguments:
 

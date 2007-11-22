@@ -330,7 +330,7 @@ Returns:
   Function = NotifyFunction;
 
   //
-  // Convert EFI 1.10 Events to thier UEFI 2.0 CreateEventEx mapping
+  // Convert EFI 1.10 Events to their UEFI 2.0 CreateEventEx mapping
   //
   if (Type == EVT_SIGNAL_EXIT_BOOT_SERVICES) {
     GuidPtr = &gEfiEventExitBootServicesGuid;

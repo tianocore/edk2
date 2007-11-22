@@ -1,5 +1,5 @@
 /** @file
-  Decode a hard disk partitioned with the GPT scheme in the EFI 1.0
+  Decode a hard disk partitioned with the GPT scheme in the UEFI 2.0
   specification.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                              

@@ -13,13 +13,13 @@ Module Name:
   LoadPe32Image.h
 
 Abstract:
-  Load File protocol as defined in the EFI 1.0 specification.
+  Load File protocol.
 
   Load file protocol exists to supports the addition of new boot devices,
   and to support booting from devices that do not map well to file system.
   Network boot is done via a LoadFile protocol.
 
-  EFI 1.0 can boot from any device that produces a LoadFile protocol.
+  UEFI 2.0 can boot from any device that produces a LoadFile protocol.
 
 --*/
 

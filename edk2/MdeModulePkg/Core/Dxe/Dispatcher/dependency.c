@@ -280,7 +280,7 @@ Returns:
 
   if (DriverEntry->Depex == NULL) {
     //
-    // A NULL Depex means treat the driver like an EFI 1.0 thing.
+    // A NULL Depex means treat the driver like an UEFI 2.0 thing.
     //
     Status = CoreAllEfiServicesAvailable ();
     if (EFI_ERROR (Status)) {

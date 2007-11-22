@@ -1,11 +1,11 @@
 /** @file
-  SimpleFileSystem protocol as defined in the EFI 1.0 specification.
+  SimpleFileSystem protocol as defined in the UEFI 2.0 specification.
 
   The SimpleFileSystem protocol is the programatic access to the FAT (12,16,32) 
-  file system specified in EFI 1.0. It can also be used to abstract a file  
+  file system specified in UEFI 2.0. It can also be used to abstract a file  
   system other than FAT.
 
-  EFI 1.0 can boot from any valid EFI image contained in a SimpleFileSystem
+  UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

@@ -1,5 +1,5 @@
 /** @file
-  Simple Text Out protocol from the EFI 1.0 specification.
+  Simple Text Out protocol from the UEFI 2.0 specification.
 
   Abstraction of a very simple text based output device like VGA text mode or
   a serial terminal. The Simple Text Out protocol instance can represent

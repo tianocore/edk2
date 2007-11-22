@@ -1,5 +1,5 @@
 /** @file
-  Bus Specific Driver Override protocol as defined in the EFI 1.1 specification.
+  Bus Specific Driver Override protocol as defined in the UEFI 2.0 specification.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

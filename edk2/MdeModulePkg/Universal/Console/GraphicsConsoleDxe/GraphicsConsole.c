@@ -1,7 +1,7 @@
 /**@file
   This is the main routine for initializing the Graphics Console support routines.
 Remaining Tasks
-  Add all standard Glyphs from EFI 1.02 Specification
+  Add all standard Glyphs from UEFI 2.0 Specification
   Implement optimal automatic Mode creation algorithm
   Solve palette issues for mixed graphics and text
   When does this protocol reset the palette?

@@ -342,7 +342,7 @@ Returns:
 
   do {
     //
-    // Connect All EFI 1.10 drivers following EFI 1.10 algorithm
+    // Connect All UEFI 2.0 drivers following UEFI 2.0 algorithm
     //
     BdsLibConnectAllEfi ();
 

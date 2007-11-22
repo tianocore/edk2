@@ -1,5 +1,5 @@
 /** @file
-  Unicode Collation protocol that follows the EFI 1.0 specification.
+  Unicode Collation protocol that follows the UEFI 2.0 specification.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

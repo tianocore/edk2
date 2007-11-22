@@ -317,7 +317,7 @@ Returns:
   PlatformBdsInit (PrivateData);
 
   //
-  // Set up the device list based on EFI 1.1 variables
+  // Set up the device list based on UEFI 2.0 variables
   // process Driver#### and Load the driver's in the
   // driver option list
   //

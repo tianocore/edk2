@@ -63,7 +63,7 @@ typedef struct {
 
   ///
   /// The length of the field 'Position Set Code Length Array Size' in Block Header.
-  /// For EFI 1.1 de/compression algorithm, mPBit = 4
+  /// For UEFI 2.0 de/compression algorithm, mPBit = 4
   /// For Tiano de/compression algorithm, mPBit = 5
   ///
   UINT8   mPBit;

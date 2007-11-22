@@ -500,7 +500,7 @@ Routine Description:
   EFI_UNSUPPORTED
 
 Arguments:
-  Per EFI 1.10 driver model
+  Per UEFI 2.0 driver model
   
 Returns:
   EFI_UNSUPPORTED

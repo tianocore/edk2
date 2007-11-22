@@ -222,7 +222,7 @@ WinNtGopDestructor (
 ;
 
 //
-// EFI 1.1 driver model prototypes for Win NT GOP
+// UEFI 2.0 driver model prototypes for Win NT GOP
 //
 
 

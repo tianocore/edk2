@@ -1,5 +1,5 @@
 /** @file
-  GUIDs used for MPS entries in the EFI 1.0 system table
+  GUIDs used for MPS entries in the UEFI 2.0 system table
   ACPI is the primary means of exporting MP information to the OS. MPS obly was
   included to support Itanium-based platform power on. So don't use it if you don't have too.
 

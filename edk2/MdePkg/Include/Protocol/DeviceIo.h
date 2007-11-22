@@ -1,5 +1,5 @@
 /** @file
-  Device IO protocol as defined in the EFI 1.0 specification.
+  Device IO protocol as defined in the EFI 1.10 specification.
 
   Device IO is used to abstract hardware access to devices. It includes
   memory mapped IO, IO, PCI Config space, and DMA.

@@ -3,7 +3,7 @@
 
   Used to provide ResetSystem runtime services
 
-  The ResetSystem () EFI 1.0 service is added to the EFI system table and the 
+  The ResetSystem () UEFI 2.0 service is added to the EFI system table and the 
   EFI_RESET_ARCH_PROTOCOL_GUID protocol is registered with a NULL pointer.
 
   No CRC of the EFI system table is required, as it is done in the DXE core.

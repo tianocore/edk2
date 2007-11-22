@@ -1,5 +1,5 @@
 /** @file
-  Disk IO protocol as defined in the EFI 1.0 specification.
+  Disk IO protocol as defined in the UEFI 2.0 specification.
 
   The Disk IO protocol is used to convert block oriented devices into byte
   oriented devices. The Disk IO protocol is intended to layer on top of the

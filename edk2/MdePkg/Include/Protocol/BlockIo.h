@@ -1,5 +1,5 @@
 /** @file
-  Block IO protocol as defined in the EFI 1.0 specification.
+  Block IO protocol as defined in the UEFI 2.0 specification.
 
   The Block IO protocol is used to abstract block devices like hard drives,
   DVD-ROMs and floppy drives.

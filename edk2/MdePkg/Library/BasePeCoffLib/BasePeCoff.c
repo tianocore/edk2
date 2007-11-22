@@ -1284,7 +1284,7 @@ PeCoffLoaderRelocateImageForRuntime (
 
       case EFI_IMAGE_REL_BASED_HIGHADJ:
         //
-        // Not implemented, but not used in EFI 1.0
+        // Not implemented, but not used in UEFI 2.0
         //
         ASSERT (FALSE);
         break;
