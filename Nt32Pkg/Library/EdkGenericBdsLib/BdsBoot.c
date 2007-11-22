@@ -90,7 +90,7 @@ BdsLibBootViaBootOption (
 
 Routine Description:
 
-  Process the boot option follow the EFI 1.1 specification and
+  Process the boot option follow the UEFI 2.0 specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
 
 Arguments:
@@ -197,7 +197,7 @@ Returns:
     BdsLibRegisterNewOption (&TempBootLists, DevicePath, L"EFI Internal Shell", L"BootOrder"); 
   }
 
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Booting EFI 1.1 way %S\n", Option->Description));
+  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Booting UEFI 2.0 way %S\n", Option->Description));
 
   Status = gBS->LoadImage (
                   TRUE,

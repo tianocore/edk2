@@ -4,7 +4,7 @@
   This code abstracts time and data functions. Used to provide
   Time and date related EFI runtime services.
 
-  The GetTime (), SetTime (), GetWakeupTime (), and SetWakeupTime () EFI 1.0
+  The GetTime (), SetTime (), GetWakeupTime (), and SetWakeupTime () UEFI 2.0
   services are added to the EFI system table and the 
   EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL_GUID protocol is registered with a NULL 
   pointer.

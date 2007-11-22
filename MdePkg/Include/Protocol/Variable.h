@@ -1,9 +1,9 @@
 /** @file
   Variable Architectural Protocol as defined in the DXE CIS
 
-  This code is used to produce the EFI 1.0 runtime variable services
+  This code is used to produce the UEFI 2.0 runtime variable services
 
-  The GetVariable (), GetNextVariableName (), and SetVariable () EFI 1.0 
+  The GetVariable (), GetNextVariableName (), and SetVariable () UEFI 2.0 
   services are added to the EFI system table and the 
   EFI_VARIABLE_ARCH_PROTOCOL_GUID protocol is registered with a NULL pointer.
 

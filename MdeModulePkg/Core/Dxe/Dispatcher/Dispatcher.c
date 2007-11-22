@@ -244,7 +244,7 @@ Returns:
       DriverEntry->DepexProtocolError = TRUE;
     } else {
       //
-      // If no Depex assume EFI 1.1 driver model
+      // If no Depex assume UEFI 2.0 driver model
       //
       DriverEntry->Depex = NULL;
       DriverEntry->Dependent = TRUE;

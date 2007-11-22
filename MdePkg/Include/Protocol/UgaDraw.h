@@ -1,5 +1,5 @@
 /** @file
-  UGA Draw protocol from the EFI 1.1 specification.
+  UGA Draw protocol from the EFI 1.10 specification.
 
   Abstraction of a very simple graphics device.
 

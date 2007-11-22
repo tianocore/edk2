@@ -16,7 +16,7 @@ Module Name:
 Abstract:
 
   This file produces the graphics abstration of GOP. It is called by
-  WinNtGopDriver.c file which deals with the EFI 1.1 driver model.
+  WinNtGopDriver.c file which deals with the UEFI 2.0 driver model.
   This file just does graphics.
 
 

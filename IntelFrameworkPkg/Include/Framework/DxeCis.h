@@ -1,5 +1,5 @@
 /** @file
-  Include file that supportes Framework extension to the EFI 1.10 spec.
+  Include file that supportes Framework extension to the UEFI 2.0 spec.
 
   This include file must only contain things defined in the Framework
   specifications. If a code construct is defined in the Framework specification
@@ -66,7 +66,7 @@ typedef struct {
   EFI_RESET_SYSTEM              ResetSystem;
 
   //
-  // Framework extension to EFI 1.10 runtime table
+  // Framework extension to UEFI 2.0 runtime table
   // It was moved to a protocol to not conflict with UEFI 2.0
   //
   EFI_REPORT_STATUS_CODE        ReportStatusCode;

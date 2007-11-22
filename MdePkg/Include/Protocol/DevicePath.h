@@ -1,5 +1,5 @@
 /** @file
-  The device path protocol as defined in EFI 1.0.
+  The device path protocol as defined in UEFI 2.0.
 
   The device path represents a programatic path to a device. It's the view
   from a software point of view. It also must persist from boot to boot, so 

@@ -143,7 +143,7 @@ EFI_STATUS
   The GetPciRom() function gets the PCI device's option ROM from a platform-specific location.
   The option ROM will be loaded into memory. This member function is used to return an image
   that is packaged as a PCI 2.2 option ROM. The image may contain both legacy and EFI option
-  ROMs. See the EFI 1.10 Specification for details. This member function can be used to return
+  ROMs. See the UEFI 2.0 Specification for details. This member function can be used to return
   option ROM images for embedded controllers. Option ROMs for embedded controllers are typically
   stored in platform-specific storage, and this member function can retrieve it from that storage
   and return it to the PCI bus driver. The PCI bus driver will call this member function before

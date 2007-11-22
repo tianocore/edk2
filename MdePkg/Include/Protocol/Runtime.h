@@ -1,7 +1,7 @@
 /** @file
   Runtime Architectural Protocol as defined in DXE CIS
 
-  This code is used to produce the EFI 1.0 runtime virtual switch over
+  This code is used to produce the UEFI 2.0 runtime virtual switch over
 
   This driver must add SetVirtualAddressMap () and ConvertPointer () to
   the EFI system table. This driver is not responcible for CRCing the 

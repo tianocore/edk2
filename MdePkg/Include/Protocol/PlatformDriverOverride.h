@@ -1,5 +1,5 @@
 /** @file
-  Platform Driver Override protocol as defined in the EFI 1.1 specification.
+  Platform Driver Override protocol as defined in the UEFI 2.1 specification.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

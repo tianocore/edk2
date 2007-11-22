@@ -1,11 +1,11 @@
 /** @file
-  Load File protocol as defined in the EFI 1.0 specification.
+  Load File protocol as defined in the UEFI 2.0 specification.
 
   Load file protocol exists to supports the addition of new boot devices, 
   and to support booting from devices that do not map well to file system. 
   Network boot is done via a LoadFile protocol.
 
-  EFI 1.0 can boot from any device that produces a LoadFile protocol.
+  UEFI 2.0 can boot from any device that produces a LoadFile protocol.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

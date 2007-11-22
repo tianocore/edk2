@@ -422,7 +422,7 @@ PlatformBdsBootSuccess (
 Routine Description:
   
   Hook point after a boot attempt succeeds. We don't expect a boot option to
-  return, so the EFI 1.0 specification defines that you will default to an
+  return, so the UEFI 2.0 specification defines that you will default to an
   interactive mode and stop processing the BootOrder list in this case. This
   is alos a platform implementation and can be customized by IBV/OEM.
 

@@ -705,7 +705,7 @@ Returns:
   }
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
-  // For EFI 1.1 de/compression algorithm(Version 1), mPBit = 4
+  // For UEFI 2.0 de/compression algorithm(Version 1), mPBit = 4
   // For Tiano de/compression algorithm(Version 2), mPBit = 5
   //
   switch (Version) {

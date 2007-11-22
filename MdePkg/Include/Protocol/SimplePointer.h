@@ -1,5 +1,5 @@
 /** @file
-  Simple Pointer protocol from the EFI 1.1 specification.
+  Simple Pointer protocol from the UEFI 2.0 specification.
 
   Abstraction of a very simple pointer device like a mice or tracekballs.
 

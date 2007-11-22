@@ -1,5 +1,5 @@
 /** @file
-  Simple Text In protocol from the EFI 1.0 specification.
+  Simple Text In protocol from the UEFI 2.0 specification.
 
   Abstraction of a very simple input device like a keyboard or serial
   terminal.

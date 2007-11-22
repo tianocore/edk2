@@ -100,7 +100,7 @@ OemHookStatusCodeInitialize (
 
   @param  CallerId      This optional parameter may be used to identify the caller.
                         This parameter allows the status code driver to apply different rules to different callers.
-                        Type EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification.
+                        Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0 Specification.
 
 
   @param  Data          This optional parameter may be used to pass additional data

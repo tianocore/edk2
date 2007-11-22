@@ -16,7 +16,7 @@
 #define __EFI_DRIVER_DIAGNOSTICS_H__
 
 //
-// Global ID for the Driver Diagnostics Protocol as defined in EFI 1.10.
+// Global ID for the Driver Diagnostics Protocol as defined in UEFI 2.0.
 //
 #define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID \
   { \

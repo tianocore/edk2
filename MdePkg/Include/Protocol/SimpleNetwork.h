@@ -1,5 +1,5 @@
 /** @file
-  Simple Network protocol as defined in the EFI 1.0 specification.
+  Simple Network protocol as defined in the UEFI 2.0 specification.
 
   Basic network device abstraction.
 
