@@ -429,8 +429,8 @@ Returns:
                     &mConIn.TextInEx,
                     &gEfiSimplePointerProtocolGuid,
                     &mConIn.SimplePointer,
-					&gEfiAbsolutePointerProtocolGuid,
-					&mConIn.AbsolutePointer,
+                    &gEfiAbsolutePointerProtocolGuid,
+                    &mConIn.AbsolutePointer,
                     &gEfiPrimaryConsoleInDeviceGuid,
                     NULL,
                     NULL
@@ -605,21 +605,21 @@ Returns:
   ConInPrivate->AbsolutePointer.Mode = &ConInPrivate->AbsolutePointerMode;
 
   Status = ConSplitterGrowBuffer (
-	  			  sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
-	  			  &ConInPrivate->AbsolutePointerListCount,
-	  			  (VOID **) &ConInPrivate->AbsolutePointerList
-	  			  );
+            sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
+            &ConInPrivate->AbsolutePointerListCount,
+            (VOID **) &ConInPrivate->AbsolutePointerList
+            );
   if (EFI_ERROR (Status)) {
-	  return EFI_OUT_OF_RESOURCES;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Status = gBS->CreateEvent (
-			  EVT_NOTIFY_WAIT,
-			  TPL_NOTIFY,
-			  ConSplitterAbsolutePointerWaitForInput,
-			  ConInPrivate,
-			  &ConInPrivate->AbsolutePointer.WaitForInput
-			  );
+            EVT_NOTIFY_WAIT,
+            TPL_NOTIFY,
+            ConSplitterAbsolutePointerWaitForInput,
+            ConInPrivate,
+            &ConInPrivate->AbsolutePointer.WaitForInput
+        );
   ASSERT_EFI_ERROR (Status);
 
   ConInPrivate->SimplePointer.Mode = &ConInPrivate->SimplePointerMode;
