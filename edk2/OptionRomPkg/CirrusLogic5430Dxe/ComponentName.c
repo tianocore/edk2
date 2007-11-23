@@ -175,9 +175,7 @@ CirrusLogic5430ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
   EFI_STATUS                      Status;
-  EFI_PCI_IO_PROTOCOL             *PciIoProtocol;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -187,42 +185,13 @@ CirrusLogic5430ComponentNameGetControllerName (
   }
 
   //
-  // Check Controller's handle
+  // Make sure this driver is currently managing ControllHandle
   //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIoProtocol,
-                  gCirrusLogic5430DriverBinding.DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (!EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-          ControllerHandle,
-          &gEfiPciIoProtocolGuid,
-          gCirrusLogic5430DriverBinding.DriverBindingHandle,
-          ControllerHandle
-          );
-
-    return EFI_UNSUPPORTED;
-  }
-
-  if (Status != EFI_ALREADY_STARTED) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get the UGA Draw Protocol on Controller
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUgaDrawProtocolGuid,
-                  (VOID **) &UgaDraw,
-                  gCirrusLogic5430DriverBinding.DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gCirrusLogic5430DriverBinding.DriverBindingHandle,
+             &gEfiPciIoProtocolGuid
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
