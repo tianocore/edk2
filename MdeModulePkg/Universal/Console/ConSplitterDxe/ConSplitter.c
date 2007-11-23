@@ -90,7 +90,7 @@ STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
     0x10000, //AbsoluteMaxX
     0x10000, //AbsoluteMaxY
     0x10000, //AbsoluteMaxZ
-    0        //Attributes    
+    0        //Attributes
   },
   0,
   (EFI_ABSOLUTE_POINTER_PROTOCOL **) NULL,
@@ -117,6 +117,19 @@ STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   FALSE
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL gUgaDrawProtocolTemplate = {
+  ConSpliterUgaDrawGetMode,
+  ConSpliterUgaDrawSetMode,
+  ConSpliterUgaDrawBlt
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL gGraphicsOutputProtocolTemplate = {
+  ConSpliterGraphicsOutputQueryMode,
+  ConSpliterGraphicsOutputSetMode,
+  ConSpliterGraphicsOutputBlt,
+  NULL
+};
+
 STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
@@ -141,9 +154,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
     FALSE,
   },
   {
-    ConSpliterUgaDrawGetMode,
-    ConSpliterUgaDrawSetMode,
-    ConSpliterUgaDrawBlt
+    NULL,
+    NULL,
+    NULL
   },
   0,
   0,
@@ -151,9 +164,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   0,
   (EFI_UGA_PIXEL *) NULL,
   {
-    ConSpliterGraphicsOutputQueryMode,
-    ConSpliterGraphicsOutputSetMode,
-    ConSpliterGraphicsOutputBlt,
+    NULL,
+    NULL,
+    NULL,
     NULL
   },
   (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
@@ -204,9 +217,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
     FALSE,
   },
   {
-    ConSpliterUgaDrawGetMode,
-    ConSpliterUgaDrawSetMode,
-    ConSpliterUgaDrawBlt
+    NULL,
+    NULL,
+    NULL
   },
   0,
   0,
@@ -214,9 +227,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   0,
   (EFI_UGA_PIXEL *) NULL,
   {
-    ConSpliterGraphicsOutputQueryMode,
-    ConSpliterGraphicsOutputSetMode,
-    ConSpliterGraphicsOutputBlt,
+    NULL,
+    NULL,
+    NULL,
     NULL
   },
   (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
@@ -578,7 +591,7 @@ Returns:
 
   //
   // Buffer for Simple Text Input Ex Protocol
-  //  
+  //
   Status = ConSplitterGrowBuffer (
              sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
              &ConInPrivate->TextInExListCount,
@@ -597,7 +610,7 @@ Returns:
                   );
   ASSERT_EFI_ERROR (Status);
 
-  InitializeListHead (&ConInPrivate->NotifyList); 
+  InitializeListHead (&ConInPrivate->NotifyList);
 
   //
   // Allocate Buffer and Create Event for Absolute Pointer and Simple Pointer Protocols
@@ -650,6 +663,17 @@ ConSplitterTextOutConstructor (
   )
 {
   EFI_STATUS  Status;
+
+  //
+  // Copy protocols template
+  //
+  if (FeaturePcdGet (PcdConOutUgaSupport)) {
+    CopyMem (&ConOutPrivate->UgaDraw, &gUgaDrawProtocolTemplate, sizeof (EFI_UGA_DRAW_PROTOCOL));
+  }
+
+  if (FeaturePcdGet (PcdConOutGopSupport)) {
+    CopyMem (&ConOutPrivate->GraphicsOutput, &gGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
+  }
 
   //
   // Initilize console output splitter's private data.
@@ -1072,7 +1096,7 @@ Returns:
   }
 
   Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
-   
+
   return Status;
 }
 
@@ -1153,7 +1177,7 @@ Returns:
              &gEfiAbsolutePointerProtocolGuid,
              (VOID **) &AbsolutePointer
              );
-  
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1417,8 +1441,8 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
-  
+
+
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -3175,36 +3199,36 @@ Routine Description:
 
 Arguments:
 
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke 
+  InputData         - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was pressed.
 
 Returns:
   TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed. 
-  
+  FLASE             - Match failed.
+
 --*/
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
-  
+
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
       (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
-    return FALSE;  
-  }      
-  
+    return FALSE;
+  }
+
   //
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
   //
   if (RegsiteredData->KeyState.KeyShiftState != 0 &&
       RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
-    return FALSE;    
-  }   
+    return FALSE;
+  }
   if (RegsiteredData->KeyState.KeyToggleState != 0 &&
       RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
-    return FALSE;    
-  }     
-  
+    return FALSE;
+  }
+
   return TRUE;
 
 }
@@ -3230,7 +3254,7 @@ ConSplitterTextInResetEx (
 
   Returns:
     EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could
                             not be reset.
 
 --*/
@@ -3270,20 +3294,20 @@ ConSplitterTextInReadKeyStrokeEx (
 /*++
 
   Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
   Arguments:
     This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
     EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    EFI_INVALID_PARAMETER - KeyData is NULL.
 
 --*/
 {
@@ -3292,7 +3316,7 @@ ConSplitterTextInReadKeyStrokeEx (
   UINTN                         Index;
   EFI_KEY_DATA                  CurrentKeyData;
 
-  
+
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -3326,7 +3350,7 @@ ConSplitterTextInReadKeyStrokeEx (
     }
   }
 
-  return EFI_NOT_READY;  
+  return EFI_NOT_READY;
 }
 
 EFI_STATUS
@@ -3342,17 +3366,17 @@ ConSplitterTextInSetState (
 
   Arguments:
     This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the
                             state for the input device.
-                          
-  Returns:                
+
+  Returns:
     EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
                             not have the setting adjusted.
     EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.
 
---*/   
+--*/
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
   EFI_STATUS                    Status;
@@ -3378,7 +3402,7 @@ ConSplitterTextInSetState (
     }
   }
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 
 }
 
@@ -3397,26 +3421,26 @@ ConSplitterTextInRegisterKeyNotify (
 
   Arguments:
     This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke
                               information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+    KeyNotificationFunction - Points to the function to be called when the key
+                              sequence is typed specified by KeyData.
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.
 
   Returns:
     EFI_SUCCESS             - The notification function was registered successfully.
     EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
+
+--*/
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
   EFI_STATUS                    Status;
   UINTN                         Index;
   TEXT_IN_EX_SPLITTER_NOTIFY    *NewNotify;
   LIST_ENTRY                    *Link;
-  TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;  
-  
+  TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;
+
 
   if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3425,7 +3449,7 @@ ConSplitterTextInRegisterKeyNotify (
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
-  // if no physical console input device exists, 
+  // if no physical console input device exists,
   // return EFI_SUCCESS directly.
   //
   if (Private->CurrentNumberOfExConsoles <= 0) {
@@ -3437,22 +3461,22 @@ ConSplitterTextInRegisterKeyNotify (
   //
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      TEXT_IN_EX_SPLITTER_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      TEXT_IN_EX_SPLITTER_NOTIFY,
+                      NotifyEntry,
                       TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE
                       );
-    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;        
+        *NotifyHandle = CurrentNotify->NotifyHandle;
         return EFI_SUCCESS;
       }
     }
   }
-  
+
   //
   // Allocate resource to save the notification function
-  //  
+  //
   NewNotify = (TEXT_IN_EX_SPLITTER_NOTIFY *) AllocateZeroPool (sizeof (TEXT_IN_EX_SPLITTER_NOTIFY));
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -3462,12 +3486,12 @@ ConSplitterTextInRegisterKeyNotify (
     gBS->FreePool (NewNotify);
     return EFI_OUT_OF_RESOURCES;
   }
-  NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;     
+  NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
-  
+
   //
-  // Return the wrong status of registering key notify of 
+  // Return the wrong status of registering key notify of
   // physical console input device if meet problems
   //
   for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
@@ -3486,7 +3510,7 @@ ConSplitterTextInRegisterKeyNotify (
 
   //
   // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
-  //  
+  //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &NewNotify->NotifyHandle,
                   &gSimpleTextInExNotifyGuid,
@@ -3496,11 +3520,11 @@ ConSplitterTextInRegisterKeyNotify (
   ASSERT_EFI_ERROR (Status);
 
   InsertTailList (&mConIn.NotifyList, &NewNotify->NotifyEntry);
-  
-  *NotifyHandle                = NewNotify->NotifyHandle;  
-  
-  return EFI_SUCCESS;  
-  
+
+  *NotifyHandle                = NewNotify->NotifyHandle;
+
+  return EFI_SUCCESS;
+
 }
 
 EFI_STATUS
@@ -3515,21 +3539,21 @@ ConSplitterTextInUnregisterKeyNotify (
     Remove a registered notification function from a particular keystroke.
 
   Arguments:
-    This                    - Protocol instance pointer.    
+    This                    - Protocol instance pointer.
     NotificationHandle      - The handle of the notification function being unregistered.
 
   Returns:
     EFI_SUCCESS             - The notification function was unregistered successfully.
     EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
---*/   
+    EFI_NOT_FOUND           - Can not find the matching entry in database.
+
+--*/
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
   EFI_STATUS                    Status;
   UINTN                         Index;
   TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;
-  LIST_ENTRY                    *Link;            
+  LIST_ENTRY                    *Link;
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3550,7 +3574,7 @@ ConSplitterTextInUnregisterKeyNotify (
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
-  // if no physical console input device exists, 
+  // if no physical console input device exists,
   // return EFI_SUCCESS directly.
   //
   if (Private->CurrentNumberOfExConsoles <= 0) {
@@ -3562,14 +3586,14 @@ ConSplitterTextInUnregisterKeyNotify (
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
         Status = Private->TextInExList[Index]->UnregisterKeyNotify (
-                                                 Private->TextInExList[Index], 
+                                                 Private->TextInExList[Index],
                                                  CurrentNotify->NotifyHandleList[Index]
                                                  );
         if (EFI_ERROR (Status)) {
           return Status;
-        }        
+        }
       }
-      RemoveEntryList (&CurrentNotify->NotifyEntry);      
+      RemoveEntryList (&CurrentNotify->NotifyEntry);
       Status = gBS->UninstallMultipleProtocolInterfaces (
                       CurrentNotify->NotifyHandle,
                       &gSimpleTextInExNotifyGuid,
@@ -3579,12 +3603,12 @@ ConSplitterTextInUnregisterKeyNotify (
       ASSERT_EFI_ERROR (Status);
       gBS->FreePool (CurrentNotify->NotifyHandleList);
       gBS->FreePool (CurrentNotify);
-      return EFI_SUCCESS;      
-    }    
+      return EFI_SUCCESS;
+    }
   }
 
-  return EFI_NOT_FOUND;    
-  
+  return EFI_NOT_FOUND;
+
 }
 
 EFI_STATUS
@@ -3833,9 +3857,9 @@ ConSplitterAbsolutePointerReset (
 
   Returns:
     EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
                             not be reset.
-                            
+
 --*/
 {
   EFI_STATUS                    Status;
@@ -3846,7 +3870,7 @@ ConSplitterAbsolutePointerReset (
   Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS (This);
 
   Private->AbsoluteInputEventSignalState = FALSE;
-    
+
   if (Private->CurrentNumberOfAbsolutePointers == 0) {
     return EFI_SUCCESS;
   }
@@ -3867,7 +3891,7 @@ ConSplitterAbsolutePointerReset (
 }
 
 EFI_STATUS
-EFIAPI 
+EFIAPI
 ConSplitterAbsolutePointerGetState (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN OUT EFI_ABSOLUTE_POINTER_STATE  *State
@@ -3884,9 +3908,9 @@ ConSplitterAbsolutePointerGetState (
   Returns:
     EFI_SUCCESS           - The state of the pointer device was returned in State..
     EFI_NOT_READY         - The state of the pointer device has not changed since the last call to
-                            GetState().                                                           
+                            GetState().
     EFI_DEVICE_ERROR      - A device error occurred while attempting to retrieve the pointer
-                            device's current state.                                         
+                            device's current state.
 --*/
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
@@ -3910,7 +3934,7 @@ ConSplitterAbsolutePointerGetState (
   State->CurrentY                        = 0;
   State->CurrentZ                        = 0;
   State->ActiveButtons                   = 0;
-    
+
   //
   // if no physical pointer device exists, return EFI_NOT_READY;
   // if any physical pointer device has changed state,
@@ -3939,7 +3963,7 @@ ConSplitterAbsolutePointerGetState (
       if (!(Private->AbsolutePointerMode.AbsoluteMinZ == 0 && Private->AbsolutePointerMode.AbsoluteMaxZ == 0)) {
         State->CurrentZ = CurrentState.CurrentZ;
       }
-      
+
     } else if (Status == EFI_DEVICE_ERROR) {
       ReturnStatus = EFI_DEVICE_ERROR;
     }
@@ -3985,7 +4009,7 @@ Returns:
   }
 
   //
-  // if AbsoluteInputEventSignalState is flagged before, 
+  // if AbsoluteInputEventSignalState is flagged before,
   // and not cleared by Reset() or GetState(), signal it
   //
   if (Private->AbsoluteInputEventSignalState) {
@@ -4486,7 +4510,7 @@ ConSplitterTextOutSetCursorPosition (
   Private   = TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
   TextOutModeMap  = NULL;
   ModeNumber      = Private->TextOutMode.Mode;
-  
+
   //
   // Get current MaxColumn and MaxRow from intersection map
   //
@@ -4496,7 +4520,7 @@ ConSplitterTextOutSetCursorPosition (
   } else {
     CurrentMode = ModeNumber;
   }
-  
+
   MaxColumn = Private->TextOutQueryData[CurrentMode].Columns;
   MaxRow    = Private->TextOutQueryData[CurrentMode].Rows;
 
