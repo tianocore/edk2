@@ -27,6 +27,8 @@
 [PcdsFeatureFlag.common]
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE|BOOLEAN|0x00010001
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE|BOOLEAN|0x00010002
+  gOptionRomPkgTokenSpaceGuid.PcdSupportGop|TRUE|BOOLEAN|0x00010004
+  gOptionRomPkgTokenSpaceGuid.PcdSupportUga|TRUE|BOOLEAN|0x00010005
 
 [PcdsFixedAtBuild.common]
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a|UINT32|0x00010003
