@@ -144,7 +144,7 @@ Returns:
       //
       mCpu->GetInterruptState (mCpu, &InterruptState);
       while (!InterruptState) {
-        gWinNt->Sleep (0);
+        gWinNt->Sleep (1);
         mCpu->GetInterruptState (mCpu, &InterruptState);
       }
        
