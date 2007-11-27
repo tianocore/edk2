@@ -1443,6 +1443,11 @@ typedef struct {
   UINT32            CapsuleImageSize;
 } EFI_CAPSULE_HEADER;
 
+typedef struct {
+  UINT32   CapsuleArrayNumber;
+  VOID*    CapsulePtr[1];
+} EFI_CAPSULE_TABLE;
+
 #define CAPSULE_FLAGS_PERSIST_ACROSS_RESET          0x00010000
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE         0x00020000
 
