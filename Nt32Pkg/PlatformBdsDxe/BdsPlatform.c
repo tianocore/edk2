@@ -28,6 +28,157 @@ Abstract:
 
 CHAR16  mFirmwareVendor[] = L"TianoCore.org";
 
+EFI_EVENT  mReadyToBootEvent;
+
+EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+  { EfiACPIReclaimMemory,   0 },
+  { EfiACPIMemoryNVS,       0 },
+  { EfiReservedMemoryType,  0 },
+  { EfiRuntimeServicesData, 0 },
+  { EfiRuntimeServicesCode, 0 },
+  { EfiBootServicesCode,    0 },
+  { EfiBootServicesData,    0 },
+  { EfiLoaderCode,          0 },
+  { EfiLoaderData,          0 },
+  { EfiMaxMemoryType,       0 }
+};
+
+VOID 
+BdsSetMemoryTypeInformationVariable (
+ VOID
+ )
+{
+  EFI_STATUS                   Status;
+  EFI_MEMORY_TYPE_INFORMATION  *PreviousMemoryTypeInformation;
+  EFI_MEMORY_TYPE_INFORMATION  *CurrentMemoryTypeInformation;
+  UINTN                        VariableSize;
+  BOOLEAN                      UpdateRequired;
+  UINTN                        Index;
+  UINTN                        Index1;
+  UINT32                       Previous;
+  UINT32                       Current;
+  UINT32                       Next;
+  EFI_HOB_GUID_TYPE            *Hob;
+
+  UpdateRequired = FALSE;
+
+  //
+  // Retrieve the current memory usage statistics.  If they are not found, then
+  // no adjustments can be made to the Memory Type Information variable.
+  //
+  Status = EfiGetSystemConfigurationTable (&gEfiMemoryTypeInformationGuid, (VOID **)&CurrentMemoryTypeInformation);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Get the Memory Type Information settings from a previous boot if they exist.
+  //
+  PreviousMemoryTypeInformation = BdsLibGetVariableAndSize (
+                                    EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                                    &gEfiMemoryTypeInformationGuid,
+                                    &VariableSize
+                                    );
+
+  //
+  // If the previous Memory Type Information is not available, then set defaults
+  //
+  if (PreviousMemoryTypeInformation == NULL) {
+    Hob = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
+
+    if (Hob != NULL) {
+      PreviousMemoryTypeInformation = GET_GUID_HOB_DATA (Hob);
+      VariableSize = GET_GUID_HOB_DATA_SIZE (Hob);
+      ASSERT (VariableSize == sizeof (mDefaultMemoryTypeInformation));
+      CopyMem (mDefaultMemoryTypeInformation, PreviousMemoryTypeInformation, VariableSize);
+    } else {
+      PreviousMemoryTypeInformation = mDefaultMemoryTypeInformation;
+      VariableSize = sizeof (mDefaultMemoryTypeInformation);
+    }
+    UpdateRequired = TRUE;
+  }
+
+  //
+  // Use a hueristic to adjust the Memory Type Information for the next boot
+  //
+  for (Index = 0; PreviousMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+
+    Current = 0;
+    for (Index1 = 0; CurrentMemoryTypeInformation[Index1].Type != EfiMaxMemoryType; Index1++) {
+      if (PreviousMemoryTypeInformation[Index].Type == CurrentMemoryTypeInformation[Index1].Type) {
+        Current = CurrentMemoryTypeInformation[Index1].NumberOfPages;
+        break;
+      }
+    }
+
+    if (CurrentMemoryTypeInformation[Index1].Type == EfiMaxMemoryType) {
+      continue;
+    }
+
+    Previous = PreviousMemoryTypeInformation[Index].NumberOfPages;
+
+    if (Current > Previous) {
+      Next = Current + (Current >> 2);
+    } else if (Current < (Previous >> 1)) {
+      Next = Previous - (Previous >> 2);
+    } else {
+      Next = Previous;
+    }
+    if (Next > 0 && Next <= 16) {
+      Next = 16;
+    }
+
+    if (Next != Previous) {
+      PreviousMemoryTypeInformation[Index].NumberOfPages = Next;
+      UpdateRequired = TRUE;
+    }
+  }
+
+  //
+  // If any changes were made to the Memory Type Information settings, then set the new variable value
+  //
+  if (UpdateRequired) {
+    Status = gRT->SetVariable (
+                    EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                    &gEfiMemoryTypeInformationGuid,
+                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    VariableSize,
+                    PreviousMemoryTypeInformation
+                    );
+  }
+
+  return;
+}
+
+
+/*++
+
+Routine Description:
+
+  This routine is a notification function for legayc boot or exit boot
+  service event. It will adjust the memory information for different
+  memory type and save them into the variables for next boot
+
+Arguments:
+
+  Event    - The event that triggered this notification function
+  Context  - Pointer to the notification functions context
+
+Returns:
+
+  None.
+
+--*/
+VOID
+EFIAPI
+BdsReadyToBootEvent (
+  EFI_EVENT  Event,
+  VOID       *Context
+  )
+{
+  BdsSetMemoryTypeInformationVariable ();
+}
+
 //
 // BDS Platform Functions
 //
@@ -67,6 +218,16 @@ Returns:
   // Fixup Tasble CRC after we updated Firmware Vendor and Revision
   //
   gBS->CalculateCrc32 ((VOID *) gST, sizeof (EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
+
+  //
+  // Create Ready To Boot event
+  // 
+  EfiCreateEventReadyToBootEx (
+    TPL_CALLBACK,
+    BdsReadyToBootEvent,
+    NULL,
+    &mReadyToBootEvent
+    );
 
   //
   // Initialize the platform specific string and language

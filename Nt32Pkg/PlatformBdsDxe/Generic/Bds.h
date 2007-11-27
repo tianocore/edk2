@@ -50,6 +50,7 @@ Revision History
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Guid/GenericPlatformVariable.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/MemoryTypeInformation.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
