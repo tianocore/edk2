@@ -235,5 +235,7 @@ typedef struct {
   UINT64                    r11;
 } PAL_CALL_RETURN;
 
+#define FUNCTION_ENTRY_POINT(p) (((EFI_PLABEL *)(p))->EntryPoint)
+
 #endif
 
