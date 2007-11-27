@@ -93,6 +93,10 @@
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
   gEfiPeiDecompressPpiGuid
   gEfiPeiFirmwareVolumeInfoPpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress
