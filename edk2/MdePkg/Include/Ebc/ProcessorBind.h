@@ -79,5 +79,7 @@ typedef unsigned long         UINTN;
 //
 #define GLOBAL_REMOVE_IF_UNREFERENCED
 
+#define FUNCTION_ENTRY_POINT(p) (p)
+
 #endif 
 

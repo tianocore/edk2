@@ -232,5 +232,7 @@ typedef INT64   INTN;
   #define ASM_PFX(name) _##name    
 #endif
 
+#define FUNCTION_ENTRY_POINT(p) (p)
+
 #endif
 
