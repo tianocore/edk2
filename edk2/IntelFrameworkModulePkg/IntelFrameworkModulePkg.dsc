@@ -183,6 +183,7 @@
   IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
+  IntelFrameworkModulePkg/Bus/Isa/Ps2MouseSimulateTouchPadDxe/Ps2MouseSimulateTouchPadDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
