@@ -114,6 +114,7 @@
   gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
   gEfiBootStateGuid                             # ALWAYS_CONSUMED
+  gEfiMemoryTypeInformationGuid
 
 
 [Protocols]
