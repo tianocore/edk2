@@ -30,6 +30,8 @@ Abstract:
 #include <Ppi/SectionExtraction.h>
 #include <Ppi/FvLoadFile.h>
 #include <Ppi/MemoryDiscovered.h>
+#include <Ppi/ReadOnlyVariable2.h>
+#include <Guid/MemoryTypeInformation.h>
 #include <Ppi/Decompress.h>
 #include <Ppi/FirmwareVolumeInfo.h>
 

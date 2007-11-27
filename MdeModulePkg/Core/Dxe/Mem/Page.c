@@ -33,7 +33,10 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  BaseAddress;
   EFI_PHYSICAL_ADDRESS  MaximumAddress;
   UINT64                CurrentNumberOfPages;
+  UINT64                NumberOfPages;
   UINTN                 InformationIndex;
+  BOOLEAN               Special;
+  BOOLEAN               Runtime;
 } EFI_MEMORY_TYPE_STAISTICS;
 
 //
@@ -57,21 +60,21 @@ LIST_ENTRY   mFreeMemoryMapEntryList  = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemo
 BOOLEAN mMemoryTypeInformationInitialized = FALSE;
 
 EFI_MEMORY_TYPE_STAISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiReservedMemoryType
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiLoaderCode
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiLoaderData
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiBootServicesCode
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiBootServicesData
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiRuntimeServicesCode
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiRuntimeServicesData
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiConventionalMemory
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiUnusableMemory
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiACPIReclaimMemory
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiACPIMemoryNVS
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiMemoryMappedIO
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiMemoryMappedIOPortSpace
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType },  // EfiPalCode
-  { 0, EFI_MAX_ADDRESS, 0, EfiMaxMemoryType }   // EfiMaxMemoryType
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiReservedMemoryType
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderCode
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderData
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiBootServicesCode
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiBootServicesData
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiRuntimeServicesCode
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiRuntimeServicesData
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiConventionalMemory
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiUnusableMemory
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiACPIReclaimMemory
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiACPIMemoryNVS
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIO
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIOPortSpace
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiPalCode
+  { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
 };
 
 EFI_PHYSICAL_ADDRESS mDefaultMaximumAddress = EFI_MAX_ADDRESS;
@@ -397,6 +400,7 @@ Returns:
         mMemoryTypeStatistics[Type].BaseAddress, 
         gMemoryTypeInformation[Index].NumberOfPages
         );
+      mMemoryTypeStatistics[Type].NumberOfPages   = gMemoryTypeInformation[Index].NumberOfPages;
       gMemoryTypeInformation[Index].NumberOfPages = 0;
     }
   }
@@ -1363,6 +1367,7 @@ Returns:
   LIST_ENTRY                        *Link;
   MEMORY_MAP                        *Entry;  
   EFI_GCD_MAP_ENTRY                 *GcdMapEntry;  
+  EFI_MEMORY_TYPE                   Type;
 
   //
   // Make sure the parameters are valid
@@ -1432,21 +1437,33 @@ Returns:
     Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
     ASSERT (Entry->VirtualStart == 0);
 
+    //
+    // Convert internal map into an EFI_MEMORY_DESCRIPTOR
+    //
     MemoryMap->Type           = Entry->Type;
     MemoryMap->PhysicalStart  = Entry->Start;
     MemoryMap->VirtualStart   = Entry->VirtualStart;
     MemoryMap->NumberOfPages  = RShiftU64 (Entry->End - Entry->Start + 1, EFI_PAGE_SHIFT);
-  
-    switch (Entry->Type) {
-    case EfiRuntimeServicesCode:
-    case EfiRuntimeServicesData:
-    case EfiPalCode:
-      MemoryMap->Attribute = Entry->Attribute | EFI_MEMORY_RUNTIME;
-      break;
-
-    default:
-      MemoryMap->Attribute = Entry->Attribute;
-      break;
+    //
+    // If the memory type is EfiConventionalMemory, then determine if the range is part of a
+    // memory type bin and needs to be converted to the same memory type as the rest of the 
+    // memory type bin in order to minimize EFI Memory Map changes across reboots.  This 
+    // improves the chances for a successful S4 resume in the presence of minor page allocation
+    // differences across reboots.
+    //
+    if (MemoryMap->Type == EfiConventionalMemory) {
+      for (Type = (EFI_MEMORY_TYPE) 0; Type < EfiMaxMemoryType; Type++) {
+        if (mMemoryTypeStatistics[Type].Special                        &&
+            mMemoryTypeStatistics[Type].NumberOfPages > 0              &&
+            Entry->Start >= mMemoryTypeStatistics[Type].BaseAddress    &&
+            Entry->End   <= mMemoryTypeStatistics[Type].MaximumAddress    ) {
+          MemoryMap->Type = Type;
+        }
+      }
+    }
+    MemoryMap->Attribute = Entry->Attribute;
+    if (mMemoryTypeStatistics[MemoryMap->Type].Runtime) {
+      MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
     }
     
     MemoryMap = NextMemoryDescriptor (MemoryMap, Size);
