@@ -11,14 +11,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  UsbMouseSimulateTouchPadComponentName.c
+  UsbMouseAbsolutePointerComponentName.c
 
 Abstract:
 
 
 **/
 
-#include "UsbMouseSimulateTouchPad.h"
+#include "UsbMouseAbsolutePointer.h"
 #include <Library/DebugLib.h>
 
 //
@@ -65,7 +65,7 @@ Abstract:
 **/
 EFI_STATUS
 EFIAPI
-UsbMouseSimulateTouchPadComponentNameGetDriverName (
+UsbMouseAbsolutePointerComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
@@ -142,7 +142,7 @@ UsbMouseSimulateTouchPadComponentNameGetDriverName (
 **/
 EFI_STATUS
 EFIAPI
-UsbMouseSimulateTouchPadComponentNameGetControllerName (
+UsbMouseAbsolutePointerComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
   IN  EFI_HANDLE                                      ControllerHandle,
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
@@ -154,24 +154,24 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseSimulateTouchPadComponentName = {
-  UsbMouseSimulateTouchPadComponentNameGetDriverName,
-  UsbMouseSimulateTouchPadComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbMouseAbsolutePointerComponentName = {
+  UsbMouseAbsolutePointerComponentNameGetDriverName,
+  UsbMouseAbsolutePointerComponentNameGetControllerName,
   "eng"
 };
 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbMouseSimulateTouchPadComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UsbMouseSimulateTouchPadComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UsbMouseSimulateTouchPadComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUsbMouseAbsolutePointerComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UsbMouseAbsolutePointerComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UsbMouseAbsolutePointerComponentNameGetControllerName,
   "en"
 };
 
 
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbMouseSimulateTouchPadDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbMouseAbsolutePointerDriverNameTable[] = {
   { "eng;en", L"Usb Mouse Simulate TouchPad Driver" },
   { NULL , NULL }
 };
@@ -218,7 +218,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbMouseSimulateTouchPad
 **/
 EFI_STATUS
 EFIAPI
-UsbMouseSimulateTouchPadComponentNameGetDriverName (
+UsbMouseAbsolutePointerComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
@@ -227,9 +227,9 @@ UsbMouseSimulateTouchPadComponentNameGetDriverName (
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,
-           mUsbMouseSimulateTouchPadDriverNameTable,
+           mUsbMouseAbsolutePointerDriverNameTable,
            DriverName,
-           (BOOLEAN)(This == &gUsbMouseSimulateTouchPadComponentName)
+           (BOOLEAN)(This == &gUsbMouseAbsolutePointerComponentName)
            );
 }
 
@@ -303,7 +303,7 @@ UsbMouseSimulateTouchPadComponentNameGetDriverName (
 **/
 EFI_STATUS
 EFIAPI
-UsbMouseSimulateTouchPadComponentNameGetControllerName (
+UsbMouseAbsolutePointerComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
   IN  EFI_HANDLE                                      ControllerHandle,
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
@@ -312,7 +312,7 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
   )
 {
   EFI_STATUS                  Status;
-  USB_MOUSE_SIMULATE_TOUCHPAD_DEV               *UsbMouseSimulateTouchPadDev;
+  USB_MOUSE_ABSOLUTE_POINTER_DEV               *UsbMouseAbsolutePointerDev;
   EFI_ABSOLUTE_POINTER_PROTOCOL *AbsolutePointerProtocol;
   EFI_USB_IO_PROTOCOL         *UsbIoProtocol;
 
@@ -330,7 +330,7 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
                   ControllerHandle,
                   &gEfiUsbIoProtocolGuid,
                   (VOID **) &UsbIoProtocol,
-                  gUsbMouseSimulateTouchPadDriverBinding.DriverBindingHandle,
+                  gUsbMouseAbsolutePointerDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -338,7 +338,7 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
     gBS->CloseProtocol (
           ControllerHandle,
           &gEfiUsbIoProtocolGuid,
-          gUsbMouseSimulateTouchPadDriverBinding.DriverBindingHandle,
+          gUsbMouseAbsolutePointerDriverBinding.DriverBindingHandle,
           ControllerHandle
           );
 
@@ -355,7 +355,7 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
                   ControllerHandle,
                  &gEfiAbsolutePointerProtocolGuid,
                   (VOID **) &AbsolutePointerProtocol,
-                  gUsbMouseSimulateTouchPadDriverBinding.DriverBindingHandle,
+                  gUsbMouseAbsolutePointerDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
@@ -364,14 +364,14 @@ UsbMouseSimulateTouchPadComponentNameGetControllerName (
     return Status;
   }
 
-  UsbMouseSimulateTouchPadDev = USB_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_MOUSE_PROTOCOL (AbsolutePointerProtocol);
+  UsbMouseAbsolutePointerDev = USB_MOUSE_ABSOLUTE_POINTER_DEV_FROM_MOUSE_PROTOCOL (AbsolutePointerProtocol);
 
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,
-           UsbMouseSimulateTouchPadDev->ControllerNameTable,
+           UsbMouseAbsolutePointerDev->ControllerNameTable,
            ControllerName,
-           (BOOLEAN)(This == &gUsbMouseSimulateTouchPadComponentName)
+           (BOOLEAN)(This == &gUsbMouseAbsolutePointerComponentName)
            );
 
 }

@@ -21,7 +21,7 @@ Abstract:
 #ifndef __MOUSE_HID_H
 #define __MOUSE_HID_H
 
-#include "UsbMouseSimulateTouchPad.h"
+#include "UsbMouseAbsolutePointer.h"
 
 //
 // HID Item general structure
@@ -77,7 +77,7 @@ typedef struct {
 
 EFI_STATUS
 ParseMouseReportDescriptor (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  UINT8           *ReportDescriptor,
   IN  UINTN           ReportSize
   );

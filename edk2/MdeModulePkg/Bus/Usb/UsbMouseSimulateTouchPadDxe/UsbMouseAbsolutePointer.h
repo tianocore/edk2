@@ -11,15 +11,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:
 
-    UsbMouseSimulateTouchPad.h
+    UsbMouseAbsolutePointer.h
 
   Abstract:
 
 
 **/
 
-#ifndef _USB_MOUSE_SIMULATE_TOUCHPAD_H
-#define _USB_MOUSE_SIMULATE_TOUCHPAD_H
+#ifndef _USB_MOUSE_ABSOLUTE_POINTER_H
+#define _USB_MOUSE_ABSOLUTE_POINTER_H
 
 
 #include <PiDxe.h>
@@ -47,7 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BOOT_PROTOCOL           0
 #define REPORT_PROTOCOL         1
 
-#define USB_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE EFI_SIGNATURE_32 ('u', 'm', 's', 't')
+#define USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE EFI_SIGNATURE_32 ('u', 'm', 's', 't')
 
 typedef struct {
   BOOLEAN ButtonDetected;
@@ -76,14 +76,14 @@ typedef struct {
 
   PRIVATE_DATA                  PrivateData;
   EFI_UNICODE_STRING_TABLE      *ControllerNameTable;
-} USB_MOUSE_SIMULATE_TOUCHPAD_DEV;
+} USB_MOUSE_ABSOLUTE_POINTER_DEV;
 
-#define USB_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_MOUSE_PROTOCOL(a) \
-    CR(a, USB_MOUSE_SIMULATE_TOUCHPAD_DEV, AbsolutePointerProtocol, USB_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE)
+#define USB_MOUSE_ABSOLUTE_POINTER_DEV_FROM_MOUSE_PROTOCOL(a) \
+    CR(a, USB_MOUSE_ABSOLUTE_POINTER_DEV, AbsolutePointerProtocol, USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE)
 
 VOID
 EFIAPI
-USBMouseSimulateTouchPadRecoveryHandler (
+USBMouseAbsolutePointerRecoveryHandler (
   IN    EFI_EVENT    Event,
   IN    VOID         *Context
   );
@@ -91,13 +91,13 @@ USBMouseSimulateTouchPadRecoveryHandler (
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gUsbMouseSimulateTouchPadDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMouseSimulateTouchPadComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMouseSimulateTouchPadComponentName2;
-extern EFI_GUID                      gEfiUsbMouseSimulateTouchPadDriverGuid;
+extern EFI_DRIVER_BINDING_PROTOCOL   gUsbMouseAbsolutePointerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMouseAbsolutePointerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMouseAbsolutePointerComponentName2;
+extern EFI_GUID                      gEfiUsbMouseAbsolutePointerDriverGuid;
 
 VOID
-MouseSimulateTouchPadReportStatusCode (
+MouseAbsolutePointerReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
   IN EFI_STATUS_CODE_TYPE      CodeType,
   IN EFI_STATUS_CODE_VALUE     Value
