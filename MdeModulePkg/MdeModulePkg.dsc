@@ -302,7 +302,7 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseSimulateTouchPadDxe/UsbMouseSimulateTouchPadDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
