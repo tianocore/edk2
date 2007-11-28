@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Ps2MouseSimulateTouchPad.h"
+#include "Ps2MouseAbsolutePointer.h"
 #include "CommPs2.h"
 
 UINT8 SampleRateTbl[MAX_SR]   = { 0xa, 0x14, 0x28, 0x3c, 0x50, 0x64, 0xc8 };
@@ -430,7 +430,7 @@ Returns:
 
 EFI_STATUS
 PS2MouseGetPacket (
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV     *MouseSimulateTouchPadDev
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev
   )
 /*++
 
@@ -474,15 +474,15 @@ Returns:
       //
       // Read mouse first byte data, if failed, immediately return
       //
-      KbcDisableAux (MouseSimulateTouchPadDev->IsaIo);
-      Status = PS2MouseRead (MouseSimulateTouchPadDev->IsaIo, &Data, &Count, State);
+      KbcDisableAux (MouseAbsolutePointerDev->IsaIo);
+      Status = PS2MouseRead (MouseAbsolutePointerDev->IsaIo, &Data, &Count, State);
       if (EFI_ERROR (Status)) {
-        KbcEnableAux (MouseSimulateTouchPadDev->IsaIo);
+        KbcEnableAux (MouseAbsolutePointerDev->IsaIo);
         return EFI_NOT_READY;
       }
 
       if (Count != 1) {
-        KbcEnableAux (MouseSimulateTouchPadDev->IsaIo);
+        KbcEnableAux (MouseAbsolutePointerDev->IsaIo);
         return EFI_NOT_READY;
       }
 
@@ -490,18 +490,18 @@ Returns:
         Packet[0] = Data;
         State     = PS2_READ_DATA_BYTE;
 
-        CheckKbStatus (MouseSimulateTouchPadDev->IsaIo, &KeyboardEnable);
-        KbcDisableKb (MouseSimulateTouchPadDev->IsaIo);
-        KbcEnableAux (MouseSimulateTouchPadDev->IsaIo);
+        CheckKbStatus (MouseAbsolutePointerDev->IsaIo, &KeyboardEnable);
+        KbcDisableKb (MouseAbsolutePointerDev->IsaIo);
+        KbcEnableAux (MouseAbsolutePointerDev->IsaIo);
       }
       break;
 
     case PS2_READ_DATA_BYTE:
       Count   = 2;
-      Status  = PS2MouseRead (MouseSimulateTouchPadDev->IsaIo, (Packet + 1), &Count, State);
+      Status  = PS2MouseRead (MouseAbsolutePointerDev->IsaIo, (Packet + 1), &Count, State);
       if (EFI_ERROR (Status)) {
         if (KeyboardEnable) {
-          KbcEnableKb (MouseSimulateTouchPadDev->IsaIo);
+          KbcEnableKb (MouseAbsolutePointerDev->IsaIo);
         }
 
         return EFI_NOT_READY;
@@ -509,7 +509,7 @@ Returns:
 
       if (Count != 2) {
         if (KeyboardEnable) {
-          KbcEnableKb (MouseSimulateTouchPadDev->IsaIo);
+          KbcEnableKb (MouseAbsolutePointerDev->IsaIo);
         }
 
         return EFI_NOT_READY;
@@ -520,7 +520,7 @@ Returns:
 
     case PS2_PROCESS_PACKET:
       if (KeyboardEnable) {
-        KbcEnableKb (MouseSimulateTouchPadDev->IsaIo);
+        KbcEnableKb (MouseAbsolutePointerDev->IsaIo);
       }
       //
       // Decode the packet
@@ -558,11 +558,11 @@ Returns:
       //
       // Update mouse state
       //
-      MouseSimulateTouchPadDev->State.CurrentX += RelativeMovementX;
-      MouseSimulateTouchPadDev->State.CurrentY -= RelativeMovementY;
-	  MouseSimulateTouchPadDev->State.CurrentZ = 0;
-      MouseSimulateTouchPadDev->State.ActiveButtons = (UINT8) (LButton || RButton) & 0x3;
-      MouseSimulateTouchPadDev->StateChanged      = TRUE;
+      MouseAbsolutePointerDev->State.CurrentX += RelativeMovementX;
+      MouseAbsolutePointerDev->State.CurrentY -= RelativeMovementY;
+      MouseAbsolutePointerDev->State.CurrentZ = 0;
+      MouseAbsolutePointerDev->State.ActiveButtons = (UINT8) (LButton || RButton) & 0x3;
+      MouseAbsolutePointerDev->StateChanged      = TRUE;
 
       return EFI_SUCCESS;
     }

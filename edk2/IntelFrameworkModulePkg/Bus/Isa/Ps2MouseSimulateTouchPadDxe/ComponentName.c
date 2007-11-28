@@ -11,28 +11,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Ps2MouseSimulateTouchPad.h"
+#include "Ps2MouseAbsolutePointer.h"
 
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gPs2MouseSimulateTouchPadComponentName = {
-  Ps2MouseSimulateTouchPadComponentNameGetDriverName,
-  Ps2MouseSimulateTouchPadComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gPs2MouseAbsolutePointerComponentName = {
+  Ps2MouseAbsolutePointerComponentNameGetDriverName,
+  Ps2MouseAbsolutePointerComponentNameGetControllerName,
   "eng"
 };
 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPs2MouseSimulateTouchPadComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ps2MouseSimulateTouchPadComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ps2MouseSimulateTouchPadComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPs2MouseAbsolutePointerComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ps2MouseAbsolutePointerComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ps2MouseAbsolutePointerComponentNameGetControllerName,
   "en"
 };
 
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2MouseSimulateTouchPadDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2MouseAbsolutePointerDriverNameTable[] = {
   {
     "eng;en",
     L"faked PS/2 Touchpad Driver"
@@ -84,7 +84,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2MouseSimulateTouchPad
 **/
 EFI_STATUS
 EFIAPI
-Ps2MouseSimulateTouchPadComponentNameGetDriverName (
+Ps2MouseAbsolutePointerComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
@@ -93,9 +93,9 @@ Ps2MouseSimulateTouchPadComponentNameGetDriverName (
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,
-           mPs2MouseSimulateTouchPadDriverNameTable,
+           mPs2MouseAbsolutePointerDriverNameTable,
            DriverName,
-           (BOOLEAN)(This == &gPs2MouseSimulateTouchPadComponentName)
+           (BOOLEAN)(This == &gPs2MouseAbsolutePointerComponentName)
            );
 }
 
@@ -169,7 +169,7 @@ Ps2MouseSimulateTouchPadComponentNameGetDriverName (
 **/
 EFI_STATUS
 EFIAPI
-Ps2MouseSimulateTouchPadComponentNameGetControllerName (
+Ps2MouseAbsolutePointerComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
   IN  EFI_HANDLE                                      ControllerHandle,
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
@@ -179,7 +179,7 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
 {
   EFI_STATUS                                  Status;
   EFI_ABSOLUTE_POINTER_PROTOCOL               *AbsolutePointerProtocol;
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV             *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV             *MouseAbsolutePointerDev;
   EFI_ISA_IO_PROTOCOL                         *IsaIoProtocol;
 
   //
@@ -195,7 +195,7 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
                   ControllerHandle,
                   &gEfiIsaIoProtocolGuid,
                   (VOID **) &IsaIoProtocol,
-                  gPS2MouseSimulateTouchPadDriver.DriverBindingHandle,
+                  gPS2MouseAbsolutePointerDriver.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -203,7 +203,7 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
     gBS->CloseProtocol (
            ControllerHandle,
            &gEfiIsaIoProtocolGuid,
-           gPS2MouseSimulateTouchPadDriver.DriverBindingHandle,
+           gPS2MouseAbsolutePointerDriver.DriverBindingHandle,
            ControllerHandle
            );
 
@@ -220,7 +220,7 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
                   ControllerHandle,
                   &gEfiAbsolutePointerProtocolGuid,
                   (VOID **) &AbsolutePointerProtocol,
-                  gPS2MouseSimulateTouchPadDriver.DriverBindingHandle,
+                  gPS2MouseAbsolutePointerDriver.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
@@ -228,13 +228,13 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
     return Status;
   }
 
-  MouseSimulateTouchPadDev = PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_THIS (AbsolutePointerProtocol);
+  MouseAbsolutePointerDev = PS2_MOUSE_ABSOLUTE_POINTER_DEV_FROM_THIS (AbsolutePointerProtocol);
 
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,
-           MouseSimulateTouchPadDev->ControllerNameTable,
+           MouseAbsolutePointerDev->ControllerNameTable,
            ControllerName,
-           (BOOLEAN)(This == &gPs2MouseSimulateTouchPadComponentName)
+           (BOOLEAN)(This == &gPs2MouseAbsolutePointerComponentName)
            );
 }

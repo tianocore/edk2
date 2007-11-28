@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Ps2MouseSimulateTouchPad.h"
+#include "Ps2MouseAbsolutePointer.h"
 #include "CommPs2.h"
 
 //
 // DriverBinding Protocol Instance
 //
-EFI_DRIVER_BINDING_PROTOCOL gPS2MouseSimulateTouchPadDriver = {
-  PS2MouseSimulateTouchPadDriverSupported,
-  PS2MouseSimulateTouchPadDriverStart,
-  PS2MouseSimulateTouchPadDriverStop,
+EFI_DRIVER_BINDING_PROTOCOL gPS2MouseAbsolutePointerDriver = {
+  PS2MouseAbsolutePointerDriverSupported,
+  PS2MouseAbsolutePointerDriverStart,
+  PS2MouseAbsolutePointerDriverStop,
   0x1,
   NULL,
   NULL
@@ -30,7 +30,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPS2MouseSimulateTouchPadDriver = {
 
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverSupported (
+PS2MouseAbsolutePointerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
@@ -110,7 +110,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverStart (
+PS2MouseAbsolutePointerDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
@@ -134,14 +134,14 @@ Returns:
   EFI_STATUS                          Status;
   EFI_STATUS                          EmptyStatus;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV     *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev;
   UINT8                               Data;
   EFI_TPL                             OldTpl;
   EFI_STATUS_CODE_VALUE               StatusCode;
   EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
 
   StatusCode  = 0;
-  MouseSimulateTouchPadDev    = NULL;
+  MouseAbsolutePointerDev    = NULL;
   IsaIo       = NULL;
 
   //
@@ -195,37 +195,37 @@ Returns:
   //
   // Allocate private data
   //
-  MouseSimulateTouchPadDev = AllocateZeroPool (sizeof (PS2_MOUSE_SIMULATE_TOUCHPAD_DEV));
-  if (MouseSimulateTouchPadDev == NULL) {
+  MouseAbsolutePointerDev = AllocateZeroPool (sizeof (PS2_MOUSE_ABSOLUTE_POINTER_DEV));
+  if (MouseAbsolutePointerDev == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
   //
   // Setup the device instance
   //
-  MouseSimulateTouchPadDev->Signature       = PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE;
-  MouseSimulateTouchPadDev->Handle          = Controller;
-  MouseSimulateTouchPadDev->SampleRate      = SSR_20;
-  MouseSimulateTouchPadDev->Resolution      = CMR4;
-  MouseSimulateTouchPadDev->Scaling         = SF1;
-  MouseSimulateTouchPadDev->DataPackageSize = 3;
-  MouseSimulateTouchPadDev->IsaIo           = IsaIo;
-  MouseSimulateTouchPadDev->DevicePath      = ParentDevicePath;
+  MouseAbsolutePointerDev->Signature       = PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE;
+  MouseAbsolutePointerDev->Handle          = Controller;
+  MouseAbsolutePointerDev->SampleRate      = SSR_20;
+  MouseAbsolutePointerDev->Resolution      = CMR4;
+  MouseAbsolutePointerDev->Scaling         = SF1;
+  MouseAbsolutePointerDev->DataPackageSize = 3;
+  MouseAbsolutePointerDev->IsaIo           = IsaIo;
+  MouseAbsolutePointerDev->DevicePath      = ParentDevicePath;
 
   //
   // Resolution = 4 counts/mm
   //
-  MouseSimulateTouchPadDev->Mode.AbsoluteMaxX               = 1024;
-  MouseSimulateTouchPadDev->Mode.AbsoluteMinX               = 0;
-  MouseSimulateTouchPadDev->Mode.AbsoluteMaxY               = 798;
-  MouseSimulateTouchPadDev->Mode.AbsoluteMinY               = 0;
-  MouseSimulateTouchPadDev->Mode.AbsoluteMaxZ               = 0;
-  MouseSimulateTouchPadDev->Mode.AbsoluteMinZ               = 0;
-  MouseSimulateTouchPadDev->Mode.Attributes                 = 0x03;
+  MouseAbsolutePointerDev->Mode.AbsoluteMaxX               = 1024;
+  MouseAbsolutePointerDev->Mode.AbsoluteMinX               = 0;
+  MouseAbsolutePointerDev->Mode.AbsoluteMaxY               = 798;
+  MouseAbsolutePointerDev->Mode.AbsoluteMinY               = 0;
+  MouseAbsolutePointerDev->Mode.AbsoluteMaxZ               = 0;
+  MouseAbsolutePointerDev->Mode.AbsoluteMinZ               = 0;
+  MouseAbsolutePointerDev->Mode.Attributes                 = 0x03;
 
-  MouseSimulateTouchPadDev->AbsolutePointerProtocol.Reset     = MouseSimulateTouchPadReset;
-  MouseSimulateTouchPadDev->AbsolutePointerProtocol.GetState  = MouseSimulateTouchPadGetState;
-  MouseSimulateTouchPadDev->AbsolutePointerProtocol.Mode      = &(MouseSimulateTouchPadDev->Mode);
+  MouseAbsolutePointerDev->AbsolutePointerProtocol.Reset     = MouseAbsolutePointerReset;
+  MouseAbsolutePointerDev->AbsolutePointerProtocol.GetState  = MouseAbsolutePointerGetState;
+  MouseAbsolutePointerDev->AbsolutePointerProtocol.Mode      = &(MouseAbsolutePointerDev->Mode);
 
   //
   // Initialize keyboard controller if necessary
@@ -250,7 +250,7 @@ Returns:
   //
   // Reset the mouse
   //
-  Status = MouseSimulateTouchPadDev->AbsolutePointerProtocol.Reset (&MouseSimulateTouchPadDev->AbsolutePointerProtocol, TRUE);
+  Status = MouseAbsolutePointerDev->AbsolutePointerProtocol.Reset (&MouseAbsolutePointerDev->AbsolutePointerProtocol, TRUE);
   if (EFI_ERROR (Status)) {
     //
     // mouse not connected
@@ -265,9 +265,9 @@ Returns:
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
-                  MouseSimulateTouchPadWaitForInput,
-                  MouseSimulateTouchPadDev,
-                  &((MouseSimulateTouchPadDev->AbsolutePointerProtocol).WaitForInput)
+                  MouseAbsolutePointerWaitForInput,
+                  MouseAbsolutePointerDev,
+                  &((MouseAbsolutePointerDev->AbsolutePointerProtocol).WaitForInput)
                   );
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -279,9 +279,9 @@ Returns:
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  PollMouseSimulateTouchPad,
-                  MouseSimulateTouchPadDev,
-                  &MouseSimulateTouchPadDev->TimerEvent
+                  PollMouseAbsolutePointer,
+                  MouseAbsolutePointerDev,
+                  &MouseAbsolutePointerDev->TimerEvent
                   );
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -290,24 +290,24 @@ Returns:
   //
   // Start timer to poll mouse (100 samples per second)
   //
-  Status = gBS->SetTimer (MouseSimulateTouchPadDev->TimerEvent, TimerPeriodic, 100000);
+  Status = gBS->SetTimer (MouseAbsolutePointerDev->TimerEvent, TimerPeriodic, 100000);
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
 
-  MouseSimulateTouchPadDev->ControllerNameTable = NULL;
+  MouseAbsolutePointerDev->ControllerNameTable = NULL;
   AddUnicodeString2 (
     "eng",
-    gPs2MouseSimulateTouchPadComponentName.SupportedLanguages,
-    &MouseSimulateTouchPadDev->ControllerNameTable,
+    gPs2MouseAbsolutePointerComponentName.SupportedLanguages,
+    &MouseAbsolutePointerDev->ControllerNameTable,
     L"Faked PS/2 Touchpad Device",
     TRUE
     );
   AddUnicodeString2 (
     "en",
-    gPs2MouseSimulateTouchPadComponentName2.SupportedLanguages,
-    &MouseSimulateTouchPadDev->ControllerNameTable,
+    gPs2MouseAbsolutePointerComponentName2.SupportedLanguages,
+    &MouseAbsolutePointerDev->ControllerNameTable,
     L"Faked PS/2 Touchpad Device",
     FALSE
     );
@@ -319,7 +319,7 @@ Returns:
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Controller,
                   &gEfiAbsolutePointerProtocolGuid,
-                  &MouseSimulateTouchPadDev->AbsolutePointerProtocol,
+                  &MouseAbsolutePointerDev->AbsolutePointerProtocol,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -342,16 +342,16 @@ ErrorExit:
       );
   }
 
-  if ((MouseSimulateTouchPadDev != NULL) && (MouseSimulateTouchPadDev->AbsolutePointerProtocol.WaitForInput != NULL)) {
-    gBS->CloseEvent (MouseSimulateTouchPadDev->AbsolutePointerProtocol.WaitForInput);
+  if ((MouseAbsolutePointerDev != NULL) && (MouseAbsolutePointerDev->AbsolutePointerProtocol.WaitForInput != NULL)) {
+    gBS->CloseEvent (MouseAbsolutePointerDev->AbsolutePointerProtocol.WaitForInput);
   }
 
-  if ((MouseSimulateTouchPadDev != NULL) && (MouseSimulateTouchPadDev->TimerEvent != NULL)) {
-    gBS->CloseEvent (MouseSimulateTouchPadDev->TimerEvent);
+  if ((MouseAbsolutePointerDev != NULL) && (MouseAbsolutePointerDev->TimerEvent != NULL)) {
+    gBS->CloseEvent (MouseAbsolutePointerDev->TimerEvent);
   }
 
-  if ((MouseSimulateTouchPadDev != NULL) && (MouseSimulateTouchPadDev->ControllerNameTable != NULL)) {
-    FreeUnicodeStringTable (MouseSimulateTouchPadDev->ControllerNameTable);
+  if ((MouseAbsolutePointerDev != NULL) && (MouseAbsolutePointerDev->ControllerNameTable != NULL)) {
+    FreeUnicodeStringTable (MouseAbsolutePointerDev->ControllerNameTable);
   }
   //
   // Since there will be no timer handler for mouse input any more,
@@ -362,8 +362,8 @@ ErrorExit:
     EmptyStatus = In8042Data (IsaIo, &Data);
   }
 
-  if (MouseSimulateTouchPadDev != NULL) {
-    gBS->FreePool (MouseSimulateTouchPadDev);
+  if (MouseAbsolutePointerDev != NULL) {
+    gBS->FreePool (MouseAbsolutePointerDev);
   }
 
   gBS->CloseProtocol (
@@ -387,7 +387,7 @@ ErrorExit:
 
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverStop (
+PS2MouseAbsolutePointerDriverStop (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN UINTN                          NumberOfChildren,
@@ -411,7 +411,7 @@ PS2MouseSimulateTouchPadDriverStop (
 {
   EFI_STATUS                            Status;
   EFI_ABSOLUTE_POINTER_PROTOCOL         *AbsolutePointerProtocol;
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV       *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV       *MouseAbsolutePointerDev;
   UINT8                                 Data;
 
   Status = gBS->OpenProtocol (
@@ -426,7 +426,7 @@ PS2MouseSimulateTouchPadDriverStop (
     return EFI_SUCCESS;
   }
 
-  MouseSimulateTouchPadDev = PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_THIS (AbsolutePointerProtocol);
+  MouseAbsolutePointerDev = PS2_MOUSE_ABSOLUTE_POINTER_DEV_FROM_THIS (AbsolutePointerProtocol);
 
   //
   // Report that the keyboard is being disabled
@@ -434,13 +434,13 @@ PS2MouseSimulateTouchPadDriverStop (
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE,
-    MouseSimulateTouchPadDev->DevicePath
+    MouseAbsolutePointerDev->DevicePath
     );
 
   Status = gBS->UninstallProtocolInterface (
                   Controller,
                   &gEfiAbsolutePointerProtocolGuid,
-                  &MouseSimulateTouchPadDev->AbsolutePointerProtocol
+                  &MouseAbsolutePointerDev->AbsolutePointerProtocol
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -448,13 +448,13 @@ PS2MouseSimulateTouchPadDriverStop (
   //
   // Disable mouse on keyboard controller
   //
-  KbcDisableAux (MouseSimulateTouchPadDev->IsaIo);
+  KbcDisableAux (MouseAbsolutePointerDev->IsaIo);
 
   //
   // Cancel mouse data polling timer, close timer event
   //
-  gBS->SetTimer (MouseSimulateTouchPadDev->TimerEvent, TimerCancel, 0);
-  gBS->CloseEvent (MouseSimulateTouchPadDev->TimerEvent);
+  gBS->SetTimer (MouseAbsolutePointerDev->TimerEvent, TimerCancel, 0);
+  gBS->CloseEvent (MouseAbsolutePointerDev->TimerEvent);
 
   //
   // Since there will be no timer handler for mouse input any more,
@@ -462,12 +462,12 @@ PS2MouseSimulateTouchPadDriverStop (
   //
   Status = EFI_SUCCESS;
   while (!EFI_ERROR (Status)) {
-    Status = In8042Data (MouseSimulateTouchPadDev->IsaIo, &Data);
+    Status = In8042Data (MouseAbsolutePointerDev->IsaIo, &Data);
   }
 
-  gBS->CloseEvent (MouseSimulateTouchPadDev->AbsolutePointerProtocol.WaitForInput);
-  FreeUnicodeStringTable (MouseSimulateTouchPadDev->ControllerNameTable);
-  gBS->FreePool (MouseSimulateTouchPadDev);
+  gBS->CloseEvent (MouseAbsolutePointerDev->AbsolutePointerProtocol.WaitForInput);
+  FreeUnicodeStringTable (MouseAbsolutePointerDev->ControllerNameTable);
+  gBS->FreePool (MouseAbsolutePointerDev);
 
   gBS->CloseProtocol (
          Controller,
@@ -488,7 +488,7 @@ PS2MouseSimulateTouchPadDriverStop (
 
 EFI_STATUS
 EFIAPI
-MouseSimulateTouchPadReset (
+MouseAbsolutePointerReset (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL    *This,
   IN BOOLEAN                          ExtendedVerification
   )
@@ -511,12 +511,12 @@ Returns:
 --*/
 {
   EFI_STATUS                       Status;
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV  *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV  *MouseAbsolutePointerDev;
   EFI_TPL                          OldTpl;
   BOOLEAN                          KeyboardEnable;
   UINT8                            Data;
 
-  MouseSimulateTouchPadDev = PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_THIS (This);
+  MouseAbsolutePointerDev = PS2_MOUSE_ABSOLUTE_POINTER_DEV_FROM_THIS (This);
 
   //
   // Report reset progress code
@@ -524,7 +524,7 @@ Returns:
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET,
-    MouseSimulateTouchPadDev->DevicePath
+    MouseAbsolutePointerDev->DevicePath
     );
 
   KeyboardEnable = FALSE;
@@ -534,28 +534,28 @@ Returns:
   //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  ZeroMem (&MouseSimulateTouchPadDev->State, sizeof (EFI_ABSOLUTE_POINTER_STATE));
-  MouseSimulateTouchPadDev->StateChanged = FALSE;
+  ZeroMem (&MouseAbsolutePointerDev->State, sizeof (EFI_ABSOLUTE_POINTER_STATE));
+  MouseAbsolutePointerDev->StateChanged = FALSE;
 
   //
   // Exhaust input data
   //
   Status = EFI_SUCCESS;
   while (!EFI_ERROR (Status)) {
-    Status = In8042Data (MouseSimulateTouchPadDev->IsaIo, &Data);
+    Status = In8042Data (MouseAbsolutePointerDev->IsaIo, &Data);
   }
 
-  CheckKbStatus (MouseSimulateTouchPadDev->IsaIo, &KeyboardEnable);
+  CheckKbStatus (MouseAbsolutePointerDev->IsaIo, &KeyboardEnable);
 
-  KbcDisableKb (MouseSimulateTouchPadDev->IsaIo);
+  KbcDisableKb (MouseAbsolutePointerDev->IsaIo);
 
-  MouseSimulateTouchPadDev->IsaIo->Io.Read (MouseSimulateTouchPadDev->IsaIo, EfiIsaIoWidthUint8, KBC_CMD_STS_PORT, 1, &Data);
+  MouseAbsolutePointerDev->IsaIo->Io.Read (MouseAbsolutePointerDev->IsaIo, EfiIsaIoWidthUint8, KBC_CMD_STS_PORT, 1, &Data);
 
   //
   // if there's data block on KBC data port, read it out
   //
   if ((Data & KBC_OUTB) == KBC_OUTB) {
-    MouseSimulateTouchPadDev->IsaIo->Io.Read (MouseSimulateTouchPadDev->IsaIo, EfiIsaIoWidthUint8, KBC_DATA_PORT, 1, &Data);
+    MouseAbsolutePointerDev->IsaIo->Io.Read (MouseAbsolutePointerDev->IsaIo, EfiIsaIoWidthUint8, KBC_DATA_PORT, 1, &Data);
   }
 
   Status = EFI_SUCCESS;
@@ -564,35 +564,35 @@ Returns:
   // This behavior is needed by performance speed. The following mouse command only succeessfully finish when mouse device is
   // connected to system, so if PS2 mouse device not connect to system or user not ask for, we skip the mouse configuration and enabling
   //
-  if (ExtendedVerification && CheckMouseSimulateTouchPadConnect (MouseSimulateTouchPadDev)) {
+  if (ExtendedVerification && CheckMouseAbsolutePointerConnect (MouseAbsolutePointerDev)) {
     //
     // Send mouse reset command and set mouse default configure
     //
-    Status = PS2MouseReset (MouseSimulateTouchPadDev->IsaIo);
+    Status = PS2MouseReset (MouseAbsolutePointerDev->IsaIo);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
 
-    Status = PS2MouseSetSampleRate (MouseSimulateTouchPadDev->IsaIo, MouseSimulateTouchPadDev->SampleRate);
+    Status = PS2MouseSetSampleRate (MouseAbsolutePointerDev->IsaIo, MouseAbsolutePointerDev->SampleRate);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
 
-    Status = PS2MouseSetResolution (MouseSimulateTouchPadDev->IsaIo, MouseSimulateTouchPadDev->Resolution);
+    Status = PS2MouseSetResolution (MouseAbsolutePointerDev->IsaIo, MouseAbsolutePointerDev->Resolution);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
 
-    Status = PS2MouseSetScaling (MouseSimulateTouchPadDev->IsaIo, MouseSimulateTouchPadDev->Scaling);
+    Status = PS2MouseSetScaling (MouseAbsolutePointerDev->IsaIo, MouseAbsolutePointerDev->Scaling);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
 
-    Status = PS2MouseEnable (MouseSimulateTouchPadDev->IsaIo);
+    Status = PS2MouseEnable (MouseAbsolutePointerDev->IsaIo);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
@@ -602,15 +602,15 @@ Exit:
   gBS->RestoreTPL (OldTpl);
 
   if (KeyboardEnable) {
-    KbcEnableKb (MouseSimulateTouchPadDev->IsaIo);
+    KbcEnableKb (MouseAbsolutePointerDev->IsaIo);
   }
 
   return Status;
 }
 
 BOOLEAN
-CheckMouseSimulateTouchPadConnect (
-  IN  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV     *MouseSimulateTouchPadDev
+CheckMouseAbsolutePointerConnect (
+  IN  PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev
   )
 /*++
 
@@ -631,7 +631,7 @@ Returns:
 {
   EFI_STATUS     Status;
 
-  Status = PS2MouseEnable (MouseSimulateTouchPadDev->IsaIo);
+  Status = PS2MouseEnable (MouseAbsolutePointerDev->IsaIo);
   if (!EFI_ERROR (Status)) {
     return TRUE;
   }
@@ -641,7 +641,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-MouseSimulateTouchPadGetState (
+MouseAbsolutePointerGetState (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL     *This,
   IN OUT EFI_ABSOLUTE_POINTER_STATE    *State
   )
@@ -664,30 +664,30 @@ Returns:
 
 --*/
 {
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV *MouseAbsolutePointerDev;
   EFI_TPL       OldTpl;
 
-  MouseSimulateTouchPadDev = PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_THIS (This);
+  MouseAbsolutePointerDev = PS2_MOUSE_ABSOLUTE_POINTER_DEV_FROM_THIS (This);
 
   if (State == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!MouseSimulateTouchPadDev->StateChanged) {
+  if (!MouseAbsolutePointerDev->StateChanged) {
     return EFI_NOT_READY;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  CopyMem (State, &(MouseSimulateTouchPadDev->State), sizeof (EFI_ABSOLUTE_POINTER_STATE));
+  CopyMem (State, &(MouseAbsolutePointerDev->State), sizeof (EFI_ABSOLUTE_POINTER_STATE));
 
   //
   // clear mouse state
   //
-  MouseSimulateTouchPadDev->State.CurrentX = 0;
-  MouseSimulateTouchPadDev->State.CurrentY = 0;
-  MouseSimulateTouchPadDev->State.CurrentZ = 0;
-  MouseSimulateTouchPadDev->State.ActiveButtons = 0x0;
-  MouseSimulateTouchPadDev->StateChanged            = FALSE;
+  MouseAbsolutePointerDev->State.CurrentX = 0;
+  MouseAbsolutePointerDev->State.CurrentY = 0;
+  MouseAbsolutePointerDev->State.CurrentZ = 0;
+  MouseAbsolutePointerDev->State.ActiveButtons = 0x0;
+  MouseAbsolutePointerDev->StateChanged            = FALSE;
   gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
@@ -695,7 +695,7 @@ Returns:
 
 VOID
 EFIAPI
-MouseSimulateTouchPadWaitForInput (
+MouseAbsolutePointerWaitForInput (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
@@ -714,15 +714,15 @@ Returns:
 // GC_TODO:    Event - add argument and description to function comment
 // GC_TODO:    Context - add argument and description to function comment
 {
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV *MouseAbsolutePointerDev;
 
-  MouseSimulateTouchPadDev = (PS2_MOUSE_SIMULATE_TOUCHPAD_DEV *) Context;
+  MouseAbsolutePointerDev = (PS2_MOUSE_ABSOLUTE_POINTER_DEV *) Context;
 
   //
   // Someone is waiting on the mouse event, if there's
   // input from mouse, signal the event
   //
-  if (MouseSimulateTouchPadDev->StateChanged) {
+  if (MouseAbsolutePointerDev->StateChanged) {
     gBS->SignalEvent (Event);
   }
 
@@ -730,7 +730,7 @@ Returns:
 
 VOID
 EFIAPI
-PollMouseSimulateTouchPad(
+PollMouseAbsolutePointer(
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
@@ -752,18 +752,18 @@ Returns:
 
 --*/
 {
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV *MouseSimulateTouchPadDev;
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV *MouseAbsolutePointerDev;
 
-  MouseSimulateTouchPadDev = (PS2_MOUSE_SIMULATE_TOUCHPAD_DEV *) Context;
+  MouseAbsolutePointerDev = (PS2_MOUSE_ABSOLUTE_POINTER_DEV *) Context;
 
   //
   // Polling mouse packet data
   //
-  PS2MouseGetPacket (MouseSimulateTouchPadDev);
+  PS2MouseGetPacket (MouseAbsolutePointerDev);
 }
 
 /**
-  The user Entry Point for module Ps2MouseSimulateTouchPad. The user code starts with this function.
+  The user Entry Point for module Ps2MouseAbsolutePointer. The user code starts with this function.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
   @param[in] SystemTable    A pointer to the EFI System Table.
@@ -774,7 +774,7 @@ Returns:
 **/
 EFI_STATUS
 EFIAPI
-InitializePs2MouseSimulateTouchPad(
+InitializePs2MouseAbsolutePointer(
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
@@ -787,10 +787,10 @@ InitializePs2MouseSimulateTouchPad(
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
-             &gPS2MouseSimulateTouchPadDriver,
+             &gPS2MouseAbsolutePointerDriver,
              ImageHandle,
-             &gPs2MouseSimulateTouchPadComponentName,
-             &gPs2MouseSimulateTouchPadComponentName2
+             &gPs2MouseAbsolutePointerComponentName,
+             &gPs2MouseAbsolutePointerComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 

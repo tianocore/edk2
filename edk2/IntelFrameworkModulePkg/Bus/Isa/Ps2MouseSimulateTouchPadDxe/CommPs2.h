@@ -343,7 +343,7 @@ Returns:
 
 EFI_STATUS
 PS2MouseGetPacket (
-  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV     *MouseSimulateTouchPadDev
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev
   )
 /*++
 

@@ -1,5 +1,5 @@
 /**@file
-  A faked PS/2 Touchpad driver header file
+  A Ps2MouseAbsolutePointer driver header file
   
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PS2MOUSESIMULATETOUCHPAD_H
-#define _PS2MOUSESIMULATETOUCHPAD_H
+#ifndef _PS2MOUSEABSOLUTEPOINTER_H
+#define _PS2MOUSEABSOLUTEPOINTER_H
 
 #include <PiDxe.h>
 #include <Framework/StatusCode.h>
@@ -66,7 +66,7 @@ typedef enum {
 //
 // Driver Private Data
 //
-#define PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE EFI_SIGNATURE_32 ('p', '2', 's', 't')
+#define PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE EFI_SIGNATURE_32 ('p', '2', 's', 't')
 
 typedef struct {
   UINTN                               Signature;
@@ -91,23 +91,23 @@ typedef struct {
 
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-} PS2_MOUSE_SIMULATE_TOUCHPAD_DEV;
+} PS2_MOUSE_ABSOLUTE_POINTER_DEV;
 
-#define PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_FROM_THIS(a)  CR (a, PS2_MOUSE_SIMULATE_TOUCHPAD_DEV, AbsolutePointerProtocol, PS2_MOUSE_SIMULATE_TOUCHPAD_DEV_SIGNATURE)
+#define PS2_MOUSE_ABSOLUTE_POINTER_DEV_FROM_THIS(a)  CR (a, PS2_MOUSE_ABSOLUTE_POINTER_DEV, AbsolutePointerProtocol, PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE)
 
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gPS2MouseSimulateTouchPadDriver;
-extern EFI_COMPONENT_NAME_PROTOCOL   gPs2MouseSimulateTouchPadComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseSimulateTouchPadComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gPS2MouseAbsolutePointerDriver;
+extern EFI_COMPONENT_NAME_PROTOCOL   gPs2MouseAbsolutePointerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseAbsolutePointerComponentName2;
 
 //
 // Function prototypes
 //
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverSupported (
+PS2MouseAbsolutePointerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
@@ -115,7 +115,7 @@ PS2MouseSimulateTouchPadDriverSupported (
 
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverStart (
+PS2MouseAbsolutePointerDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
@@ -123,7 +123,7 @@ PS2MouseSimulateTouchPadDriverStart (
 
 EFI_STATUS
 EFIAPI
-PS2MouseSimulateTouchPadDriverStop (
+PS2MouseAbsolutePointerDriverStop (
   IN EFI_DRIVER_BINDING_PROTOCOL   *This,
   IN EFI_HANDLE                    Controller,
   IN UINTN                         NumberOfChildren,
@@ -174,7 +174,7 @@ PS2MouseSimulateTouchPadDriverStop (
 **/
 EFI_STATUS
 EFIAPI
-Ps2MouseSimulateTouchPadComponentNameGetDriverName (
+Ps2MouseAbsolutePointerComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
@@ -251,7 +251,7 @@ Ps2MouseSimulateTouchPadComponentNameGetDriverName (
 **/
 EFI_STATUS
 EFIAPI
-Ps2MouseSimulateTouchPadComponentNameGetControllerName (
+Ps2MouseAbsolutePointerComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
   IN  EFI_HANDLE                                      ControllerHandle,
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
@@ -262,28 +262,28 @@ Ps2MouseSimulateTouchPadComponentNameGetControllerName (
 
 EFI_STATUS
 EFIAPI
-MouseSimulateTouchPadReset (
+MouseAbsolutePointerReset (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL  *This,
   IN BOOLEAN                        ExtendedVerification
   );
 
 EFI_STATUS
 EFIAPI
-MouseSimulateTouchPadGetState (
+MouseAbsolutePointerGetState (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL  *This,
   IN OUT EFI_ABSOLUTE_POINTER_STATE   *State
   );
 
 VOID
 EFIAPI
-MouseSimulateTouchPadWaitForInput (
+MouseAbsolutePointerWaitForInput (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   );
 
 VOID
 EFIAPI
-PollMouseSimulateTouchPad (
+PollMouseAbsolutePointer (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
@@ -294,8 +294,8 @@ In8042Data (
   IN OUT UINT8                            *Data
   );
 BOOLEAN
-CheckMouseSimulateTouchPadConnect (
-  IN  PS2_MOUSE_SIMULATE_TOUCHPAD_DEV     *MouseDev
+CheckMouseAbsolutePointerConnect (
+  IN  PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev
   );
 
 #endif
