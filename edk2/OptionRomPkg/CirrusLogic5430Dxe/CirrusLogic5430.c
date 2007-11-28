@@ -211,7 +211,9 @@ CirrusLogic5430ControllerDriverStart (
 {
   EFI_STATUS                      Status;
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
+  BOOLEAN                         PciAttributesSaved;
 
+  PciAttributesSaved = FALSE;
   //
   // Allocate Private context data for UGA Draw inteface.
   //
@@ -255,6 +257,7 @@ CirrusLogic5430ControllerDriverStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
+  PciAttributesSaved = TRUE;
 
   Status = Private->PciIo->Attributes (
                             Private->PciIo,
@@ -319,16 +322,17 @@ Error:
   if (EFI_ERROR (Status)) {
     if (Private) {
       if (Private->PciIo) {
-        //
-        // Restore original PCI attributes
-        //
-        Private->PciIo->Attributes (
-                        Private->PciIo,
-                        EfiPciIoAttributeOperationSet,
-                        Private->OriginalPciAttributes,
-                        NULL
-                        );
-
+        if (PciAttributesSaved == TRUE) {
+          //
+          // Restore original PCI attributes
+          //
+          Private->PciIo->Attributes (
+                          Private->PciIo,
+                          EfiPciIoAttributeOperationSet,
+                          Private->OriginalPciAttributes,
+                          NULL
+                          );
+        }
         //
         // Close the PCI I/O Protocol
         //

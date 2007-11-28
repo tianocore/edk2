@@ -2133,6 +2133,7 @@ UhciDriverBindingStart (
   USB_HC_DEV          *Uhc;
   UINT64              Supports;
   UINT64              OriginalPciAttributes;
+  BOOLEAN             PciAttributesSaved;
 
   //
   // Open PCIIO, then enable the EHC device and turn off emulation
@@ -2151,6 +2152,7 @@ UhciDriverBindingStart (
     return Status;
   }
 
+  PciAttributesSaved = FALSE;
   //
   // Save original PCI attributes
   //
@@ -2162,8 +2164,9 @@ UhciDriverBindingStart (
                     );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto CLOSE_PCIIO;
   }
+  PciAttributesSaved = TRUE;
 
   UhciTurnOffUsbEmulation (PciIo);
 
@@ -2262,15 +2265,17 @@ FREE_UHC:
   UhciFreeDev (Uhc);
 
 CLOSE_PCIIO:
-  //
-  // Restore original PCI attributes
-  //
-  PciIo->Attributes (
-                  PciIo,
-                  EfiPciIoAttributeOperationSet,
-                  OriginalPciAttributes,
-                  NULL
-                  );
+  if (PciAttributesSaved == TRUE) {
+    //
+    // Restore original PCI attributes
+    //
+    PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSet,
+                    OriginalPciAttributes,
+                    NULL
+                    );
+  }
 
   gBS->CloseProtocol (
         Controller,

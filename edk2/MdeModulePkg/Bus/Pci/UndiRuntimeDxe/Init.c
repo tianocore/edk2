@@ -287,6 +287,7 @@ Returns:
   EFI_PCI_IO_PROTOCOL       *PciIoFncs;
   UINTN                     Len;
   UINT64                    Supports;
+  BOOLEAN                   PciAttributesSaved;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -321,6 +322,8 @@ Returns:
     return Status;
   }
 
+  PciAttributesSaved = FALSE;
+
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
                   sizeof (UNDI32_DEV),
@@ -344,8 +347,9 @@ Returns:
                     );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto UndiErrorDeleteDevice;
   }
+  PciAttributesSaved = TRUE;
 
   //
   // allocate and initialize both (old and new) the !pxe structures here,
@@ -550,15 +554,17 @@ UndiErrorDeletePxe:
   }
 
 UndiErrorDeleteDevice:
-  //
-  // Restore original PCI attributes
-  //
-  PciIoFncs->Attributes (
-                  PciIoFncs,
-                  EfiPciIoAttributeOperationSet,
-                  UNDI32Device->NicInfo.OriginalPciAttributes,
-                  NULL
-                  );
+  if (PciAttributesSaved == TRUE) {
+    //
+    // Restore original PCI attributes
+    //
+    PciIoFncs->Attributes (
+                    PciIoFncs,
+                    EfiPciIoAttributeOperationSet,
+                    UNDI32Device->NicInfo.OriginalPciAttributes,
+                    NULL
+                    );
+  }
 
   gBS->FreePool (UNDI32Device);
 
