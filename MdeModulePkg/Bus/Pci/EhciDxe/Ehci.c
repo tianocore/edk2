@@ -1496,6 +1496,7 @@ EhcDriverBindingStart (
   EFI_PCI_IO_PROTOCOL     *PciIo;
   UINT64                  Supports;
   UINT64                  OriginalPciAttributes;
+  BOOLEAN                 PciAttributesSaved;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1514,6 +1515,7 @@ EhcDriverBindingStart (
     return EFI_DEVICE_ERROR;
   }
 
+  PciAttributesSaved = FALSE;
   //
   // Save original PCI attributes
   //
@@ -1525,8 +1527,9 @@ EhcDriverBindingStart (
                     );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto CLOSE_PCIIO;
   }
+  PciAttributesSaved = TRUE;
 
   Status = PciIo->Attributes (
                     PciIo,
@@ -1634,15 +1637,17 @@ FREE_POOL:
   gBS->FreePool (Ehc);
 
 CLOSE_PCIIO:
-  //
-  // Restore original PCI attributes
-  //
-  PciIo->Attributes (
-                  PciIo,
-                  EfiPciIoAttributeOperationSet,
-                  OriginalPciAttributes,
-                  NULL
-                  );
+  if (PciAttributesSaved == TRUE) {
+    //
+    // Restore original PCI attributes
+    //
+    PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSet,
+                    OriginalPciAttributes,
+                    NULL
+                    );
+  }
 
   gBS->CloseProtocol (
          Controller,
