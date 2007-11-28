@@ -164,7 +164,7 @@ GetItemData (
 /**
   Parse Local Item
 
-  @param  UsbMouseSimulateTouchPad          USB_MOUSE_SIMULATE_TOUCHPAD_DEV
+  @param  UsbMouseAbsolutePointer          USB_MOUSE_ABSOLUTE_POINTER_DEV
   @param  LocalItem         Local Item
 
 
@@ -172,7 +172,7 @@ GetItemData (
 STATIC
 VOID
 ParseLocalItem (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  HID_ITEM        *LocalItem
   )
 {
@@ -199,16 +199,16 @@ ParseLocalItem (
     return ;
 
   case HID_LOCAL_ITEM_TAG_USAGE_MINIMUM:
-    if (UsbMouseSimulateTouchPad->PrivateData.ButtonDetected) {
-      UsbMouseSimulateTouchPad->PrivateData.ButtonMinIndex = (UINT8) Data;
+    if (UsbMouseAbsolutePointer->PrivateData.ButtonDetected) {
+      UsbMouseAbsolutePointer->PrivateData.ButtonMinIndex = (UINT8) Data;
     }
 
     return ;
 
   case HID_LOCAL_ITEM_TAG_USAGE_MAXIMUM:
     {
-      if (UsbMouseSimulateTouchPad->PrivateData.ButtonDetected) {
-        UsbMouseSimulateTouchPad->PrivateData.ButtonMaxIndex = (UINT8) Data;
+      if (UsbMouseAbsolutePointer->PrivateData.ButtonDetected) {
+        UsbMouseAbsolutePointer->PrivateData.ButtonMaxIndex = (UINT8) Data;
       }
 
       return ;
@@ -219,7 +219,7 @@ ParseLocalItem (
 STATIC
 VOID
 ParseGlobalItem (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  HID_ITEM        *GlobalItem
   )
 {
@@ -237,7 +237,7 @@ ParseGlobalItem (
         //
         // Button Page
         //
-        UsbMouseSimulateTouchPad->PrivateData.ButtonDetected = TRUE;
+        UsbMouseAbsolutePointer->PrivateData.ButtonDetected = TRUE;
         return ;
       }
       break;
@@ -251,7 +251,7 @@ ParseGlobalItem (
 /**
   Parse Main Item
 
-  @param  UsbMouseSimulateTouchPad   USB_MOUSE_SIMULATE_TOUCHPAD_DEV
+  @param  UsbMouseAbsolutePointer   USB_MOUSE_ABSOLUTE_POINTER_DEV
   @param  MainItem          HID_ITEM to parse
 
   @return VOID
@@ -260,7 +260,7 @@ ParseGlobalItem (
 STATIC
 VOID
 ParseMainItem (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  HID_ITEM        *MainItem
   )
 {
@@ -274,7 +274,7 @@ ParseMainItem (
 /**
   Parse Hid Item
 
-  @param  UsbMouseSimulateTouchPad          USB_MOUSE_SIMULATE_TOUCHPAD_DEV
+  @param  UsbMouseAbsolutePointer          USB_MOUSE_ABSOLUTE_POINTER_DEV
   @param  HidItem           HidItem to parse
 
   @return VOID
@@ -283,7 +283,7 @@ ParseMainItem (
 STATIC
 VOID
 ParseHidItem (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  HID_ITEM        *HidItem
   )
 {
@@ -293,21 +293,21 @@ ParseHidItem (
     //
     // For Main Item, parse main item
     //
-    ParseMainItem (UsbMouseSimulateTouchPad, HidItem);
+    ParseMainItem (UsbMouseAbsolutePointer, HidItem);
     break;
 
   case HID_ITEM_TYPE_GLOBAL:
     //
     // For global Item, parse global item
     //
-    ParseGlobalItem (UsbMouseSimulateTouchPad, HidItem);
+    ParseGlobalItem (UsbMouseAbsolutePointer, HidItem);
     break;
 
   case HID_ITEM_TYPE_LOCAL:
     //
     // For Local Item, parse local item
     //
-    ParseLocalItem (UsbMouseSimulateTouchPad, HidItem);
+    ParseLocalItem (UsbMouseAbsolutePointer, HidItem);
     break;
   }
 }
@@ -328,7 +328,7 @@ ParseHidItem (
 **/
 EFI_STATUS
 ParseMouseReportDescriptor (
-  IN  USB_MOUSE_SIMULATE_TOUCHPAD_DEV   *UsbMouseSimulateTouchPad,
+  IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
   IN  UINT8           *ReportDescriptor,
   IN  UINTN           ReportSize
   )
@@ -349,14 +349,14 @@ ParseMouseReportDescriptor (
       return EFI_DEVICE_ERROR;
     }
 
-    ParseHidItem (UsbMouseSimulateTouchPad, &HidItem);
+    ParseHidItem (UsbMouseAbsolutePointer, &HidItem);
 
     ptr = GetNextItem (ptr, DescriptorEnd, &HidItem);
   }
 
-  UsbMouseSimulateTouchPad->NumberOfButtons                 = (UINT8) (UsbMouseSimulateTouchPad->PrivateData.ButtonMaxIndex - UsbMouseSimulateTouchPad->PrivateData.ButtonMinIndex + 1);
-  UsbMouseSimulateTouchPad->XLogicMax                       = UsbMouseSimulateTouchPad->YLogicMax = 1023;
-  UsbMouseSimulateTouchPad->XLogicMin                       = UsbMouseSimulateTouchPad->YLogicMin = -1023;
+  UsbMouseAbsolutePointer->NumberOfButtons                 = (UINT8) (UsbMouseAbsolutePointer->PrivateData.ButtonMaxIndex - UsbMouseAbsolutePointer->PrivateData.ButtonMinIndex + 1);
+  UsbMouseAbsolutePointer->XLogicMax                       = UsbMouseAbsolutePointer->YLogicMax = 1023;
+  UsbMouseAbsolutePointer->XLogicMin                       = UsbMouseAbsolutePointer->YLogicMin = -1023;
 
   return EFI_SUCCESS;
 }
