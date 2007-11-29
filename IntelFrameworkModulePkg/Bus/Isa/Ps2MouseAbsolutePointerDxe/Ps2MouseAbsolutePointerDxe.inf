@@ -1,0 +1,58 @@
+#/** @file
+# Ps2 Mouse Simulate TouchPad Driver
+#
+# This dirver directly uses IsaIo protocol service to support a faked Ps2 TouchPad work.
+# Copyright (c) 2006 - 2007, Intel Corporation.
+#
+# Copyright (c) 2006 - 2007, Intel Corporation
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ps2MouseAbsolutePointerDxe
+  FILE_GUID                      = 2899C94A-1FB6-4b1a-B96B-8364975303E0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializePs2MouseAbsolutePointer
+
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+
+[Sources.common]
+  ComponentName.c
+  CommPs2.h
+  CommPs2.c
+  Ps2MouseAbsolutePointer.h
+  Ps2MouseAbsolutePointer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiAbsolutePointerProtocolGuid               # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+

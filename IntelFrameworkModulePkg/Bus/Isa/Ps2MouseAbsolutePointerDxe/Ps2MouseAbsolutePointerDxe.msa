@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>Ps2MouseAbsolutePointer</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>2899C94A-1FB6-4b1a-B96B-8364975303E0</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Ps2 Mouse Absolute Pointer Driver</Abstract>
+    <Description>This dirver directly uses IsaIo protocol service to support a faked Ps2 touchpad work.</Description>
+    <Copyright>Copyright (c) 2006 - 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>Ps2MouseAbsolutePointer</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverModelLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>ReportStatusCodeLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Ps2MouseAbsolutePointer.c</Filename>
+    <Filename>Ps2MouseAbsolutePointer.h</Filename>
+    <Filename>CommPs2.c</Filename>
+    <Filename>CommPs2.h</Filename>
+    <Filename>ComponentName.c</Filename>
+  </SourceFiles>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gEfiAbsolutePointerProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiIsaIoProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <Events>
+    <CreateEvents>
+      <EventTypes Usage="ALWAYS_PRODUCED">
+        <EventType>EVENT_TYPE_RELATIVE_TIMER</EventType>
+        <HelpText>Set up a time event to wait for the faked touchpad input</HelpText>
+      </EventTypes>
+      <EventTypes Usage="ALWAYS_PRODUCED">
+        <EventType>EVENT_TYPE_PERIODIC_TIMER</EventType>
+        <HelpText>Set up a periodic timer to poll the faked touchpad state at a fixed interval</HelpText>
+      </EventTypes>
+    </CreateEvents>
+    <SignalEvents>
+      <EventTypes Usage="SOMETIMES_PRODUCED">
+        <EventType>EVENT_TYPE_RELATIVE_TIMER</EventType>
+        <HelpText>Signal an event whenever these is a pending event from the faked touchpad input</HelpText>
+      </EventTypes>
+    </SignalEvents>
+  </Events>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <DriverBinding>gPS2MouseAbsolutePointerDriver</DriverBinding>
+      <ComponentName>gPs2MouseAbsolutePointerComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>
