@@ -122,9 +122,6 @@ Returns:
   PEI_CORE_INSTANCE                                     *OldCoreData;
   EFI_PEI_CPU_IO_PPI                                    *CpuIo;
   EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
-  UINT64                                                SecPlatformInfoRecordSize;
-  EFI_SEC_PLATFORM_INFORMATION_PPI                      *SecPlatformInfoPpi;
-  EFI_SEC_PLATFORM_INFORMATION_RECORD                   *SecPlatformInfoRecord;
 
   mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
@@ -231,37 +228,6 @@ Returns:
     if (PpiList != NULL) {
       Status = PeiServicesInstallPpi (PpiList);
       ASSERT_EFI_ERROR (Status);
-      
-      //
-      // PI spec Vol 1, 7.3.1 specifies that this same information reported by EFI_SEC_PLATFORM_INFORMATION_PPI
-      // will be placed in a GUIDed HOB with the PPI GUID as the HOB GUID for HOB consumer phase.
-      //
-      Status = PeiServicesLocatePpi (
-                 &gEfiSecPlatformInformationPpiGuid,
-                 0,
-                 NULL,
-                 (VOID **) &SecPlatformInfoPpi
-                 );
-      if (!EFI_ERROR (Status)) {
-        SecPlatformInfoRecord = AllocateZeroPool (sizeof(*SecPlatformInfoRecord));
-        ASSERT (SecPlatformInfoRecord != NULL);
-
-        SecPlatformInfoRecordSize = sizeof(*SecPlatformInfoRecord);
-        
-        Status = SecPlatformInfoPpi->PlatformInformation (
-                   (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
-                   &SecPlatformInfoRecordSize,
-                   SecPlatformInfoRecord
-                   );
-        
-        if (!EFI_ERROR (Status)) {
-          BuildGuidDataHob (
-            &gEfiSecPlatformInformationPpiGuid,
-            SecPlatformInfoRecord,
-            sizeof (*SecPlatformInfoRecord)
-            );
-        }
-      }
     }
   }
 

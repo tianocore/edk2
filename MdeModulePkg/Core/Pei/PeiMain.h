@@ -37,7 +37,6 @@ Revision History
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/LoadFile.h>
 #include <Ppi/Security2.h>
-#include <Ppi/SecPlatformInformation.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
