@@ -1,0 +1,67 @@
+#/** @file
+# Component name for module UsbMouseAbsolutePointerDxe
+#
+# FIX ME!
+# Copyright (c) 2006, Intel Corporation. 
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbMouseAbsolutePointerDxe
+  FILE_GUID                      = 4EA43463-747C-46eb-97FB-B0E5C5F05306
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = USBMouseAbsolutePointerDriverBindingEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  mousehid.h
+  ComponentName.c
+  UsbMouseAbsolutePointer.c
+  mousehid.c
+  UsbMouseAbsolutePointer.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  ReportStatusCodeLib
+  PcdLib
+  UsbLib
+
+[Protocols]
+  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiAbsolutePointerProtocolGuid								# PROTOCOL ALWAYS_CONSUMED
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset
+
+
