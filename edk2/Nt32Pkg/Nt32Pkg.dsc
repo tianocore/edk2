@@ -144,6 +144,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PeCoffLib|Nt32Pkg/Library/PeiCoreNT32PeCoffLib/PeiCoreNT32PeCoffLib.inf
+  PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -395,7 +396,10 @@
   Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
   Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
+  }
   ##
   #  DXE Phase modules
   ##
