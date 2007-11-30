@@ -57,6 +57,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize

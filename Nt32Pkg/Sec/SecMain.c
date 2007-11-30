@@ -155,7 +155,7 @@ Returns:
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
-  
+
   MemorySizeStr      = (CHAR16 *) FixedPcdGetPtr (PcdWinNtMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *) FixedPcdGetPtr (PcdWinNtFirmwareVolume);
 
