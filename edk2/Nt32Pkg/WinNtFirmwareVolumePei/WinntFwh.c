@@ -117,14 +117,16 @@ Returns:
         // Hard code the address of the spare block and variable services.
         //  Assume it's a hard coded offset from FV0 in FD0.
         //
-        FdBase  = FdBase + PcdGet32 (PcdWinNtFlashNvStorageVariableBase);
+        // FdBase  = FdBase + PcdGet32 (PcdWinNtFlashNvStorageVariableBase);
         FdSize  = 
           PcdGet32 (PcdFlashNvStorageVariableSize) +
           PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
           PcdGet32 (PcdWinNtFlashNvStorageEventLogSize);
 
-        BuildFvHob (FdBase, FdSize);
+        BuildFvHob (FdBase + PcdGet32 (PcdWinNtFlashNvStorageVariableBase), FdSize);
+        
+        BuildFvHob (FdBase + PcdGet32 (PcdWinNtFlashNvStorageFtwSpareBase), PcdGet32 (PcdFlashNvStorageFtwSpareSize));
       } else {
         //
         // For other FD's just map them in.

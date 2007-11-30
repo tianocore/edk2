@@ -80,6 +80,7 @@ DATA = {
 
 0x00290000|0x00010000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+FV = FvDxe
 
 ################################################################################
 #
@@ -91,6 +92,106 @@ gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTok
 # module statements.
 #
 ################################################################################
+[FV.FvDxe]
+BlockSize          = 0x10000
+FvAlignment        = 16         #FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
+    SECTION COMPRESS PI_STD {
+      SECTION GUIDED {
+        SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
+      }
+    }
+  }
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+    SECTION COMPRESS PI_STD {
+      SECTION GUIDED {
+        SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+      }
+    }
+  }
+
+[FV.FvMain]
+BlockSize          = 0x10000
+FvAlignment        = 16         #FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+INF  Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
+INF  Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+INF  Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+INF  Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+INF  IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
+INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
+INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
+INF  Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
+INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
+INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
+INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
+INF  Nt32Pkg/TimerDxe/TimerDxe.inf
+INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+INF  MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
+INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
+INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
+INF  Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
+INF  Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
+INF  Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
+INF  Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
+INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
+INF  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+
 [FV.FvRecovery]
 FvAlignment        = 16         #FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
@@ -145,55 +246,27 @@ INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
 INF  Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
 INF  Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
+#FILE PEIM = 86D70125-BAA3-4296-A62F-602BEBBB9081 {
+#    SECTION PEI_DEPEX = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/IA32/MdeModulePkg/Core/DxeIplPeim/DxeIpl/OUTPUT/DxeIpl.depex
+#    SECTION UI = "DxeIpl"
+#    SECTION PE32 = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/IA32/MdeModulePkg/Core/DxeIplPeim/DxeIpl/DEBUG/DxeIpl.efi
+#  }
+
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
+FILE FV_IMAGE = bdddaa2d-7f72-4a0d-b35a-bef1b64f6a09 {
+    SECTION PEI_DEPEX = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/IA32/MdeModulePkg/Core/Pei/PeiMain/OUTPUT/PeiMain.depex
+    SECTION DXE_DEPEX = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/IA32/MdeModulePkg/Core/Pei/PeiMain/OUTPUT/PeiMain.depex    
+    SECTION FV_IMAGE = FvMain
+  }
   ##
   #  DXE Phase modules
   ##
 INF  MdeModulePkg/Core/Dxe/DxeMain.inf
-INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-INF  Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
-INF  Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-INF  Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
-INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-INF  Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
-INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
-INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
-INF  IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
-INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
-INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
-INF  Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
-INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
-INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
-INF  Nt32Pkg/TimerDxe/TimerDxe.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-INF  MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
-INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
-INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
-INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-INF  IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
-INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-INF  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
-INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
-INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-INF  Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
-INF  Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
-INF  Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
-INF  Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
-INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
-INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+#FILE FV_IMAGE = cc00b922-8c49-4ea6-b6e9-17920bae36e0 {
+#    SECTION FV_IMAGE = FvDxe
+#  }
 
 ################################################################################
 #
@@ -210,21 +283,6 @@ FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
       }
     }
   }
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-      }
-    }
-  }
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-      }
-    }
-  }
-
 
 ################################################################################
 #
@@ -264,7 +322,7 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional        |.depex
-     PE32      PE32                      |.efi
+     PE32     PE32                       |.efi
      UI       STRING="$(MODULE_NAME)" Optional         
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
   }
