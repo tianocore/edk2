@@ -110,15 +110,32 @@ AcquireSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  UINT64                            Tick;
-  UINT64                            Start, End;
-  UINT64                            Timeout;
+  UINT64  Current;
+  UINT64  Previous;
+  UINT64  Total;
+  UINT64  Start;
+  UINT64  End;
+  UINT64  Timeout;
+  INT64   Cycle;
+  INT64   Delta;
 
-  Tick = 0;
-  Start = 0;
-  End = 0;
   if (PcdGet32 (PcdSpinLockTimeout) > 0) {
-    Tick = GetPerformanceCounter ();
+    //
+    // Get the current timer value
+    //
+    Current = GetPerformanceCounter();
+
+    //
+    // Initialize local variables
+    //
+    Start = 0;
+    End   = 0;
+    Total = 0;
+
+    //
+    // Retrieve the performance counter properties and compute the number of performance
+    // counter ticks required to reach the timeout
+    //
     Timeout = DivU64x32 (
                 MultU64x32 (
                   GetPerformanceCounterProperties (&Start, &End),
@@ -126,16 +143,30 @@ AcquireSpinLock (
                   ),
                 1000000
                 );
-    if (Start < End) {
-      Tick += Timeout;
-    } else {
-      Tick -= Timeout;
+    Cycle = End - Start;
+    if (Cycle < 0) {
+      Cycle = -Cycle;
     }
-  }
+    Cycle++;
 
-  while (!AcquireSpinLockOrFail (SpinLock)) {
-    CpuPause ();
-    ASSERT ((Start < End) ^ (Tick <= GetPerformanceCounter ()));
+    while (!AcquireSpinLockOrFail (SpinLock)) {
+      CpuPause ();
+      Previous = Current;
+      Current  = GetPerformanceCounter();
+      Delta = (INT64) (Current - Previous);
+      if (Start > End) {
+        Delta = -Delta;
+      }
+      if (Delta < 0) {
+        Delta += Cycle;
+      }
+      Total += Delta;
+      ASSERT (Total < Timeout);
+    }
+  } else {
+    while (!AcquireSpinLockOrFail (SpinLock)) {
+      CpuPause ();
+    }
   }
   return SpinLock;
 }
