@@ -28,12 +28,6 @@ BOOLEAN mRepairLoadedImage = FALSE;
 //
 // Driver Support Function Prototypes
 //
-EFI_STATUS
-GetHandleFromDriverBinding (
-  IN EFI_DRIVER_BINDING_PROTOCOL           *DriverBindingNeed,
-  OUT  EFI_HANDLE                          *Handle 
-  );
-
 EFI_STATUS 
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -282,7 +276,8 @@ AddSortedDriverBindingProtocol (
   IN OUT  UINTN                        *NumberOfSortedDriverBindingProtocols, 
   IN OUT  EFI_DRIVER_BINDING_PROTOCOL  **SortedDriverBindingProtocols,
   IN      UINTN                        DriverBindingHandleCount,
-  IN OUT  EFI_HANDLE                   *DriverBindingHandleBuffer
+  IN OUT  EFI_HANDLE                   *DriverBindingHandleBuffer,
+  IN      BOOLEAN                      IsImageHandle
   )
 /*++
 
@@ -318,6 +313,41 @@ Returns:
   //
   Status = CoreValidateHandle (DriverBindingHandle);
   if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // If IsImageHandle is TRUE, then DriverBindingHandle is an image handle
+  // Find all the DriverBindingHandles associated with that image handle and add them to the sorted list
+  //
+  if (IsImageHandle) {
+    //
+    // Loop through all the Driver Binding Handles
+    //
+    for (Index = 0; Index < DriverBindingHandleCount; Index++) {
+      //
+      // Retrieve the Driver Binding Protocol associated with each Driver Binding Handle
+      //
+      Status = CoreHandleProtocol (
+                DriverBindingHandleBuffer[Index],
+                &gEfiDriverBindingProtocolGuid,
+                (VOID **)&DriverBinding
+                );
+      //
+      // If the ImageHandle associated with DriverBinding matches DriverBindingHandle,
+      // then add the DriverBindingProtocol[Index] to the sorted list
+      //
+      if (DriverBinding->ImageHandle == DriverBindingHandle) {
+        AddSortedDriverBindingProtocol (
+          DriverBindingHandleBuffer[Index],
+          NumberOfSortedDriverBindingProtocols, 
+          SortedDriverBindingProtocols,
+          DriverBindingHandleCount,
+          DriverBindingHandleBuffer,
+          FALSE
+          );
+      }
+    }
     return;
   }
 
@@ -405,12 +435,7 @@ Returns:
   UINTN                                      SortIndex;
   BOOLEAN                                    OneStarted;
   BOOLEAN                                    DriverFound;
-  EFI_HANDLE                                 DriverBindingHandle;
 
-  //
-  // DriverBindingHandle is used for performance measurement, initialize it here just in case.
-  //
-  DriverBindingHandle                   = NULL;
   //
   // Initialize local variables
   //
@@ -452,7 +477,8 @@ Returns:
         &NumberOfSortedDriverBindingProtocols, 
         SortedDriverBindingProtocols,
         DriverBindingHandleCount,
-        DriverBindingHandleBuffer
+        DriverBindingHandleBuffer,
+        FALSE
         );
     }
   }
@@ -479,7 +505,8 @@ Returns:
           &NumberOfSortedDriverBindingProtocols, 
           SortedDriverBindingProtocols,
           DriverBindingHandleCount,
-          DriverBindingHandleBuffer
+          DriverBindingHandleBuffer,
+          TRUE
           );
       }
     } while (!EFI_ERROR (Status));
@@ -488,7 +515,7 @@ Returns:
   //
   // Get the Bus Specific Driver Override Protocol instance on the Controller Handle
   //
-  Status = CoreHandleProtocol(
+  Status = CoreHandleProtocol (
              ControllerHandle,  
              &gEfiBusSpecificDriverOverrideProtocolGuid, 
              (VOID **)&BusSpecificDriverOverride
@@ -506,7 +533,8 @@ Returns:
           &NumberOfSortedDriverBindingProtocols, 
           SortedDriverBindingProtocols,
           DriverBindingHandleCount,
-          DriverBindingHandleBuffer
+          DriverBindingHandleBuffer,
+          TRUE
           );
       }
     } while (!EFI_ERROR (Status));
@@ -522,7 +550,8 @@ Returns:
       &NumberOfSortedDriverBindingProtocols, 
       SortedDriverBindingProtocols,
       DriverBindingHandleCount,
-      DriverBindingHandleBuffer
+      DriverBindingHandleBuffer,
+      FALSE
       );
   }
 
@@ -593,17 +622,13 @@ Returns:
           // A driver was found that supports ControllerHandle, so attempt to start the driver
           // on ControllerHandle.
           //
-          PERF_CODE_BEGIN ();
-          GetHandleFromDriverBinding (DriverBinding, &DriverBindingHandle);
-          PERF_CODE_END ();
-
-          PERF_START (DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
+          PERF_START (DriverBinding->DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
           Status = DriverBinding->Start (
                                     DriverBinding, 
                                     ControllerHandle,
                                     RemainingDevicePath
                                     );
-          PERF_END (DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
+          PERF_END (DriverBinding->DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
 
           if (!EFI_ERROR (Status)) {
             //
@@ -955,74 +980,3 @@ Done:
 
   return Status;
 }
-
-EFI_STATUS
-GetHandleFromDriverBinding (
-  IN   EFI_DRIVER_BINDING_PROTOCOL           *DriverBindingNeed,
-  OUT  EFI_HANDLE                            *Handle 
- )
-/*++
-
-Routine Description:
-
-  Locate the driver binding handle which a specified driver binding protocol installed on.
-
-Arguments:
-
-  DriverBindingNeed  - The specified driver binding protocol.
-  
-  Handle             - The driver binding handle which the protocol installed on.
-  
-
-Returns:
-
-  EFI_NOT_FOUND         - Could not find the handle.
-  
-  EFI_SUCCESS           - Successfully find the associated driver binding handle.
-  
---*/ 
- {
-  EFI_STATUS                          Status ;
-  EFI_DRIVER_BINDING_PROTOCOL         *DriverBinding;
-  UINTN                               DriverBindingHandleCount;
-  EFI_HANDLE                          *DriverBindingHandleBuffer;
-  UINTN                               Index;
-  
-  DriverBindingHandleCount = 0;
-  DriverBindingHandleBuffer = NULL;
-  *Handle = NULL_HANDLE;
-  Status = CoreLocateHandleBuffer (
-              ByProtocol,   
-              &gEfiDriverBindingProtocolGuid,  
-              NULL,
-              &DriverBindingHandleCount, 
-              &DriverBindingHandleBuffer
-              );
-  if (EFI_ERROR (Status) || DriverBindingHandleCount == 0) {
-    return EFI_NOT_FOUND;
-  }
-  
-  for (Index = 0 ; Index < DriverBindingHandleCount; Index++ ) {
-    Status = CoreOpenProtocol(
-                      DriverBindingHandleBuffer[Index],
-                      &gEfiDriverBindingProtocolGuid,
-                      (VOID **)&DriverBinding,
-                      gDxeCoreImageHandle,
-                      NULL,
-                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                      );
-                      
-   if (!EFI_ERROR (Status) && DriverBinding != NULL) {
-    
-    if ( DriverBinding == DriverBindingNeed ) {
-      *Handle = DriverBindingHandleBuffer[Index];
-      CoreFreePool (DriverBindingHandleBuffer);         
-      return EFI_SUCCESS ;
-    }
-   }
- }
- 
- CoreFreePool (DriverBindingHandleBuffer);
- return EFI_NOT_FOUND ;
-}
-
