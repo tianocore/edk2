@@ -37,4 +37,12 @@ Abstract:
 
 extern EFI_GUID gEfiCapsuleVendorGuid;
 
+//
+// Data structure of capsule guid hob 
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS BaseAddress;
+  UINT32 Length;
+} CAPSULE_HOB_INFO;
+
 #endif // #ifndef _EFI_CAPSULE_VENDOR_GUID_H_
