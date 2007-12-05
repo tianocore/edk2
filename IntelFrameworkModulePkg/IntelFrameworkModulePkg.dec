@@ -48,7 +48,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
 
 [PcdsFeatureFlag.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE|BOOLEAN|0x00010022
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|FALSE|BOOLEAN|0x00010024
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial|FALSE|BOOLEAN|0x00010026
