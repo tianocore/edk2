@@ -29,15 +29,11 @@ Abstract:
 #include <Guid/CapsuleVendor.h>
 
 #include <Library/UefiDriverEntryPoint.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-extern EFI_GUID gEfiCapsuleGuid;
+#include <Library/CapsuleLib.h>
 
 EFI_STATUS
 EFIAPI
