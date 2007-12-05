@@ -29,7 +29,7 @@
 EFI_STATUS
 EFIAPI
 PeiServicesTablePointerLibConstructor (
-  IN EFI_PEI_FILE_HANDLE  *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
   IN EFI_PEI_SERVICES     **PeiServices
   )
 ;
