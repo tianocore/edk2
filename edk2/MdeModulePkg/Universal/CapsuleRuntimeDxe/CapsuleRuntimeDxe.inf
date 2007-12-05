@@ -41,13 +41,11 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
-  MemoryAllocationLib
-  BaseMemoryLib
   PcdLib
   DebugLib
   UefiRuntimeLib
-  DxeServicesTableLib
   UefiDriverEntryPoint
+  CapsuleLib
 
 [Guids]
   gEfiCapsuleVendorGuid                         # SOMETIMES_CONSUMED

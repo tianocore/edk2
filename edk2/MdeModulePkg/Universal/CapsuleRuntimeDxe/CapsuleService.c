@@ -47,22 +47,18 @@ Returns:
                                  not set, the capsule has been successfully processed by the firmware.
                                  If it set, the ScattlerGatherList is successfully to be set.
   EFI_INVALID_PARAMETER          CapsuleCount is less than 1,CapsuleGuid is not supported.
-  EFI_DEVICE_ERROR               Failed to SetVariable or AllocatePool or ProcessFirmwareVolume.
+  EFI_DEVICE_ERROR               Failed to SetVariable or ProcessFirmwareVolume.
 
 --*/
 {
-  UINTN                     CapsuleSize;
   UINTN                     ArrayNumber;
-  VOID                      *BufferPtr;
   EFI_STATUS                Status;
-  EFI_HANDLE                FvHandle;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
 
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
   }
 
-  BufferPtr       = NULL;
   CapsuleHeader   = NULL;
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
@@ -75,25 +71,22 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }
     //
-    // To remove this check. Capsule update supports non reset image.
-    // 
-    //    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-    //      return EFI_UNSUPPORTED;
-    //    }
+    // Check Capsule image without populate flag by firmware support capsule function  
+    //
+    if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
+        (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   //
-  // Check capsule guid is suppored by this platform. To do
-  //
-
-  //
-  //Assume that capsules have the same flags on reseting or not.
+  // Assume that capsules have the same flags on reseting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
 
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     //
-    //Check if the platform supports update capsule across a system reset
+    // Check if the platform supports update capsule across a system reset
     //
     if (!FeaturePcdGet(PcdSupportUpdateCapsuleRest)) {
       return EFI_UNSUPPORTED;
@@ -120,13 +113,16 @@ Returns:
       if (Status != EFI_SUCCESS) {
         return Status;
       }
+      //
+      // Successfully set the capsule image address into variable.
+      //
+      return EFI_SUCCESS;
     }
-    return EFI_SUCCESS;
   }
 
   //
   // The rest occurs in the condition of non-reset mode
-  // Current Runtime mode doesn't support the non-reset capsule image.
+  // Now Runtime mode doesn't support the non-reset capsule image.
   //
   if (EfiAtRuntime ()) {
     return EFI_INVALID_PARAMETER;
@@ -134,29 +130,13 @@ Returns:
 
   //
   // Here should be in the boot-time for non-reset capsule image
-  // Default process to Update Capsule image into Flash for any guid image.
+  // Default process to Update Capsule image into Flash.
   //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
-    CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
-    CapsuleSize = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize;
-
-    BufferPtr = AllocatePool (CapsuleSize);
-    if (BufferPtr == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    CopyMem (BufferPtr, (UINT8*)CapsuleHeader+ CapsuleHeader->HeaderSize, CapsuleSize);
-
-    //
-    //Call DXE service ProcessFirmwareVolume to process immediatelly
-    //
-    Status = gDS->ProcessFirmwareVolume (BufferPtr, CapsuleSize, &FvHandle);
-    if (Status != EFI_SUCCESS) {
-      FreePool (BufferPtr);
+    Status = ProcessCapsuleImage (CapsuleHeaderArray[ArrayNumber]);
+    if (EFI_ERROR (Status)) {
       return Status;
     }
-    gDS->Dispatch ();
-    FreePool (BufferPtr);
   }
 
   return EFI_SUCCESS;
@@ -218,11 +198,12 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }
     //
-    // To remove this check. Capsule update supports non reset image.
-    // 
-    //    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
-    //      return EFI_UNSUPPORTED;
-    //    }
+    // Check Capsule image without populate flag by firmware support capsule function  
+    //
+    if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
+        (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   //
