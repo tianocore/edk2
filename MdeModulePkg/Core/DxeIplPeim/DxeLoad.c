@@ -135,11 +135,11 @@ PeimInitializeDxeIpl (
   }
   
   //
-  // Install FvFileLoader and DxeIpl PPIs.
+  // Install DxeIpl and Decompress PPIs.
   //
   Status = PeiServicesInstallPpi (mPpiList);
-  ASSERT_EFI_ERROR(Status);  
-	
+  ASSERT_EFI_ERROR(Status);
+
   return Status;
 }
 
@@ -167,9 +167,7 @@ DxeLoadCore (
   UINT64                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
   EFI_BOOT_MODE                             BootMode;
-  EFI_PEI_FV_HANDLE                         VolumeHandle;
   EFI_PEI_FILE_HANDLE                       FileHandle;
-  UINTN                                     Instance;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI           *Variable;
   UINTN                                     DataSize;
   EFI_MEMORY_TYPE_INFORMATION               MemoryData [EfiMaxMemoryType + 1];
@@ -194,7 +192,7 @@ DxeLoadCore (
     // Now should have a HOB with the DXE core w/ the old HOB destroyed
     //
   }
-  
+
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,
              0,
@@ -223,16 +221,12 @@ DxeLoadCore (
       DataSize
       );
   }
-  //
-  // If any FV contains an encapsulated FV extract that FV
-  //
-  DxeIplAddEncapsulatedFirmwareVolumes ();
-  
+
   //
   // Look in all the FVs present in PEI and find the DXE Core
   //
-  Instance = 0;
-  Status = DxeIplFindFirmwareVolumeInstance (&Instance, EFI_FV_FILETYPE_DXE_CORE, &VolumeHandle, &FileHandle);
+  FileHandle = NULL;
+  Status = DxeIplFindDxeCore (&FileHandle);
   ASSERT_EFI_ERROR (Status);
 
   CopyMem(&DxeCoreFileName, &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name), sizeof (EFI_GUID));
@@ -297,171 +291,38 @@ DxeLoadCore (
   return EFI_OUT_OF_RESOURCES;
 }
 
-
-STATIC
-EFI_STATUS
-GetFvAlignment (
-  IN    EFI_FIRMWARE_VOLUME_HEADER   *FvHeader,
-  OUT   UINT32                      *FvAlignment
-  )
-{
-  //
-  // Because FvLength in FvHeader is UINT64 type, 
-  // so FvHeader must meed at least 8 bytes alignment.
-  // Get the appropriate alignment requirement.
-  // 
-  if ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) < EFI_FVB2_ALIGNMENT_8) {
-    return EFI_UNSUPPORTED;
-  }
-  
-   *FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
-   return EFI_SUCCESS;
-}
-
 /**
-   Search EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE image and expand 
-   as memory FV 
-    
-   @return EFI_OUT_OF_RESOURCES There are no memory space to exstract FV
-   @return EFI_SUCESS           Sucess to find the FV 
-**/
-EFI_STATUS
-DxeIplAddEncapsulatedFirmwareVolumes (
-  VOID
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_STATUS                  VolumeStatus;
-  UINTN                       Index;
-  EFI_FV_INFO                 VolumeInfo; 
-  EFI_PEI_FV_HANDLE           VolumeHandle;
-  EFI_PEI_FILE_HANDLE         FileHandle;
-  UINT32                      SectionLength;
-  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
-  EFI_FIRMWARE_VOLUME_IMAGE_SECTION *SectionHeader;
-  VOID                        *DstBuffer;
-  UINT32                       FvAlignment;
+   Find DxeCore driver from all First Volumes.
 
-  Status = EFI_NOT_FOUND;
-  Index  = 0;
-
-  do {
-    VolumeStatus = DxeIplFindFirmwareVolumeInstance (
-                    &Index, 
-                    EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, 
-                    &VolumeHandle, 
-                    &FileHandle
-                    );
-                    
-    if (!EFI_ERROR (VolumeStatus)) {
-         Status = PeiServicesFfsFindSectionData (
-                    EFI_SECTION_FIRMWARE_VOLUME_IMAGE, 
-                    (EFI_FFS_FILE_HEADER *)FileHandle, 
-                    (VOID **)&FvHeader
-                    );
-                    
-      if (!EFI_ERROR (Status)) {
-        if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
-          //
-          // Because FvLength in FvHeader is UINT64 type, 
-          // so FvHeader must meed at least 8 bytes alignment.
-          // If current FvImage base address doesn't meet its alignment,
-          // we need to reload this FvImage to another correct memory address.
-          //
-          Status = GetFvAlignment(FvHeader, &FvAlignment); 
-          if (EFI_ERROR(Status)) {
-            return Status;
-          }
-          if (((UINTN) FvHeader % FvAlignment) != 0) {
-            SectionHeader = (EFI_FIRMWARE_VOLUME_IMAGE_SECTION*)((UINTN)FvHeader - sizeof(EFI_FIRMWARE_VOLUME_IMAGE_SECTION));
-            SectionLength =  *(UINT32 *)SectionHeader->Size & 0x00FFFFFF;
-            
-            DstBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINTN) SectionLength - sizeof (EFI_COMMON_SECTION_HEADER)), FvAlignment);
-            if (DstBuffer == NULL) {
-              return EFI_OUT_OF_RESOURCES;
-            }
-            CopyMem (DstBuffer, FvHeader, (UINTN) SectionLength - sizeof (EFI_COMMON_SECTION_HEADER));
-            FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DstBuffer;  
-          }
-
-          //
-          // This new Firmware Volume comes from a firmware file within a firmware volume.
-          // Record the original Firmware Volume Name.
-          //
-          PeiServicesFfsGetVolumeInfo (&VolumeHandle, &VolumeInfo);
-
-          PiLibInstallFvInfoPpi (
-            NULL,
-            FvHeader,
-            (UINT32) FvHeader->FvLength,
-            &(VolumeInfo.FvName),
-            &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name)
-            );
-
-          //
-          // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
-          //
-          BuildFvHob (
-            (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-            FvHeader->FvLength
-          );
-            
-          ASSERT_EFI_ERROR (Status);
-
-          //
-          // Makes the encapsulated volume show up in DXE phase to skip processing of
-          // encapsulated file again.
-          //
-          BuildFv2Hob (
-            (EFI_PHYSICAL_ADDRESS)(UINTN)FvHeader,
-            FvHeader->FvLength, 
-            &VolumeInfo.FvName,
-            &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
-            );
-          return Status;
-        }
-      }
-    }
-  } while (!EFI_ERROR (VolumeStatus));
-  
-  return Status;
-}
-
-/**
-   Find the First Volume that contains the first FileType.
-
-   @param Instance      The Fv instance.
-   @param SeachType     The type of file to search.
-   @param VolumeHandle  Pointer to Fv which contains the file to search. 
    @param FileHandle    Pointer to FFS file to search.
    
    @return EFI_SUCESS   Success to find the FFS in specificed FV
    @return others       Fail to find the FFS in specificed FV
  */
 EFI_STATUS
-DxeIplFindFirmwareVolumeInstance (
-  IN OUT UINTN              *Instance,
-  IN  EFI_FV_FILETYPE       SeachType,
-  OUT EFI_PEI_FV_HANDLE     *VolumeHandle,
+DxeIplFindDxeCore (
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
   )
 {
-  EFI_STATUS  Status;
-  EFI_STATUS  VolumeStatus;
+  EFI_STATUS        Status;
+  EFI_STATUS        FileStatus;
+  UINTN             Instance;
+  EFI_PEI_FV_HANDLE VolumeHandle;
+  
+  Instance    = 0;
+  *FileHandle = NULL;
 
   do {
-    VolumeStatus = PeiServicesFfsFindNextVolume (*Instance, VolumeHandle);
-    if (!EFI_ERROR (VolumeStatus)) {
-      *FileHandle = NULL;
-      Status = PeiServicesFfsFindNextFile (SeachType, *VolumeHandle, FileHandle);
-      if (!EFI_ERROR (Status)) {
-        return Status;
+    Status = PeiServicesFfsFindNextVolume (Instance++, &VolumeHandle);
+    if (!EFI_ERROR (Status)) {
+      FileStatus = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, FileHandle);
+      if (!EFI_ERROR (FileStatus)) {
+        return FileStatus;
       }
     }
-    *Instance += 1;
-  } while (!EFI_ERROR (VolumeStatus));
+  } while (!EFI_ERROR (Status));
 
-  return VolumeStatus;
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -646,10 +507,16 @@ CustomGuidedSectionExtract (
     //
     // Allocate output buffer
     //
-    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize));
+    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize) + 1);
     if (*OutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+    DEBUG ((EFI_D_INFO, "Customed Guided section Memory Size required is 0x%x and address is 0x%p\n", OutputBufferSize, *OutputBuffer));
+    //
+    // *OutputBuffer still is one section. Adjust *OutputBuffer offset, 
+    // skip EFI section header to make section data at page alignment.
+    //
+    *OutputBuffer = (VOID *)((UINT8 *) *OutputBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER));
   }
   
   Status = ExtractGuidedSectionDecode (
@@ -728,12 +595,17 @@ Decompress (
       return EFI_OUT_OF_RESOURCES;
     }
     //
-    // Allocate destination buffer
+    // Allocate destination buffer, extra one page for adjustment 
     //
-    DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+    DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
     if (DstBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+    //
+    // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
+    // to make section data at page alignment.
+    //
+    DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
     //
     // Call decompress function
     //
@@ -751,17 +623,20 @@ Decompress (
     }
     break;
 
-  // porting note the original branch for customized compress is removed, it should be change to use GUID compress
-
   case EFI_NOT_COMPRESSED:
     //
     // Allocate destination buffer
     //
     DstBufferSize = CompressionSection->UncompressedLength;
-    DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+    DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
     if (DstBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+    //
+    // Adjust DstBuffer offset, skip EFI section header
+    // to make section data at page alignment.
+    //
+    DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
     //
     // stream is not actually compressed, just encapsulated.  So just copy it.
     //

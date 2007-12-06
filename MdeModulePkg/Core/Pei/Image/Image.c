@@ -241,7 +241,7 @@ Returns:
   // When Image has no reloc section, it can't be relocated into memory.
   //
   if (ImageContext.RelocationsStripped) {
-    DEBUG ((EFI_D_ERROR, "The image at 0x%08x without reloc section can't be loaded into memory", (UINTN) Pe32Data));
+    DEBUG ((EFI_D_ERROR, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
     return EFI_INVALID_PARAMETER;
   }
   //
