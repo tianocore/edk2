@@ -98,7 +98,7 @@ EFI_STATUS
 //
 // DPC Protocol structure
 //
-typedef struct _EFI_DPC_PROTOCOL {
+struct _EFI_DPC_PROTOCOL {
   EFI_DPC_QUEUE_DPC     QueueDpc;
   EFI_DPC_DISPATCH_DPC  DispatchDpc;
 };
