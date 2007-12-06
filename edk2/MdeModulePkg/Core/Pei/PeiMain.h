@@ -53,6 +53,7 @@ Revision History
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PeiPiLib.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/AprioriFileName.h>
 
@@ -98,6 +99,15 @@ typedef struct {
   BOOLEAN                             ScanFv;
 } PEI_CORE_FV_HANDLE;
 
+#define CACHE_SETION_MAX_NUMBER       0x10
+typedef struct {
+  EFI_COMMON_SECTION_HEADER*          Section[CACHE_SETION_MAX_NUMBER];
+  VOID*                               SectionData[CACHE_SETION_MAX_NUMBER];
+  UINTN                               SectionSize[CACHE_SETION_MAX_NUMBER];
+  UINTN                               AllSectionCount;
+  UINTN                               SectionIndex;
+} CACHE_SECTION_DATA;
+
 //
 // Pei Core private data structure instance
 //
@@ -130,6 +140,7 @@ typedef struct{
   UINTN                              SizeOfCacheAsRam;
   VOID                               *MaxTopOfCarHeap;
   EFI_PEI_PPI_DESCRIPTOR             *XipLoadFile;
+  CACHE_SECTION_DATA                 CacheSection;
 } PEI_CORE_INSTANCE;
 
 //
@@ -1378,5 +1389,24 @@ Returns:
   
 --*/      
 ;
+
+/**
+  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
+
+	@param PeiServices          Pointer to the PEI Core Services Table.
+	@param FileHandle  	        File handle of a Fv type file.
+  @param AuthenticationState  Pointer to attestation authentication state of image.
+
+  
+  @retval EFI_NOT_FOUND  				FV image can't be found.
+  @retval EFI_SUCCESS						Successfully to process it.
+
+**/
+EFI_STATUS
+ProcessFvFile (
+  IN  EFI_PEI_SERVICES      **PeiServices,
+  IN  EFI_PEI_FILE_HANDLE   FvFileHandle,
+  OUT UINT32                *AuthenticationState
+  );
 
 #endif

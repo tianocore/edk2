@@ -258,7 +258,8 @@ Returns:
         }
       } else if (SearchType == PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE) {
         if ((FfsFileHeader->Type == EFI_FV_FILETYPE_PEIM) || 
-            (FfsFileHeader->Type == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER)) { 
+            (FfsFileHeader->Type == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER) ||
+            (FfsFileHeader->Type == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE)) { 
           
           *FileHeader = FfsFileHeader;
           return EFI_SUCCESS;
@@ -366,8 +367,15 @@ Returns:
   UINT8                                 FvCount;
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI      *Fv;
   PEI_CORE_INSTANCE                     *PrivateData;
+  EFI_PEI_FILE_HANDLE                   FileHandle;
+  VOID                                  *DepexData;
+  UINT32                                AuthenticationStatus;
+  EFI_STATUS                            Status;
   
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  FileHandle   = NULL;
+  DepexData    = NULL;
+  Status       = EFI_SUCCESS;
+  PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   if (PrivateData->FvCount >= FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
     ASSERT (FALSE);
@@ -375,19 +383,53 @@ Returns:
 
   Fv = (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *)Ppi;
 
-   if (CompareGuid (&Fv->FvFormat, &gEfiFirmwareFileSystem2Guid)) {
-     for (FvCount = 0; FvCount < PrivateData->FvCount; FvCount ++) {
-       if ((UINTN)PrivateData->Fv[FvCount].FvHeader == (UINTN)Fv->FvInfo) {
-         return EFI_SUCCESS;
-       }
-     }
+  if (CompareGuid (&Fv->FvFormat, &gEfiFirmwareFileSystem2Guid)) {
+    for (FvCount = 0; FvCount < PrivateData->FvCount; FvCount ++) {
+      if ((UINTN)PrivateData->Fv[FvCount].FvHeader == (UINTN)Fv->FvInfo) {
+        return EFI_SUCCESS;
+      }
+    }
     PrivateData->Fv[PrivateData->FvCount++].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo;
-  }
 
-  //
-  // Allways add to the All list
-  //
-  PrivateData->AllFv[PrivateData->AllFvCount++] = (EFI_PEI_FV_HANDLE)Fv->FvInfo;
+    //
+    // Only add FileSystem2 Fv to the All list
+    //
+    PrivateData->AllFv[PrivateData->AllFvCount++] = (EFI_PEI_FV_HANDLE)Fv->FvInfo;
+    
+    DEBUG ((EFI_D_INFO, "The %dth FvImage start address is 0x%10p and size is 0x%08x\n", PrivateData->AllFvCount, (VOID *) Fv->FvInfo, Fv->FvInfoSize));
+    //
+    // Preprocess all FV type files in this new FileSystem2 Fv image
+    //
+    do {
+      Status = PeiFindFileEx (
+                 (EFI_PEI_FV_HANDLE)Fv->FvInfo, 
+                 NULL, 
+                 EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, 
+                 &FileHandle, 
+                 NULL
+                 );
+      if (!EFI_ERROR (Status)) {
+        Status = PeiFfsFindSectionData (
+                    (CONST EFI_PEI_SERVICES **) PeiServices,
+                    EFI_SECTION_PEI_DEPEX,
+                    FileHandle, 
+                    (VOID **)&DepexData
+                    );
+        if (!EFI_ERROR (Status)) {
+          if (!PeimDispatchReadiness (PeiServices, DepexData)) {
+            //
+            // Dependency is not satisfied.
+            //
+            continue;
+          }
+        }
+        //
+        // Process FvFile to install FvInfo ppi and build FvHob
+        // 
+        ProcessFvFile (PeiServices, FileHandle, &AuthenticationStatus);
+      }
+    } while (FileHandle != NULL);
+  }
 
   return EFI_SUCCESS;
 }
@@ -398,25 +440,21 @@ PeiFfsProcessSection (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_COMMON_SECTION_HEADER  *Section,
   IN UINTN                      SectionSize,
-  OUT VOID                      **OutputBuffer,
-  OUT UINTN                     *OutputSize,
-  OUT UINT32                    *Authentication
+  OUT VOID                      **OutputBuffer
   )
 /*++
 
 Routine Description:
 
   Go through the file to search SectionType section,
-  when meeting an encapsuled section, search recursively. 
+  when meeting an encapsuled section. 
   
 Arguments:
-  PeiServices  - Pointer to the PEI Core Services Table.
+  PeiServices  - General purpose services available to every PEIM.
   SearchType   - Filter to find only section of this type.
   Section      - From where to search.
   SectionSize  - The file size to search.
   OutputBuffer - Pointer to the section to search.
-  OutputSize   - The size of the section to search.
-  Authentication -  Authenticate the section.
 
 Returns:
   EFI_STATUS
@@ -426,57 +464,94 @@ Returns:
   EFI_STATUS                              Status;
   UINT32                                  SectionLength;
   UINT32                                  ParsedLength;
-  EFI_GUID_DEFINED_SECTION                *GuidSection; 
   EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI   *GuidSectionPpi;
-  EFI_COMPRESSION_SECTION                 *CompressionSection;
   EFI_PEI_DECOMPRESS_PPI                  *DecompressPpi;
   VOID                                    *PpiOutput;
   UINTN                                   PpiOutputSize;
+  UINTN                                   Index;
+  UINT32                                  Authentication;
+  PEI_CORE_INSTANCE                       *PrivateData;
 
+  PrivateData   = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   *OutputBuffer = NULL;
-  ParsedLength = 0;
+  ParsedLength  = 0;
+  Index         = 0;
+  Status        = EFI_NOT_FOUND;
+  PpiOutput     = NULL;
+  PpiOutputSize = 0;
   while (ParsedLength < SectionSize) {
     if (Section->Type == SectionType) {
       *OutputBuffer = (VOID *)(Section + 1);
       return EFI_SUCCESS;
-    } else if (Section->Type == EFI_SECTION_GUID_DEFINED) {
-      GuidSection = (EFI_GUID_DEFINED_SECTION *)Section;
-      Status = PeiServicesLocatePpi (&GuidSection->SectionDefinitionGuid, 0, NULL, (VOID **) &GuidSectionPpi);
-      if (!EFI_ERROR (Status)) {
-        Status = GuidSectionPpi->ExtractSection (
-                                  GuidSectionPpi,
-                                  Section,
-                                  &PpiOutput,
-                                  &PpiOutputSize,
-                                  Authentication
-                                  );
-        if (!EFI_ERROR (Status)) {
+    } else if ((Section->Type == EFI_SECTION_GUID_DEFINED) || (Section->Type == EFI_SECTION_COMPRESSION)) {
+      //
+      // Check the encapsulated section is extracted into the cache data.
+      //
+      for (Index = 0; Index < PrivateData->CacheSection.AllSectionCount; Index ++) {
+        if (Section == PrivateData->CacheSection.Section[Index]) {
+          PpiOutput     = PrivateData->CacheSection.SectionData[Index];
+          PpiOutputSize = PrivateData->CacheSection.SectionSize[Index];
+          //
+          // Search section directly from the cache data.
+          //
           return PeiFfsProcessSection (
                   PeiServices,
                   SectionType, 
                   PpiOutput, 
                   PpiOutputSize, 
-                  OutputBuffer, 
-                  OutputSize, 
-                  Authentication
+                  OutputBuffer 
                   );
         }
       }
-    } else if (Section->Type == EFI_SECTION_COMPRESSION) {
-      CompressionSection = (EFI_COMPRESSION_SECTION *)Section;
-      Status = PeiServicesLocatePpi (&gEfiPeiDecompressPpiGuid, 0, NULL, (VOID **) &DecompressPpi);
-      if (!EFI_ERROR (Status)) {
-        Status = DecompressPpi->Decompress (
-                                  DecompressPpi,
-                                  CompressionSection,
-                                  &PpiOutput,
-                                  &PpiOutputSize
-                                  );
+      
+      Status = EFI_NOT_FOUND;
+      if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+        Status = PeiServicesLocatePpi (
+                   &((EFI_GUID_DEFINED_SECTION *)Section)->SectionDefinitionGuid, 
+                   0, 
+                   NULL, 
+                   (VOID **) &GuidSectionPpi
+                   );
         if (!EFI_ERROR (Status)) {
-          return PeiFfsProcessSection (
-                  PeiServices, SectionType, PpiOutput, PpiOutputSize, OutputBuffer, OutputSize, Authentication
-                  );
+          Status = GuidSectionPpi->ExtractSection (
+                                    GuidSectionPpi,
+                                    Section,
+                                    &PpiOutput,
+                                    &PpiOutputSize,
+                                    &Authentication
+                                    );
         }
+      } else if (Section->Type == EFI_SECTION_COMPRESSION) {
+        Status = PeiServicesLocatePpi (&gEfiPeiDecompressPpiGuid, 0, NULL, (VOID **) &DecompressPpi);
+        if (!EFI_ERROR (Status)) {
+          Status = DecompressPpi->Decompress (
+                                    DecompressPpi,
+                                    (CONST EFI_COMPRESSION_SECTION*) Section,
+                                    &PpiOutput,
+                                    &PpiOutputSize
+                                    );
+        }
+      }
+      
+      if (!EFI_ERROR (Status)) {
+        //
+        // Update cache section data.
+        //
+        if (PrivateData->CacheSection.AllSectionCount < CACHE_SETION_MAX_NUMBER) {
+          PrivateData->CacheSection.AllSectionCount ++;
+        }
+        PrivateData->CacheSection.Section [PrivateData->CacheSection.SectionIndex]     = Section;
+        PrivateData->CacheSection.SectionData [PrivateData->CacheSection.SectionIndex] = PpiOutput;
+        PrivateData->CacheSection.SectionSize [PrivateData->CacheSection.SectionIndex] = PpiOutputSize;
+        PrivateData->CacheSection.SectionIndex = (PrivateData->CacheSection.SectionIndex + 1)%CACHE_SETION_MAX_NUMBER;
+        
+        return PeiFfsProcessSection (
+                PeiServices,
+                SectionType, 
+                PpiOutput, 
+                PpiOutputSize, 
+                OutputBuffer 
+                );
       }
     }
 
@@ -526,9 +601,6 @@ Returns:
   EFI_FFS_FILE_HEADER                     *FfsFileHeader;
   UINT32                                  FileSize;
   EFI_COMMON_SECTION_HEADER               *Section;
-  UINTN                                   OutputSize;
-  UINT32                                  AuthenticationStatus;
-
 
   FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
 
@@ -542,13 +614,11 @@ Returns:
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
   return PeiFfsProcessSection (
-          PeiServices, 
+          PeiServices,
           SectionType, 
           Section, 
           FileSize, 
-          SectionData, 
-          &OutputSize, 
-          &AuthenticationStatus
+          SectionData
           );
 }
 
@@ -601,7 +671,7 @@ PeiFvFindNextVolume (
 
 Routine Description:
 
-  Return the BFV location
+  Return the firmware volumes.
 
   BugBug -- Move this to the location of this code to where the
   other FV and FFS support code lives.
@@ -761,21 +831,32 @@ Returns:
   
 --*/    
 {
-  EFI_FIRMWARE_VOLUME_HEADER             *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_HEADER             FwVolHeader;
   EFI_FIRMWARE_VOLUME_EXT_HEADER         *FwVolExHeaderInfo;
 
   if (VolumeInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  
+  //
+  // VolumeHandle may not align at 8 byte, 
+  // but FvLength is UINT64 type, which requires FvHeader align at least 8 byte. 
+  // So, Copy FvHeader into the local FvHeader structure.
+  //
+  CopyMem (&FwVolHeader, VolumeHandle, sizeof (EFI_FIRMWARE_VOLUME_HEADER));
+  //
+  // Check Fv Image Signature
+  //
+  if (FwVolHeader.Signature != EFI_FVH_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+  VolumeInfo->FvAttributes = FwVolHeader.Attributes;
+  VolumeInfo->FvStart = (VOID *) VolumeHandle;
+  VolumeInfo->FvSize = FwVolHeader.FvLength;
+  CopyMem (&VolumeInfo->FvFormat, &FwVolHeader.FileSystemGuid, sizeof(EFI_GUID));
 
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(VolumeHandle);
-  VolumeInfo->FvAttributes = FwVolHeader->Attributes;
-  VolumeInfo->FvStart = FwVolHeader;
-  VolumeInfo->FvSize = FwVolHeader->FvLength;
-  CopyMem (&VolumeInfo->FvFormat, &FwVolHeader->FileSystemGuid,sizeof(EFI_GUID));
-
-  if (FwVolHeader->ExtHeaderOffset != 0) {
-    FwVolExHeaderInfo = (EFI_FIRMWARE_VOLUME_EXT_HEADER*)(((UINT8 *)FwVolHeader) + FwVolHeader->ExtHeaderOffset);
+  if (FwVolHeader.ExtHeaderOffset != 0) {
+    FwVolExHeaderInfo = (EFI_FIRMWARE_VOLUME_EXT_HEADER*)(((UINT8 *)VolumeHandle) + FwVolHeader.ExtHeaderOffset);
     CopyMem (&VolumeInfo->FvName, &FwVolExHeaderInfo->FvName, sizeof(EFI_GUID));
   }
   return EFI_SUCCESS;

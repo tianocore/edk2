@@ -81,6 +81,7 @@
   MemoryAllocationLib
   CacheMaintenanceLib
   PeCoffLib
+  PeiPiLib
 
 [Guids]
   gPeiAprioriFileNameGuid
@@ -103,6 +104,3 @@
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
-
-
-
