@@ -412,11 +412,14 @@ Returns:
   UINTN                                                 Instance;
   UINT8                                                 *CopyBuffer;
   UINTN                                                 SectionSize;
+  EFI_FIRMWARE_VOLUME_HEADER                            *FvHeader;
+  UINT32                                                FvAlignment;  
   
-
+  
   OldTpl = CoreRaiseTpl (TPL_NOTIFY);
   Instance = SectionInstance + 1;
-  
+  FvHeader = NULL;
+  FvAlignment = 0;
   //
   // Locate target stream
   //
@@ -469,8 +472,19 @@ Returns:
   } else {
     //
     // Callee allocated buffer.  Allocate buffer and return size.
+    // For FvImage, the buffer is allocated at its required alignment.
     //
-    *Buffer = CoreAllocateBootServicesPool (CopySize);
+    if (*SectionType == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) CopyBuffer;
+      FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+      //
+      // FvAlignment must be more than 8 bytes required by FvHeader structure.
+      // 
+      if (FvAlignment < 8) {
+        FvAlignment = 8;
+      }
+    }
+    *Buffer = AllocateAlignedPool ((UINTN) CopySize, (UINTN) FvAlignment);
     if (*Buffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto GetSection_Done;
