@@ -479,7 +479,7 @@ AddUnicodeString (
                                   Unicode string to add.
   
   @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3.66 language
+                                  639-2 or RFC 3066 language
                                   codes that the Unicode string
                                   table supports. Language must
                                   be a member of this set.
@@ -854,16 +854,16 @@ AsciiErrorPrint (
   );
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol onto the driver's
+  Initializes a driver by installing the Driver Binding Protocol onto the driver's
   DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but
   it can be different if the driver produces multiple DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
 
   @retval EFI_SUCCESS                 The protocol installation is completed successfully.
@@ -881,17 +881,17 @@ EfiLibInstallDriverBinding (
 
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.  This is
   typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
   DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
   @param  ComponentName               A Component Name Protocol instance that this driver is producing.
   @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
@@ -916,16 +916,16 @@ EfiLibInstallAllDriverProtocols (
 
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Component Name 2 onto the driver's DriverBindingHandle.  This is typically the same as the driver's
   ImageHandle, but it can be different if the driver produces multiple DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
   @param  ComponentName               A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
@@ -947,17 +947,17 @@ EfiLibInstallDriverBindingComponentName2 (
 
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
   DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but it can be different if
   the driver produces multiple DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
   @param  ComponentName               A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
