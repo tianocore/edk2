@@ -87,6 +87,7 @@
   DxeCoreEntryPoint
   PeCoffLib
   ExtractGuidedSectionLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED

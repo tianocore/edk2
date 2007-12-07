@@ -82,6 +82,7 @@ Revision History
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include "DebugImageInfo.h"
 #include "Library.h"

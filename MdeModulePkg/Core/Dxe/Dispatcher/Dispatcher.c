@@ -1084,7 +1084,6 @@ Returns:
             if (FvFoundInHobFv2 (FvHandle, &NameGuid)) {
               continue;
             }
-            
             //
             // Found a firmware volume image. Produce a firmware volume block
             // protocol for it so it gets dispatched from. This is usually a 
