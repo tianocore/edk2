@@ -21,7 +21,7 @@
 
 #error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
 
-#define EFI_HII_CONFIGURATION_ACCESS_PROTOCOL_GUID  \
+#define EFI_HII_CONFIG_ACCESS_PROTOCOL_GUID  \
   { 0x330d4706, 0xf2a0, 0x4e4f, { 0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85 } }
 
 typedef struct _EFI_HII_CONFIG_ACCESS_PROTOCOL  EFI_HII_CONFIG_ACCESS_PROTOCOL;
@@ -194,11 +194,15 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FORM_CALLBACK) (
-  IN CONST  EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
-  IN CONST  UINT16                          KeyValue,
-  IN CONST  VOID                            *Data
-);
+(EFIAPI *EFI_HII_ACCESS_FORM_CALLBACK) (
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN  EFI_BROWSER_ACTION                     Action,
+  IN  EFI_QUESTION_ID                        QuestionId,
+  IN  UINT8                                  Type,
+  IN  EFI_IFR_TYPE_VALUE                     *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  )
+  ;
 /**
    
   This protocol provides a callable interface between the HII and
@@ -222,9 +226,9 @@ EFI_STATUS
 
 **/
 struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
-  EFI_HII_ACCESS_ROUTE_CONFIG    ExtractConfig;
-  EFI_HII_ACCESS_EXTRACT_CONFIG  RouteConfig;
-  EFI_FORM_CALLBACK       Callback;
+  EFI_HII_ACCESS_EXTRACT_CONFIG     ExtractConfig;
+  EFI_HII_ACCESS_ROUTE_CONFIG       RouteConfig;
+  EFI_HII_ACCESS_FORM_CALLBACK      Callback;
 } ;
 
 extern EFI_GUID gEfiHiiConfigAccessProtocolGuid;

@@ -20,11 +20,11 @@
 #error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
 
 
-#define EFI_FORM_BROWSER_PROTOCOL_GUID \
+#define EFI_FORM_BROWSER2_PROTOCOL_GUID \
   { 0xe5a1333e, 0xe1b4, 0x4e55, { 0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43 } }
 
 
-typedef struct _EFI_FORM_BROWSER_PROTOCOL   EFI_FORM_BROWSER_PROTOCOL;
+typedef struct _EFI_FORM_BROWSER2_PROTOCOL   EFI_FORM_BROWSER2_PROTOCOL;
 
 
 
@@ -51,6 +51,14 @@ typedef struct {
   UINTN   TopRow;
   UINTN   BottomRow;
 } EFI_SCREEN_DESCRIPTOR;
+
+typedef UINTN EFI_BROWSER_ACTION_REQUEST;
+
+#define EFI_BROWSER_ACTION_NONE   0
+#define EFI_BROWSER_ACTION_RESET  1
+#define EFI_BROWSER_ACTION_SUMBIT 2
+#define EFI_BROWSER_ACTION_EXIT   3
+
 
 /**
    
@@ -112,13 +120,14 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SEND_FORM) (
-  IN CONST  EFI_FORM_BROWSER_PROTOCOL *This,
-  IN CONST  EFI_HII_HANDLE            *Handle,
-  IN CONST  UINTN                     HandleCount,
-  IN CONST  BOOLEAN                   SingleUse,
-  IN CONST  EFI_SCREEN_DESCRIPTOR     *ScreenDimensions, OPTIONAL
-  OUT       BOOLEAN                   *ResetRequired OPTIONAL
+(EFIAPI *EFI_SEND_FORM2) (
+  IN CONST  EFI_FORM_BROWSER_PROTOCOL  *This,
+  IN CONST  EFI_HII_HANDLE             *Handle,
+  IN CONST  UINTN                      HandleCount,
+  IN CONST  BOOLEAN                    SingleUse,
+  IN CONST  EFI_SCREEN_DESCRIPTOR      *ScreenDimensions, OPTIONAL
+  OUT       BOOLEAN                    *ResetRequired OPTIONAL
+  OUT       EFI_BROWSER_ACTION_REQUEST *ActionRequest  OPTIONAL
 );
 
 
@@ -162,7 +171,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BROWSER_CALLBACK ) (
+(EFIAPI *EFI_BROWSER_CALLBACK2 ) (
   IN CONST  EFI_FORM_BROWSER_PROTOCOL *This,
   IN OUT    UINTN                     *ResultsDataSize,
   IN OUT    EFI_STRING                ResultsData,
@@ -194,13 +203,13 @@ EFI_STATUS
                           description.
 
 **/
-struct _EFI_FORM_BROWSER_PROTOCOL {
-  EFI_SEND_FORM         SendForm;
-  EFI_BROWSER_CALLBACK  BrowserCallback;
+struct _EFI_FORM_BROWSER2_PROTOCOL {
+  EFI_SEND_FORM2         SendForm;
+  EFI_BROWSER_CALLBACK2  BrowserCallback;
 } ;
 
 
-extern EFI_GUID gEfiFormBrowserProtocolGuid;
+extern EFI_GUID gEfiFormBrowser2ProtocolGuid;
 
 #endif
 
