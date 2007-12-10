@@ -25,8 +25,6 @@ Revision History
 #define _PEI_MAIN_H_
 
 #include <PiPei.h>
-#include <FrameworkPei.h>
-#include <Guid/StatusCodeDataTypeId.h>
 #include <Ppi/DxeIpl.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/StatusCode.h>

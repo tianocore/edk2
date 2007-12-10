@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 #include <Ppi/GuidedSectionExtraction.h>
-#include <FrameworkPei.h>
 
 EFI_STATUS
 CustomGuidedSectionExtract (
@@ -258,7 +257,7 @@ DxeLoadCore (
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
+    PcdGet32(PcdStatusCodeValuePeiHandoffToDxe)
     );
 
   DEBUG_CODE_BEGIN ();

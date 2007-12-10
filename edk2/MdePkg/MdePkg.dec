@@ -326,6 +326,27 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError|0x01020005|UINT32|0x30001000
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004|UINT32|0x30001001
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x30001002
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004|UINT32|0x30001003
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002|UINT32|0x30001004
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect|0x01010003|UINT32|0x30001005
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset|0x01010001|UINT32|0x30001006
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer|0x01011000|UINT32|0x30001007
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest|0x01011001|UINT32|0x30001008
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError|0x01010005|UINT32|0x30001009
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError|0x01010007|UINT32|0x3000100a
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007|UINT32|0x3000100b
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3031001|UINT32|0x3000100d           # EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch|0x3020002|UINT32|0x3000100e              # EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry|0x3020000|UINT32|0x3000100f              # EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry|0x3041000|UINT32|0x30001010              # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreHandoffToBds|0x3041001|UINT32|0x30001011       # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3100019|UINT32|0x30001012           # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin|0x3040002|UINT32|0x30001013            # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014              # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
 
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f

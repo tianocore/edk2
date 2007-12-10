@@ -59,7 +59,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   PeCoffLib
@@ -102,7 +101,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
-
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid
 

@@ -198,7 +198,7 @@ Returns:
   FileHeader  = (EFI_FFS_FILE_HEADER **)FileHandle;
 
   FvLength = FwVolHeader->FvLength;
-  if (FwVolHeader->Attributes & EFI_FVB_ERASE_POLARITY) {
+  if (FwVolHeader->Attributes & EFI_FVB2_ERASE_POLARITY) {
     ErasePolarity = 1;
   } else {
     ErasePolarity = 0;
@@ -781,7 +781,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((EFI_FIRMWARE_VOLUME_HEADER*)VolumeHandle)->Attributes & EFI_FVB_ERASE_POLARITY) {
+  if (((EFI_FIRMWARE_VOLUME_HEADER*)VolumeHandle)->Attributes & EFI_FVB2_ERASE_POLARITY) {
     ErasePolarity = 1;
   } else {
     ErasePolarity = 0;

@@ -1,5 +1,10 @@
-/*++
+/**@file
+  Firmware Volume Block protocol..  Consumes FV hobs and creates
+  appropriate block protocols.
 
+  Also consumes NT_NON_MM_FV envinronment variable and produces appropriate
+  block protocols fro them also... (this is TBD)
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,19 +14,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  FwVolBlock.c
-
-Abstract:
-
-  Firmware Volume Block protocol..  Consumes FV hobs and creates
-  appropriate block protocols.
-
-  Also consumes NT_NON_MM_FV envinronment variable and produces appropriate
-  block protocols fro them also... (this is TBD)
-
---*/
+**/
 
 #include <DxeMain.h>
 
@@ -202,7 +195,7 @@ Returns:
   //
   // Check if This FW can be read
   //
-  if ((FvbDevice->FvbAttributes & EFI_FVB_READ_STATUS) == 0) {
+  if ((FvbDevice->FvbAttributes & EFI_FVB2_READ_STATUS) == 0) {
     return EFI_ACCESS_DENIED;
   }
   
@@ -310,7 +303,7 @@ Returns:
   
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
   
-  if (FvbDevice->FvbAttributes & EFI_FVB_MEMORY_MAPPED) {
+  if (FvbDevice->FvbAttributes & EFI_FVB2_MEMORY_MAPPED) {
     *Address = FvbDevice->BaseAddress;
     return EFI_SUCCESS;
   }

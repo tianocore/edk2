@@ -23,6 +23,11 @@ Revision History
 
 #include <PeiMain.h>
 
+typedef struct {
+  EFI_STATUS_CODE_DATA  DataHeader;
+  EFI_HANDLE            Handle;
+} PEIM_FILE_HANDLE_EXTENDED_DATA;
+
 STATIC
 VOID
 InvokePeiCore (
@@ -223,7 +228,7 @@ Returns:
   UINTN                               PeimCount;
   UINT32                              AuthenticationState;
   EFI_PHYSICAL_ADDRESS                EntryPoint;
-  EFI_PEIM_ENTRY_POINT                PeimEntryPoint;
+  EFI_PEIM_ENTRY_POINT2               PeimEntryPoint;
   BOOLEAN                             PeimNeedingDispatch;
   BOOLEAN                             PeimDispatchOnThisPass;
   UINTN                               SaveCurrentPeimCount;
@@ -231,7 +236,7 @@ Returns:
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
   VOID                                *TopOfStack;
   PEI_CORE_PARAMETERS                 PeiCoreParameters;
-  EFI_DEVICE_HANDLE_EXTENDED_DATA     ExtendedData;
+  PEIM_FILE_HANDLE_EXTENDED_DATA      ExtendedData;
   EFI_FV_FILE_INFO                    FvFileInfo;
 
 
@@ -270,10 +275,10 @@ Returns:
             //
             // Call the PEIM entry point
             //
-            PeimEntryPoint = (EFI_PEIM_ENTRY_POINT)(UINTN)EntryPoint;
+            PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
             
             PERF_START (0, "PEIM", NULL, 0);
-            PeimEntryPoint(PeimFileHandle, &Private->PS);
+            PeimEntryPoint(PeimFileHandle, (const EFI_PEI_SERVICES **) &Private->PS);
             PERF_END (0, "PEIM", NULL, 0);
           } 
           
@@ -357,7 +362,7 @@ Returns:
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                 EFI_PROGRESS_CODE,
-                EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN,
+                FixedPcdGet32(PcdStatusCodeValuePeimDispatch),
                 (VOID *)(&ExtendedData),
                 sizeof (ExtendedData)
                 );
@@ -373,18 +378,16 @@ Returns:
                   //
                   // Call the PEIM entry point for PEIM driver
                   //
-                  PeimEntryPoint = (EFI_PEIM_ENTRY_POINT)(UINTN)EntryPoint;
-                  PeimEntryPoint (PeimFileHandle, PeiServices);
+                  PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
+                  PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
                 }
-                //
-                // One module has been dispatched.
-                //
+
                 PeimDispatchOnThisPass = TRUE;
               }
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                 EFI_PROGRESS_CODE,
-                EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_END,
+                FixedPcdGet32(PcdStatusCodeValuePeimDispatch),
                 (VOID *)(&ExtendedData),
                 sizeof (ExtendedData)
                 );
@@ -483,7 +486,7 @@ Returns:
               // We call the entry point a 2nd time so the module knows it's shadowed. 
               //
               //PERF_START (PeiServices, L"PEIM", PeimFileHandle, 0);
-              PeimEntryPoint (PeimFileHandle, PeiServices);
+              PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
               
               //

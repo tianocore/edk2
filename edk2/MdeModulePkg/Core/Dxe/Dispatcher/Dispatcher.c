@@ -1,21 +1,5 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  Dispatcher.c
-
-Abstract:
-
-  Tiano DXE Dispatcher.
+/**@file
+  DXE Dispatcher.
 
   Step #1 - When a FV protocol is added to the system every driver in the FV
             is added to the mDiscoveredList. The SOR, Before, and After Depex are 
@@ -42,7 +26,16 @@ Abstract:
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
---*/
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include <DxeMain.h>
 
@@ -490,9 +483,15 @@ Returns:
       
       CoreReleaseDispatcherLock ();
 
-      CoreReportProgressCodeSpecific (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN, DriverEntry->ImageHandle);
+      CoreReportProgressCodeSpecific (
+        FixedPcdGet32(PcdStatusCodeValueDxeDriverBegin), 
+        DriverEntry->ImageHandle
+        );
       Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
-      CoreReportProgressCodeSpecific (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END, DriverEntry->ImageHandle);
+      CoreReportProgressCodeSpecific (
+        FixedPcdGet32(PcdStatusCodeValueDxeDriverEnd), 
+        DriverEntry->ImageHandle
+        );
 
       ReturnStatus = EFI_SUCCESS;
     }

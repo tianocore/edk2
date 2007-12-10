@@ -1,4 +1,20 @@
 /**@file
+
+Copyright (c) 2006, Intel Corporation                                                         
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Module Name:
+
+  SectionExtraction.c
+  
+Abstract:
+
   Section Extraction Protocol implementation.
   
   Stream database is implemented as a linked list of section streams,
@@ -26,19 +42,10 @@
      
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
-     
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
+  
 **/
 
-#include <DxeMain.h>
+#include "SectionExtraction.h"
 
 //
 // Local defines and typedefs
@@ -95,6 +102,15 @@ typedef struct {
 } RPN_EVENT_CONTEXT;
   
   
+EFI_EVENT
+CoreCreateProtocolNotifyEvent (
+  IN EFI_GUID             *ProtocolGuid,
+  IN EFI_TPL              NotifyTpl,
+  IN EFI_EVENT_NOTIFY     NotifyFunction,
+  IN VOID                 *NotifyContext,
+  OUT VOID                **Registration,
+  IN  BOOLEAN             SignalFlag
+  );
 
 //
 // Local prototypes
@@ -124,6 +140,38 @@ CreateGuidedExtractionRpnEvent (
   IN CORE_SECTION_CHILD_NODE                  *ChildNode
   );
 
+STATIC
+EFI_STATUS
+EFIAPI
+OpenSectionStream (
+  IN     EFI_SECTION_EXTRACTION_PROTOCOL      *This,
+  IN     UINTN                                SectionStreamLength,
+  IN     VOID                                 *SectionStream,
+     OUT UINTN                                *SectionStreamHandle
+  );
+  
+STATIC
+EFI_STATUS
+EFIAPI
+GetSection (
+  IN EFI_SECTION_EXTRACTION_PROTOCOL          *This,
+  IN UINTN                                    SectionStreamHandle,
+  IN EFI_SECTION_TYPE                         *SectionType,
+  IN EFI_GUID                                 *SectionDefinitionGuid,
+  IN UINTN                                    SectionInstance,
+  IN VOID                                     **Buffer,
+  IN OUT UINTN                                *BufferSize,
+  OUT UINT32                                  *AuthenticationStatus
+  );
+  
+STATIC
+EFI_STATUS
+EFIAPI
+CloseSectionStream (
+  IN  EFI_SECTION_EXTRACTION_PROTOCOL         *This,
+  IN  UINTN                                   StreamHandleToClose
+  );
+  
 STATIC
 EFI_STATUS
 FindStreamNode (
@@ -174,15 +222,6 @@ IsValidSectionStream (
   IN  UINTN                                   SectionStreamLength
   );
 
-EFI_STATUS
-EFIAPI
-CustomGuidedSectionExtract (
-  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
-  IN CONST  VOID                                   *InputSection,
-  OUT       VOID                                   **OutputBuffer,
-  OUT       UINTN                                  *OutputSize,
-  OUT       UINT32                                 *AuthenticationStatus
-  );  
 //
 // Module globals
 //
@@ -190,13 +229,15 @@ LIST_ENTRY mStreamRoot = INITIALIZE_LIST_HEAD_VARIABLE (mStreamRoot);
 
 EFI_HANDLE mSectionExtractionHandle = NULL;
 
-EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomGuidedSectionExtractionProtocol = {
-  CustomGuidedSectionExtract
+EFI_SECTION_EXTRACTION_PROTOCOL mSectionExtraction = { 
+  OpenSectionStream, 
+  GetSection, 
+  CloseSectionStream
 };
-                                             
+
 EFI_STATUS
 EFIAPI
-InitializeSectionExtraction (
+SectionExtractionEntryPoint (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
@@ -217,34 +258,26 @@ Returns:
 --*/
 {
   EFI_STATUS                         Status;
-  EFI_GUID                           *ExtractHandlerGuidTable;
-  UINTN                              ExtractHandlerNumber;
 
   //
-  // Get custom extract guided section method guid list 
+  // Install SEP to a new handle
   //
-  ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
-  
-  Status = EFI_SUCCESS;
-  //
-  // Install custom guided extraction protocol 
-  //
-  while (ExtractHandlerNumber-- > 0) {
-    Status = CoreInstallProtocolInterface (
-              &mSectionExtractionHandle,
-              &ExtractHandlerGuidTable [ExtractHandlerNumber],
-              EFI_NATIVE_INTERFACE,
-              &mCustomGuidedSectionExtractionProtocol
-              );
-    ASSERT_EFI_ERROR (Status);
-  }
+  Status = gBS->InstallProtocolInterface (
+                  &mSectionExtractionHandle,
+                  &gEfiSectionExtractionProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mSectionExtraction
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 OpenSectionStream (
+  IN     EFI_SECTION_EXTRACTION_PROTOCOL           *This,
   IN     UINTN                                     SectionStreamLength,
   IN     VOID                                      *SectionStream,
      OUT UINTN                                     *SectionStreamHandle
@@ -286,9 +319,11 @@ Returns:
           );
 }
   
+STATIC
 EFI_STATUS
 EFIAPI
 GetSection (
+  IN EFI_SECTION_EXTRACTION_PROTOCOL                    *This,
   IN UINTN                                              SectionStreamHandle,
   IN EFI_SECTION_TYPE                                   *SectionType,
   IN EFI_GUID                                           *SectionDefinitionGuid,
@@ -303,6 +338,7 @@ Routine Description:
   SEP member function.  Retrieves requested section from section stream.
 
 Arguments:  
+  This:                 Pointer to SEP instance.
   SectionStreamHandle:  The section stream from which to extract the requested
                           section.
   SectionType:         A pointer to the type of section to search for.
@@ -355,7 +391,7 @@ Returns:
   UINTN                                                 SectionSize;
   
 
-  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   Instance = SectionInstance + 1;
   
   //
@@ -411,7 +447,7 @@ Returns:
     //
     // Callee allocated buffer.  Allocate buffer and return size.
     //
-    *Buffer = CoreAllocateBootServicesPool (CopySize);
+    *Buffer = AllocatePool (CopySize);
     if (*Buffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto GetSection_Done;
@@ -421,14 +457,16 @@ Returns:
   *BufferSize = SectionSize;
   
 GetSection_Done:
-  CoreRestoreTpl (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
 
+STATIC
 EFI_STATUS
 EFIAPI
 CloseSectionStream (
+  IN  EFI_SECTION_EXTRACTION_PROTOCOL           *This,
   IN  UINTN                                     StreamHandleToClose
   )
 /*++
@@ -454,7 +492,7 @@ Returns:
   LIST_ENTRY                                    *Link;
   CORE_SECTION_CHILD_NODE                       *ChildNode;
   
-  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   
   //
   // Locate target stream
@@ -470,14 +508,14 @@ Returns:
       ChildNode = CHILD_SECTION_NODE_FROM_LINK (Link);
       FreeChildNode (ChildNode);
     }
-    CoreFreePool (StreamNode->StreamBuffer);
-    CoreFreePool (StreamNode);
+    gBS->FreePool (StreamNode->StreamBuffer);
+    gBS->FreePool (StreamNode);
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_INVALID_PARAMETER;
   }
   
-  CoreRestoreTpl (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -728,7 +766,7 @@ Returns:
   //
   // Allocate a new node
   //
-  *ChildNode = CoreAllocateBootServicesPool (sizeof (CORE_SECTION_CHILD_NODE));
+  *ChildNode = AllocatePool (sizeof (CORE_SECTION_CHILD_NODE));
   Node = *ChildNode;
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -761,9 +799,9 @@ Returns:
       //
       if (CompressionHeader->UncompressedLength > 0) {
         NewStreamBufferSize = CompressionHeader->UncompressedLength;
-        NewStreamBuffer = CoreAllocateBootServicesPool (NewStreamBufferSize);
+        NewStreamBuffer = AllocatePool (NewStreamBufferSize);
         if (NewStreamBuffer == NULL) {
-          CoreFreePool (Node);
+          gBS->FreePool (Node);
           return EFI_OUT_OF_RESOURCES;
         }
         
@@ -780,7 +818,7 @@ Returns:
           //
           // Decompress the stream
           //
-          Status = CoreLocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
+          Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
           
           ASSERT_EFI_ERROR (Status);
           
@@ -794,10 +832,10 @@ Returns:
           ASSERT_EFI_ERROR (Status);
           ASSERT (NewStreamBufferSize == CompressionHeader->UncompressedLength);
 
-          ScratchBuffer = CoreAllocateBootServicesPool (ScratchSize);
+          ScratchBuffer = AllocatePool (ScratchSize);
           if (ScratchBuffer == NULL) {
-            CoreFreePool (Node);
-            CoreFreePool (NewStreamBuffer);
+            gBS->FreePool (Node);
+            gBS->FreePool (NewStreamBuffer);
             return EFI_OUT_OF_RESOURCES;
           }
 
@@ -811,7 +849,7 @@ Returns:
                                  ScratchSize
                                  );
           ASSERT_EFI_ERROR (Status);
-          CoreFreePool (ScratchBuffer);                                           
+          gBS->FreePool (ScratchBuffer);                                           
         }
       } else {
         NewStreamBuffer = NULL;
@@ -826,8 +864,8 @@ Returns:
                  &Node->EncapsulatedStreamHandle
                  );
       if (EFI_ERROR (Status)) {
-        CoreFreePool (Node);
-        CoreFreePool (NewStreamBuffer);
+        gBS->FreePool (Node);
+        gBS->FreePool (NewStreamBuffer);
         return Status;
       }
       break;
@@ -835,7 +873,7 @@ Returns:
     case EFI_SECTION_GUID_DEFINED:
       GuidedHeader = (EFI_GUID_DEFINED_SECTION *) SectionHeader;
       Node->EncapsulationGuid = &GuidedHeader->SectionDefinitionGuid;
-      Status = CoreLocateProtocol (Node->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
+      Status = gBS->LocateProtocol (Node->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
       if (!EFI_ERROR (Status)) {
         //
         // NewStreamBuffer is always allocated by ExtractSection... No caller
@@ -849,7 +887,7 @@ Returns:
                                      &AuthenticationStatus
                                      );
         if (EFI_ERROR (Status)) {
-          CoreFreePool (*ChildNode);
+          gBS->FreePool (*ChildNode);
           return EFI_PROTOCOL_ERROR;
         }
         
@@ -861,7 +899,7 @@ Returns:
           //
           // OR in the parent stream's aggregate status.
           //
-          AuthenticationStatus |= Stream->AuthenticationStatus & EFI_AUTH_STATUS_ALL;
+          AuthenticationStatus |= Stream->AuthenticationStatus & EFI_AGGREGATE_AUTH_STATUS_ALL;
         } else {
           //
           // since there's no authentication data contributed by the section,
@@ -878,8 +916,8 @@ Returns:
                    &Node->EncapsulatedStreamHandle
                    );
         if (EFI_ERROR (Status)) {
-          CoreFreePool (*ChildNode);
-          CoreFreePool (NewStreamBuffer);
+          gBS->FreePool (*ChildNode);
+          gBS->FreePool (NewStreamBuffer);
           return Status;
         }
       } else {
@@ -890,7 +928,7 @@ Returns:
           //
           // If the section REQUIRES an extraction protocol, then we're toast
           //
-          CoreFreePool (*ChildNode);
+          gBS->FreePool (*ChildNode);
           return EFI_PROTOCOL_ERROR;
         }
         
@@ -898,6 +936,23 @@ Returns:
         // Figure out the proper authentication status
         //
         AuthenticationStatus = Stream->AuthenticationStatus;
+        if (GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+          //
+          //  The local status of the new stream is contained in 
+          //  AuthenticaionStatus.  This value needs to be ORed into the
+          //  Aggregate bits also...
+          //
+          
+          //
+          // Clear out and initialize the local status
+          //
+          AuthenticationStatus &= ~EFI_LOCAL_AUTH_STATUS_ALL;
+          AuthenticationStatus |= EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_LOCAL_AUTH_STATUS_NOT_TESTED;
+          //
+          // OR local status into aggregate status
+          //
+          AuthenticationStatus |= AuthenticationStatus >> 16;
+        }
         
         SectionLength = SECTION_SIZE (GuidedHeader);
         Status = OpenSectionStreamEx (
@@ -908,9 +963,20 @@ Returns:
                    &Node->EncapsulatedStreamHandle
                    );
         if (EFI_ERROR (Status)) {
-          CoreFreePool (Node);
+          gBS->FreePool (Node);
           return Status;
         }
+      }
+      
+      if ((AuthenticationStatus & EFI_LOCAL_AUTH_STATUS_ALL) == 
+            (EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_LOCAL_AUTH_STATUS_NOT_TESTED)) {
+        //
+        // Need to register for RPN for when the required GUIDed extraction
+        // protocol becomes available.  This will enable us to refresh the
+        // AuthenticationStatus cached in the Stream if it's ever requested
+        // again.
+        //
+        CreateGuidedExtractionRpnEvent (Stream, Node);
       }
       
       break;
@@ -958,7 +1024,7 @@ Returns:
   //
   // Allocate new event structure and context
   //
-  Context = CoreAllocateBootServicesPool (sizeof (RPN_EVENT_CONTEXT));
+  Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
   ASSERT (Context != NULL);
   
   Context->ChildNode = ChildNode;
@@ -1008,7 +1074,7 @@ Returns:
   
   Context = RpnContext;
   
-  Status = CloseSectionStream (Context->ChildNode->EncapsulatedStreamHandle);
+  Status = CloseSectionStream (&mSectionExtraction, Context->ChildNode->EncapsulatedStreamHandle);
   if (!EFI_ERROR (Status)) {
     //
     // The stream closed successfully, so re-open the stream with correct AuthenticationStatus
@@ -1018,7 +1084,7 @@ Returns:
       (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
     ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
     
-    Status = CoreLocateProtocol (Context->ChildNode->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
+    Status = gBS->LocateProtocol (Context->ChildNode->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
     ASSERT_EFI_ERROR (Status);
 
     
@@ -1033,7 +1099,7 @@ Returns:
     //
     // OR in the parent stream's aggregagate status.
     //
-    AuthenticationStatus |= Context->ParentStream->AuthenticationStatus & EFI_AUTH_STATUS_ALL;
+    AuthenticationStatus |= Context->ParentStream->AuthenticationStatus & EFI_AGGREGATE_AUTH_STATUS_ALL;
     Status = OpenSectionStreamEx (
                NewStreamBufferSize,
                NewStreamBuffer,
@@ -1050,8 +1116,8 @@ Returns:
   //  it.
   //
   
-  CoreCloseEvent (Event);
-  CoreFreePool (Context);
+  gBS->CloseEvent (Event);
+  gBS->FreePool (Context);
 }  
   
 
@@ -1084,12 +1150,12 @@ Returns:
     // If it's an encapsulating section, we close the resulting section stream.
     // CloseSectionStream will free all memory associated with the stream.
     //
-    CloseSectionStream (ChildNode->EncapsulatedStreamHandle);
+    CloseSectionStream (&mSectionExtraction, ChildNode->EncapsulatedStreamHandle);
   }
   //
   // Last, free the child node itself
   //
-  CoreFreePool (ChildNode);
+  gBS->FreePool (ChildNode);
 }  
 
 
@@ -1128,7 +1194,7 @@ OpenSectionStreamEx (
   //
   // Allocate a new stream
   //
-  NewStream = CoreAllocateBootServicesPool (sizeof (CORE_SECTION_STREAM_NODE));
+  NewStream = AllocatePool (sizeof (CORE_SECTION_STREAM_NODE));
   if (NewStream == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1139,9 +1205,9 @@ OpenSectionStreamEx (
     // data in
     //
     if (SectionStreamLength > 0) {
-      NewStream->StreamBuffer = CoreAllocateBootServicesPool (SectionStreamLength); 
+      NewStream->StreamBuffer = AllocatePool (SectionStreamLength); 
       if (NewStream->StreamBuffer == NULL) {
-        CoreFreePool (NewStream);
+        gBS->FreePool (NewStream);
         return EFI_OUT_OF_RESOURCES;
       }
       //
@@ -1175,9 +1241,9 @@ OpenSectionStreamEx (
   //
   // Add new stream to stream list
   //
-  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&mStreamRoot, &NewStream->Link);
-  CoreRestoreTpl (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   *SectionStreamHandle = NewStream->StreamHandle;
   
@@ -1282,190 +1348,78 @@ Returns:
   return FALSE;
 }
 
-/**
-  The ExtractSection() function processes the input section and
-  allocates a buffer from the pool in which it returns the section
-  contents. If the section being extracted contains
-  authentication information (the section's
-  GuidedSectionHeader.Attributes field has the
-  EFI_GUIDED_SECTION_AUTH_STATUS_VALID bit set), the values
-  returned in AuthenticationStatus must reflect the results of
-  the authentication operation. Depending on the algorithm and
-  size of the encapsulated data, the time that is required to do
-  a full authentication may be prohibitively long for some
-  classes of systems. To indicate this, use
-  EFI_SECURITY_POLICY_PROTOCOL_GUID, which may be published by
-  the security policy driver (see the Platform Initialization
-  Driver Execution Environment Core Interface Specification for
-  more details and the GUID definition). If the
-  EFI_SECURITY_POLICY_PROTOCOL_GUID exists in the handle
-  database, then, if possible, full authentication should be
-  skipped and the section contents simply returned in the
-  OutputBuffer. In this case, the
-  EFI_AUTH_STATUS_PLATFORM_OVERRIDE bit AuthenticationStatus
-  must be set on return. ExtractSection() is callable only from
-  TPL_NOTIFY and below. Behavior of ExtractSection() at any
-  EFI_TPL above TPL_NOTIFY is undefined. Type EFI_TPL is
-  defined in RaiseTPL() in the UEFI 2.0 specification.
-
-  
-  @param This   Indicates the
-                EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
-  
-  @param InputSection Buffer containing the input GUIDed section
-                      to be processed. OutputBuffer OutputBuffer
-                      is allocated from boot services pool
-                      memory and contains the new section
-                      stream. The caller is responsible for
-                      freeing this buffer.
-
-  @param OutputSize   A pointer to a caller-allocated UINTN in
-                      which the size of OutputBuffer allocation
-                      is stored. If the function returns
-                      anything other than EFI_SUCCESS, the value
-                      of OutputSize is undefined.
-
-  @param AuthenticationStatus A pointer to a caller-allocated
-                              UINT32 that indicates the
-                              authentication status of the
-                              output buffer. If the input
-                              section's
-                              GuidedSectionHeader.Attributes
-                              field has the
-                              EFI_GUIDED_SECTION_AUTH_STATUS_VAL
-                              bit as clear, AuthenticationStatus
-                              must return zero. Both local bits
-                              (19:16) and aggregate bits (3:0)
-                              in AuthenticationStatus are
-                              returned by ExtractSection().
-                              These bits reflect the status of
-                              the extraction operation. The bit
-                              pattern in both regions must be
-                              the same, as the local and
-                              aggregate authentication statuses
-                              have equivalent meaning at this
-                              level. If the function returns
-                              anything other than EFI_SUCCESS,
-                              the value of AuthenticationStatus
-                              is undefined.
-
-
-  @retval EFI_SUCCESS The InputSection was successfully
-                      processed and the section contents were
-                      returned.
-
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient
-                                resources to process the
-                                request.
-
-  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
-                                not match this instance of the
-                                GUIDed Section Extraction
-                                Protocol.
-
-**/
-EFI_STATUS
-EFIAPI
-CustomGuidedSectionExtract (
-  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
-  IN CONST  VOID                                   *InputSection,
-  OUT       VOID                                   **OutputBuffer,
-  OUT       UINTN                                  *OutputSize,
-  OUT       UINT32                                 *AuthenticationStatus
+EFI_EVENT
+CoreCreateProtocolNotifyEvent (
+  IN EFI_GUID             *ProtocolGuid,
+  IN EFI_TPL              NotifyTpl,
+  IN EFI_EVENT_NOTIFY     NotifyFunction,
+  IN VOID                 *NotifyContext,
+  OUT VOID                **Registration,
+  IN  BOOLEAN             SignalFlag
   )
+/*++
+
+Routine Description:
+
+  Create a protocol notification event and return it.
+
+Arguments:
+
+  ProtocolGuid    - Protocol to register notification event on.
+
+  NotifyTpl        - Maximum TPL to signal the NotifyFunction.
+
+  NotifyFuncition  - EFI notification routine.
+
+  NotifyContext   - Context passed into Event when it is created.
+
+  Registration    - Registration key returned from RegisterProtocolNotify().
+
+  SignalFlag      -  Boolean value to decide whether kick the event after register or not.
+
+Returns:
+
+  The EFI_EVENT that has been registered to be signaled when a ProtocolGuid
+  is added to the system.
+
+--*/
 {
-  EFI_STATUS      Status;
-  VOID            *ScratchBuffer;
-  VOID            *AllocatedOutputBuffer;
-  UINT32          OutputBufferSize;
-  UINT32          ScratchBufferSize;
-  UINT16          SectionAttribute;
-  
-  //
-  // Init local variable
-  //
-  ScratchBuffer         = NULL;
-  AllocatedOutputBuffer = NULL;
+  EFI_STATUS              Status;
+  EFI_EVENT               Event;
 
   //
-  // Call GetInfo to get the size and attribute of input guided section data.
+  // Create the event
   //
-  Status = ExtractGuidedSectionGetInfo (
-            InputSection,
-            &OutputBufferSize,
-            &ScratchBufferSize,
-            &SectionAttribute
-           );
-  
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "GetInfo from guided section Failed - %r\n", Status));
-    return Status;
-  }
-  
-  if (ScratchBufferSize != 0) {
+
+  Status = gBS->CreateEvent (
+            EVT_NOTIFY_SIGNAL,
+            NotifyTpl,
+            NotifyFunction,
+            NotifyContext,
+           &Event
+            );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register for protocol notifactions on this event
+  //
+
+  Status = gBS->RegisterProtocolNotify (
+            ProtocolGuid,
+            Event,
+            Registration
+            );
+  ASSERT_EFI_ERROR (Status);
+
+  if (SignalFlag) {
     //
-    // Allocate scratch buffer
+    // Kick the event so we will perform an initial pass of
+    // current installed drivers
     //
-    ScratchBuffer = CoreAllocateBootServicesPool (ScratchBufferSize);
-    if (ScratchBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+    gBS->SignalEvent (Event);
   }
 
-  if (OutputBufferSize > 0) {  
-    //
-    // Allocate output buffer
-    //
-    AllocatedOutputBuffer = CoreAllocateBootServicesPool (OutputBufferSize);
-    if (AllocatedOutputBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    *OutputBuffer = AllocatedOutputBuffer;
-  }
-
-  //
-  // Call decode function to extract raw data from the guided section.
-  //
-  Status = ExtractGuidedSectionDecode (
-             InputSection, 
-             OutputBuffer,
-             ScratchBuffer,
-             AuthenticationStatus
-           );
-  if (EFI_ERROR (Status)) {
-    //
-    // Decode failed
-    //
-    if (AllocatedOutputBuffer != NULL) {
-      CoreFreePool (AllocatedOutputBuffer);
-    }
-    if (ScratchBuffer != NULL) {
-      CoreFreePool (ScratchBuffer);
-    }
-    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
-    return Status;
-  }
-
-  if (*OutputBuffer != AllocatedOutputBuffer) {
-    //
-    // OutputBuffer was returned as a different value, 
-    // so copy section contents to the allocated memory buffer.
-    // 
-    CopyMem (AllocatedOutputBuffer, *OutputBuffer, OutputBufferSize);
-    *OutputBuffer = AllocatedOutputBuffer;
-  }
-
-  //
-  // Set real size of output buffer.
-  //
-  *OutputSize = (UINTN) OutputBufferSize;
-
-  //
-  // Free unused scratch buffer.
-  //
-  if (ScratchBuffer != NULL) {
-    CoreFreePool (ScratchBuffer);
-  }
-
-  return EFI_SUCCESS;
+  return Event;
 }
+
+

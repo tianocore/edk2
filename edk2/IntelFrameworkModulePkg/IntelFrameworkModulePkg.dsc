@@ -199,7 +199,7 @@
   IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   IntelFrameworkModulePkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib.inf
   IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-
+  IntelFrameworkModulePkg/Universal/SectionExtractionDxe/SectionExtractionDxe.inf
 
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf

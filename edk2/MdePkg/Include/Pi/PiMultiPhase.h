@@ -97,5 +97,6 @@ typedef struct {
 #define EFI_AUTH_STATUS_IMAGE_SIGNED        0x02
 #define EFI_AUTH_STATUS_NOT_TESTED          0x04
 #define EFI_AUTH_STATUS_TEST_FAILED         0x08
+#define EFI_AUTH_STATUS_ALL                 0x0f
 
 #endif

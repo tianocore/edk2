@@ -1,5 +1,7 @@
-/*++
-
+/**@file
+  Firmware File System protocol. Layers on top of Firmware
+  Block protocol to produce a file abstraction of FV based files.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,16 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  FwVolDriver.h
-
-Abstract:
-
-  Firmware File System protocol. Layers on top of Firmware
-  Block protocol to produce a file abstraction of FV based files.
-
---*/
+**/
 
 #ifndef __FWVOL_H
 #define __FWVOL_H
@@ -33,7 +26,6 @@ typedef struct {
   LIST_ENTRY                      Link;
   EFI_FFS_FILE_HEADER             *FfsHeader;
   UINTN                           StreamHandle;
-  EFI_SECTION_EXTRACTION_PROTOCOL *Sep;
 } FFS_FILE_LIST_ENTRY;
 
 typedef struct {

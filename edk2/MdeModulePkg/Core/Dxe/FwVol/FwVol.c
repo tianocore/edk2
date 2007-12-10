@@ -151,7 +151,7 @@ Returns:
       //
       // Close stream and free resources from SEP
       //
-      FfsFileEntry->Sep->CloseSectionStream (FfsFileEntry->Sep, FfsFileEntry->StreamHandle);
+      CloseSectionStream (FfsFileEntry->StreamHandle);
     }
 
     CoreFreePool (FfsFileEntry);
@@ -281,7 +281,7 @@ Returns:
   //
   // Scan to check the free space & File list
   //
-  if (FvbAttributes & EFI_FVB_ERASE_POLARITY) {
+  if (FvbAttributes & EFI_FVB2_ERASE_POLARITY) {
     FvDevice->ErasePolarity = 1;
   } else {
     FvDevice->ErasePolarity = 0;
