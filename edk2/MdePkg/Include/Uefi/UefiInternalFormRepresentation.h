@@ -33,11 +33,6 @@ typedef UINT16  EFI_STRING_ID;
 typedef UINT16  EFI_FORM_ID;
 typedef UINT16  EFI_VARSTORE_ID;
 
-//
-// BugBug in UEFI2.1 
-// 
-typedef VOID    *EFI_FONT_HANDLE;
-
 
 //
 // IFR Op codes
