@@ -213,7 +213,7 @@ Returns:
     //
     REPORT_STATUS_CODE (
       EFI_PROGRESS_CODE,
-      EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
+      FixedPcdGet32 (PcdStatusCodeValuePeiCoreEntry)
       );
 
     PERF_START (NULL,"PEI", NULL, mTick);

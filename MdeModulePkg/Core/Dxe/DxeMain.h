@@ -1,5 +1,6 @@
-/*++
-
+/**@file
+  Header file of DxeCore
+  
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  DxeMain.h
-
-Abstract:
-
-Revision History
-
---*/
+**/
 
 #ifndef _DXE_MAIN_H_
 #define _DXE_MAIN_H_
@@ -25,11 +18,9 @@ Revision History
 
 
 #include <PiDxe.h>
-#include <FrameworkPei.h>
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GuidedSectionExtraction.h>
-#include <Protocol/SectionExtraction.h>
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/Runtime.h>
@@ -69,7 +60,6 @@ Revision History
 #include <Protocol/Capsule.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/Performance.h>
-#include <Guid/StatusCodeDataTypeId.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -82,6 +72,7 @@ Revision History
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 #include "DebugImageInfo.h"
@@ -133,6 +124,13 @@ typedef struct {
   BOOLEAN                     Present;
 } ARCHITECTURAL_PROTOCOL_ENTRY;
 
+typedef struct {
+  EFI_STATUS_CODE_DATA  DataHeader;
+  EFI_HANDLE            Handle;
+} EFI_DXE_DEVICE_HANDLE_EXTENDED_DATA;
+
+#define EFI_STATUS_CODE_DXE_CORE_GUID \
+  { 0x335984bd, 0xe805, 0x409a, { 0xb8, 0xf8, 0xd2, 0x7e, 0xce, 0x5f, 0xf7, 0xa6 } }
 
 //
 // DXE Dispatcher Data structures
@@ -2837,6 +2835,32 @@ DxeMainCustomDecompress (
   IN     UINT32                          DestinationSize,
   IN OUT VOID                            *Scratch,
   IN     UINT32                          ScratchSize
+  );
+
+EFI_STATUS
+EFIAPI
+OpenSectionStream (
+  IN     UINTN                                     SectionStreamLength,
+  IN     VOID                                      *SectionStream,
+     OUT UINTN                                     *SectionStreamHandle
+  );
+
+EFI_STATUS
+EFIAPI
+GetSection (
+  IN UINTN                                              SectionStreamHandle,
+  IN EFI_SECTION_TYPE                                   *SectionType,
+  IN EFI_GUID                                           *SectionDefinitionGuid,
+  IN UINTN                                              SectionInstance,
+  IN VOID                                               **Buffer,
+  IN OUT UINTN                                          *BufferSize,
+  OUT UINT32                                            *AuthenticationStatus
+  );
+
+EFI_STATUS
+EFIAPI
+CloseSectionStream (
+  IN  UINTN                                   StreamHandleToClose
   );
 
 #endif

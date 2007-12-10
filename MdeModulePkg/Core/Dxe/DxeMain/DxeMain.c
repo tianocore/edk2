@@ -1,5 +1,6 @@
-/*++
+/**@file
 
+  DXE Core Main Entry Point
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  DxeMain.c
-
-Abstract:
-
-  DXE Core Main Entry Point
-
---*/
+**/
 
 #include <DxeMain.h>
 
@@ -328,7 +321,7 @@ Returns:
   //
   // Report Status Code here for DXE_ENTRY_POINT once it is available
   //
-  CoreReportProgressCode ((EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT));
+  CoreReportProgressCode (FixedPcdGet32(PcdStatusCodeValueDxeCoreEntry));
 
   //
   // Create the aligned system table pointer structure that is used by external
@@ -423,7 +416,7 @@ Returns:
   //
   // Report Status code before transfer control to BDS
   //
-  CoreReportProgressCode ((EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT));
+  CoreReportProgressCode (FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds));
   //
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
@@ -789,7 +782,7 @@ Returns:
   //
   // We are using gEfiCallerIdGuid as the caller ID for Dxe Core
   //
-  CoreReportProgressCode ((EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES));
+  CoreReportProgressCode (FixedPcdGet32 (PcdStatusCodeValueBootServiceExit));
 
   //
   // Clear the non-runtime values of the EFI System Table

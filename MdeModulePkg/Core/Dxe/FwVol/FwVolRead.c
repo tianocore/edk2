@@ -413,7 +413,6 @@ FvReadFileSection (
   EFI_FV_FILE_ATTRIBUTES            FileAttributes;
   UINTN                             FileSize;
   UINT8                             *FileBuffer;
-  EFI_SECTION_EXTRACTION_PROTOCOL   *Sep;
   FFS_FILE_LIST_ENTRY               *FfsEntry;
  
   if (NULL == NameGuid || Buffer == NULL) {
@@ -456,17 +455,7 @@ FvReadFileSection (
   // Use FfsEntry to cache Section Extraction Protocol Inforomation
   //
   if (FfsEntry->StreamHandle == 0) {
-    //
-    // Located the protocol
-    //
-    Status = CoreLocateProtocol (&gEfiSectionExtractionProtocolGuid, NULL, (VOID **)&Sep);
-    //
-    // Section Extraction Protocol is part of Dxe Core so this should never fail
-    //
-    ASSERT_EFI_ERROR (Status);
-
-    Status = Sep->OpenSectionStream (
-                    Sep,
+    Status = OpenSectionStream (
                     FileSize,
                     FileBuffer,
                     &FfsEntry->StreamHandle
@@ -474,28 +463,20 @@ FvReadFileSection (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-
-    FfsEntry->Sep = Sep;
-  } else {
-    //
-    // Get cached copy of Sep
-    //
-    Sep = FfsEntry->Sep;
   }
 
   //
   // If SectionType == 0 We need the whole section stream
   //
-  Status = Sep->GetSection (
-                  Sep,
-                            FfsEntry->StreamHandle,
-                            (SectionType == 0) ? NULL : &SectionType,
-                            NULL,
-                            (SectionType == 0) ? 0 : SectionInstance,
-                            Buffer,
-                            BufferSize,
-                            AuthenticationStatus
-                            );
+  Status = GetSection (
+             FfsEntry->StreamHandle,
+             (SectionType == 0) ? NULL : &SectionType,
+             NULL,
+             (SectionType == 0) ? 0 : SectionInstance,
+             Buffer,
+             BufferSize,
+             AuthenticationStatus
+             );
 
   //
   // Close of stream defered to close of FfsHeader list to allow SEP to cache data

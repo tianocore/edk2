@@ -1,0 +1,52 @@
+#/** @file
+# Section Extraction Dxe Driver.
+#
+# Status Code Architectural Protocol implementation as defined in Tiano
+#  Architecture Specification. This driver has limited functionality
+#  at runtime and will not log to Data Hub at runtime.
+# Copyright (c) 2006, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SectionExtractionDxe
+  FILE_GUID                      = 801ADCA0-815E-46a4-84F7-657F53621A57
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = SectionExtractionEntryPoint
+
+[Sources]
+  SectionExtraction.c
+  SectionExtraction.h
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  DebugLib
+  BaseLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[Protocols]
+  gEfiSectionExtractionProtocolGuid    # ALWAYS_PRODUCED
+  gEfiDecompressProtocolGuid           # ALWAYS_CONSUMED
+
+[Depex]
+  TRUE

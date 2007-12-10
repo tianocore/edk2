@@ -1,6 +1,7 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation
+/**@file
+  DXE Core library services.
+  
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,25 +10,17 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Library.c
-
-Abstract:
-
-  DXE Core library services.
-
---*/
+**/
 
 #include <DxeMain.h>
 
 UINTN mErrorLevel = EFI_D_ERROR | EFI_D_LOAD;
 
-EFI_DEVICE_HANDLE_EXTENDED_DATA mStatusCodeData = {
+EFI_DXE_DEVICE_HANDLE_EXTENDED_DATA mStatusCodeData = {
   {
     sizeof (EFI_STATUS_CODE_DATA),
     0,
-    EFI_STATUS_CODE_SPECIFIC_DATA_GUID
+    EFI_STATUS_CODE_DXE_CORE_GUID
   },
   NULL
 };
@@ -57,7 +50,7 @@ Returns:
 
 --*/
 {
-  mStatusCodeData.DataHeader.Size = sizeof (EFI_DEVICE_HANDLE_EXTENDED_DATA) - sizeof (EFI_STATUS_CODE_DATA);
+  mStatusCodeData.DataHeader.Size = sizeof (EFI_DXE_DEVICE_HANDLE_EXTENDED_DATA) - sizeof (EFI_STATUS_CODE_DATA);
   mStatusCodeData.Handle          = Handle;
 
   if ((gStatusCode != NULL) && (gStatusCode->ReportStatusCode != NULL) ) {
