@@ -23,8 +23,6 @@ Revision History
 
 #include <DxeMain.h>
 
-BOOLEAN mRepairLoadedImage = FALSE;
-
 //
 // Driver Support Function Prototypes
 //
@@ -80,11 +78,6 @@ Returns:
   EFI_HANDLE                           *ChildHandleBuffer;
   UINTN                                ChildHandleCount;
   UINTN                                Index;
-  EFI_HANDLE                           *LoadedImageHandleBuffer;
-  UINTN                                LoadedImageHandleCount;
-  LOADED_IMAGE_PRIVATE_DATA            *Image;
-  EFI_HANDLE                           DeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
   
   //
   // Make sure ControllerHandle is valid
@@ -207,66 +200,6 @@ Returns:
     CoreFreePool (ChildHandleBuffer);
   }
 
-  //
-  // If a Stop() function has been called one or more time successfully, then attempt to 
-  // repair the stale DeviceHandle fields of the Loaded Image Protocols
-  //
-  if (mRepairLoadedImage) {
-    //
-    // Assume that all Loaded Image Protocols can be repaired
-    //
-    mRepairLoadedImage = FALSE;
-
-    //
-    // Get list of all Loaded Image Protocol Instances
-    //
-    Status = CoreLocateHandleBuffer (
-              ByProtocol,   
-              &gEfiLoadedImageProtocolGuid,  
-              NULL,
-              &LoadedImageHandleCount, 
-              &LoadedImageHandleBuffer
-              );
-    if (!EFI_ERROR (Status) && LoadedImageHandleCount != 0) {
-      for (Index = 0; Index < LoadedImageHandleCount; Index++) {
-        //
-        // Retrieve the Loaded Image Protocol
-        //
-        Image = CoreLoadedImageInfo (LoadedImageHandleBuffer[Index]);
-        if (Image != NULL) {
-          //
-          // Check to see if the DeviceHandle field is a valid handle
-          //
-          Status = CoreValidateHandle (Image->Info.DeviceHandle);
-          if (EFI_ERROR (Status)) {
-            //
-            // The DeviceHandle field is not valid.
-            // Attempt to locate a device handle with a device path that matches the one
-            // that was used to originally load the image
-            //
-            DevicePath = Image->DeviceHandleDevicePath;
-            if (DevicePath != NULL) {
-              Status = CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &DevicePath, &DeviceHandle);
-              if (!EFI_ERROR (Status) && (DeviceHandle != NULL_HANDLE) && IsDevicePathEnd(DevicePath)) {
-                //
-                // A device handle with a matching device path was found, so update the Loaded Image Protocol
-                // with the device handle discovered
-                //
-                Image->Info.DeviceHandle = DeviceHandle;
-              } else {
-                //
-                // There is still at least one Loaded Image Protocol that requires repair
-                //
-                mRepairLoadedImage = TRUE;
-              }
-            }
-          }
-        }
-      }
-      CoreFreePool (LoadedImageHandleBuffer);
-    }
-  }
-
   return ReturnStatus;
 }
 
@@ -298,6 +231,8 @@ Arguments:
 
   DriverBindingHandleBuffer - The buffer of driver binding protocol to be modified.
 
+  IsImageHandle - Indicate whether DriverBindingHandle is an image handle
+  
 Returns:
 
   None.
@@ -333,6 +268,10 @@ Returns:
                 &gEfiDriverBindingProtocolGuid,
                 (VOID **)&DriverBinding
                 );
+      if (EFI_ERROR (Status) || DriverBinding == NULL) {
+        continue;
+      }
+
       //
       // If the ImageHandle associated with DriverBinding matches DriverBindingHandle,
       // then add the DriverBindingProtocol[Index] to the sorted list
@@ -427,6 +366,8 @@ Returns:
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *BusSpecificDriverOverride;
   UINTN                                      DriverBindingHandleCount;
   EFI_HANDLE                                 *DriverBindingHandleBuffer;
+  UINTN                                      NewDriverBindingHandleCount;
+  EFI_HANDLE                                 *NewDriverBindingHandleBuffer;
   EFI_DRIVER_BINDING_PROTOCOL                *DriverBinding;
   UINTN                                      NumberOfSortedDriverBindingProtocols;
   EFI_DRIVER_BINDING_PROTOCOL                **SortedDriverBindingProtocols;
@@ -564,7 +505,15 @@ Returns:
   // If the number of Driver Binding Protocols has increased since this function started, then return
   // EFI_NOT_READY, so it will be restarted
   //
-  if (NumberOfSortedDriverBindingProtocols > DriverBindingHandleCount) {
+  Status = CoreLocateHandleBuffer (
+             ByProtocol,   
+             &gEfiDriverBindingProtocolGuid,  
+             NULL,
+             &NewDriverBindingHandleCount, 
+             &NewDriverBindingHandleBuffer
+             );
+  CoreFreePool (NewDriverBindingHandleBuffer);
+  if (NewDriverBindingHandleCount > DriverBindingHandleCount) {
     //
     // Free any buffers that were allocated with AllocatePool()
     //
@@ -720,9 +669,6 @@ Returns:
   OPEN_PROTOCOL_DATA                  *OpenData;
   PROTOCOL_INTERFACE                  *Prot;
   EFI_DRIVER_BINDING_PROTOCOL         *DriverBinding;
-  EFI_HANDLE                          *LoadedImageHandleBuffer;
-  UINTN                               LoadedImageHandleCount;
-  LOADED_IMAGE_PRIVATE_DATA           *Image;
 
   //
   // Make sure ControllerHandle is valid
@@ -924,49 +870,6 @@ Returns:
   }
 
   if (StopCount > 0) {
-    //
-    // If the Loaded Image Protocols do not already need to be repaired, then
-    // check the status of the DeviceHandle field of all Loaded Image Protocols
-    // to determine if any of them now need repair because a sucessful Stop()
-    // may have destroyed the DeviceHandle value in the Loaded Image Protocol
-    //
-    if (!mRepairLoadedImage) {
-      //
-      // Get list of all Loaded Image Protocol Instances
-      //
-      Status = CoreLocateHandleBuffer (
-                ByProtocol,   
-                &gEfiLoadedImageProtocolGuid,  
-                NULL,
-                &LoadedImageHandleCount, 
-                &LoadedImageHandleBuffer
-                );
-      if (!EFI_ERROR (Status) && LoadedImageHandleCount != 0) {
-        for (Index = 0; Index < LoadedImageHandleCount; Index++) {
-          //
-          // Retrieve the Loaded Image Protocol
-          //
-          Image = CoreLoadedImageInfo (LoadedImageHandleBuffer[Index]);
-          if (Image != NULL) {
-            //
-            // Check to see if the DeviceHandle field is a valid handle
-            //
-            Status = CoreValidateHandle (Image->Info.DeviceHandle);
-            if (EFI_ERROR (Status)) {
-              //
-              // The DeviceHandle field is not longer a valid handle.  This means
-              // that future calls to ConnectController() need to attemp to repair
-              // the Loaded Image Protocols with invalid DeviceHandle fields.  Set 
-              // the flag used by ConnectController().
-              //
-              mRepairLoadedImage = TRUE;
-              break;
-            }
-          }
-        }
-        CoreFreePool (LoadedImageHandleBuffer);
-      }
-    }
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_NOT_FOUND;
