@@ -859,14 +859,20 @@ Returns:
   EFI_SECTION_TYPE                    SectionType;
   UINT32                              AuthenticationStatus;
   VOID                                *Buffer;
+  VOID                                *AlignedBuffer;
   UINTN                               BufferSize;
+  EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
+  UINT32                              FvAlignment;  
 
   //
   // Read the first (and only the first) firmware volume section
   //
   SectionType = EFI_SECTION_FIRMWARE_VOLUME_IMAGE;
+  FvHeader    = NULL;
+  FvAlignment = 0;
   Buffer      = NULL;
   BufferSize  = 0;
+  AlignedBuffer = NULL;
   Status = Fv->ReadSection (
                 Fv, 
                 DriverName, 
@@ -878,22 +884,50 @@ Returns:
                 );
   if (!EFI_ERROR (Status)) {
     //
-    // Produce a FVB protocol for the file
+    // FvImage should be at its required alignment.
     //
-    Status = ProduceFVBProtocolOnBuffer (
-              (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer,
-              (UINT64)BufferSize,
-              FvHandle,
-              NULL
-              );
+    FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) Buffer;
+    FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+    //
+    // FvAlignment must be more than 8 bytes required by FvHeader structure.
+    // 
+    if (FvAlignment < 8) {
+      FvAlignment = 8;
+    }
+    
+    AlignedBuffer = AllocateAlignedPool ((UINTN) BufferSize, (UINTN) FvAlignment);
+    if (AlignedBuffer == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      //
+      // Move FvImage into the aligned buffer and release the original buffer.
+      //
+      CopyMem (AlignedBuffer, Buffer, BufferSize);
+      CoreFreePool (Buffer);
+      Buffer = NULL;
+      //
+      // Produce a FVB protocol for the file
+      //
+      Status = ProduceFVBProtocolOnBuffer (
+                (EFI_PHYSICAL_ADDRESS) (UINTN) AlignedBuffer,
+                (UINT64)BufferSize,
+                FvHandle,
+                NULL
+                );
+    }
   }
 
-  if (EFI_ERROR (Status) && (Buffer != NULL)) {    
-  //
-  // ReadSection or Produce FVB failed, Free data buffer
-  //
-  CoreFreePool (Buffer); 
-
+  if (EFI_ERROR (Status)) {    
+    //
+    // ReadSection or Produce FVB failed, Free data buffer
+    //
+    if (Buffer != NULL) {
+      CoreFreePool (Buffer); 
+    }
+    
+    if (AlignedBuffer != NULL) {
+      FreeAlignedPool (AlignedBuffer);
+    }
   }
 
   return Status;

@@ -413,13 +413,28 @@ Returns:
   UINTN                         BlockIndex;
   UINTN                         BlockIndex2;
   UINTN                         LinearOffset;
+  UINT32                        FvAlignment;
   EFI_FV_BLOCK_MAP_ENTRY        *PtrBlockMapEntry;
-
+  
+  FvAlignment = 0;
   FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BaseAddress;
   //
   // Validate FV Header, if not as expected, return
   //
   if (FwVolHeader->Signature != EFI_FVH_SIGNATURE) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+  //
+  // Get FvHeader alignment
+  //
+  FvAlignment = 1 << ((FwVolHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+  if (FvAlignment < 8) {
+    FvAlignment = 8;
+  }
+  if ((UINTN)BaseAddress % FvAlignment != 0) {
+    //
+    // FvImage buffer is not at its required alignment.
+    //
     return EFI_VOLUME_CORRUPTED;
   }
   //
