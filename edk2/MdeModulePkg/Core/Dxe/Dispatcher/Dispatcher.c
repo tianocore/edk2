@@ -894,8 +894,7 @@ Returns:
     if (FvAlignment < 8) {
       FvAlignment = 8;
     }
-    
-    AlignedBuffer = AllocateAlignedPool ((UINTN) BufferSize, (UINTN) FvAlignment);
+    AlignedBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), (UINTN) FvAlignment);
     if (AlignedBuffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     } else {
@@ -926,7 +925,7 @@ Returns:
     }
     
     if (AlignedBuffer != NULL) {
-      FreeAlignedPool (AlignedBuffer);
+      FreeAlignedPages (AlignedBuffer, EFI_SIZE_TO_PAGES (BufferSize));
     }
   }
 
