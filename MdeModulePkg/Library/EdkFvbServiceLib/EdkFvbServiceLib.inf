@@ -41,7 +41,7 @@
   Ia32/Fvb.c
 
 [Sources.X64]
-  x64/Fvb.c
+  X64/Fvb.c
 
 [Packages]
   MdePkg/MdePkg.dec
