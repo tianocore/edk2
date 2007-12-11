@@ -32,7 +32,7 @@
 #
 
 [Sources.common]
-  support.c
+  Support.c
   PxeDhcp4Release.c
   PxeDhcp4Setup.c
   ComponentName.c
