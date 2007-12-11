@@ -24,9 +24,8 @@ set -e
 # Specify the versions
 #
 GCC=gcc-4.1.0
-BINUTILS=binutils-2.16.1
-# BINUTILS=binutils-2.16.91-20060119-1
-CYGWIN_SNAP=20060403 # You may need to find a more recent one.
+BINUTILS=binutils-2.18
+CYGWIN_SNAP=20071108 # You may need to find a more recent one.
 export PATH=/bin:/usr/bin
 
 #
@@ -47,7 +46,7 @@ CYG_LOC=http://cygwin.com/snapshots/cygwin-src-${CYGWIN_SNAP}.tar.bz2
 # Uncomment one of the following depending upon which your system provides
 #
 #GET_COMMAND="curl --remote-name"
-GET_COMMAND="wget -nc --no-directories --retr-symlinks "
+GET_COMMAND="wget -c -nc --no-directories --retr-symlinks "
 
 #
 # Allow environment to override some programs
