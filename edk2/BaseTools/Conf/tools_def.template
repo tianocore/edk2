@@ -563,14 +563,14 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ICC_IA32_CC_PATH                  = DEF(ICC_BIN32)\icl.exe
 *_ICC_IA32_SLINK_PATH               = DEF(ICC_BIN32)\xilib.exe
 # xilib.exe needs lib.exe from Visual Studio
-*_ICC_IA32_SLINK_DLL                = DEF(VSNET2003_BIN)
+*_ICC_IA32_SLINK_DLL                = DEF(VS2005TEAMSUITE_BIN)
 *_ICC_IA32_DLINK_PATH               = DEF(ICC_BIN32)\xilink.exe
 *_ICC_IA32_ASMLINK_PATH             = DEF(ICC_BIN32)\xilink.exe
 *_ICC_IA32_PP_PATH                  = DEF(ICC_BIN32)\icl.exe
 *_ICC_IA32_VFRPP_PATH               = DEF(ICC_BIN32)\icl.exe
 *_ICC_IA32_APP_PATH                 = DEF(ICC_BIN32)\icl.exe
-*_ICC_IA32_ASM_PATH                 = DEF(VSNET2003_BIN)\ml.exe
-*_ICC_IA32_ASM_DLL                  = DEF(VSNET2003_DLL)
+*_ICC_IA32_ASM_PATH                 = DEF(VS2005TEAMSUITE_BIN)\ml.exe
+*_ICC_IA32_ASM_DLL                  = DEF(VS2005TEAMSUITE_DLL)
 
   DEBUG_ICC_IA32_CC_FLAGS                = /nologo /c /WX /W4 /Gy /Gs8192 /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FIAutoGen.h /EHs-c- /GF /Zi /Gm
 RELEASE_ICC_IA32_CC_FLAGS                = /nologo /c /WX /W4 /Gy /Gs8192 /D UNICODE /O1ib2 /GL /DEFI_FIRMWARE_VENDOR=L\"INTEL\" /FIAutoGen.h /EHs-c- /GF
@@ -589,14 +589,14 @@ RELEASE_ICC_IA32_DLINK_FLAGS             = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_ICC_X64_CC_PATH                   = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_SLINK_PATH                = DEF(ICC_BINX64)\xilib.exe
 # xilib.exe needs lib.exe from Visual Studio
-*_ICC_X64_SLINK_DLL                 = DEF(VSNET2003_BIN)
+*_ICC_X64_SLINK_DLL                 = DEF(VS2005TEAMSUITE_BIN)
 *_ICC_X64_DLINK_PATH                = DEF(ICC_BINX64)\xilink.exe
 *_ICC_X64_ASMLINK_PATH              = DEF(ICC_BINX64)\xilink.exe
 *_ICC_X64_PP_PATH                   = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_VFRPP_PATH                = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_APP_PATH                  = DEF(ICC_BINX64)\icl.exe
 *_ICC_X64_ASM_PATH                  = DEF(WINDDK_BINX64)\ml64.exe
-*_ICC_X64_ASM_DLL                   = DEF(VSNET2003_DLL)
+*_ICC_X64_ASM_DLL                   = DEF(VS2005TEAMSUITE_DLL)
 
   DEBUG_ICC_X64_CC_FLAGS                 = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /Zi /Gm /EHs-c- /GF
 RELEASE_ICC_X64_CC_FLAGS                 = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF
@@ -614,10 +614,10 @@ RELEASE_ICC_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 ##################
 *_ICC_IPF_CC_PATH                   = DEF(ICC_BIN64)\icl.exe
 # icl.exe needs cl.exe from Visual Studio
-*_ICC_IPF_CC_DLL                    = DEF(VSNET2003_BIN)
+*_ICC_IPF_CC_DLL                    = DEF(VS2005TEAMSUITE_BIN)
 *_ICC_IPF_SLINK_PATH                = DEF(ICC_BIN64)\xilib.exe
 # xilib.exe needs lib.exe from Visual Studio
-*_ICC_IPF_SLINK_DLL                 = DEF(VSNET2003_BIN);DEF(VSNET2003_DLL)
+*_ICC_IPF_SLINK_DLL                 = DEF(VS2005TEAMSUITE_BIN);DEF(VS2005TEAMSUITE_DLL)
 *_ICC_IPF_DLINK_PATH                = DEF(ICC_BIN64)\xilink.exe
 *_ICC_IPF_ASMLINK_PATH              = DEF(ICC_BIN64)\xilink.exe
 *_ICC_IPF_PP_PATH                   = DEF(ICC_BIN64)\icl.exe
