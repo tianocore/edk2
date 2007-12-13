@@ -151,12 +151,6 @@ build() {
     )
     done
 
-            #"--with-gnu-as" "--with-as=$pref/$targ/bin/as" \
-	    #"--with-gnu-ld" "--with-ld=$pref/$targ/bin/ld" \
-    #cp -fr cygwin-snapshot-${CYGWIN_SNAP}-1/newlib/libc/include/* $pref/$targ/include;
-    #cp -fr cygwin-snapshot-${CYGWIN_SNAP}-1/winsup/cygwin/include/* $pref/$targ/include;
-    #cp -fr ${W32API}/include/* $pref/$targ/include;
-
     wait
 }
 
