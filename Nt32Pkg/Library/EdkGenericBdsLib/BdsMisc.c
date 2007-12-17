@@ -1015,7 +1015,7 @@ Returns:
                       &Browser
                       );
 
-      ASSERT (Status != EFI_SUCCESS);
+      ASSERT_EFI_ERROR (Status);
 
       StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer1 != NULL);
