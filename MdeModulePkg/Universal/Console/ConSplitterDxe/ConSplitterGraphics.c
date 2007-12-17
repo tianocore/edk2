@@ -289,11 +289,6 @@ Routine Description:
     return EFI_OUT_OF_RESOURCES;
   }
 
-  if (!Private->HardwareNeedsStarting) {
-    if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
-      return EFI_UNSUPPORTED;
-    }
-  }
   //
   // return the worst status met
   //
