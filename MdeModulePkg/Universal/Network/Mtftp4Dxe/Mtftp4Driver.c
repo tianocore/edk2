@@ -348,7 +348,7 @@ Mtftp4DriverBindingStop (
   NicHandle = NetLibGetNicHandle (Controller, &gEfiUdp4ProtocolGuid);
 
   if (NicHandle == NULL) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
   Status = gBS->OpenProtocol (
@@ -370,37 +370,32 @@ Mtftp4DriverBindingStop (
     return EFI_SUCCESS;
   }
 
-  OldTpl             = NET_RAISE_TPL (NET_TPL_LOCK);
-  MtftpSb->InDestory = TRUE;
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
-  while (!NetListIsEmpty (&MtftpSb->Children)) {
-    Instance = NET_LIST_HEAD (&MtftpSb->Children, MTFTP4_PROTOCOL, Link);
-    Mtftp4ServiceBindingDestroyChild (ServiceBinding, Instance->Handle);
+  if (NumberOfChildren == 0) {
+
+    MtftpSb->InDestory = TRUE;
+
+    gBS->UninstallProtocolInterface (
+           NicHandle,
+           &gEfiMtftp4ServiceBindingProtocolGuid,
+           ServiceBinding
+           );
+
+    Mtftp4CleanService (MtftpSb);
+
+    NetFreePool (MtftpSb);
+  } else {
+
+    while (!NetListIsEmpty (&MtftpSb->Children)) {
+      Instance = NET_LIST_HEAD (&MtftpSb->Children, MTFTP4_PROTOCOL, Link);
+      Mtftp4ServiceBindingDestroyChild (ServiceBinding, Instance->Handle);
+    }
+
+    if (MtftpSb->ChildrenNum != 0) {
+      Status = EFI_DEVICE_ERROR;
+    }
   }
-
-  if (MtftpSb->ChildrenNum != 0) {
-    Status = EFI_DEVICE_ERROR;
-    goto ON_ERROR;
-  }
-
-  Status = gBS->UninstallProtocolInterface (
-                  NicHandle,
-                  &gEfiMtftp4ServiceBindingProtocolGuid,
-                  ServiceBinding
-                  );
-
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  Mtftp4CleanService (MtftpSb);
-  NetFreePool (MtftpSb);
-
-  NET_RESTORE_TPL (OldTpl);
-  return EFI_SUCCESS;
-
-ON_ERROR:
-  MtftpSb->InDestory = FALSE;
 
   NET_RESTORE_TPL (OldTpl);
   return Status;

@@ -229,7 +229,7 @@ Dhcp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  TPL_CALLBACK,
+                  NET_TPL_TIMER,
                   DhcpOnTimerTick,
                   DhcpSb,
                   &DhcpSb->Timer
@@ -372,7 +372,7 @@ Dhcp4DriverBindingStop (
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiUdp4ProtocolGuid);
 
   if (NicHandle == NULL) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
    Status = gBS->OpenProtocol (
@@ -394,44 +394,39 @@ Dhcp4DriverBindingStop (
     return EFI_SUCCESS;
   }
 
-  OldTpl            = NET_RAISE_TPL (NET_TPL_LOCK);
-  DhcpSb->InDestory = TRUE;
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
 
-  //
-  // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestoryChild
-  // may cause other child to be deleted.
-  //
-  while (!NetListIsEmpty (&DhcpSb->Children)) {
-    Instance = NET_LIST_HEAD (&DhcpSb->Children, DHCP_PROTOCOL, Link);
-    Dhcp4ServiceBindingDestroyChild (ServiceBinding, Instance->Handle);
+  if (NumberOfChildren == 0) {
+
+    DhcpSb->InDestory    = TRUE;
+    DhcpSb->ServiceState = DHCP_DESTORY;
+
+    gBS->UninstallProtocolInterface (
+           NicHandle,
+           &gEfiDhcp4ServiceBindingProtocolGuid,
+           ServiceBinding
+           );
+
+    Dhcp4CloseService (DhcpSb);
+
+    NetFreePool (DhcpSb);
+  } else {
+    //
+    // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestoryChild
+    // may cause other child to be deleted.
+    //
+    while (!NetListIsEmpty (&DhcpSb->Children)) {
+      Instance = NET_LIST_HEAD (&DhcpSb->Children, DHCP_PROTOCOL, Link);
+      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    }
+
+    if (DhcpSb->NumChildren != 0) {
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
-  if (DhcpSb->NumChildren != 0) {
-    Status = EFI_DEVICE_ERROR;
-    goto ON_ERROR;
-  }
-
-  DhcpSb->ServiceState  = DHCP_DESTORY;
-
-  Status = gBS->UninstallProtocolInterface (
-                  NicHandle,
-                  &gEfiDhcp4ServiceBindingProtocolGuid,
-                  ServiceBinding
-                  );
-
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  Dhcp4CloseService (DhcpSb);
   NET_RESTORE_TPL (OldTpl);
 
-  NetFreePool (DhcpSb);
-  return EFI_SUCCESS;
-
-ON_ERROR:
-  DhcpSb->InDestory = FALSE;
-  NET_RESTORE_TPL (OldTpl);
   return Status;
 }
 
@@ -460,6 +455,8 @@ DhcpInitProtocol (
   Instance->CompletionEvent   = NULL;
   Instance->RenewRebindEvent  = NULL;
   Instance->Token             = NULL;
+  Instance->UdpIo             = NULL;
+  NetbufQueInit (&Instance->ResponseQueue);
 }
 
 

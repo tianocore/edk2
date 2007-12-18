@@ -112,4 +112,12 @@ DhcpCleanLease (
   IN DHCP_SERVICE           *DhcpSb
   );
 
+VOID
+DhcpOnPacketSent (
+  NET_BUF                   *Packet,
+  UDP_POINTS                *Points,
+  EFI_STATUS                IoStatus,
+  VOID                      *Context
+  );
+
 #endif

@@ -77,6 +77,9 @@ struct _DHCP_PROTOCOL {
   EFI_EVENT                         RenewRebindEvent;
 
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
+  UDP_IO_PORT                       *UdpIo; // The UDP IO used for TransmitReceive.
+  UINT32                            Timeout;
+  NET_BUF_QUEUE                     ResponseQueue;
 };
 
 //
@@ -154,6 +157,11 @@ extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
 VOID
 DhcpYieldControl (
   IN DHCP_SERVICE         *DhcpSb
+  );
+
+VOID
+PxeDhcpDone (
+  IN DHCP_PROTOCOL  *Instance
   );
 
 #endif

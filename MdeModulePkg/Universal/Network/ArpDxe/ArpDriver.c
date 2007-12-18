@@ -413,7 +413,7 @@ ArpDriverBindingStop (
   //
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiManagedNetworkProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
   //
@@ -429,50 +429,43 @@ ArpDriverBindingStop (
                   );
   if (EFI_ERROR (Status)) {
     ARP_DEBUG_ERROR (("ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
-    return Status;
+    return EFI_DEVICE_ERROR;
   }
 
   ArpService = ARP_SERVICE_DATA_FROM_THIS (ServiceBinding);
 
-  while (!NetListIsEmpty (&ArpService->ChildrenList)) {
+  if (NumberOfChildren == 0) {
     //
-    // Iterate all the instances.
+    // Uninstall the ARP ServiceBinding protocol.
     //
-    Instance = NET_LIST_HEAD (&ArpService->ChildrenList, ARP_INSTANCE_DATA, List);
+    gBS->UninstallMultipleProtocolInterfaces (
+           NicHandle,
+           &gEfiArpServiceBindingProtocolGuid,
+           &ArpService->ServiceBinding,
+           NULL
+           );
 
     //
-    // Destroy this arp child.
+    // Clean the arp servicebinding context data and free the memory allocated.
     //
-    ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    ArpCleanService (ArpService);
+
+    NetFreePool (ArpService);
+  } else {
+
+    while (!NetListIsEmpty (&ArpService->ChildrenList)) {
+      Instance = NET_LIST_HEAD (&ArpService->ChildrenList, ARP_INSTANCE_DATA, List);
+
+      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    }
+
+    ASSERT (NetListIsEmpty (&ArpService->PendingRequestTable));
+    ASSERT (NetListIsEmpty (&ArpService->DeniedCacheTable));
+    ASSERT (NetListIsEmpty (&ArpService->ResolvedCacheTable));
   }
 
-  ASSERT (NetListIsEmpty (&ArpService->PendingRequestTable));
-  ASSERT (NetListIsEmpty (&ArpService->DeniedCacheTable));
-  ASSERT (NetListIsEmpty (&ArpService->ResolvedCacheTable));
-
-  //
-  // Uninstall the ARP ServiceBinding protocol.
-  //
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  NicHandle,
-                  &gEfiArpServiceBindingProtocolGuid,
-                  &ArpService->ServiceBinding,
-                  NULL
-                  );
-  if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("ArpDriverBindingStop: Failed to uninstall ArpSb, %r.\n", Status));
-    return Status;
-  }
-
-  //
-  // Clean the arp servicebinding context data and free the memory allocated.
-  //
-  ArpCleanService (ArpService);
-  NetFreePool (ArpService);
-
-  return Status;
+  return EFI_SUCCESS;
 }
-
 
 /**
   Creates a child handle with a set of I/O services.

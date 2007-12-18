@@ -291,7 +291,7 @@ Udp4Configure (
     //
     Udp4FlushRcvdDgram (Instance);
 
-////bugbug    ASSERT (NetListIsEmpty (&Instance->DeliveredDgramQue));
+    ASSERT (NetListIsEmpty (&Instance->DeliveredDgramQue));
   }
 
   Udp4SetVariableData (Instance->Udp4Service);

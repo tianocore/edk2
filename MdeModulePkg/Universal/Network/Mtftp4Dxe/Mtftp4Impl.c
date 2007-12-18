@@ -585,6 +585,16 @@ Mtftp4ConfigUnicastPort (
     return EFI_SUCCESS;
   }
 
+  if (!Config->UseDefaultSetting && !EFI_IP4_EQUAL (&mZeroIp4Addr, &Config->GatewayIp)) {
+    //
+    // The station IP address is manually configured and the Gateway IP is not 0.
+    // Add the default route for this UDP instance.
+    //
+    Status = UdpIo->Udp->Routes (UdpIo->Udp, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, &Config->GatewayIp);
+    if (EFI_ERROR (Status)) {
+      UdpIo->Udp->Configure (UdpIo->Udp, NULL);
+    }
+  }
   return Status;
 }
 

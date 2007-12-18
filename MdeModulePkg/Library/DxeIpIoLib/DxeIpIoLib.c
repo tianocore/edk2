@@ -1092,12 +1092,6 @@ IpIoCancelTxToken (
       Ip = SndEntry->Ip;
       Ip->Cancel (Ip, SndEntry->SndToken);
 
-      //
-      // Abort the user token.
-      //
-      SndEntry->SndToken->Status = EFI_ABORTED;
-      IpIoTransmitHandler (NULL, SndEntry);
-
       break;
     }
   }

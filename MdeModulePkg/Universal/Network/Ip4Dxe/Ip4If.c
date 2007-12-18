@@ -681,7 +681,6 @@ Ip4CancelReceive (
 
     Interface->RecvRequest = NULL;
     Interface->Mnp->Cancel (Interface->Mnp, &Token->MnpToken);
-    Ip4FreeFrameRxToken (Token);
 
     NET_RESTORE_TPL (OldTpl);
   }

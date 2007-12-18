@@ -343,7 +343,8 @@ Returns:
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mDpcHandle,
-                  &gEfiDpcProtocolGuid, &mDpc,
+                  &gEfiDpcProtocolGuid, 
+                  &mDpc,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
