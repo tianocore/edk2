@@ -639,7 +639,6 @@ DhcpHandleSelect (
   IN DHCP_PARAMETER         *Para
   )
 {
-  EFI_DHCP4_HEADER          *Head;
   EFI_STATUS                Status;
 
   Status = EFI_SUCCESS;
@@ -650,8 +649,6 @@ DhcpHandleSelect (
   // 2. if it is a DHCP message, it must contains a server ID.
   // Don't return a error for these two case otherwise the session is ended.
   //
-  Head = &Packet->Dhcp4.Header;
-
   if (!DHCP_IS_BOOTP (Para) &&
      ((Para->DhcpType != DHCP_MSG_OFFER) || (Para->ServerId == 0))) {
     goto ON_EXIT;
