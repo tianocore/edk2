@@ -206,7 +206,7 @@ InternalAllocateAlignedPages (
       return NULL;
     }
     AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
-    UnalignedPages = EFI_SIZE_TO_PAGES ((UINTN) Memory - AlignedMemory);
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
     if (UnalignedPages > 0) {
       //
       // Free first unaligned page(s).
