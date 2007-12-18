@@ -219,63 +219,53 @@ MnpDriverBindingStop (
       ("MnpDriverBindingStop: Locate MNP Service Binding Protocol failed, %r.\n",
       Status)
       );
-    goto EXIT;
+    return EFI_DEVICE_ERROR;
   }
 
   MnpServiceData = MNP_SERVICE_DATA_FROM_THIS (ServiceBinding);
 
-  while (!NetListIsEmpty (&MnpServiceData->ChildrenList)) {
+  if (NumberOfChildren == 0) {
     //
-    // Don't use NetListRemoveHead here, the remove opreration will be done
-    // in ServiceBindingDestroyChild.
+    // Uninstall the MNP Service Binding Protocol.
     //
-    Instance = NET_LIST_HEAD (
-                &MnpServiceData->ChildrenList,
-                MNP_INSTANCE_DATA,
-                InstEntry
-                );
+    gBS->UninstallMultipleProtocolInterfaces (
+           ControllerHandle,
+           &gEfiManagedNetworkServiceBindingProtocolGuid,
+           ServiceBinding,
+           NULL
+           );
 
-    ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    //
+    // Close the openned Snp protocol.
+    //
+    gBS->CloseProtocol (
+           ControllerHandle,
+           &gEfiSimpleNetworkProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
+
+    //
+    // Flush the Mnp service data.
+    //
+    MnpFlushServiceData (MnpServiceData);
+
+    NetFreePool (MnpServiceData);
+  } else {
+    while (!NetListIsEmpty (&MnpServiceData->ChildrenList)) {
+      //
+      // Don't use NetListRemoveHead here, the remove opreration will be done
+      // in ServiceBindingDestroyChild.
+      //
+      Instance = NET_LIST_HEAD (
+                   &MnpServiceData->ChildrenList,
+                   MNP_INSTANCE_DATA,
+                   InstEntry
+                   );
+
+      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    }
   }
-
-  //
-  // Uninstall the MNP Service Binding Protocol.
-  //
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  ControllerHandle,
-                  &gEfiManagedNetworkServiceBindingProtocolGuid,
-                  ServiceBinding,
-                  NULL
-                  );
-  if (EFI_ERROR (Status)) {
-
-    MNP_DEBUG_ERROR (("MnpDriverBindingStop: Uninstall MNP Service Binding Protocol failed, %r.\n"));
-    goto EXIT;
-  }
-
-  //
-  // Close the openned Snp protocol.
-  //
-  Status = gBS->CloseProtocol (
-                  ControllerHandle,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  This->DriverBindingHandle,
-                  ControllerHandle
-                  );
-  if (EFI_ERROR (Status)) {
-
-    MNP_DEBUG_ERROR (("MnpDriverBindingStop: Close SNP Protocol failed, %r.\n", Status));
-    goto EXIT;
-  }
-
-  //
-  // Flush the Mnp service data.
-  //
-  MnpFlushServiceData (MnpServiceData);
-
-  NetFreePool (MnpServiceData);
-
-EXIT:
 
   return Status;
 }

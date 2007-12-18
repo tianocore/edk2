@@ -330,6 +330,7 @@ struct _SOCKET {
   EFI_HANDLE            DriverBinding;  // socket't driver binding protocol
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  NET_LIST_ENTRY            Link;  
   SOCK_CONFIGURE_STATE  ConfigureState;
   SOCK_TYPE             Type;
   SOCK_STATE            State;

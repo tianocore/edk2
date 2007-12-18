@@ -512,6 +512,7 @@ Ip4DriverBindingStop (
   EFI_STATUS                    Status;
   EFI_TPL                       OldTpl;
   INTN                          State;
+  BOOLEAN                       IsArp;
 
   //
   // IP4 driver opens the MNP child, ARP children or the IP4_CONFIG protocol
@@ -549,7 +550,7 @@ Ip4DriverBindingStop (
                     );
 
     if (EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
+      return EFI_DEVICE_ERROR;
     }
 
     IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
@@ -594,14 +595,16 @@ Ip4DriverBindingStop (
   // service binding is installed on the NIC handle. So, need to open
   // the protocol info to find the NIC handle.
   //
+  IsArp     = FALSE;
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiManagedNetworkProtocolGuid);
 
   if (NicHandle == NULL) {
     NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
+    IsArp     = TRUE;
   }
 
   if (NicHandle == NULL) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
   //
@@ -629,62 +632,88 @@ Ip4DriverBindingStop (
     return EFI_SUCCESS;
   }
 
-  IpSb->InDestory = TRUE;
+  if (IsArp) {
+    while (!NetListIsEmpty (&IpSb->Children)) {
+      IpInstance = NET_LIST_HEAD (&IpSb->Children, IP4_PROTOCOL, Link);
 
-  State           = IpSb->State;
-  IpSb->State     = IP4_SERVICE_DESTORY;
+      ServiceBinding->DestroyChild (ServiceBinding, IpInstance->Handle);
+    }
 
-  //
-  // Destory all the children first. If not all children are destoried,
-  // the IP driver can operate correctly, so restore it state. Don't
-  // use NET_LIST_FOR_EACH_SAFE here, because it will cache the next
-  // pointer, which may point to the child that has already been destoried.
-  // For example, if there are two child in the list, the first is UDP
-  // listen child, the send is the MTFTP's child. When Udp child is
-  // destoried, it will destory the MTFTP's child. Then Next point to
-  // a invalid child.
-  //
-  while (!NetListIsEmpty (&IpSb->Children)) {
-    IpInstance = NET_LIST_HEAD (&IpSb->Children, IP4_PROTOCOL, Link);
-    Ip4ServiceBindingDestroyChild (ServiceBinding, IpInstance->Handle);
+    if (IpSb->NumChildren != 0) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
+
+    IpSb->InDestory = TRUE;
+
+    State           = IpSb->State;
+    IpSb->State     = IP4_SERVICE_DESTORY;
+
+    //
+    // Clear the variable data.
+    //
+    Ip4ClearVariableData (IpSb);
+
+    //
+    // OK, clean other resources then uninstall the service binding protocol.
+    //
+    Status = Ip4CleanService (IpSb);
+
+    if (EFI_ERROR (Status)) {
+      IpSb->State = State;
+      goto ON_ERROR;
+    }
+
+    gBS->UninstallProtocolInterface (
+           NicHandle,
+           &gEfiIp4ServiceBindingProtocolGuid,
+           ServiceBinding
+           );
+
+    NetFreePool (IpSb);
+  } else if (NumberOfChildren == 0) {
+    IpSb->InDestory = TRUE;
+
+    State           = IpSb->State;
+    IpSb->State     = IP4_SERVICE_DESTORY;
+
+    //
+    // Clear the variable data.
+    //
+    Ip4ClearVariableData (IpSb);
+
+    //
+    // OK, clean other resources then uninstall the service binding protocol.
+    //
+    Status = Ip4CleanService (IpSb);
+
+    if (EFI_ERROR (Status)) {
+      IpSb->State = State;
+      goto ON_ERROR;
+    }
+
+    gBS->UninstallProtocolInterface (
+           NicHandle,
+           &gEfiIp4ServiceBindingProtocolGuid,
+           ServiceBinding
+           );
+
+    NetFreePool (IpSb);
+  } else {
+
+    while (!NetListIsEmpty (&IpSb->Children)) {
+      IpInstance = NET_LIST_HEAD (&IpSb->Children, IP4_PROTOCOL, Link);
+
+      ServiceBinding->DestroyChild (ServiceBinding, IpInstance->Handle);
+    }
+
+    if (IpSb->NumChildren != 0) {
+      Status = EFI_DEVICE_ERROR;
+    }
   }
-
-  if (IpSb->NumChildren != 0) {
-    IpSb->State = State;
-    Status      = EFI_DEVICE_ERROR;
-    goto ON_ERROR;
-  }
-
-  //
-  // Clear the variable data.
-  //
-  Ip4ClearVariableData (IpSb);
-
-  //
-  // OK, clean other resources then uninstall the service binding protocol.
-  //
-  Status = Ip4CleanService (IpSb);
-
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  Status = gBS->UninstallProtocolInterface (
-                  NicHandle,
-                  &gEfiIp4ServiceBindingProtocolGuid,
-                  ServiceBinding
-                  );
-
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  NET_RESTORE_TPL (OldTpl);
-  NetFreePool (IpSb);
-  return EFI_SUCCESS;
 
 ON_ERROR:
-  IpSb->InDestory = FALSE;
+
   NET_RESTORE_TPL (OldTpl);
   return Status;
 }

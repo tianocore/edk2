@@ -467,7 +467,7 @@ Mtftp4SendPacket (
              Instance->UnicastPort,
              Packet,
              &UdpPoint,
-             Instance->Gateway,
+             0,
              Mtftp4OnPacketSent,
              Instance
              );
@@ -524,7 +524,7 @@ Mtftp4Retransmit (
              Instance->UnicastPort,
              Instance->LastPacket,
              &UdpPoint,
-             Instance->Gateway,
+             0,
              Mtftp4OnPacketSent,
              Instance
              );

@@ -41,6 +41,7 @@ typedef struct _TCP4_SERVICE_DATA {
   EFI_SERVICE_BINDING_PROTOCOL  Tcp4ServiceBinding;
   EFI_HANDLE                    DriverBindingHandle;
   CHAR16                        *MacString;
+  NET_LIST_ENTRY                SocketList;
 } TCP4_SERVICE_DATA;
 
 //

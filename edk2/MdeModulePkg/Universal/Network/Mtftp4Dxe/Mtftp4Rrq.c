@@ -412,6 +412,18 @@ Mtftp4RrqConfigMcastPort (
     return Status;
   }
 
+  if (!Config->UseDefaultSetting && !EFI_IP4_EQUAL (&mZeroIp4Addr, &Config->GatewayIp)) {
+    //
+    // The station IP address is manually configured and the Gateway IP is not 0.
+    // Add the default route for this UDP instance.
+    //
+    Status = McastIo->Udp->Routes (McastIo->Udp, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, &Config->GatewayIp);
+    if (EFI_ERROR (Status)) {
+      McastIo->Udp->Configure (McastIo->Udp, NULL);
+      return Status;
+    }
+  }
+
   //
   // join the multicast group
   //
@@ -534,22 +546,22 @@ Mtftp4RrqHandleOack (
 
         return Status;
       }
-
+    
       //
       // Update the parameters used.
       //
       if (Reply.BlkSize != 0) {
         Instance->BlkSize = Reply.BlkSize;
       }
-
+      
       if (Reply.Timeout != 0) {
         Instance->Timeout = Reply.Timeout;
-      }
-    }
-
+      }  
+    }    
+    
   } else {
     Instance->Master = TRUE;
-
+    
     if (Reply.BlkSize != 0) {
       Instance->BlkSize = Reply.BlkSize;
     }
@@ -558,7 +570,7 @@ Mtftp4RrqHandleOack (
       Instance->Timeout = Reply.Timeout;
     }
   }
-
+  
   //
   // Send an ACK to (Expected - 1) which is 0 for unicast download,
   // or tell the server we want to receive the Expected block.

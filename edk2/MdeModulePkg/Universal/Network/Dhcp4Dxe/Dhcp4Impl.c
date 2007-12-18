@@ -57,11 +57,7 @@ EfiDhcp4GetModeData (
   }
 
   Instance = DHCP_INSTANCE_FROM_THIS (This);
-
-  if (Instance->Signature != DHCP_PROTOCOL_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
-  }
-
+  
   OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
   DhcpSb  = Instance->Service;
 
@@ -766,6 +762,226 @@ EfiDhcp4Build (
            );
 }
 
+STATIC
+EFI_STATUS
+Dhcp4InstanceConfigUdpIo (
+  IN UDP_IO_PORT  *UdpIo,
+  IN VOID         *Context
+  )
+{
+  DHCP_PROTOCOL                     *Instance;
+  DHCP_SERVICE                      *DhcpSb;
+  EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
+  EFI_UDP4_CONFIG_DATA              UdpConfigData;
+  IP4_ADDR                          Ip;
+
+  Instance = (DHCP_PROTOCOL *) Context;
+  DhcpSb   = Instance->Service;
+  Token    = Instance->Token;
+
+  NetZeroMem (&UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
+
+  UdpConfigData.AcceptBroadcast    = TRUE;
+  UdpConfigData.AllowDuplicatePort = TRUE;
+  UdpConfigData.TimeToLive         = 64;
+  UdpConfigData.DoNotFragment      = TRUE;
+
+  Ip = HTONL (DhcpSb->ClientAddr);
+  NetCopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+
+  Ip = HTONL (DhcpSb->Netmask);
+  NetCopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
+
+  if ((Token->ListenPointCount == 0) || (Token->ListenPoints[0].ListenPort == 0)) {
+    UdpConfigData.StationPort = DHCP_CLIENT_PORT;
+  } else {
+    UdpConfigData.StationPort = Token->ListenPoints[0].ListenPort;
+  }
+
+  return UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
+}
+
+STATIC
+EFI_STATUS
+Dhcp4InstanceCreateUdpIo (
+  IN DHCP_PROTOCOL  *Instance
+  )
+{
+  DHCP_SERVICE  *DhcpSb;
+
+  ASSERT (Instance->Token != NULL);
+
+  DhcpSb          = Instance->Service;
+  Instance->UdpIo = UdpIoCreatePort (DhcpSb->Controller, DhcpSb->Image, Dhcp4InstanceConfigUdpIo, Instance);
+  if (Instance->UdpIo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  } else {
+    return EFI_SUCCESS;
+  }
+}
+
+STATIC
+VOID
+DhcpDummyExtFree (
+  IN VOID                   *Arg
+  )
+/*++
+
+Routine Description:
+
+  Release the packet.
+
+Arguments:
+
+  Arg - The packet to release
+
+Returns:
+
+  None
+
+--*/
+{  
+}
+
+VOID
+PxeDhcpInput (
+  NET_BUF                   *UdpPacket,
+  UDP_POINTS                *Points,
+  EFI_STATUS                IoStatus,
+  VOID                      *Context
+  )
+{
+  DHCP_PROTOCOL                     *Instance;
+  DHCP_SERVICE                      *DhcpSb;
+  EFI_DHCP4_HEADER                  *Head;
+  NET_BUF                           *Wrap;
+  EFI_DHCP4_PACKET                  *Packet;
+  EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
+  UINT32                            Len;
+  EFI_STATUS                        Status;
+
+  Wrap     = NULL;
+  Instance = (DHCP_PROTOCOL *) Context;
+  Token    = Instance->Token;
+  DhcpSb   = Instance->Service;
+
+  //
+  // Don't restart receive if error occurs or DHCP is destoried.
+  //
+  if (EFI_ERROR (IoStatus)) {
+    return ;
+  }
+
+  ASSERT (UdpPacket != NULL);
+  
+  //
+  // Validate the packet received
+  //
+  if (UdpPacket->TotalSize < sizeof (EFI_DHCP4_HEADER)) {
+    goto RESTART;
+  }
+  
+  //
+  // Copy the DHCP message to a continuous memory block, make the buffer size
+  // of the EFI_DHCP4_PACKET a multiple of 4-byte.
+  //
+  Len  = NET_ROUNDUP (sizeof (EFI_DHCP4_PACKET) + UdpPacket->TotalSize - sizeof (EFI_DHCP4_HEADER), 4);
+  Wrap = NetbufAlloc (Len);
+
+  if (Wrap == NULL) {
+    goto RESTART;
+  }
+
+  Packet         = (EFI_DHCP4_PACKET *) NetbufAllocSpace (Wrap, Len, NET_BUF_TAIL);
+  Packet->Size   = Len;
+  Head           = &Packet->Dhcp4.Header;
+  Packet->Length = NetbufCopy (UdpPacket, 0, UdpPacket->TotalSize, (UINT8 *) Head);
+
+  if (Packet->Length != UdpPacket->TotalSize) {
+    goto RESTART;
+  }
+  
+  //
+  // Is this packet the answer to our packet?
+  //
+  if ((Head->OpCode != BOOTP_REPLY) ||
+      (Head->Xid != Token->Packet->Dhcp4.Header.Xid) ||
+      !NET_MAC_EQUAL (&DhcpSb->Mac, Head->ClientHwAddr, DhcpSb->HwLen)) {
+    goto RESTART;
+  }
+  
+  //
+  // Validate the options and retrieve the interested options
+  //
+  if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
+      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
+      EFI_ERROR (DhcpValidateOptions (Packet, NULL))) {
+
+    goto RESTART;
+  }
+
+  //
+  // Keep this packet in the ResponseQueue.
+  //
+  NET_GET_REF (Wrap);
+  NetbufQueAppend (&Instance->ResponseQueue, Wrap);
+
+RESTART:
+
+  NetbufFree (UdpPacket);
+
+  if (Wrap != NULL) {
+    NetbufFree (Wrap);
+  }
+
+  Status = UdpIoRecvDatagram (Instance->UdpIo, PxeDhcpInput, Instance, 0);
+  if (EFI_ERROR (Status)) {
+    PxeDhcpDone (Instance);
+  }
+}
+
+VOID
+PxeDhcpDone (
+  IN DHCP_PROTOCOL  *Instance
+  )
+{
+  EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
+
+  Token = Instance->Token;
+
+  Token->ResponseCount = Instance->ResponseQueue.BufNum;
+  if (Token->ResponseCount != 0) {
+    Token->ResponseList = (EFI_DHCP4_PACKET *) NetAllocatePool (Instance->ResponseQueue.BufSize);
+    if (Token->ResponseList == NULL) {
+      Token->Status = EFI_OUT_OF_RESOURCES;
+      goto SIGNAL_USER;
+    }
+
+    //
+    // Copy the recieved DHCP responses.
+    //
+    NetbufQueCopy (&Instance->ResponseQueue, 0, Instance->ResponseQueue.BufSize, (UINT8 *) Token->ResponseList);
+    Token->Status = EFI_SUCCESS;
+  } else {
+    Token->ResponseList = NULL;
+    Token->Status       = EFI_TIMEOUT;
+  }
+
+SIGNAL_USER:
+  //
+  // Clean the resources dedicated for this transmit receive transaction.
+  //
+  NetbufQueFlush (&Instance->ResponseQueue);
+  UdpIoCleanPort (Instance->UdpIo);
+  UdpIoFreePort (Instance->UdpIo);
+  Instance->UdpIo = NULL;
+  Instance->Token = NULL;
+
+  if (Token->CompletionEvent != NULL) {
+    gBS->SignalEvent (Token->CompletionEvent);
+  }  
+}
+
 
 /**
   Transmit and receive a packet through this DHCP service.
@@ -785,10 +1001,144 @@ EfiDhcp4TransmitReceive (
   IN EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token
   )
 {
+  DHCP_PROTOCOL  *Instance;
+  EFI_TPL        OldTpl;
+  EFI_STATUS     Status;
+  NET_FRAGMENT   Frag;
+  NET_BUF        *Wrap;
+  UDP_POINTS     EndPoint;
+  IP4_ADDR       Ip;
+  DHCP_SERVICE   *DhcpSb;
+  IP4_ADDR       Gateway;
+  IP4_ADDR       SubnetMask;
+
+  if ((This == NULL) || (Token == NULL) || (Token->Packet == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = DHCP_INSTANCE_FROM_THIS (This);
+  DhcpSb   = Instance->Service;
+
+  if (Instance->Token != NULL) {
+    //
+    // The previous call to TransmitReceive is not finished.
+    //
+    return EFI_NOT_READY;
+  }
+
+  if ((Token->Packet->Dhcp4.Magik != DHCP_OPTION_MAGIC) ||
+    (NTOHL (Token->Packet->Dhcp4.Header.Xid) == Instance->Service->Xid) ||
+    (Token->TimeoutValue == 0) ||
+    ((Token->ListenPointCount != 0) && (Token->ListenPoints == NULL)) ||
+    EFI_ERROR (DhcpValidateOptions (Token->Packet, NULL)) ||
+    EFI_IP4_EQUAL (&Token->RemoteAddress, &mZeroIp4Addr)) {
+    //
+    // The DHCP packet isn't well-formed, the Transaction ID is already used
+    // , the timeout value is zero, the ListenPoint is invalid,
+    // or the RemoteAddress is zero.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (DhcpSb->ClientAddr == 0) {
+
+    return EFI_NO_MAPPING;
+  }
+
+  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+
   //
-  // This function is for PXE, leave it for now
+  // Save the token and the timeout value.
   //
-  return EFI_UNSUPPORTED;
+  Instance->Token   = Token;
+  Instance->Timeout = Token->TimeoutValue;
+
+  //
+  // Create a UDP IO for this transmit receive transaction.
+  //
+  Status = Dhcp4InstanceCreateUdpIo (Instance);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  //
+  // Wrap the DHCP packet into a net buffer.
+  //
+  Frag.Bulk = (UINT8 *) &Token->Packet->Dhcp4;
+  Frag.Len  = Token->Packet->Length;
+  Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpDummyExtFree, NULL);
+  if (Wrap == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
+  }
+
+  //
+  // Set the local address and local port.
+  //
+  EndPoint.LocalAddr = 0;
+  EndPoint.LocalPort = 0;
+
+  //
+  // Set the destination address and destination port.
+  //
+  NetCopyMem (&Ip, &Token->RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
+  EndPoint.RemoteAddr = NTOHL (Ip);
+
+  if (Token->RemotePort == 0) {
+    EndPoint.RemotePort = DHCP_SERVER_PORT;
+  } else {
+    EndPoint.RemotePort = Token->RemotePort;
+  }
+
+  //
+  // Get the gateway.
+  //
+  SubnetMask = DhcpSb->Netmask;
+  Gateway    = 0;
+  if (!IP4_NET_EQUAL (DhcpSb->ClientAddr, EndPoint.RemoteAddr, SubnetMask)) {
+    NetCopyMem (&Gateway, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    Gateway = NTOHL (Gateway);
+  }
+
+  //
+  // Transmit the DHCP packet.
+  //
+  Status = UdpIoSendDatagram (Instance->UdpIo, Wrap, &EndPoint, Gateway, DhcpOnPacketSent, NULL);
+  if (EFI_ERROR (Status)) {
+    NetbufFree (Wrap);
+    goto ON_ERROR;
+  }
+
+  //
+  // Start to receive the DHCP response.
+  //
+  Status = UdpIoRecvDatagram (Instance->UdpIo, PxeDhcpInput, Instance, 0);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+ON_ERROR:
+
+  if (EFI_ERROR (Status) && (Instance->UdpIo != NULL)) {
+    UdpIoCleanPort (Instance->UdpIo);
+    UdpIoFreePort (Instance->UdpIo);
+    Instance->UdpIo = NULL;
+    Instance->Token = NULL;
+  }
+
+  NET_RESTORE_TPL (OldTpl);
+
+  if (!EFI_ERROR (Status) && (Token->CompletionEvent == NULL)) {
+    //
+    // Keep polling until timeout if no error happens and the CompletionEvent
+    // is NULL.
+    //
+    while (Instance->Timeout != 0) {
+      Instance->UdpIo->Udp->Poll (Instance->UdpIo->Udp);
+    }
+  }
+
+  return Status;
 }
 
 
@@ -910,3 +1260,4 @@ EFI_DHCP4_PROTOCOL  mDhcp4ProtocolTemplate = {
   EfiDhcp4TransmitReceive,
   EfiDhcp4Parse
 };
+

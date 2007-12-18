@@ -153,6 +153,8 @@ Udp4CreateService (
   EFI_STATUS       Status;
   IP_IO_OPEN_DATA  OpenData;
 
+  NetZeroMem (Udp4Service, sizeof (UDP4_SERVICE_DATA));
+
   Udp4Service->Signature        = UDP4_SERVICE_DATA_SIGNATURE;
   Udp4Service->ServiceBinding   = mUdp4ServiceBinding;
   Udp4Service->ImageHandle      = ImageHandle;
@@ -184,7 +186,7 @@ Udp4CreateService (
   //
   Status = IpIoOpen (Udp4Service->IpIo, &OpenData);
   if (EFI_ERROR (Status)) {
-    goto RELEASE_IPIO;
+    goto ON_ERROR;
   }
 
   //
@@ -198,7 +200,7 @@ Udp4CreateService (
                   &Udp4Service->TimeoutEvent
                   );
   if (EFI_ERROR (Status)) {
-    goto RELEASE_IPIO;
+    goto ON_ERROR;
   }
 
   //
@@ -210,18 +212,16 @@ Udp4CreateService (
                   UDP4_TIMEOUT_INTERVAL
                   );
   if (EFI_ERROR (Status)) {
-    goto RELEASE_ALL;
+    goto ON_ERROR;
   }
-
-  Udp4Service->MacString = NULL;
 
   return EFI_SUCCESS;
 
-RELEASE_ALL:
+ON_ERROR:
 
-  gBS->CloseEvent (Udp4Service->TimeoutEvent);
-
-RELEASE_IPIO:
+  if (Udp4Service->TimeoutEvent != NULL) {
+    gBS->CloseEvent (Udp4Service->TimeoutEvent);
+  }
 
   IpIoDestroy (Udp4Service->IpIo);
 

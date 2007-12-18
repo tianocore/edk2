@@ -212,7 +212,9 @@ extern IP4_ADDR mIp4AllMasks [IP4_MASK_NUM];
 
 extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 
-#define NET_IS_DIGIT(Ch)  (('0' <= (Ch)) && ((Ch) <= '9'))
+#define NET_IS_DIGIT(Ch)            (('0' <= (Ch)) && ((Ch) <= '9'))
+#define NET_ROUNDUP(size, unit)     (((size) + (unit) - 1) & (~((unit) - 1)))
+
 //
 // Wrap functions to ease the impact of EFI library changes.
 //
