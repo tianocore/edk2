@@ -1,7 +1,7 @@
 #/** @file
 # Component description file for PeiVariable module.
 #
-# Framework PEIM to provide the Variable functionality.
+# PEIM to provide the Variable functionality.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

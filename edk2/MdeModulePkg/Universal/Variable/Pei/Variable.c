@@ -14,7 +14,7 @@ Module Name:
 
 Abstract:
 
-  Framework PEIM to provide the Variable functionality
+  PEIM to provide the Variable functionality
 
 --*/
 
