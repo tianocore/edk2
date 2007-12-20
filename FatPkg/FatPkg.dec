@@ -1,0 +1,29 @@
+#/** @file
+#
+#  FAT Package
+#
+# FAT 32 Driver
+#  Copyright (c) 2007,  Intel Corporation.
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_VERSION                    = 0x00010005
+  PACKAGE_NAME                   = FatPkg
+  PACKAGE_GUID                   = 8EA68A2C-99CB-4332-85C6-DD5864EAA674
+
+[PcdsFeatureFlag.common]
+  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE|BOOLEAN|0x00010001
+  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE|BOOLEAN|0x00010002
+
+[Guids.common]
+  gEfiFatPkgTokenSpaceGuid = {0xc8e92dba, 0x1d92, 0x411f, {0xae, 0xa, 0x1d, 0xbe, 0xd8, 0xf1, 0x32, 0x99}};
+

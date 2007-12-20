@@ -1,0 +1,98 @@
+#/** @file
+#  Component description file for FAT module.
+#
+#  This UEFI driver detects the FAT file system in the disk.
+#  It also produces the Simple File System protocol for the consumer to
+#  perform file and directory operations on the disk.
+#  Copyright (c) 2007, Intel Corporation
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Fat
+  FILE_GUID                      = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = FatEntryPoint
+  UNLOAD_IMAGE                   = FatUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gFatDriverBinding
+#  COMPONENT_NAME                =  gFatComponentName
+#  COMPONENT_NAME2               =  gFatComponentName2
+#
+
+[Sources.common]
+  DirectoryCache.c
+  DiskCache.c
+  FileName.c
+  Hash.c
+  DirectoryManage.c
+  ComponentName.c
+  FatFileSystem.h
+  Fat.h
+  ReadWrite.c
+  OpenVolume.c
+  Open.c
+  Misc.c
+  Init.c
+  Info.c
+  FileSpace.c
+  Flush.c
+  Fat.c
+  Delete.c
+  Data.c
+  UnicodeCollation.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FatPkg/FatPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
+  gEfiGlobalVariableGuid
+
+[Protocols]
+  gEfiDiskIoProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiUnicodeCollationProtocolGuid
+  gEfiUnicodeCollation2ProtocolGuid
+
+[FeaturePcd]
+  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollationSupport
+  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollation2Support
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
