@@ -13,18 +13,7 @@
 
 **/
 
-#include <Uefi.h>
-
-#include <Guid/GlobalVariable.h>
-#include <Protocol/UnicodeCollation.h>
-
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
+#include "Fat.h"
 
 STATIC EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollationInterface = NULL;
 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SpdHeader>
+    <PackageName>FatPkg</PackageName>
+    <GuidValue>8EA68A2C-99CB-4332-85C6-DD5864EAA674</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Edk FAT Package</Abstract>
+    <Description>FAT 32 Driver</Description>
+    <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>
+    <License>This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
+distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </SpdHeader>
+  <PackageDefinitions>
+    <ReadOnly>false</ReadOnly>
+    <RePackage>false</RePackage>
+  </PackageDefinitions>
+  <MsaFiles>
+    <Filename>EnhancedFatDxe/Fat.msa</Filename>
+  </MsaFiles>
+  <GuidDeclarations>
+    <Entry Name="Fat Package Token space Guid" GuidTypeList="TOKEN_SPACE_GUID">
+      <C_Name>gEfiFatPkgTokenSpaceGuid</C_Name>
+      <GuidValue>c8e92dba-1d92-411f-ae0a-1dbed8f13299</GuidValue>
+      <HelpText/>
+    </Entry>
+  </GuidDeclarations>
+  <PcdDeclarations>
+    <PcdEntry>
+      <C_Name>PcdUnicodeCollationSupport</C_Name>
+      <Token>0x00010001</Token>
+      <TokenSpaceGuidCName>gEfiFatPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>Support Unicode Collation</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdUnicodeCollationSupport2</C_Name>
+      <Token>0x00010002</Token>
+      <TokenSpaceGuidCName>gFatPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>Support Unicode Collation 2.</HelpText>
+    </PcdEntry>
+  </PcdDeclarations>
+</PackageSurfaceArea>

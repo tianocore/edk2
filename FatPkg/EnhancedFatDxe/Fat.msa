@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>Fat</ModuleName>
+    <ModuleType>UEFI_DRIVER</ModuleType>
+    <GuidValue>961578FE-B6B7-44c3-AF35-6BC705CD2B1F</GuidValue>
+    <Version>1.0</Version>
+    <Abstract>Component description file for FAT module.</Abstract>
+    <Description>This UEFI driver detects the FAT file system in the disk. It also produces the Simple File System protocol for the consumer to perform file and directory operations on the disk.</Description>
+    <Copyright>Copyright (c) 2004 - 2007, Intel Corporation</Copyright>
+    <License>This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
+distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>Fat</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiRuntimeServicesTableLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Data.c</Filename>
+    <Filename>Delete.c</Filename>
+    <Filename>Fat.c</Filename>
+    <Filename>Flush.c</Filename>
+    <Filename>FileSpace.c</Filename>
+    <Filename>Info.c</Filename>
+    <Filename>Init.c</Filename>
+    <Filename>Misc.c</Filename>
+    <Filename>Open.c</Filename>
+    <Filename>OpenVolume.c</Filename>
+    <Filename>ReadWrite.c</Filename>
+    <Filename>Fat.h</Filename>
+    <Filename>FatFileSystem.h</Filename>
+    <Filename>ComponentName.c</Filename>
+    <Filename>DirectoryManage.c</Filename>
+    <Filename>Hash.c</Filename>
+    <Filename>FileName.c</Filename>
+    <Filename>DiskCache.c</Filename>
+    <Filename>DirectoryCache.c</Filename>
+    <Filename>UnicodeCollation.c</Filename>
+  </SourceFiles>
+  <NonProcessedFiles>
+    <Filename>Debug.c</Filename>
+  </NonProcessedFiles>
+  <PackageDependencies>
+    <Package PackageGuid="1E73767F-8F52-4603-AEB4-F29B510B6766"/>
+    <Package PackageGuid="8EA68A2C-99CB-4332-85C6-DD5864EAA674"/>
+  </PackageDependencies>
+  <Protocols>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiBlockIoProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiDiskIoProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiUnicodeCollationProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiUnicodeCollation2ProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <Variables>
+    <Variable Usage="ALWAYS_CONSUMED">
+      <VariableName>0x0050 0x006c 0x0061 0x0074 0x0066 0x006f 0x0072 0x006d 0x004c 0x0061 0x006e 0x0067</VariableName>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>Variable Name: L"PlatformLang"</HelpText>
+    </Variable>
+    <Variable Usage="ALWAYS_CONSUMED">
+      <VariableName>0x004c 0x0061 0x006e 0x0067</VariableName>
+      <GuidC_Name>gEfiGlobalVariableGuid</GuidC_Name>
+      <HelpText>Variable Name: L"Lang"</HelpText>
+    </Variable>
+  </Variables>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiGlobalVariableGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiFileSystemInfoGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiFileInfoGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiFileSystemVolumeLabelInfoIdGuid</GuidCName>
+    </GuidCNames>
+  </Guids>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>FatEntryPoint</ModuleEntryPoint>
+      <ModuleUnloadImage>FatUnload</ModuleUnloadImage>
+    </Extern>
+    <Extern>
+      <DriverBinding>gFatDriverBinding</DriverBinding>
+      <ComponentName>gFatComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>
