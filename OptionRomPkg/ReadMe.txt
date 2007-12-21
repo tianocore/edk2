@@ -5,7 +5,7 @@ AtapiPassThru:
    
   AtapiPassThru driver in this package can selectively produce ScsiPassThru
   and/or ExtScsiPassThru protocol based on feature flags of PcdSupportScsiPassThru
-  and PcdExtScsiPassThru.
+  and PcdSupportExtScsiPassThru.
 
 CirrusLogic5430:
   Sample implementation of UGA Draw or Graphics Output Protocol for the Cirrus

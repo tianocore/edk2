@@ -23,7 +23,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = CirrusLogic5430UgaDraw
+  BASE_NAME                      = CirrusLogic5430Dxe
   FILE_GUID                      = 555F76EA-785F-40d7-9174-153C43636C68
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
