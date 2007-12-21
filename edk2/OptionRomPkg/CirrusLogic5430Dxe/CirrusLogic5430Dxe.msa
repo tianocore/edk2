@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MsaHeader>
+    <ModuleName>AtapiPassThruDxe</ModuleName>
+    <ModuleType>UEFI_DRIVER</ModuleType>
+    <GuidValue>555F76EA-785F-40d7-9174-153C43636C68</GuidValue>
+    <Version>0.1</Version>
+    <Abstract>Component description file for CirrusLogic5430 module.</Abstract>
+    <Description>Cirrus Logic 5430 Controller Driver.</Description>
+    <Copyright>Copyright (c) 2007, Intel Corporation.</Copyright>
+    <License>All rights reserved.
+      This program and the accompanying materials are licensed and made available
+      under the terms and conditions of the BSD License which accompanies this distribution.
+      The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+      OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>AtapiPassThruDxe</OutputFileBasename>
+  </ModuleDefinitions>
+  <SourceFiles>
+    <Filename>CirrusLogic5430.c</Filename>
+    <Filename>CirrusLogic5430.h</Filename>
+    <Filename>CirrusLogic5430GraphicsOutput.c</Filename>
+    <Filename>CirrusLogic5430UgaDraw.c</Filename>
+    <Filename>ComponentName.c</Filename>
+    <Filename>DriverSupportedEfiVersion.c</Filename>
+  </SourceFiles>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+  </LibraryClassDefinitions>
+  <Protocols>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gEfiScsiPassThruProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>gEfiExtScsiPassThruProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiDriverSupportedEfiVersionProtocolGuid</ProtocolCName>
+    </Protocol>
+  </Protocols>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FEATURE_FLAG">
+      <C_Name>PcdSupportGop</C_Name>
+      <TokenSpaceGuidCName>gOptionRomPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>Cirrus Logic 5430 driver supports to produce GOP protocol.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG">
+      <C_Name>PcdExtSupportUga</C_Name>
+      <TokenSpaceGuidCName>gOptionRomPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>Cirrus Logic 5430 driver supports to produce UGA protocol.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdDriverSupportedEfiVersion</C_Name>
+      <TokenSpaceGuidCName>gOptionRomPkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The firmware version field filled in EFI Driver Supported EFI Version protocol.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Extern>
+      <ModuleEntryPoint>InitializeCirrusLogic5430</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <PackageDependencies>
+    <Package PackageVersion="0.1" PackageGuid="1E73767F-8F52-4603-AEB4-F29B510B6766"/>
+    <Package PackageVersion="0.1" PackageGuid="AA3865E8-7F30-4f59-8696-99F560101852"/>
+  </PackageDependencies>
+</ModuleSurfaceArea>
