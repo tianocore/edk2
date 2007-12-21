@@ -232,6 +232,12 @@ public class MsaWriter {
 				}
 			}
 		}
+		if (mi.isLibrary) {
+			LibraryClassDocument.LibraryClass lc = libclassdefs
+					.addNewLibraryClass();
+			lc.setKeyword(mi.modulename);
+			lc.setUsage(UsageTypes.ALWAYS_PRODUCED);
+		}
 		it = mi.hashrequiredr9libs.iterator();
 		while (it.hasNext()) {
 			if ((temp = it.next()) != null && !temp.matches("%")
