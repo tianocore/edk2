@@ -35,6 +35,8 @@ public final class ModuleInfo {
 
 	private MsaOwner msaowner = MsaOwner.initNewMsaOwner();
 
+	public boolean isLibrary = false;
+
 	public String modulename = null;
 
 	public String guidvalue = null;

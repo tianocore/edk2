@@ -146,6 +146,9 @@ public final class ModuleReader implements Common.ForDoAll {
 					}
 					if (mtrinfequation.group(1).matches("COMPONENT_TYPE")) {
 						mi.moduletype = mtrinfequation.group(2);
+						if (mi.moduletype.matches("LIBRARY")) {
+							mi.isLibrary = true;
+						}
 					}
 				}
 			}
