@@ -1,0 +1,12 @@
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = DuetPkg
+  PACKAGE_GUID                   = 151B568B-B390-4cf1-ABD6-228E0AB96F57
+  PACKAGE_VERSION                = 0.1
+
+[Includes.common]
+  Include
+
+[Guids.common]
+  gEfiPciExpressBaseAddressGuid = {0x3677d529, 0x326f, 0x4603, {0xa9, 0x26, 0xea, 0xac, 0xe0, 0x1d, 0xcb, 0xb0 }}
+  gEfiAcpiDescriptionGuid       = {0x3c699197, 0x093c, 0x4c69, {0xb0, 0x6b, 0x12, 0x8a, 0xe3, 0x48, 0x1d, 0xc9 }}
