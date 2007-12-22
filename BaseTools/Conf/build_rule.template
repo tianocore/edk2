@@ -237,7 +237,9 @@
         $(OUTPUT_DIR)(+)$(MODULE_NAME).depex
 
     <Command>
-#       GenDepex -o ${dst} ${src}
+        "$(PP)" $(CC_FLAGS) $(APP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        Trim --source-code -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        GenDepex -t $(MODULE_TYPE) -o ${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
 [Build.Acpi-Source-Language-File]
     <InputFile>
