@@ -427,6 +427,7 @@ typedef union {
 
   ATAPI_DEVICE_PATH                    Atapi;
   SCSI_DEVICE_PATH                     Scsi;
+  ISCSI_DEVICE_PATH                    Iscsi;
   FIBRECHANNEL_DEVICE_PATH             FibreChannel;
 
   F1394_DEVICE_PATH                    F1394;
