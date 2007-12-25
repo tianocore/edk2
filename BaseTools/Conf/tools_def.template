@@ -70,7 +70,7 @@ DEFINE ASL_BIN = C:\ASL
 ####################################################################################
 #
 # format: TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE = <string>
-# priorty:
+# priority:
 #         TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE (Highest)
 #         ******_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE
 #         TARGET_*********_ARCH_COMMANDTYPE_ATTRIBUTE
@@ -542,7 +542,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 # Intel(R) C++ Compiler Version 9.1
 #
 #   IPF  - Intel(R) C++ Compiler for Itanium(R)Version 9.1  Build 20060928 Package ID: W_CC_C_9.1.032
-#   ASL  - Intel ACPI Source Language COmpiler
+#   ASL  - Intel ACPI Source Language Compiler
 #
 ####################################################################################
 #   ICC              - Intel C Compiler V9.1
