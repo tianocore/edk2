@@ -78,7 +78,7 @@
 
 ## Reserved File-Type
 #
-# Dont't change following names of file types and their associated files,
+# Don't change following names of file types and their associated files,
 # which are also used in tools' code
 #
 #   C-Code-File
