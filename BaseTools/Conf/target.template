@@ -20,29 +20,30 @@
 #  PROPERTY              Type       Use         Description
 #  ----------------      --------   --------    -----------------------------------------------------------
 #  ACTIVE_PLATFORM       Filename   Recommended Specify the WORKSPACE relative Path and Filename
-#                                               of the platform FPD file that will be used for the build
-#                                               This line is required if and only if the current working
-#                                               directory does not contain one or more FPD files.
+#                                               of the platform description file that will be used for the
+#                                               build. This line is required if and only if the current
+#                                               working directory does not contain one or more description
+#                                               files.
 ACTIVE_PLATFORM       = Nt32Pkg/Nt32Pkg.dsc
 
 #  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE,
 #                                               UserDefined; separated by a space character.
 #                                               If the line is missing or no value is specified, all
-#                                               valid targets specified in the FPD file will attempt
-#                                               to be built.  The following line will build all platform
-#                                               targets.
+#                                               valid targets specified in the platform description file 
+#                                               will attempt to be built. The following line will build all
+#                                               platform targets.
 TARGET                = DEBUG
 
 #  TARGET_ARCH           List       Optional    What kind of architecture is the binary being target for.
 #                                               One, or more, of the following, IA32, IPF, X64, EBC or ARM.
 #                                               Multiple values can be specified on a single line, using
 #                                               space charaters to separate the values.  These are used
-#                                               during the parsing of an FPD file, restricting the build
-#                                               output target(s.)
+#                                               during the parsing of an platform description file, 
+#                                               restricting the build output target(s.)
 #                                               The Build Target ARCH is determined by a logical AND of:
-#                                               FPD BuildOptions: <SupportedArchitectures> tag
+#                                               platform BuildOptions: <SupportedArchitectures> tag
 #                                               If not specified, then all valid architectures specified
-#                                               in the FPD file, for which tools are available, will be
+#                                               in the platform file, for which tools are available, will be
 #                                               built.
 TARGET_ARCH           = IA32
 
@@ -65,7 +66,7 @@ TOOL_CHAIN_TAG        = MYTOOLS
 #                                             stand-alone module build is still using the normal way.
 MULTIPLE_THREAD       = Enable
 
-# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 2. Recommend to
+# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 1. Recommend to
 #                                                 set this value to one more than the number of your compurter
 #                                                 cores or CPUs.
 MAX_CONCURRENT_THREAD_NUMBER = 1
