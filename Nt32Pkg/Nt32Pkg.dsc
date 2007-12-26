@@ -31,7 +31,7 @@
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = Nt32Pkg/Nt32Pkg.fdf
-
+ 
 
 ################################################################################
 #
@@ -369,48 +369,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
 
-[Libraries.IA32]
-  #
-  # Libraries common to PEI and DXE
-  #
-  EdkCompatibilityPkg\Foundation\Efi\Guid\EfiGuidLib.inf
-  EdkCompatibilityPkg\Foundation\Framework\Guid\EdkFrameworkGuidLib.inf
-  EdkCompatibilityPkg\Foundation\Guid\EdkGuidLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EfiCommonLib\EfiCommonLib.inf
-  EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
-  EdkCompatibilityPkg\Foundation\Cpu\Itanium\CpuIA64Lib\CpuIA64Lib.inf
-  EdkCompatibilityPkg\Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
-  EdkCompatibilityPkg\Foundation\Library\CompilerStub\CompilerStubLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Hob\HobLib.inf
-
-  #
-  # PEI libraries
-  #
-  EdkCompatibilityPkg\Foundation\Framework\Ppi\EdkFrameworkPpiLib.inf
-  EdkCompatibilityPkg\Foundation\Ppi\EdkPpiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Pei\PeiLib\PeiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Pei\Hob\PeiHobLib.inf
-
-  #
-  # DXE libraries
-  #
-  EdkCompatibilityPkg\Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Efi\Protocol\EfiProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Protocol\EdkProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
-  EdkCompatibilityPkg\Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Graphics\Graphics.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Print\PrintLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
-
-  #
-  # Print/Graphics Library consume SetupBrowser Print Protocol
-  #
-  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
 
 ################################################################################
 #
@@ -515,3 +473,56 @@
   RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
   *_*_IA32_CC_FLAGS = /D EFI_SPECIFICATION_VERSION=0x0002000A /D TIANO_RELEASE_VERSION=0x00080006
 
+
+
+
+#############################################################################################################
+# NOTE:
+# The following [Libraries.IA32] section is for building R8 module under the R9 tool chain.
+# If you want build R8 module for Nt32 platform, please uncomment [Libraries.IA32] section and
+# libraries used by that R8 module.
+# Currently, Nt32 platform do not has any R8 style module
+#  
+#
+#[Libraries.IA32]
+  #
+  # Libraries common to PEI and DXE
+  #
+  #  EdkCompatibilityPkg\Foundation\Efi\Guid\EfiGuidLib.inf
+  #  EdkCompatibilityPkg\Foundation\Framework\Guid\EdkFrameworkGuidLib.inf
+  #  EdkCompatibilityPkg\Foundation\Guid\EdkGuidLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\EfiCommonLib\EfiCommonLib.inf
+  #  EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
+  #  EdkCompatibilityPkg\Foundation\Cpu\Itanium\CpuIA64Lib\CpuIA64Lib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
+  #  EdkCompatibilityPkg\Foundation\Library\CompilerStub\CompilerStubLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Hob\HobLib.inf
+
+  #
+  # PEI libraries
+  #
+  #  EdkCompatibilityPkg\Foundation\Framework\Ppi\EdkFrameworkPpiLib.inf
+  #  EdkCompatibilityPkg\Foundation\Ppi\EdkPpiLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Pei\PeiLib\PeiLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Pei\Hob\PeiHobLib.inf
+
+  #
+  # DXE libraries
+  #
+  #  EdkCompatibilityPkg\Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
+  #  EdkCompatibilityPkg\Foundation\Efi\Protocol\EfiProtocolLib.inf
+  #  EdkCompatibilityPkg\Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
+  #  EdkCompatibilityPkg\Foundation\Protocol\EdkProtocolLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Graphics\Graphics.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Print\PrintLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
+
+  #
+  # Print/Graphics Library consume SetupBrowser Print Protocol
+  #
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
+  #  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
