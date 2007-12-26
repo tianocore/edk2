@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/UsbIo.h>
 #include <Protocol/DevicePath.h>
 
+#include <library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -75,7 +76,7 @@ enum {
   //
   USB_WAIT_PORT_STABLE_STALL     = 100 * USB_BUS_1_MILLISECOND,
 
-  // 
+  //
   // Wait for port statue reg change, set by experience
   //
   USB_WAIT_PORT_STS_CHANGE_STALL = 5 * USB_BUS_1_MILLISECOND,
@@ -98,8 +99,8 @@ enum {
   USB_SET_PORT_POWER_STALL       = 2 * USB_BUS_1_MILLISECOND,
 
   //
-  // Wait for port reset, refers to specification 
-  // [USB20-7.1.7.5, it says 10ms for hub and 50ms for 
+  // Wait for port reset, refers to specification
+  // [USB20-7.1.7.5, it says 10ms for hub and 50ms for
   // root hub]
   //
   USB_SET_PORT_RESET_STALL       = 20 * USB_BUS_1_MILLISECOND,
@@ -112,11 +113,11 @@ enum {
 
   //
   // Wait for set roothub port enable, set by experience
-  // 
+  //
   USB_SET_ROOT_PORT_ENABLE_STALL = 20 * USB_BUS_1_MILLISECOND,
 
   //
-  // Send general device request timeout, refers to 
+  // Send general device request timeout, refers to
   // specification[USB20-11.24.1]
   //
   USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 50 * USB_BUS_1_MILLISECOND,
@@ -125,7 +126,7 @@ enum {
   // Send clear feature request timeout, set by experience
   //
   USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10 * USB_BUS_1_MILLISECOND,
-  
+
   //
   // Bus raises TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
@@ -251,7 +252,58 @@ struct _USB_BUS {
   // for root hub. Device with address i is at Devices[i].
   //
   USB_DEVICE                *Devices[USB_MAX_DEVICES];
+
+  //
+  // USB Bus driver need to control the recursive connect policy of the bus, only those wanted
+  // usb child device will be recursively connected.
+  //
+  // WantedUsbIoDPList tracks the Usb child devices which user want to recursivly fully connecte,
+  // every wanted child device is stored in a item of the WantedUsbIoDPList, whose structrure is
+  // DEVICE_PATH_LIST_ITEM
+  //
+  LIST_ENTRY                WantedUsbIoDPList;
+
 };
+
+#define USB_US_LAND_ID   0x0409
+
+#define DEVICE_PATH_LIST_ITEM_SIGNATURE     EFI_SIGNATURE_32('d','p','l','i')
+typedef struct _DEVICE_PATH_LIST_ITEM{
+  UINTN                                 Signature;
+  LIST_ENTRY                            Link;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+} DEVICE_PATH_LIST_ITEM;
+
+typedef struct {
+  USB_CLASS_DEVICE_PATH           UsbClass;
+  EFI_DEVICE_PATH_PROTOCOL        End;
+} USB_CLASS_FORMAT_DEVICE_PATH;
+
+EFI_STATUS
+EFIAPI
+UsbBusFreeUsbDPList (
+  IN     LIST_ENTRY                                 *UsbIoDPList
+  );
+
+EFI_STATUS
+EFIAPI
+UsbBusAddWantedUsbIoDP (
+  IN EFI_USB_BUS_PROTOCOL         *UsbBusId,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+BOOLEAN
+EFIAPI
+UsbBusIsWantedUsbIO (
+  IN USB_BUS                 *Bus,
+  IN USB_INTERFACE           *UsbIf
+  );
+
+EFI_STATUS
+EFIAPI
+UsbBusRecursivelyConnectWantedUsbIo (
+  IN EFI_USB_BUS_PROTOCOL         *UsbBusId
+  );
 
 extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;

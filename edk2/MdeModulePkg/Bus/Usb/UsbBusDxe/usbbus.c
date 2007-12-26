@@ -868,6 +868,192 @@ ON_EXIT:
   return Status;
 }
 
+
+/**
+  Install Usb Bus Protocol on host controller, and start the Usb bus
+
+  @param This                    The USB bus driver binding instance
+  @param Controller              The controller to check
+  @param RemainingDevicePath     The remaining device patch
+
+  @retval EFI_SUCCESS            The controller is controlled by the usb bus
+  @retval EFI_ALREADY_STARTED    The controller is already controlled by the usb bus
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusBuildProtocol (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  )
+{
+  USB_BUS                 *UsbBus;
+  USB_DEVICE              *RootHub;
+  USB_INTERFACE           *RootIf;
+  EFI_STATUS              Status;
+  EFI_STATUS              Status2;
+
+  UsbBus = AllocateZeroPool (sizeof (USB_BUS));
+
+  if (UsbBus == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  UsbBus->Signature   = USB_BUS_SIGNATURE;
+  UsbBus->HostHandle  = Controller;
+
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &UsbBus->DevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to open device path %r\n", Status));
+
+    gBS->FreePool (UsbBus);
+    return Status;
+  }
+
+  //
+  // Get USB_HC2/USB_HC host controller protocol (EHCI/UHCI).
+  // This is for backward compatbility with EFI 1.x. In UEFI
+  // 2.x, USB_HC2 replaces USB_HC. We will open both USB_HC2
+  // and USB_HC because EHCI driver will install both protocols
+  // (for the same reason). If we don't consume both of them,
+  // the unconsumed one may be opened by others.
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiUsb2HcProtocolGuid,
+                  (VOID **) &(UsbBus->Usb2Hc),
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+
+  Status2 = gBS->OpenProtocol (
+                   Controller,
+                   &gEfiUsbHcProtocolGuid,
+                   (VOID **) &(UsbBus->UsbHc),
+                   This->DriverBindingHandle,
+                   Controller,
+                   EFI_OPEN_PROTOCOL_BY_DRIVER
+                   );
+
+  if (EFI_ERROR (Status) && EFI_ERROR (Status2)) {
+    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to open USB_HC/USB2_HC %r\n", Status));
+
+    Status = EFI_DEVICE_ERROR;
+    goto CLOSE_HC;
+  }
+
+  UsbHcReset (UsbBus, EFI_USB_HC_RESET_GLOBAL);
+  UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
+
+  //
+  // Install an EFI_USB_BUS_PROTOCOL to host controler to identify it.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &Controller,
+                  &mUsbBusProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &UsbBus->BusId
+                  );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to install bus protocol %r\n", Status));
+    goto CLOSE_HC;
+  }
+
+  //
+  // Initial the wanted child device path list, and add first RemainingDevicePath
+  //
+  InitializeListHead (&UsbBus->WantedUsbIoDPList);
+  Status = UsbBusAddWantedUsbIoDP (&UsbBus->BusId, RemainingDevicePath);
+  ASSERT (!EFI_ERROR (Status));
+  //
+  // Create a fake usb device for root hub
+  //
+  RootHub = AllocateZeroPool (sizeof (USB_DEVICE));
+
+  if (RootHub == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto UNINSTALL_USBBUS;
+  }
+
+  RootIf = AllocateZeroPool (sizeof (USB_INTERFACE));
+
+  if (RootIf == NULL) {
+    gBS->FreePool (RootHub);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FREE_ROOTHUB;
+  }
+
+  RootHub->Bus            = UsbBus;
+  RootHub->NumOfInterface = 1;
+  RootHub->Interfaces[0]  = RootIf;
+  RootIf->Signature       = USB_INTERFACE_SIGNATURE;
+  RootIf->Device          = RootHub;
+  RootIf->DevicePath      = UsbBus->DevicePath;
+
+  Status                  = mUsbRootHubApi.Init (RootIf);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to init root hub %r\n", Status));
+    goto FREE_ROOTHUB;
+  }
+
+  UsbBus->Devices[0] = RootHub;
+
+  DEBUG ((EFI_D_INFO, "UsbBusStart: usb bus started on %x, root hub %x\n", Controller, RootIf));
+  return EFI_SUCCESS;
+
+FREE_ROOTHUB:
+  if (RootIf != NULL) {
+    gBS->FreePool (RootIf);
+  }
+  if (RootHub != NULL) {
+    gBS->FreePool (RootHub);
+  }
+
+UNINSTALL_USBBUS:
+  gBS->UninstallProtocolInterface (Controller, &mUsbBusProtocolGuid, &UsbBus->BusId);
+
+CLOSE_HC:
+  if (UsbBus->Usb2Hc != NULL) {
+    gBS->CloseProtocol (
+          Controller,
+          &gEfiUsb2HcProtocolGuid,
+          This->DriverBindingHandle,
+          Controller
+          );
+  }
+  if (UsbBus->UsbHc != NULL) {
+    gBS->CloseProtocol (
+          Controller,
+          &gEfiUsbHcProtocolGuid,
+          This->DriverBindingHandle,
+          Controller
+          );
+  }
+  gBS->CloseProtocol (
+         Controller,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
+  gBS->FreePool (UsbBus);
+
+  DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to start bus driver %r\n", Status));
+  return Status;
+}
+
 EFI_USB_IO_PROTOCOL mUsbIoProtocol = {
   UsbIoControlTransfer,
   UsbIoBulkTransfer,
@@ -952,8 +1138,10 @@ UsbBusControllerDriverSupported (
     DevicePathNode.DevPath = RemainingDevicePath;
 
     if ((DevicePathNode.DevPath->Type    != MESSAGING_DEVICE_PATH) ||
-        (DevicePathNode.DevPath->SubType != MSG_USB_DP) ||
-        (DevicePathNodeLength (DevicePathNode.DevPath) != sizeof (USB_DEVICE_PATH))) {
+        (DevicePathNode.DevPath->SubType != MSG_USB_DP &&
+         DevicePathNode.DevPath->SubType != MSG_USB_CLASS_DP
+         && DevicePathNode.DevPath->SubType != MSG_USB_WWID_DP
+         )) {
 
       return EFI_UNSUPPORTED;
     }
@@ -1060,12 +1248,8 @@ UsbBusControllerDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  USB_BUS                 *UsbBus;
-  USB_DEVICE              *RootHub;
-  USB_INTERFACE           *RootIf;
-  EFI_USB_BUS_PROTOCOL    *UsbBusId;
-  EFI_STATUS              Status;
-  EFI_STATUS              Status2;
+  EFI_USB_BUS_PROTOCOL          *UsbBusId;
+  EFI_STATUS                    Status;
 
   //
   // Locate the USB bus protocol, if it is found, USB bus
@@ -1080,161 +1264,47 @@ UsbBusControllerDriverStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
 
-  if (!EFI_ERROR (Status)) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  UsbBus = AllocateZeroPool (sizeof (USB_BUS));
-
-  if (UsbBus == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  UsbBus->Signature   = USB_BUS_SIGNATURE;
-  UsbBus->HostHandle  = Controller;
-
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &UsbBus->DevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to open device path %r\n", Status));
-
-    gBS->FreePool (UsbBus);
-    return Status;
+    //
+    // If first start, build the bus execute enviorment and install bus protocol
+    //
+    Status = UsbBusBuildProtocol (This, Controller, RemainingDevicePath);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    //
+    // Try get the Usb Bus protocol interface again
+    //
+    Status = gBS->OpenProtocol (
+                    Controller,
+                    &mUsbBusProtocolGuid,
+                    (VOID **) &UsbBusId,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    ASSERT (!EFI_ERROR (Status));
+  } else {
+    //
+    // USB Bus driver need to control the recursive connect policy of the bus, only those wanted
+    // usb child device will be recursively connected.
+    // The RemainingDevicePath indicate the child usb device which user want to fully recursively connecte this time.
+    // All wanted usb child devices will be remembered by the usb bus driver itself.
+    // If RemainingDevicePath == NULL, all the usb child devices in the usb bus are wanted devices.
+    //
+    // Save the passed in RemainingDevicePath this time
+    //
+    Status = UsbBusAddWantedUsbIoDP (UsbBusId, RemainingDevicePath);
+    ASSERT (!EFI_ERROR (Status));
+    //
+    // Ensure all wanted child usb devices are fully recursively connected
+    //
+    Status = UsbBusRecursivelyConnectWantedUsbIo (UsbBusId);
+    ASSERT (!EFI_ERROR (Status));
   }
 
-  //
-  // Get USB_HC2/USB_HC host controller protocol (EHCI/UHCI).
-  // This is for backward compatbility with EFI 1.x. In UEFI
-  // 2.x, USB_HC2 replaces USB_HC. We will open both USB_HC2
-  // and USB_HC because EHCI driver will install both protocols
-  // (for the same reason). If we don't consume both of them,
-  // the unconsumed one may be opened by others.
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiUsb2HcProtocolGuid,
-                  (VOID **) &(UsbBus->Usb2Hc),
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
 
-  Status2 = gBS->OpenProtocol (
-                   Controller,
-                   &gEfiUsbHcProtocolGuid,
-                   (VOID **) &(UsbBus->UsbHc),
-                   This->DriverBindingHandle,
-                   Controller,
-                   EFI_OPEN_PROTOCOL_BY_DRIVER
-                   );
-
-  if (EFI_ERROR (Status) && EFI_ERROR (Status2)) {
-    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to open USB_HC/USB2_HC %r\n", Status));
-
-    Status = EFI_DEVICE_ERROR;
-    goto CLOSE_HC;
-  }
-
-  UsbHcReset (UsbBus, EFI_USB_HC_RESET_GLOBAL);
-  UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
-
-  //
-  // Install an EFI_USB_BUS_PROTOCOL to host controler to identify it.
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &Controller,
-                  &mUsbBusProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &UsbBus->BusId
-                  );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to install bus protocol %r\n", Status));
-    goto CLOSE_HC;
-  }
-
-  //
-  // Create a fake usb device for root hub
-  //
-  RootHub = AllocateZeroPool (sizeof (USB_DEVICE));
-
-  if (RootHub == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto UNINSTALL_USBBUS;
-  }
-
-  RootIf = AllocateZeroPool (sizeof (USB_INTERFACE));
-
-  if (RootIf == NULL) {
-    gBS->FreePool (RootHub);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto FREE_ROOTHUB;
-  }
-
-  RootHub->Bus            = UsbBus;
-  RootHub->NumOfInterface = 1;
-  RootHub->Interfaces[0]  = RootIf;
-  RootIf->Signature       = USB_INTERFACE_SIGNATURE;
-  RootIf->Device          = RootHub;
-  RootIf->DevicePath      = UsbBus->DevicePath;
-  
-  Status                  = mUsbRootHubApi.Init (RootIf);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to init root hub %r\n", Status));
-    goto FREE_ROOTHUB;
-  }
-
-  UsbBus->Devices[0] = RootHub;
-
-  DEBUG (( EFI_D_INFO, "UsbBusStart: usb bus started on %x, root hub %x\n", Controller, RootIf));
   return EFI_SUCCESS;
-  
-FREE_ROOTHUB:
-  if (RootIf != NULL) {
-    gBS->FreePool (RootIf);
-  }
-  if (RootHub != NULL) {
-    gBS->FreePool (RootHub);
-  }
-  
-UNINSTALL_USBBUS:
-  gBS->UninstallProtocolInterface (Controller, &mUsbBusProtocolGuid, &UsbBus->BusId);
-  
-CLOSE_HC:
-  if (UsbBus->Usb2Hc != NULL) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiUsb2HcProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-  }
-  if (UsbBus->UsbHc != NULL) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiUsbHcProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-  }
-  gBS->CloseProtocol (
-         Controller,
-         &gEfiDevicePathProtocolGuid,
-         This->DriverBindingHandle,
-         Controller
-         );
-  gBS->FreePool (UsbBus);
-
-  DEBUG (( EFI_D_ERROR, "UsbBusStart: Failed to start bus driver %r\n", Status));
-  return Status;
 }
 
 
@@ -1274,7 +1344,10 @@ UsbBusControllerDriverStop (
   Status  = EFI_SUCCESS;
 
   if (NumberOfChildren > 0) {
-    OldTpl   = gBS->RaiseTPL (USB_BUS_TPL);
+    //
+    // BugBug: Raise TPL to callback level instead of USB_BUS_TPL to avoid TPL conflict
+    //
+    OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
 
     for (Index = 0; Index < NumberOfChildren; Index++) {
       Status = gBS->OpenProtocol (
@@ -1329,7 +1402,9 @@ UsbBusControllerDriverStop (
   //
   // Stop the root hub, then free all the devices
   //
-  OldTpl  = gBS->RaiseTPL (USB_BUS_TPL);
+  // BugBug: Raise TPL to callback level instead of USB_BUS_TPL to avoid TPL conflict
+  //
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   UsbHcSetState (Bus, EfiUsbHcStateHalt);
 
   RootHub = Bus->Devices[0];
@@ -1347,6 +1422,8 @@ UsbBusControllerDriverStop (
 
   gBS->FreePool   (RootIf);
   gBS->FreePool   (RootHub);
+  Status = UsbBusFreeUsbDPList (&Bus->WantedUsbIoDPList);
+  ASSERT (!EFI_ERROR (Status));
 
   //
   // Uninstall the bus identifier and close USB_HC/USB2_HC protocols
