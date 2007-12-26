@@ -94,42 +94,42 @@ typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
 } TEXT_IN_EX_SPLITTER_NOTIFY;
 
 typedef struct {
-  UINT64                         Signature;
-  EFI_HANDLE                     VirtualHandle;
+  UINT64                             Signature;
+  EFI_HANDLE                         VirtualHandle;
 
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL TextIn;
-  UINTN                          CurrentNumberOfConsoles;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL **TextInList;
-  UINTN                          TextInListCount;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     TextIn;
+  UINTN                              CurrentNumberOfConsoles;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     **TextInList;
+  UINTN                              TextInListCount;
 
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL TextInEx;
-  UINTN                             CurrentNumberOfExConsoles;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL **TextInExList;
-  UINTN                             TextInExListCount;
-  LIST_ENTRY                        NotifyList;    
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  TextInEx;
+  UINTN                              CurrentNumberOfExConsoles;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  **TextInExList;
+  UINTN                              TextInExListCount;
+  LIST_ENTRY                         NotifyList;    
 
 
-  EFI_SIMPLE_POINTER_PROTOCOL    SimplePointer;
-  EFI_SIMPLE_POINTER_MODE        SimplePointerMode;
-  UINTN                          CurrentNumberOfPointers;
-  EFI_SIMPLE_POINTER_PROTOCOL    **PointerList;
-  UINTN                          PointerListCount;
+  EFI_SIMPLE_POINTER_PROTOCOL        SimplePointer;
+  EFI_SIMPLE_POINTER_MODE            SimplePointerMode;
+  UINTN                              CurrentNumberOfPointers;
+  EFI_SIMPLE_POINTER_PROTOCOL        **PointerList;
+  UINTN                              PointerListCount;
 
-  EFI_ABSOLUTE_POINTER_PROTOCOL	 AbsolutePointer;
-  EFI_ABSOLUTE_POINTER_MODE		 AbsolutePointerMode;
-  UINTN							 CurrentNumberOfAbsolutePointers;
-  EFI_ABSOLUTE_POINTER_PROTOCOL	 **AbsolutePointerList;
-  UINTN							 AbsolutePointerListCount;
-  BOOLEAN 						 AbsoluteInputEventSignalState; 
+  EFI_ABSOLUTE_POINTER_PROTOCOL      AbsolutePointer;
+  EFI_ABSOLUTE_POINTER_MODE          AbsolutePointerMode;
+  UINTN                              CurrentNumberOfAbsolutePointers;
+  EFI_ABSOLUTE_POINTER_PROTOCOL      **AbsolutePointerList;
+  UINTN                              AbsolutePointerListCount;
+  BOOLEAN                            AbsoluteInputEventSignalState; 
 
-  BOOLEAN                        PasswordEnabled;
-  CHAR16                         Password[MAX_STD_IN_PASSWORD];
-  UINTN                          PwdIndex;
-  CHAR16                         PwdAttempt[MAX_STD_IN_PASSWORD];
-  EFI_EVENT                      LockEvent;
+  BOOLEAN                            PasswordEnabled;
+  CHAR16                             Password[MAX_STD_IN_PASSWORD];
+  UINTN                              PwdIndex;
+  CHAR16                             PwdAttempt[MAX_STD_IN_PASSWORD];
+  EFI_EVENT                          LockEvent;
 
-  BOOLEAN                        KeyEventSignalState;
-  BOOLEAN                        InputEventSignalState;
+  BOOLEAN                            KeyEventSignalState;
+  BOOLEAN                            InputEventSignalState;
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
