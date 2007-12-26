@@ -573,7 +573,7 @@ USBKeyboardDriverBindingStop (
                   (VOID **) &SimpleInput,
                   This->DriverBindingHandle,
                   Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
