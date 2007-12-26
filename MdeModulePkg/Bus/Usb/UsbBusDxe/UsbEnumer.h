@@ -140,6 +140,7 @@ UsbRemoveDevice (
   );
 
 VOID
+EFIAPI
 UsbHubEnumeration (
   IN EFI_EVENT            Event,
   IN VOID                 *Context

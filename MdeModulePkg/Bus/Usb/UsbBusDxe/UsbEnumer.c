@@ -288,18 +288,24 @@ UsbConnectDriver (
     // twisted TPL used. It should be no problem for us to connect
     // or disconnect at CALLBACK.
     //
-    OldTpl            = UsbGetCurrentTpl ();
-    DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", OldTpl));
+    
+    //
+    // Only recursively wanted usb child device
+    //
+    if (UsbBusIsWantedUsbIO (UsbIf->Device->Bus, UsbIf)) {
+      OldTpl            = UsbGetCurrentTpl ();
+      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", OldTpl));
 
-    gBS->RestoreTPL (TPL_CALLBACK);
+      gBS->RestoreTPL (TPL_CALLBACK);
 
-    Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
-    UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
+      Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
+      UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
 
-    DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", UsbGetCurrentTpl()));
-    ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
+      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", UsbGetCurrentTpl()));
+      ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
-    gBS->RaiseTPL (OldTpl);
+      gBS->RaiseTPL (OldTpl);
+    }
   }
 
   return Status;
