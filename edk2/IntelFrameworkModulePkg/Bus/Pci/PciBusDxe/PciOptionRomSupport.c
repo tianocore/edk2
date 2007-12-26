@@ -284,6 +284,10 @@ Returns:
   PciDevice->PciIo.RomSize  = RomImageSize;
   PciDevice->PciIo.RomImage = RomInMemory;
 
+  //
+  // For OpROM read from PCI device:
+  //   Add the Rom Image to internal database for later PCI light enumeration
+  //
   PciRomAddImageMapping (
     NULL,
     PciDevice->PciRootBridgeIo->SegmentNumber,
