@@ -326,7 +326,7 @@ R8_HexStringToBuf (
   //
   // Find out how many hex characters the string has.
   //
-  for (Idx = 0, HexCnt = 0; IsHexDigit (&Digit, Str[Idx]); Idx++, HexCnt++);
+  for (Idx = 0, HexCnt = 0; R8_IsHexDigit (&Digit, Str[Idx]); Idx++, HexCnt++);
 
   if (HexCnt == 0) {
     *Len = 0;
@@ -349,7 +349,7 @@ R8_HexStringToBuf (
 
   for (Idx = 0; Idx < HexCnt; Idx++) {
 
-    IsHexDigit (&Digit, Str[HexCnt - 1 - Idx]);
+    R8_IsHexDigit (&Digit, Str[HexCnt - 1 - Idx]);
 
     //
     // For odd charaters, write the lower nibble for each buffer byte,
