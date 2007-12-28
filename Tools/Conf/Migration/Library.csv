@@ -33,6 +33,7 @@ EfiDriverLib,EfiLibAllocateRuntimeCopyPool,AllocateRuntimeCopyPool,MemoryAllocat
 EfiDriverLib,EfiLibAllocateRuntimePool,AllocateRuntimePool,MemoryAllocationLib,MdePkg
 EfiDriverLib,EfiLibAllocateRuntimeZeroPool,AllocateRuntimeZeroPool,MemoryAllocationLib,MdePkg
 EfiDriverLib,EfiLibAllocateZeroPool,AllocateZeroPool,MemoryAllocationLib,MdePkg
+EfiDriverLib,EfiLibSafeFreePool,SafeFreePool,MemoryAllocationLib,MdePkg
 EfiDriverLib,EfiCreateEventReadyToBoot,EfiCreateEventReadyToBootEx,UefiLib,MdePkg
 EfiDriverLib,EfiCreateEventLegacyBoot,EfiCreateEventLegacyBootEx,UefiLib,MdePkg
 EfiDriverLib,EfiInitializeFwVolDevicepathNode,EfiInitializeFwVolDevicepathNode,UefiLib,MdePkg
@@ -74,6 +75,7 @@ EfiCommonLib,COMMA_TYPE,COMMA_TYPE,PrintLib,MdePkg
 EfiCommonLib,DivU64x32,DivU64x64Remainder,BaseLib,MdePkg
 EfiCommonLib,EfiAsciiStrCpy,AsciiStrCpy,BaseLib,MdePkg
 EfiCommonLib,EfiAsciiStrLen,AsciiStrLen,BaseLib,MdePkg
+EfiCommonLib,EfiAsciiStrCmp,AsciiStrCmp,BaseLib,MdePkg
 EfiCommonLib,EfiCommonIoRead,n/a,n/a,MdePkg
 EfiCommonLib,EfiCommonIoWrite,n/a,n/a,MdePkg
 EfiCommonLib,EfiCommonLibCopyMem,CopyMem,BaseMemoryLib,MdePkg
@@ -88,14 +90,16 @@ EfiCommonLib,EfiDebugAssertWorker,n/a,n/a,MdePkg
 EfiCommonLib,EfiDebugVPrintWorker,n/a,n/a,MdePkg
 EfiCommonLib,EfiInitializeCommonDriverLib,n/a,n/a,MdePkg
 EfiCommonLib,EfiLibGetSystemConfigurationTable,EfiGetSystemConfigurationTable,UefiLib,MdePkg
+EfiCommonLib,EfiAsciiStrSize,AsciiStrSize,BaseLib,MdePkg
 EfiCommonLib,EfiStrCat,StrCat,BaseLib,MdePkg
 EfiCommonLib,EfiStrCmp,StrCmp,BaseLib,MdePkg
 EfiCommonLib,EfiStrCpy,StrCpy,BaseLib,MdePkg
 EfiCommonLib,EfiStrLen,StrLen,BaseLib,MdePkg
+EfiCommonLib,EfiStrnCmp,StrnCmp,BaseLib,MdePkg
 EfiCommonLib,EfiStrSize,StrSize,BaseLib,MdePkg
+EfiCommonLib,EfiStrStr,StrStr,BaseLib,MdePkg
 EfiCommonLib,EfiStrTrim,R8_EfiStrTrim,%,MdePkg
 EfiCommonLib,EfiValueToHexStr,R8_EfiValueToHexStr,%,MdePkg
-EfiCommonLib,EfiValueToString,AsciiValueToString,PrintLib,MdePkg
 EfiCommonLib,EFI_ALIGN,ALIGN_POINTER,BaseLib,MdePkg
 EfiCommonLib,GetPowerOfTwo,GetPowerOfTwo64,BaseLib,MdePkg
 EfiCommonLib,HexStringToBuf,R8_HexStringToBuf,%,MdePkg
@@ -143,6 +147,8 @@ EfiCommonLib,EFI_D_GENERIC,(DEBUG_ERROR | DEBUG_INIT | DEBUG_WARN | DEBUG_INFO |
 EfiCommonLib,EFI_D_INTRINSIC,(DEBUG_EVENT | DEBUG_POOL | DEBUG_PAGE | DEBUG_LOAD | DEBUG_BM | DEBUG_VARIABLE),DebugLib,MdePkg
 EfiCommonLib,EFI_D_RESERVED,((DEBUG_ERROR | DEBUG_INIT | DEBUG_WARN | DEBUG_INFO | DEBUG_BLKIO | DEBUG_NET | DEBUG_UNDI) | (DEBUG_EVENT | DEBUG_POOL | DEBUG_PAGE | DEBUG_LOAD | DEBUG_BM | DEBUG_VARIABLE)),DebugLib,MdePkg
 EfiCommonLib,EFI_DBUG_MASK,DEBUG_ERROR,DebugLib,MdePkg
+EfiPrintLib,VSPrint,UnicodeVSPrint,PrintLib,MdePkg
+EfiPrintLib,SPrint,UnicodeSPrint,PrintLib,MdePkg
 PeiLib,ASPrint,AsciiSPrint,PrintLib,MdePkg
 PeiLib,AvSPrint,AsciiVSPrint,PrintLib,MdePkg
 PeiLib,CompareGuid,CompareGuid,BaseMemoryLib,MdePkg

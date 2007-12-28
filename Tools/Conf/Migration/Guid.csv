@@ -1,4 +1,5 @@
 Name,R8.5 Cname,R9 Cname,Guid Value,Package
+GenericPlatformVariable,gEfiGenericVariableGuid,gEfiGenericPlatformVariableGuid,59d1c24f-50f1-401a-b101-f33e0daed443,MdeModulePkg
 Apriori,gAprioriGuid,gAprioriGuid,FC510EE7-FFDC-11D4-BD41-0080C73C8881,MdePkg
 BootObjectAuthorizationParmset,gBootObjectAuthorizationParmsetGuid,gBootObjectAuthorizationParmsetGuid,EDD35E31-07B9-11D2-83A3-00A0C91FADCF,MdePkg
 Acpi10Table,gEfiAcpi10TableGuid,gEfiAcpi10TableGuid,EB9D2D30-2D88-11D3-9A16-0090273FC14D,MdePkg
