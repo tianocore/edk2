@@ -1302,7 +1302,6 @@ PciCf8ReadBuffer (
   )
 {
   UINTN   ReturnValue;
-  UINTN   Value;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
@@ -1332,8 +1331,7 @@ PciCf8ReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    Value = (UINTN) PciCf8Read16 (StartAddress);
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) Value);
+    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
 
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
@@ -1344,8 +1342,7 @@ PciCf8ReadBuffer (
     //
     // Read as many double words as possible
     //
-    Value = (UINTN) PciCf8Read32 (StartAddress);
-    WriteUnaligned32 ((UINT32 *)Buffer, (UINT32) Value);
+    WriteUnaligned32 ((UINT32 *)Buffer, (UINT32) PciCf8Read32 (StartAddress));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1355,8 +1352,7 @@ PciCf8ReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    Value = (UINTN) PciCf8Read16 (StartAddress);
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) Value);
+    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;

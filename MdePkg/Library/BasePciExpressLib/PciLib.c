@@ -1210,7 +1210,6 @@ PciExpressReadBuffer (
   )
 {
   UINTN   ReturnValue;
-  UINTN   Value;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
@@ -1240,8 +1239,7 @@ PciExpressReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    Value = (UINTN) PciExpressRead16 (StartAddress);
-    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) Value);
+    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) PciExpressRead16 (StartAddress));
 
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
@@ -1252,8 +1250,7 @@ PciExpressReadBuffer (
     //
     // Read as many double words as possible
     //
-    Value = (UINTN) PciExpressRead32 (StartAddress);
-    WriteUnaligned32 ((UINT32 *) Buffer, (UINT32) Value);
+    WriteUnaligned32 ((UINT32 *) Buffer, (UINT32) PciExpressRead32 (StartAddress));
 
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
@@ -1264,8 +1261,7 @@ PciExpressReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    Value = (UINTN) PciExpressRead16 (StartAddress);
-    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) Value);
+    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) PciExpressRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
