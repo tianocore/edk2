@@ -42,16 +42,16 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r863 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r863 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r863 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r863 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r863 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
 
     BaseTools/Bin/Win32/GenFds.exe
-        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
 
     BaseTools/Bin/Win32/Trim.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
