@@ -535,16 +535,12 @@ UsbScsiModeSense (
   IN USB_MASS_DEVICE          *UsbMass
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS                       Status;
   USB_SCSI_MODE_SENSE6_CMD         ModeSenseCmd;
   USB_SCSI_MODE_SENSE6_PARA_HEADER ModeParaHeader;
   EFI_BLOCK_IO_MEDIA               *Media;
 
-  CopyMem (
-    &Media,
-    &(UsbMass->BlockIoMedia),
-    sizeof (EFI_BLOCK_IO_MEDIA)
-    );
+  Media   = &UsbMass->BlockIoMedia;
 
   ZeroMem (&ModeSenseCmd, sizeof (USB_SCSI_MODE_SENSE6_CMD));
   ZeroMem (&ModeParaHeader, sizeof (USB_SCSI_MODE_SENSE6_PARA_HEADER));
@@ -602,12 +598,7 @@ UsbBootGetParams (
   EFI_STATUS                  Status;
   UINT8                       CmdSet;
 
-  CopyMem (
-    &Media,
-    &(UsbMass->BlockIoMedia),
-    sizeof (EFI_BLOCK_IO_MEDIA)
-    );
-
+  Media  = &(UsbMass->BlockIoMedia);
   CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootInquiry (UsbMass);
