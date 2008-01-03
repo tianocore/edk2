@@ -106,6 +106,7 @@ CIRRUS_LOGIC_5430_VIDEO_MODES  CirrusLogic5430VideoModes[] = {
   { 1024, 768, 8, 60, Crtc_1024_768_256_60, Seq_1024_768_256_60, 0xef }
 };
 
+
 /**
   CirrusLogic5430ControllerDriverSupported
 
@@ -212,6 +213,8 @@ CirrusLogic5430ControllerDriverStart (
   EFI_STATUS                      Status;
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
   BOOLEAN                         PciAttributesSaved;
+  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
+  ACPI_ADR_DEVICE_PATH            AcpiDeviceNode;
 
   PciAttributesSaved = FALSE;
   //
@@ -227,7 +230,7 @@ CirrusLogic5430ControllerDriverStart (
   // Set up context record
   //
   Private->Signature  = CIRRUS_LOGIC_5430_PRIVATE_DATA_SIGNATURE;
-  Private->Handle     = Controller;
+  Private->Handle     = NULL;
 
   //
   // Open PCI I/O Protocol
@@ -269,52 +272,98 @@ CirrusLogic5430ControllerDriverStart (
     goto Error;
   }
 
+  //
+  // Get ParentDevicePath
+  //
+  Status = gBS->HandleProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  if (FeaturePcdGet (PcdSupportGop)) {
+    //
+    // Set Gop Device Path
+    //
+    if (RemainingDevicePath == NULL) {
+      ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
+      AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
+      AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
+      AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
+      SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
+
+      Private->GopDevicePath = AppendDevicePathNode (
+                                          ParentDevicePath,
+                                          (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
+                                          );
+    } else {
+      Private->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
+    }
+
+    //
+    // Creat child handle and device path protocol firstly
+    //
+    Private->Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Private->Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->GopDevicePath,
+                    NULL
+                    );
+  }
+
+  //
+  // Construct video mode buffer
+  //
+  Status = CirrusLogic5430VideoModeSetup (Private);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
   if (FeaturePcdGet (PcdSupportUga)) {
     //
     // Start the UGA Draw software stack.
     //
     Status = CirrusLogic5430UgaDrawConstructor (Private);
     ASSERT_EFI_ERROR (Status);
-    if (FeaturePcdGet (PcdSupportGop)) {
-      Status = CirrusLogic5430GraphicsOutputConstructor (Private);
-      ASSERT_EFI_ERROR (Status);
 
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &Private->Handle,
-                      &gEfiUgaDrawProtocolGuid,
-                      &Private->UgaDraw,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &Private->GraphicsOutput,
-                      NULL
-                      );
-    } else {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &Private->Handle,
-                      &gEfiUgaDrawProtocolGuid,
-                      &Private->UgaDraw,
-                      NULL
-                      );
+    Private->UgaDevicePath = ParentDevicePath;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Controller,
+                    &gEfiUgaDrawProtocolGuid,
+                    &Private->UgaDraw,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->UgaDevicePath,
+                    NULL
+                    );
 
-    }
+  } else if (FeaturePcdGet (PcdSupportGop)) {
+    //
+    // Start the GOP software stack.
+    //
+    Status = CirrusLogic5430GraphicsOutputConstructor (Private);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Private->Handle,
+                    &gEfiGraphicsOutputProtocolGuid,
+                    &Private->GraphicsOutput,
+                    &gEfiEdidDiscoveredProtocolGuid,
+                    &Private->EdidDiscovered,
+                    &gEfiEdidActiveProtocolGuid,
+                    &Private->EdidActive,
+                    NULL
+                    );
+
   } else {
-    if (FeaturePcdGet (PcdSupportGop)) {
-      Status = CirrusLogic5430GraphicsOutputConstructor (Private);
-      ASSERT_EFI_ERROR (Status);
-
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &Private->Handle,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &Private->GraphicsOutput,
-                      NULL
-                      );
-
-    } else {
-      //
-      // This driver must support eithor GOP or UGA or both.
-      //
-      ASSERT (FALSE);
-      Status = EFI_UNSUPPORTED;
-    }
+    //
+    // This driver must support eithor GOP or UGA or both.
+    //
+    ASSERT (FALSE);
+    Status = EFI_UNSUPPORTED;
   }
 
 

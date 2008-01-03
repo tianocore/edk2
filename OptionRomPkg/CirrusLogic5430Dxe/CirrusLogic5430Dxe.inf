@@ -37,8 +37,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gCirrusLogic5430DriverBinding                
-#  COMPONENT_NAME                =  gCirrusLogic5430ComponentName                
+#  DRIVER_BINDING                =  gCirrusLogic5430DriverBinding
+#  COMPONENT_NAME                =  gCirrusLogic5430ComponentName
 #
 
 [Sources.common]
@@ -48,6 +48,7 @@
   CirrusLogic5430GraphicsOutput.c
   CirrusLogic5430.c
   CirrusLogic5430.h
+  Edid.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -59,14 +60,21 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-
+  BaseMemoryLib
+  DevicePathLib
+  DxeI2cLib
 
 [Protocols]
   gEfiDriverSupportedEfiVersionProtocolGuid     # PROTOCOL ALWAYS_PRODUCED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL BY_START
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
+  gEfiEdidDiscoveredProtocolGuid                # PROTOCOL BY_START
+  gEfiEdidActiveProtocolGuid                    # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
-  
+  gEfiEdidOverrideProtocolGuid                  # PROTOCOL TO_START
+
+
 [FeaturePcd.common]
   gOptionRomPkgTokenSpaceGuid.PcdSupportGop
   gOptionRomPkgTokenSpaceGuid.PcdSupportUga

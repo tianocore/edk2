@@ -1,16 +1,16 @@
 /** @file
-  This file produces the graphics abstration of UGA Draw. It is called by 
-  CirrusLogic5430.c file which deals with the EFI 1.1 driver model. 
+  This file produces the graphics abstration of UGA Draw. It is called by
+  CirrusLogic5430.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -95,7 +95,7 @@ CirrusLogic5430UgaDrawSetMode (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    InitializeGraphicsMode (Private, &CirrusLogic5430VideoModes[Index]);
+    InitializeGraphicsMode (Private, &CirrusLogic5430VideoModes[Private->ModeData[Index].ModeNumber]);
 
     Private->CurrentMode            = Index;
 
@@ -380,7 +380,6 @@ CirrusLogic5430UgaDrawConstructor (
   )
 {
   EFI_UGA_DRAW_PROTOCOL *UgaDraw;
-  UINTN                 Index;
 
   //
   // Fill in Private->UgaDraw protocol
@@ -394,15 +393,7 @@ CirrusLogic5430UgaDrawConstructor (
   //
   // Initialize the private data
   //
-  Private->MaxMode      = CIRRUS_LOGIC_5430_MODE_COUNT;
-  Private->CurrentMode  = 0;
-  for (Index = 0; Index < Private->MaxMode; Index++) {
-    Private->ModeData[Index].HorizontalResolution = CirrusLogic5430VideoModes[Index].Width;
-    Private->ModeData[Index].VerticalResolution   = CirrusLogic5430VideoModes[Index].Height;
-    Private->ModeData[Index].ColorDepth           = 32;
-    Private->ModeData[Index].RefreshRate          = CirrusLogic5430VideoModes[Index].RefreshRate;
-  }
-
+  Private->CurrentMode            = 0;
   Private->HardwareNeedsStarting  = TRUE;
   Private->LineBuffer             = NULL;
 
