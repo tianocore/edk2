@@ -1,0 +1,45 @@
+#/** @file
+# DxeI2c Library implementation on CirrusLogic.
+#
+# Provides I2c Bus byte read/write functions upon CirrusLogic5430.
+# Copyright (c) 2008, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CirrusLogic5430I2cLib
+  FILE_GUID                      = 0C86ADD7-ED2A-4b9a-ABC9-D932E8AA349B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeI2cLib
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  CirrusLogic5430I2cLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OptionRomPkg/OptionRomPkg.dec
+
+
+[LibraryClasses]
+  TimerLib
+  DebugLib
+
+

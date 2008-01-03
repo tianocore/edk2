@@ -4,9 +4,9 @@
 # This package is designed to interoperate with the EDK II open source project
 # at http://www.tianocore.org, and this package is required to build PCI compliant
 # Option ROM image for all CPU architectures, including EBC target.
-# A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1. 
+# A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2008, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -57,7 +57,9 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  DxeI2cLib|OptionRomPkg/Library/CirrusLogicI2cLib/CirrusLogic5430I2cLib.inf
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
@@ -91,4 +93,4 @@
 [Components.common]
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
-  
+

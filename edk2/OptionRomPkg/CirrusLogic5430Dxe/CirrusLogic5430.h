@@ -1,7 +1,7 @@
 /** @file
   Cirrus Logic 5430 Controller Driver
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,10 @@
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/DriverSupportedEfiVersion.h>
+#include <Protocol/EdidOverride.h>
+#include <Protocol/EdidDiscovered.h>
+#include <Protocol/EdidActive.h>
+#include <Protocol/DevicePath.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -32,6 +36,9 @@
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/DxeI2cLib.h>
 
 #include <IndustryStandard/pci22.h>
 //
@@ -48,6 +55,7 @@
 #define CIRRUS_LOGIC_5430_MODE_COUNT         3
 
 typedef struct {
+  UINT32  ModeNumber;
   UINT32  HorizontalResolution;
   UINT32  VerticalResolution;
   UINT32  ColorDepth;
@@ -68,6 +76,10 @@ typedef struct {
   UINT64                                OriginalPciAttributes;
   EFI_UGA_DRAW_PROTOCOL                 UgaDraw;
   EFI_GRAPHICS_OUTPUT_PROTOCOL          GraphicsOutput;
+  EFI_EDID_DISCOVERED_PROTOCOL          EdidDiscovered;
+  EFI_EDID_ACTIVE_PROTOCOL              EdidActive;
+  EFI_DEVICE_PATH_PROTOCOL              *GopDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL              *UgaDevicePath;
   UINTN                                 CurrentMode;
   UINTN                                 MaxMode;
   CIRRUS_LOGIC_5430_MODE_DATA           ModeData[CIRRUS_LOGIC_5430_MODE_COUNT];
@@ -127,6 +139,18 @@ extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gCirrusLogic5430DriverSupporte
 #define DAC_PIXEL_MASK_REGISTER 0x3c6
 #define PALETTE_INDEX_REGISTER  0x3c8
 #define PALETTE_DATA_REGISTER   0x3c9
+
+#define ACPI_ADR_DISPLAY_TYPE_VGA               1
+
+#define ACPI_DISPLAY_ADR(_DeviceIdScheme, _HeadId, _NonVgaOutput, _BiosCanDetect, _VendorInfo, _Type, _Port, _Index) \
+          ((UINT32) ( (((_DeviceIdScheme) & 0x1) << 31) |  \
+                      (((_HeadId)         & 0x7) << 18) |  \
+                      (((_NonVgaOutput)   & 0x1) << 17) |  \
+                      (((_BiosCanDetect)  & 0x1) << 16) |  \
+                      (((_VendorInfo)     & 0xf) << 12) |  \
+                      (((_Type)           & 0xf) << 8)  |  \
+                      (((_Port)           & 0xf) << 4)  |  \
+                       ((_Index)          & 0xf) ))
 
 //
 // UGA Draw Hardware abstraction internal worker functions
@@ -405,6 +429,11 @@ UINT16
 inw (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   UINTN                           Address
+  );
+
+EFI_STATUS
+CirrusLogic5430VideoModeSetup (
+  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   );
 
 #endif
