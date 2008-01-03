@@ -45,6 +45,12 @@ GCC_URL=ftp://gd.tuwien.ac.at/gnu/gcc/snapshots/${GCC_VERSION}/${_GCC_}.tar.bz2
 MINGW_HEADERS_URL=http://superb-west.dl.sourceforge.net/sourceforge/mingw/${_MINGW_HEADERS_}.tar.bz2
 
 #
+# If your site uses proxy servers, un-comment the following lines
+# and change the server name to your site's proxy server and proxy port.
+# export http_proxy=http://proxyservername.mycompany.com:911
+# export ftp_proxy=http://proxyservername.mycompany.com:911
+
+#
 # Uncomment one of the following depending upon which your system provides
 #
 #GET_COMMAND="curl --remote-name"
