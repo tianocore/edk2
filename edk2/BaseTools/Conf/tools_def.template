@@ -50,16 +50,22 @@ DEFINE ELFGCC_BIN    = /usr/bin
 # Option 1: Hard coded full path to compiler suite
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+#
 # Option 2: Use an environment variable
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(IA32_PETOOLS_PREFIX)
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(X64_PETOOLS_PREFIX)
+#
 # Option 3: Install the compiler suite into your default paths
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = i386-pc-mingw32-
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = x86_64-pc-mingw32-
-# Option 4: Create links under the Conf directory
+#
+# Option 4: Create links under the BaseTools/Bin/gcc/ARCH directory
 # Links needed: gcc, ar & ld
-DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/Conf/gcc/ia32
-DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/Conf/gcc/x64
+#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32
+#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64
+
+DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
 
 DEFINE CYGWIN_BIN    = c:/cygwin/bin
 DEFINE CYGWIN_BIN32  = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
