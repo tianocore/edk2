@@ -25,7 +25,7 @@ set -e
 #
 GCC=gcc-4.1.0
 BINUTILS=binutils-2.18
-CYGWIN_SNAP=20071108 # You may need to find a more recent one.
+CYGWIN_SNAP=20071108 # You may need to find a more recent version.
 export PATH=/bin:/usr/bin
 
 #
@@ -36,11 +36,14 @@ PREFIX="${PREFIX:-/opt/tiano/}"
 #
 # Where to get the GNU tools
 #
-BINUTILS_URL=ftp://ftp.ibiblio.org/pub/mirrors/gnu/ftp/gnu/binutils/${BINUTILS}.tar.bz2
+BINUTILS_URL=http://mirrors.kernel.org/gnu/binutils/${BINUTILS}.tar.bz2
 GCC_URL=http://mirrors.kernel.org/gnu/gcc/$GCC/$GCC.tar.bz2
 CYG_LOC=http://cygwin.com/snapshots/cygwin-src-${CYGWIN_SNAP}.tar.bz2
-# export http_proxy=http://proxy.dp.intel.com:911
-# export ftp_proxy=http://proxy.dp.intel.com:911
+
+# If your site uses proxy servers, un-comment the following lines
+# and change the server name to your site's proxy server and proxy port.
+# export http_proxy=http://proxyservername.mycompany.com:911
+# export ftp_proxy=http://proxyservername.mycompany.com:911
 
 #
 # Uncomment one of the following depending upon which your system provides
