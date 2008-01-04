@@ -473,7 +473,7 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
   )
 {
   EFI_STATUS                Status;
-  SMBIOS_STRUCTURE_TABLE    *SmbiosTable;
+  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable;
   SMBIOS_STRUCTURE_POINTER  Smbios;
   SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
   UINT16                    Index;
@@ -484,7 +484,7 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
     return EFI_NOT_FOUND;
   }
 
-  Smbios.Hdr    = (SMBIOS_HEADER *) (UINTN) SmbiosTable->TableAddress;
+  Smbios.Hdr    = (SMBIOS_STRUCTURE *) (UINTN) SmbiosTable->TableAddress;
   SmbiosEnd.Raw = (UINT8 *) (UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength);
 
   for (Index = 0; Index < SmbiosTable->TableLength; Index++) {
