@@ -223,6 +223,7 @@ Returns:
 
 EFI_STATUS
 CoreLoadPeImage (
+  IN  BOOLEAN                    BootPolicy,
   IN  VOID                       *Pe32Handle,
   IN  LOADED_IMAGE_PRIVATE_DATA  *Image,
   IN  EFI_PHYSICAL_ADDRESS       DstBuffer   OPTIONAL,
@@ -237,6 +238,7 @@ Routine Description:
 
 Arguments:
 
+  BootPolicy       - Policy for Open Image File.
   Pe32Handle       - The handle of PE32 image
   Image            - PE image to be loaded
   DstBuffer        - The buffer to store the image
