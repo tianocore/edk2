@@ -169,6 +169,7 @@ Returns:
 
 EFI_STATUS
 CoreLoadPeImage (
+  IN BOOLEAN                     BootPolicy,  
   IN VOID                        *Pe32Handle,
   IN LOADED_IMAGE_PRIVATE_DATA   *Image,
   IN EFI_PHYSICAL_ADDRESS        DstBuffer    OPTIONAL,
@@ -182,7 +183,8 @@ Routine Description:
   Loads, relocates, and invokes a PE/COFF image
 
 Arguments:
-
+  BootPolicy       - If TRUE, indicates that the request originates from the boot manager,
+                     and that the boot manager is attempting to load FilePath as a boot selection.
   Pe32Handle       - The handle of PE32 image
   Image            - PE image to be loaded
   DstBuffer        - The buffer to store the image
@@ -201,9 +203,11 @@ Returns:
 
 --*/
 {
-  EFI_STATUS      Status;
-  BOOLEAN         DstBufAlocated;
-  UINTN           Size;
+  EFI_STATUS                Status;
+  BOOLEAN                   DstBufAlocated;
+  UINTN                     Size;
+  UINTN                     LinkTimeBase;
+  EFI_TCG_PLATFORM_PROTOCOL *TcgPlatformProtocol;
 
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
@@ -247,6 +251,10 @@ Returns:
     Image->ImageContext.ImageError = IMAGE_ERROR_INVALID_SUBSYSTEM;
     return EFI_UNSUPPORTED;
   }
+  //
+  // Get the image base address in the original PeImage.
+  //
+  LinkTimeBase = (UINTN) Image->ImageContext.ImageAddress;
 
   //
   // Allocate memory of the correct memory type aligned on the required image boundry
@@ -344,6 +352,28 @@ Returns:
         goto Done;
       }
     }
+  }
+
+  //
+  // Measure the image before applying fixup
+  //
+  Status = CoreLocateProtocol (
+             &gEfiTcgPlatformProtocolGuid,
+             NULL,
+             (VOID **) &TcgPlatformProtocol
+             );
+  if (!EFI_ERROR (Status)) {    
+    Status = TcgPlatformProtocol->MeasurePeImage (
+                                    BootPolicy,
+                                    Image->ImageContext.ImageAddress,
+                                    (UINTN) Image->ImageContext.ImageSize,
+                                    LinkTimeBase,
+                                    Image->ImageContext.ImageType,
+                                    Image->Info.DeviceHandle,
+                                    Image->Info.FilePath
+                                    );
+    
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
@@ -722,7 +752,7 @@ Returns:
   //
   // Load the image.  If EntryPoint is Null, it will not be set.
   //
-  Status = CoreLoadPeImage (&FHand, Image, DstBuffer, EntryPoint, Attribute);
+  Status = CoreLoadPeImage (BootPolicy, &FHand, Image, DstBuffer, EntryPoint, Attribute);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_BUFFER_TOO_SMALL) || (Status == EFI_OUT_OF_RESOURCES)) {
       if (NumberOfPages != NULL) {
@@ -903,9 +933,6 @@ Returns:
            Attribute
            );
 }
-
-
-
 
 EFI_STATUS
 EFIAPI

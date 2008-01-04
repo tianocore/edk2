@@ -60,6 +60,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Capsule.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/Performance.h>
+#include <Uefi/UefiTcgPlatform.h>
+#include <Protocol/TcgPlatform.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
