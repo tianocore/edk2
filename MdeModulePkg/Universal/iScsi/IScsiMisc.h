@@ -39,13 +39,13 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
 } ISCSI_SESSION_CONFIG_NVDATA;
 #pragma pack()
 
-typedef struct _ISCSI_SESSION_CONFIG_DATA {
+struct _ISCSI_SESSION_CONFIG_DATA {
   ISCSI_SESSION_CONFIG_NVDATA NvData;
 
   EFI_IPv4_ADDRESS            PrimaryDns;
   EFI_IPv4_ADDRESS            SecondaryDns;
   EFI_IPv4_ADDRESS            DhcpServer;
-} ISCSI_SESSION_CONFIG_DATA;
+};
 
 UINT8
 IScsiGetSubnetMaskPrefixLength (

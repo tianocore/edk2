@@ -101,7 +101,7 @@ Returns:
     // Need expand the control section if more than 2 NIC/Target sections
     // exist.
     //
-    Control->Header.Length += (UINT16) (NumOffset - 4) * sizeof (UINT16);
+    Control->Header.Length = (UINT16)(Control->Header.Length + (NumOffset - 4) * sizeof (UINT16));
   }
 }
 
@@ -191,7 +191,7 @@ Returns:
   //
   // Get the identifier from the handle.
   //
-  Status = gBS->HandleProtocol (Handle, &mIScsiPrivateGuid, &IScsiIdentifier);
+  Status = gBS->HandleProtocol (Handle, &mIScsiPrivateGuid, (void **)&IScsiIdentifier);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return ;
@@ -278,7 +278,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (void **)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return 0;
@@ -293,7 +293,7 @@ Returns:
     return 0;
   }
 
-  Status = gBS->HandleProtocol (PciIoHandle, &gEfiPciIoProtocolGuid, &PciIo);
+  Status = gBS->HandleProtocol (PciIoHandle, &gEfiPciIoProtocolGuid, (void **)&PciIo);
   if (EFI_ERROR (Status)) {
     return 0;
   }
@@ -333,7 +333,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   Controller,
                   &gEfiSimpleNetworkProtocolGuid,
-                  &Snp
+                  (void **)&Snp
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -392,7 +392,7 @@ Returns:
   SectionOffset = &Control->NIC0Offset;
 
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (Handles[Index], &mIScsiPrivateGuid, &IScsiIdentifier);
+    Status = gBS->HandleProtocol (Handles[Index], &mIScsiPrivateGuid, (void **)&IScsiIdentifier);
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       return ;
@@ -552,7 +552,7 @@ Returns:
   EFI_ACPI_TABLE_VERSION                    Version;
   UINT32                                    Signature;
 
-  Status = gBS->LocateProtocol (&gEfiAcpiSupportProtocolGuid, NULL, &AcpiSupport);
+  Status = gBS->LocateProtocol (&gEfiAcpiSupportProtocolGuid, NULL, (void **)&AcpiSupport);
   if (EFI_ERROR (Status)) {
     return ;
   }
@@ -563,7 +563,7 @@ Returns:
     Status = AcpiSupport->GetAcpiTable (
                             AcpiSupport,
                             Index,
-                            &Table,
+                            (void **)&Table,
                             &Version,
                             &TableHandle
                             );
@@ -613,7 +613,7 @@ Returns:
     return ;
   }
 
-  Heap = (CHAR8 *) Table + IBFT_HEAP_OFFSET;
+  Heap = (UINT8 *) Table + IBFT_HEAP_OFFSET;
 
   //
   // Fill in the various section of the iSCSI Boot Firmware Table.

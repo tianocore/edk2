@@ -21,19 +21,12 @@ Abstract:
 #ifndef _ISCSI_CONFIG_H_
 #define _ISCSI_CONFIG_H_
 
-//#include "Tiano.h"
-//#include "EfiDriverLib.h"
-//#include "Base.h"
 #include <Library/FrameworkHiiLib.h>
 #include <Protocol/FrameworkFormBrowser.h>
 #include <Protocol/FrameworkFormCallback.h>
 #include <Library/FrameworkIfrSupportLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
-//#include "EfiPrintLib.h"
-//#include EFI_PROTOCOL_DEFINITION (Hii)
-//#include EFI_PROTOCOL_DEFINITION (FormBrowser)
-//#include EFI_PROTOCOL_DEFINITION (FormCallback)
 
 #include <Library/NetLib.h>
 #include "IScsiConfigNVDataStruc.h"

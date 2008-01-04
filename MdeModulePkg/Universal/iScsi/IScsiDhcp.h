@@ -20,9 +20,7 @@ Abstract:
 #ifndef _ISCSI_DHCP_H_
 #define _ISCSI_DHCP_H_
 
-//#include "Tiano.h"
-//#include EFI_PROTOCOL_CONSUMER (Dhcp4)
-#include "protocol\Dhcp4.h"
+#include <Protocol/Dhcp4.h>
 
 #define DHCP4_TAG_PARA_LIST             55
 #define DHCP4_TAG_NETMASK               1
