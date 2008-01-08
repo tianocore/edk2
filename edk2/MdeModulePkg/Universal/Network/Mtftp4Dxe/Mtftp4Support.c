@@ -305,16 +305,16 @@ Mtftp4SendRequest (
   Packet->OpCode = HTONS (Instance->Operation);
   Cur            = Packet->Rrq.Filename;
   Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Token->Filename);
-  Cur           += AsciiStrLen ((CHAR8 *) Token->Filename);
+  Cur           += AsciiStrLen ((CHAR8 *) Token->Filename) + 1;
   Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Mode);
-  Cur           += AsciiStrLen ((CHAR8 *) Mode);
+  Cur           += AsciiStrLen ((CHAR8 *) Mode) + 1;
 
   for (Index = 0; Index < Token->OptionCount; ++Index) {
     Cur  = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].OptionStr);
-    Cur += AsciiStrLen ((CHAR8 *) Options[Index].OptionStr);
+    Cur += AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1;
 
     Cur  = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].ValueStr);
-    Cur += AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr);
+    Cur += AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr) + 1;
   }
 
   return Mtftp4SendPacket (Instance, Nbuf);
