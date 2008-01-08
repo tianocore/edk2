@@ -360,7 +360,7 @@ R8_HexStringToBuf (
     } else {
       Byte = Buf[Idx / 2];
       Byte &= 0x0F;
-      Byte |= Digit << 4;
+      Byte = (UINT8) (Byte | Digit << 4);
     }
 
     Buf[Idx / 2] = Byte;
