@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Support for ConsoleControl protocol. Support for UGA Draw spliter.
+  Support for ConsoleControl protocol. Support for Graphics output spliter.
   Support for DevNull Console Out. This console uses memory buffers
   to represnt the console. It allows a console to start very early and
   when a new console is added it is synced up with the current console
@@ -39,13 +39,13 @@ ConSpliterConsoleControlGetMode (
 
   Routine Description:
     Return the current video mode information. Also returns info about existence
-    of UGA Draw devices in system, and if the Std In device is locked. All the
+    of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
     arguments are optional and only returned if a non NULL pointer is passed in.
 
   Arguments:
     This - Protocol instance pointer.
     Mode        - Are we in text of grahics mode.
-    UgaExists   - TRUE if UGA Spliter has found a UGA device
+    GopExists   - TRUE if GOP Spliter has found a GOP/UGA device
     StdInLocked - TRUE if StdIn device is keyboard locked
 
   Returns:
@@ -155,7 +155,7 @@ ConSpliterConsoleControlSetMode (
     }
   }
   if (Mode == EfiConsoleControlScreenText) {
-    DevNullSyncGopStdOut (Private);
+    DevNullSyncStdOut (Private);
   }
   return EFI_SUCCESS;
 }
@@ -189,7 +189,6 @@ ConSpliterGraphicsOutputQueryMode (
 --*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
-  TEXT_OUT_GOP_MODE               *Mode;
 
   if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
     return EFI_INVALID_PARAMETER;
@@ -212,11 +211,7 @@ ConSpliterGraphicsOutputQueryMode (
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  CopyMem (*Info, Private->GraphicsOutput.Mode->Info, *SizeOfInfo);
-  Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
-  (*Info)->HorizontalResolution = Mode->HorizontalResolution;
-  (*Info)->VerticalResolution = Mode->VerticalResolution;
-  (*Info)->PixelsPerScanLine = Mode->HorizontalResolution;
+  CopyMem (*Info, &Private->GraphicsOutputModeBuffer[ModeNumber], *SizeOfInfo);
 
   return EFI_SUCCESS;
 }
@@ -248,7 +243,7 @@ Routine Description:
   TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
   UINTN                                  Index;
   EFI_STATUS                             ReturnStatus;
-  TEXT_OUT_GOP_MODE                      *Mode;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Mode;
   UINTN                                  Size;
   EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
   UINTN                                  NumberIndex;
@@ -335,10 +330,7 @@ Routine Description:
 
   This->Mode->Mode = ModeNumber;
 
-  Info = This->Mode->Info;
-  Info->HorizontalResolution = Mode->HorizontalResolution;
-  Info->VerticalResolution   = Mode->VerticalResolution;
-  Info->PixelsPerScanLine    = Mode->HorizontalResolution;
+  CopyMem (This->Mode->Info, &Private->GraphicsOutputModeBuffer[ModeNumber], This->Mode->SizeOfInfo);
 
   //
   // Information is not enough here, so the following items remain unchanged:
@@ -1526,7 +1518,7 @@ DevNullTextOutEnableCursor (
 }
 
 EFI_STATUS
-DevNullSyncGopStdOut (
+DevNullSyncStdOut (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
   )
 /*++
