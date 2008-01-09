@@ -71,6 +71,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  VolatileVariableBase;
   EFI_PHYSICAL_ADDRESS  NonVolatileVariableBase;
   EFI_LOCK              VariableServicesLock;
+  UINT32                ReentrantState;
 } VARIABLE_GLOBAL;
 
 typedef struct {
