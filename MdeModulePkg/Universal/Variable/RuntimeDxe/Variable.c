@@ -172,10 +172,7 @@ Returns:
 
 --*/
 {
-  if (Variable == NULL ||
-      Variable->StartId != VARIABLE_DATA ||
-      (sizeof (VARIABLE_HEADER) + Variable->NameSize + Variable->DataSize) > MAX_VARIABLE_SIZE
-      ) {
+  if (Variable == NULL || Variable->StartId != VARIABLE_DATA) {
     return FALSE;
   }
 
@@ -372,6 +369,59 @@ Returns:
 }
 
 
+UINT32
+NameSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+{
+  //
+  // Check whether the header is valid fully;
+  // Tricky: The unprogramed data in FLASH equals 0xff.
+  // 
+  if (Variable->DataSize == (UINT32) -1 || 
+      Variable->Attributes == (UINT32) -1 || 
+      Variable->NameSize == (UINT32) -1) {
+    return 0;
+  }
+  return Variable->NameSize;
+}
+
+UINT32
+DataSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+{
+  //
+  // Check whether the header is valid fully;
+  // Tricky: The unprogramed data in FLASH equals 0xff.
+  // 
+  if (Variable->DataSize == (UINT32) -1 || 
+      Variable->Attributes == (UINT32) -1 || 
+      Variable->NameSize == (UINT32) -1) {
+    return 0;
+  }
+  return Variable->DataSize;
+}
+
+UINT32
+AttributesOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+{
+
+  //
+  // Check whether the header is valid fully;
+  // Tricky: The unprogramed data in FLASH equals 0xff.
+  // 
+  if (Variable->DataSize == (UINT32) -1 || 
+      Variable->Attributes == (UINT32) -1 || 
+      Variable->NameSize == (UINT32) -1) {
+    return 0;
+  }
+  return Variable->Attributes;
+}
+
+
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
@@ -395,7 +445,7 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
+  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + NameSizeOfVariable (Variable) + GET_PAD_SIZE (NameSizeOfVariable (Variable)));
 }
 
 
@@ -425,7 +475,7 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (VARIABLE_HEADER *) ((UINTN) GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
+  return (VARIABLE_HEADER *) ((UINTN) GetVariableDataPtr (Variable) + DataSizeOfVariable (Variable) + GET_PAD_SIZE (DataSizeOfVariable (Variable)));
 }
 
 
@@ -730,13 +780,6 @@ Returns:
   UINTN                 Index;
 
   //
-  // We aquire the lock at the entry of FindVariable as GetVariable, GetNextVariableName
-  // SetVariable all call FindVariable at entry point. Please move "Aquire Lock" to
-  // the correct places if this assumption does not hold TRUE anymore.
-  //
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
-
-  //
   // 0: Volatile, 1: Non-Volatile
   // The index and attributes mapping must be kept in this order as RuntimeServiceGetNextVariableName
   // make use of this mapping to implement search algorithme.
@@ -770,7 +813,8 @@ Returns:
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), Variable[Index]->NameSize)) {
+              ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
+              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), NameSizeOfVariable (Variable[Index]))) {
                 PtrTrack->CurrPtr   = Variable[Index];
                 PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
                 return EFI_SUCCESS;
@@ -833,6 +877,8 @@ RuntimeServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
   //
   // Find existing variable
   //
@@ -840,7 +886,7 @@ RuntimeServiceGetVariable (
   if ((Status == EFI_BUFFER_TOO_SMALL) || (Status == EFI_SUCCESS)){
     // Hit in the Cache
     UpdateVariableInfo (VariableName, VendorGuid, FALSE, TRUE, FALSE, FALSE, TRUE);
-    return Status;
+    goto Done;
   }
   
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
@@ -851,7 +897,9 @@ RuntimeServiceGetVariable (
   //
   // Get data size
   //
-  VarDataSize = Variable.CurrPtr->DataSize;
+  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
+  ASSERT (VarDataSize != 0);
+
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -917,6 +965,8 @@ RuntimeServiceGetNextVariableName (
     return EFI_INVALID_PARAMETER;
   }
 
+  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
     goto Done;
@@ -954,7 +1004,9 @@ RuntimeServiceGetNextVariableName (
     //
     if (IsValidVariableHeader (Variable.CurrPtr) && Variable.CurrPtr->State == VAR_ADDED) {
       if (!(EfiAtRuntime () && !(Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
-        VarNameSize = Variable.CurrPtr->NameSize;
+        VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
+        ASSERT (VarNameSize != 0);
+
         if (VarNameSize <= *VariableNameSize) {
           CopyMem (
             VariableName,
@@ -1037,11 +1089,7 @@ RuntimeServiceSetVariable (
   UINTN                   *NonVolatileOffset;
   UINT32                  Instance;
   BOOLEAN                 Volatile;
-
-  Reclaimed         = FALSE;
-  VolatileOffset    = &mVariableModuleGlobal->VolatileLastVariableOffset;
-  NonVolatileOffset = &mVariableModuleGlobal->NonVolatileLastVariableOffset;
-  Instance          = mVariableModuleGlobal->FvbInstance;
+  EFI_PHYSICAL_ADDRESS    Point;
 
   //
   // Check input parameters
@@ -1055,6 +1103,7 @@ RuntimeServiceSetVariable (
   if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
   //  the DataSize is limited to maximum size of MAX_HARDWARE_ERROR_VARIABLE_SIZE (32K)
@@ -1075,6 +1124,36 @@ RuntimeServiceSetVariable (
       return EFI_INVALID_PARAMETER;
     }  
   }  
+
+  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  Reclaimed         = FALSE;
+  Instance          = mVariableModuleGlobal->FvbInstance;
+  VolatileOffset    = &mVariableModuleGlobal->VolatileLastVariableOffset;
+
+  //
+  // Consider reentrant in MCA/INIT/NMI. It needs be reupdated;
+  //
+  if (1 < InterlockedIncrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState)) {
+    {
+      volatile int tt = 1;
+      while (tt) {
+      }
+    }
+    Point = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;;
+    //
+    // Parse non-volatile variable data and get last variable offset
+    //
+    NextVariable  = (VARIABLE_HEADER *) (UINTN) (Point + sizeof (VARIABLE_STORE_HEADER));
+    while (IsValidVariableHeader (NextVariable)) {
+      NextVariable = GetNextVariablePtr (NextVariable);
+    }
+    mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) Point;
+  }
+
+  NonVolatileOffset = &mVariableModuleGlobal->NonVolatileLastVariableOffset;
+  
+
   //
   // Check whether the input variable is already existed
   //
@@ -1131,7 +1210,7 @@ RuntimeServiceSetVariable (
     // If the variable is marked valid and the same data has been passed in
     // then return to the caller immediately.
     //
-    if (Variable.CurrPtr->DataSize == DataSize &&
+    if (DataSizeOfVariable (Variable.CurrPtr) == DataSize &&
         (CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0)) {
       
       UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
@@ -1396,7 +1475,9 @@ RuntimeServiceSetVariable (
   UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
 
 Done:
+  InterlockedDecrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState);
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
   return Status;
 }
 
@@ -1586,6 +1667,7 @@ Returns:
 
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock, TPL_NOTIFY);
+  mVariableModuleGlobal->VariableGlobal.ReentrantState = 0;
 
   //
   // Allocate memory for volatile variable store
