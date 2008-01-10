@@ -38,10 +38,12 @@
 // 8 is for IPF archtecture.
 //
 #if defined (MDE_CPU_IPF)
-#define ALIGNMENT  8
+#define ALIGNMENT         8
 #else
-#define ALIGNMENT  1
+#define ALIGNMENT         1
 #endif
+
+#define HEADER_ALIGNMENT  4
 
 //
 // Variable Store Status

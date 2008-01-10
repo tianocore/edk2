@@ -42,10 +42,12 @@ Abstract:
 #define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
 #endif
 
+#define HEADER_ALIGN(Header)  (((UINTN) (Header) + HEADER_ALIGNMENT - 1) & (~(HEADER_ALIGNMENT - 1)))
+
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
 #define GET_VARIABLE_DATA_PTR(a) \
-  (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (a) + (a)->NameSize + GET_PAD_SIZE ((a)->NameSize))
+  (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (a) + NameSizeOfVariable(a) + GET_PAD_SIZE (NameSizeOfVariable(a) ))
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
