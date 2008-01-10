@@ -152,7 +152,6 @@ UpdateVariableInfo (
 }
 
 
-
 BOOLEAN
 IsValidVariableHeader (
   IN  VARIABLE_HEADER   *Variable
@@ -475,9 +474,34 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (VARIABLE_HEADER *) ((UINTN) GetVariableDataPtr (Variable) + DataSizeOfVariable (Variable) + GET_PAD_SIZE (DataSizeOfVariable (Variable)));
+  return (VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) GetVariableDataPtr (Variable) + DataSizeOfVariable (Variable) + GET_PAD_SIZE (DataSizeOfVariable (Variable))));
 }
 
+VARIABLE_HEADER *
+GetStartPointer (
+  IN VARIABLE_STORE_HEADER       *VarStoreHeader
+  )
+/*++
+
+Routine Description:
+
+  This code gets the pointer to the first variable memory pointer byte
+
+Arguments:
+
+  VarStoreHeader        Pointer to the Variable Store Header.
+
+Returns:
+
+  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
+
+--*/
+{
+  //
+  // The end of variable store
+  //
+  return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
+}
 
 VARIABLE_HEADER *
 GetEndPointer (
@@ -502,7 +526,7 @@ Returns:
   //
   // The end of variable store
   //
-  return (VARIABLE_HEADER *) ((UINTN) VarStoreHeader + VarStoreHeader->Size);
+  return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VarStoreHeader + VarStoreHeader->Size);
 }
 
 
@@ -545,8 +569,7 @@ Returns:
   //
   // Start Pointers for the variable.
   //
-  Variable        = (VARIABLE_HEADER *) (VariableStoreHeader + 1);
-
+  Variable        = GetStartPointer (VariableStoreHeader);
   ValidBufferSize = sizeof (VARIABLE_STORE_HEADER);
 
   while (IsValidVariableHeader (Variable)) {
@@ -572,12 +595,12 @@ Returns:
   // Copy variable store header
   //
   CopyMem (CurrPtr, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
-  CurrPtr += sizeof (VARIABLE_STORE_HEADER);
+  CurrPtr = (UINT8 *) GetStartPointer (VariableStoreHeader);
 
   //
   // Start Pointers for the variable.
   //
-  Variable = (VARIABLE_HEADER *) (VariableStoreHeader + 1);
+  Variable = GetStartPointer (VariableStoreHeader);
 
   while (IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
@@ -791,8 +814,8 @@ Returns:
   // Start Pointers for the variable.
   // Actual Data Pointer where data can be written.
   //
-  Variable[0] = (VARIABLE_HEADER *) (VariableStoreHeader[0] + 1);
-  Variable[1] = (VARIABLE_HEADER *) (VariableStoreHeader[1] + 1);
+  Variable[0] = GetStartPointer (VariableStoreHeader[0]);
+  Variable[1] = GetStartPointer (VariableStoreHeader[1]);
 
   if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -801,7 +824,7 @@ Returns:
   // Find the variable by walk through volatile and then non-volatile variable store
   //
   for (Index = 0; Index < 2; Index++) {
-    PtrTrack->StartPtr  = (VARIABLE_HEADER *) (VariableStoreHeader[Index] + 1);
+    PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
     PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
 
     while (IsValidVariableHeader (Variable[Index]) && (Variable[Index] <= GetEndPointer (VariableStoreHeader[Index]))) {
@@ -987,8 +1010,8 @@ RuntimeServiceGetNextVariableName (
     if (Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL) {
       Variable.Volatile = (BOOLEAN) (Variable.Volatile ^ ((BOOLEAN) 0x1));
       if (!Variable.Volatile) {
-        Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
-        Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase));
+        Variable.StartPtr = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
+        Variable.EndPtr   = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase));
       } else {
         Status = EFI_NOT_FOUND;
         goto Done;
@@ -1135,16 +1158,11 @@ RuntimeServiceSetVariable (
   // Consider reentrant in MCA/INIT/NMI. It needs be reupdated;
   //
   if (1 < InterlockedIncrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState)) {
-    {
-      volatile int tt = 1;
-      while (tt) {
-      }
-    }
     Point = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;;
     //
     // Parse non-volatile variable data and get last variable offset
     //
-    NextVariable  = (VARIABLE_HEADER *) (UINTN) (Point + sizeof (VARIABLE_STORE_HEADER));
+    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point);
     while (IsValidVariableHeader (NextVariable)) {
       NextVariable = GetNextVariablePtr (NextVariable);
     }
@@ -1399,7 +1417,7 @@ RuntimeServiceSetVariable (
       goto Done;
     }
 
-    *NonVolatileOffset = *NonVolatileOffset + VarSize;
+    *NonVolatileOffset = HEADER_ALIGN (*NonVolatileOffset + VarSize);
 
   } else {
     //
@@ -1444,7 +1462,7 @@ RuntimeServiceSetVariable (
       goto Done;
     }
 
-    *VolatileOffset = *VolatileOffset + VarSize;
+    *VolatileOffset = HEADER_ALIGN (*VolatileOffset + VarSize);
   }
   //
   // Mark the old variable as deleted
@@ -1580,7 +1598,7 @@ RuntimeServiceQueryVariableInfo (
   //
   // Point to the starting address of the variables.
   //
-  Variable = (VARIABLE_HEADER *) (VariableStoreHeader + 1);
+  Variable = GetStartPointer (VariableStoreHeader);
 
   //
   // Now walk through the related variable store.
@@ -1684,7 +1702,7 @@ Returns:
   //  Variable Specific Data
   //
   mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
-  mVariableModuleGlobal->VolatileLastVariableOffset = sizeof (VARIABLE_STORE_HEADER);
+  mVariableModuleGlobal->VolatileLastVariableOffset = (UINTN) GetStartPointer (VolatileVariableStore) - (UINTN) VolatileVariableStore;
 
   VolatileVariableStore->Signature                  = VARIABLE_STORE_SIGNATURE;
   VolatileVariableStore->Size                       = VARIABLE_STORE_SIZE;
@@ -1780,7 +1798,7 @@ Returns:
     //
     // Parse non-volatile variable data and get last variable offset
     //
-    NextVariable  = (VARIABLE_HEADER *) (CurrPtr + sizeof (VARIABLE_STORE_HEADER));
+    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *) CurrPtr);
     Status        = EFI_SUCCESS;
 
     while (IsValidVariableHeader (NextVariable)) {
