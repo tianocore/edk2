@@ -44,10 +44,26 @@ Abstract:
 
 #define HEADER_ALIGN(Header)  (((UINTN) (Header) + HEADER_ALIGNMENT - 1) & (~(HEADER_ALIGNMENT - 1)))
 
+#define NAMESIZE_OF_VARIABLE(Variable)  \
+          ((((Variable)->DataSize == (UINT32) -1) || \
+          ((Variable)->Attributes == (UINT32) -1) || \
+          ((Variable)->NameSize == (UINT32) -1)) ? \
+          0 : \
+          (Variable)->NameSize \
+          )
+
+#define DATASIZE_OF_VARIABLE(Variable)  \
+          ((((Variable)->DataSize == (UINT32) -1) || \
+          ((Variable)->Attributes == (UINT32) -1) || \
+          ((Variable)->NameSize == (UINT32) -1)) ? \
+          0 : \
+          (Variable)->DataSize \
+          )
+
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
 #define GET_VARIABLE_DATA_PTR(a) \
-  (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (a) + NameSizeOfVariable(a) + GET_PAD_SIZE (NameSizeOfVariable(a) ))
+          (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (a) + NAMESIZE_OF_VARIABLE(a) + GET_PAD_SIZE (NAMESIZE_OF_VARIABLE(a)))
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;

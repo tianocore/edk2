@@ -367,60 +367,6 @@ Returns:
   }
 }
 
-
-UINT32
-NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->NameSize;
-}
-
-UINT32
-DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->DataSize;
-}
-
-UINT32
-AttributesOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->Attributes;
-}
-
-
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
@@ -444,7 +390,7 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + NameSizeOfVariable (Variable) + GET_PAD_SIZE (NameSizeOfVariable (Variable)));
+  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + NAMESIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (NAMESIZE_OF_VARIABLE (Variable)));
 }
 
 
@@ -474,7 +420,7 @@ Returns:
   //
   // Be careful about pad size for alignment
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) GetVariableDataPtr (Variable) + DataSizeOfVariable (Variable) + GET_PAD_SIZE (DataSizeOfVariable (Variable))));
+  return (VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) GetVariableDataPtr (Variable) + DATASIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (DATASIZE_OF_VARIABLE (Variable))));
 }
 
 VARIABLE_HEADER *
@@ -836,8 +782,8 @@ Returns:
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
-              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), NameSizeOfVariable (Variable[Index]))) {
+              ASSERT (NAMESIZE_OF_VARIABLE (Variable[Index]) != 0);
+              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), NAMESIZE_OF_VARIABLE (Variable[Index]))) {
                 PtrTrack->CurrPtr   = Variable[Index];
                 PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
                 return EFI_SUCCESS;
@@ -920,7 +866,7 @@ RuntimeServiceGetVariable (
   //
   // Get data size
   //
-  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
+  VarDataSize = DATASIZE_OF_VARIABLE (Variable.CurrPtr);
   ASSERT (VarDataSize != 0);
 
   if (*DataSize >= VarDataSize) {
@@ -1027,7 +973,7 @@ RuntimeServiceGetNextVariableName (
     //
     if (IsValidVariableHeader (Variable.CurrPtr) && Variable.CurrPtr->State == VAR_ADDED) {
       if (!(EfiAtRuntime () && !(Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
-        VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
+        VarNameSize = NAMESIZE_OF_VARIABLE (Variable.CurrPtr);
         ASSERT (VarNameSize != 0);
 
         if (VarNameSize <= *VariableNameSize) {
@@ -1228,7 +1174,7 @@ RuntimeServiceSetVariable (
     // If the variable is marked valid and the same data has been passed in
     // then return to the caller immediately.
     //
-    if (DataSizeOfVariable (Variable.CurrPtr) == DataSize &&
+    if (DATASIZE_OF_VARIABLE (Variable.CurrPtr) == DataSize &&
         (CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0)) {
       
       UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);

@@ -120,59 +120,6 @@ Returns:
   return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VarStoreHeader + VarStoreHeader->Size);
 }
 
-UINT32
-NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->NameSize;
-}
-
-UINT32
-DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->DataSize;
-}
-
-UINT32
-AttributesOfVariable (
-  IN  VARIABLE_HEADER   *Variable
-  )
-{
-
-  //
-  // Check whether the header is valid fully;
-  // Tricky: The unprogramed data in FLASH equals 0xff.
-  // 
-  if (Variable->DataSize == (UINT32) -1 || 
-      Variable->Attributes == (UINT32) -1 || 
-      Variable->NameSize == (UINT32) -1) {
-    return 0;
-  }
-  return Variable->Attributes;
-}
-
-
 STATIC
 VARIABLE_HEADER *
 GetNextVariablePtr (
@@ -193,7 +140,7 @@ Returns:
 
 --*/
 {
-  return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) GET_VARIABLE_DATA_PTR (Variable) + DataSizeOfVariable (Variable) + GET_PAD_SIZE (DataSizeOfVariable (Variable)));
+  return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) GET_VARIABLE_DATA_PTR (Variable) + DATASIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (DATASIZE_OF_VARIABLE (Variable)));
 }
 
 STATIC
@@ -311,8 +258,8 @@ Returns:
         (((INT32 *) VendorGuid)[2] == ((INT32 *) &Variable->VendorGuid)[2]) &&
         (((INT32 *) VendorGuid)[3] == ((INT32 *) &Variable->VendorGuid)[3])
         ) {
-      ASSERT (NameSizeOfVariable (Variable) != 0);
-      if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable), NameSizeOfVariable (Variable))) {
+      ASSERT (NAMESIZE_OF_VARIABLE (Variable) != 0);
+      if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable), NAMESIZE_OF_VARIABLE (Variable))) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }
@@ -521,7 +468,7 @@ Returns:
   //
   // Get data size
   //
-  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
+  VarDataSize = DATASIZE_OF_VARIABLE (Variable.CurrPtr);
   if (*DataSize >= VarDataSize) {
     (*PeiServices)->CopyMem (Data, GET_VARIABLE_DATA_PTR (Variable.CurrPtr), VarDataSize);
 
@@ -597,9 +544,9 @@ Returns:
   while (!(Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL)) {
     if (IsValidVariableHeader (Variable.CurrPtr)) {
       if (Variable.CurrPtr->State == VAR_ADDED) {
-        ASSERT (NameSizeOfVariable (Variable.CurrPtr) != 0);
+        ASSERT (NAMESIZE_OF_VARIABLE (Variable.CurrPtr) != 0);
 
-        VarNameSize = (UINTN) NameSizeOfVariable (Variable.CurrPtr);
+        VarNameSize = (UINTN) NAMESIZE_OF_VARIABLE (Variable.CurrPtr);
         if (VarNameSize <= *VariableNameSize) {
           (*PeiServices)->CopyMem (VariableName, GET_VARIABLE_NAME_PTR (Variable.CurrPtr), VarNameSize);
 
