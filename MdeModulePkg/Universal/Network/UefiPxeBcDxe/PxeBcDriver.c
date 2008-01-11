@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -285,7 +285,7 @@ ON_ERROR:
     NetLibDestroyServiceChild (
       ControllerHandle,
       This->DriverBindingHandle,
-      &gEfiUdp4ProtocolGuid,
+      &gEfiUdp4ServiceBindingProtocolGuid,
       Private->Udp4Child
       );
   }
@@ -301,7 +301,7 @@ ON_ERROR:
     NetLibDestroyServiceChild (
       ControllerHandle,
       This->DriverBindingHandle,
-      &gEfiMtftp4ProtocolGuid,
+      &gEfiMtftp4ServiceBindingProtocolGuid,
       Private->Mtftp4Child
       );
   }
@@ -317,7 +317,7 @@ ON_ERROR:
     NetLibDestroyServiceChild (
       ControllerHandle,
       This->DriverBindingHandle,
-      &gEfiDhcp4ProtocolGuid,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
       Private->Dhcp4Child
       );
   }
@@ -398,10 +398,10 @@ PxeBcDriverBindingStop (
           Private->Udp4Child,
           &gEfiUdp4ProtocolGuid,
           This->DriverBindingHandle,
-          ControllerHandle
+          NicHandle
           );
     NetLibDestroyServiceChild (
-      ControllerHandle,
+      NicHandle,
       This->DriverBindingHandle,
       &gEfiUdp4ServiceBindingProtocolGuid,
       Private->Udp4Child
@@ -411,10 +411,10 @@ PxeBcDriverBindingStop (
           Private->Dhcp4Child,
           &gEfiDhcp4ProtocolGuid,
           This->DriverBindingHandle,
-          ControllerHandle
+          NicHandle
           );
     NetLibDestroyServiceChild (
-      ControllerHandle,
+      NicHandle,
       This->DriverBindingHandle,
       &gEfiDhcp4ServiceBindingProtocolGuid,
       Private->Dhcp4Child
@@ -424,10 +424,10 @@ PxeBcDriverBindingStop (
           Private->Mtftp4Child,
           &gEfiMtftp4ProtocolGuid,
           This->DriverBindingHandle,
-          ControllerHandle
+          NicHandle
           );
     NetLibDestroyServiceChild (
-      ControllerHandle,
+      NicHandle,
       This->DriverBindingHandle,
       &gEfiMtftp4ServiceBindingProtocolGuid,
       Private->Mtftp4Child
