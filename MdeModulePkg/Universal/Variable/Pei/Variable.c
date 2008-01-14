@@ -121,29 +121,6 @@ Returns:
 }
 
 STATIC
-VARIABLE_HEADER *
-GetNextVariablePtr (
-  IN VARIABLE_HEADER  *Variable
-  )
-/*++
-
-Routine Description:
-
-  This code checks if variable header is valid or not.
-
-Arguments:
-  Variable       Pointer to the Variable Header.
-
-Returns:
-  TRUE            Variable header is valid.
-  FALSE           Variable header is not valid.
-
---*/
-{
-  return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) GET_VARIABLE_DATA_PTR (Variable) + DATASIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (DATASIZE_OF_VARIABLE (Variable)));
-}
-
-STATIC
 BOOLEAN
 EFIAPI
 IsValidVariableHeader (
@@ -170,6 +147,159 @@ Returns:
 
   return TRUE;
 }
+
+
+UINTN
+NameSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the size of name of variable.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  UINTN               Size of variable in bytes
+
+--*/
+{
+  if (Variable->State    == (UINT8) (-1) ||
+      Variable->DataSize == (UINT32) -1 ||
+      Variable->NameSize == (UINT32) -1 ||
+      Variable->Attributes == (UINT32) -1) {
+    return 0;
+  }
+  return (UINTN) Variable->NameSize;
+}
+
+UINTN
+DataSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the size of name of variable.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  UINTN               Size of variable in bytes
+
+--*/
+{
+  if (Variable->State    == (UINT8)  -1 ||
+      Variable->DataSize == (UINT32) -1 ||
+      Variable->NameSize == (UINT32) -1 ||
+      Variable->Attributes == (UINT32) -1) {
+    return 0;
+  }
+  return (UINTN) Variable->DataSize;
+}
+
+CHAR16 *
+GetVariableNamePtr (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the pointer to the variable name.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  CHAR16*              Pointer to Variable Name
+
+--*/
+{
+
+  return (CHAR16 *) (Variable + 1);
+}
+
+
+UINT8 *
+GetVariableDataPtr (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the pointer to the variable data.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  UINT8*              Pointer to Variable Data
+
+--*/
+{
+  UINTN Value;
+  
+  //
+  // Be careful about pad size for alignment
+  //
+  Value =  (UINTN) GetVariableNamePtr (Variable);
+  Value += NameSizeOfVariable (Variable);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable));
+
+  return (UINT8 *) Value;
+}
+
+VARIABLE_HEADER *
+GetNextVariablePtr (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the pointer to the next variable header.
+
+Arguments:
+
+  Variable              Pointer to the Variable Header.
+
+Returns:
+
+  VARIABLE_HEADER*      Pointer to next variable header.
+
+--*/
+{
+  UINTN Value;
+
+  if (!IsValidVariableHeader (Variable)) {
+    return NULL;
+  }
+
+  Value =  (UINTN) GetVariableDataPtr (Variable);
+  Value += DataSizeOfVariable (Variable);
+  Value += GET_PAD_SIZE (DataSizeOfVariable (Variable));
+
+  //
+  // Be careful about pad size for alignment
+  //
+  return (VARIABLE_HEADER *) HEADER_ALIGN (Value);
+}
+
 
 STATIC
 VARIABLE_STORE_STATUS
@@ -244,6 +374,8 @@ Returns:
 
 --*/
 {
+  VOID  *Point;
+
   if (VariableName[0] == 0) {
     PtrTrack->CurrPtr = Variable;
     return EFI_SUCCESS;
@@ -258,8 +390,9 @@ Returns:
         (((INT32 *) VendorGuid)[2] == ((INT32 *) &Variable->VendorGuid)[2]) &&
         (((INT32 *) VendorGuid)[3] == ((INT32 *) &Variable->VendorGuid)[3])
         ) {
-      ASSERT (NAMESIZE_OF_VARIABLE (Variable) != 0);
-      if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable), NAMESIZE_OF_VARIABLE (Variable))) {
+      ASSERT (NameSizeOfVariable (Variable) != 0);
+      Point = (VOID *) GetVariableNamePtr (Variable);
+      if (!CompareMem (VariableName, Point, NameSizeOfVariable (Variable))) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }
@@ -468,9 +601,9 @@ Returns:
   //
   // Get data size
   //
-  VarDataSize = DATASIZE_OF_VARIABLE (Variable.CurrPtr);
+  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
   if (*DataSize >= VarDataSize) {
-    (*PeiServices)->CopyMem (Data, GET_VARIABLE_DATA_PTR (Variable.CurrPtr), VarDataSize);
+    (*PeiServices)->CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
 
     if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
@@ -544,11 +677,11 @@ Returns:
   while (!(Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL)) {
     if (IsValidVariableHeader (Variable.CurrPtr)) {
       if (Variable.CurrPtr->State == VAR_ADDED) {
-        ASSERT (NAMESIZE_OF_VARIABLE (Variable.CurrPtr) != 0);
+        ASSERT (NameSizeOfVariable (Variable.CurrPtr) != 0);
 
-        VarNameSize = (UINTN) NAMESIZE_OF_VARIABLE (Variable.CurrPtr);
+        VarNameSize = (UINTN) NameSizeOfVariable (Variable.CurrPtr);
         if (VarNameSize <= *VariableNameSize) {
-          (*PeiServices)->CopyMem (VariableName, GET_VARIABLE_NAME_PTR (Variable.CurrPtr), VarNameSize);
+          (*PeiServices)->CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
 
           (*PeiServices)->CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
 
