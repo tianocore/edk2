@@ -367,6 +367,89 @@ Returns:
   }
 }
 
+
+UINTN
+NameSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the size of name of variable.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  UINTN               Size of variable in bytes
+
+--*/
+{
+  if (Variable->State    == (UINT8) (-1) ||
+      Variable->DataSize == (UINT32) -1 ||
+      Variable->NameSize == (UINT32) -1 ||
+      Variable->Attributes == (UINT32) -1) {
+    return 0;
+  }
+  return (UINTN) Variable->NameSize;
+}
+
+UINTN
+DataSizeOfVariable (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the size of name of variable.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  UINTN               Size of variable in bytes
+
+--*/
+{
+  if (Variable->State    == (UINT8)  -1 ||
+      Variable->DataSize == (UINT32) -1 ||
+      Variable->NameSize == (UINT32) -1 ||
+      Variable->Attributes == (UINT32) -1) {
+    return 0;
+  }
+  return (UINTN) Variable->DataSize;
+}
+
+CHAR16 *
+GetVariableNamePtr (
+  IN  VARIABLE_HEADER   *Variable
+  )
+/*++
+
+Routine Description:
+
+  This code gets the pointer to the variable name.
+
+Arguments:
+
+  Variable            Pointer to the Variable Header.
+
+Returns:
+
+  CHAR16*              Pointer to Variable Name
+
+--*/
+{
+
+  return (CHAR16 *) (Variable + 1);
+}
+
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
@@ -387,10 +470,16 @@ Returns:
 
 --*/
 {
+  UINTN Value;
+  
   //
   // Be careful about pad size for alignment
   //
-  return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + NAMESIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (NAMESIZE_OF_VARIABLE (Variable)));
+  Value =  (UINTN) GetVariableNamePtr (Variable);
+  Value += NameSizeOfVariable (Variable);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable));
+
+  return (UINT8 *) Value;
 }
 
 
@@ -414,13 +503,20 @@ Returns:
 
 --*/
 {
+  UINTN Value;
+
   if (!IsValidVariableHeader (Variable)) {
     return NULL;
   }
+
+  Value =  (UINTN) GetVariableDataPtr (Variable);
+  Value += DataSizeOfVariable (Variable);
+  Value += GET_PAD_SIZE (DataSizeOfVariable (Variable));
+
   //
   // Be careful about pad size for alignment
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) GetVariableDataPtr (Variable) + DATASIZE_OF_VARIABLE (Variable) + GET_PAD_SIZE (DATASIZE_OF_VARIABLE (Variable))));
+  return (VARIABLE_HEADER *) HEADER_ALIGN (Value);
 }
 
 VARIABLE_HEADER *
@@ -747,6 +843,7 @@ Returns:
   VARIABLE_HEADER       *Variable[2];
   VARIABLE_STORE_HEADER *VariableStoreHeader[2];
   UINTN                 Index;
+  VOID                  *Point;
 
   //
   // 0: Volatile, 1: Non-Volatile
@@ -782,8 +879,10 @@ Returns:
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              ASSERT (NAMESIZE_OF_VARIABLE (Variable[Index]) != 0);
-              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), NAMESIZE_OF_VARIABLE (Variable[Index]))) {
+              Point = (VOID *) GetVariableNamePtr (Variable[Index]);
+
+              ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
+              if (!CompareMem (VariableName, Point, NameSizeOfVariable (Variable[Index]))) {
                 PtrTrack->CurrPtr   = Variable[Index];
                 PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
                 return EFI_SUCCESS;
@@ -866,7 +965,7 @@ RuntimeServiceGetVariable (
   //
   // Get data size
   //
-  VarDataSize = DATASIZE_OF_VARIABLE (Variable.CurrPtr);
+  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
   ASSERT (VarDataSize != 0);
 
   if (*DataSize >= VarDataSize) {
@@ -973,13 +1072,13 @@ RuntimeServiceGetNextVariableName (
     //
     if (IsValidVariableHeader (Variable.CurrPtr) && Variable.CurrPtr->State == VAR_ADDED) {
       if (!(EfiAtRuntime () && !(Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
-        VarNameSize = NAMESIZE_OF_VARIABLE (Variable.CurrPtr);
+        VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
         ASSERT (VarNameSize != 0);
 
         if (VarNameSize <= *VariableNameSize) {
           CopyMem (
             VariableName,
-            GET_VARIABLE_NAME_PTR (Variable.CurrPtr),
+            GetVariableNamePtr (Variable.CurrPtr),
             VarNameSize
             );
           CopyMem (
@@ -1174,7 +1273,7 @@ RuntimeServiceSetVariable (
     // If the variable is marked valid and the same data has been passed in
     // then return to the caller immediately.
     //
-    if (DATASIZE_OF_VARIABLE (Variable.CurrPtr) == DataSize &&
+    if (DataSizeOfVariable (Variable.CurrPtr) == DataSize &&
         (CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0)) {
       
       UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
@@ -1310,8 +1409,9 @@ RuntimeServiceSetVariable (
     //
     // Three steps
     // 1. Write variable header
-    // 2. Write variable data
-    // 3. Set variable state to valid
+    // 2. Set variable state to header valid  
+    // 3. Write variable data
+    // 4. Set variable state to valid
     //
     //
     // Step 1:
@@ -1329,8 +1429,26 @@ RuntimeServiceSetVariable (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
+
     //
     // Step 2:
+    //
+    NextVariable->State = VAR_HEADER_VALID_ONLY;
+    Status = UpdateVariableStore (
+               &mVariableModuleGlobal->VariableGlobal,
+               FALSE,
+               TRUE,
+               Instance,
+               *NonVolatileOffset,
+               sizeof (VARIABLE_HEADER),
+               (UINT8 *) NextVariable
+               );
+
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    //
+    // Step 3:
     //
     Status = UpdateVariableStore (
                &mVariableModuleGlobal->VariableGlobal,
@@ -1346,7 +1464,7 @@ RuntimeServiceSetVariable (
       goto Done;
     }
     //
-    // Step 3:
+    // Step 4:
     //
     NextVariable->State = VAR_ADDED;
     Status = UpdateVariableStore (

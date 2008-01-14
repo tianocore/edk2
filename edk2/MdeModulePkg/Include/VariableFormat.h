@@ -60,7 +60,9 @@ typedef enum {
 //
 #define VAR_IN_DELETED_TRANSITION     0xfe  // Variable is in obsolete transistion
 #define VAR_DELETED                   0xfd  // Variable is obsolete
-#define VAR_ADDED                     0x7f  // Variable has been completely added
+#define VAR_HEADER_VALID_ONLY         0x7f  // Variable header has been valid
+#define VAR_ADDED                     0x3f  // Variable has been completely added
+                                            // 
 #define IS_VARIABLE_STATE(_c, _Mask)  (BOOLEAN) (((~_c) & (~_Mask)) != 0)
 
 #pragma pack(1)
