@@ -637,7 +637,7 @@ Returns:
   // Copy variable store header
   //
   CopyMem (CurrPtr, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
-  CurrPtr = (UINT8 *) GetStartPointer (VariableStoreHeader);
+  CurrPtr = (UINT8 *) GetStartPointer ((VARIABLE_STORE_HEADER *) CurrPtr);
 
   //
   // Start Pointers for the variable.
