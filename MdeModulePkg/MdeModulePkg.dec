@@ -2,7 +2,7 @@
 # Mde Module Package Reference Implementations
 #
 # This module provides headers and libraries that conform to EFI/PI Industry standards.
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available under
@@ -33,6 +33,7 @@
   UdpIoLib|Include/Library/UdpIoLib.h
   S3Lib|Include/Library/S3Lib.h
   RecoveryLib|Include/Library/RecoveryLib.h
+  PlatDriOverLib|Include/Library/PlatDriOverLib.h
 
 [Guids.common]
 
@@ -64,6 +65,7 @@
   gEfiPeiPeCoffLoaderGuid        = { 0xD8117CFF, 0x94A6, 0x11D4, { 0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   gEfiVariableInfoGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
   gSimpleTextInExNotifyGuid      = { 0x856f2def, 0x4e93, 0x4d6b, { 0x94, 0xce, 0x1c, 0xfe, 0x47, 0x01, 0x3e, 0xa5 }}
+  gEfiOverrideVariableGuid       = { 0x8e3d4ad5, 0xf762, 0x438a, { 0xa1, 0xc1, 0x5b, 0x9f, 0xe6, 0x8c, 0x6b, 0x15 }}
 
 [Protocols.common]
 
@@ -97,7 +99,7 @@
 
   ##gPeiFlashMapPpiGuid will be removed in future
   gPeiFlashMapPpiGuid            = { 0xf34c2fa0, 0xde88, 0x4270, {0x84, 0x14, 0x96, 0x12, 0x22, 0xf4, 0x52, 0x1c } }
-  
+
   gPeiOperatorPresencePpiGuid    = { 0x20a7378c, 0xaa83, 0x4ce1, {0x82, 0x1f, 0x47, 0x40, 0xee, 0x1b, 0x3f, 0x9f } }
 
 [PcdsFeatureFlag.common]
