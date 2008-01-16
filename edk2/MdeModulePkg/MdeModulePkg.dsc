@@ -72,6 +72,7 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  PlatDriOverLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
 
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -255,6 +256,8 @@
   MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
 
+  MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
+
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 
@@ -273,6 +276,8 @@
   MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+
+  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
