@@ -1,7 +1,7 @@
 /** @file
   EFI Runtime Variable services.
   
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -15,9 +15,7 @@
 
 #include "Variable.h"
 
-
-VARIABLE_MODULE_GLOBAL  mRuntimeData;
-VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal = &mRuntimeData;
+VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 EFI_EVENT   mVirtualAddressChangeEvent = NULL;
 EFI_HANDLE  mHandle = NULL;
 
@@ -1705,6 +1703,32 @@ RuntimeServiceQueryVariableInfo (
   return EFI_SUCCESS;
 }
 
+VOID
+EFIAPI
+ReclaimForOS(
+  EFI_EVENT  Event,
+  VOID       *Context
+  )
+{
+  UINT32                          VarSize;
+  EFI_STATUS                      Status;
+
+  VarSize = ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase))->Size;
+  Status  = EFI_SUCCESS; 
+
+  //
+  // Check if the free area is blow a threshold
+  //
+  if ((VarSize - mVariableModuleGlobal->NonVolatileLastVariableOffset) < VARIABLE_RECLAIM_THRESHOLD) {
+    Status = Reclaim (
+              mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+              &mVariableModuleGlobal->NonVolatileLastVariableOffset,
+              FALSE
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
 EFI_STATUS
 VariableCommonInitialize (
   IN EFI_HANDLE         ImageHandle,
@@ -1746,7 +1770,16 @@ Returns:
   UINT8                           Data;
   UINT64                          VariableStoreBase;
   UINT64                          VariableStoreLength;
+  EFI_EVENT                       ReadyToBootEvent;
 
+  Status = EFI_SUCCESS;
+  //
+  // Allocate runtime memory for variable driver global structure.
+  //
+  mVariableModuleGlobal = AllocateRuntimePool (sizeof (VARIABLE_MODULE_GLOBAL));
+  if (mVariableModuleGlobal == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock, TPL_NOTIFY);
   mVariableModuleGlobal->VariableGlobal.ReentrantState = 0;
@@ -1793,9 +1826,7 @@ Returns:
 
   Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
   if (EFI_ERROR (Status)) {
-    FreePool (mVariableModuleGlobal);
-    FreePool (VolatileVariableStore);
-    return EFI_UNSUPPORTED;
+    goto Done;
   }
 
   Status = gDS->SetMemorySpaceAttributes (
@@ -1804,9 +1835,7 @@ Returns:
                   GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (mVariableModuleGlobal);
-    FreePool (VolatileVariableStore);
-    return EFI_UNSUPPORTED;
+    goto Done;
   }
   //
   // Get address of non volatile variable store base
@@ -1854,7 +1883,7 @@ Returns:
       ASSERT(VariableStoreHeader->Size == VariableStoreLength);
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
     }
 
@@ -1872,23 +1901,6 @@ Returns:
     mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) CurrPtr;
 
     //
-    // Check if the free area is blow a threshold
-    //
-    if ((((VARIABLE_STORE_HEADER *)((UINTN) CurrPtr))->Size - mVariableModuleGlobal->NonVolatileLastVariableOffset) < VARIABLE_RECLAIM_THRESHOLD) {
-      Status = Reclaim (
-                mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
-                &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-                FALSE
-                );
-    }
-
-    if (EFI_ERROR (Status)) {
-      FreePool (mVariableModuleGlobal);
-      FreePool (VolatileVariableStore);
-      return Status;
-    }
-
-    //
     // Check if the free area is really free.
     //
     for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreHeader->Size; Index++) {
@@ -1902,11 +1914,27 @@ Returns:
                   &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                   FALSE
                   );
+
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
         break;
       }
     }
+
+    //
+    // Register the event handling function to reclaim variable for OS usage.
+    //
+    Status = EfiCreateEventReadyToBootEx (
+               TPL_NOTIFY, 
+               ReclaimForOS, 
+               NULL, 
+               &ReadyToBootEvent
+               );
   }
 
+Done:
   if (EFI_ERROR (Status)) {
     FreePool (mVariableModuleGlobal);
     FreePool (VolatileVariableStore);
@@ -1914,9 +1942,6 @@ Returns:
 
   return Status;
 }
-
-
-
 
 VOID
 EFIAPI
