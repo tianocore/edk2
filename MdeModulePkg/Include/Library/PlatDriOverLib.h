@@ -24,6 +24,7 @@ Abstract:
 #include <PiDxe.h>
 #include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/DriverBinding.h>
 #include <Library/BaseLib.h>
 
 #include <VariableFormat.h>
@@ -250,6 +251,21 @@ DeleteDriverImage (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *ControllerDevicePath,
   IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
   IN     LIST_ENTRY                                     *MappingDataBase
+  );
+
+/**
+  Get the first Binding protocol which has the specific image handle
+
+  @param  Image          Image handle
+
+  @return Pointer into the Binding Protocol interface
+
+**/
+EFI_DRIVER_BINDING_PROTOCOL *
+EFIAPI
+GetBindingProtocolFromImageHandle (
+  IN  EFI_HANDLE   ImageHandle,
+  OUT EFI_HANDLE   *BindingHandle
   );
 
 #endif

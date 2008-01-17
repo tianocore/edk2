@@ -143,6 +143,8 @@ typedef union {
 #define MODE0_COLUMN_COUNT        80
 #define MODE0_ROW_COUNT           25
 
+#define MODE1_COLUMN_COUNT        100
+#define MODE1_ROW_COUNT           31
 #define BACKSPACE                 8
 #define ESC                       27
 #define CSI                       0x9B

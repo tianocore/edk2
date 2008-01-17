@@ -44,15 +44,17 @@
 
 
 [LibraryClasses]
-   BaseLib
-   DebugLib
-   BaseMemoryLib
-   UefiBootServicesTableLib
-   UefiRuntimeServicesTableLib
-   UefiLib
-   MemoryAllocationLib
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiNicIp4ConfigProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
   gEfiDpcProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED

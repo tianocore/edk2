@@ -25,6 +25,8 @@ Abstract:
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NicIp4Config.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/ComponentName2.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
@@ -842,8 +844,7 @@ NetLibDefaultUnload (
   UINTN                             Index;
   EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
   EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
-  EFI_DRIVER_CONFIGURATION_PROTOCOL *DriverConfiguration;
-  EFI_DRIVER_DIAGNOSTICS_PROTOCOL   *DriverDiagnostics;
+  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
   //
   // Get the list of all the handles in the handle database.
@@ -912,30 +913,15 @@ NetLibDefaultUnload (
 
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
-                    &gEfiDriverConfigurationProtocolGuid,
-                    (VOID **) &DriverConfiguration
+                    &gEfiComponentName2ProtocolGuid,
+                    (VOID **) &ComponentName2
                     );
-
     if (!EFI_ERROR (Status)) {
       gBS->UninstallProtocolInterface (
-            ImageHandle,
-            &gEfiDriverConfigurationProtocolGuid,
-            DriverConfiguration
-            );
-    }
-
-    Status = gBS->HandleProtocol (
-                    DeviceHandleBuffer[Index],
-                    &gEfiDriverDiagnosticsProtocolGuid,
-                    (VOID **) &DriverDiagnostics
-                    );
-
-    if (!EFI_ERROR (Status)) {
-      gBS->UninstallProtocolInterface (
-            ImageHandle,
-            &gEfiDriverDiagnosticsProtocolGuid,
-            DriverDiagnostics
-            );
+             ImageHandle,
+             &gEfiComponentName2ProtocolGuid,
+             ComponentName2
+             );
     }
   }
 

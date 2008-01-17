@@ -226,11 +226,11 @@ TerminalConOutOutputString (
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
   //
-  //  get current display mode
-  //  Terminal driver only support mode 0
+  //  Get current display mode
   //
   Mode = This->Mode;
-  if (Mode->Mode != 0) {
+  
+  if (Mode->Mode > 1) {
     return EFI_UNSUPPORTED;
   }
 
@@ -464,15 +464,17 @@ TerminalConOutQueryMode (
                 
 --*/
 {
-  if (This->Mode->MaxMode > 1) {
+  if (This->Mode->MaxMode > 2) {
     return EFI_DEVICE_ERROR;
   }
 
   if (ModeNumber == 0) {
-
     *Columns  = MODE0_COLUMN_COUNT;
     *Rows     = MODE0_ROW_COUNT;
-
+    return EFI_SUCCESS;
+  } else if (ModeNumber == 1) {  
+    *Columns  = MODE1_COLUMN_COUNT;
+    *Rows     = MODE1_ROW_COUNT;
     return EFI_SUCCESS;
   }
 
@@ -521,11 +523,14 @@ TerminalConOutSetMode (
   //
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
-  if (ModeNumber != 0) {
+  if (ModeNumber > 1) {
     return EFI_UNSUPPORTED;
   }
-
-  This->Mode->Mode = 0;
+  
+  //
+  // Set the current mode
+  //
+  This->Mode->Mode = (INT32) ModeNumber;
 
   This->ClearScreen (This);
 
@@ -537,7 +542,7 @@ TerminalConOutSetMode (
     return EFI_DEVICE_ERROR;
   }
 
-  This->Mode->Mode  = 0;
+  This->Mode->Mode  = (INT32) ModeNumber;
 
   Status            = This->ClearScreen (This);
   if (EFI_ERROR (Status)) {
