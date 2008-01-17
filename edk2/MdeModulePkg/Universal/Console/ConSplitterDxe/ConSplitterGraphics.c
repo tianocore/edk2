@@ -1350,6 +1350,7 @@ DevNullTextOutSetMode (
 --*/
 {
   UINTN                         Size;
+  INT32                         CurrentMode;
   UINTN                         Row;
   UINTN                         Column;
   TEXT_OUT_SPLITTER_QUERY_DATA  *Mode;
@@ -1357,8 +1358,14 @@ DevNullTextOutSetMode (
   //
   // No extra check for ModeNumber here, as it has been checked in
   // ConSplitterTextOutSetMode. And mode 0 should always be supported.
+  // Row and Column should be fetched from intersection map.
   //
-  Mode    = &(Private->TextOutQueryData[ModeNumber]);
+  if (Private->TextOutModeMap != NULL) {
+    CurrentMode = *(Private->TextOutModeMap + Private->TextOutListCount * ModeNumber);
+  } else {
+    CurrentMode = (INT32)(ModeNumber);
+  }
+  Mode    = &(Private->TextOutQueryData[CurrentMode]);
   Row     = Mode->Rows;
   Column  = Mode->Columns;
 

@@ -41,6 +41,14 @@ EraseCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   );
 
+EFI_STATUS
+CheckModeSupported (
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput,
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  OUT UINT32  *CurrentModeNumber
+  );
+
 //
 // Globals
 //
@@ -70,8 +78,9 @@ GRAPHICS_CONSOLE_DEV        mGraphicsConsoleDevTemplate = {
   },
   {
     { 80, 25, 0, 0, 0, 0 },  // Mode 0
-    { 80, 50, 0, 0, 0, 0 },  // Mode 1 
-    {  0,  0, 0, 0, 0, 0 }   // Mode 2
+    { 80, 50, 0, 0, 0, 0 },  // Mode 1
+    { 100,31, 0, 0, 0, 0 },  // Mode 2
+    {  0,  0, 0, 0, 0, 0 }   // Mode 3
   },
   (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
   (EFI_HII_HANDLE) 0
@@ -238,22 +247,20 @@ GraphicsConsoleControllerDriverStart (
 
 --*/
 {
-  EFI_STATUS            Status;
-  GRAPHICS_CONSOLE_DEV  *Private;
+  EFI_STATUS                           Status;
+  GRAPHICS_CONSOLE_DEV                 *Private;
   EFI_HII_PACKAGES      *Package;
   EFI_HII_FONT_PACK     *FontPack;
-  UINTN                 NarrowFontSize;
-  UINT32                HorizontalResolution;
-  UINT32                VerticalResolution;
-  UINT32                ColorDepth;
-  UINT32                RefreshRate;
-  UINTN                 MaxMode;
-  UINTN                 Columns;
-  UINTN                 Rows;
-  UINT8                 *Location;
+  UINTN                                NarrowFontSize;
+  UINT32                               HorizontalResolution;
+  UINT32                               VerticalResolution;
+  UINT32                               ColorDepth;
+  UINT32                               RefreshRate;
+  UINTN                                MaxMode;
+  UINTN                                Columns;
+  UINTN                                Rows;
+  UINT8                                *Location;
   UINT32                               ModeNumber;
-  UINTN                                SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
   
   ModeNumber = 0;
 
@@ -336,26 +343,32 @@ GraphicsConsoleControllerDriverStart (
 
   if (Private->GraphicsOutput != NULL) {
     //
-    // The console is build on top of Graphics Output Protocol, find the mode number for 800x600
+    // The console is build on top of Graphics Output Protocol, find the mode number 
+    // for the user-defined mode; if there are multiple video devices,
+    // graphic console driver will set all the video devices to the same mode.
     //
-    for (ModeNumber = 0; ModeNumber < Private->GraphicsOutput->Mode->MaxMode; ModeNumber++) {
-      Status = Private->GraphicsOutput->QueryMode (
-                         Private->GraphicsOutput,
-                         ModeNumber,
-                         &SizeOfInfo,
-                         &Info
-                         );
-      if (!EFI_ERROR (Status)) {
-        if ((Info->HorizontalResolution == 800) &&
-            (Info->VerticalResolution == 600)) {
-          Status = Private->GraphicsOutput->SetMode (Private->GraphicsOutput, ModeNumber);
-          if (!EFI_ERROR (Status)) {
-            FreePool (Info);
-            break;
-          }
-        }
-        FreePool (Info);
-      }
+    Status = CheckModeSupported (
+                 Private->GraphicsOutput, 
+                 CURRENT_HORIZONTAL_RESOLUTION, 
+                 CURRENT_VERTICAL_RESOLUTION,
+                 &ModeNumber
+                 );
+    if (!EFI_ERROR(Status)) {
+      //
+      // Update default mode to current mode
+      //
+      HorizontalResolution = CURRENT_HORIZONTAL_RESOLUTION;
+      VerticalResolution   = CURRENT_VERTICAL_RESOLUTION;
+    } else {
+      //
+      // if not supporting current mode, try 800x600 which is required by UEFI/EFI spec
+      //
+      Status = CheckModeSupported (
+                   Private->GraphicsOutput, 
+                   800, 
+                   600, 
+                   &ModeNumber
+                   );
     }
 
     if (EFI_ERROR (Status) || (ModeNumber == Private->GraphicsOutput->Mode->MaxMode)) {
@@ -368,30 +381,42 @@ GraphicsConsoleControllerDriverStart (
     }
   } else {
     //
-    // The console is build on top of UGA Draw Protocol
+    // At first try to set user-defined resolution
     //
     ColorDepth            = 32;
     RefreshRate           = 60;
     Status = Private->UgaDraw->SetMode (
                                 Private->UgaDraw,
-                                HorizontalResolution,
-                                VerticalResolution,
+                                CURRENT_HORIZONTAL_RESOLUTION,
+                                CURRENT_VERTICAL_RESOLUTION,
                                 ColorDepth,
                                 RefreshRate
                                 );
-    if (EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status)) {
+      HorizontalResolution = CURRENT_HORIZONTAL_RESOLUTION;
+      VerticalResolution   = CURRENT_VERTICAL_RESOLUTION;
+    } else {
       //
-      // Get the current mode information from the UGA Draw Protocol
+      // Try to set 800*600 which is required by UEFI/EFI spec
       //
-      Status = Private->UgaDraw->GetMode (
+      Status = Private->UgaDraw->SetMode (
                                   Private->UgaDraw,
-                                  &HorizontalResolution,
-                                  &VerticalResolution,
-                                  &ColorDepth,
-                                  &RefreshRate
+                                  HorizontalResolution,
+                                  VerticalResolution,
+                                  ColorDepth,
+                                  RefreshRate
                                   );
       if (EFI_ERROR (Status)) {
-        goto Error;
+        Status = Private->UgaDraw->GetMode (
+                                    Private->UgaDraw,
+                                    &HorizontalResolution,
+                                    &VerticalResolution,
+                                    &ColorDepth,
+                                    &RefreshRate
+                                    );
+        if (EFI_ERROR (Status)) {
+          goto Error;
+        }
       }
     }
   }
@@ -430,31 +455,47 @@ GraphicsConsoleControllerDriverStart (
     Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (50 * GLYPH_HEIGHT)) >> 1;
     MaxMode++;
   }
-  //
-  // If the graphics mode is 800x600, than add a text mode that uses the entire display
-  //
-  if (HorizontalResolution == 800 && VerticalResolution == 600) {
 
-    if (MaxMode < 2) {
-      Private->ModeData[MaxMode].Columns    = 0;
-      Private->ModeData[MaxMode].Rows       = 0;
-      Private->ModeData[MaxMode].GopWidth   = 800;
-      Private->ModeData[MaxMode].GopHeight  = 600;
-      Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-      Private->ModeData[MaxMode].DeltaX     = 0;
-      Private->ModeData[MaxMode].DeltaY     = 0;
-      MaxMode++;
-    }
-
-    Private->ModeData[MaxMode].Columns    = 800 / GLYPH_WIDTH;
-    Private->ModeData[MaxMode].Rows       = 600 / GLYPH_HEIGHT;
-    Private->ModeData[MaxMode].GopWidth   = 800;
-    Private->ModeData[MaxMode].GopHeight  = 600;
+  //
+  // If it is not to support Mode #1 - 80x50, then skip it
+  //
+  if (MaxMode < 2) {
+    Private->ModeData[MaxMode].Columns    = 0;
+    Private->ModeData[MaxMode].Rows       = 0;
+    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (800 % GLYPH_WIDTH) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (600 % GLYPH_HEIGHT) >> 1;
+    Private->ModeData[MaxMode].DeltaX     = 0;
+    Private->ModeData[MaxMode].DeltaY     = 0;
     MaxMode++;
   }
+  
+  //
+  // Add Mode #2 that must be 100x31 (graphic mode >= 800x600)
+  //
+  if (Columns >= 100 && Rows >= 31) {  
+    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
+    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (100 * GLYPH_WIDTH)) >> 1;
+    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (31 * GLYPH_HEIGHT)) >> 1;
+    MaxMode++;
+  }
+
+  //
+  // Add Mode #3 that uses the entire display for user-defined mode
+  //
+  if (HorizontalResolution > 800 && VerticalResolution > 600) {
+    Private->ModeData[MaxMode].Columns    = HorizontalResolution/GLYPH_WIDTH;
+    Private->ModeData[MaxMode].Rows       = VerticalResolution/GLYPH_HEIGHT;    
+    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
+    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution % GLYPH_WIDTH) >> 1;
+    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution % GLYPH_HEIGHT) >> 1;
+    MaxMode++;
+  }
+    
   //
   // Update the maximum number of modes
   //
@@ -585,6 +626,49 @@ GraphicsConsoleControllerDriverStop (
   }
 
   return Status;
+}
+
+EFI_STATUS
+CheckModeSupported (
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput,
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  OUT UINT32  *CurrentModeNumber
+  )
+{
+  UINT32     ModeNumber;
+  EFI_STATUS Status;
+  UINTN      SizeOfInfo;  
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+    
+  Status = EFI_SUCCESS;
+  
+  for (ModeNumber = 0; ModeNumber < GraphicsOutput->Mode->MaxMode; ModeNumber++) {
+    Status = GraphicsOutput->QueryMode (
+                       GraphicsOutput,
+                       ModeNumber,
+                       &SizeOfInfo,
+                       &Info
+                       );
+    if (!EFI_ERROR (Status)) {
+      if ((Info->HorizontalResolution == HorizontalResolution) &&
+          (Info->VerticalResolution == VerticalResolution)) {
+        Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
+        if (!EFI_ERROR (Status)) {
+          gBS->FreePool (Info);
+          break;
+        }
+      }
+      gBS->FreePool (Info);
+    }
+  }
+  
+  if (ModeNumber == GraphicsOutput->Mode->MaxMode) {
+    Status = EFI_UNSUPPORTED;
+  }
+  
+  *CurrentModeNumber = ModeNumber;
+  return Status; 
 }
 
 EFI_STATUS

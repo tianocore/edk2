@@ -63,7 +63,7 @@ InstallPlatformDriverOverrideProtocol (
   //
   if (!EFI_ERROR (Status)) {
     if (HandleBuffer != NULL) {
-      gBS->FreePool (HandleBuffer);
+      FreePool (HandleBuffer);
     }
     return EFI_ALREADY_STARTED;
   }
@@ -536,6 +536,92 @@ SaveOverridesMapping (
   return EFI_SUCCESS;
 }
 
+/**
+  Get the first Binding protocol which has the specific image handle
+
+  @param  Image          Image handle
+
+  @return Pointer into the Binding Protocol interface
+
+**/
+EFI_DRIVER_BINDING_PROTOCOL *
+EFIAPI
+GetBindingProtocolFromImageHandle (
+  IN  EFI_HANDLE   ImageHandle,
+  OUT EFI_HANDLE   *BindingHandle
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  UINTN                             DriverBindingHandleCount;
+  EFI_HANDLE                        *DriverBindingHandleBuffer;
+  EFI_DRIVER_BINDING_PROTOCOL       *DriverBindingInterface;
+
+  if (BindingHandle == NULL || ImageHandle == NULL) {
+    return NULL;
+  }
+  //
+  // Get all driver which support binding protocol in second page
+  //
+  DriverBindingHandleCount  = 0;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiDriverBindingProtocolGuid,
+                  NULL,
+                  &DriverBindingHandleCount,
+                  &DriverBindingHandleBuffer
+                  );
+  if (EFI_ERROR (Status) || (DriverBindingHandleCount == 0)) {
+    return NULL;
+  }
+
+  for (Index = 0; Index < DriverBindingHandleCount; Index++) {
+    DriverBindingInterface =NULL;
+    Status = gBS->OpenProtocol (
+                    DriverBindingHandleBuffer[Index],
+                    &gEfiDriverBindingProtocolGuid,
+                    (VOID **) &DriverBindingInterface,
+                    NULL,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if (DriverBindingInterface->ImageHandle == ImageHandle) {
+      *BindingHandle = DriverBindingHandleBuffer[Index];
+      FreePool (DriverBindingHandleBuffer);
+      return DriverBindingInterface;
+    }
+  }
+
+  FreePool (DriverBindingHandleBuffer);
+  *BindingHandle = NULL;
+  return NULL;
+}
+
+/**
+  return the current TPL, copied from the EDKII glue lib
+
+  @param  VOID
+
+  @return Current TPL
+
+**/
+EFI_TPL
+GetCurrentTpl (
+  VOID
+  )
+{
+  EFI_TPL                 Tpl;
+
+  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  gBS->RestoreTPL (Tpl);
+
+  return Tpl;
+}
+
 
 /**
   Retrieves the image handle of the platform override driver for a controller in the system from the memory mapping database.
@@ -582,6 +668,7 @@ GetDriverFromMapping (
   UINTN                       Index;
   EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
+  EFI_HANDLE                  DriverBindingHandle;
   BOOLEAN                     FoundLastReturned;
   PLATFORM_OVERRIDE_ITEM      *OverrideItem;
   DRIVER_IMAGE_INFO           *DriverImageInfo;
@@ -741,17 +828,26 @@ GetDriverFromMapping (
         }
 
         if (ImageFound) {
-          Status = gBS->HandleProtocol (
-                          ImageHandleBuffer[Index],
-                          &gEfiDriverBindingProtocolGuid,
-                          (VOID **) &DriverBinding
-                          );
-          ASSERT (!EFI_ERROR (Status));
+          //
+          // Find its related driver binding protocol
+          // Driver binding handle may be different with its driver's Image handle,
+          //
+          DriverBindingHandle = NULL;
+          DriverBinding = GetBindingProtocolFromImageHandle (
+                                      ImageHandleBuffer[Index],
+                                      &DriverBindingHandle
+                                      );
+          ASSERT (DriverBinding != NULL);
           DriverImageInfo->ImageHandle = ImageHandleBuffer[Index];
-        } else {
+        } else if (GetCurrentTpl() <= TPL_CALLBACK){
           //
           // The driver image has not been loaded and started, need try to load and start it now
           // Try to connect all device in the driver image path
+          //
+          // Note: LoadImage() and  StartImage() should be called under CALLBACK TPL in theory, but
+          // since many device need to be connected in  CALLBACK level environment( e.g. Usb devices )
+          // and the Fat and Patition driver can endure executing in CALLBACK level in fact, so here permit
+          // to use LoadImage() and  StartImage() in CALLBACK TPL.
           //
           Status = ConnectDevicePath (DriverImageInfo->DriverImagePath);
           //
@@ -774,12 +870,16 @@ GetDriverFromMapping (
                                                   &ImageHandle
                                                   );
             if (!EFI_ERROR (Status)) {
-              Status = gBS->HandleProtocol (
-                              ImageHandle,
-                              &gEfiDriverBindingProtocolGuid,
-                              (VOID **) &DriverBinding
-                              );
-              ASSERT (!EFI_ERROR (Status));
+              //
+              // Find its related driver binding protocol
+              // Driver binding handle may be different with its driver's Image handle
+              //
+              DriverBindingHandle = NULL;
+              DriverBinding = GetBindingProtocolFromImageHandle (
+                                          ImageHandle,
+                                          &DriverBindingHandle
+                                          );
+              ASSERT (DriverBinding != NULL);
               DriverImageInfo->ImageHandle = ImageHandle;
             }
           }
@@ -814,12 +914,16 @@ GetDriverFromMapping (
                 DriverImageInfo->UnStartable = TRUE;
                 DriverImageInfo->ImageHandle = NULL;
               } else {
-                Status = gBS->HandleProtocol (
-                                ImageHandle,
-                                &gEfiDriverBindingProtocolGuid,
-                                (VOID **) &DriverBinding
-                                );
-                ASSERT (!EFI_ERROR (Status));
+                //
+                // Find its related driver binding protocol
+                // Driver binding handle may be different with its driver's Image handle
+                //
+                DriverBindingHandle = NULL;
+                DriverBinding = GetBindingProtocolFromImageHandle (
+                                            ImageHandle,
+                                            &DriverBindingHandle
+                                            );
+                ASSERT (DriverBinding != NULL);
                 DriverImageInfo->ImageHandle = ImageHandle;
               }
             } else {

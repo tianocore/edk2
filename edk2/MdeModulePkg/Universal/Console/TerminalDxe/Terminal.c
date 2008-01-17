@@ -489,7 +489,29 @@ TerminalDriverBindingStart (
   //
   // Simple Text Output Protocol
   //
+  TerminalDevice->SimpleTextOutput.Reset              = TerminalConOutReset;
+  TerminalDevice->SimpleTextOutput.OutputString       = TerminalConOutOutputString;
+  TerminalDevice->SimpleTextOutput.TestString         = TerminalConOutTestString;
+  TerminalDevice->SimpleTextOutput.QueryMode          = TerminalConOutQueryMode;
+  TerminalDevice->SimpleTextOutput.SetMode            = TerminalConOutSetMode;
+  TerminalDevice->SimpleTextOutput.SetAttribute       = TerminalConOutSetAttribute;
+  TerminalDevice->SimpleTextOutput.ClearScreen        = TerminalConOutClearScreen;
+  TerminalDevice->SimpleTextOutput.SetCursorPosition  = TerminalConOutSetCursorPosition;
+  TerminalDevice->SimpleTextOutput.EnableCursor       = TerminalConOutEnableCursor;
   TerminalDevice->SimpleTextOutput.Mode               = &TerminalDevice->SimpleTextOutputMode;
+
+  TerminalDevice->SimpleTextOutputMode.MaxMode        = 2;
+  //
+  // For terminal devices, cursor is always visible
+  //
+  TerminalDevice->SimpleTextOutputMode.CursorVisible  = TRUE;
+  Status = TerminalDevice->SimpleTextOutput.SetAttribute (
+                                                      &TerminalDevice->SimpleTextOutput,
+                                                      EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK)
+                                                      );
+  if (EFI_ERROR (Status)) {
+    goto ReportError;
+  }
 
   Status = TerminalDevice->SimpleTextOutput.Reset (
                                               &TerminalDevice->SimpleTextOutput,
