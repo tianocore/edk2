@@ -42,6 +42,11 @@ Abstract:
 #undef VOID
 #undef DEBUG_EVENT
 
+// WQBugBug: This typedef is to make "windows.h" buildable.
+//                   It should be removed after the root cause why
+//                   size_t is undefined when go into the line below is found.
+typedef UINT32 size_t ;
+
 #include "windows.h"
 
 #undef GUID

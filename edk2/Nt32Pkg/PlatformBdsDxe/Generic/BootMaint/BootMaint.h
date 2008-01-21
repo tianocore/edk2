@@ -523,7 +523,7 @@ typedef struct {
   //
   // BMM main formset callback data.
   //
-  EFI_HII_HANDLE                BmmHiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE      BmmHiiHandle;
   EFI_HANDLE                    BmmCallbackHandle;
   EFI_FORM_CALLBACK_PROTOCOL    BmmDriverCallback;
   FORM_ID                       BmmCurrentPageId;
@@ -535,7 +535,7 @@ typedef struct {
   //
   // File explorer formset callback data.
   //
-  EFI_HII_HANDLE                FeHiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE      FeHiiHandle;
   EFI_HANDLE                    FeCallbackHandle;
   EFI_FORM_CALLBACK_PROTOCOL    FeDriverCallback;
   FILE_EXPLORER_STATE           FeCurrentState;
@@ -758,7 +758,7 @@ Var_ChangeBootOrder ();
 EFI_STATUS
 Var_UpdateDriverOption (
   IN  BMM_CALLBACK_DATA         *CallbackData,
-  IN  EFI_HII_HANDLE            HiiHandle,
+  IN  FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
   IN  UINT16                    *DescriptionData,
   IN  UINT16                    *OptionalData,
   IN  UINT8                     ForceReconnect
@@ -1017,7 +1017,7 @@ EfiDevicePathInstanceCount (
 EFI_STATUS
 CreateMenuStringToken (
   IN BMM_CALLBACK_DATA                *CallbackData,
-  IN EFI_HII_HANDLE                   HiiHandle,
+  IN FRAMEWORK_EFI_HII_HANDLE         HiiHandle,
   IN BM_MENU_OPTION                   *MenuOption
   );
 
@@ -1097,7 +1097,7 @@ EFIAPI
 FileExplorerCallback (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *Data,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *Data,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   );
 

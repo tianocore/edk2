@@ -421,23 +421,12 @@ Returns:
   UINT32                      HeaderSize;
   UINT32                      TotalSize;
   EFI_DATA_HUB_PROTOCOL       *DataHub;
-  EFI_HII_PROTOCOL            *Hii;
-  EFI_HII_HANDLE              StringHandle;
-  EFI_HII_PACKAGES            *PackageList;
-
+  EFI_HII_HANDLE              HiiHandle;
 
   //
   // Locate DataHub protocol.
   //
   Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  //
-  // Locate DataHub protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, &Hii);
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -456,10 +445,8 @@ Returns:
   //
   // Initialize strings to HII database
   //
-  PackageList = PreparePackages (1, &gEfiProcessorProducerGuid, CpuStrings);
-  Status      = Hii->NewPack (Hii, PackageList, &StringHandle);
-  ASSERT (!EFI_ERROR (Status));
-  FreePool (PackageList);
+  HiiLibAddPackagesToHiiDatabase (1, &gEfiProcessorProducerGuid, NULL, &HiiHandle, CpuStrings);
+  
 
   CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
 

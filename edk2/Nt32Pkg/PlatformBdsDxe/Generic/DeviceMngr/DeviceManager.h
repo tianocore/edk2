@@ -39,7 +39,7 @@ EFIAPI
 DeviceManagerCallbackRoutine (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *DataArray,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 ;

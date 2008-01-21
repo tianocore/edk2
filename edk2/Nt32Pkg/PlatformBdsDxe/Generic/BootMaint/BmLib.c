@@ -456,7 +456,7 @@ Returns:
 {
   EFI_STATUS        Status;
   UINT16            HandleBufferLength;
-  EFI_HII_HANDLE    *HiiHandleBuffer;
+  FRAMEWORK_EFI_HII_HANDLE    *HiiHandleBuffer;
   UINTN             StringBufferLength;
   UINTN             NumberOfHiiHandles;
   UINTN             Index;
@@ -488,7 +488,7 @@ Returns:
   //
   // Get the Hii Handle that matches the StructureNode->ProducerName
   //
-  NumberOfHiiHandles = HandleBufferLength / sizeof (EFI_HII_HANDLE);
+  NumberOfHiiHandles = HandleBufferLength / sizeof (FRAMEWORK_EFI_HII_HANDLE);
   for (Index = 0; Index < NumberOfHiiHandles; Index++) {
     Length = 0;
     Status = ExtractDataFromHiiHandle (

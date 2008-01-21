@@ -86,7 +86,7 @@ Returns:
         NewMenuEntry->DisplayStringToken,
         STR_NULL_STRING,
         STR_NULL_STRING,
-        EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+        FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
         (UINT16) (FILE_OPTION_OFFSET + Index),
         Location
         );
@@ -104,14 +104,14 @@ Returns:
         FormId,
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
-        EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+        FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
         (UINT16) (FILE_OPTION_OFFSET + Index),
         Location
         );
     }
 
     UpdateData->DataCount++;
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   }
 
   CallbackData->Hii->UpdateForm (
@@ -261,7 +261,7 @@ EFIAPI
 FileExplorerCallback (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *Data,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *Data,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++

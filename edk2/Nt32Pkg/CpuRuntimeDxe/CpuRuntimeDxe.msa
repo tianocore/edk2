@@ -63,9 +63,6 @@
       <ProtocolCName>gEfiWinNtIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
     </Protocol>
     <ProtocolNotify Usage="SOMETIMES_CONSUMED">

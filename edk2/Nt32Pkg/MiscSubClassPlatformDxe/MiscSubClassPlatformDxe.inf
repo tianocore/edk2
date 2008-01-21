@@ -69,7 +69,7 @@
   BaseMemoryLib
   UefiDriverEntryPoint
   UefiLib
-  FrameworkHiiLib
+  HiiLib
   DebugLib
   BaseLib
   PcdLib
@@ -83,12 +83,11 @@
 
 [Protocols]
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
-  gEfiHiiProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
 [Pcd.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize
 
 [Depex]
-  gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid
+  gEfiDataHubProtocolGuid
   

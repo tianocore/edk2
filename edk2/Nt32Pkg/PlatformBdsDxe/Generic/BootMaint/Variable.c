@@ -504,7 +504,7 @@ Var_UpdateErrorOutOption (
 EFI_STATUS
 Var_UpdateDriverOption (
   IN  BMM_CALLBACK_DATA         *CallbackData,
-  IN  EFI_HII_HANDLE            HiiHandle,
+  IN  FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
   IN  UINT16                    *DescriptionData,
   IN  UINT16                    *OptionalData,
   IN  UINT8                     ForceReconnect

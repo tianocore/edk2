@@ -164,6 +164,7 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
 INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
+#INF  Nt32Pkg/UefiPlatformBdsDxe/UefiPlatformBdsDxe.inf 
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
@@ -267,16 +268,6 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
      PE32      PE32                      |.efi
      UI       STRING="$(MODULE_NAME)" Optional         
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
-  }
-
-[Rule.Common.PEIM.TIANOCOMPRESSED]
-  FILE PEIM = $(NAMED_GUID) DEBUG_MYTOOLS_IA32 {
-    PEI_DEPEX PEI_DEPEX Optional         |.depex
-    GUIDED A31280AD-481E-41B6-95E8-127F4C984779 PROCESSING_REQUIRED = TRUE {
-      PE32      PE32                     |.efi
-      UI        STRING="$(MODULE_NAME)" Optional
-      VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-    }
   }
 
 [Rule.Common.DXE_CORE]
