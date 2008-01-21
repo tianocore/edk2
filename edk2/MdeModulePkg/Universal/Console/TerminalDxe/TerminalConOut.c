@@ -230,7 +230,7 @@ TerminalConOutOutputString (
   //
   Mode = This->Mode;
   
-  if (Mode->Mode > 1) {
+  if (Mode->Mode > 2) {
     return EFI_UNSUPPORTED;
   }
 
@@ -431,11 +431,11 @@ TerminalConOutQueryMode (
 /*++
   Routine Description:
   
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
+    Implements EFI_SIMPLE_TEXT_OUT_PROTOCOL.QueryMode().
     It returns information for an available text mode
     that the terminal supports.
-    In this driver, we only support text mode 80x25, which is
-    defined as mode 0.
+    In this driver, we support text mode 80x25 (mode 0),
+    80x50 (mode 1), 100x31 (mode 2).
         
   
   Arguments:
@@ -464,7 +464,7 @@ TerminalConOutQueryMode (
                 
 --*/
 {
-  if (This->Mode->MaxMode > 2) {
+  if (This->Mode->MaxMode > 3) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -475,6 +475,10 @@ TerminalConOutQueryMode (
   } else if (ModeNumber == 1) {  
     *Columns  = MODE1_COLUMN_COUNT;
     *Rows     = MODE1_ROW_COUNT;
+    return EFI_SUCCESS;
+  } else if (ModeNumber == 2) {
+    *Columns  = MODE2_COLUMN_COUNT;
+    *Rows     = MODE2_ROW_COUNT;
     return EFI_SUCCESS;
   }
 
@@ -523,7 +527,7 @@ TerminalConOutSetMode (
   //
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
-  if (ModeNumber > 1) {
+  if (ModeNumber > 2) {
     return EFI_UNSUPPORTED;
   }
   

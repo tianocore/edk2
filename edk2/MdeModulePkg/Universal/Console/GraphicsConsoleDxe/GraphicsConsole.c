@@ -1157,7 +1157,7 @@ GraphicsConsoleConOutQueryMode (
   GRAPHICS_CONSOLE_DEV  *Private;
   EFI_STATUS            Status;
   EFI_TPL               OldTpl;
-
+ 	
   if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
@@ -1280,10 +1280,10 @@ GraphicsConsoleConOutSetMode (
       goto Done;
     }
     //
-    // Otherwise, the size of the text console and/or the UGA mode will be changed,
-    // so turn off the cursor, and free the LineBuffer for the current mode
+    // Otherwise, the size of the text console and/or the GOP/UGA mode will be changed,
+    // so erase the cursor, and free the LineBuffer for the current mode
     //
-    This->EnableCursor (This, FALSE);
+    EraseCursor (This);
 
     FreePool (Private->LineBuffer);
   }
@@ -1377,7 +1377,6 @@ GraphicsConsoleConOutSetMode (
   // Move the text cursor to the upper left hand corner of the displat and enable it
   //
   This->SetCursorPosition (This, 0, 0);
-  This->EnableCursor (This, TRUE);
 
   Status = EFI_SUCCESS;
 
