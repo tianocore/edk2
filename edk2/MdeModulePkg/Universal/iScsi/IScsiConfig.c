@@ -22,6 +22,7 @@ Abstract:
 EFI_GUID        mVendorGuid             = ISCSI_CONFIG_GUID;
 BOOLEAN         mIScsiDeviceListUpdated = FALSE;
 UINTN           mNumberOfIScsiDevices   = 0;
+ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo;
 
 NET_LIST_ENTRY  mIScsiConfigFormList = {
   &mIScsiConfigFormList,
@@ -74,21 +75,9 @@ Returns:
 
 --*/
 {
-  EFI_FORM_BROWSER_PROTOCOL *FormBrowser;
-  EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
-  CHAR16                    Buffer[10];
 
-  Status = gBS->LocateProtocol (
-                  &gEfiFormBrowserProtocolGuid,
-                  NULL,
-                  (VOID **)&FormBrowser
-                  );
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-
-  FormBrowser->CreatePopUp (1, TRUE, 10, Buffer, &Key, Warning);
+  IfrLibCreatePopUp (1, &Key, Warning);
 }
 
 EFI_STATUS
@@ -335,42 +324,47 @@ Returns:
   IScsiAsciiStrToUnicodeStr (AuthConfigData->ReverseCHAPSecret, IfrNvData->ReverseCHAPSecret);
 }
 
+
 EFI_STATUS
 EFIAPI
-IScsiFormNvRead (
-  IN     EFI_FORM_CALLBACK_PROTOCOL    * This,
-  IN     CHAR16                        *VariableName,
-  IN     EFI_GUID                      * VendorGuid,
-  OUT    UINT32                        *Attributes OPTIONAL,
-  IN OUT UINTN                         *DataSize,
-  OUT    VOID                          *Buffer
+IScsiFormExtractConfig (
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN  CONST EFI_STRING                       Request,
+  OUT EFI_STRING                             *Progress,
+  OUT EFI_STRING                             *Results
   )
 /*++
 
-Routine Description:
+  Routine Description:
+    This function allows a caller to extract the current configuration for one
+    or more named elements from the target driver.
 
-  NV read function for the iSCSI form callback protocol.
+  Arguments:
+    This       - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+    Request    - A null-terminated Unicode string in <ConfigRequest> format.
+    Progress   - On return, points to a character in the Request string.
+                 Points to the string's null terminator if request was successful.
+                 Points to the most recent '&' before the first failing name/value
+                 pair (or the beginning of the string if the failure is in the
+                 first name/value pair) if the request was not successful.
+    Results    - A null-terminated Unicode string in <ConfigAltResp> format which
+                 has all values filled in for the names in the Request string.
+                 String to be allocated by the called function.
 
-Arguments:
-
-  This         - The EFI form callback protocol instance.
-  VariableName - Name of the variable to read.
-  VendorGuid   - Guid of the variable to read.
-  Attributes   - The storage to get the attributes of the variable.
-  DataSize     - The size of the buffer to store the variable.
-  Buffer       - The buffer to store the variable to read.
-
-Returns:
-
-  EFI_SUCCESS          - The variable is read.
-  EFI_BUFFER_TOO_SMALL - The buffer provided is too small to hold the variable.
+  Returns:
+    EFI_SUCCESS           - The Results is filled with the requested values.
+    EFI_OUT_OF_RESOURCES  - Not enough memory to store the results.
+    EFI_INVALID_PARAMETER - Request is NULL, illegal syntax, or unknown name.
+    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
 
 --*/
 {
-  EFI_STATUS              Status;
-  CHAR8                   InitiatorName[ISCSI_NAME_IFR_MAX_SIZE];
-  UINTN                   BufferSize;
-  ISCSI_CONFIG_IFR_NVDATA *IfrNvData;
+  EFI_STATUS                       Status;
+  CHAR8                            InitiatorName[ISCSI_NAME_IFR_MAX_SIZE];
+  UINTN                            BufferSize;
+  ISCSI_CONFIG_IFR_NVDATA          *IfrNvData;
+  ISCSI_FORM_CALLBACK_INFO         *Private;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
 
   if (!mIScsiDeviceListUpdated) {
     //
@@ -380,9 +374,14 @@ Returns:
     mIScsiDeviceListUpdated = TRUE;
   }
 
-  IfrNvData   = (ISCSI_CONFIG_IFR_NVDATA *) Buffer;
-  BufferSize  = ISCSI_NAME_IFR_MAX_SIZE;
+  Private = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
+  IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
+  ASSERT (IfrNvData != NULL);
+  if (Private->Current != NULL) {
+    IScsiConvertDeviceConfigDataToIfrNvData (Private->Current, IfrNvData);
+  }
 
+  BufferSize  = ISCSI_NAME_IFR_MAX_SIZE;
   Status      = gIScsiInitiatorName.Get (&gIScsiInitiatorName, &BufferSize, InitiatorName);
   if (EFI_ERROR (Status)) {
     IfrNvData->InitiatorName[0] = L'\0';
@@ -390,37 +389,82 @@ Returns:
     IScsiAsciiStrToUnicodeStr (InitiatorName, IfrNvData->InitiatorName);
   }
 
+  //
+  // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
+  //
+  HiiConfigRouting = Private->ConfigRouting;
+  BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
+  Status = HiiConfigRouting->BlockToConfig (
+                               HiiConfigRouting,
+                               Request,
+                               (UINT8 *) IfrNvData,
+                               BufferSize,
+                               Results,
+                               Progress
+                               );
+  NetFreePool (IfrNvData);
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+IScsiFormRouteConfig (
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN  CONST EFI_STRING                       Configuration,
+  OUT EFI_STRING                             *Progress
+  )
+/*++
+
+  Routine Description:
+    This function processes the results of changes in configuration.
+
+  Arguments:
+    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+    Configuration - A null-terminated Unicode string in <ConfigResp> format.
+    Progress      - A pointer to a string filled in with the offset of the most
+                    recent '&' before the first failing name/value pair (or the
+                    beginning of the string if the failure is in the first
+                    name/value pair) or the terminating NULL if all was successful.
+
+  Returns:
+    EFI_SUCCESS           - The Results is processed successfully.
+    EFI_INVALID_PARAMETER - Configuration is NULL.
+    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
+
+--*/
+{
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 EFIAPI
 IScsiFormCallback (
-  IN EFI_FORM_CALLBACK_PROTOCOL       *This,
-  IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *Data,
-  OUT EFI_HII_CALLBACK_PACKET         **Packet
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN  EFI_BROWSER_ACTION                     Action,
+  IN  EFI_QUESTION_ID                        KeyValue,
+  IN  UINT8                                  Type,
+  IN  EFI_IFR_TYPE_VALUE                     *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 /*++
 
-Routine Description:
+  Routine Description:
+    This function processes the results of changes in configuration.
 
-  The form callback function for iSCSI form callback protocol, it processes
-  the events tiggered in the UI and take some operations to update the form,
-  store the data, etc.
+  Arguments:
+    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+    Action        - Specifies the type of action taken by the browser.
+    QuestionId    - A unique value which is sent to the original exporting driver
+                    so that it can identify the type of data to expect.
+    Type          - The type of value for the question.
+    Value         - A pointer to the data being sent to the original exporting driver.
+    ActionRequest - On return, points to the action requested by the callback function.
 
-Arguments:
-
-  This     - The EFI form callback protocol instance.
-  KeyValue - A unique value which is sent to the original exporting driver so that it
-             can identify the type of data to expect.  The format of the data tends to
-             vary based on the op-code that geerated the callback.
-  Data     - A pointer to the data being sent to the original exporting driver.
-
-Returns:
-
-  EFI_SUCCESS           - The data is valid and the correspondance operation is done.
-  EFI_INVALID_PARAMETER - The data is invalid.
+  Returns:
+    EFI_SUCCESS          - The callback successfully handled the action.
+    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
+    EFI_DEVICE_ERROR     - The variable could not be saved.
+    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
 
 --*/
 {
@@ -440,8 +484,18 @@ Returns:
   EFI_STATUS                Status;
 
   Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
-  IfrNvData = (ISCSI_CONFIG_IFR_NVDATA *) Data->NvRamMap;
-  Status    = EFI_SUCCESS;
+
+  //
+  // Retrive uncommitted data from Browser
+  //
+  BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
+  IfrNvData = AllocateZeroPool (BufferSize);
+  ASSERT (IfrNvData != NULL);
+  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) IfrNvData);
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (IfrNvData);
+    return Status;
+  }
 
   switch (KeyValue) {
   case KEY_INITIATOR_NAME:
@@ -633,7 +687,7 @@ Returns:
           BufferSize,
           &Private->Current->AuthConfigData
           );
-
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
     break;
 
   default:
@@ -644,16 +698,9 @@ Returns:
       ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (KeyValue - KEY_DEVICE_ENTRY_BASE));
       ASSERT (ConfigFormEntry != NULL);
 
-      UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
+      UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
       DeviceFormTitleToken = (STRING_REF) STR_ISCSI_DEVICE_FORM_TITLE;
-
-      Private->Hii->NewString (
-                      Private->Hii,
-                      NULL,
-                      Private->RegisteredHandle,
-                      &DeviceFormTitleToken,
-                      PortString
-                      );
+      IfrLibSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString);
 
       IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
 
@@ -663,8 +710,18 @@ Returns:
     break;
   }
 
+  if (!EFI_ERROR (Status)) {
+    //
+    // Pass changed uncommitted data back to Form Browser
+    //
+    BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
+    Status = SetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
+  }
+
+  NetFreePool (IfrNvData);
   return Status;
 }
+
 
 EFI_STATUS
 IScsiConfigUpdateForm (
@@ -695,28 +752,13 @@ Returns:
   NET_LIST_ENTRY              *Entry;
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
   BOOLEAN                     EntryExisted;
-  EFI_HII_UPDATE_DATA         *UpdateData;
   EFI_STATUS                  Status;
-  EFI_FORM_CALLBACK_PROTOCOL  *Callback;
-  ISCSI_FORM_CALLBACK_INFO    *CallbackInfo;
+  EFI_HII_UPDATE_DATA         UpdateData;
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
   CHAR16                      PortString[128];
   UINT16                      FormIndex;
   UINTN                       BufferSize;
 
-  //
-  // Get the EFI_FORM_CALLBACK_PROTOCOL.
-  //
-  Status = gBS->HandleProtocol (
-                  DriverBindingHandle,
-                  &gEfiFormCallbackProtocolGuid,
-                  (VOID **)&Callback
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  CallbackInfo    = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (Callback);
 
   ConfigFormEntry = NULL;
   EntryExisted    = FALSE;
@@ -790,25 +832,13 @@ Returns:
       // Compose the Port string and create a new STRING_REF.
       //
       UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
-      CallbackInfo->Hii->NewString (
-                          CallbackInfo->Hii,
-                          NULL,
-                          CallbackInfo->RegisteredHandle,
-                          &ConfigFormEntry->PortTitleToken,
-                          PortString
-                          );
+      IfrLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleToken, PortString);
 
       //
       // Compose the help string of this port and create a new STRING_REF.
       //
       UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
-      CallbackInfo->Hii->NewString (
-                          CallbackInfo->Hii,
-                          NULL,
-                          CallbackInfo->RegisteredHandle,
-                          &ConfigFormEntry->PortTitleHelpToken,
-                          PortString
-                          );
+      IfrLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
 
       NetListInsertTail (&mIScsiConfigFormList, &ConfigFormEntry->Link);
       mNumberOfIScsiDevices++;
@@ -823,37 +853,11 @@ Returns:
   //
   // Allocate space for creation of Buffer
   //
-  UpdateData = (EFI_HII_UPDATE_DATA *) NetAllocatePool (0x1000);
-  NetZeroMem (UpdateData, 0x1000);
+  UpdateData.BufferSize = 0x1000;
+  UpdateData.Data = NetAllocateZeroPool (0x1000);
+  UpdateData.Offset = 0;
 
-  //
-  // Flag update pending in FormSet
-  //
-  UpdateData->FormSetUpdate = TRUE;
-
-  //
-  // Register CallbackHandle data for FormSet
-  //
-  UpdateData->FormCallbackHandle  = (EFI_PHYSICAL_ADDRESS) (UINTN) CallbackInfo->CallbackHandle;
-  UpdateData->FormUpdate          = FALSE;
-  UpdateData->FormTitle           = 0;
-
-  //
-  // first of all, remove all the forms.
-  //
-  UpdateData->DataCount = 0xFF;
-
-  CallbackInfo->Hii->UpdateForm (
-                      CallbackInfo->Hii,
-                      CallbackInfo->RegisteredHandle,
-                      (EFI_FORM_LABEL) DEVICE_ENTRY_LABEL,
-                      FALSE,
-                      UpdateData
-                      );
-
-  UpdateData->DataCount = 1;
-  FormIndex             = 0;
-
+  FormIndex = 0;
   NET_LIST_FOR_EACH (Entry, &mIScsiConfigFormList) {
     ConfigFormEntry = NET_LIST_USER_STRUCT (Entry, ISCSI_CONFIG_FORM_ENTRY, Link);
 
@@ -861,23 +865,24 @@ Returns:
       FORMID_DEVICE_FORM,
       ConfigFormEntry->PortTitleToken,
       ConfigFormEntry->PortTitleHelpToken,
-      EFI_IFR_FLAG_INTERACTIVE,
-      (UINT16) (KEY_DEVICE_ENTRY_BASE + FormIndex),
-      &UpdateData->Data
+      EFI_IFR_FLAG_CALLBACK,
+      KEY_DEVICE_ENTRY_BASE + FormIndex,
+      &UpdateData
       );
-
-    CallbackInfo->Hii->UpdateForm (
-                        CallbackInfo->Hii,
-                        CallbackInfo->RegisteredHandle,
-                        (EFI_FORM_LABEL) DEVICE_ENTRY_LABEL,
-                        TRUE,
-                        UpdateData
-                        );
 
     FormIndex++;
   }
 
-  NetFreePool (UpdateData);
+  IfrLibUpdateForm (
+    mCallbackInfo->RegisteredHandle,
+    &mVendorGuid,
+    FORMID_MAIN_FORM,
+    DEVICE_ENTRY_LABEL,
+    FALSE,
+    &UpdateData
+    );
+
+  NetFreePool (UpdateData.Data);
 
   return EFI_SUCCESS;
 }
@@ -903,17 +908,14 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                Status;
-  EFI_HII_PROTOCOL          *Hii;
-  EFI_HII_PACKAGES          *PackageList;
-  EFI_HII_HANDLE            HiiHandle;
-  EFI_HII_UPDATE_DATA       *UpdateData;
-  ISCSI_FORM_CALLBACK_INFO  *CallbackInfo;
-  EFI_GUID                  StringPackGuid = ISCSI_CONFIG_GUID;
+  EFI_STATUS                  Status;
+  EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
+  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
+  ISCSI_FORM_CALLBACK_INFO    *CallbackInfo;
 
-  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, (VOID **)&Hii);
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, &HiiDatabase);
   if (EFI_ERROR (Status)) {
-    return Status;;
+    return Status;
   }
 
   CallbackInfo = (ISCSI_FORM_CALLBACK_INFO *) NetAllocatePool (sizeof (ISCSI_FORM_CALLBACK_INFO));
@@ -922,59 +924,55 @@ Returns:
   }
 
   CallbackInfo->Signature             = ISCSI_FORM_CALLBACK_INFO_SIGNATURE;
-  CallbackInfo->Hii                   = Hii;
+  CallbackInfo->HiiDatabase = HiiDatabase;
   CallbackInfo->Current               = NULL;
 
-  CallbackInfo->FormCallback.NvRead   = IScsiFormNvRead;
-  CallbackInfo->FormCallback.NvWrite  = NULL;
-  CallbackInfo->FormCallback.Callback = IScsiFormCallback;
+  CallbackInfo->ConfigAccess.ExtractConfig = IScsiFormExtractConfig;
+  CallbackInfo->ConfigAccess.RouteConfig = IScsiFormRouteConfig;
+  CallbackInfo->ConfigAccess.Callback = IScsiFormCallback;
 
-  //
-  // Install protocol interface
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &DriverBindingHandle,
-                  &gEfiFormCallbackProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &CallbackInfo->FormCallback
-                  );
-
-  ASSERT_EFI_ERROR (Status);
-
-  CallbackInfo->CallbackHandle  = DriverBindingHandle;
-  PackageList                   = PreparePackages (2, &StringPackGuid, iSCSIStrings, IScsiConfigDxeBin);
-  Status                        = Hii->NewPack (Hii, PackageList, &HiiHandle);
-  NetFreePool (PackageList);
-
-  CallbackInfo->RegisteredHandle = HiiHandle;
-
-  //
-  // Allocate space for creation of Buffer
-  //
-  UpdateData = (EFI_HII_UPDATE_DATA *) NetAllocatePool (0x1000);
-  ASSERT (UpdateData != NULL);
-  if (UpdateData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, &CallbackInfo->ConfigRouting);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  NetZeroMem (UpdateData, 0x1000);
-
   //
-  // Flag update pending in FormSet
+  // Create driver handle used by HII database
   //
-  UpdateData->FormSetUpdate = TRUE;
-
+  Status = HiiLibCreateHiiDriverHandle (&CallbackInfo->DriverHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   //
-  // Register CallbackHandle data for FormSet
+  // Install Config Access protocol to driver handle
   //
-  UpdateData->FormCallbackHandle  = (EFI_PHYSICAL_ADDRESS) (UINTN) CallbackInfo->CallbackHandle;
-  UpdateData->FormUpdate          = FALSE;
-  UpdateData->FormTitle           = 0;
-  UpdateData->DataCount           = 0x1;
+  Status = gBS->InstallProtocolInterface (
+                  &CallbackInfo->DriverHandle,
+                  &gEfiHiiConfigAccessProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &CallbackInfo->ConfigAccess
+                  );
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // Publish our HII data
+  //
+  PackageList = PreparePackageList (2, &mVendorGuid, iSCSIStrings, IScsiConfigDxeBin);
+  ASSERT (PackageList != NULL);
+  
+  Status = HiiDatabase->NewPackageList (
+                           HiiDatabase,
+                           PackageList,
+                           CallbackInfo->DriverHandle,
+                           &CallbackInfo->RegisteredHandle
+                           );
+  NetFreePool (PackageList);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  Hii->UpdateForm (Hii, HiiHandle, (EFI_FORM_LABEL) 0x1000, TRUE, UpdateData);
-
-  NetFreePool (UpdateData);
+  mCallbackInfo = CallbackInfo;
 
   return Status;
 }
@@ -1003,11 +1001,6 @@ Returns:
 --*/
 {
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
-  EFI_STATUS                  Status;
-  EFI_HII_PROTOCOL            *Hii;
-  EFI_HII_UPDATE_DATA         *UpdateData;
-  EFI_FORM_CALLBACK_PROTOCOL  *FormCallback;
-  ISCSI_FORM_CALLBACK_INFO    *CallbackInfo;
 
   while (!NetListIsEmpty (&mIScsiConfigFormList)) {
     //
@@ -1021,54 +1014,25 @@ Returns:
     IScsiConfigUpdateForm (DriverBindingHandle, ConfigFormEntry->Controller, FALSE);
   }
 
-  Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, (VOID **)&Hii);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->HandleProtocol (DriverBindingHandle, &gEfiFormCallbackProtocolGuid, (VOID **)&FormCallback);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  CallbackInfo = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (FormCallback);
+  //
+  // Remove HII package list
+  //
+  mCallbackInfo->HiiDatabase->RemovePackageList (
+                                mCallbackInfo->HiiDatabase,
+                                mCallbackInfo->RegisteredHandle
+                                );
 
   //
-  // remove the form.
-  //
-  UpdateData = (EFI_HII_UPDATE_DATA *) NetAllocatePool (0x1000);
-  ASSERT (UpdateData != NULL);
-  if (UpdateData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  NetZeroMem (UpdateData, 0x1000);
-
-  UpdateData->FormSetUpdate       = FALSE;
-  UpdateData->FormCallbackHandle  = 0;
-  UpdateData->FormUpdate          = FALSE;
-  UpdateData->FormTitle           = 0;
-  UpdateData->DataCount           = 0xFF;
-
-  Hii->UpdateForm (Hii, CallbackInfo->RegisteredHandle, (EFI_FORM_LABEL) 0x1000, FALSE, UpdateData);
-
-  NetFreePool (UpdateData);
-
-  //
-  // Uninstall the EFI_FORM_CALLBACK_PROTOCOL.
+  // Uninstall EFI_HII_CONFIG_ACCESS_PROTOCOL
   //
   gBS->UninstallProtocolInterface (
-        DriverBindingHandle,
-        &gEfiFormCallbackProtocolGuid,
-        FormCallback
+        mCallbackInfo->DriverHandle,
+        &gEfiHiiConfigAccessProtocolGuid,
+        &mCallbackInfo->ConfigAccess
         );
+  HiiLibDestroyHiiDriverHandle (mCallbackInfo->DriverHandle);
 
-  //
-  // Remove the package.
-  //
-  Hii->RemovePack (Hii, CallbackInfo->RegisteredHandle);
-
-  NetFreePool (CallbackInfo);
+  NetFreePool (mCallbackInfo);
 
   return EFI_SUCCESS;
 }

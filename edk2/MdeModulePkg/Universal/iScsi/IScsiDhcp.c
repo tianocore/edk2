@@ -230,9 +230,9 @@ Returns:
 
   Status      = This->Parse (This, Packet, &OptionCount, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
-    return EFI_NOT_READY;
+    return EFI_NOT_READY;
   }
-  
+
   OptionList = NetAllocatePool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
   if (OptionList == NULL) {
     return EFI_NOT_READY;
@@ -437,7 +437,7 @@ Returns:
   // Ask the server to reply with Netmask, Router, DNS and RootPath options.
   //
   ParaList->OpCode  = DHCP4_TAG_PARA_LIST;
-  ParaList->Length  = (UINT8)(ConfigData->NvData.TargetInfoFromDhcp ? 4 : 3);
+  ParaList->Length  = ConfigData->NvData.TargetInfoFromDhcp ? 4 : 3;
   ParaList->Data[0] = DHCP4_TAG_NETMASK;
   ParaList->Data[1] = DHCP4_TAG_ROUTER;
   ParaList->Data[2] = DHCP4_TAG_DNS;

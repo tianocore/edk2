@@ -77,8 +77,8 @@
   DevicePathLib
   DebugLib
   PrintLib
-  FrameworkHiiLib
-  FrameworkIfrSupportLib
+  HiiLib
+  IfrSupportLib
   NetLib
 
 [Protocols]
@@ -88,8 +88,8 @@
   gEfiExtScsiPassThruProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiTcp4ServiceBindingProtocolGuid
-  gEfiFormCallbackProtocolGuid
-  gEfiFormBrowserProtocolGuid
+  gEfiHiiDatabaseProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
   gEfiPciIoProtocolGuid
   gEfiAcpiSupportProtocolGuid
   gEfiDhcp4ProtocolGuid

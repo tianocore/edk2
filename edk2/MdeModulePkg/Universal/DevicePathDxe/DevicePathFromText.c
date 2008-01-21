@@ -2359,14 +2359,14 @@ DevPathFromTextSata (
                                 MSG_SATA_DP,
                                 sizeof (SATA_DEVICE_PATH)
                                 );
-  Sata->HbaPortNumber = (UINT16) Xtoi (Param1);
+  Sata->HBAPortNumber = (UINT16) Xtoi (Param1);
   if (Param3 != NULL) {
-    Sata->PortMultiplierPort = (UINT16) Xtoi (Param2);
+    Sata->PortMultiplierPortNumber = (UINT16) Xtoi (Param2);
     Param2                   = Param3;
   } else {
-    Sata->PortMultiplierPort = 0;
+    Sata->PortMultiplierPortNumber = 0;
   }
-  Sata->LogicalUnitNumber = (UINT16) Xtoi (Param2);
+  Sata->Lun = (UINT16) Xtoi (Param2);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Sata;
 }

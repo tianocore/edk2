@@ -167,7 +167,7 @@ Returns:
     Len++;
   }
 
-  return (UINT8)(32 - Len);
+  return 32 - Len;
 }
 
 EFI_STATUS
@@ -196,7 +196,6 @@ Returns:
   UINT32  Index;
   CHAR8   *LunUnitStr[4];
   CHAR8   Digit;
-  UINTN   Temp;
 
   NetZeroMem (Lun, 8);
   NetZeroMem (LunUnitStr, sizeof (LunUnitStr));
@@ -204,7 +203,7 @@ Returns:
   Index         = 0;
   LunUnitStr[0] = Str;
 
-  if (!IsHexDigit ((UINT8 *)&Digit, *Str)) {
+  if (!IsHexDigit (&Digit, *Str)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -220,13 +219,13 @@ Returns:
       Index++;
 
       if (*(Str + 1) != '\0') {
-        if (!IsHexDigit ((UINT8 *)&Digit, *(Str + 1))) {
+        if (!IsHexDigit (&Digit, *(Str + 1))) {
           return EFI_INVALID_PARAMETER;
         }
 
         LunUnitStr[Index] = Str + 1;
       }
-    } else if (!IsHexDigit ((UINT8 *)&Digit, *Str)) {
+    } else if (!IsHexDigit (&Digit, *Str)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -238,8 +237,7 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }
 
-    Temp = AsciiStrHexToUintn (LunUnitStr[Index]);
-    *((UINT16 *) &Lun[Index * 2]) = HTONS (Temp);
+    *((UINT16 *) &Lun[Index * 2]) = HTONS (AsciiStrHexToUintn (LunUnitStr[Index]));
   }
 
   return EFI_SUCCESS;
@@ -472,7 +470,7 @@ Returns:
   UINT32  Index;
 
   for (Index = 0; Index < Len; Index++) {
-    Str[3 * Index]      = NibbleToHexChar ((UINT8)(Mac->Addr[Index] >> 4));
+    Str[3 * Index]      = NibbleToHexChar (Mac->Addr[Index] >> 4);
     Str[3 * Index + 1]  = NibbleToHexChar (Mac->Addr[Index]);
     Str[3 * Index + 2]  = L'-';
   }
@@ -602,7 +600,7 @@ Returns:
     } else {
       Byte = BinBuffer[*BinLength - 1 - Index / 2];
       Byte &= 0x0F;
-      Byte = (UINT8)(Byte | (Digit << 4));
+      Byte |= Digit << 4;
     }
 
     BinBuffer[*BinLength - 1 - Index / 2] = Byte;
@@ -811,7 +809,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   Private->Controller,
                   &gEfiSimpleNetworkProtocolGuid,
-                  (void **)&Snp
+                  &Snp
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -907,7 +905,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   Tcp4Io->Handle,
                   &gEfiDevicePathProtocolGuid,
-                  (void **)&DevicePath
+                  &DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return NULL;
@@ -925,7 +923,7 @@ Returns:
         ) {
 
       DPathNode->Ipv4.LocalPort       = 0;
-      DPathNode->Ipv4.StaticIpAddress = (BOOLEAN)(!Session->ConfigData.NvData.InitiatorInfoFromDhcp);
+      DPathNode->Ipv4.StaticIpAddress = !Session->ConfigData.NvData.InitiatorInfoFromDhcp;
       break;
     }
 

@@ -830,9 +830,9 @@ DevPathToTextSata (
   CatPrint (
     Str,
     L"Sata(0x%x,0x%x,0x%x)",
-    (UINTN) Sata->HbaPortNumber,
-    (UINTN) Sata->PortMultiplierPort,
-    (UINTN) Sata->LogicalUnitNumber
+    (UINTN) Sata->HBAPortNumber,
+    (UINTN) Sata->PortMultiplierPortNumber,
+    (UINTN) Sata->Lun
     );
 }
 

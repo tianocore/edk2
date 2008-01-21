@@ -35,8 +35,6 @@
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  FrameworkIfrSupportLib|IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
-
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PostCodeLib|MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
@@ -64,14 +62,24 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
+  HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
   UsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  GraphicsLib|MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
+  IfrSupportLib|MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf
+  PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
+  GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf  
+  GraphicsLib|MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
+  IfrSupportLib|MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf
+  PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
+  GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf  
   PlatDriOverLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
 
 [LibraryClasses.IA32]
@@ -261,9 +269,16 @@
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 
+  MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
+
+  MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
+
   MdeModulePkg/Universal/iScsi/IScsi.inf
 
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf 
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
   MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
   MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
@@ -317,6 +332,10 @@
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
 
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+
 [Components.IA32]
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -324,6 +343,7 @@
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
+  MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
 
 [Components.X64]
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
