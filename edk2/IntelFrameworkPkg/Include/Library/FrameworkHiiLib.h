@@ -14,10 +14,16 @@
 
 **/
 
-#ifndef __HII_LIB_H__
-#define __HII_LIB_H__
+#ifndef __FRAMEWORK_HII_LIB_H__
+#define __FRAMEWORK_HII_LIB_H__
+
+#include <FrameworkDxe.h>
 
 #include <Protocol/FrameworkHii.h>
+//
+// FrameworkHiiLib will produce HiiLib library class too.
+//
+#include <Library/HiiLib.h>
 
 /**
   This function allocates pool for an EFI_HII_PACKAGES structure
@@ -40,7 +46,5 @@ PreparePackages (
   ...
   )
 ;
-
-
 
 #endif

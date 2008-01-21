@@ -24,4 +24,6 @@
 
 #include <Framework/DxeCis.h>
 
+#include <Framework/FrameworkInternalFormRepresentation.h>
+
 #endif

@@ -43,7 +43,7 @@ typedef struct {
 typedef struct {
   EFI_HII_IFR_PACK    *IfrData;
   EFI_HII_STRING_PACK *StringData;
-} EFI_IFR_PACKET;
+} FRAMEWORK_EFI_IFR_PACKET;
 
 typedef struct {
   UINTN LeftColumn;
@@ -94,9 +94,9 @@ EFI_STATUS
 (EFIAPI *EFI_SEND_FORM) (
   IN  EFI_FORM_BROWSER_PROTOCOL       *This,
   IN  BOOLEAN                         UseDatabase,
-  IN  EFI_HII_HANDLE                  *Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
   IN  UINTN                           HandleCount,
-  IN  EFI_IFR_PACKET                  *Packet, OPTIONAL
+  IN  FRAMEWORK_EFI_IFR_PACKET                  *Packet, OPTIONAL
   IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
   IN  UINT8                           *NvMapOverride, OPTIONAL
   IN EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
