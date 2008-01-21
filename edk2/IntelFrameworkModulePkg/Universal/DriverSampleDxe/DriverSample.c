@@ -33,7 +33,7 @@ EFIAPI
 DriverCallback (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *Data,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *Data,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++
@@ -260,14 +260,14 @@ Returns:
       &UpdateData->Data                                 // Buffer location to place op-codes
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) &UpdateData->Data)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) &UpdateData->Data)->Length;
 
     CreateCheckBoxOpCode (
       QuestionId,                                       // Question ID
       1,                                                // Data width (BOOLEAN = 1)
       (UINT16) STRING_TOKEN (STR_CHECK_DYNAMIC_PROMPT), // Token value for the Prompt
       (UINT16) STRING_TOKEN (STR_CHECK_DYNAMIC_HELP),   // Token value for the Help
-      EFI_IFR_FLAG_INTERACTIVE,                         // Flags
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE,                         // Flags
       0x1236,   // Key
       Location  // Buffer location to place op-codes
       );
@@ -375,7 +375,7 @@ Returns:
 
     DataPacket->DataArray.EntryCount  = 1;
     DataPacket->DataArray.NvRamMap    = NULL;
-    ((EFI_IFR_DATA_ENTRY *) (&DataPacket->DataArray + 1))->Flags = EXIT_REQUIRED;
+    ((FRAMEWORK_EFI_IFR_DATA_ENTRY *) (&DataPacket->DataArray + 1))->Flags = EXIT_REQUIRED;
     break;
 
   case 0x1555:
@@ -437,7 +437,7 @@ DriverSampleInit (
   //  EFI_FORM_BROWSER_PROTOCOL       *FormConfig;
   //
   EFI_HII_PACKAGES    *PackageList;
-  EFI_HII_HANDLE      HiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE       HiiHandle;
   STRING_REF          TokenToUpdate;
   STRING_REF          TokenToUpdate2;
   STRING_REF          TokenToUpdate3;

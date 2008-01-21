@@ -80,7 +80,7 @@ typedef struct {
 
   UINTN           IfrNumber;
   VOID            *FormBinary;
-  EFI_HII_HANDLE  Handle;
+  FRAMEWORK_EFI_HII_HANDLE   Handle;
   EFI_TAG         *Tags;
   UINTN           TagIndex;
   EFI_TAG         *ThisTag;
@@ -167,7 +167,7 @@ UiFreeMenu (
 VOID
 UiAddMenuOption (
   IN CHAR16         *String,
-  IN EFI_HII_HANDLE Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE  Handle,
   IN EFI_TAG        *Tag,
   IN VOID           *FormBinary,
   IN UINTN          IfrNumber
@@ -177,7 +177,7 @@ UiAddMenuOption (
 VOID
 UiAddSubMenuOption (
   IN CHAR16           *String,
-  IN EFI_HII_HANDLE   Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE    Handle,
   IN EFI_TAG          *Tag,
   IN UINTN            TagIndex,
   IN UINT16           FormId,
@@ -189,7 +189,7 @@ UI_MENU_OPTION      *
 UiDisplayMenu (
   IN  BOOLEAN                      SubMenu,
   IN  EFI_FILE_FORM_TAGS           *FileFormTagsHead,
-  OUT EFI_IFR_DATA_ARRAY           *PageData
+  OUT FRAMEWORK_EFI_IFR_DATA_ARRAY           *PageData
   )
 ;
 
@@ -245,7 +245,7 @@ ReadPassword (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     PromptForPassword,
   IN  EFI_TAG                     *Tag,
-  IN  EFI_IFR_DATA_ARRAY          *PageData,
+  IN  FRAMEWORK_EFI_IFR_DATA_ARRAY          *PageData,
   IN  BOOLEAN                     SecondEntry,
   IN  EFI_FILE_FORM_TAGS          *FileFormTags,
   OUT CHAR16                      *StringPtr
@@ -302,7 +302,7 @@ ProcessOptions (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected,
   IN  EFI_FILE_FORM_TAGS          *FileFormTagsHead,
-  IN  EFI_IFR_DATA_ARRAY          *PageData,
+  IN  FRAMEWORK_EFI_IFR_DATA_ARRAY          *PageData,
   OUT CHAR16                      **OptionString
   )
 ;
@@ -368,7 +368,7 @@ GetLineByWidth (
 UINT16
 GetWidth (
   IN EFI_TAG                          *Tag,
-  IN EFI_HII_HANDLE                   Handle
+  IN FRAMEWORK_EFI_HII_HANDLE         Handle
   )
 ;
 

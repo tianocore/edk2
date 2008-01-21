@@ -21,7 +21,7 @@ EFIAPI
 HiiGetKeyboardLayout (
   IN     EFI_HII_PROTOCOL   *This,
   OUT    UINT16             *DescriptorCount,
-  OUT    EFI_KEY_DESCRIPTOR *Descriptor
+  OUT    FRAMEWORK_EFI_KEY_DESCRIPTOR *Descriptor
   )
 /*++
 

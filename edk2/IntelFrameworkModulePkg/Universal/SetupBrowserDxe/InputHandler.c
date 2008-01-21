@@ -195,7 +195,7 @@ ReadPassword (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     PromptForPassword,
   IN  EFI_TAG                     *Tag,
-  IN  EFI_IFR_DATA_ARRAY          *PageData,
+  IN  FRAMEWORK_EFI_IFR_DATA_ARRAY          *PageData,
   IN  BOOLEAN                     SecondEntry,
   IN  EFI_FILE_FORM_TAGS          *FileFormTags,
   OUT CHAR16                      *StringPtr
@@ -219,7 +219,7 @@ ReadPassword (
   EFI_VARIABLE_DEFINITION     *VariableDefinition;
   UINTN                       DimensionsWidth;
   UINTN                       DimensionsHeight;
-  EFI_IFR_DATA_ENTRY          *DataEntry;
+  FRAMEWORK_EFI_IFR_DATA_ENTRY          *DataEntry;
   UINTN                       WidthOfString;
 
   DimensionsWidth       = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
@@ -252,12 +252,12 @@ ReadPassword (
   ASSERT (TempString);
   ASSERT (TempString2);
 
-  if (Tag->Flags & EFI_IFR_FLAG_INTERACTIVE) {
+  if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
     //
     // Password requires a callback to determine if a password exists
     //
-    DataEntry = (EFI_IFR_DATA_ENTRY *) (PageData + 1);
-    DataEntry->OpCode  = EFI_IFR_PASSWORD_OP;
+    DataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (PageData + 1);
+    DataEntry->OpCode  = FRAMEWORK_EFI_IFR_PASSWORD_OP;
     DataEntry->Length  = 3;
 
     ExtractRequestedNvMap (FileFormTags, Tag->VariableNumber, &VariableDefinition);
@@ -347,12 +347,12 @@ Error:
         break;
 
       case CHAR_CARRIAGE_RETURN:
-        if (Tag->Flags & EFI_IFR_FLAG_INTERACTIVE) {
+        if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
           //
           // User just typed a string in
           //
-          DataEntry = (EFI_IFR_DATA_ENTRY *) (PageData + 1);
-          DataEntry->OpCode = EFI_IFR_PASSWORD_OP;
+          DataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (PageData + 1);
+          DataEntry->OpCode = FRAMEWORK_EFI_IFR_PASSWORD_OP;
 
           //
           // If the user just typed in a password, Data = 1
@@ -371,7 +371,7 @@ Error:
                                       );
             }
 
-            DataEntry->Length  = sizeof (EFI_IFR_DATA_ENTRY);
+            DataEntry->Length  = sizeof (FRAMEWORK_EFI_IFR_DATA_ENTRY);
             DataEntry->Data    = (VOID *) TempString;
           } else {
             DataEntry->Length  = 3;
@@ -386,7 +386,7 @@ Error:
                                       );
             }
 
-            DataEntry->Length  = sizeof (EFI_IFR_DATA_ENTRY);
+            DataEntry->Length  = sizeof (FRAMEWORK_EFI_IFR_DATA_ENTRY);
             DataEntry->Data    = (VOID *) TempString2;
           }
 
@@ -661,7 +661,7 @@ Returns:
   if (ManualInput) {
     PrintAt (Column, Row, (CHAR16 *) L"[     ]");
     Column++;
-    if (Tag->Operand != EFI_IFR_TIME_OP) {
+    if (Tag->Operand != FRAMEWORK_EFI_IFR_TIME_OP) {
       *Value = BackupValue;
     }
   }
@@ -683,7 +683,7 @@ TheKey2:
     switch (Key.UnicodeChar) {
     case '+':
     case '-':
-      if ((Tag->Operand == EFI_IFR_DATE_OP) || (Tag->Operand == EFI_IFR_TIME_OP)) {
+      if ((Tag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (Tag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
         Key.UnicodeChar = CHAR_NULL;
         if (Key.UnicodeChar == '+') {
           Key.ScanCode = SCAN_RIGHT;
@@ -699,7 +699,7 @@ TheKey2:
       switch (Key.ScanCode) {
       case SCAN_LEFT:
       case SCAN_RIGHT:
-        if ((Tag->Operand == EFI_IFR_DATE_OP) || (Tag->Operand == EFI_IFR_TIME_OP)) {
+        if ((Tag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (Tag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
           //
           // By setting this value, we will return back to the caller.
           // We need to do this since an auto-refresh will destroy the adjustment
@@ -734,7 +734,7 @@ TheKey2:
           Number = (UINT16) GetStringWidth (FormattedNumber);
 
           gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
-          if ((Tag->Operand == EFI_IFR_DATE_OP) || (Tag->Operand == EFI_IFR_TIME_OP)) {
+          if ((Tag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (Tag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
             for (Loop = 0; Loop < (UINTN) ((Number >= 8) ? 4 : 2); Loop++) {
               PrintAt (MenuOption->OptCol + Loop, MenuOption->Row, (CHAR16 *) L" ");
             }
@@ -847,7 +847,7 @@ EnterCarriageReturn:
       // if two questions are bound by consistency checks and each only has two possible choices, there
       // would be no way for a user to switch the values.  Thus we require late checking.
       //
-      if (Tag->Flags & EFI_IFR_FLAG_LATE_CHECK) {
+      if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_LATE_CHECK) {
         CopyMem (&Tag->OldValue, &BackupValue, Tag->StorageWidth);
       } else {
         //
@@ -1015,7 +1015,7 @@ GetSelectionInputPopUp (
   ShowDownArrow     = FALSE;
   ShowUpArrow       = FALSE;
 
-  if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+  if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
     ValueArrayBackup = AllocateZeroPool (Tag->StorageWidth);
     ASSERT (ValueArrayBackup != NULL);
     CopyMem (ValueArrayBackup, ValueArray, ValueCount);
@@ -1045,8 +1045,8 @@ GetSelectionInputPopUp (
   //
   // Get the number of one of options present and its size
   //
-  for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP; Index++) {
-    if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP &&
+  for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP; Index++) {
+    if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP &&
         !MenuOption->Tags[Index].Suppress) {
       if (!FirstOptionFoundFlag) {
         FirstOptionFoundFlag  = TRUE;
@@ -1060,7 +1060,7 @@ GetSelectionInputPopUp (
       //
       if (Initialized) {
         for (ValueBackup = (UINT8) MenuOption->TagIndex;
-             MenuOption->Tags[ValueBackup].Operand != EFI_IFR_END_OP;
+             MenuOption->Tags[ValueBackup].Operand != FRAMEWORK_EFI_IFR_END_OP;
              ValueBackup++
             ) {
           if (MenuOption->Tags[ValueBackup].Value == ((UINT8 *) ValueArrayBackup)[Index - MenuOption->TagIndex - 1]) {
@@ -1123,9 +1123,9 @@ GetSelectionInputPopUp (
           break;
         }
 
-        if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+        if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
           for (ValueBackup = (UINT8) MenuOption->TagIndex;
-               MenuOption->Tags[ValueBackup].Operand != EFI_IFR_END_ONE_OF_OP;
+               MenuOption->Tags[ValueBackup].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
                ValueBackup++
               ) {
             //
@@ -1190,14 +1190,14 @@ GetSelectionInputPopUp (
     //
     Index2 = Top + 1;
     for (Index = MenuOption->TagIndex + TopOptionIndex;
-         (MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP) && (Index2 < Bottom);
+         (MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) && (Index2 < Bottom);
          Index++
         ) {
-      if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+      if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
         Token = MenuOption->Tags[Index].Text;
         if (Initialized) {
           for (ValueBackup = (UINT8) MenuOption->TagIndex;
-               MenuOption->Tags[ValueBackup].Operand != EFI_IFR_END_ONE_OF_OP;
+               MenuOption->Tags[ValueBackup].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
                ValueBackup++
               ) {
             if (MenuOption->Tags[ValueBackup].Value == ((UINT8 *) ValueArrayBackup)[Index - MenuOption->TagIndex - 1]) {
@@ -1282,7 +1282,7 @@ GetSelectionInputPopUp (
     }
 
     if (!KeyInitialized) {
-      if (MenuOption->ThisTag->Operand == EFI_IFR_ONE_OF_OP) {
+      if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_ONE_OF_OP) {
         *KeyValue = MenuOption->Tags[MenuOption->TagIndex + 1].Key;
       } else {
         *KeyValue = MenuOption->ThisTag->Key;
@@ -1301,7 +1301,7 @@ TheKey:
       // If an ordered list op-code, we will allow for a popup of +/- keys
       // to create an ordered list of items
       //
-      if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+      if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         if (Key.UnicodeChar == '+') {
           if ((TopOptionIndex > 1) && (HighlightPosition == (Top + 1))) {
             //
@@ -1329,10 +1329,10 @@ TheKey:
         }
 
         for (Index = MenuOption->TagIndex + TopOptionIndex;
-             MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP;
+             MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
              Index++
             ) {
-          if (MenuOption->Tags[Index].Operand == EFI_IFR_ORDERED_LIST_OP) {
+          if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
             continue;
           }
 
@@ -1348,7 +1348,7 @@ TheKey:
             //
             // Is this prior tag a valid choice?  If not, bail out
             //
-            if (MenuOption->Tags[TempIndex].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+            if (MenuOption->Tags[TempIndex].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
               //
               // Copy the destination tag to the local variable
               //
@@ -1434,10 +1434,10 @@ TheKey:
         }
 
         for (Index = MenuOption->TagIndex + TopOptionIndex;
-             MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP;
+             MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
              Index++
             ) {
-          if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+          if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
             if (Initialized) {
               for (Index = 0; (ValueArrayBackup[Index] != TempValue) && (Index < ValueCount); Index++)
                 ;
@@ -1466,11 +1466,11 @@ TheKey:
                 //
                 // Keep going until meets meaningful tag.
                 //
-                while ((MenuOption->Tags[TempIndex].Operand != EFI_IFR_ONE_OF_OPTION_OP  &&
-                         MenuOption->Tags[TempIndex].Operand != EFI_IFR_ONE_OF_OP        &&
-                         MenuOption->Tags[TempIndex].Operand != EFI_IFR_END_ONE_OF_OP)
+                while ((MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP  &&
+                         MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_ONE_OF_OP        &&
+                         MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP)
                        ||
-                       (MenuOption->Tags[TempIndex].Operand == EFI_IFR_ONE_OF_OPTION_OP  &&
+                       (MenuOption->Tags[TempIndex].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP  &&
                          (MenuOption->Tags[TempIndex].Suppress || MenuOption->Tags[TempIndex].GrayOut))) {
                   TempIndex--;
                 }
@@ -1480,11 +1480,11 @@ TheKey:
                 //
                 // Keep going until meets meaningful tag.
                 //
-                while ((MenuOption->Tags[TempIndex].Operand != EFI_IFR_ONE_OF_OPTION_OP  &&
-                         MenuOption->Tags[TempIndex].Operand != EFI_IFR_ONE_OF_OP        &&
-                         MenuOption->Tags[TempIndex].Operand != EFI_IFR_END_ONE_OF_OP)
+                while ((MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP  &&
+                         MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_ONE_OF_OP        &&
+                         MenuOption->Tags[TempIndex].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP)
                        ||
-                       (MenuOption->Tags[TempIndex].Operand == EFI_IFR_ONE_OF_OPTION_OP  &&
+                       (MenuOption->Tags[TempIndex].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP  &&
                          (MenuOption->Tags[TempIndex].Suppress || MenuOption->Tags[TempIndex].GrayOut))) {
                   TempIndex++;
                 }
@@ -1496,7 +1496,7 @@ TheKey:
                 //
                 // Only if the previous op-code is an option can we select it, otherwise we are at the left-most option
                 //
-                if (MenuOption->Tags[TempIndex].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+                if (MenuOption->Tags[TempIndex].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
                   TempValue = MenuOption->Tags[TempIndex].Value;
                   *KeyValue = MenuOption->Tags[TempIndex].Key;
                 } else {
@@ -1528,7 +1528,7 @@ TheKey:
       //
       // return the current selection
       //
-      if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+      if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         CopyMem (ValueArray, ValueArrayBackup, ValueCount);
         FreePool (ValueArrayBackup);
       } else {

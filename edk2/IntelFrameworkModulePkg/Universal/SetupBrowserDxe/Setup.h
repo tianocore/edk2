@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _SETUP_H
 
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/FrameworkFormCallback.h>
 #include <Protocol/FrameworkFormBrowser.h>
@@ -275,14 +275,14 @@ typedef struct {
 //
 // This encapsulates all the pointers associated with found IFR binaries
 //
-typedef struct _EFI_IFR_BINARY {
-  struct _EFI_IFR_BINARY  *Next;
+typedef struct _FRAMEWORK_EFI_IFR_BINARY {
+  struct _FRAMEWORK_EFI_IFR_BINARY  *Next;
   VOID                    *IfrPackage;  // Handy for use in freeing the data later since this is the header of the buffer
   VOID                    *FormBinary;
-  EFI_HII_HANDLE          Handle;
+  FRAMEWORK_EFI_HII_HANDLE Handle;
   STRING_REF              TitleToken;
   BOOLEAN                 UnRegisterOnExit;
-} EFI_IFR_BINARY;
+} FRAMEWORK_EFI_IFR_BINARY;
 
 //
 // This encapsulates all the questions (tags) for a particular Form Set
@@ -334,7 +334,7 @@ typedef struct {
 //
 // Head of the Binary structures
 //
-EFI_IFR_BINARY    *gBinaryDataHead;
+FRAMEWORK_EFI_IFR_BINARY    *gBinaryDataHead;
 
 //
 // The IFR binary that the user chose to run
@@ -345,7 +345,7 @@ EFI_HII_PROTOCOL  *Hii;
 
 VOID              *CachedNVEntry;
 BANNER_DATA       *BannerData;
-EFI_HII_HANDLE    FrontPageHandle;
+FRAMEWORK_EFI_HII_HANDLE     FrontPageHandle;
 STRING_REF        FrontPageTimeOutTitle;
 INT16             FrontPageTimeOutValue;
 UINTN             gClassOfVfr;
@@ -356,7 +356,7 @@ BOOLEAN           gSaveRequired;
 BOOLEAN           gNvUpdateRequired;
 UINT16            gConsistencyId;
 UINTN             gPriorMenuEntry;
-EFI_HII_HANDLE    gHiiHandle;
+FRAMEWORK_EFI_HII_HANDLE     gHiiHandle;
 BOOLEAN           gFirstIn;
 VOID              *gPreviousValue;
 UINT16            gDirection;
@@ -460,7 +460,7 @@ DisplayPageFrame (
 CHAR16            *
 GetToken (
   IN  STRING_REF                              IfrBinaryTitle,
-  IN  EFI_HII_HANDLE                          HiiHandle
+  IN  FRAMEWORK_EFI_HII_HANDLE                HiiHandle
   )
 ;
 

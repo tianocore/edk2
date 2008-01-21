@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _HIIDATABASE_H
 
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Protocol/FrameworkFormCallback.h>
@@ -49,7 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _EFI_HII_HANDLE_DATABASE {
   VOID                            *Buffer;        // Actual buffer pointer
-  EFI_HII_HANDLE                  Handle;         // Monotonically increasing value to signify the value returned to caller
+  FRAMEWORK_EFI_HII_HANDLE        Handle;         // Monotonically increasing value to signify the value returned to caller
   UINT32                          NumberOfTokens; // The initial number of tokens when first registered
   struct _EFI_HII_HANDLE_DATABASE *NextHandleDatabase;
 } EFI_HII_HANDLE_DATABASE;
@@ -57,8 +57,8 @@ typedef struct _EFI_HII_HANDLE_DATABASE {
 typedef struct {
   EFI_NARROW_GLYPH    NarrowGlyphs[MAX_GLYPH_COUNT];
   EFI_WIDE_GLYPH      WideGlyphs[MAX_GLYPH_COUNT];
-  EFI_KEY_DESCRIPTOR  SystemKeyboardLayout[106];
-  EFI_KEY_DESCRIPTOR  OverrideKeyboardLayout[106];
+  FRAMEWORK_EFI_KEY_DESCRIPTOR  SystemKeyboardLayout[106];
+  FRAMEWORK_EFI_KEY_DESCRIPTOR  OverrideKeyboardLayout[106];
   BOOLEAN             SystemKeyboardUpdate;       // Has the SystemKeyboard been updated?
 } EFI_HII_GLOBAL_DATA;
 
@@ -71,7 +71,7 @@ typedef struct {
 } EFI_HII_DATA;
 
 typedef struct {
-  EFI_HII_HANDLE      Handle;
+  FRAMEWORK_EFI_HII_HANDLE       Handle;
   EFI_GUID            Guid;
   EFI_HII_HANDLE_PACK HandlePack;
   UINTN               IfrSize;
@@ -82,8 +82,8 @@ typedef struct {
 
 typedef struct {
   EFI_HII_PACK_HEADER   Header;
-  EFI_IFR_FORM_SET      FormSet;
-  EFI_IFR_END_FORM_SET  EndFormSet;
+  FRAMEWORK_EFI_IFR_FORM_SET      FormSet;
+  FRAMEWORK_EFI_IFR_END_FORM_SET  EndFormSet;
 } EFI_FORM_SET_STUB;
 
 #define EFI_HII_DATA_FROM_THIS(a) CR (a, EFI_HII_DATA, Hii, EFI_HII_DATA_SIGNATURE)
@@ -129,7 +129,7 @@ EFIAPI
 HiiNewPack (
   IN  EFI_HII_PROTOCOL      *This,
   IN  EFI_HII_PACKAGES      *PackageList,
-  OUT EFI_HII_HANDLE        *Handle
+  OUT FRAMEWORK_EFI_HII_HANDLE         *Handle
   )
 ;
 
@@ -137,7 +137,7 @@ EFI_STATUS
 EFIAPI
 HiiRemovePack (
   IN EFI_HII_PROTOCOL    *This,
-  IN EFI_HII_HANDLE      Handle
+  IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 ;
 
@@ -146,7 +146,7 @@ EFIAPI
 HiiFindHandles (
   IN     EFI_HII_PROTOCOL    *This,
   IN OUT UINT16              *HandleBufferLength,
-  OUT    EFI_HII_HANDLE      *Handle
+  OUT    FRAMEWORK_EFI_HII_HANDLE       *Handle
   )
 ;
 
@@ -154,7 +154,7 @@ EFI_STATUS
 EFIAPI
 HiiExportDatabase (
   IN     EFI_HII_PROTOCOL *This,
-  IN     EFI_HII_HANDLE   Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE    Handle,
   IN OUT UINTN            *BufferSize,
   OUT    VOID             *Buffer
   )
@@ -191,7 +191,7 @@ EFIAPI
 HiiNewString (
   IN     EFI_HII_PROTOCOL        *This,
   IN     CHAR16                  *Language,
-  IN     EFI_HII_HANDLE          Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE Handle,
   IN OUT STRING_REF              *Reference,
   IN     CHAR16                  *NewString
   )
@@ -201,7 +201,7 @@ EFI_STATUS
 EFIAPI
 HiiGetString (
   IN     EFI_HII_PROTOCOL    *This,
-  IN     EFI_HII_HANDLE      Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
   IN     STRING_REF          Token,
   IN     BOOLEAN             Raw,
   IN     CHAR16              *LanguageString,
@@ -214,7 +214,7 @@ EFI_STATUS
 EFIAPI
 HiiResetStrings (
   IN     EFI_HII_PROTOCOL    *This,
-  IN     EFI_HII_HANDLE      Handle
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 ;
 
@@ -232,7 +232,7 @@ EFI_STATUS
 EFIAPI
 HiiGetPrimaryLanguages (
   IN  EFI_HII_PROTOCOL      *This,
-  IN  EFI_HII_HANDLE        Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
   OUT EFI_STRING            *LanguageString
   )
 ;
@@ -241,7 +241,7 @@ EFI_STATUS
 EFIAPI
 HiiGetSecondaryLanguages (
   IN  EFI_HII_PROTOCOL      *This,
-  IN  EFI_HII_HANDLE        Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
   IN  CHAR16                *PrimaryLanguage,
   OUT EFI_STRING            *LanguageString
   )
@@ -251,7 +251,7 @@ EFI_STATUS
 EFIAPI
 HiiGetLine (
   IN     EFI_HII_PROTOCOL    *This,
-  IN     EFI_HII_HANDLE      Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
   IN     STRING_REF          Token,
   IN OUT UINT16              *Index,
   IN     UINT16              LineWidth,
@@ -265,7 +265,7 @@ EFI_STATUS
 EFIAPI
 HiiGetForms (
   IN     EFI_HII_PROTOCOL    *This,
-  IN     EFI_HII_HANDLE      Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
   IN     EFI_FORM_ID         FormId,
   IN OUT UINTN               *BufferLength,
   OUT    UINT8               *Buffer
@@ -276,7 +276,7 @@ EFI_STATUS
 EFIAPI
 HiiGetDefaultImage (
   IN     EFI_HII_PROTOCOL           *This,
-  IN     EFI_HII_HANDLE             Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
   IN     UINTN                      DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST **VariablePackList
   )
@@ -286,7 +286,7 @@ EFI_STATUS
 EFIAPI
 HiiUpdateForm (
   IN EFI_HII_PROTOCOL       *This,
-  IN EFI_HII_HANDLE         Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN EFI_FORM_LABEL         Label,
   IN BOOLEAN                AddData,
   IN EFI_HII_UPDATE_DATA    *Data
@@ -298,7 +298,7 @@ EFIAPI
 HiiGetKeyboardLayout (
   IN     EFI_HII_PROTOCOL    *This,
   OUT    UINT16              *DescriptorCount,
-  OUT    EFI_KEY_DESCRIPTOR  *Descriptor
+  OUT    FRAMEWORK_EFI_KEY_DESCRIPTOR  *Descriptor
   )
 ;
 

@@ -141,12 +141,12 @@ Returns:
 
   RawData = (UINT8 *) FormPack;
 
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
-    if (RawData[Index] == EFI_IFR_FORM_SET_OP) {
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
+    if (RawData[Index] == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
       //
       // Cache the guid for this formset
       //
-      CopyMem (&Guid, &((EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+      CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
       break;
     }
 
@@ -171,12 +171,12 @@ Returns:
       FormPack  = (EFI_HII_IFR_PACK *) ((CHAR8 *) (&HandlePackageInstance->IfrData) + sizeof (EFI_HII_PACK_HEADER));
       RawData   = (UINT8 *) FormPack;
 
-      for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
-        if (RawData[Index] == EFI_IFR_FORM_SET_OP) {
+      for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
+        if (RawData[Index] == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
           //
           // Cache the guid for this formset
           //
-          CopyMem (&Guid, &((EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+          CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
           break;
         }
 
@@ -209,7 +209,7 @@ EFIAPI
 HiiNewPack (
   IN  EFI_HII_PROTOCOL    *This,
   IN  EFI_HII_PACKAGES    *Packages,
-  OUT EFI_HII_HANDLE      *Handle
+  OUT FRAMEWORK_EFI_HII_HANDLE       *Handle
   )
 /*++
 
@@ -334,13 +334,13 @@ Returns:
     //
     // Advance to the Form Set Op-code
     //
-    for (Count = 0; ((EFI_IFR_OP_HEADER *) &Location[Count])->OpCode != EFI_IFR_FORM_SET_OP;) {
-      Count = Count + ((EFI_IFR_OP_HEADER *) &Location[Count])->Length;
+    for (Count = 0; ((FRAMEWORK_EFI_IFR_OP_HEADER *) &Location[Count])->OpCode != FRAMEWORK_EFI_IFR_FORM_SET_OP;) {
+      Count = Count + ((FRAMEWORK_EFI_IFR_OP_HEADER *) &Location[Count])->Length;
     }
     //
     // Copy to local variable
     //
-    CopyMem (&Guid, &((EFI_IFR_FORM_SET *) &Location[Count])->Guid, sizeof (EFI_GUID));
+    CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &Location[Count])->Guid, sizeof (EFI_GUID));
 
     //
     // Check to see if IfrPack->Guid != GuidId
@@ -364,16 +364,16 @@ Returns:
     FormSetStub.Header.Type           = EFI_HII_IFR;
     FormSetStub.Header.Length         = sizeof (EFI_FORM_SET_STUB);
 
-    FormSetStub.FormSet.Header.OpCode = EFI_IFR_FORM_SET_OP;
-    FormSetStub.FormSet.Header.Length = (UINT8) sizeof (EFI_IFR_FORM_SET);
+    FormSetStub.FormSet.Header.OpCode = FRAMEWORK_EFI_IFR_FORM_SET_OP;
+    FormSetStub.FormSet.Header.Length = (UINT8) sizeof (FRAMEWORK_EFI_IFR_FORM_SET);
     //
     // Dummy string
     //
     FormSetStub.FormSet.FormSetTitle  = 0x02;
     CopyMem (&FormSetStub.FormSet.Guid, Packages->GuidId, sizeof (EFI_GUID));
 
-    FormSetStub.EndFormSet.Header.OpCode  = EFI_IFR_END_FORM_SET_OP;
-    FormSetStub.EndFormSet.Header.Length  = (UINT8) sizeof (EFI_IFR_END_FORM_SET);
+    FormSetStub.EndFormSet.Header.OpCode  = FRAMEWORK_EFI_IFR_END_FORM_SET_OP;
+    FormSetStub.EndFormSet.Header.Length  = (UINT8) sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET);
     IfrPack = (EFI_HII_IFR_PACK *) &FormSetStub;
   }
 
@@ -432,7 +432,7 @@ Returns:
       // we go down one level deeper, increment the handle value that will be passed back.
       //
       if (Database->Handle >= *Handle) {
-        *Handle = (EFI_HII_HANDLE) (Database->Handle + 1);
+        *Handle = (FRAMEWORK_EFI_HII_HANDLE ) (Database->Handle + 1);
       }
     }
 
@@ -543,7 +543,7 @@ Returns:
       // If someone updates the Descriptors with a count of 0, blow aware the overrides.
       //
       if (KeyboardPack->DescriptorCount == 0) {
-        ZeroMem (GlobalData->OverrideKeyboardLayout, sizeof (EFI_KEY_DESCRIPTOR) * 106);
+        ZeroMem (GlobalData->OverrideKeyboardLayout, sizeof (FRAMEWORK_EFI_KEY_DESCRIPTOR) * 106);
       }
 
       if (KeyboardPack->DescriptorCount < 106 && KeyboardPack->DescriptorCount > 0) {
@@ -551,26 +551,26 @@ Returns:
         // If SystemKeyboard was updated already, then steer changes to the override database
         //
         if (GlobalData->SystemKeyboardUpdate) {
-          ZeroMem (GlobalData->OverrideKeyboardLayout, sizeof (EFI_KEY_DESCRIPTOR) * 106);
+          ZeroMem (GlobalData->OverrideKeyboardLayout, sizeof (FRAMEWORK_EFI_KEY_DESCRIPTOR) * 106);
           for (Count = 0; Count < KeyboardPack->DescriptorCount; Count++) {
             CopyMem (&Member, &KeyboardPack->Descriptor[Count].Key, sizeof (UINT16));
             CopyMem (
               &GlobalData->OverrideKeyboardLayout[Member],
               &KeyboardPack->Descriptor[Count],
-              sizeof (EFI_KEY_DESCRIPTOR)
+              sizeof (FRAMEWORK_EFI_KEY_DESCRIPTOR)
               );
           }
         } else {
           //
           // SystemKeyboard was never updated, so this is likely the keyboard driver setting the System database.
           //
-          ZeroMem (GlobalData->SystemKeyboardLayout, sizeof (EFI_KEY_DESCRIPTOR) * 106);
+          ZeroMem (GlobalData->SystemKeyboardLayout, sizeof (FRAMEWORK_EFI_KEY_DESCRIPTOR) * 106);
           for (Count = 0; Count < KeyboardPack->DescriptorCount; Count++) {
             CopyMem (&Member, &KeyboardPack->Descriptor->Key, sizeof (UINT16));
             CopyMem (
               &GlobalData->SystemKeyboardLayout[Member],
               &KeyboardPack->Descriptor[Count],
-              sizeof (EFI_KEY_DESCRIPTOR)
+              sizeof (FRAMEWORK_EFI_KEY_DESCRIPTOR)
               );
           }
           //
@@ -593,7 +593,7 @@ EFI_STATUS
 EFIAPI
 HiiRemovePack (
   IN EFI_HII_PROTOCOL    *This,
-  IN EFI_HII_HANDLE      Handle
+  IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 /*++
 

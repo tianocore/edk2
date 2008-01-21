@@ -54,7 +54,7 @@ formset
 
   varstore MyIfrNVData2, key = 0x1234, name = MY_DATA2, guid = FORMSET_GUID;
 
-  varstore MyIfrNVData, key = 0x1324, name = MY_DATA1, guid = FORMSET_GUID;
+//  varstore MyIfrNVData, key = 0x1324, name = MY_DATA1, guid = FORMSET_GUID;
 
   varstore MyIfrNVData3, key = 0x4321, name = MY_DATA3, guid = FORMSET_GUID;
 

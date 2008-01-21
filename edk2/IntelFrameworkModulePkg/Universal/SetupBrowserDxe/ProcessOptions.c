@@ -103,31 +103,31 @@ AdjustNvMap (
   // Remember, the only time we come here is because we are in the NVPlus section of the NvRamMap
   //
   for (Index = MenuOption->TagIndex;
-       (MenuOption->Tags[Index].Operand != EFI_IFR_END_FORM_OP) && (MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP);
+       (MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_FORM_OP) && (MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP);
        Index++
       ) {
 
     switch (MenuOption->Tags[Index].Operand) {
-    case EFI_IFR_ORDERED_LIST_OP:
-    case EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
       CachedStart = MenuOption->Tags[Index].StorageStart;
       break;
 
-    case EFI_IFR_ONE_OF_OPTION_OP:
-      if (MenuOption->Tags[Index].Flags & EFI_IFR_FLAG_DEFAULT) {
+    case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
+      if (MenuOption->Tags[Index].Flags & FRAMEWORK_EFI_IFR_FLAG_DEFAULT) {
         CopyMem (&NvRamMap[CachedStart], &MenuOption->Tags[Index].Value, 2);
       }
       break;
 
-    case EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
       CopyMem (&NvRamMap[MenuOption->Tags[Index].StorageStart], &MenuOption->Tags[Index].Flags, 1);
       break;
 
-    case EFI_IFR_NUMERIC_OP:
-    case EFI_IFR_DATE_OP:
-    case EFI_IFR_TIME_OP:
-    case EFI_IFR_STRING_OP:
-    case EFI_IFR_PASSWORD_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_DATE_OP:
+    case FRAMEWORK_EFI_IFR_TIME_OP:
+    case FRAMEWORK_EFI_IFR_STRING_OP:
+    case FRAMEWORK_EFI_IFR_PASSWORD_OP:
       CopyMem (
         &NvRamMap[MenuOption->Tags[Index].StorageStart],
         &MenuOption->Tags[Index].Value,
@@ -148,7 +148,7 @@ ProcessOptions (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected,
   IN  EFI_FILE_FORM_TAGS          *FileFormTagsHead,
-  IN  EFI_IFR_DATA_ARRAY          *PageData,
+  IN  FRAMEWORK_EFI_IFR_DATA_ARRAY          *PageData,
   OUT CHAR16                      **OptionString
   )
 {
@@ -210,7 +210,7 @@ ProcessOptions (
   NullCharacter = CHAR_NULL;
   FormCallback  = NULL;
 
-  if (MenuOption->ThisTag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+  if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
     OrderedList = TRUE;
     if (((UINT8 *) NvRamMap)[0] != 0x00) {
       Initialized = TRUE;
@@ -232,8 +232,8 @@ ProcessOptions (
 
   switch (Tag->Operand) {
 
-  case EFI_IFR_ORDERED_LIST_OP:
-  case EFI_IFR_ONE_OF_OP:
+  case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
+  case FRAMEWORK_EFI_IFR_ONE_OF_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -247,23 +247,23 @@ ProcessOptions (
     CachedIndex = MenuOption->TagIndex;
 
     //
-    // search for EFI_IFR_ONE_OF_OPTION_OP until you hit the EFI_IFR_END_ONE_OF_OP,
+    // search for FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP until you hit the FRAMEWORK_EFI_IFR_END_ONE_OF_OP,
     // each of the .Text in the options are going to be what gets displayed.  Break each into 26 char chunks
     // when hit right/left arrow allows for selection - then repopulate Tag[TagIndex] with the choice
     //
-    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP; Index++) {
+    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP; Index++) {
       //
       // We found an option - which assumedly has a string.  We will eventually have to support
       // wrapping of strings.  For now, let's pretend they don't wrap and code that up.
       //
       // Count how many strings there are
       //
-      if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+      if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
         //
         // If one of the options for the one-of has an interactive flag, back-define the oneof to have one too
         //
-        if (MenuOption->Tags[Index].Flags & EFI_IFR_FLAG_INTERACTIVE) {
-          MenuOption->Tags[CachedIndex].Flags = (UINT8) (MenuOption->Tags[CachedIndex].Flags | EFI_IFR_FLAG_INTERACTIVE);
+        if (MenuOption->Tags[Index].Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
+          MenuOption->Tags[CachedIndex].Flags = (UINT8) (MenuOption->Tags[CachedIndex].Flags | FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE);
         }
 
         StringCount++;
@@ -292,7 +292,7 @@ ProcessOptions (
       //
       // Copy current setting to the seed Value
       //
-      if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+      if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         ValueArray = AllocateZeroPool (MenuOption->ThisTag->StorageWidth);
         ASSERT (ValueArray != NULL);
         CopyMem (ValueArray, NvRamMap, MenuOption->ThisTag->StorageWidth);
@@ -302,14 +302,14 @@ ProcessOptions (
       }
 
       Number = Value;
-      if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+      if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         Status = GetSelectionInputPopUp (MenuOption, Tag, MenuOption->ThisTag->StorageWidth, ValueArray, &KeyValue);
       } else {
         Status = GetSelectionInputPopUp (MenuOption, Tag, 1, &Value, &KeyValue);
       }
 
       if (!EFI_ERROR (Status)) {
-        if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+        if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
           CopyMem (NvRamMap, ValueArray, MenuOption->ThisTag->StorageWidth);
           FreePool (ValueArray);
         } else {
@@ -325,7 +325,7 @@ ProcessOptions (
         // if two questions are bound by consistency checks and each only has two possible choices, there
         // would be no way for a user to switch the values.  Thus we require late checking.
         //
-        if (Tag->Flags & EFI_IFR_FLAG_LATE_CHECK) {
+        if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_LATE_CHECK) {
           CopyMem (&Tag->OldValue, &Value, Tag->StorageWidth);
         } else {
           //
@@ -372,19 +372,19 @@ ProcessOptions (
 
         UpdateStatusBar (NV_UPDATE_REQUIRED, Tag->Flags, TRUE);
       } else {
-        if (Tag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+        if (Tag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
           FreePool (ValueArray);
         }
 
         return EFI_SUCCESS;
       }
     } else {
-      for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != EFI_IFR_END_ONE_OF_OP; Index++) {
+      for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP; Index++) {
         //
         // We found an option - which assumedly has a string.  We will eventually have to support
         // wrapping of strings.  For now, let's pretend they don't wrap and code that up.
         //
-        if (MenuOption->Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+        if (MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
           if (OrderedList) {
             if (!Initialized) {
               //
@@ -410,7 +410,7 @@ ProcessOptions (
               StringPtr = GetToken (MenuOption->Tags[Index].Text, MenuOption->Handle);
             } else {
               for (Value = (UINT16) (MenuOption->TagIndex + 1);
-                   MenuOption->Tags[Value].Operand != EFI_IFR_END_ONE_OF_OP;
+                   MenuOption->Tags[Value].Operand != FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
                    Value++
                   ) {
                 if (MenuOption->Tags[Value].Value == ((UINT8 *) NvRamMap)[Index - MenuOption->TagIndex - 1]) {
@@ -419,7 +419,7 @@ ProcessOptions (
                 }
               }
 
-              if (MenuOption->Tags[Value].Operand == EFI_IFR_END_ONE_OF_OP) {
+              if (MenuOption->Tags[Value].Operand == FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
                 Skip = TRUE;
                 continue;
               }
@@ -453,7 +453,7 @@ ProcessOptions (
               break;
             }
 
-            if ((MenuOption->Tags[Index].Flags & EFI_IFR_FLAG_DEFAULT) == 1) {
+            if ((MenuOption->Tags[Index].Flags & FRAMEWORK_EFI_IFR_FLAG_DEFAULT) == 1) {
               Default = MenuOption->Tags[Index].Text;
               Value   = MenuOption->Tags[Index].Value;
             };
@@ -481,7 +481,7 @@ ProcessOptions (
     }
     break;
 
-  case EFI_IFR_CHECKBOX_OP:
+  case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -533,7 +533,7 @@ ProcessOptions (
     NewStrCat (OptionString[0], StringPtr);
     break;
 
-  case EFI_IFR_NUMERIC_OP:
+  case FRAMEWORK_EFI_IFR_NUMERIC_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -649,7 +649,7 @@ ProcessOptions (
     }
     break;
 
-  case EFI_IFR_DATE_OP:
+  case FRAMEWORK_EFI_IFR_DATE_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -677,7 +677,7 @@ ProcessOptions (
     //
     // Also, we want to internationalize the order of the date information.  We need to code for it as well.
     //
-    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand == EFI_IFR_DATE_OP; Index++)
+    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_DATE_OP; Index++)
       ;
 
     //
@@ -828,7 +828,7 @@ ProcessOptions (
   // might want to set an alarm and actually preserve the data in NVRam so a driver can pick up the instruction
   // BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG BUGBUG
   //
-  case EFI_IFR_TIME_OP:
+  case FRAMEWORK_EFI_IFR_TIME_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -858,7 +858,7 @@ ProcessOptions (
     // to 53 and found it to no longer point to a date operand, we were pointing to the last of 3
     // date operands.
     //
-    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand == EFI_IFR_TIME_OP; Index++)
+    for (Index = MenuOption->TagIndex; MenuOption->Tags[Index].Operand == FRAMEWORK_EFI_IFR_TIME_OP; Index++)
       ;
     //
     // Count 0 = We entered on the first Date operand
@@ -1002,7 +1002,7 @@ ProcessOptions (
     }
     break;
 
-  case EFI_IFR_STRING_OP:
+  case FRAMEWORK_EFI_IFR_STRING_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -1047,7 +1047,7 @@ ProcessOptions (
       return Status;
     }
 
-  case EFI_IFR_PASSWORD_OP:
+  case FRAMEWORK_EFI_IFR_PASSWORD_OP:
     //
     // If the op-code we are looking at is larger than the latest created NvMap - we likely encountered a dynamically
     // created entry which has an expanded NvMap requirement.  We won't save this information - but we need to adjust
@@ -1067,7 +1067,7 @@ ProcessOptions (
       // Since interactive passwords assume to handle the password data in a separate variable
       // storage, we don't need to do more than what is below for password callbacks
       //
-      if (Tag->Flags & EFI_IFR_FLAG_INTERACTIVE) {
+      if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
         MenuOption->Tags[0].CallbackHandle  = FileFormTags->FormTags.Tags[0].CallbackHandle;
         Status = ReadPassword (MenuOption, TRUE, Tag, PageData, FALSE, FileFormTags, StringPtr);
         ZeroMem (StringPtr, Tag->Maximum);
@@ -1424,9 +1424,9 @@ IfrToFormTag (
   UINTN                   Index;
 
   switch (OpCode) {
-  case EFI_IFR_FORM_OP:
-    CopyMem (&TargetTag->Id, &((EFI_IFR_FORM *) FormData)->FormId, sizeof (UINT16));
-    CopyMem (&TargetTag->Text, &((EFI_IFR_FORM *) FormData)->FormTitle, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_FORM_OP:
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_FORM *) FormData)->FormId, sizeof (UINT16));
+    CopyMem (&TargetTag->Text, &((FRAMEWORK_EFI_IFR_FORM *) FormData)->FormTitle, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     if (VariableDefinitionsHead != NULL) {
       VariableName = AllocateZeroPool (12);
@@ -1438,16 +1438,16 @@ IfrToFormTag (
     }
     break;
 
-  case EFI_IFR_SUBTITLE_OP:
+  case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
     TargetTag->NumberOfLines = 1;
-    CopyMem (&TargetTag->Text, &((EFI_IFR_SUBTITLE *) FormData)->SubTitle, sizeof (UINT16));
+    CopyMem (&TargetTag->Text, &((FRAMEWORK_EFI_IFR_SUBTITLE *) FormData)->SubTitle, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_TEXT_OP:
+  case FRAMEWORK_EFI_IFR_TEXT_OP:
     TargetTag->NumberOfLines = 1;
-    CopyMem (&TargetTag->Text, &((EFI_IFR_TEXT *) FormData)->Text, sizeof (UINT16));
-    CopyMem (&TargetTag->Help, &((EFI_IFR_TEXT *) FormData)->Help, sizeof (UINT16));
+    CopyMem (&TargetTag->Text, &((FRAMEWORK_EFI_IFR_TEXT *) FormData)->Text, sizeof (UINT16));
+    CopyMem (&TargetTag->Help, &((FRAMEWORK_EFI_IFR_TEXT *) FormData)->Help, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
 
     //
@@ -1455,78 +1455,78 @@ IfrToFormTag (
     // inside the if() statement.  If the encoded length is the complete size, then we
     // know we have valid data encoded that we want to integrate
     //
-    if (((EFI_IFR_TEXT *) FormData)->Header.Length == sizeof (EFI_IFR_TEXT)) {
+    if (((FRAMEWORK_EFI_IFR_TEXT *) FormData)->Header.Length == sizeof (FRAMEWORK_EFI_IFR_TEXT)) {
       //
       // Text has no help associated with it, but in case there is a second entry due to
       // dynamic/interactive flags being active, bring this data over.
       //
-      CopyMem (&TargetTag->TextTwo, &((EFI_IFR_TEXT *) FormData)->TextTwo, sizeof (UINT16));
-      TargetTag->Flags = ((EFI_IFR_TEXT *) FormData)->Flags;
-      CopyMem (&TargetTag->Key, &((EFI_IFR_TEXT *) FormData)->Key, sizeof (UINT16));
+      CopyMem (&TargetTag->TextTwo, &((FRAMEWORK_EFI_IFR_TEXT *) FormData)->TextTwo, sizeof (UINT16));
+      TargetTag->Flags = ((FRAMEWORK_EFI_IFR_TEXT *) FormData)->Flags;
+      CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_TEXT *) FormData)->Key, sizeof (UINT16));
     }
     break;
 
-  case EFI_IFR_ONE_OF_OPTION_OP:
-    CopyMem (&TargetTag->Text, &((EFI_IFR_ONE_OF_OPTION *) FormData)->Option, sizeof (UINT16));
-    CopyMem (&TargetTag->Value, &((EFI_IFR_ONE_OF_OPTION *) FormData)->Value, sizeof (UINT16));
-    TargetTag->Flags = ((EFI_IFR_ONE_OF_OPTION *) FormData)->Flags;
-    CopyMem (&TargetTag->Key, &((EFI_IFR_ONE_OF_OPTION *) FormData)->Key, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
+    CopyMem (&TargetTag->Text, &((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FormData)->Option, sizeof (UINT16));
+    CopyMem (&TargetTag->Value, &((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FormData)->Value, sizeof (UINT16));
+    TargetTag->Flags = ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FormData)->Flags;
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FormData)->Key, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_CHECKBOX_OP:
-    TargetTag->Flags          = ((EFI_IFR_CHECKBOX *) FormData)->Flags;
-    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & EFI_IFR_FLAG_RESET_REQUIRED);
-    CopyMem (&TargetTag->Key, &((EFI_IFR_CHECKBOX *) FormData)->Key, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
+    TargetTag->Flags          = ((FRAMEWORK_EFI_IFR_CHECKBOX *) FormData)->Flags;
+    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_CHECKBOX *) FormData)->Key, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_NUMERIC_OP:
-    TargetTag->Flags = ((EFI_IFR_NUMERIC *) FormData)->Flags;
-    CopyMem (&TargetTag->Key, &((EFI_IFR_NUMERIC *) FormData)->Key, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+    TargetTag->Flags = ((FRAMEWORK_EFI_IFR_NUMERIC *) FormData)->Flags;
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_NUMERIC *) FormData)->Key, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_STRING_OP:
+  case FRAMEWORK_EFI_IFR_STRING_OP:
     //
-    // Convert EFI_IFR_STRING.MinSize and EFI_IFR_STRING.MaxSize to actual minimum and maximum bytes
+    // Convert FRAMEWORK_EFI_IFR_STRING.MinSize and FRAMEWORK_EFI_IFR_STRING.MaxSize to actual minimum and maximum bytes
     // and store to EFI_TAG.Minimum and EFI_TAG.Maximum
     //
     TempValue = 0;
-    CopyMem (&TempValue, &((EFI_IFR_STRING *) FormData)->MinSize, sizeof (UINT8));
+    CopyMem (&TempValue, &((FRAMEWORK_EFI_IFR_STRING *) FormData)->MinSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Minimum, &TempValue, sizeof (UINT16));
 
     TempValue = 0;
-    CopyMem (&TempValue, &((EFI_IFR_STRING *) FormData)->MaxSize, sizeof (UINT8));
+    CopyMem (&TempValue, &((FRAMEWORK_EFI_IFR_STRING *) FormData)->MaxSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Maximum, &TempValue, sizeof (UINT16));
     CopyMem (&TargetTag->StorageWidth, &TempValue, sizeof (UINT16));
-    TargetTag->Flags          = (UINT8) (((EFI_IFR_STRING *) FormData)->Flags);
-    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & EFI_IFR_FLAG_RESET_REQUIRED);
-    CopyMem (&TargetTag->Key, &((EFI_IFR_STRING *) FormData)->Key, sizeof (UINT16));
+    TargetTag->Flags          = (UINT8) (((FRAMEWORK_EFI_IFR_STRING *) FormData)->Flags);
+    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_STRING *) FormData)->Key, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_PASSWORD_OP:
+  case FRAMEWORK_EFI_IFR_PASSWORD_OP:
     TempValue = 0;
-    CopyMem (&TempValue, &((EFI_IFR_PASSWORD *) FormData)->MinSize, sizeof (UINT8));
+    CopyMem (&TempValue, &((FRAMEWORK_EFI_IFR_PASSWORD *) FormData)->MinSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Minimum, &TempValue, sizeof (UINT16));
 
     TempValue = 0;
-    CopyMem (&TempValue, &((EFI_IFR_PASSWORD *) FormData)->MaxSize, sizeof (UINT8));
+    CopyMem (&TempValue, &((FRAMEWORK_EFI_IFR_PASSWORD *) FormData)->MaxSize, sizeof (UINT8));
     TempValue = (UINT16) (TempValue * 2);
     CopyMem (&TargetTag->Maximum, &TempValue, sizeof (UINT16));
     CopyMem (&TargetTag->StorageWidth, &TempValue, sizeof (UINT16));
-    TargetTag->Flags          = ((EFI_IFR_PASSWORD *) FormData)->Flags;
-    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & EFI_IFR_FLAG_RESET_REQUIRED);
-    CopyMem (&TargetTag->Key, &((EFI_IFR_PASSWORD *) FormData)->Key, sizeof (UINT16));
-    CopyMem (&TargetTag->Encoding, &((EFI_IFR_PASSWORD *) FormData)->Encoding, sizeof (UINT16));
+    TargetTag->Flags          = ((FRAMEWORK_EFI_IFR_PASSWORD *) FormData)->Flags;
+    TargetTag->ResetRequired  = (BOOLEAN) (TargetTag->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_PASSWORD *) FormData)->Key, sizeof (UINT16));
+    CopyMem (&TargetTag->Encoding, &((FRAMEWORK_EFI_IFR_PASSWORD *) FormData)->Encoding, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_VARSTORE_OP:
+  case FRAMEWORK_EFI_IFR_VARSTORE_OP:
     //
     // It should NEVER be NULL
     //
@@ -1544,8 +1544,8 @@ IfrToFormTag (
       //
       // If there is a variable with this GUID and ID already, we need to bail out
       //
-      if (!CompareMem (&VariableDefinitions->Guid, &((EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID)) &&
-          !CompareMem (&VariableDefinitions->VariableId, &((EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16))
+      if (!CompareMem (&VariableDefinitions->Guid, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID)) &&
+          !CompareMem (&VariableDefinitions->VariableId, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16))
             ) {
         return ;
       }
@@ -1567,16 +1567,16 @@ IfrToFormTag (
     //
     // Copy the Variable data to our linked list
     //
-    CopyMem (&VariableDefinitions->VariableId, &((EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16));
-    CopyMem (&VariableDefinitions->VariableSize, &((EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
-    CopyMem (&VariableDefinitions->Guid, &((EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID));
+    CopyMem (&VariableDefinitions->VariableId, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16));
+    CopyMem (&VariableDefinitions->VariableSize, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
+    CopyMem (&VariableDefinitions->Guid, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID));
 
     //
-    // The ASCII String which is immediately past the EFI_IFR_VARSTORE is inferred by the structure definition
+    // The ASCII String which is immediately past the FRAMEWORK_EFI_IFR_VARSTORE is inferred by the structure definition
     // due to it being variable sized.  There are rules preventing it from being > 40 characters long and should
     // be enforced by the compiler.
     //
-    AsciiString                       = (CHAR8 *) (&((EFI_IFR_VARSTORE *) FormData)->Size);
+    AsciiString                       = (CHAR8 *) (&((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Size);
     AsciiString                       = AsciiString + 2;
     VariableDefinitions->VariableName = AllocateZeroPool ((AsciiStrLen (AsciiString) + 1) * 2);
     ASSERT (VariableDefinitions->VariableName != NULL);
@@ -1589,64 +1589,64 @@ IfrToFormTag (
     //
     // Propogate the tag information for this op-code
     //
-    CopyMem (&TargetTag->VariableNumber, &((EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16));
-    CopyMem (&TargetTag->GuidValue, &((EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID));
-    CopyMem (&TargetTag->StorageWidth, &((EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
-    CopyMem (&TargetTag->Maximum, &((EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
+    CopyMem (&TargetTag->VariableNumber, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->VarId, sizeof (UINT16));
+    CopyMem (&TargetTag->GuidValue, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Guid, sizeof (EFI_GUID));
+    CopyMem (&TargetTag->StorageWidth, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
+    CopyMem (&TargetTag->Maximum, &((FRAMEWORK_EFI_IFR_VARSTORE *) FormData)->Size, sizeof (UINT16));
     break;
 
-  case EFI_IFR_VARSTORE_SELECT_OP:
-    CopyMem (&TargetTag->VariableNumber, &((EFI_IFR_VARSTORE_SELECT *) FormData)->VarId, sizeof (UINT16));
-    CopyMem (&CurrentVariable, &((EFI_IFR_VARSTORE_SELECT *) FormData)->VarId, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_VARSTORE_SELECT_OP:
+    CopyMem (&TargetTag->VariableNumber, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT *) FormData)->VarId, sizeof (UINT16));
+    CopyMem (&CurrentVariable, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT *) FormData)->VarId, sizeof (UINT16));
     CurrentVariable2 = CurrentVariable;
     break;
 
-  case EFI_IFR_VARSTORE_SELECT_PAIR_OP:
-    CopyMem (&TargetTag->VariableNumber, &((EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->VarId, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR_OP:
+    CopyMem (&TargetTag->VariableNumber, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->VarId, sizeof (UINT16));
     CopyMem (
       &TargetTag->VariableNumber2,
-      &((EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->SecondaryVarId,
+      &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->SecondaryVarId,
       sizeof (UINT16)
       );
-    CopyMem (&CurrentVariable, &((EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->VarId, sizeof (UINT16));
-    CopyMem (&CurrentVariable2, &((EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->SecondaryVarId, sizeof (UINT16));
+    CopyMem (&CurrentVariable, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->VarId, sizeof (UINT16));
+    CopyMem (&CurrentVariable2, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *) FormData)->SecondaryVarId, sizeof (UINT16));
     break;
 
-  case EFI_IFR_REF_OP:
+  case FRAMEWORK_EFI_IFR_REF_OP:
     TargetTag->NumberOfLines = 1;
-    CopyMem (&TargetTag->Id, &((EFI_IFR_REF *) FormData)->FormId, sizeof (UINT16));
-    CopyMem (&TargetTag->Key, &((EFI_IFR_REF *) FormData)->Key, sizeof (UINT16));
-    CopyMem (&TargetTag->Text, &((EFI_IFR_REF *) FormData)->Prompt, sizeof (UINT16));
-    CopyMem (&TargetTag->Help, &((EFI_IFR_REF *) FormData)->Help, sizeof (UINT16));
-    TargetTag->Flags          = ((EFI_IFR_REF *) FormData)->Flags;
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_REF *) FormData)->FormId, sizeof (UINT16));
+    CopyMem (&TargetTag->Key, &((FRAMEWORK_EFI_IFR_REF *) FormData)->Key, sizeof (UINT16));
+    CopyMem (&TargetTag->Text, &((FRAMEWORK_EFI_IFR_REF *) FormData)->Prompt, sizeof (UINT16));
+    CopyMem (&TargetTag->Help, &((FRAMEWORK_EFI_IFR_REF *) FormData)->Help, sizeof (UINT16));
+    TargetTag->Flags          = ((FRAMEWORK_EFI_IFR_REF *) FormData)->Flags;
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_EQ_ID_VAL_OP:
-    CopyMem (&TargetTag->Value, &((EFI_IFR_EQ_ID_VAL *) FormData)->Value, sizeof (UINT16));
-    CopyMem (&TargetTag->Id, &((EFI_IFR_EQ_ID_VAL *) FormData)->QuestionId, sizeof (UINT16));
-    TargetTag->StorageWidth   = ((EFI_IFR_EQ_ID_VAL *) FormData)->Width;
+  case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
+    CopyMem (&TargetTag->Value, &((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) FormData)->Value, sizeof (UINT16));
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) FormData)->QuestionId, sizeof (UINT16));
+    TargetTag->StorageWidth   = ((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) FormData)->Width;
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_EQ_VAR_VAL_OP:
-    CopyMem (&TargetTag->Value, &((EFI_IFR_EQ_VAR_VAL *) FormData)->Value, sizeof (UINT16));
-    CopyMem (&TargetTag->Id, &((EFI_IFR_EQ_VAR_VAL *) FormData)->VariableId, sizeof (UINT16));
+  case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
+    CopyMem (&TargetTag->Value, &((FRAMEWORK_EFI_IFR_EQ_VAR_VAL *) FormData)->Value, sizeof (UINT16));
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_EQ_VAR_VAL *) FormData)->VariableId, sizeof (UINT16));
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_EQ_ID_ID_OP:
-    CopyMem (&TargetTag->Id, &((EFI_IFR_EQ_ID_ID *) FormData)->QuestionId1, sizeof (UINT16));
-    CopyMem (&TargetTag->Id2, &((EFI_IFR_EQ_ID_ID *) FormData)->QuestionId2, sizeof (UINT16));
-    TargetTag->StorageWidth   = ((EFI_IFR_EQ_ID_ID *) FormData)->Width;
+  case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_EQ_ID_ID *) FormData)->QuestionId1, sizeof (UINT16));
+    CopyMem (&TargetTag->Id2, &((FRAMEWORK_EFI_IFR_EQ_ID_ID *) FormData)->QuestionId2, sizeof (UINT16));
+    TargetTag->StorageWidth   = ((FRAMEWORK_EFI_IFR_EQ_ID_ID *) FormData)->Width;
     TargetTag->VariableNumber = CurrentVariable;
     TargetTag->VariableNumber = CurrentVariable2;
     break;
 
-  case EFI_IFR_EQ_ID_LIST_OP:
-    CopyMem (&TargetTag->Id, &((EFI_IFR_EQ_ID_LIST *) FormData)->QuestionId, sizeof (UINT16));
-    CopyMem (&TargetTag->Id2, &((EFI_IFR_EQ_ID_LIST *) FormData)->ListLength, sizeof (UINT16));
-    TargetTag->StorageWidth = ((EFI_IFR_EQ_ID_LIST *) FormData)->Width;
+  case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
+    CopyMem (&TargetTag->Id, &((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) FormData)->QuestionId, sizeof (UINT16));
+    CopyMem (&TargetTag->Id2, &((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) FormData)->ListLength, sizeof (UINT16));
+    TargetTag->StorageWidth = ((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) FormData)->Width;
 
     TargetTag->IntList      = AllocateZeroPool (TargetTag->Id2 * sizeof (UINT16));
     ASSERT (TargetTag->IntList);
@@ -1654,7 +1654,7 @@ IfrToFormTag (
     for (TempValue = 0; TempValue < TargetTag->Id2; TempValue++) {
       CopyMem (
         &TargetTag->IntList[TempValue],
-        &((EFI_IFR_EQ_ID_LIST *) FormData)->ValueList[TempValue],
+        &((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) FormData)->ValueList[TempValue],
         sizeof (UINT16)
         );
     }
@@ -1662,9 +1662,9 @@ IfrToFormTag (
     TargetTag->VariableNumber = CurrentVariable;
     break;
 
-  case EFI_IFR_FORM_SET_OP:
-    CopyMem (&VariableSize, &((EFI_IFR_FORM_SET *) FormData)->NvDataSize, sizeof (UINT16));
-    CopyMem (&Guid, &((EFI_IFR_FORM_SET *) FormData)->Guid, sizeof (EFI_GUID));
+  case FRAMEWORK_EFI_IFR_FORM_SET_OP:
+    CopyMem (&VariableSize, &((FRAMEWORK_EFI_IFR_FORM_SET *) FormData)->NvDataSize, sizeof (UINT16));
+    CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) FormData)->Guid, sizeof (EFI_GUID));
     //
     // If there is a size specified in the formste, we will establish a "default" variable
     //
@@ -1678,7 +1678,7 @@ IfrToFormTag (
     }
     break;
 
-  case EFI_IFR_END_FORM_SET_OP:
+  case FRAMEWORK_EFI_IFR_END_FORM_SET_OP:
     CurrentVariable   = 0;
     CurrentVariable2  = 0;
     break;
