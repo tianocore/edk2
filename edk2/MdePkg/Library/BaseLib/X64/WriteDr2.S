@@ -33,5 +33,5 @@
 .align 16;
 _AsmWriteDr2:
     mov     %rcx, %dr2
-    mov     %rcx, rax
+    mov     %rcx, %rax
     ret
