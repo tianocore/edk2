@@ -42,6 +42,33 @@ GetGraphicsBitMapFromFV (
   OUT UINTN         *ImageSize
   );
 
+/**
+  Return the graphics image file named FileNameGuid into Image and return it's
+  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
+  file name.
+
+  @param[in]  ImageHandle   The driver image handle of the caller. The parameter is used to
+                            optimize the loading of the image file so that the FV from which
+                            the driver image is loaded will be tried first. 
+  @param[in]  FileNameGuid  File Name of graphics file in the FV(s).
+  @param[out] Image         Pointer to pointer to return graphics image.  If NULL, a 
+                            buffer will be allocated.
+  @param[out] ImageSize     Size of the graphics Image in bytes. Zero if no image found.
+
+  @retval   EFI_INVALID_PARAMETER  invalid parameter
+  @retval   EFI_UNSUPPORTED        Range can not be erased
+  @retval   EFI_SUCCESS            Image and ImageSize are valid. 
+  @retval   EFI_BUFFER_TOO_SMALL   Image not big enough. ImageSize has required size
+  @retval   EFI_NOT_FOUND          FileNameGuid not found
+
+**/
+EFI_STATUS
+GetGraphicsBitMapFromFVEx (
+  IN  EFI_HANDLE    ImageHandle,
+  IN  EFI_GUID      *FileNameGuid,
+  OUT VOID          **Image,
+  OUT UINTN         *ImageSize
+  );
 
 /**
   Convert a *.BMP graphics image to a UGA blt buffer. If a NULL UgaBlt buffer
@@ -84,6 +111,25 @@ ConvertBmpToUgaBlt (
 EFI_STATUS
 EnableQuietBoot (
   IN  EFI_GUID  *LogoFile
+  );
+
+/**
+  Use Console Control to turn off GOP/UGA based Simple Text Out consoles from going
+  to the UGA device. Put up LogoFile on every UGA device that is a console
+
+  @param  LogoFile    File name of logo to display on the center of the screen.
+  @param  ImageHandle The driver image handle of the caller. The parameter is used to
+                      optimize the loading of the logo file so that the FV from which
+                      the driver image is loaded will be tried first.
+
+  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
+  @retval EFI_UNSUPPORTED Logo not found
+
+**/
+EFI_STATUS
+EnableQuietBootEx (
+  IN  EFI_GUID    *LogoFile,
+  IN  EFI_HANDLE  ImageHandle
   );
 
 

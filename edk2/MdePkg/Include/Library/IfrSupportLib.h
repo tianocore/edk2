@@ -1,1265 +1,1031 @@
-/** @file
+/*++
+
+Copyright (c) 2007, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+Module Name:
+
+  UefiIfrLibrary.h
+
+Abstract:
+
   The file contain all library function for Ifr Operations.
-  
-  Copyright (c) 2006 - 2007, Intel Corporation
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+--*/
 
-**/
+#ifndef _IFRLIBRARY_H
+#define _IFRLIBRARY_H
 
-#ifndef __IFRSUPPORTLIBRARY_H__
-#define __IFRSUPPORTLIBRARY_H__
 
-#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+#include <Protocol/HiiFont.h>
+#include <Protocol/HiiImage.h>
+#include <Protocol/HiiString.h>
+#include <Protocol/HiiDatabase.h>
+#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/HiiConfigAccess.h>
+#include <Protocol/FormBrowser2.h>
+#include <Protocol/SimpleTextOut.h>
 
-#define DEFAULT_FORM_BUFFER_SIZE    0xFFFF
-#define DEFAULT_STRING_BUFFER_SIZE  0xFFFF
+#include <Guid/GlobalVariable.h>
+
+#define IFR_LIB_DEFAULT_STRING_SIZE     0x200
+
+//
+// The architectural variable "Lang" and "LangCodes" are deprecated in UEFI
+// specification. While, UEFI specification also states that these deprecated
+// variables may be provided for backwards compatibility.
+// If "LANG_SUPPORT" is defined, "Lang" and "LangCodes" will be produced;
+// If "LANG_SUPPORT" is undefined, "Lang" and "LangCodes" will not be produced.
+//
+#define LANG_SUPPORT
+
+#define EFI_LANGUAGE_VARIABLE           L"Lang"
+#define EFI_LANGUAGE_CODES_VARIABLE     L"LangCodes"
+
+#define UEFI_LANGUAGE_VARIABLE          L"PlatformLang"
+#define UEFI_LANGUAGE_CODES_VARIABLE    L"PlatformLangCodes"
+
+//
+// Limited buffer size recommended by RFC4646 (4.3.  Length Considerations)
+// (42 characters plus a NULL terminator)
+//
+#define RFC_3066_ENTRY_SIZE             (42 + 1)
+#define ISO_639_2_ENTRY_SIZE            3
+
+#define INVALID_VARSTORE_ID             0
+
+#define QUESTION_FLAGS              (EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY)
+#define QUESTION_FLAGS_MASK         (~QUESTION_FLAGS)
+
+extern EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
+extern EFI_HII_STRING_PROTOCOL   *gIfrLibHiiString;
 
 #pragma pack(1)
 typedef struct {
-  CHAR16      *OptionString;  // Passed in string to generate a token for in a truly dynamic form creation
-  STRING_REF  StringToken;    // This is used when creating a single op-code without generating a StringToken (have one already)
-  UINT16      Value;
-  UINT8       Flags;
-  UINT16      Key;
+  EFI_STRING_ID       StringToken;
+  EFI_IFR_TYPE_VALUE  Value;
+  UINT8               Flags;
 } IFR_OPTION;
 #pragma pack()
 
+typedef struct {
+  //
+  // Buffer size allocated for Data.
+  //
+  UINT32                BufferSize;
+
+  //
+  // Offset in Data to append the newly created opcode binary.
+  // It will be adjusted automatically in Create***OpCode(), and should be
+  // initialized to 0 before invocation of a serial of Create***OpCode()
+  //
+  UINT32                Offset;
+
+  //
+  // The destination buffer for created op-codes
+  //
+  UINT8                 *Data;
+} EFI_HII_UPDATE_DATA;
+
+
+//
+// Exported Library functions
+//
 EFI_STATUS
-GetCurrentLanguage (
-  OUT     CHAR16              *Lang
+CreateEndOpCode (
+  IN OUT EFI_HII_UPDATE_DATA *Data
   )
 /*++
 
 Routine Description:
-
-  Determine what is the current language setting
-  
-Arguments:
-
-  Lang      - Pointer of system language
-  
-Returns: 
-  
-  Status code
-
---*/
-;
-
-EFI_STATUS
-AddString (
-  IN      VOID                *StringBuffer,
-  IN      CHAR16              *Language,
-  IN      CHAR16              *String,
-  IN OUT  STRING_REF          *StringToken
-  )
-/*++
-
-Routine Description:
-
-  Add a string to the incoming buffer and return the token and offset data
-  
-Arguments:
-
-  StringBuffer      - The incoming buffer
-  
-  Language          - Currrent language
-  
-  String            - The string to be added
-  
-  StringToken       - The index where the string placed
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
-  EFI_SUCCESS             - String successfully added to the incoming buffer
-
---*/
-;
-
-EFI_STATUS
-AddOpCode (
-  IN      VOID                *FormBuffer,
-  IN OUT  VOID                *OpCodeData
-  )
-/*++
-
-Routine Description:
-
-  Add op-code data to the FormBuffer
-  
-Arguments:
-
-  FormBuffer      - Form buffer to be inserted to
-  
-  OpCodeData      - Op-code data to be inserted
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
-  EFI_SUCCESS             - Op-code data successfully inserted
-
---*/
-;
-
-EFI_STATUS
-CreateFormSet (
-  IN      CHAR16              *FormSetTitle,
-  IN      EFI_GUID            *Guid,
-  IN      UINT8               Class,
-  IN      UINT8               SubClass,
-  IN OUT  VOID                **FormBuffer,
-  IN OUT  VOID                **StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a formset
-  
-Arguments:
-
-  FormSetTitle        - Title of formset
-  
-  Guid                - Guid of formset
-  
-  Class               - Class of formset
-  
-  SubClass            - Sub class of formset
-  
-  FormBuffer          - Pointer of the formset created
-  
-  StringBuffer        - Pointer of FormSetTitile string created
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
-  EFI_SUCCESS             - Formset successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateForm (
-  IN      CHAR16              *FormTitle,
-  IN      UINT16              FormId,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a form
-  
-Arguments:
-
-  FormTitle       - Title of the form
-  
-  FormId          - Id of the form
-  
-  FormBuffer          - Pointer of the form created
-  
-  StringBuffer        - Pointer of FormTitil string created
-  
-Returns: 
-
-  EFI_SUCCESS     - Form successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateSubTitle (
-  IN      CHAR16              *SubTitle,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a SubTitle
-  
-Arguments:
-
-  SubTitle        - Sub title to be created
-  
-  FormBuffer      - Where this subtitle to add to
-  
-  StringBuffer    - String buffer created for subtitle
-  
-Returns: 
-
-  EFI_SUCCESS     - Subtitle successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateText (
-  IN      CHAR16              *String,
-  IN      CHAR16              *String2,
-  IN      CHAR16              *String3,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a line of text
-  
-Arguments:
-
-  String          - First string of the text
-  
-  String2         - Second string of the text
-  
-  String3         - Help string of the text
-  
-  Flags           - Flag of the text
-  
-  Key             - Key of the text
-  
-  FormBuffer      - The form where this text adds to
-  
-  StringBuffer    - String buffer created for String, String2 and String3
-  
-Returns: 
-
-  EFI_SUCCESS     - Text successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateGoto (
-  IN      UINT16              FormId,
-  IN      CHAR16              *Prompt,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a hyperlink
-  
-Arguments:
-
-  FormId        - Form ID of the hyperlink
-  
-  Prompt        - Prompt of the hyperlink
-  
-  FormBuffer    - The form where this hyperlink adds to
-  
-  StringBuffer  - String buffer created for Prompt
-  
-Returns: 
-
-  EFI_SUCCESS     - Hyperlink successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateOneOf (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a one-of question with a set of options to choose from.  The
-  OptionsList is a pointer to a null-terminated list of option descriptions.
-  
-Arguments:
-
-  QuestionId      - Question ID of the one-of box
-  
-  DataWidth       - DataWidth of the one-of box
-  
-  Prompt          - Prompt of the one-of box
-  
-  Help            - Help of the one-of box
-  
-  OptionsList     - Each string in it is an option of the one-of box
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - The form where this one-of box adds to
-  
-  StringBuffer    - String buffer created for Prompt, Help and Option strings
-  
-Returns: 
-
-  EFI_DEVICE_ERROR    - DataWidth > 2
-
-  EFI_SUCCESS         - One-Of box successfully created.
-
---*/
-;
-
-EFI_STATUS
-CreateOrderedList (
-  IN      UINT16              QuestionId,
-  IN      UINT8               MaxEntries,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a one-of question with a set of options to choose from.  The
-  OptionsList is a pointer to a null-terminated list of option descriptions.
-  
-Arguments:
-
-  QuestionId      - Question ID of the ordered list
-  
-  MaxEntries      - MaxEntries of the ordered list
-  
-  Prompt          - Prompt of the ordered list
-  
-  Help            - Help of the ordered list
-  
-  OptionsList     - Each string in it is an option of the ordered list
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - The form where this ordered list adds to
-  
-  StringBuffer    - String buffer created for Prompt, Help and Option strings
-  
-Returns: 
-
-  EFI_SUCCESS     - Ordered list successfully created.
-
---*/
-;
-
-EFI_STATUS
-CreateCheckBox (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT8               Flags,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a checkbox
-  
-Arguments:
-
-  QuestionId      - Question ID of the check box
-  
-  DataWidth       - DataWidth of the check box
-  
-  Prompt          - Prompt of the check box
-  
-  Help            - Help of the check box
-  
-  Flags           - Flags of the check box
-  
-  FormBuffer      - The form where this check box adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_DEVICE_ERROR    - DataWidth > 1
-
-  EFI_SUCCESS         - Check box successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateNumeric (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT16              Minimum,
-  IN      UINT16              Maximum,
-  IN      UINT16              Step,
-  IN      UINT16              Default,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a numeric
-  
-Arguments:
-
-  QuestionId      - Question ID of the numeric
-  
-  DataWidth       - DataWidth of the numeric
-  
-  Prompt          - Prompt of the numeric
-  
-  Help            - Help of the numeric
-  
-  Minimum         - Minumun boundary of the numeric
-  
-  Maximum         - Maximum boundary of the numeric
-  
-  Step            - Step of the numeric
-   
-  Default         - Default value
-  
-  Flags           - Flags of the numeric
-  
-  Key             - Key of the numeric
-  
-  FormBuffer      - The form where this numeric adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_DEVICE_ERROR      - DataWidth > 2
-  
-  EFI_SUCCESS           - Numeric is successfully created
-
---*/
-;
-
-EFI_STATUS
-CreateString (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT8               MinSize,
-  IN      UINT8               MaxSize,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
-  )
-/*++
-
-Routine Description:
-
-  Create a string
-  
-Arguments:
-
-  QuestionId      - Question ID of the string
-  
-  DataWidth       - DataWidth of the string
-  
-  Prompt          - Prompt of the string
-  
-  Help            - Help of the string
-  
-  MinSize         - Min size boundary of the string
-  
-  MaxSize         - Max size boundary of the string
-    
-  Flags           - Flags of the string
-  
-  Key             - Key of the string
-  
-  FormBuffer      - The form where this string adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_SUCCESS     - String successfully created.
-
---*/
-;
-
-EFI_STATUS
-ExtractDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
-  IN OUT  UINT16              *ImageLength,
-  OUT     UINT8               *DefaultImage,
-  OUT     EFI_GUID            *Guid
-  )
-/*++
-
-Routine Description:
-
-  Extract information pertaining to the HiiHandle
-  
-Arguments:
-
-  HiiHandle       - Hii handle
-  
-  ImageLength     - For input, length of DefaultImage;
-                    For output, length of actually required
-                    
-  DefaultImage    - Image buffer prepared by caller
-  
-  Guid            - Guid information about the form
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
-  EFI_BUFFER_TOO_SMALL    - DefualtImage has no enough ImageLength
-  
-  EFI_SUCCESS             - Successfully extract data from Hii database.
-  
-  
---*/
-;
-
-EFI_HII_HANDLE
-FindHiiHandle (
-  IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
-  IN     EFI_GUID            *Guid
-  )
-/*++
-
-Routine Description:
-  Finds HII handle for given pack GUID previously registered with the HII.
+  Create EFI_IFR_END_OP opcode.
 
 Arguments:
-  HiiProtocol - pointer to pointer to HII protocol interface. 
-                If NULL, the interface will be found but not returned.
-                If it points to NULL, the interface will be found and 
-                written back to the pointer that is pointed to.
-  Guid        - The GUID of the pack that registered with the HII.
+  Data            - Destination for the created opcode binary
 
 Returns:
-  Handle to the HII pack previously registered by the memory driver.
+  EFI_SUCCESS     - Opcode create success
+
+--*/
+;
+
+EFI_STATUS
+CreateDefaultOpCode (
+  IN     EFI_IFR_TYPE_VALUE  *Value,
+  IN     UINT8               Type,
+  IN OUT EFI_HII_UPDATE_DATA *Data
+  )
+/*++
+
+Routine Description:
+  Create EFI_IFR_DEFAULT_OP opcode.
+
+Arguments:
+  Value           - Value for the default
+  Type            - Type for the default
+  Data            - Destination for the created opcode binary
+
+Returns:
+  EFI_SUCCESS     - Opcode create success
+
+--*/
+;
+
+EFI_STATUS
+CreateActionOpCode (
+  IN     EFI_QUESTION_ID      QuestionId,
+  IN     EFI_STRING_ID        Prompt,
+  IN     EFI_STRING_ID        Help,
+  IN     UINT8                QuestionFlags,
+  IN     EFI_STRING_ID        QuestionConfig,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
+  )
+/*++
+
+Routine Description:
+  Create EFI_IFR_ACTION_OP opcode.
+
+Arguments:
+  QuestionId      - Question ID
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  QuestionConfig  - String ID for configuration
+  Data            - Destination for the created opcode binary
+
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateSubTitleOpCode (
-  IN      STRING_REF          StringToken,
-  IN OUT  VOID                *FormBuffer
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      UINT8               Flags,
+  IN      UINT8               Scope,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_SUBTITLE_OP opcode.
 
-  Create a SubTitle opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  Flags           - Subtitle opcode flags
+  Scope           - Subtitle Scope bit
+  Data            - Destination for the created opcode binary
 
-  StringToken     - StringToken of the subtitle
-  
-  FormBuffer      - Output of subtitle as a form
-  
-Returns: 
-
-  EFI_SUCCESS     - Subtitle created to be a form
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateTextOpCode (
-  IN      STRING_REF          StringToken,
-  IN      STRING_REF          StringTokenTwo,
-  IN      STRING_REF          StringTokenThree,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      EFI_STRING_ID       TextTwo,
+  IN OUT  EFI_HII_UPDATE_DATA *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_TEXT_OP opcode.
 
-  Create a Text opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  TextTwo         - String ID for text two
+  Data            - Destination for the created opcode binary
 
-  StringToken               - First string token of the text
-  
-  StringTokenTwo            - Second string token of the text
-  
-  StringTokenThree          - Help string token of the text
-  
-  Flags                     - Flag of the text
-  
-  Key                       - Key of the text
-  
-  FormBuffer                - Output of text as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - Text created to be a form
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateGotoOpCode (
-  IN      UINT16              FormId,
-  IN      STRING_REF          StringToken,
-  IN      STRING_REF          StringTokenTwo,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer
+  IN      EFI_FORM_ID         FormId,
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      UINT8               QuestionFlags,
+  IN      EFI_QUESTION_ID     QuestionId,
+  IN OUT  EFI_HII_UPDATE_DATA *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_REF_OP opcode.
 
-  Create a hyperlink opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  FormId          - Destination Form ID
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  QuestionId      - Question ID
+  Data            - Destination for the created opcode binary
 
-  FormId          - Form ID of the hyperlink
-  
-  StringToken     - Prompt string token of the hyperlink
-  
-  StringTokenTwo  - Help string token of the hyperlink
-  
-  Flags           - Flags of the hyperlink
-  
-  Key             - Key of the hyperlink
-  
-  FormBuffer      - Output of hyperlink as a form
-  
-Returns: 
-
-  EFI_SUCCESS   - Hyperlink created to be a form
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
+CreateOneOfOptionOpCode (
+  IN     UINTN                OptionCount,
+  IN     IFR_OPTION           *OptionsList,
+  IN     UINT8                Type,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
+  )
+;
+
+EFI_STATUS
 CreateOneOfOpCode (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      STRING_REF          PromptToken,
-  IN      STRING_REF          HelpToken,
-  IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer
+  IN     EFI_QUESTION_ID      QuestionId,
+  IN     EFI_VARSTORE_ID      VarStoreId,
+  IN     UINT16               VarOffset,
+  IN     EFI_STRING_ID        Prompt,
+  IN     EFI_STRING_ID        Help,
+  IN     UINT8                QuestionFlags,
+  IN     UINT8                OneOfFlags,
+  IN     IFR_OPTION           *OptionsList,
+  IN     UINTN                OptionCount,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_ONE_OF_OP opcode.
 
-  Create a one-of opcode with a set of option op-codes to choose from independent of string creation.
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-
-  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
-  has been filled in since this routine will not generate StringToken values.
-  
 Arguments:
+  QuestionId      - Question ID
+  VarStoreId      - Storage ID
+  VarOffset       - Offset in Storage
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  OneOfFlags      - Flags for oneof opcode
+  OptionsList     - List of options
+  OptionCount     - Number of options in option list
+  Data            - Destination for the created opcode binary
 
-  QuestionId      - Question ID of the one-of box
-  
-  DataWidth       - DataWidth of the one-of box
-  
-  PromptToken     - Prompt string token of the one-of box
-  
-  HelpToken       - Help string token of the one-of box
-  
-  OptionsList     - Each string in it is an option of the one-of box
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - Output of One-Of box as a form
-  
-Returns: 
-
-  EFI_SUCCESS         - One-Of box created to be a form
-  
-  EFI_DEVICE_ERROR    - DataWidth > 2
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateOrderedListOpCode (
-  IN      UINT16              QuestionId,
-  IN      UINT8               MaxEntries,
-  IN      STRING_REF          PromptToken,
-  IN      STRING_REF          HelpToken,
+  IN      EFI_QUESTION_ID     QuestionId,
+  IN      EFI_VARSTORE_ID     VarStoreId,
+  IN      UINT16              VarOffset,
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      UINT8               QuestionFlags,
+  IN      UINT8               Flags,
+  IN      UINT8               DataType,
+  IN      UINT8               MaxContainers,
   IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer
+  IN     UINTN                OptionCount,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_ORDERED_LIST_OP opcode.
 
-  Create a ordered list opcode with a set of option op-codes to choose from independent of string creation.
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-
-  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
-  has been filled in since this routine will not generate StringToken values.
-  
 Arguments:
+  QuestionId      - Question ID
+  VarStoreId      - Storage ID
+  VarOffset       - Offset in Storage
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  Flags           - Flags for ordered list opcode
+  DataType        - Type for option value
+  MaxContainers   - Maximum count for options in this ordered list
+  OptionsList     - List of options
+  OptionCount     - Number of options in option list
+  Data            - Destination for the created opcode binary
 
-  QuestionId      - Question ID of the ordered list
-  
-  MaxEntries      - MaxEntries of the ordered list
-  
-  PromptToken     - Prompt string token of the ordered list
-  
-  HelpToken       - Help string token of the ordered list
-  
-  OptionsList     - Each string in it is an option of the ordered list
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - Output of ordered list as a form
-  
-Returns: 
-
-  EFI_SUCCESS     - Ordered list created to be a form
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateCheckBoxOpCode (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      STRING_REF          PromptToken,
-  IN      STRING_REF          HelpToken,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer
+  IN      EFI_QUESTION_ID     QuestionId,
+  IN      EFI_VARSTORE_ID     VarStoreId,
+  IN      UINT16              VarOffset,
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      UINT8               QuestionFlags,
+  IN      UINT8               CheckBoxFlags,
+  IN OUT EFI_HII_UPDATE_DATA  *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_CHECKBOX_OP opcode.
 
-  Create a checkbox opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  QuestionId      - Question ID
+  VarStoreId      - Storage ID
+  VarOffset       - Offset in Storage
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  CheckBoxFlags   - Flags for checkbox opcode
+  Data            - Destination for the created opcode binary
 
-  QuestionId      - Question ID of the check box
-  
-  DataWidth       - DataWidth of the check box
-  
-  PromptToken     - Prompt string token of the check box
-  
-  HelpToken       - Help string token of the check box
-  
-  Flags           - Flags of the check box
-  
-  Key             - Key of the check box
-  
-  FormBuffer      - Output of the check box as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - Checkbox created to be a form
-  
-  EFI_DEVICE_ERROR  - DataWidth > 1
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateNumericOpCode (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      STRING_REF          PromptToken,
-  IN      STRING_REF          HelpToken,
-  IN      UINT16              Minimum,
-  IN      UINT16              Maximum,
-  IN      UINT16              Step,
-  IN      UINT16              Default,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer
+  IN     EFI_QUESTION_ID     QuestionId,
+  IN     EFI_VARSTORE_ID     VarStoreId,
+  IN     UINT16              VarOffset,
+  IN     EFI_STRING_ID       Prompt,
+  IN     EFI_STRING_ID       Help,
+  IN     UINT8               QuestionFlags,
+  IN     UINT8               NumericFlags,
+  IN     UINT64              Minimum,
+  IN     UINT64              Maximum,
+  IN     UINT64              Step,
+  IN     UINT64              Default,
+  IN OUT EFI_HII_UPDATE_DATA *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_NUMERIC_OP opcode.
 
-  Create a numeric opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  QuestionId      - Question ID
+  VarStoreId      - Storage ID
+  VarOffset       - Offset in Storage
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  NumericFlags    - Flags for numeric opcode
+  Minimum         - Numeric minimum value
+  Maximum         - Numeric maximum value
+  Step            - Numeric step for edit
+  Default         - Numeric default value
+  Data            - Destination for the created opcode binary
 
-  QuestionId      - Question ID of the numeric
-  
-  DataWidth       - DataWidth of the numeric
-  
-  PromptToken     - Prompt string token of the numeric
-  
-  HelpToken       - Help string token of the numeric
-  
-  Minimum         - Minumun boundary of the numeric
-  
-  Maximum         - Maximum boundary of the numeric
-  
-  Step            - Step of the numeric
-  
-  Default         - Default value of the numeric
-  
-  Flags           - Flags of the numeric
-  
-  Key             - Key of the numeric
-  
-  FormBuffer      - Output of the numeric as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - The numeric created to be a form.
-  
-  EFI_DEVICE_ERROR  - DataWidth > 2
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
 --*/
 ;
 
 EFI_STATUS
 CreateStringOpCode (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      STRING_REF          PromptToken,
-  IN      STRING_REF          HelpToken,
+  IN      EFI_QUESTION_ID     QuestionId,
+  IN      EFI_VARSTORE_ID     VarStoreId,
+  IN      UINT16              VarOffset,
+  IN      EFI_STRING_ID       Prompt,
+  IN      EFI_STRING_ID       Help,
+  IN      UINT8               QuestionFlags,
+  IN      UINT8               StringFlags,
   IN      UINT8               MinSize,
   IN      UINT8               MaxSize,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer
+  IN OUT EFI_HII_UPDATE_DATA  *Data
   )
 /*++
 
 Routine Description:
+  Create EFI_IFR_STRING_OP opcode.
 
-  Create a numeric opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
 Arguments:
+  QuestionId      - Question ID
+  VarStoreId      - Storage ID
+  VarOffset       - Offset in Storage
+  Prompt          - String ID for Prompt
+  Help            - String ID for Help
+  QuestionFlags   - Flags in Question Header
+  StringFlags     - Flags for string opcode
+  MinSize         - String minimum length
+  MaxSize         - String maximum length
+  Data            - Destination for the created opcode binary
 
-  QuestionId      - Question ID of the string
-  
-  DataWidth       - DataWidth of the string
-  
-  PromptToken     - Prompt token of the string
-  
-  HelpToken       - Help token of the string
-  
-  MinSize         - Min size boundary of the string
-  
-  MaxSize         - Max size boundary of the string
-    
-  Flags           - Flags of the string
-  
-  Key             - Key of the string
-  
-  FormBuffer      - Output of the string as a form
-  
-Returns: 
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
-  EFI_SUCCESS       - String created to be a form.
-
---*/
-;
-
-EFI_STATUS
-ValidateDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
-  OUT     BOOLEAN             *Results
-  )
-/*++
-
-Routine Description:
-
-  Validate that the data associated with the HiiHandle in NVRAM is within
-  the reasonable parameters for that FormSet.  Values for strings and passwords
-  are not verified due to their not having the equivalent of valid range settings.
-  
-Arguments:
-
-  HiiHandle -   Handle of the HII database entry to query
-
-  Results -     If return Status is EFI_SUCCESS, Results provides valid data
-                TRUE  = NVRAM Data is within parameters
-                FALSE = NVRAM Data is NOT within parameters
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES      - No enough buffer to allocate
-  
-  EFI_SUCCESS               - Data successfully validated
 --*/
 ;
 
 EFI_STATUS
 CreateBannerOpCode (
-  IN      UINT16              Title,
+  IN      EFI_STRING_ID       Title,
   IN      UINT16              LineNumber,
   IN      UINT8               Alignment,
-  IN OUT  VOID                *FormBuffer
+  IN OUT  EFI_HII_UPDATE_DATA *Data
   )
 /*++
 
 Routine Description:
+  Create GUIDed opcode for banner.
 
-  Create a banner opcode.  This is primarily used by the FrontPage implementation from BDS.
-  
 Arguments:
+  Title           - String ID for title
+  LineNumber      - Line number for this banner
+  Alignment       - Alignment for this banner, left, center or right
+  Data            - Destination for the created opcode binary
 
-  Title       - Title of the banner
-  
-  LineNumber  - LineNumber of the banner
-  
-  Alignment   - Alignment of the banner
-  
-  FormBuffer  - Output of banner as a form
-  
-Returns: 
+Returns:
+  EFI_SUCCESS     - Opcode create success
 
-  EFI_SUCCESS     - Banner created to be a form.
+--*/
+;
+
+EFI_HII_PACKAGE_LIST_HEADER *
+PreparePackageList (
+  IN UINTN                    NumberOfPackages,
+  IN EFI_GUID                 *GuidId,
+  ...
+  )
+/*++
+
+Routine Description:
+  Assemble EFI_HII_PACKAGE_LIST according to the passed in packages.
+
+Arguments:
+  NumberOfPackages  -  Number of packages.
+  GuidId            -  Package GUID.
+
+Returns:
+  Pointer of EFI_HII_PACKAGE_LIST_HEADER.
+
+--*/
+;
+
+EFI_HII_HANDLE
+DevicePathToHiiHandle (
+  IN EFI_HII_DATABASE_PROTOCOL  *HiiDatabase,
+  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
+  )
+/*++
+
+Routine Description:
+  Find HII Handle associated with given Device Path.
+
+Arguments:
+  HiiDatabase - Point to EFI_HII_DATABASE_PROTOCOL instance.
+  DevicePath  - Device Path associated with the HII package list handle.
+
+Returns:
+  Handle - HII package list Handle associated with the Device Path.
+  NULL   - Hii Package list handle is not found.
+
+--*/
+;
+
+EFI_STATUS
+ExtractDefault(
+  IN VOID                         *Buffer,
+  IN UINTN                        *BufferSize,
+  UINTN                           Number,
+  ...
+  )
+/*++
+
+  Routine Description:
+    Configure the buffer accrording to ConfigBody strings.
+
+  Arguments:
+    DefaultId             - the ID of default.
+    Buffer                - the start address of buffer.
+    BufferSize            - the size of buffer.
+    Number                - the number of the strings.
+
+  Returns:
+    EFI_BUFFER_TOO_SMALL  - the BufferSize is too small to operate.
+    EFI_INVALID_PARAMETER - Buffer is NULL or BufferSize is 0.
+    EFI_SUCCESS           - Operation successful.
+
+--*/
+;
+
+EFI_STATUS
+ExtractGuidFromHiiHandle (
+  IN      EFI_HII_HANDLE      Handle,
+  OUT     EFI_GUID            *Guid
+  )
+/*++
+
+Routine Description:
+  Extract Hii package list GUID for given HII handle.
+
+Arguments:
+  HiiHandle     - Hii handle
+  Guid          - Package list GUID
+
+Returns:
+  EFI_SUCCESS   - Successfully extract GUID from Hii database.
+
+--*/
+;
+
+EFI_STATUS
+BufferToHexString (
+  IN OUT CHAR16    *Str,
+  IN UINT8         *Buffer,
+  IN UINTN         BufferSize
+  )
+/*++
+
+Routine Description:
+  Converts binary buffer to Unicode string in reversed byte order to BufToHexString().
+
+Arguments:
+  Str        -  String for output
+  Buffer     -  Binary buffer.
+  BufferSize -  Size of the buffer in bytes.
+
+Returns:
+  EFI_SUCCESS    -  The function completed successfully.
+
+--*/
+;
+
+EFI_STATUS
+HexStringToBuffer (
+  IN OUT UINT8         *Buffer,
+  IN OUT UINTN         *BufferSize,
+  IN CHAR16            *Str
+  )
+/*++
+
+Routine Description:
+  Converts Hex String to binary buffer in reversed byte order to HexStringToBuf().
+
+Arguments:
+    Buffer     - Pointer to buffer that receives the data.
+    BufferSize - Length in bytes of the buffer to hold converted data.
+                 If routine return with EFI_SUCCESS, containing length of converted data.
+                 If routine return with EFI_BUFFER_TOO_SMALL, containg length of buffer desired.
+    Str        - String to be converted from.
+
+Returns:
+  EFI_SUCCESS    -  The function completed successfully.
+
+--*/
+;
+
+EFI_STATUS
+ConstructConfigHdr (
+  IN OUT CHAR16                *ConfigHdr,
+  IN OUT UINTN                 *StrBufferLen,
+  IN EFI_GUID                  *Guid,
+  IN CHAR16                    *Name, OPTIONAL
+  IN EFI_HANDLE                *DriverHandle
+  )
+/*++
+
+Routine Description:
+  Construct <ConfigHdr> using routing information GUID/NAME/PATH.
+
+Arguments:
+  ConfigHdr    - Pointer to the ConfigHdr string.
+  StrBufferLen - On input: Length in bytes of buffer to hold the ConfigHdr string. Includes tailing '\0' character.
+                 On output:
+                    If return EFI_SUCCESS, containing length of ConfigHdr string buffer.
+                    If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
+  Guid         - Routing information: GUID.
+  Name         - Routing information: NAME.
+  DriverHandle  - Driver handle which contains the routing information: PATH.
+
+Returns:
+  EFI_SUCCESS          - Routine success.
+  EFI_BUFFER_TOO_SMALL - The ConfigHdr string buffer is too small.
+
+--*/
+;
+
+BOOLEAN
+FindBlockName (
+  IN OUT CHAR16                *String,
+  UINTN                        Offset,
+  UINTN                        Width
+  )
+/*++
+
+Routine Description:
+  Search BlockName "&OFFSET=Offset&WIDTH=Width" in a string.
+
+Arguments:
+  String       - The string to be searched in.
+  Offset       - Offset in BlockName.
+  Width        - Width in BlockName.
+
+Returns:
+  TRUE         - Block name found.
+  FALSE        - Block name not found.
+
+--*/
+;
+
+EFI_STATUS
+GetBrowserData (
+  EFI_GUID                   *VariableGuid, OPTIONAL
+  CHAR16                     *VariableName, OPTIONAL
+  UINTN                      *BufferSize,
+  UINT8                      *Buffer
+  )
+/*++
+
+Routine Description:
+  This routine is invoked by ConfigAccess.Callback() to retrived uncommitted data from Form Browser.
+
+Arguments:
+  VariableGuid  - An optional field to indicate the target variable GUID name to use.
+  VariableName  - An optional field to indicate the target human-readable variable name.
+  BufferSize    - On input: Length in bytes of buffer to hold retrived data.
+                  On output:
+                    If return EFI_BUFFER_TOO_SMALL, containg length of buffer desired.
+  Buffer        - Buffer to hold retrived data.
+
+Returns:
+  EFI_SUCCESS          - Routine success.
+  EFI_BUFFER_TOO_SMALL - The intput buffer is too small.
+
+--*/
+;
+
+EFI_STATUS
+GetHiiHandles (
+  IN OUT UINTN                     *HandleBufferLength,
+  OUT    EFI_HII_HANDLE            **HiiHandleBuffer
+  )
+/*++
+
+Routine Description:
+  Determines the handles that are currently active in the database.
+  It's the caller's responsibility to free handle buffer.
+
+Arguments:
+  HiiDatabase           - A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+  HandleBufferLength    - On input, a pointer to the length of the handle buffer. On output,
+                          the length of the handle buffer that is required for the handles found.
+  HiiHandleBuffer       - Pointer to an array of Hii Handles returned.
+
+Returns:
+  EFI_SUCCESS           - Get an array of Hii Handles successfully.
+  EFI_INVALID_PARAMETER - Hii is NULL.
+  EFI_NOT_FOUND         - Database not found.
+
+--*/
+;
+
+EFI_STATUS
+SetBrowserData (
+  EFI_GUID                   *VariableGuid, OPTIONAL
+  CHAR16                     *VariableName, OPTIONAL
+  UINTN                      BufferSize,
+  UINT8                      *Buffer,
+  CHAR16                     *RequestElement  OPTIONAL
+  )
+/*++
+
+Routine Description:
+  This routine is invoked by ConfigAccess.Callback() to update uncommitted data of Form Browser.
+
+Arguments:
+  VariableGuid   - An optional field to indicate the target variable GUID name to use.
+  VariableName   - An optional field to indicate the target human-readable variable name.
+  BufferSize     - Length in bytes of buffer to hold retrived data.
+  Buffer         - Buffer to hold retrived data.
+  RequestElement - An optional field to specify which part of the buffer data
+                   will be send back to Browser. If NULL, the whole buffer of
+                   data will be committed to Browser.
+                   <RequestElement> ::= &OFFSET=<Number>&WIDTH=<Number>*
+
+Returns:
+  EFI_SUCCESS  - Routine success.
+  Other        - Updating Browser uncommitted data failed.
+
+--*/
+;
+
+EFI_STATUS
+ConvertRfc3066LanguageToIso639Language (
+  CHAR8   *LanguageRfc3066,
+  CHAR8   *LanguageIso639
+  )
+/*++
+
+Routine Description:
+  Convert language code from RFC3066 to ISO639-2.
+
+Arguments:
+  LanguageRfc3066 - RFC3066 language code.
+  LanguageIso639  - ISO639-2 language code.
+
+Returns:
+  EFI_SUCCESS   - Language code converted.
+  EFI_NOT_FOUND - Language code not found.
+
+--*/
+;
+
+CHAR8 *
+Rfc3066ToIso639 (
+  CHAR8  *SupportedLanguages
+  )
+/*++
+
+Routine Description:
+  Convert language code list from RFC3066 to ISO639-2, e.g. "en-US;fr-FR" will
+  be converted to "engfra".
+
+Arguments:
+  SupportedLanguages - The RFC3066 language list.
+
+Returns:
+  The ISO639-2 language list.
+
+--*/
+;
+
+EFI_STATUS
+GetCurrentLanguage (
+  OUT     CHAR8               *Lang
+  )
+/*++
+
+Routine Description:
+  Determine what is the current language setting
+
+Arguments:
+  Lang      - Pointer of system language
+
+Returns:
+  Status code
 
 --*/
 ;
 
 VOID
-EfiLibHiiVariablePackGetMap (
-  IN    EFI_HII_VARIABLE_PACK        *Pack,  
-  OUT   CHAR16                       **Name,  OPTIONAL
-  OUT   EFI_GUID                     **Guid,  OPTIONAL
-  OUT   UINT16                       *Id,     OPTIONAL
-  OUT   VOID                         **Var,   OPTIONAL
-  OUT   UINTN                        *Size    OPTIONAL
-  ) 
-/*++
-
-Routine Description:
-
-  Extracts a variable form a Pack.
-
-Arguments:
-
-  Pack - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns: 
-
-  VOID.
-
---*/
-;
-
-UINTN
-EfiLibHiiVariablePackListGetMapCnt (
-  IN    EFI_HII_VARIABLE_PACK_LIST   *List
+GetNextLanguage (
+  IN OUT CHAR8      **LangCode,
+  OUT CHAR8         *Lang
   )
 /*++
 
 Routine Description:
-
-  Finds a count of the variables/maps in the List.
+  Get next language from language code list.
 
 Arguments:
+  LangCode - The language code.
+  Lang     - Returned language.
 
-  List - List of variables
-
-Returns: 
-
-  Number of Map in the variable pack list.
+Returns:
+  None.
 
 --*/
 ;
 
-typedef VOID (EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK) (
-  IN CHAR16                      *Name,
-  IN EFI_GUID                    *Guid,
-  IN UINT16                      Id,
-  IN VOID                        *Var,
-  IN UINTN                       Size
-  )  
-/*++
-
-Routine Description:
-
-  type definition for the callback to be 
-  used with EfiLibHiiVariablePackListForEachVar().
-
-Arguments:
-
-  Id   - Variable/Map ID
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns: 
-
-  VOID
-
---*/
-;
-
-VOID
-EfiLibHiiVariablePackListForEachVar (
-  IN    EFI_HII_VARIABLE_PACK_LIST               *List,
-  IN    EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK  *Callback
+CHAR8 *
+GetSupportedLanguages (
+  IN EFI_HII_HANDLE           HiiHandle
   )
 /*++
 
 Routine Description:
-
-  Will iterate all variable/maps as appearing 
-  in List and for each, it will call the Callback.
-
-Arguments:
-
-  List     - List of variables
-  Callback - Routine to be called for each iterated variable.
-
-Returns: 
-
-  VOID
-
---*/
-;
-
-EFI_STATUS
-EfiLibHiiVariablePackListGetMapByIdx (
-  IN    UINTN                         Idx,  
-  IN    EFI_HII_VARIABLE_PACK_LIST    *List,  
-  OUT   CHAR16                        **Name,  OPTIONAL
-  OUT   EFI_GUID                      **Guid,  OPTIONAL
-  OUT   UINT16                        *Id,    OPTIONAL
-  OUT   VOID                          **Var,
-  OUT   UINTN                         *Size
-  ) 
-/*++
-
-Routine Description:
-
-  Finds a variable form List given 
-  the order number as appears in the List.
+  This function returns the list of supported languages, in the format specified
+  in UEFI specification Appendix M.
 
 Arguments:
-
-  Idx  - The index of the variable/map to retrieve
-  List - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
+  HiiHandle  - The HII package list handle.
 
 Returns:
-
-  EFI_SUCCESS   - Variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
+  The supported languages.
 
 --*/
 ;
 
-EFI_STATUS
-EfiLibHiiVariablePackListGetMapById (
-  IN    UINT16                        Id,  
-  IN    EFI_HII_VARIABLE_PACK_LIST    *List,
-  OUT   CHAR16                        **Name,  OPTIONAL
-  OUT   EFI_GUID                      **Guid,  OPTIONAL
-  OUT   VOID                          **Var,
-  OUT   UINTN                         *Size
-  ) 
-/*++
-
-Routine Description:
-
-  Finds a variable form List given the 
-  order number as appears in the List.
-
-Arguments:
-
-  Id   - The ID of the variable/map to retrieve
-  List - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns:
-
-  EFI_SUCCESS   - Variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
-
---*/
-;
-
-EFI_STATUS
-EfiLibHiiVariablePackListGetMap (
-  IN    EFI_HII_VARIABLE_PACK_LIST   *List,
-  IN    CHAR16                       *Name,
-  IN    EFI_GUID                     *Guid,
-  OUT   UINT16                       *Id,
-  OUT   VOID                         **Var, 
-  OUT   UINTN                        *Size
-  ) 
-/*++
-
-Routine Description:
-
-  Finds a variable form EFI_HII_VARIABLE_PACK_LIST given name and GUID.
-
-Arguments:
-
-  List - List of variables
-  Name - Name of the variable/map to be found
-  Guid - GUID of the variable/map to be found
-  Var  - Pointer to the variable/map found
-  Size - Size of the variable/map in bytes found
-
-Returns:
-
-  EFI_SUCCESS   - variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - variable is not found, OUT parameters are not valid
-
---*/
-;
-
-EFI_STATUS
-EfiLibHiiVariableRetrieveFromNv (
-  IN  CHAR16                     *Name,
-  IN  EFI_GUID                   *Guid,
-  IN  UINTN                      Size,
-  OUT VOID                       **Var
+UINT16
+GetSupportedLanguageNumber (
+  IN EFI_HII_HANDLE           HiiHandle
   )
 /*++
 
 Routine Description:
-  Finds out if a variable of specific Name/Guid/Size exists in NV. 
-  If it does, it will retrieve it into the Var. 
+  This function returns the number of supported languages
 
 Arguments:
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into buffer pointed by this pointer.
-                     If pointing to NULL, the buffer will be allocated. Caller is responsible for releasing the buffer.
+  HiiHandle  - The HII package list handle.
+
 Returns:
-  EFI_SUCCESS    - The variable of exact Name/Guid/Size parameters was retrieved and written to Var.
-  EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
-
---*/
-;
-
-////
-//// Variable override support.
-////
-
-EFI_STATUS
-EfiLibHiiVariableOverrideIfSuffix (
-  IN  CHAR16                 *Suffix,
-  IN  CHAR16                 *Name,
-  IN  EFI_GUID               *Guid,
-  IN  UINTN                   Size,
-  OUT VOID                   *Var
-  )  
-/*++
-
-Routine Description:
-  Overrrides the variable with NV data if found.
-  But it only does it if the Name ends with specified Suffix.
-  For example, if Suffix="MyOverride" and the Name="XyzSetupMyOverride",
-  the Suffix matches the end of Name, so the variable will be loaded from NV
-  provided the variable exists and the GUID and Size matches.
-
-Arguments:
-  Suffix           - Suffix the Name should end with.
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into this buffer.
-                     Caller is responsible for providing storage of exactly Size size in bytes.
-Returns:
-  EFI_SUCCESS           - The variable was overriden with NV variable of same Name/Guid/Size.
-  EFI_INVALID_PARAMETER - The name of the variable does not end with <Suffix>.
-  EFI_NOT_FOUND         - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR        - The variable in the NV was of different size, or NV API returned error.
+  The  number of supported languages.
 
 --*/
 ;
 
 EFI_STATUS
-EfiLibHiiVariableOverrideBySuffix (
-  IN  CHAR16                 *Suffix,
-  IN  CHAR16                 *Name,
-  IN  EFI_GUID               *Guid,
-  IN  UINTN                   Size,
-  OUT VOID                   *Var
-  ) 
+GetStringFromHandle (
+  IN  EFI_HII_HANDLE                  HiiHandle,
+  IN  EFI_STRING_ID                   StringId,
+  OUT EFI_STRING                      *String
+  )
 /*++
 
 Routine Description:
-  Overrrides the variable with NV data if found.
-  But it only does it if the NV contains the same variable with Name is appended with Suffix.  
-  For example, if Suffix="MyOverride" and the Name="XyzSetup",
-  the Suffix will be appended to the end of Name, and the variable with Name="XyzSetupMyOverride"
-  will be loaded from NV provided the variable exists and the GUID and Size matches.
+  Get string specified by StringId form the HiiHandle.
 
 Arguments:
-  Suffix           - Suffix the variable will be appended with.
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into this buffer.
-                     Caller is responsible for providing storage of exactly Size size in bytes.
+  HiiHandle     - The HII handle of package list.
+  StringId      - The String ID.
+  String        - The output string.
 
 Returns:
-  EFI_SUCCESS    - The variable was overriden with NV variable of same Name/Guid/Size.
-  EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
+  EFI_NOT_FOUND         - String is not found.
+  EFI_SUCCESS           - Operation is successful.
+  EFI_OUT_OF_RESOURCES  - There is not enought memory in the system.
+  EFI_INVALID_PARAMETER - The String is NULL.
 
 --*/
 ;
 
+EFI_STATUS
+GetStringFromToken (
+  IN  EFI_GUID                        *ProducerGuid,
+  IN  EFI_STRING_ID                   StringId,
+  OUT EFI_STRING                      *String
+  )
+/*++
+
+Routine Description:
+  Get the string given the StringId and String package Producer's Guid.
+
+Arguments:
+  ProducerGuid  - The Guid of String package list.
+  StringId      - The String ID.
+  String        - The output string.
+
+Returns:
+  EFI_NOT_FOUND         - String is not found.
+  EFI_SUCCESS           - Operation is successful.
+  EFI_OUT_OF_RESOURCES  - There is not enought memory in the system.
+
+--*/
+;
+
+EFI_STATUS
+IfrLibNewString (
+  IN  EFI_HII_HANDLE                  PackageList,
+  OUT EFI_STRING_ID                   *StringId,
+  IN  CONST EFI_STRING                String
+  )
+/*++
+
+  Routine Description:
+    This function adds the string into String Package of each language.
+
+  Arguments:
+    PackageList       - Handle of the package list where this string will be added.
+    StringId          - On return, contains the new strings id, which is unique within PackageList.
+    String            - Points to the new null-terminated string.
+
+  Returns:
+    EFI_SUCCESS            - The new string was added successfully.
+    EFI_NOT_FOUND          - The specified PackageList could not be found in database.
+    EFI_OUT_OF_RESOURCES   - Could not add the string due to lack of resources.
+    EFI_INVALID_PARAMETER  - String is NULL or StringId is NULL is NULL.
+
+--*/
+;
+
+EFI_STATUS
+IfrLibGetString (
+  IN  EFI_HII_HANDLE                  PackageList,
+  IN  EFI_STRING_ID                   StringId,
+  OUT EFI_STRING                      String,
+  IN  OUT UINTN                       *StringSize
+  )
+/*++
+
+  Routine Description:
+    This function try to retrieve string from String package of current language.
+    If fail, it try to retrieve string from String package of first language it support.
+
+  Arguments:
+    PackageList       - The package list in the HII database to search for the specified string.
+    StringId          - The string's id, which is unique within PackageList.
+    String            - Points to the new null-terminated string.
+    StringSize        - On entry, points to the size of the buffer pointed to by String, in bytes. On return,
+                        points to the length of the string, in bytes.
+
+  Returns:
+    EFI_SUCCESS            - The string was returned successfully.
+    EFI_NOT_FOUND          - The string specified by StringId is not available.
+    EFI_BUFFER_TOO_SMALL   - The buffer specified by StringLength is too small to hold the string.
+    EFI_INVALID_PARAMETER  - The String or StringSize was NULL.
+
+--*/
+;
+
+EFI_STATUS
+IfrLibSetString (
+  IN EFI_HII_HANDLE                   PackageList,
+  IN EFI_STRING_ID                    StringId,
+  IN CONST EFI_STRING                 String
+  )
+/*++
+
+  Routine Description:
+    This function updates the string in String package of current language.
+
+  Arguments:
+    PackageList       - The package list containing the strings.
+    StringId          - The string's id, which is unique within PackageList.
+    String            - Points to the new null-terminated string.
+
+  Returns:
+    EFI_SUCCESS            - The string was updated successfully.
+    EFI_NOT_FOUND          - The string specified by StringId is not in the database.
+    EFI_INVALID_PARAMETER  - The String was NULL.
+    EFI_OUT_OF_RESOURCES   - The system is out of resources to accomplish the task.
+
+--*/
+;
+
+EFI_STATUS
+IfrLibCreatePopUp (
+  IN  UINTN                       NumberOfLines,
+  OUT EFI_INPUT_KEY               *KeyValue,
+  IN  CHAR16                      *String,
+  ...
+  )
+/*++
+
+Routine Description:
+  Draw a dialog and return the selected key.
+
+Arguments:
+  NumberOfLines     - The number of lines for the dialog box
+  KeyValue          - The EFI_KEY value returned if HotKey is TRUE..
+  String            - Pointer to the first string in the list
+  ...               - A series of (quantity == NumberOfLines) text strings which
+                      will be used to construct the dialog box
+
+Returns:
+  EFI_SUCCESS           - Displayed dialog and received user interaction
+  EFI_INVALID_PARAMETER - One of the parameters was invalid.
+
+--*/
+;
+
+EFI_STATUS
+IfrLibUpdateForm (
+  IN EFI_HII_HANDLE            Handle,
+  IN EFI_GUID                  *FormSetGuid, OPTIONAL
+  IN EFI_FORM_ID               FormId,
+  IN UINT16                    Label,
+  IN BOOLEAN                   Insert,
+  IN EFI_HII_UPDATE_DATA       *Data
+  )
+/*++
+
+Routine Description:
+  This function allows the caller to update a form that has
+  previously been registered with the EFI HII database.
+
+Arguments:
+  Handle       - Hii Handle
+  FormSetGuid  - The formset should be updated.
+  FormId       - The form should be updated.
+  Label        - Update information starting immediately after this label in the IFR
+  Insert       - If TRUE and Data is not NULL, insert data after Label.
+                 If FALSE, replace opcodes between two labels with Data.
+  Data         - The adding data; If NULL, remove opcodes between two Label.
+
+Returns:
+  EFI_SUCCESS  - Update success.
+  Other        - Update fail.
+
+--*/
+;
 #endif

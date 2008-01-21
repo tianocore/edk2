@@ -19,12 +19,17 @@
 #ifndef __EFI_HII_CONFIG_ACCESS_H__
 #define __EFI_HII_CONFIG_ACCESS_H__
 
-#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
+#include <Protocol/FormBrowser2.h>
 
 #define EFI_HII_CONFIG_ACCESS_PROTOCOL_GUID  \
   { 0x330d4706, 0xf2a0, 0x4e4f, { 0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85 } }
 
 typedef struct _EFI_HII_CONFIG_ACCESS_PROTOCOL  EFI_HII_CONFIG_ACCESS_PROTOCOL;
+
+typedef UINTN EFI_BROWSER_ACTION;
+
+#define EFI_BROWSER_ACTION_CHANGING 0
+#define EFI_BROWSER_ACTION_CHANGED  1
 
 /**
    
@@ -234,4 +239,5 @@ struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
 extern EFI_GUID gEfiHiiConfigAccessProtocolGuid;
 
 #endif
+
 

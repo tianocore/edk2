@@ -1077,3 +1077,17 @@ FreeAlignedPool (
   Status = gBS->FreePool (RawAddress);
   ASSERT_EFI_ERROR (Status);
 }
+
+
+VOID
+EFIAPI
+SafeFreePool (
+  IN VOID   *Buffer
+  )
+{
+  if (Buffer != NULL) {
+    FreePool (Buffer);
+    Buffer = NULL;
+  }
+}
+
