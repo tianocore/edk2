@@ -356,7 +356,7 @@ DisplayForm (
   UINTN               Index;
   UINTN               Count;
   UINT16              MenuItemCount;
-  EFI_HII_HANDLE      Handle;
+  FRAMEWORK_EFI_HII_HANDLE       Handle;
   UINT16              FormId;
   STRING_REF          String;
   EFI_FILE_FORM_TAGS  *FileFormTags;
@@ -432,14 +432,14 @@ DisplayForm (
   //
   FreePool (StringPtr);
 
-  for (Index = 0; FormTags.Tags[Index].Operand != EFI_IFR_END_FORM_OP; Index++) {
+  for (Index = 0; FormTags.Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_FORM_OP; Index++) {
     GrayOut       = FALSE;
     Suppress      = FALSE;
     SuppressIf    = FALSE;
     Conditional   = FALSE;
     FileFormTags  = FileFormTagsHead;
 
-    if (FormTags.Tags[Index].Operand == EFI_IFR_FORM_OP) {
+    if (FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_FORM_OP) {
       FormId = FormTags.Tags[Index].Id;
     }
     //
@@ -465,10 +465,10 @@ DisplayForm (
 
     do {
       switch (FormTags.Tags[Index].Operand) {
-      case EFI_IFR_SUPPRESS_IF_OP:
+      case FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP:
         SuppressIf = TRUE;
 
-      case EFI_IFR_GRAYOUT_IF_OP:
+      case FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP:
 
         Conditional = TRUE;
 
@@ -482,11 +482,11 @@ DisplayForm (
         // through the AND/OR/NOT data to come up with some meaningful ID data.
         //
         for (;
-             FormTags.Tags[Index].Operand == EFI_IFR_AND_OP   ||
-             FormTags.Tags[Index].Operand == EFI_IFR_OR_OP    ||
-             FormTags.Tags[Index].Operand == EFI_IFR_GT_OP    ||
-             FormTags.Tags[Index].Operand == EFI_IFR_GE_OP    ||
-             FormTags.Tags[Index].Operand == EFI_IFR_NOT_OP;
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_AND_OP   ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_OR_OP    ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_GT_OP    ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_GE_OP    ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_NOT_OP;
            Index++
             )
           ;
@@ -518,18 +518,18 @@ DisplayForm (
         // Advance to the end of the expression (Will land us at a grayoutif/suppressif or the op-code being affected)
         //
         for (;
-             FormTags.Tags[Index].Operand == EFI_IFR_EQ_ID_VAL_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_EQ_VAR_VAL_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_EQ_ID_ID_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_EQ_ID_LIST_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_NOT_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_AND_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_OR_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_TRUE_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_FALSE_OP ||
-             FormTags.Tags[Index].Operand == EFI_IFR_GT_OP    ||
-             FormTags.Tags[Index].Operand == EFI_IFR_GE_OP    ||
-             FormTags.Tags[Index].Operand == EFI_IFR_LABEL_OP;
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_EQ_ID_ID_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_NOT_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_AND_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_OR_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_TRUE_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_FALSE_OP ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_GT_OP    ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_GE_OP    ||
+             FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_LABEL_OP;
            Index++
             )
           ;
@@ -551,7 +551,7 @@ GetOut:
       } else {
         FormTags.Tags[Index].GrayOut = FALSE;
       }
-      if (Suppress && FormTags.Tags[Index].Operand == EFI_IFR_ONE_OF_OPTION_OP) {
+      if (Suppress && FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP) {
         //
         // Only need .Suppress field when the tag is a one_of_option. For other cases, omit them directly.
         //
@@ -562,8 +562,8 @@ GetOut:
 
       if ((
             FormTags.Tags[Index].NumberOfLines > 0 ||
-            FormTags.Tags[Index].Operand == EFI_IFR_DATE_OP ||
-            FormTags.Tags[Index].Operand == EFI_IFR_TIME_OP
+            FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_DATE_OP ||
+            FormTags.Tags[Index].Operand == FRAMEWORK_EFI_IFR_TIME_OP
           ) &&
           !Suppress
           ) {
@@ -604,7 +604,7 @@ GetOut:
       // Keep processing menu entries based on the resultant suppress/grayout results until we hit an end-if
       //
       Index++;
-    } while (FormTags.Tags[Index].Operand != EFI_IFR_END_IF_OP && Conditional);
+    } while (FormTags.Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_IF_OP && Conditional);
 
     //
     // We advanced the index for the above conditional, rewind it to keep harmony with the for loop logic
@@ -612,7 +612,7 @@ GetOut:
     Index--;
   }
 
-  Selection = UiDisplayMenu (TRUE, FileFormTagsHead, (EFI_IFR_DATA_ARRAY *) CallbackData);
+  Selection = UiDisplayMenu (TRUE, FileFormTagsHead, (FRAMEWORK_EFI_IFR_DATA_ARRAY *) CallbackData);
 
   return Selection;
 }
@@ -693,11 +693,11 @@ Returns:
   gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
   switch (Selection->ThisTag->Operand) {
-  case EFI_IFR_ORDERED_LIST_OP:
-  case EFI_IFR_ONE_OF_OP:
-  case EFI_IFR_NUMERIC_OP:
-  case EFI_IFR_TIME_OP:
-  case EFI_IFR_DATE_OP:
+  case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
+  case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+  case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+  case FRAMEWORK_EFI_IFR_TIME_OP:
+  case FRAMEWORK_EFI_IFR_DATE_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
@@ -709,7 +709,7 @@ Returns:
 
       }
 
-      if ((Selection->ThisTag->Operand == EFI_IFR_DATE_OP) || (Selection->ThisTag->Operand == EFI_IFR_TIME_OP)) {
+      if ((Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
         PrintAt (
           StartColumnOfHelp,
           BottomRowOfHelp,
@@ -731,13 +731,13 @@ Returns:
       //
       // If it is a selected numeric with manual input, display different message
       //
-      if ((Selection->ThisTag->Operand == EFI_IFR_NUMERIC_OP) && (Selection->ThisTag->Step == 0)) {
+      if ((Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_NUMERIC_OP) && (Selection->ThisTag->Step == 0)) {
         PrintStringAt (SecCol, TopRowOfHelp, gNumericInput);
-      } else if (Selection->ThisTag->Operand != EFI_IFR_ORDERED_LIST_OP) {
+      } else if (Selection->ThisTag->Operand != FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
       }
 
-      if (Selection->ThisTag->Operand == EFI_IFR_ORDERED_LIST_OP) {
+      if (Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_ORDERED_LIST_OP) {
         PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gPlusString);
         PrintStringAt (ThdCol, TopRowOfHelp, gMinusString);
       }
@@ -746,7 +746,7 @@ Returns:
     }
     break;
 
-  case EFI_IFR_CHECKBOX_OP:
+  case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
@@ -760,9 +760,9 @@ Returns:
     PrintStringAt (SecCol, BottomRowOfHelp, gToggleCheckBox);
     break;
 
-  case EFI_IFR_REF_OP:
-  case EFI_IFR_PASSWORD_OP:
-  case EFI_IFR_STRING_OP:
+  case FRAMEWORK_EFI_IFR_REF_OP:
+  case FRAMEWORK_EFI_IFR_PASSWORD_OP:
+  case FRAMEWORK_EFI_IFR_STRING_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
@@ -776,7 +776,7 @@ Returns:
       PrintAt (StartColumnOfHelp, BottomRowOfHelp, (CHAR16 *) L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
       PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
     } else {
-      if (Selection->ThisTag->Operand != EFI_IFR_REF_OP) {
+      if (Selection->ThisTag->Operand != FRAMEWORK_EFI_IFR_REF_OP) {
         PrintStringAt (
           (LocalScreen.RightColumn - GetStringWidth (gEnterCommitString) / 2) / 2,
           BottomRowOfHelp,
@@ -823,14 +823,14 @@ ExtractFormHandle (
     //
     // Advance Index to the first FormOp tag information
     //
-    for (Index = 0; FileFormTags->FormTags.Tags[Index].Operand != EFI_IFR_FORM_OP; Index++)
+    for (Index = 0; FileFormTags->FormTags.Tags[Index].Operand != FRAMEWORK_EFI_IFR_FORM_OP; Index++)
       ;
   } else {
     //
     // Advance Index to the FormOp with the correct ID value
     //
     for (; LocalTags.Next != NULL; LocalTags = *LocalTags.Next) {
-      for (Index = 0; LocalTags.Tags[Index].Operand != EFI_IFR_FORM_OP; Index++)
+      for (Index = 0; LocalTags.Tags[Index].Operand != FRAMEWORK_EFI_IFR_FORM_OP; Index++)
         ;
       if (LocalTags.Tags[Index].Id == IdValue) {
         break;
@@ -886,7 +886,7 @@ UpdateNewTagData (
   FormTags->Tags = AllocateZeroPool (NumberOfTags * sizeof (EFI_TAG));
   ASSERT (FormTags->Tags != NULL);
 
-  for (CurrTag = 0; FormData[Index] != EFI_IFR_END_FORM_SET_OP; CurrTag++) {
+  for (CurrTag = 0; FormData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP; CurrTag++) {
     //
     // Operand = IFR OpCode
     //
@@ -909,27 +909,27 @@ UpdateNewTagData (
     //
     switch (FormData[Index]) {
 
-    case EFI_IFR_FORM_OP:
-    case EFI_IFR_SUBTITLE_OP:
-    case EFI_IFR_TEXT_OP:
-    case EFI_IFR_REF_OP:
+    case FRAMEWORK_EFI_IFR_FORM_OP:
+    case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
+    case FRAMEWORK_EFI_IFR_TEXT_OP:
+    case FRAMEWORK_EFI_IFR_REF_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       break;
 
-    case EFI_IFR_VARSTORE_SELECT_OP:
+    case FRAMEWORK_EFI_IFR_VARSTORE_SELECT_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
-      CopyMem (&CurrentVariable, &((EFI_IFR_VARSTORE_SELECT *) &FormData[Index])->VarId, sizeof (UINT16));
+      CopyMem (&CurrentVariable, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT *) &FormData[Index])->VarId, sizeof (UINT16));
       break;
 
-    case EFI_IFR_END_FORM_OP:
+    case FRAMEWORK_EFI_IFR_END_FORM_OP:
       FormTags->Tags[CurrTag].Operand       = FormData[Index];
       FormTags->Tags[CurrTag].NumberOfLines = 0;
 
       Finished = TRUE;
       break;
 
-    case EFI_IFR_ORDERED_LIST_OP:
-    case EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], FormData, Index, FileFormTags, CurrentVariable);
 
       //
@@ -942,23 +942,23 @@ UpdateNewTagData (
       QuestionIndex = (UINT16) CurrTag;
       break;
 
-    case EFI_IFR_ONE_OF_OPTION_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
-      FormTags->Tags[QuestionIndex].Key = ((EFI_IFR_ONE_OF_OPTION *) &FormData[Index])->Key;
-      FormTags->Tags[QuestionIndex].ResetRequired = (BOOLEAN) (FormTags->Tags[QuestionIndex].Flags & EFI_IFR_FLAG_RESET_REQUIRED);
+      FormTags->Tags[QuestionIndex].Key = ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &FormData[Index])->Key;
+      FormTags->Tags[QuestionIndex].ResetRequired = (BOOLEAN) (FormTags->Tags[QuestionIndex].Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
       break;
 
-    case EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], FormData, Index, FileFormTags, CurrentVariable);
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       break;
 
-    case EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
       GetNumericHeader (&FormTags->Tags[CurrTag], FormData, Index, (UINT16) 1, FileFormTags, CurrentVariable);
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       break;
 
-    case EFI_IFR_DATE_OP:
+    case FRAMEWORK_EFI_IFR_DATE_OP:
       //
       // Date elements come in as a Year, Month, Day.  We need to process them as a country-based
       // Order.  It is much easier to do it here than anywhere else.
@@ -1007,7 +1007,7 @@ UpdateNewTagData (
       TagLength = FormData[Index + 1];
       break;
 
-    case EFI_IFR_TIME_OP:
+    case FRAMEWORK_EFI_IFR_TIME_OP:
       GetNumericHeader (&FormTags->Tags[CurrTag], FormData, Index, (UINT16) 0, FileFormTags, CurrentVariable);
 
       if (Count == 2) {
@@ -1025,44 +1025,44 @@ UpdateNewTagData (
       }
       break;
 
-    case EFI_IFR_PASSWORD_OP:
-    case EFI_IFR_STRING_OP:
+    case FRAMEWORK_EFI_IFR_PASSWORD_OP:
+    case FRAMEWORK_EFI_IFR_STRING_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], FormData, Index, FileFormTags, CurrentVariable);
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       break;
 
-    case EFI_IFR_INCONSISTENT_IF_OP:
-    case EFI_IFR_SUPPRESS_IF_OP:
-    case EFI_IFR_GRAYOUT_IF_OP:
+    case FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP:
+    case FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP:
+    case FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP:
       ConsistencyId++;
       break;
 
-    case EFI_IFR_EQ_ID_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       FormTags->Tags[CurrTag].ConsistencyId = ConsistencyId;
       break;
 
-    case EFI_IFR_EQ_VAR_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       FormTags->Tags[CurrTag].ConsistencyId = ConsistencyId;
       break;
 
-    case EFI_IFR_EQ_ID_ID_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
       FormTags->Tags[CurrTag].ConsistencyId = ConsistencyId;
       break;
 
-    case EFI_IFR_AND_OP:
-    case EFI_IFR_OR_OP:
-    case EFI_IFR_NOT_OP:
-    case EFI_IFR_TRUE_OP:
-    case EFI_IFR_FALSE_OP:
-    case EFI_IFR_GT_OP:
-    case EFI_IFR_GE_OP:
+    case FRAMEWORK_EFI_IFR_AND_OP:
+    case FRAMEWORK_EFI_IFR_OR_OP:
+    case FRAMEWORK_EFI_IFR_NOT_OP:
+    case FRAMEWORK_EFI_IFR_TRUE_OP:
+    case FRAMEWORK_EFI_IFR_FALSE_OP:
+    case FRAMEWORK_EFI_IFR_GT_OP:
+    case FRAMEWORK_EFI_IFR_GE_OP:
       FormTags->Tags[CurrTag].ConsistencyId = ConsistencyId;
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
       IfrToFormTag (FormData[Index], &FormTags->Tags[CurrTag], (VOID *) &FormData[Index], NULL);
 
       FormTags->Tags[CurrTag].ConsistencyId = ConsistencyId;
@@ -1104,7 +1104,7 @@ ExtractDynamicFormHandle (
 Routine Description:
 
   The function does the most of the works when the EFI_TAG that
-  user selects on is EFI_IFR_FLAG_INTERACTIVE or EFI_IFR_PASSWORD_OP:
+  user selects on is FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE or FRAMEWORK_EFI_IFR_PASSWORD_OP:
   invoke CallBack, update the new form data.
 
 Arguments:
@@ -1140,7 +1140,7 @@ Returns:
   UINT16                      ConsistencyId;
   UINT16                      CurrentVariable;
   EFI_VARIABLE_DEFINITION     *VariableDefinition;
-  EFI_IFR_DATA_ENTRY          *DataEntry;
+  FRAMEWORK_EFI_IFR_DATA_ENTRY          *DataEntry;
 
   VariableDefinition  = NULL;
   NullCharacter       = CHAR_NULL;
@@ -1174,7 +1174,7 @@ Returns:
       CopyMem (&TagGuid, &LocalTags->Tags[0].GuidValue, sizeof (EFI_GUID));
     }
 
-    for (Index = 0; LocalTags->Tags[Index].Operand != EFI_IFR_FORM_OP; Index++)
+    for (Index = 0; LocalTags->Tags[Index].Operand != FRAMEWORK_EFI_IFR_FORM_OP; Index++)
       ;
     if (LocalTags->Tags[Index].Id == IdValue) {
       break;
@@ -1183,7 +1183,7 @@ Returns:
   //
   // If we are going to callback on a non-goto opcode, make sure we don't change pages
   //
-  if (Selection->ThisTag->Operand != EFI_IFR_REF_OP) {
+  if (Selection->ThisTag->Operand != FRAMEWORK_EFI_IFR_REF_OP) {
     TargetPage = Selection->FormId;
   }
   //
@@ -1211,17 +1211,17 @@ Returns:
 
   ExtractRequestedNvMap (FileFormTags, CurrentVariable, &VariableDefinition);
 
-  if (Selection->ThisTag->Flags & (EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS)) {
-    ((EFI_IFR_DATA_ARRAY *) CallbackData)->NvRamMap = VariableDefinition->NvRamMap;
+  if (Selection->ThisTag->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS)) {
+    ((FRAMEWORK_EFI_IFR_DATA_ARRAY *) CallbackData)->NvRamMap = VariableDefinition->NvRamMap;
   } else {
-    ((EFI_IFR_DATA_ARRAY *) CallbackData)->NvRamMap = NULL;
+    ((FRAMEWORK_EFI_IFR_DATA_ARRAY *) CallbackData)->NvRamMap = NULL;
   }
 
   if ((FormCallback != NULL) && (FormCallback->Callback != NULL)) {
     Status = FormCallback->Callback (
                             FormCallback,
                             Selection->ThisTag->Key,
-                            (EFI_IFR_DATA_ARRAY *) CallbackData,
+                            (FRAMEWORK_EFI_IFR_DATA_ARRAY *) CallbackData,
                             &Packet
                             );
   }
@@ -1261,14 +1261,14 @@ Returns:
       // location associated with the op-code specified there.  This is used on single op-code instances
       // and not for when a hyperlink sent us a whole page of data.
       //
-      DataEntry = (EFI_IFR_DATA_ENTRY *) (&Packet->DataArray + 1);
+      DataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (&Packet->DataArray + 1);
       if (Packet->DataArray.EntryCount == 1) {
         switch (DataEntry->OpCode) {
-        case EFI_IFR_STRING_OP:
-        case EFI_IFR_NUMERIC_OP:
-        case EFI_IFR_ORDERED_LIST_OP:
-        case EFI_IFR_ONE_OF_OP:
-        case EFI_IFR_CHECKBOX_OP:
+        case FRAMEWORK_EFI_IFR_STRING_OP:
+        case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+        case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
+        case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+        case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
           CopyMem (
             &VariableDefinition->NvRamMap[Selection->ThisTag->StorageStart],
             &DataEntry->Data,
@@ -1276,11 +1276,11 @@ Returns:
             );
           break;
 
-        case EFI_IFR_NV_ACCESS_COMMAND:
+        case FRAMEWORK_EFI_IFR_NV_ACCESS_COMMAND:
           CopyMem (
-            &VariableDefinition->NvRamMap[((EFI_IFR_NV_DATA *) Packet)->QuestionId],
-            ((EFI_IFR_NV_DATA *) Packet) + 1,
-            ((EFI_IFR_NV_DATA *) Packet)->StorageWidth
+            &VariableDefinition->NvRamMap[((FRAMEWORK_EFI_IFR_NV_DATA *) Packet)->QuestionId],
+            ((FRAMEWORK_EFI_IFR_NV_DATA *) Packet) + 1,
+            ((FRAMEWORK_EFI_IFR_NV_DATA *) Packet)->StorageWidth
             );
           break;
 
@@ -1313,19 +1313,19 @@ Returns:
     FreePool (Packet);
   }
 
-  for (BackupIndex = 0; LocalTags->Tags[BackupIndex].Operand != EFI_IFR_END_FORM_OP; BackupIndex++) {
+  for (BackupIndex = 0; LocalTags->Tags[BackupIndex].Operand != FRAMEWORK_EFI_IFR_END_FORM_OP; BackupIndex++) {
     switch (LocalTags->Tags[BackupIndex].Operand) {
-    case EFI_IFR_EQ_VAR_VAL_OP:
-    case EFI_IFR_EQ_ID_VAL_OP:
-    case EFI_IFR_EQ_ID_ID_OP:
-    case EFI_IFR_AND_OP:
-    case EFI_IFR_OR_OP:
-    case EFI_IFR_NOT_OP:
-    case EFI_IFR_TRUE_OP:
-    case EFI_IFR_FALSE_OP:
-    case EFI_IFR_GT_OP:
-    case EFI_IFR_GE_OP:
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
+    case FRAMEWORK_EFI_IFR_AND_OP:
+    case FRAMEWORK_EFI_IFR_OR_OP:
+    case FRAMEWORK_EFI_IFR_NOT_OP:
+    case FRAMEWORK_EFI_IFR_TRUE_OP:
+    case FRAMEWORK_EFI_IFR_FALSE_OP:
+    case FRAMEWORK_EFI_IFR_GT_OP:
+    case FRAMEWORK_EFI_IFR_GE_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
       //
       // If we encountered a ConsistencyId value, on this page they will be incremental
       // So register the first value we encounter.  We will pass this in when we re-create this page
@@ -1426,8 +1426,8 @@ SetupBrowser (
       //
       // True if a hyperlink/jump is selected
       //
-      if (Selection->ThisTag->Operand == EFI_IFR_REF_OP && Selection->ThisTag->Id != 0x0000) {
-        if (Selection->ThisTag->Flags & EFI_IFR_FLAG_INTERACTIVE) {
+      if (Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_REF_OP && Selection->ThisTag->Id != 0x0000) {
+        if (Selection->ThisTag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
           ExtractDynamicFormHandle (
             Selection,
             CallbackData,
@@ -1444,8 +1444,8 @@ SetupBrowser (
         }
       }
 
-      if ((Selection->ThisTag->Flags & EFI_IFR_FLAG_INTERACTIVE) &&
-          (Selection->ThisTag->Operand != EFI_IFR_PASSWORD_OP)
+      if ((Selection->ThisTag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) &&
+          (Selection->ThisTag->Operand != FRAMEWORK_EFI_IFR_PASSWORD_OP)
           ) {
         ExtractDynamicFormHandle (
           Selection,

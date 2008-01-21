@@ -135,7 +135,7 @@ EFIAPI
 HiiFindHandles (
   IN     EFI_HII_PROTOCOL *This,
   IN OUT UINT16           *HandleBufferLength,
-  OUT    EFI_HII_HANDLE   Handle[1]
+  OUT    FRAMEWORK_EFI_HII_HANDLE    Handle[1]
   )
 /*++
 
@@ -171,31 +171,31 @@ Returns:
   //
   // Is there a sufficient buffer for the data being passed back?
   //
-  if (*HandleBufferLength >= (sizeof (EFI_HII_HANDLE) * HandleCount)) {
+  if (*HandleBufferLength >= (sizeof (FRAMEWORK_EFI_HII_HANDLE ) * HandleCount)) {
     Database = HiiData->DatabaseHead;
 
     //
     // Copy the Head information
     //
     if (Database->Handle != 0) {
-      CopyMem (&Handle[0], &Database->Handle, sizeof (EFI_HII_HANDLE));
+      CopyMem (&Handle[0], &Database->Handle, sizeof (FRAMEWORK_EFI_HII_HANDLE ));
       Database = Database->NextHandleDatabase;
     }
     //
     // Copy more data if appropriate
     //
     for (HandleCount = 1; Database != NULL; HandleCount++) {
-      CopyMem (&Handle[HandleCount], &Database->Handle, sizeof (EFI_HII_HANDLE));
+      CopyMem (&Handle[HandleCount], &Database->Handle, sizeof (FRAMEWORK_EFI_HII_HANDLE ));
       Database = Database->NextHandleDatabase;
     }
 
-    *HandleBufferLength = (UINT16) (sizeof (EFI_HII_HANDLE) * HandleCount);
+    *HandleBufferLength = (UINT16) (sizeof (FRAMEWORK_EFI_HII_HANDLE ) * HandleCount);
     return EFI_SUCCESS;
   } else {
     //
     // Insufficient buffer length
     //
-    *HandleBufferLength = (UINT16) (sizeof (EFI_HII_HANDLE) * HandleCount);
+    *HandleBufferLength = (UINT16) (sizeof (FRAMEWORK_EFI_HII_HANDLE ) * HandleCount);
     return EFI_BUFFER_TOO_SMALL;
   }
 }
@@ -204,7 +204,7 @@ EFI_STATUS
 EFIAPI
 HiiGetPrimaryLanguages (
   IN  EFI_HII_PROTOCOL      *This,
-  IN  EFI_HII_HANDLE        Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
   OUT EFI_STRING            *LanguageString
   )
 /*++
@@ -301,7 +301,7 @@ EFI_STATUS
 EFIAPI
 HiiGetSecondaryLanguages (
   IN  EFI_HII_PROTOCOL      *This,
-  IN  EFI_HII_HANDLE        Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
   IN  CHAR16                *PrimaryLanguage,
   OUT EFI_STRING            *LanguageString
   )
@@ -398,4 +398,5 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
 

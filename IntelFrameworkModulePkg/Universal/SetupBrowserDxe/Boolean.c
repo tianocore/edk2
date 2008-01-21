@@ -261,9 +261,9 @@ Returns:
       // We need to rewind to the beginning of the Inconsistent expression
       //
       for (;
-           (InconsistentTags->Operand != EFI_IFR_INCONSISTENT_IF_OP) &&
-             (InconsistentTags->Operand != EFI_IFR_GRAYOUT_IF_OP) &&
-             (InconsistentTags->Operand != EFI_IFR_SUPPRESS_IF_OP);
+           (InconsistentTags->Operand != FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP) &&
+             (InconsistentTags->Operand != FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP) &&
+             (InconsistentTags->Operand != FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP);
               ) {
         InconsistentTags = InconsistentTags->Previous;
       }
@@ -278,9 +278,9 @@ Returns:
       // consistency check like grayout/suppress
       //
       for (;
-           InconsistentTags->Operand != EFI_IFR_END_IF_OP &&
-           InconsistentTags->Operand != EFI_IFR_GRAYOUT_IF_OP &&
-           InconsistentTags->Operand != EFI_IFR_SUPPRESS_IF_OP;
+           InconsistentTags->Operand != FRAMEWORK_EFI_IFR_END_IF_OP &&
+           InconsistentTags->Operand != FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP &&
+           InconsistentTags->Operand != FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP;
             ) {
         GrowBooleanExpression (InconsistentTags, BooleanExpression, BooleanExpressionLength);
         InconsistentTags = InconsistentTags->Next;
@@ -397,16 +397,16 @@ Returns:
   // while Operand means ideqval, TRUE, or other what can be evaluated to True or False,
   // and Opcode means AND or OR.
   //
-  if (Iterator->Operand == EFI_IFR_NOT_OP   ||
+  if (Iterator->Operand == FRAMEWORK_EFI_IFR_NOT_OP   ||
       Iterator->Operand == 0) {
     return 0x1;
-  } else if (Iterator->Operand == EFI_IFR_EQ_VAR_VAL_OP ||
-             Iterator->Operand == EFI_IFR_EQ_ID_VAL_OP  ||
-             Iterator->Operand == EFI_IFR_EQ_ID_ID_OP   ||
-             Iterator->Operand == EFI_IFR_EQ_ID_LIST_OP) {
+  } else if (Iterator->Operand == FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP ||
+             Iterator->Operand == FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP  ||
+             Iterator->Operand == FRAMEWORK_EFI_IFR_EQ_ID_ID_OP   ||
+             Iterator->Operand == FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP) {
     Iterator++;
-    if (Iterator->Operand == EFI_IFR_AND_OP ||
-        Iterator->Operand == EFI_IFR_OR_OP) {
+    if (Iterator->Operand == FRAMEWORK_EFI_IFR_AND_OP ||
+        Iterator->Operand == FRAMEWORK_EFI_IFR_OR_OP) {
       Iterator--;
       return 0x1;
     }
@@ -507,7 +507,7 @@ Returns:
     }
 
     switch ((*PIterator)->Operand) {
-    case EFI_IFR_EQ_VAR_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
       UnicodeValueToString (
         VariableName,
         FALSE,
@@ -539,9 +539,9 @@ Returns:
         //
         MapValue2 = (*PIterator)->Value;
         (*PIterator)++;
-        if ((*PIterator)->Operand == EFI_IFR_GT_OP) {
+        if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GT_OP) {
           PushValue = (BOOLEAN) (MapValue > MapValue2);
-        } else if ((*PIterator)->Operand == EFI_IFR_GE_OP) {
+        } else if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GE_OP) {
           PushValue = (BOOLEAN) (MapValue >= MapValue2);
         } else {
           (*PIterator)--;
@@ -552,15 +552,15 @@ Returns:
 
       break;
 
-    case EFI_IFR_EQ_ID_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
       //
       // Do operation after knowing the compare operator.
       //
       MapValue2 = (*PIterator)->Value;
       (*PIterator)++;
-      if ((*PIterator)->Operand == EFI_IFR_GT_OP) {
+      if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GT_OP) {
         PushValue = (BOOLEAN) (MapValue > MapValue2);
-      } else if ((*PIterator)->Operand == EFI_IFR_GE_OP) {
+      } else if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GE_OP) {
         PushValue = (BOOLEAN) (MapValue >= MapValue2);
       } else {
         (*PIterator)--;
@@ -569,14 +569,14 @@ Returns:
       PushBool (StackPtr, PushValue);
       break;
 
-    case EFI_IFR_EQ_ID_ID_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
       //
       // Do operation after knowing the compare operator.
       //
       (*PIterator)++;
-      if ((*PIterator)->Operand == EFI_IFR_GT_OP) {
+      if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GT_OP) {
         PushValue = (BOOLEAN) (MapValue > MapValue2);
-      } else if ((*PIterator)->Operand == EFI_IFR_GE_OP) {
+      } else if ((*PIterator)->Operand == FRAMEWORK_EFI_IFR_GE_OP) {
         PushValue = (BOOLEAN) (MapValue >= MapValue2);
       } else {
         (*PIterator)--;
@@ -585,7 +585,7 @@ Returns:
       PushBool (StackPtr, PushValue);
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
       for (Index = 0; Index < (*PIterator)->ListLength; Index++) {
         Operator = (BOOLEAN) (MapValue == (*PIterator)->ValueList[Index]);
         if (Operator) {
@@ -596,32 +596,32 @@ Returns:
       PushBool (StackPtr, Operator);
       break;
 
-    case EFI_IFR_TRUE_OP:
+    case FRAMEWORK_EFI_IFR_TRUE_OP:
       PushBool (StackPtr, TRUE);
       break;
 
-    case EFI_IFR_FALSE_OP:
+    case FRAMEWORK_EFI_IFR_FALSE_OP:
       PushBool (StackPtr, FALSE);
       break;
 
-    case EFI_IFR_AND_OP:
+    case FRAMEWORK_EFI_IFR_AND_OP:
       Operator  = PopBool (StackPtr);
       Operator2 = PopBool (StackPtr);
       PushBool (StackPtr, (BOOLEAN) (Operator && Operator2));
       break;
-    case EFI_IFR_OR_OP:
+    case FRAMEWORK_EFI_IFR_OR_OP:
       Operator  = PopBool (StackPtr);
       Operator2 = PopBool (StackPtr);
       PushBool (StackPtr, (BOOLEAN) (Operator || Operator2));
       break;
-    case EFI_IFR_NOT_OP:
+    case FRAMEWORK_EFI_IFR_NOT_OP:
       Operator  = PopBool (StackPtr);
       PushBool (StackPtr, (BOOLEAN) (!Operator));
       break;
 
-    case EFI_IFR_SUPPRESS_IF_OP:
-    case EFI_IFR_GRAYOUT_IF_OP:
-    case EFI_IFR_INCONSISTENT_IF_OP:
+    case FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP:
+    case FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP:
+    case FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP:
     default:
       //
       // Return to the previous tag if runs out of boolean expression.
@@ -750,7 +750,7 @@ Returns:
     }
 
     switch (Iterator->Operand) {
-    case EFI_IFR_SUPPRESS_IF_OP:
+    case FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP:
       //
       // Must have hit a suppress followed by a grayout or vice-versa
       //
@@ -768,7 +768,7 @@ Returns:
       *PopUp        = Iterator->Popup;
       break;
 
-    case EFI_IFR_GRAYOUT_IF_OP:
+    case FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP:
       //
       // Must have hit a suppress followed by a grayout or vice-versa
       //
@@ -786,7 +786,7 @@ Returns:
       *PopUp        = Iterator->Popup;
       break;
 
-    case EFI_IFR_INCONSISTENT_IF_OP:
+    case FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP:
       CosmeticConsistency = FALSE;
       *PopUp              = Iterator->Popup;
       break;
@@ -795,7 +795,7 @@ Returns:
     // In the case of external variable values, we must read the variable which is
     // named by the human readable version of the OpCode->VariableId and the guid of the formset
     //
-    case EFI_IFR_EQ_VAR_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -838,7 +838,7 @@ Returns:
 
       break;
 
-    case EFI_IFR_EQ_ID_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -853,7 +853,7 @@ Returns:
       PushBool (&StackPtr, (BOOLEAN) (MapValue == Iterator->Value));
       break;
 
-    case EFI_IFR_EQ_ID_ID_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -868,7 +868,7 @@ Returns:
       PushBool (&StackPtr, (BOOLEAN) (MapValue == MapValue2));
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -890,9 +890,9 @@ Returns:
       PushBool (&StackPtr, Operator);
       break;
 
-    case EFI_IFR_AND_OP:
+    case FRAMEWORK_EFI_IFR_AND_OP:
       Iterator++;
-      if (Iterator->Operand == EFI_IFR_NOT_OP) {
+      if (Iterator->Operand == FRAMEWORK_EFI_IFR_NOT_OP) {
         NotOperator = TRUE;
         Iterator++;
       }
@@ -922,7 +922,7 @@ Returns:
       }
 
       switch (Iterator->Operand) {
-      case EFI_IFR_EQ_ID_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
         //
         // If Not - flip the results
         //
@@ -939,7 +939,7 @@ Returns:
       // In the case of external variable values, we must read the variable which is
       // named by the human readable version of the OpCode->VariableId and the guid of the formset
       //
-      case EFI_IFR_EQ_VAR_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
           VariableName,
           FALSE,
@@ -976,7 +976,7 @@ Returns:
         }
         break;
 
-      case EFI_IFR_EQ_ID_ID_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
         //
         // If Not - flip the results
         //
@@ -989,7 +989,7 @@ Returns:
         PushBool (&StackPtr, Operator);
         break;
 
-      case EFI_IFR_EQ_ID_LIST_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
         for (Index = 0; Index < Iterator->ListLength; Index++) {
           //
           // If Not - flip the results
@@ -1026,9 +1026,9 @@ Returns:
       PushBool (&StackPtr, (BOOLEAN) (Operator && Operator2));
       break;
 
-    case EFI_IFR_OR_OP:
+    case FRAMEWORK_EFI_IFR_OR_OP:
       Iterator++;
-      if (Iterator->Operand == EFI_IFR_NOT_OP) {
+      if (Iterator->Operand == FRAMEWORK_EFI_IFR_NOT_OP) {
         NotOperator = TRUE;
         Iterator++;
       }
@@ -1058,7 +1058,7 @@ Returns:
       }
 
       switch (Iterator->Operand) {
-      case EFI_IFR_EQ_ID_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
         //
         // If Not - flip the results
         //
@@ -1075,7 +1075,7 @@ Returns:
       // In the case of external variable values, we must read the variable which is
       // named by the human readable version of the OpCode->VariableId and the guid of the formset
       //
-      case EFI_IFR_EQ_VAR_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
           VariableName,
           FALSE,
@@ -1112,7 +1112,7 @@ Returns:
         }
         break;
 
-      case EFI_IFR_EQ_ID_ID_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
         //
         // If Not - flip the results
         //
@@ -1125,7 +1125,7 @@ Returns:
         PushBool (&StackPtr, Operator);
         break;
 
-      case EFI_IFR_EQ_ID_LIST_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
         for (Index = 0; Index < Iterator->ListLength; Index++) {
           //
           // If Not - flip the results
@@ -1162,7 +1162,7 @@ Returns:
       PushBool (&StackPtr, (BOOLEAN) (Operator || Operator2));
       break;
 
-    case EFI_IFR_NOT_OP:
+    case FRAMEWORK_EFI_IFR_NOT_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -1179,12 +1179,12 @@ Returns:
       //
       Iterator++;
 
-      if (Iterator->Operand == EFI_IFR_OR_OP) {
+      if (Iterator->Operand == FRAMEWORK_EFI_IFR_OR_OP) {
         OrOperator = TRUE;
         Iterator++;
       }
 
-      if (Iterator->Operand == EFI_IFR_AND_OP) {
+      if (Iterator->Operand == FRAMEWORK_EFI_IFR_AND_OP) {
         AndOperator = TRUE;
         Iterator++;
       }
@@ -1214,7 +1214,7 @@ Returns:
       }
 
       switch (Iterator->Operand) {
-      case EFI_IFR_EQ_ID_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
         Operator = (BOOLEAN)!(MapValue == Iterator->Value);
         PushBool (&StackPtr, Operator);
         break;
@@ -1223,7 +1223,7 @@ Returns:
       // In the case of external variable values, we must read the variable which is
       // named by the human readable version of the OpCode->VariableId and the guid of the formset
       //
-      case EFI_IFR_EQ_VAR_VAL_OP:
+      case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
         UnicodeValueToString (
           VariableName,
           FALSE,
@@ -1254,12 +1254,12 @@ Returns:
         }
         break;
 
-      case EFI_IFR_EQ_ID_ID_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
         Operator = (BOOLEAN)!(MapValue == MapValue2);
         PushBool (&StackPtr, Operator);
         break;
 
-      case EFI_IFR_EQ_ID_LIST_OP:
+      case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
         for (Index = 0; Index < Iterator->ListLength; Index++) {
           Operator = (BOOLEAN)!(MapValue == Iterator->ValueList[Index]);
           if (Operator) {
@@ -1290,7 +1290,7 @@ Returns:
       }
       break;
 
-    case EFI_IFR_TRUE_OP:
+    case FRAMEWORK_EFI_IFR_TRUE_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -1303,7 +1303,7 @@ Returns:
       }
       break;
 
-    case EFI_IFR_FALSE_OP:
+    case FRAMEWORK_EFI_IFR_FALSE_OP:
       //
       // To check whether Ifr is legacy. Once every boolean expression.
       //
@@ -1316,7 +1316,7 @@ Returns:
       }
       break;
 
-    case EFI_IFR_END_IF_OP:
+    case FRAMEWORK_EFI_IFR_END_IF_OP:
       Operator = PopBool (&StackPtr);
       //
       // If there is an error, return, otherwise keep looking - there might

@@ -131,7 +131,7 @@ EFI_STATUS
 HiiNewString2 (
   IN     EFI_HII_PROTOCOL       *This,
   IN     CHAR16                 *Language,
-  IN     EFI_HII_HANDLE         Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN OUT STRING_REF             *Reference,
   IN     CHAR16                 *NewString,
   IN     BOOLEAN                ResetStrings
@@ -639,7 +639,7 @@ EFIAPI
 HiiNewString (
   IN     EFI_HII_PROTOCOL       *This,
   IN     CHAR16                 *Language,
-  IN     EFI_HII_HANDLE         Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN OUT STRING_REF             *Reference,
   IN     CHAR16                 *NewString
   )
@@ -714,7 +714,7 @@ EFI_STATUS
 EFIAPI
 HiiResetStrings (
   IN     EFI_HII_PROTOCOL   *This,
-  IN     EFI_HII_HANDLE     Handle
+  IN     FRAMEWORK_EFI_HII_HANDLE      Handle
   )
 /*++
 
@@ -766,7 +766,7 @@ EFI_STATUS
 EFIAPI
 HiiGetString (
   IN     EFI_HII_PROTOCOL    *This,
-  IN     EFI_HII_HANDLE      Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
   IN     STRING_REF          Token,
   IN     BOOLEAN             Raw,
   IN     CHAR16              *LanguageString,
@@ -1028,7 +1028,7 @@ EFI_STATUS
 EFIAPI
 HiiGetLine (
   IN     EFI_HII_PROTOCOL   *This,
-  IN     EFI_HII_HANDLE     Handle,
+  IN     FRAMEWORK_EFI_HII_HANDLE      Handle,
   IN     STRING_REF         Token,
   IN OUT UINT16             *Index,
   IN     UINT16             LineWidth,

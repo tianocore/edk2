@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/FrameworkFormCallback.h>
 #include <Protocol/FrameworkHii.h>
@@ -60,7 +60,7 @@ typedef struct {
   EFI_FORM_CALLBACK_PROTOCOL  DriverCallback;
   UINT16                      *KeyList;
   VOID                        *FormBuffer;
-  EFI_HII_HANDLE              RegisteredHandle;
+  FRAMEWORK_EFI_HII_HANDLE    RegisteredHandle;
   EFI_HII_PROTOCOL            *Hii;
 } EFI_CALLBACK_INFO;
 

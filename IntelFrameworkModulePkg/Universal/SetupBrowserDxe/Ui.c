@@ -361,7 +361,7 @@ Returns:
 VOID
 UiAddMenuOption (
   IN CHAR16         *String,
-  IN EFI_HII_HANDLE Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE  Handle,
   IN EFI_TAG        *Tags,
   IN VOID           *FormBinary,
   IN UINTN          IfrNumber
@@ -401,7 +401,7 @@ Returns:
 VOID
 UiAddSubMenuOption (
   IN CHAR16           *String,
-  IN EFI_HII_HANDLE   Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE    Handle,
   IN EFI_TAG          *Tags,
   IN UINTN            TagIndex,
   IN UINT16           FormId,
@@ -798,7 +798,7 @@ UpdateStatusBar (
           gScreenDimensions.BottomRow - 1,
           NvUpdateMessage
           );
-        gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED));
+        gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED) == FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
 
         gNvUpdateRequired = TRUE;
       } else {
@@ -857,8 +857,8 @@ Returns:
   EFI_FILE_FORM_TAGS      *PreviousFileForm;
   EFI_FORM_TAGS           *FormTags;
   EFI_FORM_TAGS           *PreviousFormTags;
-  EFI_IFR_BINARY          *IfrBinary;
-  EFI_IFR_BINARY          *PreviousIfrBinary;
+  FRAMEWORK_EFI_IFR_BINARY          *IfrBinary;
+  FRAMEWORK_EFI_IFR_BINARY          *PreviousIfrBinary;
   EFI_INCONSISTENCY_DATA  *Inconsistent;
   EFI_VARIABLE_DEFINITION *VariableDefinition;
   EFI_VARIABLE_DEFINITION *PreviousVariableDefinition;
@@ -900,11 +900,11 @@ Returns:
       //
       // Walk through each of the tags and free the IntList allocation
       //
-      for (Index = 0; FormTags->Tags[Index].Operand != EFI_IFR_END_FORM_OP; Index++) {
+      for (Index = 0; FormTags->Tags[Index].Operand != FRAMEWORK_EFI_IFR_END_FORM_OP; Index++) {
         //
         // It is more than likely that the very last page will contain an end formset
         //
-        if (FormTags->Tags[Index].Operand == EFI_IFR_END_FORM_SET_OP) {
+        if (FormTags->Tags[Index].Operand == FRAMEWORK_EFI_IFR_END_FORM_SET_OP) {
           break;
         }
 
@@ -1093,7 +1093,7 @@ Returns:
     //
     // If the op-code has a late check, ensure consistency checks are now applied
     //
-    if (Tag->Flags & EFI_IFR_FLAG_LATE_CHECK) {
+    if (Tag->Flags & FRAMEWORK_EFI_IFR_FLAG_LATE_CHECK) {
       if (ValueIsNotValid (TRUE, 0, Tag, FileFormTags, &PopUp)) {
         if (PopUp != 0x0000) {
           StringPtr = GetToken (PopUp, MenuOption->Handle);
@@ -1130,7 +1130,7 @@ Returns:
 UINT16
 GetWidth (
   IN EFI_TAG                        *Tag,
-  IN EFI_HII_HANDLE                 Handle
+  IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 /*++
 
@@ -1155,21 +1155,21 @@ Returns:
   //
   // See if the second text parameter is really NULL
   //
-  if ((Tag->Operand == EFI_IFR_TEXT_OP) && (Tag->TextTwo != 0)) {
+  if ((Tag->Operand == FRAMEWORK_EFI_IFR_TEXT_OP) && (Tag->TextTwo != 0)) {
     String  = GetToken (Tag->TextTwo, Handle);
     Size    = StrLen (String);
     FreePool (String);
   }
 
-  if ((Tag->Operand == EFI_IFR_SUBTITLE_OP) ||
-      (Tag->Operand == EFI_IFR_REF_OP) ||
-      (Tag->Operand == EFI_IFR_PASSWORD_OP) ||
-      (Tag->Operand == EFI_IFR_STRING_OP) ||
-      (Tag->Operand == EFI_IFR_INVENTORY_OP) ||
+  if ((Tag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP) ||
+      (Tag->Operand == FRAMEWORK_EFI_IFR_REF_OP) ||
+      (Tag->Operand == FRAMEWORK_EFI_IFR_PASSWORD_OP) ||
+      (Tag->Operand == FRAMEWORK_EFI_IFR_STRING_OP) ||
+      (Tag->Operand == FRAMEWORK_EFI_IFR_INVENTORY_OP) ||
       //
       // Allow a wide display if text op-code and no secondary text op-code
       //
-      ((Tag->Operand == EFI_IFR_TEXT_OP) && (Size == 0x0000))
+      ((Tag->Operand == FRAMEWORK_EFI_IFR_TEXT_OP) && (Size == 0x0000))
       ) {
     return (UINT16) (gPromptBlockWidth + gOptionBlockWidth);
   } else {
@@ -1285,7 +1285,7 @@ Returns:
 STATIC
 VOID
 UpdateOptionSkipLines (
-  IN EFI_IFR_DATA_ARRAY           *PageData,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY           *PageData,
   IN UI_MENU_OPTION               *MenuOption,
   IN EFI_FILE_FORM_TAGS           *FileFormTagsHead,
   IN CHAR16                       **OptionalString,
@@ -1376,7 +1376,7 @@ UI_MENU_OPTION *
 UiDisplayMenu (
   IN  BOOLEAN                      SubMenu,
   IN  EFI_FILE_FORM_TAGS           *FileFormTagsHead,
-  OUT EFI_IFR_DATA_ARRAY           *PageData
+  OUT FRAMEWORK_EFI_IFR_DATA_ARRAY           *PageData
   )
 /*++
 
@@ -1388,7 +1388,7 @@ Routine Description:
 Arguments:
   SubMenu          - Indicate is sub menu.
   FileFormTagsHead - A pointer to the EFI_FILE_FORM_TAGS structure.
-  PageData         - A pointer to the EFI_IFR_DATA_ARRAY.
+  PageData         - A pointer to the FRAMEWORK_EFI_IFR_DATA_ARRAY.
 
 Returns:
   Return the pointer of the menu which selected,
@@ -1433,7 +1433,7 @@ Returns:
   UI_MENU_OPTION              *NextMenuOption;
   UI_MENU_OPTION              *SavedMenuOption;
   UI_MENU_OPTION              *PreviousMenuOption;
-  EFI_IFR_BINARY              *IfrBinary;
+  FRAMEWORK_EFI_IFR_BINARY              *IfrBinary;
   UI_CONTROL_FLAG             ControlFlag;
   EFI_SCREEN_DESCRIPTOR       LocalScreen;
   EFI_FILE_FORM_TAGS          *FileFormTags;
@@ -1572,7 +1572,7 @@ Returns:
             if (MenuOption->ThisTag->GrayOut) {
               gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_GRAYED | FIELD_BACKGROUND);
             } else {
-              if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP) {
+              if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP) {
                 gST->ConOut->SetAttribute (gST->ConOut, SUBTITLE_TEXT | FIELD_BACKGROUND);
               }
             }
@@ -1608,8 +1608,8 @@ Returns:
             ProcessOptions (MenuOption, FALSE, FileFormTagsHead, PageData, &OptionString);
 
             if (OptionString != NULL) {
-              if (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP ||
-                  MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP
+              if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP ||
+                  MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP
                   ) {
                 //
                 // If leading spaces on OptionString - remove the spaces
@@ -1629,8 +1629,8 @@ Returns:
               //
               // If this is a date or time op-code and is used to reflect an RTC, register the op-code
               //
-                if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP ||
-                     MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP) &&
+                if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP ||
+                     MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP) &&
                     (MenuOption->ThisTag->StorageStart >= FileFormTags->FormTags.Tags[0].NvDataSize)) {
 
                 if (gMenuRefreshHead == NULL) {
@@ -1701,7 +1701,7 @@ Returns:
             //
             // If this is a text op with secondary text information
             //
-            if ((MenuOption->ThisTag->Operand == EFI_IFR_TEXT_OP) && (MenuOption->ThisTag->TextTwo != 0)) {
+            if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TEXT_OP) && (MenuOption->ThisTag->TextTwo != 0)) {
               StringPtr   = GetToken (MenuOption->ThisTag->TextTwo, MenuOption->Handle);
 
               Width       = (UINT16) gOptionBlockWidth;
@@ -1824,8 +1824,8 @@ Returns:
           ProcessOptions (MenuOption, FALSE, FileFormTagsHead, PageData, &OptionString);
           gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
           if (OptionString != NULL) {
-            if (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP ||
-                MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP
+            if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP ||
+                MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP
                 ) {
               //
               // If leading spaces on OptionString - remove the spaces
@@ -1865,7 +1865,7 @@ Returns:
               if (MenuOption->ThisTag->GrayOut) {
                 gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_GRAYED | FIELD_BACKGROUND);
               } else {
-                if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP) {
+                if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP) {
                   gST->ConOut->SetAttribute (gST->ConOut, SUBTITLE_TEXT | FIELD_BACKGROUND);
                 }
               }
@@ -1909,7 +1909,7 @@ Returns:
         // This is only possible if we entered this page and the first menu option is
         // a "non-menu" item.  In that case, force it UiDown
         //
-        if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
+        if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
           //
           // If we previously hit an UP command and we are still sitting on a text operation
           // we must continue going up
@@ -1946,8 +1946,8 @@ Returns:
         if (SubMenu) {
           ProcessOptions (MenuOption, FALSE, FileFormTagsHead, PageData, &OptionString);
           if (OptionString != NULL) {
-            if (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP ||
-                MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP
+            if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP ||
+                MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP
                 ) {
               //
               // If leading spaces on OptionString - remove the spaces
@@ -2032,8 +2032,8 @@ Returns:
 
         if (SubMenu &&
             (Repaint || NewLine ||
-             (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
-             (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) &&
+             (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) ||
+             (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) &&
             !(gClassOfVfr == EFI_GENERAL_APPLICATION_SUBCLASS)) {
         //
         // Don't print anything if it is a NULL help token
@@ -2107,9 +2107,9 @@ Returns:
 
           Status = UiWaitForSingleEvent (gST->ConIn->WaitForKey, ONE_SECOND);
           if (Status == EFI_TIMEOUT) {
-            EFI_IFR_DATA_ENTRY *DataEntry;
+            FRAMEWORK_EFI_IFR_DATA_ENTRY *DataEntry;
 
-            DataEntry = (EFI_IFR_DATA_ENTRY *) (PageData + 1);
+            DataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (PageData + 1);
 
             PageData->EntryCount  = 1;
             Count                 = (UINT32) ((OriginalTimeOut - FrontPageTimeOutValue) * 100 / OriginalTimeOut);
@@ -2119,7 +2119,7 @@ Returns:
               FormCallback->Callback (
                               FormCallback,
                               0xFFFF,
-                              (EFI_IFR_DATA_ARRAY *) PageData,
+                              (FRAMEWORK_EFI_IFR_DATA_ARRAY *) PageData,
                               NULL
                               );
             }
@@ -2135,7 +2135,7 @@ Returns:
               FormCallback->Callback (
                               FormCallback,
                               0xFFFE,
-                              (EFI_IFR_DATA_ARRAY *) PageData,
+                              (FRAMEWORK_EFI_IFR_DATA_ARRAY *) PageData,
                               NULL
                               );
             }
@@ -2181,7 +2181,7 @@ Returns:
       //
       case '+':
       case '-':
-        if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
+        if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
 
           if (Key.UnicodeChar == '+') {
             gDirection = SCAN_RIGHT;
@@ -2205,7 +2205,7 @@ Returns:
       case ' ':
         if (gClassOfVfr != EFI_FRONT_PAGE_SUBCLASS) {
           if (SubMenu) {
-            if (MenuOption->ThisTag->Operand == EFI_IFR_CHECKBOX_OP && !(MenuOption->ThisTag->GrayOut)) {
+            if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_CHECKBOX_OP && !(MenuOption->ThisTag->GrayOut)) {
               gST->ConOut->SetCursorPosition (gST->ConOut, MenuOption->Col, MenuOption->Row);
               gST->ConOut->OutputString (gST->ConOut, MenuOption->Description);
               Selection       = MenuOption;
@@ -2265,7 +2265,7 @@ Returns:
         //
         for (Link = Menu.ForwardLink; Link != &Menu; Link = Link->ForwardLink) {
           NextMenuOption = CR (Link, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE);
-          if (!(NextMenuOption->ThisTag->GrayOut) && (NextMenuOption->ThisTag->Operand != EFI_IFR_SUBTITLE_OP)) {
+          if (!(NextMenuOption->ThisTag->GrayOut) && (NextMenuOption->ThisTag->Operand != FRAMEWORK_EFI_IFR_SUBTITLE_OP)) {
             break;
           }
         }
@@ -2336,11 +2336,11 @@ Returns:
       ExtractRequestedNvMap (FileFormTags, MenuOption->ThisTag->VariableNumber, &VariableDefinition);
 
       if (SubMenu) {
-        if ((MenuOption->ThisTag->Operand == EFI_IFR_TEXT_OP &&
-            !(MenuOption->ThisTag->Flags & EFI_IFR_FLAG_INTERACTIVE)) ||
+        if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TEXT_OP &&
+            !(MenuOption->ThisTag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE)) ||
             (MenuOption->ThisTag->GrayOut) ||
-            (MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
-            (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
+            (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) ||
+            (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
             Selection = NULL;
             break;
           }
@@ -2359,7 +2359,7 @@ Returns:
           PrintStringAt (LocalScreen.LeftColumn + gPromptBlockWidth + 1, MenuOption->Row, OptionString);
         }
 
-        if (MenuOption->ThisTag->Flags & EFI_IFR_FLAG_INTERACTIVE) {
+        if (MenuOption->ThisTag->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) {
           Selection = MenuOption;
         }
 
@@ -2372,7 +2372,7 @@ Returns:
         //
         // If not a goto, dump single piece of data, otherwise dump everything
         //
-        if (Selection->ThisTag->Operand == EFI_IFR_REF_OP) {
+        if (Selection->ThisTag->Operand == FRAMEWORK_EFI_IFR_REF_OP) {
           //
           // Check for tags that might have LATE_CHECK enabled.  If they do, we can't switch pages or save NV data.
           //
@@ -2532,7 +2532,7 @@ Returns:
 
     case CfUiLeft:
       ControlFlag = CfCheckSelection;
-      if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
+      if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
         if (MenuOption->Skip == 1) {
           //
           // In the tail of the Date/Time op-code set, go left.
@@ -2553,7 +2553,7 @@ Returns:
     case CfUiRight:
       ControlFlag = CfCheckSelection;
       if ((MenuOption->Skip == 0) &&
-          ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP))
+          ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP))
           ) {
         //
         // We are in the head or middle of the Date/Time op-code set, advance right.
@@ -2593,7 +2593,7 @@ Returns:
           //
           // If the previous MenuOption contains a display-only op-code, skip to the next one
           //
-          if (PreviousMenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || PreviousMenuOption->ThisTag->GrayOut) {
+          if (PreviousMenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || PreviousMenuOption->ThisTag->GrayOut) {
             //
             // This is ok as long as not at the end of the list
             //
@@ -2648,7 +2648,7 @@ Returns:
         if (SubMenu) {
           SavedMenuOption = MenuOption;
           MenuOption      = CR (NewPos, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE);
-          if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
+          if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
             //
             // If we are at the end of the list and sitting on a text op, we need to more forward
             //
@@ -2754,7 +2754,7 @@ Returns:
           // If the next MenuOption contains a display-only op-code, skip to the next one
           // Also if the next MenuOption is date or time,
           //
-          if (NextMenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || NextMenuOption->ThisTag->GrayOut) {
+          if (NextMenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || NextMenuOption->ThisTag->GrayOut) {
             //
             // This is ok as long as not at the end of the list
             //
@@ -2880,7 +2880,7 @@ Returns:
         if (SubMenu) {
           SavedMenuOption = MenuOption;
           MenuOption      = CR (NewPos, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE);
-          if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
+          if (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut) {
             //
             // If we are at the end of the list and sitting on a text op, we need to more forward
             //
@@ -2970,7 +2970,7 @@ Returns:
 
       NvMapListHead = NULL;
 
-      Status = Hii->GetDefaultImage (Hii, MenuOption->Handle, EFI_IFR_FLAG_DEFAULT, &NvMapListHead);
+      Status = Hii->GetDefaultImage (Hii, MenuOption->Handle, FRAMEWORK_EFI_IFR_FLAG_DEFAULT, &NvMapListHead);
 
       if (!EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (NULL != NvMapListHead);
@@ -3079,7 +3079,7 @@ Returns:
 
   for (; Temp != &Menu; Temp = Direction ? Temp->BackLink : Temp->ForwardLink) {
     MenuOption = CR (Temp, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE);
-    if (!(MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut)) {
+    if (!(MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_SUBTITLE_OP || MenuOption->ThisTag->GrayOut)) {
       return FALSE;
     }
   }
@@ -3116,7 +3116,7 @@ Returns:
   NewPosition   = *CurrentPosition;
   MenuOption    = CR (NewPosition, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE);
 
-  if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
+  if ((MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == FRAMEWORK_EFI_IFR_TIME_OP)) {
     //
     // Calculate the distance from current position to the last Date/Time op-code.
     //

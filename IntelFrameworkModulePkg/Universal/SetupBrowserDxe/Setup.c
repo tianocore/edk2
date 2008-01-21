@@ -106,9 +106,9 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
 STATIC
 EFI_STATUS
 InitializeBinaryStructures (
-  IN  EFI_HII_HANDLE                           *Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE                 *Handle,
   IN  BOOLEAN                                  UseDatabase,
-  IN  EFI_IFR_PACKET                           *Packet,
+  IN  FRAMEWORK_EFI_IFR_PACKET                           *Packet,
   IN  UINT8                                    *NvMapOverride,
   IN  UINTN                                    NumberOfIfrImages,
   EFI_FILE_FORM_TAGS                           **FileFormTagsHead
@@ -117,7 +117,7 @@ InitializeBinaryStructures (
 STATIC
 EFI_STATUS
 InitializeTagStructures (
-  IN  EFI_IFR_BINARY                            *BinaryData,
+  IN  FRAMEWORK_EFI_IFR_BINARY                            *BinaryData,
   OUT EFI_FILE_FORM_TAGS                        *FileFormTags
   );
 
@@ -133,9 +133,9 @@ STATIC
 EFI_STATUS
 GetIfrBinaryData (
   IN EFI_HII_PROTOCOL *Hii,
-  IN EFI_HII_HANDLE   HiiHandle,
-  IN EFI_IFR_PACKET   *Packet,
-  IN EFI_IFR_BINARY   *BinaryData
+  IN FRAMEWORK_EFI_HII_HANDLE    HiiHandle,
+  IN FRAMEWORK_EFI_IFR_PACKET   *Packet,
+  IN FRAMEWORK_EFI_IFR_BINARY   *BinaryData
   );
 
 STATIC
@@ -150,9 +150,9 @@ EFIAPI
 SendForm (
   IN EFI_FORM_BROWSER_PROTOCOL        * This,
   IN BOOLEAN                          UseDatabase,
-  IN EFI_HII_HANDLE                   * Handle,
+  IN FRAMEWORK_EFI_HII_HANDLE         * Handle,
   IN UINTN                            HandleCount,
-  IN EFI_IFR_PACKET                   * Packet,
+  IN FRAMEWORK_EFI_IFR_PACKET                   * Packet,
   IN EFI_HANDLE                       CallbackHandle,
   IN UINT8                            *NvMapOverride,
   IN EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
@@ -197,7 +197,7 @@ Returns:
   EFI_STATUS                  Status;
   BOOLEAN                     Callback;
   VOID                        *CallbackData;
-  EFI_HII_HANDLE              BackupHandle;
+  FRAMEWORK_EFI_HII_HANDLE    BackupHandle;
 
   ZeroMem (&gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -542,11 +542,11 @@ Returns:
 
   Tag->NumberOfLines  = 1;
   Tag->VariableNumber = CurrentVariable;
-  CopyMem (&Tag->Id, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
-  CopyMem (&Tag->StorageStart, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
-  CopyMem (&Tag->StorageWidth, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Width, sizeof (UINT8));
-  CopyMem (&Tag->Text, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Prompt, sizeof (UINT16));
-  CopyMem (&Tag->Help, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Help, sizeof (UINT16));
+  CopyMem (&Tag->Id, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
+  CopyMem (&Tag->StorageStart, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
+  CopyMem (&Tag->StorageWidth, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Width, sizeof (UINT8));
+  CopyMem (&Tag->Text, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Prompt, sizeof (UINT16));
+  CopyMem (&Tag->Help, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Help, sizeof (UINT16));
 
   VariableDefinition = FileFormTags->VariableDefinitions;
 
@@ -615,16 +615,16 @@ Returns:
 
   Tag->NumberOfLines  = NumberOfLines;
   Tag->VariableNumber = CurrentVariable;
-  CopyMem (&Tag->Id, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
-  CopyMem (&Tag->StorageStart, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
-  CopyMem (&Tag->StorageWidth, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Width, sizeof (UINT8));
-  CopyMem (&Tag->Text, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Prompt, sizeof (UINT16));
-  CopyMem (&Tag->Help, &((EFI_IFR_ONE_OF *) &RawFormSet[Index])->Help, sizeof (UINT16));
-  CopyMem (&Tag->Minimum, &((EFI_IFR_NUMERIC *) &RawFormSet[Index])->Minimum, sizeof (UINT16));
-  CopyMem (&Tag->Maximum, &((EFI_IFR_NUMERIC *) &RawFormSet[Index])->Maximum, sizeof (UINT16));
-  CopyMem (&Tag->Step, &((EFI_IFR_NUMERIC *) &RawFormSet[Index])->Step, sizeof (UINT16));
-  CopyMem (&Tag->Default, &((EFI_IFR_NUMERIC *) &RawFormSet[Index])->Default, sizeof (UINT16));
-  Tag->ResetRequired  = (BOOLEAN) (((EFI_IFR_NUMERIC *) &RawFormSet[Index])->Flags & EFI_IFR_FLAG_RESET_REQUIRED);
+  CopyMem (&Tag->Id, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
+  CopyMem (&Tag->StorageStart, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->QuestionId, sizeof (UINT16));
+  CopyMem (&Tag->StorageWidth, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Width, sizeof (UINT8));
+  CopyMem (&Tag->Text, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Prompt, sizeof (UINT16));
+  CopyMem (&Tag->Help, &((FRAMEWORK_EFI_IFR_ONE_OF *) &RawFormSet[Index])->Help, sizeof (UINT16));
+  CopyMem (&Tag->Minimum, &((FRAMEWORK_EFI_IFR_NUMERIC *) &RawFormSet[Index])->Minimum, sizeof (UINT16));
+  CopyMem (&Tag->Maximum, &((FRAMEWORK_EFI_IFR_NUMERIC *) &RawFormSet[Index])->Maximum, sizeof (UINT16));
+  CopyMem (&Tag->Step, &((FRAMEWORK_EFI_IFR_NUMERIC *) &RawFormSet[Index])->Step, sizeof (UINT16));
+  CopyMem (&Tag->Default, &((FRAMEWORK_EFI_IFR_NUMERIC *) &RawFormSet[Index])->Default, sizeof (UINT16));
+  Tag->ResetRequired  = (BOOLEAN) (((FRAMEWORK_EFI_IFR_NUMERIC *) &RawFormSet[Index])->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
 
   VariableDefinition  = FileFormTags->VariableDefinitions;
 
@@ -678,17 +678,17 @@ GetTagCount (
   // Assume on entry we are pointing to an OpCode - reasonably this should
   // be a FormOp since the purpose is to count the tags in a particular Form.
   //
-  for (Index = 0; RawFormSet[Index] != EFI_IFR_END_FORM_OP;) {
+  for (Index = 0; RawFormSet[Index] != FRAMEWORK_EFI_IFR_END_FORM_OP;) {
     //
     // If we encounter the end of a form set, bail out
     //
-    if (RawFormSet[Index] == EFI_IFR_END_FORM_SET_OP) {
+    if (RawFormSet[Index] == FRAMEWORK_EFI_IFR_END_FORM_SET_OP) {
       break;
     }
     //
     // We treat date/time internally as three op-codes
     //
-    if (RawFormSet[Index] == EFI_IFR_DATE_OP || RawFormSet[Index] == EFI_IFR_TIME_OP) {
+    if (RawFormSet[Index] == FRAMEWORK_EFI_IFR_DATE_OP || RawFormSet[Index] == FRAMEWORK_EFI_IFR_TIME_OP) {
       *NumberOfTags = (UINT16) (*NumberOfTags + 3);
     } else {
       //
@@ -758,7 +758,7 @@ Returns:
 STATIC
 EFI_STATUS
 InitializeTagStructures (
-  IN  EFI_IFR_BINARY                            *BinaryData,
+  IN  FRAMEWORK_EFI_IFR_BINARY                            *BinaryData,
   OUT EFI_FILE_FORM_TAGS                        *FileFormTags
   )
 {
@@ -876,7 +876,7 @@ InitializeTagStructures (
 
   ZeroMem (FormTags->Tags, NumberOfTags * sizeof (EFI_TAG));
 
-  for (CurrTag = 0; RawFormSet[Index] != EFI_IFR_END_FORM_SET_OP; CurrTag++) {
+  for (CurrTag = 0; RawFormSet[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP; CurrTag++) {
     //
     // Operand = IFR OpCode
     //
@@ -901,7 +901,7 @@ InitializeTagStructures (
     //
     switch (RawFormSet[Index]) {
 
-    case EFI_IFR_FORM_OP:
+    case FRAMEWORK_EFI_IFR_FORM_OP:
       //
       // If there was no variable op-code defined, create a dummy entry for one
       //
@@ -919,13 +919,13 @@ InitializeTagStructures (
       }
       break;
 
-    case EFI_IFR_SUBTITLE_OP:
-    case EFI_IFR_TEXT_OP:
-    case EFI_IFR_REF_OP:
+    case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
+    case FRAMEWORK_EFI_IFR_TEXT_OP:
+    case FRAMEWORK_EFI_IFR_REF_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
       break;
 
-    case EFI_IFR_VARSTORE_OP:
+    case FRAMEWORK_EFI_IFR_VARSTORE_OP:
       if (FileFormTags->VariableDefinitions == NULL) {
         VariableDefinitions = AllocateZeroPool (sizeof (EFI_VARIABLE_DEFINITION));
         ASSERT (VariableDefinitions != NULL);
@@ -940,23 +940,23 @@ InitializeTagStructures (
         );
       break;
 
-    case EFI_IFR_VARSTORE_SELECT_OP:
+    case FRAMEWORK_EFI_IFR_VARSTORE_SELECT_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
-      CopyMem (&CurrentVariable, &((EFI_IFR_VARSTORE_SELECT *) &RawFormSet[Index])->VarId, sizeof (UINT16));
+      CopyMem (&CurrentVariable, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT *) &RawFormSet[Index])->VarId, sizeof (UINT16));
       CurrentVariable2 = CurrentVariable;
       break;
 
-    case EFI_IFR_VARSTORE_SELECT_PAIR_OP:
+    case FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
-      CopyMem(&CurrentVariable, &((EFI_IFR_VARSTORE_SELECT_PAIR *)&RawFormSet[Index])->VarId, sizeof (UINT16));
+      CopyMem(&CurrentVariable, &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *)&RawFormSet[Index])->VarId, sizeof (UINT16));
       CopyMem (
         &CurrentVariable2,
-        &((EFI_IFR_VARSTORE_SELECT_PAIR *) &RawFormSet[Index])->SecondaryVarId,
+        &((FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR *) &RawFormSet[Index])->SecondaryVarId,
         sizeof (UINT16)
         );
       break;
 
-    case EFI_IFR_END_FORM_OP:
+    case FRAMEWORK_EFI_IFR_END_FORM_OP:
       //
       // Test for an allocated buffer.  If already allocated this is due to having called this routine
       // once for sizing of the NV storage.  We then loaded the NV variable and can correctly initialize
@@ -1002,8 +1002,8 @@ InitializeTagStructures (
     // Two types of tags constitute the One Of question: a one-of header and
     // several one-of options.
     //
-    case EFI_IFR_ONE_OF_OP:
-    case EFI_IFR_ORDERED_LIST_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], RawFormSet, Index, FileFormTags, CurrentVariable);
 
       //
@@ -1016,28 +1016,28 @@ InitializeTagStructures (
       QuestionIndex = (UINT16) CurrTag;
       break;
 
-    case EFI_IFR_ONE_OF_OPTION_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
-      FormTags->Tags[QuestionIndex].Flags = ((EFI_IFR_ONE_OF_OPTION *) &RawFormSet[Index])->Flags;
+      FormTags->Tags[QuestionIndex].Flags = ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &RawFormSet[Index])->Flags;
       CopyMem (
         &FormTags->Tags[QuestionIndex].Key,
-        &((EFI_IFR_ONE_OF_OPTION *) &RawFormSet[Index])->Key,
+        &((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &RawFormSet[Index])->Key,
         sizeof (UINT16)
         );
-      FormTags->Tags[QuestionIndex].ResetRequired = (BOOLEAN) (FormTags->Tags[QuestionIndex].Flags & EFI_IFR_FLAG_RESET_REQUIRED);
+      FormTags->Tags[QuestionIndex].ResetRequired = (BOOLEAN) (FormTags->Tags[QuestionIndex].Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED);
       break;
 
-    case EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], RawFormSet, Index, FileFormTags, CurrentVariable);
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
       break;
 
-    case EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
       GetNumericHeader (&FormTags->Tags[CurrTag], RawFormSet, Index, (UINT16) 1, FileFormTags, CurrentVariable);
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
       break;
 
-    case EFI_IFR_DATE_OP:
+    case FRAMEWORK_EFI_IFR_DATE_OP:
       //
       // Date elements come in as a Year, Month, Day.  We need to process them as a country-based
       // Order.  It is much easier to do it here than anywhere else.
@@ -1086,7 +1086,7 @@ InitializeTagStructures (
       TagLength = RawFormSet[Index + 1];
       break;
 
-    case EFI_IFR_TIME_OP:
+    case FRAMEWORK_EFI_IFR_TIME_OP:
       GetNumericHeader (&FormTags->Tags[CurrTag], RawFormSet, Index, (UINT16) 0, FileFormTags, CurrentVariable);
 
       if (Count == 2) {
@@ -1104,15 +1104,15 @@ InitializeTagStructures (
       }
       break;
 
-    case EFI_IFR_PASSWORD_OP:
-    case EFI_IFR_STRING_OP:
+    case FRAMEWORK_EFI_IFR_PASSWORD_OP:
+    case FRAMEWORK_EFI_IFR_STRING_OP:
       GetQuestionHeader (&FormTags->Tags[CurrTag], RawFormSet, Index, FileFormTags, CurrentVariable);
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
       break;
 
-    case EFI_IFR_SUPPRESS_IF_OP:
-    case EFI_IFR_GRAYOUT_IF_OP:
-      InconsistentTags->Operand = ((EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Header.OpCode;
+    case FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP:
+    case FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP:
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Header.OpCode;
       gConsistencyId++;
 
       //
@@ -1135,30 +1135,30 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_FORM_SET_OP:
+    case FRAMEWORK_EFI_IFR_FORM_SET_OP:
       CopyMem (
         &FormTags->Tags[CurrTag].GuidValue,
-        &((EFI_IFR_FORM_SET *) &RawFormSet[Index])->Guid,
+        &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->Guid,
         sizeof (EFI_GUID)
         );
       CopyMem (
         &FormTags->Tags[CurrTag].CallbackHandle,
-        &((EFI_IFR_FORM_SET *) &RawFormSet[Index])->CallbackHandle,
+        &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->CallbackHandle,
         sizeof (EFI_PHYSICAL_ADDRESS)
         );
-      CopyMem (&FormTags->Tags[CurrTag].Class, &((EFI_IFR_FORM_SET *) &RawFormSet[Index])->Class, sizeof (UINT8));
+      CopyMem (&FormTags->Tags[CurrTag].Class, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->Class, sizeof (UINT8));
       CopyMem (
         &FormTags->Tags[CurrTag].SubClass,
-        &((EFI_IFR_FORM_SET *) &RawFormSet[Index])->SubClass,
+        &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->SubClass,
         sizeof (UINT8)
         );
       CopyMem (
         &FormTags->Tags[CurrTag].NvDataSize,
-        &((EFI_IFR_FORM_SET *) &RawFormSet[Index])->NvDataSize,
+        &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->NvDataSize,
         sizeof (UINT16)
         );
-      Class     = ((EFI_IFR_FORM_SET *) &RawFormSet[Index])->Class;
-      SubClass  = ((EFI_IFR_FORM_SET *) &RawFormSet[Index])->SubClass;
+      Class     = ((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->Class;
+      SubClass  = ((FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormSet[Index])->SubClass;
       //
       // If the formset has a size value, that means someone must be using this, so create a variable
       // We also shall reserve the formid of 0 for this specific purpose.
@@ -1177,41 +1177,41 @@ InitializeTagStructures (
       }
       break;
 
-    case EFI_IFR_BANNER_OP:
+    case FRAMEWORK_EFI_IFR_BANNER_OP:
       if (gClassOfVfr == EFI_FRONT_PAGE_SUBCLASS) {
         TempValue = 0;
-        CopyMem (&TempValue, &((EFI_IFR_BANNER *) &RawFormSet[Index])->Alignment, sizeof (UINT8));
+        CopyMem (&TempValue, &((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->Alignment, sizeof (UINT8));
         //
         // If this is the special timeout value, we will dynamically figure out where to put it
         // Also the least significant byte refers to the TimeOut desired.
         //
-        if (TempValue == EFI_IFR_BANNER_TIMEOUT) {
-          CopyMem (&FrontPageTimeOutTitle, &((EFI_IFR_BANNER *) &RawFormSet[Index])->Title, sizeof (UINT16));
+        if (TempValue == FRAMEWORK_EFI_IFR_BANNER_TIMEOUT) {
+          CopyMem (&FrontPageTimeOutTitle, &((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->Title, sizeof (UINT16));
           if (FrontPageTimeOutValue != (INT16) -1) {
-            CopyMem (&FrontPageTimeOutValue, &((EFI_IFR_BANNER *) &RawFormSet[Index])->LineNumber, sizeof (UINT16));
+            CopyMem (&FrontPageTimeOutValue, &((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->LineNumber, sizeof (UINT16));
           }
           break;
         }
 
         CopyMem (
-          &BannerData->Banner[((EFI_IFR_BANNER *) &RawFormSet[Index])->LineNumber][
-          ((EFI_IFR_BANNER *) &RawFormSet[Index])->Alignment],
-          &((EFI_IFR_BANNER *) &RawFormSet[Index])->Title,
+          &BannerData->Banner[((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->LineNumber][
+          ((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->Alignment],
+          &((FRAMEWORK_EFI_IFR_BANNER *) &RawFormSet[Index])->Title,
           sizeof (STRING_REF)
           );
       }
       break;
 
-    case EFI_IFR_INCONSISTENT_IF_OP:
+    case FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP:
       CopyMem (
         &FormTags->Tags[CurrTag].Text,
-        &((EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Popup,
+        &((FRAMEWORK_EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Popup,
         sizeof (UINT16)
         );
       gConsistencyId++;
 
-      InconsistentTags->Operand = ((EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Header.OpCode;
-      CopyMem (&InconsistentTags->Popup, &((EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Popup, sizeof (UINT16));
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Header.OpCode;
+      CopyMem (&InconsistentTags->Popup, &((FRAMEWORK_EFI_IFR_INCONSISTENT *) &RawFormSet[Index])->Popup, sizeof (UINT16));
 
       //
       // Since this op-code doesn't use the next field(s), initialize them with something invalid.
@@ -1235,14 +1235,14 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_EQ_ID_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
 
-      InconsistentTags->Operand = ((EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->Header.OpCode;
-      CopyMem (&InconsistentTags->Value, &((EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->Value, sizeof (UINT16));
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->Header.OpCode;
+      CopyMem (&InconsistentTags->Value, &((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->Value, sizeof (UINT16));
       CopyMem (
         &InconsistentTags->QuestionId1,
-        &((EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->QuestionId,
+        &((FRAMEWORK_EFI_IFR_EQ_ID_VAL *) &RawFormSet[Index])->QuestionId,
         sizeof (UINT16)
         );
 
@@ -1270,14 +1270,14 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_EQ_VAR_VAL_OP:
+    case FRAMEWORK_EFI_IFR_EQ_VAR_VAL_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
 
-      InconsistentTags->Operand = ((EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->Header.OpCode;
-      CopyMem (&InconsistentTags->Value, &((EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->Value, sizeof (UINT16));
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->Header.OpCode;
+      CopyMem (&InconsistentTags->Value, &((FRAMEWORK_EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->Value, sizeof (UINT16));
       CopyMem (
         &InconsistentTags->QuestionId1,
-        &((EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->VariableId,
+        &((FRAMEWORK_EFI_IFR_EQ_VAR_VAL *) &RawFormSet[Index])->VariableId,
         sizeof (UINT16)
         );
 
@@ -1304,18 +1304,18 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_EQ_ID_ID_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_ID_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
 
-      InconsistentTags->Operand = ((EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->Header.OpCode;
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->Header.OpCode;
       CopyMem (
         &InconsistentTags->QuestionId1,
-        &((EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->QuestionId1,
+        &((FRAMEWORK_EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->QuestionId1,
         sizeof (UINT16)
         );
       CopyMem (
         &InconsistentTags->QuestionId2,
-        &((EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->QuestionId2,
+        &((FRAMEWORK_EFI_IFR_EQ_ID_ID *) &RawFormSet[Index])->QuestionId2,
         sizeof (UINT16)
         );
 
@@ -1339,14 +1339,14 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_AND_OP:
-    case EFI_IFR_OR_OP:
-    case EFI_IFR_NOT_OP:
-    case EFI_IFR_GT_OP:
-    case EFI_IFR_GE_OP:
-    case EFI_IFR_TRUE_OP:
-    case EFI_IFR_FALSE_OP:
-      InconsistentTags->Operand = ((EFI_IFR_NOT *) &RawFormSet[Index])->Header.OpCode;
+    case FRAMEWORK_EFI_IFR_AND_OP:
+    case FRAMEWORK_EFI_IFR_OR_OP:
+    case FRAMEWORK_EFI_IFR_NOT_OP:
+    case FRAMEWORK_EFI_IFR_GT_OP:
+    case FRAMEWORK_EFI_IFR_GE_OP:
+    case FRAMEWORK_EFI_IFR_TRUE_OP:
+    case FRAMEWORK_EFI_IFR_FALSE_OP:
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_NOT *) &RawFormSet[Index])->Header.OpCode;
 
       //
       // Since this op-code doesn't use the next field(s), initialize them with something invalid.
@@ -1357,8 +1357,8 @@ InitializeTagStructures (
       // Reserve INVALID_OFFSET_VALUE - 1 for TRUE or FALSE because they are inconsistency tags also, but
       // have no coresponding id. The examination of id is needed by evaluating boolean expression.
       //
-      if (RawFormSet[Index] == EFI_IFR_TRUE_OP ||
-          RawFormSet[Index] == EFI_IFR_FALSE_OP) {
+      if (RawFormSet[Index] == FRAMEWORK_EFI_IFR_TRUE_OP ||
+          RawFormSet[Index] == FRAMEWORK_EFI_IFR_FALSE_OP) {
         InconsistentTags->QuestionId1         = INVALID_OFFSET_VALUE - 1;
       } else {
         InconsistentTags->QuestionId1         = INVALID_OFFSET_VALUE;
@@ -1380,18 +1380,18 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case FRAMEWORK_EFI_IFR_EQ_ID_LIST_OP:
       IfrToFormTag (RawFormSet[Index], &FormTags->Tags[CurrTag], (VOID *) &RawFormSet[Index], NULL);
 
-      InconsistentTags->Operand = ((EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->Header.OpCode;
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->Header.OpCode;
       CopyMem (
         &InconsistentTags->QuestionId1,
-        &((EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->QuestionId,
+        &((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->QuestionId,
         sizeof (UINT16)
         );
       CopyMem (
         &InconsistentTags->ListLength,
-        &((EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->ListLength,
+        &((FRAMEWORK_EFI_IFR_EQ_ID_LIST *) &RawFormSet[Index])->ListLength,
         sizeof (UINT16)
         );
       InconsistentTags->ValueList = FormTags->Tags[CurrTag].IntList;
@@ -1418,8 +1418,8 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_END_IF_OP:
-      InconsistentTags->Operand = ((EFI_IFR_END_EXPR *) &RawFormSet[Index])->Header.OpCode;
+    case FRAMEWORK_EFI_IFR_END_IF_OP:
+      InconsistentTags->Operand = ((FRAMEWORK_EFI_IFR_END_EXPR *) &RawFormSet[Index])->Header.OpCode;
 
       //
       // Since this op-code doesn't use the next field(s), initialize them with something invalid.
@@ -1441,7 +1441,7 @@ InitializeTagStructures (
       InconsistentTags = InconsistentTags->Next;
       break;
 
-    case EFI_IFR_END_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_END_ONE_OF_OP:
       break;
 
     default:
@@ -1479,12 +1479,12 @@ InitializeTagStructures (
       //
       // Search the tags for the tag which corresponds to this ID
       //
-      for (CurrTag = 0; FormTags->Tags[0].Operand != EFI_IFR_END_FORM_SET_OP; CurrTag++) {
+      for (CurrTag = 0; FormTags->Tags[0].Operand != FRAMEWORK_EFI_IFR_END_FORM_SET_OP; CurrTag++) {
         //
         // If we hit the end of a form, go to the next set of Tags.
         // Remember - EndFormSet op-codes sit on their own page after an end form.
         //
-        if (FormTags->Tags[CurrTag].Operand == EFI_IFR_END_FORM_OP) {
+        if (FormTags->Tags[CurrTag].Operand == FRAMEWORK_EFI_IFR_END_FORM_OP) {
           //
           // Reset the CurrTag value (it will be incremented, after this case statement
           // so set to a negative one so that we get the desired effect.)  Fish can beat me later.
@@ -1506,12 +1506,12 @@ InitializeTagStructures (
       //
       // Search the tags for the tag which corresponds to this ID
       //
-      for (CurrTag = 0; FormTags->Tags[CurrTag].Operand != EFI_IFR_END_FORM_SET_OP; CurrTag++) {
+      for (CurrTag = 0; FormTags->Tags[CurrTag].Operand != FRAMEWORK_EFI_IFR_END_FORM_SET_OP; CurrTag++) {
         //
         // If we hit the end of a form, go to the next set of Tags.
         // Remember - EndFormSet op-codes sit on their own page after an end form.
         //
-        if (FormTags->Tags[CurrTag].Operand == EFI_IFR_END_FORM_OP) {
+        if (FormTags->Tags[CurrTag].Operand == FRAMEWORK_EFI_IFR_END_FORM_OP) {
           //
           // Reset the CurrTag value (it will be incremented, after this case statement
           // so set to a negative one so that we get the desired effect.)  Fish can beat me later.
@@ -1582,7 +1582,7 @@ InitPage (
 CHAR16 *
 GetToken (
   IN  STRING_REF                              Token,
-  IN  EFI_HII_HANDLE                          HiiHandle
+  IN  FRAMEWORK_EFI_HII_HANDLE                HiiHandle
   )
 /*++
 
@@ -1650,7 +1650,7 @@ PopulateHomePage (
 {
   EFI_STATUS          Status;
   UINTN               Index;
-  EFI_IFR_BINARY      *IfrBinary;
+  FRAMEWORK_EFI_IFR_BINARY      *IfrBinary;
   CHAR16              *StringPtr;
   EFI_FILE_FORM_TAGS  *FileFormTags;
   EFI_FORM_TAGS       LocalTags;
@@ -1727,7 +1727,7 @@ DisplayHomePage (
     return Selection;
   }
 
-  Selection = UiDisplayMenu (FALSE, FileFormTagsHead, (EFI_IFR_DATA_ARRAY *) CallbackData);
+  Selection = UiDisplayMenu (FALSE, FileFormTagsHead, (FRAMEWORK_EFI_IFR_DATA_ARRAY *) CallbackData);
 
   return Selection;
 }
@@ -1735,9 +1735,9 @@ DisplayHomePage (
 STATIC
 EFI_STATUS
 InitializeBinaryStructures (
-  IN  EFI_HII_HANDLE                        *Handle,
+  IN  FRAMEWORK_EFI_HII_HANDLE              *Handle,
   IN  BOOLEAN                               UseDatabase,
-  IN  EFI_IFR_PACKET                        *Packet,
+  IN  FRAMEWORK_EFI_IFR_PACKET                        *Packet,
   IN  UINT8                                 *NvMapOverride,
   IN  UINTN                                 NumberOfIfrImages,
   OUT EFI_FILE_FORM_TAGS                    **FileFormTagsHead
@@ -1745,7 +1745,7 @@ InitializeBinaryStructures (
 {
   UINTN                       HandleIndex;
   EFI_STATUS                  Status;
-  EFI_IFR_BINARY              *BinaryData;
+  FRAMEWORK_EFI_IFR_BINARY              *BinaryData;
   EFI_FILE_FORM_TAGS          *FileFormTags;
   UINTN                       SizeOfNvStore;
   EFI_FORM_CALLBACK_PROTOCOL  *FormCallback;
@@ -1780,7 +1780,7 @@ InitializeBinaryStructures (
       //
       // Allocate memory for our Binary Data
       //
-      BinaryData = AllocateZeroPool (sizeof (EFI_IFR_BINARY));
+      BinaryData = AllocateZeroPool (sizeof (FRAMEWORK_EFI_IFR_BINARY));
       ASSERT (BinaryData);
 
       //
@@ -1811,7 +1811,7 @@ InitializeBinaryStructures (
       // Allocate memory for our Binary Data linked-list
       // Each handle represents a Binary and we will store that data away.
       //
-      BinaryData->Next = AllocateZeroPool (sizeof (EFI_IFR_BINARY));
+      BinaryData->Next = AllocateZeroPool (sizeof (FRAMEWORK_EFI_IFR_BINARY));
       ASSERT (BinaryData->Next);
 
       BinaryData        = BinaryData->Next;
@@ -1993,7 +1993,7 @@ InitializeBinaryStructures (
 
               NvMapListHead = NULL;
 
-              Status = Hii->GetDefaultImage (Hii, Handle[HandleIndex], EFI_IFR_FLAG_DEFAULT, &NvMapListHead);
+              Status = Hii->GetDefaultImage (Hii, Handle[HandleIndex], FRAMEWORK_EFI_IFR_FLAG_DEFAULT, &NvMapListHead);
 
               if (!EFI_ERROR (Status)) {
                 ASSERT_EFI_ERROR (NULL != NvMapListHead);
@@ -2048,9 +2048,9 @@ STATIC
 EFI_STATUS
 GetIfrBinaryData (
   IN      EFI_HII_PROTOCOL *Hii,
-  IN      EFI_HII_HANDLE   HiiHandle,
-  IN      EFI_IFR_PACKET   *Packet,
-  IN OUT  EFI_IFR_BINARY   *BinaryData
+  IN      FRAMEWORK_EFI_HII_HANDLE    HiiHandle,
+  IN      FRAMEWORK_EFI_IFR_PACKET   *Packet,
+  IN OUT  FRAMEWORK_EFI_IFR_BINARY   *BinaryData
   )
 /*++
 
@@ -2074,7 +2074,7 @@ Returns:
   UINTN             BufferSize;
   VOID              *Buffer;
   UINT8             *RawFormBinary;
-  EFI_IFR_FORM_SET  *FormOp;
+  FRAMEWORK_EFI_IFR_FORM_SET  *FormOp;
   UINT16            Index;
   UINT16            Index2;
   UINT16            TitleToken;
@@ -2147,13 +2147,13 @@ Returns:
   }
   //
   // Walk through the FormSet Opcodes looking for the FormSet opcode
-  // If we hit EFI_IFR_END_SET_OP we know we hit the end of the FormSet.
+  // If we hit FRAMEWORK_EFI_IFR_END_SET_OP we know we hit the end of the FormSet.
   //
-  for (Index = 0; RawFormBinary[Index] != EFI_IFR_END_FORM_SET_OP;) {
-    FormOp  = (EFI_IFR_FORM_SET *) &RawFormBinary[Index];
+  for (Index = 0; RawFormBinary[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
+    FormOp  = (FRAMEWORK_EFI_IFR_FORM_SET *) &RawFormBinary[Index];
     Index   = (UINT16) (Index + FormOp->Header.Length);
 
-    if (FormOp->Header.OpCode == EFI_IFR_FORM_SET_OP) {
+    if (FormOp->Header.OpCode == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
       TitleToken = FormOp->FormSetTitle;
       //
       // If displaying FrontPage - set the flag signifying it
