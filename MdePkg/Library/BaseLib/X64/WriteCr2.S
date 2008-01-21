@@ -30,7 +30,7 @@
 #   );
 #------------------------------------------------------------------------------
 .global _AsmWriteCr2;
-_AsmWriteCr0:
+_AsmWriteCr2:
     mov    %rcx,%cr2
     mov    %rcx,%rax
     ret
