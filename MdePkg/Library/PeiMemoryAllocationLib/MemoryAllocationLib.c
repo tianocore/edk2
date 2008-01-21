@@ -1075,3 +1075,16 @@ FreeAlignedPool (
   // PEI phase does not support to free pool, so leave it as NOP.
   //
 }
+
+
+VOID
+EFIAPI
+SafeFreePool (
+  IN VOID   *Buffer
+  )
+{
+  //
+  // PEI phase does not support to free pool, so leave it as NOP.
+  //
+}
+

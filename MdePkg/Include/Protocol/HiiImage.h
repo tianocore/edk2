@@ -15,8 +15,6 @@
 #ifndef __HII_IMAGE_H__
 #define __HII_IMAGE_H__
 
-#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
-
 #define EFI_HII_IMAGE_PROTOCOL_GUID \
   { 0x31a6406a, 0x6bdf, 0x4e46, { 0xb2, 0xa2, 0xeb, 0xaa, 0x89, 0xc4, 0x9, 0x20 } }
 
@@ -47,10 +45,10 @@ typedef struct _EFI_HII_IMAGE_PROTOCOL EFI_HII_IMAGE_PROTOCOL;
    
 **/
 typedef struct _EFI_IMAGE_INPUT {
-  UINT32  Flags;
-  UINT16  Width;
-  UINT16  Height;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *Bitmap;
+  UINT32                          Flags;
+  UINT16                          Width;
+  UINT16                          Height;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   Bitmap[1];
 } EFI_IMAGE_INPUT;
 
 
@@ -83,7 +81,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_NEW_IMAGE) (
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
-  IN CONST  EFI_HII_HANDLE          PackageList,
+  IN        EFI_HII_HANDLE          PackageList,
   OUT       EFI_IMAGE_ID            *ImageId,
   IN CONST  EFI_IMAGE_INPUT         *Image
 );
@@ -133,8 +131,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_GET_IMAGE) (
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
-  IN CONST  EFI_HII_HANDLE          PackageList,
-  IN CONST  EFI_IMAGE_ID            ImageId,
+  IN        EFI_HII_HANDLE          PackageList,
+  IN        EFI_IMAGE_ID            ImageId,
   OUT       EFI_IMAGE_INPUT         *Image,
   OUT       UINTN                   *ImageSize
 );
@@ -168,9 +166,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_SET_IMAGE) (
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
-  IN CONST  EFI_HII_HANDLE          PackageList,
-  IN CONST  EFI_IMAGE_ID            ImageId,
-  IN CONST  EFI_IMAGE_INPUT         Image
+  IN        EFI_HII_HANDLE          PackageList,
+  IN        EFI_IMAGE_ID            ImageId,
+  IN CONST  EFI_IMAGE_INPUT         *Image
 );
 
 
@@ -264,11 +262,11 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_DRAW_IMAGE) (
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
-  IN CONST  EFI_HII_DRAW_FLAGS      Flags,
-  IN CONST  EFI_IMAGE_INPUT         Image,
+  IN        EFI_HII_DRAW_FLAGS      Flags,
+  IN CONST  EFI_IMAGE_INPUT         *Image,
   IN OUT    EFI_IMAGE_OUTPUT        **Blt,
-  IN CONST  UINTN                   BltX,
-  IN CONST  UINTN                   BltY
+  IN        UINTN                   BltX,
+  IN        UINTN                   BltY
 );
 
 /**
@@ -342,12 +340,12 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_DRAW_IMAGE_ID) (
 IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
-IN CONST  EFI_HII_DRAW_FLAGS      Flags,
-IN CONST  EFI_HII_HANDLE          PackageList,
-IN CONST  EFI_IMAGE_ID            ImageId,
+IN        EFI_HII_DRAW_FLAGS      Flags,
+IN        EFI_HII_HANDLE          PackageList,
+IN        EFI_IMAGE_ID            ImageId,
 IN OUT    EFI_IMAGE_OUTPUT        **Blt,
-IN CONST  UINTN                   BltX,
-IN CONST  UINTN                   BltY
+IN        UINTN                   BltX,
+IN        UINTN                   BltY
 );
 
 
@@ -378,4 +376,5 @@ struct _EFI_HII_IMAGE_PROTOCOL {
 extern EFI_GUID gEfiHiiImageProtocolGuid;
 
 #endif
+
 

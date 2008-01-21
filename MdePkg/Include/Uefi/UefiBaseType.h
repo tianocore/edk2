@@ -34,7 +34,6 @@ typedef UINTN                     EFI_TPL;
 typedef UINT64                    EFI_LBA;
 
 
-typedef UINT16                    EFI_HII_HANDLE;
 typedef UINT16                    STRING_REF;
 
 typedef UINT64                    EFI_PHYSICAL_ADDRESS;

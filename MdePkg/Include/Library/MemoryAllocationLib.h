@@ -617,4 +617,10 @@ FreeAlignedPool (
   IN VOID   *Buffer
   );
 
+VOID
+EFIAPI
+SafeFreePool (
+  IN VOID   *Buffer
+  );
+
 #endif

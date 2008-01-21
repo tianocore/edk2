@@ -22,8 +22,9 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x0002000A
 
+  CONSTRUCTOR                    = UefiHiiLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
@@ -35,9 +36,27 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-
+  #BugBug: This package dependency will be re-evaluated when the code become functional and stable.
+  #      : HiiLibCreateHiiDriverHandle depends on HII_VENDOR_DEVICE_PATH which is defined by this
+  #      : specification only. 
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
   DebugLib
+  PcdLib
+  UefiRuntimeServicesTableLib
 
+[Protocols]
+  gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED
+  gEfiHiiStringProtocolGuid    # ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid  
+  
+[Guids]  
+  gEfiGlobalVariableGuid 
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND gEfiHiiStringProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang

@@ -207,9 +207,9 @@ typedef struct {
 #define MSG_SATA_DP               0x12
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
-  UINT16                          HbaPortNumber;
-  UINT16                          PortMultiplierPort;
-  UINT16                          LogicalUnitNumber;
+  UINT16                          HBAPortNumber;
+  UINT16                          PortMultiplierPortNumber;
+  UINT16                          Lun;
 } SATA_DEVICE_PATH;
 
 #define MSG_I2O_DP                0x06

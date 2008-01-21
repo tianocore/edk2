@@ -23,7 +23,6 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-
 [PcdsFeatureFlag.common]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
@@ -77,6 +76,7 @@
   MdePkg/Library/DxePiLib/DxePiLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  MdePkg/Library/HiiLib/HiiLib.inf
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
@@ -105,6 +105,7 @@
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+  
 
 [Components.IA32]
   MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf

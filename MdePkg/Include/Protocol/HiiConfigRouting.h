@@ -19,8 +19,6 @@
 #ifndef __HII_CONFIG_ROUTING_H__
 #define __HII_CONFIG_ROUTING_H__
 
-#error "UEFI 2.1 HII is not fully implemented for now, Please don't include this file now."
-
 #define EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID \
   { 0x587e72d7, 0xcc50, 0x4f79, { 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f } }
 
@@ -112,7 +110,7 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_HII_ROUTING_EXTRACT_CONFIG ) (
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
-  IN CONST  EFI_STRING                      *Request,
+  IN CONST  EFI_STRING                      Request,
   OUT       EFI_STRING                      *Progress,
   OUT       EFI_STRING                      *Results
 );
@@ -278,7 +276,7 @@ EFI_STATUS
   IN CONST  EFI_STRING                      ConfigRequest,
   IN CONST  UINT8                           *Block,
   IN CONST  UINTN                           BlockSize,
-  OUT       EFI_STRING                      **Config,
+  OUT       EFI_STRING                      *Config,
   OUT       EFI_STRING                      *Progress
 );
 
@@ -334,11 +332,61 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_HII_ROUTING_CONFIG_TO_BLOCK ) (
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
-  IN CONST  EFI_STRING                      *ConfigResp,
-  IN CONST  UINT8                           *Block,
+  IN CONST  EFI_STRING                      ConfigResp,
+  IN OUT    UINT8                           *Block,
   IN OUT    UINTN                           *BlockSize,
   OUT       EFI_STRING                      *Progress
 );
+
+typedef
+EFI_STATUS 
+(EFIAPI * EFI_HII_GET_ALT_CFG) (
+  IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL    *This, 
+  IN  CONST EFI_STRING                         Configuration, 
+  IN  CONST EFI_GUID                           *Guid, 
+  IN  CONST EFI_STRING                         Name, 
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL           *DevicePath,  
+  IN  CONST UINT16                             *AltCfgId,
+  OUT EFI_STRING                               *AltCfgResp 
+  )
+/*++
+
+  Routine Description:
+    This helper function is to be called by drivers to extract portions of 
+    a larger configuration string.
+    
+  Arguments:          
+    This                   - A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.    
+    Configuration          - A null-terminated Unicode string in <MultiConfigAltResp> format.
+    Guid                   - A pointer to the GUID value to search for in the 
+                             routing portion of the ConfigResp string when retrieving 
+                             the requested data. If Guid is NULL, then all GUID 
+                             values will be searched for.
+    Name                   - A pointer to the NAME value to search for in the 
+                             routing portion of the ConfigResp string when retrieving 
+                             the requested data. If Name is NULL, then all Name 
+                             values will be searched for.                         
+    DevicePath             - A pointer to the PATH value to search for in the 
+                             routing portion of the ConfigResp string when retrieving 
+                             the requested data. If DevicePath is NULL, then all 
+                             DevicePath values will be searched for.             
+    AltCfgId               - A pointer to the ALTCFG value to search for in the 
+                             routing portion of the ConfigResp string when retrieving 
+                             the requested data.  If this parameter is NULL, 
+                             then the current setting will be retrieved.
+    AltCfgResp             - A pointer to a buffer which will be allocated by the 
+                             function which contains the retrieved string as requested.  
+                             This buffer is only allocated if the call was successful. 
+    
+  Returns:              
+    EFI_SUCCESS            - The request succeeded. The requested data was extracted 
+                             and placed in the newly allocated AltCfgResp buffer.
+    EFI_OUT_OF_RESOURCES   - Not enough memory to allocate AltCfgResp.    
+    EFI_INVALID_PARAMETER  - Any parameter is invalid.
+    EFI_NOT_FOUND          - Target for the specified routing data was not found.
+                             
+--*/        
+;
 
 
 /**
@@ -354,6 +402,7 @@ struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
   EFI_HII_ROUTING_ROUTE_CONFIG    RouteConfig;
   EFI_HII_ROUTING_BLOCK_TO_CONFIG BlockToConfig;
   EFI_HII_ROUTING_CONFIG_TO_BLOCK ConfigToBlock;
+  EFI_HII_GET_ALT_CFG             GetAltConfig;
 };
 
 extern EFI_GUID gEfiHiiConfigRoutingProtocolGuid;

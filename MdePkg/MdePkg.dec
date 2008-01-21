@@ -83,7 +83,8 @@
   BasePeCoffLib|Include/Library/PeCoffLib.h
   GraphicsLib|Include/Library/GraphicsLib.h
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
-
+  IfrSupportLib|Include/Library/IfrSupportLib.h
+  
 [LibraryClasses.IPF]
   SalLib|Include/Library/SalLib.h
   PalCallLib|Include/Library/PalCallLib.h
@@ -271,9 +272,14 @@
   gPcdProtocolGuid               = { 0x11B34006, 0xD85B, 0x4D0A, { 0xA2, 0x90, 0xD5, 0xA5, 0x71, 0x31, 0x0E, 0xF7 }}
   gEfiTcgProtocolGuid            = { 0xf541796d, 0xa62e, 0x4954, { 0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd }}
 
-## BugBug: HII related protocols should be defined.
-  gEfiFormBrowser2ProtocolGuid    = { 0xE5A1333E, 0xE1B4, 0x4D55, { 0xCE, 0xEB, 0x35, 0xC3, 0xEF, 0x13, 0x34, 0x43 }}
-  
+  gEfiFormBrowserProtocolGuid    =   {0xE5A1333E, 0xE1B4, 0x4D55, {0xCE, 0xEB, 0x35, 0xC3, 0xEF, 0x13, 0x34, 0x43}}
+  gEfiFormBrowser2ProtocolGuid   =   {0xb9d4c360, 0xbcfb, 0x4f9b, {0x92, 0x98, 0x53, 0xc1, 0x36, 0x98, 0x22, 0x58}}
+  gEfiHiiStringProtocolGuid      =   {0x0fd96974, 0x23aa, 0x4cdc, {0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a}}
+  gEfiHiiImageProtocolGuid       =   {0x31a6406a, 0x6bdf, 0x4e46, {0xb2, 0xa2, 0xeb, 0xaa, 0x89, 0xc4, 0x09, 0x20}}
+  gEfiHiiConfigRoutingProtocolGuid = {0x587e72d7, 0xcc50, 0x4f79, {0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f}}
+  gEfiHiiDatabaseProtocolGuid    =   {0xef9fc172, 0xa1b2, 0x4693, {0xb3, 0x27, 0x6d, 0x32, 0xfc, 0x41, 0x60, 0x42}}
+  gEfiHiiFontProtocolGuid        =   {0xe9ca4775, 0x8657, 0x47fc, {0x97, 0xe7, 0x7e, 0xd6, 0x5a, 0x08, 0x43, 0x24}}
+  gEfiHiiConfigAccessProtocolGuid =  {0x330d4706, 0xf2a0, 0x4e4f, {0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85}}
 
 [PcdsFeatureFlag.common]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
@@ -321,8 +327,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fr"|VOID*|0x0000001e
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en"|VOID*|0x0000001f
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
@@ -359,8 +365,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fr"|VOID*|0x0000001e
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en"|VOID*|0x0000001f
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
@@ -371,8 +377,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fr"|VOID*|0x0000001e
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en"|VOID*|0x0000001f
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
