@@ -63,8 +63,8 @@ Returns:
 {
   EFI_STATUS            Status;
   EFI_HII_IFR_PACK      IfrPack;
-  EFI_IFR_FORM_SET      FormSet;
-  EFI_IFR_END_FORM_SET  EndFormSet;
+  FRAMEWORK_EFI_IFR_FORM_SET      FormSet;
+  FRAMEWORK_EFI_IFR_END_FORM_SET  EndFormSet;
   UINT8                 *Destination;
   CHAR16                CurrentLanguage[4];
   STRING_REF            StringToken;
@@ -103,14 +103,14 @@ Returns:
   //
   // Initialize the Ifr Package header data
   //
-  IfrPack.Header.Length = sizeof (EFI_HII_PACK_HEADER) + sizeof (EFI_IFR_FORM_SET) + sizeof (EFI_IFR_END_FORM_SET);
+  IfrPack.Header.Length = sizeof (EFI_HII_PACK_HEADER) + sizeof (FRAMEWORK_EFI_IFR_FORM_SET) + sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET);
   IfrPack.Header.Type   = EFI_HII_IFR;
 
   //
   // Initialize FormSet with the appropriate information
   //
-  FormSet.Header.OpCode = EFI_IFR_FORM_SET_OP;
-  FormSet.Header.Length = sizeof (EFI_IFR_FORM_SET);
+  FormSet.Header.OpCode = FRAMEWORK_EFI_IFR_FORM_SET_OP;
+  FormSet.Header.Length = sizeof (FRAMEWORK_EFI_IFR_FORM_SET);
   FormSet.FormSetTitle  = StringToken;
   FormSet.Class         = Class;
   FormSet.SubClass      = SubClass;
@@ -119,8 +119,8 @@ Returns:
   //
   // Initialize the end formset data
   //
-  EndFormSet.Header.Length  = sizeof (EFI_IFR_END_FORM_SET);
-  EndFormSet.Header.OpCode  = EFI_IFR_END_FORM_SET_OP;
+  EndFormSet.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET);
+  EndFormSet.Header.OpCode  = FRAMEWORK_EFI_IFR_END_FORM_SET_OP;
 
   Destination               = (UINT8 *) *FormBuffer;
 
@@ -131,11 +131,11 @@ Returns:
 
   Destination = Destination + sizeof (EFI_HII_PACK_HEADER);
 
-  CopyMem (Destination, &FormSet, sizeof (EFI_IFR_FORM_SET));
+  CopyMem (Destination, &FormSet, sizeof (FRAMEWORK_EFI_IFR_FORM_SET));
 
-  Destination = Destination + sizeof (EFI_IFR_FORM_SET);
+  Destination = Destination + sizeof (FRAMEWORK_EFI_IFR_FORM_SET);
 
-  CopyMem (Destination, &EndFormSet, sizeof (EFI_IFR_END_FORM_SET));
+  CopyMem (Destination, &EndFormSet, sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET));
   return EFI_SUCCESS;
 }
 
@@ -170,8 +170,8 @@ Returns:
 --*/
 {
   EFI_STATUS        Status;
-  EFI_IFR_FORM      Form;
-  EFI_IFR_END_FORM  EndForm;
+  FRAMEWORK_EFI_IFR_FORM      Form;
+  FRAMEWORK_EFI_IFR_END_FORM  EndForm;
   CHAR16            CurrentLanguage[4];
   STRING_REF        StringToken;
 
@@ -186,8 +186,8 @@ Returns:
     return Status;
   }
 
-  Form.Header.OpCode  = EFI_IFR_FORM_OP;
-  Form.Header.Length  = sizeof (EFI_IFR_FORM);
+  Form.Header.OpCode  = FRAMEWORK_EFI_IFR_FORM_OP;
+  Form.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_FORM);
   Form.FormId         = FormId;
   Form.FormTitle      = StringToken;
 
@@ -197,8 +197,8 @@ Returns:
     return Status;
   }
 
-  EndForm.Header.OpCode = EFI_IFR_END_FORM_OP;
-  EndForm.Header.Length = sizeof (EFI_IFR_END_FORM);
+  EndForm.Header.OpCode = FRAMEWORK_EFI_IFR_END_FORM_OP;
+  EndForm.Header.Length = sizeof (FRAMEWORK_EFI_IFR_END_FORM);
 
   Status                = AddOpCode (FormBuffer, &EndForm);
 
@@ -237,7 +237,7 @@ Returns:
 --*/
 {
   EFI_STATUS        Status;
-  EFI_IFR_SUBTITLE  Subtitle;
+  FRAMEWORK_EFI_IFR_SUBTITLE  Subtitle;
   CHAR16            CurrentLanguage[4];
   STRING_REF        StringToken;
 
@@ -252,8 +252,8 @@ Returns:
     return Status;
   }
 
-  Subtitle.Header.OpCode  = EFI_IFR_SUBTITLE_OP;
-  Subtitle.Header.Length  = sizeof (EFI_IFR_SUBTITLE);
+  Subtitle.Header.OpCode  = FRAMEWORK_EFI_IFR_SUBTITLE_OP;
+  Subtitle.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_SUBTITLE);
   Subtitle.SubTitle       = StringToken;
 
   Status                  = AddOpCode (FormBuffer, &Subtitle);
@@ -305,7 +305,7 @@ Returns:
 --*/
 {
   EFI_STATUS    Status;
-  EFI_IFR_TEXT  Text;
+  FRAMEWORK_EFI_IFR_TEXT  Text;
   CHAR16        CurrentLanguage[4];
   STRING_REF    StringToken;
 
@@ -323,8 +323,8 @@ Returns:
     return Status;
   }
 
-  Text.Header.OpCode  = EFI_IFR_TEXT_OP;
-  Text.Header.Length  = sizeof (EFI_IFR_TEXT);
+  Text.Header.OpCode  = FRAMEWORK_EFI_IFR_TEXT_OP;
+  Text.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_TEXT);
   Text.Text           = StringToken;
 
   //
@@ -338,7 +338,7 @@ Returns:
 
   Text.TextTwo  = StringToken;
 
-  Text.Flags    = (UINT8) (Flags | EFI_IFR_FLAG_CREATED);
+  Text.Flags    = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
   Text.Key      = Key;
 
   //
@@ -392,7 +392,7 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
-  EFI_IFR_REF Hyperlink;
+  FRAMEWORK_EFI_IFR_REF Hyperlink;
   CHAR16      CurrentLanguage[4];
   STRING_REF  StringToken;
 
@@ -407,8 +407,8 @@ Returns:
     return Status;
   }
 
-  Hyperlink.Header.OpCode = EFI_IFR_REF_OP;
-  Hyperlink.Header.Length = sizeof (EFI_IFR_REF);
+  Hyperlink.Header.OpCode = FRAMEWORK_EFI_IFR_REF_OP;
+  Hyperlink.Header.Length = sizeof (FRAMEWORK_EFI_IFR_REF);
   Hyperlink.FormId        = FormId;
   Hyperlink.Prompt        = StringToken;
 
@@ -468,9 +468,9 @@ Returns:
 {
   EFI_STATUS            Status;
   UINTN                 Index;
-  EFI_IFR_ONE_OF        OneOf;
-  EFI_IFR_ONE_OF_OPTION OneOfOption;
-  EFI_IFR_END_ONE_OF    EndOneOf;
+  FRAMEWORK_EFI_IFR_ONE_OF        OneOf;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OneOfOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOneOf;
   CHAR16                CurrentLanguage[4];
   STRING_REF            StringToken;
 
@@ -495,8 +495,8 @@ Returns:
     return Status;
   }
 
-  OneOf.Header.OpCode = EFI_IFR_ONE_OF_OP;
-  OneOf.Header.Length = sizeof (EFI_IFR_ONE_OF);
+  OneOf.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OP;
+  OneOf.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF);
   OneOf.QuestionId    = QuestionId;
   OneOf.Width         = DataWidth;
   OneOf.Prompt        = StringToken;
@@ -519,8 +519,8 @@ Returns:
   }
 
   for (Index = 0; Index < OptionCount; Index++) {
-    OneOfOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OneOfOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OneOfOption.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP;
+    OneOfOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     //
     // Add string and get token back
@@ -529,7 +529,7 @@ Returns:
 
     OneOfOption.Option  = StringToken;
     OneOfOption.Value   = OptionsList[Index].Value;
-    OneOfOption.Flags   = (UINT8) (OptionsList[Index].Flags | EFI_IFR_FLAG_CREATED);
+    OneOfOption.Flags   = (UINT8) (OptionsList[Index].Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
     OneOfOption.Key     = OptionsList[Index].Key;
 
     Status              = AddOpCode (FormBuffer, &OneOfOption);
@@ -539,8 +539,8 @@ Returns:
     }
   }
 
-  EndOneOf.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
-  EndOneOf.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
+  EndOneOf.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF);
+  EndOneOf.Header.OpCode  = FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
 
   Status                  = AddOpCode (FormBuffer, &EndOneOf);
 
@@ -595,9 +595,9 @@ Returns:
 {
   EFI_STATUS            Status;
   UINTN                 Index;
-  EFI_IFR_ORDERED_LIST  OrderedList;
-  EFI_IFR_ONE_OF_OPTION OrderedListOption;
-  EFI_IFR_END_ONE_OF    EndOrderedList;
+  FRAMEWORK_EFI_IFR_ORDERED_LIST  OrderedList;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OrderedListOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOrderedList;
   CHAR16                CurrentLanguage[4];
   STRING_REF            StringToken;
 
@@ -615,8 +615,8 @@ Returns:
     return Status;
   }
 
-  OrderedList.Header.OpCode = EFI_IFR_ORDERED_LIST_OP;
-  OrderedList.Header.Length = sizeof (EFI_IFR_ORDERED_LIST);
+  OrderedList.Header.OpCode = FRAMEWORK_EFI_IFR_ORDERED_LIST_OP;
+  OrderedList.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ORDERED_LIST);
   OrderedList.QuestionId    = QuestionId;
   OrderedList.MaxEntries    = MaxEntries;
   OrderedList.Prompt        = StringToken;
@@ -639,8 +639,8 @@ Returns:
   }
 
   for (Index = 0; Index < OptionCount; Index++) {
-    OrderedListOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OrderedListOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OrderedListOption.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP;
+    OrderedListOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     //
     // Add string and get token back
@@ -649,7 +649,7 @@ Returns:
 
     OrderedListOption.Option  = StringToken;
     OrderedListOption.Value   = OptionsList[Index].Value;
-    OrderedListOption.Flags   = (UINT8) (OptionsList[Index].Flags | EFI_IFR_FLAG_CREATED);
+    OrderedListOption.Flags   = (UINT8) (OptionsList[Index].Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
     OrderedListOption.Key     = OptionsList[Index].Key;
 
     Status                    = AddOpCode (FormBuffer, &OrderedListOption);
@@ -659,8 +659,8 @@ Returns:
     }
   }
 
-  EndOrderedList.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
-  EndOrderedList.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
+  EndOrderedList.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF);
+  EndOrderedList.Header.OpCode  = FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
 
   Status                        = AddOpCode (FormBuffer, &EndOrderedList);
 
@@ -713,7 +713,7 @@ Returns:
 --*/
 {
   EFI_STATUS        Status;
-  EFI_IFR_CHECKBOX  CheckBox;
+  FRAMEWORK_EFI_IFR_CHECKBOX  CheckBox;
   CHAR16            CurrentLanguage[4];
   STRING_REF        StringToken;
 
@@ -738,8 +738,8 @@ Returns:
     return Status;
   }
 
-  CheckBox.Header.OpCode  = EFI_IFR_CHECKBOX_OP;
-  CheckBox.Header.Length  = sizeof (EFI_IFR_CHECKBOX);
+  CheckBox.Header.OpCode  = FRAMEWORK_EFI_IFR_CHECKBOX_OP;
+  CheckBox.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_CHECKBOX);
   CheckBox.QuestionId     = QuestionId;
   CheckBox.Width          = DataWidth;
   CheckBox.Prompt         = StringToken;
@@ -754,7 +754,7 @@ Returns:
   }
 
   CheckBox.Help   = StringToken;
-  CheckBox.Flags  = (UINT8) (Flags | EFI_IFR_FLAG_CREATED);
+  CheckBox.Flags  = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
 
   Status          = AddOpCode (FormBuffer, &CheckBox);
 
@@ -822,7 +822,7 @@ Returns:
 --*/
 {
   EFI_STATUS      Status;
-  EFI_IFR_NUMERIC Numeric;
+  FRAMEWORK_EFI_IFR_NUMERIC Numeric;
   CHAR16          CurrentLanguage[4];
   STRING_REF      StringToken;
 
@@ -847,8 +847,8 @@ Returns:
     return Status;
   }
 
-  Numeric.Header.OpCode = EFI_IFR_NUMERIC_OP;
-  Numeric.Header.Length = sizeof (EFI_IFR_NUMERIC);
+  Numeric.Header.OpCode = FRAMEWORK_EFI_IFR_NUMERIC_OP;
+  Numeric.Header.Length = sizeof (FRAMEWORK_EFI_IFR_NUMERIC);
   Numeric.QuestionId    = QuestionId;
   Numeric.Width         = DataWidth;
   Numeric.Prompt        = StringToken;
@@ -867,7 +867,7 @@ Returns:
   Numeric.Maximum = Maximum;
   Numeric.Step    = Step;
   Numeric.Default = Default;
-  Numeric.Flags   = (UINT8) (Flags | EFI_IFR_FLAG_CREATED);
+  Numeric.Flags   = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
   Numeric.Key     = Key;
 
   Status          = AddOpCode (FormBuffer, &Numeric);
@@ -928,7 +928,7 @@ Returns:
 --*/
 {
   EFI_STATUS      Status;
-  EFI_IFR_STRING  String;
+  FRAMEWORK_EFI_IFR_STRING  String;
   CHAR16          CurrentLanguage[4];
   STRING_REF      StringToken;
 
@@ -946,8 +946,8 @@ Returns:
     return Status;
   }
 
-  String.Header.OpCode  = EFI_IFR_STRING_OP;
-  String.Header.Length  = sizeof (EFI_IFR_STRING);
+  String.Header.OpCode  = FRAMEWORK_EFI_IFR_STRING_OP;
+  String.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_STRING);
   String.QuestionId     = QuestionId;
   String.Width          = DataWidth;
   String.Prompt         = StringToken;
@@ -964,7 +964,7 @@ Returns:
   String.Help     = StringToken;
   String.MinSize  = MinSize;
   String.MaxSize  = MaxSize;
-  String.Flags    = (UINT8) (Flags | EFI_IFR_FLAG_CREATED);
+  String.Flags    = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
   String.Key      = Key;
 
   Status          = AddOpCode (FormBuffer, &String);

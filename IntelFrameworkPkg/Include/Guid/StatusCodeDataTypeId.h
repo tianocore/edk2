@@ -24,6 +24,7 @@
 #include <Framework/StatusCode.h>
 #include <Framework/DataHubRecords.h>
 #include <Protocol/DebugSupport.h>
+#include <Protocol/FrameworkHii.h>
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // String Data Type defintion. This is part of Status Code Specification
@@ -40,7 +41,7 @@ typedef enum {
 } EFI_STRING_TYPE;
 
 typedef struct {
-  EFI_HII_HANDLE  Handle;
+  FRAMEWORK_EFI_HII_HANDLE  Handle;
   STRING_REF      Token;
 } EFI_STATUS_CODE_STRING_TOKEN;
 

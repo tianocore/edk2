@@ -513,7 +513,7 @@ Returns:
 
 EFI_STATUS
 ExtractDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
+  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   IN OUT  UINT16              *ImageLength,
   OUT     UINT8               *DefaultImage,
   OUT     EFI_GUID            *Guid
@@ -547,7 +547,7 @@ Returns:
 --*/
 ;
 
-EFI_HII_HANDLE
+FRAMEWORK_EFI_HII_HANDLE 
 FindHiiHandle (
   IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
   IN     EFI_GUID            *Guid
@@ -917,7 +917,7 @@ Returns:
 
 EFI_STATUS
 ValidateDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
+  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   OUT     BOOLEAN             *Results
   )
 /*++

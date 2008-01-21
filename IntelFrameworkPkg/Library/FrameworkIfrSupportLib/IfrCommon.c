@@ -372,52 +372,52 @@ Returns:
   //
   // Copy data to the new buffer until we run into the end_form
   //
-  for (; ((EFI_IFR_OP_HEADER *) Source)->OpCode != EFI_IFR_END_FORM_OP;) {
+  for (; ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->OpCode != FRAMEWORK_EFI_IFR_END_FORM_OP;) {
     //
     // If the this opcode is an end_form_set we better be creating and endform
     // Nonetheless, we will add data before the end_form_set.  This also provides
     // for interesting behavior in the code we will run, but has no bad side-effects
     // since we will possibly do a 0 byte copy in this particular end-case.
     //
-    if (((EFI_IFR_OP_HEADER *) Source)->OpCode == EFI_IFR_END_FORM_SET_OP) {
+    if (((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->OpCode == FRAMEWORK_EFI_IFR_END_FORM_SET_OP) {
       break;
     }
 
     //
     // Copy data to new buffer
     //
-    CopyMem (Destination, Source, ((EFI_IFR_OP_HEADER *) Source)->Length);
+    CopyMem (Destination, Source, ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length);
 
     //
     // Adjust Source/Destination to next op-code location
     //
-    Destination = Destination + (UINTN) ((EFI_IFR_OP_HEADER *) Source)->Length;
-    Source      = Source + (UINTN) ((EFI_IFR_OP_HEADER *) Source)->Length;
+    Destination = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
+    Source      = Source + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
   }
 
   //
   // Prior to the end_form is where we insert the new op-code data
   //
-  CopyMem (Destination, OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
-  Destination       = Destination + (UINTN) ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+  CopyMem (Destination, OpCodeData, ((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length);
+  Destination       = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length;
 
-  NewBuffer->Length = (UINT32) (NewBuffer->Length + (UINT32) (((EFI_IFR_OP_HEADER *) OpCodeData)->Length));
+  NewBuffer->Length = (UINT32) (NewBuffer->Length + (UINT32) (((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length));
 
   //
   // Copy end-form data to new buffer
   //
-  CopyMem (Destination, Source, ((EFI_IFR_OP_HEADER *) Source)->Length);
+  CopyMem (Destination, Source, ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length);
 
   //
   // Adjust Source/Destination to next op-code location
   //
-  Destination = Destination + (UINTN) ((EFI_IFR_OP_HEADER *) Source)->Length;
-  Source      = Source + (UINTN) ((EFI_IFR_OP_HEADER *) Source)->Length;
+  Destination = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
+  Source      = Source + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
 
   //
   // Copy end-formset data to new buffer
   //
-  CopyMem (Destination, Source, ((EFI_IFR_OP_HEADER *) Source)->Length);
+  CopyMem (Destination, Source, ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length);
 
   //
   // Zero out the original buffer and copy the updated data in the new buffer to the old buffer
@@ -470,7 +470,7 @@ Returns:
 
 EFI_STATUS
 ExtractDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
+  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   IN OUT  UINT16              *ImageLength,
   OUT     UINT8               *DefaultImage,
   OUT     EFI_GUID            *Guid
@@ -560,31 +560,31 @@ Returns:
   //
   RawData = (UINT8 *) ((UINTN) RawData + sizeof (EFI_HII_PACK_HEADER));
 
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
-    case EFI_IFR_FORM_SET_OP:
+    case FRAMEWORK_EFI_IFR_FORM_SET_OP:
       //
       // Copy the GUID information from this handle
       //
-      CopyMem (Guid, &((EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+      CopyMem (Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
       break;
 
-    case EFI_IFR_ONE_OF_OP:
-    case EFI_IFR_CHECKBOX_OP:
-    case EFI_IFR_NUMERIC_OP:
-    case EFI_IFR_DATE_OP:
-    case EFI_IFR_TIME_OP:
-    case EFI_IFR_PASSWORD_OP:
-    case EFI_IFR_STRING_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_DATE_OP:
+    case FRAMEWORK_EFI_IFR_TIME_OP:
+    case FRAMEWORK_EFI_IFR_PASSWORD_OP:
+    case FRAMEWORK_EFI_IFR_STRING_OP:
       //
       // Remember, multiple op-codes may reference the same item, so let's keep a running
       // marker of what the highest QuestionId that wasn't zero length.  This will accurately
       // maintain the Size of the NvStore
       //
-      if (((EFI_IFR_ONE_OF *) &RawData[Index])->Width != 0) {
-        Temp = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((EFI_IFR_ONE_OF *) &RawData[Index])->Width;
+      if (((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width != 0) {
+        Temp = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width;
         if (SizeOfNvStore < Temp) {
-          SizeOfNvStore = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((EFI_IFR_ONE_OF *) &RawData[Index])->Width;
+          SizeOfNvStore = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width;
         }
       }
     }
@@ -608,26 +608,26 @@ Returns:
   //
   // Copy the default image information to the user's buffer
   //
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
-    case EFI_IFR_ONE_OF_OP:
-      CachedStart = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId;
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+      CachedStart = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId;
       break;
 
-    case EFI_IFR_ONE_OF_OPTION_OP:
-      if (((EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Flags & EFI_IFR_FLAG_DEFAULT) {
-        CopyMem (&DefaultImage[CachedStart], &((EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Value, 2);
+    case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
+      if (((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Flags & FRAMEWORK_EFI_IFR_FLAG_DEFAULT) {
+        CopyMem (&DefaultImage[CachedStart], &((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Value, 2);
       }
       break;
 
-    case EFI_IFR_CHECKBOX_OP:
-      DefaultImage[((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId] = ((EFI_IFR_CHECKBOX *) &RawData[Index])->Flags;
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
+      DefaultImage[((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId] = ((FRAMEWORK_EFI_IFR_CHECKBOX *) &RawData[Index])->Flags;
       break;
 
-    case EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
       CopyMem (
-        &DefaultImage[((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId],
-        &((EFI_IFR_NUMERIC *) &RawData[Index])->Default,
+        &DefaultImage[((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId],
+        &((FRAMEWORK_EFI_IFR_NUMERIC *) &RawData[Index])->Default,
         2
         );
       break;
@@ -648,7 +648,7 @@ Returns:
 }
 
 
-EFI_HII_HANDLE
+FRAMEWORK_EFI_HII_HANDLE 
 FindHiiHandle (
   IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
   IN     EFI_GUID            *Guid
@@ -672,8 +672,8 @@ Returns:
 {
   EFI_STATUS        Status;
 
-  EFI_HII_HANDLE    *HiiHandleBuffer;
-  EFI_HII_HANDLE    HiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE     *HiiHandleBuffer;
+  FRAMEWORK_EFI_HII_HANDLE     HiiHandle;
   UINT16            HiiHandleBufferLength;
   UINT32            NumberOfHiiHandles;
   EFI_GUID          HiiGuid;
@@ -741,7 +741,7 @@ Returns:
     goto lbl_exit;
   }
 
-  NumberOfHiiHandles = HiiHandleBufferLength / sizeof (EFI_HII_HANDLE);
+  NumberOfHiiHandles = HiiHandleBufferLength / sizeof (FRAMEWORK_EFI_HII_HANDLE );
 
   //
   // Iterate Hii handles and look for the one that matches our Guid
@@ -766,7 +766,7 @@ lbl_exit:
 
 EFI_STATUS
 ValidateDataFromHiiHandle (
-  IN      EFI_HII_HANDLE      HiiHandle,
+  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   OUT     BOOLEAN             *Results
   )
 /*++
@@ -854,36 +854,36 @@ Returns:
   //
   RawData = (UINT8 *) ((UINTN) RawData + sizeof (EFI_HII_PACK_HEADER));
 
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
-    if (RawData[Index] == EFI_IFR_FORM_SET_OP) {
-      CopyMem (&Guid, &((EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
+    if (RawData[Index] == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
+      CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
       break;
     }
 
     Index = RawData[Index + 1] + Index;
   }
 
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
-    case EFI_IFR_FORM_SET_OP:
+    case FRAMEWORK_EFI_IFR_FORM_SET_OP:
       break;
 
-    case EFI_IFR_ONE_OF_OP:
-    case EFI_IFR_CHECKBOX_OP:
-    case EFI_IFR_NUMERIC_OP:
-    case EFI_IFR_DATE_OP:
-    case EFI_IFR_TIME_OP:
-    case EFI_IFR_PASSWORD_OP:
-    case EFI_IFR_STRING_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+    case FRAMEWORK_EFI_IFR_DATE_OP:
+    case FRAMEWORK_EFI_IFR_TIME_OP:
+    case FRAMEWORK_EFI_IFR_PASSWORD_OP:
+    case FRAMEWORK_EFI_IFR_STRING_OP:
       //
       // Remember, multiple op-codes may reference the same item, so let's keep a running
       // marker of what the highest QuestionId that wasn't zero length.  This will accurately
       // maintain the Size of the NvStore
       //
-      if (((EFI_IFR_ONE_OF *) &RawData[Index])->Width != 0) {
-        Temp = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((EFI_IFR_ONE_OF *) &RawData[Index])->Width;
+      if (((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width != 0) {
+        Temp = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width;
         if (SizeOfNvStore < Temp) {
-          SizeOfNvStore = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((EFI_IFR_ONE_OF *) &RawData[Index])->Width;
+          SizeOfNvStore = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId + ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->Width;
         }
       }
     }
@@ -942,25 +942,25 @@ Returns:
   // This allows for the possibility of stale (obsoleted) data in the variable
   // can be overlooked without causing an error
   //
-  for (Index = 0; RawData[Index] != EFI_IFR_END_FORM_SET_OP;) {
+  for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
-    case EFI_IFR_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OP:
       //
       // A one_of has no data, its the option that does - cache the storage Id
       //
-      CachedStart = ((EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId;
+      CachedStart = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId;
       break;
 
-    case EFI_IFR_ONE_OF_OPTION_OP:
+    case FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP:
       //
       // A one_of_option can be any value
       //
-      if (VariableData[CachedStart] == ((EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Value) {
+      if (VariableData[CachedStart] == ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) &RawData[Index])->Value) {
         GotMatch = TRUE;
       }
       break;
 
-    case EFI_IFR_END_ONE_OF_OP:
+    case FRAMEWORK_EFI_IFR_END_ONE_OF_OP:
       //
       // At this point lets make sure that the data value in the NVRAM matches one of the options
       //
@@ -970,20 +970,20 @@ Returns:
       }
       break;
 
-    case EFI_IFR_CHECKBOX_OP:
+    case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
       //
       // A checkbox is a boolean, so 0 and 1 are valid
       // Remember, QuestionId corresponds to the offset location of the data in the variable
       //
-      if (VariableData[((EFI_IFR_CHECKBOX *) &RawData[Index])->QuestionId] > 1) {
+      if (VariableData[((FRAMEWORK_EFI_IFR_CHECKBOX *) &RawData[Index])->QuestionId] > 1) {
         *Results = FALSE;
         return EFI_SUCCESS;
       }
       break;
 
-    case EFI_IFR_NUMERIC_OP:
-        if ((VariableData[((EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] < ((EFI_IFR_NUMERIC *)&RawData[Index])->Minimum) ||
-            (VariableData[((EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] > ((EFI_IFR_NUMERIC *)&RawData[Index])->Maximum)) {
+    case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+        if ((VariableData[((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] < ((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->Minimum) ||
+            (VariableData[((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] > ((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->Maximum)) {
         *Results = FALSE;
         return EFI_SUCCESS;
       }
@@ -1002,4 +1002,5 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
 

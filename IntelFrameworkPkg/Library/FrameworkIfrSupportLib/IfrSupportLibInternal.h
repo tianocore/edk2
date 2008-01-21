@@ -15,9 +15,7 @@
 #ifndef __IFRSUPPORT_LIB_INTERNAL_H_
 #define __IFRSUPPORT_LIB_INTERNAL_H_
 
-
-
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Protocol/FrameworkHii.h>

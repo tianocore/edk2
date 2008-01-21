@@ -51,13 +51,13 @@ Returns:
 
 --*/
 {
-  EFI_IFR_SUBTITLE  Subtitle;
+  FRAMEWORK_EFI_IFR_SUBTITLE  Subtitle;
 
-  Subtitle.Header.OpCode  = EFI_IFR_SUBTITLE_OP;
-  Subtitle.Header.Length  = sizeof (EFI_IFR_SUBTITLE);
+  Subtitle.Header.OpCode  = FRAMEWORK_EFI_IFR_SUBTITLE_OP;
+  Subtitle.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_SUBTITLE);
   Subtitle.SubTitle       = StringToken;
 
-  CopyMem (FormBuffer, &Subtitle, sizeof (EFI_IFR_SUBTITLE));
+  CopyMem (FormBuffer, &Subtitle, sizeof (FRAMEWORK_EFI_IFR_SUBTITLE));
   return EFI_SUCCESS;
 }
 
@@ -100,10 +100,10 @@ Returns:
 
 --*/
 {
-  EFI_IFR_TEXT  Text;
+  FRAMEWORK_EFI_IFR_TEXT  Text;
 
-  Text.Header.OpCode  = EFI_IFR_TEXT_OP;
-  Text.Header.Length  = sizeof (EFI_IFR_TEXT);
+  Text.Header.OpCode  = FRAMEWORK_EFI_IFR_TEXT_OP;
+  Text.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_TEXT);
   Text.Text           = StringToken;
 
   Text.TextTwo        = StringTokenTwo;
@@ -111,7 +111,7 @@ Returns:
   Text.Flags          = Flags;
   Text.Key            = Key;
 
-  CopyMem (FormBuffer, &Text, sizeof (EFI_IFR_TEXT));
+  CopyMem (FormBuffer, &Text, sizeof (FRAMEWORK_EFI_IFR_TEXT));
 
   return EFI_SUCCESS;
 }
@@ -155,17 +155,17 @@ Returns:
 
 --*/
 {
-  EFI_IFR_REF Hyperlink;
+  FRAMEWORK_EFI_IFR_REF Hyperlink;
 
-  Hyperlink.Header.OpCode = EFI_IFR_REF_OP;
-  Hyperlink.Header.Length = sizeof (EFI_IFR_REF);
+  Hyperlink.Header.OpCode = FRAMEWORK_EFI_IFR_REF_OP;
+  Hyperlink.Header.Length = sizeof (FRAMEWORK_EFI_IFR_REF);
   Hyperlink.FormId        = FormId;
   Hyperlink.Prompt        = StringToken;
   Hyperlink.Help          = StringTokenTwo;
   Hyperlink.Key           = Key;
   Hyperlink.Flags         = Flags;
 
-  CopyMem (FormBuffer, &Hyperlink, sizeof (EFI_IFR_REF));
+  CopyMem (FormBuffer, &Hyperlink, sizeof (FRAMEWORK_EFI_IFR_REF));
 
   return EFI_SUCCESS;
 }
@@ -218,9 +218,9 @@ Returns:
 --*/
 {
   UINTN                 Index;
-  EFI_IFR_ONE_OF        OneOf;
-  EFI_IFR_ONE_OF_OPTION OneOfOption;
-  EFI_IFR_END_ONE_OF    EndOneOf;
+  FRAMEWORK_EFI_IFR_ONE_OF        OneOf;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OneOfOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOneOf;
   UINT8                 *LocalBuffer;
 
   //
@@ -230,8 +230,8 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
-  OneOf.Header.OpCode = EFI_IFR_ONE_OF_OP;
-  OneOf.Header.Length = sizeof (EFI_IFR_ONE_OF);
+  OneOf.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OP;
+  OneOf.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF);
   OneOf.QuestionId    = QuestionId;
   OneOf.Width         = DataWidth;
   OneOf.Prompt        = PromptToken;
@@ -240,30 +240,30 @@ Returns:
 
   LocalBuffer         = (UINT8 *) FormBuffer;
 
-  CopyMem (LocalBuffer, &OneOf, sizeof (EFI_IFR_ONE_OF));
+  CopyMem (LocalBuffer, &OneOf, sizeof (FRAMEWORK_EFI_IFR_ONE_OF));
 
-  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_ONE_OF));
 
   for (Index = 0; Index < OptionCount; Index++) {
-    OneOfOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OneOfOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OneOfOption.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP;
+    OneOfOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     OneOfOption.Option        = OptionsList[Index].StringToken;
     OneOfOption.Value         = OptionsList[Index].Value;
     OneOfOption.Flags         = OptionsList[Index].Flags;
     OneOfOption.Key           = OptionsList[Index].Key;
 
-    CopyMem (LocalBuffer, &OneOfOption, sizeof (EFI_IFR_ONE_OF_OPTION));
+    CopyMem (LocalBuffer, &OneOfOption, sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION));
 
-    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
+    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION));
   }
 
-  EndOneOf.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
-  EndOneOf.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
+  EndOneOf.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF);
+  EndOneOf.Header.OpCode  = FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
 
-  CopyMem (LocalBuffer, &EndOneOf, sizeof (EFI_IFR_END_ONE_OF));
+  CopyMem (LocalBuffer, &EndOneOf, sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF));
 
-  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF));
 
   return EFI_SUCCESS;
 }
@@ -313,13 +313,13 @@ Returns:
 --*/
 {
   UINTN                 Index;
-  EFI_IFR_ORDERED_LIST  OrderedList;
-  EFI_IFR_ONE_OF_OPTION OrderedListOption;
-  EFI_IFR_END_ONE_OF    EndOrderedList;
+  FRAMEWORK_EFI_IFR_ORDERED_LIST  OrderedList;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OrderedListOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOrderedList;
   UINT8                 *LocalBuffer;
 
-  OrderedList.Header.OpCode = EFI_IFR_ORDERED_LIST_OP;
-  OrderedList.Header.Length = sizeof (EFI_IFR_ORDERED_LIST);
+  OrderedList.Header.OpCode = FRAMEWORK_EFI_IFR_ORDERED_LIST_OP;
+  OrderedList.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ORDERED_LIST);
   OrderedList.QuestionId    = QuestionId;
   OrderedList.MaxEntries    = MaxEntries;
   OrderedList.Prompt        = PromptToken;
@@ -328,30 +328,30 @@ Returns:
 
   LocalBuffer               = (UINT8 *) FormBuffer;
 
-  CopyMem (LocalBuffer, &OrderedList, sizeof (EFI_IFR_ORDERED_LIST));
+  CopyMem (LocalBuffer, &OrderedList, sizeof (FRAMEWORK_EFI_IFR_ORDERED_LIST));
 
-  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ORDERED_LIST));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_ORDERED_LIST));
 
   for (Index = 0; Index < OptionCount; Index++) {
-    OrderedListOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OrderedListOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OrderedListOption.Header.OpCode = FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP;
+    OrderedListOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     OrderedListOption.Option        = OptionsList[Index].StringToken;
     OrderedListOption.Value         = OptionsList[Index].Value;
     OrderedListOption.Flags         = OptionsList[Index].Flags;
     OrderedListOption.Key           = OptionsList[Index].Key;
 
-    CopyMem (LocalBuffer, &OrderedListOption, sizeof (EFI_IFR_ONE_OF_OPTION));
+    CopyMem (LocalBuffer, &OrderedListOption, sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION));
 
-    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
+    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION));
   }
 
-  EndOrderedList.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
-  EndOrderedList.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
+  EndOrderedList.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF);
+  EndOrderedList.Header.OpCode  = FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
 
-  CopyMem (LocalBuffer, &EndOrderedList, sizeof (EFI_IFR_END_ONE_OF));
+  CopyMem (LocalBuffer, &EndOrderedList, sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF));
 
-  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF));
 
   return EFI_SUCCESS;
 }
@@ -399,7 +399,7 @@ Returns:
 
 --*/
 {
-  EFI_IFR_CHECKBOX  CheckBox;
+  FRAMEWORK_EFI_IFR_CHECKBOX  CheckBox;
 
   //
   // We do not create op-code storage widths for checkbox in excess of 8 bits for now
@@ -408,8 +408,8 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
-  CheckBox.Header.OpCode  = EFI_IFR_CHECKBOX_OP;
-  CheckBox.Header.Length  = sizeof (EFI_IFR_CHECKBOX);
+  CheckBox.Header.OpCode  = FRAMEWORK_EFI_IFR_CHECKBOX_OP;
+  CheckBox.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_CHECKBOX);
   CheckBox.QuestionId     = QuestionId;
   CheckBox.Width          = DataWidth;
   CheckBox.Prompt         = PromptToken;
@@ -418,7 +418,7 @@ Returns:
   CheckBox.Flags          = Flags;
   CheckBox.Key            = Key;
 
-  CopyMem (FormBuffer, &CheckBox, sizeof (EFI_IFR_CHECKBOX));
+  CopyMem (FormBuffer, &CheckBox, sizeof (FRAMEWORK_EFI_IFR_CHECKBOX));
 
   return EFI_SUCCESS;
 }
@@ -479,7 +479,7 @@ Returns:
 
 --*/
 {
-  EFI_IFR_NUMERIC Numeric;
+  FRAMEWORK_EFI_IFR_NUMERIC Numeric;
 
   //
   // We do not create op-code storage widths for numerics in excess of 16 bits for now
@@ -488,8 +488,8 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
-  Numeric.Header.OpCode = EFI_IFR_NUMERIC_OP;
-  Numeric.Header.Length = sizeof (EFI_IFR_NUMERIC);
+  Numeric.Header.OpCode = FRAMEWORK_EFI_IFR_NUMERIC_OP;
+  Numeric.Header.Length = sizeof (FRAMEWORK_EFI_IFR_NUMERIC);
   Numeric.QuestionId    = QuestionId;
   Numeric.Width         = DataWidth;
   Numeric.Prompt        = PromptToken;
@@ -502,7 +502,7 @@ Returns:
   Numeric.Flags         = Flags;
   Numeric.Key           = Key;
 
-  CopyMem (FormBuffer, &Numeric, sizeof (EFI_IFR_NUMERIC));
+  CopyMem (FormBuffer, &Numeric, sizeof (FRAMEWORK_EFI_IFR_NUMERIC));
 
   return EFI_SUCCESS;
 }
@@ -555,10 +555,10 @@ Returns:
 
 --*/
 {
-  EFI_IFR_STRING  String;
+  FRAMEWORK_EFI_IFR_STRING  String;
 
-  String.Header.OpCode  = EFI_IFR_STRING_OP;
-  String.Header.Length  = sizeof (EFI_IFR_STRING);
+  String.Header.OpCode  = FRAMEWORK_EFI_IFR_STRING_OP;
+  String.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_STRING);
   String.QuestionId     = QuestionId;
   String.Width          = DataWidth;
   String.Prompt         = PromptToken;
@@ -569,7 +569,7 @@ Returns:
   String.Flags          = Flags;
   String.Key            = Key;
 
-  CopyMem (FormBuffer, &String, sizeof (EFI_IFR_STRING));
+  CopyMem (FormBuffer, &String, sizeof (FRAMEWORK_EFI_IFR_STRING));
 
   return EFI_SUCCESS;
 }
@@ -604,15 +604,15 @@ Returns:
 
 --*/
 {
-  EFI_IFR_BANNER  Banner;
+  FRAMEWORK_EFI_IFR_BANNER  Banner;
 
-  Banner.Header.OpCode  = EFI_IFR_BANNER_OP;
-  Banner.Header.Length  = sizeof (EFI_IFR_BANNER);
+  Banner.Header.OpCode  = FRAMEWORK_EFI_IFR_BANNER_OP;
+  Banner.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_BANNER);
   CopyMem (&Banner.Title, &Title, sizeof (UINT16));
   CopyMem (&Banner.LineNumber, &LineNumber, sizeof (UINT16));
   Banner.Alignment = Alignment;
 
-  CopyMem (FormBuffer, &Banner, sizeof (EFI_IFR_BANNER));
+  CopyMem (FormBuffer, &Banner, sizeof (FRAMEWORK_EFI_IFR_BANNER));
 
   return EFI_SUCCESS;
 }
