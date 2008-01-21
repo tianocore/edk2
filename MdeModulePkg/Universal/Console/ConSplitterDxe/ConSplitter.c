@@ -2152,12 +2152,20 @@ Returns:
   Mode  = 0;
   Index = 0;
   while (Mode < MaxMode) {
-    TextOut->QueryMode (
-              TextOut,
-              Mode,
-              &Private->TextOutQueryData[Mode].Columns,
-              &Private->TextOutQueryData[Mode].Rows
-              );
+    Status = TextOut->QueryMode (
+                  TextOut,
+                  Mode,
+                  &Private->TextOutQueryData[Mode].Columns,
+                  &Private->TextOutQueryData[Mode].Rows
+                  );
+    //
+    // If mode 1 (80x50) is not supported, make sure mode 1 in TextOutQueryData
+    // is clear to 0x0.
+    //
+    if ((EFI_ERROR(Status)) && (Mode == 1)) {
+      Private->TextOutQueryData[Mode].Columns = 0;
+      Private->TextOutQueryData[Mode].Rows = 0;
+    }
     Private->TextOutModeMap[Index] = Mode;
     Mode++;
     Index += Private->TextOutListCount;
@@ -2166,6 +2174,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Reconstruct TextOutModeMap to get intersection of modes
+
+  This routine reconstruct TextOutModeMap to get the intersection
+  of modes for all console out devices. Because EFI/UEFI spec require
+  mode 0 is 80x25, mode 1 is 80x50, this routine will not check the
+  intersection for mode 0 and mode 1.
+
+  @parm TextOutModeMap  Current text out mode map, begin with the mode 80x25
+  @parm NewlyAddedMap   New text out mode map, begin with the mode 80x25
+  @parm MapStepSize     Mode step size for one console device
+  @parm NewMapStepSize  Mode step size for one console device
+  @parm MaxMode         Current max text mode
+  @parm CurrentMode     Current text mode
+
+  @retval None
+
+**/
 STATIC
 VOID
 ConSplitterGetIntersection (
@@ -2183,9 +2209,16 @@ ConSplitterGetIntersection (
   INT32 CurrentMaxMode;
   INT32 Mode;
 
-  Index           = 0;
-  CurrentMapEntry = TextOutModeMap;
-  NextMapEntry    = TextOutModeMap;
+  //
+  // According to EFI/UEFI spec, mode 0 and mode 1 have been reserved
+  // for 80x25 and 80x50 in Simple Text Out protocol, so don't make intersection
+  // for mode 0 and mode 1, mode number starts from 2.
+  //
+  Index           = 2;
+  CurrentMapEntry = &TextOutModeMap[MapStepSize * 2];
+  NextMapEntry    = &TextOutModeMap[MapStepSize * 2];
+  NewlyAddedMap   = &NewlyAddedMap[NewMapStepSize * 2];
+
   CurrentMaxMode  = *MaxMode;
   Mode            = *CurrentMode;
 
@@ -2248,6 +2281,7 @@ Returns:
   UINTN                         Rows;
   UINTN                         Columns;
   UINTN                         StepSize;
+  EFI_STATUS                    Status;
 
   //
   // Must make sure that current mode won't change even if mode number changes
@@ -2263,9 +2297,16 @@ Returns:
   Mode      = 0;
   MapTable  = TextOutModeMap + Private->CurrentNumberOfConsoles;
   while (Mode < TextOut->Mode->MaxMode) {
-    TextOut->QueryMode (TextOut, Mode, &Columns, &Rows);
+    Status = TextOut->QueryMode (TextOut, Mode, &Columns, &Rows);
+    if (EFI_ERROR(Status)) {
+      if (Mode == 1) {
         MapTable[StepSize] = Mode;
-
+        TextOutQueryData[Mode].Columns = 0;
+        TextOutQueryData[Mode].Rows = 0;
+      }
+      Mode++;
+      continue;
+    }
     //
     // Search the intersection map and QueryData database to see if they intersects
     //
