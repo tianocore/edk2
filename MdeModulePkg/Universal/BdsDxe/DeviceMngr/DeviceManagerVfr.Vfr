@@ -1,0 +1,82 @@
+// *++
+//
+// Copyright (c) 2004 - 2007, Intel Corporation
+// All rights reserved. This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// Module Name:
+//
+//   DeviceManagerVfr.vfr
+//
+// Abstract:
+//
+//   Device Manager formset.
+//
+// Revision History:
+//
+// --*/
+
+#define FORMSET_GUID  { 0x3ebfa8e6, 0x511d, 0x4b5b, 0xa9, 0x5f, 0xfb, 0x38, 0x26, 0xf, 0x1c, 0x27 }
+
+#define EFI_DISK_DEVICE_CLASS              0x0001
+#define EFI_VIDEO_DEVICE_CLASS             0x0002
+#define EFI_NETWORK_DEVICE_CLASS           0x0004
+#define EFI_INPUT_DEVICE_CLASS             0x0008
+#define EFI_ON_BOARD_DEVICE_CLASS          0x0010
+#define EFI_OTHER_DEVICE_CLASS             0x0020
+#define LABEL_VBIOS                        0x0040
+
+#define LABEL_END                          0xffff
+
+#define DEVICE_MANAGER_CLASS               0x0000
+#define FRONT_PAGE_SUBCLASS		           0x0003
+
+#define DEVICE_MANAGER_FORM_ID             0x1000
+
+formset
+  guid     = FORMSET_GUID,
+  title    = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE),
+  help     = STRING_TOKEN(STR_EMPTY_STRING),
+  class    = DEVICE_MANAGER_CLASS,
+  subclass = FRONT_PAGE_SUBCLASS,
+
+  form formid = DEVICE_MANAGER_FORM_ID,
+       title  = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE);
+
+    //
+    // This is where devices get added to the device manager hierarchy
+    //
+    label EFI_DISK_DEVICE_CLASS;
+//    label LABEL_END;  // Since next opcode is a label, so this one could be omitted to save code size
+
+    label EFI_VIDEO_DEVICE_CLASS;
+//    label LABEL_END;
+
+    label EFI_NETWORK_DEVICE_CLASS;
+//    label LABEL_END;
+
+    label EFI_INPUT_DEVICE_CLASS;
+//    label LABEL_END;
+
+    label EFI_ON_BOARD_DEVICE_CLASS;
+//    label LABEL_END;
+
+    label EFI_OTHER_DEVICE_CLASS;
+    label LABEL_END;
+
+    subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
+
+    label LABEL_VBIOS;
+    label LABEL_END;
+
+    subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
+    subtitle text = STRING_TOKEN(STR_EXIT_STRING);
+
+  endform;
+endformset;
+

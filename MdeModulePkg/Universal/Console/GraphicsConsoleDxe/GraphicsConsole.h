@@ -24,7 +24,7 @@ Revision History
 #define _GRAPHICS_CONSOLE_H
 
 #include <PiDxe.h>
-#include <Protocol/FrameworkHii.h>
+//#include <Protocol/FrameworkHii.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
@@ -32,10 +32,17 @@ Revision History
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
-#include <Library/FrameworkHiiLib.h>
+//#include <Library/FrameworkHiiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/HiiLib.h>
+#include <Library/BaseLib.h>
+
+#include <MdeModuleHii.h>
+
+#include <Protocol/HiiFont.h>
+#include <Protocol/HiiDatabase.h>
 
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gGraphicsConsoleComponentName;
@@ -174,8 +181,8 @@ GraphicsConsoleComponentNameGetControllerName (
 //
 // Glyph database
 //
-#define GLYPH_WIDTH   8
-#define GLYPH_HEIGHT  19
+//#define GLYPH_WIDTH   8
+//#define GLYPH_HEIGHT  19
 
 //
 // User can define valid graphic resolution here
@@ -307,11 +314,6 @@ GraphicsConsoleConOutEnableCursor (
   );
 
 EFI_STATUS
-EfiLocateHiiProtocol (
-  VOID
-  );
-
-EFI_STATUS
 EFIAPI
 GraphicsConsoleControllerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
@@ -335,5 +337,12 @@ GraphicsConsoleControllerDriverStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
+
+EFI_STATUS
+EfiLocateHiiProtocol (
+  VOID
+  )
+;
+
 
 #endif

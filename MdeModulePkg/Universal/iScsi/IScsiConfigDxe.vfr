@@ -22,6 +22,8 @@
 #include "IScsiConfigNVDataStruc.h"
 #define EFI_NETWORK_DEVICE_CLASS  0x04
 
+#define LABEL_END                 0xffff
+
 formset 
   guid     = ISCSI_CONFIG_GUID,
   title    = STRING_TOKEN(STR_ISCSI_CONFIG_FORM_TITLE),
@@ -29,8 +31,11 @@ formset
   class    = EFI_NETWORK_DEVICE_CLASS,
   subclass = 0x03,
 
+  varstore ISCSI_CONFIG_IFR_NVDATA,
+    name = ISCSI_CONFIG_IFR_NVDATA,
+    guid = ISCSI_CONFIG_GUID;
   form formid = FORMID_MAIN_FORM,
-    title  = STRING_TOKEN(STR_ISCSI_MAIN_FORM_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
+    title  = STRING_TOKEN(STR_ISCSI_MAIN_FORM_TITLE);
 
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.InitiatorName, 
             prompt  = STRING_TOKEN(STR_ISCSI_CONFIG_INIT_NAME),
@@ -42,6 +47,7 @@ formset
     endstring;
 
     label DEVICE_ENTRY_LABEL;
+    label LABEL_END;
 
   endform;
 

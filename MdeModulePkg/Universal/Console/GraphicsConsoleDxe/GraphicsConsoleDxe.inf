@@ -21,7 +21,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x0002000A
 
   ENTRY_POINT                    = InitializeGraphicsConsole
 
@@ -43,6 +43,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   # currently use Hii for glyph lookup, need to change to UEFI scheme
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
@@ -52,12 +53,13 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-  FrameworkHiiLib
+  HiiLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
-  gEfiHiiProtocolGuid                           # PROTOCOL TO_START
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL TO_START
   gEfiUgaDrawProtocolGuid                       # PROTOCOL TO_START
+  gEfiHiiFontProtocolGuid
+  gEfiHiiDatabaseProtocolGuid
 

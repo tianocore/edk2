@@ -1,0 +1,59 @@
+// *++
+//
+// Copyright (c) 2004 - 2007, Intel Corporation
+// All rights reserved. This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// Module Name:
+//
+//   BootManager.vfr
+//
+// Abstract:
+//
+//   Browser formset.
+//
+// Revision History:
+//
+// --*/
+
+#define FORMSET_GUID  { 0x847bc3fe, 0xb974, 0x446d, 0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b }
+
+#define BOOT_MANAGER_FORM_ID     0x1000
+
+#define LABEL_BOOT_OPTION        0x00
+#define LABEL_BOOT_OPTION_END    0x01
+
+#define BOOT_MANAGER_CLASS       0x00
+#define BOOT_MANAGER_SUBCLASS    0x00
+
+formset
+  guid     = FORMSET_GUID,
+  title    = STRING_TOKEN(STR_BM_BANNER),
+  help     = STRING_TOKEN(STR_LAST_STRING),
+  class    = BOOT_MANAGER_CLASS,
+  subclass = BOOT_MANAGER_SUBCLASS,
+
+  form formid = BOOT_MANAGER_FORM_ID,
+       title  = STRING_TOKEN(STR_BM_BANNER);
+
+    subtitle text = STRING_TOKEN(STR_LAST_STRING);
+    subtitle text = STRING_TOKEN(STR_BOOT_OPTION_BANNER);
+    subtitle text = STRING_TOKEN(STR_LAST_STRING);
+
+    //
+    // This is where we will dynamically add choices for the Boot Manager
+    //
+    label LABEL_BOOT_OPTION;
+    label LABEL_BOOT_OPTION_END;
+
+    subtitle text = STRING_TOKEN(STR_LAST_STRING);
+    subtitle text = STRING_TOKEN(STR_HELP_FOOTER);
+
+  endform;
+
+endformset;

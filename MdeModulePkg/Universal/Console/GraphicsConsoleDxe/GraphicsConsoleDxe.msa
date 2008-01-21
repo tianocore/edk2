@@ -65,9 +65,6 @@
     <Protocol Usage="TO_START">
       <ProtocolCName>gEfiGraphicsOutputProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="TO_START">
-      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
-    </Protocol>
     <Protocol Usage="BY_START">
       <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>

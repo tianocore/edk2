@@ -55,19 +55,19 @@ Abstract:
 
 #define DEVICE_ENTRY_LABEL        0x1234
 
-#define KEY_INITIATOR_NAME        0x01
-#define KEY_DHCP_ENABLE           0x02
-#define KEY_LOCAL_IP              0x03
-#define KEY_SUBNET_MASK           0x04
-#define KEY_GATE_WAY              0x05
-#define KEY_TARGET_IP             0x06
-#define KEY_CHAP_NAME             0x07
-#define KEY_CHAP_SECRET           0x08
-#define KEY_REVERSE_CHAP_NAME     0x09
-#define KEY_REVERSE_CHAP_SECRET   0x0a
-#define KEY_SAVE_CHANGES          0x0b
-#define KEY_TARGET_NAME           0x0c
-#define KEY_BOOT_LUN              0x0d
+#define KEY_INITIATOR_NAME        0x101
+#define KEY_DHCP_ENABLE           0x102
+#define KEY_LOCAL_IP              0x103
+#define KEY_SUBNET_MASK           0x104
+#define KEY_GATE_WAY              0x105
+#define KEY_TARGET_IP             0x106
+#define KEY_CHAP_NAME             0x107
+#define KEY_CHAP_SECRET           0x108
+#define KEY_REVERSE_CHAP_NAME     0x109
+#define KEY_REVERSE_CHAP_SECRET   0x10a
+#define KEY_SAVE_CHANGES          0x10b
+#define KEY_TARGET_NAME           0x10c
+#define KEY_BOOT_LUN              0x10d
 
 #define KEY_DEVICE_ENTRY_BASE     0x1000
 
