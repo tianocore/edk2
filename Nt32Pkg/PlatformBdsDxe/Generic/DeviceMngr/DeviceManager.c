@@ -42,7 +42,7 @@ EFIAPI
 DeviceManagerCallbackRoutine (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *DataArray,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++
@@ -73,7 +73,7 @@ Returns:
   CallbackInfo = EFI_FP_CALLBACK_DATA_FROM_THIS (This);
   switch (KeyValue) {
   case 0x2000:
-    CallbackInfo->Data.VideoBIOS = (UINT8) (UINTN) (((EFI_IFR_DATA_ENTRY *)(DataArray + 1))->Data);
+    CallbackInfo->Data.VideoBIOS = (UINT8) (UINTN) (((FRAMEWORK_EFI_IFR_DATA_ENTRY *)(DataArray + 1))->Data);
     gRT->SetVariable (
           L"VBIOS",
           &gEfiGenericPlatformVariableGuid,
@@ -184,9 +184,9 @@ Returns:
   EFI_STATUS          Status;
   UINTN               BufferSize;
   UINTN               Count;
-  EFI_HII_HANDLE      Index;
+  FRAMEWORK_EFI_HII_HANDLE       Index;
   UINT8               *Buffer;
-  EFI_IFR_FORM_SET    *FormSetData;
+  FRAMEWORK_EFI_IFR_FORM_SET    *FormSetData;
   CHAR16              *String;
   UINTN               StringLength;
   EFI_HII_UPDATE_DATA *UpdateData;
@@ -195,7 +195,7 @@ Returns:
   IFR_OPTION          *IfrOptionList;
   UINT8               *VideoOption;
   UINTN               VideoOptionSize;
-  EFI_HII_HANDLE      *HiiHandles;
+  FRAMEWORK_EFI_HII_HANDLE       *HiiHandles;
   UINT16              HandleBufferLength;
   BOOLEAN	          BootDeviceMngrMenuResetRequired;
 
@@ -296,9 +296,9 @@ Returns:
       Status = gHii->GetForms (gHii, Index, 0, &BufferSize, Buffer);
 
       //
-      // Skip EFI_HII_PACK_HEADER, advance to EFI_IFR_FORM_SET data.
+      // Skip EFI_HII_PACK_HEADER, advance to FRAMEWORK_EFI_IFR_FORM_SET data.
       //
-      FormSetData = (EFI_IFR_FORM_SET *) (Buffer + sizeof (EFI_HII_PACK_HEADER));
+      FormSetData = (FRAMEWORK_EFI_IFR_FORM_SET *) (Buffer + sizeof (EFI_HII_PACK_HEADER));
 
       //
       // If this formset belongs in the device manager, add it to the menu
@@ -343,7 +343,7 @@ Returns:
           0x1000,     // Device Manager Page
           Token,      // Description String Token
           TokenHelp,  // Description Help String Token
-          EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,  // Flag designating callback is active
+          FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,  // Flag designating callback is active
           (UINT16) Index,                                     // Callback key value
           &UpdateData->Data                                   // Buffer to fill with op-code
           );
@@ -413,17 +413,17 @@ Returns:
 
   IfrOptionList = AllocatePool (2 * sizeof (IFR_OPTION));
   if (IfrOptionList != NULL) {
-    IfrOptionList[0].Flags        = EFI_IFR_FLAG_INTERACTIVE;
+    IfrOptionList[0].Flags        = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     IfrOptionList[0].Key          = SET_VIDEO_BIOS_TYPE_QUESTION_ID + 0x2000;
     IfrOptionList[0].StringToken  = STRING_TOKEN (STR_ONE_OF_PCI);
     IfrOptionList[0].Value        = 0;
     IfrOptionList[0].OptionString = NULL;
-    IfrOptionList[1].Flags        = EFI_IFR_FLAG_INTERACTIVE;
+    IfrOptionList[1].Flags        = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     IfrOptionList[1].Key          = SET_VIDEO_BIOS_TYPE_QUESTION_ID + 0x2000;
     IfrOptionList[1].StringToken  = STRING_TOKEN (STR_ONE_OF_AGP);
     IfrOptionList[1].Value        = 1;
     IfrOptionList[1].OptionString = NULL;
-    IfrOptionList[FPCallbackInfo.Data.VideoBIOS].Flags |= EFI_IFR_FLAG_DEFAULT;
+    IfrOptionList[FPCallbackInfo.Data.VideoBIOS].Flags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
 
     CreateOneOfOpCode (
       SET_VIDEO_BIOS_TYPE_QUESTION_ID,
@@ -468,7 +468,7 @@ Returns:
     Status = gBrowser->SendForm (
                         gBrowser,
                         TRUE,                             // Use the database
-                        (EFI_HII_HANDLE *) &gCallbackKey, // The HII Handle
+                        (FRAMEWORK_EFI_HII_HANDLE  *) &gCallbackKey, // The HII Handle
                         1,
                         NULL,
                         NULL,                             // This is the handle that the interface to the callback was installed on

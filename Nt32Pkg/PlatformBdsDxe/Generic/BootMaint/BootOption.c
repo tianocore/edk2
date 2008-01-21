@@ -1662,24 +1662,3 @@ Returns:
 
 }
 
-VOID
-SafeFreePool (
-  IN VOID    *Buffer
-  )
-/*++
-
-Routine Description:
-  Wrap original FreePool gBS call
-  in order to decrease code length
-
-Arguments:
-
-Returns:
-
---*/
-{
-  if (Buffer != NULL) {
-    FreePool (Buffer);
-    Buffer = NULL;
-  }
-}

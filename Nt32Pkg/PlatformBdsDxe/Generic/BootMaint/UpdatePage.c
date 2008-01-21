@@ -71,14 +71,14 @@ UpdatePageStart (
       FORM_MAIN_ID,
       STRING_TOKEN (STR_FORM_GOTO_MAIN),
       STRING_TOKEN (STR_FORM_GOTO_MAIN),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_MAIN_ID,
       *CurrentLocation
       );
 
     UpdateData->DataCount++;
 
-    *CurrentLocation = *CurrentLocation + ((EFI_IFR_OP_HEADER *) (*CurrentLocation))->Length;
+    *CurrentLocation = *CurrentLocation + ((FRAMEWORK_EFI_IFR_OP_HEADER *) (*CurrentLocation))->Length;
   }
 
 }
@@ -97,20 +97,20 @@ UpdatePageEnd (
       FORM_MAIN_ID,
       STRING_TOKEN (STR_SAVE_AND_EXIT),
       STRING_TOKEN (STR_NULL_STRING),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       KEY_VALUE_SAVE_AND_EXIT,
       CurrentLocation
       );
 
     UpdateData->DataCount++;
 
-    CurrentLocation = CurrentLocation + ((EFI_IFR_OP_HEADER *) CurrentLocation)->Length;
+    CurrentLocation = CurrentLocation + ((FRAMEWORK_EFI_IFR_OP_HEADER *) CurrentLocation)->Length;
 
     CreateGotoOpCode (
       FORM_MAIN_ID,
       STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       STRING_TOKEN (STR_NULL_STRING),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       KEY_VALUE_NO_SAVE_AND_EXIT,
       CurrentLocation
       );
@@ -125,7 +125,7 @@ UpdatePageEnd (
       FORM_MAIN_ID,
       STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       STRING_TOKEN (STR_NULL_STRING),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       KEY_VALUE_NO_SAVE_AND_EXIT,
       CurrentLocation
       );
@@ -217,11 +217,11 @@ UpdateConCOMPage (
         FORM_CON_COM_SETUP_ID,
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
-        EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+        FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
         (UINT16) (TERMINAL_OPTION_OFFSET + Index),
         Location
         );
-      Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+      Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
       UpdateData->DataCount++;
     }
   }
@@ -260,12 +260,12 @@ UpdateBootDelPage (
       (UINT8) 1,
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       (UINT16) BOOT_OPTION_DEL_QUESTION_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
     UpdateData->DataCount++;
   }
 
@@ -293,12 +293,12 @@ UpdateDrvAddHandlePage (
       FORM_DRV_ADD_HANDLE_DESC_ID,
       NewMenuEntry->DisplayStringToken,
       STRING_TOKEN (STR_NULL_STRING),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       (UINT16) (HANDLE_OPTION_OFFSET + Index),
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
     UpdateData->DataCount++;
   }
 
@@ -334,12 +334,12 @@ UpdateDrvDelPage (
       (UINT8) 1,
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       (UINT16) DRIVER_OPTION_DEL_QUESTION_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
     UpdateData->DataCount++;
   }
 
@@ -369,7 +369,7 @@ UpdateDriverAddHandleDescPage (
     Location
     );
 
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
   CreateStringOpCode (
     DRV_ADD_HANDLE_DESC_QUESTION_ID,
@@ -378,23 +378,23 @@ UpdateDriverAddHandleDescPage (
     STRING_TOKEN (STR_NULL_STRING),
     6,
     75,
-    EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+    FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
     KEY_VALUE_DRIVER_ADD_DESC_DATA,
     Location
     );
 
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
   CreateCheckBoxOpCode (
     DRV_ADD_RECON_QUESTION_ID,
     (UINT8) 1,
     STRING_TOKEN (STR_LOAD_OPTION_FORCE_RECON),
     STRING_TOKEN (STR_LOAD_OPTION_FORCE_RECON),
-    EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+    FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
     DRV_ADD_RECON_QUESTION_ID,
     Location
     );
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
   CreateStringOpCode (
     DRIVER_ADD_OPTION_QUESTION_ID,
@@ -403,12 +403,12 @@ UpdateDriverAddHandleDescPage (
     STRING_TOKEN (STR_NULL_STRING),
     6,
     75,
-    EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+    FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
     KEY_VALUE_DRIVER_ADD_OPT_DATA,
     Location
     );
 
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdatePageEnd (CallbackData, Location);
 }
 
@@ -437,9 +437,9 @@ UpdateConsolePage (
   for (Index = 0; Index < ConsoleMenu->MenuNumber; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (ConsoleMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-    CheckFlags        = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags        = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (NewConsoleContext->IsActive) {
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
       CallbackData->BmmFakeNvData->ConsoleCheck[Index] = TRUE;
     } else {
       CallbackData->BmmFakeNvData->ConsoleCheck[Index] = FALSE;
@@ -454,14 +454,14 @@ UpdateConsolePage (
       (UINT16) (CONSOLE_OPTION_OFFSET + Index),
       Location
       );
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
     UpdateData->DataCount++;
   }
 
   Status = EfiLibLocateProtocol (&gTerminalDriverGuid, &Interface);
   if (!EFI_ERROR (Status)) {
     for (Index2 = 0; Index2 < TerminalMenu.MenuNumber; Index2++) {
-      CheckFlags          = EFI_IFR_FLAG_INTERACTIVE;
+      CheckFlags          = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
       NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
       NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
@@ -469,7 +469,7 @@ UpdateConsolePage (
           (NewTerminalContext->IsConOut && (UpdatePageId == FORM_CON_OUT_ID)) ||
           (NewTerminalContext->IsStdErr && (UpdatePageId == FORM_CON_ERR_ID))
           ) {
-        CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+        CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
         CallbackData->BmmFakeNvData->ConsoleCheck[Index] = TRUE;
       } else {
         CallbackData->BmmFakeNvData->ConsoleCheck[Index] = FALSE;
@@ -484,7 +484,7 @@ UpdateConsolePage (
         (UINT16) (CONSOLE_OPTION_OFFSET + Index),
         Location
         );
-      Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+      Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
       UpdateData->DataCount++;
       Index++;
     }
@@ -539,7 +539,7 @@ UpdateOrderPage (
       );
 
     for (Index = 0; Index < OptionMenu->MenuNumber + 2; Index++) {
-      Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+      Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
     }
 
     UpdateData->DataCount = (UINT16) (UpdateData->DataCount + OptionMenu->MenuNumber + 2);
@@ -588,10 +588,10 @@ UpdateBootNextPage (
       NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
       NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       if (NewLoadContext->IsBootNext) {
-        IfrOptionList[Index].Flags            = EFI_IFR_FLAG_DEFAULT | EFI_IFR_FLAG_INTERACTIVE;
+        IfrOptionList[Index].Flags            = FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
         CallbackData->BmmFakeNvData->BootNext = Index;
       } else {
-        IfrOptionList[Index].Flags = EFI_IFR_FLAG_INTERACTIVE;
+        IfrOptionList[Index].Flags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
       }
 
       IfrOptionList[Index].Key          = (UINT16) KEY_VALUE_MAIN_BOOT_NEXT;
@@ -603,9 +603,9 @@ UpdateBootNextPage (
     IfrOptionList[Index].Key          = (UINT16) KEY_VALUE_MAIN_BOOT_NEXT;
     IfrOptionList[Index].Value        = Index;
     IfrOptionList[Index].StringToken  = STRING_TOKEN (STR_NONE);
-    IfrOptionList[Index].Flags        = EFI_IFR_FLAG_INTERACTIVE;
+    IfrOptionList[Index].Flags        = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (CallbackData->BmmFakeNvData->BootNext == Index) {
-      IfrOptionList[Index].Flags |= EFI_IFR_FLAG_DEFAULT;
+      IfrOptionList[Index].Flags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
     }
 
     IfrOptionList[Index].OptionString = NULL;
@@ -619,8 +619,8 @@ UpdateBootNextPage (
       (UINTN) (NumberOfOptions + 1),
       Location
       );
-    Location  = Location + (NumberOfOptions + 2) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-    Location  = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location  = Location + (NumberOfOptions + 2) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+    Location  = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
     UpdateData->DataCount += 3;
     SafeFreePool (IfrOptionList);
@@ -661,7 +661,7 @@ UpdateTimeOutPage (
 
   CallbackData->BmmFakeNvData->BootTimeOut = (UINT16) BootTimeOut;
   UpdateData->DataCount++;
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
   UpdatePageEnd (CallbackData, Location);
 }
@@ -699,9 +699,9 @@ UpdateTerminalPage (
   }
 
   for (Index = 0; Index < 19; Index++) {
-    CheckFlags = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (NewTerminalContext->BaudRate == (UINT64) (BaudRateList[Index].Value)) {
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
       NewTerminalContext->BaudRateIndex         = (UINT8) Index;
       CallbackData->BmmFakeNvData->COMBaudRate  = NewTerminalContext->BaudRateIndex;
     }
@@ -722,8 +722,8 @@ UpdateTerminalPage (
     Location
     );
 
-  Location              = Location + (Index + 1) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-  Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + (Index + 1) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount = (UINT8) (UpdateData->DataCount + Index);
   UpdateData->DataCount += 2;
 
@@ -735,12 +735,12 @@ UpdateTerminalPage (
   }
 
   for (Index = 0; Index < 4; Index++) {
-    CheckFlags = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
 
     if (NewTerminalContext->DataBits == DataBitsList[Index].Value) {
       NewTerminalContext->DataBitsIndex         = (UINT8) Index;
       CallbackData->BmmFakeNvData->COMDataRate  = NewTerminalContext->DataBitsIndex;
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
     }
 
     IfrOptionList[Index].Flags        = CheckFlags;
@@ -759,8 +759,8 @@ UpdateTerminalPage (
     Location
     );
 
-  Location              = Location + (Index + 1) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-  Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + (Index + 1) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount = (UINT8) (UpdateData->DataCount + Index);
   UpdateData->DataCount += 2;
 
@@ -772,9 +772,9 @@ UpdateTerminalPage (
   }
 
   for (Index = 0; Index < 5; Index++) {
-    CheckFlags = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (NewTerminalContext->Parity == ParityList[Index].Value) {
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
       NewTerminalContext->ParityIndex         = (UINT8) Index;
       CallbackData->BmmFakeNvData->COMParity  = NewTerminalContext->ParityIndex;
     }
@@ -795,8 +795,8 @@ UpdateTerminalPage (
     Location
     );
 
-  Location              = Location + (Index + 1) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-  Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + (Index + 1) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount = (UINT8) (UpdateData->DataCount + Index);
   UpdateData->DataCount += 2;
 
@@ -808,9 +808,9 @@ UpdateTerminalPage (
   }
 
   for (Index = 0; Index < 3; Index++) {
-    CheckFlags = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (NewTerminalContext->StopBits == StopBitsList[Index].Value) {
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
       NewTerminalContext->StopBitsIndex         = (UINT8) Index;
       CallbackData->BmmFakeNvData->COMStopBits  = NewTerminalContext->StopBitsIndex;
     }
@@ -831,8 +831,8 @@ UpdateTerminalPage (
     Location
     );
 
-  Location              = Location + (Index + 1) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-  Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + (Index + 1) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount = (UINT8) (UpdateData->DataCount + Index);
   UpdateData->DataCount += 2;
 
@@ -844,9 +844,9 @@ UpdateTerminalPage (
   }
 
   for (Index = 0; Index < 4; Index++) {
-    CheckFlags = EFI_IFR_FLAG_INTERACTIVE;
+    CheckFlags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (NewTerminalContext->TerminalType == Index) {
-      CheckFlags |= EFI_IFR_FLAG_DEFAULT;
+      CheckFlags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
       CallbackData->BmmFakeNvData->COMTerminalType = NewTerminalContext->TerminalType;
     }
 
@@ -866,8 +866,8 @@ UpdateTerminalPage (
     Location
     );
 
-  Location              = Location + (Index + 1) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-  Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + (Index + 1) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+  Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount = (UINT8) (UpdateData->DataCount + Index);
   UpdateData->DataCount += 2;
 
@@ -877,19 +877,19 @@ UpdateTerminalPage (
     FORM_MAIN_ID,
     STRING_TOKEN (STR_SAVE_AND_EXIT),
     STRING_TOKEN (STR_NULL_STRING),
-    EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+    FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
     KEY_VALUE_SAVE_AND_EXIT,
     Location
     );
 
-  Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+  Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
   UpdateData->DataCount++;
 
   CreateGotoOpCode (
     FORM_MAIN_ID,
     STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
     STRING_TOKEN (STR_NULL_STRING),
-    EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+    FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
     KEY_VALUE_NO_SAVE_AND_EXIT,
     Location
     );
@@ -1129,9 +1129,9 @@ UpdateSetLegacyDeviceOrderPage (
 
   for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
     NewMenuEntry                = BOpt_GetMenuEntry (OptionMenu, Index);
-    IfrOptionList[Index].Flags  = EFI_IFR_FLAG_INTERACTIVE;
+    IfrOptionList[Index].Flags  = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
     if (0 == Index) {
-      IfrOptionList[Index].Flags |= EFI_IFR_FLAG_DEFAULT;
+      IfrOptionList[Index].Flags |= FRAMEWORK_EFI_IFR_FLAG_DEFAULT;
     }
 
     IfrOptionList[Index].Key          = Key;
@@ -1142,7 +1142,7 @@ UpdateSetLegacyDeviceOrderPage (
   //
   // for item "Disabled"
   //
-  IfrOptionList[Index].Flags        = EFI_IFR_FLAG_INTERACTIVE;
+  IfrOptionList[Index].Flags        = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE;
   IfrOptionList[Index].Key          = Key;
   IfrOptionList[Index].StringToken  = STRING_TOKEN (STR_DISABLE_LEGACY_DEVICE);
   IfrOptionList[Index].Value        = 0xFF;
@@ -1220,8 +1220,8 @@ UpdateSetLegacyDeviceOrderPage (
         LegacyOrder[Index] = (UINT8) (VarDevOrder & 0xFF);
       }
 
-      Location              = Location + (OptionMenu->MenuNumber + 2) * ((EFI_IFR_OP_HEADER *) Location)->Length;
-      Location              = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+      Location              = Location + (OptionMenu->MenuNumber + 2) * ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
+      Location              = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
       UpdateData->DataCount = (UINT16) (UpdateData->DataCount + (OptionMenu->MenuNumber + 3));
     }
   }

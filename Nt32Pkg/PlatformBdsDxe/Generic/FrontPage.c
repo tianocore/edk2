@@ -28,21 +28,21 @@ EFI_GUID                    mMemorySubClass     = EFI_MEMORY_SUBCLASS_GUID;
 EFI_GUID                    mMiscSubClass       = EFI_MISC_SUBCLASS_GUID;
 
 UINT16                      mLastSelection;
-EFI_HII_HANDLE              gFrontPageHandle;
+FRAMEWORK_EFI_HII_HANDLE    gFrontPageHandle;
 EFI_HANDLE                  FrontPageCallbackHandle;
 EFI_FORM_CALLBACK_PROTOCOL  FrontPageCallback;
 EFI_FORM_BROWSER_PROTOCOL   *gBrowser;
 UINTN                       gCallbackKey;
 BOOLEAN                     gConnectAllHappened = FALSE;
 
-extern EFI_HII_HANDLE       gFrontPageHandle;
+extern FRAMEWORK_EFI_HII_HANDLE        gFrontPageHandle;
 
 EFI_STATUS
 EFIAPI
 FrontPageCallbackRoutine (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *DataArray,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++
@@ -105,7 +105,7 @@ Returns:
     // Based on the DataArray->Data->Data value, we can determine
     // which language was chosen by the user
     //
-    for (Index = 0; Count != (UINTN) (((EFI_IFR_DATA_ENTRY *) (DataArray + 1))->Data); Index += 3) {
+    for (Index = 0; Count != (UINTN) (((FRAMEWORK_EFI_IFR_DATA_ENTRY *) (DataArray + 1))->Data); Index += 3) {
       Count++;
     }
     //
@@ -174,7 +174,7 @@ Returns:
         Background,
         TmpStr,
         Color,
-        (UINTN) (((EFI_IFR_DATA_ENTRY *) (DataArray+1))->Data),
+        (UINTN) (((FRAMEWORK_EFI_IFR_DATA_ENTRY *) (DataArray+1))->Data),
         0
         );
       FreePool (TmpStr);
@@ -243,7 +243,7 @@ Returns:
   //
   TempBuffer    = (UINT8 *) FrontPageVfrBin;
   TempBuffer    = TempBuffer + sizeof (EFI_HII_PACK_HEADER);
-  TempBuffer    = (UINT8 *) &((EFI_IFR_FORM_SET *) TempBuffer)->NvDataSize;
+  TempBuffer    = (UINT8 *) &((FRAMEWORK_EFI_IFR_FORM_SET *) TempBuffer)->NvDataSize;
   *TempBuffer   = 1;
 
   gCallbackKey  = 0;
@@ -354,7 +354,7 @@ ReInitStrings:
     CopyMem (&OptionList[OptionCount].Value, &OptionCount, sizeof (UINT16));
     Key = 0x1234;
     CopyMem (&OptionList[OptionCount].Key, &Key, sizeof (UINT16));
-    OptionList[OptionCount].Flags = EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS;
+    OptionList[OptionCount].Flags = FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS;
     OptionCount++;
   }
 
@@ -468,7 +468,7 @@ Returns:
 {
   EFI_STATUS      Status;
   UINT16          HandleBufferLength;
-  EFI_HII_HANDLE  *HiiHandleBuffer;
+  FRAMEWORK_EFI_HII_HANDLE   *HiiHandleBuffer;
   UINTN           StringBufferLength;
   UINTN           NumberOfHiiHandles;
   UINTN           Index;
@@ -490,7 +490,7 @@ Returns:
   //
   // Get the gHii Handle that matches the StructureNode->ProducerName
   //
-  NumberOfHiiHandles = HandleBufferLength / sizeof (EFI_HII_HANDLE);
+  NumberOfHiiHandles = HandleBufferLength / sizeof (FRAMEWORK_EFI_HII_HANDLE );
   for (Index = 0; Index < NumberOfHiiHandles; Index++) {
     Length = 0;
     Status = ExtractDataFromHiiHandle (
@@ -790,7 +790,7 @@ Returns:
   CreateBannerOpCode (
     STRING_TOKEN (STR_TIME_OUT_PROMPT),
     TimeoutDefault,
-    (UINT8) EFI_IFR_BANNER_TIMEOUT,
+    (UINT8) FRAMEWORK_EFI_IFR_BANNER_TIMEOUT,
     &UpdateData->Data
     );
 

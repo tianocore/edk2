@@ -45,7 +45,7 @@ FreeAllMenu (
 EFI_STATUS
 CreateMenuStringToken (
   IN BMM_CALLBACK_DATA                *CallbackData,
-  IN EFI_HII_HANDLE                   HiiHandle,
+  IN FRAMEWORK_EFI_HII_HANDLE                   HiiHandle,
   IN BM_MENU_OPTION                   *MenuOption
   )
 /*++
@@ -101,7 +101,7 @@ EFIAPI
 DriverCallback (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *Data,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *Data,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++
@@ -742,7 +742,7 @@ Returns:
   EFI_HII_PACKAGES          *PackageList;
   BMM_CALLBACK_DATA         *BmmCallbackInfo;
   EFI_HII_PROTOCOL          *Hii;
-  EFI_HII_HANDLE            HiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE            HiiHandle;
   EFI_STATUS                Status;
   EFI_HANDLE                Handle;
   UINT8                     *Ptr;
@@ -905,51 +905,51 @@ Returns:
       FORM_SET_FD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_FD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_FD_ORDER_TITLE),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_SET_FD_ORDER_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
     CreateGotoOpCode (
       FORM_SET_HD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_HD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_HD_ORDER_TITLE),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_SET_HD_ORDER_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
     CreateGotoOpCode (
       FORM_SET_CD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_CD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_CD_ORDER_TITLE),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_SET_CD_ORDER_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
     CreateGotoOpCode (
       FORM_SET_NET_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_NET_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_NET_ORDER_TITLE),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_SET_NET_ORDER_ID,
       Location
       );
 
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
     CreateGotoOpCode (
       FORM_SET_BEV_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_BEV_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_BEV_ORDER_TITLE),
-      EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,
+      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,
       FORM_SET_BEV_ORDER_ID,
       Location
       );
@@ -1313,5 +1313,5 @@ CreateCallbackPacket (
 
   (*Packet)->DataArray.EntryCount   = 1;
   (*Packet)->DataArray.NvRamMap     = NULL;
-  ((EFI_IFR_DATA_ENTRY *) (&((*Packet)->DataArray) + 1))->Flags  = Flags;
+  ((FRAMEWORK_EFI_IFR_DATA_ENTRY *) (&((*Packet)->DataArray) + 1))->Flags  = Flags;
 }

@@ -24,7 +24,7 @@ Abstract:
 UINT16                            mKeyInput;
 LIST_ENTRY                        *mBootOptionsList;
 BDS_COMMON_OPTION                 *gOption;
-EFI_HII_HANDLE                    gBootManagerHandle;
+FRAMEWORK_EFI_HII_HANDLE          gBootManagerHandle;
 EFI_HANDLE                        BootManagerCallbackHandle;
 EFI_FORM_CALLBACK_PROTOCOL        BootManagerCallback;
 EFI_GUID                          gBmGuid = BOOT_MANAGER_GUID;
@@ -38,7 +38,7 @@ EFIAPI
 BootManagerCallbackRoutine (
   IN EFI_FORM_CALLBACK_PROTOCOL       *This,
   IN UINT16                           KeyValue,
-  IN EFI_IFR_DATA_ARRAY               *DataArray,
+  IN FRAMEWORK_EFI_IFR_DATA_ARRAY               *DataArray,
   OUT EFI_HII_CALLBACK_PACKET         **Packet
   )
 /*++
@@ -97,7 +97,7 @@ Returns:
 
       DataPacket->DataArray.EntryCount  = 1;
       DataPacket->DataArray.NvRamMap    = NULL;
-      ((EFI_IFR_DATA_ENTRY *) (((EFI_IFR_DATA_ARRAY *)DataPacket) + 1))->Flags = EXIT_REQUIRED | NV_NOT_CHANGED;
+      ((FRAMEWORK_EFI_IFR_DATA_ENTRY *) (((FRAMEWORK_EFI_IFR_DATA_ARRAY *)DataPacket) + 1))->Flags = EXIT_REQUIRED | NV_NOT_CHANGED;
       return EFI_SUCCESS;
     } else {
       continue;
@@ -265,13 +265,13 @@ Returns:
               0x1000, // Form ID
               Token,  // Token Value for the string
               0,      // Help String (none)
-              EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_NV_ACCESS,  // The Op-Code flags
+              FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_NV_ACCESS,  // The Op-Code flags
               mKeyInput,                                          // The Key to get a callback on
               Location  // Buffer containing created op-code
               );
 
     UpdateData->DataCount++;
-    Location = Location + ((EFI_IFR_OP_HEADER *) Location)->Length;
+    Location = Location + ((FRAMEWORK_EFI_IFR_OP_HEADER *) Location)->Length;
 
   }
 

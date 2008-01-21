@@ -59,7 +59,7 @@ typedef struct {
 typedef struct {
   UINTN                       Signature;
   MyDevMgrIfrNVData           Data;
-  EFI_HII_HANDLE              DevMgrHiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE    DevMgrHiiHandle;
   EFI_HANDLE                  CallbackHandle;
   EFI_FORM_CALLBACK_PROTOCOL  DevMgrCallback;
 } EFI_FRONTPAGE_CALLBACK_INFO;

@@ -94,9 +94,6 @@
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
-    </Protocol>
     <ProtocolNotify Usage="SOMETIMES_CONSUMED">
       <ProtocolNotifyCName>gEfiWinNtIoProtocolGuid</ProtocolNotifyCName>
     </ProtocolNotify>

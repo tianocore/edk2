@@ -4,7 +4,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #    a real platform. This also provides an example for how an DSC is created.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -22,16 +22,16 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = NT32
-  PLATFORM_GUID                  = EB216561-961F-47EE-9EF9-CA426EF547C2
+  PLATFORM_NAME                  = NT32UefiHii
+  PLATFORM_GUID                  = 3F196473-D86B-451d-A9E7-BA925824A8E8
   PLATFORM_VERSION               = 0.3
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/NT32
+  OUTPUT_DIRECTORY               = Build/NT32UefiHii
   SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Nt32Pkg/Nt32Pkg.fdf
- 
+  FLASH_DEFINITION               = Nt32Pkg/Nt32UefiHii/Nt32UefiHii.fdf
+
 
 ################################################################################
 #
@@ -60,10 +60,14 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+#  FrameworkIfrSupportLib|IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
+#  GraphicsLib|IntelFrameworkModulePkg/Library/GraphicsLib/GraphicsLib.inf
   GraphicsLib|MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
+#  HiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
@@ -105,6 +109,7 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -159,6 +164,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
@@ -176,6 +182,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -192,6 +199,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -207,6 +215,7 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+#  FrameworkHiiLib|IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -364,7 +373,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
 
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -414,8 +422,10 @@
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+#  IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
   Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
+# Nt32Pkg/PlatformBdsDxe/PlatformBdsDxe.inf
   MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
@@ -432,6 +442,7 @@
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+#  IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
@@ -442,6 +453,7 @@
   Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
   Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
   Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
+#  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
@@ -459,6 +471,7 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
 
+  #Nt32Pkg/UefiPlatformBdsDxe/UefiPlatformBdsDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
@@ -468,60 +481,17 @@
   }
   
 [BuildOptions]
-  DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE
-  RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
-  *_*_IA32_CC_FLAGS = /D EFI_SPECIFICATION_VERSION=0x0002000A /D TIANO_RELEASE_VERSION=0x00080006
-
-
-
-
-#############################################################################################################
-# NOTE:
-# The following [Libraries.IA32] section is for building R8 module under the R9 tool chain.
-# If you want build R8 module for Nt32 platform, please uncomment [Libraries.IA32] section and
-# libraries used by that R8 module.
-# Currently, Nt32 platform do not has any R8 style module
-#  
-#
-#[Libraries.IA32]
-  #
-  # Libraries common to PEI and DXE
-  #
-  #  EdkCompatibilityPkg\Foundation\Efi\Guid\EfiGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Framework\Guid\EdkFrameworkGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Guid\EdkGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\EfiCommonLib\EfiCommonLib.inf
-  #  EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
-  #  EdkCompatibilityPkg\Foundation\Cpu\Itanium\CpuIA64Lib\CpuIA64Lib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
-  #  EdkCompatibilityPkg\Foundation\Library\CompilerStub\CompilerStubLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Hob\HobLib.inf
-
-  #
-  # PEI libraries
-  #
-  #  EdkCompatibilityPkg\Foundation\Framework\Ppi\EdkFrameworkPpiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Ppi\EdkPpiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Pei\PeiLib\PeiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Pei\Hob\PeiHobLib.inf
-
-  #
-  # DXE libraries
-  #
-  #  EdkCompatibilityPkg\Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Efi\Protocol\EfiProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Protocol\EdkProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Graphics\Graphics.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Print\PrintLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
-
-  #
-  # Print/Graphics Library consume SetupBrowser Print Protocol
-  #
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
+  DEBUG_ICC_IA32_DLINK_FLAGS                  = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  DEBUG_VS2003_IA32_DLINK_FLAGS               = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  DEBUG_MYTOOLS_IA32_DLINK_FLAGS              = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  DEBUG_WINDDK3790x1830_IA32_DLINK_FLAGS      = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  DEBUG_VS2005PRO_IA32_DLINK_FLAGS            = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  DEBUG_MIXED_IA32_DLINK_FLAGS                = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  RELEASE_ICC_IA32_DLINK_FLAGS                = /ALIGN:4096
+  RELEASE_VS2003_IA32_DLINK_FLAGS             = /ALIGN:4096
+  RELEASE_MYTOOLS_IA32_DLINK_FLAGS            = /ALIGN:4096
+  RELEASE_WINDDK3790x1830_IA32_DLINK_FLAGS    = /ALIGN:4096
+  RELEASE_VS2005PRO_IA32_DLINK_FLAGS          = /ALIGN:4096
+  RELEASE_MIXED_IA32_DLINK_FLAGS              = /ALIGN:4096
+  MSFT:DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=_ModuleEntryPoint /ALIGN:4096 /SUBSYSTEM:CONSOLE
+  MSFT:RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096

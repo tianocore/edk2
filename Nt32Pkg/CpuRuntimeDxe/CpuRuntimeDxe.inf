@@ -48,7 +48,7 @@
   MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
-  FrameworkHiiLib
+  HiiLib
   DebugLib
 
 [Guids]
@@ -58,10 +58,9 @@
 [Protocols]
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL SOMETIMES_CONSUMED
-  gEfiHiiProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
   gEfiWinNtIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
-  gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid
+  gEfiDataHubProtocolGuid

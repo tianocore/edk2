@@ -32,7 +32,7 @@ Revision History
     0x7777E939, 0xD57E, 0x4DCB, {0xA0, 0x8E, 0x64, 0xD7, 0x98, 0x57, 0x1E, 0x0F } \
   }
 
-EFI_HII_HANDLE    gStringPackHandle;
+FRAMEWORK_EFI_HII_HANDLE    gStringPackHandle;
 EFI_HII_PROTOCOL  *gHii;
 
 CHAR16            *
