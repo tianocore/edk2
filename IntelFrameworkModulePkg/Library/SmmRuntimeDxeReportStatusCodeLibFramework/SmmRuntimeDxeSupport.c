@@ -33,6 +33,9 @@ STATIC
 EFI_SMM_BASE_PROTOCOL *mSmmBase;
 
 STATIC
+EFI_RUNTIME_SERVICES  *mRT;
+
+STATIC
 BOOLEAN               mHaveExitedBootServices = FALSE;
 
 /**
@@ -56,8 +59,8 @@ InternalGetReportStatusCode (
       return (EFI_REPORT_STATUS_CODE) OemHookStatusCodeReport;
     }
   }
-  if (gRT->Hdr.Revision < 0x20000) {
-    return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)gRT)->ReportStatusCode;
+  if (mRT->Hdr.Revision < 0x20000) {
+    return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)mRT)->ReportStatusCode;
   } else if (!mHaveExitedBootServices) {
     Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
     if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
@@ -84,13 +87,13 @@ ReportStatusCodeLibVirtualAddressChange (
   )
 {
   if (NULL != mReportStatusCode) {
-    gRT->ConvertPointer (0, (VOID **) &mReportStatusCode);
+    mRT->ConvertPointer (0, (VOID **) &mReportStatusCode);
   }
   if (NULL != mSmmBase) {
-    gRT->ConvertPointer (0, (VOID **) &mSmmBase);
+    mRT->ConvertPointer (0, (VOID **) &mSmmBase);
   }
-  gRT->ConvertPointer (0, (VOID **) &mStatusCodeData);
-  gRT->ConvertPointer (0, (VOID **) &gRT);
+  mRT->ConvertPointer (0, (VOID **) &mStatusCodeData);
+  mRT->ConvertPointer (0, (VOID **) &mRT);
 }
 
 /**
@@ -148,6 +151,12 @@ ReportStatusCodeLibConstruct (
       return EFI_SUCCESS;
     }
   }
+
+  //
+  // Library should not use the gRT directly, since it
+  // may be converted by other library instance.
+  // 
+  mRT = gRT;
 
   gBS->AllocatePool (EfiRuntimeServicesData, sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE, (VOID **)&mStatusCodeData);
   ASSERT (NULL != mStatusCodeData);
