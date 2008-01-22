@@ -1,5 +1,5 @@
 #/** @file
-#  Component description file for iSCSI module.
+#  Component description file for IScsi module.
 #
 #  Copyright (c) 2006 - 2007, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
@@ -15,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = iSCSI
+  BASE_NAME                      = IScsiDxe
   FILE_GUID                      = 4579B72D-7EC4-4dd4-8486-083C86B182A7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
