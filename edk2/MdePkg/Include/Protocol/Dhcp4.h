@@ -365,9 +365,8 @@ EFI_STATUS
   IN  UINT32                  AppendCount,
   IN  EFI_DHCP4_PACKET_OPTION *AppendList[]       OPTIONAL,
   OUT EFI_DHCP4_PACKET        **NewPacket
-  );
+  )
 ;
-
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
 
