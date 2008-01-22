@@ -275,7 +275,7 @@
 
   MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
 
-  MdeModulePkg/Universal/iScsi/IScsi.inf
+  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf 
