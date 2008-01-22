@@ -56,7 +56,8 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   CpuLib|MdePkg/Library/CpuLib/CpuLib.inf
-  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+#  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
@@ -101,6 +102,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PeCoffLib|Nt32Pkg/Library/DxeNT32PeCoffLib/DxeNT32PeCoffLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
@@ -134,6 +136,7 @@
   PeCoffLib|Nt32Pkg/Library/PeiNT32PeCoffLib/PeiNT32PeCoffLib.inf
   PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
@@ -149,6 +152,7 @@
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PeCoffLib|Nt32Pkg/Library/PeiCoreNT32PeCoffLib/PeiCoreNT32PeCoffLib.inf
   PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
