@@ -866,7 +866,7 @@ Returns:
       ConfigFormEntry->PortTitleToken,
       ConfigFormEntry->PortTitleHelpToken,
       EFI_IFR_FLAG_CALLBACK,
-      KEY_DEVICE_ENTRY_BASE + FormIndex,
+      (UINT16)(KEY_DEVICE_ENTRY_BASE + FormIndex),
       &UpdateData
       );
 
@@ -913,7 +913,7 @@ Returns:
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
   ISCSI_FORM_CALLBACK_INFO    *CallbackInfo;
 
-  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, &HiiDatabase);
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **)&HiiDatabase);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -931,7 +931,7 @@ Returns:
   CallbackInfo->ConfigAccess.RouteConfig = IScsiFormRouteConfig;
   CallbackInfo->ConfigAccess.Callback = IScsiFormCallback;
 
-  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, &CallbackInfo->ConfigRouting);
+  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **)&CallbackInfo->ConfigRouting);
   if (EFI_ERROR (Status)) {
     return Status;
   }

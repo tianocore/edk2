@@ -37,7 +37,7 @@ Abstract:
 
 #define ISCSI_SESSION_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'S', 'N')
 
-typedef struct _ISCSI_SESSION {
+struct _ISCSI_SESSION {
   UINT32                    Signature;
 
   ISCSI_SESSION_CONFIG_DATA ConfigData;
@@ -77,11 +77,11 @@ typedef struct _ISCSI_SESSION {
   BOOLEAN                   DataPDUInOrder;
   BOOLEAN                   DataSequenceInOrder;
   UINT8                     ErrorRecoveryLevel;
-} ISCSI_SESSION;
+};
 
 #define ISCSI_CONNECTION_SIGNATURE  EFI_SIGNATURE_32 ('I', 'S', 'C', 'N')
 
-typedef struct _ISCSI_CONNECTION {
+struct _ISCSI_CONNECTION {
   UINT32            Signature;
   NET_LIST_ENTRY    Link;
 
@@ -116,7 +116,7 @@ typedef struct _ISCSI_CONNECTION {
   UINT32            MaxRecvDataSegmentLength;
   ISCSI_DIGEST_TYPE HeaderDigest;
   ISCSI_DIGEST_TYPE DataDigest;
-} ISCSI_CONNECTION;
+};
 
 #define ISCSI_DRIVER_DATA_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'D', 'A')
 
@@ -142,7 +142,7 @@ typedef struct _ISCSI_CONNECTION {
   ISCSI_DRIVER_DATA_SIGNATURE \
   )
 
-typedef struct _ISCSI_DRIVER_DATA {
+struct _ISCSI_DRIVER_DATA {
   UINT32                          Signature;
   EFI_HANDLE                      Image;
   EFI_HANDLE                      Controller;
@@ -156,6 +156,6 @@ typedef struct _ISCSI_DRIVER_DATA {
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
 
   ISCSI_SESSION                   Session;
-} ISCSI_DRIVER_DATA;
+};
 
 #endif
