@@ -112,5 +112,6 @@ GetPerformanceCounterProperties (
   )
 {
   ASSERT (FALSE);
-  return 0;
+
+  return (UINT64)(-1);
 }
