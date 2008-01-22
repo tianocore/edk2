@@ -546,7 +546,7 @@ Returns:
   //
   // Allocate the space for the key-value pair.
   //
-  Data = NetbufAllocSpace (Pdu, TotalLen, NET_BUF_TAIL);
+  Data = (CHAR8 *)NetbufAllocSpace (Pdu, TotalLen, NET_BUF_TAIL);
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -668,7 +668,7 @@ Returns:
     //
     // Check whether we will issue the stage transition signal?
     //
-    Conn->TransitInitiated = ISCSI_FLAG_ON (LoginReq, ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT);
+    Conn->TransitInitiated = (BOOLEAN) ISCSI_FLAG_ON (LoginReq, ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT);
   }
 
   return Nbuf;
@@ -746,7 +746,7 @@ Returns:
     // Process the TargetAddress key-value strings in the data segment to update the
     // target address info.
     //
-    Status = IScsiUpdateTargetAddress (Session, DataSeg, DataSegLen);
+    Status = IScsiUpdateTargetAddress (Session, (CHAR8 *)DataSeg, DataSegLen);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -765,11 +765,11 @@ Returns:
   //
   // The status is sucess, extract the wanted fields from the header segment.
   //
-  Transit                     = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT);
-  Continue                    = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE);
+  Transit                     = (BOOLEAN) ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT);
+  Continue                    = (BOOLEAN) ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE);
 
-  CurrentStage                = ISCSI_GET_CURRENT_STAGE (LoginRsp);
-  NextStage                   = ISCSI_GET_NEXT_STAGE (LoginRsp);
+  CurrentStage                = (UINT8) ISCSI_GET_CURRENT_STAGE (LoginRsp);
+  NextStage                   = (UINT8) ISCSI_GET_NEXT_STAGE (LoginRsp);
 
   LoginRsp->InitiatorTaskTag  = NTOHL (LoginRsp->InitiatorTaskTag);
 
@@ -1283,7 +1283,7 @@ Returns:
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetbufQueCopy (&Conn->RspQue, 0, Len, Data);
+  NetbufQueCopy (&Conn->RspQue, 0, Len, (UINT8 *) Data);
 
   Status = EFI_PROTOCOL_ERROR;
 
@@ -1352,7 +1352,7 @@ Returns:
     goto ON_ERROR;
   }
 
-  Session->InitialR2T = Session->InitialR2T || (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  Session->InitialR2T = (BOOLEAN) (Session->InitialR2T || (AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // ImmediateData, result function is AND.
@@ -1362,7 +1362,7 @@ Returns:
     goto ON_ERROR;
   }
 
-  Session->ImmediateData = Session->ImmediateData && (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  Session->ImmediateData = (BOOLEAN) (Session->ImmediateData && (AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // MaxRecvDataSegmentLength, result function is Mininum.
@@ -1422,7 +1422,7 @@ Returns:
     goto ON_ERROR;
   }
 
-  Session->DataPDUInOrder = Session->DataPDUInOrder || (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  Session->DataPDUInOrder = (BOOLEAN) (Session->DataPDUInOrder || (AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // DataSequenceInorder, result function is OR.
@@ -1432,7 +1432,7 @@ Returns:
     goto ON_ERROR;
   }
 
-  Session->DataSequenceInOrder = Session->DataSequenceInOrder || (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  Session->DataSequenceInOrder = (BOOLEAN) (Session->DataSequenceInOrder || (AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // DefaultTime2Wait, result function is Maximum.
@@ -1799,7 +1799,7 @@ Returns:
       //
       // Convert the upper-case characters to lower-case ones
       //
-      Name[Index] = Name[Index] - 'A' + 'a';
+      Name[Index] = (CHAR8) (Name[Index] - 'A' + 'a');
     }
 
     if (!NET_IS_LOWER_CASE_CHAR (Name[Index]) &&
@@ -2048,7 +2048,7 @@ Returns:
     //
     // The CDB exceeds 16 bytes, an extended CDB AHS is required.
     //
-    AHSLength += ISCSI_ROUNDUP (Packet->CdbLength - 16) + sizeof (ISCSI_ADDITIONAL_HEADER);
+    AHSLength = (UINT8) (AHSLength + (ISCSI_ROUNDUP (Packet->CdbLength - 16) + sizeof (ISCSI_ADDITIONAL_HEADER)));
   }
 
   Length    = sizeof (SCSI_COMMAND) + AHSLength;
@@ -2769,6 +2769,7 @@ Returns:
   UINT8                   *Data;
   ISCSI_IN_BUFFER_CONTEXT InBufferContext;
   UINT64                  Timeout;
+  UINT8                   *Buffer;
 
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (PassThru);
   Session       = &Private->Session;
@@ -2814,7 +2815,8 @@ Returns:
   }
 
   XferContext         = &Tcb->XferContext;
-  XferContext->Offset = ISCSI_GET_DATASEG_LEN (NetbufGetByte (Pdu, 0, NULL));
+  Buffer              = NetbufGetByte (Pdu, 0, NULL);
+  XferContext->Offset = ISCSI_GET_DATASEG_LEN (Buffer);
 
   //
   // Transmit the SCSI Command PDU.

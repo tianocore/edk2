@@ -119,7 +119,6 @@ Returns:
 {
   EFI_STATUS                Status;
   ISCSI_SESSION             *Session;
-  ISCSI_SESSION_CONFIG_DATA *ConfigData;
   ISCSI_CHAP_AUTH_DATA      *AuthData;
   CHAR8                     *Value;
   UINT8                     *Data;
@@ -137,7 +136,6 @@ Returns:
   ASSERT (Conn->RspQue.BufNum != 0);
 
   Session     = Conn->Session;
-  ConfigData  = &Session->ConfigData;
   AuthData    = &Session->AuthData;
 
   Len         = Conn->RspQue.BufSize;
@@ -153,7 +151,7 @@ Returns:
   //
   // Build the key-value list from the data segment of the Login Response.
   //
-  KeyValueList = IScsiBuildKeyValueList (Data, Len);
+  KeyValueList = IScsiBuildKeyValueList ((CHAR8 *) Data, Len);
   if (KeyValueList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -319,7 +317,6 @@ Returns:
   EFI_STATUS                Status;
   ISCSI_SESSION             *Session;
   ISCSI_LOGIN_REQUEST       *LoginReq;
-  ISCSI_SESSION_CONFIG_DATA *ConfigData;
   ISCSI_CHAP_AUTH_DATA      *AuthData;
   CHAR8                     *Value;
   CHAR8                     ValueStr[256];
@@ -331,7 +328,6 @@ Returns:
   ASSERT (Conn->CurrentStage == ISCSI_SECURITY_NEGOTIATION);
 
   Session     = Conn->Session;
-  ConfigData  = &Session->ConfigData;
   AuthData    = &Session->AuthData;
   LoginReq    = (ISCSI_LOGIN_REQUEST *) NetbufGetByte (Pdu, 0, 0);
   Status      = EFI_SUCCESS;
@@ -387,7 +383,7 @@ Returns:
     //
     // CHAP_N=<N>
     //
-    IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_NAME, (UINT8 *) &AuthData->AuthConfig.CHAPName);
+    IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_NAME, (CHAR8 *) &AuthData->AuthConfig.CHAPName);
     //
     // CHAP_R=<R>
     //

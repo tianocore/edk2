@@ -117,10 +117,10 @@ typedef enum {
 #define ISCSI_GET_OPCODE(PduHdr)            ((((ISCSI_BASIC_HEADER *) (PduHdr))->OpCode) & ISCSI_OPCODE_MASK)
 #define ISCSI_CHECK_OPCODE(PduHdr, Op)      ((((PduHdr)->OpCode) & ISCSI_OPCODE_MASK) == (Op))
 #define ISCSI_IMMEDIATE_ON(PduHdr)          ((PduHdr)->OpCode & ISCSI_REQ_IMMEDIATE)
-#define ISCSI_SET_FLAG(PduHdr, Flag)        (((ISCSI_BASIC_HEADER *) (PduHdr))->Flags |= (Flag))
+#define ISCSI_SET_FLAG(PduHdr, Flag)        (((ISCSI_BASIC_HEADER *) (PduHdr))->Flags |= (BOOLEAN)(Flag))
 #define ISCSI_CLEAR_FLAG(PduHdr, Flag)      (((ISCSI_BASIC_HEADER *) (PduHdr))->Flags &= ~(Flag))
 #define ISCSI_FLAG_ON(PduHdr, Flag)         ((((ISCSI_BASIC_HEADER *) (PduHdr))->Flags & (Flag)) == (Flag))
-#define ISCSI_SET_STAGES(PduHdr, Cur, Nxt)  ((PduHdr)->Flags |= ((Cur) << 2 | (Nxt)))
+#define ISCSI_SET_STAGES(PduHdr, Cur, Nxt)  ((PduHdr)->Flags = (UINT8) ((PduHdr)->Flags | ((Cur) << 2 | (Nxt))))
 #define ISCSI_GET_CURRENT_STAGE(PduHdr)     (((PduHdr)->Flags >> 2) & 0x3)
 #define ISCSI_GET_NEXT_STAGE(PduHdr)        (((PduHdr)->Flags) & 0x3)
 
@@ -129,9 +129,9 @@ typedef enum {
 
 #define HTON24(Dst, Src) \
   do { \
-    (Dst)[0]  = (UINT8) ((Src) >> 16) & 0xFF; \
-    (Dst)[1]  = (UINT8) ((Src) >> 8) & 0xFF; \
-    (Dst)[2]  = (UINT8) (Src) & 0xFF; \
+    (Dst)[0]  = (UINT8) (((Src) >> 16) & 0xFF); \
+    (Dst)[1]  = (UINT8) (((Src) >> 8) & 0xFF); \
+    (Dst)[2]  = (UINT8) ((Src) & 0xFF); \
   } while (0);
 
 #define NTOH24(src)                         (((src)[0] << 16) | ((src)[1] << 8) | ((src)[2]))
