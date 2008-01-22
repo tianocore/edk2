@@ -189,7 +189,7 @@
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
   IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
-  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+#  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
   IntelFrameworkModulePkg/Universal/PcatSingleSegmentPciCfgPei/PcatSingleSegmentPciCfgPei.inf
   IntelFrameworkModulePkg/Universal/VariablePei/VariablePei.inf
