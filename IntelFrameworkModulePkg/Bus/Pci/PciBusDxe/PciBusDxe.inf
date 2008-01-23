@@ -32,8 +32,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gPciBusDriverBinding                         
-#  COMPONENT_NAME                =  gPciBusComponentName                         
+#  DRIVER_BINDING                =  gPciBusDriverBinding
+#  COMPONENT_NAME                =  gPciBusComponentName
 #
 
 [Sources.common]
@@ -106,6 +106,7 @@
   gEfiPciPlatformProtocolGuid                   # PROTOCOL TO_START
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiIncompatiblePciDeviceSupportProtocolGuid  # PROTOCOL TO_START
 
 
 [FeaturePcd.common]

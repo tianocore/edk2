@@ -308,9 +308,9 @@ UhciComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  EFI_STATUS          Status;
-  USB_HC_DEV          *UhciDev;
-  EFI_USB_HC_PROTOCOL *UsbHc;
+  EFI_STATUS           Status;
+  USB_HC_DEV           *UhciDev;
+  EFI_USB2_HC_PROTOCOL *Usb2Hc;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -336,8 +336,8 @@ UhciComponentNameGetControllerName (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiUsbHcProtocolGuid,
-                  (VOID **) &UsbHc,
+                  &gEfiUsb2HcProtocolGuid,
+                  (VOID **) &Usb2Hc,
                   gUhciDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -347,7 +347,7 @@ UhciComponentNameGetControllerName (
     return Status;
   }
 
-  UhciDev = UHC_FROM_USB_HC_PROTO (UsbHc);
+  UhciDev = UHC_FROM_USB2_HC_PROTO (Usb2Hc);
 
   return LookupUnicodeString2 (
            Language,

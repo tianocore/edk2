@@ -1,13 +1,13 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -294,9 +294,7 @@ Returns:
   //
   // Update the bar information for this PCI device so as to support some specific device
   //
-  if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_ACPI_RESOURCE_SUPPORT) {
-    UpdatePciInfo (PciIoDevice);
-  }
+  UpdatePciInfo (PciIoDevice);
 
   if (PciIoDevice->DevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1216,21 +1214,54 @@ Returns:
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
 
   Configuration = NULL;
+  Status        = EFI_SUCCESS;
 
-  //
-  // Check whether the device belongs to incompatible devices or not
-  // If it is , then get its special requirement in the ACPI table
-  //
-  PciDeviceInfo.VendorID          = PciIoDevice->Pci.Hdr.VendorId;
-  PciDeviceInfo.DeviceID          = PciIoDevice->Pci.Hdr.DeviceId;
-  PciDeviceInfo.RevisionID        = PciIoDevice->Pci.Hdr.RevisionID;
-  PciDeviceInfo.SubsystemVendorID = PciIoDevice->Pci.Device.SubsystemVendorID;
-  PciDeviceInfo.SubsystemID       = PciIoDevice->Pci.Device.SubsystemID;
+  if (gEfiIncompatiblePciDeviceSupport == NULL) {
+    //
+    // It can only be supported after the Incompatible PCI Device
+    // Support Protocol has been installed
+    //
+    Status = gBS->LocateProtocol (
+                    &gEfiIncompatiblePciDeviceSupportProtocolGuid,
+                    NULL,
+                    (VOID **) &gEfiIncompatiblePciDeviceSupport
+                    );
+  }
+  if (Status == EFI_SUCCESS) {
+      //
+      // Check whether the device belongs to incompatible devices from protocol or not
+      // If it is , then get its special requirement in the ACPI table
+      //
+      Status = gEfiIncompatiblePciDeviceSupport->CheckDevice (
+                                                  gEfiIncompatiblePciDeviceSupport,
+                                                  PciIoDevice->Pci.Hdr.VendorId,
+                                                  PciIoDevice->Pci.Hdr.DeviceId,
+                                                  PciIoDevice->Pci.Hdr.RevisionID,
+                                                  PciIoDevice->Pci.Device.SubsystemVendorID,
+                                                  PciIoDevice->Pci.Device.SubsystemID,
+                                                  &Configuration
+                                                  );
 
-  Status = PciResourceUpdateCheck (&PciDeviceInfo, &Configuration);
+  }
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    //
+    // Check whether the device belongs to incompatible devices from library or not
+    // If it is , then get its special requirement in the ACPI table
+    //
+    if (PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_ACPI_RESOURCE_SUPPORT) {
+      PciDeviceInfo.VendorID          = PciIoDevice->Pci.Hdr.VendorId;
+      PciDeviceInfo.DeviceID          = PciIoDevice->Pci.Hdr.DeviceId;
+      PciDeviceInfo.RevisionID        = PciIoDevice->Pci.Hdr.RevisionID;
+      PciDeviceInfo.SubsystemVendorID = PciIoDevice->Pci.Device.SubsystemVendorID;
+      PciDeviceInfo.SubsystemID       = PciIoDevice->Pci.Device.SubsystemID;
+
+      Status = PciResourceUpdateCheck (&PciDeviceInfo, &Configuration);
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
   }
 
   //

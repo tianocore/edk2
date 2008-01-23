@@ -27,6 +27,7 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
   NULL
 };
 
+EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gEfiIncompatiblePciDeviceSupport = NULL;
 EFI_HANDLE                                    gPciHostBrigeHandles[PCI_MAX_HOST_BRIDGE_NUM];
 UINTN                                         gPciHostBridgeNumber;
 BOOLEAN                                       gFullEnumeration;
@@ -214,6 +215,12 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS  Status;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiIncompatiblePciDeviceSupportProtocolGuid,
+                  NULL,
+                  (VOID **) &gEfiIncompatiblePciDeviceSupport
+                  );
 
   //
   // If PCI Platform protocol is available, get it now.
