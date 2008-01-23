@@ -63,6 +63,5 @@
 
 [Protocols]
   gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsbHcProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiUsb2HcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
 

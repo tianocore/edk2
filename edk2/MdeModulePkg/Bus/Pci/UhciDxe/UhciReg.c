@@ -168,7 +168,7 @@ UhciAckAllInterrupt (
   //
   if (!UhciIsHcWorking (Uhc->PciIo)) {
     UHCI_ERROR (("UhciAckAllInterrupt: re-enable the UHCI from system error\n"));
-    Uhc->UsbHc.SetState (&Uhc->UsbHc, EfiUsbHcStateOperational);
+    Uhc->Usb2Hc.SetState (&Uhc->Usb2Hc, EfiUsbHcStateOperational);
   }
 }
 
@@ -186,8 +186,8 @@ UhciAckAllInterrupt (
 **/
 EFI_STATUS
 UhciStopHc (
-  IN USB_HC_DEV         *Uhc,
-  IN UINTN              Timeout
+  IN USB_HC_DEV        *Uhc,
+  IN UINTN             Timeout
   )
 {
   UINT16                UsbSts;
