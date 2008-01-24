@@ -21,6 +21,14 @@
 
 #include <Library/BaseLib.h>
 
+.globl ASM_PFX(m16Start)
+.globl ASM_PFX(m16Size)
+.globl ASM_PFX(mThunk16Attr)
+.globl ASM_PFX(m16Gdt)
+.globl ASM_PFX(m16GdtrBase)
+.globl ASM_PFX(mTransition)
+.globl ASM_PFX(InternalAsmThunk16)
+
 # define the structure of IA32_REGS
 .equ  _EDI, 0       #size 4
 .equ  _ESI, 4       #size 4
@@ -42,15 +50,15 @@
 
     .data
 
-m16Size:         .word      _InternalAsmThunk16 - m16Start
-mThunk16Attr:    .word      _ThunkAttr - m16Start
-m16Gdt:          .word      _NullSeg - m16Start
-m16GdtrBase:     .word      _16GdtrBase - m16Start
-mTransition:     .word      _EntryPoint - m16Start
+ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(m16Gdt):          .word      _NullSeg - ASM_PFX(m16Start)
+ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
+ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
 
     .text
 
-m16Start:
+ASM_PFX(m16Start):
 
 SavedGdt:    .space 10
 
@@ -134,10 +142,10 @@ SavedCs:     .space      2
     movq     %r8, %rsp
     ret
 
-_EntryPoint: .long      ASM_PFX(ToUserCode) - m16Start
+_EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
 _16Gdtr:     .word      GDT_SIZE - 1
-_16GdtrBase: .quad      $_NullSeg
+_16GdtrBase: .quad      _NullSeg
 _16Idtr:     .word      0x3ff
              .long      0
 
@@ -244,11 +252,11 @@ ASM_PFX(InternalAsmThunk16):
     popq    %rcx
     rep
     movsl                               # copy RegSet
-    lea     (SavedCr4 - m16Start)(%rdx), %ecx
+    lea     (SavedCr4 - ASM_PFX(m16Start))(%rdx), %ecx
     movl    %edx,%eax                   # eax <- transition code address
     andl    $0xf,%edx
     shll    $12,%eax                    # segment address in high order 16 bits
-    lea     (_BackFromUserCode - m16Start)(%rdx), %ax
+    lea     (_BackFromUserCode - ASM_PFX(m16Start))(%rdx), %ax
     stosl                               # [edi] <- return address of user code
     sgdt    (SavedGdt - SavedCr4)(%rcx) 
     sidt    0x38(%rsp)
