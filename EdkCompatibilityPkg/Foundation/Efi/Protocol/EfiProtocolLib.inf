@@ -37,6 +37,8 @@ COMPONENT_TYPE=   LIBRARY
 [nmake.common]
 
 [sources.common]
+  AbsolutePointer\AbsolutePointer.h
+  AbsolutePointer\AbsolutePointer.c
   AcpiTable\AcpiTable.h
   AcpiTable\AcpiTable.c
   Arp\Arp.h
@@ -93,8 +95,22 @@ COMPONENT_TYPE=   LIBRARY
   FileSystemInfo\FileSystemInfo.c
   FileSystemVolumeLabelInfo\FileSystemVolumeLabelInfo.h
   FileSystemVolumeLabelInfo\FileSystemVolumeLabelInfo.c
+  FormBrowser2\FormBrowser2.h
+  FormBrowser2\FormBrowser2.c
   GraphicsOutput\GraphicsOutput.h
   GraphicsOutput\GraphicsOutput.c
+  HiiConfigAccess\HiiConfigAccess.h
+  HiiConfigAccess\HiiConfigAccess.c
+  HiiConfigRouting\HiiConfigRouting.h
+  HiiConfigRouting\HiiConfigRouting.c
+  HiiDatabase\HiiDatabase.h
+  HiiDatabase\HiiDatabase.c
+  HiiFont\HiiFont.h
+  HiiFont\HiiFont.c
+  HiiImage\HiiImage.h
+  HiiImage\HiiImage.c
+  HiiString\HiiString.h
+  HiiString\HiiString.c  
   Ip4\Ip4.h
   Ip4\Ip4.c
   Ip4Config\Ip4Config.h
@@ -129,6 +145,8 @@ COMPONENT_TYPE=   LIBRARY
   SimplePointer\SimplePointer.c
   SimpleTextIn\SimpleTextIn.h
   SimpleTextIn\SimpleTextIn.c
+  SimpleTextInputEx\SimpleTextInputEx.h
+  SimpleTextInputEx\SimpleTextInputEx.c  
   SimpleTextOut\SimpleTextOut.h
   SimpleTextOut\SimpleTextOut.c
   Udp4\Udp4.h

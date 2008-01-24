@@ -135,10 +135,10 @@ EfiDisableCache PROC    PUBLIC
     and   rax, 060000000h     
     cmp   rax, 0
     jne   @f
-    wbinvd
     mov   rax, cr0
     or    rax, 060000000h     
     mov   cr0, rax
+    wbinvd
 @@:
     ret
 EfiDisableCache ENDP

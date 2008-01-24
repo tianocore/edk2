@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -190,10 +190,16 @@ typedef enum {
   EfiProcessorFamilyHobbit       = 0x70,
   EfiProcessorFamilyCrusoeTM5000 = 0x78,
   EfiProcessorFamilyCrusoeTM3000 = 0x79,
+  EfiProcessorFamilyEfficeonTM8000 = 0x7A,
   EfiProcessorFamilyWeitek       = 0x80,
   EfiProcessorFamilyItanium      = 0x82,
   EfiProcessorFamilyAmdAthlon64  = 0x83,
   EfiProcessorFamilyAmdOpteron   = 0x84,
+  EfiProcessorFamilyAmdSempron   = 0x85,
+  EfiProcessorFamilyAmdTurion64Mobile = 0x86,
+  EfiProcessorFamilyDualCoreAmdOpteron = 0x87,
+  EfiProcessorFamilyAmdAthlon64X2DualCore = 0x88,
+  EfiProcessorFamilyAmdTurion64X2Mobile   = 0x89,
   EfiProcessorFamilyPARISC       = 0x90,
   EfiProcessorFamilyPaRisc8500   = 0x91,
   EfiProcessorFamilyPaRisc8000   = 0x92,
@@ -215,13 +221,35 @@ typedef enum {
   EfiProcessorFamilyIntelCeleronD = 0xBA,
   EfiProcessorFamilyIntelPentiumD = 0xBB,
   EfiProcessorFamilyIntelPentiumEx = 0xBC,
+  EfiProcessorFamilyIntelCoreBrand = 0xBD,
+  EfiProcessorFamilyReserved       = 0xBE,
+  EfiProcessorFamilyIntelCore2     = 0xBF,
   EfiProcessorFamilyIBM390       = 0xC8,
   EfiProcessorFamilyG4           = 0xC9,
   EfiProcessorFamilyG5           = 0xCA,
+  EfiProcessorFamilyG6           = 0xCB,
+  EfiProcessorFamilyzArchitectur = 0xCC,
+  EfiProcessorFamilyViaC7M      = 0xD2,
+  EfiProcessorFamilyViaC7D      = 0xD3,
+  EfiProcessorFamilyViaC7       = 0xD4,
+  EfiProcessorFamilyViaEden     = 0xD5,
   EfiProcessorFamilyi860         = 0xFA,
-  EfiProcessorFamilyi960         = 0xFB
+  EfiProcessorFamilyi960         = 0xFB,
+  EfiProcessorFamilyIndicatorFamily2    = 0xFE
 } EFI_PROCESSOR_FAMILY_DATA;
 
+typedef enum {
+  EfiProcessorFamilySh3           = 0x104,
+  EfiProcessorFamilySh4           = 0x105,
+  EfiProcessorFamilyArm           = 0x118,
+  EfiProcessorFamilyStrongArm     = 0x119,
+  EfiProcessorFamily6x86          = 0x12C,
+  EfiProcessorFamilyMediaGx       = 0x12D,
+  EfiProcessorFamilyMii           = 0x12E,
+  EfiProcessorFamilyWinChip       = 0x140,
+  EfiProcessorFamilyDsp           = 0x15E,
+  EfiProcessorFamilyVideo         = 0x1F4
+} EFI_PROCESSOR_FAMILY2_DATA;  
 
 typedef EFI_EXP_BASE10_DATA EFI_PROCESSOR_VOLTAGE_DATA;
 
@@ -282,7 +310,10 @@ typedef enum {
   EfiProcessorSocket939 = 0x12,
   EfiProcessorSocketmPGA604 = 0x13,
   EfiProcessorSocketLGA771 = 0x14,
-  EfiProcessorSocketLGA775 = 0x15
+  EfiProcessorSocketLGA775 = 0x15,
+  EfiProcessorSocketS1 = 0x16,
+  EfiProcessorSocketAm2 = 0x17,
+  EfiProcessorSocketF   = 0x18
 } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
 typedef STRING_REF EFI_PROCESSOR_SOCKET_NAME_DATA;
@@ -297,7 +328,18 @@ typedef enum {
 
 typedef UINTN   EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
+typedef UINT8   EFI_PROCESSOR_CORE_COUNT_DATA;
+typedef UINT8   EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA;
+typedef UINT8   EFI_PROCESSOR_THREAD_COUNT_DATA;
+
 typedef EFI_EXP_BASE10_DATA   EFI_PROCESSOR_MAX_FSB_FREQUENCY_DATA;
+
+typedef struct {
+  UINT16  Reserved              :1;
+  UINT16  Unknown               :1;
+  UINT16  Capable64Bit          :1;
+  UINT16  Reserved2             :13;
+} EFI_PROCESSOR_CHARACTERISTICS_DATA;
 
 typedef enum {
   ProcessorCoreFrequencyRecordType = 1,
@@ -323,7 +365,12 @@ typedef enum {
   ProcessorPackageNumberRecordType = 21,
   ProcessorCoreFrequencyListRecordType = 22,
   ProcessorFsbFrequencyListRecordType  = 23,
-  ProcessorHealthStatusRecordType  = 24
+  ProcessorHealthStatusRecordType  = 24,
+  ProcessorCoreCountRecordType = 25,
+  ProcessorEnabledCoreCountRecordType = 26,
+  ProcessorThreadCountRecordType = 27,
+  ProcessorCharacteristicsRecordType = 28,
+  ProcessorFamily2RecordType = 29
 } EFI_CPU_VARIABLE_RECORD_TYPE;
 
 typedef union {
@@ -350,6 +397,11 @@ typedef union {
   EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
   EFI_PROCESSOR_HEALTH_STATUS             ProcessorHealthStatus;
   EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
+  EFI_PROCESSOR_CORE_COUNT_DATA           ProcessorCoreCount;
+  EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA   ProcessorEnabledCoreCount;
+  EFI_PROCESSOR_THREAD_COUNT_DATA         ProcessorThreadCount;
+  EFI_PROCESSOR_CHARACTERISTICS_DATA      ProcessorCharacteristics;
+  EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
 } EFI_CPU_VARIABLE_RECORD;
 
 typedef struct {

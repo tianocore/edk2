@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -44,15 +44,13 @@ EFI_FORWARD_DECLARATION (EFI_ACPI_S3_SAVE_PROTOCOL);
 //
 typedef
 EFI_STATUS
-EFI_BOOTSERVICE
 (EFIAPI *EFI_ACPI_S3_SAVE) (
   IN EFI_ACPI_S3_SAVE_PROTOCOL      * This,
   IN VOID                           * LegacyMemoryAddress 
   );
 
 typedef 
-EFI_STATUS 
-EFI_BOOTSERVICE 
+EFI_STATUS  
 (EFIAPI *EFI_ACPI_GET_LEGACY_MEMORY_SIZE) (
   IN  EFI_ACPI_S3_SAVE_PROTOCOL     * This,
   OUT UINTN                         * Size

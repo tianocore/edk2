@@ -45,7 +45,7 @@ typedef enum {
 
 typedef
 VOID
-(*EFI_CPU_INTERRUPT_HANDLER) (
+(EFIAPI *EFI_CPU_INTERRUPT_HANDLER) (
   IN EFI_EXCEPTION_TYPE                 InterruptType,
   IN EFI_SYSTEM_CONTEXT                 SystemContext
   );
