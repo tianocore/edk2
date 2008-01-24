@@ -387,7 +387,7 @@ Returns:
   Hob->AllocDescriptor.Name = gEfiHobMemeryAllocStackGuid;
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength = Length;
-  Hob->AllocDescriptor.MemoryType = EfiConventionalMemory;
+  Hob->AllocDescriptor.MemoryType = EfiBootServicesData;
   (*PeiServices)->SetMem (
                     Hob->AllocDescriptor.Reserved, 
                     sizeof (Hob->AllocDescriptor.Reserved), 

@@ -45,6 +45,7 @@ Abstract:
 #include "EfiCapsule.h"
 #include EFI_PROTOCOL_DEFINITION (DevicePath)
 #include "TianoDevicePath.h"
+#include "PeiPerf.h"
 
 //
 // GUID definitions
@@ -58,6 +59,8 @@ Abstract:
 #include EFI_GUID_DEFINITION (FirmwareFileSystem)
 #include EFI_GUID_DEFINITION (SmramMemoryReserve)
 #include EFI_GUID_DEFINITION (DataHubRecords)
+#include EFI_GUID_DEFINITION (PeiPerformanceHob)
+
 //
 // *** NOTE ***: StatusCodeDataTypeId definition differences need to be 
 // resolved when porting a module to real EDK II

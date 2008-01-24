@@ -30,6 +30,10 @@ Abstract:
   #define BUILD_WITH_EDKII_GLUE_LIB
 #endif
 
+#ifndef BUILD_WITH_GLUELIB
+  #define BUILD_WITH_GLUELIB
+#endif
+
 //
 // General Type & API definitions
 //

@@ -18,7 +18,7 @@ Abstract:
 
 --*/
 
-#include "..\BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Performs an atomic increment of an 32-bit unsigned integer.

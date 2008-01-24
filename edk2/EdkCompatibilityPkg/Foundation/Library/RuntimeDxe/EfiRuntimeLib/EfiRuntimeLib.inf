@@ -44,6 +44,7 @@ COMPONENT_TYPE  = LIBRARY
   x64\Lock.c
   x64\PlatformIoLib.c
   x64\Fvb.c
+  x64\RuntimeLibAsm.asm
 
 [sources.ipf]
   Ipf\RuntimeLib.c

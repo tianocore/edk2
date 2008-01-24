@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,11 @@ Abstract:
 #ifndef __EDKII_GLUE_DEFINITION_CHANGES_BASE_H__
 #define __EDKII_GLUE_DEFINITION_CHANGES_BASE_H__
 
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include "TianoHii.h"
+#else
 #include "EfiInternalFormRepresentation.h"
+#endif
 #include "EfiPxe.h"
 
 
@@ -47,7 +51,7 @@ Abstract:
 // ----------------------------------------------------------------------------------
 // InternalFormRepresentation.h:
 // ----------------------------------------------------------------------------------
-
+#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
 typedef struct {
   EFI_IFR_OP_HEADER Header;
   UINT16            QuestionId; // The ID designating what the question is about...sucked in from a #define, likely in the form of a variable name
@@ -66,6 +70,7 @@ typedef struct {
 typedef struct {
   EFI_IFR_OP_HEADER Header;
 } EFI_IFR_END_EXPR;
+#endif
 
 // ------------------------
 // define GUID as EFI_GUID

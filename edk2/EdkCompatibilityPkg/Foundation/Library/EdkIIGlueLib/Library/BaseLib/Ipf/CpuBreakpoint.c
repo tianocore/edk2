@@ -18,7 +18,7 @@ Abstract:
 
 --*/
 
-#include "..\BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 //void __mfa (void);
 

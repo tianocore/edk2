@@ -420,7 +420,7 @@ Returns:
   CopyMem(&(Hob.MemoryAllocationStack->AllocDescriptor.Name), &gEfiHobMemeryAllocStackGuid, sizeof(EFI_GUID));
   (Hob.MemoryAllocationStack->AllocDescriptor).MemoryBaseAddress = BaseAddress;
   (Hob.MemoryAllocationStack->AllocDescriptor).MemoryLength      = Length;
-  (Hob.MemoryAllocationStack->AllocDescriptor).MemoryType  = EfiConventionalMemory;
+  (Hob.MemoryAllocationStack->AllocDescriptor).MemoryType  = EfiBootServicesData;
 
   Hob.MemoryAllocationStack++;
   HandOffHob.HandoffInformationTable->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) Hob.Raw;
@@ -597,6 +597,124 @@ Returns:
     }
 
     GuidHob.Raw = GET_NEXT_HOB (GuidHob);
+  }
+
+  return Status;
+}
+
+VOID *
+GetHob (
+  IN UINT16  Type,
+  IN VOID    *HobStart
+  )
+/*++
+
+Routine Description:
+
+  This function returns the first instance of a HOB type in a HOB list.
+  
+Arguments:
+
+  Type          The HOB type to return.
+  HobStart      The first HOB in the HOB list.
+    
+Returns:
+
+  HobStart      There were no HOBs found with the requested type.
+  else          Returns the first HOB with the matching type.
+
+--*/
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = HobStart;
+  //
+  // Return input if not found
+  //
+  if (HobStart == NULL) {
+    return HobStart;
+  }
+
+  //
+  // Parse the HOB list, stop if end of list or matching type found.
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+
+    if (Hob.Header->HobType == Type) {
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+  
+  //
+  // Return input if not found
+  //
+  if (END_OF_HOB_LIST (Hob)) {
+    return HobStart;
+  }
+
+  return (VOID *) (Hob.Raw);
+}
+
+EFI_STATUS
+GetNextGuidHob (
+  IN OUT VOID      **HobStart,
+  IN     EFI_GUID  * Guid,
+  OUT    VOID      **Buffer,
+  OUT    UINTN     *BufferSize OPTIONAL
+  )
+/*++
+
+Routine Description:
+  Get the next guid hob.
+  
+Arguments:
+  HobStart        A pointer to the start hob.
+  Guid            A pointer to a guid.
+  Buffer          A pointer to the buffer.
+  BufferSize      Buffer size.
+  
+Returns:
+  Status code.
+
+  EFI_NOT_FOUND          - Next Guid hob not found
+  
+  EFI_SUCCESS            - Next Guid hob found and data for this Guid got
+  
+  EFI_INVALID_PARAMETER  - invalid parameter
+
+--*/
+{
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  GuidHob;
+
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Status = EFI_NOT_FOUND; EFI_ERROR (Status);) {
+
+    GuidHob.Raw = *HobStart;
+    if (END_OF_HOB_LIST (GuidHob)) {
+      return EFI_NOT_FOUND;
+    }
+
+    GuidHob.Raw = GetHob (EFI_HOB_TYPE_GUID_EXTENSION, *HobStart);
+    if (GuidHob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
+      if ( ((INT32 *)Guid)[0] == ((INT32 *)&GuidHob.Guid->Name)[0] &&
+           ((INT32 *)Guid)[1] == ((INT32 *)&GuidHob.Guid->Name)[1] &&
+           ((INT32 *)Guid)[2] == ((INT32 *)&GuidHob.Guid->Name)[2] &&
+           ((INT32 *)Guid)[3] == ((INT32 *)&GuidHob.Guid->Name)[3] ) {
+        Status  = EFI_SUCCESS;
+        *Buffer = (VOID *) ((UINT8 *) (&GuidHob.Guid->Name) + sizeof (EFI_GUID));
+        if (BufferSize != NULL) {
+          *BufferSize = GuidHob.Header->HobLength - sizeof (EFI_HOB_GUID_TYPE);
+        }
+      }
+    }
+
+    *HobStart = GET_NEXT_HOB (GuidHob);
   }
 
   return Status;

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -59,7 +59,11 @@ Abstract:
 #include "PrintWidth.h"
 #include "EfiPrintLib.h"
 #include "Print.h"
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include EFI_PROTOCOL_DEFINITION (HiiFont)
+#else
 #include EFI_PROTOCOL_DEFINITION (Hii)
+#endif
 
 STATIC
 CHAR_W                *
@@ -161,22 +165,26 @@ Returns:
 {
   VOID                           *Buffer;
   EFI_STATUS                     Status;
-  UINT16                         GlyphWidth;
-  UINT32                         GlyphStatus;
-  UINT16                         StringIndex;
   UINTN                          Index;
   CHAR16                         *UnicodeWeight;
-  EFI_NARROW_GLYPH               *Glyph;
-  EFI_HII_PROTOCOL               *Hii;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *LineBuffer;
   UINT32                         HorizontalResolution;
   UINT32                         VerticalResolution;
   UINT32                         ColorDepth;
   UINT32                         RefreshRate;
   UINTN                          BufferLen;
   UINTN                          LineBufferLen;
-
-  GlyphStatus = 0;
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  EFI_HII_FONT_PROTOCOL          *HiiFont;
+  EFI_IMAGE_OUTPUT               *Blt;
+  EFI_FONT_DISPLAY_INFO          *FontInfo;  
+#else
+  EFI_HII_PROTOCOL               *Hii;
+  UINT16                         GlyphWidth;
+  UINT32                         GlyphStatus;
+  UINT16                         StringIndex;
+  EFI_NARROW_GLYPH               *Glyph;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *LineBuffer;
+#endif
 
   //
   // For now, allocate an arbitrarily long buffer
@@ -192,19 +200,29 @@ Returns:
   } else {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   }
-  ASSERT ((HorizontalResolution != 0) && (VerticalResolution !=0));
-  
-  LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * GLYPH_HEIGHT;
-  LineBuffer = EfiLibAllocatePool (LineBufferLen);
-  if (LineBuffer == NULL) {
-    gBS->FreePool (Buffer);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT ((HorizontalResolution != 0) && (VerticalResolution !=0)); 
 
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  Blt      = NULL;
+  FontInfo = NULL;
+  ASSERT (GraphicsOutput != NULL);
+  Status = gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &HiiFont);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }  
+#else  
+  LineBuffer = NULL;
   Status = gBS->LocateProtocol (&gEfiHiiProtocolGuid, NULL, (VOID**)&Hii);
   if (EFI_ERROR (Status)) {
     goto Error;
   }
+  LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * GLYPH_HEIGHT;
+  LineBuffer = EfiLibAllocatePool (LineBufferLen);
+  if (LineBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }  
+#endif
 
   VSPrint (Buffer, 0x10000, fmt, args);
   
@@ -219,7 +237,65 @@ Returns:
   }
 
   BufferLen = EfiStrLen (Buffer);
+ 
+
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * EFI_GLYPH_HEIGHT;
+  if (EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * BufferLen > LineBufferLen) {
+     Status = EFI_INVALID_PARAMETER;
+     goto Error;
+  }
+
+  Blt = (EFI_IMAGE_OUTPUT *) EfiLibAllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
+  if (Blt == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+
+  Blt->Width        = (UINT16) (HorizontalResolution);
+  Blt->Height       = (UINT16) (VerticalResolution);
+  Blt->Image.Screen = GraphicsOutput;
+   
+  FontInfo = (EFI_FONT_DISPLAY_INFO *) EfiLibAllocateZeroPool (sizeof (EFI_FONT_DISPLAY_INFO));
+  if (FontInfo == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+  if (Foreground != NULL) {
+    EfiCopyMem (&FontInfo->ForegroundColor, Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+  } else {
+    EfiCopyMem (
+      &FontInfo->ForegroundColor, 
+      &mEfiColors[Sto->Mode->Attribute & 0x0f], 
+      sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+      );
+  }
+  if (Background != NULL) {
+    EfiCopyMem (&FontInfo->BackgroundColor, Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+  } else {
+    EfiCopyMem (
+      &FontInfo->BackgroundColor, 
+      &mEfiColors[Sto->Mode->Attribute >> 4], 
+      sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+      );
+  }
+
+  Status = HiiFont->StringToImage (
+                       HiiFont,
+                       EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
+                       Buffer,
+                       FontInfo,
+                       &Blt,
+                       X,
+                       Y,
+                       NULL,
+                       NULL,
+                       NULL
+                       );
   
+#else
+  GlyphStatus = 0;
+
   if (GLYPH_WIDTH * GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * BufferLen > LineBufferLen) {
      Status = EFI_INVALID_PARAMETER;
      goto Error;
@@ -288,8 +364,15 @@ Returns:
                         );
   }
 
+#endif
+
 Error:
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  EfiLibSafeFreePool (Blt);
+  EfiLibSafeFreePool (FontInfo);
+#else
   gBS->FreePool (LineBuffer);
+#endif  
   gBS->FreePool (Buffer);
   return Status;
 }
@@ -417,6 +500,7 @@ Returns:
 }
 
 UINTN
+EFIAPI
 VSPrint (
   OUT CHAR_W        *StartOfBuffer,
   IN  UINTN         BufferSize,

@@ -39,7 +39,11 @@ GetPeiServicesTablePointer (
 {
   EFI_PEI_SERVICES  **PeiServices;
 
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
   PeiServices = (EFI_PEI_SERVICES **)(UINTN)AsmReadKr1 ();
+#else
+  PeiServices = (EFI_PEI_SERVICES **)(UINTN)AsmReadKr7 ();
+#endif
   ASSERT (PeiServices != NULL);
   return PeiServices;
 }
@@ -63,6 +67,8 @@ PeiServicesTablePointerLibConstructor (
   IN EFI_PEI_SERVICES     **PeiServices
   )
 {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
   AsmWriteKr1 ((UINT64)(UINTN)PeiServices);
+#endif
   return EFI_SUCCESS;
 }

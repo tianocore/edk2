@@ -51,7 +51,7 @@ EFI_FORWARD_DECLARATION (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL);
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EXTRACT_GUIDED_SECTION) (
-  IN  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL          *This,
+  IN  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL          * This,
   IN  VOID                                            *InputSection,
   OUT VOID                                            **OutputBuffer,
   OUT UINTN                                           *OutputSize,

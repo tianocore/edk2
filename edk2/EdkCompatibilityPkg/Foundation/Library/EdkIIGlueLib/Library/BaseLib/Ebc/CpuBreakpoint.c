@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include "..\BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 extern
 UINT64

@@ -31,10 +31,12 @@ Abstract:
 //  0x3000  - the 3rd release
 //  0x5000  - support IPF. Jan, 2007
 //  0x6000  - support EBC. Feb, 2007
+//  0x7000  - size reduction, Jun, 2007
+//  0x7100  - backward compatibility supported, Jun, 2007
 //
 //  For reference only, don't change the value
 //
-#define EDKII_GLUE_LIBRARY_VERSION 0x6000
+#define EDKII_GLUE_LIBRARY_VERSION 0x7100
 
 
 //
@@ -84,21 +86,19 @@ Abstract:
 
 //
 // debug print level
-// only when EFI_DEBUG is defined, the mask is effective
 //
 #define EDKII_GLUE_DebugPrintErrorLevel         EFI_D_ERROR
 
 //
 // debug propery mask
-// only when EFI_DEBUG is defined, the mask is effective
 //
-#define EDKII_GLUE_DebugPropertyMask            (  DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED                \
-                                                   | DEBUG_PROPERTY_DEBUG_PRINT_ENABLED               \
-                                                   | DEBUG_PROPERTY_DEBUG_CODE_ENABLED                \
-                                                   | DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED              \
-                                                   | DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED         \
-                                                   | DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED           \
-                                                )
+#define EDKII_GLUE_DebugPropertyMask           (  DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED                \
+                                                  | DEBUG_PROPERTY_DEBUG_PRINT_ENABLED               \
+                                                  | DEBUG_PROPERTY_DEBUG_CODE_ENABLED                \
+                                                  | DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED              \
+                                                  | DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED         \
+                                                  | DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED           \
+                                               )
 
 //
 // clear memory value
@@ -115,23 +115,22 @@ Abstract:
 // This value is FSB Clock frequency. Its unit is Hz and its 
 // default value is 200000000, that means FSB frequency is 200Mhz.
 //
-#define EDKII_GLUE_FSBClock                  200000000
+#define EDKII_GLUE_FSBClock                     200000000
 
 //
 // post code property mask
 //
 #define EDKII_GLUE_PostCodePropertyMask         (  POST_CODE_PROPERTY_POST_CODE_ENABLED               \
-                                                   | POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED \
+                                                     | POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED \
                                                 )
 
 //
 // status code property mask
 //
 #define EDKII_GLUE_ReportStatusCodePropertyMask (  REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED  \
-                                                   | REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED   \
-                                                   | REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED   \
-                                                )
-
+                                                     | REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED   \
+                                                     | REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED   \
+                                                  )
 
 //
 // for IPF only

@@ -62,6 +62,45 @@ Abstract:
 #endif
 
 //
+//  DxePerformanceLib
+//
+#ifdef __EDKII_GLUE_DXE_PERFORMANCE_LIB__
+  #ifndef __EDKII_GLUE_BASE_LIB__
+  #define __EDKII_GLUE_BASE_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_BASE_MEMORY_LIB__
+  #define __EDKII_GLUE_BASE_MEMORY_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_DXE_MEMORY_ALLOCATION_LIB__
+  #define __EDKII_GLUE_DXE_MEMORY_ALLOCATION_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_DXE_HOB_LIB__
+  #define __EDKII_GLUE_DXE_HOB_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
+  #define __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_UEFI_LIB__
+  #define __EDKII_GLUE_UEFI_LIB__
+  #endif
+#endif
+
+//
+//  PeiPerformanceLib
+//
+#ifdef __EDKII_GLUE_PEI_PERFORMANCE_LIB__
+  #ifndef __EDKII_GLUE_BASE_LIB__
+  #define __EDKII_GLUE_BASE_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_BASE_MEMORY_LIB__
+  #define __EDKII_GLUE_BASE_MEMORY_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_PEI_SERVICES_LIB__
+  #define __EDKII_GLUE_PEI_SERVICES_LIB__
+  #endif
+#endif
+
+//
 // EdkDxeRuntimeDriverLib
 //
 #ifdef __EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__
@@ -554,6 +593,14 @@ Abstract:
   //
 #endif
 
+//
+//  Whether _gDriverExitBootServicesEvent[] contains effective handler
+//
+#if defined(__EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__) || defined(__EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__)
+  #define __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__ 1
+#else  
+  #define __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__ 0
+#endif
 
 //
 // Check against multiple instances of same library class being used
@@ -654,6 +701,7 @@ Abstract:
 
 #ifdef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
 EFI_STATUS
+EFIAPI
 UefiBootServicesTableLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -671,6 +719,7 @@ IoLibConstructor (
 
 #ifdef __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
 EFI_STATUS
+EFIAPI
 UefiRuntimeServicesTableLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -679,6 +728,7 @@ UefiRuntimeServicesTableLibConstructor (
 
 #ifdef __EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__
 EFI_STATUS
+EFIAPI
 RuntimeDriverLibConstruct (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -687,6 +737,7 @@ RuntimeDriverLibConstruct (
 
 #ifdef __EDKII_GLUE_DXE_HOB_LIB__
 EFI_STATUS
+EFIAPI
 HobLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -695,6 +746,7 @@ HobLibConstructor (
 
 #ifdef __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
 EFI_STATUS
+EFIAPI
 UefiDriverModelLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -703,6 +755,7 @@ UefiDriverModelLibConstructor (
 
 #ifdef __EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB__
 EFI_STATUS
+EFIAPI
 PeiServicesTablePointerLibConstructor (
   IN EFI_FFS_FILE_HEADER  *FfsHeader,
   IN EFI_PEI_SERVICES     **PeiServices
@@ -711,6 +764,7 @@ PeiServicesTablePointerLibConstructor (
 
 #ifdef __EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_MM7__
 EFI_STATUS
+EFIAPI
 PeiServicesTablePointerLibConstructor (
   IN EFI_FFS_FILE_HEADER  *FfsHeader,
   IN EFI_PEI_SERVICES     **PeiServices
@@ -719,6 +773,7 @@ PeiServicesTablePointerLibConstructor (
 
 #ifdef __EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_KR1__
 EFI_STATUS
+EFIAPI
 PeiServicesTablePointerLibConstructor (
   IN EFI_FFS_FILE_HEADER  *FfsHeader,
   IN EFI_PEI_SERVICES     **PeiServices
@@ -736,6 +791,7 @@ SmbusLibConstructor (
 
 #ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
 EFI_STATUS
+EFIAPI
 DxeServicesTableLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -760,6 +816,7 @@ DxeSalLibConstructor (
 //
 #ifdef __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
 EFI_STATUS
+EFIAPI
 UefiDriverModelLibDestructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -768,6 +825,7 @@ UefiDriverModelLibDestructor (
 
 #ifdef __EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__
 EFI_STATUS
+EFIAPI
 RuntimeDriverLibDeconstruct (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable

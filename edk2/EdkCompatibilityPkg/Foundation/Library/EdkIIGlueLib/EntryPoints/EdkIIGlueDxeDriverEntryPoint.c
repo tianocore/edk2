@@ -84,21 +84,63 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DRIVER_MODEL_PROTOCOL_LIST  _gDriverMode
 // NOTE: Limitation:
 // Only one handler for SetVirtualAddressMap Event and ExitBootServices Event each
 //
+
+/*
+ *  This is the WRONG macro and it's kept only for backward compatibility.
+ */
+#ifdef __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT__HANDLER__
+VOID
+EFIAPI
+__EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT__HANDLER__ (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
+#endif
+
+/*
+ *  This is the CORRECT macro users should use.
+ */  
 #ifdef __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT_HANDLER__
 VOID
+EFIAPI
 __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT_HANDLER__ (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   );
 #endif
 
+/*
+ *  Both __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT__HANDLER__ and 
+ *  __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT_HANDLER__ are kept here although
+ *  the former is a WRONG macro. It's kept only for backward compatibility.
+ *  For a single module, it's not likely that both macros are defined.
+ */
 GLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {
+#ifdef __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT__HANDLER__
+  __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT__HANDLER__,
+#endif
+
 #ifdef __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT_HANDLER__
   __EDKII_GLUE_SET_VIRTUAL_ADDRESS_MAP_EVENT_HANDLER__,
 #endif
+
   NULL
 };
 
+/*
+ *  This is the WRONG macro and it's kept only for backward compatibility.
+ */
+#ifdef __EDKII_GLUE_EXTI_BOOT_SERVICES_EVENT__HANDLER__
+VOID
+__EDKII_GLUE_EXTI_BOOT_SERVICES_EVENT__HANDLER__ (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
+#endif
+
+/*
+ *  This is the CORRECT macro users should use.
+ */
 #ifdef __EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__
 VOID
 __EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__ (
@@ -120,6 +162,13 @@ RuntimeDriverExitBootServices (
   IN VOID             *Context
   );
 
+
+/*
+ *  Both __EDKII_GLUE_EXTI_BOOT_SERVICES_EVENT__HANDLER__ and 
+ *  __EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__ are kept here although
+ *  the former is a WRONG macro. It's kept only for backward compatibility.
+ *  For a single module, it's not likely that both macros are defined.
+ */
 GLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {
 #ifdef __EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__  
   //
@@ -127,9 +176,15 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEve
   //
   RuntimeDriverExitBootServices,
 #endif
+    
+#ifdef __EDKII_GLUE_EXTI_BOOT_SERVICES_EVENT__HANDLER__
+  __EDKII_GLUE_EXTI_BOOT_SERVICES_EVENT__HANDLER__,
+#endif
+
 #ifdef __EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__
   __EDKII_GLUE_EXIT_BOOT_SERVICES_EVENT_HANDLER__,
 #endif
+
   NULL
 };
 
@@ -167,6 +222,7 @@ ProcessModuleUnloadList (
 // Library constructors
 //
 VOID
+EFIAPI
 ProcessLibraryConstructorList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -253,6 +309,7 @@ ProcessLibraryConstructorList (
 // Library Destructors
 //
 VOID
+EFIAPI
 ProcessLibraryDestructorList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -309,16 +366,15 @@ _DriverUnloadHandler (
     //
     // Close our ExitBootServices () notify function
     //
+
+#if __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__
     if (_gDriverExitBootServicesEvent[0] != NULL) {
       ASSERT (gBS != NULL);
       Status = gBS->CloseEvent (_mDriverExitBootServicesNotifyEvent);
       ASSERT_EFI_ERROR (Status);
     }
+#endif
 
-    //
-    // NOTE: To allow passing in gST here, any library instance having a destructor
-    // must depend on EfiDriverLib
-    //
     ProcessLibraryDestructorList (ImageHandle, gST);
   }
 
@@ -352,6 +408,7 @@ Returns:
 
 --*/
 {
+#if __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__
   EFI_EVENT_NOTIFY  ChildNotifyEventHandler;
   UINTN             Index;
 
@@ -359,6 +416,7 @@ Returns:
     ChildNotifyEventHandler = _gDriverExitBootServicesEvent[Index];
     ChildNotifyEventHandler (Event, NULL);
   }
+#endif  
 }
 
 EFI_DRIVER_ENTRY_POINT (_ModuleEntryPoint);
@@ -393,7 +451,6 @@ _ModuleEntryPoint (
   )
 {
   EFI_STATUS                 Status;
-  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
 
 //  if (_gUefiDriverRevision != 0) {
 //    //
@@ -414,6 +471,7 @@ _ModuleEntryPoint (
   //
   // Register our ExitBootServices () notify function
   //
+#if __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__
   if (_gDriverExitBootServicesEvent[0] != NULL) {
     Status = SystemTable->BootServices->CreateEvent (
                     EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
@@ -425,17 +483,34 @@ _ModuleEntryPoint (
 
     ASSERT_EFI_ERROR (Status);
   }
+#endif
 
   //
   //  Install unload handler...
   //
-  Status = SystemTable->BootServices->HandleProtocol (
-                  ImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID **)&LoadedImage
-                  );
-  ASSERT_EFI_ERROR (Status);
-  LoadedImage->Unload = _DriverUnloadHandler;
+  //
+  //  Add conditional macro to save size. The 4 macros check against
+  //  potential functions which may be invoked, if there is no function
+  //  to be called, we don't register Unload callback.
+  //
+#if ( defined(__EDKII_GLUE_MODULE_UNLOAD_HANDLER__)                    \
+      || defined(__EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__)                 \
+      || defined(__EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__) )          \
+    || __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__ 
+
+    do {   
+    EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+
+    Status = SystemTable->BootServices->HandleProtocol (
+                    ImageHandle,
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
+    ASSERT_EFI_ERROR (Status);
+    LoadedImage->Unload = _DriverUnloadHandler;
+    } while(0);
+
+#endif  
 
   //
   // Call the driver entry point
@@ -453,11 +528,13 @@ _ModuleEntryPoint (
     //
     // Close our ExitBootServices () notify function
     //
+#if __EDKII_GLUE_HAVE_DRIVER_EXIT_BOOT_SERVICES_EVENT__    
     if (_gDriverExitBootServicesEvent[0] != NULL) {
     	EFI_STATUS CloseEventStatus;
       CloseEventStatus = SystemTable->BootServices->CloseEvent (_mDriverExitBootServicesNotifyEvent);
       ASSERT_EFI_ERROR (CloseEventStatus);
     }
+#endif
 
     ProcessLibraryDestructorList (ImageHandle, SystemTable);
   }

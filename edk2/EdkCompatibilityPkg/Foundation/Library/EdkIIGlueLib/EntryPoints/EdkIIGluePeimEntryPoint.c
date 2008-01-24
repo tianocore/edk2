@@ -32,20 +32,12 @@ Abstract:
 // Library constructors
 //
 VOID
+EFIAPI
 ProcessLibraryConstructorList (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   )
 {
-//
-// Declare "Status" if any of the following libraries are used
-//
-#if defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_MM7__)    \
-    || defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_KR1__) \
-    || defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB__)
-  EFI_STATUS  Status;
-#endif
-
 //
 // EdkII Glue Library Constructors: 
 // PeiServicesTablePointerLib      PeiServicesTablePointerLibConstructor()
@@ -56,6 +48,8 @@ ProcessLibraryConstructorList (
 #if defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_MM7__)    \
     || defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB_KR1__) \
     || defined(__EDKII_GLUE_PEI_SERVICES_TABLE_POINTER_LIB__)
+  EFI_STATUS  Status;
+
   Status = PeiServicesTablePointerLibConstructor (FfsHeader, PeiServices);
   ASSERT_EFI_ERROR (Status);
 #endif

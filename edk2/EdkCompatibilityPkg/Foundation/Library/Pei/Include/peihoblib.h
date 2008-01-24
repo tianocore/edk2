@@ -313,6 +313,30 @@ Returns:
 --*/
 ;
 
+VOID *
+GetHob (
+  IN UINT16  Type,
+  IN VOID    *HobStart
+  )
+/*++
+
+Routine Description:
+
+  This function returns the first instance of a HOB type in a HOB list.
+  
+Arguments:
+
+  Type          The HOB type to return.
+  HobStart      The first HOB in the HOB list.
+    
+Returns:
+
+  HobStart      There were no HOBs found with the requested type.
+  else          Returns the first HOB with the matching type.
+
+--*/
+;
+
 EFI_STATUS
 GetFirstGuidHob (
   IN     VOID      **HobStart,
@@ -342,4 +366,35 @@ Returns:
 
 --*/
 ;
+
+EFI_STATUS
+GetNextGuidHob (
+  IN OUT VOID      **HobStart,
+  IN     EFI_GUID  * Guid,
+  OUT    VOID      **Buffer,
+  OUT    UINTN     *BufferSize OPTIONAL
+  )
+/*++
+
+Routine Description:
+  Get the next guid hob.
+  
+Arguments:
+  HobStart        A pointer to the start hob.
+  Guid            A pointer to a guid.
+  Buffer          A pointer to the buffer.
+  BufferSize      Buffer size.
+  
+Returns:
+  Status code.
+
+  EFI_NOT_FOUND          - Next Guid hob not found
+  
+  EFI_SUCCESS            - Next Guid hob found and data for this Guid got
+  
+  EFI_INVALID_PARAMETER  - invalid parameter
+
+--*/
+;
+
 #endif

@@ -23,7 +23,7 @@ Abstract:
 #include "PeiHob.h"
 #include "Pei.h"
 #include "PeiLib.h"
-
+#include "EfiCommonLib.h"
 
 VOID
 PeiCopyMem (
@@ -55,12 +55,7 @@ Returns:
 
 --*/
 {
-  INT8  *Ptr;
-
-  Ptr = Buffer;
-  while (Size--) {
-    *(Ptr++) = 0;
-  }
+  EfiCommonLibZeroMem (Buffer, Size);
 }
 
 VOID
@@ -89,20 +84,7 @@ Returns:
 
 --*/
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
-
-  Destination8  = Destination;
-  Source8       = Source;
-  if (((Source8 + Length) <= Destination8) || (Source8 >= Destination8)) {
-    while (Length--) {
-      *(Destination8++) = *(Source8++);
-    }
-  } else {
-    while (Length--) {
-      *(Destination8 + Length) = *(Source8 + Length);
-    }
-  }
+  EfiCommonLibCopyMem (Destination, Source, Length);
 }
 
 VOID
@@ -131,20 +113,7 @@ Returns:
 
 --*/
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
-
-  Destination8  = Destination;
-  Source8       = Source;
-  if (((Source8 + Length) <= Destination8) || (Source8 >= Destination8)) {
-    while (Length--) {
-      *(Destination8++) = *(Source8++);
-    }
-  } else {
-    while (Length--) {
-      *(Destination8 + Length) = *(Source8 + Length);
-    }
-  }
+  EfiCommonLibCopyMem (Destination, Source, Length);
 }
 
 

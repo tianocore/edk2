@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 //
 // Byte packed structure for a segment descriptor in a GDT/LDT
 //

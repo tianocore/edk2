@@ -676,6 +676,16 @@ typedef struct {
 //
 #define EFI_ACPI_3_0_WATCHDOG_RESOURCE_TABLE_SIGNATURE 0x54524457
 
+//
+// "WDAT" Watchdog Action Table
+//
+#define EFI_ACPI_3_0_WATCHDOG_ACTION_TABLE_SIGNATURE 0x54414457
+
+//
+// "iBFT" iSCSI Boot Firmware Table
+//
+#define EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE 0x54464269
+
 #pragma pack()
 
 #endif

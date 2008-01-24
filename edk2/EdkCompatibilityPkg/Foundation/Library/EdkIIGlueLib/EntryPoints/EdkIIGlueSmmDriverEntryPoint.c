@@ -56,6 +56,7 @@ ProcessModuleUnloadList (
 // Library constructors
 //
 VOID
+EFIAPI
 ProcessLibraryConstructorList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -133,6 +134,7 @@ ProcessLibraryConstructorList (
 // Library destructors
 //
 VOID
+EFIAPI
 ProcessLibraryDestructorList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable

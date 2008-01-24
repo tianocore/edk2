@@ -39,8 +39,13 @@ Abstract:
 #include "EfiFirmwareVolumeHeader.h"
 #include "EfiFirmwareFileSystem.h"
 #include "PeiHob.h"
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include "TianoHii.h"
+#else
 #include "EfiInternalFormRepresentation.h"
+#endif
 #include "EfiStatusCode.h"
+#include "EfiPerf.h"
 
 //
 // IPF only
@@ -90,10 +95,20 @@ Abstract:
 // resolved when porting a module to real EDK II
 //
 #include EFI_GUID_DEFINITION (StatusCodeDataTypeId)
+#include EFI_GUID_DEFINITION (PeiPerformanceHob)
 
 //
 // Protocol definitions
 //
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include EFI_PROTOCOL_DEFINITION (FormBrowser2)
+#include EFI_PROTOCOL_DEFINITION (HiiConfigAccess)
+#include EFI_PROTOCOL_DEFINITION (HiiConfigRouting)
+#include EFI_PROTOCOL_DEFINITION (HiiDatabase)
+#include EFI_PROTOCOL_DEFINITION (HiiFont)
+#include EFI_PROTOCOL_DEFINITION (HiiImage)
+#include EFI_PROTOCOL_DEFINITION (HiiString)
+#endif
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #include EFI_PROTOCOL_DEFINITION (DevicePathFromText)
@@ -120,7 +135,9 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (BootScriptSave)
 #include EFI_PROTOCOL_DEFINITION (BusSpecificDriverOverride)
 #include EFI_PROTOCOL_DEFINITION (ComponentName)
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #include EFI_PROTOCOL_DEFINITION (ComponentName2)
+#endif
 #include EFI_PROTOCOL_DEFINITION (CpuIo)
 #include EFI_PROTOCOL_DEFINITION (DataHub)
 #include EFI_PROTOCOL_DEFINITION (DebugPort)
@@ -140,10 +157,14 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (FirmwareVolume)
 #include EFI_PROTOCOL_DEFINITION (FirmwareVolumeBlock)
 #include EFI_PROTOCOL_DEFINITION (FirmwareVolumeDispatch)
+#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
 #include EFI_PROTOCOL_DEFINITION (FormBrowser)
 #include EFI_PROTOCOL_DEFINITION (FormCallback)
+#endif
 #include EFI_PROTOCOL_DEFINITION (GuidedSectionExtraction)
+#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
 #include EFI_PROTOCOL_DEFINITION (Hii)
+#endif
 #include EFI_PROTOCOL_DEFINITION (IdeControllerInit)
 #include EFI_PROTOCOL_DEFINITION (IncompatiblePciDeviceSupport)
 #include EFI_PROTOCOL_DEFINITION (Legacy8259)

@@ -33,9 +33,12 @@ COMPONENT_TYPE  = LIBRARY
   LinkedList.c
 
 [sources.ia32]
-  Ia32\EfiCopyMem.c
-  Ia32\EfiSetMem.c
-  Ia32\EfiZeroMem.c
+  Ia32\EfiCopyMemRep1.c
+  Ia32\EfiSetMemRep4.c
+  Ia32\EfiZeroMemRep4.c
+#  Ia32\EfiCopyMem.c
+#  Ia32\EfiSetMem.c
+#  Ia32\EfiZeroMem.c
   Ia32\LShiftU64.c
   Ia32\RShiftU64.c
   Ia32\MultU64x32.c
@@ -57,9 +60,12 @@ COMPONENT_TYPE  = LIBRARY
   Math.c
   
 [sources.x64]
-  x64\EfiCopyMem.asm
-  x64\EfiSetMem.asm
-  x64\EfiZeroMem.asm
+  x64\EfiCopyMemRep1.asm
+  x64\EfiSetMemRep4.asm
+  x64\EfiZeroMemRep4.asm
+#  x64\EfiCopyMem.asm
+#  x64\EfiSetMem.asm
+#  x64\EfiZeroMem.asm
   Math.c
 
 [includes.common]

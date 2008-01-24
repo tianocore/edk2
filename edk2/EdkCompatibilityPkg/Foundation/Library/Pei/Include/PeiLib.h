@@ -25,6 +25,7 @@ Abstract:
 #include "Tiano.h"
 #include "Pei.h"
 #include "peiHobLib.h"
+#include "PeiPerf.h"
 #include EFI_PROTOCOL_DEFINITION (Decompress)
 #include EFI_PROTOCOL_DEFINITION (TianoDecompress)
 #include EFI_GUID_DEFINITION (PeiPeCoffLoader)
@@ -709,37 +710,6 @@ Returns:
 --*/
 ;
 
-VOID
-PeiPerfMeasure (
-  EFI_PEI_SERVICES              **PeiServices,
-  IN UINT16                     *Token,
-  IN EFI_FFS_FILE_HEADER        *FileHeader,
-  IN BOOLEAN                    EntryExit,
-  IN UINT64                     Value
-  )
-/*++
-
-Routine Description:
-
-  Log a timestamp count.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Core Services table
-  
-  Token       - Pointer to Token Name
-  
-  FileHeader  - Pointer to the file header
-
-  EntryExit   - Indicates start or stop measurement
-
-  Value       - The start time or the stop time
-
-Returns:
-
---*/
-;
-
 EFI_STATUS
 GetTimerValue (
   OUT UINT64    *TimerValue
@@ -760,14 +730,6 @@ Returns:
 
 --*/
 ;
-
-#ifdef EFI_PEI_PERFORMANCE
-#define PEI_PERF_START(Ps, Token, FileHeader, Value)  PeiPerfMeasure (Ps, Token, FileHeader, FALSE, Value)
-#define PEI_PERF_END(Ps, Token, FileHeader, Value)    PeiPerfMeasure (Ps, Token, FileHeader, TRUE, Value)
-#else
-#define PEI_PERF_START(Ps, Token, FileHeader, Value)
-#define PEI_PERF_END(Ps, Token, FileHeader, Value)
-#endif
 
 #ifdef EFI_NT_EMULATOR
 EFI_STATUS
@@ -1306,6 +1268,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 FindFv (
   IN     EFI_FIND_FV_PPI             *This,
   IN     EFI_PEI_SERVICES            **PeiServices,

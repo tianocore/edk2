@@ -42,6 +42,7 @@ GetTimerValue (
 
 
 VOID
+EFIAPI
 PeiPerfMeasure (
   EFI_PEI_SERVICES              **PeiServices,
   IN UINT16                     *Token,

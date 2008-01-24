@@ -34,6 +34,7 @@ static EFI_PEI_SERVICES  **gPeiServices;
 
 **/
 EFI_PEI_SERVICES **
+EFIAPI
 GetPeiServicesTablePointer (
   VOID
   )

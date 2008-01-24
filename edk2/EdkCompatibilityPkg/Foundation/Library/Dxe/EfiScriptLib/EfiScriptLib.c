@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -24,6 +24,7 @@ Abstract:
 EFI_BOOT_SCRIPT_SAVE_PROTOCOL *mBootScriptSave;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveInitialize (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -60,6 +61,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveIoWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -109,6 +111,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveIoReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -158,6 +161,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveMemWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -207,6 +211,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveMemReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -256,6 +261,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSavePciCfgWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -305,6 +311,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSavePciCfgReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -354,6 +361,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveSmbusExecute (
   IN  UINT16                            TableName,
   IN  EFI_SMBUS_DEVICE_ADDRESS          SlaveAddress,
@@ -409,6 +417,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveStall (
   IN  UINT16                            TableName,
   IN  UINTN                             Duration
@@ -449,6 +458,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveDispatch (
   IN  UINT16                            TableName,
   IN  EFI_PHYSICAL_ADDRESS              EntryPoint
@@ -484,6 +494,61 @@ Returns:
 
   return EFI_SUCCESS;
 
+}
+
+EFI_STATUS
+EFIAPI
+BootScriptMemPoll (
+  IN  UINT16                            TableName,
+  IN  EFI_BOOT_SCRIPT_WIDTH             Width,
+  IN  UINT64                            Address,
+  IN  VOID                              *BitMask,
+  IN  VOID                              *BitValue,
+  IN  UINTN                             Duration,
+  IN  UINTN                             LoopTimes
+  )
+/*++
+
+Routine Description:
+
+  Save I/O write to boot script 
+
+Arguments:
+  TableName - Desired boot script table
+
+  Width     - The width of the memory operations.
+  
+  Address   - The base address of the memory operations.
+  
+  BitMask   - A pointer to the bit mask to be AND-ed with the data read from the register.
+
+  BitValue  - A pointer to the data value after to be Masked.
+
+  Duration  - Duration in microseconds of the stall.
+  
+  LoopTimes - The times of the register polling.
+
+Returns: 
+  
+  EFI_NOT_FOUND - BootScriptSave Protocol not exist.
+  
+  EFI_STATUS - BootScriptSave Protocol exist, always returns EFI_SUCCESS
+
+--*/
+{
+  mBootScriptSave->Write (
+                    mBootScriptSave,
+                    TableName,
+                    EFI_BOOT_SCRIPT_MEM_POLL_OPCODE,
+                    Width,
+                    Address,
+                    BitMask,
+                    BitValue,
+                    Duration,
+                    LoopTimes
+                    );
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS

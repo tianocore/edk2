@@ -100,7 +100,7 @@ Returns:
 {
   return GetImageEx (
            ImageHandle,
-           &gEfiDefaultBmpLogoGuid,
+           FileNameGuid,
            EFI_SECTION_RAW,
            Image,
            ImageSize,
