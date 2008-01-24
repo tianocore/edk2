@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c)  2004 - 2006, Intel Corporation                                                         
+Copyright (c)  2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -52,7 +52,6 @@ Abstract:
 // Private data declarations
 //
 #define MAX_RECORD_NUM                    1000
-#define INITIAL_RECORD_NUM                20
 #define BYTES_PER_RECORD                  EFI_STATUS_CODE_DATA_MAX_SIZE
 #define BYTES_PER_BUFFER                  (BYTES_PER_RECORD * sizeof (UINT8))
 
@@ -60,77 +59,63 @@ Abstract:
 
 typedef struct {
   UINTN           Signature;
-  EFI_LIST_ENTRY  Link;
-  UINT8           RecordBuffer[BYTES_PER_RECORD];
-} STATUS_CODE_RECORD_LIST;
+  EFI_LIST_ENTRY  Node;
+  UINT8           Data[BYTES_PER_RECORD];
+} DATAHUB_STATUSCODE_RECORD;
 
 //
 // Function prototypes
 //
-STATUS_CODE_RECORD_LIST *
-AllocateRecordBuffer (
-  VOID
+EFI_STATUS
+EFIAPI
+BsDataHubInitializeStatusCode (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
   );
 /*++
 
 Routine Description:
 
-  Allocate a new record list node and initialize it.
-  Inserting the node into the list isn't the task of this function.
+  Install a data hub listener.
 
 Arguments:
 
-  None
+  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
 
 Returns:
 
-  A pointer to the new allocated node or NULL if non available
-
---*/
-
-DATA_HUB_STATUS_CODE_DATA_RECORD *
-AquireEmptyRecordBuffer (
-  VOID
-  );
-/*++
-
-Routine Description:
-
-  Acquire an empty record buffer from the record list if there's free node,
-  or allocate one new node and insert it to the list if the list is full and
-  the function isn't run in EFI_TPL_HIGH_LEVEL.
-
-Arguments:
-
-  None
-
-Returns:
-
-  Pointer to new record buffer. NULL if none available.
+  EFI_SUCCESS - Logging Hub protocol installed
+  Other       - No protocol installed, unload driver.
 
 --*/
 
 EFI_STATUS
-ReleaseRecordBuffer (
-  IN  STATUS_CODE_RECORD_LIST  *RecordBuffer
+EFIAPI
+BsDataHubReportStatusCode (
+  IN EFI_STATUS_CODE_TYPE     CodeType,
+  IN EFI_STATUS_CODE_VALUE    Value,
+  IN UINT32                   Instance,
+  IN EFI_GUID                 * CallerId,
+  IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
   );
 /*++
 
 Routine Description:
 
-  Release a buffer in the list, remove some nodes to keep the list inital length.
+  Boot service report status code listener.  This function logs the status code
+  into the data hub.
+
 Arguments:
 
-  RecordBuffer          - Buffer to release
+  Same as gRT->ReportStatusCode (See Tiano Runtime Specification)
 
 Returns:
 
-  EFI_SUCCESS           - If DataRecord is valid
-  EFI_UNSUPPORTED       - The record list has empty
+  None
 
 --*/
 
-void
+VOID
 EFIAPI
 LogDataHubEventHandler (
   IN  EFI_EVENT     Event,

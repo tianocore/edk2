@@ -269,7 +269,6 @@ IMAGE_SCRIPT =
   $(BASE_NAME).ver \
 }
 
-
 [=============================================================================]
 [Package.DxeIplPad.Default]
 PACKAGE.INF 
@@ -284,7 +283,6 @@ IMAGE_SCRIPT =
 { \
   $(BASE_NAME).pad \
 }
-
 
 [=============================================================================]
 [Package.BS_DRIVER.DxeMain]
@@ -303,7 +301,6 @@ IMAGE_SCRIPT =
     $(BASE_NAME).ver
   }
 }
-
 
 [=============================================================================]
 [Package.BS_DRIVER.Default,Package.RT_DRIVER.Default,Package.SAL_RT_DRIVER.Default]
@@ -388,4 +385,27 @@ IMAGE_SCRIPT =
     $(SOURCE_FV)Fv.sec
   }
 }
+
+[=============================================================================]
+[Package.AcpiTable.Default]
+PACKAGE.INF
+\[.]
+BASE_NAME                   = $(BASE_NAME)
+FFS_FILEGUID                = $(FILE_GUID)
+FFS_FILETYPE                = EFI_FV_FILETYPE_FREEFORM
+FFS_ATTRIB_CHECKSUM         = TRUE
+
+IMAGE_SCRIPT =
+{
+  Compress ($(COMPRESS_METHOD)) {
+    Tool (
+      $(OEMTOOLPATH)\GenCRC32Section
+      ARGS= -i $(SECTION_TARGETS)
+               $(DEST_DIR)\$(BASE_NAME).ui
+            -o $(DEST_DIR)\$(BASE_NAME).crc32
+      OUTPUT = $(DEST_DIR)\$(BASE_NAME).crc32
+    )
+  }
+}
+
 [=============================================================================]

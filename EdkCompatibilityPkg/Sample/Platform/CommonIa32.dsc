@@ -275,7 +275,6 @@ IMAGE_SCRIPT =
   }    
 }
 
-
 [=============================================================================]
 [Package.BS_DRIVER.Default,Package.RT_DRIVER.Default]
 PACKAGE.INF
@@ -359,6 +358,7 @@ IMAGE_SCRIPT =
     $(SOURCE_FV)Fv.sec
   }
 }
+
 [=============================================================================]
 #
 # Stripped package descriptions for size reduction.
@@ -422,6 +422,7 @@ IMAGE_SCRIPT =
 {
   $(BASE_NAME).tes
 }
+
 [=============================================================================]
 [Package.PE32_PEIM.DefaultStripped]
 PACKAGE.INF
@@ -504,7 +505,6 @@ IMAGE_SCRIPT =
   }
 }
 
-
 [=============================================================================]
 [Package.BS_DRIVER.DefaultStripped,Package.RT_DRIVER.DefaultStripped]
 PACKAGE.INF
@@ -521,7 +521,6 @@ IMAGE_SCRIPT =
     $(DEST_DIR)\$(BASE_NAME).pe32
   }
 }
-
 
 [=============================================================================]
 [Package.FvImageFile.DefaultStripped]
@@ -553,6 +552,44 @@ IMAGE_SCRIPT =
   Blank1.pad \
   $(BASE_NAME).tes \
   ResetVec.raw \
+}
+
+[=============================================================================]
+[Package.AcpiTable.Default]
+PACKAGE.INF
+\[.]
+BASE_NAME                   = $(BASE_NAME)
+FFS_FILEGUID                = $(FILE_GUID)
+FFS_FILETYPE                = EFI_FV_FILETYPE_FREEFORM
+FFS_ATTRIB_CHECKSUM         = TRUE
+
+IMAGE_SCRIPT =
+{
+  Compress ($(COMPRESS_METHOD)) {
+    Tool (
+      $(OEMTOOLPATH)\GenCRC32Section
+      ARGS= -i $(SECTION_TARGETS)
+               $(DEST_DIR)\$(BASE_NAME).ui
+            -o $(DEST_DIR)\$(BASE_NAME).crc32
+      OUTPUT = $(DEST_DIR)\$(BASE_NAME).crc32
+    )
+  }
+}
+
+[=============================================================================]
+[Package.AcpiTable.DefaultStripped]
+PACKAGE.INF
+\[.]
+BASE_NAME                   = $(BASE_NAME)
+FFS_FILEGUID                = $(FILE_GUID)
+FFS_FILETYPE                = EFI_FV_FILETYPE_FREEFORM
+FFS_ATTRIB_CHECKSUM         = TRUE
+
+IMAGE_SCRIPT =
+{
+  Compress ($(COMPRESS_METHOD)) {
+    $(SECTION_TARGETS)
+  }
 }
 
 [=============================================================================]

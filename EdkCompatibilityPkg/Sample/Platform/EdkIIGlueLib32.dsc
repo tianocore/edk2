@@ -37,3 +37,4 @@ $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiHobLib\PeiHobLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiReportStatusCodeLib\PeiReportStatusCodeLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiResourcePublicationLib\PeiResourcePublicationLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiSmbusLib\PeiSmbusLib.inf
+$(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiPerformanceLib\PeiPerformanceLib.inf

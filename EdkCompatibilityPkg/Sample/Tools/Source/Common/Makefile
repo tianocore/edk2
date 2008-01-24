@@ -100,7 +100,7 @@ all: $(TARGET_LIB)
 "$(EDK_TOOLS_OUTPUT)\PeCoffLoaderEx.obj": "$(EDK_SOURCE)\Foundation\Library\Pei\PeiLib\$(PROCESSOR)\PeCoffLoaderEx.c"
   $(CC) $(C_FLAGS) "$(EDK_SOURCE)\Foundation\Library\Pei\PeiLib\$(PROCESSOR)\PeCoffLoaderEx.c" /Fo"$(EDK_TOOLS_OUTPUT)\PeCoffLoaderEx.obj"
 
-"$(EDK_TOOLS_OUTPUT)\FvLib.obj": "$(TARGET_SOURCE_DIR)\FvLib.c" "$(TARGET_SOURCE_DIR)\FvLib.h" $(EDK_SOURCE)\Sample\Include\Efi2WinNt.h $(EDK_SOURCE)\Foundation\Framework\Include\EfiFirmwareFileSystem.h "$(EDK_SOURCE)\Foundation\Framework\Include\EfiFirmwareVolumeHeader.h"
+"$(EDK_TOOLS_OUTPUT)\FvLib.obj": "$(TARGET_SOURCE_DIR)\FvLib.c" "$(TARGET_SOURCE_DIR)\FvLib.h" $(EDK_SOURCE)\Foundation\Framework\Include\EfiFirmwareFileSystem.h "$(EDK_SOURCE)\Foundation\Framework\Include\EfiFirmwareVolumeHeader.h"
   $(CC) $(C_FLAGS) "$(TARGET_SOURCE_DIR)\FvLib.c" /Fo"$(EDK_TOOLS_OUTPUT)\FvLib.obj"
 
 "$(EDK_TOOLS_OUTPUT)\EfiUtilityMsgs.obj": "$(TARGET_SOURCE_DIR)\EfiUtilityMsgs.c" "$(TARGET_SOURCE_DIR)\EfiUtilityMsgs.h"
@@ -125,10 +125,12 @@ $(TARGET_LIB): $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).lib
 !ELSE
 $(TARGET_LIB): $(OBJECTS)
   $(LIB_EXE) $(LIB_FLAGS) $(OBJECTS) /OUT:$(TARGET_LIB)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
   if not exist $(EFI_PLATFORM_BIN)\Tools mkdir $(EFI_PLATFORM_BIN)\Tools
   if exist $(TARGET_LIB) copy $(TARGET_LIB) $(EFI_PLATFORM_BIN)\tools\$(TARGET_NAME).lib /Y
   if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME)Obj.pdb \
   copy $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME)Obj.pdb $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME)Obj.pdb /Y
+!ENDIF
 !ENDIF
 
 clean:

@@ -87,10 +87,15 @@ DEPEX_TYPE = EFI_SECTION_PEI_DEPEX
 DEPEX_TYPE = EFI_SECTION_DXE_DEPEX
 !ENDIF
 
+!IF "$(COMPONENT_TYPE)" != "LIBRARY" && EXIST($(BUILD_DIR)\$(PROCESSOR)\CompilerStub.lib)
+LIBS = $(LIBS) $(BUILD_DIR)\$(PROCESSOR)\CompilerStub.lib
+!ENDIF
+
 #
 # Command flags for MAKEDEPS tool
 #
 DEP_FLAGS = -target $** -o $(DEP_FILE) $(INC) -ignorenotfound -q
+DEP_FLAGS2 = -target $@ -o $(DEP_FILE) -cl
 
 [=============================================================================]
 #
@@ -112,17 +117,20 @@ DEP_FLAGS = -target $** -o $(DEP_FILE) $(INC) -ignorenotfound -q
 [=============================================================================]
 [Compile.Ia32.asm,Compile.x64.asm]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE)Asm.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
 
 !IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)Asm.dep
 !IF !EXIST($(DEP_FILE))
 CREATEDEPS = YES
 !ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
 !ENDIF
 
 #
@@ -140,48 +148,22 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 [=============================================================================]
 [Compile.Ipf.s]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE)S.dep
 
-!IF EXIST($(DEST_DIR)\$(FILE).pro)
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+
+!IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)S.dep
 !IF !EXIST($(DEP_FILE))
 CREATEDEPS = YES
 !ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
-
-#
-# Update dep file for next round incremental build
-#
-$(DEP_FILE) : $(DEST_DIR)\$(FILE).pro
-  $(MAKEDEPS) -f $(SOURCE_FILE_NAME) $(DEP_FLAGS)
-
-#
-# Compile the file
-#
-$(DEST_DIR)\$(FILE).pro : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
-  $(CC) $(C_FLAGS_PRO) $(SOURCE_FILE_NAME) > $@
-
-$(DEST_DIR)\$(FILE).obj : $(DEST_DIR)\$(FILE).pro
-  $(ASM) $(ASM_FLAGS) $(DEST_DIR)\$(FILE).pro
-
-[=============================================================================]
-[Compile.Ia32.c,Compile.Ipf.c,Compile.x64.c]
-
-DEP_FILE    = $(DEST_DIR)\$(FILE).dep
-
-!IF EXIST($(DEST_DIR)\$(FILE).obj)
-DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE).dep
-!IF !EXIST($(DEP_FILE))
-CREATEDEPS = YES
-!ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
 !ENDIF
 
 #
@@ -190,16 +172,33 @@ CREATEDEPS = YES
 $(DEP_FILE) : $(DEST_DIR)\$(FILE).obj
   $(MAKEDEPS) -f $(SOURCE_FILE_NAME) $(DEP_FLAGS)
 
+!ENDIF
+
 #
 # Compile the file
 #
 $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
-  $(CC) $(C_FLAGS) $(SOURCE_FILE_NAME)
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_PRO) $(SOURCE_FILE_NAME) > $(DEST_DIR)\$(FILE).pro
+!ELSE
+  -$(CC) $(C_FLAGS_PRO) $(SOURCE_FILE_NAME) /showIncludes > $(DEST_DIR)\$(FILE).pro 2> $(DEST_DIR)\$(FILE)S.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(FILE)S.cl $(DEP_FLAGS2)
+!ENDIF
+  $(ASM) $(ASM_FLAGS) $(DEST_DIR)\$(FILE).pro
 
 [=============================================================================]
-[Compile.Ebc.c]
+[Compile.Ia32.c,Compile.Ipf.c,Compile.x64.c]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE).dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
 
 !IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE).dep
@@ -208,8 +207,42 @@ CREATEDEPS = YES
 !ENDIF
 !ENDIF
 
+#
+# Update dep file for next round incremental build
+#
+$(DEP_FILE) : $(DEST_DIR)\$(FILE).obj
+  $(MAKEDEPS) -f $(SOURCE_FILE_NAME) $(DEP_FLAGS)
+
+!ENDIF
+  
+#
+# Compile the file
+#
+$(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS) $(SOURCE_FILE_NAME)
+!ELSE
+  -$(CC) $(C_FLAGS) $(SOURCE_FILE_NAME) /showIncludes > $(DEST_DIR)\$(FILE).cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(FILE).cl $(DEP_FLAGS2)
+!ENDIF
+
+[=============================================================================]
+[Compile.Ebc.c]
+
+#
+# Add build dependency check
+#
+DEP_FILE    = $(DEST_DIR)\$(FILE).dep
+
 !IF EXIST($(DEP_FILE))
 !INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF EXIST($(DEST_DIR)\$(FILE).obj)
+DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE).dep
+!IF !EXIST($(DEP_FILE))
+CREATEDEPS = YES
+!ENDIF
 !ENDIF
 
 #
@@ -351,8 +384,32 @@ clean :
 #
 LIB_NAME = $(LIB_DIR)\$(BASE_NAME).lib
 
+#
+# $(DEP_TARGETS) are not needed for binary build.
+#
+!IF ("$(BINARY)" == "TRUE") || (("$(BINARY)" == "") && ("$(EFI_BINARY_LIBRARY)" == "YES"))
+DEP_TARGETS=
+CREATEDEPS=
+!ENDIF
+
+#
+# Module can be built from source code or binary files. 
+#
+!IF ((("$(BINARY)" == "TRUE") || (("$(BINARY)" == "") && ("$(EFI_BINARY_LIBRARY)" == "YES"))) \
+    && EXIST($(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).lib))
+$(LIB_NAME) : $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).lib
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).lib $(LIB_NAME) /Y
+  if exist $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME)Obj.pdb \
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME)Obj.pdb $(DEST_DIR)\$(BASE_NAME)Obj.pdb /Y
+!ELSE
 $(LIB_NAME) : $(OBJECTS) $(LIBS) $(INF_FILENAME) $(ENV_DEPS)
   $(LIB) $(LIB_FLAGS) $(OBJECTS) $(LIBS) /OUT:$@
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
+  if not exist $(EFI_PLATFORM_BIN)\$(PROCESSOR) mkdir $(EFI_PLATFORM_BIN)\$(PROCESSOR)
+  if exist $(LIB_NAME) copy $(LIB_NAME) $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).lib /Y
+  if exist $(DEST_DIR)\$(BASE_NAME)Obj.pdb copy $(DEST_DIR)\$(BASE_NAME)Obj.pdb $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME)Obj.pdb /Y
+!ENDIF
+!ENDIF
 
 !IF "$(CREATEDEPS)"=="YES"
 all : $(DEP_TARGETS)
@@ -558,10 +615,31 @@ $(TARGET_PE32) : $(TARGET_EFI)
   $(GENSECTION) -I $(TARGET_EFI) -O $(TARGET_PE32) -S EFI_SECTION_PE32
 
 #
-# Run FWImage on the DLL to set it as an EFI image type.
+# $(DEP_TARGETS) are not needed for binary build.
 #
+!IF "$(BINARY)" == "TRUE"
+DEP_TARGETS=
+CREATEDEPS=
+!ENDIF
+
+#
+# Build module to generate *.efi file from source code or binary file. 
+#
+!IF (("$(BINARY)" == "TRUE") && EXIST($(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi))
+LOCALIZE_TARGETS=
+$(TARGET_EFI) : $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi $(TARGET_EFI) /Y
+  if exist $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb \
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb $(TARGET_PDB) /Y
+!ELSE
 $(TARGET_EFI) : $(TARGET_DLL) $(INF_FILENAME)
   $(FWIMAGE) -t 0 $(COMPONENT_TYPE) $(TARGET_DLL) $(TARGET_EFI)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
+  if not exist $(EFI_PLATFORM_BIN)\$(PROCESSOR) mkdir $(EFI_PLATFORM_BIN)\$(PROCESSOR)
+  if exist $(TARGET_EFI) copy $(TARGET_EFI) $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi /Y
+  if exist $(TARGET_PDB) copy $(TARGET_PDB) $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb /Y
+!ENDIF
+!ENDIF
 
 !ENDIF
 
@@ -621,11 +699,17 @@ DPX_SOURCE_FILE = $(DPX_SOURCE_OVERRIDE)
 
 !IF "$(DPX_SOURCE_FILE)" != ""
 !IF EXIST ($(DPX_SOURCE_FILE))
+
 #
-# Add dependency check for dxs file, because dxs file depends on PPI or 
-# PROTOCOL guid defintions.
+# Add build dependency check
 #
 DEP_FILE    = $(DEST_DIR)\$(BASE_NAME)dxs.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
 
 !IF EXIST($(TARGET_DPX))
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(BASE_NAME)dxs.dep
@@ -634,17 +718,21 @@ CREATEDEPS = YES
 !ENDIF
 !ENDIF
 
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
 #
 # Update dep file for next round incremental build
 #
 $(DEP_FILE) : $(TARGET_DPX)
   $(MAKEDEPS) -f $(DPX_SOURCE_FILE) $(DEP_FLAGS)
 
+!ENDIF
+
 $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
-  $(CC) /nologo $(INC) $(VERSION_FLAGS) /EP $(DPX_SOURCE_FILE) > $*.tmp1
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) > $*.tmp1
+!ELSE
+  -$(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) /showIncludes > $*.tmp1 2> $(DEST_DIR)\$(BASE_NAME)dxs.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(BASE_NAME)dxs.cl $(DEP_FLAGS2)
+!ENDIF
   $(GENDEPEX) -I $*.tmp1 -O $*.tmp2
   $(GENSECTION) -I $*.tmp2 -O $@ -S $(DEPEX_TYPE)
   del $*.tmp1 > NUL
@@ -666,8 +754,40 @@ $(TARGET_DPX) :
 !IF "$(COMPONENT_TYPE)" == "COMBINED_PEIM_DRIVER"
 !IF "$(DXE_DPX_SOURCE)" != ""
 !IF EXIST ($(SOURCE_DIR)\$(DXE_DPX_SOURCE))
+
+#
+# Add build dependency check
+#
+DEP_FILE    = $(DEST_DIR)\$(BASE_NAME)dxs2.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+
+!IF EXIST($(TARGET_DXE_DPX))
+DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(BASE_NAME)dxs2.dep
+!IF !EXIST($(DEP_FILE))
+CREATEDEPS = YES
+!ENDIF
+!ENDIF
+
+#
+# Update dep file for next round incremental build
+#
+$(DEP_FILE) : $(TARGET_DXE_DPX)
+  $(MAKEDEPS) -f $(SOURCE_DIR)\$(DXE_DPX_SOURCE) $(DEP_FLAGS)
+
+!ENDIF
+
 $(TARGET_DXE_DPX) : $(SOURCE_DIR)\$(DXE_DPX_SOURCE) $(INF_FILENAME)
-  $(CC) /nologo $(INC) $(VERSION_FLAGS) /EP $(SOURCE_DIR)\$(DXE_DPX_SOURCE) > $*.tmp1
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_DPX) $(SOURCE_DIR)\$(DXE_DPX_SOURCE) > $*.tmp1
+!ELSE
+  -$(CC) $(C_FLAGS_DPX) $(SOURCE_DIR)\$(DXE_DPX_SOURCE) /showIncludes > $*.tmp1 2> $(DEST_DIR)\$(BASE_NAME)dxs2.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(BASE_NAME)dxs2.cl $(DEP_FLAGS2)
+!ENDIF
   $(GENDEPEX) -I $*.tmp1 -O $*.tmp2
   $(GENSECTION) -I $*.tmp2 -O $@ -S EFI_SECTION_DXE_DEPEX
   del $*.tmp1 > NUL
@@ -778,10 +898,30 @@ $(TARGET_TES) : $(TARGET_TE)
   $(GENSECTION) -I $(TARGET_TE) -O $(TARGET_TES) -S EFI_SECTION_TE
 
 #
-# Run FWImage on the DLL to set it as an EFI image type.
+# $(DEP_TARGETS) are not needed for binary build.
 #
+!IF "$(BINARY)" == "TRUE"
+DEP_TARGETS=
+CREATEDEPS=
+!ENDIF
+
+#
+# Build module to generate *.efi file from source code or binary file.
+#
+!IF (("$(BINARY)" == "TRUE") && EXIST($(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi))
+$(TARGET_EFI) : $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi $(TARGET_EFI) /Y
+  if exist $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb \
+  copy $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb $(TARGET_PDB) /Y
+!ELSE
 $(TARGET_EFI) : $(TARGET_DLL) $(INF_FILENAME)
   $(FWIMAGE) $(COMPONENT_TYPE) $(TARGET_DLL) $(TARGET_EFI)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
+  if not exist $(EFI_PLATFORM_BIN)\$(PROCESSOR) mkdir $(EFI_PLATFORM_BIN)\$(PROCESSOR)
+  if exist $(TARGET_EFI) copy $(TARGET_EFI) $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).efi /Y
+  if exist $(TARGET_PDB) copy $(TARGET_PDB) $(EFI_PLATFORM_BIN)\$(PROCESSOR)\$(BASE_NAME).pdb /Y
+!ENDIF
+!ENDIF
 
 #
 # Run GenTEImage on the built .efi file to create our TE file.
@@ -845,11 +985,17 @@ DPX_SOURCE_FILE = $(DPX_SOURCE_OVERRIDE)
 
 !IF "$(DPX_SOURCE_FILE)" != ""
 !IF EXIST ($(DPX_SOURCE_FILE))
+
 #
-# Add dependency check for dxs file, because dxs file depends on PPI or 
-# PROTOCOL guid defintions.
+# Add build dependency check
 #
 DEP_FILE    = $(DEST_DIR)\$(BASE_NAME)dxs.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
 
 !IF EXIST($(TARGET_DPX))
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(BASE_NAME)dxs.dep
@@ -858,17 +1004,21 @@ CREATEDEPS = YES
 !ENDIF
 !ENDIF
 
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
 #
 # Update dep file for next round incremental build
 #
 $(DEP_FILE) : $(TARGET_DPX)
   $(MAKEDEPS) -f $(DPX_SOURCE_FILE) $(DEP_FLAGS)
 
+!ENDIF
+
 $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
-  $(CC) /nologo $(INC) $(VERSION_FLAGS) /EP $(DPX_SOURCE_FILE) > $*.tmp1
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) > $*.tmp1
+!ELSE
+  -$(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) /showIncludes > $*.tmp1 2> $(DEST_DIR)\$(BASE_NAME)dxs.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(BASE_NAME)dxs.cl $(DEP_FLAGS2)
+!ENDIF
   $(GENDEPEX) -I $*.tmp1 -O $*.tmp2
   $(GENSECTION) -I $*.tmp2 -O $@ -S $(DEPEX_TYPE)
   del $*.tmp1 > NUL
@@ -1042,11 +1192,17 @@ DPX_SOURCE_FILE = $(DPX_SOURCE_OVERRIDE)
 
 !IF "$(DPX_SOURCE_FILE)" != ""
 !IF EXIST ($(DPX_SOURCE_FILE))
+
 #
-# Add dependency check for dxs file, because dxs file depends on PPI or 
-# PROTOCOL guid defintions.
+# Add build dependency check
 #
 DEP_FILE    = $(DEST_DIR)\$(BASE_NAME)dxs.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
 
 !IF EXIST($(TARGET_DPX))
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(BASE_NAME)dxs.dep
@@ -1055,17 +1211,21 @@ CREATEDEPS = YES
 !ENDIF
 !ENDIF
 
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
 #
 # Update dep file for next round incremental build
 #
 $(DEP_FILE) : $(TARGET_DPX)
   $(MAKEDEPS) -f $(DPX_SOURCE_FILE) $(DEP_FLAGS)
 
+!ENDIF
+
 $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
-  $(CC) /nologo $(INC) $(VERSION_FLAGS) /EP $(DPX_SOURCE_FILE) > $*.tmp1
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) > $*.tmp1
+!ELSE
+  -$(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) /showIncludes > $*.tmp1 2> $(DEST_DIR)\$(BASE_NAME)dxs.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(BASE_NAME)dxs.cl $(DEP_FLAGS2)
+!ENDIF
   $(GENDEPEX) -I $*.tmp1 -O $*.tmp2
   $(GENSECTION) -I $*.tmp2 -O $@ -S $(DEPEX_TYPE)
   del $*.tmp1 > NUL
@@ -1210,11 +1370,17 @@ DPX_SOURCE_FILE = $(DPX_SOURCE_OVERRIDE)
 
 !IF "$(DPX_SOURCE_FILE)" != ""
 !IF EXIST ($(DPX_SOURCE_FILE))
+
 #
-# Add dependency check for dxs file, because dxs file depends on PPI or 
-# PROTOCOL guid defintions.
+# Add build dependency check
 #
 DEP_FILE    = $(DEST_DIR)\$(BASE_NAME)dxs.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
+
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
 
 !IF EXIST($(TARGET_DPX))
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(BASE_NAME)dxs.dep
@@ -1223,17 +1389,21 @@ CREATEDEPS = YES
 !ENDIF
 !ENDIF
 
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
 #
 # Update dep file for next round incremental build
 #
 $(DEP_FILE) : $(TARGET_DPX)
   $(MAKEDEPS) -f $(DPX_SOURCE_FILE) $(DEP_FLAGS)
 
+!ENDIF
+
 $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
-  $(CC) /nologo $(INC) $(VERSION_FLAGS) /EP $(DPX_SOURCE_FILE) > $*.tmp1
+!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
+  $(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) > $*.tmp1
+!ELSE
+  -$(CC) $(C_FLAGS_DPX) $(DPX_SOURCE_FILE) /showIncludes > $*.tmp1 2> $(DEST_DIR)\$(BASE_NAME)dxs.cl
+  @$(MAKEDEPS) -f $(DEST_DIR)\$(BASE_NAME)dxs.cl $(DEP_FLAGS2)
+!ENDIF
   $(GENDEPEX) -I $*.tmp1 -O $*.tmp2
   $(GENSECTION) -I $*.tmp2 -O $@ -S $(DEPEX_TYPE)
   del $*.tmp1 > NUL
@@ -1348,17 +1518,20 @@ LOCALIZE        = YES
 [=============================================================================]
 [Compile.Ia32.Vfr,Compile.Ipf.Vfr,Compile.x64.Vfr]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE)Vfr.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
 
 !IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)Vfr.dep
 !IF !EXIST($(DEP_FILE))
 CREATEDEPS = YES
 !ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
 !ENDIF
 
 #
@@ -1425,17 +1598,20 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 [=============================================================================]
 [Compile.Ia32.Ifr_Bin,Compile.Ipf.Ifr_Bin,Compile.x64.Ifr_Bin]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE)Vfr.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
 
 !IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)Vfr.dep
 !IF !EXIST($(DEP_FILE))
 CREATEDEPS = YES
 !ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
 !ENDIF
 
 #
@@ -1472,17 +1648,20 @@ HII_IFR_PACK_FILES = $(HII_IFR_PACK_FILES) $(DEST_DIR)\$(FILE).hpk
 [=============================================================================]
 [Compile.Ebc.Ifr_Bin]
 
+#
+# Add build dependency check
+#
 DEP_FILE    = $(DEST_DIR)\$(FILE)Vfr.dep
+
+!IF EXIST($(DEP_FILE))
+!INCLUDE $(DEP_FILE)
+!ENDIF
 
 !IF EXIST($(DEST_DIR)\$(FILE).obj)
 DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)Vfr.dep
 !IF !EXIST($(DEP_FILE))
 CREATEDEPS = YES
 !ENDIF
-!ENDIF
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
 !ENDIF
 
 #
