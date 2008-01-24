@@ -112,7 +112,7 @@ ON_INVAILD_PARAMETER:
 /**
   Retrieves current state of the USB host controller according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB_HC_PROTOCOL instance.
+  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
   @param  State                Variable to receive current device state
 
   @return EFI_SUCCESS           : The state is returned
@@ -158,7 +158,7 @@ Uhci2GetState (
 /**
   Sets the USB host controller to a specific state according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB_HC_PROTOCOL instance.
+  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
   @param  State                Indicates the state of the host controller that will
                                be set.
 
