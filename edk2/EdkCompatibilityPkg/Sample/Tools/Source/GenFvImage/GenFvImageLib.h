@@ -26,7 +26,7 @@ Abstract:
 //
 // Include files
 //
-#include "Efi2WinNT.h"
+#include <windows.h>
 #include "ParseInf.h"
 
 //

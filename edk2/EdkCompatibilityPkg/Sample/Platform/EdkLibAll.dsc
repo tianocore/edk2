@@ -25,7 +25,6 @@ $(EDK_PREFIX)Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
 $(EDK_PREFIX)Foundation\Cpu\Itanium\CpuIA64Lib\CpuIA64Lib.inf
 $(EDK_PREFIX)Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
 $(EDK_PREFIX)Foundation\Library\CompilerStub\CompilerStubLib.inf
-$(EDK_PREFIX)Foundation\Library\Dxe\Hob\HobLib.inf
 
 #
 # PEI libraries
@@ -42,10 +41,12 @@ $(EDK_PREFIX)Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
 $(EDK_PREFIX)Foundation\Efi\Protocol\EfiProtocolLib.inf
 $(EDK_PREFIX)Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
 $(EDK_PREFIX)Foundation\Protocol\EdkProtocolLib.inf
+$(EDK_PREFIX)Foundation\Library\Dxe\Hob\HobLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
 $(EDK_PREFIX)Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\Graphics\Graphics.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
+$(EDK_PREFIX)Foundation\Library\Dxe\UefiEfiIfrSupportLib\UefiEfiIfrSupportLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\Print\PrintLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
@@ -55,9 +56,3 @@ $(EDK_PREFIX)Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
 #
 $(EDK_PREFIX)Foundation\Library\Dxe\PrintLite\PrintLib.inf
 $(EDK_PREFIX)Foundation\Library\Dxe\GraphicsLite\Graphics.inf
-
-#
-# Module Libraries
-#
-#$(EDK_PREFIX)Sample\Platform\Generic\Dxe\GenericBds\GenericBds.inf
-#$(EDK_PREFIX)Sample\Bus\Usb\UsbLib\Dxe\UsbDxeLib.inf

@@ -1,5 +1,5 @@
 #/*++
-#  
+#   
 #  Copyright (c) 2006 - 2007, Intel Corporation                                                         
 #  All rights reserved. This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -8,16 +8,14 @@
 #                                                                                            
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-#  
-#  Module Name:
-#  
-#    Makefile
-#  
+#   
+#  Module Name:  makefile
+#   
 #  Abstract:
-#  
-#    makefile for building the GenBootsector utility.
-#    
-#--*/  
+#   
+#    This file is used to build the Strip utility.
+#   
+#--*/
 
 #
 # Make sure environmental variable EDK_SOURCE is set
@@ -51,14 +49,13 @@ INC=$(INC)
 # Target specific information
 #
 
-TARGET_NAME=GenBootsector
+TARGET_NAME=Strip
 TARGET_SOURCE_DIR = $(EDK_TOOLS_SOURCE)\$(TARGET_NAME)
 
 TARGET_EXE = $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).exe
 
-TARGET_EXE_SOURCE = "$(TARGET_SOURCE_DIR)\GenBootsector.c"
+TARGET_EXE_SOURCE = "$(TARGET_SOURCE_DIR)\Strip.c"
 TARGET_EXE_INCLUDE = 
-
 
 #
 # Build targets
@@ -69,14 +66,12 @@ all: $(TARGET_EXE)
 #
 # Build EXE
 #
-$(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.obj: $(TARGET_SOURCE_DIR)\GenBootsector.c $(TARGET_SOURCE_DIR)\fat.h
-  $(CC) $(C_FLAGS) $(INC) $(TARGET_SOURCE_DIR)\GetDrvNumOffset.c /Fo$(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.obj
 
 $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj: $(TARGET_EXE_SOURCE) $(TARGET_EXE_INCLUDE)
   $(CC) $(C_FLAGS) $(INC) $(TARGET_EXE_SOURCE) /Fo$(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj
 
 #
-# Add Binary Build description for this tool.
+# Add Binary Build description for this tools.
 #
 
 !IF (("$(EFI_BINARY_TOOLS)" == "YES") && EXIST($(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe))
@@ -85,15 +80,15 @@ $(TARGET_EXE): $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe
   if exist $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb \
   copy $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb /Y
 !ELSE
-$(TARGET_EXE): $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj $(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.obj
-  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) user32.lib advapi32.lib /out:$(TARGET_EXE) $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj $(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.obj
+$(TARGET_EXE): $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj $(TARGET_EXE_LIBS) $(TARGET_DLL)
+  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) $(LIBS) /out:$(TARGET_EXE) $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj $(TARGET_LIB)  $(TARGET_EXE_LIBS)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
   if not exist $(EFI_PLATFORM_BIN)\Tools mkdir $(EFI_PLATFORM_BIN)\Tools
   if exist $(TARGET_EXE) copy $(TARGET_EXE) $(EFI_PLATFORM_BIN)\tools\$(TARGET_NAME).exe /Y
   if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb \
   copy $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb /Y
 !ENDIF
+!ENDIF
 
 clean:
-  @if exist $(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.* del $(EDK_TOOLS_OUTPUT)\GetDrvNumOffset.* > NUL
   @if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* del $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* > NUL
-

@@ -1,6 +1,6 @@
 #/*++
 #  
-#  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+#  Copyright (c) 2004 - 2007, Intel Corporation                                                         
 #  All rights reserved. This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -15,7 +15,7 @@
 #  
 #  Abstract:
 #  
-#    makefile for building the GenPage utility.
+#    makefile for building the StrGather utility.
 #    
 #--*/  
 
@@ -36,28 +36,11 @@ TOOLCHAIN = TOOLCHAIN_MSVC
 !INCLUDE $(BUILD_DIR)\PlatformTools.env
 
 #
-# Define some macros we use here. Should get rid of them someday and 
-# get rid of the extra level of indirection.
-#
-COMMON_SOURCE      = $(EDK_TOOLS_COMMON)
-
-#
-# Common information
-#
-
-INC=$(INC)
-
-#
 # Target specific information
 #
-
-TARGET_NAME=GenPage
-TARGET_SOURCE_DIR = $(EDK_TOOLS_SOURCE)\$(TARGET_NAME)
-
-TARGET_EXE = $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).exe
-
-TARGET_EXE_SOURCE = "$(TARGET_SOURCE_DIR)\GenPage.c"
-TARGET_EXE_INCLUDE = "$(TARGET_SOURCE_DIR)\VirtualMemory.h"
+TARGET_NAME         = StrGather
+TARGET_SRC_DIR      = $(EDK_TOOLS_SOURCE)\Uefi$(TARGET_NAME)
+TARGET_EXE          = $(EDK_TOOLS_OUTPUT)\StrGather.exe
 
 #
 # Build targets
@@ -65,15 +48,39 @@ TARGET_EXE_INCLUDE = "$(TARGET_SOURCE_DIR)\VirtualMemory.h"
 
 all: $(TARGET_EXE)
 
-#
-# Build EXE
-#
 
-$(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj: $(TARGET_EXE_SOURCE) $(TARGET_EXE_INCLUDE)
-  $(CC) $(C_FLAGS) $(INC) $(TARGET_EXE_SOURCE) /Fo$(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj
+LIBS      = "$(EDK_TOOLS_OUTPUT)\Common.lib"
+
+OBJECTS   = $(EDK_TOOLS_OUTPUT)\StrGather.obj  \
+            $(EDK_TOOLS_OUTPUT)\StringDB.obj   
+
+INC_PATHS = -I $(TARGET_SRC_DIR) \
+            -I $(EDK_SOURCE)\Foundation\Include\Ia32 \
+            -I $(EDK_SOURCE)\Foundation\Efi\Include \
+            -I $(EDK_SOURCE)\Foundation\Framework\Include \
+		    -I $(EDK_SOURCE)\Foundation\Include\IndustryStandard \
+			-I $(EDK_SOURCE)\Foundation\         \
+			-I $(EDK_SOURCE)\Foundation\Core\Dxe \
+			-I $(EDK_SOURCE)\Foundation\Efi      \
+			-I $(EDK_SOURCE)\Foundation\Framework \
+			-I $(EDK_TOOLS_SOURCE)\Common \
+			-I $(EDK_SOURCE)\Foundation\Include
+
+INC_DEPS  = $(TARGET_SRC_DIR)\StrGather.h $(TARGET_SRC_DIR)\StringDB.h 
+
+C_FLAGS = $(C_FLAGS) /W4
 
 #
-# Add Binary Build description for this tool.
+# Compile each source file
+#
+$(EDK_TOOLS_OUTPUT)\StrGather.obj : $(TARGET_SRC_DIR)\StrGather.c $(INC_DEPS)
+  $(CC) $(C_FLAGS) $(INC_PATHS) $(TARGET_SRC_DIR)\StrGather.c /Fo$@
+
+$(EDK_TOOLS_OUTPUT)\StringDB.obj : $(TARGET_SRC_DIR)\StringDB.c $(INC_DEPS)
+  $(CC) $(C_FLAGS) $(INC_PATHS) $(TARGET_SRC_DIR)\StringDB.c /Fo$@
+
+#
+# Add Binary Build description for this tools.
 #
 
 !IF (("$(EFI_BINARY_TOOLS)" == "YES") && EXIST($(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe))
@@ -82,14 +89,15 @@ $(TARGET_EXE): $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe
   if exist $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb \
   copy $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb /Y
 !ELSE
-$(TARGET_EXE): $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj
-  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) /out:$(TARGET_EXE) $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).obj
+$(TARGET_EXE) : $(OBJECTS) $(LIBS)
+  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) $(LIBS) /out:$(TARGET_EXE) $(OBJECTS)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
   if not exist $(EFI_PLATFORM_BIN)\Tools mkdir $(EFI_PLATFORM_BIN)\Tools
   if exist $(TARGET_EXE) copy $(TARGET_EXE) $(EFI_PLATFORM_BIN)\tools\$(TARGET_NAME).exe /Y
   if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb \
   copy $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb /Y
 !ENDIF
+!ENDIF
 
 clean:
-  @if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* del $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* > NUL
-
+  

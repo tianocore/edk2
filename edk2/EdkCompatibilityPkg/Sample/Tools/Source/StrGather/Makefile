@@ -79,10 +79,12 @@ $(TARGET_EXE): $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe
 !ELSE
 $(TARGET_EXE) : $(OBJECTS) $(LIBS)
   $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) $(LIBS) /out:$(TARGET_EXE) $(OBJECTS)
+!IF ("$(EFI_BINARY_BUILD)" == "YES")
   if not exist $(EFI_PLATFORM_BIN)\Tools mkdir $(EFI_PLATFORM_BIN)\Tools
   if exist $(TARGET_EXE) copy $(TARGET_EXE) $(EFI_PLATFORM_BIN)\tools\$(TARGET_NAME).exe /Y
   if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb \
   copy $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb /Y
+!ENDIF
 !ENDIF
 
 clean:

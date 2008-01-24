@@ -18,13 +18,6 @@
 #--*/
 
 #
-# Everything depends on EDK_SOURCE. Make sure it's defined
-#
-!IFNDEF EDK_SOURCE
-!ERROR EDK_SOURCE environmental variable not set
-!ENDIF
-
-#
 # Define our toolchain before we include the master settings file
 #
 TOOLCHAIN = TOOLCHAIN_MSVC
@@ -42,24 +35,25 @@ MAKEFILES = $(EDK_TOOLS_SOURCE)\Common\Makefile             \
             $(EDK_TOOLS_SOURCE)\GenDepex\Makefile           \
             $(EDK_TOOLS_SOURCE)\GenFfsFile\Makefile         \
             $(EDK_TOOLS_SOURCE)\GenFvImage\Makefile         \
+            $(EDK_TOOLS_SOURCE)\GenTEImage\makefile         \
             $(EDK_TOOLS_SOURCE)\FwImage\Makefile            \
             $(EDK_TOOLS_SOURCE)\ProcessDsc\makefile         \
             $(EDK_TOOLS_SOURCE)\GuidChk\makefile            \
             $(EDK_TOOLS_SOURCE)\MakeDeps\makefile           \
             $(EDK_TOOLS_SOURCE)\SetStamp\makefile           \
+!IF "$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A"
+            $(EDK_TOOLS_SOURCE)\UefiVfrCompile\makefile     \
+            $(EDK_TOOLS_SOURCE)\UefiStrGather\makefile      \
+!ELSE
             $(EDK_TOOLS_SOURCE)\VfrCompile\makefile         \
             $(EDK_TOOLS_SOURCE)\StrGather\makefile          \
-            $(EDK_TOOLS_SOURCE)\BootsectImage\Makefile      \
-            $(EDK_TOOLS_SOURCE)\GenBootsector\Makefile      \
-            $(EDK_TOOLS_SOURCE)\GenPage\Makefile            \
+!ENDIF
             $(EDK_TOOLS_SOURCE)\SplitFile\Makefile          \
+            $(EDK_TOOLS_SOURCE)\Strip\Makefile              \
             $(EDK_TOOLS_SOURCE)\EfiCompress\Makefile        \
-            $(EDK_TOOLS_SOURCE)\EfildrImage\Makefile        \
             $(EDK_TOOLS_SOURCE)\EfiRom\Makefile             \
             $(EDK_TOOLS_SOURCE)\GenAprioriFile\Makefile     \
             $(EDK_TOOLS_SOURCE)\ModifyInf\Makefile
-
-
 
 #
 # Define default all target which calls all our makefiles. The special

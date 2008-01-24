@@ -391,6 +391,91 @@ Returns:
 }
 
 EFI_STATUS
+SearchSectionByType (
+  IN EFI_FILE_SECTION_POINTER  FirstSection,
+  IN UINT8                     *SearchEnd,
+  IN EFI_SECTION_TYPE          SectionType,
+  IN OUT UINTN                 *StartIndex,
+  IN UINTN                     Instance,
+  OUT EFI_FILE_SECTION_POINTER *Section
+  )
+/*++
+
+Routine Description:
+
+  Helper function to search a sequence of sections from the section pointed
+  by FirstSection to SearchEnd for the Instance-th section of type SectionType.
+  The current counter is saved in StartIndex and when the section is found, it's
+  saved in Section. GUID-defined sections, if special processing is not required,
+  are searched recursively in a depth-first manner.
+
+Arguments:
+
+  FirstSection The first section to start searching from.
+  SearchEnd    The end address to stop search.
+  SectionType  The type of section to search.
+  StartIndex   The current counter is saved.
+  Instance     The requested n-th section number.
+  Section      The found section returned.
+
+Returns:
+
+  EFI_SUCCESS             The function completed successfully.
+  EFI_NOT_FOUND           The section is not found.
+--*/
+{
+  EFI_FILE_SECTION_POINTER  CurrentSection;
+  EFI_FILE_SECTION_POINTER  InnerSection;
+  EFI_STATUS                Status;
+  UINTN                     SectionSize;
+
+  CurrentSection = FirstSection;
+
+  while ((UINTN) CurrentSection.CommonHeader < (UINTN) SearchEnd) {
+    if (CurrentSection.CommonHeader->Type == SectionType) {
+      (*StartIndex)++;
+    }
+
+    if (*StartIndex == Instance) {
+      *Section = CurrentSection;
+      return EFI_SUCCESS;
+    }
+    //
+    // If the requesting section is not GUID-defined and
+    // we find a GUID-defined section that doesn't need
+    // special processing, go ahead to search the requesting
+    // section inside the GUID-defined section.
+    //
+    if (SectionType != EFI_SECTION_GUID_DEFINED &&
+        CurrentSection.CommonHeader->Type == EFI_SECTION_GUID_DEFINED &&
+        !(CurrentSection.GuidDefinedSection->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED)) {
+      InnerSection.CommonHeader = (EFI_COMMON_SECTION_HEADER *)
+        ((UINTN) CurrentSection.CommonHeader + CurrentSection.GuidDefinedSection->DataOffset);
+      SectionSize = CurrentSection.CommonHeader->Size[0] +
+        (CurrentSection.CommonHeader->Size[1] << 8) + 
+        (CurrentSection.CommonHeader->Size[2] << 16);
+      Status = SearchSectionByType (
+                 InnerSection,
+                 (UINT8 *) ((UINTN) CurrentSection.CommonHeader + SectionSize),
+                 SectionType,
+                 StartIndex,
+                 Instance,
+                 Section
+                 );
+      if (!EFI_ERROR (Status)) {
+        return EFI_SUCCESS;
+      }
+    }
+    //
+    // Find next section (including compensating for alignment issues.
+    //
+    CurrentSection.CommonHeader = (EFI_COMMON_SECTION_HEADER *) ((((UINTN) CurrentSection.CommonHeader) + GetLength (CurrentSection.CommonHeader->Size) + 0x03) & (-1 << 2));
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
 GetSectionByType (
   IN EFI_FFS_FILE_HEADER          *File,
   IN EFI_SECTION_TYPE             SectionType,
@@ -403,7 +488,8 @@ Routine Description:
 
   Find a section in a file by type and instance.  An instance of 1 is the first 
   instance.  The function will return NULL if a matching section cannot be found.
-  The function will not handle encapsulating sections.
+  GUID-defined sections, if special processing is not needed, are handled in a
+  depth-first manner.
 
 Arguments:
 
@@ -448,28 +534,24 @@ Returns:
   //
   CurrentSection.CommonHeader = (EFI_COMMON_SECTION_HEADER *) ((UINTN) File + sizeof (EFI_FFS_FILE_HEADER));
 
-  //
-  // Loop as long as we have a valid file
-  //
-  while ((UINTN) CurrentSection.CommonHeader < (UINTN) File + GetLength (File->Size)) {
-    if (CurrentSection.CommonHeader->Type == SectionType) {
-      SectionCount++;
-    }
+  Status = SearchSectionByType (
+             CurrentSection,
+             (UINT8 *) ((UINTN) File + GetLength (File->Size)),
+             SectionType,
+             &SectionCount,
+             Instance,
+             Section
+             );
 
-    if (SectionCount == Instance) {
-      *Section = CurrentSection;
-      return EFI_SUCCESS;
-    }
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  } else {
     //
-    // Find next section (including compensating for alignment issues.
+    // Section not found
     //
-    CurrentSection.CommonHeader = (EFI_COMMON_SECTION_HEADER *) ((((UINTN) CurrentSection.CommonHeader) + GetLength (CurrentSection.CommonHeader->Size) + 0x03) & (-1 << 2));
+    (*Section).Code16Section = NULL;
+    return EFI_NOT_FOUND;
   }
-  //
-  // Section not found
-  //
-  (*Section).Code16Section = NULL;
-  return EFI_NOT_FOUND;
 }
 //
 // will not parse compressed sections

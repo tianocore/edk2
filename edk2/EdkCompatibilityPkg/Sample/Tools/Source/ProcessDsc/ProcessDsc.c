@@ -554,6 +554,12 @@ AddModuleName (
   INT8    *InfName
   );
 
+static 
+void
+ReplaceSlash (
+  INT8    *Path
+  );
+
 /*****************************************************************************/
 int
 main (
@@ -1032,10 +1038,11 @@ Returns:
   // added local symbols
   //
   ExpandSymbols (ArgLine, Line, sizeof (Line), EXPANDMODE_NO_UNDEFS);
-
+  
   //
   // If we have "c:\path\filename"
   //
+  ReplaceSlash (Line);
   if (IsAbsolutePath (Line)) {
     ComponentFilePathAbsolute = 1;
   } else if (Line[0] == '.') {
@@ -1054,7 +1061,7 @@ Returns:
   //
   strcpy (ComponentFilePath, Line);
   Cptr = ComponentFilePath + strlen (ComponentFilePath) - 1;
-  while ((*Cptr != '\\') && (*Cptr != '/') && (Cptr != ComponentFilePath)) {
+  while ((*Cptr != '\\') && (Cptr != ComponentFilePath)) {
     Cptr--;
   }
   //
@@ -1239,7 +1246,8 @@ Returns:
   // They may have defined DEST_DIR on the component INF line, so it's already
   // been defined, If that's the case, then don't set it to the path of this file.
   //
-  if (GetSymbolValue (DEST_DIR) == NULL) {
+  TempCptr = GetSymbolValue (DEST_DIR);
+  if (TempCptr == NULL) {
     if (ComponentFilePathAbsolute == 0) {
       //
       // The destination path is $(BUILD_DIR)\$(PROCESSOR)\component_path
@@ -1264,6 +1272,8 @@ Returns:
         );
     }
     AddSymbol (DEST_DIR, FileName, SYM_OVERWRITE | SYM_LOCAL | SYM_FILEPATH);
+  } else {
+    ReplaceSlash (TempCptr);
   }
   
   //
@@ -1818,6 +1828,7 @@ Returns:
   //
   OverridePath = GetSymbolValue (SOURCE_OVERRIDE_PATH);
   if (OverridePath != NULL) {
+    ReplaceSlash (OverridePath);
     fprintf (MakeFptr, "INC = $(INC) -I %s\n", OverridePath);
     fprintf (MakeFptr, "INC = $(INC) -I %s\\%s \n", OverridePath, Processor);
   }
@@ -1881,6 +1892,7 @@ ProcessIncludesSectionSingle (
       // Don't process blank lines
       //
       if (*Cptr) {
+        ReplaceSlash (Cptr);
         //
         // Strip off trailing slash
         //
@@ -2150,6 +2162,7 @@ ProcessSourceFilesSection (
         //
         ExpandSymbols (Cptr, FileName, sizeof (FileName), 0);
         AddFileSymbols (FileName);
+        ReplaceSlash (FileName);
         //
         // Set the SOURCE_FILE_NAME symbol. What we have now is the name of
         // the file, relative to the location of the INF file. So prepend
@@ -2197,6 +2210,7 @@ ProcessSourceFilesSection (
           OverridePath = GetSymbolValue (SOURCE_OVERRIDE_PATH);
         }
         if (OverridePath != NULL) {
+          ReplaceSlash (OverridePath);
           //
           // See if the file exists. If it does, reset the SOURCE_FILE_NAME symbol.
           //
@@ -2490,6 +2504,7 @@ ProcessObjectsSingle (
         //
         if (!IsIncludeFile (Cptr)) {
           ExpandSymbols (Cptr, FileName, sizeof (FileName), 0);
+          ReplaceSlash (FileName);
           Cptr2 = BuiltFileExtension (FileName);
           if (Cptr2 != NULL) {
             SetFileExtension (FileName, Cptr2);
@@ -2731,8 +2746,10 @@ ProcessIncludeFilesSingle (
         //
         ExpandSymbols (Cptr, FileName, sizeof (FileName), 0);
         AddFileSymbols (FileName);
+        ReplaceSlash (FileName);
         if (IsIncludeFile (FileName)) {
           if ((OverridePath != NULL) && (!IsAbsolutePath (FileName))) {
+            ReplaceSlash (OverridePath);
             strcpy (TempFileName, OverridePath);
             strcat (TempFileName, "\\");
             strcat (TempFileName, FileName);
@@ -2743,7 +2760,7 @@ ProcessIncludeFilesSingle (
               // to the beginning of the list of include paths.
               //
               for (Cptr = TempFileName + strlen (TempFileName) - 1;
-                   (Cptr >= TempFileName) && (*Cptr != '\\') && (*Cptr != '/');
+                   (Cptr >= TempFileName) && (*Cptr != '\\');
                    Cptr--
                   )
                 ;
@@ -2848,9 +2865,9 @@ GetFileParts (
     FP->Extension[0]  = 0;
   }
   //
-  // Now back up and get the base name (include the preceding '\' or '/')
+  // Now back up and get the base name (include the preceding '\')
   //
-  for (; (Cptr > FileNamePtr) && (*Cptr != '\\') && (*Cptr != '/'); Cptr--)
+  for (; (Cptr > FileNamePtr) && (*Cptr != '\\'); Cptr--)
     ;
   FP->BaseName = (char *) malloc (strlen (Cptr) + 1);
   strcpy (FP->BaseName, Cptr);
@@ -3329,7 +3346,7 @@ MakeFilePath (
   }
 
   for (;;) {
-    for (; *Cptr && (*Cptr != '/') && (*Cptr != '\\'); Cptr++)
+    for (; *Cptr && (*Cptr != '\\'); Cptr++)
       ;
     if (*Cptr) {
       SavedChar = *Cptr;
@@ -4204,6 +4221,7 @@ Returns:
     FreeCwd = 1;
     AddSymbol (BUILD_DIR, Cptr, SYM_OVERWRITE | SYM_GLOBAL | SYM_FILEPATH);
   } else {
+    ReplaceSlash (Cptr);
     FreeCwd = 0;
   }
 
@@ -4359,6 +4377,7 @@ GetEfiSource (
   //
   EfiSource = GetSymbolValue (EFI_SOURCE);
   if ( EfiSource != NULL) {
+    ReplaceSlash (EfiSource);
     if (EfiSource[strlen (EfiSource) - 1] == '\\') {
       EfiSource[strlen (EfiSource) - 1] = 0;
     }    
@@ -4370,6 +4389,7 @@ GetEfiSource (
   //
   EfiSource = getenv (EFI_SOURCE);
   if (EfiSource != NULL) {
+    ReplaceSlash (EfiSource);
     if (EfiSource[strlen (EfiSource) - 1] == '\\') {
       EfiSource[strlen (EfiSource) - 1] = 0;
     }
@@ -4724,3 +4744,26 @@ Returns:
   return 0;
 }
 
+ 
+static 
+void
+ReplaceSlash (
+  INT8    *Path
+  )
+/*++
+
+Routine Description:
+  
+  Replace '/' with '\\'
+
+Returns:
+
+--*/
+{
+  while (*Path) {
+    if (*Path == '/') {
+      *Path = '\\';
+    }
+    Path++;
+  }
+}

@@ -52,3 +52,5 @@ $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\EdkDxeSalLib\EdkDxeSalLib.i
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\EdkDxeRuntimeDriverLib\EdkDxeRuntimeDriverLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\DxeSmbusLib\DxeSmbusLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiSmbusLib\PeiSmbusLib.inf
+$(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\DxePerformanceLib\DxePerformanceLib.inf
+$(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiPerformanceLib\PeiPerformanceLib.inf

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -101,6 +101,12 @@ typedef struct _SYMBOL {
   INT8            *Value;
 } SYMBOL;
 
+typedef enum {
+  SearchCurrentDir,
+  SearchIncludePaths,
+  SearchAllPaths,
+} FILE_SEARCH_TYPE;
+
 //
 // Here's all our globals. We need a linked list of include paths, a linked
 // list of source files, a linked list of subdirectories (appended to each
@@ -108,6 +114,7 @@ typedef struct _SYMBOL {
 //
 static struct {
   STRING_LIST *IncludePaths;            // all include paths to search
+  STRING_LIST *ParentPaths;             // all parent paths to search
   STRING_LIST *SourceFiles;             // all source files to parse
   STRING_LIST *SubDirs;                 // appended to each include path when searching
   SYMBOL      *SymbolTable;             // for replacement strings
@@ -120,25 +127,37 @@ static struct {
   BOOLEAN     NoDupes;                  // to not list duplicate dependency files (for timing purposes)
   BOOLEAN     UseSumDeps;               // use summary dependency files if found
   BOOLEAN     IsAsm;                    // The SourceFiles are assembler files
+  BOOLEAN     IsCl;                     // The SourceFiles are the output of cl with /showIncludes
   INT8        TargetFileName[MAX_PATH]; // target object filename
   INT8        SumDepsPath[MAX_PATH];    // path to summary files
+  INT8        TmpFileName[MAX_PATH];    // temp file name for output file
   INT8        *OutFileName;             // -o option
 } mGlobals;
 
 static
 STATUS
 ProcessFile (
+  INT8              *TargetFileName,
+  INT8              *FileName,
+  UINT32            NestDepth,
+  STRING_LIST       *ProcessedFiles,
+  FILE_SEARCH_TYPE  FileSearchType
+  );
+
+static
+STATUS
+ProcessClOutput (
   INT8            *TargetFileName,
   INT8            *FileName,
-  UINT32          NestDepth,
   STRING_LIST     *ProcessedFiles
   );
 
 static
 FILE  *
 FindFile (
-  INT8    *FileName,
-  UINT32  FileNameLen
+  INT8              *FileName,
+  UINT32            FileNameLen,
+  FILE_SEARCH_TYPE  FileSearchType
   );
 
 static
@@ -258,7 +277,12 @@ Returns:
       strcpy (TargetFileName, mGlobals.TargetFileName);
     }
 
-    Status = ProcessFile (TargetFileName, File->Str, START_NEST_DEPTH, &ProcessedFiles);
+    if (mGlobals.IsCl) {
+      Status = ProcessClOutput (TargetFileName, File->Str, &ProcessedFiles);
+    } else {
+      Status = ProcessFile (TargetFileName, File->Str, START_NEST_DEPTH, 
+                            &ProcessedFiles, SearchCurrentDir);
+    }
     if (Status != STATUS_SUCCESS) {
       goto Finish;
     }
@@ -282,7 +306,7 @@ Finish:
     ProcessedFiles.Next = TempList;
   }
   //
-  // Close our output file
+  // Close our temp output file
   //
   if ((mGlobals.OutFptr != stdout) && (mGlobals.OutFptr != NULL)) {
     fclose (mGlobals.OutFptr);
@@ -291,12 +315,22 @@ Finish:
   if (mGlobals.NeverFail) {
     return STATUS_SUCCESS;
   }
-  //
-  // If any errors, then delete our output so that it will get created
-  // again on a rebuild.
-  //
-  if ((GetUtilityStatus () == STATUS_ERROR) && (mGlobals.OutFileName != NULL)) {
-    remove (mGlobals.OutFileName);
+
+  if (mGlobals.OutFileName != NULL) {
+    if (GetUtilityStatus () == STATUS_ERROR) {
+      //
+      // If any errors, then delete our temp output
+      // Also try to delete target file to improve the incremental build
+      //      
+      remove (mGlobals.TmpFileName);
+      remove (TargetFileName);
+    } else {
+      //
+      // Otherwise, rename temp file to output file
+      //
+      remove (mGlobals.OutFileName);
+      rename (mGlobals.TmpFileName, mGlobals.OutFileName);
+    }
   }
 
   return GetUtilityStatus ();
@@ -305,10 +339,11 @@ Finish:
 static
 STATUS
 ProcessFile (
-  INT8            *TargetFileName,
-  INT8            *FileName,
-  UINT32          NestDepth,
-  STRING_LIST     *ProcessedFiles
+  INT8              *TargetFileName,
+  INT8              *FileName,
+  UINT32            NestDepth,
+  STRING_LIST       *ProcessedFiles,
+  FILE_SEARCH_TYPE  FileSearchType
   )
 /*++
 
@@ -322,6 +357,7 @@ Arguments:
   FileName       - name of the file to process
   NestDepth      - how deep we're nested in includes
   ProcessedFiles - list of processed files.
+  FileSearchType - search type for FileName
 
 Returns:
 
@@ -342,6 +378,7 @@ Returns:
   UINT32      Index;
   UINT32      LineNum;
   STRING_LIST *ListPtr;
+  STRING_LIST ParentPath;
 
   Status  = STATUS_SUCCESS;
   Fptr    = NULL;
@@ -380,37 +417,6 @@ Returns:
       return STATUS_SUCCESS;
     }
   }
-  //
-  // If we're not doing duplicates, and we've already seen this filename,
-  // then return
-  //
-  if (mGlobals.NoDupes) {
-    for (ListPtr = ProcessedFiles->Next; ListPtr != NULL; ListPtr = ListPtr->Next) {
-      if (_stricmp (FileName, ListPtr->Str) == 0) {
-        break;
-      }
-    }
-    //
-    // If we found a match, we're done. If we didn't, create a new element
-    // and add it to the list.
-    //
-    if (ListPtr != NULL) {
-      //
-      // Print a message if verbose mode
-      //
-      if (mGlobals.Verbose) {
-        DebugMsg (NULL, 0, 0, FileName, "duplicate include -- not processed again");
-      }
-
-      return STATUS_SUCCESS;
-    }
-
-    ListPtr       = malloc (sizeof (STRING_LIST));
-    ListPtr->Str  = malloc (strlen (FileName) + 1);
-    strcpy (ListPtr->Str, FileName);
-    ListPtr->Next         = ProcessedFiles->Next;
-    ProcessedFiles->Next  = ListPtr;
-  }
 
   //
   // Make sure we didn't exceed our maximum nesting depth
@@ -424,14 +430,20 @@ Returns:
   // if we have to.
   //
   strcpy (FileNameCopy, FileName);
-  //
-  // Try to open the file locally
-  //
-  if ((Fptr = fopen (FileNameCopy, "r")) == NULL) {
+  
+  if (FileSearchType == SearchCurrentDir) {
+    //
+    // Try to open the source file locally
+    //
+    if ((Fptr = fopen (FileNameCopy, "r")) == NULL) {
+      Error (NULL, 0, 0, FileNameCopy, "could not open source file");
+      return STATUS_ERROR;
+    }
+  } else {
     //
     // Try to find it among the paths.
     //
-    Fptr = FindFile (FileNameCopy, sizeof (FileNameCopy));
+    Fptr = FindFile (FileNameCopy, sizeof (FileNameCopy), FileSearchType);
     if (Fptr == NULL) {
       //
       // If this is not the top-level file, and the command-line argument
@@ -457,11 +469,58 @@ Returns:
       }
     }
   }
+
+  //
+  // If we're not doing duplicates, and we've already seen this filename,
+  // then return
+  //
+  if (mGlobals.NoDupes) {
+    for (ListPtr = ProcessedFiles->Next; ListPtr != NULL; ListPtr = ListPtr->Next) {
+      if (_stricmp (FileNameCopy, ListPtr->Str) == 0) {
+        break;
+      }
+    }
+    //
+    // If we found a match, we're done. If we didn't, create a new element
+    // and add it to the list.
+    //
+    if (ListPtr != NULL) {
+      //
+      // Print a message if verbose mode
+      //
+      if (mGlobals.Verbose) {
+        DebugMsg (NULL, 0, 0, FileNameCopy, "duplicate include -- not processed again");
+      }
+      fclose (Fptr);
+      return STATUS_SUCCESS;
+    }
+
+    ListPtr       = malloc (sizeof (STRING_LIST));
+    ListPtr->Str  = malloc (strlen (FileNameCopy) + 1);
+    strcpy (ListPtr->Str, FileNameCopy);
+    ListPtr->Next         = ProcessedFiles->Next;
+    ProcessedFiles->Next  = ListPtr;
+  }
+    
   //
   // Print the dependency, with string substitution
   //
   PrintDependency (TargetFileName, FileNameCopy);
-
+  
+  //
+  // Get the file path and push to ParentPaths
+  //
+  Cptr = FileNameCopy + strlen (FileNameCopy) - 1;
+  for (; (Cptr > FileNameCopy) && (*Cptr != '\\') && (*Cptr != '/'); Cptr--);
+  if ((*Cptr == '\\') || (*Cptr == '/')) {
+    *(Cptr + 1) = 0;
+  } else {
+    strcpy (FileNameCopy, ".\\");
+  }
+  ParentPath.Next = mGlobals.ParentPaths;
+  ParentPath.Str = FileNameCopy;
+  mGlobals.ParentPaths = &ParentPath;
+  
   //
   // Now read in lines and find all #include lines. Allow them to indent, and
   // to put spaces between the # and include.
@@ -523,7 +582,8 @@ Returns:
           // Null terminate the filename and try to process it.
           //
           *EndPtr = 0;
-          Status  = ProcessFile (TargetFileName, Cptr, NestDepth + 1, ProcessedFiles);
+          Status  = ProcessFile (TargetFileName, Cptr, NestDepth + 1, 
+                                 ProcessedFiles, SearchAllPaths);
         } else {
           //
           // Handle special #include MACRO_NAME(file)
@@ -579,7 +639,8 @@ Returns:
                 //
                 // Process immediately, then break out of the outside FOR loop.
                 //
-                Status = ProcessFile (TargetFileName, MacroIncludeFileName, NestDepth + 1, ProcessedFiles);
+                Status = ProcessFile (TargetFileName, MacroIncludeFileName, NestDepth + 1, 
+                                      ProcessedFiles, SearchAllPaths);
                 break;
               }
             }
@@ -615,12 +676,20 @@ Returns:
             //
             // If we're processing it, do it
             //
-            if ((EndChar != '>') || (!mGlobals.NoSystem)) {
+            if (EndChar != '>') {
               //
               // Null terminate the filename and try to process it.
               //
               *EndPtr = 0;
-              Status  = ProcessFile (TargetFileName, Cptr, NestDepth + 1, ProcessedFiles);
+              Status  = ProcessFile (TargetFileName, Cptr, NestDepth + 1, 
+                                     ProcessedFiles, SearchAllPaths);
+            } else if (!mGlobals.NoSystem) {
+              //
+              // Null terminate the filename and try to process it.
+              //
+              *EndPtr = 0;
+              Status  = ProcessFile (TargetFileName, Cptr, NestDepth + 1, 
+                                     ProcessedFiles, SearchIncludePaths);
             }
           } else {
             Warning (FileNameCopy, LineNum, 0, "malformed include", "missing closing %c", EndChar);
@@ -631,6 +700,10 @@ Returns:
       }
     }
   }
+  //
+  // Pop the file path from ParentPaths
+  //
+  mGlobals.ParentPaths = ParentPath.Next;  
 
 Finish:
   //
@@ -641,6 +714,120 @@ Finish:
   }
 
   return Status;
+}
+
+static
+STATUS
+ProcessClOutput (
+  INT8            *TargetFileName,
+  INT8            *FileName,
+  STRING_LIST     *ProcessedFiles
+  )
+/*++
+
+Routine Description:
+
+  Given a source file name, open the file and parse all "Note: including file: xxx.h" lines.
+  
+Arguments:
+
+  TargetFileName - name of the usually .obj target
+  FileName       - name of the file to process
+  ProcessedFiles - list of processed files.
+
+Returns:
+
+  standard status.
+  
+--*/
+{
+  FILE        *Fptr;
+  INT8        Line[MAX_LINE_LEN];
+  INT8        IncludeFileName[MAX_LINE_LEN];
+  STRING_LIST *ListPtr;
+  BOOLEAN     ClError;
+  INT32       Ret;
+  INT8        Char;
+
+  if ((Fptr = fopen (FileName, "r")) == NULL) {
+    Error (NULL, 0, 0, FileName, "could not open file for reading");
+    return STATUS_ERROR;
+  }
+  if (fgets (Line, sizeof (Line), Fptr) != NULL) {
+    //
+    // First line is the source file name, print it
+    //
+    printf ("%s", Line);
+  } else {
+    //
+    // No output from cl
+    //
+    fclose (Fptr);
+    Error (NULL, 0, 0, NULL, "incorrect cl tool path may be used ");
+    return STATUS_ERROR;
+  }
+  
+  ClError = FALSE;
+  while (fgets (Line, sizeof (Line), Fptr) != NULL) {
+    Ret = sscanf (Line, "Note: including file: %s %c", IncludeFileName, &Char);
+    if (Ret == 2) {
+      //
+      // There is space in include file name. It's VS header file. Ignore it.
+      //
+      continue;
+    } else if ( Ret != 1) {
+      //
+      // Cl error info, print it
+      // the tool will return error code to stop the nmake
+      //
+      ClError = TRUE;
+      printf ("%s", Line);
+      continue;
+    }
+    
+    //
+    // If we're not doing duplicates, and we've already seen this filename,
+    // then continue
+    //
+    if (mGlobals.NoDupes) {
+      for (ListPtr = ProcessedFiles->Next; ListPtr != NULL; ListPtr = ListPtr->Next) {
+        if (_stricmp (IncludeFileName, ListPtr->Str) == 0) {
+          break;
+        }
+      }
+      //
+      // If we found a match, we're done. If we didn't, create a new element
+      // and add it to the list.
+      //
+      if (ListPtr != NULL) {
+        //
+        // Print a message if verbose mode
+        //
+        if (mGlobals.Verbose) {
+          DebugMsg (NULL, 0, 0, IncludeFileName, "duplicate include -- not processed again");
+        }
+  
+        continue;
+      }
+  
+      ListPtr       = malloc (sizeof (STRING_LIST));
+      ListPtr->Str  = malloc (strlen (IncludeFileName) + 1);
+      strcpy (ListPtr->Str, IncludeFileName);
+      ListPtr->Next         = ProcessedFiles->Next;
+      ProcessedFiles->Next  = ListPtr;
+    }
+    
+    PrintDependency (TargetFileName, IncludeFileName);
+  }
+  
+  fclose (Fptr);
+  
+  if (ClError) {
+    Error (NULL, 0, 0, NULL, "cl error");
+    return STATUS_ERROR;
+  } else {
+    return STATUS_SUCCESS;
+  }
 }
 
 static
@@ -754,8 +941,9 @@ ReplaceSymbols (
 static
 FILE *
 FindFile (
-  INT8    *FileName,
-  UINT32  FileNameLen
+  INT8              *FileName,
+  UINT32            FileNameLen,
+  FILE_SEARCH_TYPE  FileSearchType
   )
 {
   FILE        *Fptr;
@@ -766,6 +954,49 @@ FindFile (
   //
   // Traverse the list of paths and try to find the file
   //
+  if (FileSearchType == SearchAllPaths) {
+    List = mGlobals.ParentPaths;
+    while (List != NULL) {
+      //
+      // Put the path and filename together
+      //
+      if (strlen (List->Str) + strlen (FileName) + 1 > sizeof (FullFileName)) {
+        Error (
+          __FILE__,
+          __LINE__,
+          0,
+          "application error",
+          "cannot concatenate '%s' + '%s'",
+          List->Str,
+          FileName
+          );
+        return NULL;
+      }
+      //
+      // Append the filename to this include path and try to open the file.
+      //
+      strcpy (FullFileName, List->Str);
+      strcat (FullFileName, FileName);
+      if ((Fptr = fopen (FullFileName, "r")) != NULL) {
+        //
+        // Return the file name
+        //
+        if (FileNameLen <= strlen (FullFileName)) {
+          Error (__FILE__, __LINE__, 0, "application error", "internal path name of insufficient length");
+          //
+          // fprintf (stdout, "File length > %d: %s\n", FileNameLen, FullFileName);
+          //
+          return NULL;
+        }
+  
+        strcpy (FileName, FullFileName);
+        return Fptr;
+      }
+  
+      List = List->Next;
+    }    
+  }
+  
   List = mGlobals.IncludePaths;
   while (List != NULL) {
     //
@@ -846,7 +1077,7 @@ ProcessArgs (
   STRING_LIST *LastIncludePath;
   STRING_LIST *LastSourceFile;
   SYMBOL      *Symbol;
-  int         Index;
+
   //
   // Clear our globals
   //
@@ -957,50 +1188,7 @@ ProcessArgs (
         Usage ();
         return STATUS_ERROR;
       }
-      //
-      // The C compiler first looks for #include files in the directory where
-      // the source file came from. Add the file's source directory to the
-      // list of include paths.
-      //
-      NewList = malloc (sizeof (STRING_LIST));
-      if (NewList == NULL) {
-        Error (__FILE__, __LINE__, 0, "memory allocation failure", NULL);
-        return STATUS_ERROR;
-      }
 
-      NewList->Next = NULL;
-      NewList->Str  = malloc (strlen (Argv[1]) + 3);
-      if (NewList->Str == NULL) {
-        free (NewList);
-        Error (__FILE__, __LINE__, 0, "memory allocation failure", NULL);
-        return STATUS_ERROR;
-      }
-
-      strcpy (NewList->Str, Argv[1]);
-      //
-      // Back up in the source file name to the last backslash and terminate after it.
-      //
-      for (Index = strlen (NewList->Str) - 1; (Index > 0) && (NewList->Str[Index] != '\\'); Index--)
-        ;
-      if (Index < 0) {
-        strcpy (NewList->Str, ".\\");
-      } else {
-        NewList->Str[Index + 1] = 0;
-      }
-      //
-      // Add it to the end of the our list of include paths
-      //
-      if (mGlobals.IncludePaths == NULL) {
-        mGlobals.IncludePaths = NewList;
-      } else {
-        LastIncludePath->Next = NewList;
-      }
-
-      if (mGlobals.Verbose) {
-        fprintf (stdout, "Adding include path: %s\n", NewList->Str);
-      }
-
-      LastIncludePath = NewList;
       Argc--;
       Argv++;
     } else if (_stricmp (Argv[0], "-s") == 0) {
@@ -1145,15 +1333,20 @@ ProcessArgs (
       // check for one more arg
       //
       if (Argc > 1) {
+        mGlobals.OutFileName = Argv[1];
         //
-        // Try to open the file
+        // Use temp file for output
+        // This can avoid overwriting previous existed dep file when error 
+        // ocurred in this tool
         //
-        if ((mGlobals.OutFptr = fopen (Argv[1], "w")) == NULL) {
-          Error (NULL, 0, 0, Argv[1], "could not open file for writing");
+        sprintf (mGlobals.TmpFileName, "%s2", mGlobals.OutFileName);
+        //
+        // Try to open the temp file
+        //
+        if ((mGlobals.OutFptr = fopen (mGlobals.TmpFileName, "w")) == NULL) {
+          Error (NULL, 0, 0, mGlobals.TmpFileName, "could not open file for writing");
           return STATUS_ERROR;
         }
-
-        mGlobals.OutFileName = Argv[1];
       } else {
         Error (NULL, 0, 0, Argv[0], "option requires output file name");
         Usage ();
@@ -1171,7 +1364,17 @@ ProcessArgs (
     } else if (_stricmp (Argv[0], "-ignorenotfound") == 0) {
       mGlobals.IgnoreNotFound = TRUE;
     } else if (_stricmp (Argv[0], "-asm") == 0) {
+      if (mGlobals.IsCl) {
+        Error (NULL, 0, 0, Argv[0], "option conflict with -cl");
+        return STATUS_ERROR;
+      }      
       mGlobals.IsAsm = TRUE;
+    } else if (_stricmp (Argv[0], "-cl") == 0) {
+      if (mGlobals.IsAsm) {
+        Error (NULL, 0, 0, Argv[0], "option conflict with -asm");
+        return STATUS_ERROR;
+      }
+      mGlobals.IsCl = TRUE; 
     } else if ((_stricmp (Argv[0], "-h") == 0) || (strcmp (Argv[0], "-?") == 0)) {
       Usage ();
       return STATUS_ERROR;
@@ -1306,7 +1509,8 @@ Returns:
     //    "      -nodupes         keep track of include files, don't rescan duplicates",
     //
     "      -usesumdeps path use summary dependency files in 'path' directory.",
-    "      -asm             The SourceFile is assembler file",
+    "      -asm             The SourceFiles are assembler files",
+    "      -cl              The SourceFiles are the output of cl with /showIncludes",
     "",
     NULL
   };
