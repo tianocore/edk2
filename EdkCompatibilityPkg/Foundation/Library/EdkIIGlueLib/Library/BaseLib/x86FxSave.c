@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Save the current floating point/SSE/SSE2 context to a buffer.

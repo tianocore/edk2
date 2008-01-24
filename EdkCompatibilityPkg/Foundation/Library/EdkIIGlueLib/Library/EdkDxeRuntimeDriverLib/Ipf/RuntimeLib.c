@@ -57,6 +57,7 @@ Returns:
   }
 }
 
+STATIC
 VOID
 EFIAPI
 RuntimeLibVirtualNotifyEvent (
@@ -147,7 +148,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 RuntimeDriverLibDeconstruct (
-  VOID
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 /*++
 
@@ -199,8 +201,11 @@ Returns:
 
 --*/
 {
-  EFI_GUID Guid = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID;
+  EFI_GUID Guid;
   SAL_RETURN_REGS ReturnReg;
+
+  *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_LO;
+  *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_HI;
 
   ReturnReg = EfiCallEsalService (&Guid, IsEfiRuntime, 0, 0, 0, 0, 0, 0, 0);
 
@@ -225,8 +230,11 @@ Returns:
 
 --*/
 {
-  EFI_GUID Guid = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID;
+  EFI_GUID Guid;
   SAL_RETURN_REGS ReturnReg;
+
+  *((UINT64 *) &Guid) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_LO;
+  *(((UINT64 *)&Guid) + 1) = EFI_EXTENDED_SAL_VIRTUAL_SERVICES_PROTOCOL_GUID_HI;
 
   ReturnReg = EfiCallEsalService (&Guid, IsVirtual, 0, 0, 0, 0, 0, 0, 0);
 

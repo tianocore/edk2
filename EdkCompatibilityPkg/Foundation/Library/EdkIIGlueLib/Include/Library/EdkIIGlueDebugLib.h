@@ -97,6 +97,19 @@ Abstract:
 #define EFI_D_EVENT     DEBUG_EVENT
 #define EFI_D_ERROR     DEBUG_ERROR
 
+
+//
+// Use the following 4 macros to save size
+//
+#define DebugAssertEnabled()      ((BOOLEAN)((__EDKII_GLUE_PCD_PcdDebugPropertyMask__ & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0))
+
+#define DebugPrintEnabled()       ((BOOLEAN)((__EDKII_GLUE_PCD_PcdDebugPropertyMask__ & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0))
+
+#define DebugCodeEnabled()        ((BOOLEAN)((__EDKII_GLUE_PCD_PcdDebugPropertyMask__ & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0))
+
+#define DebugClearMemoryEnabled() ((BOOLEAN)((__EDKII_GLUE_PCD_PcdDebugPropertyMask__ & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0))
+
+
 /**
 
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -179,78 +192,6 @@ DebugClearMemory (
 
 /**
   
-  Returns TRUE if ASSERT() macros are enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-DebugAssertEnabled (
-  VOID
-  );
-
-
-/**
-  
-  Returns TRUE if DEBUG()macros are enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-DebugPrintEnabled (
-  VOID
-  );
-
-
-/**
-  
-  Returns TRUE if DEBUG_CODE()macros are enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-DebugCodeEnabled (
-  VOID
-  );
-
-
-/**
-  
-  Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-DebugClearMemoryEnabled (
-  VOID
-  );
-
-
-/**
-  
   Internal worker macro that calls DebugAssert().
 
   This macro calls DebugAssert() passing in the filename, line number, and 
@@ -259,8 +200,12 @@ DebugClearMemoryEnabled (
   @param  Expression  Boolean expression that evailated to FALSE
 
 **/
+#ifdef EFI_DEBUG
 #define _ASSERT(Expression)  DebugAssert (__FILE__, __LINE__, #Expression)
+#else
+#define _ASSERT(Expression)
 
+#endif
 
 /**
   
@@ -273,8 +218,12 @@ DebugClearMemoryEnabled (
                       and a variable argument list based on the format string.
 
 **/
+#ifdef EFI_DEBUG
 #define _DEBUG(Expression)   DebugPrint Expression
+#else
+#define _DEBUG(Expression)
 
+#endif
 
 /**
   
@@ -443,6 +392,7 @@ DebugClearMemoryEnabled (
   @param  Guid    Pointer to a protocol GUID.
 
 **/
+#ifdef EFI_DEBUG
 #define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                               \
   do {                                                                                \
     if (DebugAssertEnabled ()) {                                                      \
@@ -459,6 +409,10 @@ DebugClearMemoryEnabled (
       }                                                                               \
     }                                                                                 \
   } while (FALSE)
+#else
+#define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                               \
+   do {} while(0);
+#endif
 
 
 /**
@@ -563,9 +517,15 @@ DebugClearMemoryEnabled (
   @param  TestSignature  The 32-bit signature value to match.
 
 **/
-#define CR(Record, TYPE, Field, TestSignature)                                          \
-  (DebugAssertEnabled () && (_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
-  (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                   \
-  _CR (Record, TYPE, Field)
-    
+#ifdef EFI_DEBUG
+  #define CR(Record, TYPE, Field, TestSignature)                                          \
+    (DebugAssertEnabled () && (_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
+    (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                   \
+    _CR (Record, TYPE, Field)
+#else
+  #define CR(Record, TYPE, Field, TestSignature)                                          \
+          _CR (Record, TYPE, Field)
+#endif
+
+
 #endif

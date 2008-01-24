@@ -73,7 +73,9 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION(Bis)
 #include EFI_PROTOCOL_DEFINITION(BusSpecificDriverOverride)
 #include EFI_PROTOCOL_DEFINITION(ComponentName)
-#include EFI_PROTOCOL_DEFINITION(ComponentName2)
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#include EFI_PROTOCOL_DEFINITION (ComponentName2)
+#endif
 #include EFI_PROTOCOL_DEFINITION(DebugPort)
 #include EFI_PROTOCOL_DEFINITION(DebugSupport)
 #include EFI_PROTOCOL_DEFINITION(Decompress)

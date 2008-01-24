@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +28,7 @@ Abstract:
 
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveInitialize (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -52,6 +53,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveIoWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -87,6 +89,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveIoReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -122,6 +125,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveMemWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -157,6 +161,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveMemReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -192,6 +197,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSavePciCfgWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -228,6 +234,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSavePciCfgReadWrite (
   IN  UINT16                            TableName,
   IN  EFI_BOOT_SCRIPT_WIDTH             Width,
@@ -265,6 +272,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveSmbusExecute (
   IN  UINT16                            TableName,
   IN  EFI_SMBUS_DEVICE_ADDRESS          SlaveAddress,
@@ -303,6 +311,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveStall (
   IN  UINT16                            TableName,
   IN  UINTN                             Duration
@@ -330,6 +339,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 BootScriptSaveDispatch (
   IN  UINT16                            TableName,
   IN  EFI_PHYSICAL_ADDRESS              EntryPoint
@@ -355,7 +365,45 @@ Returns:
 
 --*/
 ;
+
+EFI_STATUS
+EFIAPI
+BootScriptMemPoll (
+  IN  UINT16                            TableName,
+  IN  EFI_BOOT_SCRIPT_WIDTH             Width,
+  IN  UINT64                            Address,
+  IN  VOID                              *BitMask,
+  IN  VOID                              *BitValue,
+  IN  UINTN                             Duration,
+  IN  UINTN                             LoopTimes
+  )
+/*++
+
+Routine Description:
+  Polling one memory mapping register
+
+Arguments:
+  TableName - Desired boot script table
+
+  Width     - The width of the memory operations.
   
+  Address   - The base address of the memory operations.
+  
+  BitMask   - A pointer to the bit mask to be AND-ed with the data read from the register.
+
+  BitValue  - A pointer to the data value after to be Masked.
+
+  Duration  - Duration in microseconds of the stall.
+  
+  LoopTimes - The times of the register polling.
+
+Returns:
+
+  EFI_SUCCESS           - The operation was executed successfully
+
+--*/
+;
+
 EFI_STATUS
 EFIAPI
 BootScriptSaveInformation (
@@ -473,6 +521,21 @@ Returns:
 #define SCRIPT_DISPATCH(TableName, EntryPoint) \
           BootScriptSaveDispatch(TableName, EntryPoint)
 
+#define SCRIPT_MEM_POLL(TableName, Width, Address, BitMask, BitValue, Duration, LoopTimes) \
+          BootScriptMemPoll(TableName, Width, Address, BitMask, BitValue, Duration, LoopTimes)
+
+#define SCRIPT_INFORMATION(TableName, Length, Buffer) \
+          BootScriptSaveInformation(TableName, Length, Buffer)
+
+#define SCRIPT_INFORMATION_UNICODE_STRING(TableName, String) \
+          BootScriptSaveInformationUnicodeString(TableName, String)
+
+#define SCRIPT_INFORMATION_ASCII_STRING(TableName, String) \
+          BootScriptSaveInformationAsciiString(TableName, String)
+
+//
+// For backward compatibility
+//
 #define SCRIPT_INOFRMATION(TableName, Length, Buffer) \
           BootScriptSaveInformation(TableName, Length, Buffer)
 
@@ -506,6 +569,17 @@ Returns:
 
 #define SCRIPT_DISPATCH(TableName, EntryPoint) 
 
+#define SCRIPT_MEM_POLL(TableName, Width, Address, BitMask, BitValue, Duration, LoopTimes)
+
+#define SCRIPT_INFORMATION(TableName, Length, Buffer)
+
+#define SCRIPT_INFORMATION_UNICODE_STRING(TableName, String)
+
+#define SCRIPT_INFORMATION_ASCII_STRING(TableName, String)
+
+//
+// For backward compatibility
+//
 #define SCRIPT_INOFRMATION(TableName, Length, Buffer)
 
 #define SCRIPT_INOFRMATION_UNICODE_STRING(TableName, String)

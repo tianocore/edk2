@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include "..\BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Worker function that checks ASSERT condition for JumpBuffer
@@ -33,6 +33,7 @@ Abstract:
 
 **/
 VOID
+EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );

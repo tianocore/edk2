@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Writes the current Global Descriptor Table Register (GDTR) descriptor.

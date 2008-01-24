@@ -250,6 +250,7 @@ EfiGetNextHighMonotonicCount (
 
 **/
 VOID
+EFIAPI
 EfiResetSystem (
   IN EFI_RESET_TYPE               ResetType,
   IN EFI_STATUS                   ResetStatus,

@@ -51,6 +51,8 @@ COMPONENT_TYPE=   LIBRARY
   DebugSerialIo\DebugSerialIo.c
   DiskInfo\DiskInfo.h
   DiskInfo\DiskInfo.c
+  Dpc\Dpc.h
+  Dpc\Dpc.c
   EfiOemBadging\EfiOemBadging.h
   EfiOemBadging\EfiOemBadging.c
   FaultTolerantWriteLite\FaultTolerantWriteLite.h

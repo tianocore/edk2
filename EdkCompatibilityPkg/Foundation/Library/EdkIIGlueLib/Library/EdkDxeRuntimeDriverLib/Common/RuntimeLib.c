@@ -121,7 +121,7 @@ RuntimeDriverLibConstruct (
 
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -147,8 +147,8 @@ RuntimeDriverLibDeconstruct (
   ASSERT (gBS != NULL);
   Status = gBS->CloseEvent (mEfiVirtualNotifyEvent);
   ASSERT_EFI_ERROR (Status);
-
-  return EFI_SUCCESS;
+  
+  return Status;
 }
 
 /**

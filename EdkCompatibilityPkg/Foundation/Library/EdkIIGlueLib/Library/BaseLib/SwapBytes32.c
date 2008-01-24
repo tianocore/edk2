@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Switches the endianess of a 32-bit integer.

@@ -47,14 +47,14 @@ InternalIpfDelay (
   //
   // The target timer count is calculated here
   //
-  Ticks = IpfReadItc () + Delay;
+  Ticks = (INT64)AsmReadItc () + Delay;
 
   //
   // Wait until time out
   // Delay > 2^63 could not be handled by this function
   // Timer wrap-arounds are handled correctly by this function
   //
-  while (Ticks - IpfReadItc () >= 0);
+  while (Ticks - (INT64)AsmReadItc() >= 0);
 }
 
 /**
@@ -123,7 +123,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return IpfReadItc ();
+  return AsmReadItc ();
 }
 
 /**
@@ -156,7 +156,7 @@ GetPerformanceCounterProperties (
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-  PAL_PROC_RETURN                   PalRet;
+  PAL_CALL_RETURN                   PalRet;
   UINT64                            BaseFrequence;
 
   PalRet = PalCallStatic (NULL, 13, 0, 0, 0);

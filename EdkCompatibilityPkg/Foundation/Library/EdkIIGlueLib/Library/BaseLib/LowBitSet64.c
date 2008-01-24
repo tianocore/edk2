@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Returns the bit position of the lowest bit set in a 64-bit value.

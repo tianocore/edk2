@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Rotates a 64-bit integer right between 0 and 63 bits, filling the high bits

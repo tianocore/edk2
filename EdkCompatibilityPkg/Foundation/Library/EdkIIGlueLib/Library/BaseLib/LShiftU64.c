@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Shifts a 64-bit integer left between 0 and 63 bits. The low bits are filled

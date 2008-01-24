@@ -22,7 +22,6 @@ Abstract:
 
 #include "EdkIIGlueUefi.h"
 
-EFI_HANDLE         gImageHandle;
 EFI_SYSTEM_TABLE   *gST;
 EFI_BOOT_SERVICES  *gBS;
 
@@ -47,11 +46,6 @@ UefiBootServicesTableLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  //
-  // Cache the Image Handle
-  //
-  gImageHandle = ImageHandle;
-
   //
   // Cache pointer to the EFI System Table
   //

@@ -25,6 +25,7 @@ Abstract:
 EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *mEsalBootService = NULL;
 EFI_PLABEL                          mPlabel;
 
+STATIC
 EFI_STATUS
 EFIAPI
 DxeSalLibInitialize (
@@ -46,7 +47,7 @@ DxeSalLibInitialize (
   // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
   // away. We cache it in a module global, so we can register the vitrual version.
   //
-  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
+  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, (VOID **) &mEsalBootService);
   if (EFI_ERROR (Status)) {
     mEsalBootService = NULL;
     return EFI_SUCCESS;
@@ -59,46 +60,6 @@ DxeSalLibInitialize (
   SetEsalPhysicalEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 
   return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-DxeSalLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return DxeSalLibInitialize ();
-}
-
-VOID
-EFIAPI
-DxeSalVirtualNotifyEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-/*++
-
-Routine Description:
-
-  Fixup virtual address pointer of label.
-
-Arguments:
-
-  Event   - The Event that is being processed
-  
-  Context - Event Context
-
-Returns: 
-
-  None
-
---*/
-{
-  EfiConvertPointer (0x0, (VOID **) &mPlabel.EntryPoint);
-  EfiConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
-
-  SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
 }
 
 EFI_STATUS
@@ -118,11 +79,11 @@ Routine Description:
 
 Arguments:
   FunctionId    - ID of function to register
-  ClassGuid     - GUID of function class 
+  ClassGuid     - GUID of function class
   Function      - Function to register under ClassGuid/FunctionId pair
   ModuleGlobal  - Module global for Function.
 
-Returns: 
+Returns:
   EFI_SUCCESS - If ClassGuid/FunctionId Function was registered.
 
 --*/
@@ -152,12 +113,12 @@ Routine Description:
   This function is boot service only!
 
 Arguments:
-  ClassGuid     - GUID of function class 
+  ClassGuid     - GUID of function class
   ModuleGlobal  - Module global for Function.
-  ...           - SAL_INTERNAL_EXTENDED_SAL_PROC and FunctionId pairs. NULL 
+  ...           - SAL_INTERNAL_EXTENDED_SAL_PROC and FunctionId pairs. NULL
                   indicates the end of the list.
 
-Returns: 
+Returns:
   EFI_SUCCESS - All members of ClassGuid registered
 
 --*/
@@ -212,7 +173,7 @@ EfiCallEsalService (
 
 Routine Description:
 
-  Call module that is not linked direclty to this module. This code is IP 
+  Call module that is not linked direclty to this module. This code is IP
   relative and hides the binding issues of virtual or physical calling. The
   function that gets dispatched has extra arguments that include the registered
   module global and a boolean flag to indicate if the system is in virutal mode.
@@ -228,7 +189,7 @@ Arguments:
   Arg7        - Argument 7 ClassGuid/FunctionId defined
   Arg8        - Argument 8 ClassGuid/FunctionId defined
 
-Returns: 
+Returns:
   Status of ClassGuid/FuncitonId
 
 --*/

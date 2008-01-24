@@ -792,7 +792,13 @@ Returns:
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000) 
   if (gStatusCode == NULL) {
-    return EFI_UNSUPPORTED;
+    if (EfiAtRuntime ()) {
+      return EFI_UNSUPPORTED;
+    }
+    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
+    if (EFI_ERROR (Status) || gStatusCode == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
   Status = gStatusCode->ReportStatusCode (CodeType, Value, Instance, CallerId, Data);
 #else
@@ -838,5 +844,8 @@ Returns:
 
 --*/
 {
+  __asm {
+    wbinvd
+  }
   return EFI_SUCCESS;
 }

@@ -23,9 +23,14 @@ Abstract:
 #ifndef __EDKII_GLUE_DEFINITION_CHANGES_PEIM_H__
 #define __EDKII_GLUE_DEFINITION_CHANGES_PEIM_H__
 
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include "TianoHii.h"
+#else
 #include "EfiInternalFormRepresentation.h"
+#endif
 
 #include "EdkIIGlueDefinitionChangesBase.h"
+
 #include "EfiPciCfg.h"
 
 //

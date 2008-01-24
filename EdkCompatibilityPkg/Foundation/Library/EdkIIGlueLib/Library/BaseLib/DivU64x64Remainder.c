@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Divides a 64-bit unsigned integer by a 64-bit unsigned integer and generates

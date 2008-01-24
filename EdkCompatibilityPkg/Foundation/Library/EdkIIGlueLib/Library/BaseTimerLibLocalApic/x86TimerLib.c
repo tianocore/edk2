@@ -38,6 +38,26 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
   0x20, 0x40, 0x80, 0x01
 };
 
+VOID
+CpuInitLocalApicTimer (
+  VOID
+  );
+
+/**
+    Local Apic Timer Initialize
+    Local Apic Timer needs to be initialized before being used
+ **/
+EFI_STATUS
+EFIAPI
+BaseTimerLibLocalApicInit (
+  VOID
+  )
+{
+  CpuInitLocalApicTimer();
+
+  return EFI_SUCCESS;
+}
+
 /**
   Internal function to retrieve the base address of local APIC.
 
@@ -46,7 +66,6 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
   @return The base address of local APIC
 
 **/
-STATIC
 UINTN
 InternalX86GetApicBase (
   VOID

@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include "..\BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 UINT32
 EFIAPI

@@ -24,12 +24,26 @@ Abstract:
 #ifndef _TCG_SERVICE_PROTOCOL_H_
 #define _TCG_SERVICE_PROTOCOL_H_
 
-#include <EfiTpm.h>
+#include "EfiTpm.h"
 
 #define EFI_TCG_PROTOCOL_GUID  \
   {0xf541796d, 0xa62e, 0x4954, 0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd}
 
+#define EFI_TCG_PLATFORM_PROTOCOL_GUID  \
+  { 0x8c4c9a41, 0xbf56, 0x4627, 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }
+
 #define TSS_EVENT_DATA_MAX_SIZE   256
+
+#define EFI_CALLING_EFI_APPLICATION         \
+  "Calling EFI Application from Boot Option"
+#define EFI_RETURNING_FROM_EFI_APPLICATOIN  \
+  "Returning from EFI Application from Boot Option"
+#define EFI_EXIT_BOOT_SERVICES_INVOCATION   \
+  "Exit Boot Services Invocation"
+#define EFI_EXIT_BOOT_SERVICES_FAILED       \
+  "Exit Boot Services Returned with Failure"
+#define EFI_EXIT_BOOT_SERVICES_SUCCEEDED    \
+  "Exit Boot Services Returned with Success"
 
 EFI_FORWARD_DECLARATION (EFI_TCG_PROTOCOL);
 
@@ -124,5 +138,33 @@ typedef struct _EFI_TCG_PROTOCOL {
 } EFI_TCG_PROTOCOL;
 
 extern EFI_GUID gEfiTcgProtocolGuid;
+
+//
+// EFI TCG Platform Protocol
+//
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TCG_MEASURE_PE_IMAGE) (
+  IN      BOOLEAN                   BootPolicy,
+  IN      EFI_PHYSICAL_ADDRESS      ImageAddress,
+  IN      UINTN                     ImageSize,
+  IN      UINTN                     LinkTimeBase,
+  IN      UINT16                    ImageType,
+  IN      EFI_HANDLE                DeviceHandle,
+  IN      EFI_DEVICE_PATH_PROTOCOL  *FilePath
+  );
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TCG_MEASURE_ACTION) (
+  IN      CHAR8                     *ActionString
+  );
+
+typedef struct tdEFI_TCG_PLATFORM_PROTOCOL {
+  EFI_TCG_MEASURE_PE_IMAGE          MeasurePeImage;
+  EFI_TCG_MEASURE_ACTION            MeasureAction;
+} EFI_TCG_PLATFORM_PROTOCOL;
+
+extern EFI_GUID                     gEfiTcgPlatformProtocolGuid;
 
 #endif

@@ -20,19 +20,22 @@ Abstract:
 
 --*/
 
-#include "BaseLibInternal.h"
+#include "BaseLibInternals.h"
 
 /**
   Transfers control to a function starting with a new stack.
 
   Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
+  new stack specified by NewStack and passing in the parameters specified
+  by Context1 and Context2.  Context1 and Context2 are optional and may
+  be NULL.  The function EntryPoint must never return.  This function
+  supports a variable number of arguments following the NewStack parameter.
+  These additional arguments are ignored on IA-32, x64, and EBC.
+  IPF CPUs expect one additional parameter of type VOID * that specifies
+  the new backing store pointer.
 
   If EntryPoint is NULL, then ASSERT().
   If NewStack is NULL, then ASSERT().
-  For IPF CPUs, if NewStack is not aligned on a 16-byte boundary, then ASSERT().
 
   @param  EntryPoint  A pointer to function to call with the new stack.
   @param  Context1    A pointer to the context to pass into the EntryPoint
@@ -47,16 +50,23 @@ VOID
 EFIAPI
 SwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,
-  IN      VOID                      *Context2,
-  IN      VOID                      *NewStack
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *NewStack,
+  ...
   )
 {
-  ASSERT (EntryPoint != NULL && NewStack != NULL);
+  VA_LIST    Marker;
 
-#ifdef MDE_CPU_IPF
-  ASSERT (((UINTN)NewStack & 0xf) == 0);
-#endif
+  ASSERT (EntryPoint != NULL);
+  ASSERT (NewStack != NULL);
 
-  InternalSwitchStack (EntryPoint, Context1, Context2, NewStack);
+  VA_START (Marker, NewStack);
+
+  InternalSwitchStack (EntryPoint, Context1, Context2, NewStack, Marker);
+
+  //
+  // InternalSwitchStack () will never return
+  //
+  ASSERT (FALSE);
 }

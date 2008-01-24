@@ -1513,15 +1513,13 @@ EfiFvbSetVolumeAttributes (
 
 Routine Description:
   Modifies the current settings of the firmware volume according to the 
-  input parameter, and returns the new setting of the volume
+  input parameter.
 
 Arguments:
   Instance              - The FV instance whose attributes is going to be 
                           modified
-  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  Attributes            - It is a pointer to EFI_FVB_ATTRIBUTES 
                           containing the desired firmware volume settings.
-                          On successful return, it contains the new settings
-                          of the firmware volume
 
 Returns: 
   Status code

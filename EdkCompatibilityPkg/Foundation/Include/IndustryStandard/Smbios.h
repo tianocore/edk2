@@ -136,6 +136,17 @@ typedef struct {
   SMBIOS_TABLE_STRING   SerialNumber;
   SMBIOS_TABLE_STRING   AssetTag;
   SMBIOS_TABLE_STRING   PartNumber;
+  //
+  // Add for smbios 2.5
+  //
+  UINT8                 CoreCount;
+  UINT8                 EnabledCoreCount;
+  UINT8                 ThreadCount;
+  UINT16                ProcessorCharacteristics;
+  //
+  // Add for smbios 2.6
+  //
+  UINT16                ProcessorFamily2;
 } SMBIOS_TABLE_TYPE4;
 
 typedef struct {
@@ -197,6 +208,12 @@ typedef struct {
   UINT16                SlotID;
   UINT8                 SlotCharacteristics1;
   UINT8                 SlotCharacteristics2;
+  //
+  // Add for smbios 2.6
+  //
+  UINT16                SegmentGroupNum;
+  UINT8                 BusNum;
+  UINT8                 DevFuncNum;
 } SMBIOS_TABLE_TYPE9;
 
 typedef struct {
@@ -286,6 +303,10 @@ typedef struct {
   SMBIOS_TABLE_STRING   SerialNumber;
   SMBIOS_TABLE_STRING   AssetTag;
   SMBIOS_TABLE_STRING   PartNumber;
+  //
+  // Add for smbios 2.6
+  //  
+  UINT8                 Attributes;
 } SMBIOS_TABLE_TYPE17;
 
 typedef struct {
@@ -516,6 +537,33 @@ typedef struct {
   UINT16                InputCurrentProbeHandle;
 } SMBIOS_TABLE_TYPE39;
 
+//
+// Add type 40 and type 41 for smbios 2.6
+//
+typedef struct {                       
+  UINT8                   EntryLength; 
+  UINT16                  ReferencedHandle;
+  UINT8                   ReferencedOffset;
+  SMBIOS_TABLE_STRING     EntryString;
+  UINT8                   Value[1];
+}ADDITIONAL_INFORMATION_ENTRY;
+
+typedef struct {
+  SMBIOS_TABLE_HEADER                   Hdr;
+  UINT8                                 NumberOfAdditionalInformationEntries;
+  ADDITIONAL_INFORMATION_ENTRY          AdditionalInfoEntries[1];  
+} SMBIOS_TABLE_TYPE40;
+
+typedef struct {
+  SMBIOS_TABLE_HEADER     Hdr;
+  SMBIOS_TABLE_STRING     ReferenceDesignation;
+  UINT8                   DeviceType;
+  UINT8                   DeviceTypeInstance;
+  UINT16                  SegmentGroupNum;
+  UINT8                   BusNum;
+  UINT8                   DevFuncNum;  
+} SMBIOS_TABLE_TYPE41;
+
 typedef struct {
   SMBIOS_TABLE_HEADER   Hdr;
 } SMBIOS_TABLE_TYPE126;
@@ -566,6 +614,8 @@ typedef union {
   SMBIOS_TABLE_TYPE37   *Type37;
   SMBIOS_TABLE_TYPE38   *Type38;
   SMBIOS_TABLE_TYPE39   *Type39;
+  SMBIOS_TABLE_TYPE40   *Type40;
+  SMBIOS_TABLE_TYPE41   *Type41;
   SMBIOS_TABLE_TYPE126  *Type126;
   SMBIOS_TABLE_TYPE127  *Type127;
   UINT8                 *Raw;

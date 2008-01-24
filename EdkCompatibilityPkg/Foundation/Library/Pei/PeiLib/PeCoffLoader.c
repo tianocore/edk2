@@ -434,7 +434,7 @@ Returns:
       ImageContext->ImageAddress = Hdr.Pe32Plus->OptionalHeader.ImageBase;
     }
   } else {
-    ImageContext->ImageAddress = (EFI_PHYSICAL_ADDRESS)(Hdr.Te->ImageBase);
+    ImageContext->ImageAddress = (EFI_PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
   }
 
   //
@@ -799,8 +799,8 @@ Returns:
     }
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-    Adjust             = (UINT64) (BaseAddress - Hdr.Te->ImageBase);
-    Hdr.Te->ImageBase  = (UINT64) (BaseAddress);
+    Adjust             = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->ImageBase);
+    Hdr.Te->ImageBase  = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
 
     //
     // Find the relocation block

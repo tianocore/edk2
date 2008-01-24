@@ -38,8 +38,16 @@ GetPeiServicesTablePointer (
   )
 {
   EFI_PEI_SERVICES  **PeiServices;
+#if (PI_SPECIFICATION_VERSION >= 0x00010000)
+  IA32_DESCRIPTOR   Idtr;
+#endif
 
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
   PeiServices = (EFI_PEI_SERVICES **)(UINTN)AsmReadMm7 ();
+#else
+  AsmReadIdtr (&Idtr);
+  PeiServices = (EFI_PEI_SERVICES **)(UINTN)(*(UINTN*)(Idtr.Base - sizeof (UINTN)));
+#endif
   ASSERT (PeiServices != NULL);
   return PeiServices;
 }
@@ -63,6 +71,8 @@ PeiServicesTablePointerLibConstructor (
   IN EFI_PEI_SERVICES     **PeiServices
   )
 {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
   AsmWriteMm7 ((UINT64)(UINTN)PeiServices);
+#endif
   return EFI_SUCCESS;
 }

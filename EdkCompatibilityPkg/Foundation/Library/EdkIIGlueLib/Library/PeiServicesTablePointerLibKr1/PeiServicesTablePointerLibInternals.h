@@ -43,10 +43,10 @@ AsmReadKr1 (
   @param  Value The 64-bit value to write to Kr1.
 
 **/
-VOID
+UINT64
 EFIAPI
 AsmWriteKr1 (
-  IN      UINT64                    Value
+  IN UINT64  Value
   );
 
 #endif

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,6 +23,7 @@ Abstract:
 #ifndef __EDKII_GLUE_HII_LIB_H__
 #define __EDKII_GLUE_HII_LIB_H__
 
+#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
 
 #define PreparePackages GluePreparePackages
 
@@ -49,6 +50,6 @@ GluePreparePackages (
   )
 ;
 
-
+#endif
 
 #endif
