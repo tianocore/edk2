@@ -218,6 +218,7 @@ Returns:
 --*/
 {
   EFI_STATUS                        Status;
+  EFI_STATUS                        KeyStatus;
   EFI_STATUS                        InitStatus;
   EFI_STATUS                        ReturnStatus;
   BOOLEAN                           RequireSoftECCInit;
@@ -353,7 +354,8 @@ Returns:
 
     PreviousValue = TestPercent;
 
-    if (Key.ScanCode == SCAN_ESC) {
+    KeyStatus     = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (!EFI_ERROR (KeyStatus) && (Key.ScanCode == SCAN_ESC)) {
       if (!RequireSoftECCInit) {
         TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
         if (TmpStr != NULL) {
