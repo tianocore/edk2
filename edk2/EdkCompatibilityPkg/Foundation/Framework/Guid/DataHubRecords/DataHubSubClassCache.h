@@ -73,7 +73,8 @@ typedef enum {
   EfiCacheAssociativity4Way = 5,
   EfiCacheAssociativityFully = 6,
   EfiCacheAssociativity8Way = 7,
-  EfiCacheAssociativity16Way = 8
+  EfiCacheAssociativity16Way = 8,
+  EfiCacheAssociativity24Way = 9
 } EFI_CACHE_ASSOCIATIVITY_DATA;
 
 typedef struct {  

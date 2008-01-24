@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -208,6 +208,19 @@ typedef struct {
   UINT8   LastPciBus;
 
 } EFI_COMPATIBILITY16_TABLE;
+
+typedef enum {
+  Compatibility16InitializeYourself     = 0x0000,
+  Compatibility16UpdateBbs              = 0x0001,
+  Compatibility16PrepareToBoot          = 0x0002,
+  Compatibility16Boot                   = 0x0003,
+  Compatibility16RetrieveLastBootDevice = 0x0004,
+  Compatibility16DispatchOprom          = 0x0005,
+  Compatibility16GetTableAddress        = 0x0006,
+  Compatibility16SetKeyboardLeds        = 0x0007,
+  Compatibility16InstallPciHandler      = 0x0008,
+} EFI_COMPATIBILITY_FUNCTIONS;
+
 //
 // define maximum number of HDD system supports
 //

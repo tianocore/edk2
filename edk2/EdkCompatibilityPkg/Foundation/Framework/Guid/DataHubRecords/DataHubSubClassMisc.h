@@ -1,6 +1,6 @@
 /*++
  
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,6 +42,11 @@ Revision History
 typedef struct {
   UINT8   LastPciBus;
 } EFI_MISC_LAST_PCI_BUS;
+
+typedef struct {
+  UINT8      FunctionNum  :3;
+  UINT8      DeviceNum    :5;
+} EFI_MISC_DEV_FUNC_NUM;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -225,6 +230,10 @@ typedef enum {
   EfiMiscChassisTypeRackMountChassis = 0x17,
   EfiMiscChassisTypeSealedCasePc = 0x18,
   EfiMiscChassisMultiSystemChassis = 0x19,
+  EfiMiscChassisCompactPCI = 0x1A,
+  EfiMiscChassisAdvancedTCA = 0x1B,
+  EfiMiscChassisBlade = 0x1C,
+  EfiMiscChassisBladeEnclosure = 0x1D
 } EFI_MISC_CHASSIS_TYPE;
 
 typedef struct {
@@ -323,6 +332,7 @@ typedef enum {
   EfiPortConnectorTypeHeadPhoneMiniJack = 0x1F,
   EfiPortConnectorTypeBNC = 0x20,
   EfiPortConnectorType1394 = 0x21,
+  EfiPortConnectorTypeSasSata = 0x22,
   EfiPortConnectorTypePC98 = 0xA0,
   EfiPortConnectorTypePC98Hireso = 0xA1,
   EfiPortConnectorTypePCH98 = 0xA2,
@@ -364,6 +374,8 @@ typedef enum {
   EfiPortTypeAudioPort = 0x1D,
   EfiPortTypeModemPort = 0x1E,
   EfiPortTypeNetworkPort = 0x1F,
+  EfiPortTypeSata = 0x20,
+  EfiPortTypeSas = 0x21,
   EfiPortType8251Compatible = 0xA0,
   EfiPortType8251FifoCompatible = 0xA1,
   EfiPortTypeOther = 0xFF,
@@ -412,6 +424,11 @@ typedef enum {
   EfiSlotTypePC98LocalBus = 0xA3,
   EfiSlotTypePC98Card = 0xA4,
   EfiSlotTypePciExpress = 0xA5,
+  EfiSlotTypePciExpressX1 = 0xA6,
+  EfiSlotTypePciExpressX2 = 0xA7,
+  EfiSlotTypePciExpressX4 = 0xA8,
+  EfiSlotTypePciExpressX8 = 0xA9,
+  EfiSlotTypePciExpressX16 = 0xAA
 } EFI_MISC_SLOT_TYPE;
 
 typedef enum {  
@@ -469,6 +486,9 @@ typedef struct {
   UINT16                        SlotId;
   EFI_MISC_SLOT_CHARACTERISTICS SlotCharacteristics;
   EFI_DEVICE_PATH_PROTOCOL      SlotDevicePath;
+  UINT16                        SegmentGroupNum;
+  UINT8                         BusNum;
+  EFI_MISC_DEV_FUNC_NUM         DevFuncNum;
 } EFI_MISC_SYSTEM_SLOT_DESIGNATION;      
 
 //
@@ -486,6 +506,9 @@ typedef enum {
   EfiOnBoardDeviceTypeEthernet = 5,
   EfiOnBoardDeviceTypeTokenRing = 6,
   EfiOnBoardDeviceTypeSound = 7,
+  EfiOnBoardDeviceTypePataController = 8,
+  EfiOnBoardDeviceTypeSataController = 9,
+  EfiOnBoardDeviceTypeSasController = 10
 } EFI_MISC_ONBOARD_DEVICE_TYPE;
 
 typedef struct {
@@ -1010,6 +1033,48 @@ typedef struct {
 //
 //////////////////////////////////////////////////////////////////////////////
 //
+//Additional Information Record - SMBIOS Type 40
+//
+typedef struct {                       
+  UINT8                   EntryLength; 
+  UINT8                   ReferencedSmbiosType;
+  EFI_INTER_LINK_DATA     ReferencedLink;
+  UINT8                   ReferencedOffset;
+  STRING_REF              EntryString;
+  EFI_PHYSICAL_ADDRESS    ValueAddress;
+} EFI_MISC_ADDITIONAL_INFORMATION_ENTRY;                               
+                                   
+typedef struct {
+  UINT8                                  NumberOfAdditionalInformationEntries;
+  EFI_PHYSICAL_ADDRESS                   AdditionalInfoEntriesAddr;
+} EFI_MISC_ADDITIONAL_INFORMATION;
+
+#define EFI_MISC_ADDITIONAL_INFORMATION_RECORD_NUMBER 0x00000022
+
+//
+//////////////////////////////////////////////////////////////////////////////
+//
+//Onboard Devices Extended Infomation Record - SMBIOS Type 41
+//
+typedef struct {
+  UINT8     TypeOfDevice:7;
+  UINT8     DeviceStatus:1;
+} EFI_MISC_DEVICE_TYPE;
+
+typedef struct {
+  STRING_REF              ReferenceDesignation;
+  EFI_MISC_DEVICE_TYPE    DeviceType;
+  UINT8                   DeviceTypeInstance;
+  UINT16                  SegmentGroupNum;
+  UINT8                   BusNum;
+  EFI_MISC_DEV_FUNC_NUM   DevFuncNum;
+} EFI_MISC_ONBOARD_DEVICES_EXTENDED_INFORMATION;
+
+#define EFI_MISC_ONBOARD_DEVICES_EXTENDED_INFORMATION_RECORD_NUMBER 0x00000023
+
+//
+//////////////////////////////////////////////////////////////////////////////
+//
 // Generic Data Record - All SMBIOS Type
 // Put smbios raw data into one datahub record directly. Smbios driver would
 // copy smbios raw data into smbios table but not take any translation.
@@ -1113,7 +1178,9 @@ typedef union {
   EFI_MISC_IPMI_INTERFACE_TYPE_DATA                     MiscIpmiInterfaceTypeData;
   EFI_MISC_SYSTEM_POWER_SUPPLY                          MiscPowerSupplyInfo;
   EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION                  MiscSmbiosStructEncapsulation; 
-  EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD                  MiscManagementDeviceThreshold; 
+  EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD                  MiscManagementDeviceThreshold;
+  EFI_MISC_ADDITIONAL_INFORMATION                       MiscAdditionalInformation;
+  EFI_MISC_ONBOARD_DEVICES_EXTENDED_INFORMATION         MiscOnBoardDevicesExtendedInformation;
 } EFI_MISC_SUBCLASS_RECORDS;
 
 //

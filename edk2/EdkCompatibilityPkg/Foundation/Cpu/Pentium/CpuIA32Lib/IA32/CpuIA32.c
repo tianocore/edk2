@@ -106,10 +106,10 @@ EfiDisableCache (VOID)
     and   al, 60h
     cmp   al, 60h
     je    Exit
-    wbinvd
     mov   eax, cr0
     or    eax, 060000000h     
     mov   cr0, eax
+    wbinvd
 Exit:
   }
 }

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2007, Intel Corporation                                                  
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,8 +29,11 @@ Abstract:
 #ifndef _DATAHUB_RECORDS_H_
 #define _DATAHUB_RECORDS_H_
 
-
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#include "TianoHii.h"
+#else
 #include "EfiInternalFormRepresentation.h"
+#endif
 #include "DataHubSubClass.h"
 #include "DataHubSubClassProcessor.h"
 #include "DataHubSubClassCache.h"

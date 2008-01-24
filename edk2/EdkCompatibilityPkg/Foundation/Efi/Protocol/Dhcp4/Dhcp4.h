@@ -88,18 +88,18 @@ typedef enum{
   Dhcp4SendDiscover   = 0x01,
   Dhcp4RcvdOffer      = 0x02,
   Dhcp4SelectOffer    = 0x03,
-  Dhcp4SendRequest    = 0x05,
-  Dhcp4RcvdAck        = 0x06,
-  Dhcp4RcvdNak        = 0x07,
-  Dhcp4SendDecline    = 0x08,
-  Dhcp4BoundCompleted = 0x09,
-  Dhcp4EnterRenewing  = 0x0a,
-  Dhcp4EnterRebinding = 0x0b,
-  Dhcp4AddressLost    = 0x0c,
-  Dhcp4Fail           = 0x0d
+  Dhcp4SendRequest    = 0x04,
+  Dhcp4RcvdAck        = 0x05,
+  Dhcp4RcvdNak        = 0x06,
+  Dhcp4SendDecline    = 0x07,
+  Dhcp4BoundCompleted = 0x08,
+  Dhcp4EnterRenewing  = 0x09,
+  Dhcp4EnterRebinding = 0x0a,
+  Dhcp4AddressLost    = 0x0b,
+  Dhcp4Fail           = 0x0c
 } EFI_DHCP4_EVENT;
 
-typedef EFI_STATUS (*EFI_DHCP4_CALLBACK)(
+typedef EFI_STATUS (*EFI_DHCP4_CALLBACK) (
   IN EFI_DHCP4_PROTOCOL   *This,
   IN VOID                 *Context,
   IN EFI_DHCP4_STATE      CurrentState,
@@ -139,23 +139,22 @@ typedef struct {
 } EFI_DHCP4_LISTEN_POINT;
 
 typedef struct {
-  OUT EFI_STATUS            Status;
-  IN EFI_EVENT              CompletionEvent;
-  IN EFI_IPv4_ADDRESS       RemoteAddress;
-  IN UINT16                 RemotePort;
-  IN EFI_IPv4_ADDRESS       GatewayAddress;
-  IN UINT32                 ListenPointCount;
-  IN EFI_DHCP4_LISTEN_POINT *ListenPoints;
-  IN UINT32                 TimeoutValue;
-  IN EFI_DHCP4_PACKET       *Packet;
-  OUT UINT32                ResponseCount;
-  OUT EFI_DHCP4_PACKET      *ResponseList;   
-}EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN;
-
+  EFI_STATUS              Status;
+  EFI_EVENT               CompletionEvent;
+  EFI_IPv4_ADDRESS        RemoteAddress;
+  UINT16                  RemotePort;
+  EFI_IPv4_ADDRESS        GatewayAddress;
+  UINT32                  ListenPointCount;
+  EFI_DHCP4_LISTEN_POINT  *ListenPoints;
+  UINT32                  TimeoutValue;
+  EFI_DHCP4_PACKET        *Packet;
+  UINT32                  ResponseCount;
+  EFI_DHCP4_PACKET        *ResponseList;
+} EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN;
 
 typedef 
 EFI_STATUS 
-(EFIAPI *EFI_DHCP4_GET_MODE_DATA)(
+(EFIAPI *EFI_DHCP4_GET_MODE_DATA) (
   IN EFI_DHCP4_PROTOCOL     *This,
   OUT EFI_DHCP4_MODE_DATA   *Dhcp4ModeData
 );
@@ -176,8 +175,8 @@ typedef EFI_STATUS
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_RENEW) (
-  IN EFI_DHCP4_PROTOCOL      *This,
+(EFIAPI *EFI_DHCP4_RENEW_REBIND) (
+  IN EFI_DHCP4_PROTOCOL     *This,
   IN BOOLEAN                RebindRequest,
   IN EFI_EVENT              CompletionEvent    OPTIONAL
 );
@@ -201,7 +200,7 @@ EFI_STATUS
   IN UINT32                   DeleteCount,
   IN UINT8                    *DeleteList        OPTIONAL,
   IN UINT32                   AppendCount,
-  IN EFI_DHCP4_PACKET_OPTION  *AppendList[]       OPTIONAL,
+  IN EFI_DHCP4_PACKET_OPTION  *AppendList[]      OPTIONAL,
   OUT EFI_DHCP4_PACKET        **NewPacket
 );
 
@@ -211,7 +210,6 @@ EFI_STATUS
   IN EFI_DHCP4_PROTOCOL                *This,
   IN EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token
 );
-
 
 typedef
 EFI_STATUS
@@ -226,7 +224,7 @@ typedef struct _EFI_DHCP4_PROTOCOL {
   EFI_DHCP4_GET_MODE_DATA      GetModeData;
   EFI_DHCP4_CONFIGURE          Configure;
   EFI_DHCP4_START              Start;
-  EFI_DHCP4_RENEW              RenewRebind;
+  EFI_DHCP4_RENEW_REBIND       RenewRebind;
   EFI_DHCP4_RELEASE            Release;
   EFI_DHCP4_STOP               Stop;
   EFI_DHCP4_BUILD              Build;
