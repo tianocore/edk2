@@ -1,17 +1,35 @@
-The binaries of EdkShellBinPkg are generated with EDK-Shell 1.03 release and build with Edk Compatibility Package
-(r4226)
-
+The binaries of EdkShellBinPkg are generated with EDK-Shell 1.04 release and build with Edk Compatibility & BaseTools Package
+(r4631)
 
 The following steps are can help to re-generate these binaries for customization:
-1. Check out EdkCompatibilityPkg (r4226) to a directory EdkCompatibilityPkg in workspace (svn https://edk2.tianocore.org/svn/edk2/trunk/edk2/EdkCompatibilityPkg). 
-2. Download EfiShell 1.03.zip from EDK Shell official release https://efi-shell.tianocore.org/servlets/ProjectDocumentList?folderID=52&expandFolder=52&folderID=45
-3. Unzip it to a local folder in EdkCompatibilityPkg , e.g. c:\EdkII\EdkCompatibilityPkg\Other\Maintained\Application\Shell
-4. Add the INF file under [components] section of platform DSC files:
-  EdkCompatibilityPkg\Sample\Platform\Ia32\Build\Ia32.dsc
-  EdkCompatibilityPkg\Sample\Platform\X64\Build\X64.dsc
-  EdkCompatibilityPkg\Sample\Platform\Ipf\Build\Ipf.dsc
-4.Set environment variable of EDK_SOURCE, e.g. EDK_SOURCE=c:\EdkII\EdkCompatibilityPkg
-5.Go to build directory of different architecture and enter "build", e.g. EdkCompatibilityPkg\Sample\Platform\Ia32\Build 
+1. Check out EdkCompatibilityPkg (r4631) to a directory EdkCompatibilityPkg in workspace (svn https://edk2.tianocore.org/svn/edk2/trunk/edk2/EdkCompatibilityPkg). 
+2. Update to the newest BaseTools package.
+2. Download EfiShell 1.04.zip from EDK Shell official release https://efi-shell.tianocore.org/servlets/ProjectDocumentList?folderID=52&expandFolder=52&folderID=45
+3. Unzip it to the directory in EdkCompatibilityPkg , e.g. c:\EdkII\EdkCompatibilityPkg\Shell
+4. Workaround an issue in EdkCompatibilityPkg\Shell\ver\Ver.inf to spit:
+  [sources.ia32|x64]
+    ia32\ver32.c
+
+  to be:
+  [sources.ia32]
+    ia32\ver32.c
+
+  [sources.x64]
+    ia32\ver32.c
+
+   since current build tools (r4630) does not support this syntax in EDK inf.
+
+5. Under workspace directory, exectute:
+   build -a IA32 -a X64 -a IPF -p EdkShellBinPkg\GenBin\EdkShellPkg.dsc -t WINDDK3790x1830
+   The use of WINDDK instead of MYTOOLS is due to the fact that EDK shell source 1.04 is not
+   VS2005 clean.
+
+6. Copy the binaries from Build directory to this package. Typically the EFI binary
+   of EdkCompatibility\Shell\$(INF_BASENAME).inf is generaged at:
+   Build\EdkShellPkg\DEBUG_WINDDK3790x1830\$(ARCH)\EdkCompatibility\Shell\$(INF_BASENAME)\OUTPUT\$(BASENAME).efi
+   for example:
+   The x64 EFI image of EdkCompatibility\Shell\ver\ver.inf is generated at:
+   Build\EdkShellPkg\DEBUG_WINDDK3790x1830\X64\EdkCompatibilityPkg\Shell\ver\Ver\OUTPUT\ver.efi
 
 Note: Other\Maintained\Application\Shell\Shell.inf corresponds to Minimum shell binaries.
       Other\Maintained\Application\Shell\ShellFull.inf corresponds to Full Shell binaries.
