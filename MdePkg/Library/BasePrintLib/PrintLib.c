@@ -355,6 +355,12 @@ BasePrintLibVSPrint (
           Flags &= (~ARGUMENT_UNICODE);
           ArgumentString = "<null string>";
         }
+        //
+        // Set the default precision for string to be zero if not specified.
+        //
+        if ((Flags & PRECISION) == 0) {
+          Precision = 0;
+        }
         break;
 
       case 'c':
