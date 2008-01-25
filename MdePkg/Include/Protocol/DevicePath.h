@@ -373,14 +373,14 @@ typedef struct {
 } MEDIA_PROTOCOL_DEVICE_PATH;
 
 
-#define MEDIA_PIWG_FW_VOL_DP      0x6
+#define MEDIA_PIWG_FW_VOL_DP      0x7
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   EFI_GUID                        FvName;
 } MEDIA_FW_VOL_DEVICE_PATH;
 
 
-#define MEDIA_PIWG_FW_FILE_DP     0x7
+#define MEDIA_PIWG_FW_FILE_DP     0x6
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   EFI_GUID                        FvFileName;
