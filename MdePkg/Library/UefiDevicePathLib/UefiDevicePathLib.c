@@ -418,7 +418,7 @@ CreateDeviceNode (
     return NULL;
   }
  
-  DevicePath = AllocatePool (NodeLength);
+  DevicePath = AllocateZeroPool (NodeLength);
   if (DevicePath != NULL) {
      DevicePath->Type    = NodeType;
      DevicePath->SubType = NodeSubType;
