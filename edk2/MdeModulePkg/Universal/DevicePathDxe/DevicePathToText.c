@@ -440,11 +440,11 @@ EisaIdToText (
   //
   //UnicodeSPrint ("%X", 0x0a03) => "0000000000000A03"
   //
-  UnicodeSPrint (PnpIdStr, 17 * 2, L"%X", EisaId >> 16);
+  UnicodeSPrint (PnpIdStr, 17 * 2, L"%16X", EisaId >> 16);
 
   UnicodeSPrint (
     Text,
-    0,
+    sizeof (CHAR16) + sizeof (CHAR16) + sizeof (CHAR16) + sizeof (PnpIdStr),
     L"%c%c%c%s",
     '@' + ((EisaId >> 10) & 0x1f),
     '@' + ((EisaId >>  5) & 0x1f),
