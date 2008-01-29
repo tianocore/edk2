@@ -34,44 +34,24 @@
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  FvbVirtualAddressChangeNotifyEvent
 #
 
-[Sources.common]
+[Sources]
   Fvb.h
-
-[Sources.Ia32]
-  Ia32/Fvb.c
-
-[Sources.X64]
-  X64/Fvb.c
+  Fvb.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-[LibraryClasses.IA32]
+[LibraryClasses]
   UefiBootServicesTableLib
   UefiRuntimeLib
   BaseMemoryLib
   DebugLib
   BaseLib
   UefiLib
-
-[LibraryClasses.X64]
-  UefiBootServicesTableLib
-  UefiRuntimeLib
-  BaseMemoryLib
-  DebugLib
-  BaseLib
-  UefiLib
-
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
-
-[Protocols.IA32]
-  gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-
-[Protocols.X64]
   gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
 
