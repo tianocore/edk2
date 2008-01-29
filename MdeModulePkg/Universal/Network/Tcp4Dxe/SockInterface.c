@@ -214,15 +214,11 @@ SockDestroyChild (
 **/
 SOCKET *
 SockCreateChild (
-  IN SOCK_INIT_DATA *SockInitData,
-  IN VOID           *ProtoData,
-  IN UINT32         Len
+  IN SOCK_INIT_DATA *SockInitData
   )
 {
   SOCKET      *Sock;
   EFI_STATUS  Status;
-
-  ASSERT (ProtoData && (Len <= PROTO_RESERVED_LEN));
 
   //
   // create a new socket
@@ -235,15 +231,6 @@ SockCreateChild (
 
     return NULL;
   }
-
-  //
-  // Open the
-  //
-
-  //
-  // copy the protodata into socket
-  //
-  NetCopyMem (Sock->ProtoReserved, ProtoData, Len);
 
   Status = NET_TRYLOCK (&(Sock->Lock));
   if (EFI_ERROR (Status)) {

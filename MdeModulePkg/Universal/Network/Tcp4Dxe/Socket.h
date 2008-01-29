@@ -211,24 +211,6 @@ typedef struct _SOCK_BUFFER {
   NET_BUF_QUEUE *DataQueue; // the queue to buffer data
 } SOCK_BUFFER;
 
-//
-// the initialize data for create a new socket
-//
-typedef struct _SOCK_INIT_DATA {
-  SOCK_TYPE   Type;
-  SOCK_STATE  State;
-
-  SOCKET      *Parent;        // the parent of this socket
-  UINT32      BackLog;        // the connection limit for listening socket
-  UINT32      SndBufferSize;  // the high warter mark of send buffer
-  UINT32      RcvBufferSize;  // the high warter mark of receive buffer
-  VOID        *Protocol;      // the pointer to protocol function template
-                              // wanted to install on socket
-
-  SOCK_PROTO_HANDLER  ProtoHandler;
-
-  EFI_HANDLE   DriverBinding; // the driver binding handle
-} SOCK_INIT_DATA;
 
 //
 // socket provided oprerations for low layer protocol
@@ -317,6 +299,51 @@ SockRcvdErr (
   IN EFI_STATUS   Error
   );
 
+typedef
+EFI_STATUS
+(*SOCK_CREATE_CALLBACK) (
+  IN SOCKET  *This,
+  IN VOID    *Context
+  );
+
+typedef
+VOID
+(*SOCK_DESTROY_CALLBACK) (
+  IN SOCKET  *This,
+  IN VOID    *Context
+  );
+
+//
+// the initialize data for create a new socket
+//
+typedef struct _SOCK_INIT_DATA {
+  SOCK_TYPE   Type;
+  SOCK_STATE  State;
+
+  SOCKET      *Parent;        // the parent of this socket
+  UINT32      BackLog;        // the connection limit for listening socket
+  UINT32      SndBufferSize;  // the high warter mark of send buffer
+  UINT32      RcvBufferSize;  // the high warter mark of receive buffer
+  VOID        *Protocol;      // the pointer to protocol function template
+                              // wanted to install on socket
+
+  //
+  // Callbacks after socket is created and before socket is to be destroyed.
+  //
+  SOCK_CREATE_CALLBACK   CreateCallback;
+  SOCK_DESTROY_CALLBACK  DestroyCallback;
+  VOID                   *Context;
+
+  //
+  // Opaque protocol data.
+  //
+  VOID                   *ProtoData;
+  UINT32                 DataSize;
+
+  SOCK_PROTO_HANDLER     ProtoHandler;
+
+  EFI_HANDLE   DriverBinding; // the driver binding handle
+} SOCK_INIT_DATA;
 //
 // the socket structure representing a network service access point
 //
@@ -368,6 +395,13 @@ struct _SOCKET {
     EFI_TCP4_PROTOCOL TcpProtocol;
     EFI_UDP4_PROTOCOL UdpProtocol;
   } NetProtocol;
+
+  //
+  // Callbacks.
+  //
+  SOCK_CREATE_CALLBACK   CreateCallback;
+  SOCK_DESTROY_CALLBACK  DestroyCallback;
+  VOID                   *Context;
 };
 
 //
@@ -401,9 +435,7 @@ typedef struct _TCP_RSV_DATA {
 //
 SOCKET  *
 SockCreateChild (
-  IN SOCK_INIT_DATA *SockInitData,
-  IN VOID           *ProtoData,
-  IN UINT32         Len
+  IN SOCK_INIT_DATA *SockInitData
   );
 
 //

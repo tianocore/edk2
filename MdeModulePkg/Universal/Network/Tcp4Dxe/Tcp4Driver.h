@@ -122,6 +122,18 @@ Tcp4DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
+EFI_STATUS
+Tcp4CreateSocketCallback (
+  IN SOCKET  *This,
+  IN VOID    *Context
+  );
+
+VOID
+Tcp4DestroySocketCallback (
+  IN SOCKET  *This,
+  IN VOID    *Context
+  );
+
 //
 // Function ptototypes for the ServiceBinding Prococol
 //

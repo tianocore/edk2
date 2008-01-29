@@ -563,6 +563,7 @@ SockCreate (
 
   ASSERT (SockInitData && SockInitData->ProtoHandler);
   ASSERT (SockInitData->Type == SOCK_STREAM);
+  ASSERT (SockInitData->ProtoData && (SockInitData->DataSize <= PROTO_RESERVED_LEN));
 
   Parent = SockInitData->Parent;
 
@@ -619,6 +620,9 @@ SockCreate (
   Sock->Type                = SockInitData->Type;
   Sock->DriverBinding       = SockInitData->DriverBinding;
   Sock->State               = SockInitData->State;
+  Sock->CreateCallback      = SockInitData->CreateCallback;
+  Sock->DestroyCallback     = SockInitData->DestroyCallback;
+  Sock->Context             = SockInitData->Context;
 
   Sock->SockError           = EFI_ABORTED;
   Sock->SndBuffer.LowWater  = SOCK_BUFF_LOW_WATER;
@@ -632,6 +636,11 @@ SockCreate (
     SockInitData->Protocol,
     sizeof (EFI_TCP4_PROTOCOL)
     );
+
+  //
+  // copy the protodata into socket
+  //
+  NetCopyMem (Sock->ProtoReserved, SockInitData->ProtoData, SockInitData->DataSize);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Sock->SockHandle,
@@ -663,21 +672,35 @@ SockCreate (
     NetListInsertTail (&Parent->ConnectionList, &Sock->ConnectionList);
   }
 
+  if (Sock->CreateCallback != NULL) {
+    Status = Sock->CreateCallback (Sock, Sock->Context);
+    if (EFI_ERROR (Status)) {
+      goto OnError;
+    }
+  }
+
   return Sock;
 
 OnError:
-  if (NULL != Sock) {
 
-    if (NULL != Sock->SndBuffer.DataQueue) {
-      NetbufQueFree (Sock->SndBuffer.DataQueue);
-    }
-
-    if (NULL != Sock->RcvBuffer.DataQueue) {
-      NetbufQueFree (Sock->RcvBuffer.DataQueue);
-    }
-
-    NetFreePool (Sock);
+  if (Sock->SockHandle != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           Sock->SockHandle,
+           &gEfiTcp4ProtocolGuid,
+           &(Sock->NetProtocol.TcpProtocol),
+           NULL
+           );
   }
+
+  if (NULL != Sock->SndBuffer.DataQueue) {
+    NetbufQueFree (Sock->SndBuffer.DataQueue);
+  }
+
+  if (NULL != Sock->RcvBuffer.DataQueue) {
+    NetbufQueFree (Sock->RcvBuffer.DataQueue);
+  }
+
+  NetFreePool (Sock);
 
   return NULL;
 }
@@ -701,6 +724,10 @@ SockDestroy (
   EFI_STATUS  Status;
 
   ASSERT (SOCK_STREAM == Sock->Type);
+
+  if (Sock->DestroyCallback != NULL) {
+    Sock->DestroyCallback (Sock, Sock->Context);
+  }
 
   //
   // Flush the completion token buffered
@@ -888,6 +915,11 @@ SockClone (
   InitData.SndBufferSize  = Sock->SndBuffer.HighWater;
   InitData.DriverBinding  = Sock->DriverBinding;
   InitData.Protocol       = &(Sock->NetProtocol);
+  InitData.CreateCallback  = Sock->CreateCallback;
+  InitData.DestroyCallback = Sock->DestroyCallback;
+  InitData.Context         = Sock->Context;
+  InitData.ProtoData       = Sock->ProtoReserved;
+  InitData.DataSize        = sizeof (Sock->ProtoReserved);
 
   ClonedSock              = SockCreate (&InitData);
 
@@ -895,12 +927,6 @@ SockClone (
     SOCK_DEBUG_ERROR (("SockClone: no resource to create a cloned sock\n"));
     return NULL;
   }
-
-  NetCopyMem (
-    ClonedSock->ProtoReserved,
-    Sock->ProtoReserved,
-    PROTO_RESERVED_LEN
-    );
 
   SockSetState (ClonedSock, SO_CONNECTING);
   ClonedSock->ConfigureState = Sock->ConfigureState;
