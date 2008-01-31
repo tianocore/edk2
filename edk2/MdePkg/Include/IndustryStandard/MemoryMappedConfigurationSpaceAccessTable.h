@@ -32,7 +32,14 @@ typedef struct {
   UINT8   EndBusNumber;
   UINT32  Reserved;
 } EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE;
-
+//
+// MCFG Table header definition.  The rest of the table 
+// must be defined in a platform specific manner.
+//
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER                       Header;
+  UINT64                                            Reserved;
+} EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER;
 //
 // MCFG Revision (defined in spec)
 //

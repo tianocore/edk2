@@ -498,6 +498,11 @@ typedef struct {
 //
 #define EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  0x54445358
 
+//
+// "MCFG" Static Resource Affinity Table
+//
+#define EFI_ACPI_2_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE 0x4746434D
+
 #pragma pack()
 
 #endif
