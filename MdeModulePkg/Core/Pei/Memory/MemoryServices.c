@@ -115,23 +115,16 @@ Returns:
   UINT64                                EfiFreeMemorySize;
   EFI_PHYSICAL_ADDRESS                  PhysicalAddressOfOldHob;
 
-  if (MemoryLength > (MAX_ADDRESS - MemoryBegin + 1))
-    return EFI_INVALID_PARAMETER;
-    
-   
   DEBUG ((EFI_D_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
   
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   PrivateData->SwitchStackSignal = TRUE;
   PrivateData->PeiMemoryInstalled = TRUE;
+
+  PrivateData->StackBase = MemoryBegin;
   
-  //
-  // Ensure the stack base is in page alignment 
-  //
-  PrivateData->StackBase = ((UINTN)MemoryBegin + (EFI_PAGE_SIZE - 1)) & EFI_PAGE_SIZE;
-  
-  PeiStackSize = (RShiftU64 (MemoryLength, 1) + (EFI_PAGE_SIZE - 1)) & EFI_PAGE_SIZE;
+  PeiStackSize = RShiftU64 (MemoryLength, 1);
   if (PEI_STACK_SIZE > PeiStackSize) {
     PrivateData->StackSize = PeiStackSize;
   } else {
@@ -140,7 +133,7 @@ Returns:
 
   OldHandOffHob = PrivateData->HobList.HandoffInformationTable;
 
-  PrivateData->HobList.Raw = (VOID *)((UINTN)(PrivateData->StackBase + PrivateData->StackSize));
+  PrivateData->HobList.Raw = (VOID *)((UINTN)(MemoryBegin + PrivateData->StackSize));
   NewHandOffHob = PrivateData->HobList.HandoffInformationTable;
   PhysicalAddressOfOldHob = (EFI_PHYSICAL_ADDRESS) (UINTN) OldHandOffHob;
 
