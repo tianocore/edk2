@@ -646,11 +646,15 @@ Returns:
   EFI_LBA Index;
   UINTN   LbaSize;
   UINTN   ScratchLbaSizeData;
+  EFI_STATUS Status;
 
   //
   // First LBA
   //
-  FvbGetLbaAddress (Instance, StartLba, NULL, &LbaSize, NULL, Global, Virtual);
+  Status = FvbGetLbaAddress (Instance, StartLba, NULL, &LbaSize, NULL, Global, Virtual);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Use the scratch space as the intermediate buffer to transfer data
@@ -668,7 +672,10 @@ Returns:
   // write the data back to the first block
   //
   if (ScratchLbaSizeData > 0) {
-    FvbWriteBlock (Instance, StartLba, 0, &ScratchLbaSizeData, Global->FvbScratchSpace[Virtual], Global, Virtual);
+    Status = FvbWriteBlock (Instance, StartLba, 0, &ScratchLbaSizeData, Global->FvbScratchSpace[Virtual], Global, Virtual);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
   //
   // Middle LBAs
@@ -682,22 +689,29 @@ Returns:
   // Last LBAs, the same as first LBAs
   //
   if (LastLba > StartLba) {
-    FvbGetLbaAddress (Instance, LastLba, NULL, &LbaSize, NULL, Global, Virtual);
+    Status = FvbGetLbaAddress (Instance, LastLba, NULL, &LbaSize, NULL, Global, Virtual);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
     FvbReadBlock (Instance, LastLba, 0, &LbaSize, Global->FvbScratchSpace[Virtual], Global, Virtual);
     FvbEraseBlock (Instance, LastLba, Global, Virtual);
   }
 
-  ScratchLbaSizeData = LbaSize - (OffsetStartLba + 1);
+  ScratchLbaSizeData = LbaSize - (OffsetLastLba + 1);
+  
+  if (ScratchLbaSizeData > 0) {
+    Status = FvbWriteBlock (
+              Instance,
+              LastLba,
+              (OffsetLastLba + 1),
+              &ScratchLbaSizeData,
+              Global->FvbScratchSpace[Virtual] + OffsetLastLba + 1,
+              Global,
+              Virtual
+              );
+  }
 
-  return FvbWriteBlock (
-          Instance,
-          LastLba,
-          (OffsetLastLba + 1),
-          &ScratchLbaSizeData,
-          Global->FvbScratchSpace[Virtual],
-          Global,
-          Virtual
-          );
+  return Status;
 }
 
 EFI_STATUS
