@@ -429,7 +429,7 @@ EfiFvbEraseBlock (
     return EFI_INVALID_PARAMETER;
   }
 
-  return mFvbEntry[Instance].Fvb->EraseBlocks (mFvbEntry[Instance].Fvb, Lba, -1);
+  return mFvbEntry[Instance].Fvb->EraseBlocks (mFvbEntry[Instance].Fvb, Lba, 1, EFI_LBA_LIST_TERMINATOR);
 }
 
 /**
