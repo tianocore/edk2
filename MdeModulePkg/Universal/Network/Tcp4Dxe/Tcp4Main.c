@@ -147,7 +147,6 @@ Tcp4Configure (
   IP4_ADDR         Ip;
   IP4_ADDR         SubnetMask;
 
-//  CpuBreakpoint ();
   if (NULL == This) {
     return EFI_INVALID_PARAMETER;
   }
