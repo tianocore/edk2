@@ -39,5 +39,5 @@ InternalAssertJumpBuffer (
 {
   ASSERT (JumpBuffer != NULL);
 
-  ASSERT (((UINTN)JumpBuffer & ((BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT - 1) >> 8)) == 0);
+  ASSERT (((UINTN)JumpBuffer & (BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT - 1)) == 0);
 }
