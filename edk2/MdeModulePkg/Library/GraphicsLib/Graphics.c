@@ -131,7 +131,7 @@ Returns:
 
 --*/
 {
-  return PiLibGetSectionFromCurrentFv (
+  return PiLibGetSectionFromAnyFv (
            FileNameGuid,
            EFI_SECTION_RAW,
            0,
