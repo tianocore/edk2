@@ -713,7 +713,7 @@ LookupUnicodeString2 (
       SupportedLanguages += 3;
     } else {
       for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
-      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
+      if ((AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) && (Language[Index] == 0)) {
         Found = TRUE;
         break;
       }
