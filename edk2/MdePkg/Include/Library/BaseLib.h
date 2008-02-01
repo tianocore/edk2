@@ -38,7 +38,7 @@ typedef struct {
   UINT32                            Eip;
 } BASE_LIBRARY_JUMP_BUFFER;
 
-#define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
+#define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 4
 
 #elif defined (MDE_CPU_IPF)
 
