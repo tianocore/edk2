@@ -21,6 +21,38 @@
     ((((_Port) & 0xfffc) << 10) | ((_Port) & 0x0fff))
 
 /**
+  Translates I/O port address to memory address.
+
+  This function translates I/O port address to memory address by adding the 64MB
+  aligned I/O Port space to the I/O address.
+  If I/O Port space base is not 64MB aligned, then ASSERT ().  
+
+  @param  Port  The I/O port to read.
+
+  @return The memory address.
+
+**/
+UINTN
+InternalGetMemoryMapAddress (
+  IN UINTN                  Port
+  )
+{
+  UINTN                     Address;
+  UINTN                     IoBlockBaseAddress;
+
+  Address            = MAP_PORT_BASE_TO_MEM (Port);
+  IoBlockBaseAddress = PcdGet64(PcdIoBlockBaseAddressForIpf);
+
+  //
+  // Make sure that the I/O Port space base is 64MB aligned.
+  // 
+  ASSERT ((IoBlockBaseAddress & 0x3ffffff) == 0);
+  Address += IoBlockBaseAddress;
+
+  return Address;
+}
+
+/**
   Reads a 8-bit I/O port.
 
   Reads the 8-bit I/O port specified by Port. The 8-bit read value is returned.
@@ -38,15 +70,7 @@ IoRead8 (
   IN  UINT64                 Port
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioRead8 (Address);
+  return MmioRead8 (InternalGetMemoryMapAddress (Port));
 }
 
 /**
@@ -67,15 +91,7 @@ IoRead16 (
   IN  UINT64                 Port
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioRead16 (Address);
+  return MmioRead16 (InternalGetMemoryMapAddress (Port));
 }
 
 /**
@@ -96,15 +112,7 @@ IoRead32 (
   IN  UINT64                 Port
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioRead32 (Address);
+  return MmioRead32 (InternalGetMemoryMapAddress (Port));
 }
 
 /**
@@ -151,15 +159,7 @@ IoWrite8 (
   IN  UINT8                  Data
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioWrite8 (Address, Data);
+  return MmioWrite8 (InternalGetMemoryMapAddress (Port), Data);
 }
 
 /**
@@ -182,15 +182,7 @@ IoWrite16 (
   IN  UINT16                 Data
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioWrite16 (Address, Data);
+  return MmioWrite16 (InternalGetMemoryMapAddress (Port), Data);
 }
 
 /**
@@ -213,15 +205,7 @@ IoWrite32 (
   IN  UINT32                 Data
   )
 {
-  UINT64           Address;
-
-  //
-  // Add the 64MB aligned IO Port space to the IO address
-  //
-  Address = MAP_PORT_BASE_TO_MEM (Port);
-  Address += PcdGet64(PcdIoBlockBaseAddressForIpf);
-
-  return MmioWrite32 (Address, Data);
+  return MmioWrite32 (InternalGetMemoryMapAddress (Port), Data);
 }
 
 /**
@@ -299,6 +283,11 @@ MmioRead16 (
 {
   UINT16           Data;
 
+  //
+  // Make sure that Address is 16-bit aligned.
+  // 
+  ASSERT ((Address & 1) == 0);
+
   Address |= BIT63;
 
   MemoryFence ();
@@ -328,6 +317,11 @@ MmioRead32 (
 {
   UINT32           Data;
 
+  //
+  // Make sure that Address is 32-bit aligned.
+  // 
+  ASSERT ((Address & 3) == 0);
+
   Address |= BIT63;
 
   MemoryFence ();
@@ -356,6 +350,11 @@ MmioRead64 (
   )
 {
   UINT64           Data;
+
+  //
+  // Make sure that Address is 64-bit aligned.
+  // 
+  ASSERT ((Address & 7) == 0);
 
   Address |= BIT63;
 
@@ -416,6 +415,11 @@ MmioWrite16 (
   IN  UINT16                 Data
   )
 {
+  //
+  // Make sure that Address is 16-bit aligned.
+  // 
+  ASSERT ((Address & 1) == 0);
+
   Address |= BIT63;
 
   MemoryFence ();
@@ -445,6 +449,11 @@ MmioWrite32 (
   IN  UINT32                 Data
   )
 {
+  //
+  // Make sure that Address is 32-bit aligned.
+  // 
+  ASSERT ((Address & 3) == 0);
+
   Address |= BIT63;
 
   MemoryFence ();
@@ -474,6 +483,11 @@ MmioWrite64 (
   IN  UINT64                 Data
   )
 {
+  //
+  // Make sure that Address is 64-bit aligned.
+  // 
+  ASSERT ((Address & 7) == 0);
+
   Address |= BIT63;
 
   MemoryFence ();
