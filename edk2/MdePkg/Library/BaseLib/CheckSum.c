@@ -122,14 +122,15 @@ CalculateSum16 (
 {
   UINT16    Sum;
   UINTN     Count;
+  UINTN     Total;
 
   ASSERT (Buffer != NULL);
   ASSERT (((UINTN) Buffer & 0x1) == 0);
   ASSERT ((Length & 0x1) == 0);
   ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
 
-
-  for (Sum = 0, Count = 0; Count < Length; Count++) {
+  Total = Length / sizeof (*Buffer);
+  for (Sum = 0, Count = 0; Count < Total; Count++) {
     Sum = (UINT16) (Sum + *(Buffer + Count));
   }
   
@@ -203,14 +204,15 @@ CalculateSum32 (
 {
   UINT32    Sum;
   UINTN     Count;
+  UINTN     Total;
 
   ASSERT (Buffer != NULL);
   ASSERT (((UINTN) Buffer & 0x3) == 0);
   ASSERT ((Length & 0x3) == 0);
   ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
 
-
-  for (Sum = 0, Count = 0; Count < Length; Count++) {
+  Total = Length / sizeof (*Buffer);
+  for (Sum = 0, Count = 0; Count < Total; Count++) {
     Sum = Sum + *(Buffer + Count);
   }
   
@@ -284,13 +286,15 @@ CalculateSum64 (
 {
   UINT64    Sum;
   UINTN     Count;
+  UINTN     Total;
 
   ASSERT (Buffer != NULL);
   ASSERT (((UINTN) Buffer & 0x7) == 0);
   ASSERT ((Length & 0x7) == 0);
   ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
 
-  for (Sum = 0, Count = 0; Count < Length; Count++) {
+  Total = Length / sizeof (*Buffer);
+  for (Sum = 0, Count = 0; Count < Total; Count++) {
     Sum = Sum + *(Buffer + Count);
   }
   
