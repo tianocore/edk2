@@ -148,7 +148,7 @@
   Ia32/EnablePaging32.c | MSFT 
   Ia32/EnableInterrupts.c | MSFT 
   Ia32/EnableDisableInterrupts.c | MSFT 
-  Ia32/DivU64x64Remainder.c | MSFT 
+  Ia32/DivU64x64Remainder.asm | MSFT 
   Ia32/DivU64x32Remainder.c | MSFT 
   Ia32/DivU64x32.c | MSFT 
   Ia32/DisablePaging32.c | MSFT 
