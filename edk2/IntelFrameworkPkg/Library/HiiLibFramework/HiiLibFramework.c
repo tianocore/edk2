@@ -40,7 +40,7 @@ HiiLibFrameworkConstructor (
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
-                  &gHiiProtocol
+                  (VOID **) &gHiiProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 

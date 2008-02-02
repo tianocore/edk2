@@ -128,7 +128,7 @@ PreparePackages (
 
 EFI_STATUS
 EFIAPI
-HiiLibAddPackagesToHiiDatabase (
+HiiLibAddPackages (
   IN       UINTN               NumberOfPackages,
   IN CONST EFI_GUID            *GuidId,
   IN       EFI_HANDLE          DriverHandle, OPTIONAL
@@ -186,7 +186,7 @@ HiiLibAddFontPackageToHiiDatabase (
   //
   // Register our Fonts into the global database
   //
-  Status = HiiLibAddPackagesToHiiDatabase (1, NULL, HiiHandle, NULL, FontPack);
+  Status = HiiLibAddPackages (1, NULL, HiiHandle, NULL, FontPack);
   //
   // Free the font database
   //
@@ -195,13 +195,16 @@ HiiLibAddFontPackageToHiiDatabase (
   return Status;  
 }
 
-EFI_STATUS
+VOID
 EFIAPI
-HiiLibRemovePackagesFromHiiDatabase (
+HiiLibRemovePackages (
   IN      EFI_HII_HANDLE      HiiHandle
   )
 {
-  return mHii->RemovePack (mHii, (FRAMEWORK_EFI_HII_HANDLE) (UINTN) HiiHandle);
+  EFI_STATUS Status;
+  
+  Status = mHii->RemovePack (mHii, (FRAMEWORK_EFI_HII_HANDLE) (UINTN) HiiHandle);
+  ASSERT_EFI_ERROR (Status);
 }
 
 
@@ -223,7 +226,7 @@ HiiLibRemovePackagesFromHiiDatabase (
 **/
 EFI_STATUS
 EFIAPI
-HiiLibCreateString (
+HiiLibNewString (
   IN  EFI_HII_HANDLE                  PackageList,
   OUT EFI_STRING_ID                   *StringId,
   IN  CONST EFI_STRING                String
@@ -273,7 +276,7 @@ HiiLibUpdateString (
 //
 EFI_STATUS
 EFIAPI
-HiiLibGetStringFromGuidId (
+HiiLibGetStringFromToken (
   IN  EFI_GUID                        *ProducerGuid,
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      *String
