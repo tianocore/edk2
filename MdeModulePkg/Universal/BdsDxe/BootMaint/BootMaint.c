@@ -68,7 +68,7 @@ Returns:
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (MenuOption, Index);
 
-    IfrLibNewString (
+    HiiLibNewString (
       HiiHandle,
       &NewMenuEntry->DisplayStringToken,
       NewMenuEntry->DisplayString
@@ -77,7 +77,7 @@ Returns:
     if (NULL == NewMenuEntry->HelpString) {
       NewMenuEntry->HelpStringToken = NewMenuEntry->DisplayStringToken;
     } else {
-      IfrLibNewString (
+      HiiLibNewString (
         HiiHandle,
         &NewMenuEntry->HelpStringToken,
         NewMenuEntry->HelpString
@@ -885,7 +885,7 @@ Returns:
   //
   // Post our Boot Maint VFR binnary to the HII database.
   //
-  PackageList = PreparePackageList (2, &mBootMaintGuid, BmBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mBootMaintGuid, BmBin, BdsStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -899,7 +899,7 @@ Returns:
   //
   // Post our File Explorer VFR binary to the HII database.
   //
-  PackageList = PreparePackageList (2, &mFileExplorerGuid, FEBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mFileExplorerGuid, FEBin, BdsStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -1124,7 +1124,7 @@ Returns:
     //
     NextListNode = EfiAllocateZeroPool (sizeof (STRING_LIST_NODE));
 
-    IfrLibNewString (CallbackData->BmmHiiHandle, &(NextListNode->StringToken), L" ");
+    HiiLibNewString (CallbackData->BmmHiiHandle, &(NextListNode->StringToken), L" ");
     ASSERT (NextListNode->StringToken != 0);
 
     StringDepository->TotalNodeNumber++;

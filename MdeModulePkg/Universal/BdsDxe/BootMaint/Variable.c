@@ -601,13 +601,13 @@ Var_UpdateDriverOption (
                                       CallbackData,
                                       DriverOptionStrDepository
                                       );
-  IfrLibNewString (HiiHandle, &NewMenuEntry->DisplayStringToken, NewMenuEntry->DisplayString);
+  HiiLibNewString (HiiHandle, &NewMenuEntry->DisplayStringToken, NewMenuEntry->DisplayString);
 
   NewMenuEntry->HelpStringToken = GetStringTokenFromDepository (
                                     CallbackData,
                                     DriverOptionHelpStrDepository
                                     );
-  IfrLibNewString (HiiHandle, &NewMenuEntry->HelpStringToken, NewMenuEntry->HelpString);
+  HiiLibNewString (HiiHandle, &NewMenuEntry->HelpStringToken, NewMenuEntry->HelpString);
 
   if (OptionalDataExist) {
     Ptr += (UINT8) GetDevicePathSize (CallbackData->LoadContext->FilePathList);
@@ -759,13 +759,13 @@ Var_UpdateBootOption (
                                       CallbackData,
                                       BootOptionStrDepository
                                       );
-  IfrLibNewString (CallbackData->FeHiiHandle, &NewMenuEntry->DisplayStringToken, NewMenuEntry->DisplayString);
+  HiiLibNewString (CallbackData->FeHiiHandle, &NewMenuEntry->DisplayStringToken, NewMenuEntry->DisplayString);
 
   NewMenuEntry->HelpStringToken = GetStringTokenFromDepository (
                                     CallbackData,
                                     BootOptionHelpStrDepository
                                     );
-  IfrLibNewString (CallbackData->FeHiiHandle, &NewMenuEntry->HelpStringToken, NewMenuEntry->HelpString);
+  HiiLibNewString (CallbackData->FeHiiHandle, &NewMenuEntry->HelpStringToken, NewMenuEntry->HelpString);
 
   if (OptionalDataExist) {
     Ptr += (UINT8) GetDevicePathSize (CallbackData->LoadContext->FilePathList);

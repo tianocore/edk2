@@ -151,7 +151,7 @@ Returns:
   //
   // Publish our HII data
   //
-  PackageList = PreparePackageList (2, &mBootManagerGuid, BootManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mBootManagerGuid, BootManagerVfrBin, BdsStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -246,7 +246,7 @@ Returns:
       continue;
     }
 
-    IfrLibNewString (HiiHandle, &Token, Option->Description);
+    HiiLibNewString (HiiHandle, &Token, Option->Description);
 
     TempStr = DevicePathToStr (Option->DevicePath);
     TempSize = StrSize (TempStr);
@@ -254,7 +254,7 @@ Returns:
     StrCat (HelpString, L"Device Path : ");
     StrCat (HelpString, TempStr);
 
-    IfrLibNewString (HiiHandle, &HelpToken, HelpString);
+    HiiLibNewString (HiiHandle, &HelpToken, HelpString);
 
     CreateActionOpCode (
       mKeyInput,

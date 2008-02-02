@@ -79,6 +79,8 @@
   PrintLib
   HiiLib
   IfrSupportLib
+  ExtendedHiiLib
+  ExtendedIfrSupportLib
   NetLib
 
 [Protocols]

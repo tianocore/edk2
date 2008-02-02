@@ -63,7 +63,7 @@ Returns:
     return Status;
   }
 
-  PackageList = PreparePackageList (1, &mBdsStringPackGuid, &BdsStrings);
+  PackageList = HiiLibPreparePackageList (1, &mBdsStringPackGuid, &BdsStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -98,7 +98,7 @@ Returns:
   CHAR16 *String;
 
   String = NULL;
-  GetStringFromHandle (gStringPackHandle, Id, &String);
+  HiiLibGetStringFromHandle (gStringPackHandle, Id, &String);
 
   return String;
 }

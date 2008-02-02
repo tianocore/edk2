@@ -700,7 +700,7 @@ IScsiFormCallback (
 
       UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
       DeviceFormTitleToken = (STRING_REF) STR_ISCSI_DEVICE_FORM_TITLE;
-      IfrLibSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString);
+      HiiLibSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString);
 
       IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
 
@@ -832,13 +832,13 @@ Returns:
       // Compose the Port string and create a new STRING_REF.
       //
       UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
-      IfrLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleToken, PortString);
+      HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleToken, PortString);
 
       //
       // Compose the help string of this port and create a new STRING_REF.
       //
       UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
-      IfrLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
+      HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
 
       NetListInsertTail (&mIScsiConfigFormList, &ConfigFormEntry->Link);
       mNumberOfIScsiDevices++;
@@ -958,7 +958,7 @@ Returns:
   //
   // Publish our HII data
   //
-  PackageList = PreparePackageList (2, &mVendorGuid, IScsiDxeStrings, IScsiConfigDxeBin);
+  PackageList = HiiLibPreparePackageList (2, &mVendorGuid, IScsiDxeStrings, IScsiConfigDxeBin);
   ASSERT (PackageList != NULL);
   
   Status = HiiDatabase->NewPackageList (

@@ -63,6 +63,7 @@
   FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
+  ExtendedHiiLib|MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   UsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
@@ -70,13 +71,13 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   GraphicsLib|MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
-  IfrSupportLib|MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  IfrSupportLib|MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf
   PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf  
   GraphicsLib|MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
-  IfrSupportLib|MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
   DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf
   PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf  
@@ -269,9 +270,10 @@
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
 
-  MdeModulePkg/Library/IfrSupportLib/IfrSupportLib.inf
   MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   MdeModulepkg/Library/GraphicsLib/GraphicsLib.inf
+  MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
+  MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
 
   MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
 
