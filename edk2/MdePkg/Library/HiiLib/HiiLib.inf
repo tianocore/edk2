@@ -32,20 +32,19 @@
 
 [Sources.common]
   HiiLib.c
+  HiiString.c
+  HiiLanguage.c
 
 
 [Packages]
   MdePkg/MdePkg.dec
-  #BugBug: This package dependency will be re-evaluated when the code become functional and stable.
-  #      : HiiLibCreateHiiDriverHandle depends on HII_VENDOR_DEVICE_PATH which is defined by this
-  #      : specification only. 
-  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
   DebugLib
   PcdLib
   UefiRuntimeServicesTableLib
+  DevicePathLib
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED

@@ -1488,4 +1488,14 @@ typedef struct {
 
 
 
+//
+// References to string tokens must use this macro to enable scanning for
+// token usages.
+//
+//
+// STRING_TOKEN is not defined in UEFI specification. But it is placed 
+// here for the easy access by C files and VFR source files.
+//
+#define STRING_TOKEN(t) t
+
 #endif

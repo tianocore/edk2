@@ -15,6 +15,34 @@
 #ifndef __INTERNAL_HII_LIB_H__
 #define __INTERNAL_HII_LIB_H__
 
+#include <PiDxe.h>
 
+#include <Protocol/HiiDatabase.h>
+#include <Protocol/HiiString.h>
+#include <Protocol/DevicePath.h>
+
+#include <Guid/GlobalVariable.h>
+
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/HiiLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DevicePathLib.h>
+
+#define HII_LIB_DEFAULT_STRING_SIZE     0x200
+
+
+extern EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
+extern EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
+
+BOOLEAN
+IsHiiHandleRegistered (
+  EFI_HII_HANDLE    HiiHandle
+  )
+;
 
 #endif
