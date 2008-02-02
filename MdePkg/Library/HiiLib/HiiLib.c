@@ -12,59 +12,22 @@
 
 **/
 
-
-#include <PiDxe.h>
-
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/HiiString.h>
-#include <Protocol/DevicePath.h>
-
-#include <Guid/GlobalVariable.h>
-
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/HiiLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/PcdLib.h>
-
-#include <MdeModuleHii.h>
-
 #include "InternalHiiLib.h"
-
 
 EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
 EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
 
-//
-// Hii vendor device path template
-//
-HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
-  {
-    {
-      {
-        HARDWARE_DEVICE_PATH,
-        HW_VENDOR_DP,
-        {
-          (UINT8) (sizeof (HII_VENDOR_DEVICE_PATH_NODE)),
-          (UINT8) ((sizeof (HII_VENDOR_DEVICE_PATH_NODE)) >> 8)
-        }
-      },
-      EFI_IFR_TIANO_GUID
-    },
-    0
-  },
-  {
-    END_DEVICE_PATH_TYPE,
-    END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
-      END_DEVICE_PATH_LENGTH
-    }
-  }
-};
+/**
+  The constructor function of Hii Library.
+  
+  The constructor function caches the value of default HII protocol instances.
 
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
 EFI_STATUS
 EFIAPI
 UefiHiiLibConstructor (
@@ -93,166 +56,6 @@ UefiHiiLibConstructor (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-HiiLibGetCurrentLanguage (
-  OUT     CHAR8               *Lang
-  )
-/*++
-
-Routine Description:
-  Determine what is the current language setting
-
-Arguments:
-  Lang      - Pointer of system language
-
-Returns:
-  Status code
-
---*/
-{
-  EFI_STATUS  Status;
-  UINTN       Size;
-
-  //
-  // Get current language setting
-  //
-  Size = RFC_3066_ENTRY_SIZE;
-  Status = gRT->GetVariable (
-                  L"PlatformLang",
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &Size,
-                  Lang
-                  );
-
-  if (EFI_ERROR (Status)) {
-    AsciiStrCpy (Lang, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang));
-  }
-
-  return Status;
-}
-
-VOID
-HiiLibGetNextLanguage (
-  IN OUT CHAR8      **LangCode,
-  OUT CHAR8         *Lang
-  )
-/*++
-
-Routine Description:
-  Get next language from language code list (with separator ';').
-
-Arguments:
-  LangCode - On input: point to first language in the list. On output: point to
-             next language in the list, or NULL if no more language in the list.
-  Lang     - The first language in the list.
-
-Returns:
-  None.
-
---*/
-{
-  UINTN  Index;
-  CHAR8  *StringPtr;
-
-  if (LangCode == NULL || *LangCode == NULL) {
-    *Lang = 0;
-    return;
-  }
-
-  Index = 0;
-  StringPtr = *LangCode;
-  while (StringPtr[Index] != 0 && StringPtr[Index] != ';') {
-    Index++;
-  }
-
-  CopyMem (Lang, StringPtr, Index);
-  Lang[Index] = 0;
-
-  if (StringPtr[Index] == ';') {
-    Index++;
-  }
-  *LangCode = StringPtr + Index;
-}
-
-CHAR8 *
-HiiLibGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
-  )
-/*++
-
-Routine Description:
-  This function returns the list of supported languages, in the format specified
-  in UEFI specification Appendix M.
-
-Arguments:
-  HiiHandle  - The HII package list handle.
-
-Returns:
-  The supported languages.
-
---*/
-{
-  EFI_STATUS  Status;
-  UINTN       BufferSize;
-  CHAR8       *LanguageString;
-
-  //
-  // Collect current supported Languages for given HII handle
-  //
-  BufferSize = 0x1000;
-  LanguageString = AllocatePool (BufferSize);
-  Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (LanguageString);
-    LanguageString = AllocatePool (BufferSize);
-    Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
-  }
-
-  if (EFI_ERROR (Status)) {
-    LanguageString = NULL;
-  }
-
-  return LanguageString;
-}
-
-UINT16
-HiiLibGetSupportedLanguageNumber (
-  IN EFI_HII_HANDLE           HiiHandle
-  )
-/*++
-
-Routine Description:
-  This function returns the number of supported languages
-
-Arguments:
-  HiiHandle  - The HII package list handle.
-
-Returns:
-  The  number of supported languages.
-
---*/
-{
-  CHAR8   *Languages;
-  CHAR8   *LanguageString;
-  UINT16  LangNumber;
-  CHAR8   Lang[RFC_3066_ENTRY_SIZE];
-
-  Languages = HiiLibGetSupportedLanguages (HiiHandle);
-  if (Languages == NULL) {
-    return 0;
-  }
-
-  LangNumber = 0;
-  LanguageString = Languages;
-  while (*LanguageString != 0) {
-    HiiLibGetNextLanguage (&LanguageString, Lang);
-    LangNumber++;
-  }
-  gBS->FreePool (Languages);
-
-  return LangNumber;
-}
 
 
 EFI_HII_PACKAGE_LIST_HEADER *
@@ -318,22 +121,11 @@ HiiLibPreparePackageList (
   IN CONST EFI_GUID           *GuidId,
   ...
   )
-/*++
-
-Routine Description:
-  Assemble EFI_HII_PACKAGE_LIST according to the passed in packages.
-
-Arguments:
-  NumberOfPackages  -  Number of packages.
-  GuidId            -  Package GUID.
-
-Returns:
-  Pointer of EFI_HII_PACKAGE_LIST_HEADER.
-
---*/
 {
   EFI_HII_PACKAGE_LIST_HEADER *PackageListHeader;
   VA_LIST                     Marker;
+
+  ASSERT (GuidId != NULL);
 
   VA_START (Marker, GuidId);
   PackageListHeader = InternalHiiLibPreparePackages (NumberOfPackages, GuidId, Marker);
@@ -343,28 +135,9 @@ Returns:
 }
 
 
-/**
-  This function allocates pool for an EFI_HII_PACKAGE_LIST structure
-  with additional space that is big enough to host all packages described by the variable 
-  argument list of package pointers.  The allocated structure is initialized using NumberOfPackages, 
-  GuidId,  and the variable length argument list of package pointers.
-
-  Then, EFI_HII_PACKAGE_LIST will be register to the default System HII Database. The
-  Handle to the newly registered Package List is returned throught HiiHandle.
-
-  @param  NumberOfPackages  The number of HII packages to register.
-  @param  GuidId                    Package List GUID ID.
-  @param  HiiHandle                The ID used to retrieve the Package List later.
-  @param  ...                          The variable argument list describing all HII Package.
-
-  @return
-  The allocated and initialized packages.
-
-**/
-
 EFI_STATUS
 EFIAPI
-HiiLibAddPackagesToHiiDatabase (
+HiiLibAddPackages (
   IN       UINTN               NumberOfPackages,
   IN CONST EFI_GUID            *GuidId,
   IN       EFI_HANDLE          DriverHandle, OPTIONAL
@@ -376,6 +149,7 @@ HiiLibAddPackagesToHiiDatabase (
   EFI_HII_PACKAGE_LIST_HEADER *PackageListHeader;
   EFI_STATUS                Status;
 
+  ASSERT (HiiHandle != NULL);
 
   VA_START (Args, HiiHandle);
   PackageListHeader = InternalHiiLibPreparePackages (NumberOfPackages, GuidId, Args);
@@ -410,7 +184,7 @@ HiiLibAddFontPackageToHiiDatabase (
   UINT8                                *Package;
 
   //
-  // Add 4 bytes to the header for entire length for PreparePackageList use only.
+  // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
   // Looks ugly. Might be updated when font tool is ready.
   //
   PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + FontSize + 4;
@@ -439,361 +213,238 @@ HiiLibAddFontPackageToHiiDatabase (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
+VOID
 EFIAPI
-HiiLibRemovePackagesFromHiiDatabase (
+HiiLibRemovePackages (
   IN      EFI_HII_HANDLE      HiiHandle
   )
 {
-  return mHiiDatabaseProt->RemovePackageList (mHiiDatabaseProt, HiiHandle);
+  EFI_STATUS Status;
+
+  ASSERT (HiiHandle != NULL);
+  Status = mHiiDatabaseProt->RemovePackageList (mHiiDatabaseProt, HiiHandle);
+  ASSERT_EFI_ERROR (Status);
 }
+
 
 EFI_STATUS
 EFIAPI
-HiiLibCreateString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  OUT EFI_STRING_ID                   *StringId,
-  IN  CONST EFI_STRING                String
+HiiLibGetHiiHandles (
+  IN OUT UINTN                     *HandleBufferLength,
+  OUT    EFI_HII_HANDLE            **HiiHandleBuffer
   )
 {
+  UINTN       BufferLength;
   EFI_STATUS  Status;
-  CHAR8       *Languages;
-  CHAR8       *LangStrings;
-  CHAR8       Lang[RFC_3066_ENTRY_SIZE];
 
-  Status = EFI_SUCCESS;
+  ASSERT (HandleBufferLength != NULL);
+  ASSERT (HiiHandleBuffer != NULL);
 
-  Languages = HiiLibGetSupportedLanguages (PackageList);
+  BufferLength = 0;
 
-  LangStrings = Languages;
-  while (*LangStrings != 0) {
-    HiiLibGetNextLanguage (&LangStrings, Lang);
-
-    Status = mHiiStringProt->NewString (
-                                 mHiiStringProt,
-                                 PackageList,
-                                 StringId,
-                                 Lang,
+  //
+  // Try to find the actual buffer size for HiiHandle Buffer.
+  //
+  Status = mHiiDatabaseProt->ListPackageLists (
+                                 mHiiDatabaseProt,
+                                 EFI_HII_PACKAGE_TYPE_ALL,
                                  NULL,
-                                 String,
-                                 NULL
+                                 &BufferLength,
+                                 *HiiHandleBuffer
                                  );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+      *HiiHandleBuffer = AllocateZeroPool (BufferLength);
+      Status = mHiiDatabaseProt->ListPackageLists (
+                                     mHiiDatabaseProt,
+                                     EFI_HII_PACKAGE_TYPE_ALL,
+                                     NULL,
+                                     &BufferLength,
+                                     *HiiHandleBuffer
+                                     );
+      //
+      // we should not fail here.
+      //
+      ASSERT_EFI_ERROR (Status);
   }
 
-  FreePool (Languages);
-
-  return Status;
-  
-}
-
-EFI_STATUS
-EFIAPI
-HiiLibUpdateString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  IN  EFI_STRING_ID                   StringId,
-  IN  CONST EFI_STRING                String
-  )
-{
-  EFI_STATUS  Status;
-  CHAR8       *Languages;
-  CHAR8       *LangStrings;
-  CHAR8       Lang[RFC_3066_ENTRY_SIZE];
-
-  Status = EFI_SUCCESS;
-
-  Languages = HiiLibGetSupportedLanguages (PackageList);
-
-  LangStrings = Languages;
-  while (*LangStrings != 0) {
-    HiiLibGetNextLanguage (&LangStrings, Lang);
-
-    Status = mHiiStringProt->SetString (
-                                 mHiiStringProt,
-                                 PackageList,
-                                 StringId,
-                                 Lang,
-                                 String,
-                                 NULL
-                                 );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-  }
-
-  FreePool (Languages);
-
-  return Status;
-}
-
-//                                                                                      //
-// //////////////////////////////////////////////////
-//                                                                                    //
-
-//
-// This function is Implementation Specifc. HII_VENDOR_DEVICE_PATH
-// This should be moved to MdeModulepkg.
-//
-EFI_STATUS
-EFIAPI
-HiiLibCreateHiiDriverHandle (
-  OUT EFI_HANDLE               *DriverHandle
-  )
-{
-  EFI_STATUS                   Status;
-  HII_VENDOR_DEVICE_PATH_NODE  *VendorDevicePath;
-  UINT64                       MonotonicCount;
-
-  VendorDevicePath = AllocateCopyPool (sizeof (HII_VENDOR_DEVICE_PATH), &mHiiVendorDevicePathTemplate);
-  if (VendorDevicePath == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  gBS->GetNextMonotonicCount (&MonotonicCount);
-  VendorDevicePath->MonotonicCount = (UINT32) MonotonicCount;
-
-  *DriverHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  VendorDevicePath
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-EFI_STATUS
-EFIAPI
-HiiLibDestroyHiiDriverHandle (
-  IN EFI_HANDLE               DriverHandle
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
-
-  Status = gBS->HandleProtocol (
-                  DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &DevicePath
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->UninstallProtocolInterface (
-                  DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  DevicePath
-                  );
+  *HandleBufferLength = BufferLength;
 
   return Status;
 }
 
 EFI_STATUS
-HiiLibExtractDefault(
-  IN VOID                         *Buffer,
-  IN UINTN                        *BufferSize,
-  UINTN                           Number,
-  ...
-  )
-/*++
-
-  Routine Description:
-
-    Configure the buffer accrording to ConfigBody strings.
-
-  Arguments:
-    DefaultId             - the ID of default.
-    Buffer                - the start address of buffer.
-    BufferSize            - the size of buffer.
-    Number                - the number of the strings.
-
-  Returns:
-    EFI_BUFFER_TOO_SMALL  - the BufferSize is too small to operate.
-    EFI_INVALID_PARAMETER - Buffer is NULL or BufferSize is 0.
-    EFI_SUCCESS           - Operation successful.
-
---*/
-{
-  VA_LIST                         Args;
-  UINTN                           Index;
-  UINT32                          TotalLen;
-  UINT8                           *BufCfgArray;
-  UINT8                           *BufferPos;
-  UINT16                          Offset;
-  UINT16                          Width;
-  UINT8                           *Value;
-
-  if ((Buffer == NULL) || (BufferSize == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Offset = 0;
-  Width  = 0;
-  Value  = NULL;
-
-  VA_START (Args, Number);
-  for (Index = 0; Index < Number; Index++) {
-    BufCfgArray = (UINT8 *) VA_ARG (Args, VOID *);
-    CopyMem (&TotalLen, BufCfgArray, sizeof (UINT32));
-    BufferPos = BufCfgArray + sizeof (UINT32);
-
-    while ((UINT32)(BufferPos - BufCfgArray) < TotalLen) {
-      CopyMem (&Offset, BufferPos, sizeof (UINT16));
-      BufferPos += sizeof (UINT16);
-      CopyMem (&Width, BufferPos, sizeof (UINT16));
-      BufferPos += sizeof (UINT16);
-      Value = BufferPos;
-      BufferPos += Width;
-
-      if ((UINTN)(Offset + Width) > *BufferSize) {
-        return EFI_BUFFER_TOO_SMALL;
-      }
-
-      CopyMem ((UINT8 *)Buffer + Offset, Value, Width);
-    }
-  }
-  VA_END (Args);
-
-  *BufferSize = (UINTN)Offset;
-
-  return EFI_SUCCESS;
-}
-
-
-STATIC EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
-
-EFI_STATUS
-HiiLibExtractClassFromHiiHandle (
+EFIAPI
+HiiLibExtractGuidFromHiiHandle (
   IN      EFI_HII_HANDLE      Handle,
-  OUT     UINT16              *Class,
-  OUT     EFI_STRING_ID       *FormSetTitle,
-  OUT     EFI_STRING_ID       *FormSetHelp
+  OUT     EFI_GUID            *Guid
   )
-/*++
-
-Routine Description:
-  Extract formset class for given HII handle.
-
-Arguments:
-  HiiHandle       - Hii handle
-  Class           - Class of the formset
-  FormSetTitle    - Formset title string
-  FormSetHelp     - Formset help string
-
-Returns:
-  EFI_SUCCESS     - Successfully extract Class for specified Hii handle.
-
---*/
 {
   EFI_STATUS                   Status;
   UINTN                        BufferSize;
-  EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
 
-  *Class = EFI_NON_DEVICE_CLASS;
-  *FormSetTitle = 0;
-  *FormSetHelp = 0;
-
-  //
-  // Locate HII Database protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiDatabaseProtocolGuid,
-                  NULL,
-                  (VOID **) &HiiDatabase
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  ASSERT (Guid != NULL);
 
   //
   // Get HII PackageList
   //
   BufferSize = 0;
   HiiPackageList = NULL;
-  Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
+  Status = mHiiDatabaseProt->ExportPackageLists (mHiiDatabaseProt, Handle, &BufferSize, HiiPackageList);
+  ASSERT (Status != EFI_NOT_FOUND);
+  
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
     ASSERT (HiiPackageList != NULL);
 
-    Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
+    Status = mHiiDatabaseProt->ExportPackageLists (mHiiDatabaseProt, Handle, &BufferSize, HiiPackageList);
   }
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Get Form package from this HII package List
+  // Extract GUID
   //
-  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  Offset2 = 0;
-  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
-
-  while (Offset < PackageListLength) {
-    Package = ((UINT8 *) HiiPackageList) + Offset;
-    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-
-    if (PackageHeader.Type == EFI_HII_PACKAGE_FORM) {
-      //
-      // Search Class Opcode in this Form Package
-      //
-      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-      while (Offset2 < PackageHeader.Length) {
-        OpCodeData = Package + Offset2;
-
-        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-          //
-          // Find FormSet OpCode
-          //
-          CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-          CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-        }
-
-        if ((((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_GUID_OP) &&
-             CompareGuid (&mIfrVendorGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER))) &&
-            (((EFI_IFR_GUID_CLASS *) OpCodeData)->ExtendOpCode == EFI_IFR_EXTEND_OP_CLASS)
-           ) {
-          //
-          // Find GUIDed Class OpCode
-          //
-          CopyMem (Class, &((EFI_IFR_GUID_CLASS *) OpCodeData)->Class, sizeof (UINT16));
-
-          //
-          // Till now, we ought to have found the formset Opcode
-          //
-          break;
-        }
-
-        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-      }
-
-      if (Offset2 < PackageHeader.Length) {
-        //
-        // Target formset found
-        //
-        break;
-      }
-    }
-
-    Offset += PackageHeader.Length;
-  }
+  CopyMem (Guid, &HiiPackageList->PackageListGuid, sizeof (EFI_GUID));
 
   gBS->FreePool (HiiPackageList);
 
   return EFI_SUCCESS;
+}
+
+EFI_HII_HANDLE
+EFIAPI
+HiiLibDevicePathToHiiHandle (
+  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DEVICE_PATH_PROTOCOL    *TmpDevicePath;
+  UINTN                       BufferSize;
+  UINTN                       HandleCount;
+  UINTN                       Index;
+  EFI_HANDLE                  *Handles;
+  EFI_HANDLE                  Handle;
+  UINTN                       Size;
+  EFI_HANDLE                  DriverHandle;
+  EFI_HII_HANDLE              *HiiHandles;
+  EFI_HII_HANDLE              HiiHandle;
+
+  ASSERT (DevicePath != NULL);
+
+  //
+  // Locate Device Path Protocol handle buffer
+  //
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiDevicePathProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Search Driver Handle by Device Path
+  //
+  DriverHandle = NULL;
+  BufferSize = GetDevicePathSize (DevicePath);
+  for(Index = 0; Index < HandleCount; Index++) {
+    Handle = Handles[Index];
+    gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **) &TmpDevicePath);
+
+    //
+    // Check whether DevicePath match
+    //
+    Size = GetDevicePathSize (TmpDevicePath);
+    if ((Size == BufferSize) && CompareMem (DevicePath, TmpDevicePath, Size) == 0) {
+      DriverHandle = Handle;
+      break;
+    }
+  }
+  gBS->FreePool (Handles);
+
+  if (DriverHandle == NULL) {
+    return NULL;
+  }
+
+  //
+  // Retrieve all Hii Handles from HII database
+  //
+  BufferSize = 0x1000;
+  HiiHandles = AllocatePool (BufferSize);
+  ASSERT (HiiHandles != NULL);
+  Status = mHiiDatabaseProt->ListPackageLists (
+                          mHiiDatabaseProt,
+                          EFI_HII_PACKAGE_TYPE_ALL,
+                          NULL,
+                          &BufferSize,
+                          HiiHandles
+                          );
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    gBS->FreePool (HiiHandles);
+    HiiHandles = AllocatePool (BufferSize);
+    ASSERT (HiiHandles != NULL);
+
+    Status = mHiiDatabaseProt->ListPackageLists (
+                            mHiiDatabaseProt,
+                            EFI_HII_PACKAGE_TYPE_ALL,
+                            NULL,
+                            &BufferSize,
+                            HiiHandles
+                            );
+  }
+
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (HiiHandles);
+    return NULL;
+  }
+
+  //
+  // Search Hii Handle by Driver Handle
+  //
+  HiiHandle = NULL;
+  HandleCount = BufferSize / sizeof (EFI_HII_HANDLE);
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = mHiiDatabaseProt->GetPackageListHandle (
+                            mHiiDatabaseProt,
+                            HiiHandles[Index],
+                            &Handle
+                            );
+    if (!EFI_ERROR (Status) && (Handle == DriverHandle)) {
+      HiiHandle = HiiHandles[Index];
+      break;
+    }
+  }
+
+  gBS->FreePool (HiiHandles);
+  return HiiHandle;
+}
+
+BOOLEAN
+IsHiiHandleRegistered (
+  EFI_HII_HANDLE    HiiHandle
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+
+  ASSERT (HiiHandle != NULL);
+
+  HiiPackageList = NULL;
+  BufferSize = 0;
+  Status = mHiiDatabaseProt->ExportPackageLists (
+             mHiiDatabaseProt,
+             HiiHandle,
+             &BufferSize,
+             HiiPackageList
+             );
+
+  return (BOOLEAN) (Status == EFI_BUFFER_TOO_SMALL);
 }
 
