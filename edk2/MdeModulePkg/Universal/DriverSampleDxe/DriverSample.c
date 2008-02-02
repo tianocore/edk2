@@ -111,7 +111,7 @@ ValidatePassword (
   Password = AllocateZeroPool (BufferSize);
   ASSERT (Password != NULL);
 
-  Status = IfrLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
+  Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
   if (EFI_ERROR (Status)) {
     gBS->FreePool (Password);
     return Status;
@@ -169,7 +169,7 @@ SetPassword (
   //
   Password = &PrivateData->Configuration.WhatIsThePassword2[0];
   ZeroMem (Password, 20 * sizeof (CHAR16));
-  Status = IfrLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
+  Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -646,7 +646,7 @@ DriverSampleInit (
   //
   // Publish our HII data
   //
-  PackageList = PreparePackageList (
+  PackageList = HiiLibPreparePackageList (
                   2,
                   &mFormSetGuid,
                   DriverSampleStrings,
@@ -677,7 +677,7 @@ DriverSampleInit (
   }
   PrivateData->DriverHandle[1] = DriverHandle[1];
 
-  PackageList = PreparePackageList (
+  PackageList = HiiLibPreparePackageList (
                   2,
                   &mInventoryGuid,
                   DriverSampleStrings,
@@ -705,7 +705,7 @@ DriverSampleInit (
   //
   NewString = L"700 Mhz";
 
-  Status = IfrLibSetString (HiiHandle[0], STRING_TOKEN (STR_CPU_STRING2), NewString);
+  Status = HiiLibSetString (HiiHandle[0], STRING_TOKEN (STR_CPU_STRING2), NewString);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -732,7 +732,7 @@ DriverSampleInit (
     // based on default values stored in IFR
     //
     BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-    Status = ExtractDefault (Configuration, &BufferSize, 1, VfrMyIfrNVDataDefault0000);
+    Status = IfrLibExtractDefault (Configuration, &BufferSize, 1, VfrMyIfrNVDataDefault0000);
 
     if (!EFI_ERROR (Status)) {
       gRT->SetVariable(

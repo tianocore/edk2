@@ -162,7 +162,7 @@ Returns:
   //
   // Publish our HII data
   //
-  PackageList = PreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -251,7 +251,7 @@ Returns:
   //
   // Get all the Hii handles
   //
-  Status = GetHiiHandles (&HandleBufferLength, &HiiHandles);
+  Status = HiiLibGetHiiHandles (&HandleBufferLength, &HiiHandles);
   ASSERT_EFI_ERROR (Status);
 
   HiiHandle = gDeviceManagerPrivate.HiiHandle;
@@ -265,7 +265,7 @@ Returns:
   //
   NumberOfHiiHandles = HandleBufferLength / sizeof (EFI_HII_HANDLE);
   for (Index = 0; Index < NumberOfHiiHandles; Index++) {
-    HiiLibExtractClassFromHiiHandle (HiiHandles[Index], &FormSetClass, &FormSetTitle, &FormSetHelp);
+    IfrLibExtractClassFromHiiHandle (HiiHandles[Index], &FormSetClass, &FormSetTitle, &FormSetHelp);
 
     if (FormSetClass == EFI_NON_DEVICE_CLASS) {
       continue;
@@ -274,14 +274,14 @@ Returns:
     Token = 0;
     *String = 0;
     StringLength = 0x1000;
-    IfrLibGetString (HiiHandles[Index], FormSetTitle, String, &StringLength);
-    IfrLibNewString (HiiHandle, &Token, String);
+    HiiLibGetString (HiiHandles[Index], FormSetTitle, String, &StringLength);
+    HiiLibNewString (HiiHandle, &Token, String);
 
     TokenHelp = 0;
     *String = 0;
     StringLength = 0x1000;
-    IfrLibGetString (HiiHandles[Index], FormSetHelp, String, &StringLength);
-    IfrLibNewString (HiiHandle, &TokenHelp, String);
+    HiiLibGetString (HiiHandles[Index], FormSetHelp, String, &StringLength);
+    HiiLibNewString (HiiHandle, &TokenHelp, String);
 
     for (Count = 0; Count < MENU_ITEM_NUM; Count++) {
       if (FormSetClass & mDeviceManagerMenuItemTable[Count].Class) {
@@ -413,7 +413,7 @@ Returns:
   // Cleanup dynamic created strings in HII database by reinstall the packagelist
   //
   gHiiDatabase->RemovePackageList (gHiiDatabase, HiiHandle);
-  PackageList = PreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
   ASSERT (PackageList != NULL);
   Status = gHiiDatabase->NewPackageList (
                            gHiiDatabase,

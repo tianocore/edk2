@@ -45,12 +45,6 @@ typedef struct {
 
 
 //
-// References to string tokens must use this macro to enable scanning for
-// token usages.
-//
-#define STRING_TOKEN(t) t
-
-//
 // GUIDed opcodes defined for Tiano
 //
 #define EFI_IFR_TIANO_GUID \

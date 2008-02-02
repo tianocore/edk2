@@ -2259,7 +2259,7 @@ UiDisplayMenu (
           DevicePath = AllocatePool (BufferSize);
 
           HexStringToBuffer ((UINT8 *) DevicePath, &BufferSize, StringPtr);
-          Selection->Handle = DevicePathToHiiHandle (mHiiDatabase, DevicePath);
+          Selection->Handle = HiiLibDevicePathToHiiHandle (DevicePath);
           if (Selection->Handle == NULL) {
             //
             // If target Hii Handle not found, exit

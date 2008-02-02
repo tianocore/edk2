@@ -12,7 +12,7 @@
 
 **/
 
-#include "UefiIfrLibraryInternal.h"
+#include "LibraryInternal.h"
 
 
 CHAR16

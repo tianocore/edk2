@@ -688,7 +688,7 @@ Returns:
     UnicodeValueToString (RowString, 0, Row, 0);
     StrCat (ModeString, RowString);
 
-    IfrLibNewString (CallbackData->BmmHiiHandle, &ModeToken[Index], ModeString);
+    HiiLibNewString (CallbackData->BmmHiiHandle, &ModeToken[Index], ModeString);
 
     IfrOptionList[Index].StringToken  = ModeToken[Index];
     IfrOptionList[Index].Value.u16    = (UINT16) Mode;
@@ -1142,11 +1142,11 @@ UpdateSetLegacyDeviceOrderPage (
       //
       UnicodeSPrint (String, sizeof (String), TypeStr, Index);
       StrRef = 0;
-      IfrLibNewString (CallbackData->BmmHiiHandle, &StrRef, String);
+      HiiLibNewString (CallbackData->BmmHiiHandle, &StrRef, String);
 
       UnicodeSPrint (String, sizeof (String), TypeStrHelp, Index);
       StrRefHelp = 0;
-      IfrLibNewString (CallbackData->BmmHiiHandle, &StrRefHelp, String);
+      HiiLibNewString (CallbackData->BmmHiiHandle, &StrRefHelp, String);
 
       CreateOneOfOpCode (
         (EFI_QUESTION_ID) (Key + Index),

@@ -43,22 +43,4 @@ Abstract:
 
 #include "R8Lib.h"
 
-VOID
-LocateHiiProtocols (
-  VOID
-  )
-/*++
-
-Routine Description:
-  This function locate Hii relative protocols for later usage.
-
-Arguments:
-  None.
-
-Returns:
-  None.
-
---*/
-;
-
 #endif

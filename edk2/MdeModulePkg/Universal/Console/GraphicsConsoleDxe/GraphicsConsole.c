@@ -619,10 +619,8 @@ GraphicsConsoleControllerDriverStop (
     // Remove the font pack
     //
 #if 1
-    Status = HiiLibRemovePackagesFromHiiDatabase (Private->HiiHandle);
-    if (!EFI_ERROR (Status)) {
-      mFirstAccessFlag = TRUE;
-    }
+    HiiLibRemovePackages (Private->HiiHandle);
+    mFirstAccessFlag = TRUE;
 #else    
     mHii->RemovePack (mHii, Private->HiiHandle);
 #endif

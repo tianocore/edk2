@@ -568,7 +568,7 @@ InitializeSetup (
   Status = HiiLibCreateHiiDriverHandle (&HiiDriverHandle);
   ASSERT_EFI_ERROR (Status);
 
-  PackageList = PreparePackageList (1, &gSetupBrowserGuid, SetupBrowserStrings);
+  PackageList = HiiLibPreparePackageList (1, &gSetupBrowserGuid, SetupBrowserStrings);
   ASSERT (PackageList != NULL);
   Status = mHiiDatabase->NewPackageList (
                            mHiiDatabase,
@@ -631,7 +631,7 @@ NewString (
   EFI_STATUS     Status;
 
   StringId = 0;
-  Status = IfrLibNewString (HiiHandle, &StringId, String);
+  Status = HiiLibNewString (HiiHandle, &StringId, String);
   ASSERT_EFI_ERROR (Status);
 
   return StringId;
@@ -656,7 +656,7 @@ DeleteString (
   CHAR16  NullChar;
 
   NullChar = CHAR_NULL;
-  return IfrLibSetString (HiiHandle, StringId, &NullChar);
+  return HiiLibSetString (HiiHandle, StringId, &NullChar);
 }
 
 
@@ -687,14 +687,14 @@ GetToken (
   String = AllocateZeroPool (BufferLength);
   ASSERT (String != NULL);
 
-  Status = IfrLibGetString (HiiHandle, Token, String, &BufferLength);
+  Status = HiiLibGetString (HiiHandle, Token, String, &BufferLength);
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
     gBS->FreePool (String);
     String = AllocateZeroPool (BufferLength);
     ASSERT (String != NULL);
 
-    Status = IfrLibGetString (HiiHandle, Token, String, &BufferLength);
+    Status = HiiLibGetString (HiiHandle, Token, String, &BufferLength);
   }
   ASSERT_EFI_ERROR (Status);
 

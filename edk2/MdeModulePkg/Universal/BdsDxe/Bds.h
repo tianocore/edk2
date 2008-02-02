@@ -70,6 +70,7 @@ Revision History
 #include <Library/PerformanceLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/IfrSupportLib.h>
+#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>
@@ -77,6 +78,8 @@ Revision History
 #include <Library/PcdLib.h>
 #include <Library/CapsuleLib.h>
 #include <Library/HiiLib.h>
+#include <Library/ExtendedHiiLib.h>
+
 
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>

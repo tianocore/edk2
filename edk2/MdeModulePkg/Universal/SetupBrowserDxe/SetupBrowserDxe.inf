@@ -67,6 +67,7 @@
   GraphicsLib
   IfrSupportLib
   HiiLib
+  ExtendedHiiLib
 
 [Protocols]
   gEfiPrintProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED

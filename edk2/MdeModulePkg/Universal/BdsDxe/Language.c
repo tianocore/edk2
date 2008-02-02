@@ -33,7 +33,7 @@ EFI_GUID  mFontPackageGuid = {
 
 typedef struct {
   //
-  // This 4-bytes total array length is required by PreparePackageList()
+  // This 4-bytes total array length is required by HiiLibPreparePackageList()
   //
   UINT32                 Length;
 
@@ -288,7 +288,7 @@ Returns:
     return ;
   }
 
-  PackageList = PreparePackageList (1, &mFontPackageGuid, &mFontBin);
+  PackageList = HiiLibPreparePackageList (1, &mFontPackageGuid, &mFontBin);
   ASSERT (PackageList != NULL);
 
   gHiiDatabase->NewPackageList (gHiiDatabase, PackageList, DriverHandle, &HiiHandle);

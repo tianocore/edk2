@@ -35,6 +35,8 @@
   RecoveryLib|Include/Library/RecoveryLib.h
   GenericBdsLib.h|Include/Library/GenericBdsLib.h
   PlatDriOverLib|Include/Library/PlatDriOverLib.h
+  ExtendedHiiLib|Include/Library/ExtendedHiiLib.h
+  ExtendedIfrSupportLib|Include/Library/ExtendedIfrSupportLib.h
 
 [Guids.common]
 

@@ -22,7 +22,9 @@ Abstract:
 #define _ISCSI_CONFIG_H_
 
 #include <Library/HiiLib.h>
+#include <Library/ExtendedHiiLib.h>
 #include <Library/IfrSupportLib.h>
+#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
