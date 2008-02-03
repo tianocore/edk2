@@ -22,6 +22,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include< Library/OemHookStatusCodeLib.h>
 #include <Library/PcdLib.h>
 
 #include <DebugInfo.h>
@@ -30,6 +31,29 @@
 // Define the maximum extended data size that is supported in the PEI phase
 //
 #define MAX_EXTENDED_DATA_SIZE  0x200
+
+
+/**
+  The constructor function initializes the OEM hooked status
+  code device.
+  
+  @param  FfsHeader   Pointer to FFS header the loaded driver.
+  @param  PeiServices Pointer to the PEI services.
+
+  @return  Status of initialization of OEM hook status code
+           device.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiReportStatusCodeLibConstructor (
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
+  IN EFI_PEI_SERVICES     **PeiServices
+  )
+{
+  return OemHookStatusCodeInitialize ();
+}
+
 
 /**
   Internal worker function that reports a status code through the Status Code Protocol
@@ -65,16 +89,21 @@ InternalReportStatusCode (
   )
 {
   CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_STATUS              Status;
 
   PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
-  return (*PeiServices)->ReportStatusCode (
-                           PeiServices,
-                           Type,
-                           Value,
-                           Instance,
-                           (EFI_GUID *)CallerId,
-                           Data
-                           );
+  Status =  (*PeiServices)->ReportStatusCode (
+                             PeiServices,
+                             Type,
+                             Value,
+                             Instance,
+                             (EFI_GUID *)CallerId,
+                             Data
+                             );
+  if (Status == EFI_NOT_AVAILABLE_YET) {
+    return OemHookStatusCodeReport (Type, Value, Instance, (EFI_GUID *) CallerId, Data);
+  }
+  return Status;
 }
 
 
