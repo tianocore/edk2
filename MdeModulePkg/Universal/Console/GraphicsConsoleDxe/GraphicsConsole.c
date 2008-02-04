@@ -618,12 +618,10 @@ GraphicsConsoleControllerDriverStop (
     //
     // Remove the font pack
     //
-#if 1
-    HiiLibRemovePackages (Private->HiiHandle);
-    mFirstAccessFlag = TRUE;
-#else    
-    mHii->RemovePack (mHii, Private->HiiHandle);
-#endif
+    if (Private->HiiHandle != NULL) {
+      HiiLibRemovePackages (Private->HiiHandle);
+      mFirstAccessFlag = TRUE;
+    }
 
     //
     // Free our instance data
