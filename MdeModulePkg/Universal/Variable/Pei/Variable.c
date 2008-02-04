@@ -603,6 +603,13 @@ Returns:
   //
   VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
   if (*DataSize >= VarDataSize) {
+    //
+    // PO-TKW: Address one checking in this place
+    //
+    if (Data == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     (*PeiServices)->CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
 
     if (Attributes != NULL) {
