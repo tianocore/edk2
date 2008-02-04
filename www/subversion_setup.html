@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Subversion Setup Guide</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20080121;12074440">
+	<META NAME="CHANGEDBY" CONTENT="Larry Hauch">
+	<META NAME="CHANGED" CONTENT="20080121;14380303">
+	<STYLE TYPE="text/css">
+	<!--
+		H2.heading-2 { font-family: tahoma, verdana, sans-serif; color="GRAY"; font-size: 18pt; }
+		H3.heading-3 { font-size: 16pt; font-variant: small-caps; }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+  <H1>Setup Guide for Subversion for EDK II</H1>
+  <TABLE WIDTH="800" BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN=LEFT>
+    <TR>
+      <TD>
+        <P><DIV>After you have completed the steps on this page, you will have
+          a working copy (edk2 WORKSPACE) of the EDK II development tree. Refer
+          to BuildNotes.txt and BuildNotes2.txt in the edk2 folder of 
+          information on building EDK2.</DIV></P>
+        <H2 CLASS="heading-2">Table of Contents<A NAME="TOP"></A></H2>
+        <UL>
+        	<LI><A HREF="#Requirements">Requirements</A></LI>
+        	<LI><A HREF="#TortoiseSVN">Windows TortoiseSVN Client</A></LI>
+        	<LI><A HREF="#CLI">Windows SVN Command-Line Client</A></LI>
+        	<LI><A HREF="#UNIX">UNIX-based OS SVN Command-Line Client</A></LI>
+        </UL>
+
+        <P><BR></P>
+        <H2 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H2>
+        <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
+        At least one SVN client is required to be able to obtain the EDK II 
+        source code.
+        The following table lists the locations for obtaining SVN clients.
+        <TABLE BORDER="1" CELLPADDING="1" CELLSPACING="0" WIDTH="800">
+            <TR>
+              <TD ALIGN=CENTER><B> Name </B></TD>
+              <TD ALIGN=CENTER><B> Version </B></TD>
+              <TD ALIGN=CENTER><B> URL </B></TD>
+            </TR>
+            <TR>
+              <TD>
+                <P ALIGN=CENTER><I>TortoiseSVN</I></P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>1.4.5</P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER><A HREF="http://tortoisesvn.net/downloads">
+                 http://tortoisesvn.net/downloads</A></P>
+              </TD>
+            </TR>
+            <TR>
+              <TD>
+                <P ALIGN=CENTER><I>Windows SVN Command Line Tool</I></P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>1.4.5</P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>
+                  <A HREF="http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=91">
+                  http://subversion.tigris.org/servlets/ProjectDocumentList?folder ID=91</A></P>
+              </TD>
+            </TR>
+        
+            <TR>
+              <TD>
+                <P ALIGN=CENTER><I>Mac OS/X SVN Command Line Tool</I></B></P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>1.4.4</P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>
+                  <A HREF="http://downloads.open.collab.net/binaries.html">
+                  http://downloads.open.collab.net/binaries.html</A></P>
+              </TD>
+            </TR>
+            <TR>
+              <TD>
+                <P ALIGN=CENTER><I>Linux SVN Command Line Tool</I></B></P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>1.4.5</P>
+              </TD>
+              <TD>
+                <P ALIGN=CENTER>
+                  <A HREF="http://subversion.tigris.org/project_packages.html">
+                  http://subversion.tigris.org/project_packages.html</A></P>
+              </TD>
+            </TR>
+        </TABLE>
+        </DIV>
+        <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;
+           <A HREF="#Top">Back to Top</A></P>
+        <DIV>
+            <P><BR></P>
+            <H2 CLASS="heading-2"><A NAME="TortoiseSVN"></A>
+              Install and Configure TortoiseSVN on Windows Platforms</H2>
+            <P><DIV>TortoiseSVN is a Windows shell extension; it integrates in
+              the file explorer. That means you can use it with any tool that
+              you are most familiar with.  All commands are available directly
+              from the windows explorer. Translation packs are 
+              <A HREF="http://tortoisesvn.net/translation_devel_gui">
+              available</A> to transform the GUI into your native language.
+            </DIV></P>
+            <H3 CLASS="heading-3">Installation Steps</H3>
+            <P>The TortoiseSVN software uses the Microsoft standard software
+              "Installer" process (.msi file.) <BR>&nbsp;
+              <DIV ALIGN=CENTER><img src="Install.jpg" BORDER="0" /></DIV><BR>
+              The customized setup screen can be modifed to enable the English
+              (US) dictionary - the English (GB) dictionary does not need to be
+              installed.  (If you install a Translation pack, the dictionary for
+              the specific language is also included.)<BR>
+              The dictionary is used for spell-checking of the messages window 
+              when performing check-ins.<BR>&nbsp;
+              <DIV ALIGN=CENTER><img src="CustomSetup.jpg" BORDER="0" /></DIV><BR>
+              If you install multiple dictionaries, check the TortoiseSVN 
+              language settings.  This is covered in the configuration steps 
+              below.<BR>
+              It should be noted that all messages should be in US English.<BR>
+              &nbsp;<br>
+              The minimum version for TortoiseSVN is 1.4.4, however, later 
+              versions should function correctly. <BR>
+              <I><B>Note:</B> While the installation program will present you
+              with an option to restart the system, you may select the "Manual
+              Restart", as restarting of the system is not required.</I>
+            </P>
+            <H3 CLASS="heading-3">Configuration Steps</H3>
+            <P><DIV ALIGN="LEFT">
+              <OL TYPE="1">
+                <LI VALUE="1">Open a Windows File Explorer Window in the 
+                  directory where you would like to do the checkout.</LI>
+                <LI>Right-click somewhere in the background of that window.</LI>
+                <LI>From the pop-up menu, select TortoiseSVN (If you install a 
+                  Translation pack, the dictionary for the specific language is 
+                  also included.) <LI>
+              <LI>TortoiseSVN Settings</LI>
+              </OL>
+              <OL TYPE="A">
+                <LI TYPE="A" VALUE="A">
+                  <FONT FACE="Arial Black, verdana, sans-serif">
+                    General Tab</FONT></LI><BR>
+                  Select your language using the drop down dialog.<BR>
+                  We recommend that the Automatically check... feature be 
+                  disabled.<BR>
+                  <DIV><IMG SRC="General.jpg"/></DIV>
+                <LI><FONT FACE="Arial Black, verdana, sans-serif">
+                  Look and Feel -> Icon Overlays Tab</FONT></LI><BR>
+                  This page allows you to choose the items for which 
+                  TortoiseSVN will display icon overlays.<BR>
+                  Network drives can be very slow, so by default icons are
+                  not shown for working copies located on network shares.<BR>
+                  Caching is done directly inside the shell extension dll, 
+                  but only for the currently visible folder. Each time you 
+                  navigate to another folder, the status information is 
+                  fetched again.<BR>
+                  <b>Advantage</b>: needs only very little memory (around 1 
+                  MB of RAM) and can show the status in realtime.<BR>
+                  <b>Disadvantage</b>: Since only one folder is cached, the
+                  overlays don't show the status recursively. For big working
+                  copies, it can take more time to show a folder in explorer
+                  than with the default cache. Also the mime-type column is
+                  not available.
+                  <DIV><IMG SRC="IconSettings.jpg"/></DIV>
+                <LI><FONT FACE="Arial Black, verdana, sans-serif">
+                  Network Tab</FONT></LI><BR>
+                  If you are behind a firewall, you need to configure your 
+                  proxy settings. Configure the proxy as follows. (You may 
+                  not get outside of your company firewall without a proxy.)<BR>
+                  For <I>Server <u>a</u>ddress:</I>  replace 
+                  myproxyserever.mycorp.com with the name of your company's 
+                  proxy server.<BR>
+                  For <I><u>P</u>ort:</I> entry the proxy port number used by 
+                  your company. The example is using 911, your company may use 
+                  a different port number.<BR>
+                  The SSH client is not required, however, we recommend 
+                  installing one for any command line access you may need in the
+                  future.  In this example, the PuTTY SSH client has been 
+                  installed in the folder: C:\Bin.</BR>
+                  <DIV><IMG SRC="Network.jpg"/></DIV>
+              </OL>
+            </DIV></P>
+            <H3 CLASS="heading-3">First Check-out Steps</H3>
+            <P><DIV ALIGN="LEFT">
+              <OL TYPE="1">
+                <LI VALUE="1"> Right Click in the Explorer Window in the 
+                  directory that you want the Edk2 source checked-out.</LI>
+                <LI>Select SVN Checkout</LI>
+                  <DIV ALIGN=CENTER><IMG SRC="WindowsExplorer.jpg"/></DIV>
+                <LI>Fill in the URL of the repository in the Checkout Dialog 
+                  like so:
+                  <DIV ALIGN=CENTER><IMG SRC="CheckoutDialog.jpg"/></DIV></LI>
+                <LI>The first time you access the repository, you <i>might</i>
+                  be asked to accept, permanent, or reject the Security
+                  Certificate. Always Accept permanent.<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="Cert2.jpg"/></DIV>
+                  Note: the above certificate is for a different server using
+                  TortoiseSVN.  The EDK II server will be:
+                  https://edk2.tianocore.org:443:<BR>
+                  Occasionally, the security certificate will be updated on
+                  this server, when it is, you will be queried with the same
+                  dialog box.</LI>
+                <LI>Prior to the checkout, an Authentication Dialog window will
+                  open.  You need to enter your Login name from TianoCore.org
+                  and your TianoCore.org password.<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="AuthenticationDialog.jpg"/></DIV></LI>
+                  After a few seconds, the transfer will begin with status shown as
+                  below.
+                  <BR>
+                  <DIV ALIGN=CENTER><IMG SRC="TSVN_COStatus.jpg"/></DIV>
+              </OL>
+            </DIV></P>
+            <H3>Congratulations, your TortoiseSVN setup is complete!</H3>
+        </DIV>
+        <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;
+           <A HREF="#Top">Back to Top</A></P>
+        <DIV>
+            <P><BR></P>
+            <H2 CLASS="heading-2"><A NAME="CLI"></A>
+              Install and Configure Windows Command Line Interface</H2>
+            <P><DIV>
+              The command line client will allow you to execute SVN commands
+              from the command prompt.  This functionality permits access to
+              the source code repository from scripts. <BR>
+              After installing the command into a directory that is in the
+              system environment variable: PATH (echo %PATH%), you will need
+              to navigate to your home folder:<BR><DIV>
+              <FONT FACE="Courier New, courier, monospace" color="#771100">
+              cd %HOMEPATH%</FONT><BR></DIV>
+              and, if not created by the installation, create a folder, 
+              <B>.subversion</B>. Once
+              the .subversion folder exists, cd to that folder and using
+              your favorite text editor, edit the file: &quot;servers&quot;
+              (you may have to create this file).  It must be a plain text
+              file, and it cannot have a file extension.<BR>
+              The file should look like the following (do not worry if you
+              have to create a blank file, the content is very simple):
+              <DIV ALIGN=CENTER><IMG SRC="ServersFileTop.jpg"/></DIV><BR>
+              All lines in this file that start with the hash &quot;#&quot;
+              character are comments that are ignored.  You will need to
+              add a few simple lines of text. (If the file was not created
+              during the install, just add a [groups] line before all of
+              the remaining lines in the file.)  
+              <UL TYPE=1>
+                <LI VALUE=1>
+                  Locate the [groups] section and add the following two lines:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  tianocore = *.tianocore.org<BR>[tianocore]</FONT></DIV><BR>
+                </LI>
+                <LI>
+                  Add the following two lines:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  http-proxy-server = proxy.mycompany.com<BR>
+                  http-proxy-port = 911</FONT></DIV><BR>
+                  Your company's IT support should be able to provide you with the
+                  correct proxy server name and proxy port number.<BR>&nbsp;<BR>
+                </LI>
+                <LI>
+                  Locate the [global] section and add the following line: (Note:
+                  if you are creating a file, add a [globals] line, then add
+                  the following.)<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  http-proxy-exceptions = *.mycompany.com</FONT><BR></DIV>&nbsp;
+                  A short servers file, created from scratch, should look like:<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="Servers.jpg" /></DIV><BR>
+                  If you do not use SVN internally, the global section and the
+                  http-proxy-exceptions line can be omitted.<BR>&nbsp;
+                </LI>
+              </UL>
+            </DIV></P>
+            <H3 CLASS="heading-3">First Check-out Steps</H3>
+            <P><DIV ALIGN="LEFT">
+              <OL TYPE="1">
+                <LI VALUE="1"> Open a command prompt window, change to the 
+                  directory where you want to checkout the EDK II tree and
+                  type:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2</FONT>
+                  <BR>&nbsp;</DIV></LI>
+                <LI>Select SVN Checkout</LI>
+                  <DIV ALIGN=CENTER><IMG SRC="CommandLineCO.jpg"/></DIV>
+                <LI>The first time you access the repository, the SSL security
+                  certificate will not validate, and you will be asked to 
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  <BR>
+                  (R)eject, accept (t)emporarily or accept (p)ermanently?</FONT>
+                  <BR> Always accept permanently.<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="Certificate.jpg" /></DIV><BR>
+                  Occasionally, the security certificate will be updated on
+                  this server. Any time it gets updated, you will queried with 
+                  the same dialog.<BR>&nbsp;</LI>
+                <LI>You will be prompted for your username and password.
+                  Use your tianocore.org login name and password.  After a few
+                  seconds, the transfer will begin with status shown as below.
+                  <BR>
+                  <DIV ALIGN=CENTER><IMG SRC="COStatus.jpg"/></DIV>
+                </LI>
+              </OL>
+            </DIV></P>
+            <H3>Congratulations, your Windows CLI setup is complete!</H3>
+        </DIV>
+        <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;
+           <A HREF="#Top">Back to Top</A></P>
+        <DIV>
+            <P><BR></P>
+            <H2 CLASS="heading-2"><A NAME="UNIX"></A>
+              Install and Configure Command Line Interface (Linux & OS/X)</H2>
+            <P><DIV>
+              Follow your platform administration guide for installing the
+              subversion package (either a pre-built binary for your OS, or
+              sources.)<BR>
+              The command line client will allow you to execute SVN commands
+              from a shell prompt as well as to access the source code 
+              repository from shell scripts. <BR>
+              After installing the command into a directory that is in the
+              system environment variable: PATH (echo $PATH,) you will need 
+              to navigate to your home folder:<BR><DIV>
+              <FONT FACE="Courier New, courier, monospace" color="#771100">
+              cd ~username</FONT><BR></DIV>
+              where username is your login name (your home directory) and, 
+              if not created by the installation, create a folder, 
+              <B>.subversion</B>. Once
+              the .subversion folder exists, cd to that folder and using
+              your favorite text editor, edit the file: &quot;servers&quot;
+              (you may have to create this file).  It must be a plain text
+              file, and it cannot have a file extension.<BR>
+              The file should look like the following (do not worry if you
+              have to create a blank file, the content is very simple.):
+              <DIV ALIGN=CENTER><IMG SRC="NixServersFileTop.jpg"/></DIV><BR>
+              All lines in this file that start with the hash &quot;#&quot;
+              character are comments that are ignored.  You will need to
+              add a few simple lines of text. (If the file was not created
+              during the install, just add a [groups] line before all of
+              the remaining lines in the file.)  
+              <UL TYPE=1>
+                <LI VALUE=1>
+                  Locate the [groups] section and add the following two lines:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  tianocore = *.tianocore.org<BR>[tianocore]</FONT></DIV><BR>
+                </LI>
+                <LI>
+                  Add the following two lines:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  http-proxy-server = proxy.mycompany.com<BR>
+                  http-proxy-port = 911</FONT></DIV><BR>
+                  Your company's IT support should be able to provide you with the
+                  correct proxy server name and proxy port number.<BR>&nbsp;<BR>
+                </LI>
+                <LI>
+                  Locate the [global] section and add the following line: (Note:
+                  if you are creating a file, add a [globals] line, then add
+                  the following.)<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  http-proxy-exceptions = *.mycompany.com</FONT><BR></DIV>&nbsp;
+                  A short servers file, created from scratch, should look like:<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="NixServers.jpg" /></DIV><BR>
+                  If you do not use SVN internally, the global section and the
+                  http-proxy-exceptions line can be omitted.<BR>&nbsp;
+                </LI>
+              </UL>
+            </DIV></P>
+            <H3 CLASS="heading-3">First Check-out Steps</H3>
+            <P><DIV ALIGN="LEFT">
+              <OL TYPE="1">
+                <LI VALUE="1"> Open a command prompt window, change to the 
+                  directory where you want to checkout the EDK II tree and
+                  type:<BR>
+                  <DIV>
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2</FONT>
+                  <BR>&nbsp;</DIV></LI>
+                <LI>Select SVN Checkout</LI>
+                  <DIV ALIGN=CENTER><IMG SRC="NixCommandLineCO.jpg"/></DIV>
+                <LI>The first time you access the repository, the SSL security
+                  certificate will not validate, and you will be asked to 
+                  <FONT FACE="Courier New, courier, monospace" color="#771100">
+                  <BR>
+                  (R)eject, accept (t)emporarily or accept (p)ermanently?</FONT>
+                  <BR> Always accept permanently.<BR>
+                  <DIV ALIGN=CENTER><IMG SRC="Certificate.jpg" /></DIV><BR>
+                  Occasionally, the security certificate will be updated on
+                  this server. Any time it gets updated, you will queried with 
+                  the same dialog.<BR>&nbsp;</LI>
+                <LI>You will be prompted for your username and password.
+                  Use your tianocore.org login name and password.  After a few
+                  seconds, the transfer will begin with status shown as below.
+                  <BR>
+                  <DIV ALIGN=CENTER><IMG SRC="NixCOStatus.jpg"/></DIV>
+                </LI>
+              </OL>
+            </DIV></P>
+            <H3>Congratulations, your SVN setup is complete!</H3>
+        </DIV>
+        <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;
+           <A HREF="#Top">Back to Top</A></P>
+      </TD>
+    </TR>
+  </TABLE>
+</BODY>
+</HTML>
