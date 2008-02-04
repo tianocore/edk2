@@ -32,29 +32,6 @@
 //
 #define MAX_EXTENDED_DATA_SIZE  0x200
 
-
-/**
-  The constructor function initializes the OEM hooked status
-  code device.
-  
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
-  @param  PeiServices Pointer to the PEI services.
-
-  @return  Status of initialization of OEM hook status code
-           device.
-
-**/
-EFI_STATUS
-EFIAPI
-PeiReportStatusCodeLibConstructor (
-  IN EFI_PEI_FILE_HANDLE  FileHandle,
-  IN EFI_PEI_SERVICES     **PeiServices
-  )
-{
-  return OemHookStatusCodeInitialize ();
-}
-
-
 /**
   Internal worker function that reports a status code through the Status Code Protocol
 
@@ -101,7 +78,10 @@ InternalReportStatusCode (
                              Data
                              );
   if (Status == EFI_NOT_AVAILABLE_YET) {
-    return OemHookStatusCodeReport (Type, Value, Instance, (EFI_GUID *) CallerId, Data);
+    Status = OemHookStatusCodeInitialize ();
+    if (!EFI_ERROR (Status)) {
+      return OemHookStatusCodeReport (Type, Value, Instance, (EFI_GUID *) CallerId, Data);
+    }
   }
   return Status;
 }
