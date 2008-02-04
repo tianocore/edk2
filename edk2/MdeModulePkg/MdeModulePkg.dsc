@@ -82,6 +82,8 @@
   PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf  
   PlatDriOverLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
+  OemHookStatusCodeLib|IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
+
 
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
