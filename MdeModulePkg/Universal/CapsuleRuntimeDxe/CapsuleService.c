@@ -125,7 +125,7 @@ Returns:
   // Now Runtime mode doesn't support the non-reset capsule image.
   //
   if (EfiAtRuntime ()) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
 
   //
