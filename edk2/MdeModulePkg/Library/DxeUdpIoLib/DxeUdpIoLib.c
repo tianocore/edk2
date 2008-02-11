@@ -30,7 +30,7 @@ Abstract:
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <library/BaseMemoryLib.h>
+#include <Library/BaseMemoryLib.h>
 
 STATIC
 VOID
