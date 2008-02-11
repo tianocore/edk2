@@ -48,13 +48,13 @@
   PxeBcDriver.h
 
 [Sources.IA32]
-  Ia32\PxeArch.h
+  Ia32/PxeArch.h
 
 [Sources.X64]
-  X64\PxeArch.h
+  X64/PxeArch.h
 
 [Sources.IPF]
-  Ipf\PxeArch.h
+  Ipf/PxeArch.h
 
 
 [Packages]
