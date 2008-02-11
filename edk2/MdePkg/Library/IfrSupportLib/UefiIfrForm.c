@@ -27,6 +27,7 @@ Abstract:
 //
 UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
 
+#if 0
 STATIC
 EFI_STATUS
 GetPackageDataFromPackageList (
@@ -72,6 +73,7 @@ GetPackageDataFromPackageList (
   *Buffer    = Package;
   return EFI_SUCCESS;
 }
+#endif
 
 
 /**
