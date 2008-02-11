@@ -22,7 +22,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
-#include< Library/OemHookStatusCodeLib.h>
+#include <Library/OemHookStatusCodeLib.h>
 #include <Library/PcdLib.h>
 
 #include <DebugInfo.h>
