@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -16,27 +16,44 @@
 # windows style.
 
 if [ \
+     -z "$1" -o \
      "$1" = "-?" -o \
      "$1" = "-h" -o \
      "$1" = "--help" \
    ]
 then
-  echo BaseTools Usage: \'. edksetup.sh NewBuild\'
-  echo Ant Tools Usage: \'. edksetup.sh [ForceRebuild]\'
+  echo BaseTools Usage: \'. edksetup.sh BaseTools\'
+  echo Ant Tools Usage: \'. edksetup.sh [AntBuild \| ForceRebuild]\'
   echo
   echo Please note: This script must be \'sourced\' so the environment can be changed.
   echo \(Either \'. edksetup.sh\' or \'source edksetup.sh\'\)
   return
 fi
 
-if [ "$1" = NewBuild ]
+if [ "$1" = BaseTools ]
 then
-  echo To utilize the new build system, run
-  echo "  . BaseTools/BuildEnv [options]"
-  echo Try \'. BaseTools/BuildEnv --help\' for more information.
-  return
+  if [ -z "$WORKSPACE" ]
+  then
+    . BaseTools/BuildEnv $*
+  else
+    . $WORKSPACE/BaseTools/BuildEnv $*
+  fi
 else
-  . $WORKSPACE/Tools/OldBuildEnv $*
+  if [ "$1" = AntBuild -o "$1" = ForceRebuild ]
+  then
+    if [ -z "$WORKSPACE" ]
+    then
+      if [ "$1" = AntBuild ]
+      then
+        shift
+      fi
+      . Tools/OldBuildEnv $*
+    else
+      . $WORKSPACE/Tools/OldBuildEnv $*
+    fi
+  else
+    echo Please run \'. edksetup.sh --help\' for help.
+  fi
 fi
 
 
