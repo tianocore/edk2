@@ -109,6 +109,7 @@ ChildIsType (
   IN EFI_GUID                                 *SectionDefinitionGuid
   );
 
+#if 0
 STATIC
 VOID
 EFIAPI
@@ -116,13 +117,16 @@ NotifyGuidedExtraction (
   IN  EFI_EVENT                             Event,
   IN  VOID                                  *RpnContext
   );
+#endif
 
+#if 0
 STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
   IN CORE_SECTION_STREAM_NODE                 *ParentStream,
   IN CORE_SECTION_CHILD_NODE                  *ChildNode
   );
+#endif
 
 STATIC
 EFI_STATUS
@@ -932,6 +936,7 @@ Returns:
 }
 
 
+#if 0
 STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
@@ -973,8 +978,10 @@ Returns:
                     FALSE
                     );
 }
-  
-  
+#endif
+
+
+#if 0
 STATIC
 VOID
 EFIAPI
@@ -1053,7 +1060,8 @@ Returns:
   CoreCloseEvent (Event);
   CoreFreePool (Context);
 }  
-  
+#endif
+
 
 STATIC
 VOID
