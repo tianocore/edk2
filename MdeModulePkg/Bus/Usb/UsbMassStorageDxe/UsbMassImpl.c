@@ -40,10 +40,6 @@ USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   NULL
 };
 
-UINTN mUsbMscInfo  = DEBUG_INFO;
-UINTN mUsbMscError = DEBUG_ERROR;
-
-
 /**
   Retrieve the media parameters such as disk gemotric for the
   device's BLOCK IO protocol.
@@ -84,6 +80,7 @@ UsbMassInitMedia (
   Media->ReadOnly         = FALSE;
   Media->WriteCaching     = FALSE;
   Media->IoAlign          = 0;
+  Media->MediaId          = 1;
 
   //
   // Some device may spend several seconds before it is ready.
@@ -102,7 +99,7 @@ UsbMassInitMedia (
 
     Status = UsbBootIsUnitReady (UsbMass);
     if (EFI_ERROR (Status)) {
-      gBS->Stall (USB_BOOT_RETRY_UNIT_READY_STALL * (Index + 1)); 
+      gBS->Stall (USB_BOOT_RETRY_UNIT_READY_STALL * (Index + 1));
     }
 
   }
@@ -122,6 +119,7 @@ UsbMassInitMedia (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbMassReset (
   IN EFI_BLOCK_IO_PROTOCOL    *This,
   IN BOOLEAN                  ExtendedVerification
@@ -162,6 +160,7 @@ UsbMassReset (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbMassReadBlocks (
   IN EFI_BLOCK_IO_PROTOCOL    *This,
   IN UINT32                   MediaId,
@@ -175,7 +174,7 @@ UsbMassReadBlocks (
   EFI_STATUS          Status;
   EFI_TPL             OldTpl;
   UINTN               TotalBlock;
-  
+
   OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
   UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
   Media   = &UsbMass->BlockIoMedia;
@@ -187,21 +186,21 @@ UsbMassReadBlocks (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-  
+
   //
   // If it is a removable media, such as CD-Rom or Usb-Floppy,
-  // need to detect the media before each rw. While some of 
+  // need to detect the media before each rw. While some of
   // Usb-Flash is marked as removable media.
-  // 
-  // 
+  //
+  //
   if (Media->RemovableMedia == TRUE) {
     Status = UsbBootDetectMedia (UsbMass);
     if (EFI_ERROR (Status)) {
-      DEBUG ((mUsbMscError, "UsbMassReadBlocks: UsbBootDetectMedia (%r)\n", Status));
+      DEBUG ((EFI_D_ERROR, "UsbMassReadBlocks: UsbBootDetectMedia (%r)\n", Status));
       goto ON_EXIT;
-    } 
+    }
   }
-  
+
   //
   // Make sure BlockSize and LBA is consistent with BufferSize
   //
@@ -213,13 +212,23 @@ UsbMassReadBlocks (
   TotalBlock = BufferSize / Media->BlockSize;
 
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
-    Status = EFI_BAD_BUFFER_SIZE;
+    Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-  
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto ON_EXIT;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto ON_EXIT;
+  }
+
   Status = UsbBootReadBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
 
@@ -249,6 +258,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
+EFIAPI
 UsbMassWriteBlocks (
   IN EFI_BLOCK_IO_PROTOCOL    *This,
   IN UINT32                   MediaId,
@@ -274,21 +284,21 @@ UsbMassWriteBlocks (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-  
+
   //
   // If it is a removable media, such as CD-Rom or Usb-Floppy,
-  // need to detect the media before each rw. While some of 
+  // need to detect the media before each rw. While some of
   // Usb-Flash is marked as removable media.
-  // 
-  // 
+  //
+  //
   if (Media->RemovableMedia == TRUE) {
     Status = UsbBootDetectMedia (UsbMass);
     if (EFI_ERROR (Status)) {
-      DEBUG ((mUsbMscError, "UsbMassWriteBlocks: UsbBootDetectMedia (%r)\n", Status));
+      DEBUG ((EFI_D_ERROR, "UsbMassWriteBlocks: UsbBootDetectMedia (%r)\n", Status));
       goto ON_EXIT;
-    } 
+    }
   }
-  
+
   //
   // Make sure BlockSize and LBA is consistent with BufferSize
   //
@@ -300,20 +310,30 @@ UsbMassWriteBlocks (
   TotalBlock = BufferSize / Media->BlockSize;
 
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
-    Status = EFI_BAD_BUFFER_SIZE;
+    Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-  
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto ON_EXIT;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto ON_EXIT;
+  }
+
   //
   // Try to write the data even the device is marked as ReadOnly,
   // and clear the status should the write succeed.
   //
   Status = UsbBootWriteBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
-  
+
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
   return Status;
@@ -330,6 +350,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
+EFIAPI
 UsbMassFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   )
@@ -402,7 +423,7 @@ USBMassDriverBindingSupported (
     }
   }
 
-  DEBUG ((mUsbMscInfo, "Found a USB mass store device %r\n", Status));
+  DEBUG ((EFI_D_INFO, "Found a USB mass store device %r\n", Status));
 
 ON_EXIT:
   gBS->CloseProtocol (
@@ -467,7 +488,7 @@ USBMassDriverBindingStart (
   //
   Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "USBMassDriverBindingStart: UsbIo->UsbGetInterfaceDescriptor (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbIo->UsbGetInterfaceDescriptor (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -484,7 +505,7 @@ USBMassDriverBindingStart (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "USBMassDriverBindingStart: Transport->Init (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: Transport->Init (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -508,11 +529,11 @@ USBMassDriverBindingStart (
          (UsbMass->Pdt != USB_PDT_CDROM) &&
          (UsbMass->Pdt != USB_PDT_OPTICAL) &&
          (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
-      DEBUG ((mUsbMscError, "USBMassDriverBindingStart: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
+      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
       goto ON_ERROR;
     }
   } else if (Status != EFI_NO_MEDIA){
-    DEBUG ((mUsbMscError, "USBMassDriverBindingStart: UsbMassInitMedia (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitMedia (%r)\n", Status));
     goto ON_ERROR;
   }
 

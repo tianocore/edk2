@@ -53,7 +53,7 @@ UhciReadReg (
                       );
 
   if (EFI_ERROR (Status)) {
-    UHCI_ERROR (("UhciReadReg: PciIo Io.Read error: %r at offset %d\n", Status, Offset));
+    DEBUG ((EFI_D_ERROR, "UhciReadReg: PciIo Io.Read error: %r at offset %d\n", Status, Offset));
 
     Data = 0xFFFF;
   }
@@ -91,7 +91,7 @@ UhciWriteReg (
                       );
 
   if (EFI_ERROR (Status)) {
-    UHCI_ERROR (("UhciWriteReg: PciIo Io.Write error: %r at offset %d\n", Status, Offset));
+    DEBUG ((EFI_D_ERROR, "UhciWriteReg: PciIo Io.Write error: %r at offset %d\n", Status, Offset));
   }
 }
 
@@ -167,7 +167,7 @@ UhciAckAllInterrupt (
   // is a temporary error status.
   //
   if (!UhciIsHcWorking (Uhc->PciIo)) {
-    UHCI_ERROR (("UhciAckAllInterrupt: re-enable the UHCI from system error\n"));
+    DEBUG ((EFI_D_ERROR, "UhciAckAllInterrupt: re-enable the UHCI from system error\n"));
     Uhc->Usb2Hc.SetState (&Uhc->Usb2Hc, EfiUsbHcStateOperational);
   }
 }
@@ -232,7 +232,7 @@ UhciIsHcWorking (
   UsbSts = UhciReadReg (PciIo, USBSTS_OFFSET);
 
   if (UsbSts & (USBSTS_HCPE | USBSTS_HSE | USBSTS_HCH)) {
-    UHCI_ERROR (("UhciIsHcWorking: current USB state is %x\n", UsbSts));
+    DEBUG ((EFI_D_ERROR, "UhciIsHcWorking: current USB state is %x\n", UsbSts));
     return FALSE;
   }
 
@@ -271,7 +271,7 @@ UhciSetFrameListBaseAddr (
                        );
 
   if (EFI_ERROR (Status)) {
-    UHCI_ERROR (("UhciSetFrameListBaseAddr: PciIo Io.Write error: %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "UhciSetFrameListBaseAddr: PciIo Io.Write error: %r\n", Status));
   }
 }
 

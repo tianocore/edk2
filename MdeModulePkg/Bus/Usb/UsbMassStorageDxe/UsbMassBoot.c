@@ -167,7 +167,7 @@ UsbBootRequestSense (
                         &CmdResult
                         );
   if (EFI_ERROR (Status) || CmdResult != USB_MASS_CMD_SUCCESS) {
-    DEBUG ((mUsbMscError, "UsbBootRequestSense: (%r) CmdResult=0x%x\n", Status, CmdResult));
+    DEBUG ((EFI_D_ERROR, "UsbBootRequestSense: (%r) CmdResult=0x%x\n", Status, CmdResult));
     return Status;
   }
 
@@ -225,7 +225,7 @@ UsbBootRequestSense (
     break;
   }
 
-  DEBUG ((mUsbMscInfo, "UsbBootRequestSense: (%r) with sense key %x/%x/%x\n",
+  DEBUG ((EFI_D_INFO, "UsbBootRequestSense: (%r) with sense key %x/%x/%x\n",
           Status,
           USB_BOOT_SENSE_KEY (SenseData.SenseKey),
           SenseData.ASC,
@@ -291,7 +291,7 @@ UsbBootExecCmd (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((mUsbMscInfo, "UsbBootExecCmd: Fail to Exec 0x%x Cmd /w %r\n",
+  DEBUG ((EFI_D_INFO, "UsbBootExecCmd: Fail to Exec 0x%x Cmd /w %r\n",
           *(UINT8 *)Cmd ,Status));
 
   return UsbBootRequestSense (UsbMass);
@@ -349,7 +349,7 @@ UsbBootExecCmdWithRetry (
                DataDir,
                Data,
                DataLen,
-               Timeout * (Index + 1)
+               Timeout
                );
     if (Status == EFI_SUCCESS ||
         Status == EFI_MEDIA_CHANGED) {
@@ -513,7 +513,7 @@ UsbBootReadCapacity (
     return EFI_NOT_READY;
   }
 
-  DEBUG ((mUsbMscInfo, "UsbBootReadCapacity Success LBA=%ld BlockSize=%d\n",
+  DEBUG ((EFI_D_INFO, "UsbBootReadCapacity Success LBA=%ld BlockSize=%d\n",
           Media->LastBlock, Media->BlockSize));
 
   return EFI_SUCCESS;
@@ -603,7 +603,7 @@ UsbBootGetParams (
 
   Status = UsbBootInquiry (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbBootGetParams: UsbBootInquiry (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBootGetParams: UsbBootInquiry (%r)\n", Status));
     return Status;
   }
 
@@ -670,7 +670,7 @@ UsbBootDetectMedia (
 
   Status = UsbBootIsUnitReady (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbBootDetectMedia: UsbBootIsUnitReady (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: UsbBootIsUnitReady (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -687,7 +687,7 @@ UsbBootDetectMedia (
 
   Status = UsbBootReadCapacity (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbMscError, "UsbBootDetectMedia: UsbBootReadCapacity (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: UsbBootReadCapacity (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -709,7 +709,7 @@ ON_ERROR:
       (Media->LastBlock != OldMedia.LastBlock)) {
 
     OldTpl = UsbGetCurrentTpl ();
-    DEBUG ((mUsbMscError, "UsbBootDetectMedia: TPL before reinstall BlockIoProtocol is %d\n", OldTpl));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL before reinstall BlockIoProtocol is %d\n", OldTpl));
 
     gBS->RestoreTPL (TPL_CALLBACK);
 
@@ -720,7 +720,7 @@ ON_ERROR:
            &UsbMass->BlockIo
            );
 
-    DEBUG ((mUsbMscError, "UsbBootDetectMedia: TPL after reinstall is %d\n", UsbGetCurrentTpl()));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL after reinstall is %d\n", UsbGetCurrentTpl()));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);

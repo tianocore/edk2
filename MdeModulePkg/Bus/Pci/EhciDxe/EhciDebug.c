@@ -15,8 +15,6 @@ Module Name:
 
 Abstract:
   This file provides the information dump support for EHCI when in debug mode.
-You can dynamically adjust the debug level by changing variable mEhcDebugLevel
-and mEhcErrorLevel.
 
 Revision History
 
@@ -25,100 +23,11 @@ Revision History
 
 #include "Ehci.h"
 
-#ifdef EFI_DEBUG
-UINTN mEhcDebugMask   = USB_DEBUG_FORCE_OUTPUT;
-
-
-/**
-  EHCI's debug output function. It determines whether
-  to output by the mask and level
-
-  @param  Level    The output level
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhciDebugPrint (
-  IN  UINTN               Level,
-  IN  CHAR8               *Format,
-  ...
-  )
-{
-
-  VA_LIST                 Marker;
-
-  VA_START (Marker, Format);
-
-  if (Level & mEhcDebugMask) {
-    if (mEhcDebugMask & USB_DEBUG_FORCE_OUTPUT) {
-      DebugVPrint (DEBUG_ERROR, Format, Marker);
-    } else {
-      DebugVPrint (DEBUG_INFO, Format, Marker);
-    }
-  }
-
-  VA_END (Marker);
-}
-
-
-/**
-  EHCI's debug output function. It determines whether
-  to output by the mask and level
-
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhcDebug (
-  IN  CHAR8               *Format,
-  ...
-  )
-{
-  VA_LIST                 Marker;
-
-  VA_START (Marker, Format);
-  DebugVPrint (DEBUG_INFO, Format, Marker);
-  VA_END (Marker);
-}
-
-
-/**
-  EHCI's error output function. It determines whether
-  to output by the mask and level
-
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhcError (
-  IN  CHAR8               *Format,
-  ...
-  )
-{
-
-  VA_LIST                 Marker;
-
-  VA_START (Marker, Format);
-  DebugVPrint (DEBUG_ERROR, Format, Marker);
-  VA_END (Marker);
-}
-
-
 /**
   Dump the status byte in QTD/QH to a more friendly
   format
 
   @param  State    The state in the QTD/QH
-  @param  Level    The output level
 
   @return None
 
@@ -126,43 +35,42 @@ EhcError (
 STATIC
 VOID
 EhcDumpStatus (
-  IN UINT32               State,
-  IN UINTN                Level
+  IN UINT32               State
   )
 {
   if (EHC_BIT_IS_SET (State, QTD_STAT_DO_PING)) {
-    EhciDebugPrint (Level, "  Do_Ping");
+    DEBUG ((EFI_D_INFO, "  Do_Ping"));
   } else {
-    EhciDebugPrint (Level, "  Do_Out");
+    DEBUG ((EFI_D_INFO, "  Do_Out"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_DO_CS)) {
-    EhciDebugPrint (Level, "  Do_CS");
+    DEBUG ((EFI_D_INFO, "  Do_CS"));
   } else {
-    EhciDebugPrint (Level, "  Do_SS");
+    DEBUG ((EFI_D_INFO, "  Do_SS"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_TRANS_ERR)) {
-    EhciDebugPrint (Level, "  Transfer_Error");
+    DEBUG ((EFI_D_INFO, "  Transfer_Error"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_BABBLE_ERR)) {
-    EhciDebugPrint (Level, "  Babble_Error");
+    DEBUG ((EFI_D_INFO, "  Babble_Error"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_BUFF_ERR)) {
-    EhciDebugPrint (Level, "  Buffer_Error");
+    DEBUG ((EFI_D_INFO, "  Buffer_Error"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_HALTED)) {
-    EhciDebugPrint (Level, "  Halted");
+    DEBUG ((EFI_D_INFO, "  Halted"));
   }
 
   if (EHC_BIT_IS_SET (State, QTD_STAT_ACTIVE)) {
-    EhciDebugPrint (Level, "  Active");
+    DEBUG ((EFI_D_INFO, "  Active"));
   }
 
-  EhciDebugPrint (Level, "\n");
+  DEBUG ((EFI_D_INFO, "\n"));
 }
 
 
@@ -178,47 +86,44 @@ EhcDumpStatus (
 VOID
 EhcDumpQtd (
   IN EHC_QTD              *Qtd,
-  IN UINT8                *Msg
+  IN CHAR8                *Msg
   )
 {
   QTD_HW                  *QtdHw;
   UINTN                   Index;
-  UINTN                   Level;
-
-  Level = EHC_DEBUG_QTD;
 
   if (Msg != NULL) {
-    EhciDebugPrint (Level, Msg);
+    DEBUG ((EFI_D_INFO, Msg));
   }
 
-  EhciDebugPrint (Level, "Queue TD @ 0x%x, data length %d\n", Qtd, Qtd->DataLen);
+  DEBUG ((EFI_D_INFO, "Queue TD @ 0x%x, data length %d\n", Qtd, Qtd->DataLen));
 
   QtdHw = &Qtd->QtdHw;
 
-  EhciDebugPrint (Level, "Next QTD     : %x\n", QtdHw->NextQtd);
-  EhciDebugPrint (Level, "AltNext QTD  : %x\n", QtdHw->AltNext);
-  EhciDebugPrint (Level, "Status       : %x\n", QtdHw->Status);
-  EhcDumpStatus (QtdHw->Status, Level);
+  DEBUG ((EFI_D_INFO, "Next QTD     : %x\n", QtdHw->NextQtd));
+  DEBUG ((EFI_D_INFO, "AltNext QTD  : %x\n", QtdHw->AltNext));
+  DEBUG ((EFI_D_INFO, "Status       : %x\n", QtdHw->Status));
+  EhcDumpStatus (QtdHw->Status);
 
   if (QtdHw->Pid == QTD_PID_SETUP) {
-    EhciDebugPrint (Level, "PID          : Setup\n");
+    DEBUG ((EFI_D_INFO, "PID          : Setup\n"));
 
   } else if (QtdHw->Pid == QTD_PID_INPUT) {
-    EhciDebugPrint (Level, "PID          : IN\n");
+    DEBUG ((EFI_D_INFO, "PID          : IN\n"));
 
   } else if (QtdHw->Pid == QTD_PID_OUTPUT) {
-    EhciDebugPrint (Level, "PID          : OUT\n");
+    DEBUG ((EFI_D_INFO, "PID          : OUT\n"));
 
   }
 
-  EhciDebugPrint (Level, "Error Count  : %d\n", QtdHw->ErrCnt);
-  EhciDebugPrint (Level, "Current Page : %d\n", QtdHw->CurPage);
-  EhciDebugPrint (Level, "IOC          : %d\n", QtdHw->IOC);
-  EhciDebugPrint (Level, "Total Bytes  : %d\n", QtdHw->TotalBytes);
-  EhciDebugPrint (Level, "Data Toggle  : %d\n", QtdHw->DataToggle);
+  DEBUG ((EFI_D_INFO, "Error Count  : %d\n", QtdHw->ErrCnt));
+  DEBUG ((EFI_D_INFO, "Current Page : %d\n", QtdHw->CurPage));
+  DEBUG ((EFI_D_INFO, "IOC          : %d\n", QtdHw->IOC));
+  DEBUG ((EFI_D_INFO, "Total Bytes  : %d\n", QtdHw->TotalBytes));
+  DEBUG ((EFI_D_INFO, "Data Toggle  : %d\n", QtdHw->DataToggle));
 
   for (Index = 0; Index < 5; Index++) {
-    EhciDebugPrint (Level, "Page[%d]      : 0x%x\n", Index, QtdHw->Page[Index]);
+    DEBUG ((EFI_D_INFO, "Page[%d]      : 0x%x\n", Index, QtdHw->Page[Index]));
   }
 }
 
@@ -236,7 +141,7 @@ EhcDumpQtd (
 VOID
 EhcDumpQh (
   IN EHC_QH               *Qh,
-  IN UINT8                *Msg,
+  IN CHAR8                *Msg,
   IN BOOLEAN              DumpBuf
   )
 {
@@ -244,64 +149,62 @@ EhcDumpQh (
   QH_HW                   *QhHw;
   LIST_ENTRY              *Entry;
   UINTN                   Index;
-  UINTN                   Level;
-
-  Level = EHC_DEBUG_QH;
 
   if (Msg != NULL) {
-    EhciDebugPrint (Level, Msg);
+    DEBUG ((EFI_D_INFO, Msg));
   }
 
-  EhciDebugPrint (Level, "Queue head @ 0x%x, interval %d, next qh %x\n",
-                                Qh, Qh->Interval, Qh->NextQh);
+  DEBUG ((EFI_D_INFO, "Queue head @ 0x%x, interval %d, next qh %x\n",
+                                Qh, Qh->Interval, Qh->NextQh));
 
   QhHw = &Qh->QhHw;
 
-  EhciDebugPrint (Level, "Hoziontal link: %x\n", QhHw->HorizonLink);
-  EhciDebugPrint (Level, "Device address: %d\n", QhHw->DeviceAddr);
-  EhciDebugPrint (Level, "Inactive      : %d\n", QhHw->Inactive);
-  EhciDebugPrint (Level, "EP number     : %d\n", QhHw->EpNum);
-  EhciDebugPrint (Level, "EP speed      : %d\n", QhHw->EpSpeed);
-  EhciDebugPrint (Level, "DT control    : %d\n", QhHw->DtCtrl);
-  EhciDebugPrint (Level, "Reclaim head  : %d\n", QhHw->ReclaimHead);
-  EhciDebugPrint (Level, "Max packet len: %d\n", QhHw->MaxPacketLen);
-  EhciDebugPrint (Level, "Ctrl EP       : %d\n", QhHw->CtrlEp);
-  EhciDebugPrint (Level, "Nak reload    : %d\n", QhHw->NakReload);
+  DEBUG ((EFI_D_INFO, "Hoziontal link: %x\n", QhHw->HorizonLink));
+  DEBUG ((EFI_D_INFO, "Device address: %d\n", QhHw->DeviceAddr));
+  DEBUG ((EFI_D_INFO, "Inactive      : %d\n", QhHw->Inactive));
+  DEBUG ((EFI_D_INFO, "EP number     : %d\n", QhHw->EpNum));
+  DEBUG ((EFI_D_INFO, "EP speed      : %d\n", QhHw->EpSpeed));
+  DEBUG ((EFI_D_INFO, "DT control    : %d\n", QhHw->DtCtrl));
+  DEBUG ((EFI_D_INFO, "Reclaim head  : %d\n", QhHw->ReclaimHead));
+  DEBUG ((EFI_D_INFO, "Max packet len: %d\n", QhHw->MaxPacketLen));
+  DEBUG ((EFI_D_INFO, "Ctrl EP       : %d\n", QhHw->CtrlEp));
+  DEBUG ((EFI_D_INFO, "Nak reload    : %d\n", QhHw->NakReload));
 
-  EhciDebugPrint (Level, "SMask         : %x\n", QhHw->SMask);
-  EhciDebugPrint (Level, "CMask         : %x\n", QhHw->CMask);
-  EhciDebugPrint (Level, "Hub address   : %d\n", QhHw->HubAddr);
-  EhciDebugPrint (Level, "Hub port      : %d\n", QhHw->PortNum);
-  EhciDebugPrint (Level, "Multiplier    : %d\n", QhHw->Multiplier);
+  DEBUG ((EFI_D_INFO, "SMask         : %x\n", QhHw->SMask));
+  DEBUG ((EFI_D_INFO, "CMask         : %x\n", QhHw->CMask));
+  DEBUG ((EFI_D_INFO, "Hub address   : %d\n", QhHw->HubAddr));
+  DEBUG ((EFI_D_INFO, "Hub port      : %d\n", QhHw->PortNum));
+  DEBUG ((EFI_D_INFO, "Multiplier    : %d\n", QhHw->Multiplier));
 
-  EhciDebugPrint (Level, "Cur QTD       : %x\n", QhHw->CurQtd);
+  DEBUG ((EFI_D_INFO, "Cur QTD       : %x\n", QhHw->CurQtd));
 
-  EhciDebugPrint (Level, "Next QTD      : %x\n", QhHw->NextQtd);
-  EhciDebugPrint (Level, "AltNext QTD   : %x\n", QhHw->AltQtd);
-  EhciDebugPrint (Level, "Status        : %x\n", QhHw->Status);
-  EhcDumpStatus (QhHw->Status, Level);
+  DEBUG ((EFI_D_INFO, "Next QTD      : %x\n", QhHw->NextQtd));
+  DEBUG ((EFI_D_INFO, "AltNext QTD   : %x\n", QhHw->AltQtd));
+  DEBUG ((EFI_D_INFO, "Status        : %x\n", QhHw->Status));
+
+  EhcDumpStatus (QhHw->Status);
 
   if (QhHw->Pid == QTD_PID_SETUP) {
-    EhciDebugPrint (Level, "PID           : Setup\n");
+    DEBUG ((EFI_D_INFO, "PID           : Setup\n"));
 
   } else if (QhHw->Pid == QTD_PID_INPUT) {
-    EhciDebugPrint (Level, "PID           : IN\n");
+    DEBUG ((EFI_D_INFO, "PID           : IN\n"));
 
   } else if (QhHw->Pid == QTD_PID_OUTPUT) {
-    EhciDebugPrint (Level, "PID           : OUT\n");
+    DEBUG ((EFI_D_INFO, "PID           : OUT\n"));
   }
 
-  EhciDebugPrint (Level, "Error Count   : %d\n", QhHw->ErrCnt);
-  EhciDebugPrint (Level, "Current Page  : %d\n", QhHw->CurPage);
-  EhciDebugPrint (Level, "IOC           : %d\n", QhHw->IOC);
-  EhciDebugPrint (Level, "Total Bytes   : %d\n", QhHw->TotalBytes);
-  EhciDebugPrint (Level, "Data Toggle   : %d\n", QhHw->DataToggle);
+  DEBUG ((EFI_D_INFO, "Error Count   : %d\n", QhHw->ErrCnt));
+  DEBUG ((EFI_D_INFO, "Current Page  : %d\n", QhHw->CurPage));
+  DEBUG ((EFI_D_INFO, "IOC           : %d\n", QhHw->IOC));
+  DEBUG ((EFI_D_INFO, "Total Bytes   : %d\n", QhHw->TotalBytes));
+  DEBUG ((EFI_D_INFO, "Data Toggle   : %d\n", QhHw->DataToggle));
 
   for (Index = 0; Index < 5; Index++) {
-    EhciDebugPrint (Level, "Page[%d]       : 0x%x\n", Index, QhHw->Page[Index]);
+    DEBUG ((EFI_D_INFO, "Page[%d]       : 0x%x\n", Index, QhHw->Page[Index]));
   }
 
-  EhciDebugPrint (Level, "\n");
+  DEBUG ((EFI_D_INFO, "\n"));
 
   EFI_LIST_FOR_EACH (Entry, &Qh->Qtds) {
     Qtd = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
@@ -333,13 +236,11 @@ EhcDumpBuf (
 
   for (Index = 0; Index < Len; Index++) {
     if (Index % 16 == 0) {
-      EhciDebugPrint (EHC_DEBUG_BUF, "\n");
+      DEBUG ((EFI_D_INFO,"\n"));
     }
 
-    EhciDebugPrint (EHC_DEBUG_BUF, "%02x ", Buf[Index]);
+    DEBUG ((EFI_D_INFO, "%02x ", Buf[Index]));
   }
 
-  EhciDebugPrint (EHC_DEBUG_BUF, "\n");
+  DEBUG ((EFI_D_INFO, "\n"));
 }
-
-#endif

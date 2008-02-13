@@ -54,7 +54,7 @@ EhcReadCapRegister (
                              );
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcReadCapRegister: Pci Io read error - %r at %d\n", Status, Offset));
+    DEBUG ((EFI_D_ERROR, "EhcReadCapRegister: Pci Io read error - %r at %d\n", Status, Offset));
     Data = 0xFFFF;
   }
 
@@ -92,7 +92,7 @@ EhcReadOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
+    DEBUG ((EFI_D_ERROR, "EhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
     Data = 0xFFFF;
   }
 
@@ -131,7 +131,7 @@ EhcWriteOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((EFI_D_ERROR, "EhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 
@@ -245,7 +245,7 @@ EhcClearLegacySupport (
   UINT32                    Value;
   UINT32                    TimeOut;
 
-  EHC_DEBUG (("EhcClearLegacySupport: called to clear legacy support\n"));
+  DEBUG ((EFI_D_INFO, "EhcClearLegacySupport: called to clear legacy support\n"));
 
   PciIo     = Ehc->PciIo;
   ExtendCap = (Ehc->HcCapParams >> 8) & 0xFF;
@@ -622,14 +622,14 @@ EhcInitHC (
   Status = EhcEnablePeriodSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcInitHC: failed to enable period schedule\n"));
+    DEBUG ((EFI_D_ERROR, "EhcInitHC: failed to enable period schedule\n"));
     return Status;
   }
 
   Status = EhcEnableAsyncSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcInitHC: failed to enable async schedule\n"));
+    DEBUG ((EFI_D_ERROR, "EhcInitHC: failed to enable async schedule\n"));
     return Status;
   }
 

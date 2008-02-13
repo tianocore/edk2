@@ -25,73 +25,6 @@ Revision History
 #define _EFI_EHCI_DEBUG_H_
 
 
-enum {
-  USB_DEBUG_FORCE_OUTPUT  = (UINTN)(1 << 0),
-
-  EHC_DEBUG_QH            = (UINTN)(1 << 8),
-  EHC_DEBUG_QTD           = (UINTN)(1 << 9),
-  EHC_DEBUG_BUF           = (UINTN)(1 << 10)
-};
-
-
-/**
-  EHCI's debug output function. It determines whether
-  to output by the mask and level
-
-  @param  Level    The output level
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhciDebugPrint (
-  IN  UINTN               Level,
-  IN  CHAR8               *Format,
-  ...
-  )
-;
-
-
-/**
-  EHCI's debug output function. It determines whether
-  to output by the mask and level
-
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhcDebug (
-  IN  CHAR8               *Format,
-  ...
-  )
-;
-
-
-
-/**
-  EHCI's error output function. It determines whether
-  to output by the mask and level
-
-  @param  Format   The format parameters to the print
-  @param  ...      The variable length parameters after format
-
-  @return None
-
-**/
-VOID
-EhcError (
-  IN  CHAR8               *Format,
-  ...
-  )
-;
-
-
-
 /**
   Dump the fields of a QTD
 
@@ -104,7 +37,7 @@ EhcError (
 VOID
 EhcDumpQtd (
   IN EHC_QTD              *Qtd,
-  IN UINT8                *Msg
+  IN CHAR8                *Msg
   )
 ;
 
@@ -123,7 +56,7 @@ EhcDumpQtd (
 VOID
 EhcDumpQh (
   IN EHC_QH               *Qh,
-  IN UINT8                *Msg,
+  IN CHAR8                *Msg,
   IN BOOLEAN              DumpBuf
   )
 ;
@@ -145,19 +78,5 @@ EhcDumpBuf (
   IN UINTN                Len
   )
 ;
-
-#ifdef EFI_DEBUG
-  #define EHC_DEBUG(arg)                  EhcDebug    arg
-  #define EHC_ERROR(arg)                  EhcError    arg
-  #define EHC_DUMP_QH(arg)                EhcDumpQh   arg
-  #define EHC_DUMP_QTD(arg)               EhcDumpQtd  arg
-  #define EHC_DUMP_BUF(arg)               EhcDumpBuf  arg
-#else
-  #define EHC_DEBUG(arg)
-  #define EHC_ERROR(arg)
-  #define EHC_DUMP_QH(arg)
-  #define EHC_DUMP_QTD(arg)
-  #define EHC_DUMP_BUF(arg)
-#endif
 
 #endif
